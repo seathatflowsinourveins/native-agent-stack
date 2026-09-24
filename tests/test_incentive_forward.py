@@ -167,8 +167,18 @@ class BoardVersion(unittest.TestCase):
             rc, record = self.decide(board)
             self.assertEqual((rc, record["reason"], record["protocol_board_version"]), (4, "board_version_mismatch", 1), board.get("board_version"))
             self.assertEqual(record["board_version"], board.get("board_version"))
-        rc, record = self.decide(v1)  # version 1 passes and stops later, at the absent credential file (nothing is read)
-        self.assertEqual((rc, record["reason"], record["board_version"]), (4, "snapshot_failed", 1))
+        rc, record = self.decide(v1)  # version 1 passes; then this bridge's code is not protocol v1's frozen code
+        self.assertEqual((rc, record["reason"], record["board_version"], record["frozen"]), (4, "code_not_frozen", 1, B.M.FROZEN_V1))
+
+    def test_only_the_frozen_code_goes_past_the_code_check(self):
+        from unittest import mock
+        v1, _ = B.M.board_payloads(datetime.now(timezone.utc), [], [], [], [], {"code_sha256": B.sha(B.HERE / "monitor.py")})
+        current = {"monitor.py": B.sha(B.HERE / "monitor.py"), "board_scan.py": B.sha(B.HERE / "board_scan.py")}
+        self.assertNotEqual(current, B.M.FROZEN_V1)   # this code is not protocol v1's
+        self.assertEqual(B.FROZEN_CODE[B.PROTOCOL["id"]], B.M.FROZEN_V1)
+        with mock.patch.dict(B.FROZEN_CODE, {B.PROTOCOL["id"]: current}):
+            rc, record = self.decide(v1)
+        self.assertEqual((rc, record["reason"], record["board_version"]), (4, "snapshot_failed", 1))  # stops at the absent credential file
 
 
 class MonitorBinding(unittest.TestCase):

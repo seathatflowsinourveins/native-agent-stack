@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import gzip
 import hashlib
+import io
 import json
 import os
+import pwd
 import sys
 import tempfile
+import threading
 import time
 import types
 import unittest
@@ -527,15 +531,21 @@ class EventsSSE(unittest.TestCase):
         self.assertIn("reverse_split_corporateaction_event", url)
         self.assertNotIn("cash_dividend", url)
 
-    def test_resume_point_is_the_newest_archived_id(self):
-        with tempfile.TemporaryDirectory() as tmp:
+    def test_resume_point_is_the_last_valid_id_of_the_newest_archive(self):
+        with tempfile.TemporaryDirectory() as tmp:  # the archive appends only ids newer than its last, so the last is the newest
             root = Path(tmp)
-            for name, ids in (("20260922", [ulid(5)]), ("20260923", [ulid(1), ulid(3), ulid(2)])):
+            for name, ids in (("20260922", [ulid(5)]), ("20260923", [ulid(1), ulid(2), ulid(3)])):
                 (root / name).mkdir()
                 (root / name / "corporate-actions.jsonl").write_text("".join(json.dumps({"event_id": i}) + "\n" for i in ids)
-                                                                     + '{"event_id": "not-a-ulid"}\n{"torn')
+                                                                     + '{"unparsed": "x"}\n{"event_id": "not-a-ulid"}\n{"torn')
+            (root / "20260924").mkdir()   # a newer day without an archive
             self.assertEqual(M.last_archived_event_id(root), ulid(3))
             self.assertIsNone(M.last_archived_event_id(root / "empty"))
+            big = root / "20260925"   # read from the end in blocks: a trailing line longer than one block is skipped whole
+            big.mkdir()
+            rows = [json.dumps({"event_id": ulid(10 + i), "pad": "x" * 200}) for i in range(2000)]
+            (big / "corporate-actions.jsonl").write_text("\n".join(rows) + "\n" + json.dumps({"unparsed": "y" * 70_000}) + "\n")
+            self.assertEqual(M.last_archived_event_id(root), ulid(2009))
 
 
 class Screener(unittest.TestCase):
@@ -625,10 +635,13 @@ class OptionChains(unittest.TestCase):
                 if path == M.OPTION_CONTRACTS:
                     return {"option_contracts": [{"symbol": "ABC261002C00010000", "type": "call", "open_interest": "5"}], "next_page_token": None}
                 return {"snapshots": {"ABC261002C00010000": opt(0.5), "ABC261002P00010000": opt(0.7)}, "next_page_token": "more"}
-        args = M.parser().parse_args(["run", "--env-file", "e", "--out", "o", "--oi-per-sweep", "1"])
+
+            def remaining(self, host):
+                return None
+        args = M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o", "--oi-per-sweep", "1"])
         http, state = FakeHttp(), M.State()
         state.today, state.features = self.today, {"ABC": {"p": 10.2}}
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(M, "chain_session_open", lambda at: True):   # inside 09:45-16:00 ET
             sink = M.Sink(Path(tmp))
             self.assertEqual(M.poll_option_chains(http, state, sink, args, ["ABC", "NONE"]), {"roots": 1, "empty": 1})
             self.assertEqual(M.poll_option_oi(http, state, sink, args, ["ABC", "XYZ"]), 1)  # oi_per_sweep
@@ -639,7 +652,7 @@ class OptionChains(unittest.TestCase):
         self.assertEqual(state.no_options, {"NONE"})
         base, path, params = next(c for c in http.calls if c[1].endswith("/ABC"))
         self.assertEqual((base, params["feed"], params["limit"], params["expiration_date_gte"], params["expiration_date_lte"],
-                          params["strike_price_gte"], params["strike_price_lte"]), (M.DATA, "opra", 1000, "2026-10-01", "2026-10-15", 9.18, 11.22))
+                          params["strike_price_gte"], params["strike_price_lte"]), (M.DATA, "opra", 1000, "2026-10-01", "2026-11-05", 9.18, 11.22))
         self.assertEqual(sum(1 for c in http.calls if c[1].endswith("/ABC")), 1)  # one page although more exist
         self.assertEqual((row["symbol"], row["atm_iv"], row["truncated"], row["pages"]), ("ABC", 0.6, True, 1))
         self.assertEqual((oi["symbol"], oi["call_oi"], state.oi["ABC"]["call_oi"]), ("ABC", 5, 5))
@@ -657,7 +670,10 @@ class OptionChains(unittest.TestCase):
                 if params["underlying_symbols"] == "BAD":
                     raise urllib.error.HTTPError(path, 422, "unprocessable", {}, None)
                 return {"option_contracts": [], "next_page_token": None}
-        args = M.parser().parse_args(["run", "--env-file", "e", "--out", "o"])
+
+            def remaining(self, host):
+                return None
+        args = M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o"])
         http, state = FakeHttp(), M.State()
         with tempfile.TemporaryDirectory() as tmp:
             sink = M.Sink(Path(tmp))
@@ -732,26 +748,29 @@ class FinraShortVolume(unittest.TestCase):
 
 class Budgets(unittest.TestCase):
     def args(self, *extra):
-        return M.parser().parse_args(["run", "--env-file", "e", "--out", "o", *extra])
+        return M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o", *extra])
 
     def test_default_plan_is_inside_five_percent_of_the_data_limit(self):
         plan = M.plan_budget(13_500, self.args())
         self.assertEqual(plan["refusals"], [])
         self.assertEqual(plan["sweep_seconds"], 20.0)
-        self.assertEqual(plan["per_sweep"], {"snapshots": 27, "screener": 3, "option_chains": 25, "option_contracts": 2, "edgar": 7,
-                                             "nasdaq_halts": 1, "finra": 1})
-        self.assertEqual((plan["data_per_min"], plan["data_first_min"], plan["data_cap_per_min"]), (165.0, 233.0, 500.0))
-        self.assertEqual((plan["trading_per_min"], plan["trading_cap_per_min"], plan["nasdaq_per_min"]), (7.0, 10.0, 1.0))
+        self.assertEqual(plan["per_sweep"], {"snapshots": 27, "screener": 3, "option_chains": 30, "option_contracts": 0, "edgar": 7,
+                                             "nasdaq_halts": 1, "finra": 1})   # open interest is opt-in (--option-oi)
+        self.assertEqual((plan["per_minute"], plan["once"]), ({"adv_bars": 68}, {"assets": 5, "sec_files": 5}))
+        self.assertEqual((plan["data_per_min"], plan["data_first_min"], plan["data_cap_per_min"]), (180.0, 248.0, 500.0))
+        self.assertEqual((plan["trading_per_min"], plan["trading_cap_per_min"], plan["nasdaq_per_min"]), (1.0, 10.0, 1.0))
+        self.assertEqual(M.plan_budget(13_500, self.args("--option-oi"))["trading_per_min"], 7.0)
         self.assertEqual(plan["streams"]["corporate_actions"]["connects_per_min"], 2)
 
     def test_plans_above_the_caps_are_refused(self):
         refused = lambda *extra: M.plan_budget(13_500, self.args(*extra))["refusals"]
-        self.assertEqual(refused("--sweep-seconds", "5"), ["data_calls_above_5pct_of_limit", "trading_calls_above_5pct_of_limit"])  # 55 + 2 every 5 s
+        self.assertEqual(refused("--sweep-seconds", "5", "--option-oi"), ["data_calls_above_5pct_of_limit", "trading_calls_above_5pct_of_limit"])  # 60 + 2 every 5 s
         self.assertEqual(refused("--option-roots", "150"), ["data_calls_above_5pct_of_limit"])
-        self.assertEqual(refused("--oi-per-sweep", "4"), ["trading_calls_above_5pct_of_limit"])
+        self.assertEqual(refused("--oi-per-sweep", "4", "--option-oi"), ["trading_calls_above_5pct_of_limit"])
+        self.assertEqual(refused("--oi-per-sweep", "4"), [])   # open interest off: no trading calls planned
         self.assertEqual(refused("--rss-seconds", "20"), ["nasdaq_rss_more_than_once_per_minute"])
         self.assertEqual(refused("--option-pages", "0"), ["invalid_bounds"])
-        self.assertEqual(refused("--sweep-seconds", "5", "--no-option-chains", "--no-screener", "--no-option-oi"), [])  # 324/min + 68 once
+        self.assertEqual(refused("--sweep-seconds", "5", "--no-option-chains", "--no-screener"), [])  # 324/min + 68 a minute
 
     def test_sources_by_url(self):
         urls = {"https://data.alpaca.markets/v2/stocks/snapshots?x": "snapshots", "https://data.alpaca.markets/v2/stocks/bars?x": "adv_bars",
@@ -817,7 +836,7 @@ class BoardV2(unittest.TestCase):
         state.haltbook.stream_status({"S": "C", "sc": "P", "rc": "LUDP", "t": "2026-09-24T14:30:00Z", "z": "C"}, "r")  # a volatility pause
         state.ca.observe(ca_event(ulid(1), "reverse_split", id="rs", symbol="D", ex_date="2026-09-28"))
         state.iv.first["E"] = {"at": "2026-09-24T13:50:00+00:00", "iv": 0.5, "expiry": "2026-10-02"}
-        state.iv.last["E"] = {"at": "2026-09-24T14:55:00+00:00", "iv": 0.7, "expiry": "2026-10-02"}
+        state.iv.last["E"] = {"at": "2026-09-24T14:59:50+00:00", "iv": 0.7, "expiry": "2026-10-02"}
         state.short_volume = {"F": {"ratio": 0.9, "total": 500_000, "short": 450_000, "date": "20260923"}}
         state.screener = {"A": {"volume_rank": 3}}
         return state
@@ -833,7 +852,7 @@ class BoardV2(unittest.TestCase):
         self.assertEqual(rows["A"]["context"]["screener"], {"volume_rank": 3})
         self.assertEqual(incentive, ["A", "B", "D", "E"])  # C is price-triggered and F volume-derived
         parts = {s: M.v2_components(state, s, M.score(s, state.features[s], None, 0, [], [], None), self.at, state.ca.by_symbol(state.today))[0]
-                 for s in "CDEF"}
+                 for s in "CDEF"}   # (parts, context, superseded v1 parts)
         self.assertEqual(parts, {"C": {"stream_volatility_halt": 1.0}, "D": {"corporate_action": 0.5}, "E": {"iv_runup": 1.0},
                                  "F": {"short_volume_high": 0.5}})
 
@@ -856,62 +875,132 @@ class BoardV2(unittest.TestCase):
         self.assertEqual((v2["weights_v2"], v1["incentive_symbols"], v1["monitor"]), (M.V2_WEIGHTS, ["A"], {"code_sha256": "x"}))
 
 
+class Market:
+    """A synthetic response router for whole-pipeline runs (local integration: urlopen is replaced, nothing leaves the host)."""
+
+    def __init__(self, now=None, remaining="9000"):
+        self.now = now or datetime.now(timezone.utc)
+        self.today = self.now.astimezone(M.ET).date()
+        self.expiry = (self.today + M.timedelta(days=8)).strftime("%y%m%d")
+        self.remaining, self.opened, self.on_request = remaining, [], None
+        self.halts = HALTS.replace(b"PMAX", b"AAA").replace(b"09/24/2026", self.today.strftime("%m/%d/%Y").encode()).replace(b"10:08:56.356", b"00:00:01.000")
+        self.split = ca_event(ulid(1_790_000_000_001), "reverse_split", id="r1", symbol="BBB", ex_date=self.today.isoformat())
+        self.bar = f"{self.today.isoformat()}T13:30:00Z"
+
+    def snap(self, p):
+        return {"latestTrade": {"p": p, "t": self.now.isoformat()}, "latestQuote": {"bp": p - 0.01, "ap": p + 0.01},
+                "dailyBar": {"t": self.bar, "c": p, "v": 1000}, "prevDailyBar": {"c": 10.0}, "minuteBar": {"v": 5, "t": self.bar}}
+
+    def route(self, url):
+        if "/v2/assets" in url:
+            return [{"symbol": "AAA", "name": "Aaa Inc", "tradable": True}, {"symbol": "BBB", "name": "Bbb Corp", "tradable": True}]
+        if "company_tickers.json" in url:
+            return {"0": {"cik_str": 1490906, "ticker": "AAA", "title": "Example Holdings"}}
+        if "/v2/stocks/bars" in url:
+            return {"bars": {"AAA": [{"v": 1000}] * 20, "BBB": [{"v": 1000}] * 20}, "next_page_token": None}
+        if "/v2/stocks/snapshots" in url:
+            return {"AAA": self.snap(11.0), "BBB": self.snap(10.0)}
+        if "browse-edgar" in url:
+            return EDGAR
+        if "nasdaqtrader.com" in url:
+            return self.halts
+        if "most-actives" in url:
+            return {"most_actives": [{"symbol": "AAA", "volume": 5, "trade_count": 2}], "last_updated": "x"}
+        if "/movers" in url:
+            return {"gainers": [{"symbol": "AAA", "percent_change": 10.0, "change": 1.0, "price": 11.0}], "losers": [], "market_type": "stocks"}
+        if "/v1beta1/options/snapshots/AAA" in url:
+            return {"snapshots": {f"AAA{self.expiry}C00011000": opt(0.5, bar_t=self.bar), f"AAA{self.expiry}P00011000": opt(0.7, bar_t=self.bar)},
+                    "next_page_token": None}
+        if "/v2/options/contracts" in url:
+            return {"option_contracts": [{"symbol": f"AAA{self.expiry}C00011000", "type": "call", "open_interest": "12"}], "next_page_token": None}
+        if url.startswith("https://cdn.finra.org/"):
+            return FINRA.replace(b"20260923", url[-12:-4].encode())
+        if url.startswith(M.CA_EVENTS):
+            return [f"data: {json.dumps([self.split])}\n", "\n"]
+        raise AssertionError(f"unexpected request {url}")
+
+    def urlopen(self, request, timeout):
+        self.opened.append(request.full_url)
+        if self.on_request:
+            self.on_request(request.full_url)
+        body = self.route(request.full_url)
+        if isinstance(body, list) and body and isinstance(body[0], str):
+            return Response(lines=body)
+        headers = {"X-Ratelimit-Limit": "10000", "X-Ratelimit-Remaining": self.remaining} if "alpaca.markets" in request.full_url else {}
+        return Response(body=body if isinstance(body, bytes) else json.dumps(body).encode(), headers=headers)
+
+    def run(self, argv, tmp: Path, *patches, session_open=True):
+        """M.main(argv) with this router, fake credentials, the chain session clock fixed and no version 1 monitor on the
+        host (the test host's own processes never decide a result); returns the exit code."""
+        with contextlib.ExitStack() as stack:
+            for patch in (mock.patch.object(M.urllib.request, "urlopen", self.urlopen), mock.patch.object(M, "credentials", lambda path: ("key", "secret")),
+                          mock.patch.object(M, "sec_identity", lambda: "Example Research admin@example.com"),
+                          mock.patch.object(M, "chain_session_open", lambda at: session_open),
+                          mock.patch.object(M, "live_v1_monitors", lambda proc=None: []), *patches):
+                stack.enter_context(patch)
+            return M.main([*argv, "--env-file", str(tmp / "absent.env"), "--lease-dir", str(tmp / "leases")])
+
+
+def day_files(out: Path) -> dict:
+    """{name: parsed content} of the newest day directory: .jsonl as lists of records, .json as objects."""
+    day = sorted(out.glob("[0-9]" * 8))[-1]
+    found = {}
+    for path in day.iterdir():
+        if path.suffix == ".jsonl":
+            found[path.name] = [json.loads(line) for line in path.read_text().splitlines()]
+        elif path.suffix == ".json":
+            found[path.name] = json.loads(path.read_text())
+    return found
+
+
+class FakeStreams:
+    """Stand-ins for the websockets and msgpack modules: every connect is recorded and its socket stays silent."""
+
+    def __init__(self):
+        self.connects = []
+        streams = self
+
+        class WS:
+            async def send(self, data):
+                return None
+
+            async def recv(self):
+                await asyncio.sleep(3600)
+
+        class Connect:
+            def __init__(self, url, **kwargs):
+                streams.connects.append(url)
+
+            async def __aenter__(self):
+                return WS()
+
+            async def __aexit__(self, *exc):
+                return False
+        self.modules = {"websockets": types.SimpleNamespace(connect=Connect), "msgpack": types.SimpleNamespace(packb=lambda x: b"x", unpackb=None)}
+
+    def patch(self):
+        return mock.patch.dict(sys.modules, self.modules)
+
+
 class OnceSweep(unittest.TestCase):
     """The whole `once` pipeline against synthetic responses (local integration: urlopen is replaced, nothing leaves the host)."""
 
+    def sweep(self, *extra, patches=(), prepare=None, market=None, session_open=True):
+        market = market or Market()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            out = tmp / "out"
+            if prepare:
+                prepare(out, market)
+            rc = market.run(["once", "--standalone", "--out", str(out), "--option-oi", *extra], tmp, *patches, session_open=session_open)
+            files = day_files(out) if list(out.glob("[0-9]" * 8)) else {}
+            modes = {p.name: p.stat().st_mode & 0o777 for p in out.rglob("*") if p.is_file()}
+        return rc, files, modes, market
+
     def test_one_sweep_writes_both_boards_inside_the_budget(self):
-        now = datetime.now(timezone.utc)
-        today = now.astimezone(M.ET).date()
-        expiry = (today + M.timedelta(days=8)).strftime("%y%m%d")
-        halts = HALTS.replace(b"PMAX", b"AAA").replace(b"09/24/2026", today.strftime("%m/%d/%Y").encode()).replace(b"10:08:56.356", b"00:00:01.000")
-        split = ca_event(ulid(1_790_000_000_001), "reverse_split", id="r1", symbol="BBB", ex_date=today.isoformat())
-        bar = f"{today.isoformat()}T13:30:00Z"
-        snap = lambda p: {"latestTrade": {"p": p, "t": now.isoformat()}, "latestQuote": {"bp": p - 0.01, "ap": p + 0.01},
-                          "dailyBar": {"t": bar, "c": p, "v": 1000}, "prevDailyBar": {"c": 10.0}, "minuteBar": {"v": 5, "t": bar}}
-        opened = []
-
-        def route(url):
-            if "/v2/assets" in url:
-                return [{"symbol": "AAA", "name": "Aaa Inc", "tradable": True}, {"symbol": "BBB", "name": "Bbb Corp", "tradable": True}]
-            if "company_tickers.json" in url:
-                return {"0": {"cik_str": 1490906, "ticker": "AAA", "title": "Example Holdings"}}
-            if "/v2/stocks/bars" in url:
-                return {"bars": {"AAA": [{"v": 1000}] * 20, "BBB": [{"v": 1000}] * 20}, "next_page_token": None}
-            if "/v2/stocks/snapshots" in url:
-                return {"AAA": snap(11.0), "BBB": snap(10.0)}
-            if "browse-edgar" in url:
-                return EDGAR
-            if "nasdaqtrader.com" in url:
-                return halts
-            if "most-actives" in url:
-                return {"most_actives": [{"symbol": "AAA", "volume": 5, "trade_count": 2}], "last_updated": "x"}
-            if "/movers" in url:
-                return {"gainers": [{"symbol": "AAA", "percent_change": 10.0, "change": 1.0, "price": 11.0}], "losers": [], "market_type": "stocks"}
-            if "/v1beta1/options/snapshots/AAA" in url:
-                return {"snapshots": {f"AAA{expiry}C00011000": opt(0.5, bar_t=bar), f"AAA{expiry}P00011000": opt(0.7, bar_t=bar)}, "next_page_token": None}
-            if "/v2/options/contracts" in url:
-                return {"option_contracts": [{"symbol": f"AAA{expiry}C00011000", "type": "call", "open_interest": "12"}], "next_page_token": None}
-            if url.startswith("https://cdn.finra.org/"):
-                return FINRA.replace(b"20260923", url[-12:-4].encode())
-            if url.startswith(M.CA_EVENTS):
-                return [f"data: {json.dumps([split])}\n", "\n"]
-            raise AssertionError(f"unexpected request {url}")
-
-        def fake_urlopen(request, timeout):
-            opened.append(request.full_url)
-            body = route(request.full_url)
-            if isinstance(body, list) and body and isinstance(body[0], str):
-                return Response(lines=body)
-            headers = {"X-Ratelimit-Limit": "10000", "X-Ratelimit-Remaining": "9000"} if "alpaca.markets" in request.full_url else {}
-            return Response(body=body if isinstance(body, bytes) else json.dumps(body).encode(), headers=headers)
-        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(M.urllib.request, "urlopen", fake_urlopen), \
-                mock.patch.object(M, "credentials", lambda path: ("key", "secret")), mock.patch.object(M, "sec_identity", lambda: "Example Research admin@example.com"):
-            out = Path(tmp) / "out"
-            self.assertEqual(M.main(["once", "--env-file", str(Path(tmp) / "absent.env"), "--out", str(out), "--lease-dir", str(Path(tmp) / "leases")]), 0)
-            day = next(out.glob("[0-9]" * 8))
-            v1, v2 = (json.loads((day / name).read_text()) for name in ("board.json", "board-v2.json"))
-            monitor = [json.loads(line) for line in (day / "monitor.jsonl").read_text().splitlines()]
-            modes = {p.name: p.stat().st_mode & 0o777 for p in day.rglob("*") if p.is_file()} | {"finra": next((out / "finra").glob("*.txt")).stat().st_mode & 0o777}
+        rc, files, modes, market = self.sweep()
+        self.assertEqual(rc, 0)
+        v1, v2, monitor = files["board.json"], files["board-v2.json"], files["monitor.jsonl"]
         events = [m.get("event") for m in monitor]
         self.assertEqual(events, ["start", "budget", "restored", "ca_context", "sweep", "stop"])
         budget, sweep = monitor[1], monitor[4]
@@ -927,11 +1016,69 @@ class OnceSweep(unittest.TestCase):
         self.assertEqual((aaa["symbol"], aaa["score_v1"], aaa["context"]["screener"]["volume_rank"], aaa["context"]["options"]["call_oi"]), ("AAA", v1["board"][0]["score"], 1, 12))
         self.assertEqual((aaa["context"]["halt"]["state"], aaa["context"]["short_volume"]["ratio"], aaa["parts"]["short_volume_high"]), ("halted", 0.85, 0.5))
         self.assertEqual(aaa["score"], round(aaa["score_v1"] + 0.5, 3))  # v1 parts unchanged plus the one v2 part
+        self.assertEqual({k: v for k, v in aaa.items() if k not in ("score", "score_v1", "parts", "context")},
+                         {k: v for k, v in v1["board"][0].items() if k not in ("score", "parts")})   # the same v1 row
         self.assertIn("BBB", v2["incentive_symbols"])  # the corporate-action context replay surfaced its reverse split
         self.assertNotIn("BBB", v1["incentive_symbols"])
         self.assertEqual(set(modes.values()), {0o600})
         self.assertTrue(all(u.startswith(("https://data.alpaca.markets/", "https://paper-api.alpaca.markets/", "https://www.sec.gov/",
-                                          "https://www.nasdaqtrader.com/", "https://cdn.finra.org/", M.CA_EVENTS)) for u in opened))
+                                          "https://www.nasdaqtrader.com/", "https://cdn.finra.org/", M.CA_EVENTS)) for u in market.opened))
+        self.assertTrue(any("region=us" in u for u in market.opened if u.startswith(M.CA_EVENTS)))
+
+    def test_no_chain_is_sampled_outside_the_option_session(self):
+        rc, files, _, _ = self.sweep(session_open=False)
+        sweep = next(m for m in files["monitor.jsonl"] if m.get("event") == "sweep")
+        self.assertEqual(rc, 0)
+        self.assertNotIn("option_chains", sweep["source_calls"])
+        self.assertNotIn("option_contracts", sweep["source_calls"])
+        self.assertNotIn("options-iv.jsonl", files)
+
+    def test_optional_data_sources_pause_below_the_rate_limit_floor(self):
+        rc, files, _, _ = self.sweep(patches=(mock.patch.object(M.Http, "data_remaining", lambda self: M.RATELIMIT_FLOOR - 500),))
+        sweep = next(m for m in files["monitor.jsonl"] if m.get("event") == "sweep")
+        self.assertEqual((rc, sweep["ratelimit_floor"]), (0, 3000))
+        self.assertFalse({"screener", "option_chains", "option_contracts"} & set(sweep["source_calls"]))
+        self.assertEqual(sweep["source_calls"]["snapshots"], 1)   # the required sources still run
+
+    def test_a_board_v2_failure_never_stops_board_v1(self):
+        def broken(*a, **k):
+            raise TypeError("unhashable type: 'list'")
+        rc, files, _, _ = self.sweep(patches=(mock.patch.object(M, "build_board_v2", broken),))
+        sweep = next(m for m in files["monitor.jsonl"] if m.get("event") == "sweep")
+        self.assertEqual(rc, 0)
+        self.assertEqual(files["board.json"]["board"][0]["symbol"], "AAA")
+        self.assertNotIn("board-v2.json", files)
+        self.assertEqual(sweep["board_v2_error"], "TypeError: unhashable type: 'list'")
+
+    def test_an_old_archive_resumes_from_its_last_id_and_an_empty_one_from_the_retained_history(self):
+        captured = []
+        real = M.EventStream
+
+        class Capture(real):
+            def __init__(self, *a, **k):
+                captured.append((a[3], k.get("last_id")))
+                super().__init__(*a, **k)
+        old = ulid(int((datetime.now(timezone.utc) - M.timedelta(days=30)).timestamp() * 1000))
+
+        def archive(out, market):
+            folder = out / (market.today - M.timedelta(days=30)).strftime("%Y%m%d")
+            folder.mkdir(parents=True)
+            (folder / "corporate-actions.jsonl").write_text(json.dumps({"event_id": old}) + "\n")
+        _, files, _, _ = self.sweep(patches=(mock.patch.object(M, "EventStream", Capture),), prepare=archive)
+        self.assertEqual(captured[-1][1], old)   # a 30-day-old resume id is kept, not dropped
+        self.assertNotIn("ca_resume_gap", [m.get("event") for m in files["monitor.jsonl"]])
+        self.sweep(patches=(mock.patch.object(M, "EventStream", Capture),))
+        self.assertEqual((captured[-1][0], captured[-1][1]), (datetime(2020, 1, 1, tzinfo=timezone.utc), None))
+
+    def test_this_monitor_refuses_to_run_beside_the_frozen_v1_bridge(self):
+        here = Path(M.__file__).resolve().parent
+        pinned = {**M.FROZEN_V1, "board_scan.py": hashlib.sha256((here / "board_scan.py").read_bytes()).hexdigest()}
+        called = []
+        rc, files, _, market = self.sweep(patches=(mock.patch.dict(M.FROZEN_V1, pinned),
+                                                   mock.patch.object(M, "credentials", lambda path: called.append("credentials") or ("k", "s")),
+                                                   mock.patch.object(M, "sec_identity", lambda: called.append("sec") or "x")))
+        self.assertEqual((rc, market.opened, called), (2, [], []))   # nothing read, nothing requested
+        self.assertEqual(files["monitor.jsonl"][-1], {**files["monitor.jsonl"][-1], "event": "stop", "refused": ["beside_frozen_v1_bridge"]})
 
 
 class RestoreV2(unittest.TestCase):
@@ -954,8 +1101,698 @@ class RestoreV2(unittest.TestCase):
         self.assertEqual(counts, {"status": 1, "status_unreadable": 1, "rss_events": 1, "luld": 1, "options_iv_previous": 1, "options_iv": 1, "options_oi": 1})
         now = datetime(2026, 9, 24, 15, tzinfo=timezone.utc)
         self.assertEqual((state.haltbook.stream_category("B"), state.haltbook.state("Q", now)["state"], state.haltbook.band("B")["u"]), ("news", "paused", 11.0))
-        self.assertEqual((state.iv.change("E", now)["baseline"], state.oi["E"]["call_oi"]), ("previous_session", 5))
+        fresh = datetime(2026, 9, 24, 13, 50, 20, tzinfo=timezone.utc)   # 20 s after the restored sample
+        self.assertEqual((state.iv.change("E", fresh)["baseline"], state.oi["E"]["call_oi"]), ("previous_session", 5))
+        self.assertIsNone(state.iv.change("E", now))   # the restored latest sample is over an hour old: no change until the next one
         self.assertNotIn("OLD", state.haltbook.symbols())
+
+
+# ---------------------------------------------------------------- review fixes (synthetic fixtures; no network)
+
+class Coexistence(unittest.TestCase):
+    """Version 2 beside the running version 1 monitor: a follower holds no news or OPRA connection and makes no EDGAR or
+    Nasdaq RSS request; it reads those inputs from version 1's files (local integration against synthetic responses)."""
+
+    def v1_files(self, root: Path, market) -> Path:
+        day = root / market.today.strftime("%Y%m%d")
+        day.mkdir(parents=True)
+        received = market.now.isoformat()
+        rows = {"news": [{"id": 7, "received_at": received, "symbols": ["AAA"], "headline": "h"}],
+                "halts": [{"IssueSymbol": "AAA", "HaltDate": market.today.strftime("%m/%d/%Y"), "HaltTime": "00:00:01.000", "ReasonCode": "T1",
+                           "received_at": received}],
+                "edgar": [{"accession": "a1", "cik": 1490906, "form": "8-K", "role": "Filer", "items": ["2.02"], "tickers": ["AAA"], "received_at": received}],
+                "options-minute": [{"drained_at": "x", "root": "AAA", "cells": {"C|0-7": [100, 300000.0, 5]}}],
+                "options-large": [{"root": "AAA"}] * 3,
+                "monitor": [{"event": "sweep", "at": received}]}
+        for name, items in rows.items():
+            (day / f"{name}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in items))
+        return day
+
+    def test_a_follower_holds_no_news_or_opra_connection_and_polls_neither_edgar_nor_the_rss(self):
+        market, streams = Market(), FakeStreams()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            v1, out = tmp / "v1", tmp / "out"
+            v1_day = self.v1_files(v1, market)
+            with streams.patch():
+                rc = market.run(["run", "--follow-v1", str(v1), "--out", str(out), "--until-et", "00:00", "--no-corporate-actions"], tmp)
+            files = day_files(out)
+            v1_listing = sorted(p.name for p in v1_day.iterdir())
+        self.assertEqual(rc, 0)
+        self.assertEqual(streams.connects, [])   # no news, OPRA or IEX connection
+        self.assertEqual([u for u in market.opened if "sec.gov" in u or "nasdaqtrader.com" in u], [])
+        monitor = files["monitor.jsonl"]
+        start, budget = monitor[0], next(m for m in monitor if m.get("event") == "budget")
+        sweep = next(m for m in monitor if m.get("event") == "sweep")
+        self.assertEqual((start["role"], start["from_v1_files"]), ("follower", ["opra_trades", "news", "edgar", "nasdaq_halts"]))
+        self.assertEqual((budget["per_sweep"]["edgar"], budget["per_sweep"]["nasdaq_halts"], budget["once"]["sec_files"]), (0, 0, 0))
+        self.assertEqual((budget["streams"]["news"]["connections"], budget["streams"]["opra"]["connections"], budget["nasdaq_per_min"]), (0, 0, 0.0))
+        self.assertNotIn("board.json", files)   # version 1's board is version 1's own
+        aaa = next(r for r in files["board-v2.json"]["board"] if r["symbol"] == "AAA")
+        self.assertEqual({k: aaa["parts"][k] for k in ("news", "news_halt", "material_8k", "short_dated_calls", "large_option_prints")},
+                         {"news": 1.0, "news_halt": 2.0, "material_8k": 1.0, "short_dated_calls": 1.5, "large_option_prints": 0.5})
+        self.assertEqual(aaa["context"]["halt"]["source"], "rss")
+        self.assertEqual((sweep["follow_v1_heartbeat"]["event"], sweep["follow_v1"]["news"], sweep["source_calls"].get("edgar")), ("sweep", 1, None))
+        self.assertEqual(([k for k in sweep if k.endswith("_error")], sweep["budget_refused"]), ([], {}))   # not even a refused attempt
+        self.assertEqual(v1_listing, ["edgar.jsonl", "halts.jsonl", "monitor.jsonl", "news.jsonl", "options-large.jsonl", "options-minute.jsonl"])
+
+    def test_the_follower_applies_each_complete_line_once(self):
+        state = M.State()
+        state.today = date(2026, 9, 24)
+        row = json.dumps({"root": "R", "cells": {"C|0-7": [10, 1000.0, 2]}})
+        with tempfile.TemporaryDirectory() as tmp:
+            day = Path(tmp) / "20260924"
+            day.mkdir()
+            minute = day / "options-minute.jsonl"
+            minute.write_text(row + "\n" + row[:10])   # the second line is still being written
+            follow = M.FollowV1(Path(tmp), state.today)
+            follow.poll(state)
+            follow.poll(state)
+            self.assertEqual(state.options.day["R"]["C_volume"], 10)
+            with minute.open("a") as f:
+                f.write(row[10:] + "\n" + "not json\n")
+            counts = follow.poll(state)
+            follow.poll(state)
+        self.assertEqual((state.options.day["R"]["C_volume"], counts["options_minutes"], counts["options-minute_unreadable"]), (20, 2, 1))
+        self.assertEqual(M.FollowV1(Path(tmp), state.today).heartbeat(datetime.now(timezone.utc)), {"event": None, "age_s": None})
+
+    def test_every_run_declares_its_role(self):
+        base = ["run", "--env-file", "e", "--out", "o"]
+        with mock.patch("sys.stderr", new=io.StringIO()):
+            for argv in (base, base + ["--standalone", "--follow-v1", "d"], ["once", "--env-file", "e", "--out", "o"]):
+                with self.assertRaises(SystemExit):
+                    M.parser().parse_args(argv)
+        self.assertTrue(M.parser().parse_args(base + ["--standalone"]).standalone)
+        self.assertEqual(M.parser().parse_args(base + ["--follow-v1", "d"]).follow_v1, Path("d"))
+
+    def test_a_follower_needs_an_existing_version_1_directory_other_than_its_own(self):
+        market = Market()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            rc = market.run(["run", "--follow-v1", str(tmp / "missing"), "--out", str(tmp / "out"), "--until-et", "00:00", "--no-corporate-actions"], tmp)
+            refused = day_files(tmp / "out")["monitor.jsonl"][-1]["refused"]
+            (tmp / "same").mkdir()
+            rc2 = market.run(["run", "--follow-v1", str(tmp / "same"), "--out", str(tmp / "same"), "--until-et", "00:00", "--no-corporate-actions"], tmp)
+            refused2 = day_files(tmp / "same")["monitor.jsonl"][-1]["refused"]
+        self.assertEqual((rc, refused, rc2, refused2, market.opened), (2, ["follow_v1_directory_missing"], 2, ["follow_v1_is_this_out_directory"], []))
+
+    def test_version_1_monitors_on_this_host_are_found_from_proc(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proc, deploy = Path(tmp) / "proc", Path(tmp) / "deploy"
+            deploy.mkdir()
+            (deploy / "monitor.py").write_text("# a version 1 copy\n")
+            processes = {"4242": ["python3", "monitor.py", "run", "--env-file", "e", "--out", "o"],           # version 1 (relative path)
+                         "4243": ["python3", str(deploy / "monitor.py"), "run", "--standalone", "--env-file", "e", "--out", "o"],
+                         "4244": ["python3", str(deploy / "monitor.py"), "run", "--follow-v1", "v1", "--env-file", "e", "--out", "o"],
+                         "4245": ["python3", str(deploy / "monitor.py"), "once", "--env-file", "e", "--out", "o"],
+                         "4246": ["python3", "other.py", "run", "--env-file", "e", "--out", "o"], "self": ["x"]}
+            for pid, argv in processes.items():
+                (proc / pid).mkdir(parents=True)
+                (proc / pid / "cmdline").write_bytes(b"\0".join(a.encode() for a in argv) + b"\0")
+                os.symlink(deploy, proc / pid / "cwd")
+            self.assertEqual(M.live_v1_monitors(proc), [4242])
+            frozen = hashlib.sha256((deploy / "monitor.py").read_bytes()).hexdigest()
+            with mock.patch.dict(M.FROZEN_V1, {"monitor.py": frozen}):   # the frozen file, whatever its arguments
+                self.assertEqual(M.live_v1_monitors(proc), [4242, 4243, 4244])
+            self.assertEqual(M.live_v1_monitors(Path(tmp) / "absent"), [])
+
+    def test_standalone_refuses_while_a_version_1_monitor_runs_here(self):
+        market = Market()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "v1").mkdir()
+            live = mock.patch.object(M, "live_v1_monitors", lambda proc=None: [4242])
+            rc = market.run(["once", "--standalone", "--out", str(tmp / "out")], tmp, live)
+            refused = day_files(tmp / "out")["monitor.jsonl"][-1]["refused"]
+            opened = list(market.opened)
+            rc2 = market.run(["once", "--follow-v1", str(tmp / "v1"), "--out", str(tmp / "out2"), "--no-corporate-actions"], tmp, live)
+        self.assertEqual((rc, refused, opened), (2, ["v1_monitor_running_use_follow_v1"], []))
+        self.assertEqual(rc2, 0)   # a follower runs beside it
+
+    def test_the_lease_directory_does_not_depend_on_the_environment(self):
+        found = set()
+        for env in ({"XDG_RUNTIME_DIR": "/run/user/1000", "HOME": "/tmp/a"}, {"XDG_RUNTIME_DIR": "", "HOME": "/tmp/b"}):
+            with mock.patch.dict(os.environ, env):
+                found.add(M.default_lease_dir())
+        self.assertEqual(found, {Path(pwd.getpwuid(os.getuid()).pw_dir) / ".cache" / "alpaca-stream-leases"})
+
+
+class StreamBackoff(unittest.TestCase):
+    def run_stream(self, batches, stop_after, **kwargs):
+        connects, holder = [], {}
+
+        class WS:
+            def __init__(self, queue):
+                self.queue = [json.dumps(b) for b in queue]
+
+            async def send(self, data):
+                return None
+
+            async def recv(self):
+                if self.queue:
+                    return self.queue.pop(0)
+                await asyncio.sleep(3600)
+
+        class Connect:
+            def __init__(self, url, **kw):
+                connects.append(url)
+                if len(connects) >= stop_after:
+                    holder["stop"].set()
+                self.ws = WS(batches[min(len(connects), len(batches)) - 1])
+
+            async def __aenter__(self):
+                return self.ws
+
+            async def __aexit__(self, *exc):
+                return False
+        fakes = {"websockets": types.SimpleNamespace(connect=Connect), "msgpack": types.SimpleNamespace(packb=None, unpackb=None)}
+        with tempfile.TemporaryDirectory() as tmp:
+            sink, state = M.Sink(Path(tmp)), M.State()
+
+            async def main():
+                holder["stop"] = asyncio.Event()
+                await M.stream("news", M.NEWS_WS, {"action": "subscribe", "news": ["*"]}, {}, lambda m: None, state, sink, holder["stop"], False,
+                               backoff=lambda attempt: 0, **kwargs)
+            with mock.patch.dict(sys.modules, fakes):
+                asyncio.run(asyncio.wait_for(main(), 10))
+            sink.close()
+            return connects, records(tmp, "monitor")
+
+    WELCOME, AUTHORIZED = [{"T": "success", "msg": "connected"}], [{"T": "success", "msg": "authenticated"}]
+    LIMIT = [{"T": "error", "code": 406, "msg": "connection limit exceeded"}]
+
+    def test_welcome_batches_before_a_406_never_reset_the_backoff(self):
+        _, monitor = self.run_stream([[self.WELCOME, self.AUTHORIZED, self.LIMIT]], stop_after=4)
+        self.assertEqual([m["attempt"] for m in monitor if m["event"] == "stream_down"], [1, 2, 3])
+
+    def test_a_data_message_resets_the_backoff(self):
+        data = [{"T": "n", "id": 1, "symbols": ["X"]}]
+        _, monitor = self.run_stream([[self.WELCOME, self.LIMIT], [self.WELCOME, data, self.LIMIT], [self.WELCOME, self.LIMIT]], stop_after=4)
+        self.assertEqual([m["attempt"] for m in monitor if m["event"] == "stream_down"], [1, 1, 2])
+
+    def test_an_error_that_reconnecting_cannot_heal_stops_the_stream(self):
+        connects, monitor = self.run_stream([[self.WELCOME, [{"T": "error", "code": 409, "msg": "insufficient subscription"}]]], stop_after=5)
+        self.assertEqual((len(connects), [m["event"] for m in monitor]), (1, ["stream_connected", "stream_error", "stream_stopped"]))
+
+
+class OptionSession(unittest.TestCase):
+    et = staticmethod(lambda h, m, s=0: datetime(2026, 9, 24, h, m, s, tzinfo=M.ET))
+
+    def test_the_option_session_is_0945_to_1600_et(self):
+        self.assertEqual([M.chain_session_open(self.et(*t)) for t in ((9, 44, 59), (9, 45), (15, 59, 59), (16, 0), (19, 59))],
+                         [False, True, True, False, False])
+
+    def test_samples_outside_the_session_never_count(self):
+        iv = M.IVTracker(max_age=60)
+        iv.prev["X"] = {"at": "2026-09-23T19:55:00+00:00", "iv": 0.50, "expiry": "2026-10-16"}   # 15:55 ET yesterday
+        iv.observe("X", self.et(9, 0), {"atm_iv": 0.80, "expiry": "2026-10-16"})   # pre-market: stale option quotes
+        self.assertEqual((iv.last, iv.first, iv.runup("X", self.et(9, 0, 30))), ({}, {}, None))
+        iv.observe("X", self.et(16, 30), {"atm_iv": 0.80, "expiry": "2026-10-16"})
+        self.assertEqual(iv.last, {})
+        iv.observe("X", self.et(10, 0), {"atm_iv": 0.62, "expiry": "2026-10-16"})
+        self.assertEqual(iv.runup("X", self.et(10, 0, 30))["baseline"], "previous_session")
+
+    def test_the_previous_session_baseline_is_its_last_sample_by_1600(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "20260923").mkdir()
+            (root / "20260924").mkdir()
+            rows = [{"symbol": "E", "received_at": "2026-09-23T19:55:00+00:00", "atm_iv": 0.5, "expiry": "2026-10-16"},   # 15:55 ET
+                    {"symbol": "E", "received_at": "2026-09-23T23:59:00+00:00", "atm_iv": 0.8, "expiry": "2026-10-16"}]   # 19:59 ET
+            (root / "20260923" / "options-iv.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+            state = M.State()
+            state.today = date(2026, 9, 24)
+            counts = M.restore_v2(state, root, root / "20260924")
+        self.assertEqual((state.iv.prev["E"]["iv"], counts["options_iv_previous"], counts["options_iv_previous_outside_session"]), (0.5, 1, 1))
+
+    def test_the_first_value_today_is_the_baseline_only_for_its_own_expiry(self):
+        iv = M.IVTracker(max_age=60)
+        iv.observe("X", self.et(9, 50), {"atm_iv": 0.50, "expiry": "2026-10-02"})
+        iv.observe("X", self.et(10, 30), {"atm_iv": 0.70, "expiry": "2026-10-09"})   # the target expiry moved
+        self.assertIsNone(iv.runup("X", self.et(10, 30, 10)))   # +40% across two expiries is not a run-up
+        self.assertEqual((iv.first["X"]["expiry"], iv.change("X", self.et(10, 30, 10))["baseline_age_s"]), ("2026-10-09", 10))
+        iv.observe("X", self.et(11, 5), {"atm_iv": 0.85, "expiry": "2026-10-09"})
+        self.assertEqual(iv.runup("X", self.et(11, 5, 10))["chg"], round(0.85 / 0.70 - 1, 4))
+        iv.first["Y"] = {"at": M.iso(self.et(9, 50)), "iv": 0.5, "expiry": "2026-10-02"}   # e.g. a restored baseline of another expiry
+        iv.last["Y"] = {"at": M.iso(self.et(11, 0)), "iv": 0.9, "expiry": "2026-10-09"}
+        self.assertIsNone(iv.change("Y", self.et(11, 0, 10)))   # never compared across expiries
+
+    def test_a_stale_latest_sample_no_longer_counts(self):
+        iv = M.IVTracker(max_age=40)
+        iv.observe("X", self.et(10, 0), {"atm_iv": 0.5, "expiry": "2026-10-02"})
+        iv.observe("X", self.et(10, 40), {"atm_iv": 0.7, "expiry": "2026-10-02"})
+        found = iv.runup("X", self.et(10, 40, 30))
+        self.assertEqual((found["last_at"], found["baseline"]), (M.iso(self.et(10, 40)), "first_today"))
+        self.assertIsNone(iv.change("X", self.et(10, 41)))   # the root left the sampled set a minute ago
+        state = M.State()
+        state.iv = iv
+        self.assertEqual(("X" in M.v2_symbols(state, self.et(10, 40, 30), {}), "X" in M.v2_symbols(state, self.et(10, 41), {})), (True, False))
+
+
+class ChainWindow(unittest.TestCase):
+    today = date(2026, 9, 24)
+
+    def args(self, *extra):
+        return M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o", *extra])
+
+    def test_a_monthly_only_root_22_days_out_is_found(self):
+        class FakeHttp:
+            def alpaca_json(self, base, path, params):
+                if params["expiration_date_gte"] <= "2026-10-16" <= params["expiration_date_lte"]:
+                    return {"snapshots": {"MTH261016C00010000": opt(0.6), "MTH261016P00010000": opt(0.8)}, "next_page_token": None}
+                return {"snapshots": {}, "next_page_token": None}
+        state = M.State()
+        state.today, state.features = self.today, {"MTH": {"p": 10.1}}
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            stats = M.poll_option_chains(FakeHttp(), state, sink, self.args(), ["MTH"])
+            sink.close()
+            (row,) = records(tmp, "options-iv")
+        self.assertEqual((stats, state.no_options, row["expiry"], row["dte"], row["atm_iv"]), ({"roots": 1}, set(), "2026-10-16", 22, 0.7))
+        for n in range(34):   # on any day the window holds the next standard monthly (third Friday) expiry
+            day = date(2026, 1, 1) + M.timedelta(days=n * 11)
+            first = date.fromisoformat(M.chain_params(None, day, self.args())["expiration_date_gte"])
+            last = date.fromisoformat(M.chain_params(None, day, self.args())["expiration_date_lte"])
+            self.assertTrue([d for d in (first + M.timedelta(days=i) for i in range((last - first).days + 1)) if d.weekday() == 4 and 15 <= d.day <= 21], day)
+
+    def test_an_empty_in_band_chain_is_asked_again_without_the_band(self):
+        class FakeHttp:
+            def __init__(self):
+                self.calls = []
+
+            def alpaca_json(self, base, path, params):
+                root = path.rsplit("/", 1)[1]
+                self.calls.append((root, "strike_price_gte" in params))
+                if root == "NONE" or "strike_price_gte" in params:
+                    return {"snapshots": {}, "next_page_token": None}
+                return {"snapshots": {f"{root}261002C00012500": opt(0.9), f"{root}261002P00012500": opt(1.1)}, "next_page_token": None}
+        state, http = M.State(), FakeHttp()
+        state.today, state.features = self.today, {"MOV": {"p": 20.0}, "NONE": {"p": 5.0}, "LATE": {"p": 7.0}}
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            polls = [M.poll_option_chains(http, state, sink, self.args("--option-retries", n), [root]) for root, n in (("MOV", "1"), ("MOV", "1"), ("NONE", "1"), ("LATE", "0"))]
+            sink.close()
+            rows = records(tmp, "options-iv")
+        self.assertEqual(polls, [{"roots": 1, "unbanded_retry": 1}, {"roots": 1}, {"unbanded_retry": 1, "empty": 1}, {"retry_deferred": 1}])
+        self.assertEqual(http.calls, [("MOV", True), ("MOV", False), ("MOV", False), ("NONE", True), ("NONE", False), ("LATE", True)])
+        self.assertEqual((state.chain_unbanded, state.no_options), ({"MOV"}, {"NONE"}))   # LATE is asked again next sweep
+        self.assertEqual([(r["symbol"], r["strike"], r["banded"]) for r in rows], [("MOV", 12.5, False), ("MOV", 12.5, False)])
+        self.assertEqual(M.plan_budget(13_500, self.args())["per_sweep"]["option_chains"], 30)   # 25 roots and 5 retries a sweep
+
+    def test_a_stalled_chain_endpoint_cannot_hold_the_sweep(self):
+        release = threading.Event()
+
+        class FakeHttp:
+            def alpaca_json(self, base, path, params):
+                if path.endswith("/SLOW"):
+                    release.wait(5)
+                return {"snapshots": {"FAST261002C00010000": opt(0.5)}, "next_page_token": None}
+        state = M.State()
+        state.today, state.features = self.today, {"FAST": {"p": 10.0}, "SLOW": {"p": 10.0}}
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            started = time.monotonic()
+            stats = M.poll_option_chains(FakeHttp(), state, sink, self.args(), ["FAST", "SLOW"], deadline_s=0.3)
+            elapsed = time.monotonic() - started
+            release.set()
+            sink.close()
+        self.assertEqual(stats, {"roots": 1, "deadline": 1})
+        self.assertLess(elapsed, 2.0)
+
+
+class OpenInterest(unittest.TestCase):
+    def test_open_interest_is_opt_in_and_pauses_near_the_trading_limit(self):
+        base = ["run", "--standalone", "--env-file", "e", "--out", "o"]
+        self.assertFalse(M.parser().parse_args(base).option_oi)
+        args = M.parser().parse_args(base + ["--option-oi"])
+
+        class FakeHttp:
+            def __init__(self, left):
+                self.left, self.calls = left, []
+
+            def remaining(self, host):
+                return self.left if host == M.TRADING_HOST else None
+
+            def alpaca_json(self, base, path, params):
+                self.calls.append(params["underlying_symbols"])
+                return {"option_contracts": [], "next_page_token": None}
+        state = M.State()
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            low, high = FakeHttp(M.TRADING_RATELIMIT_FLOOR - 1), FakeHttp(M.TRADING_RATELIMIT_FLOOR)
+            self.assertEqual((M.poll_option_oi(low, state, sink, args, ["A", "B"]), low.calls), (0, []))
+            self.assertEqual((M.poll_option_oi(high, state, sink, args, ["A", "B"]), high.calls), (2, ["A", "B"]))
+            sink.close()
+        http = M.Http({}, None)
+        http.ratelimit[M.TRADING_HOST] = {"remaining": "42"}
+        self.assertEqual((http.remaining(M.TRADING_HOST), http.data_remaining()), (42, None))
+
+
+class FinraRetries(unittest.TestCase):
+    now = datetime(2026, 9, 24, 17, 0, tzinfo=M.ET)   # before publication: the due file is the 23rd's
+
+    def fake(self, failure):
+        class FakeHttp:
+            def __init__(self):
+                self.urls, self.fail = [], True
+
+            def get(self, url, kind, headers, timeout=20):
+                self.urls.append(url.rsplit("/", 1)[1])
+                if url.endswith("20260923.txt") and self.fail:
+                    if isinstance(failure, bytes):
+                        return failure
+                    raise failure
+                return FINRA.replace(b"20260923", url[-12:-4].encode())
+        return FakeHttp()
+
+    def test_every_failure_waits_an_hour_before_the_same_file_is_asked_again(self):
+        failures = {"no_trailer": FINRA.replace(b"3\r\n", b""), "server_error": urllib.error.HTTPError("u", 503, "unavailable", {}, None),
+                    "network_error": urllib.error.URLError("timed out"), "other_day": FINRA.replace(b"20260923", b"20260922")}
+        for name, failure in failures.items():
+            clock = [1000.0]
+            tick = lambda: clock[0]
+            http, state = self.fake(failure), M.State()
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmp:
+                sink = M.Sink(Path(tmp))
+                with self.assertRaises((ValueError, urllib.error.URLError)):
+                    M.poll_finra(http, state, sink, self.now, clock=tick)
+                self.assertEqual(M.poll_finra(http, state, sink, self.now, clock=tick), "20260922")   # the previous weekday meanwhile
+                self.assertIsNone(M.poll_finra(http, state, sink, self.now, clock=tick))
+                clock[0] += M.FINRA_RETRY_SECONDS
+                http.fail = False
+                self.assertEqual(M.poll_finra(http, state, sink, self.now, clock=tick), "20260923")
+                self.assertEqual(http.urls, ["CNMSshvol20260923.txt", "CNMSshvol20260922.txt", "CNMSshvol20260923.txt"])
+                self.assertTrue((Path(tmp) / "finra" / "CNMSshvol20260923.txt").exists())
+
+    def test_a_stored_file_is_checked_once_more_after_the_next_publication(self):
+        class FakeHttp:
+            def __init__(self):
+                self.urls = []
+
+            def get(self, url, kind, headers, timeout=20):
+                self.urls.append(url.rsplit("/", 1)[1])
+                if url.endswith("20260923.txt"):
+                    return FINRA.replace(b"850000.5", b"860000.5")   # FINRA updated the file on a later day
+                return FINRA.replace(b"20260923", url[-12:-4].encode())
+        http, state = FakeHttp(), M.State()
+        now = datetime(2026, 9, 24, 18, 30, tzinfo=M.ET)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "finra").mkdir(mode=0o700)
+            (root / "finra" / "CNMSshvol20260923.txt").write_bytes(FINRA)
+            (root / "finra" / "CNMSshvol20260923.json").write_text(json.dumps({"date": "20260923", "received_at": "2026-09-23T22:10:00+00:00",
+                                                                               "sha256": hashlib.sha256(FINRA).hexdigest(), "rows": 3}))
+            sink = M.Sink(root)
+            self.assertEqual(M.poll_finra(http, state, sink, now), "20260924")   # a new file first
+            self.assertEqual(M.poll_finra(http, state, sink, now), "updated:20260923")
+            self.assertIsNone(M.poll_finra(http, state, sink, now))   # once only
+            manifest = json.loads((root / "finra" / "CNMSshvol20260923.json").read_text())
+            (kept,) = (root / "finra" / "superseded").glob("CNMSshvol20260923.*.txt")
+            self.assertEqual((manifest["recheck"], manifest["supersedes"], kept.read_bytes()), ("updated", hashlib.sha256(FINRA).hexdigest(), FINRA))
+            self.assertEqual(M.load_short_volume(root, date(2026, 9, 23))[1]["AAA"]["short"], 860000.5)
+        self.assertEqual(http.urls, ["CNMSshvol20260924.txt", "CNMSshvol20260923.txt"])
+
+
+class HaltComponents(unittest.TestCase):
+    at = datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc)
+
+    def state(self):
+        state = M.State()
+        state.today = date(2026, 9, 24)
+        state.features = {s: {"s": s, "chg": 0.02, "p": 10.0, "v": None, "spr_bps": 10.0} for s in ("M1", "P1")}
+        return state
+
+    def test_any_rss_halt_today_blocks_the_stream_volatility_part(self):
+        state = self.state()
+        state.halts["M1"].append({"IssueSymbol": "M1", "ReasonCode": "M"})   # an RSS code version 1 does not score
+        state.haltbook.stream_status({"S": "M1", "sc": "2", "rc": "M", "t": "2026-09-24T14:00:00Z", "z": "A"}, "r")
+        row = M.score_candidates(state, self.at)["M1"]
+        self.assertEqual((row["parts"], M.v2_components(state, "M1", row, self.at, {})[0]), ({}, {}))
+
+    def test_a_stream_news_halt_replaces_the_v1_volatility_halt(self):
+        state = self.state()
+        state.halts["P1"].append({"IssueSymbol": "P1", "ReasonCode": "LUDP"})   # the RSS lists a pause at 10:00
+        state.haltbook.stream_status({"S": "P1", "sc": "H", "rc": "T1", "t": "2026-09-24T14:30:00Z", "z": "C"}, "r")   # the stream's news halt at 10:30
+        board, incentive = M.build_board_v2(state, self.at)
+        (p1,) = [r for r in board if r["symbol"] == "P1"]
+        self.assertEqual((p1["parts"], p1["score"], p1["score_v1"], p1["context"]["superseded_v1_parts"]),
+                         ({"stream_news_halt": 2.0}, 2.0, 1.0, ["volatility_halt"]))
+        self.assertIn("P1", incentive)
+
+    def test_an_ongoing_halt_from_an_earlier_day_enters_the_merged_state_only(self):
+        rows = HALTS.replace(b"<ndaq:HaltDate>09/24/2026", b"<ndaq:HaltDate>09/22/2026")   # halted two days ago, not resumed
+
+        class FakeHttp:
+            def get(self, url, kind, headers, timeout=20):
+                return rows
+        state = M.State()
+        state.today = date(2026, 9, 24)
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            self.assertEqual(M.poll_halts(FakeHttp(), state, sink), 0)
+            sink.close()
+            self.assertFalse(list(Path(tmp).glob("*/halts.jsonl")))   # version 1's halt rows stay today's
+        self.assertEqual((state.haltbook.state("PMAX", self.at)["state"], "PMAX" in state.halts), ("halted", False))
+        resumed = M.parse_halts(rows.replace(b"<ndaq:ResumptionDate>09/24/2026", b"<ndaq:ResumptionDate>09/22/2026").replace(
+            b"<ndaq:ResumptionTradeTime />", b"<ndaq:ResumptionTradeTime>15:00:00</ndaq:ResumptionTradeTime>"), "r")[0]
+        fresh = M.State()
+        self.assertEqual((fresh.haltbook.rss_ongoing(resumed, state.today), state.haltbook.rss_ongoing(resumed, state.today)), (False, True))
+
+    def test_a_resumption_moved_later_replaces_the_earlier_one(self):
+        book = M.HaltBook()
+        row = {"IssueSymbol": "X", "HaltDate": "09/24/2026", "HaltTime": "11:00:00", "ReasonCode": "T1", "ResumptionDate": "09/24/2026",
+               "ResumptionQuoteTime": "11:55:00", "ResumptionTradeTime": "12:00:00"}
+        extended = {**row, "ResumptionQuoteTime": "12:25:00", "ResumptionTradeTime": "12:30:00"}
+        self.assertEqual((book.rss_row(row), book.rss_row(extended), book.rss_row(extended)), (3, 2, 0))
+        at = lambda *t: datetime(2026, 9, 24, *t, tzinfo=M.ET)
+        self.assertEqual([book.state("X", at(*t))["state"] for t in ((12, 10), (12, 25, 6), (12, 30, 6))], ["halted", "quotation_only", "trading"])
+        self.assertEqual(len(book.events["X"]), 3)
+
+
+class CorporateActionFixes(unittest.TestCase):
+    today = date(2026, 9, 24)
+
+    def test_an_action_inserted_today_stays_fresh_after_its_updates(self):
+        cas, e = M.CorporateActions(), lambda n: ulid(1_790_000_000_000 + n)
+        cas.observe(ca_event(e(1), "cash_merger", id="cm", acquiree_symbol="TGT", acquirer_symbol="BUY", effective_date="2026-12-20",
+                             at="2026-09-24T13:00:00Z"))
+        cas.observe(ca_event(e(2), "cash_merger", action="update", id="cm", acquiree_symbol="TGT", acquirer_symbol="BUY", rate="42.5",
+                             effective_date="2026-12-20", at="2026-09-24T14:00:00Z"))
+        (item,) = cas.by_symbol(self.today)["TGT"]
+        self.assertEqual((item["in_window"], item["action"], item["inserted_at"], item["days"]), (True, "update", "2026-09-24T13:00:00Z", 87))
+        self.assertNotIn("TGT", cas.by_symbol(date(2026, 9, 25)))   # fresh on its insert day only, and 86 days out is beyond the context
+
+    def test_non_us_events_are_archived_but_never_surfaced(self):
+        us, foreign = ulid(1_790_000_000_001), ulid(1_790_000_000_002)
+        events = [ca_event(us, "reverse_split", id="u1", symbol="RSX", ex_date="2026-09-25"),
+                  {**ca_event(foreign, "reverse_split", id="f1", symbol="SAME", ex_date="2026-09-25"), "region": "non_us"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            sink, state = M.Sink(Path(tmp)), M.State()
+            stream = M.EventStream({}, sink, state, datetime(2026, 9, 24, 4, tzinfo=timezone.utc))
+            stream.consume([f"data: {json.dumps(events)}\n", "\n"], archive=True)
+            sink.close()
+            archived = [r["event_id"] for r in records(tmp, "corporate-actions")]
+        self.assertEqual((archived, stream.counts["surfaced"], set(state.ca.by_symbol(self.today))), ([us, foreign], 1, {"RSX"}))
+
+    def test_a_malformed_symbol_never_breaks_the_context(self):
+        cas = M.CorporateActions()
+        self.assertTrue(cas.observe(ca_event(ulid(5), "forward_split", id="bad", symbol=["LIST"], ex_date="2026-09-25")))
+        self.assertEqual(cas.by_symbol(self.today), {})
+
+    def test_a_resume_records_a_gap_only_when_the_resume_id_is_not_redelivered(self):
+        old, kept, later = ulid(1_787_000_000_000), ulid(1_787_000_000_001), ulid(1_790_000_000_000)
+        lines = lambda eid: [f"id: {eid}\n", f"data: {json.dumps([ca_event(eid, 'cash_dividend', id=eid)])}\n", "\n"]
+        with tempfile.TemporaryDirectory() as tmp:
+            sink, state = M.Sink(Path(tmp)), M.State()
+            responses, resumes = [Response(lines(old) + lines(kept)), Response(lines(later))], []
+            stream = M.EventStream({}, sink, state, datetime(2026, 9, 24, 4, tzinfo=timezone.utc), last_id=old, backoff=lambda a: 0, connects_per_min=10)
+
+            def opener(request, timeout):
+                resumes.append(request.get_header("Last-event-id"))
+                if not responses:
+                    stream.stop_event.set()
+                    raise OSError("synthetic end")
+                return responses.pop(0)
+            stream.opener = opener
+            stream.run()
+            sink.close()
+            gaps = [r for r in records(tmp, "monitor") if r["event"] == "ca_resume_gap"]
+            archived = [r["event_id"] for r in records(tmp, "corporate-actions")]
+        self.assertEqual(resumes, [old, kept, later])   # a month-old resume id is used as it is
+        self.assertEqual(archived, [kept, later])
+        self.assertEqual([(g["resume_id"], g["first_id"]) for g in gaps], [(kept, later)])   # only the second resume missed its id
+
+    def test_at_most_two_connects_a_minute_the_context_replay_included(self):
+        clock = [0.0]
+        stream = M.EventStream({}, None, M.State(), datetime(2026, 9, 24, tzinfo=timezone.utc), clock=lambda: clock[0])
+        allowed = []
+        for t in (0.0, 1.0, 10.0, 59.9, 60.0, 61.5, 62.0):
+            clock[0] = t
+            allowed.append(stream.may_connect())
+        self.assertEqual(allowed, [True, True, False, False, True, True, False])
+        opened = []
+        stream.opener = lambda request, timeout: opened.append(request) or Response([])
+        stream.context = (datetime(2026, 8, 25, tzinfo=timezone.utc), datetime(2026, 9, 24, tzinfo=timezone.utc))
+        stream.stop_event.set()   # the budget is spent: the replay waits (and here stops) instead of connecting
+        stream.run_context()
+        self.assertEqual((opened, stream.counts["connect_budget_waits"]), ([], 1))
+
+    def test_the_context_replay_ends_at_its_deadline(self):
+        clock, timeouts = [0.0], []
+
+        def tick():
+            clock[0] += 1.0
+            return clock[0]
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            stream = M.EventStream({}, sink, M.State(), datetime(2026, 9, 24, tzinfo=timezone.utc), clock=tick,
+                                   opener=lambda request, timeout: timeouts.append(timeout) or Response([": keep-alive\n"] * 1000))
+            with self.assertRaises(TimeoutError):
+                stream.replay_context(datetime(2026, 8, 25, tzinfo=timezone.utc), datetime(2026, 9, 24, 14, tzinfo=timezone.utc), deadline_s=30)
+            stream.context = (datetime(2026, 8, 25, tzinfo=timezone.utc), datetime(2026, 9, 24, 14, tzinfo=timezone.utc))
+            stream.run_context()
+            sink.close()
+            (error,) = [r for r in records(tmp, "monitor") if r["event"] == "ca_context_error"]
+        self.assertEqual((timeouts, error["error"]), ([M.CA_CONTEXT_READ_TIMEOUT] * 2, "TimeoutError: ca_context_deadline"))
+
+    def test_where_an_empty_archive_starts(self):
+        today = date(2026, 9, 24)
+        self.assertEqual(M.ca_archive_start("retained", today), datetime(2020, 1, 1, tzinfo=timezone.utc))
+        self.assertEqual(M.ca_archive_start("today", today), datetime(2026, 9, 24, 4, tzinfo=timezone.utc))
+        self.assertEqual(M.ca_archive_start("2026-09-01T00:00:00Z", today), datetime(2026, 9, 1, tzinfo=timezone.utc))
+        with mock.patch("sys.stderr", new=io.StringIO()), self.assertRaises(SystemExit):
+            M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o", "--ca-archive-since", "yesterday"])
+
+
+class DailyBars(unittest.TestCase):
+    symbols = [f"S{i:03d}" for i in range(450)]
+
+    def test_a_failed_load_resumes_at_the_failed_request(self):
+        class FakeHttp:
+            def __init__(self):
+                self.calls, self.failing = [], 3
+
+            def alpaca_json(self, base, path, params):
+                first = params["symbols"].split(",")[0]
+                self.calls.append((first, params.get("page_token")))
+                if first == "S200" and self.failing:
+                    self.failing -= 1
+                    raise urllib.error.HTTPError(path, 429, "too many requests", {}, None)
+                if first == "S000" and not params.get("page_token"):
+                    return {"bars": {"S000": [{"v": 10}] * 5}, "next_page_token": "p2"}
+                return {"bars": {s: [{"v": 20}] * 5 for s in params["symbols"].split(",")}, "next_page_token": None}
+        loader, http = M.AdvLoader(self.symbols, date(2026, 9, 24), sleep=lambda s: None), FakeHttp()
+        with self.assertRaises(urllib.error.HTTPError):
+            loader.run(http)
+        adv = loader.run(http)
+        self.assertEqual(http.calls, [("S000", None), ("S000", "p2"), ("S200", None), ("S200", None), ("S200", None), ("S200", None), ("S400", None)])
+        self.assertEqual((len(adv), adv["S000"], adv["S449"], loader.failures), (450, 15.0, 20.0, 3))
+
+    def test_a_budget_refusal_ends_the_attempt_at_once(self):
+        class Refusing:
+            calls = 0
+
+            def alpaca_json(self, base, path, params):
+                Refusing.calls += 1
+                raise M.BudgetExceeded("adv_bars")
+        slept = []
+        loader = M.AdvLoader(self.symbols, date(2026, 9, 24), sleep=slept.append)
+        with self.assertRaises(M.BudgetExceeded):
+            loader.run(Refusing())
+        self.assertEqual((Refusing.calls, slept, loader.index), (1, [], 0))
+
+    def test_the_daily_bar_load_stays_inside_its_per_minute_cap(self):
+        clock = [0.0]
+        budget = M.Budget(per_minute={"adv_bars": 2}, clock=lambda: clock[0])
+        taken = []
+        for t in (0.0, 1.0, 2.0, 59.0, 60.5, 61.5):
+            clock[0] = t
+            taken.append(budget.take("adv_bars"))
+        self.assertEqual((taken, budget.refused["adv_bars"]), ([True, True, False, False, True, True], 2))
+        budget.start_sweep()   # a per-minute cap does not reset with the sweep
+        clock[0] = 62.0
+        self.assertFalse(budget.take("adv_bars"))
+
+    def test_a_zero_rss_interval_is_refused_not_divided_by(self):
+        args = M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o", "--rss-seconds", "0"])
+        self.assertEqual(M.plan_budget(13_500, args)["refusals"], ["invalid_bounds"])
+
+
+class IexRecorder(unittest.TestCase):
+    def test_status_luld_and_imbalance_messages_land_in_their_files_with_tape_counts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sink, state = M.Sink(Path(tmp)), M.State()
+            on_iex = M.iex_handler(state, sink)
+            for msg in ({"T": "s", "S": "AAA", "sc": "H", "rc": "T1", "t": "2026-09-24T14:00:00Z", "z": "C"},
+                        {"T": "l", "S": "BBB", "u": 11.0, "d": 9.0, "i": "B", "t": "2026-09-24T14:00:00Z", "z": "A"},
+                        {"T": "i", "S": "CCC", "p": 5.5, "t": "2026-09-24T14:00:00Z", "z": "B"},
+                        {"T": "s", "S": "DDD", "sc": "2", "rc": "M", "t": "2026-09-24T14:01:00Z", "z": "A"}):
+                on_iex(msg)
+            sink.close()
+            files = {name: records(tmp, name) for name in ("status", "luld", "imbalance")}
+        self.assertEqual({k: [r["S"] for r in v] for k, v in files.items()}, {"status": ["AAA", "DDD"], "luld": ["BBB"], "imbalance": ["CCC"]})
+        self.assertTrue(all(r["received_at"] for v in files.values() for r in v))
+        self.assertEqual(dict(state.iex_tapes), {"s:C": 1, "l:A": 1, "i:B": 1, "s:A": 1})
+        self.assertEqual((state.haltbook.stream_category("AAA"), state.haltbook.stream_category("DDD"), state.haltbook.band("BBB")["u"]),
+                         ("news", "volatility", 11.0))
+
+    def test_the_iex_stream_is_opt_in_and_refused_while_a_declared_engine_config_streams_iex(self):
+        self.assertFalse(M.parser().parse_args(["run", "--standalone", "--env-file", "e", "--out", "o"]).iex_status)
+        market, streams = Market(), FakeStreams()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            engine = tmp / "engine.json"
+            engine.write_text(json.dumps({"feed": "iex"}))
+            with streams.patch():
+                rc = market.run(["run", "--standalone", "--out", str(tmp / "out"), "--until-et", "00:00", "--no-corporate-actions",
+                                 "--iex-status", "--engine-config", str(engine)], tmp)
+            monitor = day_files(tmp / "out")["monitor.jsonl"]
+        (refused,) = [m for m in monitor if m.get("event") == "stream_refused"]
+        self.assertEqual(rc, 0)
+        self.assertEqual(sorted(streams.connects), sorted([M.NEWS_WS, M.OPRA_WS]))   # no IEX connection
+        self.assertEqual((refused["endpoint"], refused["reason"], refused["configs"]), ("v2-iex", "engine_config_streams_iex", [str(engine)]))
+
+
+class RunLoop(unittest.TestCase):
+    def test_two_sweeps_inside_a_minute_make_one_rss_request_and_one_edgar_cycle(self):
+        market, streams, snapshots = Market(), FakeStreams(), []
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            out = tmp / "out"
+
+            def on_request(url):
+                if "/v2/stocks/snapshots" in url:
+                    snapshots.append(url)
+                    if len(snapshots) == 2:
+                        (out / "STOP").touch()
+            market.on_request = on_request
+            with streams.patch():
+                rc = market.run(["run", "--standalone", "--out", str(out), "--until-et", "23:59", "--sweep-seconds", "1", "--edgar-seconds", "30",
+                                 "--no-corporate-actions", "--no-screener", "--no-option-chains", "--no-finra"], tmp)
+            sweeps = [m for m in day_files(out)["monitor.jsonl"] if m.get("event") == "sweep"]
+        self.assertEqual((rc, len(sweeps)), (0, 2))
+        self.assertEqual((sum("nasdaqtrader.com" in u for u in market.opened), sum("browse-edgar" in u for u in market.opened)), (1, 7))
+        self.assertEqual([("halt_changes" in s, "edgar_new" in s) for s in sweeps], [(True, True), (False, False)])
+        self.assertEqual(sorted(streams.connects), sorted([M.NEWS_WS, M.OPRA_WS]))
+
+
+class PairedBoards(unittest.TestCase):
+    def test_board_v2_rows_carry_board_v1_scores_of_the_same_pass(self):
+        at = datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc)
+        state = M.State()
+        state.today = date(2026, 9, 24)
+        state.features = {s: {"s": s, "chg": 0.02, "p": 10.0, "v": None, "spr_bps": 10.0} for s in ("N", "Z")}
+        state.news["N"] = {1: at.timestamp() - 60}
+        state.halts["N"].append({"IssueSymbol": "N", "ReasonCode": "T1"})
+        actions = state.ca.by_symbol(state.today)
+        rows, v1 = M.score_rows(state, at, M.v2_scoring_extra(state, at, actions))
+        board, _ = M.build_board(state, at, rows={s: rows[s] for s in v1})
+        state.news["N"].update({2: at.timestamp() - 30, 3: at.timestamp() - 10})   # arrives while the chains are polled
+        state.filings["Z"].append({"form": "SC TO-T", "items": [], "role": "Subject"})
+        board_v2, incentive_v2 = M.build_board_v2(state, at, rows=rows, v1=v1, actions=actions)
+        (n1,), (n2,) = [r for r in board if r["symbol"] == "N"], [r for r in board_v2 if r["symbol"] == "N"]
+        self.assertEqual((n2["score_v1"], n2["parts"], n1["parts"]["news"]), (n1["score"], n1["parts"], 1.0))
+        self.assertNotIn("Z", incentive_v2)   # scored at the next sweep, in both boards alike
 
 
 if __name__ == "__main__":
