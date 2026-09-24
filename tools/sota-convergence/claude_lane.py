@@ -296,7 +296,9 @@ def main(argv=None) -> int:
     audit_items = {f"{layer['catalog']}__{layer['layer_id']}": {
         "marker": str(layer.get("packet_path") or ""), "roots": [export, str(layer.get("packet_path") or "")]}
         for layer in result.get("layers") or [] if isinstance(layer.get("final"), dict)}
-    report = transcript_audit.audit(args.transcripts, audit_items, marker_prefix=packets_dir + "/")
+    # Bound to the run that returned this result, from this export.
+    report = transcript_audit.audit(args.transcripts, audit_items, marker_prefix=packets_dir + "/", export=export,
+                                    result=result)
     (out_dir / TRANSCRIPT_AUDIT_NAME).write_text(json.dumps({"dir": str(args.transcripts.resolve()), **report},
                                                             indent=1, sort_keys=True) + "\n", encoding="utf-8")
     written, without_final, failures = [], [], []

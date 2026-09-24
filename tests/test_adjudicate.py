@@ -98,8 +98,10 @@ class AdjudicateFixture(unittest.TestCase):
         # not pass its own gets clean transcripts for the inputs claude-args gave the workflow.
         real_collect = adjudicate.collect_claude
         def collect(work_dir, result, model, repo_override=None, transcripts=None):
+            unwrapped = result["result"] if (isinstance(result, dict) and "items" not in result
+                                             and isinstance(result.get("result"), dict)) else result
             return real_collect(work_dir, result, model, repo_override,
-                                transcripts if transcripts is not None else self.clean_transcripts())
+                                transcripts if transcripts is not None else self.clean_transcripts(unwrapped))
         collect_patch = mock.patch.object(adjudicate, "collect_claude", collect)
         collect_patch.start()
         self.addCleanup(collect_patch.stop)
@@ -165,10 +167,19 @@ class AdjudicateFixture(unittest.TestCase):
                 record["events"][stage] = {"path": str(path), "sha256": adjudicate.sha256_file(path)}
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
-    def write_transcripts(self, inputs: dict, extra_reads=()) -> Path:
-        """A workflow run's agent transcripts: one judge agent per input ("<name>.<order>" -> input path) whose
-        prompt names its Input file line and which reads that input, plus ``extra_reads``."""
-        directory = Path(tempfile.mkdtemp(dir=self.base))
+    def write_transcripts(self, inputs: dict, extra_reads=(), result=None) -> Path:
+        """A completed workflow run as Claude Code keeps it (<session>/workflows/<run>.json and
+        <session>/subagents/workflows/<run>/agent-<id>.jsonl): one judge agent per input ("<name>.<order>" -> input
+        path) whose prompt names its Input file line and which reads that input, plus ``extra_reads``; the run
+        record holds ``result``."""
+        session = Path(tempfile.mkdtemp(dir=self.base))
+        directory = session / "subagents" / "workflows" / "wf_test"
+        directory.mkdir(parents=True)
+        (session / "workflows").mkdir()
+        ids = [f"a{index:04d}" for index in range(len(inputs))]
+        (session / "workflows" / "wf_test.json").write_text(json.dumps({
+            "status": "completed", "result": result,
+            "workflowProgress": [{"type": "workflow_agent", "agentId": agent} for agent in ids]}), encoding="utf-8")
         for index, (key, input_path) in enumerate(sorted(inputs.items())):
             calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": str(input_path)}},
                      *({"type": "tool_use", "name": "Read", "input": {"file_path": str(path)}} for path in extra_reads),
@@ -176,18 +187,19 @@ class AdjudicateFixture(unittest.TestCase):
             lines = [{"type": "user", "cwd": str(self.repo), "message": {"role": "user", "content":
                       f"Input file: {input_path}\nPacket file: x\nRepository root: {self.repo}"}},
                      {"type": "assistant", "cwd": str(self.repo), "message": {"role": "assistant", "content": calls}}]
-            (directory / f"agent-{index:04d}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
-                                                                 encoding="utf-8")
+            (directory / f"agent-{ids[index]}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
+                                                                  encoding="utf-8")
         return directory
 
-    def clean_transcripts(self) -> Path:
-        """Clean transcripts for every input the current claude-args snapshot gave the workflow."""
+    def clean_transcripts(self, result=None) -> Path:
+        """Clean transcripts for every input the current claude-args snapshot gave the workflow, whose run returned
+        ``result``."""
         path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
         snapshot = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
         index = adjudicate.load_index(self.work)
         inputs = {f"{name}.{order}": input_path for name, order, input_path, _sha in adjudicate.pending_items(index)
                   if f"{name}.{order}" in (snapshot.get("inputs") or {})}
-        return self.write_transcripts(inputs)
+        return self.write_transcripts(inputs, result=result)
 
     def input_body(self, order="AB"):
         """The input with the Claude return as A, whichever position the index's secret map gave it (F3)."""
@@ -453,7 +465,7 @@ class AssembleTests(AdjudicateFixture):
         result_path.write_text(json.dumps(self.as_workflow(result)), encoding="utf-8")
         code, err = quiet(adjudicate.main, ["claude-collect", "--work-dir", str(self.work), "--result",
                                             str(result_path), "--model", "claude-opus-5-5",
-                                            "--transcripts", str(self.clean_transcripts())])
+                                            "--transcripts", str(self.clean_transcripts(json.loads(result_path.read_text(encoding="utf-8"))))])
         self.assertEqual(code, 1)
         self.assertIn("BA: missing", err)
         for order in adjudicate.ORDERS:
@@ -464,7 +476,7 @@ class AssembleTests(AdjudicateFixture):
         self.assert_valid(record)
         code, err = quiet(adjudicate.main, ["claude-collect", "--work-dir", str(self.work), "--result",
                                             str(result_path), "--model", "unknown",
-                                            "--transcripts", str(self.clean_transcripts())])
+                                            "--transcripts", str(self.clean_transcripts(json.loads(result_path.read_text(encoding="utf-8"))))])
         self.assertEqual(code, 2)
 
 
@@ -694,10 +706,14 @@ class LeakTests(AdjudicateFixture):
         with self.assertRaisesRegex(ValueError, "--transcripts"):
             self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5")
         sibling = self.work / "claude" / f"{NAME}.json"
-        flagged = self.write_transcripts(inputs, extra_reads=[sibling])
+        flagged = self.write_transcripts(inputs, extra_reads=[sibling], result=self.as_workflow(self.claude_result()))
         missing = self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5",
                                            transcripts=flagged)
         self.assertEqual(sorted(reason for _stem, reason in missing), [adjudicate.AUDIT_FLAGGED] * 2)
+        audit = json.loads((self.work / "adjudication-judgments" / "claude" / adjudicate.TRANSCRIPT_AUDIT_NAME)
+                           .read_text(encoding="utf-8"))
+        self.assertIsNone(audit["run_issue"])
+        self.assertIn(str(sibling), " ".join(audit["items"][f"{NAME}.AB"]["flagged"]))
         record = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertEqual((record["audit_clean"], record["judge"]), (False, None))
         # A record edited to claim a clean audit is re-audited on the recorded transcripts and still does not count.
@@ -709,9 +725,12 @@ class LeakTests(AdjudicateFixture):
         partial = self.write_transcripts({f"{NAME}.AB": inputs[f"{NAME}.AB"]})
         self.assertEqual(adjudicate.transcript_audit.audit(partial, adjudicate.claude_audit_items(
             adjudicate.load_index(self.work), self.repo, inputs))["flagged_items"], [f"{NAME}.BA"])
-        clean = self.write_transcripts(inputs)
-        missing = self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5",
-                                           transcripts=clean)
+        result = self.as_workflow(self.claude_result())
+        clean = self.write_transcripts(inputs, result=result)
+        # Another run's transcripts (its record holds another result) are refused as a whole.
+        other = self.write_transcripts(inputs, result={"items": []})
+        self.assertEqual(len(self.real_collect_claude(self.work, result, "claude-opus-5-5", transcripts=other)), 2)
+        missing = self.real_collect_claude(self.work, result, "claude-opus-5-5", transcripts=clean)
         self.assertEqual(missing, [])
         record = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertIsNone(adjudicate.claude_transcripts_issue(record, entry))

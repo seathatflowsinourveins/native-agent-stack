@@ -792,6 +792,12 @@ class RealExportIsolationTests(unittest.TestCase):
         exposure = isolation.prose_exposure(export, packets_dir, isolation.ledger_winners(ROOT),
                                             {"schema_version": 1, "packets": sealed})
         self.assertIn("docs/full-stack-convergence.md", exposure["foundation::web-research"]["cited_files"])
+        # Each recorded winner selects at most one adopted candidate (Codex review of #145 at 68e74f2c: data-mlflow
+        # also selected mlflow, alpaca-py also data-alpaca-py, one repository each).
+        adopted = isolation.load_packets(packets_dir, {"schema_version": 1, "packets": sealed})
+        for layer, winners in isolation.ledger_winners(ROOT).items():
+            for winner in winners:
+                self.assertLessEqual(len(isolation.winner_keys(adopted.get(layer) or [], [winner])), 1, (layer, winner))
         self.assertFalse(exposure["foundation::git-github-automation"]["cited_files"])
         # Exported files are verbatim beyond label stripping (round 6, B6-4): a hash-bound listing keeps its bytes.
         for relative in ("evidence/artifacts/usage-report.source.txt",):

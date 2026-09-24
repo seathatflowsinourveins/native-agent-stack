@@ -1390,9 +1390,14 @@ What remains and how it is handled:
 - **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
   limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
   keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py
-  locate` finds the one run of a session). Each agent is mapped to the item its prompt names: a lane packet's path,
-  or an adjudication input's "Input file:" line. Its reads must stay under the export and that item's packet (and
-  input), and it may use no other tool. `claude_lane.py --transcripts` voids a flagged layer (kept as
+  locate` finds the one run of a session). The audit is bound to that run: its record
+  (`<session>/workflows/<run id>.json`) must be completed, list exactly the agents whose transcripts are present
+  and hold the very result being collected, and every agent must have run from the export; the recorded digest
+  covers the transcripts and the record. Each agent is mapped to the item its prompt names: a lane packet's path,
+  or an adjudication input's "Input file:" line. Its reads, compared as resolved paths, must stay under the export
+  and that item's packet (and input), and it may use no other tool, server-side and MCP tools included. An
+  unreadable transcript line, a relative path without a working directory, a glob that climbs with `..` or an
+  agent naming several items flags too. `claude_lane.py --transcripts` voids a flagged layer (kept as
   `.audit-flagged`, recorded as failed). `adjudicate.py claude-collect --transcripts` voids a flagged judgment,
   and records the transcripts' digest with `audit_clean`; `usable_judgment` re-audits them, so an edited record
   does not count. An item no agent served, or a flagged agent that names no item, flags every item. Like the Codex
@@ -1747,7 +1752,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     role labels outside evidence records and packet fields on exactly the winners now fail; record-field hits
     (three records at least, low-cardinality columns only, `evidence_ref` as evidence) and evidence-record role
     words other than winner, incumbent and chosen are reported. The same sweep on this head: 32 of 297 changes in
-    18 layers fail, all on the older container and packet checks (28 of 288 at fe5143e2).
+    18 layers fail (32 of 296 after the exact-id fix below, which leaves one scenario fewer), all on the older container and packet checks (28 of 288 at fe5143e2).
   - **Prose exposure (BL7-1, BL7-2).** A table's body row is scored with its header, so "| Layer | Selected native
     practice |" over the web-research row is an exposure. A statement counts only when it names a winner and no
     adopted non-winner, and states a selection by a choice phrase, a status copula or label, or an imperative

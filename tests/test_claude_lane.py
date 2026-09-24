@@ -92,17 +92,25 @@ class ClaudeLaneWriterTests(unittest.TestCase):
             "lost": ["us-equities/l3"]}), encoding="utf-8")
         # The workflow run's agent transcripts (Codex review of #145 at 68e74f2c): l1's agent read its packet and the
         # export only.
-        self.transcripts = self.tmp / "transcripts"
+        # As Claude Code keeps a workflow run: <session>/workflows/<run>.json (status, result, agents) and
+        # <session>/subagents/workflows/<run>/agent-<id>.jsonl.
+        self.transcripts = self.tmp / "session" / "subagents" / "workflows" / "wf_test"
         self.write_transcript("l1", [str(self.export / "evidence.json")])
 
     def write_transcript(self, layer_id, reads):
-        self.transcripts.mkdir(exist_ok=True)
+        self.transcripts.mkdir(parents=True, exist_ok=True)
         packet = self.packet[layer_id]["packet_path"]
         calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": path}} for path in [packet, *reads]]
         lines = [{"type": "user", "cwd": str(self.export), "message": {"content": f"Read the packet at {packet}"}},
                  {"type": "assistant", "cwd": str(self.export), "message": {"content": calls}}]
         (self.transcripts / f"agent-{layer_id}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
                                                                    encoding="utf-8")
+        record = self.transcripts.parents[2] / "workflows" / "wf_test.json"
+        record.parent.mkdir(parents=True, exist_ok=True)
+        agents = sorted(path.name[len("agent-"):-len(".jsonl")] for path in self.transcripts.glob("agent-*.jsonl"))
+        record.write_text(json.dumps({"status": "completed", "result": json.loads(self.result.read_text(encoding="utf-8")),
+                                      "workflowProgress": [{"type": "workflow_agent", "agentId": agent}
+                                                           for agent in agents]}), encoding="utf-8")
 
     def run_main(self, *extra):
         # The vendored role stands in for the host's installed copy, which CI does not have.
@@ -121,6 +129,17 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertTrue((claude / "foundation__l1.json.audit-flagged").exists())
         failures = json.loads((claude / "failures.json").read_text(encoding="utf-8"))["failures"]
         self.assertIn("transcript audit flagged", next(f["reason"] for f in failures if f["layer_id"] == "l1"))
+
+    def test_another_runs_transcripts_void_every_layer(self):
+        # Round 9 focus: transcripts are bound to the run that returned the collected result.
+        record = self.transcripts.parents[2] / "workflows" / "wf_test.json"
+        data = json.loads(record.read_text(encoding="utf-8"))
+        record.write_text(json.dumps(dict(data, result={"layers": []})), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+        audit = json.loads((self.work / "claude" / "transcript-audit.json").read_text(encoding="utf-8"))
+        self.assertIn("another result", audit["run_issue"])
 
     def test_missing_transcripts_are_refused(self):
         self.transcripts = self.tmp / "no-transcripts"

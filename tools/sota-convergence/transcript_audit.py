@@ -2,14 +2,20 @@
 """Blind audit of a Claude Code workflow run's agent transcripts (Codex review of #145 at 68e74f2c).
 
 The Claude family's blind agents (blind-lane-reviewer, blind-adjudicator) have Read, Glob and Grep with no path
-limit, so their prompts' blind rule is enforced after the fact, as codex_lane.blind_audit does for a Codex child:
-Claude Code keeps every workflow agent's transcript at
-``~/.claude/projects/<cwd slug>/<session id>/subagents/workflows/<run id>/agent-<id>.jsonl``, and each tool call
-there names the path it read. An agent is mapped to the item its prompt names (an adjudication input's
-"Input file: <path>" line, a lane packet's path); every Read, Glob and Grep must stay under that item's allowed
-roots (the blind export and the item's own input and packet), and no other tool may be used except the structured
-return. An item no agent served, or any flagged agent that names no single item, flags the item (all items, for an
-unmapped one), so a wrong or incomplete transcript directory never passes.
+limit, so their prompts' blind rule is enforced after the fact, as codex_lane.blind_audit does for a Codex child.
+Claude Code keeps a headless session's workflow run as
+``~/.claude/projects/<cwd slug>/<session id>/workflows/<run id>.json`` (status, returned result and the agents it
+ran) and each agent's transcript as ``.../<session id>/subagents/workflows/<run id>/agent-<agent id>.jsonl``, where
+every tool call names what it read.
+
+The audit is bound to one run: the run record must exist and be completed, name exactly the agents whose transcripts
+are present, and (when the caller passes it) hold the very result being collected; each agent must have run from
+the export. An agent is mapped to the item its prompt names (an adjudication input's "Input file: <path>" line, a
+lane packet's path). Its Read, Glob and Grep calls must stay under that item's allowed roots (the export and the
+item's own input and packet, compared as resolved paths), and it may use no other tool except the structured
+return. It fails closed: an unreadable transcript line, a tool call it does not model, a relative path without a
+recorded working directory, a glob that climbs with ``..``, an agent naming several items, or an item no agent
+served flags the item; an unmapped flagged agent or a run-level problem flags every item.
 
 A heuristic lower bound, like the Codex audit: it reads the paths the tool calls name, not what a program derived.
 Standard library only.
@@ -23,33 +29,79 @@ import os
 import re
 from pathlib import Path
 
-# The input keys that name what each read tool opened; a missing path reads the agent's working directory.
-READ_TOOL_PATHS = {"Read": ("file_path",), "Glob": ("path", "pattern"), "Grep": ("path",)}
+READ_TOOLS = frozenset({"Read", "Glob", "Grep"})
 QUIET_TOOLS = frozenset({"StructuredOutput"})
 _GLOB_CHARS = re.compile(r"[*?\[{]")
 
 
 def transcript_files(directory) -> list:
-    return sorted(Path(directory).glob("agent-*.jsonl")) if directory and Path(directory).is_dir() else []
+    """Every agent transcript under ``directory``, nested ones included."""
+    return sorted(Path(directory).rglob("agent-*.jsonl")) if directory and Path(directory).is_dir() else []
 
 
 def transcripts_sha256(directory) -> str:
-    """One digest over every agent transcript's name and bytes: binds a judgment to the transcripts it was audited on."""
+    """One digest over every agent transcript's relative path and bytes and the run record's bytes: binds a judgment
+    to the transcripts and run it was audited on."""
     digest = hashlib.sha256()
     for path in transcript_files(directory):
-        digest.update(f"{path.name}\0{hashlib.sha256(path.read_bytes()).hexdigest()}\n".encode("utf-8"))
+        relative = path.relative_to(directory).as_posix()
+        digest.update(f"{relative}\0{hashlib.sha256(path.read_bytes()).hexdigest()}\n".encode("utf-8"))
+    record = run_record_path(directory)
+    if record is not None and record.is_file():
+        digest.update(f"run\0{hashlib.sha256(record.read_bytes()).hexdigest()}\n".encode("utf-8"))
     return digest.hexdigest()
 
 
-def _prompt_calls_cwd(path: Path) -> tuple:
-    """(first user prompt text, [(tool name, input dict)], working directory) of one agent transcript."""
-    prompt, calls, cwd = None, [], None
+def run_record_path(directory):
+    """``<session>/workflows/<run id>.json`` for ``<session>/subagents/workflows/<run id>``, or None."""
+    directory = Path(directory)
+    if len(directory.parents) < 3 or directory.parent.name != "workflows" or directory.parents[1].name != "subagents":
+        return None
+    return directory.parents[2] / "workflows" / f"{directory.name}.json"
+
+
+def _canonical(value) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
+def run_issue(directory, files, result=None):
+    """Why the transcripts are not one completed run's complete record (of ``result``, when given), or None."""
+    record_path = run_record_path(directory)
+    if record_path is None or not record_path.is_file():
+        return "no workflow run record next to the transcripts (<session>/workflows/<run id>.json)"
+    try:
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return "the workflow run record is unreadable"
+    if not isinstance(record, dict) or record.get("status") != "completed":
+        return "the workflow run did not complete"
+    agents = {entry.get("agentId") for entry in record.get("workflowProgress") or []
+              if isinstance(entry, dict) and entry.get("type") == "workflow_agent"}
+    present = {path.name[len("agent-"):-len(".jsonl")] for path in files}
+    if not agents or agents != present:
+        return (f"the transcripts ({len(present)}) are not exactly the run's agents ({len(agents)}): missing "
+                f"{sorted(agents - present)[:3]}, extra {sorted(present - agents)[:3]}")
+    if result is not None:
+        returned = record.get("result")
+        candidates = [result] + ([result["result"]] if isinstance(result, dict) and "result" in result else [])
+        if not any(_canonical(returned) == _canonical(candidate) for candidate in candidates):
+            return "the workflow run record holds another result than the one collected"
+    return None
+
+
+def _parse(path: Path) -> tuple:
+    """(first user prompt text, [(tool name, input)], working directory, unreadable line count) of a transcript."""
+    prompt, calls, cwd, unreadable = None, [], None, 0
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not line.strip():
+            continue
         try:
             record = json.loads(line)
         except ValueError:
+            unreadable += 1
             continue
         if not isinstance(record, dict):
+            unreadable += 1
             continue
         cwd = cwd or (record.get("cwd") if isinstance(record.get("cwd"), str) else None)
         message = record.get("message") if isinstance(record.get("message"), dict) else {}
@@ -59,68 +111,106 @@ def _prompt_calls_cwd(path: Path) -> tuple:
                 part.get("text", "") for part in content or [] if isinstance(part, dict) and part.get("type") == "text")
         if isinstance(content, list):
             for part in content:
-                if isinstance(part, dict) and part.get("type") == "tool_use":
-                    calls.append((part.get("name"), part.get("input") if isinstance(part.get("input"), dict) else {}))
-    return prompt or "", calls, cwd
+                # tool_use, server_tool_use (web search and fetch), mcp_tool_use: every kind of call counts.
+                if isinstance(part, dict) and str(part.get("type", "")).endswith("tool_use"):
+                    calls.append((part.get("name"), part.get("input")))
+    return prompt or "", calls, cwd, unreadable
 
 
-def _read_paths(name: str, inputs: dict, cwd) -> list:
-    """The absolute paths a read tool call opened or searched (a glob pattern up to its first wildcard)."""
-    base = cwd or os.getcwd()
-    paths = []
-    for key in READ_TOOL_PATHS[name]:
-        value = inputs.get(key)
-        if key == "pattern":
-            if not isinstance(value, str) or not (os.path.isabs(value) or ".." in Path(value).parts):
-                continue  # a relative pattern searches under the call's path, checked on its own
-            value = "/".join(part for part in value.split("/")[:next(
-                (index for index, part in enumerate(value.split("/")) if _GLOB_CHARS.search(part)),
-                len(value.split("/")))]) or "/"
-        elif not isinstance(value, str) or not value:
-            value = base  # Glob and Grep without a path search the working directory
-        paths.append(os.path.normpath(value if os.path.isabs(value) else os.path.join(base, value)))
-    return paths
+def _pattern_prefix(pattern: str) -> str:
+    parts = pattern.split("/")
+    stop = next((index for index, part in enumerate(parts) if _GLOB_CHARS.search(part)), len(parts))
+    return "/".join(parts[:stop]) or "/"
+
+
+def _call_reads(name, inputs, cwd) -> tuple:
+    """(absolute paths the call opened or searched, reasons it cannot be checked) for a read tool call."""
+    if not isinstance(inputs, dict):
+        return [], [f"{name} call without an input object"]
+    paths, reasons = [], []
+
+    def resolve(value):
+        if os.path.isabs(value):
+            paths.append(value)
+        elif cwd:
+            paths.append(os.path.join(cwd, value))
+        else:
+            reasons.append(f"{name} relative path {value!r} without a recorded working directory")
+
+    def pattern_check(label, value):
+        if not isinstance(value, str) or not value:
+            return
+        if ".." in Path(value).parts:
+            reasons.append(f"{name} {label} climbs with ..: {value}")
+        elif os.path.isabs(value):
+            paths.append(_pattern_prefix(value))
+
+    if name == "Read":
+        value = inputs.get("file_path")
+        if isinstance(value, str) and value:
+            resolve(value)
+        else:
+            reasons.append("Read call without a file_path")
+    else:
+        value = inputs.get("path")
+        resolve(value if isinstance(value, str) and value else ".")
+        pattern_check("pattern", inputs.get("pattern") if name == "Glob" else None)
+        pattern_check("glob", inputs.get("glob") if name == "Grep" else None)
+    return paths, reasons
 
 
 def _within(path: str, roots) -> bool:
-    candidates = {path, os.path.realpath(path)}
+    """Whether ``path``, resolved (symlinks and ``..``), is one of ``roots`` or under one, also resolved."""
+    real = os.path.realpath(path)
     for root in roots:
-        for spelling in {os.path.normpath(os.path.abspath(root)), os.path.realpath(root)}:
-            if any(candidate == spelling or candidate.startswith(spelling.rstrip("/") + "/") for candidate in candidates):
-                return True
+        if not root:
+            continue
+        base = os.path.realpath(root)
+        if real == base or real.startswith(base.rstrip("/") + "/"):
+            return True
     return False
 
 
-def audit(directory, items: dict, marker_prefix: str = None) -> dict:
-    """Audit every agent transcript in ``directory`` against ``items``: {key: {"marker": text its prompt contains,
-    "roots": [allowed paths]}}. Returns the per-item agent counts and reasons, the flagged unmapped agents, the
-    transcripts digest and ``flagged_items``. With ``marker_prefix`` (the marker's fixed start, such as
-    "Input file: "), an agent whose prompt holds that prefix but none of these items' markers served an item outside
-    this audit and is skipped; any other agent that names no single item is unmapped."""
+def audit(directory, items: dict, marker_prefix: str = None, export=None, result=None) -> dict:
+    """Audit the workflow run's agent transcripts in ``directory`` against ``items``: {key: {"marker": text its prompt
+    contains, "roots": [allowed paths]}}. ``marker_prefix`` (the marker's fixed start) skips an agent that names an
+    item outside this audit; ``export`` requires every agent to have run from it; ``result`` requires the run record to
+    hold that result. Returns the per-item agent counts and reasons, the flagged unmapped agents, the run issue, the
+    transcripts digest and ``flagged_items``."""
     files = transcript_files(directory)
     union = [root for item in items.values() for root in item["roots"]]
     report = {"transcripts": len(files), "transcripts_sha256": transcripts_sha256(directory),
+              "run_issue": run_issue(directory, files, result),
               "items": {key: {"agents": 0, "flagged": []} for key in items}, "unmapped_flagged": []}
+    export_real = os.path.realpath(export) if export else None
     for path in files:
-        prompt, calls, cwd = _prompt_calls_cwd(path)
+        prompt, calls, cwd, unreadable = _parse(path)
         keys = [key for key, item in items.items() if item["marker"] and item["marker"] in prompt]
         if not keys and marker_prefix and marker_prefix in prompt:
             continue
         roots = items[keys[0]]["roots"] if len(keys) == 1 else union
-        reasons = []
+        reasons = [f"{unreadable} unreadable transcript line(s)"] if unreadable else []
+        if len(keys) > 1:
+            reasons.append(f"the prompt names {len(keys)} items")
+        if export_real and (not cwd or os.path.realpath(cwd) != export_real):
+            reasons.append(f"ran from {cwd!r}, not the export")
         for name, inputs in calls:
-            if name in READ_TOOL_PATHS:
+            if not isinstance(name, str):
+                reasons.append(f"a tool call without a tool name: {name!r}")
+            elif name in READ_TOOLS:
+                reads, problems = _call_reads(name, inputs, cwd)
+                reasons += problems
                 reasons += [f"{name} outside the item's input, packet and export: {read}"
-                            for read in _read_paths(name, inputs, cwd) if not _within(read, roots)]
+                            for read in reads if not _within(read, roots)]
             elif name not in QUIET_TOOLS:
                 reasons.append(f"used {name}")
-        if len(keys) == 1:
-            report["items"][keys[0]]["agents"] += 1
-            report["items"][keys[0]]["flagged"] += [f"{path.name}: {reason}" for reason in reasons]
-        elif reasons:
+        for key in keys:
+            report["items"][key]["agents"] += 1
+            report["items"][key]["flagged"] += [f"{path.name}: {reason}" for reason in reasons]
+        if not keys and reasons:
             report["unmapped_flagged"].append({"transcript": path.name, "reasons": reasons})
     flagged = {key for key, entry in report["items"].items() if entry["flagged"] or not entry["agents"]}
-    if report["unmapped_flagged"]:
+    if report["unmapped_flagged"] or report["run_issue"]:
         flagged = set(items)
     report["flagged_items"] = sorted(flagged)
     return report
@@ -135,6 +225,8 @@ def project_slug(cwd) -> str:
 def workflow_transcript_dir(cwd, session_id: str, projects_root=None) -> Path:
     """The one workflow run's agent transcript directory of a headless session run from ``cwd``; ValueError when the
     session holds no workflow run or more than one."""
+    if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9-]+", session_id):
+        raise ValueError(f"not a session id: {session_id!r}")
     base = Path(projects_root or Path.home() / ".claude" / "projects") / project_slug(cwd) / session_id
     runs = sorted(path for path in (base / "subagents" / "workflows").glob("*") if path.is_dir())
     if len(runs) != 1:

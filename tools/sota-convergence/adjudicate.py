@@ -1122,7 +1122,8 @@ def claude_transcripts_issue(data: dict, entry=None):
         roots.append(str(entry["packet_path"]))
     key = f"{data.get('layer')}.{data.get('order')}"
     report = transcript_audit.audit(recorded["dir"], {key: {"marker": f"{INPUT_MARKER}{data.get('input_path')}",
-                                                             "roots": roots}}, marker_prefix=INPUT_MARKER)
+                                                             "roots": roots}}, marker_prefix=INPUT_MARKER,
+                                    export=data.get("repo"))
     return AUDIT_FLAGGED if key in report["flagged_items"] else None
 LEAK_TEXT_LIMIT = 400
 
@@ -1359,7 +1360,9 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None, trans
                          "<export slug>/<session>/subagents/workflows/<run id>): every Claude judgment is audited on "
                          "what its agents read")
     transcripts = str(Path(transcripts).resolve())
-    transcript_report = transcript_audit.audit(transcripts, claude_audit_items(index, repo, snapshot))
+    # Bound to the run that returned this result, from this export (the run record holds the result it returned).
+    transcript_report = transcript_audit.audit(transcripts, claude_audit_items(index, repo, snapshot),
+                                               export=repo, result=result)
     write_json(work_dir / JUDGMENTS_DIR / "claude" / TRANSCRIPT_AUDIT_NAME, {"dir": transcripts, **transcript_report})
     for name, order, input_path, packet_sha256 in pending_items(index):
         if f"{name}.{order}" not in snapshot:

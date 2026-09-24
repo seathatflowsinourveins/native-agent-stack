@@ -393,6 +393,9 @@ def _role_key(key, value=None) -> bool:
         return False
     if key == "role" and isinstance(value, str):
         # A card's role that states the component's status ("Selected north-star engine ...") goes (round 6, B6-3).
+        here = str(Path(__file__).resolve().parent)
+        if here not in sys.path:
+            sys.path.insert(0, here)
         from lane_packets import states_candidate_status
         return states_candidate_status(value)
     if key in CATALOGS_NONEMPTY_KEYS or key in ROLE_LABEL_KEYS:
