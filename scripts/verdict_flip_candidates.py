@@ -79,7 +79,9 @@ def find_candidates(root: Path, context: platform_evidence.StatusContext | None 
                             "declared_status": declared,
                             "derived_status": derived.status,
                             "reason": derived.reason,
-                            "qualifying_receipts": list(derived.receipt_refs),
+                            # The receipts behind the derived status: reviewed use passes for accepted, the
+                            # supporting passes (install-only among them) for conditional (#164 review, item 4).
+                            "supporting_receipts": list(derived.receipt_refs),
                         })
     candidates.sort(key=lambda c: (c["catalog"], c["layer_id"], c["component_id"], c["platform"]))
     return candidates

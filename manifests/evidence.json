@@ -9533,13 +9533,13 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a91a6c459f84085ed54e4cfcfe1198b53da01cce1492e52ff9d881e8df2001e8",
-      "bytes": 18618
+      "sha256": "2ce1d8e7950a6cb087bf91cc108a39cf98727978ec79414341dab7df8ebb23aa",
+      "bytes": 18656
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "6bad12ace4a3ce63b0543073dd9e42f25359f5dffb81c7db6bc8611d01111258",
-      "bytes": 23755
+      "sha256": "4b5bdc52c113edbd46a082807409f38288b8330e4bd85ded8323ffe8e27d3620",
+      "bytes": 25597
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -28348,13 +28348,13 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "d34deba5a38d94f537cfff480a5fc2f2b30c025eb1303ed880168eaf76b187af",
-      "bytes": 26109
+      "sha256": "b1fa0f762d2bc39a062b23eb93c88ff1a650f0d2bbc9f85cfa2feaa718c66c4b",
+      "bytes": 26462
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "907c8c37a0918bad890647cf4ce450250c9823b816c50e62122f45f320f729ce",
-      "bytes": 61199
+      "sha256": "30da2f203f9f3d03c60eec6dc8ce416e84665013523e9001681429fbaf6d7598",
+      "bytes": 62536
     },
     {
       "path": "scripts/landscape.py",
@@ -28373,8 +28373,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "6cd39c921358cc0c14865610ee07442aebcf76f5cecf8ef84af7363fd1baeec0",
-      "bytes": 9906
+      "sha256": "b45a62e4babb37d0ef8e1ab9b8e5759e08d38ba6e7bc491bb70939fe00fe6d04",
+      "bytes": 11399
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -28628,8 +28628,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "552c45bc589eee7937c231602eafcea181340b05864f70efecf8cbe5ff3ef05b",
-      "bytes": 24271
+      "sha256": "c2bdbacd7e48f268adbf9b6df3fe24811ca6a085dd7f01d846ffc0cb994bb12e",
+      "bytes": 25175
     },
     {
       "path": "tests/test_convergence_contract.py",
@@ -28728,8 +28728,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "99cea6e3a7aea9be0c8e65bd51d7956e5779870681bb742460ea6e3004d10c4a",
-      "bytes": 69997
+      "sha256": "8494c3483a225d97ba9fb33cb12eb5e4728e14ae8313f3bdad03f424b135df81",
+      "bytes": 73068
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -28753,8 +28753,8 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "23c920916e72deb0143d76058507cd50b2b800d031f508508360cb7d578a5d18",
-      "bytes": 77628
+      "sha256": "bbb15581188b795aadd6823374d2bd406a93291454c3147776a4f5a52b1a0fc0",
+      "bytes": 77642
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -28888,8 +28888,8 @@
     },
     {
       "path": "tests/test_platform_status.py",
-      "sha256": "efea1b7d21275f595ad492043d3ff5cc76f360b9f6be1f735c960b878543dbf4",
-      "bytes": 15658
+      "sha256": "8bf7b2d5a09174f8f5cdd8c27f3e2b2ae795c9339c39db0f465e8b6339291244",
+      "bytes": 21701
     },
     {
       "path": "tests/test_point_in_time.py",

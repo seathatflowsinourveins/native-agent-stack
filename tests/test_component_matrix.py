@@ -438,6 +438,22 @@ class AlternativeAndDecisionJoinTests(unittest.TestCase):
             self.assertIsNone(document["rows"][0]["open_executable_now_gaps"])
 
 
+class AlternativeHostVerifiedTests(unittest.TestCase):
+    """#164 review, item 2: an alternative is host_verified only on a reviewed use-stage pass, as a winner is
+    accepted only on one (platform_status.ACCEPTING_STAGES)."""
+
+    def _state(self, stages):
+        summary = {"components": {"widget": {"platforms": {"linux-wsl2-x86_64": {
+            "independently_reviewed_native_proven_pass_stages": stages}}}}}
+        return cm.build_alternative({"name": "Widget", "repository": "https://github.com/acme/widget"},
+                                    {"https://github.com/acme/widget": "widget"}, summary)["e2e_state"]
+
+    def test_install_only_is_recorded_and_use_is_verified(self):
+        self.assertEqual(self._state(["install"]), "receipts_recorded")
+        self.assertEqual(self._state([]), "receipts_recorded")
+        self.assertEqual(self._state(["install", "use"]), "host_verified")
+
+
 class QualifiedModelsSurfacingTests(unittest.TestCase):
     """scripts/host_receipts.py record --qualified-model entries must surface per platform
     on the runtime component's winner row, and never affect the flip rule."""

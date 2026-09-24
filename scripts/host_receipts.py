@@ -23,6 +23,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import time
@@ -57,6 +58,24 @@ QUALIFIED_MODEL_RESULTS = {"pass", "fail"}
 IDENTITY_ENV = "CLAUDE_CODE_SESSION_ID"
 IDENTITY_DOMAIN = "host-receipt-identity-v1:"
 DISSENT_VERDICTS = {"disagree", "needs_changes"}
+
+# A ``use`` receipt records the component doing its job. Whether it does is judged by the independent review
+# (contributing-evidence.md step 8), never by the command text: no classifier of shell text is both sound and complete
+# (#164 Codex re-check: ``sh -c 'rtk --version'`` and ``rtk help gain`` pass any such rule, ``du -h /dev/null`` fails
+# a broad one), so status derivation never reads it. ``record`` only refuses the unambiguous case, a whole command
+# that is exactly ``<program> <flag>`` with one of these, as a convenience that is knowingly incomplete. ``-h`` is
+# left out: ``df -h`` and ``du -h`` are functional.
+BARE_HELP_OR_VERSION = frozenset({"--help", "--version", "-V", "help", "version"})
+
+
+def bare_help_or_version(cmd: str) -> bool:
+    """Whether ``cmd`` is exactly one program and one help or version argument (BARE_HELP_OR_VERSION)."""
+    try:
+        argv = shlex.split(cmd)
+    except ValueError:
+        return False
+    return len(argv) == 2 and argv[1] in BARE_HELP_OR_VERSION
+
 
 HOST_ID_PATTERN = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -610,6 +629,10 @@ def cmd_record(args: argparse.Namespace) -> int:
     commands_to_run.extend(args.cmd or [])
     if not commands_to_run:
         print("error: no commands provided; pass --cmd and/or --from-stack-commands")
+        return 2
+    if args.stage == "use" and all(bare_help_or_version(cmd) for cmd in commands_to_run):
+        print("error: --stage use records the component doing its job, but every command here is only a help or "
+              "version call; pass a functional --cmd, or record these as --stage install")
         return 2
 
     catalog_revision = git_head(root)
