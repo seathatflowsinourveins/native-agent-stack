@@ -561,8 +561,8 @@
       },
       {
         "precondition": 2,
-        "acceptance_artifact": "data/session-calendar.json, data/fees-v3.json and both amendment files on origin/main, with data-pins.json, and their sha256 copied into freeze_record at the freeze (as first committed on PR #186, not yet merged: session-calendar.json fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965, fees-v3.json f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a, both amendment files empty)",
-        "status": "open: PR #186 in review"
+        "acceptance_artifact": "data/session-calendar.json, data/fees-v3.json and both amendment files on origin/main since PR #186 (squash commit b165579; data-pins.json: session-calendar.json fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965, fees-v3.json f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a, both amendment files empty), with their sha256 copied into freeze_record at the freeze",
+        "status": "open: the files are committed on origin/main; the protocol pins them only at the freeze, and fees-v3.json must then carry every rate announced before the freeze"
       },
       {
         "precondition": 3,
