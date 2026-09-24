@@ -16,18 +16,21 @@ capacity fixture cited, no live broker fills claimed). The installed skfolio
 **1.2.9** acceptance covers its chronological splitter/control study. The earlier
 1.231.0 source review is historical, superseded for installation by the
 [dated R&D readiness decision](../../docs/foundation-rd-readiness.md). NautilusTrader
-remains prerelease: 2.0.0 final has not shipped, and the SPY/LEAN parity gate
-**G-a** (`retained-equity-replay`) is recorded as
-`reported_execution_blocked_review_incomplete` in
-[`runtime-target.json`](runtime-target.json) `next_acceptance`: the retained
+remains prerelease: 2.0.0 final has not shipped. The SPY/LEAN parity gate
+**G-a** (`retained-equity-replay`, gate `spy-lean-parity`) was established on
+2026-09-23 for the one_zero case: `spy-parity/verdict-v2.json` reads PASS with
+136 checks and 0 failed, on the sealed v2 preregistration (native
+SimulationModule dividend cash and a native OCO open-fill proxy; gate
+`dividend-sim-module`), and [`runtime-target.json`](runtime-target.json)
+`next_acceptance` now records `spy_lean_parity_passed_one_zero_case`. Before
+that it recorded `reported_execution_blocked_review_incomplete`: the retained
 [comparison summary](../../evidence/artifacts/comparison-progress-20260922/summary.json)
-records a completed **BLOCKED** replay of the historical one_zero case with four
-failed checks on the unsupported `distributions_and_cash` and
-`market_on_open_proxy` mappings; a completed blocked comparison is not parity
-acceptance. The verdict and its 29 checks are on main under
-`blueprints/us-equities/engine-nautilus/spy-parity/`; closing the gate needs an
-engine-native market-on-open and dividend-cash mechanism or a newly
-preregistered mapping manifest (gate `dividend-sim-module`).
+records a completed **BLOCKED** v1 replay of the historical one_zero case with
+four failed checks on the then-unsupported `distributions_and_cash` and
+`market_on_open_proxy` mappings. The v1 verdict and its 29 checks stay on main
+under `blueprints/us-equities/engine-nautilus/spy-parity/`. Parity covers one
+case, and the open-fill proxy is not a general market-on-open equivalent when
+the open equals the prior close.
 The current target also records bounded AAPL replay and Alpaca paper evidence;
 neither establishes SPY parity, a strategy edge or complete broker recovery.
 

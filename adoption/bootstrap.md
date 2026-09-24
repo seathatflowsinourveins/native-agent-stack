@@ -14,7 +14,7 @@ it (a commit cannot contain its own hash), and the pinned tag may predate
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
@@ -25,8 +25,8 @@ and confirms it resolves to `source.release_commit` (read from the manifest you 
 cloned, never from a commit pasted into prose, which a later re-pin would leave
 stale), published with SLSA build
 provenance by `.github/workflows/publish-catalog.yml`. `scripts/release_due.py`
-was added after `v2026.09.23`, so it runs here, on the default branch, before
-the checkout. After checkout, follow the documents in your checkout.
+runs here, on the default branch, before the checkout. After checkout, follow
+the documents in your checkout.
 
 The pages here name the release a step was written against. "Added after
 `vT`" means release `vT` lacks the file that step uses (a path in
@@ -120,16 +120,6 @@ GitHub-hosted macOS runner; see
    "none of N" pinned installs none of its own components through the script
    (only the `node`, `uv` and `gh` every run installs); use the recipes.
 
-   The macOS script and pins changed after `v2026.09.23`. At `v2026.09.23`,
-   `adoption/bootstrap-macos.sh` installs only a missing `jq` through Homebrew
-   (install the other formulae on
-   [the macOS page](platforms/macos-arm64.md#prerequisites) yourself first),
-   `adoption/pins-macos-arm64.json` has no `socraticode` pin (the script skips
-   it by default, so `macos-arm64-foundation` installs 7 of 8), no pinned
-   darwin binary for Codex or Claude Code (npm resolves those unverified) and
-   no embedding-model pin. Linux/WSL2's script and pins are the same at
-   `v2026.09.23` as on main.
-
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
    Use each client's own device flow:
@@ -206,7 +196,7 @@ GitHub-hosted macOS runner; see
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
      already matches.
-   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+   - **agents**: copies the seven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical.
    - **MCP servers**: for each entry in
@@ -238,10 +228,16 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
-   The profile installer, the apply tool and their assets
-   (`adoption/hooks/claude/`, `adoption/agents/claude/`,
-   `adoption/mcp/claude-user.json`) were added after `v2026.09.23`; at that
-   tag, merge the rendered settings by hand.
+   The agent definitions in `adoption/agents/claude/` changed after `v2026.09.24.1`:
+   at that tag `source-scout` and `isolated-builder` declare `effort: medium`
+   (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,
+   `semantic-evidence-reviewer` and `blind-judge` declare `effort: high`, and the
+   two blind lane roles are absent; here all seven declare `effort: max`
+   ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The guard
+   hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
+   `SHA256SUMS` gained the secret-path guard entry). The installer replaces a
+   differing agent file, so rerunning its agents step from a checkout that has
+   the change installs the `max` definitions.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude
@@ -289,8 +285,7 @@ GitHub-hosted macOS runner; see
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
    (table in [the macOS page](platforms/macos-arm64.md#launchd-services); run
-   only on a hosted runner, not yet on a Mac workstation; its launchd
-   templates were added after `v2026.09.23`). For the portable guarded runner wrappers used by
+   only on a hosted runner, not yet on a Mac workstation). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
 6. **Prerequisite report.** `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`
@@ -310,8 +305,7 @@ GitHub-hosted macOS runner; see
    has neither. `scripts/host_receipts.py` (this same step's own recording
    tool, plus `scripts/component_matrix.py`, `scripts/new_host_grand_list.py`,
    `tools/sota-convergence/build_verdicts.py`,
-   `scripts/validate_convergence.py` and `scripts/release_due.py`, which was
-   added after `v2026.09.23`) needs
+   `scripts/validate_convergence.py` and `scripts/release_due.py`) needs
    **Python 3.9 or newer**: every one of those scripts parses under the
    Python 3.9 grammar and uses `from __future__ import annotations`, and this
    is exercised directly, not merely declared -- a macOS CI job runs the

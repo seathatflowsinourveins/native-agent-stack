@@ -1,0 +1,38 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Blind adjudication judgment (one presentation order)",
+ "description": "preferred picks return A or B; there is no tie. why must be at least 60 characters and cite the evidence paths opened (adjudicate.py enforces the length; it is not a schema keyword because Codex strict output does not accept minLength). leak is true, with leak_text quoting what was found, when the input shows reviewer identity (adjudication-prompt.md, the leak check); the other fields are then placeholders and adjudicate.py records the judgment as missing (failure leak). Otherwise leak is false and leak_text is empty.",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "preferred": {
+   "type": "string",
+   "enum": [
+    "A",
+    "B"
+   ]
+  },
+  "why": {
+   "type": "string"
+  },
+  "evidence_refs": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "leak": {
+   "type": "boolean"
+  },
+  "leak_text": {
+   "type": "string"
+  }
+ },
+ "required": [
+  "preferred",
+  "why",
+  "evidence_refs",
+  "leak",
+  "leak_text"
+ ]
+}
