@@ -50,13 +50,22 @@ the strongest honest evidence, the comparison is per component. A dated record n
 headless limitation, and a manual or scripted functional check whose reviewed pass stands in for `use`. It
 does not reopen install-stage acceptance for other components.
 
-## Follow-up (2026-09-24, #164 review items 1-5)
+## Follow-up (2026-09-24, #164 review items 1-5, and the Codex re-check of be09a5e2)
 
-- `use` is defined in `docs/contributing-evidence.md` §2 as the component doing its job. A help or version
-  call is never `use`: `host_receipts.py record` refuses `--stage use` when every command is one, `validate`
-  rejects such a receipt, and the receipt summary counts one as `install`, so its pass supports
-  `conditional` at most and its fail still blocks. The documented recording examples pass a functional
-  `--cmd`, because the stack.json commands for `ccusage` and `agentsview` are `--help` calls.
+- `use` is defined in `docs/contributing-evidence.md` §2 as the component doing its job; a help or version
+  call is never `use`. The control is the independent review: step 8 tells the reviewer to record
+  `needs_changes` on a `use` receipt whose commands are only help or version calls, however wrapped, and a
+  standing dissent withholds `accepted`.
+- No status is derived from command text. be09a5e2 had `validate` reject help-only `use` receipts and the
+  receipt summary count them as `install`. The Codex re-check showed that classification was neither sound
+  nor complete. `sh -c 'rtk --version'`, `true && rtk -V` and `rtk help gain` passed as `use`, while
+  `du -h /dev/null` was refused. Worse, counting a misread functional `use` fail as `install` let a later
+  install pass stop it blocking, which promoted `conditional` to `accepted` in 44 of 82,944 synthetic
+  comparisons. Both were removed. `record` keeps a narrow lint: it refuses `--stage use` only when every
+  command is exactly a program and one of `--help`, `--version`, `-V`, `help` or `version`. `-h` is left
+  out because `df -h` and `du -h` are functional. The lint is a documented convenience, not a control.
+- The documented recording examples pass a functional `--cmd`, because the stack.json commands for
+  `ccusage` and `agentsview` are `--help` calls.
 - `component_matrix.build_alternative` marks an alternative `host_verified` only on a reviewed use pass.
 - `QUALIFYING_STAGES` is renamed `BLOCKING_STAGES`, and `verdict_flip_candidates.py` reports
   `supporting_receipts`.

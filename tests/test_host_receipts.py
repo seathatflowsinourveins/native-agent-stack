@@ -1207,9 +1207,10 @@ class QualifiedModelSchemaSyncTests(unittest.TestCase):
         self.assertNotIn("qualified_models", self.schema["required"])
 
 
-class UseStageMeansFunctionTests(unittest.TestCase):
-    """#164 review, item 1: a ``use`` receipt exercises the component's function; help and version calls are an
-    install check, so they can never make a reviewed use pass (the route to ``accepted``)."""
+class UseStageLintTests(unittest.TestCase):
+    """#164: ``record`` refuses ``--stage use`` only when every command is exactly a program and one help or version
+    argument, a convenience that is knowingly incomplete; the independent review is the control, and no status is
+    derived from command text (Codex re-check of be09a5e2)."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -1227,27 +1228,27 @@ class UseStageMeansFunctionTests(unittest.TestCase):
                 *[argument for command in commands for argument in ("--cmd", command)]])
         return exit_code, buffer.getvalue()
 
-    def test_the_classifier(self):
-        for command in ("ccusage --help", "agentsview --help", "gh --version", "uv version", "git help",
-                        "ccusage --help | head -5", "X=1 codex --version && rtk --version"):
-            self.assertTrue(hr.informational_command(command), command)
-        for command in ("ccusage daily --json", "rg -n foo .", "python3 -m pytest -q", "cat x | jq .",
-                        "echo hi", "codex --version && codex exec 'say ok'"):
-            self.assertFalse(hr.informational_command(command), command)
+    def test_only_an_exact_help_or_version_argv_matches(self):
+        for command in ("rtk --version", "ccusage --help", "uv version", "rtk -V", "git help"):
+            self.assertTrue(hr.bare_help_or_version(command), command)
+        # Functional commands are never refused, and wrapped help calls pass the lint (left to the review).
+        for command in ("du -h /dev/null", "df -h", "python3 -c 'print(6*7)' --version", "ccusage daily --json",
+                        "sh -c 'rtk --version'", "true && rtk -V", "rtk help gain", "echo hi"):
+            self.assertFalse(hr.bare_help_or_version(command), command)
 
-    def test_record_refuses_a_use_stage_of_only_help_and_version_calls(self):
-        marker = self.root / "ran.marker"
-        exit_code, output = self._record("use", ["true --help", f"touch {marker} --version"])
+    def test_record_refuses_a_use_stage_of_only_bare_help_and_version_calls(self):
+        exit_code, output = self._record("use", ["true --help", "true --version"])
         self.assertEqual(exit_code, 2, output)
-        self.assertIn("help or version", output)
-        self.assertFalse(marker.exists(), "a command ran before the refusal")
-        self.assertEqual(list((self.root / "evidence" / "hosts").rglob("*.json")), [])
+        self.assertIn("help or", output)
+        self.assertFalse((self.root / "evidence" / "hosts").exists()
+                         and list((self.root / "evidence" / "hosts").rglob("*.json")))
 
     def test_help_calls_record_as_install_and_a_functional_command_as_use(self):
         self.assertEqual(self._record("install", ["true --help"])[0], 0)
         self.assertEqual(self._record("use", ["true --version", "echo hi"])[0], 0)
+        self.assertEqual(self._record("use", ["du -h /dev/null"])[0], 0)
 
-    def test_validate_rejects_a_hand_written_help_only_use_receipt(self):
+    def test_validate_derives_nothing_from_command_text(self):
         self.assertEqual(self._record("use", ["echo hi"])[0], 0)
         path = next((self.root / "evidence" / "hosts").rglob("*.json"))
         receipt = json.loads(path.read_text(encoding="utf-8"))
@@ -1255,7 +1256,7 @@ class UseStageMeansFunctionTests(unittest.TestCase):
         errors: list[str] = []
         hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors, set(), set(), set(),
                                              {})
-        self.assertTrue(any("help or version" in error for error in errors), errors)
+        self.assertFalse(any("help" in error for error in errors), errors)
 
 
 class QualifiedModelRecordTests(unittest.TestCase):

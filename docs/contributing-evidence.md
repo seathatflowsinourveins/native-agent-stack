@@ -104,9 +104,14 @@ Every receipt also names one `stage`. Two decide a platform status:
   reviewed install pass supports `conditional` at most.
 - **`use`** shows the component doing its job on this host: it reads or
   writes real input, answers a query, runs a workload or serves a request.
-  A help or version call is never `use`: `host_receipts.py record` refuses
-  `--stage use` when every command is one, and `validate` rejects such a
-  receipt. Among receipts, only a reviewed `use` pass supports
+  A help or version call is never `use`, however it is wrapped. The
+  independent review (step 8) enforces this: a reviewer records
+  `needs_changes` on such a receipt, which withholds `accepted`. As a
+  convenience, `host_receipts.py record` also refuses `--stage use` when
+  every command is exactly a program and one of `--help`, `--version`,
+  `-V`, `help` or `version`. That check is knowingly incomplete (it passes
+  `sh -c 'x --version'` or `x help sub`) and nothing derives a status from
+  command text. Among receipts, only a reviewed `use` pass supports
   `accepted` (Section 5).
 
 ## 3. The flow
@@ -266,7 +271,11 @@ Every receipt also names one `stage`. Two decide a platform status:
 8. **Independent review.** Someone other than the recorder — another agent
    session, the Codex review lane, or a human — reviews the receipt (reads
    the commands and output excerpt, and if practical reproduces at least one
-   command) and appends a review:
+   command) and appends a review. For a `use` receipt, the reviewer checks
+   that the commands make the component do its job. A help or version call,
+   including one wrapped in a shell, `&&` or a subcommand (`sh -c 'x
+   --version'`, `true && x -V`, `x help sub`), is not use: record
+   `--verdict needs_changes`, which withholds `accepted` (Section 5).
 
    ```sh
    python3 scripts/host_receipts.py review \

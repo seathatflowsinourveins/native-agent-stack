@@ -236,13 +236,36 @@ class PlatformStatusTests(unittest.TestCase):
                 self.assertEqual(derived.status, "conditional")
                 self.assertIn("failed", derived.reason)
 
-    def test_a_help_only_use_receipt_counts_as_install(self):
-        # #164 review, item 1: validate rejects it; should one reach the summary, it never supports accepted.
-        path = self.r.root / self.r.receipt(stage="use", host="mac-a")
-        receipt = json.loads(path.read_text(encoding="utf-8"))
-        receipt["commands"][0]["cmd"] = "widget --help"
-        path.write_text(json.dumps(receipt), encoding="utf-8")
-        self.assertEqual(self.r.status().status, "conditional")
+    def test_a_use_fail_then_an_install_pass_on_its_host_still_blocks(self):
+        # Codex re-check of be09a5e2: the summary's reclassification turned a use fail into install, so a later
+        # install pass on that host cleared it and another reviewed use pass promoted to accepted. No command text
+        # changes a stage now, so the use fail blocks whatever it ran.
+        for command in ("widget run --input sample.json", "widget --version", "sh -c 'widget --version'"):
+            for platform_id, winner in (("macos-arm64", {}),
+                                        ("linux-wsl2-x86_64", {"evidence_class": "source_review"})):
+                with self.subTest(command=command, platform=platform_id):
+                    self.setUp()
+                    self.r.receipt(platform_id, stage="use", host="box-b")
+                    fail = self.r.root / self.r.receipt(platform_id, result="fail", stage="use", host="box-a",
+                                                        observed_at="2026-09-23T01:00:00Z")
+                    receipt = json.loads(fail.read_text(encoding="utf-8"))
+                    receipt["commands"][0]["cmd"] = command
+                    fail.write_text(json.dumps(receipt), encoding="utf-8")
+                    self.r.receipt(platform_id, stage="install", host="box-a", observed_at="2026-09-23T02:00:00Z")
+                    self.assertEqual(self.r.status(platform_id, **winner).status, "conditional")
+
+    def test_a_help_only_use_pass_is_withheld_by_review_not_by_its_text(self):
+        # The control is the independent review (contributing-evidence.md step 8): the text alone changes nothing,
+        # and a reviewer's needs_changes withholds accepted.
+        for verdict, expected in (("agree", "accepted"), ("needs_changes", "conditional")):
+            with self.subTest(verdict):
+                self.setUp()
+                path = self.r.root / self.r.receipt(stage="use", host="mac-a", verdict=verdict)
+                receipt = json.loads(path.read_text(encoding="utf-8"))
+                receipt["commands"][0]["cmd"] = "widget --help"
+                path.write_text(json.dumps(receipt), encoding="utf-8")
+                self.r.receipt(stage="install", host="mac-b")
+                self.assertEqual(self.r.status().status, expected)
 
     def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):
         self.r.receipt(result="fail", stage="use", host="mac-a", observed_at="2026-09-23T01:00:00Z")

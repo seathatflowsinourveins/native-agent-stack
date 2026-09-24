@@ -59,30 +59,23 @@ IDENTITY_ENV = "CLAUDE_CODE_SESSION_ID"
 IDENTITY_DOMAIN = "host-receipt-identity-v1:"
 DISSENT_VERDICTS = {"disagree", "needs_changes"}
 
-# A ``use`` receipt records the component doing its job; a help or version call only shows the program starts, the
-# install check (#164 review, item 1: stack.json lists only ``ccusage --help`` and ``agentsview --help`` for two
-# components, so `--stage use --from-stack-commands` recorded a help call as use).
-INFORMATIONAL_FLAGS = frozenset({"--help", "-h", "--version", "-V"})
-INFORMATIONAL_SUBCOMMANDS = (["help"], ["version"], ["--help"], ["--version"])
+# A ``use`` receipt records the component doing its job. Whether it does is judged by the independent review
+# (contributing-evidence.md step 8), never by the command text: no classifier of shell text is both sound and complete
+# (#164 Codex re-check: ``sh -c 'rtk --version'`` and ``rtk help gain`` pass any such rule, ``du -h /dev/null`` fails
+# a broad one), so status derivation never reads it. ``record`` only refuses the unambiguous case, a whole command
+# that is exactly ``<program> <flag>`` with one of these, as a convenience that is knowingly incomplete. ``-h`` is
+# left out: ``df -h`` and ``du -h`` are functional.
+BARE_HELP_OR_VERSION = frozenset({"--help", "--version", "-V", "help", "version"})
 
 
-def informational_command(cmd: str) -> bool:
-    """Whether every step of ``cmd`` (split on ``&&``, ``||`` and ``;``; for a pipeline, its first program) is a help
-    or version invocation: a help or version flag among its arguments, or a bare ``help``/``version`` subcommand."""
-    steps = [step.split("|", 1)[0] for step in re.split(r"&&|\|\||;", cmd) if step.strip()]
-    if not steps:
+def bare_help_or_version(cmd: str) -> bool:
+    """Whether ``cmd`` is exactly one program and one help or version argument (BARE_HELP_OR_VERSION)."""
+    try:
+        argv = shlex.split(cmd)
+    except ValueError:
         return False
-    for step in steps:
-        try:
-            argv = shlex.split(step)
-        except ValueError:
-            return False
-        while argv and re.match(r"^[A-Za-z_]\w*=", argv[0]):
-            argv = argv[1:]
-        arguments = argv[1:]
-        if not argv or not (INFORMATIONAL_FLAGS & set(arguments) or arguments in INFORMATIONAL_SUBCOMMANDS):
-            return False
-    return True
+    return len(argv) == 2 and argv[1] in BARE_HELP_OR_VERSION
+
 
 HOST_ID_PATTERN = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -637,9 +630,9 @@ def cmd_record(args: argparse.Namespace) -> int:
     if not commands_to_run:
         print("error: no commands provided; pass --cmd and/or --from-stack-commands")
         return 2
-    if args.stage == "use" and all(informational_command(cmd) for cmd in commands_to_run):
-        print("error: --stage use records the component doing its job, but every command here is a help or version "
-              "call; pass a functional --cmd, or record these as --stage install")
+    if args.stage == "use" and all(bare_help_or_version(cmd) for cmd in commands_to_run):
+        print("error: --stage use records the component doing its job, but every command here is only a help or "
+              "version call; pass a functional --cmd, or record these as --stage install")
         return 2
 
     catalog_revision = git_head(root)
@@ -894,11 +887,6 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
                       f"{label}: id date segment {id_date!r} does not match observed_at_utc date {expected_date!r}")
 
     commands = receipt.get("commands") if isinstance(receipt.get("commands"), list) else []
-    command_texts = [command.get("cmd") for command in commands if isinstance(command, dict)]
-    if receipt.get("stage") == "use" and command_texts and all(
-            isinstance(text, str) and informational_command(text) for text in command_texts):
-        errors.append(f"{label}: stage 'use' runs only help or version commands; a use receipt must exercise the "
-                      "component's function (record help and version calls as stage 'install')")
     result = receipt.get("result")
     if result == "pass":
         for index, command in enumerate(commands):
@@ -1097,14 +1085,6 @@ def build_summary(root: Path) -> dict:
         host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
         platform_id = host.get("platform_id")
         stage = receipt.get("stage")
-        command_texts = [command.get("cmd") for command in (receipt.get("commands") or [])
-                         if isinstance(command, dict)] if isinstance(receipt.get("commands"), list) else []
-        if stage == "use" and command_texts and all(
-                isinstance(text, str) and informational_command(text) for text in command_texts):
-            # A help or version call is an install check whatever stage a receipt names (validate rejects such a
-            # receipt; #164 review, item 1): it counts as install here, so its pass never supports accepted and its
-            # fail still blocks.
-            stage = "install"
         result = receipt.get("result")
         evidence_class = receipt.get("evidence_class")
         observed_at = receipt.get("observed_at_utc")
