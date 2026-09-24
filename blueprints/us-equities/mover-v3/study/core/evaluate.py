@@ -1,0 +1,203 @@
+"""One stage's evaluation: terciles, trades per arm, the five items, labels and verdicts, in memory.
+
+The caller (core.runner) writes the returned results once, atomically, after every item is computed
+(run_discipline.once). Nothing here reads a file or the network.
+"""
+from __future__ import annotations
+
+from collections import Counter
+
+import numpy as np
+
+from core import stats as ST
+from core import terciles as TC
+from core.params import ALTERNATIVE, BOOT, CHRONO, FETCH, ITEM_IDS, TRADABLE
+from core.trades import h3c_event, trade
+
+ARM_OF = {"H1-D": "b_lane", "H1-D-b_lane-low": "b_lane", "H3-a": "a_intraday", "H3-b": "b_overnight"}
+SENSITIVITY_MODES = ("c0.5", "c2.0", "table_only", "stress")
+
+
+class Unsealed(Exception):
+    pass
+
+
+def void_rate(incomplete_by_kind: dict) -> dict:
+    """Review round 8, R8-5: the per-stage fetch-incomplete rate over every required request, reported by kind."""
+    req = sum(v["requests"] for v in incomplete_by_kind.values())
+    inc = sum(v["incomplete"] for v in incomplete_by_kind.values())
+    rate = inc / req if req else 0.0
+    return {"requests": req, "incomplete": inc, "rate": rate, "void": rate > FETCH["void_incomplete_rate"],
+            "by_kind": incomplete_by_kind}
+
+
+def in_stage(ctx, ev, stage_sessions: set) -> bool:
+    """Segments are assigned by entry session: an event belongs to the stage if t or its entry session t+1 is a
+    kept stage session (a decision whose entry lies in no segment is then counted as dropped by trade())."""
+    d1 = ctx.cal.offset(ev["t"], 1)
+    return ev["t"] in stage_sessions or (d1 is not None and d1 in stage_sessions)
+
+
+def assign_terciles(events: list, pool: list, members) -> dict:
+    """{(symbol, t): tercile or None} for the stage's events, from trailing pool breakpoints at t."""
+    by_session = {}
+    for ev in events:
+        if ev["max21"] is not None:
+            by_session.setdefault(ev["t"], []).append(ev["max21"])
+    out = {}
+    for ev in events:
+        if members(ev):
+            out[(ev["symbol"], ev["t"])] = TC.assign(ev["max21"], TC.breakpoints(pool, by_session, ev["t"]))
+    return out
+
+
+def build_trades(events: list, ctx, store, stage_sessions: set, terc: dict):
+    trades, h3c, needs = [], [], []
+    for ev in events:
+        if not in_stage(ctx, ev, stage_sessions):
+            continue
+        for arm in ("b_lane", "a_intraday", "b_overnight"):
+            tr = trade(ev, arm, ctx, store)
+            if "needs" in tr:
+                needs.extend(tr["needs"])
+                continue
+            tr["tercile"] = terc.get((ev["symbol"], ev["t"]))
+            trades.append(tr)
+        h3c.append(h3c_event(ev, ctx))
+    return trades, h3c, needs
+
+
+def item_trades(item: str, trades: list, h3c: list) -> list:
+    if item == "H3-c":
+        return [{"session": e["entry_session"], "value": e["value"], "rec": e} for e in h3c if e["status"] == "complete"]
+    arm = ARM_OF[item]
+    rows = [tr for tr in trades if tr["arm"] == arm and tr["status"] == "filled"]
+    if item == "H1-D":
+        rows = [tr for tr in rows if tr["tercile"] in ("high", "low")]
+    elif item == "H1-D-b_lane-low":
+        rows = [tr for tr in rows if tr["tercile"] == "low"]
+    return [{"session": tr["entry_session"], "value": tr["nets"]["primary"], "group": tr.get("tercile"), "rec": tr}
+            for tr in rows]
+
+
+def _mean(xs):
+    return float(np.mean(xs)) if len(xs) else None
+
+
+def bh_diagnostics(item: str, rows: list) -> dict:
+    """BH (q = 0.10) across year, entry price tier and tercile splits of one tradable cell (never gating)."""
+    from pinned.rules_copy import price_tier
+    splits = {}
+    for r in rows:
+        rec = r["rec"]
+        for name, key in (("year", r["session"][:4]), ("price_tier", str(price_tier(rec["entry_mid"]))),
+                          ("tercile", str(rec.get("tercile")))):
+            splits.setdefault(f"{name}={key}", []).append(r["value"])
+    pvals = {k: ST.split_p(v, ALTERNATIVE[item]) for k, v in sorted(splits.items())}
+    rejected = ST.benjamini_hochberg(pvals) if pvals else {}
+    return {k: {"n": len(splits[k]), "mean": _mean(splits[k]), "p": pvals[k], "bh_rejected": rejected[k]} for k in pvals}
+
+
+def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: str, B: int | None = None,
+                fees=None) -> dict:
+    alt = ALTERNATIVE[item]
+    rng = ST.generator(protocol_id, stage, item)
+    L = BOOT["block_sessions"][item]
+    if item == "H1-D":
+        hi = [r for r in rows if r["group"] == "high"]
+        lo = [r for r in rows if r["group"] == "low"]
+        n_hi, n_lo = len(hi), len(lo)
+        est = (_mean([r["value"] for r in hi]) - _mean([r["value"] for r in lo])) if hi and lo else None
+        groups = [ST.session_arrays(sessions, rows, "high"), ST.session_arrays(sessions, rows, "low")]
+        n = n_hi + n_lo
+        mde_v = ST.mde(item, n1=n_hi, n2=n_lo)
+    else:
+        n_hi = n_lo = None
+        n = len(rows)
+        est = _mean([r["value"] for r in rows])
+        groups = [ST.session_arrays(sessions, rows)]
+        mde_v = ST.mde(item, n=n)
+    if not sessions or n == 0:
+        boot = np.full(B or BOOT["B"], np.nan)
+    else:
+        boot = ST.bootstrap(sessions, groups, rng, L, B=B)
+    p = ST.p_value(boot, alt)
+    p_n = ST.normal_tail_p(est, boot, alt) if est is not None else 1.0
+    res = {"item": item, "alternative": alt, "estimate": est, "n": n, "n_high": n_hi, "n_low": n_lo,
+           "median": float(np.median([r["value"] for r in rows])) if rows else None,
+           "p": p, "p_normal_tail": p_n, "mde": mde_v, "mde_excluded": ST.mde_excluded(item, boot, mde_v),
+           "n_ok": ST.minimum_met(item, stage, n, n_hi, n_lo),
+           "lineage_confirmed": ST.lineage_confirmed(p, p_n)}
+    if item in TRADABLE:
+        rob = ST.robustness([{"session": r["session"], "value": r["value"]} for r in rows]) if rows else \
+            {"all_positive": False}
+        res["robustness"] = rob
+        res["sensitivities"] = {m: _mean([r["rec"]["nets"][m] for r in rows]) for m in SENSITIVITY_MODES}
+        res["sensitivities"]["terminal_zero_rebooked_at_last_bid"] = _mean(
+            [r["rec"].get("terminal_rebooked_at_last_bid", r["value"]) if r["rec"].get("exit") in
+             ("terminal_zero", "censored_terminal") and r["rec"].get("terminal_rebooked_at_last_bid") is not None
+             else r["value"] for r in rows])
+        res["sensitivities"]["ratio_rule_holds_removed"] = _mean(
+            [r["value"] for r in rows if not r["rec"].get("ratio_rule_in_hold")])
+        res["sensitivities"]["censored_removed"] = _mean([r["value"] for r in rows if not r["rec"].get("censored")])
+        res["sensitivities"]["least_exposed_slice"] = _mean([r["value"] for r in rows if r["rec"].get("least_exposed")])
+        res["sensitivities"]["without_paper_exposed"] = _mean(
+            [r["value"] for r in rows if not r["rec"].get("paper_exposed")])
+        res["exits"] = dict(Counter(r["rec"]["exit"] for r in rows))
+        res["break_even_cost_multiple"] = ST.break_even_multiple([r["rec"] for r in rows], fees) if rows and fees else None
+        res["two_way_clustered"] = ST.two_way_cluster([r["value"] for r in rows], [r["session"] for r in rows],
+                                                      [r["rec"]["symbol"] for r in rows])
+        res["bh_diagnostics"] = bh_diagnostics(item, rows)
+    res["paper_exposed_fraction"] = (sum(1 for r in rows if r["rec"].get("paper_exposed")) / len(rows)) if rows else 0.0
+    return res
+
+
+def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_sessions: list, pool: list,
+             tested: bool = True, void: dict | None = None, carried: tuple = ITEM_IDS,
+             validation_signs: dict | None = None, B: int | None = None) -> dict:
+    """Every item of one stage. stage_sessions: the stage's kept sessions (the bootstrap list and the decision
+    sessions); pool: the tercile pool (warm-up included for development)."""
+    sset = set(stage_sessions)
+    terc = assign_terciles(events, pool, lambda ev: in_stage(ctx, ev, sset))
+    trades, h3c, needs = build_trades(events, ctx, store, sset, terc)
+    if needs:
+        raise Unsealed(f"{len(needs)} planned requests are not sealed; no outcome is computed from unsealed data")
+    counts = {"trades_by_arm_status": dict(Counter(f"{t['arm']}:{t['status']}" for t in trades)),
+              "h3c_by_status": dict(Counter(e["status"] for e in h3c)),
+              "terciles": dict(Counter(str(v) for v in terc.values())),
+              "terminal_zero_without_merger_record": sum(1 for t in trades if t.get("no_merger_record")),
+              "terminal_zero_with_rename_record": sum(1 for t in trades if t.get("rename_record_in_window")),
+              "merger_without_bid": sum(1 for t in trades if t.get("merger_without_bid"))}
+    is_void = bool(void and void.get("void"))
+    items = {}
+    for item in ITEM_IDS:
+        rows = item_trades(item, trades, h3c)
+        items[item] = item_result(item, stage, rows, stage_sessions, protocol_id, B=B, fees=ctx.fees)
+    # descriptive H1 cells
+    desc = {}
+    for terc_name in ("high", "middle"):
+        vals = [t["nets"]["primary"] for t in trades if t["arm"] == "b_lane" and t["status"] == "filled"
+                and t["tercile"] == terc_name]
+        desc[f"b_lane_{terc_name}"] = {"n": len(vals), "mean": _mean(vals)}
+    # stage p-values
+    p_raw = {i: (items[i]["p"] if (tested and not is_void and i in carried) else 1.0) for i in ITEM_IDS}
+    if stage == "development":
+        p_stage = p_raw
+    else:
+        p_stage = ST.holm(p_raw, {i: items[i]["p_normal_tail"] for i in ITEM_IDS})
+    labels = {}
+    for i in ITEM_IDS:
+        r = items[i]
+        sign_ok = True
+        if stage == "holdout" and i == "H3-c":
+            vs = (validation_signs or {}).get("H3-c")
+            sign_ok = vs is not None and r["estimate"] is not None and np.sign(r["estimate"]) == np.sign(vs)
+        contaminated = stage == "holdout" and r["paper_exposed_fraction"] > CHRONO["paper_exposed_max_fraction"]
+        labels[i] = ST.item_label(stage, i, p_stage=p_stage[i], n_ok=r["n_ok"] and tested,
+                                  robust_ok=bool(r.get("robustness", {}).get("all_positive", True)),
+                                  mde_ok=r["mde_excluded"], void=is_void, sign_ok=sign_ok,
+                                  contaminated=contaminated, carried=i in carried)
+        r["p_stage"] = p_stage[i]
+        r["label"] = labels[i]
+    return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
+            "verdicts": ST.hypothesis_verdict(stage, labels), "descriptive": desc, "counts": counts}

@@ -458,13 +458,31 @@ into another:
 - the documented market-data rate limit and a fetch-time estimate, from the sampled candidate count, with margin under
   the 40 sessions before the holdout;
 - the holdout collector committed and scheduled so that its first batch covers the freeze session;
-- the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed, including
+- a native dry run of the study tree's fetch plumbing on an already exposed 2023 window, emitting counts only;
+- the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed (done in
+  draft; rerun on the tree the freeze pins), including
   terminal exits, renames and ticker reuse, split and ex-dividend crossings, early-close sessions, segment-end
   censoring and the embargo, validation's independence from development outputs, the access-log authorization and
   completion records and the evaluator's refusals.
 
+**Study code (code-first, 2026-09-24).** The study tree the core preregisters now exists in draft at
+[`study/`](study/README.md): the request plan and fetch loop, the transport (HTTP only, under `study/fetch/`), the
+records and sealed snapshot, identity and dedup (the pinned `dedupe_identity`, run through DuckDB), membership, the
+three arms and five items, terminal exits, the cost model, the stages with Holm over m = 5, the seeded bootstrap, the
+H3-c sign rule, the holdout gate and access log, the frozen-tree and runtime-lock refusals, the append-only data
+amendments and the count-only code. Its synthetic suite passes under `study/runtime.lock` (uv-managed CPython
+3.13.15 with duckdb, exchange_calendars 4.13.2, numpy and pandas pinned); the test command and the draft tree hash
+are in `protocol-core-draft.json` (`run_discipline.study_code`). These are synthetic tests of locally written code,
+not a native run: no market data was read and no provider was called. Review round 8 resolved the 21 remaining
+findings of the last core review in code and in the protocol, including the two high ones: the request plan and
+parsing left `study/fetch/`, so a transport deviation cannot change a stamp or a window (R8-1), and duckdb is an
+allowed, pinned import so that the pinned dedup runs (E1). The next steps are an independent review of the draft and
+its study tree from a different model family, then the other preconditions, then the freeze. Until then every fetch
+and evaluation command refuses to run.
+
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-7 (the restructure into the core and its two review rounds) are in `protocol-core-draft.json`.
+`protocol-draft.json` (`review_record`); rounds 5-8 (the restructure into the core, its two review rounds and the code-first round) are in
+`protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.
 

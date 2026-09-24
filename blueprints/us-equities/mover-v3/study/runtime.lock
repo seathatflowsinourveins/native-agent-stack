@@ -1,0 +1,21 @@
+{
+ "schema_version": 1,
+ "python": "3.13.15",
+ "python_distribution": "uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu), isolated from system site-packages",
+ "packages": {
+  "duckdb": "1.5.5",
+  "exchange_calendars": "4.13.2",
+  "korean_lunar_calendar": "0.4.0",
+  "numpy": "2.5.3",
+  "pandas": "3.0.6",
+  "pyluach": "2.3.0",
+  "python-dateutil": "2.9.0.post0",
+  "six": "1.17.0",
+  "toolz": "1.1.0",
+  "tzdata": "2026.4"
+ },
+ "requirements_file": "runtime-requirements.txt",
+ "test_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -m unittest discover -s blueprints/us-equities/mover-v3/study/tests -t blueprints/us-equities/mover-v3/study",
+ "run_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python blueprints/us-equities/mover-v3/study/run.py",
+ "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python, numpy, pandas, exchange_calendars or duckdb version differs"
+}
