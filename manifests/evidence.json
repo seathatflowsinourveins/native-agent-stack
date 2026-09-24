@@ -8613,13 +8613,13 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-pins.json",
-      "sha256": "757d0686bce3a3b3bb0acebe7420aadc81524566017f9dae3c6b360ea25a11d8",
+      "sha256": "a17c7c0af288d5af175a6f26b6ca9a6078f63c19527bddc97636cf452661e02c",
       "bytes": 4425
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
-      "sha256": "88bb18f8eace8dd8d2a1e09c3a10b3cef60b3b950994015483bcb8b245511903",
-      "bytes": 8258
+      "sha256": "c646bcd8deda457e6009e62c3eb507f3295ca9a69cfea209ec19068447923b04",
+      "bytes": 8306
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
@@ -8643,8 +8643,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
-      "sha256": "fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965",
-      "bytes": 502703
+      "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+      "bytes": 514006
     },
     {
       "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
@@ -29113,8 +29113,8 @@
     },
     {
       "path": "tests/test_mover_v3_data.py",
-      "sha256": "38c644ba7129ff4e82a25c9e97ba22ef083849298c3946b6547095ce45cf9ab2",
-      "bytes": 15989
+      "sha256": "babc35795dee09e905a432373cb6b2031b5e4949097f5cbc0151e89e34f45241",
+      "bytes": 16325
     },
     {
       "path": "tests/test_nanosecond_replay.py",
