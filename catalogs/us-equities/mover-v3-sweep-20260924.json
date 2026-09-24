@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "kind": "mover_v3_sota_sweep_catalog_decisions",
+  "checked_at": "2026-09-24",
+  "baseline_commit": "4a4c8a285630412ecfa8715c290a1e049ed03cb2",
+  "plan": "blueprints/us-equities/mover-v3/README.md",
+  "protocol_draft": "blueprints/us-equities/mover-v3/protocol-draft.json",
+  "scope": "Catalog actions from a read-only SOTA sweep for the mover v3 research plan: 5 angles, 37 items, each checked by at least two independent verifiers (5 survive, 24 contested, 8 killed). Only surviving items and contested items whose refutation the synthesis judged weak are recorded; killed items are listed in the plan's Dropped section. No record here involves installation, native execution, a paper order or a market-data fetch. Inclusion never upgrades an evidence level.",
+  "sweep_input_sha256": "e2120c0578dd02c9784c0abcd0af89e5e61d3dfb004a9bed55d278891b8764d1",
+  "evidence_levels": {
+    "literature_source_review": "the primary paper was opened and read by a verifier; bibliographic and abstract-level claims only",
+    "literature_metadata": "the citation was located; the primary text was not read",
+    "official_docs_metadata": "an official vendor, broker, exchange or regulator page was read live on 2026-09-24",
+    "unpinned_source_read": "source files were fetched live without a pinned commit",
+    "live_repository_metadata": "a live GitHub API recheck of push date, licence and archive state",
+    "existing_record": "already recorded elsewhere in this repository with equal or stronger evidence"
+  },
+  "registration": "Only /repository_decisions is registered with the decision index (python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/mover-v3-sweep-20260924.json#/repository_decisions), because the union accepts only records that name a GitHub repository. /non_repository_decisions holds the papers, APIs, exchange pages and vendors as data.",
+  "repository_decisions": [
+    {
+      "id": "mover-v3-alpaca-py-order-classes",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "catalog_action": "add",
+      "decision": "add_execution_method_candidate",
+      "sweep_status": "trailing_stop and DELETE /v2/orders survive; bracket contested and corrected to OCO for a held position; OTO folded into the OCO/trailing path",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none; Alpaca paper semantics for trailing_stop, OCO and bracket are undocumented and are what H6 measures",
+      "reason": "The SDK path to the broker-held exit order classes and single-call cancel-all that the v3 exit policy needs. native_adapter.py builds only LIMIT/DAY orders and cancels in a per-order loop today. A verifier named TradingClient.cancel_orders() as the SDK method for DELETE /v2/orders; that method was not source-read in this record.",
+      "links": ["mover-v3-alpaca-order-classes", "mover-v3-alpaca-cancel-all"],
+      "sources": [
+        "https://docs.alpaca.markets/docs/orders-at-alpaca",
+        "https://docs.alpaca.markets/reference/deleteallorders-1"
+      ]
+    },
+    {
+      "id": "mover-v3-dbn-status-schema",
+      "repository": "https://github.com/databento/dbn",
+      "catalog_action": "compare",
+      "decision": "compare_status_schema_for_halt_reconstruction",
+      "sweep_status": "contested: corrected from raw ITCH H/h/J messages to Databento's normalized status schema",
+      "evidence_level": "unpinned_source_read",
+      "native_execution": "none; the cost quote and XNAS.ITCH coverage start are unverified",
+      "reason": "Candidate source for historical halt and LULD state (H4 and simulation halt fidelity), closing the open item in evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/README.md. ITCH covers Nasdaq-listed names only. The existing pinned record in catalogs/us-equities/architecture/trading.json is unchanged; access goes through databento/databento-python (already conditional), whose Historical.metadata.get_cost gives the quote.",
+      "sources": [
+        "https://databento.com/docs/venues-and-datasets/xnas-itch",
+        "https://github.com/databento/dbn/blob/main/rust/dbn/src/record.rs",
+        "https://github.com/databento/dbn/blob/main/rust/dbn/src/enums.rs",
+        "https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf"
+      ]
+    },
+    {
+      "id": "mover-v3-hftbacktest-latency-protocol",
+      "repository": "https://github.com/nkaz001/hftbacktest",
+      "catalog_action": "no-change",
+      "decision": "no_change_add_latency_protocol_gate_note",
+      "sweep_status": "contested as a new candidate (duplicate); the documented latency-collection protocol was verified on the primary page",
+      "evidence_level": "existing_record",
+      "native_execution": "none",
+      "reason": "Keep the existing pinned review (5f3ec40, trading.json) and its refuted_keep_but_compare disposition. Add only a gate note: calibrate simulated latency from real paper order latencies (trade_updates timestamps, plus at most 2 unfillable probes a minute from the management reserve, labelled as measurement), not an invented constant. Live metadata 2026-09-24: MIT, not archived, last push 2025-12-23.",
+      "sources": [
+        "https://hftbacktest.readthedocs.io/en/latest/tutorials/Order%20Latency%20Data.html"
+      ]
+    },
+    {
+      "id": "mover-v3-kelly-code-discovery-only",
+      "repository": "https://github.com/cvxgrp/kelly_code",
+      "catalog_action": "no-change",
+      "decision": "retain_discovery_only",
+      "sweep_status": "contested: the fractional-Kelly overlay idea stands; the code is not adopted",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "The v3 sizing overlay (mover-v3-fractional-kelly) reimplements the idea. The repository stays discovery_only: GPL-3.0, last push 2020-10-02.",
+      "links": ["mover-v3-fractional-kelly"],
+      "sources": [
+        "https://github.com/cvxgrp/kelly_code"
+      ]
+    },
+    {
+      "id": "mover-v3-rd-agent-recheck",
+      "repository": "https://github.com/microsoft/RD-Agent",
+      "catalog_action": "no-change",
+      "decision": "no_change_existing_card_current",
+      "sweep_status": "contested as a new candidate: duplicates the existing targeted_candidate card",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "Live recheck 2026-09-24 matches the existing card: MIT, not archived, pushed 2026-09-23, release v1.0.0 on 2026-09-23. Any use needs a licensed US PIT dataset in Qlib format, and a final segment its own feedback loop never sees.",
+      "sources": [
+        "https://github.com/microsoft/RD-Agent",
+        "https://github.com/microsoft/RD-Agent/releases/latest"
+      ]
+    },
+    {
+      "id": "mover-v3-qlib-recheck",
+      "repository": "https://github.com/microsoft/qlib",
+      "catalog_action": "no-change",
+      "decision": "no_change_existing_card_current",
+      "sweep_status": "contested: duplicates the existing conditional card",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "Live recheck 2026-09-24: MIT, not archived, pushed 2026-09-22. The US-PIT adaptation gate stays open. The bundled examples default to China costs, limits and calendar.",
+      "sources": [
+        "https://github.com/microsoft/qlib"
+      ]
+    },
+    {
+      "id": "mover-v3-vectorbt-recheck",
+      "repository": "https://github.com/polakowo/vectorbt",
+      "catalog_action": "no-change",
+      "decision": "no_change_existing_card_current",
+      "sweep_status": "contested: duplicates the existing alternative card",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "Live recheck 2026-09-24: pushed 2026-09-17, not archived. The licence is Apache-2.0 with a Commons Clause; GitHub reports NOASSERTION. A pre-filter only, never the acceptance engine; any wide sweep stays inside the preregistered family and holdout discipline.",
+      "sources": [
+        "https://github.com/polakowo/vectorbt"
+      ]
+    }
+  ],
+  "non_repository_decisions": [
+    {
+      "id": "mover-v3-max-lottery",
+      "item": "Bali, Cakici, Whitelaw (2011) MAX/lottery effect, as a caution prior for mover selection (H1)",
+      "catalog_action": "add",
+      "sweep_status": "survives",
+      "evidence_level": "literature_source_review",
+      "native_execution": "none",
+      "reason": "Stocks selected on the largest recent daily return earn lower subsequent risk-adjusted returns. Monthly, cross-sectional evidence; carrying it over to catalyst-conditioned $1-50 movers is the H1 test.",
+      "sources": [
+        "https://pages.stern.nyu.edu/~rwhitela/papers/max%20jfe.pdf",
+        "https://www.nber.org/system/files/working_papers/w14804/w14804.pdf"
+      ]
+    },
+    {
+      "id": "mover-v3-overnight-intraday",
+      "item": "Lou, Polk, Skouras (2019) and Akbas, Boehmer, Jiang, Koch (2022), the overnight/intraday tug of war (H3)",
+      "catalog_action": "add",
+      "sweep_status": "contested: the original citation was a secondary Lachance (2023) summary; the substance was not refuted",
+      "evidence_level": "literature_metadata",
+      "native_execution": "none",
+      "reason": "The corrected primaries replace the secondary summary. Both still need a direct read (DOIs unverified). Evidence comes from large, liquid names.",
+      "sources": [
+        "https://onlinelibrary.wiley.com/doi/full/10.1002/rfe.1180"
+      ]
+    },
+    {
+      "id": "mover-v3-attention-buying",
+      "item": "Barber-Odean attention-buying line, downscoped to a prior on retail P&L (H2)",
+      "catalog_action": "add",
+      "sweep_status": "contested: the refutation concerned a citation and the fit, not the direction",
+      "evidence_level": "literature_source_review",
+      "native_execution": "none",
+      "reason": "Retail buying of extreme-return, high-volume names is documented and not profitable for the buyer. This is not a rules-based backtest.",
+      "sources": [
+        "https://faculty.haas.berkeley.edu/odean/papers/Attention/All%20that%20Glitters.pdf",
+        "https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.13183",
+        "https://www.cambridge.org/core/journals/journal-of-financial-and-quantitative-analysis/article/resolving-a-paradox-retail-trades-positively-predict-returns-but-are-not-profitable/6AAA9078F50C2597F44D73FA6A8E3F0D"
+      ]
+    },
+    {
+      "id": "mover-v3-days-to-cover",
+      "item": "Hong, Li, Ni, Scheinkman, Yan, days to cover (NBER w21166; SSRN 10.2139/ssrn.2568768), attached to the existing FINRA short-interest entry in blueprints/us-equities/acceptance-wave/factors-regimes.md (H5)",
+      "catalog_action": "add",
+      "sweep_status": "survives",
+      "evidence_level": "literature_source_review",
+      "native_execution": "none",
+      "reason": "Days to cover beats the raw short ratio, and high days to cover predicts lower returns. Squeezes are episodic. Bi-monthly publication makes it an overlay only.",
+      "sources": [
+        "https://www.nber.org/system/files/working_papers/w21166/w21166.pdf"
+      ]
+    },
+    {
+      "id": "mover-v3-alpaca-order-classes",
+      "item": "Alpaca trailing_stop, OCO, bracket and OTO order classes as execution methods",
+      "catalog_action": "add",
+      "sweep_status": "trailing_stop survives; bracket contested and corrected to OCO for a held position (a bracket's take-profit closes the whole position); OTO folded",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none; native paper execution is missing (H6)",
+      "reason": "Broker-held legs replace the client-side cancel-and-resubmit ratchet and cost no further calls when they fill.",
+      "sources": [
+        "https://docs.alpaca.markets/docs/orders-at-alpaca"
+      ]
+    },
+    {
+      "id": "mover-v3-alpaca-cancel-all",
+      "item": "Alpaca DELETE /v2/orders batch cancel-all (HTTP 207 with a result for each order)",
+      "catalog_action": "add",
+      "sweep_status": "survives",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none",
+      "reason": "One call whatever the number of open orders, against native_adapter.py's one-call-per-order loop (line 391). Partial per-order failures must be reconciled against the durable ledger before adoption.",
+      "sources": [
+        "https://docs.alpaca.markets/reference/deleteallorders-1"
+      ]
+    },
+    {
+      "id": "mover-v3-nasdaq-trader-halts",
+      "item": "Nasdaq Trader halt search, history and RSS pages",
+      "catalog_action": "add",
+      "sweep_status": "survives",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none",
+      "reason": "Free current and recent halts with reason codes. A web/RSS interface with a limited lookback, not a bulk archive: a pilot and a cross-check, not the primary historical halt source.",
+      "sources": [
+        "https://www.nasdaqtrader.com/trader.aspx?id=TradeHalts",
+        "https://www.nasdaqtrader.com/trader.aspx?id=TradingHaltHistory",
+        "https://www.nasdaqtrader.com/trader.aspx?id=tradinghaltsearch"
+      ]
+    },
+    {
+      "id": "mover-v3-luld-mechanics",
+      "item": "LULD limit-state and reopening-auction execution states (SEC DERA papers; Nasdaq LULD material)",
+      "catalog_action": "add",
+      "sweep_status": "contested: the execution-state idea survives; 'pause duration predicts post-reopen volatility' is corrected to a statement from DERA's literature review",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none",
+      "reason": "Halted, then reopening auction, then post-auction: no fills through halts, exits priced at the auction or the first post-reopen print. Band tiers must be checked against the current LULD plan text before any hardcoding.",
+      "sources": [
+        "https://www.sec.gov/files/dera-luld-white-paper.pdf",
+        "https://www.sec.gov/files/marketstructure/research/dera_wp_luld_and_extraordinary_transitory_volatility.pdf",
+        "https://www.nasdaq.com/articles/all-about-lulds",
+        "https://nasdaqtrader.com/content/MarketRegulation/LULD_FAQ.pdf"
+      ]
+    },
+    {
+      "id": "mover-v3-sec-xbrl-frames",
+      "item": "SEC XBRL frames API as a float and shares-outstanding screen, confirmed through companyfacts",
+      "catalog_action": "add",
+      "sweep_status": "contested: one misattributed source corrected; the claim stands",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none",
+      "reason": "Public domain, 10 req/s. Frames returns the latest filed fact with no accession ID, so a name that clears the screen must be confirmed from companyfacts' dated per-accession fact before the float counts as point-in-time.",
+      "sources": [
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://www.sec.gov/os/webmaster-faq"
+      ]
+    },
+    {
+      "id": "mover-v3-alpaca-1000-tiers",
+      "item": "Alpaca non-retail 1000/min ($0.004/share, wholesale routing given up) versus Elite 1000/min ($30k deposit), as an addendum to the Elite entries in catalogs/us-equities/runtime-target.json and paper-practice-20260921.md",
+      "catalog_action": "compare",
+      "sweep_status": "contested: facts confirmed; contested only on decision value",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none; paper observes 200/min",
+      "reason": "Capacity planning only. Throughput is capacity, not a trading target; 1000 round trips a minute is unreachable on one account, and sustained high rates are cost-bound first.",
+      "sources": [
+        "https://alpaca.markets/support/increase-api-rate-limit",
+        "https://alpaca.markets/elite",
+        "https://alpaca.markets/support/usage-limit-api-calls"
+      ]
+    },
+    {
+      "id": "mover-v3-norgate",
+      "item": "Norgate Data US Platinum versus the in-repo SEC Form-25 delisting proxy",
+      "catalog_action": "compare",
+      "sweep_status": "contested: facts confirmed; not new (already named in catalogs/sota-convergence/manifest-20260923.json)",
+      "evidence_level": "official_docs_metadata",
+      "native_execution": "none; gated on a paid subscription the user must buy; EULA not read",
+      "reason": "The only named candidate for survivorship-free delisted history before 2020. Access ends when a subscription lapses, so any derived receipt needs its own licence review.",
+      "sources": [
+        "https://norgatedata.com/prices.php"
+      ]
+    },
+    {
+      "id": "mover-v3-vwap-ladder-exit",
+      "item": "VWAP-loss and ladder exit (Maroy, SSRN 5095349, posted 2025-01-12)",
+      "catalog_action": "compare",
+      "sweep_status": "contested: HTTP 403, not read; the '2026' date was corrected to 2025",
+      "evidence_level": "literature_metadata",
+      "native_execution": "none",
+      "reason": "A single working paper on SPY. An exploratory arm only, outside the v3 confirmatory family unless a pre-freeze amendment adds it.",
+      "sources": [
+        "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5095349"
+      ]
+    },
+    {
+      "id": "mover-v3-fractional-kelly",
+      "item": "MacLean, Thorp, Ziemba (2010) fractional Kelly, as a sizing overlay applied only after a holdout pass",
+      "catalog_action": "add",
+      "sweep_status": "contested: a repository path in the proposal was misattributed; the idea stands",
+      "evidence_level": "literature_metadata",
+      "native_execution": "none",
+      "reason": "Edge shrink stays 0 until a v3 rule passes its holdout, then at most half-Kelly with estimation-error shrinkage, always under the leverage-schedule-v1 ceiling and safety.py hard caps. The full text (Quantitative Finance 10(7):681-687) was not opened.",
+      "links": ["mover-v3-kelly-code-discovery-only"],
+      "sources": [
+        "https://www.worldscientific.com/doi/10.1142/9789811285530_0015"
+      ]
+    },
+    {
+      "id": "mover-v3-no-change-duplicates",
+      "item": "Qullamaggie breakout scanner (duplicates the catalogued tradermonty/claude-trading-skills vcp-screener) and the backtrader family",
+      "catalog_action": "no-change",
+      "sweep_status": "scanner contested (duplicate); backtrader-family-closed killed (duplicates the catalog)",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "Recorded so the next sweep does not re-search them. The scanner is a single-maintainer, yfinance-only project (MIT, pushed 2026-09-16); only its feature vocabulary is of interest, and it is already covered. backtrader: GPL-3.0, last push 2024-08-19.",
+      "sources": [
+        "https://github.com/VladPetrariu/Qullamaggie-breakout-scanner",
+        "https://github.com/mementum/backtrader"
+      ]
+    },
+    {
+      "id": "mover-v3-already-recorded",
+      "item": "FINRA 4210 intraday margin standard; PATCH replace fill race; NautilusTrader halt-status model",
+      "catalog_action": "no-change",
+      "sweep_status": "4210 flag and replace semantics killed as duplicates; the Nautilus halt-status model was killed as a v3 candidate (background only)",
+      "evidence_level": "existing_record",
+      "native_execution": "none",
+      "reason": "Already recorded in catalogs/us-equities/convergence-program/trading.md, blueprints/us-equities/order-contract/README.md and the runtime target respectively. Halts remain a data-provider responsibility.",
+      "sources": [
+        "https://alpaca.markets/blog/finra-retires-the-pdt-rule-introducing-alpacas-new-intraday-margin-framework/",
+        "https://docs.alpaca.markets/us/reference/patchorderbyorderid-1"
+      ]
+    }
+  ]
+}

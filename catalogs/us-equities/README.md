@@ -28,6 +28,11 @@ the reasons for retaining or comparing the CLI, MCP and simulation alternatives.
 Its bounded operational paper lane uses 120 requests/minute against the observed
 200/minute account limit; Elite's advertised 1,000 is API calls, not fills.
 
+The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
+catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):
+literature and metadata evidence only, with each record's sweep status. Its
+repository records are registered in the decision index.
+
 The [current token-practice audit](../../docs/token-practice.md) maps the
 then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a

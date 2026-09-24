@@ -9153,8 +9153,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "7f0977dadd2f04ae9563b2456777f7ec00d07c3e23aac79fccd1f27cf4d70557",
-      "bytes": 15337
+      "sha256": "9add859b3528ad05c7e830261b1ae42c2deb4dca5961108ee876ac02a9c5819e",
+      "bytes": 15649
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -9298,8 +9298,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "f305a462b8ef3b51c90f5998164ecb88c48c79875de9d354be0eab67a5ff12d0",
-      "bytes": 719950
+      "sha256": "64ff0e784d915e37fb8f8235e9d1d249bbad4f7570751b2eedaf3ecc0065dacd",
+      "bytes": 722539
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
