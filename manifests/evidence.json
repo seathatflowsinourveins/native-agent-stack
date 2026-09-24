@@ -3002,19 +3002,19 @@
     },
     {
       "id": "wsl-retrieval-20260920",
-      "kind": "native_cli_e2e",
+      "kind": "historical_inventory",
       "component_ids": [
         "ast-grep",
         "qmd"
       ],
-      "claim": "Historical local fixture checks on WSL: pinned ripgrep 15.2.0 and ast-grep 0.45.3 passed 22 source checks across six native commands; QMD 2.8.3 passed 70 lexical checks across 17 commands, including exact provenance, Unicode, scoped negatives, reopen, update and deletion.",
+      "claim": "Incomplete historical WSL fixture reference: selected receipts report 22 source checks/six commands and 70 QMD lexical checks/17 commands. Offline byte and result consistency can be checked, but missing command argv/cwd, unrecovered raw logs and unsupported historical QMD installation prevent native E2E or adoption acceptance.",
       "limitations": [
-        "Historical September 20 Linux x86_64 fixture execution. September 23 leaf completion checked retained artifacts offline; no refreshed native or latest-release claim.",
-        "Locally authored integration checks and synthetic document fixtures, not unchanged official upstream tests. Native returned results and independent artifact auditing qualify only the exercised fixture scope.",
-        "Selected source and synthetic lexical corpus only; no semantic RAG, production corpus, native-client integration, service activation or OS-confinement acceptance. No model or automatic history capture.",
-        "Initial QMD URI-checker failure and its five native commands remain preserved separately; the corrected second attempt passed. Result bounds are assertions after capture, not streaming resource limits.",
-        "Original worker reported full native logs retained, but exact private raw-log subdirectories could not be verified locally during completion. Selected outputs and their hashes remain inspectable.",
-        "Whole-task parent/child/retry/cache provider usage remains unknown; no token-saving claim. Ripgrep evidence remains in the leaf without adding a new stack component."
+        "Historical reference only; not live verification, native E2E acceptance or adoption evidence. No new host/native/client acceptance follows from these artifacts.",
+        "Historical command facts omit argv and cwd. Exact raw-log locations are unavailable; no invocation was reconstructed or represented as observed.",
+        "The unchanged historical install receipt records npm --ignore-scripts --omit=optional. Future installation must use the current supported recipe with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency scripts enabled.",
+        "Both executed runner versions and the initial URI-checker failure are retained byte-for-byte. The future runner adds command provenance capture without changing past evidence.",
+        "Receipt-reported 22/70 checks and 6/17 commands describe selected local/synthetic fixtures. Five failed-attempt commands remain separate; no upstream-suite, semantic RAG, production, client or service acceptance.",
+        "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
       ],
       "path": "evidence/receipts/wsl-retrieval-20260920.json"
     }
@@ -4023,8 +4023,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "6475e15f0b5ad0afa49aff9c793c1a5561937e969a1d6709b19997d39f117bad",
-      "bytes": 5407
+      "sha256": "19fd6c29d75ddb583d5612054e43b4379b3d9c6a3f4dbe76e3241bead7c063d5",
+      "bytes": 5308
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -5318,18 +5318,18 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
-      "sha256": "ea88bcd35f3233d1ce0845e30ebf2081c2644f6a5eecfc6436d26f6ab6387ff0",
-      "bytes": 6743
+      "sha256": "e15a193803dfee256bd81d303ff1b309820b42ca16b2af9252f66d7137a494b3",
+      "bytes": 6575
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-      "sha256": "ef914a1710657ab4108e5a77e4dde0c5e7495a2b9cfbc6254f3669fc148c78a6",
-      "bytes": 8846
+      "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd",
+      "bytes": 11713
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
-      "sha256": "084d4ed07ad002d93d3993da6a5b3f532b365cdbe59765289c5633ddc6750024",
-      "bytes": 12972
+      "sha256": "a029dc2d8de56dd387202e5bffc341ad9d0a163e93f7bc01954b932f4ecf0244",
+      "bytes": 11528
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
@@ -5377,9 +5377,14 @@
       "bytes": 14888
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
       "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2",
       "bytes": 15192
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
     },
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
@@ -6353,8 +6358,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "26c32439b7c8e74c5504cdc12a0832e493d0ab64495ed3d3d09e6f119dea2e0f",
-      "bytes": 479772
+      "sha256": "50eee2f1231d3b34e04a327f900250cbcae6a1f37ec5f499cf149f90b02c265e",
+      "bytes": 479422
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9448,8 +9453,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "2e3945692e1e6ae8ddac2002c94fdf9f4c15af1b518bddbaf9a424de392449a6",
-      "bytes": 41450
+      "sha256": "8372460d154d6ee768f2529b050eaaab8444cb6456c9caeb7690367011bcda17",
+      "bytes": 41473
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -27623,8 +27628,8 @@
     },
     {
       "path": "evidence/receipts/wsl-retrieval-20260920.json",
-      "sha256": "ab2f3955d25e5d33e833e8728d17dcc0397d390c91a062af9428d0245236fb5f",
-      "bytes": 2281
+      "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
+      "bytes": 2455
     },
     {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
@@ -27878,8 +27883,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "d84fe1c650421b6f82e961b1eba8302b4e09572bca69d4b4db366c52bc58034e",
-      "bytes": 87773
+      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163",
+      "bytes": 87705
     },
     {
       "path": "observability/README.md",
@@ -28808,8 +28813,8 @@
     },
     {
       "path": "tests/test_wsl_retrieval.py",
-      "sha256": "d04565f52421a833e98e8a61ea489290f78c2725ceaa3c699289bf9c4e0280fd",
-      "bytes": 5646
+      "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903",
+      "bytes": 12720
     },
     {
       "path": "tests/test_zizmor_negative_control.py",

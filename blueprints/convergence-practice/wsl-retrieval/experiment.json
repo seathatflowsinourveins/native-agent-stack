@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "observed",
   "lane": "retrieval",
-  "task_and_failure": "Qualify frozen WSL source and lexical document retrieval, detecting incorrect spans, absent-answer errors, cross-collection leakage, wrong provenance, stale updates and accidental model work. Complete the historical September 20 evidence contract offline on September 23.",
+  "task_and_failure": "Audit the incomplete historical September 20 WSL fixture reference offline. Missing per-command argv/cwd, unavailable raw-log locations and unsupported blanket lifecycle-script suppression prevent native E2E or adoption acceptance.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
@@ -25,19 +25,18 @@
   "discovery_provenance": [
     "Existing selected ripgrep, ast-grep and QMD components; bounded official-source preflight dated September 20. No discovery-list installation or fresh currency claim during offline completion."
   ],
-  "license_and_compatibility": "ripgrep MIT OR Unlicense; ast-grep and QMD MIT. Dated source review and pins preserve tagged license identities. Native Linux x86_64 binaries, Node 24.21.0, QMD 2.8.3, better-sqlite3 13.0.3 and sqlite-vec 0.1.9 qualified in the retained attempts; lifecycle scripts and optional inference backends excluded.",
+  "license_and_compatibility": "Dated pins and tagged license identities are preserved: ripgrep MIT OR Unlicense; ast-grep and QMD MIT. The retained Linux x86_64 fixture reports Node 24.21.0, QMD 2.8.3, better-sqlite3 13.0.3 and sqlite-vec 0.1.9. Historical npm --ignore-scripts installation is not a supported fresh-host recipe; native dependency setup is not qualified.",
   "baseline_and_candidate": {
-    "baseline": "Independent Python string/AST oracles and explicit four-document source bodies; no performance or model baseline run.",
-    "candidate": "Exact pinned ripgrep/ast-grep source commands and QMD lexical search/get/reopen/update/deletion against owned frozen fixtures."
+    "baseline": "Frozen Python string/AST oracles and explicit source bodies; no performance or model baseline run.",
+    "candidate": "Offline consistency audit of selected facts from incomplete historical receipts; no independently verified native invocation."
   },
   "frozen_inputs": {
     "base_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
     "tasks": [
-      "source-retrieval",
-      "qmd-lexical-retrieval"
+      "historical-reference-audit"
     ],
     "roles": [
-      "deterministic-runner"
+      "offline-auditor"
     ],
     "sources": [
       {
@@ -45,7 +44,7 @@
         "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0"
       },
       {
-        "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+        "path": "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
         "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2"
       },
       {
@@ -83,7 +82,7 @@
         "sha256": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136"
       },
       {
-        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
         "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3"
       },
       {
@@ -102,20 +101,24 @@
       },
       {
         "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-        "sha256": "ef914a1710657ab4108e5a77e4dde0c5e7495a2b9cfbc6254f3669fc148c78a6"
+        "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd"
       },
       {
         "path": "tests/test_wsl_retrieval.py",
-        "sha256": "d04565f52421a833e98e8a61ea489290f78c2725ceaa3c699289bf9c4e0280fd"
+        "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+        "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
       }
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Frozen oracle and executed runners define exact source paths/lines/byte spans, QMD named-index and collection URI scope, exact source bodies, absent answers, bounded get/search outputs, reopen/update/deletion, zero vectors and no model artifacts. The retrospective contract preserves both runner versions and the initial checker failure.",
-    "usage_rule": "Deterministic fixture commands invoke no model: per-fixture provider usage is zero. Whole-task parent/child/retry/cache accounting is unknown; no token-saving or performance comparison."
+    "quality_rule": "Retrospective offline audit requires exact frozen-input and check-name sets, byte identities, source spans, QMD bodies, URI scope and retained failure. Consistency cannot establish the missing argv/cwd or independently certify historical execution. Native acceptance remains incomplete.",
+    "usage_rule": "The offline audit invokes no model. Historical per-fixture zero-usage declarations are retained as reported, not independently verified; whole-task parent/child/retry/cache accounting is unknown. No savings claim."
   },
   "runtime_and_platform": {
-    "platform": "Historical September 20 WSL2 Linux x86_64 runs; Python 3.12.3. September 23 completion checks inspect retained artifacts offline.",
+    "platform": "Historical receipts report September 20 WSL2 Linux x86_64 / Python 3.12.3. Current assessment is offline only; no native host requalification.",
     "tools": [
       {
         "name": "python",
@@ -146,133 +149,79 @@
         "version": "0.1.9"
       }
     ],
-    "isolation": "Owned fixture copies, new private run directories, exact executable arguments, explicit QMD config/cache and named index. Real HOME unchanged. No persistent services or native-client/global changes; no OS confinement or network-audit claim."
+    "isolation": "Historical runner source describes owned fixture state and scoped configuration. Missing command argv/cwd and unrecovered raw logs prevent verifying its actual invocation; no confinement, client or service acceptance."
   },
   "commands": [
-    "python3 \"$RETAINED_INITIAL_RUNNER\" --mode source --run-dir \"$NEW_PRIVATE_SOURCE_RUN\" --source \"$PINNED_PLANNER_SOURCE\" --rg \"$PINNED_RIPGREP_BINARY\" --ast-grep \"$PINNED_AST_GREP_BINARY\"",
-    "python3 \"$RETAINED_INITIAL_RUNNER\" --mode qmd --run-dir \"$NEW_PRIVATE_QMD_ATTEMPT_1\" --node \"$PINNED_NODE_BINARY\" --package-prefix \"$OWNED_PACKAGE_PREFIX\"",
-    "python3 blueprints/convergence-practice/wsl-retrieval/run.py --mode qmd --run-dir \"$NEW_PRIVATE_QMD_ATTEMPT_2\" --node \"$PINNED_NODE_BINARY\" --package-prefix \"$OWNED_PACKAGE_PREFIX\""
+    "python3 blueprints/convergence-practice/wsl-retrieval/audit.py"
   ],
   "observations": [
     {
-      "id": "source-retrieval-attempt-1",
-      "task": "source-retrieval",
-      "role": "deterministic-runner",
+      "id": "historical-reference-audit",
+      "task": "historical-reference-audit",
+      "role": "offline-auditor",
       "condition": "candidate",
       "attempt": 1,
       "command_index": 0,
-      "evidence_class": "native_cli_execution",
-      "scope": "WSL2 Linux x86_64 selected source and lexical document retrieval fixtures",
-      "status": "passed",
-      "exit_code": 0,
-      "quality": {
-        "semantic": true,
-        "contract": true
-      },
-      "artifacts": [
-        {
-          "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
-          "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01"
-        }
-      ],
-      "usage": {
-        "uncached_input": 0,
-        "cache_creation": 0,
-        "cache_read": 0,
-        "output": 0,
-        "reasoning_in_output": 0,
-        "total": 0,
-        "native_retries": 0
-      }
-    },
-    {
-      "id": "qmd-lexical-retrieval-attempt-1",
-      "task": "qmd-lexical-retrieval",
-      "role": "deterministic-runner",
-      "condition": "candidate",
-      "attempt": 1,
-      "command_index": 1,
-      "evidence_class": "native_cli_execution",
-      "scope": "WSL2 Linux x86_64 selected source and lexical document retrieval fixtures",
+      "evidence_class": "offline_artifact_check",
+      "scope": "Offline consistency of incomplete historical fixture reference",
       "status": "failed",
-      "exit_code": 1,
+      "exit_code": 0,
       "quality": {
         "semantic": null,
         "contract": false
       },
       "artifacts": [
         {
+          "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
+          "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01"
+        },
+        {
           "path": "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
           "sha256": "452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6"
-        }
-      ],
-      "usage": {
-        "uncached_input": 0,
-        "cache_creation": 0,
-        "cache_read": 0,
-        "output": 0,
-        "reasoning_in_output": 0,
-        "total": 0,
-        "native_retries": 0
-      }
-    },
-    {
-      "id": "qmd-lexical-retrieval-attempt-2",
-      "task": "qmd-lexical-retrieval",
-      "role": "deterministic-runner",
-      "condition": "candidate",
-      "attempt": 2,
-      "command_index": 2,
-      "evidence_class": "native_cli_execution",
-      "scope": "WSL2 Linux x86_64 selected source and lexical document retrieval fixtures",
-      "status": "passed",
-      "exit_code": 0,
-      "quality": {
-        "semantic": true,
-        "contract": true
-      },
-      "artifacts": [
+        },
         {
           "path": "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
           "sha256": "cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-retrieval/verification.json",
+          "sha256": "1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe"
         }
       ],
       "usage": {
-        "uncached_input": 0,
-        "cache_creation": 0,
-        "cache_read": 0,
-        "output": 0,
-        "reasoning_in_output": 0,
-        "total": 0,
-        "native_retries": 0
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
       }
     }
   ],
   "failures_and_skips": [
     {
-      "run_id": "qmd-lexical-retrieval-attempt-1",
-      "reason": "The initial checker compared the named-index URI with a bare collection/path and failed qmd-positive-0_paths after five successful native command exits. The exact expected document body was returned; run.py subsequently parses and validates the URI. The failed receipt and executed initial runner are preserved."
+      "run_id": "historical-reference-audit",
+      "reason": "The consistency checker exits 0 but native acceptance fails: command argv/cwd were never retained, raw log locations are unavailable, and blanket npm lifecycle-script suppression is unsupported for fresh QMD installation. No native command was rerun. The original QMD URI-checker failure and five command facts remain unchanged in qmd-attempt-1.json."
     }
   ],
   "limitations": [
-    "The source attempt passed 22 checks/six native commands; QMD attempt 2 passed 70 checks/17 commands. Five commands from failed QMD attempt 1 remain separately counted. These are historical receipts, not new native execution.",
-    "Semantic quality means exact correctness on the selected source/body oracle, not semantic search, RAG, embeddings, model performance, production corpus coverage or native-client integration.",
-    "Package lifecycle scripts were disabled. The optional llama backend and model-artifact inventories are empty; no inference commands were invoked. Empty inventories are not independent network monitoring.",
-    "Output byte bounds are fixture assertions after capture, not streaming process resource limits. Default-index routing, general source ignore behavior and other languages were not qualified.",
-    "Raw logs were reported retained by the original handoff; exact private subdirectory locators could not be verified locally during completion. Published hashes/selected facts do not independently certify historical execution.",
-    "Per-fixture provider usage is zero; whole-task parent/child/retry/cache usage unknown. No savings claim. No native-client account, model, effort, permission, service or automatic history-capture changes.",
-    "Locally authored integration checks and synthetic document fixtures; no unchanged upstream test suite was recorded. Historical native operation evidence and independent artifact auditing are distinct from upstream-suite acceptance under docs/acceptance-evidence-policy.md."
+    "Incomplete historical fixture reference only; no native E2E or adoption acceptance. Receipt-declared source success (22 checks/six commands), QMD attempt-2 success (70 checks/17 commands), and failed QMD attempt 1 (five commands) are preserved without inventing missing invocation details.",
+    "Exact frozen-input/check-name sets and selected result bytes can be audited offline. Historical argv/cwd are absent; original raw-log locations cannot be verified, so output digests do not prove which native command produced them.",
+    "Original install-receipt.json still records npm --ignore-scripts --omit=optional. This historical action is not a recommended installation recipe; future setup follows recipes/README.md and docs/native-token-ci.md with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency lifecycle scripts enabled.",
+    "Both historical runner versions remain byte-identical. The new run.py records sanitized argv/cwd and is a future recording aid, not evidence of a new execution or a repair of historical receipts.",
+    "The first QMD attempt failed its bare-URI comparison while returning the expected body. The second runner corrected named-index URI parsing. Both receipts and all reported command counts remain preserved.",
+    "Local synthetic fixtures do not qualify upstream suites, semantic RAG, production corpora, native clients, services, inference, OS confinement or resource performance.",
+    "Historical verification.json records the earlier 18-test offline completion and its then-current assessment; it is not refreshed acceptance. Review changes supersede its acceptance wording without altering historical bytes.",
+    "Whole-task provider usage remains unknown. No savings claim, model/global change or automatic history capture."
   ],
   "decision_and_scope": {
-    "decision": "adopt_within_scope",
-    "scope": "WSL2 Linux x86_64 selected source and lexical document retrieval fixtures",
-    "qualification_run_ids": [
-      "source-retrieval-attempt-1",
-      "qmd-lexical-retrieval-attempt-2"
-    ]
+    "decision": "defer",
+    "scope": "Incomplete historical fixture reference; native acceptance unavailable",
+    "qualification_run_ids": []
   },
   "rollback": "No production or global deployment. Retain required evidence, then retire only the owned private fixture/index/package prefix if no longer needed; never remove or stop unrelated state or processes.",
-  "next_decision_changing_test": "Coordinator-owned production-corpus and actual native-client retrieval acceptance, if separately authorized. Existing exact pins and historical passing inputs should be reused; no native rerun is required for this offline completion.",
+  "next_decision_changing_test": "Recover and verify the original raw logs and actual invocation provenance, or authorize a separate reachable-host native trial using the supported QMD installation recipe and complete command capture. Neither is performed by this offline repair.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

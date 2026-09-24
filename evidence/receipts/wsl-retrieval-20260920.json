@@ -1,29 +1,31 @@
 {
   "schema_version": 1,
   "id": "wsl-retrieval-20260920",
-  "kind": "native_cli_e2e",
+  "kind": "historical_inventory",
   "component_ids": [
     "ast-grep",
     "qmd"
   ],
   "recorded_at_utc": "2026-09-20T08:28:46.519057+00:00",
-  "claim": "Historical local fixture checks on WSL: pinned ripgrep 15.2.0 and ast-grep 0.45.3 passed 22 source checks across six native commands; QMD 2.8.3 passed 70 lexical checks across 17 commands, including exact provenance, Unicode, scoped negatives, reopen, update and deletion.",
+  "claim": "Incomplete historical WSL fixture reference: selected receipts report 22 source checks/six commands and 70 QMD lexical checks/17 commands. Offline byte and result consistency can be checked, but missing command argv/cwd, unrecovered raw logs and unsupported historical QMD installation prevent native E2E or adoption acceptance.",
   "limitations": [
-    "Historical September 20 Linux x86_64 fixture execution. September 23 leaf completion checked retained artifacts offline; no refreshed native or latest-release claim.",
-    "Locally authored integration checks and synthetic document fixtures, not unchanged official upstream tests. Native returned results and independent artifact auditing qualify only the exercised fixture scope.",
-    "Selected source and synthetic lexical corpus only; no semantic RAG, production corpus, native-client integration, service activation or OS-confinement acceptance. No model or automatic history capture.",
-    "Initial QMD URI-checker failure and its five native commands remain preserved separately; the corrected second attempt passed. Result bounds are assertions after capture, not streaming resource limits.",
-    "Original worker reported full native logs retained, but exact private raw-log subdirectories could not be verified locally during completion. Selected outputs and their hashes remain inspectable.",
-    "Whole-task parent/child/retry/cache provider usage remains unknown; no token-saving claim. Ripgrep evidence remains in the leaf without adding a new stack component."
+    "Historical reference only; not live verification, native E2E acceptance or adoption evidence. No new host/native/client acceptance follows from these artifacts.",
+    "Historical command facts omit argv and cwd. Exact raw-log locations are unavailable; no invocation was reconstructed or represented as observed.",
+    "The unchanged historical install receipt records npm --ignore-scripts --omit=optional. Future installation must use the current supported recipe with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency scripts enabled.",
+    "Both executed runner versions and the initial URI-checker failure are retained byte-for-byte. The future runner adds command provenance capture without changing past evidence.",
+    "Receipt-reported 22/70 checks and 6/17 commands describe selected local/synthetic fixtures. Five failed-attempt commands remain separate; no upstream-suite, semantic RAG, production, client or service acceptance.",
+    "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
   ],
   "evidence_paths": [
     "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
     "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
     "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
     "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
+    "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
     "blueprints/convergence-practice/wsl-retrieval/pins.json",
     "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
-    "blueprints/convergence-practice/wsl-retrieval/verification.json"
+    "blueprints/convergence-practice/wsl-retrieval/verification.json",
+    "blueprints/convergence-practice/wsl-retrieval/install-receipt.json"
   ]
 }

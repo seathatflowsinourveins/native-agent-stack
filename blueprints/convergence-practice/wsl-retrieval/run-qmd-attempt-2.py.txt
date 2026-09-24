@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import platform
-import re
 import shutil
 import sqlite3
 import subprocess
@@ -28,43 +27,6 @@ def save(path, value):
 
 def hashes(path):
     return {str(p.relative_to(path)): sha(p) for p in sorted(path.rglob('*')) if p.is_file()}
-
-
-def record_command(label, argv, run, env, path_scopes, facts, result):
-    """Retain argv boundaries and cwd, replacing private path roots with scope markers."""
-    argv = [str(value) for value in argv]
-
-    def sanitize(value):
-        for path, marker in sorted(path_scopes.items(), key=lambda item: len(str(item[0])), reverse=True):
-            value = re.sub(re.escape(str(path)) + r'(?=$|/)', lambda _: marker, value)
-        return value
-
-    fact = {'label': label, 'argv': [sanitize(value) for value in argv],
-            'cwd': sanitize(str(run)), 'exit_code': None}
-    facts.append(fact)
-    save(run/'receipt.partial.json', result)
-    stdout, stderr = '', ''
-    try:
-        out = subprocess.run(argv, cwd=run, env=env, text=True,
-                             capture_output=True, timeout=30, check=False)
-        stdout, stderr = out.stdout, out.stderr
-        fact['exit_code'] = out.returncode
-        return out, fact
-    except subprocess.TimeoutExpired as exc:
-        result['cleanup']['timed_out_commands'] += 1
-        fact['failure'] = 'timeout'
-        stdout, stderr = exc.stdout or '', exc.stderr or ''
-        raise
-    except OSError:
-        fact['failure'] = 'launch_error'
-        raise
-    finally:
-        for suffix, value in [('stdout', stdout), ('stderr', stderr)]:
-            data = value if isinstance(value, bytes) else value.encode()
-            (run/(label+'.'+suffix)).write_bytes(data)
-            fact[suffix+'_bytes'] = len(data)
-            fact[suffix+'_sha256'] = sha(run/(label+'.'+suffix))
-        save(run/'receipt.partial.json', result)
 
 
 def main():
@@ -114,14 +76,20 @@ def main():
         if not condition:
             raise AssertionError(name)
 
-    path_scopes = {str(run): '<RUN>', str(Path.home()): '<HOME>'}
-    for name in ['source', 'rg', 'ast_grep', 'node', 'package_prefix']:
-        path = getattr(args, name)
-        if path is not None:
-            path_scopes[str(path)] = '<' + name.upper() + '>'
-
     def command(label, argv, extra_env=None):
-        return record_command(label, argv, run, env | (extra_env or {}), path_scopes, facts, result)
+        try:
+            out = subprocess.run([str(x) for x in argv], cwd=run, env=env | (extra_env or {}),
+                                 text=True, capture_output=True, timeout=30, check=False)
+        except subprocess.TimeoutExpired:
+            result['cleanup']['timed_out_commands'] += 1
+            raise
+        (run/(label+'.stdout')).write_text(out.stdout)
+        (run/(label+'.stderr')).write_text(out.stderr)
+        fact = {'label': label, 'exit_code': out.returncode, 'stdout_bytes': len(out.stdout.encode()),
+                'stdout_sha256': sha(run/(label+'.stdout')), 'stderr_sha256': sha(run/(label+'.stderr'))}
+        facts.append(fact)
+        save(run/'receipt.partial.json', result)
+        return out, fact
 
     def ok(label, argv, extra_env=None):
         out, fact = command(label, argv, extra_env)

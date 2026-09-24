@@ -7,6 +7,44 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 
+# Fixed acceptance names from the preserved runner versions, never from a receipt.
+REQUIRED_FROZEN_INPUTS = {
+    'oracle.json', 'package-lock.json', 'package.json', 'pins.json', 'run.py',
+    'seed/planner.py', 'seed/corpus/decoy/other.md',
+    'seed/corpus/primary/notes/aéé.md', 'seed/corpus/primary/recovery.md',
+    'seed/corpus/primary/scope.md',
+}
+SOURCE_CHECKS = {
+    'canonical_source_hash', 'frozen_source_hash', 'ripgrep_binary_hash',
+    'ripgrep-version_exit', 'ripgrep_version', 'ast-grep_binary_hash',
+    'ast-grep-version_exit', 'ast-grep_version', 'independent_literal_oracle',
+    'rg-positive_exit', 'rg_positive_exact_lines', 'rg_positive_exact_spans',
+    'rg_negative_exit_and_empty', 'independent_ast_oracle', 'ast-positive_exit',
+    'ast_exact_spans', 'ast_bounded_exact_source_text', 'ast_negative_empty',
+    'canonical_source_unchanged', 'source_binaries_unchanged',
+    'frozen_inputs_unchanged', 'owned_commands_completed',
+}
+QMD_INITIAL_CHECKS = {
+    'node_binary_hash', 'node-version_exit', 'node_version', 'qmd_package_version',
+    'qmd_license_hash', 'qmd_entrypoint_hash', 'package_lock_hash',
+    'no_optional_llama_backends', 'qmd-version_exit', 'native_qmd_version',
+    'qmd-add-primary_exit', 'qmd-add-decoy_exit',
+}
+FAILED_QMD_CHECKS = QMD_INITIAL_CHECKS | {'qmd-positive-0_exit', 'qmd-positive-0_paths'}
+QMD_CHECKS = QMD_INITIAL_CHECKS | {
+    'qmd-bounded-get_exit', 'qmd_get_exact_bounded_line', 'qmd-update_exit',
+    'single_owned_database', 'qmd_database_integrity', 'qmd_active_scope_count',
+    'qmd_no_embedding_rows', 'qmd_no_model_files', 'qmd_entrypoint_and_lock_unchanged',
+    'frozen_inputs_unchanged', 'owned_commands_completed',
+}
+QMD_CHECKS |= {label + '_' + suffix
+               for label in ['qmd-positive-' + str(i) for i in range(5)]
+                            + ['qmd-reopen', 'qmd-updated']
+               for suffix in ['exit', 'uri_scope', 'paths', 'body', 'bound']}
+QMD_CHECKS |= {label + '_' + suffix
+               for label in ['qmd-negative-0', 'qmd-negative-1', 'qmd-old-marker', 'qmd-deleted']
+               for suffix in ['exit', 'uri_scope', 'paths']}
+
 
 def require(condition, message):
     if not condition:
@@ -17,9 +55,14 @@ def audit(source, qmd, failed, inventory, root=ROOT):
     oracle = json.loads((root/'oracle.json').read_text())
     code = (root/'seed/planner.py').read_bytes()
     require(hashlib.sha256(code).hexdigest() == oracle['source_sha256'], 'changed source oracle')
-    for receipt, mapping in [(source, {'run.py': 'run-initial.py.txt'}),
-                             (failed, {'run.py': 'run-initial.py.txt'}), (qmd, {})]:
-        require(receipt['frozen_file_mapping'] == mapping, 'wrong executed runner provenance')
+    for receipt, declared_mapping, runner in [
+            (source, {'run.py': 'run-initial.py.txt'}, 'run-initial.py.txt'),
+            (failed, {'run.py': 'run-initial.py.txt'}, 'run-initial.py.txt'),
+            (qmd, {}, 'run-qmd-attempt-2.py.txt')]:
+        require(receipt['frozen_file_mapping'] == declared_mapping, 'wrong executed runner provenance')
+        # The original QMD receipt had no remapping. Its run.py bytes are now archived.
+        mapping = {'run.py': runner}
+        require(set(receipt['frozen_inputs']) == REQUIRED_FROZEN_INPUTS, 'required frozen input names changed')
         for name, digest in receipt['frozen_inputs'].items():
             require(hashlib.sha256((root/mapping.get(name, name)).read_bytes()).hexdigest() == digest,
                     'changed frozen input: '+name)
@@ -28,8 +71,12 @@ def audit(source, qmd, failed, inventory, root=ROOT):
             require(receipt[claim] is False, 'unsupported claim: '+claim)
         require(receipt['whole_task_provider_usage'] is None, 'whole-task usage is unknown')
         require(receipt['platform']['system'] == 'Linux' and receipt['platform']['architecture'] == 'x86_64', 'wrong native target')
-    for receipt, mode, check_count, commands in [(source, 'source', 22, 6), (qmd, 'qmd', 70, 17)]:
-        require(receipt['passed'] is True and receipt['mode'] == mode and len(receipt['checks']) == check_count
+    for receipt, names in [(source, SOURCE_CHECKS), (qmd, QMD_CHECKS), (failed, FAILED_QMD_CHECKS)]:
+        require(set(receipt['checks']) == names, 'required check names changed')
+    require(all(value is (name != 'qmd-positive-0_paths') for name, value in failed['checks'].items()),
+            'initial failure check outcomes changed')
+    for receipt, mode, commands in [(source, 'source', 6), (qmd, 'qmd', 17)]:
+        require(receipt['passed'] is True and receipt['mode'] == mode
                 and all(v is True for v in receipt['checks'].values()), 'required native checks incomplete')
         require(receipt['native_commands'] == commands and len(receipt['facts']) == commands, 'native commands missing')
 
@@ -111,7 +158,8 @@ def audit(source, qmd, failed, inventory, root=ROOT):
     failed_row = named(failed)['qmd-positive-0']['rows']
     require(failed_row == qfacts['qmd-positive-0']['rows'], 'initial failure was not the documented URI format assumption')
     return {'evidence_consistent': True, 'source_checks': 22, 'qmd_checks': 70,
-            'accepted_native_commands': 23, 'retained_failed_commands': 5,
+            'status': 'incomplete_historical_reference', 'native_acceptance_established': False,
+            'recorded_successful_attempt_commands': 23, 'retained_failed_commands': 5,
             'whole_task_provider_usage': None, 'semantic_rag_or_client_integration': False}
 
 

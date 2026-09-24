@@ -725,9 +725,9 @@
     },
     {
       "id": "wsl-retrieval-20260920",
-      "title": "Scoped WSL source and lexical retrieval",
-      "status": "Historical local fixture acceptance",
-      "body": "Pinned ripgrep and ast-grep passed 22 source checks; QMD passed 70 lexical checks with exact named-index provenance, Unicode, absent answers, reopen, update and deletion. The initial URI-checker failure remains recorded. Local integration checks and synthetic fixtures; no upstream-suite, semantic RAG, native-client or token-saving claim.",
+      "title": "Incomplete historical WSL retrieval reference",
+      "status": "Native acceptance incomplete",
+      "body": "Retained source and QMD fixture receipts lack command argv/cwd; raw logs could not be recovered. Historical npm --ignore-scripts is not the supported fresh-install recipe. Selected facts and the failed attempt remain inspectable, but do not qualify native E2E or adoption. Future runs must retain invocation provenance and use supported QMD installation controls.",
       "path": "blueprints/convergence-practice/wsl-retrieval/README.md"
     }
   ],
