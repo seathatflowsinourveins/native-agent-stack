@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1919,7 +1919,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -5449,7 +5449,7 @@
       "bytes": 126
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
       "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
       "bytes": 111
     },
@@ -9320,8 +9320,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "aed574090f2ae3716719e36e0f42cc3ed79de8926d1a6d9e2dd75f4b76fc8ce5",
-      "bytes": 179660
+      "sha256": "0f5ee1ec04ad8308e2f3f3eac3ec95aae1a892a93f588e55ca7868f0ed2345a3",
+      "bytes": 180411
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9375,8 +9375,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "84f4cd52cdcf0abe9c51390c4fce9441f0a7effc3be667868d84a982fbab4a3f",
-      "bytes": 76661
+      "sha256": "b511a3f313dd15942b745bb8f7ccf66158d844a7fd4872ab3c3c23fdacdaa19c",
+      "bytes": 76641
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9815,8 +9815,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "9b8aeada8a7c5f440ffdaa601a0a54f4ca2e08c9838da6ba9b03ac222c668733",
-      "bytes": 17962
+      "sha256": "df09a0b93c6fb71c15f9d757b377cf2afb2f689774e58718a8fbfe5eff85021b",
+      "bytes": 18294
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10120,8 +10120,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "f2504883970ee5dfdae4eba3ac192a394c42ea3293ecbd5ad6d87c8f2e33e96d",
-      "bytes": 15158
+      "sha256": "516114c5801eb11eb19c4689ef106cf5a1bc0c5f7136fd92ef1f54253d2b0c4b",
+      "bytes": 15138
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -27615,13 +27615,13 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--duckdb--use--20260924.json",
-      "sha256": "b9d6aeebe8ca0a6a99015eab4b83e2b93c8e45ed01558657fa41f22bda6f7ece",
-      "bytes": 4440
+      "sha256": "73eb8050c7a53730250bdca748bafe5629eb7f97d6c463270e06cb4618a1cec5",
+      "bytes": 5003
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--fastapi--use--20260924.json",
-      "sha256": "bb389756d7069c3614af126948391572631153f15a5d687f7d89f50177b29196",
-      "bytes": 5267
+      "sha256": "2411caf39057b2ad556a381ba953ad7f65f7673dbc358bd9dad469bfe2a2dccb",
+      "bytes": 5830
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
@@ -27635,28 +27635,28 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nextjs--use--20260924.json",
-      "sha256": "c73a9cb55032181ba810c98573ac375582e1a4d84f2ee2cd9417668c87859054",
-      "bytes": 4819
+      "sha256": "5632e8c2be6670c2c7c6d7c755dd0ae6382b32861132938c5825a64a285af619",
+      "bytes": 5382
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-cli--use--20260924.json",
-      "sha256": "196831792c316a0bb302c356c48304da43d1ac361d9234f193d9eebf89a27fef",
-      "bytes": 5058
+      "sha256": "adef7590dc1d2ee486d2912926dfa8568abcacbe11e35f11ff5d8e421dd20dc4",
+      "bytes": 5621
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-test--use--20260924.json",
-      "sha256": "fff12a16cad0ab59765e7cdab8f45f6f89e8d089921b9fc2ff6c99aa45a8bfe7",
-      "bytes": 4208
+      "sha256": "c2289e7ba21113633655836678515f9bdb83d82757879ed84ce98dbfff4df0df",
+      "bytes": 4771
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--postgresql--use--20260924.json",
-      "sha256": "46e16ad94f3a6f4ca5f35a6e57547f20a3d83c8bb1d0c5503eb39a2cbc1919a9",
-      "bytes": 5800
+      "sha256": "a77ac936ac63cf1817b91935b016bc6c862ae5045f062f147f25e5d4f229cc3b",
+      "bytes": 6363
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--react--use--20260924.json",
-      "sha256": "cce77bcab5b54558d05e14095c26aed289ca6d33bc487fda68afbcb715ef310e",
-      "bytes": 5046
+      "sha256": "1f053024b6fcc86c3803a2d16964649e8d52a1be441fcfa137a3843abb563e9b",
+      "bytes": 5609
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",
