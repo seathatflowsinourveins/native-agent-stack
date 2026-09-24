@@ -1,0 +1,1138 @@
+{
+  "schema_version": 1,
+  "id": "overfitting-controls-research-evaluation-20260924",
+  "evidence_class": "local_integration_check",
+  "observed_utc": "2026-09-24T15:54:19Z",
+  "status": "diagnostic_computed_no_promotion",
+  "claim": "Deflated Sharpe ratio (Bailey and Lopez de Prado 2014) and CSCV probability of backtest overfitting (Bailey, Borwein, Lopez de Prado and Zhu 2017) were computed offline over the 6605-record research-evaluation candidate ledger (301 aligned development episodes, 2015-01-02 to 2020-12-16). For the frozen four-candidate selection set the highest-Sharpe candidate (momentum120, per-episode Sharpe 0.0254) has DSR 0.5521 against SR0 0.0177, and PBO is 0.7756 (S=16, mean-label metric, 12870 combinations). The walk-forward selected series has Sharpe -0.0151 and PSR(0) 0.4048. The retained candidates show no deflated-Sharpe evidence of skill, and the in-sample best candidate usually ranks below the out-of-sample median.",
+  "frozen_parameters": {
+    "path": "blueprints/us-equities/overfitting-controls/params.json",
+    "sha256": "0e371da46601c673453a40ebcb608e38512348c37bf95a63ac7793d263c21487",
+    "frozen_utc": "2026-09-24T15:53:14Z",
+    "before": "The first computation over the retained ledger (run-1 started 2026-09-24T15:54:19Z). Library unit tests on synthetic fixtures and the published example ran before it; no parameter changed after results were seen."
+  },
+  "inputs": {
+    "ledger": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json",
+      "sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+      "bytes": 2536508,
+      "records": 6605,
+      "provenance": "SHA-256 equals results.ledger_sha256 in blueprints/us-equities/research-evaluation/receipt.json (native skfolio 1.2.9 run of 2026-09-19); this in-tree copy is the gap-wave2 portfolio-risk byte-identical regeneration (raw/3/compare.json). No data was refetched."
+    },
+    "research_receipt": {
+      "path": "blueprints/us-equities/research-evaluation/receipt.json",
+      "sha256": "92a2c4c1984c7cd38af21fbc9b5290395805fed3177522b19d408ad50c59d56b",
+      "used_for": "Ledger hash binding and each development fold's frozen chosen candidate for the walk-forward series."
+    }
+  },
+  "method": {
+    "primary_sources": [
+      {
+        "citation": "Bailey, D. H. and Lopez de Prado, M. (2012). The Sharpe Ratio Efficient Frontier. Journal of Risk 15(2), 3-44.",
+        "used_for": "Probabilistic Sharpe ratio with skewness and kurtosis adjustment."
+      },
+      {
+        "citation": "Bailey, D. H. and Lopez de Prado, M. (2014). The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality. Journal of Portfolio Management 40(5), 94-107. SSRN 2460551.",
+        "used_for": "Expected maximum null Sharpe SR0 and DSR = PSR(SR0); the paper's numerical example is a unit test."
+      },
+      {
+        "citation": "Bailey, D. H., Borwein, J. M., Lopez de Prado, M. and Zhu, Q. J. (2017). The Probability of Backtest Overfitting. Journal of Computational Finance 20(4), 39-69. SSRN 2326253.",
+        "used_for": "CSCV algorithm, relative rank logits, PBO, probability of out-of-sample loss and performance degradation regression."
+      }
+    ],
+    "implementation_decision": {
+      "choice": "Written from the papers as a standard-library module (overfitting.py); no third-party code copied or vendored.",
+      "alternatives_considered": [
+        "eslazarev/purged-cross-validation: catalogued discovery_only in catalogs/landscape/claude-independent-discovery.json with no source pin, licence review or execution in this repository.",
+        "pypbo (Python) and the R pbo package: no copy on this host and no reviewed pin; installing either would require a network fetch and a new dependency lock for roughly 150 lines of arithmetic.",
+        "skfolio 1.2.9 (already locked for this lane) supplied the WalkForward splitter upstream of this ledger; this change did not review skfolio for DSR or PBO estimators."
+      ],
+      "overturn_condition": "Prefer a maintained, licence-reviewed upstream implementation if, pinned and executed, it reproduces the DSR numerical example and these ledger results within floating-point tolerance; also revisit if the papers' text contradicts a transcribed formula."
+    },
+    "parameters": "See frozen params.json: trial sets, per-episode (non-annualized) Sharpe with population moments, ddof=1 trial variance, S=16 primary with 8/10/12 sensitivity, mean-label primary metric with Sharpe sensitivity, earliest-row truncation, trial-order in-sample ties, average out-of-sample ranks, PBO rule lambda <= 0."
+  },
+  "implementation": {
+    "overfitting.py": {
+      "path": "blueprints/us-equities/overfitting-controls/overfitting.py",
+      "sha256": "c44a5f7d00f8cb2b9787ab8f408e76731a99e4ac7e67f69f3efbb34b4b7eebdf"
+    },
+    "evaluate.py": {
+      "path": "blueprints/us-equities/overfitting-controls/evaluate.py",
+      "sha256": "e62af085613c0b341ffdfc2a0eac94255551325f430844f29e317a26ede6cedc"
+    },
+    "crosscheck.py": {
+      "path": "blueprints/us-equities/overfitting-controls/crosscheck.py",
+      "sha256": "dc03b73d54ecf64f4286e98cab7242898979a05247c2042729efe80b663d03d0"
+    }
+  },
+  "commands": [
+    {
+      "id": "run-1",
+      "argv": [
+        "python3",
+        "blueprints/us-equities/overfitting-controls/evaluate.py"
+      ],
+      "cwd": "checkout root",
+      "runtime": "CPython 3.13.15 (standard library only)",
+      "started_utc": "2026-09-24T15:54:19Z",
+      "ended_utc": "2026-09-24T15:54:21Z",
+      "exit": 0,
+      "stderr": "only the elapsed-time line of the wrapping /usr/bin/time (1.54 s)",
+      "stdout_sha256": "3815782f85fcb7c8aebd6defce82ae9540039f6bf408a82a83ff47dd0a83ff43"
+    },
+    {
+      "id": "run-2",
+      "argv": [
+        "python3",
+        "blueprints/us-equities/overfitting-controls/evaluate.py"
+      ],
+      "runtime": "CPython 3.13.15",
+      "exit": 0,
+      "stderr_bytes": 0,
+      "stdout_sha256": "3815782f85fcb7c8aebd6defce82ae9540039f6bf408a82a83ff47dd0a83ff43"
+    },
+    {
+      "id": "run-3",
+      "argv": [
+        "<pinned adaptive-paper runtime python>",
+        "blueprints/us-equities/overfitting-controls/evaluate.py"
+      ],
+      "runtime": "CPython 3.12.3",
+      "exit": 0,
+      "stderr_bytes": 0,
+      "stdout_sha256": "3815782f85fcb7c8aebd6defce82ae9540039f6bf408a82a83ff47dd0a83ff43"
+    }
+  ],
+  "determinism": "All three runs produced byte-identical stdout; the results object below is that stdout.",
+  "independent_observation": {
+    "method": "crosscheck.py recomputes the primary DSR and PBO with numpy 2.5.3 (array moments, direct row slicing of all 12870 CSCV combinations, explicit average ranks, math.erf CDF), sharing only statistics.NormalDist.inv_cdf and the ledger with the module under test.",
+    "runtime": "CPython 3.12.3 pinned adaptive-paper runtime, exit 0, empty stderr",
+    "stdout_sha256": "16fa24af60088749727bea5f789136a44d03be78e68dd018ce6a0db788a63395",
+    "result": {
+      "T": 301,
+      "selected": "momentum120",
+      "sr": 0.02539620742431157,
+      "sr0": 0.017690872785666837,
+      "dsr": 0.5520685371554236,
+      "pbo": 0.7756021756021756,
+      "combinations": 12870,
+      "numpy": "2.5.3"
+    },
+    "matches_primary": true
+  },
+  "tests": {
+    "file": "tests/test_overfitting_controls.py",
+    "command": "python3 -m unittest tests.test_overfitting_controls -v",
+    "classes": {
+      "published_worked_example": "Bailey and Lopez de Prado (2014) numerical example (N=100, annualized V=1/2, SR=2.5, T=1250, skew -3, kurtosis 10): SR0 0.1132 and DSR 0.9004 reproduced to four decimals. Expected values are transcribed from the paper; the paper text was not re-fetched in this offline session.",
+      "reference_value": "Expected maximum of 100 iid standard normals (order-statistic tables, 2.50759) within the approximation's 1.5% tolerance.",
+      "synthetic_fixture": "Locally constructed PBO cases: exact reversal (PBO 1), dominant trial (PBO 0), pure-noise mean near 0.5 over 20 seeds, block-merge equality with a brute-force recomputation, tie handling and invalid configurations. No published PBO numerical example with exact expected values was available offline.",
+      "replay": "Recomputes this receipt's results object from the retained ledger (float tolerance 1e-9 relative)."
+    },
+    "observed": {
+      "focused": "13 tests passed, 0 skipped on CPython 3.13.15; with tests.test_research_evaluation, 25 passed, 0 skipped on CPython 3.12.3 (pinned runtime)",
+      "full_suite": "python3 -m unittest on CPython 3.13.15 (system interpreter without numpy, jsonschema or PyYAML): 4031 tests OK, 490 skipped; none of the skips are in tests.test_overfitting_controls"
+    }
+  },
+  "results": {
+    "development_episodes": 301,
+    "dsr": {
+      "momentum_only": {
+        "dsr": 0.5608136084061657,
+        "expected_max_sharpe_sr0": 0.016387328850452767,
+        "observations": 301,
+        "per_trial": {
+          "momentum120": {
+            "kurtosis": 11.70581994534825,
+            "mean": 0.000647213217448946,
+            "n": 301,
+            "sharpe": 0.02539620742431157,
+            "skew": -1.4941526859828613,
+            "std": 0.025484640546342932
+          },
+          "momentum20": {
+            "kurtosis": 10.534059391680314,
+            "mean": 0.00047619722098306353,
+            "n": 301,
+            "sharpe": 0.020820777225615553,
+            "skew": -0.6864816724012911,
+            "std": 0.022871250953936714
+          },
+          "momentum60": {
+            "kurtosis": 14.863770264503078,
+            "mean": -0.00022989605827723083,
+            "n": 301,
+            "sharpe": -0.00993755279683209,
+            "skew": -2.2018993871687806,
+            "std": 0.02313407163487146
+          }
+        },
+        "psr_vs_zero": 0.6669116476097554,
+        "selected_sharpe": 0.02539620742431157,
+        "selected_trial": "momentum120",
+        "trial_sharpe_variance_ddof1": 0.0003692473397730362,
+        "trials": [
+          "momentum20",
+          "momentum60",
+          "momentum120"
+        ]
+      },
+      "primary": {
+        "dsr": 0.5520685371554236,
+        "expected_max_sharpe_sr0": 0.01769087278566683,
+        "observations": 301,
+        "per_trial": {
+          "cash": {
+            "kurtosis": null,
+            "mean": 0.0,
+            "n": 301,
+            "sharpe": 0.0,
+            "skew": null,
+            "std": 0.0
+          },
+          "momentum120": {
+            "kurtosis": 11.70581994534825,
+            "mean": 0.000647213217448946,
+            "n": 301,
+            "sharpe": 0.02539620742431157,
+            "skew": -1.4941526859828613,
+            "std": 0.025484640546342932
+          },
+          "momentum20": {
+            "kurtosis": 10.534059391680314,
+            "mean": 0.00047619722098306353,
+            "n": 301,
+            "sharpe": 0.020820777225615553,
+            "skew": -0.6864816724012911,
+            "std": 0.022871250953936714
+          },
+          "momentum60": {
+            "kurtosis": 14.863770264503078,
+            "mean": -0.00022989605827723083,
+            "n": 301,
+            "sharpe": -0.00993755279683209,
+            "skew": -2.2018993871687806,
+            "std": 0.02313407163487146
+          }
+        },
+        "psr_vs_zero": 0.6669116476097554,
+        "selected_sharpe": 0.02539620742431157,
+        "selected_trial": "momentum120",
+        "trial_sharpe_variance_ddof1": 0.0002827259258371177,
+        "trials": [
+          "momentum20",
+          "momentum60",
+          "momentum120",
+          "cash"
+        ]
+      },
+      "with_equalweight_control": {
+        "dsr": 0.5750830794792382,
+        "expected_max_sharpe_sr0": 0.02141737891040903,
+        "observations": 301,
+        "per_trial": {
+          "cash": {
+            "kurtosis": null,
+            "mean": 0.0,
+            "n": 301,
+            "sharpe": 0.0,
+            "skew": null,
+            "std": 0.0
+          },
+          "equalweight": {
+            "kurtosis": 11.325886200438843,
+            "mean": 0.0008972410662137079,
+            "n": 301,
+            "sharpe": 0.03257184566045634,
+            "skew": -1.1840401587874543,
+            "std": 0.02754652209662771
+          },
+          "momentum120": {
+            "kurtosis": 11.70581994534825,
+            "mean": 0.000647213217448946,
+            "n": 301,
+            "sharpe": 0.02539620742431157,
+            "skew": -1.4941526859828613,
+            "std": 0.025484640546342932
+          },
+          "momentum20": {
+            "kurtosis": 10.534059391680314,
+            "mean": 0.00047619722098306353,
+            "n": 301,
+            "sharpe": 0.020820777225615553,
+            "skew": -0.6864816724012911,
+            "std": 0.022871250953936714
+          },
+          "momentum60": {
+            "kurtosis": 14.863770264503078,
+            "mean": -0.00022989605827723083,
+            "n": 301,
+            "sharpe": -0.00993755279683209,
+            "skew": -2.2018993871687806,
+            "std": 0.02313407163487146
+          }
+        },
+        "psr_vs_zero": 0.7098198477046372,
+        "selected_sharpe": 0.03257184566045634,
+        "selected_trial": "equalweight",
+        "trial_sharpe_variance_ddof1": 0.00032251312952154255,
+        "trials": [
+          "momentum20",
+          "momentum60",
+          "momentum120",
+          "cash",
+          "equalweight"
+        ]
+      }
+    },
+    "first_decision": "2015-01-02",
+    "inputs": {
+      "evaluate_py_sha256": "e62af085613c0b341ffdfc2a0eac94255551325f430844f29e317a26ede6cedc",
+      "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+      "overfitting_py_sha256": "c44a5f7d00f8cb2b9787ab8f408e76731a99e4ac7e67f69f3efbb34b4b7eebdf",
+      "params_sha256": "0e371da46601c673453a40ebcb608e38512348c37bf95a63ac7793d263c21487",
+      "research_receipt_sha256": "92a2c4c1984c7cd38af21fbc9b5290395805fed3177522b19d408ad50c59d56b"
+    },
+    "last_decision": "2020-12-16",
+    "ledger_records": 6605,
+    "pbo": {
+      "momentum_only": {
+        "mean_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.0008984119858695838,
+          "degradation_slope": -0.9118725676377238,
+          "in_sample_selection_counts": [
+            107,
+            25,
+            120
+          ],
+          "lambda_histogram": {
+            "-1.098612": 116,
+            "0.000000": 120,
+            "1.098612": 16
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.4359572574079801,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 120,
+          "metric": "mean",
+          "partitions": 10,
+          "pbo": 0.9365079365079365,
+          "pbo_strict": 0.4603174603174603,
+          "probability_oos_loss": 0.5317460317460317,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.0011109767822259436,
+          "selected_out_of_sample_mean": -0.00011465726512468383,
+          "trials": 3
+        },
+        "mean_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.0009573417091899579,
+          "degradation_slope": -0.9115018430994034,
+          "in_sample_selection_counts": [
+            408,
+            61,
+            455
+          ],
+          "lambda_histogram": {
+            "-1.098612": 343,
+            "0.000000": 511,
+            "1.098612": 70
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.32458999437921426,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 511,
+          "metric": "mean",
+          "partitions": 12,
+          "pbo": 0.9242424242424242,
+          "pbo_strict": 0.3712121212121212,
+          "probability_oos_loss": 0.48593073593073594,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.001025869501173754,
+          "selected_out_of_sample_mean": 2.2259768090615506e-05,
+          "trials": 3
+        },
+        "mean_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.0008912723722196319,
+          "degradation_slope": -0.9211665387182658,
+          "in_sample_selection_counts": [
+            5746,
+            776,
+            6348
+          ],
+          "lambda_histogram": {
+            "-1.098612": 4428,
+            "0.000000": 7880,
+            "1.098612": 562
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.33001049790139175,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 7880,
+          "metric": "mean",
+          "partitions": 16,
+          "pbo": 0.9563325563325563,
+          "pbo_strict": 0.34405594405594403,
+          "probability_oos_loss": 0.4966588966588967,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.0009689287943105048,
+          "selected_out_of_sample_mean": -1.2724114998384463e-06,
+          "trials": 3
+        },
+        "mean_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.0009605227808458237,
+          "degradation_slope": -0.9140463245423784,
+          "in_sample_selection_counts": [
+            29,
+            7,
+            34
+          ],
+          "lambda_histogram": {
+            "-1.098612": 25,
+            "0.000000": 39,
+            "1.098612": 6
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.29819476406705836,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 39,
+          "metric": "mean",
+          "partitions": 8,
+          "pbo": 0.9142857142857143,
+          "pbo_strict": 0.35714285714285715,
+          "probability_oos_loss": 0.5428571428571428,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.0009350556555339403,
+          "selected_out_of_sample_mean": 0.00010583859566246121,
+          "trials": 3
+        },
+        "sharpe_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.02990585230917518,
+          "degradation_slope": -0.9276892193206676,
+          "in_sample_selection_counts": [
+            101,
+            27,
+            124
+          ],
+          "lambda_histogram": {
+            "-1.098612": 120,
+            "0.000000": 108,
+            "1.098612": 24
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.41851896711166087,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 108,
+          "metric": "sharpe",
+          "partitions": 10,
+          "pbo": 0.9047619047619048,
+          "pbo_strict": 0.47619047619047616,
+          "probability_oos_loss": 0.5357142857142857,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.04271119999452696,
+          "selected_out_of_sample_mean": -0.009716867469996438,
+          "trials": 3
+        },
+        "sharpe_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.03473384022372467,
+          "degradation_slope": -0.9003237991945331,
+          "in_sample_selection_counts": [
+            395,
+            72,
+            457
+          ],
+          "lambda_histogram": {
+            "-1.098612": 353,
+            "0.000000": 477,
+            "1.098612": 94
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.30794435364181866,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 477,
+          "metric": "sharpe",
+          "partitions": 12,
+          "pbo": 0.8982683982683982,
+          "pbo_strict": 0.38203463203463206,
+          "probability_oos_loss": 0.4945887445887446,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.040848690296514785,
+          "selected_out_of_sample_mean": -0.0020432078161543806,
+          "trials": 3
+        },
+        "sharpe_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.028851212592936295,
+          "degradation_slope": -0.8725597711548888,
+          "in_sample_selection_counts": [
+            5373,
+            990,
+            6507
+          ],
+          "lambda_histogram": {
+            "-1.098612": 4800,
+            "0.000000": 7032,
+            "1.098612": 1038
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.32113282284144745,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 7032,
+          "metric": "sharpe",
+          "partitions": 16,
+          "pbo": 0.9193473193473194,
+          "pbo_strict": 0.372960372960373,
+          "probability_oos_loss": 0.498989898989899,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.03685917292888655,
+          "selected_out_of_sample_mean": -0.0033106189028514247,
+          "trials": 3
+        },
+        "sharpe_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.030083454037995377,
+          "degradation_slope": -0.9262724087164941,
+          "in_sample_selection_counts": [
+            23,
+            8,
+            39
+          ],
+          "lambda_histogram": {
+            "-1.098612": 26,
+            "0.000000": 28,
+            "1.098612": 16
+          },
+          "lambda_max": 1.0986122886681098,
+          "lambda_mean": -0.15694461266687285,
+          "lambda_min": -1.0986122886681098,
+          "lambda_zero_count": 28,
+          "metric": "sharpe",
+          "partitions": 8,
+          "pbo": 0.7714285714285715,
+          "pbo_strict": 0.37142857142857144,
+          "probability_oos_loss": 0.5428571428571428,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.03183331097631105,
+          "selected_out_of_sample_mean": 0.0005971364025465317,
+          "trials": 3
+        }
+      },
+      "primary": {
+        "mean_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.0003755960182084304,
+          "degradation_slope": -0.6974169642087382,
+          "in_sample_selection_counts": [
+            73,
+            12,
+            98,
+            69
+          ],
+          "lambda_histogram": {
+            "-0.405465": 88,
+            "-1.386294": 125,
+            "0.405465": 33,
+            "1.386294": 6
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.7431333726953017,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "mean",
+          "partitions": 10,
+          "pbo": 0.8452380952380952,
+          "pbo_strict": 0.8452380952380952,
+          "probability_oos_loss": 0.5119047619047619,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.0013061708589959147,
+          "selected_out_of_sample_mean": -0.0005353496970104204,
+          "trials": 4
+        },
+        "mean_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.0003975356503207397,
+          "degradation_slope": -0.6748833832155265,
+          "in_sample_selection_counts": [
+            255,
+            31,
+            386,
+            252
+          ],
+          "lambda_histogram": {
+            "-0.405465": 271,
+            "-1.386294": 449,
+            "0.405465": 182,
+            "1.386294": 22
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.6796905701513202,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "mean",
+          "partitions": 12,
+          "pbo": 0.7792207792207793,
+          "pbo_strict": 0.7792207792207793,
+          "probability_oos_loss": 0.4816017316017316,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.0012389532857593503,
+          "selected_out_of_sample_mean": -0.0004386133348185236,
+          "trials": 4
+        },
+        "mean_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.00044423801083574936,
+          "degradation_slope": -0.7273275972514565,
+          "in_sample_selection_counts": [
+            3814,
+            289,
+            5490,
+            3277
+          ],
+          "lambda_histogram": {
+            "-0.405465": 4128,
+            "-1.386294": 5854,
+            "0.405465": 2632,
+            "1.386294": 256
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.6501205621817375,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "mean",
+          "partitions": 16,
+          "pbo": 0.7756021756021756,
+          "pbo_strict": 0.7756021756021756,
+          "probability_oos_loss": 0.48003108003108,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.0011880286000091778,
+          "selected_out_of_sample_mean": -0.00041984797627493757,
+          "trials": 4
+        },
+        "mean_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.00012216926410789342,
+          "degradation_slope": -0.6075829596038457,
+          "in_sample_selection_counts": [
+            12,
+            2,
+            26,
+            30
+          ],
+          "lambda_histogram": {
+            "-0.405465": 18,
+            "-1.386294": 45,
+            "0.405465": 7
+          },
+          "lambda_max": 0.4054651081081642,
+          "lambda_mean": -0.9549051777083554,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "mean",
+          "partitions": 8,
+          "pbo": 0.9,
+          "pbo_strict": 0.9,
+          "probability_oos_loss": 0.5142857142857142,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.0013772289987410554,
+          "selected_out_of_sample_mean": -0.0007146116069994381,
+          "trials": 4
+        },
+        "sharpe_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.014650477575139365,
+          "degradation_slope": -0.7779968069155431,
+          "in_sample_selection_counts": [
+            73,
+            14,
+            96,
+            69
+          ],
+          "lambda_histogram": {
+            "-0.405465": 86,
+            "-1.386294": 125,
+            "0.405465": 37,
+            "1.386294": 4
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.7444817777492334,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "sharpe",
+          "partitions": 10,
+          "pbo": 0.8373015873015873,
+          "pbo_strict": 0.8373015873015873,
+          "probability_oos_loss": 0.5158730158730159,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.052143438043757,
+          "selected_out_of_sample_mean": -0.025916950724502032,
+          "trials": 4
+        },
+        "sharpe_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.013853123632035766,
+          "degradation_slope": -0.6874544874643813,
+          "in_sample_selection_counts": [
+            269,
+            40,
+            363,
+            252
+          ],
+          "lambda_histogram": {
+            "-0.405465": 266,
+            "-1.386294": 446,
+            "0.405465": 200,
+            "1.386294": 12
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.6801000539623067,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "sharpe",
+          "partitions": 12,
+          "pbo": 0.7705627705627706,
+          "pbo_strict": 0.7705627705627706,
+          "probability_oos_loss": 0.4902597402597403,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.05072668963403052,
+          "selected_out_of_sample_mean": -0.021019166791091427,
+          "trials": 4
+        },
+        "sharpe_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.01674539901662133,
+          "degradation_slope": -0.7513857960806316,
+          "in_sample_selection_counts": [
+            3964,
+            336,
+            5293,
+            3277
+          ],
+          "lambda_histogram": {
+            "-0.405465": 3960,
+            "-1.386294": 5770,
+            "0.405465": 3056,
+            "1.386294": 84
+          },
+          "lambda_max": 1.3862943611198908,
+          "lambda_mean": -0.6409487331046992,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "sharpe",
+          "partitions": 16,
+          "pbo": 0.756021756021756,
+          "pbo_strict": 0.756021756021756,
+          "probability_oos_loss": 0.48166278166278165,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.047414314217345,
+          "selected_out_of_sample_mean": -0.01888104321719565,
+          "trials": 4
+        },
+        "sharpe_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.0027391817604871457,
+          "degradation_slope": -0.6594005137910001,
+          "in_sample_selection_counts": [
+            12,
+            2,
+            26,
+            30
+          ],
+          "lambda_histogram": {
+            "-0.405465": 15,
+            "-1.386294": 43,
+            "0.405465": 12
+          },
+          "lambda_max": 0.4054651081081642,
+          "lambda_mean": -0.8689578978925684,
+          "lambda_min": -1.3862943611198906,
+          "lambda_zero_count": 0,
+          "metric": "sharpe",
+          "partitions": 8,
+          "pbo": 0.8285714285714286,
+          "pbo_strict": 0.8285714285714286,
+          "probability_oos_loss": 0.5142857142857142,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.053047748257383835,
+          "selected_out_of_sample_mean": -0.032240530695887386,
+          "trials": 4
+        }
+      },
+      "with_equalweight_control": {
+        "mean_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.0008124346550125723,
+          "degradation_slope": -0.8238587597598237,
+          "in_sample_selection_counts": [
+            64,
+            6,
+            71,
+            49,
+            62
+          ],
+          "lambda_histogram": {
+            "-0.693147": 73,
+            "-1.609438": 105,
+            "0.000000": 32,
+            "0.693147": 30,
+            "1.609438": 12
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.7122343437319405,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 32,
+          "metric": "mean",
+          "partitions": 10,
+          "pbo": 0.8333333333333334,
+          "pbo_strict": 0.7063492063492064,
+          "probability_oos_loss": 0.47619047619047616,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.0013663870558545004,
+          "selected_out_of_sample_mean": -0.00031327529017559347,
+          "trials": 5
+        },
+        "mean_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.0007711894468638225,
+          "degradation_slope": -0.7328454819776022,
+          "in_sample_selection_counts": [
+            156,
+            18,
+            253,
+            172,
+            325
+          ],
+          "lambda_histogram": {
+            "-0.693147": 273,
+            "-1.609438": 339,
+            "0.000000": 185,
+            "0.693147": 85,
+            "1.609438": 42
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.6583492748248891,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 185,
+          "metric": "mean",
+          "partitions": 12,
+          "pbo": 0.8625541125541125,
+          "pbo_strict": 0.6623376623376623,
+          "probability_oos_loss": 0.47294372294372294,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.001423733394545966,
+          "selected_out_of_sample_mean": -0.0002721871388698237,
+          "trials": 5
+        },
+        "mean_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.0007905055762317812,
+          "degradation_slope": -0.7793453291223932,
+          "in_sample_selection_counts": [
+            2543,
+            120,
+            3643,
+            2446,
+            4118
+          ],
+          "lambda_histogram": {
+            "-0.693147": 3097,
+            "-1.609438": 4861,
+            "0.000000": 2751,
+            "0.693147": 1591,
+            "1.609438": 570
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.6177138878149186,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 2751,
+          "metric": "mean",
+          "partitions": 16,
+          "pbo": 0.832090132090132,
+          "pbo_strict": 0.6183372183372183,
+          "probability_oos_loss": 0.4575757575757576,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.0013298401978357331,
+          "selected_out_of_sample_mean": -0.0002458991704306967,
+          "trials": 5
+        },
+        "mean_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.00042937317639973383,
+          "degradation_slope": -0.6247513283072168,
+          "in_sample_selection_counts": [
+            8,
+            0,
+            12,
+            25,
+            25
+          ],
+          "lambda_histogram": {
+            "-0.693147": 17,
+            "-1.609438": 36,
+            "0.000000": 11,
+            "0.693147": 6
+          },
+          "lambda_max": 0.6931471805599452,
+          "lambda_mean": -0.936634054768386,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 11,
+          "metric": "mean",
+          "partitions": 8,
+          "pbo": 0.9142857142857143,
+          "pbo_strict": 0.7571428571428571,
+          "probability_oos_loss": 0.4857142857142857,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.0015279743255972446,
+          "selected_out_of_sample_mean": -0.0005252308131364684,
+          "trials": 5
+        },
+        "sharpe_S10": {
+          "combinations": 252,
+          "degradation_intercept": 0.028639078022273817,
+          "degradation_slope": -0.858701567497155,
+          "in_sample_selection_counts": [
+            68,
+            8,
+            65,
+            49,
+            62
+          ],
+          "lambda_histogram": {
+            "-0.693147": 73,
+            "-1.609438": 103,
+            "0.000000": 39,
+            "0.693147": 29,
+            "1.609438": 8
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.7277582445471316,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 39,
+          "metric": "sharpe",
+          "partitions": 10,
+          "pbo": 0.8531746031746031,
+          "pbo_strict": 0.6984126984126984,
+          "probability_oos_loss": 0.4722222222222222,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 30,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.05483720380767608,
+          "selected_out_of_sample_mean": -0.018449714844538587,
+          "trials": 5
+        },
+        "sharpe_S12": {
+          "combinations": 924,
+          "degradation_intercept": 0.022452792840967795,
+          "degradation_slope": -0.6241540598620049,
+          "in_sample_selection_counts": [
+            180,
+            26,
+            227,
+            172,
+            319
+          ],
+          "lambda_histogram": {
+            "-0.693147": 250,
+            "-1.609438": 338,
+            "0.000000": 214,
+            "0.693147": 78,
+            "1.609438": 44
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.6411212784761213,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 214,
+          "metric": "sharpe",
+          "partitions": 12,
+          "pbo": 0.8679653679653679,
+          "pbo_strict": 0.6363636363636364,
+          "probability_oos_loss": 0.4772727272727273,
+          "rows": 301,
+          "rows_dropped_earliest": 1,
+          "rows_per_partition": 25,
+          "rows_used": 300,
+          "selected_in_sample_mean": 0.0588850571579611,
+          "selected_out_of_sample_mean": -0.014300554649379833,
+          "trials": 5
+        },
+        "sharpe_S16": {
+          "combinations": 12870,
+          "degradation_intercept": 0.02700644710335813,
+          "degradation_slope": -0.754633031920549,
+          "in_sample_selection_counts": [
+            2896,
+            167,
+            3542,
+            2446,
+            3819
+          ],
+          "lambda_histogram": {
+            "-0.693147": 3167,
+            "-1.609438": 4757,
+            "0.000000": 3198,
+            "0.693147": 1504,
+            "1.609438": 244
+          },
+          "lambda_max": 1.6094379124341007,
+          "lambda_mean": -0.6539313955000999,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 3198,
+          "metric": "sharpe",
+          "partitions": 16,
+          "pbo": 0.8641802641802642,
+          "pbo_strict": 0.6156954156954157,
+          "probability_oos_loss": 0.46907536907536906,
+          "rows": 301,
+          "rows_dropped_earliest": 13,
+          "rows_per_partition": 18,
+          "rows_used": 288,
+          "selected_in_sample_mean": 0.05285136074821765,
+          "selected_out_of_sample_mean": -0.012876935499196043,
+          "trials": 5
+        },
+        "sharpe_S8": {
+          "combinations": 70,
+          "degradation_intercept": 0.011697305728640854,
+          "degradation_slope": -0.6344411567427698,
+          "in_sample_selection_counts": [
+            8,
+            0,
+            17,
+            25,
+            20
+          ],
+          "lambda_histogram": {
+            "-0.693147": 16,
+            "-1.609438": 32,
+            "0.000000": 19,
+            "0.693147": 3
+          },
+          "lambda_max": 0.6931471805599452,
+          "lambda_mean": -0.8644703792167215,
+          "lambda_min": -1.6094379124341005,
+          "lambda_zero_count": 19,
+          "metric": "sharpe",
+          "partitions": 8,
+          "pbo": 0.9571428571428572,
+          "pbo_strict": 0.6857142857142857,
+          "probability_oos_loss": 0.4857142857142857,
+          "rows": 301,
+          "rows_dropped_earliest": 5,
+          "rows_per_partition": 37,
+          "rows_used": 296,
+          "selected_in_sample_mean": 0.05786714389700346,
+          "selected_out_of_sample_mean": -0.025015991982774335,
+          "trials": 5
+        }
+      }
+    },
+    "primary": {
+      "dsr": 0.5520685371554236,
+      "dsr_selected_trial": "momentum120",
+      "pbo": 0.7756021756021756,
+      "pbo_strict": 0.7756021756021756,
+      "probability_oos_loss": 0.48003108003108
+    },
+    "walk_forward": {
+      "chosen_counts": {
+        "cash": 7,
+        "momentum120": 4,
+        "momentum20": 4,
+        "momentum60": 5
+      },
+      "first_decision": "2016-01-14",
+      "folds": 20,
+      "last_decision": "2020-12-16",
+      "moments": {
+        "kurtosis": 17.496936247274043,
+        "mean": -0.0003171285205987647,
+        "n": 249,
+        "skew": -1.812947934946181,
+        "std": 0.02099941875059171
+      },
+      "observations": 249,
+      "psr_vs_zero": 0.40476571908946396,
+      "sharpe": -0.015101776118914188
+    }
+  },
+  "conclusion": [
+    "DSR of the best retained selection candidate is 0.552 (momentum120), far below a 0.95 confidence threshold, even though only four trials are deflated; its undeflated PSR(0) is 0.667. Adding the equal-weight control (best: equalweight, DSR 0.575) or restricting to momentum rules (DSR 0.561) does not change this.",
+    "PBO is 0.776 for the primary set (S=16, mean label): the in-sample best candidate ranks below the out-of-sample median in about three of four CSCV splits (N=4, so no split lands exactly on the median), and the selected candidate's out-of-sample mean regresses negatively on its in-sample mean (slope -0.727). Every sensitivity cell (S 8 to 16, mean or Sharpe metric, three trial sets) has PBO (lambda <= 0) between 0.76 and 0.96; the strict lambda < 0 share is lower where an odd trial count allows exact median ties (momentum-only N=3: 0.34 to 0.48; with the control N=5: 0.62 to 0.76).",
+    "The frozen walk-forward selector's development out-of-sample series (249 episodes over 20 folds) has negative mean and Sharpe -0.0151, PSR(0) 0.405. This is consistent with the research-evaluation README, which makes no persistent-advantage claim for the training-selected rule.",
+    "Conclusion: over these retained candidates the evidence is consistent with selection noise (or mild anti-persistence of in-sample ranking), not skill. This is a negative diagnostic for this three-ETF control lane; it neither tunes, promotes nor rejects any future strategy."
+  ],
+  "limitations": [
+    "Inputs are raw-price five-session labels less a fixed 20bp proxy, not portfolio returns; the Sharpe ratios are per-episode label ratios, not investable or annualized Sharpe ratios.",
+    "The trial count is only this lane's frozen candidate set (4, sensitivity 3 and 5). Trials run elsewhere in the research program are not counted, so the DSR here is an optimistic upper bound relative to program-wide multiple testing; no effective-N clustering was applied although momentum60 and momentum120 share 60% of development labels.",
+    "CSCV with three to five highly correlated trials gives only a few distinct relative ranks (four logit values in the primary S=16 run) and assumes the contiguous 18-episode blocks are exchangeable; PBO is descriptive and carries no p-value.",
+    "Only development episodes (2015-01-02 to 2020-12-16) are used; the inspected 2021Q1 reserved segment (11 episodes) is excluded and was not re-scored.",
+    "The earliest T mod S rows (13 at S=16) are dropped; results for other truncation choices were not computed.",
+    "The DSR worked-example constants are transcribed from the paper rather than re-fetched; the PBO tests are locally constructed synthetic fixtures, not upstream tests.",
+    "Evidence class is a local integration check with an independent numpy recomputation; no upstream implementation was executed or compared."
+  ]
+}

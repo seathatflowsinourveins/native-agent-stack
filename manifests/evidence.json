@@ -8818,8 +8818,8 @@
     },
     {
       "path": "blueprints/us-equities/research-evaluation/README.md",
-      "sha256": "5f6e4b5cc7338e9f5fc3edeb0d2d5092f1c2ba779d0243ed3ba29da76a80edde",
-      "bytes": 8589
+      "sha256": "89b428b4ea8c289472805bb2eb5c45d7dcb0333011ad61097fb0d6bf5aee9d5c",
+      "bytes": 9054
     },
     {
       "path": "blueprints/us-equities/research-evaluation/evaluate.py",
