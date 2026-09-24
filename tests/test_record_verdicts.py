@@ -22,7 +22,8 @@ from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import (
-    build_landscape, lane_winner_components, verify_sealed_waves, withhold_policy_labels,
+    SEALED_CANDIDATE_FIELDS, build_landscape, lane_winner_components, sealed_candidate_labels, verify_sealed_waves,
+    withhold_policy_labels,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -150,18 +151,34 @@ class PacketWriter:
         self.packets_dir = work_dir / "packets"
         self.packets_dir.mkdir(parents=True, exist_ok=True)
         self.sums = {}
+        # lane_packets.py --keys-out: each candidate's sealed manifest fields, outside packets/ (review of #145).
+        self.keys_path = work_dir / "sealed-keys" / "packet-keys.json"
+        self.keys = {}
 
-    def write(self, catalog, layer_id, packet) -> str:
+    def write(self, catalog, layer_id, packet, seal=True) -> str:
+        """``seal=False`` writes the candidates' manifest fields into the packet itself, as a packet not built
+        with lane_packets.py --withhold-labels would carry them."""
         filename = f"{catalog}__{layer_id}.json"
+        packet = copy.deepcopy(packet)
+        sealed = {candidate["key"]: {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS
+                                     if seal and field in candidate}
+                  for candidate in packet.get("candidates") or [] if isinstance(candidate, dict) and "key" in candidate}
+        if seal:
+            packet["withheld"] = list(packet.get("withheld") or []) + [
+                label for label in sealed_candidate_labels() if label not in (packet.get("withheld") or [])]
         text = json.dumps(packet, sort_keys=True, indent=1) + "\n"
         (self.packets_dir / filename).write_text(text, encoding="utf-8")
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
         # One line per packet, as lane_packets.py writes it: a rebuilt packet replaces its line.
         self.sums[filename] = f"{digest}  {filename}"
+        self.keys[filename] = {"packet_sha256": digest, "candidates": sealed}
         return digest
 
     def flush(self):
         (self.packets_dir / "SHA256SUMS").write_text("\n".join(self.sums.values()) + "\n", encoding="utf-8")
+        self.keys_path.parent.mkdir(parents=True, exist_ok=True)
+        self.keys_path.write_text(json.dumps({"schema_version": 1, "packets": self.keys}, sort_keys=True, indent=1)
+                                  + "\n", encoding="utf-8")
 
 
 def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dict):
@@ -309,6 +326,9 @@ class RecordVerdictsFixture(unittest.TestCase):
                  checked_at="2026-09-22"):
         args = ["--root", str(self.root), "--work-dir", str(self.work_dir),
                 *(["--checked-at", checked_at] if checked_at is not None else []), *extra]
+        keys_path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if "--packet-keys" not in extra and keys_path.is_file():
+            args += ["--packet-keys", str(keys_path)]
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
         args.append("--write" if write else "--check")
@@ -2087,8 +2107,14 @@ class ReviewOf122Tests(NewWaveFixture):
         held = next(entry for entry in manifest["packets"] if entry["layer_id"] == "wave-same-layer")
         self.assertEqual(held, first_manifest["packets"][0])
         for relative, data in first_sealed.items():
-            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS")):
+            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS", "packet-keys.json")):
                 self.assertEqual((self.root / relative).read_bytes(), data, relative)
+        # The wave's packet-keys document is extended like SHA256SUMS: the held packet's entry is carried unchanged.
+        first_keys = json.loads(next(data for relative, data in first_sealed.items()
+                                     if relative.endswith("packet-keys.json")))["packets"]
+        keys = json.loads((self.sealed_base() / "packet-keys.json").read_text(encoding="utf-8"))["packets"]
+        self.assertEqual(sorted(keys), ["foundation__wave-append-layer.json", "foundation__wave-same-layer.json"])
+        self.assertEqual(keys["foundation__wave-same-layer.json"], first_keys["foundation__wave-same-layer.json"])
         digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
         for layer_id in ("wave-same-layer", "wave-append-layer"):
             self.assertEqual(self.load_row(catalog, layer_id)["lanes"]["run_manifest_sha256"], digest)
@@ -2159,7 +2185,9 @@ class ReviewOf122Tests(NewWaveFixture):
     def test_a_packet_carrying_withheld_keys_is_refused_for_a_new_wave(self):
         c1 = make_candidate("c1", "wave-withheld-layer", "c1")
         c2 = dict(make_candidate("c2", "wave-withheld-layer", "c2"), upstream={"latest": "2.0", "stars": 9})
-        self.packets.write("foundation", "wave-withheld-layer", make_packet("foundation", "wave-withheld-layer", [c1, c2]))
+        # Unsealed, so the upstream record (a sealed field of a --withhold-labels packet) reaches the packet.
+        self.packets.write("foundation", "wave-withheld-layer", make_packet("foundation", "wave-withheld-layer", [c1, c2]),
+                           seal=False)
         self.packets.flush()
         with self.assertRaisesRegex(SystemExit, "carries withheld keys .*upstream.latest"):
             self.run_wave()
@@ -2194,8 +2222,10 @@ class ReviewOf122Tests(NewWaveFixture):
                 self.packets = PacketWriter(self.work_dir)
                 c2 = make_candidate("c2", "wave-withheld-layer", "c2")
                 change(c2)
+                # Unsealed, so a nested key inside a sealed field (upstream, decisions) reaches the packet.
                 self.packets.write("foundation", "wave-withheld-layer", make_packet(
-                    "foundation", "wave-withheld-layer", [make_candidate("c1", "wave-withheld-layer", "c1"), c2]))
+                    "foundation", "wave-withheld-layer", [make_candidate("c1", "wave-withheld-layer", "c1"), c2]),
+                    seal=False)
                 self.packets.flush()
                 with self.assertRaisesRegex(SystemExit, "carries withheld keys .*" + re.escape(label)):
                     self.run_wave()
@@ -2331,6 +2361,50 @@ class CheckedAtDefaultTests(NewWaveFixture):
                 record_verdicts.checked_at_for(run_id)
         with self.assertRaises(SystemExit):
             record_verdicts.checked_at_for("20260923", "23 Sep 2026")
+
+
+class SealedPacketKeysTests(NewWaveFixture):
+    """Review of #145 (F5): lanes judge packets whose candidates' manifest fields are sealed; the recorder restores
+    them from --packet-keys after checking each packet's sha256 and retains the keys with the wave."""
+
+    def test_the_winner_component_comes_from_the_sealed_keys_and_is_retained(self):
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-same-layer")["winners"][0]["component_id"], "wave-same-layer-c1")
+        retained = (self.sealed_base() / "packets" / "foundation__wave-same-layer.json").read_text(encoding="utf-8")
+        self.assertFalse(any("component_id" in candidate for candidate in json.loads(retained)["candidates"]))
+        keys = self.sealed_base() / "packet-keys.json"
+        manifest = json.loads((self.sealed_base() / "run-manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["packet_keys_sha256"], hashlib.sha256(keys.read_bytes()).hexdigest())
+        build_landscape(self.root)
+
+    def test_a_sealed_packet_without_its_keys_is_refused(self):
+        self.both_lanes("wave-same-layer")
+        (self.work_dir / "sealed-keys" / "packet-keys.json").unlink()
+        with self.assertRaisesRegex(SystemExit, "--packet-keys has no entry for the retained packet"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    def test_keys_for_other_packet_bytes_reject_the_lanes(self):
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["packet_sha256"] = "0" * 64
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "--packet-keys has no entry for the retained packet"):
+            self.run_wave()
+        outcomes = {}
+        rejections = []
+        row = v2_row("foundation", "wave-same-layer", "Wave same layer")
+        record_verdicts.process_row(
+            row, self.root, "foundation", "wave-same-layer", self.work_dir, "2026-09-23", None, set(), {},
+            record_verdicts.parse_sha256sums(self.work_dir / "packets" / "SHA256SUMS"), rejections,
+            run_date=NEW_RUN, sealed_base=NEW_SEALED_BASE, outcomes=outcomes,
+            status_context=record_verdicts.load_context(self.root), lane_code=record_verdicts.load_lane_code(self.root),
+            packet_keys=keys)
+        self.assertEqual({item["lane"] for item in rejections}, {"claude", "codex"})
+        self.assertTrue(all("names packet_sha256" in item["reason"] for item in rejections), rejections)
 
 
 if __name__ == "__main__":

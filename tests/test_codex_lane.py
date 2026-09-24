@@ -859,6 +859,10 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
                 mock.patch.object(codex_lane.subprocess, "run", side_effect=fake_run):
             codex_lane.run_attempt(["codex", "exec"], 5)
         self.assertEqual(seen["env"]["CODEX_HOME"], str(home))
+        # Review of #145: user Agent Skills under $HOME/.agents/skills name adopted tools; the child's HOME is empty.
+        self.assertEqual(seen["env"]["HOME"], str(home / "home"))
+        self.assertEqual(list((home / "home").iterdir()), [])
+        self.assertEqual(oct((home / "home").stat().st_mode & 0o777), "0o700")
 
     def test_the_home_is_recreated_without_leftovers_and_a_dry_run_writes_none(self):
         # Codex review of #145: a leftover AGENTS.md in codex-home would be loaded; a dry run writes nothing.

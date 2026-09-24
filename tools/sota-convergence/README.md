@@ -643,7 +643,9 @@ the `manifests/evidence.json` receipts that name its component, sorted by path, 
 - **Receipt ids:** under `--withhold-labels` the receipt `id` is dropped, because ids such as
   `native-session-defaults-20260920` can name the incumbent's role, and the packet's `withheld` list names
   `candidates[].registered_receipts[].id` and `sota_components_not_in_candidates[].registered_receipts[].id`.
-  Paths and receipt contents are not stripped, and a receipt describing an adoption still says so.
+  `matched_by` is dropped as well, because `component_id` and `alias` exist only for a manifest component
+  (review of #145). Paths and receipt contents are not stripped, and a receipt describing an adoption still
+  says so.
 
 A packet-level `registered_receipts_note` says how each entry matched, that a receipt may name several
 components and that its `kind` is the registrant's label. The lane opens the receipt and judges what it ran
@@ -1680,6 +1682,25 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-4 review of 2a2ffb8d (blindness lens):**
+  - **Sealed manifest fields (F5).** Only a sota-manifest component carries `component_id`, `pin`, `upstream`,
+    `recipe_ref` and `decisions`, so their presence alone marked membership. On the 2026-09-23 packets they
+    were present on exactly the recorded winners among the adopted candidates in 6 layers (8 against the v1
+    selected/default candidates). Under `--withhold-labels`, `lane_packets.py` now moves them, by candidate key,
+    into a packet-keys document at `--keys-out`. That flag is required with `--withhold-labels` and must point
+    outside `--out`, which lanes read. `record_verdicts.py --packet-keys` and `adjudicate.py inputs
+    --packet-keys` restore the fields after checking the packet's sha256, so winner component ids and pins
+    resolve as before. A wave retains the document as `<sealed_base>/packet-keys.json`, bound by the run
+    manifest's `packet_keys_sha256`. `scripts/landscape.py` and `scripts/verdict_review_gate.py` restore from
+    it, and `withheld_packet_keys` refuses a new-wave packet whose candidates still carry a sealed field.
+    `export_isolation_check.packet_field_hits` measures the packet fields themselves and fails on a non-evidence
+    field. After the change it finds none. `registered_receipts` still sits on exactly the winners in 6 layers.
+    This is disclosed as evidence-volume asymmetry: the catalog ran what it chose.
+  - **Codex children's HOME (F2).** Codex also discovers user Agent Skills under `$HOME/.agents/skills`, and
+    their names are adopted tools. A blind child now runs with `HOME=<codex-home>/home`, an empty directory
+    of mode 0700. Measured 2026-09-24 with `codex-cli 0.155.1`: with the isolated `CODEX_HOME` and the
+    caller's `HOME`, a probe child listed qmd, tavily-* and typesafe-ai among its skills. With the empty
+    `HOME`, it listed only the CLI's bundled skills.
 - **Codex review at a2434e2e and the Codex cross-family review:**
   - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
     and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a

@@ -58,7 +58,8 @@ for _path in (HERE, REPO_ROOT):
 import codex_lane  # noqa: E402
 from build_manifest import sanitize_value  # noqa: E402  (the sealed form record_verdicts.sealed_text writes)
 from scripts.landscape import (  # noqa: E402
-    FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components, model_family_issue)
+    FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components, model_family_issue,
+    packet_keys_issue, packet_seals_candidates, unseal_packet)
 
 PROMPT_PATH = HERE / "adjudication-prompt.md"
 JUDGE_SCHEMA = HERE / "adjudication-judge.schema.json"
@@ -378,9 +379,12 @@ def components_list(components) -> list:
 PACKET_SNAPSHOTS_DIR = "adjudication-packets"
 
 
-def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
+def build_inputs(work_dir: Path, layers=None, repo_roots=(), packet_keys=None) -> dict:
     """Write the counterbalanced input files and index.json; return the index. ``repo_roots`` are the
-    checkouts the lanes were given (their absolute evidence paths become repository-relative). An input is
+    checkouts the lanes were given (their absolute evidence paths become repository-relative).
+    ``packet_keys`` (lane_packets.py --keys-out) restores the sealed manifest fields of a --withhold-labels
+    packet's candidates, so winner component sets compare as record_verdicts.py compares them; judges still
+    read the sealed packet. An input is
     ``{layer, packet_sha256, A, B}``: the packet path is not in it (the judge's labelled ``Packet file:`` line
     carries it, from index.json). A layer whose scrubbed returns still hold a host path is listed in
     ``skipped`` with the offenders and gets no input file."""
@@ -408,6 +412,14 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             index["skipped"].append({"layer": name, "reason": f"packet unreadable: {error}"})
             continue
         packet_sha256 = hashlib.sha256(packet_bytes).hexdigest()
+        resolved_packet = packet
+        if packet_seals_candidates(packet):
+            issue = (packet_keys_issue(packet_keys, packet_path.name, packet_sha256, packet) if packet_keys is not None
+                     else "the packet seals its candidates' manifest fields: pass --packet-keys")
+            if issue:
+                index["skipped"].append({"layer": name, "reason": issue})
+                continue
+            resolved_packet = unseal_packet(packet, packet_keys, packet_path.name)
         for lane, path in paths.items():
             try:
                 data = json.loads(path.read_bytes().decode("utf-8"))
@@ -424,7 +436,7 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
                 returns[lane] = data
         components = {}
         for lane, data in returns.items():
-            issue, found = lane_winner_components(data, packet)
+            issue, found = lane_winner_components(data, resolved_packet)
             if issue:
                 reasons.append(f"{lane} return: {issue}")
             else:
@@ -1433,6 +1445,8 @@ def parse_args(argv=None):
                         help="Required, repeatable: a checkout a lane was given as its repository root. Host paths "
                              "under it become repository-relative in the inputs; any other host path becomes "
                              "the bare <outside-path>, and one under <work-dir>/packets/ becomes PACKET.")
+    inputs.add_argument("--packet-keys", type=Path, default=None,
+                        help="The lane_packets.py --keys-out file of this run (required for --withhold-labels packets).")
     codex = sub.add_parser("codex", help="Run the Codex judge and refuter for every input file.")
     codex.add_argument("--work-dir", required=True, type=Path)
     codex.add_argument("--repo", required=True, type=Path)
@@ -1482,7 +1496,8 @@ def main(argv=None) -> int:
         if refusal:
             print(refusal, file=sys.stderr)
             return 2
-        index = build_inputs(args.work_dir, layer_set(args.layers), roots)
+        packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8")) if args.packet_keys else None
+        index = build_inputs(args.work_dir, layer_set(args.layers), roots, packet_keys)
         for skipped in index["skipped"]:
             print(f"adjudicate: skipped {skipped['layer']}: {skipped['reason']}", file=sys.stderr)
         disagree = [entry["layer"] for entry in index["layers"] if entry["agreement"] == "disagree"]

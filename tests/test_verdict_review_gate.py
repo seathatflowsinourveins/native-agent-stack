@@ -30,11 +30,13 @@ RUN = "20260923"
 SEALED = f"evidence/artifacts/layer-verdicts-{RUN}"
 ANTHROPIC = {"name": "claude-opus-4-5", "family": "anthropic", "effort": "high"}
 OPENAI = {"name": "gpt-5.2", "family": "openai", "effort": "high"}
+# A --withhold-labels packet lists every policy label; its candidates' manifest fields are sealed in KEYS, which
+# the wave retains as packet-keys.json (review of #145).
 PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
-    {"key": "c1", "component_id": "comp-one", "repository": "https://github.com/example/one", "adopted": True,
-     "pin": "1.0"},
-    {"key": "c2", "component_id": "comp-two", "repository": "https://github.com/example/two", "adopted": True},
-], "withheld": landscape.withhold_policy_labels(None)}  # a --withhold-labels packet lists every policy label
+    {"key": "c1", "repository": "https://github.com/example/one", "adopted": True},
+    {"key": "c2", "repository": "https://github.com/example/two", "adopted": True},
+], "withheld": landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()}
+KEYS = {"c1": {"component_id": "comp-one", "pin": "1.0"}, "c2": {"component_id": "comp-two"}}
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
 INDEX = "catalogs/us-equities/decision-index.json"
@@ -60,9 +62,10 @@ def winner(component_id, linux="not_established", macos="untested", evidence_cla
            evidence_refs=(), pin=None):
     """The winner record_verdicts.build_winners writes: the packet pin, else "unpinned" (the fixture
     rows carry no v1 candidates unless a test adds them)."""
-    candidate = next(c for c in PACKET["candidates"] if c["component_id"] == component_id)
+    key = next(key for key, fields in KEYS.items() if fields["component_id"] == component_id)
+    candidate = next(c for c in PACKET["candidates"] if c["key"] == key)
     return {"component_id": component_id, "repository": candidate["repository"],
-            "pin": pin or candidate.get("pin") or "unpinned", "evidence_class": evidence_class,
+            "pin": pin or KEYS[key].get("pin") or "unpinned", "evidence_class": evidence_class,
             "why_selected": "fixture", "evidence_refs": list(evidence_refs), "recipe_ref": LEDGERS["foundation"],
             "platform_status": {"linux-wsl2-x86_64": linux, "macos-arm64": macos}}
 
@@ -93,6 +96,8 @@ class GateFixture(unittest.TestCase):
         # retained packet name -> sha256 (the run manifest's retained_packets); layer ids whose row is
         # not bound to the run manifest (lanes.run_manifest_sha256 left out); a run-manifest override.
         self.retained, self.unbound, self.manifest_overrides = {}, set(), {}
+        # retained packet name -> its packet-keys entry (lane_packets.py --keys-out, retained by record_verdicts.py)
+        self.keys = {}
         self.manifest = {"schema_version": 1, "catalogs": dict(LEDGERS), "sources": {"repository_index": INDEX}}
         self.write(INDEX, dump({"aliases": {}, "records": [
             {"repository": c["repository"]} for c in PACKET["candidates"]] + [{"repository": ALTERNATIVE["repository"]}]}))
@@ -133,6 +138,10 @@ class GateFixture(unittest.TestCase):
                 "packets_sha256sums": "".join(f"{digest}  {name}\n" for name, digest in sorted(self.retained.items())),
                 "retained_packets": [{"name": name, "sha256": digest} for name, digest in sorted(self.retained.items())],
                 "packets": [self.manifest_entries[key] for key in sorted(self.manifest_entries)], "rejections": []}
+            keys_data = dump({"schema_version": 1, "packets": self.keys})
+            self.write(f"{SEALED}/packet-keys.json", keys_data)
+            self.register(f"{SEALED}/packet-keys.json")
+            manifest["packet_keys_sha256"] = sha(keys_data)
             manifest.update(self.manifest_overrides)
             data = dump(manifest)
             self.write(f"{SEALED}/run-manifest.json", data)
@@ -185,12 +194,15 @@ class GateFixture(unittest.TestCase):
     def record(self, layer_id="beta", *, claude_keys=("c1",), codex_keys=("c1",), codex=True, codex_model=OPENAI,
                codex_packet=None, agreement=None, winners=None, judged=None, packets=True, single_lane=None,
                register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded", packet=None,
-               evidence_class="source_review", evidence_refs=(), linux="not_established"):
+               evidence_class="source_review", evidence_refs=(), linux="not_established", keys=None):
         """Seal a new-wave (20260923) row the way record_verdicts.py would, then add it to the ledger."""
         self.new_wave = True
         packet_bytes = dump(packet if packet is not None else PACKET)
         packet_name = f"foundation__{layer_id}.json"
         self.retained[packet_name] = sha(packet_bytes)
+        self.keys[packet_name] = {"packet_sha256": sha(packet_bytes), "candidates": {
+            candidate["key"]: (KEYS if keys is None else keys).get(candidate["key"], {})
+            for candidate in (packet if packet is not None else PACKET).get("candidates") or []}}
         if packets:
             self.write(f"{SEALED}/packets/{packet_name}", packet_bytes)
             self.write(f"{SEALED}/packets/SHA256SUMS", "".join(
@@ -945,6 +957,18 @@ class ToolingAlignmentTests(GateFixture):
         self.write(f"{SEALED}/packets/foundation__beta.json", dump({**PACKET, "extra": 1}))
         self.assertFails(self.report(), "is not the run manifest's packet_sha256")
 
+    def test_sealed_candidate_keys_are_bound_by_the_run_manifest(self):
+        # Review of #145 (F5): winners resolve through the wave's packet-keys document, never an unbound one.
+        self.record()
+        self.manifest_overrides["packet_keys_sha256"] = "0" * 64
+        self.assertFails(self.report(), "packet-keys.json is not the run manifest's packet_keys_sha256")
+        del self.manifest_overrides["packet_keys_sha256"]
+        # Bound, but naming another component for the winning key: the row's winner no longer matches.
+        self.keys["foundation__beta.json"]["candidates"]["c1"] = {"component_id": "comp-forged", "pin": "1.0"}
+        report = self.report()
+        self.assertEqual(report["status"], "failed", self.messages(report))
+        self.assertIn("comp-forged", self.messages(report))
+
     def test_sha256sums_other_than_the_run_manifest_text_fails(self):
         self.record()
         path = self.root / f"{SEALED}/packets/SHA256SUMS"
@@ -953,11 +977,12 @@ class ToolingAlignmentTests(GateFixture):
 
     def test_withheld_keys_in_the_sealed_packet_fail(self):
         for layer_id, packet, label in (
-                ("stars", {**PACKET, "candidates": [{**PACKET["candidates"][0], "upstream": {"stars": 5}},
-                                                    PACKET["candidates"][1]]}, "candidates[].upstream.stars"),
+                # upstream itself is a sealed field (review of #145), so nested keys are placed under evidence.
+                ("stars", {**PACKET, "candidates": [{**PACKET["candidates"][0], "evidence": {"stars": 5}},
+                                                    PACKET["candidates"][1]]}, "candidates[].evidence.stars"),
                 ("pushed", {**PACKET, "candidates": [{**PACKET["candidates"][0],
-                                                      "upstream": {"meta": [{"pushed_at": "2026"}]}},
-                                                     PACKET["candidates"][1]]}, "candidates[].upstream.meta[].pushed_at"),
+                                                      "evidence": {"meta": [{"pushed_at": "2026"}]}},
+                                                     PACKET["candidates"][1]]}, "candidates[].evidence.meta[].pushed_at"),
                 ("latest", {**PACKET, "latest": "2.0"}, "latest"),
                 ("prerelease", {**PACKET, "candidates": [{**PACKET["candidates"][0], "prerelease": True},
                                                          PACKET["candidates"][1]]}, "candidates[].prerelease"),
@@ -974,7 +999,7 @@ class ToolingAlignmentTests(GateFixture):
     def test_packet_own_checked_at_is_not_withheld(self):
         self.record(packet={**PACKET, "checked_at": "2026-09-23"})
         self.assertPasses(self.report())
-        labels = landscape.withhold_policy_labels(None)
+        labels = landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
         self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}], "withheld": labels}),
                          ["c[].checked_at"])
 
@@ -1363,8 +1388,9 @@ class SealedWinnerBindingTests(GateFixture):
         row = self.record(winners=[winner("comp-one", linux="accepted")])
         self.rebase()
         self.ledger["foundation"] = [r for r in self.ledger["foundation"] if r is not row]
-        packet = {**PACKET, "candidates": [dict(PACKET["candidates"][0], pin="2.0"), PACKET["candidates"][1]]}
-        self.record(packet=packet, winners=[winner("comp-one", linux="accepted", pin="2.0")])
+        # The pin is a sealed candidate field (review of #145): the re-recorded wave's packet-keys moves it.
+        self.record(keys={**KEYS, "c1": dict(KEYS["c1"], pin="2.0")},
+                    winners=[winner("comp-one", linux="accepted", pin="2.0")])
         report = self.report()
         self.assertEqual(report["status"], "failed", self.messages(report))
         self.assertIn("derives 'not_established'", self.messages(report))

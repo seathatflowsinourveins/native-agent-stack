@@ -20,7 +20,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.landscape import withheld_packet_keys
+from scripts.landscape import SEALED_CANDIDATE_FIELDS, withheld_packet_keys
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -218,6 +218,44 @@ class ShuffleTests(LanePacketsFixture):
         packet = self.packet("foundation", "layer-a")
         self.assertEqual([c["key"] for c in packet["candidates"]],
                           [f"c{i}" for i in range(1, len(packet["candidates"]) + 1)])
+
+
+class SealedKeysOutTests(LanePacketsFixture):
+    """Review of #145 (F5): --withhold-labels seals every candidate's manifest fields into --keys-out, outside
+    --out, bound to each packet's sha256."""
+
+    def run_main(self, *extra):
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            code = lane_packets.main(["--root", str(self.root), "--out", str(self.out), *extra])
+        return code, err.getvalue()
+
+    def test_withhold_labels_writes_the_sealed_keys_bound_to_each_packet(self):
+        keys_path = self.out.parent / "keys" / "packet-keys.json"
+        code, err = self.run_main("--withhold-labels", "--keys-out", str(keys_path))
+        self.assertEqual(code, 0, err)
+        keys = json.loads(keys_path.read_text(encoding="utf-8"))
+        self.assertEqual(keys["schema_version"], 1)
+        packets_dir = self.out / "packets"
+        names = sorted(path.name for path in packets_dir.glob("*__*.json"))
+        self.assertEqual(sorted(keys["packets"]), names)
+        restored = 0
+        for name in names:
+            raw = (packets_dir / name).read_bytes()
+            packet = json.loads(raw)
+            entry = keys["packets"][name]
+            self.assertEqual(entry["packet_sha256"], hashlib.sha256(raw).hexdigest())
+            self.assertEqual(sorted(entry["candidates"]), sorted(c["key"] for c in packet["candidates"]))
+            self.assertEqual(withheld_packet_keys(packet), [])
+            restored += sum(1 for fields in entry["candidates"].values() if fields.get("component_id"))
+        self.assertTrue(restored, "the fixture must match a manifest component")
+
+    def test_keys_out_is_required_with_withhold_labels_and_outside_out(self):
+        self.assertEqual(self.run_main("--withhold-labels")[0], 2)
+        self.assertEqual(self.run_main("--keys-out", str(self.out.parent / "k.json"))[0], 2)
+        code, err = self.run_main("--withhold-labels", "--keys-out", str(self.out / "packet-keys.json"))
+        self.assertEqual(code, 2)
+        self.assertIn("outside --out", err)
+        self.assertFalse((self.out / "packets").exists())
 
 
 class Sha256sumsTests(LanePacketsFixture):
@@ -552,23 +590,33 @@ class ManifestTradingCandidatesTests(LanePacketsFixture):
 
 class WithholdLabelsTests(LanePacketsFixture):
     def test_withheld_packets_carry_no_decision_bearing_label(self):
-        packets = self.build(withhold=True)
+        sealed = {}
+        packets = self.build(withhold=True, sealed_keys=sealed)
         for name, text in packets.items():
             packet = json.loads(text)
             for candidate in packet["candidates"]:
                 self.assertIsNone(candidate["review_status"], name)
-                for decision in candidate["decisions"]:
+                # Decision records mark a manifest component and are sealed out of the packet (review of #145).
+                self.assertNotIn("decisions", candidate)
+                for decision in sealed[name]["candidates"][candidate["key"]].get("decisions", []):
                     self.assertNotIn("selection", decision)
                     self.assertNotIn("review_status", decision)
             self.assertIn("candidates[].decisions[].selection", packet["withheld"])
+            self.assertIn("candidates[].decisions", packet["withheld"])
         text = "".join(packets.values())
         self.assertNotIn("confirmed_default", text)
 
     def test_evidence_prose_of_decisions_is_kept(self):
+        # Kept in the sealed keys record_verdicts.py restores; the blind packet carries no decision records.
         plain = json.loads(self.build()["foundation__layer-a.json"])
-        withheld = json.loads(self.build(withhold=True)["foundation__layer-a.json"])
+        sealed = {}
+        withheld = json.loads(self.build(withhold=True, sealed_keys=sealed)["foundation__layer-a.json"])
+        self.assertTrue(any(candidate["decisions"] for candidate in plain["candidates"]), "the fixture needs decisions")
         for before, after in zip(plain["candidates"], withheld["candidates"]):
-            for d_before, d_after in zip(before["decisions"], after["decisions"]):
+            self.assertEqual(before["key"], after["key"])
+            after_decisions = sealed["foundation__layer-a.json"]["candidates"][after["key"]]["decisions"]
+            self.assertEqual(len(before["decisions"]), len(after_decisions))
+            for d_before, d_after in zip(before["decisions"], after_decisions):
                 for key in ("id", "capability", "evidence_scope", "limitations", "next_gap"):
                     self.assertEqual(d_before.get(key), d_after.get(key))
 
@@ -595,13 +643,17 @@ class WithholdLabelsUnitTests(unittest.TestCase):
 class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
     def test_manifest_mode_trading_packets_only_lose_popularity_and_recency_when_withheld(self):
         # Manifest-mode trading packets carry no decision labels, so --withhold-labels changes
-        # them only by the popularity/recency strip (2026-09-23 peer audit); every other field
-        # stays as the plain build wrote it.
+        # them only by the popularity/recency strip (2026-09-23 peer audit) and the sealed manifest
+        # fields (review of #145); every other field stays as the plain build wrote it.
         plain = json.loads(self.build(trading_candidates="manifest")["us-equities__layer-b.json"])
         withheld = json.loads(self.build(trading_candidates="manifest", withhold=True)["us-equities__layer-b.json"])
         for key in set(plain) | set(withheld):
             if key != "withheld":
-                self.assertEqual(scrub_popularity(plain[key]), withheld[key], key)
+                expected = scrub_popularity(plain[key])
+                if key == "candidates":
+                    expected = [{field: value for field, value in candidate.items() if field not in SEALED_CANDIDATE_FIELDS}
+                                for candidate in expected]
+                self.assertEqual(expected, withheld[key], key)
         self.assertEqual(plain["withheld"], withheld["withheld"][:len(plain["withheld"])])
         self.assertIn("candidates[].upstream.stars", withheld["withheld"])
         self.assertFalse({key for key in keys_anywhere(withheld) if key in POPULARITY_RECENCY_KEYS})
@@ -670,17 +722,20 @@ class WithholdPopularityAndRecencyTests(LanePacketsFixture):
                     self.assertIn(f"sota_components_not_in_candidates[].upstream.{key}", packet["withheld"], name)
 
     def test_archived_and_license_are_kept_only_where_the_requirement_names_them(self):
-        packets = self.build(withhold=True)
-        packet = json.loads(packets["foundation__layer-a.json"])
-        uploads = [c["upstream"] for c in packet["candidates"] if c.get("upstream")]
+        # The candidates' upstream records are sealed (review of #145); the policy still applies to the sealed copy.
+        name = "foundation__layer-a.json"
+        sealed = {}
+        packet = json.loads(self.build(withhold=True, sealed_keys=sealed)[name])
+        uploads = [fields["upstream"] for fields in sealed[name]["candidates"].values() if fields.get("upstream")]
         self.assertTrue(uploads, "the fixture must match an upstream record")
         self.assertTrue(all("license" not in u and "archived" not in u for u in uploads))
         self.assertIn("candidates[].upstream.license", packet["withheld"])
         ledger = self.read("catalogs/landscape/foundation.json")
         ledger["layers"][0]["requirement"] = "Use a permissively licensed, non-archived tool."
         self.write("catalogs/landscape/foundation.json", ledger)
-        packet = json.loads(self.build(withhold=True)["foundation__layer-a.json"])
-        uploads = [c["upstream"] for c in packet["candidates"] if c.get("upstream")]
+        sealed = {}
+        packet = json.loads(self.build(withhold=True, sealed_keys=sealed)[name])
+        uploads = [fields["upstream"] for fields in sealed[name]["candidates"].values() if fields.get("upstream")]
         self.assertTrue(all("license" in u and "archived" in u for u in uploads))
         self.assertNotIn("candidates[].upstream.license", packet["withheld"])
         self.assertNotIn("stars", json.dumps(uploads))
@@ -735,14 +790,18 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
     record_verdicts.py and scripts/landscape.py. Each position below returned [] on fcee72b."""
 
     def withheld_packet(self, requirement="Run the tool."):
-        return lane_packets.withhold_popularity({
+        return self.seal(lane_packets.withhold_popularity({
             "schema_version": 1, "requirement": requirement, "checked_at": "2026-09-23",
             "enums": {"disposition": ["selected", "conditional"]}, "withheld": [],
             "candidates": [{"key": "c1", "pin": "1.0", "review_status": None, "adopted": True,
                             "decisions": [{"id": "d1", "capability": "x", "evidence_scope": "y"}],
                             "upstream": {"renamed_to": None}}],
             "sota_components_not_in_candidates": [{"id": "x", "pin": "1.0", "review_status": None,
-                                                   "upstream": {}}]})
+                                                   "upstream": {}}]}))
+
+    @staticmethod
+    def seal(packet):
+        return lane_packets.seal_candidate_fields(packet)[0]
 
     def test_a_withhold_labels_packet_is_clean(self):
         # Controls: a null review_status, the packet's own checked_at and the output enums stay.
@@ -752,33 +811,39 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         positions = {
             "candidates[].prerelease": lambda p: p["candidates"][0].update(prerelease=False),
             "candidates[].latest": lambda p: p["candidates"][0].update(latest="2.0"),
-            "candidates[].upstream.newcomer": lambda p: p["candidates"][0]["upstream"].update(newcomer=True),
+            "candidates[].upstream.newcomer": lambda p: p["candidates"][0].setdefault("upstream", {}).update(newcomer=True),
             "candidates[].upstream.pin_behind_upstream":
-                lambda p: p["candidates"][0]["upstream"].update(pin_behind_upstream=True),
+                lambda p: p["candidates"][0].setdefault("upstream", {}).update(pin_behind_upstream=True),
             "candidates[].upstream.latest_release":
-                lambda p: p["candidates"][0]["upstream"].update(latest_release="2.0"),
-            "candidates[].upstream.latest_flag": lambda p: p["candidates"][0]["upstream"].update(
+                lambda p: p["candidates"][0].setdefault("upstream", {}).update(latest_release="2.0"),
+            "candidates[].upstream.latest_flag": lambda p: p["candidates"][0].setdefault("upstream", {}).update(
                 latest_flag={"tag": "release/2025-11-28", "reason": "tag_listing_only_not_version_shaped"}),
             "candidates[].upstream.release":
-                lambda p: p["candidates"][0]["upstream"].update(release={"published_at": "2026-09-01"}),
+                lambda p: p["candidates"][0].setdefault("upstream", {}).update(release={"published_at": "2026-09-01"}),
             "candidates[].evidence.published_at":
                 lambda p: p["candidates"][0].update(evidence={"published_at": "2026-09-01"}),
             "candidates[].evidence.stars": lambda p: p["candidates"][0].update(evidence={"stars": 9}),
-            "candidates[].decisions[].note": lambda p: p["candidates"][0]["decisions"][0].update(note="gap"),
+            "candidates[].decisions[].note": lambda p: p["candidates"][0].setdefault("decisions", [{"id": "d1"}])[0].update(note="gap"),
             "sota_components_not_in_candidates[].upstream.stars":
                 lambda p: p["sota_components_not_in_candidates"][0]["upstream"].update(stars=9),
             "newcomers": lambda p: p.update(newcomers=[{"key": "c1"}]),
-            "candidates[].upstream.license": lambda p: p["candidates"][0]["upstream"].update(license="MIT"),
-            "candidates[].upstream.archived": lambda p: p["candidates"][0]["upstream"].update(archived=False),
+            "candidates[].upstream.license": lambda p: p["candidates"][0].setdefault("upstream", {}).update(license="MIT"),
+            "candidates[].upstream.archived": lambda p: p["candidates"][0].setdefault("upstream", {}).update(archived=False),
             # The disposition labels lane_packets.withhold_labels removes.
             "candidates[].review_status": lambda p: p["candidates"][0].update(review_status="confirmed_default"),
             "sota_components_not_in_candidates[].review_status":
                 lambda p: p["sota_components_not_in_candidates"][0].update(review_status="confirmed_default"),
-            "candidates[].decisions[].selection": lambda p: p["candidates"][0]["decisions"][0].update(selection="default"),
+            "candidates[].decisions[].selection": lambda p: p["candidates"][0].setdefault("decisions", [{"id": "d1"}])[0].update(selection="default"),
             "candidates[].decisions[].review_status":
-                lambda p: p["candidates"][0]["decisions"][0].update(review_status="accepted_within_scope"),
+                lambda p: p["candidates"][0].setdefault("decisions", [{"id": "d1"}])[0].update(review_status="accepted_within_scope"),
             "candidates[].disposition": lambda p: p["candidates"][0].update(disposition="selected"),
             "current_choice": lambda p: p.update(current_choice="Native selected tool"),
+            # Manifest membership (review of #145): the sealed candidate fields and a receipt's match route.
+            **{f"candidates[].{field}": (lambda field: lambda p: p["candidates"][0].update({field: None}))(field)
+               for field in SEALED_CANDIDATE_FIELDS},
+            "candidates[].registered_receipts[].matched_by": lambda p: p["candidates"][0].update(
+                registered_receipts=[{"kind": "host_e2e", "path": "a.json", "matched_by": "component_id"}]),
+            "withheld[] lacks candidates[].component_id": lambda p: p["withheld"].remove("candidates[].component_id"),
             # A packet built without --withhold-labels lacks the policy labels in withheld[].
             "withheld[] lacks candidates[].upstream.stars": lambda p: p["withheld"].remove("candidates[].upstream.stars"),
         }
@@ -790,7 +855,7 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
 
     def test_archived_and_license_pass_only_where_the_requirement_names_them(self):
         packet = self.withheld_packet("Use a permissively licensed, maintained tool.")
-        packet["candidates"][0]["upstream"].update(license="MIT", archived=False)
+        packet["sota_components_not_in_candidates"][0]["upstream"].update(license="MIT", archived=False)
         self.assertEqual(withheld_packet_keys(packet), [])
 
     def test_the_builder_strips_every_position_the_check_rejects(self):
@@ -800,10 +865,10 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
                                "upstream": {"latest_flag": {"tag": "release/2025-11-28"},
                                             "release": {"published_at": "2026-09-01", "tag": "v1"}}}],
                "sota_components_not_in_candidates": []}
-        built = lane_packets.withhold_popularity(copy.deepcopy(raw))
-        self.assertNotIn("2025-11-28", json.dumps(built))
+        built, sealed = lane_packets.seal_candidate_fields(lane_packets.withhold_popularity(copy.deepcopy(raw)))
+        self.assertNotIn("2025-11-28", json.dumps([built, sealed]))
         self.assertEqual(built["candidates"][0]["evidence"], {"kept": 1})
-        self.assertEqual(built["candidates"][0]["upstream"], {})
+        self.assertEqual(sealed["c1"]["upstream"], {})
         for label in ("candidates[].evidence.stars", "candidates[].upstream.latest_flag",
                       "candidates[].upstream.release"):
             self.assertIn(label, built["withheld"])
@@ -1002,14 +1067,16 @@ class RegisteredReceiptsTests(LanePacketsFixture):
                        "component_ids": [candidate["component_id"]], "path": "evidence/receipts/a.json"})
         packets = self.build(registered_receipts=True, withhold=True)
         packet, candidate = self.candidate(packets)
-        self.assertEqual(candidate["registered_receipts"], [
-            {"kind": "host_e2e", "path": "evidence/receipts/a.json", "matched_by": "component_id"}])
+        # matched_by component_id exists only for a manifest component, so it is dropped (review of #145).
+        self.assertEqual(candidate["registered_receipts"], [{"kind": "host_e2e", "path": "evidence/receipts/a.json"}])
         self.assertNotIn("native-session-run-20260920", "".join(packets.values()))
+        self.assertNotIn("matched_by", "".join(json.dumps(json.loads(text)["candidates"]) for text in packets.values()))
         for text in packets.values():
             document = json.loads(text)
             self.assertEqual(withheld_packet_keys(document), [])
             for label in ("candidates[].registered_receipts[].id",
-                          "sota_components_not_in_candidates[].registered_receipts[].id"):
+                          "sota_components_not_in_candidates[].registered_receipts[].id",
+                          "candidates[].registered_receipts[].matched_by"):
                 self.assertIn(label, document["withheld"])
         for text in self.build(registered_receipts=True).values():
             self.assertNotIn("registered_receipts[].id", json.dumps(json.loads(text)["withheld"]))

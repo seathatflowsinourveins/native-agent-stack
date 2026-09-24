@@ -204,6 +204,60 @@ def withhold_policy_labels(requirement=None):
                   + list(COPY_WITHHELD_FIELDS))
 
 
+# Candidate fields only a sota-manifest-matched candidate carries (its manifest id, pin, upstream record, adoption
+# recipe and decision records): their presence alone marks manifest membership, which singled out the catalog's
+# current choice among a layer's adopted candidates in the 2026-09-23 packets (review of #145, measured
+# 2026-09-24: 8 of 32 layers against the v1 selected/default candidates, 6 against the recorded 20260922 winners
+# by export_isolation_check.packet_field_hits, 0 once sealed). A --withhold-labels packet carries none of them: lane_packets.py --keys-out seals them by candidate
+# key into a packet-keys document outside the lanes' reach, record_verdicts.py and adjudicate.py restore them to
+# resolve winner component ids, and a new wave retains the document as <sealed_base>/packet-keys.json, bound by
+# the run manifest's packet_keys_sha256. A registered receipt's matched_by (component_id or alias) names the
+# same membership and is dropped from a blind packet.
+SEALED_CANDIDATE_FIELDS = ("component_id", "pin", "upstream", "recipe_ref", "decisions")
+PACKET_KEYS_NAME = "packet-keys.json"
+PACKET_KEYS_SCHEMA_VERSION = 1
+
+
+def sealed_candidate_labels():
+    return [f"candidates[].{field}" for field in SEALED_CANDIDATE_FIELDS]
+
+
+def packet_seals_candidates(packet):
+    """Whether a packet's withheld list says its candidates' SEALED_CANDIDATE_FIELDS are sealed out of it."""
+    listed = packet.get("withheld") if isinstance(packet, dict) else None
+    return isinstance(listed, list) and all(label in listed for label in sealed_candidate_labels())
+
+
+def packet_keys_issue(keys_doc, name, packet_sha256, packet):
+    """None when ``keys_doc`` (a packet-keys document) seals exactly the candidates of ``packet`` (file ``name``
+    with ``packet_sha256``), each with SEALED_CANDIDATE_FIELDS only."""
+    if not (isinstance(keys_doc, dict) and keys_doc.get("schema_version") == PACKET_KEYS_SCHEMA_VERSION
+            and isinstance(keys_doc.get("packets"), dict)):
+        return "the packet-keys document is malformed"
+    entry = keys_doc["packets"].get(name)
+    if not isinstance(entry, dict):
+        return f"the packet-keys document has no entry for {name}"
+    if entry.get("packet_sha256") != packet_sha256:
+        return (f"the packet-keys entry for {name} names packet_sha256 {entry.get('packet_sha256')!r}, "
+                f"not {packet_sha256}")
+    sealed = entry.get("candidates")
+    keys = [candidate.get("key") for candidate in (packet.get("candidates") or []) if isinstance(candidate, dict)]
+    if not isinstance(sealed, dict) or set(sealed) != set(keys):
+        return f"the packet-keys entry for {name} must seal exactly the packet's candidate keys"
+    for key, fields in sealed.items():
+        if not isinstance(fields, dict) or set(fields) - set(SEALED_CANDIDATE_FIELDS):
+            return f"the packet-keys entry for {name} seals fields other than {list(SEALED_CANDIDATE_FIELDS)} for {key}"
+    return None
+
+
+def unseal_packet(packet, keys_doc, name):
+    """A copy of ``packet`` whose candidates carry their sealed fields again (packet_keys_issue must be None)."""
+    sealed = keys_doc["packets"][name]["candidates"]
+    return dict(packet, candidates=[dict(candidate, **sealed.get(candidate.get("key"), {}))
+                                    if isinstance(candidate, dict) else candidate
+                                    for candidate in packet.get("candidates") or []])
+
+
 def withheld_packet_keys(packet):
     """Labels ("candidates[].upstream.stars", "newcomers", ...) of every withheld key a packet still
     carries at any depth, plus "withheld[] lacks <label>" for each policy label missing from its
@@ -233,9 +287,18 @@ def withheld_packet_keys(packet):
                 walk(item, f"{label}[]", in_copy)
 
     walk(packet, "", False)
+    for collection in PACKET_UPSTREAM_COPIES:
+        for item in packet.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            if collection == "candidates":
+                found |= {f"candidates[].{field}" for field in SEALED_CANDIDATE_FIELDS if field in item}
+            if any(isinstance(receipt, dict) and "matched_by" in receipt for receipt in item.get("registered_receipts") or []):
+                found.add(f"{collection}[].registered_receipts[].matched_by")
     listed = packet.get("withheld")
     listed = set(listed) if isinstance(listed, list) and all(isinstance(item, str) for item in listed) else set()
-    found |= {f"withheld[] lacks {label}" for label in withhold_policy_labels(requirement) if label not in listed}
+    found |= {f"withheld[] lacks {label}" for label in withhold_policy_labels(requirement) + sealed_candidate_labels()
+              if label not in listed}
     return sorted(found)
 
 
@@ -612,6 +675,17 @@ def verify_sealed_waves(root, wave_refs):
                 f"wave {wave}: {sums_relative} must list exactly the retained packets and their sha256 "
                 f"(differs for {sorted(name for name in set(sums_listed) | set(retained_sha) if sums_listed.get(name) != retained_sha.get(name))})")
         referenced.add(sums_relative)
+        # Every retained packet is a --withhold-labels packet, so its candidates' manifest fields are sealed in
+        # the wave's packet-keys document, bound by the run manifest (review of #145).
+        keys_file = folder / PACKET_KEYS_NAME
+        require(keys_file.is_file() and hashlib.sha256(keys_file.read_bytes()).hexdigest()
+                == manifest.get("packet_keys_sha256"),
+                f"wave {wave}: {PACKET_KEYS_NAME} must be retained with the run manifest's packet_keys_sha256")
+        keys_doc = json.loads(keys_file.read_text(encoding="utf-8"))
+        keys_packets = keys_doc.get("packets") if isinstance(keys_doc, dict) else None
+        require(isinstance(keys_packets, dict) and set(keys_packets) == set(retained_sha),
+                f"wave {wave}: {PACKET_KEYS_NAME} must seal exactly the retained packets")
+        referenced.add(PACKET_KEYS_NAME)
         for name, digest in retained_sha.items():
             relative = f"{RETAINED_PACKETS_DIR}/{name}"
             packet_file = folder / relative
@@ -620,6 +694,8 @@ def verify_sealed_waves(root, wave_refs):
             found = withheld_packet_keys(json.loads(packet_file.read_text(encoding="utf-8")))
             require(not found, f"wave {wave}: retained packet {relative} carries withheld keys {found}; "
                                "a new wave's lanes judge --withhold-labels packets")
+            issue = packet_keys_issue(keys_doc, name, digest, json.loads(packet_file.read_text(encoding="utf-8")))
+            require(issue is None, f"wave {wave}: {issue}")
             referenced.add(relative)
         for entry in manifest.get("packets") or []:
             if not isinstance(entry, dict):
@@ -805,6 +881,17 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                 str(key) + f" needs its retained packet {sealed_base}/{packet_relative} with the run manifest's "
                            "packet_sha256")
         retained_packet = json.loads(packet_file.read_text(encoding="utf-8"))
+        if packet_seals_candidates(retained_packet):
+            # Winner component ids resolve against the candidates' sealed manifest fields (review of #145).
+            keys_file = safe_file(root, f"{sealed_base}/{PACKET_KEYS_NAME}")
+            require(keys_file.is_file() and hashlib.sha256(keys_file.read_bytes()).hexdigest()
+                    == run_manifest.get("packet_keys_sha256"),
+                    str(key) + f" needs {sealed_base}/{PACKET_KEYS_NAME} with the run manifest's packet_keys_sha256")
+            keys_doc = json.loads(keys_file.read_text(encoding="utf-8"))
+            packet_name = f"{key[0]}__{key[1]}.json"
+            issue = packet_keys_issue(keys_doc, packet_name, packet_sha256, retained_packet)
+            require(issue is None, str(key) + f": {issue}")
+            retained_packet = unseal_packet(retained_packet, keys_doc, packet_name)
         if wave_refs is not None:
             wave_refs.setdefault(wave, set()).update(
                 f"{lane}/{lanes_field[lane]['run_id']}.json" for lane in sealed_returns)

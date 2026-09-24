@@ -103,8 +103,8 @@ for _path in (ROOT, TOOL_DIR):
 # family and adjudication rules; the verdict tools own the ledger/registry paths and packet format.
 from scripts.landscape import (  # noqa: E402
     DEFAULT_SEALED_BASE, GRANDFATHERED_RUN_IDS, LANE_FAMILIES, LANES, MANIFEST, RUN_MANIFEST_NAME,
-    SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, run_id_of, run_manifest_row_issue,
-    withheld_packet_keys,
+    PACKET_KEYS_NAME, SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, packet_keys_issue,
+    packet_seals_candidates, run_id_of, run_manifest_row_issue, unseal_packet, withheld_packet_keys,
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
 from scripts.catalog_decisions import identity, safe_file, unique_json  # noqa: E402
@@ -460,6 +460,23 @@ def sealed_packet(head, sealed_base, catalog, layer_id, manifest=None, manifest_
     if withheld:
         return (f"{path} carries withheld keys {withheld}; a new wave's lanes judge --withhold-labels packets"), \
             None, None
+    if packet_seals_candidates(packet):
+        # The candidates' manifest fields are sealed in the wave's packet-keys document (review of #145).
+        keys_path = f"{sealed_base}/{PACKET_KEYS_NAME}"
+        keys_bytes = head.read(keys_path)
+        if keys_bytes is None:
+            return (f"{keys_path} is absent, so the sealed candidates' component ids cannot be resolved; "
+                    "failing closed"), None, None
+        if sha256(keys_bytes) != manifest.get("packet_keys_sha256"):
+            return f"{keys_path} is not the run manifest's packet_keys_sha256", None, None
+        try:
+            keys_doc = strict_json(keys_bytes)
+        except ValueError:
+            return f"{keys_path} is not JSON", None, None
+        issue = packet_keys_issue(keys_doc, name, actual, packet)
+        if issue:
+            return f"{keys_path}: {issue}", None, None
+        packet = unseal_packet(packet, keys_doc, name)
     candidates = {candidate.get("key"): candidate for candidate in (packet.get("candidates") or [])
                   if isinstance(candidate, dict)}
     return None, candidates, actual

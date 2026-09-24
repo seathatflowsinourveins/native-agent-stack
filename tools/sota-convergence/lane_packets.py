@@ -63,8 +63,9 @@ from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E40
 # The withheld-key policy is shared with scripts/landscape.py, which re-checks every packet a new
 # wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
 from scripts.landscape import (  # noqa: E402
-    COPY_WITHHELD_FIELDS, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS, is_withheld_packet_key,
-    requirement_names, withhold_policy_labels,
+    COPY_WITHHELD_FIELDS, PACKET_KEYS_SCHEMA_VERSION, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS,
+    SEALED_CANDIDATE_FIELDS, is_withheld_packet_key, requirement_names, sealed_candidate_labels,
+    withhold_policy_labels,
 )
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
 
@@ -505,8 +506,10 @@ def receipts_for(item: dict, component_id, index: dict, withhold: bool = False) 
             # The path would carry what the withheld id carried (Codex review of #145): left out of a blind
             # packet; attach_registered_receipts counts it in the packet's withheld list.
             continue
-        fields = {"kind": entry["kind"], "path": entry["path"]} if withhold else dict(entry)
-        result.append({**fields, "matched_by": matched_by})
+        # matched_by component_id or alias exists only for a manifest component, so a blind packet drops it
+        # with the other membership fields (review of #145; scripts/landscape.py SEALED_CANDIDATE_FIELDS).
+        result.append({"kind": entry["kind"], "path": entry["path"]} if withhold
+                      else {**entry, "matched_by": matched_by})
     return result
 
 
@@ -527,9 +530,15 @@ REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/ev
                             "and no other manifest component shares that repository. A receipt may name several "
                             "components, and its kind is the registrant's label, not a checked evidence class: "
                             "open it and judge what it actually ran for this component, as for evidence_refs.")
-# Listed in a packet's withheld list when --withhold-labels drops the receipt ids.
+BLIND_REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/evidence.json registers for a "
+                                  "candidate. A receipt may name several components, and its kind is the "
+                                  "registrant's label, not a checked evidence class: open it and judge what it "
+                                  "actually ran for this candidate, as for evidence_refs.")
+# Listed in a packet's withheld list when --withhold-labels drops the receipt ids and match routes.
 WITHHELD_RECEIPT_ID_LABELS = ("candidates[].registered_receipts[].id",
-                              "sota_components_not_in_candidates[].registered_receipts[].id")
+                              "sota_components_not_in_candidates[].registered_receipts[].id",
+                              "candidates[].registered_receipts[].matched_by",
+                              "sota_components_not_in_candidates[].registered_receipts[].matched_by")
 
 
 def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False) -> dict:
@@ -537,7 +546,7 @@ def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False
         item["registered_receipts"] = receipts_for(item, item.get("component_id"), index, withhold)
     for item in packet.get("sota_components_not_in_candidates") or []:
         item["registered_receipts"] = receipts_for(item, item.get("id"), index, withhold)
-    packet["registered_receipts_note"] = REGISTERED_RECEIPTS_NOTE
+    packet["registered_receipts_note"] = BLIND_REGISTERED_RECEIPTS_NOTE if withhold else REGISTERED_RECEIPTS_NOTE
     if withhold:
         withheld = list(packet.get("withheld", []))
         withheld.extend(label for label in WITHHELD_RECEIPT_ID_LABELS if label not in withheld)
@@ -672,15 +681,32 @@ def withhold_labels(packet: dict) -> dict:
     return packet
 
 
+def seal_candidate_fields(packet: dict) -> tuple:
+    """(packet, {candidate key: {field: value}}): every candidate's SEALED_CANDIDATE_FIELDS moved out of a
+    --withhold-labels packet and listed in its withheld list. Their presence alone marks a sota-manifest
+    component, which singled out the catalog's current choice among the adopted candidates (review of #145;
+    scripts/landscape.py SEALED_CANDIDATE_FIELDS has the measurement); record_verdicts.py and adjudicate.py
+    restore them from --keys-out."""
+    sealed = {}
+    for candidate in packet.get("candidates") or []:
+        sealed[candidate["key"]] = {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
+    withheld = list(packet.get("withheld", []))
+    withheld.extend(label for label in sealed_candidate_labels() if label not in withheld)
+    packet["withheld"] = withheld
+    return packet, sealed
+
+
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
                       manifest: str = None, registered_receipts: bool = False,
-                      gap_receipts: bool = False) -> dict:
+                      gap_receipts: bool = False, sealed_keys: dict = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
     packets); pass the same value used for build_verdicts.py's --manifest so
-    the packets and the verdict catalog agree on the pins."""
+    the packets and the verdict catalog agree on the pins. Under ``withhold``,
+    each packet's sealed candidate fields (seal_candidate_fields) go to
+    ``sealed_keys`` ({filename: {packet_sha256, candidates}}) when it is given."""
     rules = load_rules()
     sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
@@ -729,7 +755,15 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 packet["gap_receipts_note"] = GAP_RECEIPTS_NOTE
             if receipts_index is not None:
                 packet = attach_registered_receipts(packet, receipts_index, withhold)
-            packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
+            name = packet_filename(catalog, row["layer_id"])
+            sealed = None
+            if withhold:
+                # Last, after receipts were matched by component id.
+                packet, sealed = seal_candidate_fields(packet)
+            packets[name] = serialize(packet)
+            if sealed is not None and sealed_keys is not None:
+                sealed_keys[name] = {"packet_sha256": hashlib.sha256(packets[name].encode("utf-8")).hexdigest(),
+                                     "candidates": sealed}
     return packets
 
 
@@ -761,6 +795,11 @@ def parse_args(argv=None):
                              "and any key naming a release) at any depth of every candidate and component copy "
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
+    parser.add_argument("--keys-out", type=Path, default=None,
+                        help="With --withhold-labels (required there): write the candidates' sealed manifest fields "
+                             "(component_id, pin, upstream, recipe_ref, decisions) to this packet-keys JSON file, "
+                             "outside --out so no lane reads it; record_verdicts.py --packet-keys and adjudicate.py "
+                             "inputs --packet-keys restore them.")
     parser.add_argument("--registered-receipts", action="store_true",
                         help="Attach to every candidate and component the receipts registered in "
                              "manifests/evidence.json for it (kind, path and matched_by; id too unless "
@@ -789,16 +828,31 @@ def main(argv=None) -> int:
         print("lane_packets: --gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
               "previous winner", file=sys.stderr)
         return 2
+    if args.withhold_labels != (args.keys_out is not None):
+        print("lane_packets: --keys-out is required with --withhold-labels and only meaningful there: the sealed "
+              "candidate fields are needed to record verdicts", file=sys.stderr)
+        return 2
+    if args.keys_out is not None:
+        keys_out, out = args.keys_out.resolve(), args.out.resolve()
+        if keys_out == out or out in keys_out.parents:
+            print("lane_packets: --keys-out must be outside --out, where lanes read packets", file=sys.stderr)
+            return 2
+    sealed_keys = {}
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
                                 manifest=str(args.manifest) if args.manifest else None,
-                                registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts)
+                                registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
+                                sealed_keys=sealed_keys)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, text in packets.items():
         (out_dir / name).write_text(text, encoding="utf-8")
     (out_dir / "SHA256SUMS").write_text(sha256sums(packets), encoding="utf-8")
+    if args.keys_out is not None:
+        args.keys_out.parent.mkdir(parents=True, exist_ok=True)
+        args.keys_out.write_text(serialize({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": sealed_keys}),
+                                 encoding="utf-8")
 
     unmatched_counts = {}
     for name, text in packets.items():

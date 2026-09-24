@@ -8,8 +8,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.landscape import (MANIFEST, build_landscape, judge_adjudication, verify_sealed_waves,
-                               withhold_policy_labels)
+from scripts.landscape import (MANIFEST, SEALED_CANDIDATE_FIELDS, build_landscape, judge_adjudication,
+                               sealed_candidate_labels, verify_sealed_waves, withhold_policy_labels)
 from scripts import platform_status
 
 
@@ -460,17 +460,23 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         bound to the run manifest; ``agreement`` is what the two returns establish."""
         models = models or NEW_WAVE_MODELS
         provenance = provenance or NEW_WAVE_PROVENANCE
+        # The candidates' manifest fields are sealed in the wave's packet-keys document (review of #145).
+        sealed = {"c1": {"component_id": "selected", "upstream": {}}, "c2": {"component_id": None, "upstream": {}}}
         packet = {"schema_version": 1, "catalog": "foundation", "layer_id": layer_id, "requirement": "Find the source",
                   "candidates": [
-                      {"key": "c1", "component_id": "selected", "repository": self.candidate["repository"],
-                       "adopted": True, "upstream": {}},
-                      {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
-                       "adopted": True, "upstream": {}}],
-                  "sota_components_not_in_candidates": [], "withheld": withhold_policy_labels("Find the source"),
+                      {"key": "c1", "repository": self.candidate["repository"], "adopted": True},
+                      {"key": "c2", "repository": "https://github.com/example/alternative", "adopted": True}],
+                  "sota_components_not_in_candidates": [],
+                  "withheld": withhold_policy_labels("Find the source") + sealed_candidate_labels(),
                   **(packet_extra or {})}
         name = f"foundation__{layer_id}.json"
         self.write(f"{NEW_WAVE_BASE}/packets/{name}", packet)
         packet_sha256 = hashlib.sha256(json.dumps(packet).encode("utf-8")).hexdigest()
+        keys = {"schema_version": 1, "packets": {name: {"packet_sha256": packet_sha256, "candidates": {
+            candidate["key"]: {**sealed.get(candidate["key"], {}),
+                               **{field: candidate[field] for field in SEALED_CANDIDATE_FIELDS if field in candidate}}
+            for candidate in packet["candidates"]}}}}
+        self.write(f"{NEW_WAVE_BASE}/packet-keys.json", keys)
         sums = f"{packet_sha256}  {name}\n"
         (self.root / NEW_WAVE_BASE / "packets" / "SHA256SUMS").write_text(sums, encoding="utf-8")
         agreement = "same_winner" if codex_winner == "c1" else "disagree"
@@ -494,6 +500,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             "packets": [{"catalog": "foundation", "layer_id": layer_id, "packet_sha256": packet_sha256,
                          "lanes": manifest_lanes or manifest_entry_lanes}],
             "rejections": [],
+            "packet_keys_sha256": hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest(),
         })
         self.bind_manifest(lanes)
         self.write(NEW_WAVE_RECEIPT, {"exit_code": 0, "scope": "A registered local fixture receipt"})
@@ -1127,6 +1134,26 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "SHA256SUMS must be retained and equal"):
             self.build()
 
+    def test_the_sealed_packet_keys_are_bound_and_decide_the_winner_component(self):
+        # Review of #145 (F5): a retained packet's candidates carry no manifest fields; the wave's packet-keys
+        # document, bound by the run manifest, restores them for the winner check.
+        lanes = self.seal_new_wave()
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        self.build()
+        keys = json.loads((self.root / NEW_WAVE_BASE / "packet-keys.json").read_text(encoding="utf-8"))
+        keys["packets"]["foundation__retrieval.json"]["candidates"]["c1"]["component_id"] = "other"
+        self.write(f"{NEW_WAVE_BASE}/packet-keys.json", keys)
+        with self.assertRaisesRegex(ValueError, "packet_keys_sha256"):
+            self.build()
+        digest = hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest()
+        lanes = self.edit_manifest(lanes, lambda manifest: manifest.update(packet_keys_sha256=digest))
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "are not the claude lane's sealed winner set"):
+            self.build()
+        (self.root / NEW_WAVE_BASE / "packet-keys.json").unlink()
+        with self.assertRaisesRegex(ValueError, "packet-keys.json"):
+            self.build()
+
     def test_retained_packets_with_gap_receipts_are_refused(self):
         # Round-2 review: a blind wave cannot seal packets built with lane_packets.py --gap-receipts.
         lanes = self.seal_new_wave(packet_extra={"gap_receipts": ["evidence/artifacts/gap-wave2/x/0-check.json"],
@@ -1138,10 +1165,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
     def test_retained_packets_are_checked_at_every_depth(self):
         # Review of the #122 fix round: CI only looked where withhold_popularity strips, so a nested
         # release date, a top-level newcomers list or a disposition label passed.
-        c1 = {"key": "c1", "component_id": "selected", "repository": self.candidate["repository"],
-              "adopted": True, "review_status": None, "upstream": {}}
-        c2 = {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
-              "adopted": True, "review_status": None, "upstream": {}}
+        c1 = {"key": "c1", "repository": self.candidate["repository"], "adopted": True, "review_status": None}
+        c2 = {"key": "c2", "repository": "https://github.com/example/alternative", "adopted": True,
+              "review_status": None}
         cases = {
             "candidates[].upstream.latest_flag": {"candidates": [
                 c1, dict(c2, upstream={"latest_flag": {"tag": "release/2025-11-28"}})]},
@@ -1150,7 +1176,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             "candidates[].decisions[].selection": {"candidates": [
                 c1, dict(c2, decisions=[{"id": "d1", "selection": "default"}])]},
             "newcomers": {"newcomers": ["c2"]},
-            "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]},
+            "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]
+                                                             + sealed_candidate_labels()},
         }
         for label, extra in cases.items():
             with self.subTest(label):

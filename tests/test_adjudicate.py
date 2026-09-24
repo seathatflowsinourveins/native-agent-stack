@@ -25,7 +25,9 @@ CHECK_SYNTAX = ROOT / "examples" / "claude-native" / "workflows" / "check-syntax
 spec = importlib.util.spec_from_file_location("adjudicate", TOOL_DIR / "adjudicate.py")
 adjudicate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adjudicate)
-from scripts.landscape import judge_adjudication  # noqa: E402  (adjudicate put the repo root on sys.path)
+# adjudicate put the repo root on sys.path.
+from scripts.landscape import (  # noqa: E402
+    SEALED_CANDIDATE_FIELDS, judge_adjudication, sealed_candidate_labels)
 
 NAME = "foundation__native-clients"
 WHY = "A cites evidence/receipt.json, which records a native execution; B cites only a README claim."
@@ -1585,6 +1587,64 @@ class WorkflowSyntaxTests(unittest.TestCase):
         for key in ("leak", "leak_text"):
             self.assertIn(key, source)
         self.assertIn("Do not try to identify which lane", source)
+
+
+class SealedPacketKeysTests(AdjudicateFixture):
+    """Review of #145 (F5): a --withhold-labels packet seals its candidates' manifest fields (their presence alone
+    marked the catalog's current default); inputs restores them from --packet-keys to compare winner component
+    sets as record_verdicts.py does, and refuses the layer without them."""
+
+    def seal_packet(self, same_repository=False):
+        packet = json.loads(json.dumps(PACKET))
+        if same_repository:
+            # Two manifest entries can share one repository (lane_packets.manifest_layer_candidates).
+            packet["candidates"][1]["repository"] = packet["candidates"][0]["repository"]
+        sealed = {candidate["key"]: {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
+                  for candidate in packet["candidates"]}
+        packet["withheld"] = sealed_candidate_labels()
+        path = self.work / "packets" / f"{NAME}.json"
+        path.write_text(json.dumps(packet), encoding="utf-8")
+        self.sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        self.write_return("claude", "c1", refutation={"status": "unrefuted"}, final_source="proposal")
+        self.write_return("codex", "c2")
+        keys = self.base / "keys" / "packet-keys.json"
+        keys.parent.mkdir()
+        keys.write_text(json.dumps({"schema_version": 1, "packets": {
+            f"{NAME}.json": {"packet_sha256": self.sha, "candidates": sealed}}}), encoding="utf-8")
+        return keys
+
+    def index(self):
+        return json.loads(adjudicate.index_path(self.work).read_text(encoding="utf-8"))
+
+    def test_a_sealed_packet_needs_its_keys(self):
+        self.seal_packet()
+        self.assertEqual(self.inputs()[0], 1, "a skipped layer fails inputs")
+        skipped = self.index()["skipped"]
+        self.assertEqual([item["layer"] for item in skipped], [NAME])
+        self.assertIn("pass --packet-keys", skipped[0]["reason"])
+        self.assertFalse((self.work / "adjudication-inputs" / f"{NAME}.AB.json").exists())
+
+    def test_the_keys_restore_component_ids_even_for_a_shared_repository(self):
+        keys = self.seal_packet(same_repository=True)
+        code, _err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root", str(self.repo),
+                                             "--packet-keys", str(keys)])
+        self.assertEqual(code, 0)
+        entry = self.index()["layers"][0]
+        # Without the keys both winners fall back to candidate:example-one and would compare as agreeing.
+        self.assertEqual(entry["agreement"], "disagree")
+        self.assertEqual(entry["components"]["claude"], [["comp-one", "https://github.com/example/one"]])
+        self.assertEqual(entry["components"]["codex"], [["comp-two", "https://github.com/example/one"]])
+        # Judges read the sealed packet, never the restored fields.
+        self.assertNotIn("comp-one", self.snapshot_packet().read_text(encoding="utf-8"))
+
+    def test_keys_for_other_packet_bytes_are_refused(self):
+        keys = self.seal_packet()
+        document = json.loads(keys.read_text(encoding="utf-8"))
+        document["packets"][f"{NAME}.json"]["packet_sha256"] = "0" * 64
+        keys.write_text(json.dumps(document), encoding="utf-8")
+        quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root", str(self.repo),
+                                "--packet-keys", str(keys)])
+        self.assertIn("names packet_sha256", self.index()["skipped"][0]["reason"])
 
 
 if __name__ == "__main__":

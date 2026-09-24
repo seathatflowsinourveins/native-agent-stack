@@ -98,7 +98,8 @@ from scripts.landscape import (  # noqa: E402
     lane_model_issue, lane_provenance_issue, load_lane_provenance_registry,
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
-    withheld_packet_keys, adjudication_binding_issue,
+    withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
+    packet_keys_issue, packet_seals_candidates, unseal_packet,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -695,7 +696,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
                  lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE,
                  outcomes: dict = None, single_lane_decision: str = None, status_context=None,
-                 lane_code=None, failures: dict = None) -> list:
+                 lane_code=None, failures: dict = None, packet_keys: dict = None) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -728,6 +729,13 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             packet_mismatch = f"packets/SHA256SUMS has no entry for {packet_filename}"
         elif sha256sums[packet_filename] != actual:
             packet_mismatch = f"packet file packets/{packet_filename} does not match packets/SHA256SUMS"
+        elif packet_seals_candidates(packet):
+            # Winner component ids and pins come from the sealed manifest fields (review of #145).
+            packet_mismatch = (packet_keys_issue(packet_keys, packet_filename, actual, packet) if packet_keys is not None
+                               else "the packet seals its candidates' manifest fields: pass --packet-keys "
+                                    "(the lane_packets.py --keys-out file of this run)")
+            if packet_mismatch is None:
+                packet = unseal_packet(packet, packet_keys, packet_filename)
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
 
@@ -1144,6 +1152,25 @@ def run_manifest_document(work_dir: Path, run_date: str, sealed_base: str, outco
     }
 
 
+def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, packet_keys, only) -> str:
+    """The wave's packet-keys document (<sealed_base>/packet-keys.json): the --packet-keys entry of every packet
+    retained now and, under --append-rows, the sealed document's entry of every carried-over packet."""
+    existing_path = root / sealed_base / PACKET_KEYS_NAME
+    existing = {}
+    if only is not None and existing_path.is_file():
+        existing = json.loads(existing_path.read_text(encoding="utf-8")).get("packets") or {}
+    current = (packet_keys or {}).get("packets") or {}
+    entries = {}
+    for item in retained:
+        name = item["name"]
+        entry = (existing if only is not None and name not in only else current).get(name)
+        if not isinstance(entry, dict) or entry.get("packet_sha256") != item["sha256"]:
+            raise SystemExit(f"--packet-keys has no entry for the retained packet {name} with its sha256; pass the "
+                             "lane_packets.py --keys-out file of this run")
+        entries[name] = entry
+    return sealed_text({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": entries})
+
+
 def run_manifest_text(work_dir: Path, run_date: str, sealed_base: str, outcomes: dict, rejections: list,
                       **kwargs) -> str:
     return sealed_text(run_manifest_document(work_dir, run_date, sealed_base, outcomes, rejections, **kwargs))
@@ -1177,6 +1204,10 @@ def parse_args(argv=None):
                              "--write refuses it once --root holds that wave (its sealed directory or a "
                              "registered wave document). Pass the same value to --check as was used for --write.")
     parser.add_argument("--adjudications", type=Path, default=None)
+    parser.add_argument("--packet-keys", type=Path, default=None,
+                        help="The lane_packets.py --keys-out file of this run: restores each candidate's sealed "
+                             "manifest fields (component_id, pin, upstream, recipe_ref, decisions) after checking "
+                             "its packet's sha256; retained as <sealed_base>/packet-keys.json.")
     parser.add_argument("--allow-single-lane", default=None, metavar="PATH",
                         help="Dated decision record under docs/decisions/ (YYYY-MM-DD or YYYYMMDD in its file "
                              "name) that authorizes recording a codex_absent layer from the Claude lane alone; "
@@ -1253,6 +1284,7 @@ def main(argv=None) -> int:
     status_context = load_context(root)
     lane_code = load_lane_code(root)
     failures = load_lane_failures(work_dir)
+    packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8")) if args.packet_keys else None
 
     rejections: list = []
     sealed_writes: list = []
@@ -1282,7 +1314,7 @@ def main(argv=None) -> int:
                                     for spelling in (os.path.abspath(root), str(Path(root).resolve())))),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
-                lane_code=lane_code, failures=failures))
+                lane_code=lane_code, failures=failures, packet_keys=packet_keys))
 
     # Survivorship: every packet of the run and each lane's outcome (sealed, rejected with its
     # reasons, failed with its runner's reason, or missing) is sealed next to the returns, with the
@@ -1315,6 +1347,9 @@ def main(argv=None) -> int:
                                  "judge packets built with lane_packets.py --withhold-labels")
             sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / item["name"], text))
         sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS", manifest["packets_sha256sums"]))
+        keys_text = retained_packet_keys_text(root, sealed_base, manifest["retained_packets"], packet_keys, only)
+        manifest["packet_keys_sha256"] = hashlib.sha256(keys_text.encode("utf-8")).hexdigest()
+        sealed_writes.append((root / sealed_base / PACKET_KEYS_NAME, keys_text))
         manifest_text = sealed_text(manifest)
         sealed_writes.append((manifest_path, manifest_text))
         manifest_sha256 = hashlib.sha256(manifest_text.encode("utf-8")).hexdigest()
@@ -1336,7 +1371,8 @@ def main(argv=None) -> int:
         if not grandfathered:
             # Never overwrite a sealed file with other bytes; only the manifest and the retained
             # SHA256SUMS are extended by an append.
-            replaceable = {manifest_path, root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS"}
+            replaceable = {manifest_path, root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS",
+                           root / sealed_base / PACKET_KEYS_NAME}
             conflicts = sorted(sealed_path.relative_to(root).as_posix() for sealed_path, text in sealed_writes
                                if sealed_path not in replaceable and sealed_path.is_file()
                                and sealed_path.read_text(encoding="utf-8") != text)

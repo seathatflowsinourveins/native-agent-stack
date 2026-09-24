@@ -382,7 +382,12 @@ def isolated_codex_home(work_dir: Path) -> Path:
     ``auth.json`` (never a copy). ``--ignore-user-config`` skips config.toml but not ``$CODEX_HOME/AGENTS.md``,
     the user's global instructions, which name adopted tools (measured 2026-09-24: a child quoted its
     "# AGENTS.md instructions" block; with this home it answered "none"). Sessions and logs the child writes stay
-    in the work dir. A missing native auth.json is left for the CLI to report."""
+    in the work dir. A missing native auth.json is left for the CLI to report.
+
+    The child's HOME is the empty ``<codex-home>/home`` (child_home): Codex also discovers user Agent Skills
+    under ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child
+    with this CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it
+    listed only the CLI's bundled skills)."""
     home = Path(work_dir).resolve() / "codex-home"
     if home.is_symlink() or home.is_file():
         home.unlink()
@@ -392,6 +397,7 @@ def isolated_codex_home(work_dir: Path) -> Path:
         shutil.rmtree(home)
     home.mkdir(parents=True)
     home.chmod(0o700)
+    child_home(home).mkdir(mode=0o700)
     native = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "auth.json"
     link = home / "auth.json"
     if native.is_file() and not link.is_symlink():
@@ -400,9 +406,15 @@ def isolated_codex_home(work_dir: Path) -> Path:
     return home
 
 
+def child_home(codex_home: Path) -> Path:
+    """The empty HOME a blind child runs with, inside its run-scoped CODEX_HOME (isolated_codex_home)."""
+    return Path(codex_home) / "home"
+
+
 def run_attempt(cmd: list, timeout: float) -> dict:
     started = time.monotonic()
-    env = dict(os.environ, CODEX_HOME=str(CHILD_CODEX_HOME)) if CHILD_CODEX_HOME is not None else None
+    env = (dict(os.environ, CODEX_HOME=str(CHILD_CODEX_HOME), HOME=str(child_home(CHILD_CODEX_HOME)))
+           if CHILD_CODEX_HOME is not None else None)
     try:
         completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
         return {

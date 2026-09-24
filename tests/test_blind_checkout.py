@@ -743,3 +743,21 @@ class RealExportIsolationTests(unittest.TestCase):
         report = isolation.isolation_hits(export, packets_dir, isolation.ledger_winners(ROOT))
         self.assertGreaterEqual(len(report), 25)
         self.assertEqual(isolation.role_label_hits(report), [])
+        # Review of #145 (F5): no packet field but evidence is present on exactly a layer's winners.
+        fields = isolation.packet_field_hits(packets_dir, isolation.ledger_winners(ROOT))
+        self.assertGreaterEqual(len(fields), 25)
+        self.assertEqual(isolation.packet_role_label_hits(fields), [])
+
+    def test_a_packet_field_on_exactly_the_winners_is_a_role_label_unless_it_is_evidence(self):
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        candidates = [{"key": "c1", "repository": "https://github.com/acme/win", "adopted": True, "pin": "1.0",
+                       "registered_receipts": [{"kind": "host_e2e", "path": "a.json"}]},
+                      {"key": "c2", "repository": "https://github.com/acme/other", "adopted": True, "pin": None,
+                       "registered_receipts": []},
+                      {"key": "c3", "repository": "https://github.com/acme/new", "adopted": False, "pin": "2.0"}]
+        (scratch / "foundation__layer.json").write_text(json.dumps({"candidates": candidates}), encoding="utf-8")
+        fields = isolation.packet_field_hits(scratch, {"foundation::layer": {"github.com/acme/win"}})
+        self.assertEqual(fields, {"foundation::layer": ["pin", "registered_receipts"]})
+        self.assertEqual(isolation.packet_role_label_hits(fields), [{"layer": "foundation::layer", "field": "pin"}])
