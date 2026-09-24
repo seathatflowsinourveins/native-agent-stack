@@ -1,0 +1,9 @@
+{
+  "name": "wsl-retrieval-qualification",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@tobilu/qmd": "2.8.3",
+    "sqlite-vec-linux-x64": "0.1.9"
+  }
+}

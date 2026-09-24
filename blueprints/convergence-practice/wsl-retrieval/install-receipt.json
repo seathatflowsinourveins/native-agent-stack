@@ -1,0 +1,27 @@
+[
+  {
+    "command": [
+      "install",
+      "--package-lock-only",
+      "--ignore-scripts",
+      "--omit=optional",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "e64af586ea357f57559d65d1407e250bb430d9affd6f6fb18035db10efc3efe1",
+    "stderr_sha256": "2c3e597b5ccf7b2d7debcb640a0172edd9a8605d3ec1c758868c1c90660f2067"
+  },
+  {
+    "command": [
+      "ci",
+      "--ignore-scripts",
+      "--omit=optional",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "exit_code": 0,
+    "stdout_sha256": "7b8bd21189ce243664ed7fd53dbdfff80246af0a7b3fa996be94c12062e8c9cd",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

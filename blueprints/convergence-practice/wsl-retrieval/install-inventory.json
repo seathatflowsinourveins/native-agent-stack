@@ -1,0 +1,13 @@
+{
+  "lock_sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+  "locked_package_entries": 178,
+  "installed_package_identities": 126,
+  "installed_qmd": "2.8.3",
+  "installed_better_sqlite3": "13.0.3",
+  "installed_sqlite_vec": "0.1.9",
+  "installed_sqlite_vec_linux_x64": "0.1.9",
+  "installed_optional_llama_backends": [],
+  "model_files_under_owned_prefix": [],
+  "all_registry_payloads_have_integrity": true,
+  "installed_package_identities_note": "Unique name/version package manifests; dependency subdirectories can contain auxiliary manifests, not an npm semantic dependency count."
+}
