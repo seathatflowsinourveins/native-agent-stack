@@ -148,7 +148,8 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "wsl-retrieval-20260920"
       ],
       "upstream_sources": [
         "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
@@ -769,7 +770,8 @@
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "wsl-retrieval-20260920"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"

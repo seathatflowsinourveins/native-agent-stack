@@ -7,6 +7,12 @@ and [qmd-receipt.json](qmd-receipt.json) preserve selected command outputs,
 stdout/stderr digests, exact frozen inputs, and outcomes. These are historical
 WSL observations. The September 23 completion work performs offline checks only.
 
+Under the current [acceptance evidence policy](../../../docs/acceptance-evidence-policy.md),
+these are locally authored integration checks with synthetic document fixtures
+and a frozen repository source file. No unchanged upstream test suite was recorded
+for these attempts. The retained native command results and independent artifact
+audit support this limited fixture scope, not upstream-suite acceptance.
+
 The source fixture uses ripgrep **15.2.0** and ast-grep **0.45.3** against the
 frozen accepted planner from repository revision
 `6f74bc503ccecaaf6ccebd53677b23aedab50921`. Independent Python string and AST

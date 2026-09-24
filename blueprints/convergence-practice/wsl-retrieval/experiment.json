@@ -260,7 +260,8 @@
     "Package lifecycle scripts were disabled. The optional llama backend and model-artifact inventories are empty; no inference commands were invoked. Empty inventories are not independent network monitoring.",
     "Output byte bounds are fixture assertions after capture, not streaming process resource limits. Default-index routing, general source ignore behavior and other languages were not qualified.",
     "Raw logs were reported retained by the original handoff; exact private subdirectory locators could not be verified locally during completion. Published hashes/selected facts do not independently certify historical execution.",
-    "Per-fixture provider usage is zero; whole-task parent/child/retry/cache usage unknown. No savings claim. No native-client account, model, effort, permission, service or automatic history-capture changes."
+    "Per-fixture provider usage is zero; whole-task parent/child/retry/cache usage unknown. No savings claim. No native-client account, model, effort, permission, service or automatic history-capture changes.",
+    "Locally authored integration checks and synthetic document fixtures; no unchanged upstream test suite was recorded. Historical native operation evidence and independent artifact auditing are distinct from upstream-suite acceptance under docs/acceptance-evidence-policy.md."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",

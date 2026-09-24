@@ -722,6 +722,13 @@
       "status": "Isolated WSL acceptance",
       "body": "Official Linux ai-memory2.3.2 passed65 synthetic native checks across exact scope, Unicode/reserved paths, restart, upstream HTTP backup and native restore; four owned processes exited0. Isolated fresh synthetic store and39 MCP tool calls; not production activation, native-client integration or prior-version migration.",
       "path": "blueprints/convergence-practice/wsl-memory-maintenance/README.md"
+    },
+    {
+      "id": "wsl-retrieval-20260920",
+      "title": "Scoped WSL source and lexical retrieval",
+      "status": "Historical local fixture acceptance",
+      "body": "Pinned ripgrep and ast-grep passed 22 source checks; QMD passed 70 lexical checks with exact named-index provenance, Unicode, absent answers, reopen, update and deletion. The initial URI-checker failure remains recorded. Local integration checks and synthetic fixtures; no upstream-suite, semantic RAG, native-client or token-saving claim.",
+      "path": "blueprints/convergence-practice/wsl-retrieval/README.md"
     }
   ],
   "annotations": [

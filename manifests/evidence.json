@@ -2999,6 +2999,24 @@
         "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
       ],
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
+    },
+    {
+      "id": "wsl-retrieval-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ast-grep",
+        "qmd"
+      ],
+      "claim": "Historical local fixture checks on WSL: pinned ripgrep 15.2.0 and ast-grep 0.45.3 passed 22 source checks across six native commands; QMD 2.8.3 passed 70 lexical checks across 17 commands, including exact provenance, Unicode, scoped negatives, reopen, update and deletion.",
+      "limitations": [
+        "Historical September 20 Linux x86_64 fixture execution. September 23 leaf completion checked retained artifacts offline; no refreshed native or latest-release claim.",
+        "Locally authored integration checks and synthetic document fixtures, not unchanged official upstream tests. Native returned results and independent artifact auditing qualify only the exercised fixture scope.",
+        "Selected source and synthetic lexical corpus only; no semantic RAG, production corpus, native-client integration, service activation or OS-confinement acceptance. No model or automatic history capture.",
+        "Initial QMD URI-checker failure and its five native commands remain preserved separately; the corrected second attempt passed. Result bounds are assertions after capture, not streaming resource limits.",
+        "Original worker reported full native logs retained, but exact private raw-log subdirectories could not be verified locally during completion. Selected outputs and their hashes remain inspectable.",
+        "Whole-task parent/child/retry/cache provider usage remains unknown; no token-saving claim. Ripgrep evidence remains in the leaf without adding a new stack component."
+      ],
+      "path": "evidence/receipts/wsl-retrieval-20260920.json"
     }
   ],
   "files": [
@@ -4000,8 +4018,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "0c630a8bce5202fe21986e5d1eed30654a07bfc28ec9fdb475b568d2f1ff9d76",
-      "bytes": 4949
+      "sha256": "6475e15f0b5ad0afa49aff9c793c1a5561937e969a1d6709b19997d39f117bad",
+      "bytes": 5407
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -5292,6 +5310,111 @@
       "path": "blueprints/convergence-practice/wsl-restore/validation.json",
       "sha256": "558b43769f30e3e7924d7a7ed789670fb063b330feed207e4dfba39d093e1438",
       "bytes": 2429
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
+      "sha256": "ea88bcd35f3233d1ce0845e30ebf2081c2644f6a5eecfc6436d26f6ab6387ff0",
+      "bytes": 6743
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
+      "sha256": "ef914a1710657ab4108e5a77e4dde0c5e7495a2b9cfbc6254f3669fc148c78a6",
+      "bytes": 8846
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+      "sha256": "084d4ed07ad002d93d3993da6a5b3f532b365cdbe59765289c5633ddc6750024",
+      "bytes": 12972
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
+      "sha256": "e2a082ad9b9ada2f2382a9293718f36f2ce48d02a6acca506d5651c70d287742",
+      "bytes": 617
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-receipt.json",
+      "sha256": "8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654",
+      "bytes": 699
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/oracle.json",
+      "sha256": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c",
+      "bytes": 2300
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+      "bytes": 82463
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+      "bytes": 174
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/pins.json",
+      "sha256": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d",
+      "bytes": 1877
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
+      "sha256": "452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6",
+      "bytes": 4158
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
+      "sha256": "cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527",
+      "bytes": 12226
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
+      "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0",
+      "bytes": 14888
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+      "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2",
+      "bytes": 15192
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
+      "sha256": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136",
+      "bytes": 126
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
+      "bytes": 111
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/recovery.md",
+      "sha256": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c",
+      "bytes": 121
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/scope.md",
+      "sha256": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67",
+      "bytes": 123
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "bytes": 1972
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
+      "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01",
+      "bytes": 6253
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-review.json",
+      "sha256": "9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423",
+      "bytes": 6338
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/verification.json",
+      "sha256": "1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe",
+      "bytes": 3872
     },
     {
       "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md",
@@ -9320,8 +9443,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "0db04ef8bb14b8ed8d2d37c2fad7b0753c730df09d5b284b1947bc16b3fc9935",
-      "bytes": 40857
+      "sha256": "fc1eb10de083ac509450bb2679c80e974867e0c63825e67bb4642c97a27f783a",
+      "bytes": 41450
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -27494,6 +27617,11 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-retrieval-20260920.json",
+      "sha256": "ab2f3955d25e5d33e833e8728d17dcc0397d390c91a062af9428d0245236fb5f",
+      "bytes": 2281
+    },
+    {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
       "sha256": "150c1d59848e227df6886863473838a032cd17b9e28303dedf8dcb2e4f1112d4",
       "bytes": 1013
@@ -27745,8 +27873,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163",
-      "bytes": 87705
+      "sha256": "d84fe1c650421b6f82e961b1eba8302b4e09572bca69d4b4db366c52bc58034e",
+      "bytes": 87773
     },
     {
       "path": "observability/README.md",
@@ -28669,6 +28797,11 @@
       "bytes": 4442
     },
     {
+      "path": "tests/test_wsl_retrieval.py",
+      "sha256": "d04565f52421a833e98e8a61ea489290f78c2725ceaa3c699289bf9c4e0280fd",
+      "bytes": 5646
+    },
+    {
       "path": "tests/test_zizmor_negative_control.py",
       "sha256": "fa0bcd820eb59cfb7b806d440fa5c1abaa4b576062fdcc9190f4ed3f427ee4a3",
       "bytes": 7469
@@ -28770,10 +28903,9 @@
     }
   ],
   "convergence_records": [
-    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
+    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
@@ -28786,6 +28918,8 @@
     "blueprints/convergence-practice/native-worker/experiment.json",
     "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
-    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json"
+    "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
   ]
 }
