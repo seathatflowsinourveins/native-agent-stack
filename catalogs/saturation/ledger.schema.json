@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "catalogs/saturation/ledger.schema.json",
+ "$id": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/catalogs/saturation/ledger.schema.json",
  "title": "Saturation ledger",
  "description": "Append-only record of landscape sweeps per layer. Structure only: scripts/saturation_ledger.py --check also verifies the hash chain, the manifest/evidence/returns bindings, known/new, and recomputes survival from the votes.",
  "type": "object",
