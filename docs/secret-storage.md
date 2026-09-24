@@ -115,7 +115,11 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
 5. Run `git config core.hooksPath scripts/git-hooks` in each clone, and put the
    pinned gitleaks 8.30.1 on `PATH`: through the WSL native-tools recipe, or
    Homebrew on macOS. This replaces `.git/hooks` for that clone.
-6. Merge the user-level guard snippets below into your client settings.
+6. Install the user-level guards with the Claude profile tools
+   ([`adoption/bootstrap.md`](../adoption/bootstrap.md) step 4a):
+   `python3 tools/adoption/install_claude_profile.py --only guard`, then render
+   and apply the settings template. For Codex, add the snippet in
+   [User-level guards](#user-level-guards-deployed-by-the-claude-profile) by hand.
 7. Run `python3 scripts/credential_status.py` again until every required entry
    reports `ok`.
 8. Run the fail-closed check with a synthetic file, never a copy of the real
@@ -144,8 +148,8 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths; `printenv`, `env`, `gh auth token` | Python or other subprocesses that open the files themselves; forms that do not match the rule text; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash) | commands that name a store path, read `/proc/*/environ`, dump the environment, reference a secret variable, trace a process, print a native token, or run a reader such as `cat` on a pointer variable or a `.env` file | a program that imports a loader and prints the result, obfuscated paths, and anything else that is not literal text in the command |
-| Codex | nothing at the file level. Codex 0.155.1 has no documented per-path read deny | same-uid reads of the store from a Codex shell |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token; run a reader (`cat`, `sed`, `awk`, `jq`, ...) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable into a command; turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one | a program that imports a loader and prints the result, obfuscated or renamed paths, a script file that sources and traces on its own, and anything else that is not literal text in the command |
+| Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
 still read the Alpaca paper keys. It only has to run a Python one-liner that
@@ -173,8 +177,38 @@ Other boundaries that are recorded but not closed:
 - **Stores that keep output:** once a value is printed, copies can remain in
   Claude Code transcripts (`~/.claude/projects/`), RTK full-output recall,
   the context-mode knowledge base, ai-memory observations and the local
-  OpenTelemetry stack. The user settings enable `OTEL_LOG_TOOL_CONTENT` and
-  raw API body logging.
+  OpenTelemetry/Loki stack. See [Telemetry](#telemetry-and-pasted-values).
+
+### Telemetry and pasted values
+
+Claude Code exports prompt, tool and API content to OpenTelemetry only when
+these `env` flags are truthy (Claude Code monitoring docs, fetched
+2026-09-24): `OTEL_LOG_USER_PROMPTS`, `OTEL_LOG_ASSISTANT_RESPONSES` (falls back
+to the prompt flag when unset), `OTEL_LOG_TOOL_DETAILS` (Bash commands and tool
+input), `OTEL_LOG_TOOL_CONTENT` (tool output) and `OTEL_LOG_RAW_API_BODIES`
+(the whole conversation; the docs say enabling it implies consent to what
+the other three reveal). When any of them is on, a value pasted into a prompt
+or passed through a tool call is copied into the local OpenTelemetry/Loki
+store. Whatever the flags say, the transcript and the ai-memory observations
+also keep it. **A pasted key must be rotated**, then its copies purged
+(see [Rotation and incidents](#rotation-and-incidents)).
+
+`python3 scripts/credential_status.py --client-guards` reports each flag as
+true or false from the key names in `~/.claude/settings.json` and never
+prints a value. Measured on this host on 2026-09-24:
+`CLAUDE_CODE_ENABLE_TELEMETRY` is on and all five content flags are present
+and **false** in `~/.claude/settings.json`. There is no `settings.local.json`
+or managed settings file, and the flags are not in the process environment.
+The same was true of the two retained settings backups from 2026-09-23. The
+earlier text of this page said the user settings enabled tool-content and
+raw-body logging; this measurement does not support that statement, so it is
+withdrawn. The settings template sets all five to `"false"`, so
+`apply_claude_settings.py` writes them off on a new host.
+
+Recommendation, as a user decision: keep tool-content and raw-body logging
+(and tool details) off for as long as broker keys exist on the host. Turning
+any of them on is a deliberate choice to copy tool traffic into the local
+store; the checker then reports `claude_telemetry_logs_content: true`.
 
 ### Measured on this host (2026-09-24, Claude Code 2.1.281, headless `bypassPermissions`)
 
@@ -189,12 +223,40 @@ Other boundaries that are recorded but not closed:
 These probes are a local integration check with a harmless fixture. They
 did not test the sandbox, Codex, or a real credential.
 
-## User-level guard snippets (host step, not in this repository)
+## User-level guards (deployed by the Claude profile)
 
-The project file applies only to sessions started in this repository. Add the
-same deny rules to your user settings so they apply everywhere, and keep the
-project copy as a second layer. In `~/.claude/settings.json`, under
-`permissions.deny`:
+The project file applies only to sessions started in this repository. The
+managed Claude user profile carries the same guards to every session on a
+host, and the documented installer deploys them on every new PC
+([`adoption/bootstrap.md`](../adoption/bootstrap.md) step 4a):
+
+- `python3 tools/adoption/install_claude_profile.py --only guard` copies
+  `scripts/hooks/secret_path_guard.py` to `~/.claude/hooks/secret_path_guard.py`,
+  refusing unless its sha256 matches
+  [`adoption/hooks/claude/SHA256SUMS`](../adoption/hooks/claude/SHA256SUMS)
+  (paths relative to that file, so `sha256sum -c SHA256SUMS` also verifies it).
+- [`adoption/templates/claude.settings.template.json`](../adoption/templates/claude.settings.template.json)
+  carries every deny rule from `.claude/settings.json` and a `PreToolUse`
+  `Bash` hook that runs the installed guard. `render_config.py` and
+  `apply_claude_settings.py` merge both into `~/.claude/settings.json`; the
+  merge keeps host-only rules and hooks. The hook command does nothing when the
+  guard file is missing, so applying the settings before installing the guard
+  never blocks every Bash call; `--client-guards` reports
+  `claude_user_secret_guard_hook: false` until both are in place.
+
+In this repository both the project hook and the user hook run. They are the
+same file, so the second run only repeats the verdict. Because the user hook
+runs in every project, its rules avoid ordinary work: copying a `.env.example`
+to `.env`, writing to a `.env` file, sourcing one to run a program, `set -x`
+without sourcing, and `/proc` reads other than `environ` all pass. One
+deliberate trade-off remains: a shell search for a listed secret variable
+name, such as `grep -rn GITHUB_TOKEN .github`, is blocked even in code; use
+the Grep tool, which Claude's `Read` deny rules cover, for that search. `tests/test_secret_path_guard.py`
+checks that an installed host copy is byte-identical to the repository file
+(skipped in CI and on a host without it).
+
+For a host that does not use the template, merge the same rules by hand under
+`permissions.deny` in `~/.claude/settings.json`:
 
 ```json
 "Read(~/.config/native-agent-stack/**)", "Edit(~/.config/native-agent-stack/**)",
@@ -204,30 +266,58 @@ project copy as a second layer. In `~/.claude/settings.json`, under
 "Bash(printenv)", "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)"
 ```
 
-For Codex, stop broker variables from reaching Codex shells. Next to the
-existing `[shell_environment_policy.set]` table in `~/.codex/config.toml`, add:
+### Codex
+
+Stop credential and broker variables from reaching Codex shells with an
+empty inherited environment plus explicit, non-secret `set` entries. In
+`~/.codex/config.toml`:
 
 ```toml
 [shell_environment_policy]
-inherit = "core"
+inherit = "none"
+
+[shell_environment_policy.set]
+# Only what Codex shells need. Never put a credential here.
+PATH = "/usr/local/bin:/usr/bin:/bin"   # keep your existing PATH entry
+HOME = "/home/example"   # your home directory
+RTK_TELEMETRY_DISABLED = "1"
 ```
 
-The repository's own measurement on codex-cli 0.155.1
-(`blueprints/gap-wave2-20260923/us-equities__security-supply-chain/`) showed
-that only `inherit = "none"` removed every broker variable. Setting
-`ignore_default_excludes = false` still let `TWS_*`, `IBKR_*`, `ALPACA_PAPER*`
-and `APCA_API_BASE_URL` through. The `core` value is documented but was not
-measured here. Rerun that canary probe (`worker_env_check.sh` and the B-arm
-method) after changing the setting, and use `none` plus explicit `set`
-entries if `core` still lets names through. With the storage rules above, no
-credential variable should be in the launcher environment in the first place.
+Add any other non-secret variable a tool in those shells needs (for example
+`LANG`, `TERM` or `TMPDIR`). The official Codex configuration reference
+(<https://developers.openai.com/codex/config-reference>, fetched 2026-09-24)
+documents `inherit` as `all`, `core` or `none`, `set` as "explicit
+environment values injected after exclusions", and `ignore_default_excludes`
+as `true` by default, which keeps variables whose names contain `KEY`,
+`SECRET` or `TOKEN`.
+
+This choice rests on the repository's own measurement on codex-cli 0.155.1
+([`blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py`](../blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py)
+lines 181-187, canary values in the launcher environment, `codex sandbox`):
+with `inherit = "none"` no broker variable reached the shell and no process
+environment held the canary; the default policy passed all 12 names; and
+`ignore_default_excludes = false` still passed `TWS_*`, `IBKR_ACCOUNT_ID`,
+`ALPACA_PAPER*`, `ALPACA_ACCOUNT_PROFILE` and `APCA_API_BASE_URL`.
+`inherit = "core"` is documented but **unmeasured** here; do not rely on it
+without rerunning that canary probe (`worker_env_check.sh` and the B-arm
+method). `credential_status.py --client-guards` counts only
+`inherit = "none"` as guarded.
+
+This setting controls **environment inheritance, not file reads**. A Codex
+shell runs as your user and can still read a credential file, for example
+`cat` on the store. The file-level mitigations are the store's location
+outside every workspace, so no project checkout contains it, plus the Codex
+sandbox; this setting adds nothing there. With the storage rules above, no
+credential variable should be in the launcher environment in the first
+place.
 
 ## Rotation and incidents
 
 Rotate immediately when any of these happens: a gitleaks, push-protection or
 secret-scanning alert; the checker reports mode, owner or location drift; a
-value appears in a transcript, log, receipt, telemetry or agent context; a
-host is lost or retired; a collaborator or device changes. Rotate the Alpaca
+value appears in a transcript, log, receipt, telemetry or agent context,
+including a key pasted into a prompt or passed through a tool call; a host is
+lost or retired; a collaborator or device changes. Rotate the Alpaca
 paper pair once after adopting this layout, because broker-prefixed variable
 names were seen in a launcher environment on 2026-09-23. Paid keys (Databento,
 Typesafe) rotate quarterly. The checker flags files older than 90 days as
@@ -282,7 +372,11 @@ reports:
 - whether the project guard file exists.
 
 `--client-guards` parses `~/.claude/settings.json` and `~/.codex/config.toml`
-and reports only booleans. The exit status is 1 only when a **required** entry
+and reports only booleans: user deny rules for the store, the user secret-guard
+hook (registered and installed), the Claude sandbox, whether Claude Code
+telemetry logs content (`claude_telemetry_logs_content`, plus one boolean per
+flag; key names and truthiness only), and whether Codex uses
+`inherit = "none"`. The exit status is 1 only when a **required** entry
 is unsafe.
 
 ## Follow-ups not in this change

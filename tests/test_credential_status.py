@@ -188,18 +188,65 @@ class CredentialStatusTests(unittest.TestCase):
 
     def test_client_guards_reports_booleans_only(self):
         claude = self.home / ".claude"
-        claude.mkdir()
+        (claude / "hooks").mkdir(parents=True)
+        (claude / "hooks" / "secret_path_guard.py").write_text("# stand-in\n")
         (claude / "settings.json").write_text(json.dumps({
             "permissions": {"deny": ["Read(~/.config/native-agent-stack/**)"]},
-            "env": {"SOME_TOKEN": self.secret}}))
+            "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
+                {"type": "command", "command": "python3 /h/.claude/hooks/secret_path_guard.py"}]}]},
+            "env": {"SOME_TOKEN": self.secret, "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                    "OTEL_LOG_TOOL_CONTENT": "1", "OTEL_LOG_RAW_API_BODIES": f"file:/tmp/{self.secret}",
+                    "OTEL_LOG_USER_PROMPTS": "false"}}))
         codex = self.home / ".codex"
         codex.mkdir()
         (codex / "config.toml").write_text('[shell_environment_policy]\ninherit = "none"\n')
         report = self.report(with_client_guards=True)
-        self.assertEqual(report["client_guards"], {"claude_user_deny_rules": True,
-                                                   "claude_sandbox_enabled": False,
-                                                   "codex_shell_environment_policy": True})
+        self.assertEqual(report["client_guards"], {
+            "claude_user_deny_rules": True,
+            "claude_user_secret_guard_hook": True,
+            "claude_sandbox_enabled": False,
+            "claude_telemetry_logs_content": True,
+            "claude_telemetry_content_flags": {
+                "OTEL_LOG_TOOL_CONTENT": True, "OTEL_LOG_TOOL_DETAILS": False,
+                "OTEL_LOG_USER_PROMPTS": False, "OTEL_LOG_ASSISTANT_RESPONSES": False,
+                "OTEL_LOG_RAW_API_BODIES": True},
+            "codex_shell_environment_inherit_none": True})
         self.assert_no_values(json.dumps(report))
+        self.assert_no_values(cs.render_text(report))
+        self.assertIn("claude telemetry logs content: true", cs.render_text(report))
+
+    def test_telemetry_flags_need_telemetry_enabled_and_follow_documented_fallback(self):
+        off = cs.telemetry_content_logging({"OTEL_LOG_TOOL_CONTENT": "1"})
+        self.assertFalse(off["logs_content"])
+        self.assertTrue(off["flags"]["OTEL_LOG_TOOL_CONTENT"])
+        fallback = cs.telemetry_content_logging({"CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                                                 "OTEL_LOG_USER_PROMPTS": "1"})
+        self.assertTrue(fallback["flags"]["OTEL_LOG_ASSISTANT_RESPONSES"])
+        self.assertTrue(fallback["logs_content"])
+        redacted = cs.telemetry_content_logging({"CLAUDE_CODE_ENABLE_TELEMETRY": "1", "OTEL_LOG_TOOL_CONTENT": "0",
+                                                 "OTEL_LOG_RAW_API_BODIES": "false", "OTEL_LOG_TOOL_DETAILS": ""})
+        self.assertFalse(redacted["logs_content"])
+        self.assertEqual(cs.telemetry_content_logging(None)["flags"]["OTEL_LOG_USER_PROMPTS"], False)
+
+    def test_codex_counts_only_inherit_none_as_guarded(self):
+        codex = self.home / ".codex"
+        codex.mkdir()
+        for body, expected in (('inherit = "none"\n', True), ('inherit = "core"\n', False),
+                               ('inherit = "all"\nignore_default_excludes = false\nexclude = ["*KEY*"]\n', False),
+                               ('', False)):
+            with self.subTest(body=body):
+                (codex / "config.toml").write_text("[shell_environment_policy]\n" + body)
+                guards = self.report(with_client_guards=True)["client_guards"]
+                self.assertIs(guards["codex_shell_environment_inherit_none"], expected)
+
+    def test_guard_hook_needs_registration_and_installed_file(self):
+        claude = self.home / ".claude"
+        claude.mkdir()
+        (claude / "settings.json").write_text(json.dumps({"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
+            {"type": "command", "command": "python3 /h/.claude/hooks/secret_path_guard.py"}]}]}}))
+        guards = self.report(with_client_guards=True)["client_guards"]
+        self.assertFalse(guards["claude_user_secret_guard_hook"])
+        self.assertIsNone(guards["codex_shell_environment_inherit_none"])
 
     def test_tracked_sensitive_names_match_basenames_only(self):
         repo = self.home / "repo"

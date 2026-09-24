@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3182,8 +3182,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "ff84961451fa443ecb25d7139bc1afdf7714cf54fa3c4a0a797672773d6251f3",
-      "bytes": 20793
+      "sha256": "08cf412e162594ce05e1de224850a81dcdd8e26c6e83c1d8cb6ddbf0c4de6c96",
+      "bytes": 21262
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3327,8 +3327,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a85d53f83852b289a1dafd1767b863bd22f4d6f24a15b4bbbf0588e665b44b55",
-      "bytes": 6480
+      "sha256": "68a6a973d3a08ae12b9d0c60209a5f25b877441ca9ff8275ada91446270e7f42",
+      "bytes": 7328
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -5402,7 +5402,7 @@
       "bytes": 126
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
       "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
       "bytes": 111
     },
@@ -9653,8 +9653,8 @@
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
-      "sha256": "01a4be728982f807a23023e7c8576da35411195a9f14f02d58e44f1ab58a2d53",
-      "bytes": 9498
+      "sha256": "4c15f89c8d4e2661d2a8a54b76e779f88297954c23ec3b96d609d2cc8db62150",
+      "bytes": 11170
     },
     {
       "path": "docs/direct-results.md",
@@ -9943,8 +9943,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6c8923e9a688a70c25a871b4c1fcd1547daf6ef68d5d49aa2987d3044dae9f6c",
-      "bytes": 17254
+      "sha256": "fbcb8a5b9b659936c4122715c756d77273f099f65dbb82e8ea908553e1ca6585",
+      "bytes": 23939
     },
     {
       "path": "docs/stack.md",
@@ -28438,8 +28438,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "a07362ab59c305a8870fff2195b962c3223efe6181e0192ba85fc0f33d05b878",
-      "bytes": 15184
+      "sha256": "3820d02b868e0385a7eb6a47e0d35833420136505e6807c25861119014630fde",
+      "bytes": 18120
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -28448,8 +28448,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "e1ea08085973ea757894e33f010b8dab21d7ce52ce24967c65f5047cbf45640f",
-      "bytes": 7743
+      "sha256": "580cf3effc6fc36afaafc2f1b70cea01a25d8ede50c0e18a103808293cbb9bee",
+      "bytes": 15034
     },
     {
       "path": "scripts/host_receipts.py",
@@ -28753,8 +28753,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "fe84bb21fcdbee657e0a196394594687e0234a66993f2280e556a715373619a2",
-      "bytes": 9614
+      "sha256": "50b8d5771eccbbaf77204dd10ed065023ba9a96f69562ffd8f584da07f82c11c",
+      "bytes": 12707
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -28858,8 +28858,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "b01a05e900adecedb804d9a96903d0c3a3534a86e43a4390c215e8a791eb0f14",
-      "bytes": 13050
+      "sha256": "8372146abfc8c87a68092fa937e2dfb62dfbb8d5095c82e78bd5ec98960c0860",
+      "bytes": 17718
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -29053,8 +29053,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "98ce97c54c32fe2ba63331e80ba06234808c9396875a5d58bec8f9f96f3983de",
-      "bytes": 6264
+      "sha256": "fee883d95a2a9d446f07691b5c9a765863143df937856c36744d0dcc36d1c5b0",
+      "bytes": 13727
     },
     {
       "path": "tests/test_security_identity.py",

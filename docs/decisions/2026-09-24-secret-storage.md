@@ -52,9 +52,17 @@ was read.
 5. **Agent side:** a tracked `.claude/settings.json` holds deny rules only, plus
    the `scripts/hooks/secret_path_guard.py` PreToolUse hook. Both are
    described as guards against **accidental** exposure, not as a boundary.
-   The same deny rules also go into user settings, as a host step. For Codex,
-   the host step is `[shell_environment_policy] inherit = "core"` (documented),
-   or `"none"` (measured), and it must be re-measured with the canary probe.
+   The same deny rules and the same hook ship in the managed Claude user
+   profile: `tools/adoption/install_claude_profile.py` installs the hook
+   (sha256-pinned in `adoption/hooks/claude/SHA256SUMS`) and the settings
+   template carries the rules and the hook registration, so the documented
+   installer deploys them on every new host. The hook searches reader and
+   search commands for secret variable names and credential files, and blocks
+   shell tracing or environment dumps around sourcing a credential file.
+   For Codex, the host step is `[shell_environment_policy] inherit = "none"`
+   plus explicit non-secret `set` entries, the only value the repository
+   measured to remove every broker variable. `"core"` is documented but
+   unmeasured. This setting controls environment inheritance, not file reads.
 
 | Class | Store | Loaded by |
 | --- | --- | --- |
@@ -89,7 +97,14 @@ sandboxed commands cannot reach the user systemd bus.
 Recorded boundaries: Windows-side reads over `\\wsl.localhost`; values in a
 child's environment, which the same uid can read through `/proc/<pid>/environ`
 and `ps e`; and output-retaining stores (transcripts, RTK recall, context-mode,
-ai-memory, OTEL tool-content logging). Incident handling purges these.
+ai-memory, and OpenTelemetry/Loki whenever a Claude Code content flag is
+on). Incident handling purges these, and a key pasted into a prompt or passed
+through a tool call is rotated. `credential_status.py --client-guards`
+reports the content flags as booleans. On 2026-09-24 this host had telemetry
+on and all five content flags explicitly false in `~/.claude/settings.json`;
+the earlier statement that tool-content and raw-body logging were enabled is
+withdrawn. Keeping them off while broker keys exist is recommended and is the
+user's decision.
 
 ## Measured (local integration class, 2026-09-24)
 
@@ -114,8 +129,18 @@ ai-memory, OTEL tool-content logging). Incident handling purges these.
   a `0644` synthetic file exited 3 with `error_type: SafetyError` and no value
   in the output.
 
-Not tested: the sandbox, Codex environment policy changes, the user-level
-snippets, macOS, and any real credential.
+- The extended hook has a test per blocked form (secret-name searches,
+  `git grep`, `find -exec` readers, `*.env` files, tracing while sourcing,
+  environment dumps after sourcing, `/proc` environ spellings) and a
+  66-command negative corpus of ordinary repository and shell work.
+- The profile tests install both hooks into a temporary home, check that
+  `SHA256SUMS` verifies like `sha256sum -c`, and run the rendered template
+  hook through `sh`: it exits 0 while the guard is not installed and blocks
+  with exit 2 once it is.
+
+Not tested: the sandbox, Codex environment policy changes (the Codex
+evidence is the gap-wave2 canary receipt), a live Claude session with the
+user-level hook, macOS, and any real credential.
 
 ## Alternatives rejected
 

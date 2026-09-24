@@ -9,6 +9,8 @@ placeholder rendering and `claude mcp add` argument order are tested as data.
 
 import io
 import json
+import string
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -44,6 +46,85 @@ class GuardInstallTests(unittest.TestCase):
             status = icp.install_guard(home, dry_run=True)
             self.assertEqual(status, "planned")
             self.assertFalse((home / ".claude" / "hooks" / "effort-default-guard.py").exists())
+
+
+class SecretGuardProfileTests(unittest.TestCase):
+    """The secret-path guard and its deny rules ship in the user profile for every new host."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_install_guards_installs_both_hooks_pinned_by_sha256sums(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            results = icp.install_guards(home, dry_run=False)
+            self.assertEqual(results, {"effort-default-guard.py": "installed", "secret_path_guard.py": "installed"})
+            dest = home / ".claude" / "hooks" / "secret_path_guard.py"
+            self.assertEqual(dest.read_bytes(), icp.SECRET_GUARD_SRC.read_bytes())
+            self.assertEqual(icp.install_guards(home, dry_run=False),
+                             {"effort-default-guard.py": "skipped", "secret_path_guard.py": "skipped"})
+
+    def test_sha256sums_verifies_like_sha256sum_c(self):
+        entries = icp.sha256sums_entries()
+        self.assertEqual(set(entries), {src.resolve() for src in icp.HOOKS.values()})
+        for source, digest in entries.items():
+            with self.subTest(source=source.name):
+                self.assertEqual(icp.sha256_of(source), digest)
+
+    def test_modified_hook_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(icp, "expected_sha256", return_value="0" * 64):
+                with self.assertRaises(icp.InstallError):
+                    icp.install_guards(Path(tmp), dry_run=False)
+            self.assertFalse((Path(tmp) / ".claude").exists())
+
+    def test_template_carries_project_deny_rules_and_the_guard_hook(self):
+        template = json.loads(self.TEMPLATE.read_text())
+        project = json.loads((ROOT / ".claude" / "settings.json").read_text())
+        deny = template["permissions"]["deny"]
+        for rule in project["permissions"]["deny"]:
+            self.assertIn(rule, deny)
+        self.assertIn("Agent(codex:codex-rescue)", deny)
+        bash_groups = [g for g in template["hooks"]["PreToolUse"] if g.get("matcher") == "Bash"]
+        commands = [h["command"] for g in bash_groups for h in g["hooks"]]
+        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+
+    def rendered_hook(self, home: Path) -> str:
+        text = string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=str(home))
+        for group in json.loads(text)["hooks"]["PreToolUse"]:
+            for hook in group["hooks"]:
+                if "secret_path_guard.py" in hook["command"]:
+                    return hook["command"]
+        self.fail("no secret guard hook in the template")
+
+    def run_rendered(self, command: str, bash_command: str) -> subprocess.CompletedProcess:
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": bash_command}})
+        return subprocess.run(["sh", "-c", command], input=payload, capture_output=True, text=True, timeout=30)
+
+    def test_rendered_hook_blocks_after_install_and_is_inert_before(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            command = self.rendered_hook(home)
+            missing = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
+            self.assertEqual(missing.returncode, 0, "no installed guard must not block every Bash call")
+            icp.install_guards(home, dry_run=False)
+            blocked = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
+            self.assertEqual(blocked.returncode, 2)
+            self.assertIn("credential_file_read", blocked.stderr)
+            allowed = self.run_rendered(command, "git status")
+            self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
+
+    def test_apply_merge_keeps_host_rules_and_adds_the_guard(self):
+        import apply_claude_settings as acs
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+        base = {"permissions": {"deny": ["Bash(rm -rf /)"]},
+                "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "rtk hook claude"}]}]}}
+        merged = acs.merge_settings(base, template)
+        self.assertEqual(merged["permissions"]["deny"][0], "Bash(rm -rf /)")
+        self.assertIn("Read(~/.config/native-agent-stack/**)", merged["permissions"]["deny"])
+        commands = [h["command"] for h in merged["hooks"]["PreToolUse"][0]["hooks"]]
+        self.assertEqual(commands.count("rtk hook claude"), 1)
+        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
 
 
 class AgentsInstallTests(unittest.TestCase):

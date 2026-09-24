@@ -224,28 +224,74 @@ def hooks_path(root: Path) -> str | None:
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+TELEMETRY_CONTENT_FLAGS = ("OTEL_LOG_TOOL_CONTENT", "OTEL_LOG_TOOL_DETAILS", "OTEL_LOG_USER_PROMPTS",
+                           "OTEL_LOG_ASSISTANT_RESPONSES", "OTEL_LOG_RAW_API_BODIES")
+FALSY = {"", "0", "false", "no", "off"}
+SECRET_GUARD_HOOK = "secret_path_guard.py"
+
+
+def truthy(value) -> bool:
+    """Truthiness of a settings env entry. The value is compared, never returned or printed."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    return isinstance(value, str) and value.strip().lower() not in FALSY
+
+
+def telemetry_content_logging(settings_env) -> dict:
+    """Booleans for Claude Code's OpenTelemetry content flags in settings `env`.
+
+    Only key names and truthiness are used. OTEL_LOG_ASSISTANT_RESPONSES falls back
+    to OTEL_LOG_USER_PROMPTS when unset (Claude Code monitoring docs)."""
+    env = settings_env if isinstance(settings_env, dict) else {}
+    flags = {name: truthy(env.get(name)) for name in TELEMETRY_CONTENT_FLAGS}
+    if "OTEL_LOG_ASSISTANT_RESPONSES" not in env:
+        flags["OTEL_LOG_ASSISTANT_RESPONSES"] = flags["OTEL_LOG_USER_PROMPTS"]
+    enabled = truthy(env.get("CLAUDE_CODE_ENABLE_TELEMETRY"))
+    return {"telemetry_enabled": enabled, "flags": flags,
+            "logs_content": enabled and any(flags.values())}
+
+
+def user_secret_guard_hook(settings, claude_dir: Path) -> bool:
+    """A user PreToolUse hook runs the secret guard and the guard file exists (lstat only)."""
+    groups = settings.get("hooks", {}).get("PreToolUse", [])
+    registered = any(
+        isinstance(hook, dict) and SECRET_GUARD_HOOK in str(hook.get("command", ""))
+        for group in groups if isinstance(group, dict)
+        for hook in (group.get("hooks") if isinstance(group.get("hooks"), list) else []))
+    return registered and os.path.lexists(claude_dir / "hooks" / SECRET_GUARD_HOOK)
+
+
 def client_guards(env) -> dict:
-    """Opt-in presence check of the user-level guard keys. Booleans only."""
+    """Opt-in check of the user-level guard keys. Booleans only; no value is returned."""
     home = env.get("HOME") or str(Path.home())
     claude_dir = Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude")
     codex_dir = Path(env.get("CODEX_HOME") or f"{home}/.codex")
-    result = {"claude_user_deny_rules": None, "claude_sandbox_enabled": None,
-              "codex_shell_environment_policy": None}
+    result = {"claude_user_deny_rules": None, "claude_user_secret_guard_hook": None,
+              "claude_sandbox_enabled": None, "claude_telemetry_logs_content": None,
+              "claude_telemetry_content_flags": None,
+              "codex_shell_environment_inherit_none": None}
     try:
         settings = json.loads((claude_dir / "settings.json").read_text(encoding="utf-8"))
         deny = settings.get("permissions", {}).get("deny", [])
         result["claude_user_deny_rules"] = any(
             isinstance(rule, str) and "native-agent-stack" in rule for rule in deny)
+        result["claude_user_secret_guard_hook"] = user_secret_guard_hook(settings, claude_dir)
         result["claude_sandbox_enabled"] = bool(settings.get("sandbox", {}).get("enabled"))
+        telemetry = telemetry_content_logging(settings.get("env"))
+        result["claude_telemetry_logs_content"] = telemetry["logs_content"]
+        result["claude_telemetry_content_flags"] = telemetry["flags"]
     except (OSError, ValueError, AttributeError):
         pass
     try:
         import tomllib
         config = tomllib.loads((codex_dir / "config.toml").read_text(encoding="utf-8"))
         policy = config.get("shell_environment_policy", {})
-        result["codex_shell_environment_policy"] = (
-            policy.get("inherit") == "none"
-            or (policy.get("ignore_default_excludes") is False and bool(policy.get("exclude"))))
+        # Only inherit = "none" is guarded: the repository's codex-cli 0.155.1 canary
+        # measurement (gap-wave2 security-supply-chain receipt) removed every broker
+        # variable only with "none"; "core" is unmeasured and exclude lists leaked names.
+        result["codex_shell_environment_inherit_none"] = policy.get("inherit") == "none"
     except (ImportError, OSError, ValueError, AttributeError):
         pass
     return result
@@ -301,6 +347,10 @@ def render_text(report: dict) -> str:
                  f"project guard settings: {repo['project_guard_settings_present']}")
     if "client_guards" in report:
         lines.append("client guards: " + json.dumps(report["client_guards"], sort_keys=True))
+        if report["client_guards"].get("claude_telemetry_logs_content"):
+            lines.append("claude telemetry logs content: true. Any value pasted into a prompt or passed through "
+                         "a tool call is copied into the local telemetry store; rotate a pasted key "
+                         "(docs/secret-storage.md)")
     lines.append(f"result: {report['result']} (lstat and names only; no credential file was opened)")
     return "\n".join(lines)
 
@@ -311,7 +361,8 @@ def main(argv=None) -> int:
     parser.add_argument("--inventory", type=Path)
     parser.add_argument("--json", action="store_true", help="print the JSON report")
     parser.add_argument("--client-guards", action="store_true",
-                        help="also check user-level Claude/Codex settings for the guard keys (booleans only)")
+                        help="also check user-level Claude/Codex settings for the guard keys and "
+                             "Claude telemetry content logging (booleans only)")
     args = parser.parse_args(argv)
     inventory_path = args.inventory or args.root / INVENTORY
     try:

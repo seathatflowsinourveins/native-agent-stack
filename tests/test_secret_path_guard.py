@@ -6,6 +6,7 @@ hook for a security boundary.
 """
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -15,6 +16,8 @@ from scripts.hooks import secret_path_guard as guard
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "scripts/hooks/secret_path_guard.py"
+HOST_HOOK = Path.home() / ".claude" / "hooks" / "secret_path_guard.py"
+IN_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI", "").lower() == "true"
 
 BLOCKED = {
     "cat ~/.config/native-agent-stack/alpaca-paper.env": "credential_store_path",
@@ -51,7 +54,56 @@ BLOCKED = {
     "cp \"${ENV_FILE}\" /tmp/x": "credential_file_read",
     "cat .env": "dotenv_read",
     "cat .env.probe": "dotenv_read",
+    "cp .env /tmp/backup": "dotenv_read",
+    "cat .env > /tmp/copy.txt": "dotenv_read",
+    "diff .env.example .env": "dotenv_read",
     "grep KEY ../other/.env.local": "dotenv_read",
+    # Readers and searches on a secret variable name, a credential file or the store directory.
+    "grep -n APCA_API_KEY_ID blueprints/us-equities/adaptive-paper/runner.py": "secret_name_search",
+    "grep -r APCA_API_SECRET_KEY ~": "secret_name_search",
+    "rg -n 'DATABENTO_API_KEY|TYPESAFE_API_KEY' /srv": "secret_name_search",
+    "ag GF_SECURITY_ADMIN_PASSWORD /etc": "secret_name_search",
+    "ack --hidden OPENAI_API_KEY": "secret_name_search",
+    "git grep -n GH_TOKEN": "secret_name_search",
+    "git -C ../other --no-pager grep HF_TOKEN": "secret_name_search",
+    "find ~ -type f -exec grep -H ALPACA_SECRET_KEY {} +": "secret_name_search",
+    "find ~ -name '*.env' -exec cat {} \\;": "dotenv_read",
+    "find . -name .env -execdir head -n 3 {} +": "dotenv_read",
+    "awk -F= '$1==\"APCA_API_SECRET_KEY\"{print $2}' paper.cfg": "secret_name_search",
+    "sed -n '/TWS_PASSWORD/p' gateway.ini": "secret_name_search",
+    "sed -n 1,5p alpaca-paper.env": "dotenv_read",
+    "rg --hidden -g '*.env' KEY ~": "dotenv_read",
+    "git log -p | grep ANTHROPIC_API_KEY": "secret_name_search",
+    "ls ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack": "credential_store_path",
+    "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
+    "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
+    # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
+    "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
+    "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
+    "set -o xtrace; source \"${PAPER_ENV_FILE}\"": "trace_while_sourcing",
+    "set -v; . ./alpaca-paper.env": "trace_while_sourcing",
+    "bash -x -c '. \"$PAPER_ENV_FILE\"; python3 run.py'": "trace_while_sourcing",
+    "sh -xc 'set -a; . \"$SEC_CONTACT_ENV\"'": "trace_while_sourcing",
+    "bash -o xtrace -c 'source \"$PAPER_ENV_FILE\"'": "trace_while_sourcing",
+    "SHELLOPTS=xtrace bash -c '. \"$PAPER_ENV_FILE\"'": "trace_while_sourcing",
+    # Environment dumps after sourcing, including name-filtered forms.
+    "set -a; . \"$PAPER_ENV_FILE\"; set +a; env": "environment_dump_after_source",
+    ". \"$PAPER_ENV_FILE\" && printenv APCA_API_BASE_URL": "environment_dump_after_source",
+    "source \"$PAPER_ENV_FILE\"; export -p": "environment_dump_after_source",
+    ". \"$PAPER_ENV_FILE\"; declare -x": "environment_dump_after_source",
+    ". \"$PAPER_ENV_FILE\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    ". \"$PAPER_ENV_FILE\"; env | grep APCA": "environment_dump_after_source",
+    "bash -c '. \"$PAPER_ENV_FILE\"; env'": "environment_dump_after_source",
+    "( . \"$PAPER_ENV_FILE\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
+    "eval '. \"$PAPER_ENV_FILE\"; typeset -p'": "environment_dump_after_source",
+    "bash -lc 'printenv'": "environment_dump",
+    "env -u HOME env": "environment_dump",
+    # /proc/<pid>/environ in any spelling.
+    "grep -a -z APCA /proc/*/environ": "process_environment",
+    "xargs -0 -n1 < /proc/self/task/42/environ": "process_environment",
+    "cat '/proc/'\"$pid\"'/environ'": "process_environment",
+    "cd /proc/1234 && tr '\\0' '\\n' < environ": "process_environment",
+    "find /proc -maxdepth 2 -name environ": "process_environment",
 }
 
 ALLOWED = [
@@ -68,9 +120,79 @@ ALLOWED = [
     "git status && git diff --stat",
     "cat .env.example",
     "cat docs/examples/alpaca-paper.env.example",
-    "grep -n APCA_API_KEY_ID blueprints/us-equities/adaptive-paper/runner.py",
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
+    "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+]
+
+# Negative corpus: ordinary repository and shell work that must never be blocked.
+SAFE_CORPUS = [
+    "ls -la",
+    "pwd",
+    "git status --short",
+    "git log --oneline -5",
+    "git diff origin/main...HEAD --stat",
+    "git grep -n shell_environment_policy -- docs",
+    "git -C ../other grep -n TODO",
+    "git commit -m 'Tighten the secret guard'",
+    "git push origin HEAD:feature",
+    "gh pr view 12 --json title",
+    "gh auth status",
+    "grep -rn TODO docs",
+    "grep -rn 'def check' scripts/hooks",
+    "grep -n OTEL_LOG_TOOL_CONTENT docs/secret-storage.md",
+    "grep -rn environ scripts/credential_status.py",
+    "grep -c SECRET_NAMES scripts/hooks/secret_path_guard.py",
+    "rg -n 'shell_environment_policy' docs adoption",
+    "rg --files | wc -l",
+    "ag --python parse_args tools",
+    "ack -l shlex scripts",
+    "sed -n '1,80p' scripts/credential_status.py",
+    "sed -i 's/foo/bar/' README.md",
+    "awk -F, '{print $2}' data.csv",
+    "awk 'NR<=5' manifests/stack.json",
+    "cat README.md | head -20",
+    "head -n 40 docs/secret-storage.md",
+    "tail -f logs/app.log",
+    "jq '.files | length' manifests/evidence.json",
+    "diff -u a.txt b.txt",
+    "sort -u names.txt | uniq -c",
+    "find . -name '*.py' -newer setup.cfg -print",
+    "find . -name '*.py' -exec wc -l {} +",
+    "find . -name '*.py' -exec grep -l shlex {} +",
+    "find . -type f -name '*.md' | xargs grep -l 'secret storage'",
+    "python3 -m unittest tests.test_secret_path_guard",
+    "uv run -q --no-project --with pyyaml python -m unittest tests.test_credential_status",
+    "python3 scripts/validate.py",
+    "python3 -c 'import os; print(os.environ.get(\"HOME\"))'",
+    "make -j4 test",
+    "npm test",
+    "set -x; make test",
+    "bash -x scripts/build.sh",
+    "bash -lc 'git status'",
+    "sh -c 'echo hello'",
+    "set -euo pipefail; python3 run.py",
+    "source .venv/bin/activate && set -x && pytest -q",
+    ". ~/.bashrc; env -u HF_TOKEN python3 x.py",
+    "export PATH=\"$HOME/.local/bin:$PATH\"",
+    "declare -a arr=(1 2 3)",
+    "printf '%s\\n' \"$PATH\"",
+    "echo \"$HOME\"",
+    "cat /proc/cpuinfo",
+    "wc -l /proc/self/status",
+    "ls /proc/self/fd",
+    "ps -ef | grep python",
+    "docker ps --format '{{.Names}}'",
+    "cp docs/examples/alpaca-paper.env.example /tmp/template.txt",
+    "sed -n 1,10p docs/examples/sec-contact.env.example",
+    "eval \"$(ssh-agent -s)\"",
+    "timeout 30 python3 scripts/landscape.py --root .",
+    "cp .env.example .env",
+    "cp -n docs/examples/alpaca-paper.env.example ./local.env",
+    "cat docs/examples/sec-contact.env.example > .env.local",
+    "echo 'PORT=3000' | tee -a .env",
+    "set -a; source .env; set +a; npm run dev",
+    "ls -la .env",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
@@ -95,6 +217,17 @@ class SecretPathGuardTests(unittest.TestCase):
         for command in ALLOWED:
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_safe_corpus_is_never_blocked(self):
+        for command in SAFE_CORPUS:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_every_secret_name_is_caught_by_a_search(self):
+        for name in guard.SECRET_NAMES:
+            with self.subTest(name=name):
+                self.assertEqual(guard.check(f"rg -n {name}"), "secret_name_search")
+                self.assertIsNone(guard.check(f"rg -n MY_{name}_HINT"))
 
     def test_known_bypasses_are_recorded_not_claimed(self):
         for command in EXPECTED_PASS_THROUGH:
@@ -130,6 +263,16 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(hooks[0]["matcher"], "Bash")
         self.assertIn("scripts/hooks/secret_path_guard.py", hooks[0]["hooks"][0]["command"])
         self.assertNotIn("/home/", json.dumps(settings))
+
+
+    def test_host_profile_copy_is_verbatim(self):
+        if IN_CI:
+            self.skipTest("running in CI: a runner has no host install of the guard to compare")
+        if not HOST_HOOK.is_file():
+            self.skipTest(f"no host guard at {HOST_HOOK}; "
+                          "tools/adoption/install_claude_profile.py --only guard installs it")
+        self.assertEqual(HOOK.read_bytes(), HOST_HOOK.read_bytes(),
+                         "the installed user-scope guard must be a verbatim copy of scripts/hooks/secret_path_guard.py")
 
 
 if __name__ == "__main__":

@@ -198,10 +198,14 @@ GitHub-hosted macOS runner; see
    last step (still only meaningful after sign-in; run it manually
    afterward otherwise, exactly as the script's own closing message says).
    Three idempotent sub-steps, each safe to re-run:
-   - **guard hook**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
-     to `~/.claude/hooks/effort-default-guard.py`, refusing to install unless
-     its sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS);
-     skipped if the installed copy already matches.
+   - **guard hooks**: copies [`adoption/hooks/claude/effort-default-guard.py`](hooks/claude/effort-default-guard.py)
+     to `~/.claude/hooks/effort-default-guard.py` and the secret guard
+     [`scripts/hooks/secret_path_guard.py`](../scripts/hooks/secret_path_guard.py)
+     to `~/.claude/hooks/secret_path_guard.py` (the secret guard and its
+     settings entries were added after `v2026.09.24.1`), refusing to install either unless
+     every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
+     (paths relative to that file); skipped per file if the installed copy
+     already matches.
    - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical.
@@ -216,7 +220,8 @@ GitHub-hosted macOS runner; see
      them). A same-named server with a different config is reported and left
      unchanged unless `--replace-mcp` is given.
    Then apply the settings template itself (model, effort, ultracode,
-   workflow env, hooks) into the live `~/.claude/settings.json` with
+   workflow env, hooks, and the credential deny rules plus the `PreToolUse`
+   secret-guard hook from [`docs/secret-storage.md`](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)) into the live `~/.claude/settings.json` with
    [`tools/adoption/apply_claude_settings.py`](../tools/adoption/apply_claude_settings.py),
    after rendering it for this host with step 4's `render_config.py --out`:
    ```sh
