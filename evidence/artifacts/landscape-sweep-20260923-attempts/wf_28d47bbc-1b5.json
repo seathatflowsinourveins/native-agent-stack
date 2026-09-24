@@ -13,7 +13,19 @@
  },
  "discovery_returns": 9,
  "refuter_returns": 0,
- "provider_usage": "unknown: the workflow runtime reports usage only for a completed run, and none was captured for this stopped run",
+ "provider_usage": {
+  "source": "agent-lab .claude/workflows/child-usage.mjs over the retained subagent transcripts (2026-09-24)",
+  "children": 17,
+  "children_returned": 9,
+  "children_stopped_in_flight": 8,
+  "resolved_model": "claude-sonnet-5",
+  "resolved_effort": "high",
+  "output_tokens": 168052,
+  "input_tokens": 302,
+  "cache_read_input_tokens": 8233147,
+  "cache_creation_input_tokens": 773809,
+  "note": "The workflow runtime's own subagent-token total is reported only for a completed run; none exists for this stopped run. Do not sum these per-request counters with the runtime's counter."
+ },
  "layers": [
   {
    "layer_id": "code-navigation",

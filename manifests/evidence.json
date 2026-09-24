@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "7c4a5f14360cecff31a70bd6c14f509a5dc4741d3d059318d1a15713dc451492",
-      "bytes": 1117831
+      "sha256": "97eb35318a81896533bf0eda8fac01f7eeaa94af6995e729ef1f86528108cd7d",
+      "bytes": 1118325
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -23950,8 +23950,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
-      "sha256": "3785003ac2d1079949e5be864c88f174db1e802775626f6468df5bfcc3fc89ba",
-      "bytes": 5551
+      "sha256": "fe74ba838a761c2b40281658867a56a8540445774a6489c94c606838523a7970",
+      "bytes": 6026
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
