@@ -764,11 +764,17 @@ class RealExportIsolationTests(unittest.TestCase):
                                           {"schema_version": 1, "packets": sealed})
         self.assertGreaterEqual(len(report), 25)
         self.assertEqual(isolation.role_label_hits(report), [])
-        # Record fields of candidate lists (card evidence_level, installed_version) no longer mark the winners
-        # (round 6, B6-3).
+        # Record-field hits are reported, never failed (round 7, OPR7-2): a winner change made intrinsic attributes
+        # (license, a version) isolate the new winner. The cards' own label fields are stripped (round 6, B6-3), so
+        # none sits outside an evidence record today.
         records = isolation.record_field_hits(export, packets_dir, isolation.ledger_winners(ROOT),
                                               {"schema_version": 1, "packets": sealed})
-        self.assertEqual(isolation.record_label_hits(records), [])
+        self.assertEqual([hit for hit in isolation.record_label_hits(records) if not hit["evidence_record"]], [])
+        # The exposure a wave discloses (round 7, BL7-1): web-research's cited table row states its selection.
+        exposure = isolation.prose_exposure(export, packets_dir, isolation.ledger_winners(ROOT),
+                                            {"schema_version": 1, "packets": sealed})
+        self.assertIn("docs/full-stack-convergence.md", exposure["foundation::web-research"]["cited_files"])
+        self.assertFalse(exposure["foundation::git-github-automation"]["cited_files"])
         # Exported files are verbatim beyond label stripping (round 6, B6-4): a hash-bound listing keeps its bytes.
         for relative in ("evidence/artifacts/usage-report.source.txt",):
             if (export / relative).is_file():
@@ -804,9 +810,14 @@ class RealExportIsolationTests(unittest.TestCase):
         isolation = load_module("export_isolation_check", "export_isolation_check.py")
         self.assertEqual(isolation._key_tokens("$.records[].selectedTools"), {"selected", "tools"})
         self.assertEqual(isolation._key_tokens("$.x.selected-repos{keys}"), {"selected", "repos"})
-        for key in ("selectedTools", "selected_repos", "selection", "picked", "recommended", "default", "primary"):
+        # Round 7, OPR7-2: in an evidence record the strong role words fail, the others are reported.
+        for key in ("winnerTools", "chosen_repos", "incumbents"):
             hit = {"file": "evidence/run/receipt.json", "path": f"$.{key}", "mode": "names_alone"}
             self.assertFalse(isolation.evidence_hit(hit), key)
+        for key in ("selectedTools", "selected_repos", "selection", "picked", "recommended", "default", "primary"):
+            hit = {"file": "evidence/run/receipt.json", "path": f"$.{key}", "mode": "names_alone"}
+            self.assertTrue(isolation.evidence_hit(hit), key)
+            self.assertEqual(len(isolation.evidence_role_word_hits({"foundation::layer": [hit]})), 1, key)
         self.assertTrue(isolation.evidence_hit({"file": "evidence/run/receipt.json", "path": "$.sources",
                                                 "mode": "names_alone"}))
         scratch = Path(tempfile.mkdtemp())
@@ -817,6 +828,37 @@ class RealExportIsolationTests(unittest.TestCase):
         (scratch / "foundation__layer.json").write_text(json.dumps({"candidates": candidates}), encoding="utf-8")
         fields = isolation.packet_field_hits(scratch, {"foundation::layer": [("github.com/acme/win", "")]})
         self.assertEqual(fields, {"foundation::layer": ["role"]})
+
+    def test_a_card_role_is_stripped_only_when_it_states_status(self):
+        # Round 7, BL7-4: the export's role strip shares the packet rule, so behaviour roles stay.
+        for role in ("Selected-file handoff bundles", "Retained local sanitized operational logs and LogQL queries"):
+            self.assertFalse(blind_checkout._role_key("role", role), role)
+        for role in ("Selected north-star engine for backtests.", "The selected GitHub CLI."):
+            self.assertTrue(blind_checkout._role_key("role", role), role)
+
+    def test_prose_exposure_scores_tables_and_discriminating_statements(self):
+        # Round 7, BL7-1: a selection-headed table row, a statement naming only winners, never one naming a non-winner.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        (export / "docs").mkdir(parents=True)
+        packets.mkdir()
+        (packets / "foundation__layer.json").write_text(json.dumps({"candidates": [
+            {"key": "c1", "name": "Tavily", "repository": "https://github.com/acme/tavily", "adopted": True,
+             "evidence_refs": ["docs/a.md", "docs/b.md"]},
+            {"key": "c2", "name": "Crawler", "repository": "https://github.com/acme/crawler", "adopted": True}]}),
+            encoding="utf-8")
+        winners = {"foundation::layer": [("github.com/acme/tavily", "")]}
+        (export / "docs" / "a.md").write_text("| Layer | Selected practice |\n| --- | --- |\n| Web | Tavily |\n",
+                                              encoding="utf-8")
+        (export / "docs" / "b.md").write_text("Tavily and Crawler both keep defaults. `Tavily` defaults `--depth`.\n",
+                                              encoding="utf-8")
+        (export / "docs" / "c.md").write_text("Retain Tavily for search.\n", encoding="utf-8")
+        report = isolation.prose_exposure(export, packets, winners)
+        self.assertEqual(report["foundation::layer"], {"scored": True, "cited_files": ["docs/a.md"],
+                                                       "export_files": ["docs/a.md", "docs/c.md"]})
+        self.assertFalse(isolation.prose_exposure(export, packets, {})["foundation::layer"]["scored"])
 
     def test_the_checker_refuses_bad_input_with_exit_2(self):
         # Round 6, OPR6-5: a missing or malformed --packet-keys, or none for sealed packets, is a usage error (2),

@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import re
 import sys
@@ -629,13 +630,25 @@ CHOICE_PHRASE = re.compile(r"\b(?:incumbents?|winners?|current (?:choice|selecti
                            r"use stage|lifecycle stage|partial_acceptance|qualified component|adoption (?:stage|status)|"
                            # Catalog membership status (Codex review of #145 at a516c477: "gh CLI has no separate
                            # manifests/stack.json inventory entry").
-                           r"stack\.json|inventory entry|stack (?:entry|inventory|membership))", re.I)
+                           r"stack\.json|inventory entry|stack (?:entry|inventory|membership)|"
+                           # A broker path's status (round 7, BL7-5: "IBKR is this catalog's selected live-primary
+                           # broker path").
+                           r"live-primary)", re.I)
 CANDIDATE_PLACEHOLDER = "<candidate>"
 CHOICE_WINDOW = 25
 # Short names that are ordinary words are never terms ("one" as a component id is not the word "one").
 COMMON_SHORT_WORDS = frozenset({"one", "two", "six", "ten", "all", "any", "and", "the", "for", "new", "run", "use",
                                 "set", "get", "not", "yes", "off", "on", "in", "at", "to", "by", "of", "is", "it",
                                 "as", "or", "an", "be", "do", "no", "up", "so", "we", "us", "if", "id", "ok"})
+# Ordinary words that are also another layer's candidate name or name part ("Temporal", "LangGraph", "adaptive-paper",
+# "OpenTelemetry"): as catalog-wide terms they matched plain prose and dropped a requirement clause ("retain scoped
+# telemetry ...") (independent review of #145, round 7, BL7-3). Such a catalog name matches only as written.
+ORDINARY_WORDS = frozenset({"graph", "exact", "paper", "inference", "actions", "action", "security", "token", "tokens",
+                            "temporal", "telemetry", "optional", "foundation", "lineage", "official", "registry",
+                            "exchange", "route", "testing", "financial", "basic", "software", "semantic", "modal",
+                            "containers", "container", "subagent", "reference", "contrib", "practice", "support",
+                            "companion", "sandbox", "inspect", "efficient", "awesome", "calendars", "calendar",
+                            "attest", "servers", "collector", "timestamp", "pandas", "tracing", "evaluation"})
 NEUTRAL_REQUIREMENT_NO_SCOPE = "Judge fit against the layer title; the ledger's requirement text is withheld."
 # Candidate prose a lane reads besides the shared fields (round 5, N2).
 CANDIDATE_PROSE_FIELDS = ("role", "card_limitations")
@@ -643,29 +656,34 @@ CANDIDATE_PROSE_FIELDS = ("role", "card_limitations")
 
 class CandidateMatcher:
     """Finds the candidates a text names: full names, repository names, component ids and owners and name parts
-    unique to one candidate (four characters or longer, case-insensitive, with -/_/space variants), and shorter
-    names such as gh, uv or RTK as whole case-sensitive tokens (round 5, N2; review of 52344da8)."""
+    unique to one candidate (four characters or longer, case-insensitive, with -/_/space variants), shorter names
+    such as gh, uv or RTK as whole case-sensitive tokens (round 5, N2; review of 52344da8), and ``exact_terms`` (other
+    layers' name parts and ordinary-word names) only as written and never inside a path (round 7, BL7-3)."""
 
-    def __init__(self, long_terms, short_terms):
+    def __init__(self, long_terms, short_terms, exact_terms=()):
         # A selection word is never a name term, even when a candidate's name holds it (round 5, N2).
         long_terms = {term for term in long_terms if not SELECTION_WORD.fullmatch(term.strip())}
         short_terms = {term for term in short_terms if not SELECTION_WORD.fullmatch(term.strip())}
+        exact_terms = {term for term in exact_terms if not SELECTION_WORD.fullmatch(term.strip())}
         self.long = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(long_terms, key=len, reverse=True))
                                + r")(?![A-Za-z0-9])", re.I) if long_terms else None
         self.short = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(short_terms, key=len, reverse=True))
                                 + r")(?![A-Za-z0-9])") if short_terms else None
+        self.exact = re.compile(r"(?<![A-Za-z0-9/._-])(?:" + "|".join(re.escape(t) for t in sorted(exact_terms, key=len, reverse=True))
+                                + r")(?![A-Za-z0-9/_-])") if exact_terms else None
+
+    def patterns(self):
+        return [pattern for pattern in (self.long, self.short, self.exact) if pattern is not None]
 
     def search(self, text: str) -> bool:
-        return bool((self.long and self.long.search(text)) or (self.short and self.short.search(text)))
+        return any(pattern.search(text) for pattern in self.patterns())
 
     def spans(self, text: str) -> list:
-        return [match.span() for pattern in (self.long, self.short) if pattern is not None
-                for match in pattern.finditer(text)]
+        return [match.span() for pattern in self.patterns() for match in pattern.finditer(text)]
 
     def sub(self, replacement: str, text: str) -> str:
-        for pattern in (self.long, self.short):
-            if pattern is not None:
-                text = pattern.sub(replacement, text)
+        for pattern in self.patterns():
+            text = pattern.sub(replacement, text)
         return text
 
 
@@ -695,16 +713,28 @@ def candidate_matcher(candidates, layer_words=(), catalog_candidates=()) -> Cand
     only when one candidate has it and the layer's own title and scope words (``layer_words``) do not.
     ``catalog_candidates`` (every layer's) add their whole names, so a packet does not name another layer's incumbent
     either (Codex review of #145 at a516c477: a factor layer's prose named Nautilus, LEAN and Alpaca)."""
-    long_terms, short_terms = set(), set()
+    long_terms, short_terms, exact_terms = set(), set(), set()
     owned_parts: dict = {}
     layer = {word.lower() for word in layer_words}
     for candidate in catalog_candidates or ():
         if isinstance(candidate, dict):
-            _name_terms(candidate, long_terms, short_terms)
+            # Other layers' candidates: their whole names, except that a single ordinary word ("Temporal") matches
+            # only as written; their name parts only capitalized, as a proper noun ("Nautilus", "Alpaca"), never as
+            # the ordinary word ("telemetry", "graph", "exact") or a path segment (round 7, BL7-3).
+            catalog_long, catalog_short = set(), set()
+            _name_terms(candidate, catalog_long, catalog_short)
+            short_terms |= catalog_short
+            for term in catalog_long:
+                if term in ORDINARY_WORDS:
+                    exact_terms.update(value for value in (candidate.get("name"), candidate.get("component_id"))
+                                       if isinstance(value, str) and value.lower() == term and not value.islower())
+                else:
+                    long_terms.add(term)
             for value in (candidate.get("name"), (candidate.get("repository") or "").rstrip("/").split("/")[-1]):
                 for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
-                    if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS and part.lower() not in layer:
-                        long_terms.add(part.lower())
+                    if (len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS | ORDINARY_WORDS
+                            and part.lower() not in layer):
+                        exact_terms.add(part[:1].upper() + part[1:].lower())
     for index, candidate in enumerate(candidates or []):
         if not isinstance(candidate, dict):
             continue
@@ -714,52 +744,88 @@ def candidate_matcher(candidates, layer_words=(), catalog_candidates=()) -> Cand
         _name_terms(candidate, long_terms, short_terms)
         for value in (candidate.get("name"), basename):
             for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
-                if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS:
+                if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS | ORDINARY_WORDS:
                     owned_parts.setdefault(part.lower(), set()).add(index)
         if len(owner) >= 4:
             owned_parts.setdefault(owner.lower(), set()).add(index)
     long_terms |= {part for part, owners in owned_parts.items() if len(owners) == 1 and part not in layer}
-    return CandidateMatcher(long_terms, short_terms)
+    return CandidateMatcher(long_terms, short_terms, exact_terms)
 
 
-def states_choice(sentence: str, matcher: CandidateMatcher) -> bool:
+def states_choice(sentence: str, matcher: CandidateMatcher, own: CandidateMatcher = None) -> bool:
     """Whether a sentence states the catalog's choice: a choice phrase, or a selection word next to a candidate name
     (within CHOICE_WINDOW characters: "the selected NautilusTrader destination", "Nautilus stays the default").
     A selection verb elsewhere in the sentence ("Keep ... across Claude and Codex sessions") is not one (round 5,
-    N1)."""
+    N1).
+
+    ``own`` (a candidate's own names, for its role and limitations): a selection word next to the candidate's own name
+    describes it ("Brokerage model defaults include NullSlippageModel"), and a sentence carrying a result marker is
+    evidence, so neither drops a sentence by proximity; a choice phrase always does (round 7, BL7-4)."""
     if CHOICE_PHRASE.search(sentence):
         return True
     selections = [match.span() for match in SELECTION_WORD.finditer(sentence)]
     if not selections:
         return False
     names = matcher.spans(sentence)
+    if own is not None:
+        if RESULT_MARKER.search(sentence):
+            return False
+        own_spans = set(own.spans(sentence))
+        names = [span for span in names if not any(o_start <= span[0] and span[1] <= o_end
+                                                   for o_start, o_end in own_spans)]
     return any(max(0, max(s_start, n_start) - min(s_end, n_end)) <= CHOICE_WINDOW
                for s_start, s_end in selections for n_start, n_end in names)
 
 
-# A sentence of a candidate's own role or limitations that states its status: it opens with a selection adjective
-# ("Selected north-star engine ...", "Default ...") or says the candidate is, stays or remains the selected/default
-# one. A result marker or a repository path marks evidence, which stays (round 6, B6-5: the earlier rule, any
-# selection word, dropped real limitations such as a BLOCKED parity-gate record).
-STATUS_STATEMENT = re.compile(r"^\W*(?:the\s+)?(?:selected|default|chosen|retained|adopted|incumbent|preferred)\b|"
-                              r"\b(?:is|was|are|remains?|stays?|kept as|serves as|as)\s+(?:the\s+)?(?:current\s+)?"
-                              r"(?:selected|default|chosen|retained|adopted|incumbent|preferred)\b", re.I)
-RESULT_MARKER = re.compile(r"\b(?:PASS(?:ED)?|FAIL(?:ED)?|BLOCKED|exit(?: code)? \d+|\d+/\d+)\b|"
-                           r"(?<![\w.])[\w.-]+/[\w./-]+\.\w+")
+# A sentence of a candidate's own role or limitations that states its status (round 6, B6-5; round 7, BL7-4/BL7-5):
+# - a copula naming the status: "is the selected ...", "remains default", "is this catalog's selected live-primary
+#   broker path" ("retained" and "adopted" need a determiner, since "usage is retained" states behaviour);
+# - or an opening selection adjective that labels: after "the" ("The selected GitHub CLI."), before a role noun
+#   ("Selected north-star engine", "Default backend") or as a short label of at most four words ("Selected GitHub
+#   CLI"), but not "Default examples use model API credentials", "Selected-file handoff bundles" or "Retained local
+#   sanitized operational logs and LogQL queries".
+# A choice phrase or a copula is status whatever else the sentence says; an opening adjective is not when the sentence
+# carries a result marker.
+_STATUS_ROLE = (r"(?:engine|runtime|stack|choice|destination|path|backend|broker|option|candidate|component|tool|"
+                r"implementation|provider|store|layer|winner|solution|lane|adapter|framework|service|default|primary)s?")
+STATUS_COPULA = re.compile(
+    r"\b(?:is|was|are|remains?|stays?|kept as|serves as)\s+(?:(?:the|this|a|an|our|its|this catalog's|the catalog's)"
+    r"\s+(?:[\w'-]+\s+){0,2}?(?:current\s+)?(?:selected|default|chosen|retained|adopted|incumbent|preferred)|"
+    r"(?:current\s+)?(?:selected|default|chosen|incumbent|preferred))\b", re.I)
+_STATUS_ADJECTIVE = r"(?:selected|default|chosen|retained|adopted|incumbent|preferred)(?![\w-])"
+STATUS_OPENING = re.compile(r"^\W*(?:the\s+" + _STATUS_ADJECTIVE + r"|" + _STATUS_ADJECTIVE + r"\s+(?:[\w'/-]+\s+){0,3}?"
+                            + _STATUS_ROLE + r"\b)", re.I)
+STATUS_LABEL = re.compile(r"^\W*" + _STATUS_ADJECTIVE + r"(?:\s+[\w'/()-]+){0,3}\W*$", re.I)
+
+
+def opens_with_status(sentence: str) -> bool:
+    """Whether a sentence opens with a selection adjective that labels its subject (STATUS_OPENING, STATUS_LABEL)."""
+    return bool(STATUS_OPENING.search(sentence) or STATUS_LABEL.search(sentence))
+# Evidence in a sentence: a pass/fail/blocked result (also inside an underscore-joined status token such as
+# reported_execution_blocked_review_incomplete), an exit code, a count such as 4/6, a repository path or a bare
+# evidence file name (round 7, BL7-4: the marker was case-sensitive and needed a slash path).
+RESULT_MARKER = re.compile(r"(?<![A-Za-z])(?:pass(?:ed|es)?|fail(?:ed|s|ure)?|blocked)(?![A-Za-z])|"
+                           r"\bexit(?: code)? \d+\b|\b\d+/\d+\b|"
+                           r"(?<![\w.])[\w.-]+/[\w./-]+\.\w+|"
+                           r"\b[\w.-]+\.(?:json|jsonl|md|txt|ya?ml|py|csv|log|sha256|SHA256SUMS)\b", re.I)
 
 
 def states_candidate_status(sentence: str) -> bool:
-    return bool((CHOICE_PHRASE.search(sentence) or STATUS_STATEMENT.search(sentence))
-                and not RESULT_MARKER.search(sentence))
+    return bool(CHOICE_PHRASE.search(sentence) or STATUS_COPULA.search(sentence)
+                or (opens_with_status(sentence) and not RESULT_MARKER.search(sentence)))
 
 
-def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = False) -> str:
+def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = False,
+                 own: CandidateMatcher = None) -> str:
     """``text`` without the sentences that state the choice, and with every other candidate name replaced by
     <candidate> (round 5, N1: redact the name rather than empty the sentence). A candidate's own role or
-    limitations (``about_candidate``) also lose a sentence that states that candidate's status."""
+    limitations (``about_candidate``, with its own names ``own``) also lose a sentence that states that candidate's
+    status, and keep one whose selection word only describes the candidate itself or sits beside a result marker
+    (round 7, BL7-4)."""
     kept = []
     for sentence in re.split(r"(?<=[.!?;])\s+", text.strip()):
-        if not sentence or states_choice(sentence, matcher) or (about_candidate and states_candidate_status(sentence)):
+        if (not sentence or states_choice(sentence, matcher, own if about_candidate else None)
+                or (about_candidate and states_candidate_status(sentence))):
             continue
         kept.append(matcher.sub(CANDIDATE_PLACEHOLDER, sentence))
     return " ".join(kept)
@@ -782,12 +848,13 @@ def withhold_prose(packet: dict, catalog_candidates=()) -> dict:
             reduced.append(field)
         packet[field] = kept
     for candidate in packet.get("candidates") or []:
+        own = candidate_matcher([candidate], layer_words)
         for field in CANDIDATE_PROSE_FIELDS:
             value = candidate.get(field)
             if isinstance(value, str):
-                candidate[field] = reduce_prose(value, matcher, about_candidate=True) or None
+                candidate[field] = reduce_prose(value, matcher, about_candidate=True, own=own) or None
             elif isinstance(value, list):
-                candidate[field] = [item for item in (reduce_prose(str(entry), matcher, about_candidate=True)
+                candidate[field] = [item for item in (reduce_prose(str(entry), matcher, about_candidate=True, own=own)
                                                       for entry in value) if item]
     if not packet.get("requirement"):
         # Only a packet that carries layer_scope_terms is pointed at them (round 5, N1/N4).
@@ -1055,6 +1122,7 @@ def main(argv=None) -> int:
         if keys_out == out or out in keys_out.parents:
             print("lane_packets: --keys-out must be outside --out, where lanes read packets", file=sys.stderr)
             return 2
+    manifest_relative = str(args.manifest) if args.manifest else None
     if args.withhold_labels:
         # A blind build never overwrites a wave's packets or keys (independent review of #145, round 6, OPR6-3): a
         # re-check goes to new directories.
@@ -1063,10 +1131,28 @@ def main(argv=None) -> int:
                 print(f"lane_packets: {existing} already exists; write a blind build to new directories",
                       file=sys.stderr)
                 return 2
+        # Lanes read --out, and --keys-out names the winners: neither may sit in a repository, whose history or
+        # siblings a worker can read (round 7, OPR7-5).
+        for flag, place in (("--out", args.out), ("--keys-out", args.keys_out)):
+            absolute = Path(os.path.abspath(place))
+            repository = next((str(path) for path in (absolute, *absolute.parents) if (path / ".git").exists()), None)
+            if repository:
+                print(f"lane_packets: {flag} {absolute} is inside the git repository {repository}; place a blind "
+                      "build outside every repository", file=sys.stderr)
+                return 2
+        if args.manifest:
+            # The keys document records the manifest relative to --root, where record_verdicts finds it (round 7,
+            # REG7-4: an absolute path was sanitized to <host-path> and refused only at step 6).
+            manifest_path = Path(args.manifest)
+            resolved = (manifest_path if manifest_path.is_absolute() else root / manifest_path).resolve()
+            if root not in resolved.parents or not resolved.is_file():
+                print(f"lane_packets: --manifest {args.manifest} is not a file under --root {root}", file=sys.stderr)
+                return 2
+            manifest_relative = resolved.relative_to(root).as_posix()
     sealed_keys, removed_refs = {}, {}
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
-                                manifest=str(args.manifest) if args.manifest else None,
+                                manifest=manifest_relative,
                                 registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
                                 sealed_keys=sealed_keys, removed_refs=removed_refs)
 
@@ -1079,7 +1165,7 @@ def main(argv=None) -> int:
         args.keys_out.parent.mkdir(parents=True, exist_ok=True)
         # The manifest the sealed component ids come from, by path and sha256: record_verdicts.py checks every
         # sealed id against it (round 6, INT-R6-2).
-        manifest_relative = str(args.manifest) if args.manifest else SOTA_MANIFEST_PATH
+        manifest_relative = manifest_relative or SOTA_MANIFEST_PATH
         manifest_bytes = (root / manifest_relative).read_bytes()
         args.keys_out.write_text(serialize({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": sealed_keys,
                                             "manifest": {"path": manifest_relative,

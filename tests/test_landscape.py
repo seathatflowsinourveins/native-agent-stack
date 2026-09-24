@@ -1318,5 +1318,22 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.assertEqual(data["layers"][1]["layer_id"], "renamed")
 
 
+class PacketKeysShapeTests(unittest.TestCase):
+    """Round 7, INT-R7-1: a sealed component_id or pin of the wrong type is a clean refusal, not a TypeError."""
+
+    def test_wrong_typed_ids_and_pins_are_refused(self):
+        from scripts import landscape
+        packet = {"candidates": [{"key": "c1"}, {"key": "c2"}]}
+        for fields in ({"component_id": {"x": 1}}, {"component_id": ["a"]}, {"component_id": 7},
+                       {"component_id": "a", "pin": 3}):
+            sealed = {"c1": fields, "c2": {"component_id": "b"}}
+            packet[landscape.SEALED_COMMITMENT_KEY] = landscape.sealed_candidates_sha256(sealed)
+            keys = {"schema_version": landscape.PACKET_KEYS_SCHEMA_VERSION,
+                    "packets": {"p.json": {"packet_sha256": "0" * 64, "candidates": sealed}}}
+            issue = landscape.packet_keys_issue(keys, "p.json", "0" * 64, packet)
+            self.assertIsNotNone(issue, fields)
+            self.assertIn("c1", issue)
+
+
 if __name__ == "__main__":
     unittest.main()

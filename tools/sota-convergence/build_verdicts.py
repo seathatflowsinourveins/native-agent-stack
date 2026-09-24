@@ -230,7 +230,14 @@ def same_json(left, right) -> bool:
 
 
 def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID, manifest: str = None) -> dict:
-    sota_doc = load_json(root / (manifest or default_manifest(run_id)))
+    manifest_path = root / (manifest or default_manifest(run_id))
+    if not manifest_path.is_file():
+        # A clean refusal naming the flag, not a traceback (round 7, OPR7-3): a wave's run id is the date it was
+        # recorded, which need not be the date of the sota manifest its packets were built from.
+        print(f"build_verdicts: no sota manifest at {manifest or default_manifest(run_id)}; pass --manifest with the "
+              "dated manifest the wave's packets were built from", file=sys.stderr)
+        raise SystemExit(2)
+    sota_doc = load_json(manifest_path)
     sota_index = sota_layer_index(sota_doc)
     # adoption/manifest.json's recipe_map is joined implicitly: a winner's own
     # recipe_ref is already validated (scripts/landscape.py) to resolve there

@@ -1755,6 +1755,32 @@ class CallBindingRound4Tests(AdjudicateFixture):
         self.assertEqual(code, 2)
         self.assertIn("another run holds", err)
 
+    def test_a_second_run_with_another_homes_base_is_refused(self):
+        # Round 7, REG7-2/ISO-R7-4: the work dir's own lock, whatever NAS_CODEX_HOME_DIR says.
+        self.inputs()
+        with adjudicate.codex_lane.exclusive_run_lock(adjudicate.codex_lane.work_run_lock(self.work)):
+            with mock.patch.dict(os.environ, {adjudicate.codex_lane.CODEX_HOME_BASE_ENV: str(self.work.parent / "b2")}):
+                code, err = self.run_judges([(self.JUDGE, "gpt-6-astra", [0], None, None)])
+        self.assertEqual(code, 2)
+        self.assertIn("another run holds", err)
+
+    def test_a_stop_writes_no_record_and_starts_no_refute_stage(self):
+        # Round 7, ISO-R7-3: after a stop signal no refute stage starts and the judged call leaves no record.
+        self.inputs()
+        self.addCleanup(adjudicate.codex_lane.STOP.clear)
+
+        def judge_then_stop(*_args, **_kwargs):
+            adjudicate.codex_lane.STOP.set()
+            return self.JUDGE, "gpt-6-astra", [0], None, None
+
+        call = mock.Mock(side_effect=judge_then_stop)
+        with mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                    "--model", "gpt-6-astra", "--jobs", "1"])
+        self.assertEqual(call.call_count, 1)
+        self.assertEqual(sorted((self.work / "adjudication-judgments" / "codex").glob("*.AB.json")), [])
+
     def test_an_edited_record_over_flagged_events_does_not_count(self):
         # BIND-R4-6: audit_clean is re-checked against the recorded events, so editing a record cannot count a
         # judgment whose calls read outside their input.

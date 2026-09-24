@@ -783,6 +783,9 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
     for _attempt in (1, 2):
         out_tmp.unlink(missing_ok=True)
         result = codex_lane.run_attempt(cmd, timeout)
+        if result.get("stopped"):
+            # A stop signal: no retry, and the caller writes no record (round 7, ISO-R7-3).
+            return None, event_model, exit_codes, "stopped", None
         exit_codes.append(result["exit_code"])
         with events_path.open("a", encoding="utf-8") as handle:
             for line in result["stdout"].splitlines():
@@ -875,7 +878,9 @@ def run_codex(args) -> int:
                 print(f"adjudicate: {issue}", file=sys.stderr)
                 return 2
             try:
-                # One Codex run per work dir, shared with codex_lane (BIND-R4-5; round 6, ISO-R6-1).
+                # One Codex run per work dir, shared with codex_lane (BIND-R4-5; round 6, ISO-R6-1): the work dir's
+                # own lock first, whatever the homes' base (round 7, REG7-2/ISO-R7-4).
+                stack.enter_context(codex_lane.exclusive_run_lock(codex_lane.work_run_lock(work_dir)))
                 stack.enter_context(codex_lane.exclusive_run_lock(codex_lane.codex_home_lock(work_dir)))
             except codex_lane.RunLocked as error:
                 print(f"adjudicate: {error}", file=sys.stderr)
@@ -893,7 +898,8 @@ def run_codex(args) -> int:
             return judge_pending(args, work_dir, repo, index, packets, items, pending, failures, out_dir,
                                  run_provenance, judge_template, refute_template)
         finally:
-            codex_lane.remove_codex_home_link(codex_lane.CHILD_CODEX_HOME)
+            # Every child stopped and waited for before the link goes (round 7, ISO-R7-2).
+            codex_lane.release_codex_home(codex_lane.CHILD_CODEX_HOME)
             codex_lane.CHILD_CODEX_HOME = None
 
 
@@ -912,6 +918,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         name, order, input_path, packet_sha256, out_path = item
         stem = f"{name}.{order}"
         leak = None
+        if codex_lane.STOP.is_set():
+            return
         if inputs_changed(index, [stem]):
             # Rebuilt, edited or deleted after the scheduling check (Codex review of #145): never judge unindexed
             # bytes, and a missing input is a failure rather than a traceback.
@@ -936,6 +944,9 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
             events_dir / f"{stem}.judge.jsonl", valid_judge)
         refuter, refute_model, refute_codes = None, None, []
+        if codex_lane.STOP.is_set():
+            # A stop signal: no refute stage starts and no record is written (round 7, ISO-R7-3).
+            return
         if judge_leak is not None:
             leak = {"stage": "judge", "text": redact_leak_text(judge_leak)}
         elif judge is not None:
@@ -944,6 +955,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
                 events_dir / f"{stem}.refute.jsonl", valid_refuter)
+            if codex_lane.STOP.is_set():
+                return
             if refute_leak is not None:
                 leak = {"stage": "refuter", "text": redact_leak_text(refute_leak)}
             failure = f"refuter {failure}" if failure else None
@@ -1001,8 +1014,12 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
                 failures.append((stem, failure))
 
     if args.jobs > 1:
-        with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+        executor = ThreadPoolExecutor(max_workers=args.jobs)
+        try:
             list(executor.map(process, pending))
+        finally:
+            # A stop cancels the queued calls; the in-flight ones return at once (round 7, ISO-R7-3).
+            executor.shutdown(wait=True, cancel_futures=True)
     else:
         for item in pending:
             process(item)

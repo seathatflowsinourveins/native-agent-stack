@@ -75,8 +75,10 @@ lane's `winner_evidence_class`.
 ```sh
 # Layout: WORK_DIR, BLIND_DIR and KEYS_DIR sit outside every repository, KEYS_DIR outside WORK_DIR and
 # BLIND_DIR (no lane may read it), and BLIND_DIR/export is at least four
-# directories deep (not /, /home, /tmp or a home directory itself). Every blind tool below refuses otherwise (the
-# shared root rule in tools/sota-convergence/codex_lane.py). CATALOG is this checkout; AL is a clean agent-lab
+# directories deep (not /, /home, /tmp or a home directory itself). The lane runners, adjudicate and
+# blind_checkout.py refuse an export or work dir that breaks this (the shared root rule in
+# tools/sota-convergence/codex_lane.py), and lane_packets.py refuses an --out or --keys-out inside a repository;
+# keeping KEYS_DIR apart from WORK_DIR and BLIND_DIR is the operator's (round 7, OPR7-5). CATALOG is this checkout; AL is a clean agent-lab
 # checkout whose .claude/workflows/layer-verdict-lane.js and .claude/agents/blind-*.md are the vendored
 # examples/claude-native/ copies, installed as ~/.claude/agents/blind-*.md.
 CATALOG=$(pwd -P)
@@ -86,17 +88,32 @@ CATALOG=$(pwd -P)
 #    that each packet commits to (sealed_candidates_sha256). Never pass --gap-receipts in a blind wave (it names
 #    the previous winner; refused with --withhold-labels). A model worker runs as this user and can read any file
 #    it names, so the keys document never exists while one runs: it is deleted here, and rebuilt (the build is
-#    deterministic) and checked against these packets for the trusted steps 5 and 6.
-PACKETS_ARGS=(--root . --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest
-  --withhold-labels --registered-receipts --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)")
+#    deterministic) and checked against these packets for the trusted steps 5 and 6. The wave's date and
+#    manifest are fixed once and kept in KEYS_DIR/wave.env (never in packets/ or the export: the seed fixes the
+#    candidate order), so a resume in a new shell on another day rebuilds the same packets (round 7, OPR7-1).
+mkdir -p "$KEYS_DIR"
+printf 'WAVE_DATE=%s\nWAVE_MANIFEST=%s\n' "$(date +%Y-%m-%d)" catalogs/sota-convergence/manifest-YYYYMMDD.json \
+  > "$KEYS_DIR/wave.env"
+packets_args() {  # the wave's fixed build arguments, from KEYS_DIR/wave.env
+  . "$KEYS_DIR/wave.env"
+  PACKETS_ARGS=(--root . --manifest "$WAVE_MANIFEST" --trading-candidates manifest --withhold-labels
+    --registered-receipts --checked-at "$WAVE_DATE" --seed "${WAVE_DATE//-/}")
+}
+packets_args
 python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$WORK_DIR" \
   --keys-out "$KEYS_DIR/packet-keys.json"
 rm "$KEYS_DIR/packet-keys.json"
-keys() {  # rebuild the keys document for these packets; refuse if the rebuilt packets differ
-  rm -rf "$KEYS_DIR/rebuild" && python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" \
-    --out "$KEYS_DIR/rebuild" --keys-out "$KEYS_DIR/packet-keys.json" >/dev/null \
-    && cmp "$KEYS_DIR/rebuild/packets/SHA256SUMS" "$WORK_DIR/packets/SHA256SUMS"
+keys() {  # rebuild the keys document for these packets; it replaces any earlier one only when the rebuilt
+          # packets are byte-identical, so a failed call leaves no document
+  packets_args
+  rm -rf "$KEYS_DIR/rebuild" "$KEYS_DIR/rebuild-keys" "$KEYS_DIR/packet-keys.json" \
+    && python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$KEYS_DIR/rebuild" \
+      --keys-out "$KEYS_DIR/rebuild-keys/packet-keys.json" >/dev/null \
+    && cmp "$KEYS_DIR/rebuild/packets/SHA256SUMS" "$WORK_DIR/packets/SHA256SUMS" \
+    && mv "$KEYS_DIR/rebuild-keys/packet-keys.json" "$KEYS_DIR/packet-keys.json"
 }
+#    Resume (any later shell): set CATALOG, WORK_DIR, BLIND_DIR, KEYS_DIR and AL again, cd "$CATALOG", and
+#    define packets_args and keys as above (never rewrite wave.env); every step below then runs unchanged.
 
 # 2. Blind export: only what the packets reference, labels stripped, no .git.
 #    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
@@ -155,24 +172,27 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --o
 #    --adjudications to --check. --run-id is required; the grandfathered 20260922 wave is never re-recorded.
 #    --lane-repo-root must name the export adjudicate inputs got: the adjudication binds the sealed form of
 #    each return, whose sources_read are relativized against it. Every worker has finished, so the rebuilt keys
-#    document may stay; the wave retains it as packet-keys.json.
-keys
-python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
-  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
-  --packet-keys "$KEYS_DIR/packet-keys.json" --write
-python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
-  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
-  --packet-keys "$KEYS_DIR/packet-keys.json" --check
+#    document may stay; the wave retains it as packet-keys.json. --write also measures the wave's prose exposure
+#    against the ledger before its rows (the incumbents the export showed the lanes), over that export, and seals
+#    it as prose-exposure.json; each row records lanes.prose_exposed (round 7, BL7-2).
+keys && python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+  --lane-repo-root "$BLIND_DIR/export" --checked-at "$WAVE_DATE" --run-id "${WAVE_DATE//-/}" \
+  --adjudications "$WORK_DIR/adjudications" --packet-keys "$KEYS_DIR/packet-keys.json" --write \
+&& python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+  --lane-repo-root "$BLIND_DIR/export" --checked-at "$WAVE_DATE" --run-id "${WAVE_DATE//-/}" \
+  --adjudications "$WORK_DIR/adjudications" --packet-keys "$KEYS_DIR/packet-keys.json" --check
 
 # 7. Refresh the derived catalogs, register the newly sealed files and rehash only the listed files this wave
 #    changed, then run every check CI runs (.github/workflows/validate.yml). Start step 6 from a clean checkout,
 #    so the working tree's changes are exactly the wave's: a rehash of every listed file would also hide unrelated
 #    tampering from scripts/validate.py (independent review of #145, round 6, OPR6-2). A changed winner also needs
 #    the handbook's "Foundation selection by layer" table and any handbook display entry for a new component id
-#    (tests/test_handbook_summary.py checks them).
+#    (tests/test_handbook_summary.py checks them): make those edits first. After any later edit, a remedy below
+#    included, run the registration block and evidence_manifest.py --write again before the checks (round 7,
+#    OPR7-6).
 python3 scripts/component_matrix.py --write
-python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
-  --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
+python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "${WAVE_DATE//-/}" \
+  --checked-at "$WAVE_DATE" --manifest "$WAVE_MANIFEST"
 python3 scripts/new_host_grand_list.py --write   # its check runs in CI (round 6, OPR6-1)
 python3 - <<'EOF'
 import hashlib, json, pathlib, subprocess
@@ -193,12 +213,19 @@ for relative in sorted(changed):
 path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 EOF
 python3 scripts/evidence_manifest.py --write
-#    The recorded winners are the next wave's incumbents: check an export against them before opening the PR
-#    (round 4, OPS-3). Build it in new directories, never over this wave's packets or keys (lane_packets.py
-#    refuses an existing --out/packets or --keys-out; round 6, OPR6-3). A role-label hit (exit 1) is fixed in
-#    blind_checkout.py (REMOVE_GLOBS or the role keys) and re-checked the same way; an evidence-record hit and
-#    the prose exposure are reported and disclosed. tests/test_blind_checkout.py runs the same check in CI.
+#    The next wave's pre-check: the recorded winners are its incumbents, so check an export against them before
+#    opening the PR (round 4, OPS-3). This wave's own exposure is already sealed by step 6. Build it in new
+#    directories, never over this wave's packets or keys (lane_packets.py refuses an existing --out/packets or
+#    --keys-out; round 6, OPR6-3). Only two hit kinds fail (exit 1); resolve each, then re-check the same way:
+#    - role_label_hits, an isolating container outside an evidence record: a role key in blind_checkout.py for a
+#      real label; a REVIEWED_EVIDENCE_PATHS entry, with its reason, in export_isolation_check.py for an evidence
+#      list; REMOVE_GLOBS last, listing the evidence references the rebuilt packets then drop (their withheld);
+#    - packet_role_label_hits, a packet field on exactly the winners: withhold it in lane_packets.py.
+#    record_label_hits, evidence_role_word_hits, packet_evidence_field_hits and the prose exposure are reported,
+#    not failed (round 7, OPR7-2: intrinsic fields such as license isolate a new winner by coincidence); note any
+#    real label among them in the PR. tests/test_blind_checkout.py runs the failing check in CI.
 CHECK_DIR=$(mktemp -d "$(dirname "$BLIND_DIR")/isolation-check.XXXXXX")
+packets_args
 python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$CHECK_DIR/work" \
   --keys-out "$CHECK_DIR/keys/packet-keys.json"
 python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD --dest "$CHECK_DIR/hosts/blind/checkout" \
@@ -206,7 +233,10 @@ python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD --dest "$
 python3 tools/sota-convergence/export_isolation_check.py "$CHECK_DIR/hosts/blind/export" "$CHECK_DIR/work/packets" . \
   --packet-keys "$CHECK_DIR/keys/packet-keys.json"
 git worktree remove --force "$CHECK_DIR/hosts/blind/checkout"
-#    Every check CI runs (validate.yml), in its order:
+#    The validate job's offline steps, in its order (zizmor, actionlint, the secret scan and the network checks
+#    run in CI only; round 7, OPR7-4):
+(cd examples/claude-native/workflows && sha256sum --check --strict SHA256SUMS)
+python3 scripts/release_due.py --strict-if-repinned origin/main
 python3 scripts/validate.py
 python3 scripts/host_receipts.py validate
 python3 scripts/validate_catalogs.py
@@ -221,7 +251,13 @@ python3 tools/sota-convergence/gap_crosswalk.py build --check
 python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 \
   --owner gap-resolution --check
 python3 scripts/build_ecosystem.py --check
+python3 scripts/verdict_flip_candidates.py
 python3 -m unittest
+node --test blueprints/native-skill-practice/test-contract.cjs
+#    The verdict-review-gate job runs the base commit's gate against the committed wave, so commit first:
+git worktree add --detach "$CHECK_DIR/gate-base" origin/main
+python3 "$CHECK_DIR/gate-base/scripts/verdict_review_gate.py" --root . --base origin/main
+git worktree remove --force "$CHECK_DIR/gate-base"
 ```
 
 A lane disagreement (different winner component-id sets) stays

@@ -22,7 +22,8 @@ from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import (
-    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, build_landscape, lane_winner_components, sealed_candidate_labels,
+    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, PROSE_EXPOSURE_NAME, build_landscape, expected_prose_exposed,
+    lane_winner_components, sealed_candidate_labels,
     sealed_candidates_sha256, verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels,
 )
 
@@ -1582,6 +1583,42 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(sealed["model"]["family"], "openai")
         self.assertEqual(sealed["provenance"], lane_provenance("codex"))
         build_landscape(self.root)
+
+    def test_a_wave_seals_its_prose_exposure_and_stamps_each_row(self):
+        # Round 7, BL7-2: measured at --write against the pre-wave ledger over the lanes' export, sealed and bound by
+        # the run manifest, stamped as lanes.prose_exposed; landscape.py rejects a stamp the document does not hold.
+        scratch = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, scratch)
+        export = scratch / "hosts" / "blind" / "export"
+        (export / "docs").mkdir(parents=True)
+        (export / "docs" / "notes.md").write_text("The selected engine is recorded elsewhere.\n", encoding="utf-8")
+        catalog = self.both_lanes("wave-same-layer")
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(lane_roots=(str(export),))
+        self.assertEqual(code, 0, output)
+        exposure_path = self.sealed_base() / PROSE_EXPOSURE_NAME
+        exposure = json.loads(exposure_path.read_text(encoding="utf-8"))
+        self.assertEqual(exposure["measured_against"], "the ledger before this wave's rows were written")
+        self.assertIn(f"{catalog}::wave-same-layer", exposure["layers"])
+        self.assertEqual(self.run_manifest()["prose_exposure_sha256"],
+                         hashlib.sha256(exposure_path.read_bytes()).hexdigest())
+        row = self.load_row(catalog, "wave-same-layer")
+        self.assertIn("prose_exposed", row["lanes"])
+        self.assertEqual(row["lanes"]["prose_exposed"],
+                         expected_prose_exposed(exposure, catalog, "wave-same-layer"))
+        build_landscape(self.root)
+        # --check reads the retained document rather than re-measuring against the now-written ledger.
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main(write=False, run_id=NEW_RUN, lane_roots=(str(export),)), 0)
+        relative = record_verdicts.LEDGER_FILES[catalog]
+        document = json.loads((self.root / relative).read_text(encoding="utf-8"))
+        for entry in document["layers"]:
+            if entry["layer_id"] == "wave-same-layer":
+                entry["lanes"]["prose_exposed"] = not entry["lanes"]["prose_exposed"]
+        (self.root / relative).write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+        with self.assertRaisesRegex(Exception, "prose_exposed"):
+            build_landscape(self.root)
 
     def test_a_lane_without_model_family_is_rejected(self):
         model = {"name": "claude-opus-5-5", "effort": "high"}

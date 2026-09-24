@@ -99,7 +99,7 @@ from scripts.landscape import (  # noqa: E402
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
     withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
-    packet_keys_issue, packet_seals_candidates, unseal_packet,
+    packet_keys_issue, packet_seals_candidates, unseal_packet, PROSE_EXPOSURE_NAME, expected_prose_exposed,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -1181,6 +1181,21 @@ def load_packet_keys(path) -> dict:
     return document
 
 
+def prose_exposure_text(root: Path, work_dir: Path, lane_root, packet_keys: dict) -> str:
+    """The wave's sealed prose exposure (independent review of #145, round 7, BL7-2): which exported prose files state
+    each layer's winner, measured with export_isolation_check.prose_exposure against the ledger as it stands before
+    this wave's rows are written, over the export the lanes read (``lane_root``) and this run's packets."""
+    import export_isolation_check
+    report = export_isolation_check.prose_exposure(Path(lane_root), work_dir / "packets",
+                                                   export_isolation_check.ledger_winners(root), packet_keys)
+    sums = (work_dir / "packets" / "SHA256SUMS").read_bytes()
+    return sealed_text({"schema_version": 1,
+                        "measured_against": "the ledger before this wave's rows were written",
+                        "lane_root_tree_sha256": lane_root_tree(lane_root),
+                        "packets_sha256sums_sha256": hashlib.sha256(sums).hexdigest(),
+                        "layers": report})
+
+
 def manifest_component_ids(manifest: dict) -> set:
     """Every component id a sota manifest registers: its foundation components and trading entries."""
     ids = set()
@@ -1202,10 +1217,11 @@ def packet_keys_manifest_issue(root: Path, packet_keys: dict):
     if path is None or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != manifest.get("sha256"):
         return f"the packet-keys document's manifest {manifest['path']} is missing under --root or changed"
     registered = manifest_component_ids(json.loads(path.read_text(encoding="utf-8")))
-    unknown = sorted({fields.get("component_id") for entry in (packet_keys.get("packets") or {}).values()
+    unknown = sorted({str(fields.get("component_id")) for entry in (packet_keys.get("packets") or {}).values()
                       if isinstance(entry, dict) for fields in (entry.get("candidates") or {}).values()
                       if isinstance(fields, dict) and fields.get("component_id")
-                      and fields["component_id"] not in registered})
+                      and not (isinstance(fields["component_id"], str) and fields["component_id"] in registered)},
+                     key=str)
     if unknown:
         return f"sealed component ids {unknown[:5]} are not registered in {manifest['path']}"
     return None
@@ -1367,6 +1383,17 @@ def main(argv=None) -> int:
             except (OSError, ValueError) as error:
                 raise SystemExit(f"--lane-repo-root {lane_root}: {error}")
 
+    # Measured before any row changes, against the incumbents the lanes' export showed (round 7, BL7-2). A wave keeps
+    # the exposure of its first --write: an append or a --check reads the retained document.
+    exposure_text = None
+    if not grandfathered:
+        retained_exposure = root / sealed_base / PROSE_EXPOSURE_NAME
+        if retained_exposure.is_file():
+            exposure_text = retained_exposure.read_text(encoding="utf-8")
+        elif write_mode and args.lane_repo_root and packet_keys is not None:
+            exposure_text = prose_exposure_text(root, work_dir, args.lane_repo_root[0], packet_keys)
+    exposure_doc = json.loads(exposure_text) if exposure_text is not None else None
+
     rejections: list = []
     sealed_writes: list = []
     documents = {}
@@ -1432,16 +1459,22 @@ def main(argv=None) -> int:
                                               work_dir)
         manifest["packet_keys_sha256"] = hashlib.sha256(keys_text.encode("utf-8")).hexdigest()
         sealed_writes.append((root / sealed_base / PACKET_KEYS_NAME, keys_text))
+        if exposure_text is not None:
+            manifest["prose_exposure_sha256"] = hashlib.sha256(exposure_text.encode("utf-8")).hexdigest()
+            sealed_writes.append((root / sealed_base / PROSE_EXPOSURE_NAME, exposure_text))
         manifest_text = sealed_text(manifest)
         sealed_writes.append((manifest_path, manifest_text))
         manifest_sha256 = hashlib.sha256(manifest_text.encode("utf-8")).hexdigest()
         # Every row of this wave is bound to the manifest it is recorded with (an append re-binds the
         # wave's earlier rows to the extended manifest, whose earlier entries it carries unchanged).
-        for _path, _text, document in documents.values():
+        for catalog, (_path, _text, document) in documents.items():
             for row in document.get("layers", []):
                 lanes = row.get("lanes")
                 if isinstance(lanes, dict) and lanes.get("sealed_base") == sealed_base:
                     lanes["run_manifest_sha256"] = manifest_sha256
+                    if exposure_doc is not None:
+                        # Disclosed per row: its layer's cited prose states a winner's selection (round 7, BL7-2).
+                        lanes["prose_exposed"] = expected_prose_exposed(exposure_doc, catalog, row["layer_id"])
 
     ledger_outputs = {}
     for catalog, (path, original_text, document) in documents.items():

@@ -215,6 +215,20 @@ def withhold_policy_labels(requirement=None):
 # same membership and is dropped from a blind packet.
 SEALED_CANDIDATE_FIELDS = ("component_id", "pin", "upstream", "recipe_ref", "decisions")
 PACKET_KEYS_NAME = "packet-keys.json"
+# A new wave's prose exposure (independent review of #145, round 7, BL7-2): measured by record_verdicts.py --write
+# against the ledger before the wave's rows (the incumbents the lanes' export shows), sealed with the wave, bound by the
+# run manifest's prose_exposure_sha256, and stamped on each row as lanes.prose_exposed (true, false, or null for a
+# layer whose winners are not among its adopted candidates).
+PROSE_EXPOSURE_NAME = "prose-exposure.json"
+
+
+def expected_prose_exposed(exposure_doc, catalog: str, layer_id: str):
+    """A row's lanes.prose_exposed under ``exposure_doc``: true when a file the layer's packet cites states a
+    winner's selection, false when none does, null when the layer was not scored."""
+    entry = ((exposure_doc or {}).get("layers") or {}).get(f"{catalog}::{layer_id}")
+    if not isinstance(entry, dict) or not entry.get("scored"):
+        return None
+    return bool(entry.get("cited_files"))
 SEALED_COMMITMENT_KEY = "sealed_candidates_sha256"
 PACKET_KEYS_SCHEMA_VERSION = 1
 
@@ -257,6 +271,12 @@ def packet_keys_issue(keys_doc, name, packet_sha256, packet):
     for key, fields in sealed.items():
         if not isinstance(fields, dict) or set(fields) - set(SEALED_CANDIDATE_FIELDS):
             return f"the packet-keys entry for {name} seals fields other than {list(SEALED_CANDIDATE_FIELDS)} for {key}"
+        # A clean refusal, not a TypeError, for an id or pin of the wrong type (round 7, INT-R7-1).
+        if fields.get("component_id") is not None and not (isinstance(fields["component_id"], str)
+                                                          and fields["component_id"]):
+            return f"the packet-keys entry for {name} seals a component_id for {key} that is not a non-empty string"
+        if fields.get("pin") is not None and not isinstance(fields["pin"], str):
+            return f"the packet-keys entry for {name} seals a pin for {key} that is not a string or null"
     ids = [fields.get("component_id") for fields in sealed.values() if fields.get("component_id")]
     if len(ids) != len(set(ids)):
         # Two candidates restored to one component would record a false same_winner (round 6, INT-R6-2).
@@ -712,6 +732,12 @@ def verify_sealed_waves(root, wave_refs):
         require(isinstance(keys_packets, dict) and set(keys_packets) == set(retained_sha),
                 f"wave {wave}: {PACKET_KEYS_NAME} must seal exactly the retained packets")
         referenced.add(PACKET_KEYS_NAME)
+        if manifest.get("prose_exposure_sha256") is not None:
+            exposure_file = folder / PROSE_EXPOSURE_NAME
+            require(exposure_file.is_file() and hashlib.sha256(exposure_file.read_bytes()).hexdigest()
+                    == manifest.get("prose_exposure_sha256"),
+                    f"wave {wave}: {PROSE_EXPOSURE_NAME} must be retained with the run manifest's prose_exposure_sha256")
+            referenced.add(PROSE_EXPOSURE_NAME)
         for name, digest in retained_sha.items():
             relative = f"{RETAINED_PACKETS_DIR}/{name}"
             packet_file = folder / relative
@@ -895,6 +921,17 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         run_manifest = json.loads(manifest_bytes)
         issue = run_manifest_row_issue(run_manifest, wave, key[0], key[1], lanes_field)
         require(issue is None, str(key) + ": " + str(issue))
+        if run_manifest.get("prose_exposure_sha256") is not None:
+            exposure_file = safe_file(root, f"{sealed_base}/{PROSE_EXPOSURE_NAME}")
+            require(exposure_file.is_file() and hashlib.sha256(exposure_file.read_bytes()).hexdigest()
+                    == run_manifest.get("prose_exposure_sha256"),
+                    str(key) + f" needs {sealed_base}/{PROSE_EXPOSURE_NAME} with the run manifest's prose_exposure_sha256")
+            expected = expected_prose_exposed(json.loads(exposure_file.read_text(encoding="utf-8")), key[0], key[1])
+            require("prose_exposed" in lanes_field and lanes_field.get("prose_exposed") == expected,
+                    str(key) + f".lanes.prose_exposed must be {expected!r}, as the wave's {PROSE_EXPOSURE_NAME} records")
+        else:
+            require("prose_exposed" not in lanes_field,
+                    str(key) + ".lanes.prose_exposed needs a run manifest with prose_exposure_sha256")
         # The row is bound to the exact run manifest it was recorded with (finding 3).
         require(lanes_field.get("run_manifest_sha256") == hashlib.sha256(manifest_bytes).hexdigest(),
                 str(key) + f".lanes.run_manifest_sha256 must be the sha256 of its run manifest {manifest_path}")

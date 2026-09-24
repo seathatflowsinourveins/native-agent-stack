@@ -13,6 +13,7 @@ import contextlib
 import hashlib
 import importlib.util
 import io
+import time
 import json
 import os
 import re
@@ -112,6 +113,10 @@ class CodexLaneFixture(unittest.TestCase):
         os.environ["CODEX_HOME"] = str(self.native_codex)
         os.environ[codex_lane.CODEX_HOME_BASE_ENV] = str(base / "codex-homes")
         self.addCleanup(setattr, codex_lane, "CHILD_CODEX_HOME", None)
+        # A stop signal in one test never leaks into the next (round 7), nor a held in-use lock.
+        codex_lane.STOP.clear()
+        self.addCleanup(codex_lane.STOP.clear)
+        self.addCleanup(lambda: codex_lane.IN_USE_HANDLE and codex_lane.release_codex_home(None))
         # The fake codex reads its CODEX_FAKE_* settings; production children get only the allowlist (ISO-R5-2).
         prefixes = mock.patch.object(codex_lane, "CHILD_ENV_EXTRA_PREFIXES", ("CODEX_FAKE_",))
         prefixes.start()
@@ -286,6 +291,9 @@ class CodexLaneTests(CodexLaneFixture):
                                  model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})
         out_path = codex_dir / "foundation__native-clients.json"
         out_path.write_text(json.dumps(existing, sort_keys=True, indent=1) + "\n", encoding="utf-8")
+        # A blind return is resumed only with its clean retained events (round 7, REG7-1).
+        (codex_dir / "events").mkdir()
+        (codex_dir / "events" / "foundation__native-clients.jsonl").write_text(CANNED_EVENTS, encoding="utf-8")
         before = out_path.read_text(encoding="utf-8")
 
         exit_code = self.run_lane()
@@ -758,6 +766,92 @@ class BlindIsolationTests(CodexLaneFixture):
 
 
 
+class InterruptionTests(CodexLaneFixture):
+    """Independent review of #145, round 7 (REG7-1, ISO-R7-1..4): an interrupted or resumed blind run never keeps a
+    flagged layer, a stop writes no return and starts no retry, and one work dir runs once whatever the base."""
+
+    FLAGGED = json.dumps({"type": "item.completed", "item": {
+        "type": "command_execution", "command": "/bin/bash -lc 'cat /home/example/.state/verdicts.json'"}}) + "\n"
+
+    def flagged_events(self) -> Path:
+        path = self.work_dir.parent / "flagged-events.jsonl"
+        path.write_text(CANNED_EVENTS + "\n" + self.FLAGGED, encoding="utf-8")
+        return path
+
+    def test_an_interrupted_run_and_its_resume_never_keep_a_flagged_layer(self):
+        self.write_packet("foundation", "a-layer")
+        self.write_packet("foundation", "b-layer")
+        os.environ["CODEX_FAKE_EVENTS_MAP"] = json.dumps({"foundation__a-layer": str(self.flagged_events())})
+        os.environ["CODEX_FAKE_TERM_PARENT_MATCH"] = "foundation__b-layer"
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            self.run_lane()
+        codex_dir = self.work_dir / "codex"
+        # The flagged layer was audited before any write; the stopped one wrote nothing.
+        self.assertFalse((codex_dir / "foundation__a-layer.json").exists())
+        self.assertTrue((codex_dir / "foundation__a-layer.json.audit-flagged").exists())
+        self.assertFalse((codex_dir / "foundation__b-layer.json").exists())
+        audit = json.loads((codex_dir / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        self.assertTrue(audit["layers"]["foundation__a-layer"]["flagged_commands"])
+        os.environ.pop("CODEX_FAKE_TERM_PARENT_MATCH")
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(), 1)
+        self.assertFalse((codex_dir / "foundation__a-layer.json").exists())
+        self.assertTrue((codex_dir / "foundation__b-layer.json").exists())
+
+    def test_a_resume_reaudits_a_kept_return(self):
+        packet_path = self.write_packet("foundation", "native-clients")
+        codex_dir = self.work_dir / "codex"
+        (codex_dir / "events").mkdir(parents=True)
+        out_path = codex_dir / "foundation__native-clients.json"
+        events_path = codex_dir / "events" / "foundation__native-clients.jsonl"
+        for events in (self.FLAGGED, None):
+            with self.subTest(events="flagged" if events else "missing"):
+                self.argv_log.unlink(missing_ok=True)
+                out_path.write_text(json.dumps(canned_return(
+                    packet_sha256=hashlib.sha256(packet_path.read_bytes()).hexdigest(),
+                    provenance=codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo),
+                    model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})), encoding="utf-8")
+                if events:
+                    events_path.write_text(events, encoding="utf-8")
+                else:
+                    events_path.unlink(missing_ok=True)
+                with contextlib.redirect_stderr(io.StringIO()):
+                    self.run_lane(["--model", "gpt-6-astra", "--effort", "high"])
+                self.assertEqual(len(self.argv_calls()), 1, "a kept return with flagged or missing events reruns")
+
+    def test_a_stop_with_jobs_2_writes_no_return_and_starts_no_retry(self):
+        self.write_packet("foundation", "a-layer")
+        self.write_packet("foundation", "b-layer")
+        os.environ["CODEX_FAKE_SLEEP_MAP"] = json.dumps({"foundation__a-layer": 30})
+        os.environ["CODEX_FAKE_TERM_PARENT_MATCH"] = "foundation__b-layer"
+        os.environ["CODEX_FAKE_TERM_SLEEP"] = "30"
+        started = time.monotonic()
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            self.run_lane(["--jobs", "2"])
+        self.assertLess(time.monotonic() - started, 20)
+        # Each layer's child ran at most once: no retry starts after a stop, and a layer whose child had not started
+        # when the stop came never starts one.
+        calls = [" ".join(call) for call in self.argv_calls()]
+        for layer in ("foundation__a-layer", "foundation__b-layer"):
+            self.assertLessEqual(sum(layer in call for call in calls), 1, layer)
+        self.assertEqual(sum("foundation__b-layer" in call for call in calls), 1)
+        self.assertEqual(sorted(p.name for p in (self.work_dir / "codex").glob("*__*.json")), [])
+        # The run home's link is gone and no child is left holding it.
+        homes = sorted(codex_lane.codex_home_base().glob(codex_lane.codex_home_prefix(self.work_dir) + "-*"))
+        self.assertTrue(homes)
+        self.assertFalse(any((home / "auth.json").is_symlink() for home in homes))
+        self.assertFalse(any(codex_lane.home_in_use(home) for home in homes))
+
+    def test_one_work_dir_runs_once_whatever_the_homes_base(self):
+        self.write_packet("foundation", "native-clients")
+        with codex_lane.exclusive_run_lock(codex_lane.work_run_lock(self.work_dir)):
+            os.environ[codex_lane.CODEX_HOME_BASE_ENV] = str(self.work_dir.parent / "other-base")
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_lane(), 2)
+        self.assertIn("another run holds", err.getvalue())
+        self.assertEqual(self.argv_calls(), [])
+
+
 class DocumentedCommandTests(unittest.TestCase):
     """PR #141 review (P2): the README's codex exec block omitted -c web_search="disabled"."""
 
@@ -875,14 +969,16 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         self.assertEqual(oct(home.stat().st_mode & 0o777), "0o700")
         seen = {}
 
-        def fake_run(cmd, **kwargs):
+        def fake_popen(cmd, **kwargs):
             seen.update(kwargs)
-            return mock.Mock(returncode=0, stdout="", stderr="")
+            return mock.Mock(returncode=0, communicate=mock.Mock(return_value=("", "")), poll=mock.Mock(return_value=0))
 
         with mock.patch.dict(os.environ, {"CLAUDE_CODE_SSE_PORT": "1", "ALPACA_API_KEY_ID": "x", "LANG": "C.UTF-8"}), \
                 mock.patch.object(codex_lane, "CHILD_CODEX_HOME", home), \
-                mock.patch.object(codex_lane.subprocess, "run", side_effect=fake_run):
+                mock.patch.object(codex_lane.subprocess, "Popen", side_effect=fake_popen):
             codex_lane.run_attempt(["codex", "exec"], 5)
+        # The run home's in-use lock rides along to the child (round 7, ISO-R7-2).
+        self.assertEqual(seen["pass_fds"], (codex_lane.IN_USE_HANDLE.fileno(),))
         env = seen["env"]
         self.assertEqual(env["CODEX_HOME"], str(home))
         # Review of #145: user Agent Skills under $HOME/.agents/skills name adopted tools; the child's HOME is empty.
@@ -974,11 +1070,47 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         self.assertEqual((env.get("CODEX_API_KEY"), env.get("OPENAI_API_KEY")), (None, None))
         stale = codex_lane.isolated_codex_home(self.work_dir, self.repo)
         self.assertTrue((stale / "auth.json").is_symlink())
+        # A live holder of the in-use lock (a child of a killed run) keeps its link (round 7, ISO-R7-2) ...
+        codex_lane.sweep_stale_links(self.work_dir)
+        self.assertTrue((stale / "auth.json").is_symlink())
+        # ... and once no process holds it, the next run's sweep removes it.
+        codex_lane.IN_USE_HANDLE.close()
+        codex_lane.IN_USE_HANDLE = None
         codex_lane.sweep_stale_links(self.work_dir)
         self.assertFalse((stale / "auth.json").is_symlink())
         self.assertTrue((self.native_codex / "auth.json").is_file())
         self.assertEqual(codex_lane.redact_userinfo("http://user:secret@proxy:3128"), "http://***@proxy:3128")
+        # Round 7, ISO-R7-6: scheme-less, and a password holding '@'.
+        self.assertEqual(codex_lane.redact_userinfo("user:pass@proxy:3128"), "***@proxy:3128")
+        self.assertEqual(codex_lane.redact_userinfo("socks5h://user:p@ss@proxy:1080"), "socks5h://***@proxy:1080")
+        self.assertEqual(codex_lane.redact_userinfo("/usr/bin:/bin"), "/usr/bin:/bin")
         self.assertEqual(codex_lane.codex_home_lock(self.work_dir).parent, codex_lane.codex_home_base())
+        # Round 7, ISO-R7-8: the homes' base is private.
+        self.assertEqual(oct(codex_lane.codex_home_base().stat().st_mode & 0o777), "0o700")
+
+    def test_round7_audit_reads_only_shell_active_text(self):
+        # REG7-3/ISO-R7-7: bash expands nothing inside single quotes; ISO-R7-9: the bare name CODEX_HOME.
+        events = self.work_dir / "active-events.jsonl"
+        commands = {"/bin/bash -lc \"rg -n '`component_id`' docs catalogs\"": False,
+                    "/bin/bash -lc \"rg -n --fixed-strings '$(' tools\"": False,
+                    "/bin/bash -lc \"rg -n 'CODEX_HOME' docs\"": False,
+                    "/bin/bash -lc 'cat $(dirname x)/y'": True,
+                    "/bin/bash -lc 'printenv CODEX_HOME | xargs dirname'": True,
+                    "/bin/bash -lc 'rg -l winner ${TMPDIR}'": True}
+        for command, flagged in commands.items():
+            events.write_text(json.dumps({"type": "item.completed", "item": {
+                "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+            report = codex_lane.blind_audit(events, [str(self.repo)])
+            self.assertEqual(bool(report["flagged_commands"]), flagged, command)
+
+    def test_round7_a_proxy_with_credentials_is_refused_for_a_blind_run(self):
+        # ISO-R7-5: every child variable reaches the model's shell.
+        with mock.patch.dict(os.environ, {"HTTPS_PROXY": "http://user:secret@proxy.example:3128"}):
+            issue = codex_lane.codex_home_issue(self.work_dir, self.repo)
+        self.assertIn("carries credentials", issue)
+        self.assertNotIn("secret", issue)
+        with mock.patch.dict(os.environ, {"HTTPS_PROXY": "http://proxy.example:3128", "NO_PROXY": "a@b"}):
+            self.assertIsNone(codex_lane.codex_home_issue(self.work_dir, self.repo))
 
     def test_a_dry_run_refuses_a_home_it_could_not_set_up(self):
         # Round 6, ISO-R6-5: the refusals run before the dry run and create nothing.

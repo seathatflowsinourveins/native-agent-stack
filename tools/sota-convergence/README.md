@@ -1111,14 +1111,10 @@ adjudication packets; the rule then moves to (or adds) that judge.
   evidence files. Re-running `--write` on an already-current work dir writes
   byte-identical output.
 
-After recording, refresh the generated join and narrative and rerun the
-landscape and publication checks:
-
-```sh
-python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id YYYYMMDD --checked-at YYYY-MM-DD
-python3 scripts/landscape.py --root .
-python3 scripts/validate.py
-```
+After recording, follow `recipes/sota-convergence-practice.md` step 7: it refreshes the component matrix, the
+generated join and narrative (`build_verdicts.py --write` with `--manifest`, the dated manifest the wave's packets
+were built from; without it a missing `manifest-<run-id>.json` is refused, round 7, OPR7-3) and the new-host grand
+list, registers and rehashes what the wave changed, and runs the checks.
 
 ## Blind checkout
 
@@ -1160,11 +1156,21 @@ prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs
 **Remaining limits: what the export still carries.** The export strips the JSON label fields under
 `catalogs/`, `adoption/` and `blueprints/` (below) and the instruction files. Since round 6 it rewrites no
 sentence of an exported file: Markdown, text and JSON prose are exported verbatim, and the exposure is disclosed
-per layer (round 6, below). Measured on the allowlisted 2026-09-23 export (633 files) at round 6, it still
-carries:
-- **Choice prose in cited files.** 26 of the 89 exported prose files state a winner's selection, exposing 18 of
-  the 32 layers (`export_isolation_check.py`'s `prose_exposed_layers`). A wave record lists those layers as not
-  blind against cited prose.
+per layer (round 6, below). Measured on the allowlisted 2026-09-23 export (633 files; 611 byte-identical to the
+source) at round 7, it still carries:
+- **Choice prose.** Counting only statements that tell a layer's winners apart from its adopted non-winners
+  (round 7, BL7-1), 13 cited prose files expose 18 of the 30 scored layers (`prose_exposed_layers`), and across
+  the whole export, which a lane may also search, 28 of the 30 are reachable (`prose_reachable_layers`).
+  execution-broker and observability-hosting are not scored: their recorded winners are not among their adopted
+  candidates. `record_verdicts.py --write` seals each wave's own measure as `prose-exposure.json` and stamps
+  every row's `lanes.prose_exposed` (round 7, BL7-2).
+- **Label-stripped files.** 22 exported JSON files differ from the source only by stripped label keys. Five of
+  them have their original sha256 recorded in another exported file, so that hash no longer matches in the
+  export: `CLAUDE.md` (replaced, in `catalog-clean-install-20260921/source-manifest.json`),
+  `blueprints/convergence-practice/offhost-restore/upstream-source.json` (in `upstream-tests.json` and
+  `hosted-plan.json`), `blueprints/us-equities/adaptive-paper/receipt.json` (in two trials' `frozen-*.SHA256SUMS`),
+  `catalogs/foundation/community-practice-20260920.json` (in `native-review.json`) and
+  `evidence/artifacts/claude-upstream-checks-20260921/provenance.json` (in its receipt).
 - **Evidence prose in JSON.** String values are not redacted. 206 sentences in 102 JSON files name a winner (its
   name, repository name or component id) with a selection word: 154 under `evidence/`, 35 under `blueprints/`,
   13 under `catalogs/`, 3 under `observability/` and 1 under `adoption/`. Most use the words in their technical
@@ -1355,8 +1361,10 @@ What remains and how it is handled:
 - **Git history:** `codex_lane.py` refuses a `--repo` when it or any parent directory has `.git`, because git
   walks up from a subdirectory. Pass `--allow-git-history` only outside a blind wave. Run the lanes on a
   `blind_checkout.py --export` copy placed outside every repository.
-- **Blind audit:** after each run, `codex_lane.py` writes `<work-dir>/codex/blind-audit.json`, a
-  report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
+- **Blind audit:** `codex_lane.py` audits each layer's events as soon as its child finishes and records the
+  result in `<work-dir>/codex/blind-audit.json`. In a blind run a flagged layer is void before its return is
+  written (kept only as `<name>.json.audit-flagged`), and a resume re-audits a kept return's events, rerunning it
+  when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
@@ -1370,9 +1378,12 @@ What remains and how it is handled:
   - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
     `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget.
+  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget;
+  - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
+    literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
+    name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
 
-  A flag is evidence for the coordinator to review and disclose, not a verdict. The audit is a heuristic
+  In a non-blind run a flag is evidence for the coordinator to review and disclose. The audit is a heuristic
   lower bound: it reads only the command text. Known gaps include a path a program computes (a
   `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
   reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
@@ -1696,6 +1707,54 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-7 review of a4dfd99e (blindness, operability, regressions and isolation-integrity lenses),
+  under the reviewer's convergence plan: no new detection features; fix the confirmed mediums with real-data tests;
+  make the disclosure the resolution; take the lows where the code was open:**
+  - **Interrupted and resumed Codex runs (REG7-1, ISO-R7-1..4, ISO-R7-8).** Each layer is audited before its
+    return is written, so a flagged layer is void even when the run is interrupted, and a resume re-audits a kept
+    return's events. A stop signal (SIGTERM, SIGHUP, SIGINT) sets a stop that starts no attempt, retry or refute
+    stage and promotes no return, terminates and waits for every child, and cannot be interrupted by a second
+    signal; the executors cancel queued work. Every run home holds an in-use lock its children inherit, so a
+    later run's sweep never removes a link a live orphan still uses, and the link is removed only after the
+    children are gone. Both runners hold the work dir's own lock (`.codex-run.lock`) before the homes' base lock,
+    so a second run of one work dir is refused whatever its `NAS_CODEX_HOME_DIR`. The base is created 0700.
+    Tests: an interrupt then a resume never keeps a flagged layer; a stop with `--jobs 2` writes no return and
+    starts no retry; a kept return with flagged or missing events reruns; a stop during adjudication writes no
+    record and starts no refute stage.
+  - **Audit and credentials (REG7-3, ISO-R7-5..7, ISO-R7-9).** Substitution, `CODEX_HOME` (the bare name too) and
+    inherited directory variables are matched in the shell-active text only. A proxy variable with inline
+    credentials is refused for a blind run, since every child variable reaches the model's shell; the dry-run
+    redaction handles a scheme-less value and a password containing `@`.
+  - **Checker scope (OPR7-2).** With round 6's rules, 96 of 288 single-layer winner changes failed step 7 and CI,
+    mostly on intrinsic card fields (license, a version) and on evidence lists such as `primary_references`. Only
+    role labels outside evidence records and packet fields on exactly the winners now fail; record-field hits
+    (three records at least, low-cardinality columns only, `evidence_ref` as evidence) and evidence-record role
+    words other than winner, incumbent and chosen are reported. The same sweep on this head: 32 of 297 changes in
+    18 layers fail, all on the older container and packet checks (28 of 288 at fe5143e2).
+  - **Prose exposure (BL7-1, BL7-2).** A table's body row is scored with its header, so "| Layer | Selected native
+    practice |" over the web-research row is an exposure. A statement counts only when it names a winner and no
+    adopted non-winner, and states a selection by a choice phrase, a status copula or label, or an imperative
+    choice ("Retain skfolio"), not by a selection word merely near a name. `record_verdicts.py --write` measures
+    this against the ledger before the wave's rows, over the export the lanes read, seals it as
+    `prose-exposure.json` (bound by the run manifest's `prose_exposure_sha256`) and stamps each row's
+    `lanes.prose_exposed`; `landscape.py` checks both. Step 7's check is the next wave's pre-check.
+  - **Packet prose (BL7-3, BL7-4, BL7-5).** Another layer's name parts match only as capitalized proper nouns
+    ("Nautilus", "Alpaca"), and a candidate name that is an ordinary word only as written ("Temporal"), never
+    inside a path: the dropped clause "retain scoped telemetry, failed attempts and recoverable state ..." is back
+    in 3 requirements, and shared-field placeholders fell from 125 to 74 (prose placeholders 331 to 172). In a
+    candidate's own fields a selection word next to its own name, or beside a result marker, no longer drops a
+    sentence; a choice phrase or status copula still does. Status needs a copula ("is this catalog's selected
+    live-primary broker path") or a labelling opening ("The selected GitHub CLI.", "Selected north-star engine");
+    "Default examples use model API credentials", "Failed-turn usage is retained." and the NautilusTrader
+    parity-gate record stay. The result marker is case-insensitive and also matches `failed`/`blocked` inside a
+    status token and a bare `*.json` name.
+  - **Operability (OPR7-1, OPR7-3..6, REG7-4, INT-R7-1).** The wave's date and manifest are fixed once in
+    `KEYS_DIR/wave.env`, so `keys()` rebuilds the same packets on any later day; it replaces the keys document
+    only after `cmp` passes, so a failed call leaves none, and step 6 chains it. `build_verdicts.py` refuses a
+    missing manifest with exit 2. Step 7 lists the validate job's offline steps, including the base commit's
+    verdict-review gate, and says to re-register after any later edit. `lane_packets.py` records an absolute
+    `--manifest` relative to `--root` and refuses an `--out` or `--keys-out` inside a repository. A sealed
+    `component_id` or `pin` of the wrong type is a clean refusal.
 - **Independent round-6 review of fe5143e2 (integrity, Codex-isolation, blindness, regressions and operability
   lenses):**
   - **Exported files are verbatim; the exposure is disclosed (design decision, 2026-09-24; B6-4, B6-2).** Six
@@ -1704,7 +1763,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     dropped incumbents' own negative evidence. The export now rewrites no sentence or table. Reduction is limited
     to what this catalog builds for a lane: the packets (below) and the label fields of catalog cards and ledger
     rows. `export_isolation_check.py` reports `prose_exposed_layers`: 18 of 32 layers have a cited prose file
-    that states their winner's selection (26 of 89 exported prose files). A wave record discloses those layers as
+    that states their winner's selection (26 of 89 exported prose files; superseded by round 7's measure, which
+    scores tables and counts only discriminating statements). A wave record discloses those layers as
     not blind against cited prose. Alternatives measured: excluding every cited narrative document would drop
     108 of 1,378 packet references and leave 9 adopted candidates without evidence; redaction is above.
     Overturn: a redaction that a mutation test shows removes every seeded choice statement without changing a
@@ -1787,6 +1847,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     repository names, component ids, owners and name parts unique to one candidate (outside the layer's own title
     and scope words), with `-`/`_`/space variants. Short names such as `gh`, `uv` or `RTK` match as whole
     case-sensitive tokens. Since the Codex review, every catalog candidate's whole names and distinctive parts
+    (round 7, BL7-3: parts only as capitalized proper nouns, ordinary words only as written)
     count in every packet, so a factor layer's prose no longer names Nautilus, LEAN or Alpaca. A selection word is
     never a term. On the 2026-09-23 packets, 4 requirements are emptied (13 before), all us-equities layers
     sharing the group requirement that names the selected destination, and 363 names are written `<candidate>`
@@ -1871,8 +1932,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     environment as `env -i PATH=... LANG=... TERM=... 'CODEX_HOME=<base>/<prefix>-<run>' 'HOME=<base>/<prefix>-<run>/home'
     codex exec ...`, with proxy credentials shown as `***`. The credential link is removed when the run ends, on an
     exception, on SIGINT, and on SIGTERM or SIGHUP (raised as `SystemExit`). A SIGKILLed run leaves the link; the
-    next run of the same work dir, under the same lock, removes every such leftover `auth.json` symlink first. The
-    blind audit also flags `${...}` parameter expansion.
+    next run of the same work dir, under the same lock, removes every such leftover `auth.json` symlink first,
+    except in a home whose in-use lock a live child still holds (round 7, ISO-R7-2). The blind audit also flags
+    `${...}` parameter expansion.
   - **Run lock and bound audits (BIND-R4-5, BIND-R4-6).** `codex_lane` and `adjudicate codex` hold an exclusive
     `flock` for the run (since round 6 one shared lock per work dir, `<base>/<prefix>.lock`), so two runs cannot
     recreate each other's home or

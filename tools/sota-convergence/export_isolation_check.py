@@ -53,11 +53,13 @@ ROLE_WORDS = frozenset({"selected", "winner", "winners", "default", "primary", "
 EVIDENCE_PREFIXES = ("evidence/", "blueprints/", "observability/")
 # The keys blind_checkout.py strips under evidence/ as a selection of candidates (EVIDENCE_SELECTION_KEY there).
 EVIDENCE_SELECTION_KEY = re.compile(r"^selected_(?:component|repositor|tool|candidate|stack)")
-# Inside an evidence record, a key carrying any of these words is a label when it isolates the winners, unless its
-# position is reviewed in REVIEWED_EVIDENCE_PATHS (round 6, B6-6: selectedTools, selected_repos, picked, primary).
-EVIDENCE_ROLE_WORDS = frozenset({"winner", "winners", "incumbent", "incumbents", "chosen", "selected", "selection",
-                                 "pick", "picked", "picks", "recommended", "preferred", "default", "primary",
-                                 "current"})
+# Inside an evidence record, a key carrying one of these words is a label when it isolates the winners.
+EVIDENCE_ROLE_WORDS = frozenset({"winner", "winners", "incumbent", "incumbents", "chosen"})
+# These are reported, not failed, inside evidence records (round 6, B6-6; round 7, OPR7-2): "primary_references",
+# "selected_tests" and "primary_sources_and_pins" are what a receipt ran and cited, and a winner change made them
+# isolate the new winner in a third of single-layer changes. A wave lists them in its record.
+EVIDENCE_REPORTED_ROLE_WORDS = frozenset({"selected", "selection", "pick", "picked", "picks", "recommended",
+                                          "preferred", "default", "primary", "current"})
 # Positions reviewed as evidence although neither rule covers them: (file, container path) -> why.
 REVIEWED_EVIDENCE_PATHS = {
     ("catalogs/landscape/native-practice.json", "$.installation_method.agents"):
@@ -72,8 +74,8 @@ REVIEWED_EVIDENCE_PATHS = {
         "the pinned documentation and source URLs the research-evaluation receipt cites",
 }
 # Record fields that cite evidence, by exact name: a token match would pass evidence_level, a label.
-RECORD_EVIDENCE_FIELDS = frozenset({"evidence_refs", "evidence", "sources", "references", "source_findings",
-                                    "observations", "registered_receipts"})
+RECORD_EVIDENCE_FIELDS = frozenset({"evidence_refs", "evidence_ref", "evidence", "sources", "references",
+                                    "source_findings", "observations", "registered_receipts"})
 # Record fields reviewed as evidence although they are not citations: field -> why.
 REVIEWED_EVIDENCE_FIELDS = {
     "qualification_gap": "states how far each candidate's evidence goes; fourteen challengers share the generic "
@@ -257,7 +259,8 @@ def record_field_hits(export_dir: Path, packets_dir: Path, winners: dict, packet
                 if len(keys) == 1:
                     matched.setdefault(keys[0], record)
             covered = set(matched)
-            if not win or not (win <= covered) or covered == win or len(covered) < 2:
+            # Three records at least: with two, any field on one of them isolates whichever wins (round 7, OPR7-2).
+            if not win or not (win <= covered) or covered == win or len(covered) < 3:
                 continue
             fields = set().union(*(record.keys() for record in matched.values())) - set(ELEMENT_ID_FIELDS)
             for field in sorted(fields):
@@ -267,7 +270,10 @@ def record_field_hits(export_dir: Path, packets_dir: Path, winners: dict, packet
                     value = record.get(field)
                     if isinstance(value, (str, int, float, bool)) and value not in ("",):
                         holders.setdefault(json.dumps(value), set()).add(key)
-                categorical = any(len(keys) >= 2 for keys in holders.values())
+                # A column of few distinct values (a status, a level), not free text or versions where one duplicate
+                # made every other value "isolate" its candidate (round 7, OPR7-2).
+                categorical = (any(len(keys) >= 2 for keys in holders.values())
+                               and len(holders) <= max(2, len(matched) // 2))
                 if present in (win, covered - win) or (categorical and any(keys == win for keys in holders.values())):
                     hits.add((relative, json_path, field))
         report[layer] = [dict(zip(("file", "path", "field"), hit)) for hit in sorted(hits)]
@@ -275,10 +281,13 @@ def record_field_hits(export_dir: Path, packets_dir: Path, winners: dict, packet
 
 
 def record_label_hits(report: dict) -> list:
-    """Record-field hits outside evidence records and not on an evidence field."""
-    return [{"layer": layer, **hit} for layer, hits in report.items() for hit in hits
-            if not (hit["file"].startswith(EVIDENCE_PREFIXES) or "receipt" in hit["file"].rsplit("/", 1)[-1])
-            and hit["field"] not in RECORD_EVIDENCE_FIELDS and hit["field"] not in REVIEWED_EVIDENCE_FIELDS]
+    """Record-field hits not on an evidence field, each marked whether it sits in an evidence record. Reported, never
+    failed (round 7, OPR7-2: intrinsic attributes such as license or a version isolate a new winner by coincidence);
+    evidence-record hits are listed too, so a wave discloses them (BL7-6)."""
+    return [{"layer": layer, **hit,
+             "evidence_record": hit["file"].startswith(EVIDENCE_PREFIXES) or "receipt" in hit["file"].rsplit("/", 1)[-1]}
+            for layer, hits in report.items() for hit in hits
+            if hit["field"] not in RECORD_EVIDENCE_FIELDS and hit["field"] not in REVIEWED_EVIDENCE_FIELDS]
 
 
 def evidence_hit(hit: dict) -> bool:
@@ -296,8 +305,17 @@ def evidence_hit(hit: dict) -> bool:
 
 
 def role_label_hits(report: dict) -> list:
-    """Isolating containers that are labels, not evidence."""
+    """Isolating containers that are labels, not evidence: the check's failing set."""
     return [{"layer": layer, **hit} for layer, hits in report.items() for hit in hits if not evidence_hit(hit)]
+
+
+def evidence_role_word_hits(report: dict) -> list:
+    """Isolating containers in evidence records under a key with a reported role word (EVIDENCE_REPORTED_ROLE_WORDS)
+    at an unreviewed position: listed for the wave's disclosure, not failed (round 7, OPR7-2)."""
+    return [{"layer": layer, **hit} for layer, hits in report.items() for hit in hits
+            if evidence_hit(hit) and (hit["file"], hit["path"]) not in REVIEWED_EVIDENCE_PATHS
+            and (hit["file"].startswith(EVIDENCE_PREFIXES) or "receipt" in hit["file"].rsplit("/", 1)[-1])
+            and _key_tokens(hit["path"]) & EVIDENCE_REPORTED_ROLE_WORDS]
 
 
 def packet_field_hits(packets_dir: Path, winners: dict) -> dict:
@@ -347,6 +365,12 @@ def packet_role_label_hits(report: dict) -> list:
 
 PROSE_SUFFIXES = (".md", ".markdown", ".txt", ".rst")
 _BLOCK_START = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|#{1,6}\s|>|\|)")
+# A table header cell that states a selection makes each body row a selection statement (round 7, BL7-1:
+# "| Layer | Selected native practice |" over "| Web research | Tavily, ..., OpenResearch |").
+TABLE_CHOICE_HEADER = re.compile(r"\b(?:selected|selection|choices?|chosen|decisions?|in use|primary|current|default|"
+                                 r"adopted|retained|retain|winners?|incumbents?)\b", re.I)
+_PATH_TOKEN = re.compile(r"\S*/\S*|\S+\.(?:json|jsonl|md|txt|ya?ml|py|sh)\b")
+_TABLE_SEPARATOR = re.compile(r":?-{2,}:?")
 
 
 def _prose_blocks(text: str):
@@ -368,24 +392,86 @@ def _prose_blocks(text: str):
     yield " ".join(block)
 
 
+def prose_statements(text: str):
+    """(statement, choice_headed) pairs: each sentence of a paragraph or list item, and each table body row, marked
+    when its table's header states a selection (round 7, BL7-1: a row was scored alone and its header lost)."""
+    header = None
+    for block in _prose_blocks(text):
+        stripped = block.strip()
+        if stripped.startswith("|"):
+            cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+            if cells and all(_TABLE_SEPARATOR.fullmatch(cell) for cell in cells if cell):
+                continue
+            if header is None:
+                header = bool(TABLE_CHOICE_HEADER.search(" ".join(cells)))
+                continue
+            yield stripped, header
+            continue
+        header = None
+        for sentence in re.split(r"(?<=[.!?;])\s+", stripped):
+            if sentence:
+                yield sentence, False
+
+
+# An imperative choice right before a winner's name ("Retain skfolio 1.2.9", "Keep Serena for symbols").
+IMPERATIVE_CHOICE = re.compile(r"(?:^|[|.;:]\s*)\s*(?:retain|keep|select|choose|adopt|prefer)\s+(?:the\s+)?", re.I)
+IMPERATIVE_REACH = 30
+
+
+def _states_selection(statement: str, winners) -> bool:
+    """Whether a statement states a selection: a choice phrase, a status copula or opening label
+    (lane_packets.CHOICE_PHRASE, STATUS_COPULA, opens_with_status), or an imperative choice before a winner's name.
+    Not a bare selection word near a name, which also reads "`gh attestation verify` defaults ..." or "retained
+    accepted SEC run" (round 7, BL7-1: false positives in 6 of the 18 layers)."""
+    from lane_packets import CHOICE_PHRASE, STATUS_COPULA, opens_with_status
+    if CHOICE_PHRASE.search(statement) or STATUS_COPULA.search(statement) or opens_with_status(statement):
+        return True
+    for match in IMPERATIVE_CHOICE.finditer(statement):
+        window = statement[match.end():match.end() + IMPERATIVE_REACH]
+        if any(any(start == 0 or window[:start].strip() == "" for start, _end in matcher.spans(window))
+               for matcher in winners):
+            return True
+    return False
+
+
+def _statement_exposes(statement: str, choice_headed: bool, winners, others) -> bool:
+    """Whether a statement tells the winners apart from the adopted non-winners: it names a winner and no adopted
+    non-winner, and states a selection, as a choice-headed table row or by _states_selection with path tokens removed
+    (so "stack.json" in a file list is no choice) (round 7, BL7-1)."""
+    if not any(matcher.search(statement) for matcher in winners):
+        return False
+    if any(matcher.search(statement) for matcher in others):
+        return False
+    return choice_headed or _states_selection(_PATH_TOKEN.sub(" ", statement), winners)
+
+
 def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_keys: dict = None) -> dict:
-    """layer -> sorted exported prose files a layer's packet cites (directly or through a cited JSON file) that
-    hold a sentence stating the choice of one of its winners (lane_packets.states_choice: a choice phrase, or a
-    selection word next to the winner's name). Exported prose is never rewritten (round 6, B6-4), so this is the
-    exposure a wave discloses."""
+    """layer -> {"scored", "cited_files", "export_files"}: the exported prose files holding a statement that tells
+    the layer's winners apart from its adopted non-winners (_statement_exposes), among the files its packet cites
+    (directly or through a cited JSON file) and across the whole export, which a lane may also search. A layer
+    whose winners are not among its adopted candidates is not scored. Exported prose is never rewritten (round 6,
+    B6-4), so this is the exposure a wave discloses."""
     here = str(Path(__file__).resolve().parent)
     if here not in sys.path:
         sys.path.insert(0, here)
     from blind_checkout import _string_values, bare_reference
-    from lane_packets import candidate_matcher, states_choice
+    from lane_packets import candidate_matcher
     export_dir = Path(export_dir)
-    report = {}
+    statements = {}
+    for path in sorted(export_dir.rglob("*")):
+        if path.is_file() and path.suffix.lower() in PROSE_SUFFIXES:
+            statements[path] = list(prose_statements(path.read_text(encoding="utf-8", errors="replace")))
     packets = {}
     for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
         packets[packet_file.stem.replace("__", "::", 1)] = json.loads(packet_file.read_text(encoding="utf-8"))
+    report = {}
     for layer, adopted in load_packets(packets_dir, packet_keys).items():
         win = winner_keys(adopted, winners.get(layer) or [])
-        matcher = candidate_matcher([c for c in adopted if c.get("key") in win])
+        if not win:
+            report[layer] = {"scored": False, "cited_files": [], "export_files": []}
+            continue
+        winner_matchers = [candidate_matcher([c]) for c in adopted if c.get("key") in win]
+        other_matchers = [candidate_matcher([c]) for c in adopted if c.get("key") not in win]
         refs = set()
         for candidate in packets.get(layer, {}).get("candidates") or []:
             for raw in (candidate.get("evidence_refs") or []) + [r.get("path") for r in candidate.get("registered_receipts") or []
@@ -393,28 +479,24 @@ def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_ke
                 bare = bare_reference(raw)
                 if bare:
                     refs.add(bare)
-        files = set()
+        cited = set()
         for ref in refs:
             path = export_dir / ref
-            found = [path] if path.is_file() else ([q for q in path.rglob("*") if q.is_file()] if path.is_dir() else [])
-            files |= set(found)
-        for path in list(files):
+            cited |= {path} if path.is_file() else ({q for q in path.rglob("*") if q.is_file()} if path.is_dir() else set())
+        for path in list(cited):
             if path.suffix == ".json":
                 try:
                     values = _string_values(json.loads(path.read_text(encoding="utf-8")))
                 except (OSError, UnicodeError, ValueError):
                     continue
-                files |= {export_dir / bare for bare in (bare_reference(v) for v in values)
+                cited |= {export_dir / bare for bare in (bare_reference(v) for v in values)
                           if bare and (export_dir / bare).is_file()}
-        exposed = []
-        for path in sorted(files):
-            if path.suffix.lower() not in PROSE_SUFFIXES or not win:
-                continue
-            text = path.read_text(encoding="utf-8", errors="replace")
-            if any(states_choice(sentence, matcher) and matcher.search(sentence)
-                   for block in _prose_blocks(text) for sentence in re.split(r"(?<=[.!?;])\s+", block) if sentence):
-                exposed.append(path.relative_to(export_dir).as_posix())
-        report[layer] = exposed
+        exposing = sorted(path.relative_to(export_dir).as_posix() for path, found in statements.items()
+                          if any(_statement_exposes(text, headed, winner_matchers, other_matchers)
+                                 for text, headed in found))
+        cited_names = {path.relative_to(export_dir).as_posix() for path in cited}
+        report[layer] = {"scored": True, "cited_files": [name for name in exposing if name in cited_names],
+                         "export_files": exposing}
     return report
 
 
@@ -472,16 +554,22 @@ def main(argv=None) -> int:
     records = record_label_hits(record_field_hits(export_dir, packets_dir, winners, packet_keys))
     fields = packet_field_hits(packets_dir, winners)
     field_labels = packet_role_label_hits(fields)
+    exposure = prose_exposure(export_dir, packets_dir, winners, packet_keys)
     print(json.dumps({"layers": len(report), "layers_with_hits": sum(bool(h) for h in report.values()),
                       "layers_with_evidence_hits": sorted(layer for layer, hits in report.items()
                                                           if any(evidence_hit(hit) for hit in hits)),
-                      "role_label_hits": labels, "record_label_hits": records,
+                      # Failing: labels outside evidence records and packet fields on exactly the winners.
+                      "role_label_hits": labels, "packet_role_label_hits": field_labels,
+                      # Reported for the wave's disclosure (round 7, OPR7-2, BL7-6).
+                      "record_label_hits": records, "evidence_role_word_hits": evidence_role_word_hits(report),
                       "packet_evidence_field_hits": {layer: hits for layer, hits in fields.items() if hits},
-                      "prose_exposed_layers": {layer: files for layer, files in
-                                               prose_exposure(export_dir, packets_dir, winners, packet_keys).items()
-                                               if files},
-                      "packet_role_label_hits": field_labels}, indent=1))
-    return 1 if labels or field_labels or records else 0
+                      "prose_exposed_layers": {layer: entry["cited_files"] for layer, entry in exposure.items()
+                                               if entry["cited_files"]},
+                      "prose_reachable_layers": sorted(layer for layer, entry in exposure.items()
+                                                       if entry["export_files"]),
+                      "unscored_layers": sorted(layer for layer, entry in exposure.items() if not entry["scored"])},
+                     indent=1))
+    return 1 if labels or field_labels else 0
 
 
 if __name__ == "__main__":

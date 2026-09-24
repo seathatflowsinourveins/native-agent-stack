@@ -50,9 +50,21 @@ All behavior is env-var driven so a single script fixture serves every test:
   CODEX_FAKE_BAD_OUTPUT_TEXT text written to -o for a CODEX_FAKE_BAD_OUTPUT_ATTEMPTS
                               attempt. Optional (default: an unparseable
                               string, "{not valid json").
+  CODEX_FAKE_EVENTS_MAP      JSON {argv substring: events path}: a call whose argv
+                              contains the substring prints that file instead of
+                              CODEX_FAKE_EVENTS_FILE. Optional.
+  CODEX_FAKE_SLEEP_MAP       JSON {argv substring: seconds} overriding
+                              CODEX_FAKE_SLEEP_SECONDS for a matching call. Optional.
+  CODEX_FAKE_TERM_PARENT_MATCH
+                              argv substring: a matching call prints its events,
+                              sends SIGTERM to its parent (the runner) and then
+                              sleeps CODEX_FAKE_TERM_SLEEP seconds (default 5)
+                              before carrying on, so the runner's stop handling
+                              can terminate it. Optional.
 """
 import json
 import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -83,6 +95,10 @@ def main() -> int:
         attempt = count
 
     events_file = os.environ.get("CODEX_FAKE_EVENTS_FILE")
+    joined = " ".join(sys.argv)
+    for needle, path in json.loads(os.environ.get("CODEX_FAKE_EVENTS_MAP") or "{}").items():
+        if needle in joined:
+            events_file = path
     # CODEX_FAKE_EMIT_BEFORE_SLEEP=1 writes the events first, so a timed-out
     # attempt still leaves partial output for the runner to capture.
     emit_first = os.environ.get("CODEX_FAKE_EMIT_BEFORE_SLEEP") == "1"
@@ -91,12 +107,20 @@ def main() -> int:
         sys.stdout.flush()
 
     sleep_seconds = float(os.environ.get("CODEX_FAKE_SLEEP_SECONDS", "0") or "0")
+    for needle, seconds in json.loads(os.environ.get("CODEX_FAKE_SLEEP_MAP") or "{}").items():
+        if needle in joined:
+            sleep_seconds = float(seconds)
     if sleep_seconds:
         time.sleep(sleep_seconds)
 
     if events_file and not emit_first:
         sys.stdout.write(Path(events_file).read_text(encoding="utf-8"))
         sys.stdout.flush()
+
+    term_match = os.environ.get("CODEX_FAKE_TERM_PARENT_MATCH")
+    if term_match and term_match in joined:
+        os.kill(os.getppid(), signal.SIGTERM)
+        time.sleep(float(os.environ.get("CODEX_FAKE_TERM_SLEEP", "5") or "5"))
 
     fail_attempts = {
         int(item) for item in os.environ.get("CODEX_FAKE_FAIL_ATTEMPTS", "").split(",") if item.strip()

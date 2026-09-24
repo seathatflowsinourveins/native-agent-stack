@@ -182,7 +182,7 @@ def discover_packets(work_dir: Path, layers: "set[str] | None") -> list:
 
 def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str,
                              provenance: dict = None, configured_model: str = None,
-                             configured_effort: str = None) -> bool:
+                             configured_effort: str = None, audit_roots=None) -> bool:
     """Resumable-skip check: the file must parse as a JSON object already
     forced onto this lane and this exact packet. A present-but-different
     ``packet_sha256`` (the packet changed since the file was written) is
@@ -197,9 +197,17 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
 
     A return whose ``model.name`` is ``"unknown"`` (no model was configured or observed; record_verdicts.py
     rejects it by family pattern), or differs from a given ``configured_model`` (the ``--model`` of this
-    run), also reruns (round-2 review)."""
+    run), also reruns (round-2 review).
+
+    ``audit_roots`` (a blind run's export and packets) re-audits the layer's retained events: a return whose events
+    are missing or flagged reruns, so a return an interrupted run wrote before its audit is never resumed as clean
+    (independent review of #145, round 7, REG7-1/ISO-R7-1)."""
     if not out_path.exists():
         return False
+    if audit_roots is not None:
+        events_path = out_path.parent / "events" / f"{out_path.stem}.jsonl"
+        if not events_path.is_file() or audit_is_flagged(blind_audit(events_path, audit_roots)):
+            return False
     try:
         data = load_json(out_path)
     except (json.JSONDecodeError, OSError, UnicodeDecodeError):
@@ -298,8 +306,13 @@ VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]
 # directory argument (``rg -l x ${TMPDIR}``, ``cp -r $SSL_CERT_DIR .``; round 6, REG6-3). A child's TMPDIR is a fresh,
 # empty directory of its run home, so it names no lane data either way.
 INHERITED_DIRECTORY = re.compile(r"\$\{?(?:TMPDIR|SSL_CERT_DIR|SSL_CERT_FILE|OLDPWD)\b\}?")
-CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
+# The bare name too (``printenv CODEX_HOME | xargs dirname``; round 7, ISO-R7-9).
+CODEX_HOME_REFERENCE = re.compile(r"\$?\{?\bCODEX_HOME\b[^\s'\"]*")
 COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
+# These three match the shell-active text only: the script a ``sh -c`` wrapper runs, with its single-quoted spans
+# removed, since bash expands nothing inside single quotes (round 7, REG7-3/ISO-R7-7: ``rg -n '`component_id`' docs``
+# is a read inside the export).
+SHELL_WRAPPERS = ("sh", "bash", "zsh", "dash")
 PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
@@ -317,6 +330,23 @@ EXECUTABLE_TOKEN = re.compile(r"(?:^|;|&&|\|\||\||\n|\b(?:ba|z|da)?sh\s+-l?c\s+[
 # kept with data and is flagged (round-2 review).
 SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/")
 EXEMPT_PATHS = ("/dev/null",)
+
+
+def shell_active_text(command: str) -> str:
+    """The text of ``command`` a shell expands: a ``sh -c``/``-lc`` wrapper's script, else the command, with its
+    single-quoted spans emptied."""
+    try:
+        argv = shlex.split(command)
+    except ValueError:
+        argv = []
+    script = (argv[2] if len(argv) >= 3 and Path(argv[0]).name in SHELL_WRAPPERS and argv[1] in ("-c", "-lc")
+              else command)
+    return re.sub(r"'[^']*'", "''", script)
+
+
+def audit_is_flagged(report: dict) -> bool:
+    """Whether a blind_audit report flags anything: web search, an MCP tool call or a flagged command."""
+    return bool(report.get("web_search") or report.get("mcp_tool_calls") or report.get("flagged_commands"))
 
 
 def executable_token_starts(command: str) -> set:
@@ -352,9 +382,10 @@ def unnamed_cd_targets(command: str) -> list:
 
 
 def blind_audit(events_path: Path, allowed_roots) -> dict:
-    """Report-only reading of one child's event stream: web searches, MCP tool calls, and commands that
-    name an absolute path outside ``allowed_roots`` (the repository and the packets directory) or run a
-    CLI in AUDIT_TOOLS. A flag is evidence for the coordinator to review and disclose, not a verdict.
+    """Reading of one child's event stream: web searches, MCP tool calls, and commands that name an absolute path
+    outside ``allowed_roots`` (the repository and the packets directory) or run a CLI in AUDIT_TOOLS. In a blind run
+    a flagged layer is void: its return is set aside before it is written, and a resume re-audits a kept return
+    (round 7, REG7-1); in a non-blind run the report is for review and disclosure.
 
     This is a heuristic lower bound, not a boundary: it reads command text only, so a path a program
     computes (``python3 -c`` joining parts, a glob, a variable set earlier) and anything a command reads
@@ -386,11 +417,12 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
             # (independent review of #145, BIND-R4-7).
             reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
-            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
+            active = shell_active_text(command)
+            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(active)]
             # A blind child never needs its CODEX_HOME, and a command substitution builds a path the event does not
             # show (round 6, ISO-R6-2).
-            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
-            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
+            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(active)]
+            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(active)][:1]
             reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
@@ -403,9 +435,11 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
 # The CODEX_HOME every blind child runs with (isolated_codex_home), or None to inherit the caller's.
 CHILD_CODEX_HOME = None
 # Where run-scoped Codex homes live: outside the work dir (which holds both lanes' returns) and outside the
-# adjudication state dir (the position index), so no path a child derives from $CODEX_HOME reaches either
-# (independent review of #145, BIND-R4-7). Each run gets a fresh directory there (mkdtemp); nothing is ever
-# removed to make one (round 5, INT-R5-2: removing a home that was, or held, the native home deleted it).
+# adjudication state dir (the position index). The default base shares a parent with that state dir, so a path a
+# child derives from its CODEX_HOME can reach it; the blind audit flags any use of CODEX_HOME and any path outside
+# the export and packets, as far as command text shows (independent review of #145, BIND-R4-7; round 7, ISO-R7-9).
+# Each run gets a fresh directory there (mkdtemp); nothing is ever removed to make one (round 5, INT-R5-2: removing
+# a home that was, or held, the native home deleted it).
 CODEX_HOME_BASE_ENV = "NAS_CODEX_HOME_DIR"
 DEFAULT_CODEX_HOME_BASE = Path("~/.local/state/native-agent-stack/codex-home")
 
@@ -461,20 +495,54 @@ def codex_home_issue(work_dir: Path, repo: Path = None):
     if not native.is_file():
         return (f"no native Codex credential at {native}; sign in natively with `codex login` (with an API key: "
                 "`codex login --with-api-key`); a blind child is never given an API key variable")
+    for key in PROXY_VARIABLES:
+        if PROXY_USERINFO.match(os.environ.get(key) or ""):
+            # Every variable a child gets is exported into the model's shell (round 7, ISO-R7-5).
+            return (f"{key} carries credentials (user:password@host); every variable a blind child gets reaches the "
+                    "model's shell and its events, so use a proxy without inline credentials for a blind run")
     return None
 
 
 def codex_home_lock(work_dir: Path) -> Path:
-    """The lock both codex_lane and adjudicate codex hold for a work dir: one per work dir under the homes' base, so
+    """The homes' base lock for a work dir, held with work_run_lock by both codex_lane and adjudicate codex, so
     neither sweeps or shares the other's credential link (review of 52344da8; round 6, ISO-R6-1)."""
     return codex_home_base() / f"{codex_home_prefix(work_dir)}.lock"
 
 
+def work_run_lock(work_dir: Path) -> Path:
+    """The work dir's own lock, shared by both runners: two runs of one work dir with different homes' bases would
+    otherwise both run and interleave the events files (round 7, REG7-2/ISO-R7-4)."""
+    return Path(work_dir) / ".codex-run.lock"
+
+
+IN_USE_NAME = ".in-use"
+# The current run home's in-use lock handle; every child inherits it (run_attempt pass_fds), so the flock stays held
+# while any child lives, even after the lane is SIGKILLed (round 7, ISO-R7-2).
+IN_USE_HANDLE = None
+
+
+def home_in_use(home: Path) -> bool:
+    """Whether a live process (a run, or a child it started) still holds ``home``'s in-use lock."""
+    import fcntl
+    marker = Path(home) / IN_USE_NAME
+    if not marker.is_file():
+        return False
+    with open(marker, "a", encoding="utf-8") as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return True
+        fcntl.flock(handle, fcntl.LOCK_UN)
+    return False
+
+
 def sweep_stale_links(work_dir: Path) -> None:
     """Remove the credential links an interrupted (SIGKILLed) earlier run of this work dir left in its homes; only
-    symlinks named auth.json are removed. The caller holds codex_home_lock (round 6, ISO-R6-1)."""
+    symlinks named auth.json are removed, and never in a home whose in-use lock a live child still holds (round 7,
+    ISO-R7-2). The caller holds the run locks (round 6, ISO-R6-1)."""
     for home in codex_home_base().glob(f"{codex_home_prefix(work_dir)}-*"):
-        remove_codex_home_link(home)
+        if home.is_dir() and not home_in_use(home):
+            remove_codex_home_link(home)
 
 
 def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
@@ -497,14 +565,37 @@ def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
         raise CodexHomeRefused(issue)
     base = codex_home_base()
     native = native_auth_path()
-    base.mkdir(parents=True, exist_ok=True, mode=0o700)
+    import fcntl
+    global IN_USE_HANDLE
+    private_dir(base)
     home = Path(tempfile.mkdtemp(prefix=f"{codex_home_prefix(work_dir)}-", dir=base))
     home.chmod(0o700)
     child_home(home).mkdir(mode=0o700)
     (home / "tmp").mkdir(mode=0o700)
+    IN_USE_HANDLE = open(home / IN_USE_NAME, "a", encoding="utf-8")
+    fcntl.flock(IN_USE_HANDLE, fcntl.LOCK_EX | fcntl.LOCK_NB)
     if native.is_file():
         (home / "auth.json").symlink_to(native)
     return home
+
+
+def release_codex_home(home) -> None:
+    """End a run's use of its home: stop and wait for every live child, then remove the credential link and release
+    the in-use lock, in that order, so no child outlives its link (round 7, ISO-R7-2)."""
+    global IN_USE_HANDLE
+    terminate_children()
+    remove_codex_home_link(home)
+    if IN_USE_HANDLE is not None:
+        IN_USE_HANDLE.close()
+        IN_USE_HANDLE = None
+
+
+def private_dir(path: Path) -> None:
+    """Create ``path`` (and its parents) if missing; a directory created here is mode 0700 (round 7, ISO-R7-8)."""
+    path = Path(path)
+    if not path.is_dir():
+        path.mkdir(parents=True, exist_ok=True)
+        path.chmod(0o700)
 
 
 def remove_codex_home_link(home) -> None:
@@ -529,7 +620,7 @@ def exclusive_run_lock(path: Path):
     """Hold an exclusive, non-blocking flock on ``path`` for the run (independent review of #145, BIND-R4-5): two
     runs on one work dir would recreate each other's Codex home and interleave each other's events files."""
     import fcntl
-    path.parent.mkdir(parents=True, exist_ok=True)
+    private_dir(path.parent)
     handle = open(path, "a", encoding="utf-8")
     try:
         fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -552,19 +643,56 @@ CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "SSL_CERT_F
 CHILD_ENV_EXTRA_PREFIXES = ()
 
 
+PROXY_VARIABLES = tuple(key for key in CHILD_ENV_ALLOWLIST if key.lower().endswith("_proxy") and "no_" not in
+                        key.lower())
+# userinfo before the host, with or without a scheme, up to the last '@' (round 7, ISO-R7-6).
+PROXY_USERINFO = re.compile(r"^((?:[A-Za-z][A-Za-z0-9+.-]*://)?)[^/\s]*@")
+
+
 def redact_userinfo(value: str) -> str:
-    """A proxy URL's user:password@ as ***@ in printed output (round 6, ISO-R6-5)."""
-    return re.sub(r"(://)[^/@\s]+@", r"\1***@", value) if isinstance(value, str) else value
+    """A proxy URL's user:password@ as ***@ in printed output (round 6, ISO-R6-5; round 7, ISO-R7-6)."""
+    return PROXY_USERINFO.sub(r"\1***@", value) if isinstance(value, str) else value
+
+
+# Set by a stop signal: no attempt starts, no return is written, and every live child is terminated (independent
+# review of #145, round 7, REG7-1/ISO-R7-3). Cleared when a run starts.
+STOP = threading.Event()
+_LIVE_CHILDREN: set = set()
+_LIVE_LOCK = threading.Lock()
+STOP_GRACE_SECONDS = 10.0
+
+
+def terminate_children(grace: float = STOP_GRACE_SECONDS) -> None:
+    """Terminate every live child, wait up to ``grace`` seconds, then kill those still running."""
+    with _LIVE_LOCK:
+        children = list(_LIVE_CHILDREN)
+    for child in children:
+        if child.poll() is None:
+            child.terminate()
+    deadline = time.monotonic() + grace
+    for child in children:
+        try:
+            child.wait(timeout=max(0.0, deadline - time.monotonic()))
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
 
 
 @contextlib.contextmanager
 def terminate_on_signal():
-    """SIGTERM and SIGHUP raise SystemExit while held, so the caller's finally removes the credential link (round 6,
-    ISO-R6-1); a SIGKILLed run leaves it for the next run's sweep_stale_links."""
+    """While held, SIGTERM, SIGHUP and SIGINT set STOP, terminate the live children and raise SystemExit, so the
+    caller's cleanup (release_codex_home) runs with no child left; a second signal changes nothing, so it cannot
+    interrupt that cleanup (round 6, ISO-R6-1; round 7, ISO-R7-2/ISO-R7-3). A SIGKILLed run leaves its link for the
+    next run's sweep_stale_links, which skips a home a live child still holds."""
     import signal
     def stop(signum, _frame):
+        if STOP.is_set():
+            return
+        STOP.set()
+        terminate_children()
         raise SystemExit(128 + signum)
-    previous = {signum: signal.signal(signum, stop) for signum in (signal.SIGTERM, signal.SIGHUP)}
+    STOP.clear()
+    previous = {signum: signal.signal(signum, stop) for signum in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)}
     try:
         yield
     finally:
@@ -588,38 +716,32 @@ def child_home(codex_home: Path) -> Path:
 
 
 def run_attempt(cmd: list, timeout: float) -> dict:
+    """Run one child to completion or ``timeout``; after a stop (STOP) none starts and ``stopped`` is true."""
     started = time.monotonic()
+    if STOP.is_set():
+        return {"exit_code": None, "stdout": "", "stderr": "", "elapsed": 0.0, "timed_out": False, "stopped": True}
     env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
+    # The in-use lock rides along (round 7, ISO-R7-2); no stdin (round 5, ISO-R5-3): codex exec appends a
+    # non-terminal stdin to the prompt and waits for its end.
+    pass_fds = (IN_USE_HANDLE.fileno(),) if IN_USE_HANDLE is not None else ()
+    child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             text=True, env=env, pass_fds=pass_fds)
+    with _LIVE_LOCK:
+        _LIVE_CHILDREN.add(child)
+    if STOP.is_set():
+        child.terminate()
+    timed_out = False
     try:
-        # No stdin (round 5, ISO-R5-3): codex exec appends a non-terminal stdin to the prompt and waits for its end.
-        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env,
-                                   stdin=subprocess.DEVNULL)
-        return {
-            "exit_code": completed.returncode,
-            "stdout": completed.stdout or "",
-            "stderr": completed.stderr or "",
-            "elapsed": time.monotonic() - started,
-            "timed_out": False,
-        }
-    except subprocess.TimeoutExpired as exc:
-        # subprocess.run kills the child and re-raises after collecting
-        # whatever communicate() had already buffered. On POSIX the partial
-        # output arrives as bytes even with text=True, so decode it rather
-        # than discard the events and usage an attempt produced before timing out.
-        def decoded(value):
-            if isinstance(value, bytes):
-                return value.decode("utf-8", errors="replace")
-            return value if isinstance(value, str) else ""
-
-        stdout = decoded(exc.stdout)
-        stderr = decoded(exc.stderr)
-        return {
-            "exit_code": None,
-            "stdout": stdout,
-            "stderr": stderr,
-            "elapsed": time.monotonic() - started,
-            "timed_out": True,
-        }
+        stdout, stderr = child.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        child.kill()
+        stdout, stderr = child.communicate()
+        timed_out = True
+    finally:
+        with _LIVE_LOCK:
+            _LIVE_CHILDREN.discard(child)
+    return {"exit_code": None if timed_out else child.returncode, "stdout": stdout or "", "stderr": stderr or "",
+            "elapsed": time.monotonic() - started, "timed_out": timed_out, "stopped": STOP.is_set()}
 
 
 def parse_events(stdout_text: str) -> list:
@@ -876,16 +998,18 @@ def main(argv=None) -> int:
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"codex_lane: {error}", file=sys.stderr)
         return 2
+    blind = not args.allow_git_history
+    audit_roots = [str(repo), str((work_dir / "packets").resolve())]
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
+        # A blind return counts only with clean retained events (round 7, REG7-1/ISO-R7-1).
         if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model,
-                                    args.effort):
+                                    args.effort, audit_roots=audit_roots if blind else None):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
-    blind = not args.allow_git_history
     if blind:
         # The home refusals create nothing, so they run before the dry run and the lock (round 6, ISO-R6-5).
         issue = codex_home_issue(work_dir, repo)
@@ -918,7 +1042,9 @@ def main(argv=None) -> int:
     with contextlib.ExitStack() as stack:
         if pending:
             try:
-                # One lock per work dir for both runners, under the homes' base (round 6, ISO-R6-1).
+                # The work dir's own lock, then the homes' base lock, both shared by the two runners (round 6,
+                # ISO-R6-1; round 7, REG7-2/ISO-R7-4).
+                stack.enter_context(exclusive_run_lock(work_run_lock(work_dir)))
                 stack.enter_context(exclusive_run_lock(codex_home_lock(work_dir)))
             except RunLocked as error:
                 print(f"codex_lane: {error}", file=sys.stderr)
@@ -937,7 +1063,7 @@ def main(argv=None) -> int:
             return run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path,
                                pending, provenance)
         finally:
-            remove_codex_home_link(CHILD_CODEX_HOME)
+            release_codex_home(CHILD_CODEX_HOME)
             CHILD_CODEX_HOME = None
 
 
@@ -946,15 +1072,34 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
+    audit_lock = threading.Lock()
     failures: list = []
+    blind = not args.allow_git_history
+    roots = [str(repo), str((work_dir / "packets").resolve())]
+    audit_path = codex_dir / AUDIT_NAME
+    try:
+        audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
+    except ValueError:
+        audit = {}
+    audit_layers = audit.get("layers") if isinstance(audit.get("layers"), dict) else {}
+
+    def record_audit(name, report):
+        # Written as each layer is audited, so an interrupted run keeps what it audited.
+        with audit_lock:
+            audit_layers[name] = report
+            audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": audit_layers},
+                                             indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
     def process(item):
         catalog, layer_id, packet_path, packet_sha256, out_path = item
+        name = f"{catalog}__{layer_id}"
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
-        tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
+        tmp_out = codex_dir / f"{name}.out.tmp"
         cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
                             ISOLATION_ARGS)
-        events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
+        events_path = events_dir / f"{name}.jsonl"
+        if STOP.is_set():
+            return
         events_path.write_text("", encoding="utf-8")
 
         succeeded = False
@@ -967,6 +1112,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # produced a stale earlier attempt's (or run's) output.
             tmp_out.unlink(missing_ok=True)
             result = run_attempt(cmd, args.timeout)
+            if result.get("stopped") and not result["stdout"]:
+                return  # stopped before a child ran
             events = parse_events(result["stdout"])
             with events_path.open("a", encoding="utf-8") as handle:
                 for line in result["stdout"].splitlines():
@@ -985,6 +1132,10 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             usage_row.update(usage)
             with usage_lock, usage_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(usage_row, sort_keys=True) + "\n")
+            if STOP.is_set():
+                # After a stop nothing is promoted and no retry starts (round 7, REG7-1/ISO-R7-3).
+                tmp_out.unlink(missing_ok=True)
+                return
 
             if result["timed_out"] or result["exit_code"] != 0:
                 last_failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
@@ -1006,20 +1157,41 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
 
             final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
                                          provenance, configured_model=args.model)
-            out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
+            # This layer's own audit, before its return is written (round 7, REG7-1/ISO-R7-1): in a blind run a
+            # flagged layer (a read outside the export and packets, web search or an MCP tool) is void, as an
+            # adjudication judgment is, since it may have read the packet keys or another lane's return (Codex review
+            # of #145). Its return is kept only as <name>.json.audit-flagged, and the layer is recorded as failed.
+            report = blind_audit(events_path, roots)
+            record_audit(name, report)
+            if blind and audit_is_flagged(report):
+                out_path.unlink(missing_ok=True)
+                out_path.with_name(out_path.name + ".audit-flagged").write_text(
+                    json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+                last_failure = None
+                failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
+                                                     "outside the export and packets)"))
+                return
+            if STOP.is_set():
+                return
+            out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             succeeded = True
             break
 
         if not succeeded:
             # A stale return (e.g. one rejected for an older packet hash) must
             # not survive, so record_verdicts.py records this `failed` reason.
+            record_audit(name, blind_audit(events_path, roots))
             out_path.unlink(missing_ok=True)
             failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
 
     if args.jobs > 1:
-        with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+        executor = ThreadPoolExecutor(max_workers=args.jobs)
+        try:
             list(executor.map(process, pending))
+        finally:
+            # A stop cancels the queued layers; the in-flight ones return at once (round 7, ISO-R7-3).
+            executor.shutdown(wait=True, cancel_futures=True)
     else:
         for item in pending:
             process(item)
@@ -1036,36 +1208,10 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 out_path.replace(out_path.with_name(out_path.name + ".tree-changed"))
             failures.append((catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export"))
 
-    audit_path = codex_dir / AUDIT_NAME
-    try:
-        audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
-    except ValueError:
-        audit = {}
-    layers = audit.get("layers") if isinstance(audit.get("layers"), dict) else {}
-    roots = [str(repo), str((work_dir / "packets").resolve())]
-    for catalog, layer_id, _packet_path, _packet_sha256, _out_path in pending:
-        layers[f"{catalog}__{layer_id}"] = blind_audit(events_dir / f"{catalog}__{layer_id}.jsonl", roots)
-    audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": layers},
-                                     indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    flagged = sorted(name for name, entry in layers.items()
-                     if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
+    flagged = sorted(name for name, entry in audit_layers.items() if isinstance(entry, dict) and audit_is_flagged(entry))
     if flagged:
         print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
               + ", ".join(flagged), file=sys.stderr)
-    if not args.allow_git_history:
-        # In a blind run a flagged layer (a read outside the export and packets, web search or an MCP tool) is void,
-        # as an adjudication judgment is: it may have read the packet keys or another lane's return (Codex review of
-        # #145). Its return is set aside and the layer is recorded as failed.
-        this_run = {f"{catalog}__{layer_id}": out_path for catalog, layer_id, _p, _s, out_path in pending}
-        for name in flagged:
-            out_path = this_run.get(name)
-            if out_path is None:
-                continue
-            if out_path.is_file():
-                out_path.replace(out_path.with_name(out_path.name + ".audit-flagged"))
-            catalog, _, layer_id = name.partition("__")
-            failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
-                                                 "outside the export and packets)"))
 
     failures_path = codex_dir / FAILURES_NAME
     if failures:
