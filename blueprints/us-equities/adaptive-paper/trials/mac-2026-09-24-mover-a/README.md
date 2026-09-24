@@ -88,8 +88,9 @@ loosening it by the rounding bound would let a real one-tick violation pass on l
 
 ## Records and their limits
 
-- `verify_mover_trial.py .` re-checks these artifacts offline: config and scan hashes, flat state, reconciliation,
-  the recover proof, and readback-versus-receipt totals.
+- `verify_mover_trial.py .` re-checks these artifacts offline: config and scan hashes, P&L consistency, and
+  readback-versus-receipt state and totals. It prints the outcome (status, flat, final reconciliation, the recover
+  proof) without judging it.
 - `mover_ledger_readback.py` read the durable ledger read-only. It leaves out broker order ids, the ledger path, the
   account fingerprint and cash balances. The NautilusTrader JSON log and `live/run.json` are not committed, because
   they hold account-scoped identifiers and local paths.
