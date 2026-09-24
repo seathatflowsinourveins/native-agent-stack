@@ -1131,6 +1131,49 @@ class TenthRereviewOf145Tests(AdjudicateFixture):
         self.assertIsNone(record)
 
 
+class EleventhRereviewOf145Tests(AdjudicateFixture):
+    """Round-11 review of #145: Windows host paths are scrubbed, and inputs hashes the bytes it parsed."""
+
+    def test_windows_host_paths_are_scrubbed_and_caught(self):
+        for path in (r"C:\Users\example\private\result.json", r"\Users\example\private.json",
+                     r"\\server\share\x.json", "C:/Users/example/y.json"):
+            text = f"see {path} for details"
+            self.assertEqual(adjudicate.scrub_text(text, str(self.work / "packets")),
+                             "see <outside-path> for details", path)
+            self.assertTrue(adjudicate.unscrubbed_paths([text]), path)
+            self.assertNotIn("Users", adjudicate.redact_leak_text(text))
+        for prose in ("Section C: done", r"a regex \d+ here", "and/or"):
+            self.assertEqual(adjudicate.scrub_text(prose, str(self.work / "packets")), prose)
+
+    def test_inputs_hash_the_lane_return_bytes_they_parsed(self):
+        # The codex return is rewritten right after its first read, as a lane rerun racing `inputs` would.
+        codex_path = self.work / "codex" / f"{NAME}.json"
+        original = codex_path.read_bytes()
+        rewritten = json.dumps(lane_return("codex", "c2", self.sha, limits=["rewritten"])).encode("utf-8")
+        real_read_bytes, real_load_json = Path.read_bytes, adjudicate.load_json
+        state = {"rewritten": False}
+
+        def rewrite_after_first_read(path):
+            if Path(path) == codex_path and not state["rewritten"]:
+                state["rewritten"] = True
+                codex_path.write_bytes(rewritten)
+
+        def read_bytes(path):
+            data = real_read_bytes(path)
+            rewrite_after_first_read(path)
+            return data
+
+        def load_json(path):
+            data = real_load_json(path)
+            rewrite_after_first_read(path)
+            return data
+
+        with mock.patch.object(Path, "read_bytes", read_bytes), mock.patch.object(adjudicate, "load_json", load_json):
+            self.inputs()
+        index = adjudicate.load_index(self.work)
+        self.assertEqual(index["layers"][0]["lane_returns_sha256"]["codex"], hashlib.sha256(original).hexdigest(),
+                         "the hash is of the bytes the inputs were built from")
+
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
 class CodexLeakTests(AdjudicateFixture):
     def setUp(self):

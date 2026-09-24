@@ -18,6 +18,7 @@ import re
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import (
@@ -191,6 +192,9 @@ def write_adjudication(adjudications_dir: Path, catalog: str, layer_id: str, dat
     if "lane_returns_sha256" not in data and all(path.is_file() for path in lanes.values()):
         data = dict(data, lane_returns_sha256={lane: hashlib.sha256(path.read_bytes()).hexdigest()
                                                for lane, path in lanes.items()})
+    if "provenance" not in data:
+        # The evidence tree the judges read: the one both fixture lanes read.
+        data = dict(data, provenance={"repo_tree_sha256": REPO_TREE_SHA256})
     adjudications_dir.mkdir(parents=True, exist_ok=True)
     (adjudications_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
 
@@ -1604,6 +1608,64 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(code, 1, output)
         self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
         self.assertNotEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
+    def test_lanes_or_an_adjudication_on_another_evidence_tree_are_rejected(self):
+        # Codex review of #145: both lanes and the adjudication must have read one evidence tree.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), provenance={"repo_tree_sha256": "8" * 64}))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("the adjudication read evidence tree " + "8" * 64, output)
+
+    def test_lanes_on_different_evidence_trees_are_not_both_sealed(self):
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        data = json.loads(codex_file.read_text(encoding="utf-8"))
+        data["provenance"]["repo_tree_sha256"] = "9" * 64
+        codex_file.write_text(json.dumps(data, indent=1), encoding="utf-8")
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("the codex lane read evidence tree " + "9" * 64, output)
+
+    def test_the_sealed_lane_bytes_are_the_ones_hashed_against_the_adjudication(self):
+        # Codex review of #145: a lane rewritten between validation and the hash check must not pass with an
+        # adjudication of the new bytes while the old return is sealed.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        original = codex_file.read_bytes()
+        rerun = json.loads(original)
+        rerun["why_selected"] = rerun.get("why_selected", "") + " (rerun)"
+        rerun_bytes = json.dumps(rerun, indent=1).encode("utf-8")
+        codex_file.write_bytes(rerun_bytes)
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        codex_file.write_bytes(original)
+        real_read_bytes, real_load_json = Path.read_bytes, record_verdicts.load_json
+        state = {"rewritten": False}
+
+        def rewrite_after_first_read(path):
+            if Path(path) == codex_file and not state["rewritten"]:
+                state["rewritten"] = True
+                codex_file.write_bytes(rerun_bytes)
+
+        def read_bytes(path):
+            data = real_read_bytes(path)
+            rewrite_after_first_read(path)
+            return data
+
+        def load_json(path):
+            data = real_load_json(path)
+            rewrite_after_first_read(path)
+            return data
+
+        with mock.patch.object(Path, "read_bytes", read_bytes), \
+                mock.patch.object(record_verdicts, "load_json", load_json):
+            code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
 
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")

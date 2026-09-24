@@ -988,7 +988,8 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   ```sh
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
-    --agent-file ~/.claude/agents/blind-lane-reviewer.md --resolved-model claude-opus-5-5
+    --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/blind-export \
+    --resolved-model claude-opus-5-5
   ```
 
 **Two-family adjudication is keep-but-compare** (decision
@@ -1587,6 +1588,15 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
     adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
   - Leak records keep input basenames only.
+- **Bindings added in round 11:**
+  - `inputs` reads each packet and lane return once. The parsed object, its sha256 and the packet snapshot
+    all come from those bytes.
+  - `record_verdicts.py` also reads each lane file once, for validation, the `lane_returns_sha256` check and
+    sealing.
+  - A new-wave row needs both lanes' `repo_tree_sha256` equal (otherwise the Codex lane is rejected), and an
+    adjudication whose provenance names another tree is rejected.
+  - Windows host paths (`C:\x`, `C:/x`, `\Users\example\y`, `\\server\share\x`) are scrubbed and caught like
+    POSIX ones.
 - **Audit roots (round 9):** the Codex adjudication audit allows `<work-dir>/adjudication-packets/`.
 - **Leak text (round 9):** a reported leak's text has every path form the input scrubbing removes replaced by
   `<outside-path>`, and is capped at 400 characters, before it is stored in `leaks.json`,

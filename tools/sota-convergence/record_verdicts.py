@@ -268,7 +268,7 @@ def load_packet(packet_path: Path):
         return None
 
 
-def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_key,
+def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_key, raw: bytes = None,
                           packet_sha256sums, packet_filename, grandfathered=True,
                           lane_code=None) -> dict:
     """Full structural + "rules beyond the JSON schema" validation of one
@@ -282,7 +282,8 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     workflow_sha256) a registry entry whose vendored file's current SHA256SUMS entry is that
     hash; a Codex return the current codex_lane.py and lane-prompt.md hashes of this checkout."""
     try:
-        data = load_json(path)
+        # ``raw``: the bytes the caller captured once, so validation, hashing and sealing share one snapshot.
+        data = json.loads(raw) if raw is not None else load_json(path)
     except (OSError, UnicodeError, ValueError) as error:
         raise LaneRejected(f"unreadable or invalid JSON: {error}") from error
 
@@ -727,9 +728,16 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
 
-    valid = {}
+    valid, lane_bytes = {}, {}
     for lane, path in lane_paths.items():
         if not path.is_file():
+            continue
+        try:
+            # One read per lane file (Codex review of #145): validation, the adjudication's
+            # lane_returns_sha256 check and sealing all use these bytes.
+            lane_bytes[lane] = path.read_bytes()
+        except OSError as error:
+            reject_lane(lane, f"unreadable: {error}")
             continue
         try:
             if packet is None:
@@ -738,7 +746,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                 raise LaneRejected(packet_mismatch)
             valid[lane] = validate_lane_return(
                 path, lane=lane, catalog=catalog, layer_id=layer_id, candidates_by_key=candidates_by_key,
-                packet_sha256sums=sha256sums, packet_filename=packet_filename, grandfathered=grandfathered,
+                raw=lane_bytes[lane], packet_sha256sums=sha256sums, packet_filename=packet_filename, grandfathered=grandfathered,
                 lane_code=lane_code)
         except LaneRejected as error:
             reject_lane(lane, str(error))
@@ -746,6 +754,14 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     if not grandfathered and len(valid) == 2 and valid["claude"]["model"]["family"] == valid["codex"]["model"]["family"]:
         # Unreachable while each lane's family is fixed, kept so the two-family rule cannot lapse.
         reject_lane("codex", "the codex lane must come from a different model family than the claude lane")
+        del valid["codex"]
+    if (not grandfathered and len(valid) == 2 and valid["claude"]["provenance"].get("repo_tree_sha256")
+            != valid["codex"]["provenance"].get("repo_tree_sha256")):
+        # Both lanes must have judged one evidence tree (Codex review of #145); the Claude lane is kept and the
+        # layer stays pending until the Codex lane is rerun on the same export.
+        reject_lane("codex", "the codex lane read evidence tree "
+                             f"{valid['codex']['provenance'].get('repo_tree_sha256')}, not the claude lane's "
+                             f"{valid['claude']['provenance'].get('repo_tree_sha256')}; rerun it on the same export")
         del valid["codex"]
 
     if not valid:
@@ -838,11 +854,19 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         if adjudication is not None and not grandfathered:
             # The adjudication must have compared exactly the lane returns sealed here (Codex review of #145):
             # a lane rerun after assemble would otherwise inherit a winner_lane its judges never saw.
-            current = {lane: hashlib.sha256(lane_paths[lane].read_bytes()).hexdigest() for lane in LANES}
+            current = {lane: hashlib.sha256(lane_bytes[lane]).hexdigest() for lane in LANES}
+            lanes_tree = valid["claude"]["provenance"].get("repo_tree_sha256")
+            adjudication_tree = (adjudication["raw"].get("provenance") or {}).get("repo_tree_sha256")
             if adjudication["raw"].get("lane_returns_sha256") != current:
                 rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
                                    "reason": "the adjudication's lane_returns_sha256 does not name the lane "
                                              "returns being sealed; rerun adjudicate inputs and assemble"})
+                adjudication = None
+            elif adjudication_tree != lanes_tree:
+                # The judges must have read the evidence tree both lanes read (Codex review of #145).
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": f"the adjudication read evidence tree {adjudication_tree}, not the "
+                                             f"lanes' {lanes_tree}; adjudicate against the lanes' export"})
                 adjudication = None
         if adjudication is not None:
             try:

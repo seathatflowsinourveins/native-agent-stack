@@ -150,6 +150,10 @@ ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+" + _SEGMENT_START + _PATH_CHA
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
 PARENT_TEXT_PATH = re.compile(_PATH_START + r"\.\.(?:/" + _PATH_CHARS + r"*)?(?![\w])")
+# Windows host paths (Codex review of #145), the forms build_manifest.HOST_PATH_PATTERNS also names: a drive
+# path (C:\Users\example, C:/x) or a rooted backslash path (\Users\example\y, \\server\share\x).
+WINDOWS_TEXT_PATH = re.compile(r"(?<![\w\\])(?:[A-Za-z]:[\\/]|\\{1,2}(?=[^\s\\'\"|;&<>()`,]+\\))"
+                               + _PATH_CHARS + "*")
 OUTSIDE = "<outside-path>"
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
@@ -162,6 +166,7 @@ RESIDUAL_PATTERNS = (
     re.compile(r"\$HOME\b|\$\{HOME\}"),
     re.compile(r"<host-path>"),
     re.compile(r"(?<![\w.])\.\./"),
+    WINDOWS_TEXT_PATH,
 )
 
 
@@ -213,6 +218,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
         core, tail = _split_tail(match.group(0))
         return _outside(core) + tail
 
+    text = WINDOWS_TEXT_PATH.sub(outside, text)
     text = HOST_PLACEHOLDER.sub(outside, text)
     text = HOME_TEXT_PATH.sub(outside, text)
     text = PARENT_TEXT_PATH.sub(outside, text)
@@ -339,16 +345,21 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             index["skipped"].append({"layer": name, "reason": "a lane return is missing: "
                                      + ", ".join(sorted(lane for lane, path in paths.items() if not path.is_file()))})
             continue
-        packet_sha256 = sha256_file(packet_path)
-        returns, reasons = {}, []
+        # Each file is read once (Codex review of #145): the parsed object, its sha256 and the packet snapshot
+        # all come from the same bytes, so a file rewritten while inputs runs cannot split them.
+        returns, reasons, return_sha256 = {}, [], {}
         try:
-            packet = load_json(packet_path)
+            packet_bytes = packet_path.read_bytes()
+            packet = json.loads(packet_bytes)
         except (OSError, ValueError) as error:
             index["skipped"].append({"layer": name, "reason": f"packet unreadable: {error}"})
             continue
+        packet_sha256 = hashlib.sha256(packet_bytes).hexdigest()
         for lane, path in paths.items():
             try:
-                data = load_json(path)
+                raw = path.read_bytes()
+                return_sha256[lane] = hashlib.sha256(raw).hexdigest()
+                data = json.loads(raw)
             except (OSError, ValueError) as error:
                 reasons.append(f"{lane} return does not parse: {error}")
                 continue
@@ -374,12 +385,12 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
         snapshot_packet = work_dir / PACKET_SNAPSHOTS_DIR / packet_sha256 / "packets" / packet_path.name
         if not snapshot_packet.is_file() or sha256_file(snapshot_packet) != packet_sha256:
             snapshot_packet.parent.mkdir(parents=True, exist_ok=True)
-            snapshot_packet.write_bytes(packet_path.read_bytes())
+            snapshot_packet.write_bytes(packet_bytes)
         entry = {"layer": name, "packet_path": str(snapshot_packet), "packet_sha256": packet_sha256,
                  "components": {lane: components_list(components[lane]) for lane in FAMILIES},
                  # The lane return files these inputs were built from (Codex review of #145): assemble and
                  # record_verdicts.py refuse the adjudication for any other returns.
-                 "lane_returns_sha256": {lane: sha256_file(path) for lane, path in paths.items()}}
+                 "lane_returns_sha256": dict(return_sha256)}
         if components["claude"] == components["codex"]:
             entry["agreement"] = "agree"
             index["layers"].append(entry)
@@ -792,7 +803,8 @@ def redact_leak_text(text):
     <outside-path> here too, and the text is bounded."""
     if not isinstance(text, str):
         return text
-    for pattern in (HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH, *RESIDUAL_PATTERNS):
+    for pattern in (WINDOWS_TEXT_PATH, HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH,
+                    *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
     return text[:LEAK_TEXT_LIMIT]
 
