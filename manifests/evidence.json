@@ -3200,8 +3200,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "08cf412e162594ce05e1de224850a81dcdd8e26c6e83c1d8cb6ddbf0c4de6c96",
-      "bytes": 21262
+      "sha256": "6a8bc180930f45402f0e7502e42cba656250c7fa70b0d8b3d3e554faa8981467",
+      "bytes": 21263
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -28191,12 +28191,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "f863ee722a8cdde7340db0166fc9dc9b052875909b0cb11bef69f9a016a43b3a",
-      "bytes": 17480
+      "sha256": "fd2bb74cb0f15f52ef96f241c056b5be010cb66b6a35e53cea7e894c9a8b3052",
+      "bytes": 17670
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "cb039d7b829d2aa37307e1d3f021690c72cc3c5099d08c97dbbebe6fb027568c",
+      "sha256": "c659b36ea75690467e353d73f9b9f44caaa8c9b8832bbfc5b09d0d0e6eb18d7d",
       "bytes": 1129
     },
     {
@@ -28246,8 +28246,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "53e25add00eada875b792ae2179249958ae2d1dc10527c86bf6485ee9bf65251",
-      "bytes": 44508
+      "sha256": "bb9314dc3c24de168149ba795351821957ec03e7afc05574708edb492adc7c29",
+      "bytes": 44501
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -28651,8 +28651,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "900853f08b4ae9629aa3d6d80548c9f338422c07d31a3cb1fe4622898e1f1117",
-      "bytes": 10681
+      "sha256": "d17ddbcdb518d687cc0e46ce0bd9ee58728cdc3adb7c8c2f305cdd94120c5202",
+      "bytes": 25043
     },
     {
       "path": "recipes/tavily.md",
@@ -28701,8 +28701,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "f9b06d2605fe66feae35928fb7d135dd93221f8b07b36a2a4092510d2dd5c4ac",
-      "bytes": 87819
+      "sha256": "617f882a89ad3d789d9b8f5c3d491c3b37676defd4bbe88d4a7e872448ba48b3",
+      "bytes": 103824
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -29106,8 +29106,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "8372146abfc8c87a68092fa937e2dfb62dfbb8d5095c82e78bd5ec98960c0860",
-      "bytes": 17718
+      "sha256": "e57a159819925000baddff8f7ee00f315382287cb3402f8910415a5f2ebb01ad",
+      "bytes": 17923
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -29116,13 +29116,13 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "bbb15581188b795aadd6823374d2bd406a93291454c3147776a4f5a52b1a0fc0",
-      "bytes": 77642
+      "sha256": "3d6f9fd29aa451a0054109b8c0eaabf40d91657eb32a5f95d40bfcd2e7b67d05",
+      "bytes": 86746
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "67bb83708593472f08578e76b06187e406b9f939528ee649d71449277419b173",
-      "bytes": 29814
+      "sha256": "ee85d714bdd00edcc217e20441d0e59a2b3382c0533496428558d75b764c9267",
+      "bytes": 30275
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -29411,8 +29411,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "5f3e431981748d60ac211b946ee42d0ee5bd144699adabfe69d24e1f05a3e936",
-      "bytes": 83474
+      "sha256": "94a15d87aab17b5ecdc8eb0d5aaa0173c02c291a68e1261deb22aa255dbaf583",
+      "bytes": 167815
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -29421,8 +29421,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "c51e7c3d079f6c695b835e62aa79ac6fc1fe7f74a5fbf9a0b86c5fabb359c4b3",
-      "bytes": 26592
+      "sha256": "715c98a3ea23e71768326b19250cac5ce3e3bc1c568f540771ba64e45976a4ee",
+      "bytes": 27482
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

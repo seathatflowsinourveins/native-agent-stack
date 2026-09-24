@@ -206,7 +206,7 @@ GitHub-hosted macOS runner; see
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
      already matches.
-   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+   - **agents**: copies the seven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical.
    - **MCP servers**: for each entry in

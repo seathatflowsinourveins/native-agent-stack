@@ -128,11 +128,13 @@ class SecretGuardProfileTests(unittest.TestCase):
 
 
 class AgentsInstallTests(unittest.TestCase):
-    def test_installs_all_five_agents(self):
+    def test_installs_every_adoption_agent(self):
+        # Seven since 2026-09-23: the blind layer-verdict roles (blind-lane-reviewer, blind-adjudicator) joined.
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
-            self.assertEqual(len(results), 5)
+            self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
+            self.assertEqual(len(results), 7)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))

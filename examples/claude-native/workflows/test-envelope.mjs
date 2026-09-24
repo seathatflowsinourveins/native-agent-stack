@@ -362,7 +362,7 @@ function agentOptionLiterals(src) {
     const ROUTING = {
       [WF.review]: { inventory: ['source-scout', 'sonnet', 'medium'], review: ['evidence-reviewer', 'opus', 'high'], recheck: ['source-scout', 'sonnet', 'medium'] },
       [WF.readiness]: { 'read:': ['source-scout', 'sonnet', 'medium'], verify: [undefined, 'opus', 'high'] },
-      'workflows/layer-verdict-lane.js': { 'propose:': ['semantic-evidence-reviewer', 'opus', 'high'], 'refute:': ['evidence-reviewer', 'opus', 'high'] },
+      'workflows/layer-verdict-lane.js': { 'propose:': ['blind-lane-reviewer', 'opus', 'max'], 'refute:': ['blind-lane-reviewer', 'opus', 'max'] },
     }
     const routes = ROUTING[f] || {}
     const routeOf = (label) => Object.keys(routes).find((k) => String(label).startsWith(k))

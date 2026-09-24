@@ -1,5 +1,5 @@
 You are the {LANE} lane of the layer-verdict convergence. Read the packet at {PACKET_PATH}
-(one catalog layer: requirement, candidates with evidence references, upstream metadata). The repository root is
+(one catalog layer: requirement, candidates with evidence references and registered receipts). The repository root is
 {REPO_ROOT}; every evidence_ref is relative to it. Produce exactly one JSON object matching the given schema and
 nothing else.
 
