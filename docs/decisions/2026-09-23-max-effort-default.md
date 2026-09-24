@@ -10,16 +10,16 @@ instead.
 
 **Scope:**
 
-- the five shipped agent definitions (`adoption/agents/claude/*.md`, kept byte-identical
-  to agent-lab's `.claude/agents/` copies at agent-lab commit `915e73e`, which made the
-  same one-line change there);
+- the shipped agent definitions (`adoption/agents/claude/*.md`; the five installer agents
+  change here, and the two blind lane roles arrived at `max` with #145), all byte-identical
+  to agent-lab's `.claude/agents/` copies at agent-lab `b31f640` (the `max` change is agent-lab
+  #43; `source-scout`'s `maxTurns: 100` is agent-lab #46);
 - a new committed project settings file for this repository (`.claude/settings.json`) and
   the coordinator rule in [`AGENTS.md`](../../AGENTS.md);
 - the portable examples: [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md),
   the agents in `examples/claude-native/agents/`, the saved workflows (`review-changes.js`,
-  `readiness-audit.js` and the vendored `layer-verdict-lane.js`, all byte-identical to
-  agent-lab `915e73e`), the `blind-lane-reviewer` agent that lane now names, and their
-  contract suites;
+  `readiness-audit.js`; the vendored `layer-verdict-lane.js` and its two blind roles are
+  vendored at `max` by #145, not by this change), and their contract suites;
 - the model/effort guidance in
   [`recipes/claude-native-ultracode.md`](../../recipes/claude-native-ultracode.md) and
   [`recipes/claude-native-profile.md`](../../recipes/claude-native-profile.md), and the
@@ -149,10 +149,12 @@ action or of a cloud session was executed for this record.
 
 1. **The main loop stays at Ultracode everywhere** (`xhigh` plus dynamic workflow
    orchestration): the user-scope settings template as it is, and a new committed
-   [`.claude/settings.json`](../../.claude/settings.json) in this repository, byte
-   for byte the [portable example](../../examples/claude-native/ultracode.settings.json)
-   and agent-lab's committed project settings (`enableWorkflows`, `ultracode`, the
+   [`.claude/settings.json`](../../.claude/settings.json) in this repository: the
+   [portable example](../../examples/claude-native/ultracode.settings.json)'s keys, as in
+   agent-lab's committed project settings (`enableWorkflows`, `ultracode`, the
    `unrestricted` size guideline, the concurrency cap of eight and spawn depth one),
+   merged with this repository's existing secret-read `permissions.deny` rules and
+   secret-path guard hook,
    so single-repository cloud sessions on this repository start with it. It adds
    neither `effortLevel` (a `max` there is dropped: Q1, and the schema and docs for a
    project file) nor `CLAUDE_CODE_EFFORT_LEVEL`, which is never set at any value: any
@@ -236,8 +238,7 @@ Revisit this record when any of these happens:
   from that tag gets the `max` definitions after the next release and re-pin, or by
   running `tools/adoption/install_claude_profile.py --only agents` from a default-branch
   clone; the installer replaces any differing catalog-owned agent file.
-- **Vendored pin on an unmerged commit.** agent-lab `915e73e`, the source commit of
-  the vendored lane, the two review scripts and `blind-lane-reviewer`, is on agent-lab
-  branch `claude/max-effort-default-20260923` and not yet merged; after its squash
-  merge, `vendored-lanes.json` should name the merged commit (the bytes, and so the
-  `SHA256SUMS` entries, stay the same).
+- **Vendored lane.** The lane and its two blind roles are vendored at `max` by catalog #145
+  (pinned at agent-lab `e070125`), not by this change; the pre-merge `915e73e` pin on an
+  earlier revision of this branch never reached main. The review and readiness scripts and
+  the `child-usage.mjs` mirror here are byte-identical to agent-lab `b31f640`.

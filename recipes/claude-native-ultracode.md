@@ -130,7 +130,7 @@ the measured constraints and the per-stage rule.
 | Implementation from a clear contract | `isolated-builder` (Sonnet, max, own worktree, named MCP tools behind ToolSearch) | One real task: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864) |
 | Independent review from source and recorded evidence | `evidence-reviewer` (Opus, max; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
 | Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` (Opus, max; Read, Glob and Grep, `typesafe-ai` skill preloaded) | One probe, `wf_20a5e69a-84d`, measured the skill preload (first prompt 15,059 tokens; [convergence record](../docs/harness-rules-convergence-20260922.md)); no quality comparison with another reviewer is recorded. The vendored layer-verdict lane no longer uses it (next row) |
-| Proposing, refuting and re-checking one stripped layer-verdict packet | `blind-lane-reviewer` (Opus, max; Read, Glob and Grep, no preloaded skill, no project instructions) | Every stage of the vendored [layer-verdict lane](../examples/claude-native/workflows/layer-verdict-lane.js) names it (agent-lab `915e73e`, vendored with the lane). A skill it preloaded could be one of the candidates a packet judges, and project instructions can name incumbent selections, so it carries neither; this catalog records no dated run of the lane with it |
+| Proposing, refuting and re-checking one stripped layer-verdict packet | `blind-lane-reviewer` (Opus, max; Read, Glob and Grep, no preloaded skill, no project instructions) | Every stage of the vendored [layer-verdict lane](../examples/claude-native/workflows/layer-verdict-lane.js) names it (agent-lab `e070125`, vendored with the lane). A skill it preloaded could be one of the candidates a packet judges, and project instructions can name incumbent selections, so it carries neither; this catalog records no dated run of the lane with it |
 | Judging or refuting one sealed comparison packet | `blind-judge` (Opus, max; Read only, no project instructions) | Its frontmatter was checked against the agent contract in the [convergence record](../docs/harness-rules-convergence-20260922.md); its body was not reviewed there, and this catalog records no dated run of the role |
 | Cheap exact extraction | Haiku | Not routed: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 9/14 with a quote attributed to a file that does not contain it; overturn only after a repeat trial with no unanchored citation on two distinct packets. Haiku 4.5 takes no effort level, so `max` does not apply to it |
 | Independent cross-family review | Existing official Codex companion | Reuse its separately recorded native acceptance; this trial did not run Codex inside a Workflow graph. Its reasoning effort follows the Codex configuration, not this table |
@@ -166,7 +166,7 @@ second worker and compares both runs in code. Record each run's children with
 `node .claude/workflows/child-usage.mjs --latest`.
 Since 2026-09-23 the examples' agents and stages bind effort `max` with their
 task-matched models unchanged (the review, readiness and layer-verdict scripts
-are byte-identical to agent-lab commit `915e73e`), as do the shipped
+are byte-identical to agent-lab `b31f640`; the max change is agent-lab #43), as do the shipped
 [`adoption/agents/claude/`](../adoption/agents/claude/) definitions. Their
 contract suite now fails a stage or agent at any other effort, a `MODEL` record
 that differs from the stages it describes, a routing table that restates an
@@ -288,8 +288,7 @@ rule, auto or bypass permission mode, or a hook that allows the call
 ([workflows](https://code.claude.com/docs/en/workflows#approve-the-plan-before-it-runs),
 fetched 2026-09-23). Such a job fails at a usage limit instead of waiting. This
 repository's committed [`.claude/settings.json`](../.claude/settings.json) is
-byte-identical to the linked settings example file (the inline JSON above
-omits its `$schema` line). Per the official
+the settings example's keys (`enableWorkflows`, `ultracode`, `workflowSizeGuideline` and the two env values) merged with this repository's secret-read `permissions.deny` rules and secret-path guard hook. Per the official
 [cloud-session settings](https://code.claude.com/docs/en/settings#settings-in-cloud-sessions)
 docs, a cloud session on this one repository reads it, while a session with
 several repositories reads only its `enabledPlugins` and

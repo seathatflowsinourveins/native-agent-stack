@@ -7,7 +7,8 @@ qualification, with one later change: since 2026-09-23 every stage and agent
 binds effort `max`, models unchanged
 ([decision](../../../docs/decisions/2026-09-23-max-effort-default.md)).
 `review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are
-byte-identical to agent-lab commit `915e73e`, which made that change there. The
+byte-identical to agent-lab `b31f640` (the `max` change is agent-lab #43; the lane is
+pinned at agent-lab `e070125` in `vendored-lanes.json`). The
 qualification ran at the earlier efforts (Sonnet/medium, Opus/high); no native
 run at `max` is recorded yet. These are local integration assets, not upstream
 tests. The separate `semantic-evidence-reviewer` example received a later
@@ -74,7 +75,7 @@ more definitions ship here. `semantic-evidence-reviewer` (Opus, max; Read, Glob,
 Grep; the `typesafe-ai` skill) is project-local to agent-lab and published
 separately. `blind-lane-reviewer` (Opus, max; Read, Glob and Grep; no preloaded
 skill and no project instructions) is the agent every `layer-verdict-lane` stage
-names, vendored byte-identical from agent-lab commit `915e73e` and pinned in
+names, vendored byte-identical from agent-lab `e070125` and pinned in
 `vendored-lanes.json`. The contract suite covers every file in `agents/`.
 
 ## Workflows
@@ -195,6 +196,7 @@ Effort column since 2026-09-23: every child role runs at `max` with its task-mat
 | Independent review from source and recorded evidence | `evidence-reviewer` | Opus, max | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
 | Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` | Opus, max | Read, Glob, Grep and the `typesafe-ai` skill preloaded (first prompt 15,059 in the 2026-09-22 probe); no MCP grants, Bash or writes |
 | Layer-verdict lane stages: propose, refute and re-check one stripped packet from its repository root | `blind-lane-reviewer` | Opus, max | Read, Glob and Grep; no preloaded skill and no project instructions (`omitClaudeMd`); used by `layer-verdict-lane` |
+| Layer-verdict adjudication: judge, or refute a judgment on, one anonymous two-return disagreement input | `blind-adjudicator` | Opus, max | Read, Glob and Grep; no preloaded skill and no project instructions (`omitClaudeMd`); used by the catalog's adjudication lane |
 | Verification that must re-run commands | default workflow subagent | Opus, max | full tools; pays the 42k prompt deliberately |
 | Web or documentation research | default workflow subagent | Sonnet, max | Context Mode `ctx_fetch_and_index` then `ctx_search` (observed: 1 fetch, 5 searches, 8 requests) |
 | Cross-family review | `/codex:review` lanes | Codex | see `recipes/claude-codex-cooperation-lanes.md`; usage is not in the Claude journal |

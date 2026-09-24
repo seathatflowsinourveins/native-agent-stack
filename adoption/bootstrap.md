@@ -228,13 +228,16 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
-   The agent definitions in `adoption/agents/claude/` changed after `v2026.09.23.1`:
-   at that tag they declare `effort: medium` (`source-scout`,
-   `isolated-builder`) or `effort: high` (`evidence-reviewer`,
-   `semantic-evidence-reviewer`, `blind-judge`) instead of `effort: max`
-   ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The
-   installer replaces a differing agent file, so rerunning its agents step
-   from a checkout that has the change installs the `max` definitions.
+   The agent definitions in `adoption/agents/claude/` changed after `v2026.09.24.1`:
+   at that tag `source-scout` and `isolated-builder` declare `effort: medium`
+   (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,
+   `semantic-evidence-reviewer` and `blind-judge` declare `effort: high`, and the
+   two blind lane roles are absent; here all seven declare `effort: max`
+   ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The guard
+   hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
+   `SHA256SUMS` gained the secret-path guard entry). The installer replaces a
+   differing agent file, so rerunning its agents step from a checkout that has
+   the change installs the `max` definitions.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude
