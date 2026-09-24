@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--rtk--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "6f7a77c65c6d905244152be42b0ba5acccf25abe",
+  "recorded_by": {
+    "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "rtk --version",
+      "exit": 0,
+      "duration_s": 0.006,
+      "output_sha256": "edaa9940d1075ff9ed8f007410d63b7d9de8fd70f7450b29c9566a01288b1c77",
+      "output_excerpt": "rtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk git status",
+      "exit": 0,
+      "duration_s": 0.062,
+      "output_sha256": "570ae6bac7b5a722a73ff456dcc0e99c0c851e554107adeb993ae26e72748322",
+      "output_excerpt": "* evidence/macos-m5pro-20260924-foundation...origin/main\n M adoption/hardware-profiles.json\n M manifests/evidence.json\n?? evidence/artifacts/hw-profiles/\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-24T14:20:45Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), rtk 0.49.0 (the catalog pin) reported its version, then ran as a CLI proxy: rtk git status in a scratch clone of this repository's main branch returned the compacted branch and working-tree status (both commands exit 0). rtk, worktrunk and gitleaks on this host are installed and version-pinned by the host's own control plane, outside this repository.",
+  "limitations": [
+    "CLI-only use: rtk is not wired into Claude Code hooks on this host, so this receipt does not cover hook-based command rewriting, client attribution or token savings, and no rtk gain report was read.",
+    "One read-only git status in a scratch clone; other rtk filters and a size comparison against raw git output were not exercised.",
+    "Recorded outside Claude Code's Seatbelt sandbox, in a scratch clone of the default branch (adoption/update.md), not in the host's pinned install checkout. adoption/manifest.json keeps macos-arm64 at drafted_not_accepted: this receipt changes no platform_status and counts toward one only after an independent host_receipts.py review by a different session."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T14:20:45Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

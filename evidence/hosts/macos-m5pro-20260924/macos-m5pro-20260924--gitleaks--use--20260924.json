@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--gitleaks--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "6f7a77c65c6d905244152be42b0ba5acccf25abe",
+  "recorded_by": {
+    "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "gitleaks",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "gitleaks version",
+      "exit": 0,
+      "duration_s": 0.117,
+      "output_sha256": "c9fd9ccb6682c54b5fcb0363757b6c6873564e7c067f70b3b5581b611528b9f4",
+      "output_excerpt": "8.30.1\n"
+    },
+    {
+      "cmd": "gitleaks git --no-banner --redact --log-opts=-1",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_sha256": "1290385fa4cb044dda22ecc3ae5a23053378d5f525c3ef413f76ab34ca0c4bbf",
+      "output_excerpt": "\u001b[90m10:20AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1m1 commits scanned.\u001b[0m\n\u001b[90m10:20AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~3626 bytes (3.63 KB) in 82.4ms\u001b[0m\n\u001b[90m10:20AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mno leaks found\u001b[0m\n"
+    }
+  ],
+  "tool_versions": {
+    "gitleaks": "8.30.1"
+  },
+  "observed_at_utc": "2026-09-24T14:20:45Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), gitleaks 8.30.1 (the catalog pin) reported its version, then scanned the latest commit of a scratch clone of this repository's main branch in redacted mode and found no leaks (both commands exit 0). rtk, worktrunk and gitleaks on this host are installed and version-pinned by the host's own control plane, outside this repository.",
+  "limitations": [
+    "One commit was scanned (--log-opts=-1, the recorded catalog_revision). This is not a full-history or working-tree scan, and a clean result does not prove that no secret exists.",
+    "gitleaks loaded the repository's .gitleaks.toml (extending its default rules), as a separate --log-level debug run showed; that run is not part of this receipt. The host's control plane also runs gitleaks on staged changes before each commit; this receipt does not cover that hook.",
+    "Recorded outside Claude Code's Seatbelt sandbox, in a scratch clone of the default branch (adoption/update.md), not in the host's pinned install checkout. adoption/manifest.json keeps macos-arm64 at drafted_not_accepted: this receipt changes no platform_status and counts toward one only after an independent host_receipts.py review by a different session."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T14:20:45Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
