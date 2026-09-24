@@ -648,7 +648,7 @@
               "bootstrap_version": null
             },
             "macos-arm64": {
-              "e2e_state": "untested",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             }
@@ -671,7 +671,7 @@
               "bootstrap_version": null
             },
             "macos-arm64": {
-              "e2e_state": "untested",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             }
@@ -694,7 +694,7 @@
               "bootstrap_version": null
             },
             "macos-arm64": {
-              "e2e_state": "untested",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             }
@@ -1105,7 +1105,7 @@
               "bootstrap_version": null
             },
             "macos-arm64": {
-              "e2e_state": "untested",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             }
@@ -2334,7 +2334,7 @@
     },
     "needs_host": {
       "linux-wsl2-x86_64": 33,
-      "macos-arm64": 60
+      "macos-arm64": 56
     }
   }
 }

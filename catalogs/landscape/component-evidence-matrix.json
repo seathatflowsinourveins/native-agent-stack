@@ -814,7 +814,7 @@
       "alternatives": [
         {
           "disposition": "overlap",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "React",
           "repository": "https://github.com/react/react"
@@ -921,14 +921,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T16:38:24Z",
                 "pass": 1
               },
@@ -981,14 +981,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T16:38:25Z",
                 "pass": 1
               },
@@ -1041,14 +1041,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T16:38:24Z",
                 "pass": 1
               },
@@ -1984,14 +1984,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T16:38:30Z",
                 "pass": 1
               },
@@ -2798,7 +2798,7 @@
       "alternatives": [
         {
           "disposition": "overlap",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "local_integration",
           "name": "Playwright CLI",
           "repository": "https://github.com/microsoft/playwright-cli"
@@ -4998,24 +4998,6 @@
         },
         {
           "catalog": "foundation",
-          "component_id": "fastapi",
-          "e2e_state": "untested",
-          "layer_id": "hosting-services"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "nextjs",
-          "e2e_state": "untested",
-          "layer_id": "hosting-services"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "postgresql",
-          "e2e_state": "untested",
-          "layer_id": "hosting-services"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "affaan-m/ECC",
           "e2e_state": "untested",
           "layer_id": "instructions-skills"
@@ -5079,12 +5061,6 @@
           "component_id": "prometheus",
           "e2e_state": "untested",
           "layer_id": "observation-inference"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "playwright-test",
-          "e2e_state": "untested",
-          "layer_id": "quality-evaluation"
         },
         {
           "catalog": "foundation",
