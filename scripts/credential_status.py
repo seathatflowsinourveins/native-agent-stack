@@ -226,8 +226,12 @@ def hooks_path(root: Path) -> str | None:
 
 TELEMETRY_CONTENT_FLAGS = ("OTEL_LOG_TOOL_CONTENT", "OTEL_LOG_TOOL_DETAILS", "OTEL_LOG_USER_PROMPTS",
                            "OTEL_LOG_ASSISTANT_RESPONSES", "OTEL_LOG_RAW_API_BODIES")
+TELEMETRY_ENABLE_FLAG = "CLAUDE_CODE_ENABLE_TELEMETRY"
 FALSY = {"", "0", "false", "no", "off"}
-SECRET_GUARD_HOOK = "secret_path_guard.py"
+GUARD_HOOK_FILE = "secret_path_guard.py"
+CLIENT_GUARD_KEYS = ("claude_user_deny_rules", "claude_user_secret_guard_hook", "claude_sandbox_enabled",
+                     "claude_telemetry_logs_content", "claude_telemetry_content_flags",
+                     "codex_shell_environment_inherit_none")
 
 
 def truthy(value) -> bool:
@@ -239,28 +243,78 @@ def truthy(value) -> bool:
     return isinstance(value, str) and value.strip().lower() not in FALSY
 
 
+def enabled_names(settings_env) -> tuple[frozenset[str], frozenset[str]]:
+    """Key names only: (names present, names whose entry is truthy).
+
+    Each entry is reduced to its key and one boolean here; no entry value leaves
+    this function, so everything downstream of it works on key names alone."""
+    if not isinstance(settings_env, dict):
+        return frozenset(), frozenset()
+    present = frozenset(name for name in settings_env if isinstance(name, str))
+    enabled = frozenset(name for name in present if truthy(settings_env[name]))
+    return present, enabled
+
+
 def telemetry_content_logging(settings_env) -> dict:
     """Booleans for Claude Code's OpenTelemetry content flags in settings `env`.
 
     Only key names and truthiness are used. OTEL_LOG_ASSISTANT_RESPONSES falls back
     to OTEL_LOG_USER_PROMPTS when unset (Claude Code monitoring docs)."""
-    env = settings_env if isinstance(settings_env, dict) else {}
-    flags = {name: truthy(env.get(name)) for name in TELEMETRY_CONTENT_FLAGS}
-    if "OTEL_LOG_ASSISTANT_RESPONSES" not in env:
+    present, enabled = enabled_names(settings_env)
+    flags = {name: name in enabled for name in TELEMETRY_CONTENT_FLAGS}
+    if "OTEL_LOG_ASSISTANT_RESPONSES" not in present:
         flags["OTEL_LOG_ASSISTANT_RESPONSES"] = flags["OTEL_LOG_USER_PROMPTS"]
-    enabled = truthy(env.get("CLAUDE_CODE_ENABLE_TELEMETRY"))
-    return {"telemetry_enabled": enabled, "flags": flags,
-            "logs_content": enabled and any(flags.values())}
+    telemetry_on = TELEMETRY_ENABLE_FLAG in enabled
+    return {"telemetry_enabled": telemetry_on, "flags": flags,
+            "logs_content": telemetry_on and any(flags.values())}
 
 
-def user_secret_guard_hook(settings, claude_dir: Path) -> bool:
-    """A user PreToolUse hook runs the secret guard and the guard file exists (lstat only)."""
+def guard_hook_installed(settings, claude_dir: Path) -> bool:
+    """A user PreToolUse hook runs the path guard and the guard file exists (lstat only)."""
     groups = settings.get("hooks", {}).get("PreToolUse", [])
     registered = any(
-        isinstance(hook, dict) and SECRET_GUARD_HOOK in str(hook.get("command", ""))
+        isinstance(hook, dict) and GUARD_HOOK_FILE in str(hook.get("command", ""))
         for group in groups if isinstance(group, dict)
         for hook in (group.get("hooks") if isinstance(group.get("hooks"), list) else []))
-    return registered and os.path.lexists(claude_dir / "hooks" / SECRET_GUARD_HOOK)
+    return registered and os.path.lexists(claude_dir / "hooks" / GUARD_HOOK_FILE)
+
+
+def claude_guard_booleans(claude_dir: Path) -> dict | None:
+    """Booleans derived from the user Claude settings, or None when unreadable.
+
+    The parsed settings stay local to this function; only booleans are returned."""
+    try:
+        settings = json.loads((claude_dir / "settings.json").read_text(encoding="utf-8"))
+        deny = settings.get("permissions", {}).get("deny", [])
+        telemetry = telemetry_content_logging(settings.get("env"))
+        return {
+            "claude_user_deny_rules": any(isinstance(rule, str) and "native-agent-stack" in rule
+                                          for rule in deny),
+            "claude_user_secret_guard_hook": guard_hook_installed(settings, claude_dir),
+            "claude_sandbox_enabled": bool(settings.get("sandbox", {}).get("enabled")),
+            "claude_telemetry_logs_content": telemetry["logs_content"],
+            "claude_telemetry_content_flags": telemetry["flags"],
+        }
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
+def codex_inherit_none(codex_dir: Path) -> bool | None:
+    """Whether Codex shell_environment_policy.inherit is "none"; None when unreadable."""
+    try:
+        import tomllib
+        config = tomllib.loads((codex_dir / "config.toml").read_text(encoding="utf-8"))
+        # Only inherit = "none" is guarded: the repository's codex-cli 0.155.1 canary
+        # measurement (gap-wave2 security-supply-chain receipt) removed every broker
+        # variable only with "none"; "core" is unmeasured and exclude lists leaked names.
+        return config.get("shell_environment_policy", {}).get("inherit") == "none"
+    except (ImportError, OSError, ValueError, AttributeError):
+        return None
+
+
+def only_booleans(value) -> bool:
+    return value is None or isinstance(value, bool) or (
+        isinstance(value, dict) and all(isinstance(k, str) and only_booleans(v) for k, v in value.items()))
 
 
 def client_guards(env) -> dict:
@@ -268,32 +322,11 @@ def client_guards(env) -> dict:
     home = env.get("HOME") or str(Path.home())
     claude_dir = Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude")
     codex_dir = Path(env.get("CODEX_HOME") or f"{home}/.codex")
-    result = {"claude_user_deny_rules": None, "claude_user_secret_guard_hook": None,
-              "claude_sandbox_enabled": None, "claude_telemetry_logs_content": None,
-              "claude_telemetry_content_flags": None,
-              "codex_shell_environment_inherit_none": None}
-    try:
-        settings = json.loads((claude_dir / "settings.json").read_text(encoding="utf-8"))
-        deny = settings.get("permissions", {}).get("deny", [])
-        result["claude_user_deny_rules"] = any(
-            isinstance(rule, str) and "native-agent-stack" in rule for rule in deny)
-        result["claude_user_secret_guard_hook"] = user_secret_guard_hook(settings, claude_dir)
-        result["claude_sandbox_enabled"] = bool(settings.get("sandbox", {}).get("enabled"))
-        telemetry = telemetry_content_logging(settings.get("env"))
-        result["claude_telemetry_logs_content"] = telemetry["logs_content"]
-        result["claude_telemetry_content_flags"] = telemetry["flags"]
-    except (OSError, ValueError, AttributeError):
-        pass
-    try:
-        import tomllib
-        config = tomllib.loads((codex_dir / "config.toml").read_text(encoding="utf-8"))
-        policy = config.get("shell_environment_policy", {})
-        # Only inherit = "none" is guarded: the repository's codex-cli 0.155.1 canary
-        # measurement (gap-wave2 security-supply-chain receipt) removed every broker
-        # variable only with "none"; "core" is unmeasured and exclude lists leaked names.
-        result["codex_shell_environment_inherit_none"] = policy.get("inherit") == "none"
-    except (ImportError, OSError, ValueError, AttributeError):
-        pass
+    result = dict.fromkeys(CLIENT_GUARD_KEYS)
+    result.update(claude_guard_booleans(claude_dir) or {})
+    result["codex_shell_environment_inherit_none"] = codex_inherit_none(codex_dir)
+    if set(result) != set(CLIENT_GUARD_KEYS) or not only_booleans(result):
+        raise AssertionError("client guards must be the fixed keys with boolean values")
     return result
 
 

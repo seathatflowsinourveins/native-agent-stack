@@ -9,7 +9,6 @@ import copy
 import json
 import os
 from pathlib import Path
-import secrets
 import subprocess
 import sys
 import tempfile
@@ -38,14 +37,15 @@ class CredentialStatusTests(unittest.TestCase):
         self.store.mkdir(parents=True)
         self.store.chmod(0o700)
         self.inventory = json.loads((ROOT / cs.INVENTORY).read_text())
-        self.key = "SENTINELKEY" + secrets.token_hex(12)
-        self.secret = "SENTINELSECRET" + secrets.token_hex(12)
+        # Fake sentinels generated per test; the checker must never echo them.
+        self.fake_a = "SENTINELA" + os.urandom(12).hex()
+        self.fake_b = "SENTINELB" + os.urandom(12).hex()
         self.env = {"HOME": str(self.home), "XDG_CONFIG_HOME": str(self.config)}
 
     def write_alpaca(self, mode=0o600):
         path = self.store / "alpaca-paper.env"
         path.unlink(missing_ok=True)
-        path.write_text(f"export APCA_API_KEY_ID={self.key}\nexport APCA_API_SECRET_KEY={self.secret}\n")
+        path.write_text(f"export APCA_API_KEY_ID={self.fake_a}\nexport APCA_API_SECRET_KEY={self.fake_b}\n")
         path.chmod(mode)
         return path
 
@@ -57,8 +57,8 @@ class CredentialStatusTests(unittest.TestCase):
 
     def assert_no_values(self, *texts):
         for text in texts:
-            self.assertNotIn(self.key, text)
-            self.assertNotIn(self.secret, text)
+            self.assertNotIn(self.fake_a, text)
+            self.assertNotIn(self.fake_b, text)
             self.assertNotIn(str(self.home), text)
 
     def run_cli(self, *args):
@@ -126,7 +126,7 @@ class CredentialStatusTests(unittest.TestCase):
 
     def test_symlink_is_refused_not_followed(self):
         target = self.home / "elsewhere.env"
-        target.write_text(f"export APCA_API_KEY_ID={self.key}\n")
+        target.write_text(f"export APCA_API_KEY_ID={self.fake_a}\n")
         target.chmod(0o600)
         (self.store / "alpaca-paper.env").symlink_to(target)
         entry = self.entry(self.report())
@@ -157,12 +157,12 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertIn("older_than_90_days", entry["warnings"])
 
     def test_exported_names_reported_without_values(self):
-        env = {**self.env, "APCA_API_KEY_ID": self.key, "GH_TOKEN": self.secret}
+        env = {**self.env, "APCA_API_KEY_ID": self.fake_a, "GH_TOKEN": self.fake_b}
         report = self.report(env)
         self.assertEqual(self.entry(report)["variables_in_environment"], ["APCA_API_KEY_ID"])
         self.assertEqual(report["environment"]["must_not_be_set_present"], ["GH_TOKEN"])
         self.assert_no_values(json.dumps(report), cs.render_text(report))
-        cli_env = {"APCA_API_KEY_ID": self.key, "GH_TOKEN": self.secret}
+        cli_env = {"APCA_API_KEY_ID": self.fake_a, "GH_TOKEN": self.fake_b}
         with patch.dict(self.env, cli_env):
             result = self.run_cli("--json")
         self.assertIn("GH_TOKEN", result.stdout)
@@ -194,8 +194,8 @@ class CredentialStatusTests(unittest.TestCase):
             "permissions": {"deny": ["Read(~/.config/native-agent-stack/**)"]},
             "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
                 {"type": "command", "command": "python3 /h/.claude/hooks/secret_path_guard.py"}]}]},
-            "env": {"SOME_TOKEN": self.secret, "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
-                    "OTEL_LOG_TOOL_CONTENT": "1", "OTEL_LOG_RAW_API_BODIES": f"file:/tmp/{self.secret}",
+            "env": {"SOME_PROVIDER_VALUE": self.fake_b, "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                    "OTEL_LOG_TOOL_CONTENT": "1", "OTEL_LOG_RAW_API_BODIES": f"file:/tmp/{self.fake_b}",
                     "OTEL_LOG_USER_PROMPTS": "false"}}))
         codex = self.home / ".codex"
         codex.mkdir()
@@ -214,6 +214,40 @@ class CredentialStatusTests(unittest.TestCase):
         self.assert_no_values(json.dumps(report))
         self.assert_no_values(cs.render_text(report))
         self.assertIn("claude telemetry logs content: true", cs.render_text(report))
+
+    def write_client_settings(self):
+        claude = self.home / ".claude"
+        (claude / "hooks").mkdir(parents=True)
+        (claude / "hooks" / "secret_path_guard.py").write_text("# stand-in\n")
+        (claude / "settings.json").write_text(json.dumps({
+            "permissions": {"deny": ["Read(~/.config/native-agent-stack/**)"]},
+            "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [
+                {"type": "command", "command": "python3 /h/.claude/hooks/secret_path_guard.py"}]}]},
+            "env": {"SOME_PROVIDER_VALUE": self.fake_a, "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                    "OTEL_LOG_TOOL_CONTENT": "1", "OTEL_LOG_RAW_API_BODIES": f"file:/tmp/{self.fake_b}"}}))
+        codex = self.home / ".codex"
+        codex.mkdir()
+        (codex / "config.toml").write_text(f'[shell_environment_policy]\ninherit = "none"\n# {self.fake_b}\n')
+
+    def test_cli_output_never_contains_values_in_any_mode(self):
+        self.write_alpaca()
+        self.write_client_settings()
+        exported = {"APCA_API_KEY_ID": self.fake_a, "GH_TOKEN": self.fake_b}
+        for args in ((), ("--json",), ("--client-guards",), ("--json", "--client-guards")):
+            with self.subTest(args=args), patch.dict(self.env, exported):
+                result = self.run_cli(*args)  # run_cli asserts both fake values are absent
+                self.assertIn(result.returncode, (0, 1), result.stderr)
+                if "--json" in args:
+                    report = json.loads(result.stdout)
+                    if "--client-guards" in args:
+                        self.assertTrue(cs.only_booleans(report["client_guards"]))
+                        self.assertTrue(report["client_guards"]["claude_telemetry_logs_content"])
+
+    def test_settings_env_is_reduced_to_key_names(self):
+        present, enabled = cs.enabled_names({"SOME_PROVIDER_VALUE": self.fake_a, "OFF": "0", 3: "x"})
+        self.assertEqual(present, {"SOME_PROVIDER_VALUE", "OFF"})
+        self.assertEqual(enabled, {"SOME_PROVIDER_VALUE"})
+        self.assertEqual(cs.enabled_names("not a dict"), (frozenset(), frozenset()))
 
     def test_telemetry_flags_need_telemetry_enabled_and_follow_documented_fallback(self):
         off = cs.telemetry_content_logging({"OTEL_LOG_TOOL_CONTENT": "1"})

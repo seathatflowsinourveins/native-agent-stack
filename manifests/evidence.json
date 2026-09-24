@@ -28473,8 +28473,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "3820d02b868e0385a7eb6a47e0d35833420136505e6807c25861119014630fde",
-      "bytes": 18120
+      "sha256": "01ffa476af31539c444bbf393c2e1d37befc018e765c07f3b62a291a6376e37a",
+      "bytes": 19607
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -28788,8 +28788,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "50b8d5771eccbbaf77204dd10ed065023ba9a96f69562ffd8f584da07f82c11c",
-      "bytes": 12707
+      "sha256": "558dfbd4897fdccf21298d54e669b7a85ee41a3c2754f39b702e16ce70033d4d",
+      "bytes": 14902
     },
     {
       "path": "tests/test_delisting_coverage.py",
