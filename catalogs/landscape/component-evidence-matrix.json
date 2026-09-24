@@ -814,7 +814,7 @@
       "alternatives": [
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "React",
           "repository": "https://github.com/react/react"
@@ -921,16 +921,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.141.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T16:38:24Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -981,16 +981,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '16.3.5'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T16:38:25Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -1041,16 +1041,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '18.6'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T16:38:24Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -1984,16 +1984,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '1.63.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T16:38:30Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2798,7 +2798,7 @@
       "alternatives": [
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
           "name": "Playwright CLI",
           "repository": "https://github.com/microsoft/playwright-cli"

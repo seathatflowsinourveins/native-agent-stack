@@ -9296,8 +9296,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "ab6e87803b74ffd3d4f027e6c2436a1c02a3eaa18b33442ec482499263a198a8",
-      "bytes": 180203
+      "sha256": "f31f88cda9489155e372383ef30f3556e81df428e2556ef08d2503eb49e278ae",
+      "bytes": 180396
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9786,7 +9786,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "687cd2f40ea575b892848d1e25d4b5ab70e0bdf8142ecd981ef75b5da6935114",
+      "sha256": "ff8dc0bc2c0e856c77f13b622f0363246c82862cb6995c7d8b062d1c72d781ea",
       "bytes": 18246
     },
     {
