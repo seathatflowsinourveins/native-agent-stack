@@ -31,6 +31,26 @@ import rate_governor as g  # noqa: E402
 import rate_limit_evidence as evidence  # noqa: E402
 
 UUID_TEXT = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
+# Every signal the CLI routes to the stop-and-cleanup path (those this platform has).
+STOP_SIGNALS = tuple(getattr(signal, name) for name in ("SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT")
+                     if hasattr(signal, name))
+
+
+@contextlib.contextmanager
+def restored_signal_handlers():
+    """Restore every stop signal's handler afterwards. SIGHUP and SIGQUIT first get a
+    recording sentinel, so a signal the code under test failed to route is recorded
+    instead of terminating the test process."""
+    saved = {sig: signal.getsignal(sig) for sig in STOP_SIGNALS}
+    unrouted = []
+    try:
+        for sig in STOP_SIGNALS:
+            if sig not in (signal.SIGINT, signal.SIGTERM):
+                signal.signal(sig, lambda signum, _frame: unrouted.append(signum))
+        yield unrouted
+    finally:
+        for sig, handler in saved.items():
+            signal.signal(sig, handler)
 
 
 class Clock:
@@ -240,13 +260,8 @@ class CapacityRunTests(unittest.TestCase):
                            "APCA_API_BASE_URL=https://api.alpaca.markets\n")
             os.chmod(env, 0o600)
             out = Path(private) / "receipt.json"
-            handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
-            try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    code = c.main(["paper", "--env-file", str(env), "--output", str(out)])
-            finally:
-                for sig, handler in handlers.items():
-                    signal.signal(sig, handler)
+            with restored_signal_handlers(), contextlib.redirect_stdout(io.StringIO()):
+                code = c.main(["paper", "--env-file", str(env), "--output", str(out)])
             receipt = json.loads(out.read_text())
         self.assertEqual(code, 2)
         self.assertEqual(receipt["refusal_reason"], "non_paper_base_url")
@@ -613,6 +628,27 @@ class NativePortLogicTests(unittest.TestCase):
         port._connection("orders", False)
         self.assertEqual(port.stream_health(), {"ready": False, "reasons": ["orders_disconnected"]})
 
+    def test_positions_read_raises_on_an_error_status(self):
+        """The native port raises on a 429 or 5xx positions read (there is no retry), so the
+        live periodic position check fails closed."""
+        class Client:
+            def __init__(self, status):
+                self.owner, self.status = None, status
+
+            def get_all_positions(self):
+                self.owner._observe({"kind": "read", "status": self.status, "headers": {"retry-after": "1"}})
+                error = RuntimeError("provider text never retained")
+                error.status_code = self.status
+                raise error
+
+        for status in (429, 503):
+            with self.subTest(status=status):
+                client = Client(status)
+                port, native = self.port(client)
+                client.owner = port
+                with self.assertRaises(native.transport.TransportError):
+                    port.positions()
+
 
 class LaggedFuture(c.Future):
     """Resolved at dispatch (the broker saw the call then), but reported done only once
@@ -955,13 +991,8 @@ class ReviewFixTests(unittest.TestCase):
                          ["paper", "--env-file", "<path>", "--output=<path>", "--cap", "1000"])
         with tempfile.TemporaryDirectory(dir="/tmp") as private:
             out = Path(private) / "receipt.json"
-            handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
-            try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    code = c.main(["offline", "--output", str(out), "--duration", "70", "--required-windows", "1"])
-            finally:
-                for sig, handler in handlers.items():
-                    signal.signal(sig, handler)
+            with restored_signal_handlers(), contextlib.redirect_stdout(io.StringIO()):
+                code = c.main(["offline", "--output", str(out), "--duration", "70", "--required-windows", "1"])
             saved = json.loads(out.read_text())
         self.assertEqual(saved["provenance"]["exit_code"], code)
         self.assertEqual(saved["provenance"]["argv"][:3], ["offline", "--output", "<path>"])
@@ -1292,7 +1323,7 @@ class LiveCapacityTests(unittest.TestCase):
         os.chmod(path, mode)
         return path
 
-    def live(self, *, go=None, broker=None, clock=None, env=None, **config):
+    def harness(self, *, go=None, broker=None, clock=None, env=None, journal=None, **config):
         clock = clock or fx.FakeClock()
         broker = broker or LiveFakeBroker(clock)
         broker.clock = clock
@@ -1301,7 +1332,12 @@ class LiveCapacityTests(unittest.TestCase):
         harness = c.LiveCapacityRun(broker, cfg, clock=clock, executor=c.InlineExecutor(),
                                     stop_file=self.root / "STOP",
                                     live_stop_file=self.root / "alpaca-live" / "STOP",
-                                    go_file=go or self.go(at=clock.time()), env_file=env or self.env)
+                                    go_file=go or self.go(at=clock.time()), env_file=env or self.env,
+                                    journal_path=journal)
+        return harness, broker
+
+    def live(self, **kwargs):
+        harness, broker = self.harness(**kwargs)
         return harness.run(), harness, broker
 
     def assert_refused_before_any_request(self, receipt, broker, reason):
@@ -1625,7 +1661,7 @@ class LiveCapacityTests(unittest.TestCase):
         self.assertEqual(held, [{"symbol": "SPY", "qty": "1"}])  # the fill is left for the user
         live = receipt["live"]
         self.assertEqual(live["fills"], [{
-            "seq": 3,
+            "kind": "probe_fill", "seq": 3, "symbol": "SPY",
             "stream": {"filled_qty": "1", "filled_avg_price": "475.00", "event": "fill"},
             "broker": {"filled_qty": "1", "filled_avg_price": "475.00", "status": "filled"}}])
         self.assertEqual((live["filled_qty_total"], live["auto_sell"]), ("1", False))
@@ -1772,17 +1808,14 @@ class LiveCapacityTests(unittest.TestCase):
     def cli(self, argv):
         """c.main with every credential read and native port construction forbidden."""
         out = self.root / ("receipt-%d.json" % len(list(self.root.glob("receipt-*.json"))))
-        handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
         forbidden = AssertionError("must not be reached")
-        try:
-            with mock.patch("runner.credentials", side_effect=forbidden), \
-                    mock.patch("alpaca_capacity_port.AlpacaCapacityPort", side_effect=forbidden), \
-                    mock.patch("alpaca_capacity_port.AlpacaLiveCapacityPort", side_effect=forbidden), \
-                    contextlib.redirect_stdout(io.StringIO()):
-                code = c.main(list(argv) + ["--output", str(out)])
-        finally:
-            for sig, handler in handlers.items():
-                signal.signal(sig, handler)
+        with restored_signal_handlers() as unrouted, \
+                mock.patch("runner.credentials", side_effect=forbidden), \
+                mock.patch("alpaca_capacity_port.AlpacaCapacityPort", side_effect=forbidden), \
+                mock.patch("alpaca_capacity_port.AlpacaLiveCapacityPort", side_effect=forbidden), \
+                contextlib.redirect_stdout(io.StringIO()):
+            code = c.main(list(argv) + ["--output", str(out)])
+        self.unrouted_signals = unrouted
         return code, json.loads(out.read_text())
 
     def test_cli_live_gates_refuse_before_reading_credentials(self):
@@ -1832,6 +1865,309 @@ class LiveCapacityTests(unittest.TestCase):
         self.assertEqual(receipt["evidence_class"], "offline_fixture")
         self.assertNotIn("live", receipt)
 
+    # -- review of f4d505a0: each case below fails on that commit ----------------------------
+
+    def live_cli(self, *extra):
+        """The live CLI with a valid go file and the acknowledgement flag (credentials forbidden)."""
+        return self.cli(["live", "--env-file", str(self.env), "--live-go-file", str(self.go(at=time.time())),
+                         "--i-understand-live-orders"] + list(extra))
+
+    # Finding 1: live probes use SPY, QQQ, IWM or DIA only, priced from a quote at most 10 s old.
+    def test_live_accepts_only_spy_qqq_iwm_or_dia(self):
+        for symbol in ("AAPL", "TSLA", "QQQM", "SPXL", "BRK.B"):
+            with self.subTest(symbol=symbol):
+                receipt, _, broker = self.live(symbol=symbol)
+                self.assert_refused_before_any_request(receipt, broker, "live_symbol_not_allowed")
+        for symbol in ("SPY", "QQQ", "IWM", "DIA"):
+            with self.subTest(symbol=symbol):
+                clock = fx.FakeClock()
+                receipt, _, broker = self.live(broker=LiveFakeBroker(clock, symbol=symbol), clock=clock,
+                                               symbol=symbol, max_duration_seconds=70.0, required_windows=1)
+                self.assertEqual(receipt["status"], "completed")
+                self.assertEqual({order["symbol"] for order in broker.orders.values()}, {symbol})
+        code, receipt = self.live_cli("--symbol", "AAPL")
+        self.assertEqual((code, receipt["refusal_reason"]), (2, "live_symbol_not_allowed"))
+        c.CapacityConfig(symbol="AAPL").validate()  # paper keeps any valid symbol
+
+    def test_live_refuses_a_quote_older_than_10_seconds_before_any_order(self):
+        for age in (10.5, 59.0):
+            with self.subTest(quote_age=age):
+                clock = fx.FakeClock()
+                broker = LiveFakeBroker(clock, quote_age=age)
+                receipt, _, _ = self.live(broker=broker, clock=clock)
+                self.assertEqual((receipt["status"], receipt["refusal_reason"]), ("refused", "quote_stale"))
+                self.assertEqual(broker.submit_count, 0)
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(broker=LiveFakeBroker(clock, quote_age=9.0), clock=clock,
+                                       max_duration_seconds=70.0, required_windows=1)
+        self.assertEqual(receipt["status"], "completed")
+        self.assertGreater(broker.submit_count, 0)
+        # A live configuration cannot allow an older quote or a slower refresh.
+        for change, reason in (({"max_quote_age_seconds": 30.0}, "live_max_quote_age_above_10s"),
+                               ({"requote_seconds": 60.0}, "live_requote_seconds_above_5s")):
+            with self.subTest(reason=reason):
+                receipt, _, broker = self.live(**change)
+                self.assert_refused_before_any_request(receipt, broker, reason)
+
+    def test_live_prices_come_from_a_quote_at_most_10s_old_and_submits_hold_for_a_fresh_one(self):
+        """The data feed stalls for 25 s: its quotes keep one timestamp. No probe is priced
+        from a quote more than 10 s old; submissions hold until a fresh quote, then resume.
+        Each quote has its own bid, so every probe's price identifies the quote behind it."""
+        clock = fx.FakeClock()
+        stall_from, stall_until = clock.time() + 20.0, clock.time() + 45.0
+
+        class StallingFeed(LiveFakeBroker):
+            def __init__(self, clock):
+                super().__init__(clock)
+                self.served, self.sent = [], []
+
+            def latest_quote(self):
+                wall = self.clock.time()
+                ts = stall_from if stall_from <= wall < stall_until else wall
+                bid = Decimal(400 + len(self.served))
+                self.served.append((wall, ts, bid))
+                return {"bid": str(bid), "ask": str(bid + Decimal("0.02")), "ts_ns": int(ts * 1e9)}
+
+            def submit(self, cid, symbol, qty, limit_price, extended_hours):
+                self.sent.append((self.clock.time(), Decimal(limit_price)))
+                return super().submit(cid, symbol, qty, limit_price, extended_hours)
+
+        broker = StallingFeed(clock)
+        receipt, _, _ = self.live(broker=broker, clock=clock, max_duration_seconds=70.0, required_windows=1)
+        self.assertEqual((receipt["status"], receipt["health_freezes"]), ("completed", []))
+        quote_behind = {c.limit_price_below_bid(bid, 500): (wall, ts, bid) for wall, ts, bid in broker.served}
+        self.assertTrue(broker.sent)
+        for sent_at, price in broker.sent:
+            served_at, ts, bid = quote_behind[price]
+            self.assertLessEqual(served_at, sent_at)
+            self.assertLessEqual(sent_at - ts, 10.0)  # never priced from a quote over 10 s old
+            self.assertLessEqual(price, bid * Decimal("0.95"))  # at least 500 bps below that quote's bid
+        # Held while every available quote was over 10 s old; resumed after a fresh one.
+        self.assertEqual([t for t, _ in broker.sent if stall_from + 10.0 < t < stall_until], [])
+        self.assertTrue([t for t, _ in broker.sent if t > stall_until])
+        freshness = receipt["live"]["quote_freshness"]
+        self.assertEqual((freshness["max_quote_age_seconds"], freshness["requote_seconds"]), (10.0, 5.0))
+        self.assertGreaterEqual(freshness["stale_quotes_refused"], 1)
+        self.assertGreaterEqual(freshness["submit_holds"], 1)
+
+    def test_live_submit_rechecks_the_quote_age_on_the_rest_worker(self):
+        """The worker re-checks the price's quote age immediately before the port call, so a
+        submit that waited in the executor is never sent from a quote over 10 s old."""
+        clock = fx.FakeClock()
+        harness, broker = self.harness(clock=clock)
+        harness._price({"bid": "500.00", "ask": "500.02", "ts_ns": int((clock.time() - 9.9) * 1e9)})
+        submit = harness._submit_call()
+        clock.advance(0.2)  # the worker ran 0.2 s later: the quote is now 10.1 s old
+        response = submit("cap-20260924t140000-abcdef-000001", "SPY", 1, "475.00", False)
+        self.assertTrue(response.not_sent)
+        self.assertEqual(broker.call_log, [])
+        harness._price({"bid": "500.00", "ask": "500.02", "ts_ns": int(clock.time() * 1e9)})
+        response = harness._submit_call()("cap-20260924t140000-abcdef-000002", "SPY", 1, "475.00", False)
+        self.assertEqual((response.status, response.not_sent), (200, False))
+
+    # Finding 2: SIGHUP (terminal or WSL session closed) and SIGQUIT stop and clean up.
+    @unittest.skipUnless(hasattr(signal, "SIGHUP") and hasattr(signal, "SIGQUIT"), "POSIX signals")
+    def test_hangup_or_quit_stops_a_live_run_and_cleans_up(self):
+        for sig in (signal.SIGHUP, signal.SIGQUIT):
+            with self.subTest(signal=sig.name):
+                class SignalAt20(LiveFakeBroker):
+                    def submit(self, *args):
+                        response = super().submit(*args)
+                        if self.submit_count == 20:
+                            signal.raise_signal(sig)
+                        return response
+
+                clock = fx.FakeClock()
+                harness, broker = self.harness(broker=SignalAt20(clock), clock=clock)
+                with restored_signal_handlers() as unrouted:
+                    c.install_stop_signals(harness)
+                    receipt = harness.run()
+                self.assertEqual(unrouted, [])
+                self.assertEqual((receipt["status"], receipt["stop_reason"]), ("completed", "signal"))
+                self.assertEqual(broker.submit_count, 20)  # nothing submitted after the signal
+                self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+                self.assertEqual(broker.open_orders_with_prefix(receipt["probe_plan"]["client_order_id_prefix"]),
+                                 [])
+
+    @unittest.skipUnless(hasattr(signal, "SIGHUP") and hasattr(signal, "SIGQUIT"), "POSIX signals")
+    def test_cli_routes_hangup_and_quit_to_request_stop(self):
+        def signalled_run(harness):
+            for sig in (signal.SIGHUP, signal.SIGQUIT):
+                signal.raise_signal(sig)
+            return harness.refuse("stop_reason_%s" % harness._stop_reason)
+
+        go_now = str(self.go(at=time.time()))
+        with mock.patch.object(c.CapacityRun, "run", signalled_run):
+            for argv in (["live", "--env-file", str(self.env), "--live-go-file", go_now], ["offline"]):
+                with self.subTest(command=argv[0]):
+                    _, receipt = self.cli(argv)
+                    self.assertEqual(self.unrouted_signals, [])
+                    self.assertEqual(receipt["refusal_reason"], "stop_reason_signal")
+
+    # Finding 3: any fill or position change ends needs_attention, over failed, and
+    # live.fills carries what is known about it.
+    def test_probe_fill_with_a_port_error_ends_needs_attention_with_the_fill(self):
+        clock = fx.FakeClock()
+        broker = LiveFakeBroker(clock, fill_submit_seqs={3}, crash_on_submit_seq=3)
+        receipt, _, _ = self.live(broker=broker, clock=clock)
+        self.assertEqual((receipt["status"], receipt["error_type"], receipt["port_errors"]),
+                         ("needs_attention", "RuntimeError", 1))
+        live = receipt["live"]
+        self.assertEqual(live["fills"], [{
+            "kind": "probe_fill", "seq": 3, "symbol": "SPY",
+            "stream": {"filled_qty": "1", "filled_avg_price": "475.00", "event": "fill"},
+            "broker": {"filled_qty": "1", "filled_avg_price": "475.00", "status": "filled"}}])
+        self.assertEqual((live["filled_qty_total"], live["auto_sell"]), ("1", False))
+        self.assertEqual({order["side"] for order in broker.orders.values()}, {"buy"})
+
+    def test_fill_of_another_order_is_reported_with_quantity_and_price(self):
+        class ForeignFillThenDefect(LiveFakeBroker):
+            def submit(self, *args):
+                if self.submit_count == 4:
+                    # Another order on the account fills; then the port fails on submit 5.
+                    self.callback({"stream": "trade_updates", "data": {"event": "fill", "order": {
+                        "client_order_id": "manual-client-7", "id": "manual-order-id-7", "symbol": "AAPL",
+                        "side": "buy", "status": "filled", "filled_qty": "2", "filled_avg_price": "187.5"}}})
+                return super().submit(*args)
+
+        clock = fx.FakeClock()
+        receipt, _, _ = self.live(broker=ForeignFillThenDefect(clock, crash_on_submit_seq=5), clock=clock)
+        self.assertEqual((receipt["status"], receipt["error_type"]), ("needs_attention", "RuntimeError"))
+        live = receipt["live"]
+        self.assertEqual(live["foreign_fill_events"], 1)
+        self.assertEqual(live["fills"], [{
+            "kind": "other_order_fill", "order": "not_this_run", "symbol": "AAPL", "side": "buy",
+            "stream": {"filled_qty": "2", "filled_avg_price": "187.5", "event": "fill"}}])
+        self.assertEqual(live["filled_qty_total"], "0")  # the total counts this run's probes
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        text = json.dumps(receipt)
+        self.assertNotIn("manual-order-id-7", text)  # no broker order id
+        self.assertNotIn("manual-client-7", text)
+
+    def test_position_change_with_a_port_error_ends_needs_attention_with_the_change(self):
+        clock = fx.FakeClock()
+        start = clock.time()
+
+        class DriftThenDefect(LiveFakeBroker):
+            """MSFT appears with no trade update; the next positions read raises."""
+            reported = False
+
+            def positions(self):
+                held, responses = super().positions()
+                if self.clock.time() - start > 30:
+                    if self.reported:
+                        raise RuntimeError("fixture positions defect")
+                    self.reported = True
+                    held = held + [{"symbol": "MSFT", "qty": "3"}]
+                return held, responses
+
+        receipt, _, _ = self.live(broker=DriftThenDefect(clock), clock=clock)
+        self.assertEqual((receipt["status"], receipt["error_type"]), ("needs_attention", "RuntimeError"))
+        self.assertEqual(receipt["stop_reason"], "frozen:live_position_change")
+        self.assertEqual(receipt["live"]["fills"], [{
+            "kind": "position_change", "symbol": "MSFT", "before": "0", "after": "3",
+            "seen_by": ["periodic_check"]}])
+
+    # Finding 4: a journal's recorded mode must match the command's, checked before credentials.
+    def live_journal(self):
+        journal = self.root / "live-run.journal.jsonl"
+        clock = fx.FakeClock()
+        receipt, _, _ = self.live(clock=clock, journal=journal, max_duration_seconds=70.0, required_windows=1)
+        self.assertEqual(receipt["status"], "completed")
+        return journal
+
+    def paper_journal(self):
+        journal = self.root / "paper-run.journal.jsonl"
+        clock = fx.FakeClock()
+        receipt = c.CapacityRun(fx.FakeBroker(clock), c.CapacityConfig(max_duration_seconds=70.0, required_windows=1),
+                                clock=clock, executor=c.InlineExecutor(), stop_file=self.root / "STOP",
+                                journal_path=journal).run()
+        self.assertEqual(receipt["status"], "completed")
+        return journal
+
+    def test_recover_and_audit_refuse_a_live_journal_before_reading_credentials(self):
+        journal = self.live_journal()
+        # A start record as f4d505a0 wrote it: no mode field, the live base URL in its config.
+        legacy = self.root / "legacy-live.journal.jsonl"
+        start = json.loads(journal.read_text().splitlines()[0])
+        legacy.write_text(json.dumps({key: start[key] for key in ("type", "harness", "prefix", "started_wall",
+                                                                  "symbol", "evidence_class", "config")}) + "\n")
+        paper_env = str(self.root / "alpaca-paper-capacity.env")  # judged by name, never read
+        for path in (journal, legacy):
+            for command in ("recover", "audit"):
+                with self.subTest(journal=path.name, command=command):
+                    code, receipt = self.cli([command, "--env-file", paper_env, "--journal", str(path)])
+                    self.assertEqual((code, receipt["status"], receipt["refusal_reason"]),
+                                     (2, "refused", "live_journal_in_paper_mode"))
+
+    def test_journals_record_their_mode_and_each_mode_refuses_the_others_journal(self):
+        live_journal, paper_journal = self.live_journal(), self.paper_journal()
+        live_start = c.read_journal(live_journal)["start"]
+        paper_start = c.read_journal(paper_journal)["start"]
+        self.assertEqual((live_start["mode"], live_start["trading_origin"]), ("live", c.LIVE_URL))
+        self.assertEqual((paper_start["mode"], paper_start["trading_origin"]),
+                         ("paper", "https://paper-api.alpaca.markets"))
+        # The paper engine's recover and audit refuse the live journal before any request.
+        for cancel in (True, False):
+            clock = fx.FakeClock()
+            broker = fx.FakeBroker(clock)
+            receipt = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                                    stop_file=self.root / "STOP").recover(live_journal, cancel=cancel)
+            self.assertEqual((receipt["status"], receipt["refusal_reason"]), ("refused", "live_journal_in_paper_mode"))
+            self.assertEqual(broker.call_log, [])
+        # A run refuses an existing file at its journal path before any request, naming the other mode.
+        receipt, _, broker = self.live(journal=paper_journal)
+        self.assert_refused_before_any_request(receipt, broker, "paper_journal_in_live_mode")
+        receipt, _, broker = self.live(journal=live_journal)
+        self.assert_refused_before_any_request(receipt, broker, "journal_exists")
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock)
+        receipt = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                                stop_file=self.root / "STOP", journal_path=live_journal).run()
+        self.assert_refused_before_any_request(receipt, broker, "live_journal_in_paper_mode")
+        code, receipt = self.live_cli("--journal", str(paper_journal))
+        self.assertEqual((code, receipt["refusal_reason"]), (2, "paper_journal_in_live_mode"))
+        self.assertEqual(c.journal_origin_refusal(paper_start, c.LIVE_URL), "paper_journal_in_live_mode")
+        self.assertEqual(c.journal_origin_refusal(live_start, "https://paper-api.alpaca.markets"),
+                         "live_journal_in_paper_mode")
+        for start in ({}, {"config": {"base_url": "https://example.invalid"}},
+                      dict(paper_start, mode="live"), dict(live_start, evidence_class="native_paper",
+                                                           trading_origin="https://paper-api.alpaca.markets")):
+            self.assertEqual(c.journal_origin_refusal(start, c.LIVE_URL), "journal_origin_unknown")
+
+    # Finding 5: the live budget is floor(min(--cap, observed limit) * 0.9).
+    def test_live_headroom_is_held_at_0_9(self):
+        for headroom in (1.0, 0.95, 0.5):
+            with self.subTest(headroom=headroom):
+                receipt, _, broker = self.live(headroom=headroom)
+                self.assert_refused_before_any_request(receipt, broker, "live_headroom_must_be_0_9")
+        for cap, limit, budget in ((1000, 1000, 900), (500, 1000, 450), (1000, 200, 180)):
+            with self.subTest(cap=cap, limit=limit):
+                clock = fx.FakeClock()
+                receipt, _, _ = self.live(broker=LiveFakeBroker(clock, limit=limit), clock=clock,
+                                          configured_cap_per_minute=cap, max_duration_seconds=70.0,
+                                          required_windows=1)
+                self.assertEqual((receipt["rate"]["headroom"], receipt["rate"]["budget_per_minute"]), (0.9, budget))
+        code, receipt = self.live_cli("--headroom", "1.0")
+        self.assertEqual((code, receipt["refusal_reason"]), (2, "live_headroom_must_be_0_9"))
+        c.CapacityConfig(headroom=1.0).validate()  # paper keeps its configurable headroom
+
+    # The periodic position check fails closed on any failed read (the docstring promised a retry).
+    def test_live_position_check_fails_closed_on_any_failed_read(self):
+        class Limited(LiveFakeBroker):
+            """Every positions read gets a 429 response; the native port raises instead."""
+            def positions(self):
+                self.clock.advance(self.read_latency)
+                return [], [c.Response(429, {"retry-after": "1", "x-ratelimit-limit": "200"})]
+
+        clock = fx.FakeClock()
+        receipt, _, _ = self.live(broker=Limited(clock), clock=clock)
+        self.assertEqual(receipt["stop_reason"], "frozen:live_position_check_failed")
+        self.assertEqual(receipt["live"]["position_checks"]["failed"], 1)
+        self.assertLess(receipt["throughput"]["submission_phase_seconds"], 15.0)
+        self.assertEqual(receipt["status"], "needs_attention")
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
 
 class LivePortTests(unittest.TestCase):
     """The native live port's own logic; no request leaves the process."""
@@ -1872,6 +2208,31 @@ class LivePortTests(unittest.TestCase):
             port.recovery_preflight()
         with self.assertRaises(Exception):
             port.cancel_all()
+
+    def test_live_port_refuses_any_symbol_but_spy_qqq_iwm_or_dia(self):
+        import queue
+        import alpaca_capacity_port as native
+        for symbol in ("AAPL", "QQQM"):
+            with self.assertRaises(native.transport.TransportError):
+                native.AlpacaLiveCapacityPort("k", "s", symbol, go=self.go(), stop_files=self.stops)
+
+        class Client:
+            def __init__(self):
+                self.orders = []
+
+            def submit_order(self, request):
+                self.orders.append(request)
+                return {"id": "x"}
+
+        client = Client()
+        port = native.AlpacaLiveCapacityPort("k", "s", "SPY", go=self.go(), stop_files=self.stops)
+        port._pool = queue.Queue()  # a stub client: no SDK client and no network
+        port._pool.put(client)
+        for symbol in ("AAPL", "QQQ"):  # QQQ is allowed, but not by a port built for SPY
+            with self.subTest(symbol=symbol):
+                response = port.submit("cap-20260924t140000-abcdef-000001", symbol, 1, "100.00", False)
+                self.assertTrue(response.not_sent)
+        self.assertEqual(client.orders, [])
 
     @unittest.skipUnless(HAS_REQUESTS, "requests is not installed in this interpreter")
     def test_each_guarded_session_admits_one_origin(self):

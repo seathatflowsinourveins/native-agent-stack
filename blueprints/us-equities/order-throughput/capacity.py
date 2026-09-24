@@ -15,9 +15,10 @@ the host STOP kill switch and the account-writer lock. See README.md.
 The ``paper`` command stays paper-only. The separate ``live`` command
 (``LiveCapacityRun``) runs the same engine against https://api.alpaca.markets
 only after every live gate passes: the user's own go file, a live env file,
-``--i-understand-live-orders``, regular trading hours, an account with no open
-orders, and no STOP file. Live probes are capacity probes only; a fill stops
-the run and is left to the user (the harness never sells). See README "Live".
+``--i-understand-live-orders``, SPY, QQQ, IWM or DIA, headroom 0.9, regular
+trading hours, an account with no open orders, and no STOP file. Live probes are
+capacity probes only, priced from a quote at most 10 s old; a fill stops the run
+and is left to the user (the harness never sells). See README "Live".
 """
 from __future__ import annotations
 
@@ -337,7 +338,9 @@ class Journal:
 
 
 def read_journal(path):
-    """Parse a run journal; a torn final line (crash mid-write) is ignored."""
+    """Parse a run journal; a torn final line (crash mid-write) is ignored.
+
+    The caller checks the start record's recorded mode with ``journal_origin_refusal``."""
     try:
         lines = Path(path).read_text().splitlines()
     except OSError:
@@ -422,9 +425,11 @@ class CapacityRun:
     so this (paper) engine never drives a live-origin port.
     """
 
-    # The evidence class a qualifying receipt must carry, the one trading origin
-    # a port may declare, and REST workers beyond ``inflight`` (the quote refresh).
+    # The evidence class a qualifying receipt must carry, the mode and the one trading
+    # origin a port may declare (both recorded in the journal), and REST workers beyond
+    # ``inflight`` (the quote refresh).
     QUALIFYING_EVIDENCE_CLASS = "native_paper"
+    MODE = "paper"
     TRADING_ORIGIN = PAPER_URL
     EXTRA_WORKERS = 1
 
@@ -469,6 +474,7 @@ class CapacityRun:
         self.extended_hours = False
         self.session_kind = None
         self.quote_at = None
+        self.quote_wall = None  # the timestamp (Unix seconds) of the quote behind limit_price
         self.cleanup = {}
         self.reconciliation = {}
         self.error_type = None
@@ -477,6 +483,7 @@ class CapacityRun:
         self.refusal = None
         self._preflight_open_orders = 0
         self._preflight_positions = {}
+        self._positions_after = None
         self.receipt = {}
 
     # -- external control ------------------------------------------------------
@@ -819,6 +826,7 @@ class CapacityRun:
         if price * self.config.qty > Decimal(self.config.max_order_notional_usd):
             raise HarnessRefusal("order_notional_cap_exceeded")
         self.limit_price = price
+        self.quote_wall = ts_ns / 1e9
         self.quote_at = self.clock.monotonic()
 
     def _requote(self):
@@ -832,14 +840,21 @@ class CapacityRun:
                 quote, _ = future.result()
                 self._price(quote)
             except HarnessRefusal as exc:
-                self._freeze("requote_" + str(exc))
+                self._requote_refused(str(exc))
             except Exception:
                 self._freeze("requote_failed")
             finally:
                 self.quote_at = self.clock.monotonic()
             return
-        if self.clock.monotonic() - self.quote_at >= self.config.requote_seconds:
+        if self._requote_due():
             self._quote_future = self.executor.submit(self._timed, self.port.latest_quote)
+
+    def _requote_due(self):
+        return self.clock.monotonic() - self.quote_at >= self.config.requote_seconds
+
+    def _requote_refused(self, reason):
+        """A refreshed quote that cannot price a probe freezes submissions; cleanup runs."""
+        self._freeze("requote_" + reason)
 
     def _periodic_checks(self):
         """Per-iteration background checks after the requote; none in paper and offline."""
@@ -897,8 +912,12 @@ class CapacityRun:
                                 "extended_hours": probe.extended_hours})
         probe.sent_at = self.clock.monotonic()
         self.probes[cid] = self._live[cid] = probe
-        self._dispatch("submit", self.port.submit, cid, self.config.symbol, self.config.qty,
+        self._dispatch("submit", self._submit_call(), cid, self.config.symbol, self.config.qty,
                        str(self.limit_price), self.extended_hours, key=cid)
+
+    def _submit_call(self):
+        """The callable a REST worker runs for one submit (the port's own in paper)."""
+        return self.port.submit
 
     def _cancel_one(self):
         cid = self._cancel_queue.pop(0)
@@ -1117,6 +1136,7 @@ class CapacityRun:
         if result is not None:
             positions_after = {p["symbol"]: str(p["qty"]) for p in result[0]
                                if Decimal(str(p.get("qty", "0"))) != 0}
+        self._positions_after = positions_after
         symbol = self.config.symbol
         position_unchanged = (positions_after is not None and Decimal(positions_after.get(symbol, "0"))
                               == Decimal(self._preflight_positions.get(symbol, "0")))
@@ -1142,11 +1162,15 @@ class CapacityRun:
 
     # -- entry point ------------------------------------------------------------
     def _validate(self):
-        """Every gate decided before any request: the configuration bounds, and a
-        port that declares a trading origin must declare this engine's."""
+        """Every gate decided before any request: the configuration bounds, a port
+        that declares a trading origin must declare this engine's, and no file may
+        exist at the journal path (another mode's journal is named as such)."""
         self.config.validate()
         if getattr(self.port, "trading_origin", self.TRADING_ORIGIN) != self.TRADING_ORIGIN:
             raise HarnessRefusal("port_trading_origin_mismatch")
+        reason = existing_journal_refusal(self.journal_path, self.TRADING_ORIGIN)
+        if reason:
+            raise HarnessRefusal(reason)
 
     def refuse(self, reason):
         """Record a refusal decided before this run touched the port (e.g. by the CLI)."""
@@ -1234,7 +1258,9 @@ class CapacityRun:
         if self.journal_path is None:
             return
         self.journal = Journal(self.journal_path)
-        self.journal.write({"type": "start", "harness": HARNESS_VERSION, "prefix": self.prefix,
+        # mode and trading_origin let recover/audit refuse another mode's journal.
+        self.journal.write({"type": "start", "harness": HARNESS_VERSION, "mode": self.MODE,
+                            "trading_origin": self.TRADING_ORIGIN, "prefix": self.prefix,
                             "started_wall": self.started_wall, "symbol": self.config.symbol,
                             "evidence_class": getattr(self.port, "evidence_class", "unknown"),
                             "config": self.config.public()}, sync=True)
@@ -1255,12 +1281,17 @@ class CapacityRun:
         """After a crash: cancel (or, with cancel=False, only list) every order that
         carries the journal's prefix, individually and through the governor, then
         verify zero open. Cancels only; the STOP file does not block it, exactly
-        as adaptive-paper keeps cancels allowed under STOP."""
+        as adaptive-paper keeps cancels allowed under STOP. A journal recorded by
+        another mode (a live run's, for this paper engine) is refused before any
+        request."""
         self.mode = "recover" if cancel else "audit"
         self.stage = "journal"
         record = listing = None
         try:
             record = read_journal(journal_path)
+            reason = journal_origin_refusal(record["start"], self.TRADING_ORIGIN)
+            if reason:
+                raise HarnessRefusal(reason)
             self.prefix = record["start"]["prefix"]
             self.started_wall = float(record["start"]["started_wall"])
             self.config.validate()
@@ -1544,10 +1575,27 @@ LIVE_GO_CLOCK_SKEW_SECONDS = 60.0
 # every open probe, fit the order-action cap, so cleanup cancels always fit too.
 CANCELS_RESERVED_PER_PROBE = MAX_CANCEL_ATTEMPTS + CLEANUP_VERIFY_ROUNDS
 ORDER_ACTION_KINDS = frozenset({"submit", "cancel", "cancel_all"})
-# Freezes that end a live run as needs_attention for the user to decide.
+# Freezes that end a live run as needs_attention for the user to decide, even when a
+# port error was also recorded (they outrank "failed").
 LIVE_ATTENTION_FREEZES = frozenset({"unexpected_fill", "live_position_change", "live_position_check_failed",
                                     "live_malformed_stream_event", "order_action_cap_exhausted"})
 LIVE_ENV_NAME = re.compile(r"alpaca-live-[A-Za-z0-9._-]+\.env\Z")
+# Live probes use one of these liquid index ETFs only.
+LIVE_SYMBOLS = ("SPY", "QQQ", "IWM", "DIA")
+# The live budget is floor(min(--cap, observed x-ratelimit-limit) * LIVE_HEADROOM).
+LIVE_HEADROOM = 0.9
+# A live probe is priced only from a quote at most LIVE_MAX_QUOTE_AGE_SECONDS old,
+# checked again on the REST worker immediately before each submit. The price is
+# refreshed every LIVE_REQUOTE_SECONDS, and while it is stale (submissions hold) at
+# most once per LIVE_STALE_REQUOTE_SECONDS until a fresh quote prices it again.
+LIVE_MAX_QUOTE_AGE_SECONDS = 10.0
+LIVE_REQUOTE_SECONDS = 5.0
+LIVE_STALE_REQUOTE_SECONDS = 1.0
+# A journal start record's mode names its trading origin.
+JOURNAL_MODE_ORIGINS = {"paper": PAPER_URL, "live": LIVE_URL}
+JOURNAL_CHECK_MAX_BYTES = 64 * 1024 * 1024
+# Symbols of fills and position changes that are not this run's probes, as a receipt shows them.
+RECEIPT_SYMBOL = re.compile(r"[A-Za-z0-9][A-Za-z0-9./:_\-]{0,31}\Z")
 
 
 def _env_names(path):
@@ -1594,6 +1642,72 @@ def live_base_url_refusal(base):
     if value != LIVE_URL:
         return "non_live_base_url"
     return None
+
+
+def journal_origin_refusal(start, trading_origin):
+    """None when a journal start record was written for ``trading_origin``; else the reason.
+
+    The recorded origin comes from the start record's ``mode`` and ``trading_origin``
+    (written since the mode check), its ``config.base_url`` (every journal has it) and
+    a ``native_live`` evidence class. They must all agree on the paper or the live
+    origin; anything else is ``journal_origin_unknown``."""
+    if not isinstance(start, dict):
+        return "journal_origin_unknown"
+    config = start.get("config") if isinstance(start.get("config"), dict) else {}
+    declared = set()
+    for value in (start.get("trading_origin"), config.get("base_url")):
+        if value is not None:
+            declared.add(value if isinstance(value, str) else "invalid")
+    if "mode" in start:
+        mode = start["mode"]
+        declared.add(JOURNAL_MODE_ORIGINS.get(mode, "invalid") if isinstance(mode, str) else "invalid")
+    if start.get("evidence_class") == "native_live":
+        declared.add(LIVE_URL)
+    if len(declared) != 1 or not declared <= {PAPER_URL, LIVE_URL}:
+        return "journal_origin_unknown"
+    origin = declared.pop()
+    if origin == trading_origin:
+        return None
+    return "live_journal_in_paper_mode" if origin == LIVE_URL else "paper_journal_in_live_mode"
+
+
+def recorded_journal_refusal(path, trading_origin):
+    """Read a journal (never a credential) and check the mode its start record declares."""
+    try:
+        start = read_journal(path)["start"]
+    except HarnessRefusal as exc:
+        return str(exc)
+    return journal_origin_refusal(start, trading_origin)
+
+
+def existing_journal_refusal(path, trading_origin):
+    """A run creates its journal exclusively, so a file already at the journal path
+    refuses the run before any request: ``journal_exists``, or the mismatch reason when
+    it is a regular file holding another mode's journal."""
+    if path is None:
+        return None
+    try:
+        info = os.lstat(path)
+    except FileNotFoundError:
+        return None
+    except OSError:
+        return "journal_unavailable"
+    if stat.S_ISREG(info.st_mode) and info.st_size <= JOURNAL_CHECK_MAX_BYTES:
+        reason = recorded_journal_refusal(path, trading_origin)
+        if reason in ("live_journal_in_paper_mode", "paper_journal_in_live_mode"):
+            return reason
+    return "journal_exists"
+
+
+def _receipt_symbol(value):
+    text = str(value or "")
+    return text if RECEIPT_SYMBOL.fullmatch(text) else None
+
+
+def _order_identity(order):
+    """The symbol and side of an order that is not this run's probe (no ids)."""
+    side = str(order.get("side") or "")
+    return {"symbol": _receipt_symbol(order.get("symbol")), "side": side if side in ("buy", "sell") else None}
 
 
 @dataclass(frozen=True)
@@ -1755,6 +1869,8 @@ class LiveCapacityConfig(CapacityConfig):
     """Live configuration with its own validation; ``CapacityConfig.validate`` stays paper-only."""
     configured_cap_per_minute: int = LIVE_DEFAULT_CAP
     max_open_notional_usd: str = str(LIVE_MAX_OPEN_NOTIONAL)
+    max_quote_age_seconds: float = LIVE_MAX_QUOTE_AGE_SECONDS
+    requote_seconds: float = LIVE_REQUOTE_SECONDS
     allow_extended_hours: bool = False
     base_url: str = LIVE_URL
     max_order_actions: int | None = None
@@ -1766,6 +1882,10 @@ class LiveCapacityConfig(CapacityConfig):
             raise HarnessRefusal("non_live_base_url")
         if self.live_orders_acknowledged is not True:
             raise HarnessRefusal("live_orders_not_acknowledged")
+        if self.symbol not in LIVE_SYMBOLS:
+            raise HarnessRefusal("live_symbol_not_allowed")
+        if self.headroom != LIVE_HEADROOM:
+            raise HarnessRefusal("live_headroom_must_be_0_9")
         if type(self.band_bps) is int and self.band_bps < LIVE_MIN_BAND_BPS:
             raise HarnessRefusal("live_band_bps_below_500")
         if type(self.qty) is not int or self.qty != 1:
@@ -1785,6 +1905,10 @@ class LiveCapacityConfig(CapacityConfig):
         if type(seconds) not in (int, float) or not math.isfinite(seconds) or not 2.0 <= seconds <= 60.0:
             raise HarnessRefusal("position_check_seconds_out_of_bounds")
         self._validate_bounds()
+        if self.max_quote_age_seconds > LIVE_MAX_QUOTE_AGE_SECONDS:
+            raise HarnessRefusal("live_max_quote_age_above_10s")
+        if self.requote_seconds > LIVE_REQUOTE_SECONDS:
+            raise HarnessRefusal("live_requote_seconds_above_5s")
         if Decimal(self.max_order_notional_usd) > LIVE_MAX_ORDER_NOTIONAL:
             raise HarnessRefusal("live_order_notional_cap_exceeds_1000")
         if Decimal(self.max_open_notional_usd) > LIVE_MAX_OPEN_NOTIONAL:
@@ -1798,16 +1922,21 @@ class LiveCapacityRun(CapacityRun):
     journal and reconciliation unchanged. Adds, in order before any request: the
     ``--i-understand-live-orders`` flag, the user's go file (read, never written;
     caps = min(CLI, go file, live ceilings)), the live env-file name, the live
-    configuration bounds and regular trading hours; then both STOP files, and at
-    preflight an account with zero open orders and a broker clock that is open.
-    While running: a total order-action cap that always leaves room for cleanup
-    cancels, the go file's expiry, a periodic re-read of the go file (revoked,
-    invalid or changed stops submissions) and a governed periodic position check.
-    Any fill or position change stops submissions; cleanup cancels this run's open
-    probes individually; nothing is ever sold, and the run ends needs_attention
-    with the filled quantity and price in the receipt for the user to decide."""
+    configuration bounds (SPY, QQQ, IWM or DIA only; headroom 0.9; quotes at most
+    10 s old), no file at the journal path and regular trading hours; then both
+    STOP files, and at preflight an account with zero open orders and a broker
+    clock that is open. While running: probes priced only from a quote at most 10 s
+    old (submissions hold until a fresh quote, and the REST worker re-checks the age
+    before each submit), a total order-action cap that always leaves room for
+    cleanup cancels, the go file's expiry, a periodic re-read of the go file
+    (revoked, invalid or changed stops submissions) and a governed periodic position
+    check. Any fill or position change stops submissions; cleanup cancels this
+    run's open probes individually; nothing is ever sold, and the run ends
+    needs_attention (over failed) with what is known of each fill and position
+    change in the receipt for the user to decide."""
 
     QUALIFYING_EVIDENCE_CLASS = "native_live"
+    MODE = "live"
     TRADING_ORIGIN = LIVE_URL
     EXTRA_WORKERS = 2  # the quote refresh and the position check
 
@@ -1820,9 +1949,13 @@ class LiveCapacityRun(CapacityRun):
         self.go_sha256 = None
         self.caps = None
         self.stop_files_seen = set()
-        self.fills = {}
+        self.fills = {}  # probe seq -> {"stream": ..., "broker": ...}
+        self.other_fills = {}  # broker order id (never in the receipt) -> fill of an order not ours
+        self.position_changes = {}  # symbol -> {"before", "after", "seen_by"}
         self.foreign_fill_events = 0
         self.position_checks = {"sent": 0, "completed": 0, "failed": 0, "changes_detected": 0}
+        self.quote_stats = {"stale_quotes_refused": 0, "submit_holds": 0, "stale_at_dispatch": 0}
+        self._quote_hold = False
         self.go_rechecks = {"performed": 0, "stopped_by": None}
         self._position_future = None
         self._position_action = None
@@ -1887,6 +2020,43 @@ class LiveCapacityRun(CapacityRun):
             raise HarnessRefusal("quote_halted")
         super()._price(quote)
 
+    # -- quote freshness -------------------------------------------------------------
+    def _quote_fresh(self):
+        """True while the quote behind the probe price is at most max_quote_age_seconds old."""
+        if self.quote_wall is None:
+            return False
+        age = self.clock.time() - self.quote_wall
+        return -QUOTE_FUTURE_TOLERANCE_SECONDS <= age <= self.config.max_quote_age_seconds
+
+    def _requote_due(self):
+        since = self.clock.monotonic() - self.quote_at
+        return (since >= self.config.requote_seconds
+                or (since >= LIVE_STALE_REQUOTE_SECONDS and not self._quote_fresh()))
+
+    def _requote_refused(self, reason):
+        if reason == "quote_stale":
+            # Never priced from; submissions hold until a fresh quote prices the probes again.
+            self.quote_stats["stale_quotes_refused"] += 1
+            return
+        super()._requote_refused(reason)
+
+    def _submit_call(self):
+        """The port's submit, preceded on the REST worker by one more age check of the
+        price's quote, so a submit that waited in the executor is never sent stale."""
+        submit, quote_wall, limit = self.port.submit, self.quote_wall, self.config.max_quote_age_seconds
+
+        def fresh_submit(*args):
+            age = None if quote_wall is None else self.clock.time() - quote_wall
+            if age is None or not -QUOTE_FUTURE_TOLERANCE_SECONDS <= age <= limit:
+                return Response(None, error="quote_stale_at_dispatch", not_sent=True)
+            return submit(*args)
+        return fresh_submit
+
+    def _on_submit(self, probe, response, done_at=None):
+        if response.not_sent and response.error == "quote_stale_at_dispatch":
+            self.quote_stats["stale_at_dispatch"] += 1
+        super()._on_submit(probe, response, done_at)
+
     # -- total order-action cap ----------------------------------------------------
     def _order_actions_sent(self):
         """Submits and cancels sent so far (every attempt counts, sent or refused)."""
@@ -1907,6 +2077,13 @@ class LiveCapacityRun(CapacityRun):
         return self._order_actions_sent() >= self.config.max_order_actions
 
     def _may_submit(self):
+        # Never price from a stale quote: hold until a fresh quote prices the probes again.
+        if not self._quote_fresh():
+            if not self._quote_hold:
+                self._quote_hold = True
+                self.quote_stats["submit_holds"] += 1
+            return False
+        self._quote_hold = False
         return super()._may_submit() and self._fits_new_probe()
 
     # The reservation keeps every cancel inside the cap; these backstops keep the
@@ -1955,25 +2132,49 @@ class LiveCapacityRun(CapacityRun):
         filled = Decimal(str(order.get("filled_qty") or "0"))
         if event not in FILL_EVENTS and filled <= 0:
             return
-        probe = self.probes.get(cid) if self.prefix and cid.startswith(self.prefix) else None
+        stream = {"filled_qty": _decimal_text(filled), "filled_avg_price": _decimal_text(order.get("filled_avg_price")),
+                  "event": event or str(order.get("status") or "")}
+        ours = bool(self.prefix) and cid.startswith(self.prefix)
+        probe = self.probes.get(cid) if ours else None
         if probe is None:
-            # A fill of any order this run did not submit changes a position on the account.
+            # A fill of any order this run did not submit changes a position on the account;
+            # the receipt keeps what the event says of it (never its ids).
             self.foreign_fill_events += 1
+            self._other_fill(order, ours, "event-%d" % self.foreign_fill_events)["stream"] = stream
             self._freeze("live_position_change")
             return
-        self.fills.setdefault(probe.seq, {})["stream"] = {
-            "filled_qty": _decimal_text(filled), "filled_avg_price": _decimal_text(order.get("filled_avg_price")),
-            "event": event or str(order.get("status") or "")}
+        self.fills.setdefault(probe.seq, {})["stream"] = stream
 
-    def _positions_changed(self, rows):
-        """True/False against the preflight snapshot; None if the rows are unreadable."""
+    def _other_fill(self, order, ours, fallback_key):
+        """The receipt entry for a filled order this run does not own, keyed internally by
+        its broker id: the stream and the final listing fill in what each knows."""
+        key = str(order.get("id") or "") or fallback_key
+        entry = self.other_fills.setdefault(key, {
+            "order": "unknown_with_this_runs_prefix" if ours else "not_this_run", "symbol": None, "side": None})
+        entry.update({name: value for name, value in _order_identity(order).items() if value is not None})
+        return entry
+
+    def _position_changes(self, rows):
+        """{symbol: (before, after)} for each symbol whose quantity differs from the
+        preflight snapshot (empty if none); None if the rows are unreadable."""
         try:
-            after = {str(row["symbol"]): Decimal(str(row["qty"])) for row in rows
-                     if Decimal(str(row.get("qty", "0"))) != 0}
+            after = {str(row["symbol"]): Decimal(str(row["qty"])) for row in rows}
         except (AttributeError, KeyError, TypeError, ValueError, InvalidOperation):
             return None
+        if not all(qty.is_finite() for qty in after.values()):
+            return None
+        zero = Decimal(0)
         before = {name: Decimal(qty) for name, qty in self._preflight_positions.items()}
-        return after != before
+        after = {name: qty for name, qty in after.items() if qty != 0}
+        return {name: (before.get(name, zero), after.get(name, zero)) for name in sorted(set(before) | set(after))
+                if before.get(name, zero) != after.get(name, zero)}
+
+    def _note_position_changes(self, changes, source):
+        for name, (before, after) in changes.items():
+            entry = self.position_changes.setdefault(name, {"before": str(before), "seen_by": []})
+            entry["after"] = str(after)
+            if source not in entry["seen_by"]:
+                entry["seen_by"].append(source)
 
     def _recheck_go(self):
         """The user may revoke the go mid-run: a go file that is now missing, invalid,
@@ -1993,9 +2194,12 @@ class LiveCapacityRun(CapacityRun):
     def _periodic_checks(self):
         """Every ``position_check_seconds``: re-read the go file (a local read), and
         a governed positions read on a worker. Any change from the preflight snapshot
-        freezes submissions. A finished read is handled in the same pass, before the
-        next submit decision. A 429 or 5xx is retried at the next interval; an
-        exception or unreadable rows fail closed."""
+        freezes submissions (``live_position_change``) and is recorded for the
+        receipt. A finished read is handled in the same pass, before the next submit
+        decision. Any failed read fails closed (``live_position_check_failed``) and
+        is not retried: an exception (the native port raises on every error status,
+        429 and 5xx included), a response that is not 2xx (fed to the governor first,
+        so a 429 still backs off cleanup) or unreadable rows."""
         now = self.clock.monotonic()
         if self._last_go_check is None:
             self._last_go_check = now
@@ -2019,6 +2223,7 @@ class LiveCapacityRun(CapacityRun):
         action = self._position_action
         try:
             (rows, responses), _ = future.result()
+            responses = list(responses)
         except Exception:
             action["ok"] = False
             self.position_checks["failed"] += 1
@@ -2027,17 +2232,15 @@ class LiveCapacityRun(CapacityRun):
         for response in responses:
             self._record("read", response, "run")
         action["ok"] = bool(responses) and all(self._ok(response) for response in responses)
-        if not action["ok"]:
-            self.position_checks["failed"] += 1
-            return
-        changed = self._positions_changed(rows)
-        if changed is None:
+        changes = self._position_changes(rows) if action["ok"] else None
+        if changes is None:
             self.position_checks["failed"] += 1
             self._freeze("live_position_check_failed")
             return
         self.position_checks["completed"] += 1
-        if changed:
+        if changes:
             self.position_checks["changes_detected"] += 1
+            self._note_position_changes(changes, "periodic_check")
             self._freeze("live_position_change")
 
     def _list(self, status, after_wall, deadline, phase):
@@ -2047,37 +2250,76 @@ class LiveCapacityRun(CapacityRun):
         return result
 
     def _reconcile(self):
+        """The paper reconciliation, plus every filled order in its listing (this run's
+        probes and any other order) and every position change in its positions read."""
         super()._reconcile()
-        for row in self._reconciliation_orders or []:
-            cid = str(row.get("client_order_id") or "")
-            probe = self.probes.get(cid) if self.prefix and cid.startswith(self.prefix) else None
+        for index, row in enumerate(self._reconciliation_orders or []):
             filled = _decimal_text(row.get("filled_qty"))
-            if probe is None or filled is None or Decimal(filled) <= 0:
+            if filled is None or Decimal(filled) <= 0:
                 continue
-            self.fills.setdefault(probe.seq, {})["broker"] = {
-                "filled_qty": filled, "filled_avg_price": _decimal_text(row.get("filled_avg_price")),
-                "status": str(row.get("status") or "")}
+            broker = {"filled_qty": filled, "filled_avg_price": _decimal_text(row.get("filled_avg_price")),
+                      "status": str(row.get("status") or "")}
+            cid = str(row.get("client_order_id") or "")
+            ours = bool(self.prefix) and cid.startswith(self.prefix)
+            probe = self.probes.get(cid) if ours else None
+            if probe is not None:
+                self.fills.setdefault(probe.seq, {})["broker"] = broker
+            else:
+                self._other_fill(row, ours, "listing-%d" % index)["broker"] = broker
+        if self._positions_after is not None:
+            changes = self._position_changes([{"symbol": name, "qty": qty}
+                                              for name, qty in self._positions_after.items()])
+            if changes:
+                self._note_position_changes(changes, "reconciliation")
 
     def recover(self, journal_path, *, cancel=True):
         raise NotImplementedError("live recover is not implemented; see README 'Live'")
 
     # -- receipt -------------------------------------------------------------------------
+    def _attention_required(self):
+        """Any fill or position change, seen by any path, or a freeze that leaves the
+        account's state for the user to check."""
+        rec = self.reconciliation or {}
+        return bool(self.fills or self.other_fills or self.position_changes or self.foreign_fill_events
+                    or self.unexpected_fill_qty > 0 or self._health & LIVE_ATTENTION_FREEZES
+                    or rec.get("filled_probes") or (rec.get("changed_position_symbols") or 0) > 0)
+
     def _build_receipt(self):
-        if self.status == "completed" and (self._health & LIVE_ATTENTION_FREEZES or self.fills):
+        # needs_attention outranks failed: a port error stays in error_type and
+        # port_errors, but a fill or position change is what the user must act on.
+        if self.status in ("completed", "failed") and self._attention_required():
             self.status = "needs_attention"
         receipt = super()._build_receipt()
         receipt["live"] = self._live_summary()
         return receipt
 
-    def _live_summary(self):
-        config = self.config
+    def _fills_summary(self):
+        """Every fill and position change as far as known, and this run's probe fill total.
+
+        ``probe_fill``: this run's probe (stream and broker listing). ``other_order_fill``:
+        an order this run does not own (symbol, side, quantity, average price; no ids).
+        ``position_change``: a quantity that differs from the preflight snapshot, unless it
+        is exactly this run's probe fills in the probe symbol (listed already)."""
+        symbol = self.config.symbol
         fills, total = [], Decimal(0)
         for seq in sorted(self.fills):
-            entry = dict(self.fills[seq], seq=seq)
+            entry = dict({"kind": "probe_fill", "seq": seq, "symbol": symbol}, **self.fills[seq])
             quantities = [Decimal(side["filled_qty"]) for side in (entry.get("stream"), entry.get("broker"))
                           if side and side.get("filled_qty")]
             total += max(quantities, default=Decimal(0))
             fills.append(entry)
+        fills.extend(dict({"kind": "other_order_fill"}, **entry) for entry in self.other_fills.values())
+        for name in sorted(self.position_changes):
+            change = self.position_changes[name]
+            if name == symbol and total > 0 and Decimal(change["after"]) - Decimal(change["before"]) == total:
+                continue
+            fills.append({"kind": "position_change", "symbol": _receipt_symbol(name) or "unrecognized",
+                          "before": change["before"], "after": change["after"], "seen_by": list(change["seen_by"])})
+        return fills, total
+
+    def _live_summary(self):
+        config = self.config
+        fills, total = self._fills_summary()
         sent = self._order_actions_sent()
         cap = config.max_order_actions if self.caps is not None else None
         return {
@@ -2099,6 +2341,9 @@ class LiveCapacityRun(CapacityRun):
                               "min_band_bps_below_bid": LIVE_MIN_BAND_BPS},
             "order_actions": {"sent": sent, "cap": cap, "within_cap": None if cap is None else sent <= cap,
                               "reserved_cancels_per_open_probe": CANCELS_RESERVED_PER_PROBE},
+            "quote_freshness": dict(self.quote_stats, max_quote_age_seconds=config.max_quote_age_seconds,
+                                    requote_seconds=config.requote_seconds,
+                                    stale_requote_seconds=LIVE_STALE_REQUOTE_SECONDS),
             "fills": fills,
             "filled_qty_total": str(total),
             "auto_sell": False,
@@ -2106,7 +2351,8 @@ class LiveCapacityRun(CapacityRun):
             "foreign_fill_events": self.foreign_fill_events,
             "stop_files_seen": sorted(self.stop_files_seen),
             "rules": {"regular_trading_hours_only": True, "zero_open_orders_at_preflight": True,
-                      "cancel_all": "disabled", "explicit_flag": "--i-understand-live-orders"},
+                      "cancel_all": "disabled", "explicit_flag": "--i-understand-live-orders",
+                      "symbols": list(LIVE_SYMBOLS), "headroom": LIVE_HEADROOM},
         }
 
 
@@ -2146,10 +2392,10 @@ def build_parser():
                              "required by recover/audit")
     parser.add_argument("--env-file", type=Path,
                         help="0600 credential file outside any Git worktree (live: alpaca-live-<label>.env)")
-    parser.add_argument("--symbol", default="SPY")
+    parser.add_argument("--symbol", default="SPY", help="live: SPY, QQQ, IWM or DIA only")
     parser.add_argument("--band-bps", type=int, default=500, help="probe price below the bid (live: at least 500)")
     parser.add_argument("--cap", type=int, default=None, help="configured calls/min cap (default 200; live 1000)")
-    parser.add_argument("--headroom", type=float, default=0.9)
+    parser.add_argument("--headroom", type=float, default=0.9, help="budget share of the limit (live: 0.9 only)")
     parser.add_argument("--max-orders", type=int, default=600)
     parser.add_argument("--duration", type=float, default=330.0)
     parser.add_argument("--max-open-orders", type=int, default=10)
@@ -2254,6 +2500,23 @@ class _UnbuiltPaperPort:
     evidence_class = "native_paper"
 
 
+# SIGHUP arrives when the terminal or WSL session closes; SIGQUIT on Ctrl-\.
+STOP_SIGNAL_NAMES = ("SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT")
+
+
+def install_stop_signals(run):
+    """Route every stop signal this platform has to ``run.request_stop``: submissions
+    stop, and cleanup, reconciliation, the receipt and the journal end record still
+    run (recover/audit finish their cancels). Returns the previous handlers. SIGKILL
+    cannot be caught; after one, the journal holds the run's prefix."""
+    previous = {}
+    for name in STOP_SIGNAL_NAMES:
+        sig = getattr(signal, name, None)
+        if sig is not None:
+            previous[sig] = signal.signal(sig, lambda *_: run.request_stop("signal"))
+    return previous
+
+
 def exit_code_for(receipt):
     if receipt["status"] == "refused":
         return 2
@@ -2306,9 +2569,18 @@ def main(argv=None):
             parser.error("%s requires --env-file" % args.command)
         if args.command in ("recover", "audit") and args.journal is None:
             parser.error("%s requires --journal" % args.command)
+        journal = args.journal
+        if args.command == "paper" and journal is None:
+            journal = args.output.with_suffix(".journal.jsonl")
+        # Refused here, before any credential is read: a live env file, a journal that
+        # recover/audit would act on but a live run recorded, or a file already at the
+        # paper run's journal path.
         refusal = paper_env_refusal(args.env_file)
+        if refusal is None and args.command in ("recover", "audit"):
+            refusal = recorded_journal_refusal(journal, PAPER_URL)
+        if refusal is None and args.command == "paper":
+            refusal = existing_journal_refusal(journal, PAPER_URL)
         if refusal is not None:
-            # A live env file is refused here, before any credential is read.
             run = CapacityRun(_UnbuiltPaperPort(), config, argv=raw_argv)
             receipt = run.refuse(refusal)
         else:
@@ -2319,15 +2591,11 @@ def main(argv=None):
                 config.base_url = base  # CapacityConfig.validate refuses it before any request
             from alpaca_capacity_port import AlpacaCapacityPort
             port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
-            journal = args.journal
-            if args.command == "paper" and journal is None:
-                journal = args.output.with_suffix(".journal.jsonl")
             run = CapacityRun(port, config, account_scope=_paper_scope(args.adaptive_state_root,
                                                                        args.accept_adaptive_lane_conflict),
                               journal_path=journal if args.command == "paper" else None, argv=raw_argv)
     if receipt is None:
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            signal.signal(sig, lambda *_: run.request_stop("signal"))
+        install_stop_signals(run)
         if args.command in ("recover", "audit"):
             receipt = run.recover(args.journal, cancel=args.command == "recover")
         else:

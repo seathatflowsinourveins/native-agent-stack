@@ -59,7 +59,9 @@ evidence of strategy quality.
    POST session, orders carry `extended_hours=true`. The CLOSED session is
    refused. The calendar is adaptive-paper `sessions.py` (2026 only). A
    synchronous rejection, such as a price collar, is recorded as data by HTTP
-   status. `--max-consecutive-rejections` ends the run.
+   status. `--max-consecutive-rejections` ends the run. Live probes are
+   stricter: SPY, QQQ, IWM or DIA only, and a quote at most 10 s old (see
+   [Live](#probes-and-caps)).
 4. **State from the websocket.** Order state comes from `trade_updates`, not
    from polling, so the REST budget goes only to submits and cancels. A probe
    is cancelled individually (`DELETE /v2/orders/{id}`) once the stream shows
@@ -73,8 +75,13 @@ evidence of strategy quality.
    raised. The first one freezes submissions and makes the run `failed`. An
    affected submit becomes ambiguous, so the sweep and reconciliation resolve
    it. Further in-flight failures are recorded the same way.
-5. **Cleanup** runs on normal end, STOP, SIGINT/SIGTERM, a freeze or an
-   exception. It cancels every live probe individually. It then lists open
+5. **Cleanup** runs on normal end, STOP, a stop signal, a freeze or an
+   exception. The stop signals are SIGINT, SIGTERM, SIGHUP (the terminal or
+   WSL session closed) and SIGQUIT. In a run, each stops new submissions;
+   cleanup, reconciliation, the receipt and the journal end record still run.
+   `recover` and `audit` finish their work instead of stopping. SIGKILL cannot
+   be caught (see the journal below). Cleanup cancels every live probe
+   individually. It then lists open
    orders and cancels anything left with this run's `client_order_id` prefix,
    including submits whose outcome was ambiguous. A final open-order listing
    must show **zero** open orders with the prefix (`verified_zero_open`).
@@ -150,6 +157,14 @@ evidence of strategy quality.
   `audit` lists the prefix's orders read-only. Like adaptive-paper's STOP,
   which blocks entries but never cancels, the STOP file does not block
   `recover`.
+- **Journal mode.** The start record also records the run's `mode` (`paper`
+  or `live`) and `trading_origin`. `recover` and `audit` are paper commands:
+  they read the journal's start record before any credential and refuse a
+  live run's journal (`live_journal_in_paper_mode`). A journal written before
+  these fields existed is judged by its recorded `config.base_url`; fields that
+  disagree refuse it (`journal_origin_unknown`). A run refuses any file already
+  at its journal path before any request (`journal_exists`), and names another
+  mode's journal (`live_journal_in_paper_mode`, `paper_journal_in_live_mode`).
 - **Existing exposure.** The run is refused unless the exact number of
   existing nonzero positions and open orders matches `--acknowledge-positions`
   and `--acknowledge-open-orders` (both default 0).
@@ -315,14 +330,19 @@ them.
    any name containing `paper`) is refused (`paper_env_file_in_live_mode`).
    The paper-side commands refuse an `alpaca-live*` env file the same way.
    Neither check reads the file.
-4. The live configuration: `--band-bps` at least 500
-   (`live_band_bps_below_500`), qty 1, no cancel-all
-   (`live_cancel_all_disabled`), no extended hours, and
-   `--acknowledge-open-orders 0`.
-5. Regular trading hours only: 09:30-16:00 ET, with early closes (13:00 ET)
+4. The live configuration: `--symbol` SPY, QQQ, IWM or DIA
+   (`live_symbol_not_allowed`), `--headroom` 0.9 (`live_headroom_must_be_0_9`),
+   `--band-bps` at least 500 (`live_band_bps_below_500`), qty 1, no cancel-all
+   (`live_cancel_all_disabled`), no extended hours,
+   `--acknowledge-open-orders 0`, a maximum quote age of at most 10 s
+   (`live_max_quote_age_above_10s`) and a price refresh at least every 5 s
+   (`live_requote_seconds_above_5s`).
+5. No file at the journal path (`journal_exists`, or
+   `paper_journal_in_live_mode` for a paper run's journal).
+6. Regular trading hours only: 09:30-16:00 ET, with early closes (13:00 ET)
    taken from the engine's session calendar. PRE, POST and CLOSED are refused
    (`live_outside_regular_trading_hours`).
-6. No STOP file. There are two: the host STOP
+7. No STOP file. There are two: the host STOP
    (`~/.local/state/native-agent-stack/alpaca-paper/STOP`) and the live STOP
    (`~/.local/state/native-agent-stack/alpaca-live/STOP`). Both work as in
    paper: a STOP at start refuses the run, and a STOP mid-run stops submits
@@ -341,12 +361,24 @@ identity and kept in adaptive-paper's lock directory.
 
 ### Probes and caps
 
-- Each probe is a DAY limit BUY for qty 1 of one liquid symbol (default SPY),
-  priced at least 500 bps below the current bid. Each probe is cancelled
+- Each probe is a DAY limit BUY for qty 1 of SPY (default), QQQ, IWM or DIA.
+  The live port itself refuses any other symbol. Each probe is cancelled
   individually; cancel-all stays disabled.
+- A probe is priced at least 500 bps below the bid of a quote at most 10 s
+  old:
+  - A quote older than 10 s (or more than 1 s ahead of the host clock) never
+    prices a probe. At preflight it refuses the run (`quote_stale`).
+  - The price is refreshed every 5 s. Once its quote is older than 10 s,
+    submissions hold and the refresh repeats at most once a second. A stale
+    refresh is refused and counted. The first fresh quote reprices the probes,
+    and submissions resume. Cancels continue during a hold.
+  - The REST worker checks the quote's age once more immediately before each
+    submit. A submit that waited too long is not sent.
+  - A failed, halted or otherwise unusable refresh stops submissions, as in
+    paper.
 - The budget is `floor(min(--cap, observed x-ratelimit-limit) * 0.9)` calls
   per 60 s, using the same governor as paper. `--cap` defaults to 1000 in
-  live.
+  live. Any `--headroom` other than 0.9 refuses the run.
 - Per-order notional is at most min(`--max-order-notional`, 1000, the go
   file's `max_open_notional_usd`).
 - Open notional is at most min(`--max-open-notional`, 2000, the go file's
@@ -362,7 +394,13 @@ identity and kept in adaptive-paper's lock directory.
 - The receipt's `live.caps_used` and `live.cap_binding` show each cap
   actually used, and whether `cli`, `go_file` or `live_ceiling` set it.
 - A governed positions read every 10 s compares every nonzero position with
-  the preflight snapshot.
+  the preflight snapshot. Any failed read stops submissions
+  (`live_position_check_failed`) and is not retried. A failed read is an
+  exception (the native port raises on every error status, 429 and 5xx
+  included), a response that is not 2xx, or unreadable rows.
+- SIGINT, SIGTERM, SIGHUP (the terminal or WSL session closed) and SIGQUIT
+  stop submissions, and cleanup still cancels this run's probes. SIGKILL
+  cannot be caught; see [Not implemented](#not-implemented).
 
 ### Fills and position changes
 
@@ -376,12 +414,23 @@ Submissions stop immediately on any of these:
 No new probe is submitted after the event is seen. Submits already in flight
 (at most `--inflight`) cannot be recalled; cleanup cancels them with the
 rest. Cleanup cancels every open probe of this run individually. The harness
-never sells or flattens a position. The run ends `needs_attention`, and the
-receipt shows what happened:
+never sells or flattens a position. The run ends `needs_attention`, also when
+a port error was recorded; `error_type` and `port_errors` still show that
+error. The receipt shows what happened, as far as it is known:
 
-- `live.fills` lists each filled probe's quantity and average price, from the
-  stream and from the broker's order listing.
-- `live.filled_qty_total` gives the total, and `live.auto_sell` is `false`.
+- `live.fills` has one entry per event, by `kind`:
+  - `probe_fill`: a filled probe of this run, with its `seq` and symbol. It
+    gives the quantity and average price from the stream and from the
+    broker's order listing.
+  - `other_order_fill`: a filled order this run does not own. It gives the
+    symbol, side, quantity and average price from the stream and from the
+    listing. It never includes the order's ids.
+  - `position_change`: a position that differs from the preflight snapshot,
+    with `before`, `after` and which read saw it (`periodic_check`,
+    `reconciliation`). A change of the probe symbol that equals this run's
+    probe fills is not repeated here.
+- `live.filled_qty_total` totals this run's probe fills, and `live.auto_sell`
+  is `false`.
 
 You decide what to do with the position.
 
@@ -395,6 +444,10 @@ contains:
   `user_go.rechecks` for the mid-run re-reads;
 - the caps used;
 - `order_actions`, with the actions sent and the cap;
+- `quote_freshness`: the age limit, the refresh interval, and counts of stale
+  refreshes refused (`stale_quotes_refused`), submission holds
+  (`submit_holds`) and submits not sent by the worker's age check
+  (`stale_at_dispatch`);
 - `fills`, `position_checks` and `stop_files_seen` (labels, not paths).
 
 Like the paper receipt, it contains no account id, account hash, balance or
@@ -403,10 +456,11 @@ class `native_live` and the same frozen criteria. It remains self-reported.
 
 ### Not implemented
 
-- There is no live `recover` or `audit`. After a crash, the run journal
-  (`<output>.journal.jsonl`) holds the run's `client_order_id` prefix. Cancel
-  any open order with that prefix in the Alpaca dashboard. The probes are DAY
-  orders and expire at the close.
+- There is no live `recover` or `audit`. The paper `recover` and `audit`
+  refuse a live run's journal before reading any credential. After a crash
+  or SIGKILL, the run journal (`<output>.journal.jsonl`) holds the run's
+  `client_order_id` prefix. Cancel any open order with that prefix in the
+  Alpaca dashboard. The probes are DAY orders and expire at the close.
 - The live port has not been run against Alpaca or its network endpoints.
 
 ## Acceptance criteria for a capacity run
@@ -488,7 +542,7 @@ IDs.
 
 | File | Role |
 |---|---|
-| `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, journal and `recover`/`audit`, receipt, CLI; live mode (`LiveCapacityConfig`, `LiveCapacityRun`, go-file and env-file gates) |
+| `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, journal (with its mode check) and `recover`/`audit`, receipt, CLI and its stop signals; live mode (`LiveCapacityConfig`, `LiveCapacityRun`, go-file and env-file gates, quote freshness) |
 | `rate_governor.py` | Token bucket + rolling window + remaining/reset + 429 backoff |
 | `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only. `AlpacaLiveCapacityPort`: the only live-origin `GuardedSession` and live `trade_updates` stream |
 | `capacity_fixture.py` | Offline fake clock, broker and `trade_updates` stream |
@@ -501,8 +555,8 @@ IDs.
 |---|---|
 | Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff (including during cleanup), refusals, cleanup, and reconciliation, including a lost response for a created order. Also: per-page listing admission, several in-flight calls completing out of order, the real `ThreadPoolExecutor` path, failing in-flight port calls, and crash then journal recovery. See `tests/test_order_throughput.py`. |
 | Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
-| Measured (offline fixture, live mode) | Each live gate's refusal: go file, acknowledgement flag, env-file names both ways, band, RTH including an early close, open orders, both STOP files, cancel-all. Also: caps from min(CLI, go file, live ceilings), the order-action cap on the worst-case cancel path, fill and position-change stops without selling, and go expiry, revocation or change mid-run. See `LiveCapacityTests` and `LivePortTests` in `tests/test_order_throughput.py`. |
-| Measured (SDK objects, no network) | Under alpaca-py 0.44.0, the live `TradingClient` and its `GuardedSession` use only `https://api.alpaca.markets`, and the live stream only `wss://api.alpaca.markets/stream`. The paper port's objects use only the paper origin. The live preflight, run against stub clients, returns an identity hash and no account id or balance. These tests are skipped where alpaca-py is not installed. |
-| Not yet measured | Any native paper run of this harness. Any live run, and the live port against Alpaca. |
-| Not exercised against the SDK | `alpaca_capacity_port.py` was not run with alpaca-py 0.44.0 in this change, because the SDK was not installed on the authoring host and no network was used. |
+| Measured (offline fixture, live mode) | Each live gate's refusal: go file, acknowledgement flag, env-file names both ways, symbol, headroom, quote age and refresh limits, band, an existing journal, RTH including an early close, open orders, both STOP files, cancel-all. Also: caps from min(CLI, go file, live ceilings), the order-action cap on the worst-case cancel path, and go expiry, revocation or change mid-run. Fills and position changes stop the run without selling; they end `needs_attention` even with a port error, and the receipt keeps another order's fill quantity and price. A 25 s quote-feed stall: no probe priced from a quote over 10 s old, submissions hold, then resume. SIGHUP and SIGQUIT stop the run and cleanup runs. A failed position read fails closed. Paper `recover` and `audit` refuse a live journal, including one without the mode fields, before reading credentials. See `LiveCapacityTests` and `LivePortTests` in `tests/test_order_throughput.py`. |
+| Measured (SDK objects, no network) | Under alpaca-py 0.44.0 (the adaptive-paper pinned venv, Python 3.12): the live `TradingClient` and its `GuardedSession` use only `https://api.alpaca.markets`, and the live stream only `wss://api.alpaca.markets/stream`. The paper port's objects use only the paper origin. The live preflight, run against stub clients, returns an identity hash and no account id or balance. These tests build SDK objects and send no request. They are skipped where alpaca-py is not installed. |
+| Not exercised with SDK objects | The order request (`LimitOrderRequest`); the port's submit, cancel, listing, positions and quote-refresh calls through SDK clients; a running `trade_updates` stream. Their logic is tested with stub clients only. |
+| Not yet measured | Any native paper run of this harness. Any live run, and either port against Alpaca's REST or websocket endpoints. |
 | Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination in practice (it is documented on the Trading API "Get All Orders" reference, updated 2026-05-27, as exclusive and not to be combined with `after`/`until`; adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |

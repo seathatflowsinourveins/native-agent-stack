@@ -26,7 +26,8 @@ This module has not been exercised against Alpaca in this change.
 ``GuardedSession`` is built for the live origin https://api.alpaca.markets, and
 its ``trade_updates`` stream is pinned to wss://api.alpaca.markets/stream. It
 keeps the same method/path allowlist (no cancel-all path), is constructed only
-with a verified, unexpired ``capacity.LiveGo``, and re-checks the host and
+with a verified, unexpired ``capacity.LiveGo`` and one of ``capacity.LIVE_SYMBOLS``
+(SPY, QQQ, IWM, DIA), submits only that symbol, and re-checks the host and
 alpaca-live STOP files and the go file's expiry before every POST. The paper
 port above never admits the live origin. The live port has not been run
 against Alpaca or its network endpoints.
@@ -48,7 +49,7 @@ for _path in (str(HERE), str(ADAPTIVE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from capacity import LIVE_URL, LIVE_WS, LiveGo, Response  # noqa: E402
+from capacity import LIVE_SYMBOLS, LIVE_URL, LIVE_WS, LiveGo, Response  # noqa: E402
 from safety import DEFAULT_STOP, SafetyError  # noqa: E402
 import transport  # noqa: E402
 
@@ -378,12 +379,20 @@ class AlpacaLiveCapacityPort(AlpacaCapacityPort):
     def __init__(self, api_key, secret_key, symbol, *, go, feed="iex", workers=4, stop_files=()):
         if not isinstance(go, LiveGo) or not go.expires_at > time.time():
             raise transport.TransportError("live port requires a verified, unexpired user go")
+        if symbol not in LIVE_SYMBOLS:
+            raise transport.TransportError("live port admits SPY, QQQ, IWM or DIA only")
         stop_files = tuple(Path(path) for path in stop_files)
         if len(stop_files) < 2:
             raise transport.TransportError("live port requires the host and alpaca-live STOP files")
         super().__init__(api_key, secret_key, symbol, feed=feed, workers=workers, stop_file=stop_files[0])
         self.go = go
         self.stop_files = stop_files
+
+    def submit(self, client_order_id, symbol, qty, limit_price, extended_hours):
+        # This port's own allowlisted symbol only; refused before any SDK object is built.
+        if symbol != self.symbol or symbol not in LIVE_SYMBOLS:
+            return Response(None, error="live_symbol_not_allowed", not_sent=True)
+        return super().submit(client_order_id, symbol, qty, limit_price, extended_hours)
 
     def _before_request(self, kind, client_id=None):
         # Final boundary: GuardedSession turns this refusal into SubmissionNotSent.
