@@ -20,14 +20,19 @@ from contextlib import contextmanager, nullcontext
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from decimal import ROUND_DOWN, Decimal, InvalidOperation
+import hashlib
+import importlib.metadata
 import json
 import math
+import os
 from pathlib import Path
+import platform
 import queue
 import re
 import secrets
 import shlex
 import signal
+import subprocess
 import sys
 import time
 
@@ -56,6 +61,19 @@ PREFIX = re.compile(r"cap-[0-9]{8}t[0-9]{6}-[0-9a-f]{6}-\Z")
 SYMBOL = re.compile(r"[A-Z][A-Z0-9.\-]{0,14}\Z")
 CENT = Decimal("0.01")
 MAX_CANCEL_ATTEMPTS = 3
+# Cleanup may outlast cleanup_timeout_seconds by this many governor max_backoff
+# periods, so a 429 near or during cleanup cannot consume the whole window.
+CLEANUP_BACKOFF_PERIODS = 3
+CLEANUP_VERIFY_ROUNDS = 3
+RECONCILE_SECONDS = 30.0
+SESSION_MARGIN_SECONDS = 30.0
+# Frozen qualification criteria (README "Acceptance criteria"). Configurable
+# values below these stay exploratory: acceptance.passed is then false.
+FROZEN_REQUIRED_WINDOWS = 5
+FROZEN_TARGET_ACTIONS_RATIO = 0.85
+PATH_OPTIONS = frozenset({"--env-file", "--output", "--journal", "--adaptive-state-root", "--stop-file"})
+SOURCE_FILES = ("capacity.py", "rate_governor.py", "alpaca_capacity_port.py", "capacity_fixture.py")
+ADAPTIVE_SOURCE_FILES = ("transport.py", "safety.py", "sessions.py", "runner.py")
 
 
 class HarnessRefusal(RuntimeError):
@@ -266,6 +284,109 @@ def env_base_url(path):
     return None
 
 
+class Journal:
+    """Append-only JSONL run journal (0600, created exclusively, no secrets).
+
+    The start record, which carries the ``client_order_id`` prefix, is fsynced
+    before the stream starts and before any order is sent, so a run killed by
+    SIGKILL, OOM or power loss can still be found and cancelled with
+    ``capacity.py recover``. Each probe intent is written and flushed before
+    its POST (it survives process death; the prefix alone suffices for
+    recovery). The end record is fsynced."""
+
+    def __init__(self, path):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        try:
+            fd = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_APPEND | os.O_NOFOLLOW, 0o600)
+        except FileExistsError:
+            raise HarnessRefusal("journal_exists") from None
+        except OSError:
+            raise HarnessRefusal("journal_unavailable") from None
+        self._stream = os.fdopen(fd, "a")
+
+    def write(self, record, sync=False):
+        self._stream.write(json.dumps(record, sort_keys=True) + "\n")
+        self._stream.flush()
+        if sync:
+            os.fsync(self._stream.fileno())
+
+    def close(self):
+        try:
+            self._stream.flush()
+            os.fsync(self._stream.fileno())
+        finally:
+            self._stream.close()
+
+
+def read_journal(path):
+    """Parse a run journal; a torn final line (crash mid-write) is ignored."""
+    try:
+        lines = Path(path).read_text().splitlines()
+    except OSError:
+        raise HarnessRefusal("journal_unreadable") from None
+    start, intents, end = None, [], None
+    for line in lines:
+        try:
+            record = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(record, dict):
+            continue
+        if record.get("type") == "start" and start is None:
+            start = record
+        elif record.get("type") == "intent":
+            intents.append(record)
+        elif record.get("type") == "end":
+            end = record
+    if start is None or not PREFIX.fullmatch(str(start.get("prefix") or "")):
+        raise HarnessRefusal("journal_has_no_start_record")
+    return {"start": start, "intents": intents, "end": end}
+
+
+def sanitize_argv(argv):
+    """Keep the argument vector but replace private path values."""
+    result, redact_next = [], False
+    for item in argv or []:
+        item = str(item)
+        if redact_next:
+            result.append("<path>")
+            redact_next = False
+        elif item in PATH_OPTIONS:
+            result.append(item)
+            redact_next = True
+        elif "=" in item and item.split("=", 1)[0] in PATH_OPTIONS:
+            result.append(item.split("=", 1)[0] + "=<path>")
+        else:
+            result.append(item)
+    return result
+
+
+def _sha256(path):
+    try:
+        return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def source_provenance():
+    """Harness source identity for the receipt: file hashes, git revision, SDK version."""
+    try:
+        done = subprocess.run(["git", "-C", str(HERE), "rev-parse", "HEAD"], capture_output=True,
+                              text=True, timeout=5, check=False)
+        revision = done.stdout.strip() if done.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError):
+        revision = None
+    try:
+        sdk = importlib.metadata.version("alpaca-py")
+    except importlib.metadata.PackageNotFoundError:
+        sdk = None
+    files = {"order-throughput/" + name: _sha256(HERE / name) for name in SOURCE_FILES}
+    files.update({"adaptive-paper/" + name: _sha256(ADAPTIVE / name) for name in ADAPTIVE_SOURCE_FILES})
+    return {"git_revision": revision, "source_sha256": files, "alpaca_py_version": sdk,
+            "python_version": platform.python_version()}
+
+
 class CapacityRun:
     """One bounded capacity run against a broker port.
 
@@ -273,13 +394,14 @@ class CapacityRun:
     ``evidence_class``; ``supports_cancel_all``; ``preflight()`` -> dict;
     ``submit(client_order_id, symbol, qty, limit_price, extended_hours)``,
     ``cancel(order_id)`` and ``cancel_all()`` -> Response;
-    ``list_orders(status, after_wall)`` -> (orders, complete, [Response]);
+    ``list_orders(status, after_wall, admit)`` -> (orders, complete, [Response]),
+    where ``admit()`` must return True before each page after the first;
     ``positions()`` -> (positions, [Response]); ``latest_quote()`` -> dict;
     ``start_stream(callback, timeout)``, ``stream_health()`` and ``stop_stream()``.
     """
 
     def __init__(self, port, config, *, clock=None, executor=None, stop_file=None,
-                 account_scope=None, prefix=None):
+                 account_scope=None, prefix=None, journal_path=None, argv=None):
         self.port = port
         self.config = config
         self.clock = clock or SystemClock()
@@ -287,15 +409,23 @@ class CapacityRun:
         self.stop_file = Path(stop_file) if stop_file is not None else DEFAULT_STOP
         self.account_scope = account_scope or (lambda fingerprint: nullcontext())
         self.prefix = prefix
+        self.journal_path = None if journal_path is None else Path(journal_path)
+        self.journal = None
+        self.argv = sanitize_argv(argv)
+        self.exit_code = None
+        self.mode = "run"
         self.governor = None
         self.probes = {}
         self._live = {}
         self._events = queue.Queue()
         self._inflight = {}
+        self._quote_future = None
         self._cancel_queue = []
         self._stop_reason = None
         self._health = set()
         self._stream_started = False
+        self._broker_seen = set()
+        self.port_errors = 0
         self.actions = []
         self.responses = []
         self.stream_stats = {"events_total": 0, "events_this_run": 0, "foreign_events_ignored": 0,
@@ -345,18 +475,18 @@ class CapacityRun:
 
     # -- stream -----------------------------------------------------------------
     def _on_stream(self, raw):
-        """Called on the stream thread (or inline by a fake); only enqueues."""
-        self._events.put(raw)
+        """Called on the stream thread (or inline by a fake); stamps receipt time and enqueues."""
+        self._events.put((self.clock.monotonic(), raw))
 
     def _drain_events(self):
         while True:
             try:
-                raw = self._events.get_nowait()
+                at, raw = self._events.get_nowait()
             except queue.Empty:
                 return
-            self._handle_event(raw)
+            self._handle_event(raw, at)
 
-    def _handle_event(self, raw):
+    def _handle_event(self, raw, at=None):
         self.stream_stats["events_total"] += 1
         try:
             payload = raw.get("data", raw)
@@ -380,7 +510,7 @@ class CapacityRun:
             self.stream_stats["unknown_harness_events"] += 1
             self._freeze("unknown_harness_order")
             return
-        now = self.clock.monotonic()
+        now = self.clock.monotonic() if at is None else at
         probe.events.append(event or status)
         if order_id:
             if probe.order_id and probe.order_id != order_id:
@@ -419,31 +549,66 @@ class CapacityRun:
         if response.origin == "trading" and not response.not_sent:
             self.governor.on_response(kind, response.status, response.headers, inflight=len(self._inflight))
 
+    def _timed(self, fn, *args):
+        """Runs on a REST worker: the completion time is stamped there, not at collection."""
+        result = fn(*args)
+        return result, self.clock.monotonic()
+
+    def _port_error(self, exc):
+        """A port defect (an exception rather than a Response). The first one fails
+        the run and freezes submissions; cleanup and reconciliation still run."""
+        self.port_errors += 1
+        self.error_type = self.error_type or type(exc).__name__
+        self._freeze("port_exception")
+
+    @staticmethod
+    def _ok(response):
+        status = getattr(response, "status", None)
+        return not getattr(response, "not_sent", True) and status is not None and 200 <= status < 300
+
     def _dispatch(self, kind, fn, *args, key):
-        now = self.clock.monotonic()
-        self.actions.append({"t": now, "kind": kind})
-        future = self.executor.submit(fn, *args)
-        self._inflight[future] = (kind, key)
+        action = {"t": self.clock.monotonic(), "kind": kind, "ok": None}
+        self.actions.append(action)
+        future = self.executor.submit(self._timed, fn, *args)
+        self._inflight[future] = (kind, key, action)
 
     def _collect(self):
+        """Handle every finished REST call. Never raises: a failed future is recorded."""
         for future in [future for future in self._inflight if future.done()]:
-            kind, key = self._inflight.pop(future)
-            response = future.result()  # a port defect is fatal: the run ends and cleans up
-            self._record(kind, response, "run")
+            kind, key, action = self._inflight.pop(future)
             probe = self.probes[key]
+            try:
+                response, done_at = future.result()
+            except Exception as exc:
+                action["ok"] = False
+                self._port_error(exc)
+                if kind == "submit":
+                    # The order may exist; the prefix sweep and reconciliation resolve it.
+                    probe.rest_status = None
+                    probe.state = "accepted_by_stream" if probe.events else "ambiguous"
+                    self.rejections["port_exception"] = self.rejections.get("port_exception", 0) + 1
+                    self._settle(probe)
+                else:
+                    probe.cancel_statuses.append(None)
+                    probe.cancel_state = None
+                    if not probe.terminal:
+                        self._schedule_cancel(probe)
+                continue
+            action["ok"] = self._ok(response)
+            self._record(kind, response, "run")
             if kind == "submit":
-                self._on_submit(probe, response)
+                self._on_submit(probe, response, done_at)
             else:
-                self._on_cancel(probe, response)
+                self._on_cancel(probe, response, done_at)
 
-    def _on_submit(self, probe, response):
+    def _on_submit(self, probe, response, done_at=None):
         probe.rest_status = response.status
         if response.not_sent:
             probe.state = "not_sent"
             self.rejections["not_sent"] = self.rejections.get("not_sent", 0) + 1
         elif response.status is not None and 200 <= response.status < 300 and response.order:
             probe.state = "accepted"
-            probe.rest_at = self.clock.monotonic()
+            probe.rest_at = self.clock.monotonic() if done_at is None else done_at
             order_id = str(response.order.get("id") or "")
             if order_id:
                 if probe.order_id and probe.order_id != order_id:
@@ -465,11 +630,12 @@ class CapacityRun:
             self.consecutive_rejections += 1
         self._settle(probe)
 
-    def _on_cancel(self, probe, response):
+    def _on_cancel(self, probe, response, done_at=None):
+        done_at = self.clock.monotonic() if done_at is None else done_at
         probe.cancel_statuses.append(response.status)
         if response.status is not None and 200 <= response.status < 300:
             probe.cancel_state = "acknowledged"
-            probe.cancel_done_at = self.clock.monotonic()
+            probe.cancel_done_at = done_at
         elif response.status == 429 or response.status is None or response.status >= 500:
             probe.cancel_state = None  # retried once the governor's backoff ends
             if not probe.terminal:
@@ -477,48 +643,64 @@ class CapacityRun:
         else:
             # 404/422: typically already terminal; the stream and reconciliation decide.
             probe.cancel_state = "refused_%d" % response.status
-            probe.cancel_done_at = self.clock.monotonic()
+            probe.cancel_done_at = done_at
+
+    @staticmethod
+    def _due(deadline):
+        return deadline() if callable(deadline) else deadline
 
     def _governed(self, kind, deadline):
-        while self.clock.monotonic() < deadline:
+        """Wait for one admission until ``deadline`` (a value or a callable re-read each pass)."""
+        while self.clock.monotonic() < self._due(deadline):
             if self.governor.try_acquire(kind):
                 return True
             self.clock.sleep(max(0.001, min(0.25, self.governor.wait_hint())))
         return False
 
     def _sync(self, kind, deadline, fn, *args, phase):
-        """One governed synchronous call (cleanup/reconciliation). None if no budget."""
+        """One governed synchronous call (cleanup/reconciliation). None if no budget or a port defect."""
         if not self._governed("cancel" if kind in ("cancel", "cancel_all") else kind, deadline):
             return None
-        self.actions.append({"t": self.clock.monotonic(), "kind": kind})
-        result = fn(*args)
-        responses = [result] if isinstance(result, Response) else result[-1]
-        # Extra pages of one listing were not individually admitted; count them.
-        if len(responses) > 1:
-            self.governor.note_external_calls(len(responses) - 1)
+        action = {"t": self.clock.monotonic(), "kind": kind, "ok": None}
+        self.actions.append(action)
+        try:
+            result = fn(*args)
+        except Exception as exc:
+            action["ok"] = False
+            self._port_error(exc)
+            return None
+        # Listings and positions return tuples ending in their responses; cancels return one.
+        responses = list(result[-1]) if isinstance(result, tuple) else [result]
+        action["ok"] = bool(responses) and self._ok(responses[0])
         for response in responses:
             self._record("read" if kind == "read" else "cancel", response, phase)
+        return result
+
+    def _list(self, status, after_wall, deadline, phase):
+        """A governed, paged order listing: every page is admitted by the governor."""
+        pages = {"admitted": 0}
+
+        def admit():
+            if not self._governed("read", deadline):
+                return False
+            pages["admitted"] += 1
+            self.actions.append({"t": self.clock.monotonic(), "kind": "read", "ok": True})
+            return True
+
+        result = self._sync("read", deadline, self.port.list_orders, status, after_wall, admit, phase=phase)
+        if result is None:
+            return None
+        # A port that ignored ``admit`` sent unadmitted pages; count them in the window.
+        extra = len(result[-1]) - 1 - pages["admitted"]
+        if extra > 0:
+            self.governor.note_external_calls(extra)
         return result
 
     # -- phases -----------------------------------------------------------------
     def _preflight(self):
         pre = self.port.preflight()
+        limits = self._governor_from(pre)
         observations = pre.get("observations", [])
-        trading = [o for o in observations if o.get("origin") == "trading"]
-        limits = [int(str(o["headers"]["x-ratelimit-limit"])) for o in trading
-                  if str((o.get("headers") or {}).get("x-ratelimit-limit", "")).isdigit()]
-        self.responses.extend({"kind": o.get("kind", "read"), "status": o.get("status"),
-                               "origin": o.get("origin"), "headers": dict(o.get("headers") or {}),
-                               "phase": "preflight"} for o in observations)
-        if not limits:
-            raise HarnessRefusal("trading_rate_limit_header_unobserved")
-        self.governor = RateGovernor(self.config.configured_cap_per_minute, headroom=self.config.headroom,
-                                     burst=self.config.burst, clock=self.clock.monotonic, wall=self.clock.time)
-        # The market-data origin reports its own, unrelated limit; only trading headers count.
-        self.governor.observe_limit(limits[-1])
-        self.governor.note_external_calls(len(trading))
-        last = trading[-1].get("headers") or {}
-        self.governor.on_response("read", trading[-1].get("status"), last)
         positions = [p for p in pre.get("positions", []) if Decimal(str(p.get("qty", "0"))) != 0]
         open_orders = list(pre.get("open_orders", []))
         self._preflight_open_orders = len(open_orders)
@@ -544,6 +726,36 @@ class CapacityRun:
             raise HarnessRefusal("asset_not_tradable")
         return pre
 
+    def _governor_from(self, pre):
+        """Size the RateGovernor from the preflight's trading-origin headers."""
+        observations = pre.get("observations", [])
+        trading = [o for o in observations if o.get("origin") == "trading"]
+        limits = [int(str(o["headers"]["x-ratelimit-limit"])) for o in trading
+                  if str((o.get("headers") or {}).get("x-ratelimit-limit", "")).isdigit()]
+        self.responses.extend({"kind": o.get("kind", "read"), "status": o.get("status"),
+                               "origin": o.get("origin"), "headers": dict(o.get("headers") or {}),
+                               "phase": "preflight"} for o in observations)
+        if not limits:
+            raise HarnessRefusal("trading_rate_limit_header_unobserved")
+        self.governor = RateGovernor(self.config.configured_cap_per_minute, headroom=self.config.headroom,
+                                     burst=self.config.burst, clock=self.clock.monotonic, wall=self.clock.time)
+        # The market-data origin reports its own, unrelated limit; only trading headers count.
+        self.governor.observe_limit(limits[-1])
+        self.governor.note_external_calls(len(trading))
+        last = trading[-1].get("headers") or {}
+        self.governor.on_response("read", trading[-1].get("status"), last)
+        return limits
+
+    def cleanup_ceiling_seconds(self):
+        """Hard bound on cleanup: the timeout plus room for a few governor backoffs."""
+        max_backoff = self.governor.max_backoff if self.governor else 60.0
+        return self.config.cleanup_timeout_seconds + CLEANUP_BACKOFF_PERIODS * max_backoff
+
+    def post_loop_reserve_seconds(self):
+        """Everything that can run after the submission deadline, plus stream start before t0."""
+        return (self.config.stream_start_timeout_seconds + self.cleanup_ceiling_seconds()
+                + RECONCILE_SECONDS + SESSION_MARGIN_SECONDS)
+
     def _session(self):
         now = datetime.fromtimestamp(self.clock.time(), timezone.utc)
         try:
@@ -557,8 +769,9 @@ class CapacityRun:
             if not self.config.allow_extended_hours:
                 raise HarnessRefusal("extended_hours_not_allowed")
             self.extended_hours = True
-        # Finish, including cleanup, inside the current session segment.
-        remaining = (info.seconds_to_close or 0) - self.config.cleanup_timeout_seconds - 30.0
+        # Finish, including stream start, cleanup (with its backoff allowance) and
+        # reconciliation, inside the current session segment.
+        remaining = (info.seconds_to_close or 0) - self.post_loop_reserve_seconds()
         if remaining < 60.0:
             raise HarnessRefusal("session_ends_too_soon")
         return min(self.config.max_duration_seconds, remaining)
@@ -573,16 +786,24 @@ class CapacityRun:
         self.quote_at = self.clock.monotonic()
 
     def _requote(self):
-        if self.clock.monotonic() - self.quote_at < self.config.requote_seconds:
+        """Refresh the probe price on a worker so the data call never blocks the main loop."""
+        future = self._quote_future
+        if future is not None:
+            if not future.done():
+                return
+            self._quote_future = None
+            try:
+                quote, _ = future.result()
+                self._price(quote)
+            except HarnessRefusal as exc:
+                self._freeze("requote_" + str(exc))
+            except Exception:
+                self._freeze("requote_failed")
+            finally:
+                self.quote_at = self.clock.monotonic()
             return
-        try:
-            self._price(self.port.latest_quote())
-        except HarnessRefusal as exc:
-            self._freeze("requote_" + str(exc))
-        except Exception:
-            self._freeze("requote_failed")
-        finally:
-            self.quote_at = self.clock.monotonic()
+        if self.clock.monotonic() - self.quote_at >= self.config.requote_seconds:
+            self._quote_future = self.executor.submit(self._timed, self.port.latest_quote)
 
     def _stop_condition(self, deadline):
         if self._stop_reason:
@@ -625,6 +846,11 @@ class CapacityRun:
         seq = len(self.probes) + 1
         cid = "%s%06d" % (self.prefix, seq)
         probe = Probe(cid, seq, str(self.limit_price), self.config.qty, self.extended_hours)
+        if self.journal is not None:
+            # Written (and flushed) before the POST, so a crash leaves a record of the intent.
+            self.journal.write({"type": "intent", "seq": seq, "client_order_id": cid,
+                                "limit_price": probe.limit_price, "qty": probe.qty,
+                                "extended_hours": probe.extended_hours})
         probe.sent_at = self.clock.monotonic()
         self.probes[cid] = self._live[cid] = probe
         self._dispatch("submit", self.port.submit, cid, self.config.symbol, self.config.qty,
@@ -665,14 +891,14 @@ class CapacityRun:
                 self.clock.sleep(max(0.001, min(0.05, hint)))
 
     def _wait_inflight(self, deadline):
-        while self._inflight and self.clock.monotonic() < deadline:
+        while self._inflight and self.clock.monotonic() < self._due(deadline):
             self._collect()
             self._drain_events()
             if self._inflight:
                 self.clock.sleep(0.005)
 
     def _list_open(self, deadline, phase):
-        result = self._sync("read", deadline, self.port.list_orders, "open", None, phase=phase)
+        result = self._list("open", None, deadline, phase)
         if result is None:
             return None, False
         orders, complete, _ = result
@@ -681,7 +907,7 @@ class CapacityRun:
     def _cancel_live(self, deadline, result):
         """Cancel every live order with a known broker id, individually, through the governor."""
         last_activity = self.clock.monotonic()
-        while self.clock.monotonic() < deadline:
+        while self.clock.monotonic() < self._due(deadline):
             self._drain_events()
             self._collect()
             for probe in self._open_probes():
@@ -702,29 +928,16 @@ class CapacityRun:
         self._wait_inflight(deadline)
         self._drain_events()
 
-    def _cleanup(self):
-        """Cancel every order this run created and verify that none remains open."""
-        start = self.clock.monotonic()
-        deadline = start + self.config.cleanup_timeout_seconds
-        result = {"cancel_all_used": False, "cancel_all_decision": "not_enabled",
-                  "individual_cancels": 0, "rest_sweep_cancels": 0}
-        self._wait_inflight(deadline)
-        self._drain_events()
-        # 0) Cancel-all only when enabled AND the guard proves no foreign open order exists.
-        if self.config.allow_cancel_all and self._live:
-            orders, complete = self._list_open(deadline, "cleanup_cancel_all_guard")
-            permitted, reason = cancel_all_guard(orders or [], orders is not None and complete, self.prefix,
-                                                 preflight_open_orders=self._preflight_open_orders)
-            if permitted and not getattr(self.port, "supports_cancel_all", False):
-                permitted, reason = False, "port_does_not_expose_cancel_all"
-            result["cancel_all_decision"] = reason
-            if permitted:
-                response = self._sync("cancel_all", deadline, self.port.cancel_all, phase="cleanup")
-                result["cancel_all_used"] = response is not None
-                self._drain_events()
-        # 1) Individual cancels by broker id.
-        self._cancel_live(deadline, result)
-        # 2) REST sweep for anything with this prefix still open (e.g. ambiguous submits).
+    def _adopt(self, cid):
+        """Recovery only: a prefix order the journal did not list (intent line lost)."""
+        suffix = cid[len(self.prefix):]
+        seq = int(suffix) if suffix.isdigit() else 0
+        probe = Probe(cid, seq, "0", self.config.qty, False, state="ambiguous")
+        self.probes[cid] = self._live[cid] = probe
+        return probe
+
+    def _sweep(self, deadline, result):
+        """REST sweep: cancel anything with this prefix still open (e.g. ambiguous submits)."""
         orders, _ = self._list_open(deadline, "cleanup_sweep")
         for raw in orders or []:
             cid = str(raw.get("client_order_id") or "")
@@ -732,8 +945,10 @@ class CapacityRun:
                 continue
             probe = self.probes.get(cid)
             if probe is None:
-                self._freeze("unknown_harness_order")
-                continue
+                if self.mode != "recover":
+                    self._freeze("unknown_harness_order")
+                    continue
+                probe = self._adopt(cid)
             probe.order_id = probe.order_id or (str(raw.get("id") or "") or None)
             if probe.order_id is None or probe.terminal:
                 continue
@@ -742,31 +957,98 @@ class CapacityRun:
                 probe.cancel_attempts += 1
                 self._on_cancel(probe, response)
                 result["rest_sweep_cancels"] += 1
-        self._cancel_live(deadline, result)  # retries any cancel a 429 deferred
-        # 3) Bounded wait for stream terminal events, then REST verification.
-        settle = min(deadline, self.clock.monotonic() + min(self.config.stream_timeout_seconds, 5.0))
+
+    def _settle_stream(self, deadline):
+        settle = min(self._due(deadline), self.clock.monotonic() + min(self.config.stream_timeout_seconds, 5.0))
         while self.clock.monotonic() < settle and [p for p in self._open_probes() if p.order_id]:
             self.clock.sleep(0.05)
             self._drain_events()
         self._drain_events()
-        orders, complete = self._list_open(deadline + 30.0, "cleanup_verification")
-        remaining = [o for o in (orders or []) if str(o.get("client_order_id", "")).startswith(self.prefix)]
-        result.update(open_listing_complete=orders is not None and bool(complete),
-                      open_harness_orders_after=None if orders is None else len(remaining),
-                      verified_zero_open=orders is not None and bool(complete) and not remaining,
-                      seconds=round(self.clock.monotonic() - start, 3))
+
+    def _cleanup(self):
+        """Cancel every order this run created and verify that none remains open.
+
+        The working deadline is ``cleanup_timeout_seconds`` of time outside any
+        governor freeze: a 429 backoff extends it, up to the hard ceiling
+        ``cleanup_ceiling_seconds()``. An incomplete or non-zero verification
+        repeats the sweep and verification, within the same ceiling. A failing
+        step is recorded and the next step still runs."""
+        start = self.clock.monotonic()
+        ceiling = start + self.cleanup_ceiling_seconds()
+
+        def deadline():
+            base = start + self.config.cleanup_timeout_seconds
+            frozen = self.governor.frozen_until
+            if frozen is not None:
+                base = max(base, frozen + self.config.cleanup_timeout_seconds)
+            return min(ceiling, base)
+
+        result = {"cancel_all_used": False, "cancel_all_decision": "not_enabled",
+                  "individual_cancels": 0, "rest_sweep_cancels": 0, "verification_rounds": 0,
+                  "ceiling_seconds": round(ceiling - start, 3), "step_errors": []}
+
+        def step(fn, *args):
+            try:
+                return fn(*args)
+            except Exception as exc:  # never abandon the remaining cleanup steps
+                result["step_errors"].append(type(exc).__name__)
+                self.error_type = self.error_type or type(exc).__name__
+                return None
+
+        step(self._wait_inflight, deadline)
+        step(self._drain_events)
+        # 0) Cancel-all only when enabled AND the guard proves no foreign open order exists.
+        if self.config.allow_cancel_all and self._live and self.mode != "recover":
+            step(self._cancel_all_guarded, deadline, result)
+        # 1) Individual cancels by broker id.
+        step(self._cancel_live, deadline, result)
+        verified = False
+        for _ in range(CLEANUP_VERIFY_ROUNDS):
+            result["verification_rounds"] += 1
+            round_start = self.clock.monotonic()
+
+            def until(round_start=round_start):
+                return min(ceiling, max(deadline(), round_start + RECONCILE_SECONDS))
+
+            # 2) Sweep by prefix, then retry any cancel a 429 deferred.
+            step(self._sweep, until, result)
+            step(self._cancel_live, until, result)
+            # 3) Bounded wait for stream terminal events, then REST verification.
+            step(self._settle_stream, until)
+            listing = step(self._list_open, until, "cleanup_verification")
+            orders, complete = listing if listing is not None else (None, False)
+            remaining = [o for o in (orders or []) if str(o.get("client_order_id", "")).startswith(self.prefix)]
+            verified = orders is not None and bool(complete) and not remaining
+            result.update(open_listing_complete=orders is not None and bool(complete),
+                          open_harness_orders_after=None if orders is None else len(remaining))
+            if verified or self.clock.monotonic() >= ceiling:
+                break
+        result.update(verified_zero_open=verified, seconds=round(self.clock.monotonic() - start, 3))
         self.cleanup = result
 
+    def _cancel_all_guarded(self, deadline, result):
+        orders, complete = self._list_open(deadline, "cleanup_cancel_all_guard")
+        permitted, reason = cancel_all_guard(orders or [], orders is not None and complete, self.prefix,
+                                             preflight_open_orders=self._preflight_open_orders)
+        if permitted and not getattr(self.port, "supports_cancel_all", False):
+            permitted, reason = False, "port_does_not_expose_cancel_all"
+        result["cancel_all_decision"] = reason
+        if permitted:
+            response = self._sync("cancel_all", deadline, self.port.cancel_all, phase="cleanup")
+            result["cancel_all_used"] = response is not None
+            self._drain_events()
+
     def _reconcile(self):
-        deadline = self.clock.monotonic() + 30.0
-        listing = self._sync("read", deadline, self.port.list_orders, "all", self.started_wall - 5.0,
-                             phase="reconciliation")
+        deadline = self.clock.monotonic() + RECONCILE_SECONDS
+        listing = self._list("all", self.started_wall - 5.0, deadline, "reconciliation")
         if listing is None:
             self.reconciliation = {"performed": False, "reason": "no_read_budget", "clean": False}
             return
         orders, complete, _ = listing
         ours = {str(o.get("client_order_id") or ""): o for o in orders
                 if str(o.get("client_order_id") or "").startswith(self.prefix)}
+        # Every probe the broker proves existed must also be covered by the stream.
+        self._broker_seen = set(ours) & set(self.probes)
         unknown = sorted(set(ours) - set(self.probes))
         missing, mismatched, non_terminal, filled = [], [], [], []
         ambiguous = {"existed": 0, "not_created": 0, "unresolved": 0}
@@ -820,13 +1102,15 @@ class CapacityRun:
                 self.prefix = self.prefix or new_prefix(self.started_wall)
                 if not PREFIX.fullmatch(self.prefix):
                     raise HarnessRefusal("invalid_client_order_id_prefix")
+                self._journal_start()
                 self.stage = "stream"
                 self._stream_started = True
                 self.port.start_stream(self._on_stream, self.config.stream_start_timeout_seconds)
                 if not self.port.stream_health().get("ready"):
                     raise HarnessRefusal("trade_updates_stream_not_ready")
                 if self.executor is None:
-                    self.executor = ThreadPoolExecutor(max_workers=self.config.inflight,
+                    # One extra worker for the off-loop quote refresh.
+                    self.executor = ThreadPoolExecutor(max_workers=self.config.inflight + 1,
                                                        thread_name_prefix="capacity-rest")
                 self.stage = "running"
                 self.t0 = self.clock.monotonic()
@@ -863,11 +1147,103 @@ class CapacityRun:
                     self._freeze("stream_stop_failed")
             if isinstance(self.executor, ThreadPoolExecutor):
                 self.executor.shutdown(wait=True)
+        if self.status == "completed" and self.error_type is not None:
+            self.status = "failed"  # a port defect was recorded while cleanup still ran
         if self.status == "completed" and (not self.cleanup.get("verified_zero_open")
                                            or not self.reconciliation.get("clean")
                                            or self.unexpected_fill_qty > 0):
             self.status = "needs_attention"
         self.receipt = self._build_receipt()
+        self._journal_end()
+        return self.receipt
+
+    # -- journal and crash recovery ----------------------------------------------
+    def _journal_start(self):
+        if self.journal_path is None:
+            return
+        self.journal = Journal(self.journal_path)
+        self.journal.write({"type": "start", "harness": HARNESS_VERSION, "prefix": self.prefix,
+                            "started_wall": self.started_wall, "symbol": self.config.symbol,
+                            "evidence_class": getattr(self.port, "evidence_class", "unknown"),
+                            "config": self.config.public()}, sync=True)
+
+    def _journal_end(self):
+        if self.journal is None:
+            return
+        try:
+            self.journal.write({"type": "end", "status": self.status,
+                                "verified_zero_open": bool(self.cleanup.get("verified_zero_open")),
+                                "probes": len(self.probes)}, sync=True)
+            self.journal.close()
+        except OSError:
+            pass
+        self.journal = None
+
+    def recover(self, journal_path, *, cancel=True):
+        """After a crash: cancel (or, with cancel=False, only list) every order that
+        carries the journal's prefix, individually and through the governor, then
+        verify zero open. Cancels only; the STOP file does not block it, exactly
+        as adaptive-paper keeps cancels allowed under STOP."""
+        self.mode = "recover" if cancel else "audit"
+        self.stage = "journal"
+        record = listing = None
+        try:
+            record = read_journal(journal_path)
+            self.prefix = record["start"]["prefix"]
+            self.started_wall = float(record["start"]["started_wall"])
+            self.config.validate()
+            self.stage = "preflight"
+            pre = self.port.preflight()
+            self._governor_from(pre)
+            with self.account_scope(pre.get("account_identity_sha256")):
+                for intent in record["intents"]:
+                    cid = str(intent.get("client_order_id") or "")
+                    if cid.startswith(self.prefix) and cid not in self.probes:
+                        probe = Probe(cid, int(intent.get("seq") or 0), str(intent.get("limit_price") or "0"),
+                                      self.config.qty, bool(intent.get("extended_hours")), state="ambiguous")
+                        self.probes[cid] = self._live[cid] = probe
+                if self.executor is None:
+                    self.executor = ThreadPoolExecutor(max_workers=self.config.inflight,
+                                                       thread_name_prefix="capacity-recover")
+                if cancel:
+                    self.stage = "cleanup"
+                    self._cleanup()
+                self.stage = "listing"
+                listing = self._list("all", self.started_wall - 5.0,
+                                     self.clock.monotonic() + RECONCILE_SECONDS, "recovery_listing")
+            self.status = "completed"
+        except (HarnessRefusal, GovernorError) as exc:
+            self.refusal, self.status, listing = str(exc), "refused", None
+        except Exception as exc:
+            self.error_type, self.status, listing = type(exc).__name__, "failed", None
+        finally:
+            if isinstance(self.executor, ThreadPoolExecutor):
+                self.executor.shutdown(wait=True)
+        by_status, complete = {}, False
+        if listing is not None:
+            orders, complete, _ = listing
+            for order in orders:
+                if str(order.get("client_order_id") or "").startswith(self.prefix or "\0"):
+                    status = str(order.get("status") or "unknown")
+                    by_status[status] = by_status.get(status, 0) + 1
+        if self.status == "completed" and (self.error_type or (cancel and not self.cleanup.get("verified_zero_open"))
+                                           or not complete):
+            self.status = "needs_attention"
+        self.receipt = {
+            "schema_version": 1, "harness": HARNESS_VERSION, "mode": self.mode,
+            "evidence_class": getattr(self.port, "evidence_class", "unknown"),
+            "policy": POLICY_STATEMENT, "counts_as_strategy_trades": False, "strategy_trades": 0,
+            "status": self.status, "stage": self.stage, "refusal_reason": self.refusal,
+            "error_type": self.error_type, "client_order_id_prefix": self.prefix,
+            "journal": {"intents": len(record["intents"]) if record else None,
+                        "end_record_present": bool(record and record["end"])},
+            "cleanup": self.cleanup if cancel else None,
+            "broker_orders_with_prefix": {"listing_complete": bool(complete), "by_status": dict(sorted(by_status.items()))},
+            "rate": self.governor.summary() if self.governor else None,
+            "provenance": dict(source_provenance(), argv=self.argv,
+                               ended_at=datetime.fromtimestamp(self.clock.time(), timezone.utc).isoformat(),
+                               exit_code=self.exit_code),
+        }
         return self.receipt
 
     # -- metrics & receipt ------------------------------------------------------
@@ -876,19 +1252,32 @@ class CapacityRun:
             return [], []
         end = self.submit_phase_end if self.submit_phase_end is not None else self.clock.monotonic()
         full = int((end - self.t0) // 60)
-        windows = {index: {"index": index, "submits": 0, "cancels": 0, "reads": 0}
-                   for index in range(full)}
+
+        def blank(index):
+            return {"index": index, "submits": 0, "cancels": 0, "submits_attempted": 0,
+                    "cancels_attempted": 0, "reads": 0}
+
+        windows = {index: blank(index) for index in range(full)}
         for action in self.actions:
             if action["t"] < self.t0:
                 continue
             index = int((action["t"] - self.t0) // 60)
-            row = windows.setdefault(index, {"index": index, "submits": 0, "cancels": 0, "reads": 0})
+            row = windows.setdefault(index, blank(index))
             kind = action["kind"]
-            row["submits" if kind == "submit" else "reads" if kind == "read" else "cancels"] += 1
+            if kind == "read":
+                row["reads"] += 1
+                continue
+            name = "submits" if kind == "submit" else "cancels"
+            row[name + "_attempted"] += 1
+            # Only broker-accepted submits and acknowledged cancels (2xx) are completed
+            # order actions; rejections, 429s, unsent and failed calls are not.
+            if action.get("ok"):
+                row[name] += 1
         rows = []
         for index in sorted(windows):
             row = windows[index]
             row["order_actions"] = row["submits"] + row["cancels"]
+            row["order_actions_attempted"] = row["submits_attempted"] + row["cancels_attempted"]
             row["full"] = index < full
             rows.append(row)
         return rows, [row for row in rows if row["full"]]
@@ -925,7 +1314,10 @@ class CapacityRun:
         rest_latency = [p.rest_at - p.sent_at for p in sent if p.rest_at is not None]
         ack_latency = [p.stream_ack_at - p.sent_at for p in sent if p.stream_ack_at is not None]
         terminal_latency = [p.terminal_at - p.sent_at for p in sent if p.terminal_at is not None]
-        existing = [p for p in self.probes.values() if p.state in ("accepted", "accepted_by_stream") or p.events]
+        # Orders known to exist: accepted by REST, seen on the stream, or proven by
+        # the final broker listing (e.g. an ambiguous submit whose order was created).
+        existing = [p for p in self.probes.values() if p.state in ("accepted", "accepted_by_stream") or p.events
+                    or p.client_order_id in self._broker_seen]
         acked = [p for p in existing if p.stream_ack_at is not None or p.terminal_status == "rejected"]
         terminal = [p for p in existing if p.terminal]
         complete = [p for p in acked if p.terminal]
@@ -946,11 +1338,15 @@ class CapacityRun:
                 remaining_min[origin] = min(remaining_min.get(origin, 10 ** 9), int(remaining))
         end = self.submit_phase_end if self.submit_phase_end is not None else self.t0
         duration = (end - self.t0) if self.t0 is not None else 0.0
-        in_phase = sum(1 for a in self.actions if a["kind"] in ("submit", "cancel", "cancel_all")
-                       and self.t0 is not None and self.t0 <= a["t"] <= end)
+        phase_actions = [a for a in self.actions if a["kind"] in ("submit", "cancel", "cancel_all")
+                         and self.t0 is not None and self.t0 <= a["t"] <= end]
+        in_phase = sum(1 for a in phase_actions if a.get("ok"))
+        frozen_met = (self.config.required_windows >= FROZEN_REQUIRED_WINDOWS
+                      and self.config.target_actions_ratio >= FROZEN_TARGET_ACTIONS_RATIO)
         acceptance = {
             "target_order_actions_per_window": target,
-            "target_rule": "ceil(target_actions_ratio * effective_limit); each submit and each cancel is one order action",
+            "target_rule": ("ceil(target_actions_ratio * effective_limit); each broker-accepted submit and "
+                            "each acknowledged (2xx) cancel is one completed order action"),
             "required_consecutive_full_windows": self.config.required_windows,
             "best_consecutive_full_windows_at_target": best,
             "sustained": best >= self.config.required_windows,
@@ -959,13 +1355,29 @@ class CapacityRun:
             "reconciliation_clean": bool(self.reconciliation.get("clean")),
             "cleanup_verified_zero_open": bool(self.cleanup.get("verified_zero_open")),
             "no_unexpected_fills": self.unexpected_fill_qty == 0,
-            "evidence_class_qualifies": getattr(self.port, "evidence_class", None) == "native_paper"}
+            "no_health_freezes": not self._health,
+            "evidence_class_qualifies": getattr(self.port, "evidence_class", None) == "native_paper",
+            "frozen_criteria": {"required_windows_min": FROZEN_REQUIRED_WINDOWS,
+                                "target_actions_ratio_min": FROZEN_TARGET_ACTIONS_RATIO,
+                                "configured_at_or_above": frozen_met}}
         acceptance["capacity_criteria_met"] = (self.status == "completed" and acceptance["unhandled_http_429"] == 0
                                                and all(acceptance[key] for key in (
                                                    "sustained", "websocket_completeness_is_1",
                                                    "reconciliation_clean", "cleanup_verified_zero_open",
-                                                   "no_unexpected_fills")))
-        acceptance["passed"] = acceptance["capacity_criteria_met"] and acceptance["evidence_class_qualifies"]
+                                                   "no_unexpected_fills", "no_health_freezes")))
+        blockers = []
+        if not acceptance["capacity_criteria_met"]:
+            blockers.append("capacity_criteria_not_met")
+        if not frozen_met:
+            blockers.append("criteria_below_frozen_minimum")
+        if not acceptance["evidence_class_qualifies"]:
+            blockers.append("evidence_class_not_native_paper")
+        acceptance["passed"] = not blockers
+        acceptance["passed_blockers"] = blockers
+        acceptance["passed_is_self_reported"] = True
+        acceptance["independent_observation_required"] = (
+            "Native acceptance also needs an observation by a separate method, e.g. the Alpaca dashboard or "
+            "account-activity export for this prefix, checked against the receipt counts.")
         governor = self.governor.summary() if self.governor else None
         return {
             "schema_version": 1,
@@ -981,7 +1393,12 @@ class CapacityRun:
             "stop_reason": self._stop_reason,
             "health_freezes": sorted(self._health),
             "started_at": datetime.fromtimestamp(self.started_wall, timezone.utc).isoformat(),
+            "provenance": dict(source_provenance(), argv=self.argv,
+                               ended_at=datetime.fromtimestamp(self.clock.time(), timezone.utc).isoformat(),
+                               exit_code=self.exit_code,
+                               journal_used=self.journal_path is not None),
             "session_kind": self.session_kind,
+            "port_errors": self.port_errors,
             "extended_hours_orders": self.extended_hours,
             "config": self.config.public(),
             "probe_plan": {"side": "buy", "type": "limit", "time_in_force": "day", "marketable": False,
@@ -1010,6 +1427,8 @@ class CapacityRun:
                         "submit_to_stream_terminal": _latency_summary(terminal_latency)},
             "throughput": {"submission_phase_seconds": round(duration, 3),
                            "order_actions_in_phase": in_phase,
+                           "order_actions_attempted_in_phase": len(phase_actions),
+                           "order_actions_not_completed_in_phase": len(phase_actions) - in_phase,
                            "order_actions_per_minute_mean": round(in_phase * 60.0 / duration, 3) if duration > 0 else None,
                            "full_windows": len(full_rows),
                            "min_order_actions_full_window": min((r["order_actions"] for r in full_rows), default=None),
@@ -1051,8 +1470,12 @@ def _paper_scope(state_root, accept_conflict):
 
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("command", choices=["offline", "paper"])
+    parser.add_argument("command", choices=["offline", "paper", "recover", "audit"],
+                        help="recover: cancel every open order with a crashed run's journal prefix; "
+                             "audit: list that prefix's orders read-only")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--journal", type=Path, default=None,
+                        help="run journal (paper default: <output>.journal.jsonl); required by recover/audit")
     parser.add_argument("--env-file", type=Path, help="0600 paper credential file outside any Git worktree")
     parser.add_argument("--symbol", default="SPY")
     parser.add_argument("--band-bps", type=int, default=500)
@@ -1093,22 +1516,37 @@ def config_from_args(args):
                           required_windows=args.required_windows)
 
 
+def exit_code_for(receipt):
+    if receipt["status"] == "refused":
+        return 2
+    if receipt["status"] != "completed":
+        return 3
+    if "acceptance" not in receipt:
+        return 0
+    return 0 if receipt["acceptance"]["capacity_criteria_met"] else 1
+
+
 def main(argv=None):
     parser = build_parser()
-    args = parser.parse_args(argv)
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    args = parser.parse_args(raw_argv)
     config = config_from_args(args)
     from runner import save  # adaptive-paper: atomic 0600 JSON write
     if args.command == "offline":
+        if args.journal is not None:
+            parser.error("--journal is for paper, recover and audit")
         from capacity_fixture import FakeBroker, FakeClock
         clock = FakeClock()
         port = FakeBroker(clock, limit=args.limit_header, symbol=args.symbol)
         run = CapacityRun(port, config, clock=clock, executor=InlineExecutor(),
-                          stop_file=args.stop_file or (HERE / "offline-stop-file-not-used"))
+                          stop_file=args.stop_file or (HERE / "offline-stop-file-not-used"), argv=raw_argv)
     else:
         if args.stop_file is not None:
             parser.error("--stop-file is offline only; paper honours the host STOP file")
         if args.env_file is None:
-            parser.error("paper requires --env-file")
+            parser.error("%s requires --env-file" % args.command)
+        if args.command in ("recover", "audit") and args.journal is None:
+            parser.error("%s requires --journal" % args.command)
         from runner import credentials  # adaptive-paper: 0600, owner, outside-Git checks
         key, secret = credentials(args.env_file)
         base = env_base_url(args.env_file)
@@ -1116,22 +1554,35 @@ def main(argv=None):
             config.base_url = base  # CapacityConfig.validate refuses it before any request
         from alpaca_capacity_port import AlpacaCapacityPort
         port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
+        journal = args.journal
+        if args.command == "paper" and journal is None:
+            journal = args.output.with_suffix(".journal.jsonl")
         run = CapacityRun(port, config, account_scope=_paper_scope(args.adaptive_state_root,
-                                                                   args.accept_adaptive_lane_conflict))
+                                                                   args.accept_adaptive_lane_conflict),
+                          journal_path=journal if args.command == "paper" else None, argv=raw_argv)
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: run.request_stop("signal"))
-    receipt = run.run()
+    if args.command in ("recover", "audit"):
+        receipt = run.recover(args.journal, cancel=args.command == "recover")
+    else:
+        receipt = run.run()
+    code = exit_code_for(receipt)
+    receipt["provenance"]["exit_code"] = run.exit_code = code
     save(args.output, receipt)
-    print(json.dumps({"status": receipt["status"], "evidence_class": receipt["evidence_class"],
-                      "refusal_reason": receipt["refusal_reason"], "stop_reason": receipt["stop_reason"],
-                      "capacity_criteria_met": receipt["acceptance"]["capacity_criteria_met"],
-                      "passed": receipt["acceptance"]["passed"]}))
-    if receipt["status"] == "refused":
-        return 2
-    if receipt["status"] != "completed":
-        return 3
-    return 0 if receipt["acceptance"]["capacity_criteria_met"] else 1
+    summary = {"status": receipt["status"], "evidence_class": receipt["evidence_class"],
+               "refusal_reason": receipt["refusal_reason"]}
+    if "acceptance" in receipt:
+        summary.update(stop_reason=receipt["stop_reason"],
+                       capacity_criteria_met=receipt["acceptance"]["capacity_criteria_met"],
+                       passed=receipt["acceptance"]["passed"])
+    else:
+        summary.update(mode=receipt["mode"], by_status=receipt["broker_orders_with_prefix"]["by_status"])
+    print(json.dumps(summary))
+    return code
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # Run through the importable module so the ports' ``from capacity import
+    # Response`` and this engine share one module (not ``__main__`` plus a copy).
+    import capacity
+    raise SystemExit(capacity.main())

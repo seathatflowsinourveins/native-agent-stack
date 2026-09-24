@@ -43,8 +43,9 @@ evidence of strategy quality.
 3. **Probes.** Each probe is a DAY limit BUY for `qty` (default 1) of one liquid
    symbol (default SPY). It is priced `--band-bps` (default 500 = 5%) below the
    current bid, rounded down to the cent. The price is refreshed from the data
-   endpoint every 60 s, which does not use the trading budget. If a refresh
-   fails, submissions freeze and cleanup runs. In the PRE or
+   endpoint every 60 s on a worker thread, so the main loop never blocks on it,
+   and the refresh does not use the trading budget. If a refresh fails,
+   submissions freeze and cleanup runs. In the PRE or
    POST session, orders carry `extended_hours=true`. The CLOSED session is
    refused. The calendar is adaptive-paper `sessions.py` (2026 only). A
    synchronous rejection, such as a price collar, is recorded as data by HTTP
@@ -55,15 +56,30 @@ evidence of strategy quality.
    it was acknowledged (`pending_new`/`new`/`accepted`). Cancels always take
    priority over new submits. If a probe gets no acknowledgement or no
    terminal event within `stream_timeout_seconds` (10 s), submissions freeze
-   and the run cleans up.
+   and the run cleans up. Stream events are timestamped on the stream thread
+   when they arrive, and REST completions are timestamped on the REST worker.
+   Latencies therefore exclude the time an event waits for the main loop.
+   A port defect (an exception instead of an HTTP outcome) is recorded, not
+   raised. The first one freezes submissions and makes the run `failed`. An
+   affected submit becomes ambiguous, so the sweep and reconciliation resolve
+   it. Further in-flight failures are recorded the same way.
 5. **Cleanup** runs on normal end, STOP, SIGINT/SIGTERM, a freeze or an
    exception. It cancels every live probe individually. It then lists open
    orders and cancels anything left with this run's `client_order_id` prefix,
    including submits whose outcome was ambiguous. A final open-order listing
    must show **zero** open orders with the prefix (`verified_zero_open`).
+   The cleanup deadline is `cleanup_timeout_seconds` (60 s) of time outside
+   any governor freeze. A 429 backoff during cleanup extends it, up to a hard
+   ceiling of the timeout plus 3 x the governor's 60 s maximum backoff (240 s
+   by default). If a verification listing is incomplete or still shows
+   orders, the sweep and verification run again, at most 3 rounds, within the
+   ceiling. A failing step is recorded in `step_errors`, and the next step
+   still runs. A 429 storm longer than the ceiling ends as `needs_attention`
+   with `verified_zero_open: false`. In that case, use `recover` (below).
 6. **Reconciliation (bounded, at the end only).** It lists all orders
-   submitted since the run started (paged, at most 20 pages) and compares them
-   with the local and stream record. Any of the following makes the run
+   submitted since the run started and compares them with the local and
+   stream record. The listing is paged (at most 20 pages), and the governor
+   admits every page. No page goes out unadmitted. Any of the following makes the run
    unclean: an order missing at the broker, an unknown order with the prefix,
    a stream/REST terminal-status mismatch, a non-terminal order, a filled
    probe, an unresolved ambiguous submit, or a changed position.
@@ -98,8 +114,22 @@ evidence of strategy quality.
   and open orders (`--max-open-orders`, default 10). It also bounds per-order
   and open notional (`--max-order-notional` 1000 and `--max-open-notional`
   10000 USD), 429s (`max_http_429` 5), consecutive rejections and in-flight
-  REST calls (`--inflight` 4). The run must also finish, including cleanup,
-  inside the current session segment.
+  REST calls (`--inflight` 4). The run must also finish inside the current
+  session segment. The submission phase ends early enough to leave room for
+  the stream start (15 s), the cleanup ceiling (240 s), reconciliation (30 s)
+  and a 30 s margin, which is 315 s by default.
+- **Durable journal and crash recovery.** A paper run writes an append-only
+  JSONL journal (mode 0600, created exclusively). The default path is
+  `<output>.journal.jsonl`; set it with `--journal`. The start record
+  carries the `client_order_id` prefix and is fsynced before the stream
+  starts and before any order is sent. Each probe intent is written and
+  flushed before its POST, and the end record is fsynced. After SIGKILL, OOM
+  or power loss, `capacity.py recover --journal ...` cancels every open order
+  with that prefix, individually and through the governor, and verifies zero
+  open. The prefix alone is enough, even if the last intent lines were lost.
+  `audit` lists the prefix's orders read-only. Like adaptive-paper's STOP,
+  which blocks entries but never cancels, the STOP file does not block
+  `recover`.
 - **Existing exposure.** The run is refused unless the exact number of
   existing nonzero positions and open orders matches `--acknowledge-positions`
   and `--acknowledge-open-orders` (both default 0).
@@ -156,24 +186,46 @@ PY="$ADAPTIVE_PAPER_VENV/bin/python"
 ```
 
 If the header still reports 200 when `--cap 1000` is given, the budget stays
-at 180/min. The receipt then shows `effective_limit: 200`. Exit codes:
+at 180/min. The receipt then shows `effective_limit: 200`.
+
+After a crash, or when a receipt shows `verified_zero_open: false`:
+
+```sh
+# read-only: counts of this run's orders by status
+"$PY" blueprints/us-equities/order-throughput/capacity.py audit \
+  --env-file "$ENV_FILE" --journal "$PRIVATE_OUTPUT/capacity-200.journal.jsonl" \
+  --output "$PRIVATE_OUTPUT/capacity-200-audit.json"
+# cancel every open order with the journal's prefix, then verify zero open
+"$PY" blueprints/us-equities/order-throughput/capacity.py recover \
+  --env-file "$ENV_FILE" --journal "$PRIVATE_OUTPUT/capacity-200.journal.jsonl" \
+  --output "$PRIVATE_OUTPUT/capacity-200-recover.json"
+```
+
+Exit codes:
 
 | Code | Meaning |
 |---|---|
-| 0 | Completed, and the capacity criteria were met |
+| 0 | Completed, and the capacity criteria were met (recover/audit: completed) |
 | 1 | Completed, but below target |
 | 2 | Refused before any order |
 | 3 | `needs_attention`, `failed`, or cleanup/reconciliation not clean |
 
 ## Acceptance criteria for a capacity run
 
-A run qualifies (`acceptance.passed`) only when its evidence class is
-`native_paper` and **all** of the following hold:
+These criteria are frozen: at least 5 consecutive full windows at a ratio
+of at least 0.85. `--required-windows` and `target_actions_ratio` can be set
+lower for exploratory runs. `acceptance.passed` is then false, with the
+blocker `criteria_below_frozen_minimum`. A run reports `acceptance.passed`
+only when its evidence class is `native_paper`, the frozen criteria apply,
+and **all** of the following hold:
 
-- **Sustained.** At least `ceil(0.85 * effective_limit)` order actions in each
-  of 5 consecutive full 60-second windows. That is **170 actions/min at a 200
-  limit** and 850 at 1000. One submit and one cancel each count as one
-  action. At a 200 limit this means about 85 submits plus 85 cancels per
+- **Sustained.** At least `ceil(0.85 * effective_limit)` **completed** order
+  actions in each of 5 consecutive full 60-second windows. That is **170
+  actions/min at a 200 limit** and 850 at 1000. Completed actions are
+  broker-accepted (2xx) submits and acknowledged (2xx) cancels, counted in
+  the window where they were sent. Rejected submits (for example 422 or
+  403), 429s, unsent calls and refused cancels are reported as attempted
+  actions and never count toward the target. At a 200 limit this means about 85 submits plus 85 cancels per
   minute. A target of "170 submits/min" is impossible with individual cancels,
   because it would need about 340 calls/min. The arithmetic is in
   `rate-limit-evidence-20260924.json`.
@@ -181,12 +233,28 @@ A run qualifies (`acceptance.passed`) only when its evidence class is
   affected submit, cancel or read was later resolved (for example, an
   ambiguous submit was proven created or not created by the complete
   listing).
-- **100% websocket completeness.** Every order that exists at the broker had
-  a stream acknowledgement and a terminal event. A stream `rejected` event
-  counts as both.
+- **100% websocket completeness.** Every order known to exist had a stream
+  acknowledgement and a terminal event. An order is known to exist if REST
+  accepted it, the stream reported it, or the final broker listing shows it.
+  The last case includes an ambiguous submit whose order was created. A
+  stream `rejected` event counts as both an acknowledgement and a terminal
+  event.
 - **Clean reconciliation.** See step 6 above.
 - **Cleanup verified.** Zero open orders with this run's prefix at the end.
 - **No unexpected fills.**
+- **No health freezes.** Any freeze fails the run, for example
+  `stream_stop_failed`, `client_id_collision`, `requote_failed` or
+  `port_exception`.
+
+`acceptance.passed` is **self-reported** by the harness
+(`passed_is_self_reported: true`). Under
+`docs/acceptance-evidence-policy.md`, the harness's own `passed` field is not
+independent confirmation, and the reconciliation uses the same port and
+session as the run. Native acceptance therefore also needs an observation by
+a separate method. For example, check the Alpaca dashboard or the account
+activity export for the run's prefix against the receipt's submit, cancel and
+status counts. The `audit` command is a later read-only listing through the
+same port, which makes it weaker evidence than the dashboard.
 
 ## Receipt
 
@@ -204,19 +272,24 @@ The JSON receipt is written atomically with mode 0600 through adaptive-paper
 - HTTP status counts.
 - Latency p50/p95/p99 for three spans: submit to REST acknowledgement, submit
   to stream acknowledgement, and submit to stream terminal event.
-- Per-window submits, cancels and order actions.
+- Per-window completed and attempted submits, cancels and order actions.
 - Websocket completeness.
 - Cleanup and reconciliation results.
-- The acceptance block.
+- The acceptance block, with `passed_blockers`.
+- Provenance: git revision, SHA-256 of the harness and adaptive-paper source
+  files it uses, the alpaca-py and Python versions, the argument vector with
+  path values replaced by `<path>`, the end time and the exit code.
 
 It contains no credentials, account identifier or account hash, and no broker
-order IDs.
+order IDs. The journal holds the prefix, configuration and per-probe
+client order IDs. It contains no secrets, account identity or broker order
+IDs.
 
 ## Files
 
 | File | Role |
 |---|---|
-| `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, receipt, CLI |
+| `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, journal and `recover`/`audit`, receipt, CLI |
 | `rate_governor.py` | Token bucket + rolling window + remaining/reset + 429 backoff |
 | `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only |
 | `capacity_fixture.py` | Offline fake clock, broker and `trade_updates` stream |
@@ -227,7 +300,7 @@ order IDs.
 
 | Status | What |
 |---|---|
-| Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff, refusals, cleanup and reconciliation. See `tests/test_order_throughput.py`. |
+| Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff (including during cleanup), refusals, cleanup, and reconciliation, including a lost response for a created order. Also: per-page listing admission, several in-flight calls completing out of order, the real `ThreadPoolExecutor` path, failing in-flight port calls, and crash then journal recovery. See `tests/test_order_throughput.py`. |
 | Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
 | Not yet measured | Any native paper run of this harness. |
 | Not exercised against the SDK | `alpaca_capacity_port.py` was not run with alpaca-py 0.44.0 in this change, because the SDK was not installed on the authoring host and no network was used. |

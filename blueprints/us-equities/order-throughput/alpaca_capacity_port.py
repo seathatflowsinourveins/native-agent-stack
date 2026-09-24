@@ -166,12 +166,16 @@ class AlpacaCapacityPort:
     def cancel_all(self):
         raise transport.TransportError("cancel-all is not an admitted GuardedSession path")
 
-    def list_orders(self, status, after_wall):
+    def list_orders(self, status, after_wall, admit=None):
+        """Paged listing. The caller admitted the first page; ``admit()`` must
+        return True before each further page, else the listing stops incomplete."""
         params = {"status": status, "direction": "asc", "limit": 500, "nested": False}
         if after_wall is not None:
             params["after"] = datetime.fromtimestamp(after_wall, timezone.utc).isoformat()
         orders, responses, seen = [], [], set()
-        for _ in range(MAX_PAGES):
+        for index in range(MAX_PAGES):
+            if index and admit is not None and not admit():
+                return [_order_view(o) for o in orders], False, responses
             response, page = self._call(lambda client: client.get("/orders", dict(params)))
             responses.append(response)
             if response.error or not isinstance(page, list) or len(page) > 500:

@@ -594,6 +594,9 @@ class NativePortLogicTests(unittest.TestCase):
         self.assertEqual((len(orders), complete, len(responses)), (503, True, 2))
         self.assertIn("after", client.calls[0])
         self.assertNotIn("after", client.calls[1])  # ID and timestamp cursors are exclusive
+        client.calls.clear()
+        orders, complete, responses = port.list_orders("all", None, lambda: False)
+        self.assertEqual((len(orders), complete, len(responses), len(client.calls)), (500, False, 1, 1))
         with self.assertRaises(Exception):
             port.cancel_all()
 
@@ -605,6 +608,424 @@ class NativePortLogicTests(unittest.TestCase):
         self.assertTrue(port.stream_health()["ready"])
         port._connection("orders", False)
         self.assertEqual(port.stream_health(), {"ready": False, "reasons": ["orders_disconnected"]})
+
+
+class LaggedFuture(c.Future):
+    """Resolved at dispatch (the broker saw the call then), but reported done only once
+    the fake clock passes ``ready_at``: several calls stay in flight and complete out of order."""
+
+    def __init__(self, clock, ready_at):
+        super().__init__()
+        self.clock, self.ready_at = clock, ready_at
+
+    def done(self):
+        return self.clock.monotonic() >= self.ready_at and super().done()
+
+
+class LaggedExecutor:
+    LAGS = (1.2, 0.1, 2.0, 0.5, 1.6, 0.3)
+
+    def __init__(self, clock):
+        self.clock = clock
+        self.count = 0
+        self.max_pending = 0
+        self.pending = []
+
+    def submit(self, fn, *args):
+        future = LaggedFuture(self.clock, self.clock.monotonic() + self.LAGS[self.count % len(self.LAGS)])
+        self.count += 1
+        try:
+            future.set_result(fn(*args))
+        except Exception as exc:
+            future.set_exception(exc)
+        now = self.clock.monotonic()
+        self.pending = [f for f in self.pending if f.ready_at > now] + [future]
+        self.max_pending = max(self.max_pending, len(self.pending))
+        return future
+
+    def shutdown(self, wait=True):
+        return None
+
+
+class LockedClock(fx.FakeClock):
+    """FakeClock safe for REST worker threads (no lost updates, never goes backwards)."""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.lock = __import__("threading").RLock()
+
+    def monotonic(self):
+        with self.lock:
+            return self.now
+
+    def time(self):
+        with self.lock:
+            return self.now + self.offset
+
+    def sleep(self, seconds):
+        with self.lock:
+            self.now += max(float(seconds), 1e-4)
+
+    def advance(self, seconds):
+        with self.lock:
+            self.now += float(seconds)
+
+
+class LockedBroker(fx.FakeBroker):
+    """Serializes the fake broker's state for a real ThreadPoolExecutor."""
+
+    def __init__(self, clock, **kwargs):
+        super().__init__(clock, **kwargs)
+        self.lock = clock.lock
+
+    def submit(self, *args):
+        with self.lock:
+            return super().submit(*args)
+
+    def cancel(self, *args):
+        with self.lock:
+            return super().cancel(*args)
+
+    def list_orders(self, *args):
+        with self.lock:
+            return super().list_orders(*args)
+
+    def positions(self):
+        with self.lock:
+            return super().positions()
+
+
+def max_calls_in_rolling_window(call_log, width=60.0):
+    return max_in_any_window(sorted(row["t"] for row in call_log), width)
+
+
+class ReviewFixTests(unittest.TestCase):
+    """Cases added for the independent review of the capacity harness."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def harness(self, broker, clock, executor=None, **config):
+        cfg = c.CapacityConfig(**dict({"max_duration_seconds": 130.0, "required_windows": 2}, **config))
+        return c.CapacityRun(broker, cfg, clock=clock, executor=executor or c.InlineExecutor(),
+                             stop_file=stop_path(self.tmp.name))
+
+    # F1 (review A): several failing in-flight futures must not abort cleanup.
+    def test_several_failing_inflight_futures_still_clean_up(self):
+        clock = fx.FakeClock()
+
+        class CreatesThenRaises(fx.FakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count in (5, 6, 7):
+                    raise AttributeError("post-create defect")
+                return response
+
+        broker = CreatesThenRaises(clock)
+        executor = LaggedExecutor(clock)
+        harness = self.harness(broker, clock, executor, inflight=4)
+        receipt = harness.run()
+        prefix = receipt["probe_plan"]["client_order_id_prefix"]
+        self.assertGreaterEqual(executor.max_pending, 3)
+        self.assertEqual((receipt["status"], receipt["error_type"]), ("failed", "AttributeError"))
+        self.assertEqual(receipt["port_errors"], 3)
+        self.assertIn("port_exception", receipt["health_freezes"])
+        self.assertEqual(receipt["orders"]["rest_rejections"].get("port_exception"), 3)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])
+        # The orders were created and seen on the stream, so the stream resolves them.
+        self.assertEqual(sum(1 for p in harness.probes.values()
+                             if p.rest_status is None and p.state == "accepted_by_stream"), 3)
+        self.assertTrue(receipt["reconciliation"]["clean"])
+        self.assertEqual(receipt["websocket"]["completeness"], 1.0)
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    # F2 (review A): a 429 during cleanup must not use up the cleanup window.
+    def test_429_backoff_during_cleanup_extends_the_cleanup_deadline(self):
+        clock = fx.FakeClock()
+        box = {}
+
+        class LimitedInCleanup(fx.FakeBroker):
+            def _admit(self, kind):
+                harness = box.get("harness")
+                if harness is not None and harness.stage == "cleanup" and box.setdefault("forced", 0) < 2:
+                    box["forced"] += 1
+                    self.force_429_calls.add(self.total_trading_calls + 1)
+                return super()._admit(kind)
+
+        broker = LimitedInCleanup(clock, drop_events={"new"}, retry_after="60")
+        harness = self.harness(broker, clock, max_duration_seconds=5.0)
+        box["harness"] = harness
+        receipt = harness.run()
+        prefix = receipt["probe_plan"]["client_order_id_prefix"]
+        self.assertEqual(receipt["http_429"]["total"], 2)
+        self.assertEqual([b["seconds"] for b in receipt["rate"]["backoffs"]], [60.0, 60.0])
+        self.assertGreater(receipt["cleanup"]["seconds"], c.CapacityConfig().cleanup_timeout_seconds)
+        self.assertLessEqual(receipt["cleanup"]["seconds"], receipt["cleanup"]["ceiling_seconds"] + 1.0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])
+
+    # F3 (review A): every listing page is admitted by the governor.
+    def test_every_listing_page_is_admitted_by_the_governor(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock, page_size=40)
+        receipt = self.harness(broker, clock, headroom=1.0).run()
+        broker_reads = sum(1 for row in broker.call_log if row["kind"] == "read")
+        self.assertGreater(broker_reads - 4, 3)  # multi-page listings happened
+        self.assertEqual(receipt["rate"]["admitted"]["read"], broker_reads - 4)  # 4 preflight GETs
+        self.assertEqual(receipt["rate"]["external_calls_noted"], 4)  # only the preflight
+        self.assertEqual(receipt["http_429"]["total"], 0)
+        self.assertTrue(receipt["reconciliation"]["listing_complete"])
+
+    # F1 (review B): rejected submits are not completed order actions.
+    def test_rejected_submits_do_not_count_toward_sustained_capacity(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock, reject_submit_seqs={s: 422 for s in range(1, 5001) if s % 10})
+        receipt = self.harness(broker, clock, max_orders=5000, max_duration_seconds=330.0,
+                               required_windows=5).run()
+        full = [row for row in receipt["throughput"]["windows"] if row["full"]]
+        self.assertEqual(len(full), 5)
+        self.assertTrue(all(row["order_actions_attempted"] >= 170 for row in full))
+        self.assertTrue(all(row["order_actions"] < 170 for row in full))
+        self.assertTrue(all(row["submits"] < row["submits_attempted"] for row in full))
+        self.assertGreater(receipt["throughput"]["order_actions_not_completed_in_phase"], 0)
+        self.assertEqual(receipt["acceptance"]["best_consecutive_full_windows_at_target"], 0)
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    # F2 (review B) and F5: an ambiguous submit whose order WAS created.
+    def test_created_order_with_lost_response_and_no_stream_breaks_completeness(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock, lost_response_seqs={10: None}, silent_submit_seqs={10})
+        receipt = self.harness(broker, clock).run()
+        prefix = receipt["probe_plan"]["client_order_id_prefix"]
+        self.assertEqual(receipt["reconciliation"]["ambiguous_submits"]["existed"], 1)
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])  # the prefix sweep cancelled it
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertLess(receipt["websocket"]["completeness"], 1.0)
+        self.assertFalse(receipt["acceptance"]["websocket_completeness_is_1"])
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    def test_created_order_with_lost_5xx_response_resolved_by_stream(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock, lost_response_seqs={10: 503, 11: None})
+        receipt = self.harness(broker, clock).run()
+        self.assertEqual(receipt["orders"]["rest_rejections"], {"ambiguous_503": 1, "ambiguous_no_response": 1})
+        self.assertEqual(receipt["websocket"]["completeness"], 1.0)
+        self.assertTrue(receipt["reconciliation"]["clean"])
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(receipt["status"], "completed")
+
+    # F3 (review B): configurable criteria cannot lower the frozen qualification.
+    def test_passed_requires_frozen_criteria(self):
+        class GateOnly(fx.FakeBroker):
+            evidence_class = "native_paper"  # labels the fixture ONLY to exercise the gate logic
+
+        for windows, ratio, expected in ((5, 0.85, []), (1, 0.85, ["criteria_below_frozen_minimum"]),
+                                         (5, 0.5, ["criteria_below_frozen_minimum"])):
+            clock = fx.FakeClock()
+            receipt = self.harness(GateOnly(clock), clock, max_duration_seconds=330.0,
+                                   required_windows=windows, target_actions_ratio=ratio).run()
+            self.assertTrue(receipt["acceptance"]["capacity_criteria_met"])
+            self.assertEqual(receipt["acceptance"]["passed_blockers"], expected)
+            self.assertEqual(receipt["acceptance"]["passed"], expected == [])
+            self.assertTrue(receipt["acceptance"]["passed_is_self_reported"])
+        receipt, _, _ = run(self.tmp.name)
+        self.assertIn("evidence_class_not_native_paper", receipt["acceptance"]["passed_blockers"])
+
+    # F4 (review B): a durable journal and crash recovery.
+    def test_crash_mid_run_then_recover_from_journal(self):
+        class Crash(BaseException):
+            """Stands in for SIGKILL/OOM: nothing after it runs in the process."""
+
+        clock = fx.FakeClock()
+
+        class CrashAt8(fx.FakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count == 8:
+                    raise Crash()
+                return response
+
+        broker = CrashAt8(clock, drop_events={"new"})
+        journal = Path(self.tmp.name) / "private" / "run.journal.jsonl"
+        cfg = c.CapacityConfig(max_duration_seconds=130.0)
+        harness = c.CapacityRun(broker, cfg, clock=clock, executor=c.InlineExecutor(),
+                                stop_file=stop_path(self.tmp.name), journal_path=journal)
+
+        def killed():
+            raise Crash()
+        harness._cleanup = killed  # the process dies: no cleanup, no receipt
+        with self.assertRaises(Crash):
+            harness.run()
+        harness.journal.close()
+        prefix = harness.prefix
+        self.assertEqual(len(broker.open_orders_with_prefix(prefix)), 8)
+        self.assertEqual(journal.stat().st_mode & 0o777, 0o600)
+        lines = journal.read_text().splitlines()
+        self.assertEqual(json.loads(lines[0])["prefix"], prefix)
+        self.assertEqual(len(lines), 9)  # start + 8 intents written before each POST
+        text = journal.read_text()
+        self.assertNotIn(fx.hashlib.sha256(b"fixture-account").hexdigest(), text)
+        # A torn final write: the last intent line is lost mid-record.
+        journal.write_text("\n".join(lines[:-1]) + "\n" + lines[-1][:17])
+        stop_path(self.tmp.name).write_text("")  # STOP blocks entries, never cancels
+
+        audit = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                              stop_file=stop_path(self.tmp.name)).recover(journal, cancel=False)
+        self.assertEqual(audit["mode"], "audit")
+        self.assertEqual(audit["broker_orders_with_prefix"]["by_status"], {"new": 8})
+        self.assertEqual(len(broker.open_orders_with_prefix(prefix)), 8)
+
+        receipt = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                                stop_file=stop_path(self.tmp.name)).recover(journal)
+        self.assertEqual((receipt["mode"], receipt["status"]), ("recover", "completed"))
+        self.assertEqual(receipt["journal"], {"intents": 7, "end_record_present": False})
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])
+        self.assertEqual(receipt["broker_orders_with_prefix"]["by_status"], {"canceled": 8})
+        self.assertIs(receipt["counts_as_strategy_trades"], False)
+        self.assertIsNone(UUID_TEXT.search(json.dumps(receipt)))
+
+    def test_journal_is_exclusive_and_records_start_and_end(self):
+        journal = Path(self.tmp.name) / "j.jsonl"
+        clock = fx.FakeClock()
+        receipt = c.CapacityRun(fx.FakeBroker(clock), c.CapacityConfig(max_duration_seconds=70.0,
+                                                                      required_windows=1),
+                                clock=clock, executor=c.InlineExecutor(), stop_file=stop_path(self.tmp.name),
+                                journal_path=journal).run()
+        parsed = c.read_journal(journal)
+        self.assertEqual(parsed["start"]["prefix"], receipt["probe_plan"]["client_order_id_prefix"])
+        self.assertEqual(len(parsed["intents"]), receipt["orders"]["submit_attempts"])
+        self.assertEqual(parsed["end"]["status"], "completed")
+        clock = fx.FakeClock()
+        again = c.CapacityRun(fx.FakeBroker(clock), c.CapacityConfig(), clock=clock,
+                              executor=c.InlineExecutor(), stop_file=stop_path(self.tmp.name),
+                              journal_path=journal).run()
+        self.assertEqual((again["status"], again["refusal_reason"]), ("refused", "journal_exists"))
+        self.assertEqual(again["orders"]["submit_attempts"], 0)
+
+    # F5 (review B): several calls in flight, out-of-order completion.
+    def test_multi_inflight_out_of_order_completion_holds_budget(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock)
+        executor = LaggedExecutor(clock)
+        receipt = self.harness(broker, clock, executor, inflight=4, max_duration_seconds=190.0,
+                               required_windows=3).run()
+        self.assertGreaterEqual(executor.max_pending, 3)
+        self.assertEqual(receipt["status"], "completed")
+        self.assertEqual(receipt["http_429"]["total"], 0)
+        self.assertLessEqual(max_calls_in_rolling_window(broker.call_log), 180 + 4)  # budget + preflight
+        reserve = receipt["rate"]["reserve_per_minute"]
+        self.assertGreaterEqual(receipt["observed_rate_limit_headers"]["min_remaining_by_origin"]["trading"],
+                                reserve - 1)
+        self.assertEqual(receipt["websocket"]["completeness"], 1.0)
+        self.assertTrue(receipt["reconciliation"]["clean"])
+        self.assertTrue(receipt["acceptance"]["capacity_criteria_met"])
+        # REST latency is stamped at completion, not when the lagged future was collected.
+        self.assertAlmostEqual(receipt["latency"]["submit_rest_ack"]["max_ms"], 30.0, delta=0.5)
+
+    def test_thread_pool_executor_path(self):
+        clock = LockedClock()
+        broker = LockedBroker(clock)
+        receipt = self.harness(broker, clock, executor=None, inflight=4, max_orders=150).run()
+        self.assertEqual(receipt["status"], "completed")
+        self.assertEqual(receipt["http_429"]["total"], 0)
+        self.assertEqual(receipt["orders"]["submit_attempts"], 150)
+        self.assertLessEqual(max_calls_in_rolling_window(broker.call_log), 200)
+        self.assertEqual(receipt["websocket"]["completeness"], 1.0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertTrue(receipt["reconciliation"]["clean"])
+
+    # F6 (review B): provenance for the receipt.
+    def test_receipt_provenance_and_sanitized_argv(self):
+        receipt, _, _ = run(self.tmp.name)
+        prov = receipt["provenance"]
+        for key in ("git_revision", "source_sha256", "alpaca_py_version", "python_version", "argv",
+                    "ended_at", "exit_code"):
+            self.assertIn(key, prov)
+        self.assertEqual(len(prov["source_sha256"]), 8)
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", v) for v in prov["source_sha256"].values()))
+        self.assertEqual(c.sanitize_argv(["paper", "--env-file", "/srv/private/p.env", "--output=/x/y.json",
+                                          "--cap", "1000"]),
+                         ["paper", "--env-file", "<path>", "--output=<path>", "--cap", "1000"])
+        with tempfile.TemporaryDirectory(dir="/tmp") as private:
+            out = Path(private) / "receipt.json"
+            handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    code = c.main(["offline", "--output", str(out), "--duration", "70", "--required-windows", "1"])
+            finally:
+                for sig, handler in handlers.items():
+                    signal.signal(sig, handler)
+            saved = json.loads(out.read_text())
+        self.assertEqual(saved["provenance"]["exit_code"], code)
+        self.assertEqual(saved["provenance"]["argv"][:3], ["offline", "--output", "<path>"])
+        self.assertNotIn(private, json.dumps(saved))
+
+    def test_script_entry_point_shares_one_response_class(self):
+        """Run as ``python3 capacity.py`` the ports import ``capacity.Response``;
+        completed actions must still be recognised (no __main__ duplicate)."""
+        import subprocess
+        with tempfile.TemporaryDirectory(dir="/tmp") as private:
+            out = Path(private) / "r.json"
+            done = subprocess.run([sys.executable, str(SOURCE / "capacity.py"), "offline", "--output", str(out),
+                                   "--duration", "130", "--required-windows", "2"],
+                                  capture_output=True, text=True, timeout=120, check=False)
+            receipt = json.loads(out.read_text())
+        self.assertEqual(done.returncode, 0, done.stderr[-2000:])
+        self.assertGreaterEqual(receipt["throughput"]["min_order_actions_full_window"], 170)
+        self.assertEqual(receipt["throughput"]["order_actions_not_completed_in_phase"], 0)
+        self.assertEqual(receipt["port_errors"], 0)
+
+    # F7 (review B): event times are stamped when the stream thread receives them.
+    def test_stream_event_time_is_receipt_time_not_drain_time(self):
+        clock = fx.FakeClock()
+        harness = c.CapacityRun(fx.FakeBroker(clock), c.CapacityConfig(), clock=clock)
+        harness.prefix = "cap-20260924t140000-abcdef-"
+        cid = harness.prefix + "000001"
+        probe = c.Probe(cid, 1, "475.00", 1, False)
+        harness.probes[cid] = harness._live[cid] = probe
+        received = clock.monotonic()
+        harness._on_stream({"data": {"event": "new", "order": {"client_order_id": cid, "id": "u-1",
+                                                                "status": "new"}}})
+        clock.advance(7.0)  # the main loop was busy
+        harness._drain_events()
+        self.assertEqual(probe.stream_ack_at, received)
+        response, done_at = harness._timed(lambda: clock.advance(0.25) or "ok")
+        self.assertEqual((response, done_at), ("ok", received + 7.25))
+
+    # F8 (review B): any health freeze fails the capacity criteria.
+    def test_health_freeze_fails_capacity_criteria(self):
+        class StopFails(fx.FakeBroker):
+            def stop_stream(self):
+                super().stop_stream()
+                raise RuntimeError("stream thread failed to terminate")
+
+        clock = fx.FakeClock()
+        receipt = self.harness(StopFails(clock), clock).run()
+        self.assertEqual(receipt["health_freezes"], ["stream_stop_failed"])
+        self.assertTrue(receipt["acceptance"]["sustained"])
+        self.assertFalse(receipt["acceptance"]["no_health_freezes"])
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    # F9 (review B): the session reserve covers every post-loop phase.
+    def test_session_reserve_covers_stream_start_cleanup_and_reconciliation(self):
+        cfg = c.CapacityConfig()
+        harness = c.CapacityRun(fx.FakeBroker(fx.FakeClock()), cfg)
+        self.assertEqual(harness.post_loop_reserve_seconds(),
+                         cfg.stream_start_timeout_seconds + cfg.cleanup_timeout_seconds + 3 * 60.0
+                         + c.RECONCILE_SECONDS + c.SESSION_MARGIN_SECONDS)
+        close = datetime(2026, 9, 24, 20, 0, tzinfo=timezone.utc).timestamp()
+        late = fx.FakeClock(close - 240.0)
+        receipt = self.harness(fx.FakeBroker(late), late).run()
+        self.assertEqual(receipt["refusal_reason"], "session_ends_too_soon")
+        near = fx.FakeClock(close - 600.0)
+        harness = self.harness(fx.FakeBroker(near), near, max_duration_seconds=3600.0)
+        receipt = harness.run()
+        self.assertEqual(receipt["status"], "completed")
+        self.assertLessEqual(receipt["throughput"]["submission_phase_seconds"], 600.0 - 315.0 + 0.01)
+        self.assertLessEqual(near.time(), close)  # finished, cleanup included, before the close
 
 
 class EvidenceFileTests(unittest.TestCase):

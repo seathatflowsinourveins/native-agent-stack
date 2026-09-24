@@ -2,8 +2,9 @@
 
 Evidence class ``offline_fixture``. It models only what the harness depends on:
 per-account fixed 60-second rate windows with x-ratelimit-* headers and 429 +
-Retry-After when exceeded, order acceptance, individual cancels, cancel-all,
-paged order listings and trade_updates events. It does not model Alpaca's real
+Retry-After when exceeded, order acceptance, lost submit responses for created
+orders, individual cancels, cancel-all, paged order listings (one trading call
+per page) and trade_updates events. It does not model Alpaca's real
 latency, matching, price collars or websocket behavior; nothing here is broker
 evidence.
 """
@@ -47,7 +48,8 @@ class FakeBroker:
                  read_latency=0.02, limit_schedule=None, force_429_calls=(), retry_after="2",
                  reject_submit_seqs=None, fill_submit_seqs=(), drop_events=(), crash_on_submit_seq=None,
                  supports_cancel_all=True, hide_from_listing=(), listing_status_override=None,
-                 ghost_order=False, open_orders_complete=True, stream_ready=True, data_limit=10000):
+                 ghost_order=False, open_orders_complete=True, stream_ready=True, data_limit=10000,
+                 page_size=None, lost_response_seqs=None, silent_submit_seqs=()):
         self.clock = clock
         self.limit = limit
         self.limit_schedule = limit_schedule
@@ -68,6 +70,12 @@ class FakeBroker:
         self.open_orders_complete = open_orders_complete
         self._stream_ready = stream_ready
         self.data_limit = data_limit
+        self.page_size = page_size
+        # seq -> status (None or 5xx): the order IS created but the REST response is lost.
+        self.lost_response_seqs = dict(lost_response_seqs or {})
+        # Orders created by these submits never appear on trade_updates.
+        self.silent_submit_seqs = set(silent_submit_seqs)
+        self._silent_cids = set()
         self.orders = {}
         self.callback = None
         self.trading_calls = []
@@ -121,6 +129,8 @@ class FakeBroker:
     def _emit(self, event, order):
         if self.callback is None or event in self.drop_events or (event, order["client_order_id"]) in self.drop_events:
             return
+        if order["client_order_id"] in self._silent_cids:
+            return
         self.callback({"stream": "trade_updates",
                        "data": {"event": event, "order": {k: v for k, v in order.items() if k != "created_at_wall"}}})
 
@@ -170,6 +180,8 @@ class FakeBroker:
         if seq in self.reject_submit_seqs:
             return Response(self.reject_submit_seqs[seq], headers)
         order = self._create(cid, symbol, limit_price)
+        if seq in self.silent_submit_seqs:
+            self._silent_cids.add(cid)
         self._emit("new", order)
         if seq in self.fill_submit_seqs:
             order.update(status="filled", filled_qty="1")
@@ -178,6 +190,8 @@ class FakeBroker:
             raise RuntimeError("fixture port defect")
         if self.ghost_order and seq == 1:
             self._create(cid[:-6] + "999999", symbol, limit_price, status="canceled")
+        if seq in self.lost_response_seqs:
+            return Response(self.lost_response_seqs[seq], {}, error="response_lost")
         return Response(200, headers, order=dict(order))
 
     def cancel(self, order_id):
@@ -206,11 +220,7 @@ class FakeBroker:
                 self._emit("canceled", order)
         return Response(207, headers)
 
-    def list_orders(self, status, after_wall):
-        self.clock.advance(self.read_latency)
-        ok, headers = self._admit("read")
-        if not ok:
-            return [], False, [Response(429, headers)]
+    def list_orders(self, status, after_wall, admit=None):
         rows = []
         for cid, order in self.orders.items():
             if any(cid.endswith("%06d" % seq) for seq in self.hide_from_listing):
@@ -226,7 +236,20 @@ class FakeBroker:
             if after_wall is not None and order["created_at_wall"] <= after_wall:
                 continue
             rows.append(row)
-        return rows, True, [Response(200, headers)]
+        # Paged like the native port: every page is one trading call, and every
+        # page after the first needs admit() first.
+        size = self.page_size or max(1, len(rows))
+        listed, responses = [], []
+        for index, start in enumerate(range(0, max(1, len(rows)), size)):
+            if index and admit is not None and not admit():
+                return listed, False, responses
+            self.clock.advance(self.read_latency)
+            ok, headers = self._admit("read")
+            responses.append(Response(200 if ok else 429, headers))
+            if not ok:
+                return listed, False, responses
+            listed.extend(rows[start:start + size])
+        return listed, True, responses
 
     def positions(self):
         self.clock.advance(self.read_latency)
