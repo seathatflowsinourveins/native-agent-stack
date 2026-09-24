@@ -11,6 +11,8 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
+    "native_paper_capacity": "2026-09-24 order-throughput harness on Alpaca paper from the WSL2 workstation (harness 4911baf): 180 order actions in each of 5 full one-minute windows, 496 submits and 496 cancels, 0 HTTP 429, websocket completeness 1.0, reconciled with 0 open orders, at the account's observed 200/min trading limit. Self-reported by the harness; an independent alpaca-py listing matched the order counts only (not rates or latencies). Non-marketable probes cancelled individually, not strategy trades or fills. 1000/min was not measured; an earlier regular-session run froze on cancel confirmations of about 16 s and is retained as a non-pass.",
+    "native_paper_capacity_evidence": "blueprints/us-equities/order-throughput/evidence/index-20260924.json",
     "broker_status": "Adaptive 1x broker trial passed 2026-09-23 on main 843dc8f (adaptive-paper/receipt.json broker_readiness passed; trials/20260923g-main-passed: 300.5 s, 5 real paper orders, 4 native fills, reconciled flat); earlier one-SPY broker receipt retained",
     "market_research": "Bounded50-provider-news-item and24-IEX-snapshot collection observed; partial news coverage; no execution eligibility",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
@@ -138,9 +140,10 @@
   "next_acceptance": [
     {
       "id": "retained-equity-replay",
-      "status": "reported_execution_blocked_review_incomplete",
-      "scope": "The September 22 source-host SPY/LEAN one_zero harness returned a completed BLOCKED comparison with four failed checks attributed to dividend cash posting and market-on-open mappings. This is recorded progress, not accepted parity; hardening and qualified rerun remain open. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and does not close this requirement.",
-      "executed_evidence_ref": "evidence/artifacts/comparison-progress-20260922/summary.json#/rows/6"
+      "status": "spy_lean_parity_passed_one_zero_case",
+      "scope": "Gate spy-lean-parity (catalogs/us-equities/gates-20260922.json) was established 2026-09-23 on the sealed v2 preregistration: verdict-v2.json reads PASS for the historical one_zero case with 136 checks, 0 failed and 0 skipped (106/106 execution checks) and preregistration_qualifying true, with dividend cash from a native rc5 SimulationModule and the open fill from native OCO-linked orders (gate dividend-sim-module, also established). The six earlier v2 replays ran before review and are disclosed in replay-history-v2.json with an accepted deviation. The September 22 v1 verdict.json (BLOCKED, four failed checks on the then-unsupported dividend-cash and market-on-open mappings) is retained. Limits: one case only; the open-fill proxy is not a general market-on-open equivalent when the open equals the prior close; parity is agreement with the frozen LEAN oracle, not strategy merit. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and is not this gate.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+      "earlier_evidence_ref": "evidence/artifacts/comparison-progress-20260922/summary.json#/rows/6"
     },
     {
       "id": "broker-state-failures",
@@ -150,7 +153,7 @@
     {
       "id": "separate-paper-adapters",
       "status": "bounded_alpaca_paper_smoke_passed_ibkr_1231_python_paper_passed_rc5_pending",
-      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders remain blocked by nautilus_trader#4983 (open). Continuous operation, native broker faults, Elite throughput and IBKR reconnect/restart reconciliation remain separate.",
+      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders remain blocked by nautilus_trader#4983 (open). Continuous operation, native in-flight broker faults (see broker-state-failures), Elite 1000/min throughput (200/min measured; see adaptive_practice native_paper_capacity) and IBKR reconnect/restart reconciliation remain separate.",
       "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
       "rc5_blocker": "https://github.com/nautechsystems/nautilus_trader/issues/4983"
     }

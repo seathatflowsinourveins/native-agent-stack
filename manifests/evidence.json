@@ -1218,6 +1218,25 @@
       "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
     },
     {
+      "id": "native-sec-new-host-20260924",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "edgartools"
+      ],
+      "claim": "New-host observation on the WSL2 Threadripper workstation: native EdgarTools 5.58.0, in an isolated runtime whose installed packages equal requirements.lock, completed the bounded get_filings request for 2020-03-02 with one SEC archive GET answered 200, 371 8-K/8-K/A index rows and the same five selected CIK/accession rows as the 2026-09-19 receipt. It adds a host; it does not replace the 2026-09-19 receipt.",
+      "limitations": [
+        "One native upstream metadata request (the quarterly form index) on one host at one time. The provenance adapter (catalyst.py acquire and packet) was not run on this host, so no daily index, header bytes or temporal packets are observed here.",
+        "Unique-accession counts, forms breakdown and the complete compressed source's bytes and gzip validation were measured in 2026-09-19 and are not re-measured by this output, which records only the cohort count and five selected rows.",
+        "The exact command line was not retained. The output's keys and fields match native_edgar.py's native_network receipt, but that the file came from this repository's native_edgar.py is inferred from its schema, not recorded.",
+        "The runtime package check (installed packages equal requirements.lock) was made when this receipt was written, after the request; the request-time environment is inferred from it.",
+        "The contact identity is private. Its unsalted SHA-256 in the private output is withheld from the committed copy, because a guessed contact could be confirmed against it; a matching contact between the two hosts is therefore not shown.",
+        "Successful access on this host does not establish historical availability, as-known data or a strategy result; 2020 filing dates do not imply this runtime observed the filings then.",
+        "Not a host_receipts.py receipt: that recorder executes its own commands, so it cannot import an earlier output. No platform_status, landscape verdict or trading gate changes because of this file."
+      ],
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "host_scope": "WSL2 Threadripper workstation (linux-wsl2-x86_64); new-host observation alongside, not replacing, native-sec-access-resolution-20260919"
+    },
+    {
       "id": "sec-catalyst-dataset-native-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -7323,8 +7342,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
-      "sha256": "5196a315acc411406df5b4510b5e850bb87db8b068a2c73802d62fa8b2390507",
-      "bytes": 5539
+      "sha256": "4871969dd4d56bd00c165080268062c106d068e98a7b562c52e2652d9b947084",
+      "bytes": 6270
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/catalyst.py",
@@ -7345,6 +7364,11 @@
       "path": "blueprints/us-equities/catalyst-provenance/native_edgar.py",
       "sha256": "72af6528dad542842f63fc3c765c3a3c21867d36942126f69f3f03c298983df7",
       "bytes": 4843
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json",
+      "sha256": "6698720da2ae22c941e67c9515364879c937c44ab0f2d93fd44fca405b165215",
+      "bytes": 7543
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json",
@@ -7483,8 +7507,8 @@
     },
     {
       "path": "blueprints/us-equities/data/README.md",
-      "sha256": "cedf2256164a6f93bb79a3859a8660e6bcf5fd20378dac7ebdd76738213aa9e4",
-      "bytes": 11630
+      "sha256": "8810322b8daa2459970f15432bea4c8476a683742327a81320f514ac50f544de",
+      "bytes": 12108
     },
     {
       "path": "blueprints/us-equities/data/fixtures/bad-gate-result.json",
@@ -9523,13 +9547,13 @@
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "sha256": "df7ca25f3df2d2a08d12fb47f869706a11209b00798cd05ed3d56ea38916d8f0",
-      "bytes": 105331
+      "sha256": "cc4dfdb8087419ccbea22d6af9a1d6bbf0359ba9821aa0f58a5754a350350136",
+      "bytes": 105732
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "sha256": "4452709796abb64c66064c8e733ab29843ef271b1e8c8bb09777364f48ff415c",
-      "bytes": 25190
+      "sha256": "74d4c7f385b6de7ff9f9011647b87eed6c7c3a2a24334732875dc0d4a227277b",
+      "bytes": 25459
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -9548,8 +9572,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "8c27800fd27821dec706a8cced1eff1cc688396fb9b87fe13e50f4572d3774a2",
-      "bytes": 41396
+      "sha256": "9379c0ce9c85b392382cfacca7abbe975bf61c42ae7cd59840db66d8178a5675",
+      "bytes": 42536
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9623,8 +9647,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "f21f52bc1fc539e89a2569e329f840291ffc90f0692731cafc057d17da34f137",
-      "bytes": 12804
+      "sha256": "6fcbe0068c22be5ec55d9188dd04c2579acc5f09f80abbb22e1da75c45611ab1",
+      "bytes": 14377
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -28518,8 +28542,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "ad2ad7382426b77a6c1f2c4bf60f48504ed4e00a856337bdf197243f51ccd191",
-      "bytes": 11607
+      "sha256": "4a79f8135d12671a110df703f3c9bd6537943970f77a0a37fa4607c12e339c3a",
+      "bytes": 11718
     },
     {
       "path": "observability/native-data/README.md",

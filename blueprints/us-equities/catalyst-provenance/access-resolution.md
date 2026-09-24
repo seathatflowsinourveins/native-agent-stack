@@ -98,3 +98,16 @@ replacement for filing bodies or complete historical availability.
 References: [SEC access and contact guidance](https://www.sec.gov/about/webmaster-frequently-asked-questions),
 [public APIs and bulk data](https://www.sec.gov/search-filings/edgar-application-programming-interfaces),
 [pinned EdgarTools HTTP implementation](https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/httpclient.py).
+
+## New-host observation, 2026-09-24
+
+A second WSL2 host, the Threadripper workstation, ran the same native request
+on 2026-09-24. EdgarTools 5.58.0 ran in an isolated runtime whose packages
+equal `requirements.lock`. One SEC archive GET was answered 200, and the
+request selected 371 8-K/8-K/A index rows. The five selected CIK/accession rows
+equal this receipt's five headers. The
+[new-host receipt](new-host-native-network-20260924.json) is an added
+observation. It does not replace the 2026-09-19 receipt above. It covers only
+the native upstream request: the provenance adapter, header bytes and temporal
+packets were not run on that host. The committed copy of its output leaves out
+the unsalted hash of the private contact.
