@@ -3047,8 +3047,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "6fada93b561e3bdbc740d65e4a2d70884f9e70c0ff551815fc512c177c919e1f",
-      "bytes": 8725
+      "sha256": "8314468fc13980d4c4aecb42eeb87b577bbc63035c530f3b60f8c6608908e238",
+      "bytes": 9021
     },
     {
       "path": ".github/pull_request_template.md",
@@ -8490,6 +8490,41 @@
       "path": "blueprints/us-equities/mover-v3/README.md",
       "sha256": "5728609b55cf20969342f7bccbc5dd14bf41af0dbcb6a540eaba9d400891b6d2",
       "bytes": 51853
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-pins.json",
+      "sha256": "757d0686bce3a3b3bb0acebe7420aadc81524566017f9dae3c6b360ea25a11d8",
+      "bytes": 4425
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
+      "sha256": "88bb18f8eace8dd8d2a1e09c3a10b3cef60b3b950994015483bcb8b245511903",
+      "bytes": 8258
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
+      "sha256": "ace5be25b5fc38723a2d5e2ffe6d03b2fa88682e7bcf5306326e169ec68bba24",
+      "bytes": 486
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-tools/requirements.lock",
+      "sha256": "96aed792d953c079fd29ed10d711c38c945dd03f240b31cf7b6255d528d3d2a6",
+      "bytes": 12453
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-tools/verify_fee_sources.py",
+      "sha256": "c9a1617b63d46bfda0af8f7c95efc14e3c935030b99f6a135d42d1274b5b6652",
+      "bytes": 5296
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+      "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+      "bytes": 59794
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
+      "sha256": "fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965",
+      "bytes": 502703
     },
     {
       "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
@@ -28950,6 +28985,11 @@
       "path": "tests/test_mover_followup_v2.py",
       "sha256": "1bd4e0225bfbc5e76d25de02a99a5780fa45e2f5091e78bb6307dc0ef98cc77c",
       "bytes": 10184
+    },
+    {
+      "path": "tests/test_mover_v3_data.py",
+      "sha256": "38c644ba7129ff4e82a25c9e97ba22ef083849298c3946b6547095ce45cf9ab2",
+      "bytes": 15989
     },
     {
       "path": "tests/test_nanosecond_replay.py",
