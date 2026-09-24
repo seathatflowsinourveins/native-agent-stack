@@ -1414,7 +1414,9 @@ What remains and how it is handled:
   when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
-    (Python's `Path.cwd()/ref`) and a URL's `//` after `:` start no path. Only `/dev/null` and a
+    (Python's `Path.cwd()/ref`) starts no path, and neither does the `//` of a network URL (`https://host`,
+    `ssh://`), though `file:///` and `https:///` do. The root rule skips a quoted `'/'` joined with `+` on
+    both sides (`p+'/'+k`), but not `'/'+'etc/passwd'`. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
     `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
     after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
@@ -1426,15 +1428,22 @@ What remains and how it is handled:
   - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
     `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - name git, sqlite3, curl or wget anywhere in the command. A blind child's PATH resolves none of ai-memory,
-    agentsview, mcporter, qmd, socraticode, jcodemunch, serena, codex or claude: `child_env` sets it to the system
-    directories (`/usr/bin:/bin:/usr/sbin:/sbin`), codex is launched by the absolute path the caller's PATH resolves,
-    and `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves
-    there or in what the login shell adds (measured per run: Codex runs commands with `bash -lc`, and
-    /etc/profile.d adds `/snap/bin` here; macOS path_helper adds /etc/paths). So their names are not flagged in a
-    blind run, since they are also candidates a lane must search for; a non-blind run still flags them. Measured
-    2026-09-24 with a real blind child: every one of them, and node, npx and uvx, was missing, while python3, git
-    and Codex's bundled rg resolved;
+  - name git, sqlite3, curl or wget anywhere in the command, or any audited CLI by an absolute path outside the
+    repository and packets (`/usr/local/bin/qmd`, which is otherwise an exempt system executable token).
+  - **PATH enforcement.** A blind child's PATH resolves none of ai-memory, agentsview, mcporter, qmd, socraticode,
+    jcodemunch, serena, codex or claude:
+    - `child_env` sets PATH to the system directories (`/usr/bin:/bin:/usr/sbin:/sbin`);
+    - codex runs by the absolute path the caller's PATH resolves, and an npm `#!/usr/bin/env node` launcher runs with
+      the interpreter the caller's PATH resolves;
+    - `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves on
+      any PATH a child's command can end up with. That is measured each run after a sentinel: the login shell's
+      (Codex runs commands with `bash -lc`; /etc/profile.d adds `/snap/bin` here, and macOS path_helper adds
+      /etc/paths), the default a shell sets when a command drops PATH (`/usr/local/bin` included), and
+      `os.defpath`.
+
+    So their names alone are not flagged in a blind run, since they are also candidates a lane must search for; a
+    non-blind run still flags them. Measured 2026-09-24 with a real blind child: every one of them, and node, npx
+    and uvx, was missing, while python3, git and Codex's bundled rg resolved.
   - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
     literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
     name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
@@ -1791,6 +1800,13 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     over the `test_real_reaches_still_flag` cases still flags each.
   - **The Claude lane was killed 20 minutes in.** `claude -p` ended its background workflow 600 s after its turn
     ended. The recipe now sets `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`.
+  - **Review of the fix (#206):** Codex and the independent review found gaps, each fixed with a test that fails without it:
+    - an npm `#!/usr/bin/env node` launcher could not start under the child's PATH;
+    - a CLI named by an absolute system path was exempt;
+    - `file:///` passed as a URL;
+    - a `'/'` joined on one side only built `/etc/passwd`;
+    - a command dropping PATH got the shell's default, with `/usr/local/bin`;
+    - profile output could reach the measured PATH.
   - **Nothing from the attempt is recorded:** codex_lane.py's hash changed, so both lanes rerun on a new wave.
 - **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
   - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text

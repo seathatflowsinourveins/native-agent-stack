@@ -308,6 +308,8 @@ AUDIT_TOOLS = ("git", "sqlite3", "curl", "wget")
 # (~/.local/share/codex-ecosystem/bin on this WSL host); codex itself is launched by the absolute path the caller's
 # PATH resolves (run_attempt).
 BLIND_CHILD_PATH = os.pathsep.join(("/usr/bin", "/bin", "/usr/sbin", "/sbin"))
+# A scheme whose ``//`` starts a network authority, not a filesystem path (``file://`` is not one).
+NETWORK_SCHEME_BEFORE = re.compile(r"(?i)(?<![A-Za-z0-9+.-])(?:https?|wss?|ftps?|sftp|ssh|git):\Z")
 # Not after ``)`` or ``]``: Python's path join (``Path.cwd()/ref``, ``parts[0]/name``) names no absolute path
 # (2026-09-24 re-record).
 ABSOLUTE_PATH = re.compile(r"(?<![\w.~})\]-])(/[^\s'\"|;&<>()`]+)")
@@ -366,8 +368,10 @@ def outside_paths(command: str, allowed_roots) -> list:
         path = match.group(1)
         if path in EXEMPT_PATHS:
             continue
-        # A URL's authority (``https://host/x``, a bare ``'https://'``) is no filesystem path (2026-09-24 re-record).
-        if path.startswith("//") and command[match.start(1) - 1:match.start(1)] == ":":
+        # A network URL's authority (``https://host/x``, a bare ``'https://'``) is no filesystem path (2026-09-24
+        # re-record); a ``file://`` URL is, so it stays checked (Codex review of #206, P2).
+        if (path.startswith("//") and not path.startswith("///")
+                and NETWORK_SCHEME_BEFORE.search(command[max(0, match.start(1) - 12):match.start(1)])):
             continue
         if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
             continue
@@ -378,14 +382,15 @@ def outside_paths(command: str, allowed_roots) -> list:
 
 
 def names_root(command: str) -> bool:
-    """Whether ``command`` names the filesystem root ``/``: ROOT_PATH, except a quoted ``'/'`` joined with ``+``, which
-    builds a path from parts (``p+'/'+k`` walking a JSON document) and names no directory; ``os.walk('/')`` and
-    ``ls /`` still do (2026-09-24 re-record: 8 voided layers)."""
+    """Whether ``command`` names the filesystem root ``/``: ROOT_PATH, except a quoted ``'/'`` joined with ``+`` on both
+    sides, which joins two parts (``p+'/'+k`` walking a JSON document) and names no directory; ``os.walk('/')``,
+    ``'/'+'etc/passwd'`` and ``ls /`` still do (2026-09-24 re-record: 8 voided layers)."""
     for match in ROOT_PATH.finditer(command):
         slash = match.end() - 1
         quote = command[slash - 1:slash]
+        # Both sides joined: '/'+'etc/passwd' builds /etc/passwd (independent review of #206, C2).
         if quote in ("'", '"') and command[slash + 1:slash + 2] == quote and (
-                re.search(r"\+\s*\Z", command[:slash - 1]) or re.match(r"\s*\+", command[slash + 2:])):
+                re.search(r"\+\s*\Z", command[:slash - 1]) and re.match(r"\s*\+", command[slash + 2:])):
             continue
         return True
     return False
@@ -448,6 +453,13 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
             reasons += [f"runs {tool}" for tool in tools if tool in words]
+            # A CLI named by an absolute path runs whatever PATH says (``/usr/local/bin/qmd``, an exempt system
+            # executable token otherwise), so its basename is checked against every audited CLI (Codex review of
+            # #206, P2); a bare search word is not a path.
+            reasons += [f"runs {name} by path: {path}" for path in ABSOLUTE_PATH.findall(command)
+                        for name in [os.path.basename(path.rstrip("/"))]
+                        if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
+                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
             if reasons:
                 report["flagged_commands"].append({"command": command, "reasons": reasons})
     return report
@@ -732,22 +744,34 @@ def child_env(codex_home: Path) -> dict:
     return env
 
 
+PATH_SENTINEL = "__NAS_BLIND_PATH__="
+
+
 def login_shell_path():
-    """The PATH a blind child's commands end up with on this host, or None when it cannot be measured. Codex runs each
-    command through the user's shell with ``-lc`` (``/bin/bash -lc`` here), whose profile can add directories: on this
-    WSL host /etc/profile.d/apps-bin-path.sh adds /snap/bin, and macOS path_helper adds /etc/paths and /etc/paths.d.
-    Measured with BLIND_CHILD_PATH and an empty HOME, as the child runs (2026-09-24 probe: codex also prepends its own
-    codex-path directory, which holds only rg)."""
+    """Every PATH a blind child's commands can end up with on this host, joined, or None when one cannot be measured.
+    Codex runs each command through the user's shell with ``-lc`` (``/bin/bash -lc`` here), whose profile can add
+    directories: on this WSL host /etc/profile.d/apps-bin-path.sh adds /snap/bin, and macOS path_helper adds /etc/paths
+    and /etc/paths.d (2026-09-24 probe: codex also prepends its own codex-path directory, which holds only rg). A command
+    can also drop PATH (``subprocess.run(..., shell=True, env={})``), and a shell started without one sets its compiled
+    default, /usr/local/bin included, while Python's exec uses os.defpath (independent review of #206, C3). Each is
+    measured after a sentinel, so profile output is not read as a directory (C5)."""
     import pwd
     import tempfile
     try:
         shell = pwd.getpwuid(os.getuid()).pw_shell or "/bin/sh"
+        probe = f'printf "\\n{PATH_SENTINEL}%s" "$PATH"'
+        paths = [os.defpath]
         with tempfile.TemporaryDirectory() as home:
-            result = subprocess.run([shell, "-lc", 'printf %s "$PATH"'], env={"PATH": BLIND_CHILD_PATH, "HOME": home},
-                                    stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30)
+            for argv, env in (([shell, "-lc", probe], {"PATH": BLIND_CHILD_PATH, "HOME": home}),
+                              (["/bin/sh", "-c", probe], {}), ([shell, "-c", probe], {})):
+                result = subprocess.run(argv, env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                                        timeout=30)
+                if result.returncode != 0 or PATH_SENTINEL not in result.stdout:
+                    return None
+                paths.append(result.stdout.rsplit(PATH_SENTINEL, 1)[1])
     except (OSError, KeyError, subprocess.SubprocessError):
         return None
-    return result.stdout if result.returncode == 0 and result.stdout else None
+    return os.pathsep.join(path for path in paths if path)
 
 
 def blind_path_issue(path: str = None):
@@ -772,6 +796,28 @@ def child_executable(name: str):
     return name if os.path.isabs(name) else shutil.which(name)
 
 
+def blind_child_argv(cmd: list) -> list:
+    """``cmd`` as a blind child runs it: its program by the absolute path the caller's PATH resolves, and, when that
+    program is a ``#!/usr/bin/env <interpreter>`` script (npm's codex launcher: ``#!/usr/bin/env node``, installed by
+    adoption/bootstrap-macos.sh), preceded by the interpreter the caller's PATH resolves, since the child's own PATH
+    (BLIND_CHILD_PATH) has no node (Codex review of #206, P1). An unresolved program is left for Popen to report."""
+    program = child_executable(cmd[0])
+    if program is None:
+        return list(cmd)
+    try:
+        with open(program, "rb") as handle:
+            first = handle.readline(256)
+    except OSError:
+        return [program, *cmd[1:]]
+    words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
+    if len(words) >= 2 and os.path.basename(words[0]) == "env":
+        rest = [word for word in words[1:] if word != "-S"]
+        interpreter = shutil.which(rest[0]) if rest and not rest[0].startswith("-") else None
+        if interpreter:
+            return [interpreter, *rest[1:], program, *cmd[1:]]
+    return [program, *cmd[1:]]
+
+
 def child_home(codex_home: Path) -> Path:
     """The empty HOME a blind child runs with, inside its run-scoped CODEX_HOME (isolated_codex_home)."""
     return Path(codex_home) / "home"
@@ -783,13 +829,13 @@ def run_attempt(cmd: list, timeout: float) -> dict:
     if STOP.is_set():
         return {"exit_code": None, "stdout": "", "stderr": "", "elapsed": 0.0, "timed_out": False, "stopped": True}
     env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
-    # A blind child's PATH has no codex (BLIND_CHILD_PATH), so it runs the one the caller's PATH resolves; argv[0] stays.
-    executable = child_executable(cmd[0]) if env is not None else None
+    # A blind child's PATH has no codex (BLIND_CHILD_PATH), so it runs the one the caller's PATH resolves.
+    cmd = blind_child_argv(cmd) if env is not None else cmd
     # The in-use lock rides along (round 7, ISO-R7-2); no stdin (round 5, ISO-R5-3): codex exec appends a
     # non-terminal stdin to the prompt and waits for its end.
     pass_fds = (IN_USE_HANDLE.fileno(),) if IN_USE_HANDLE is not None else ()
-    child = subprocess.Popen(cmd, executable=executable, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE, text=True, env=env, pass_fds=pass_fds)
+    child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             text=True, env=env, pass_fds=pass_fds)
     with _LIVE_LOCK:
         _LIVE_CHILDREN.add(child)
     if STOP.is_set():
@@ -1096,7 +1142,7 @@ def main(argv=None) -> int:
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
             # The child's PATH has no codex, so the printed command names the one this PATH resolves.
-            print(shlex.join(env_prefix + ([child_executable(cmd[0]) or cmd[0], *cmd[1:]] if blind else cmd)))
+            print(shlex.join(env_prefix + (blind_child_argv(cmd) if blind else cmd)))
         return 0
 
     if pending and shutil.which("codex") is None:
