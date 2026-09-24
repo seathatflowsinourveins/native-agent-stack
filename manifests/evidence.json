@@ -3152,8 +3152,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "5fc4f760395c2e8a7412e7352a546a9fb2eeb457babddb1c7bf05f7e96ff4da0",
-      "bytes": 22841
+      "sha256": "376d92f5e4818c8a6d6ec1d34830c099f808ebe144ce50a62410cd5855000b44",
+      "bytes": 22907
     },
     {
       "path": "SECURITY.md",
@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "795403e602aa2f0638790629e5d10b10377e4a004bb3afe3be2f7c94de2fe4be",
-      "bytes": 16600
+      "sha256": "b39e002f6f8821025d765033f45c627167839530c4d5c6f06fc8301d1fe238c2",
+      "bytes": 20514
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3272,13 +3272,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "c26ba0ed11ba0ebcade4ba0f86183244b9e04375c2e1a6820dd39ca6eaf3c620",
-      "bytes": 6206
+      "sha256": "cd517021c129ee2ef93ef8f44e2ffba693dccfbb0226ae7223fe15dab747aab8",
+      "bytes": 6401
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "920ba6279fee6ac61a59385e52b9c95df90d952c891267c1b02a281ace3ad3d8",
-      "bytes": 40322
+      "sha256": "146e5065d42199409327668fefd6f88c890ffe8060adbe9b7c21b9105bcedc16",
+      "bytes": 40489
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3347,8 +3347,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "34052c3aca3a02d6a27213e3e31b603492bde71a830319751428c64042106f3d",
-      "bytes": 16401
+      "sha256": "bbf6953c9c72a2fec61727a44a13d8d0ff96097f4ba044241a3cfd5ef0025dbf",
+      "bytes": 17042
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -8357,6 +8357,126 @@
       "bytes": 3775
     },
     {
+      "path": "blueprints/us-equities/mover-early-entry/README.md",
+      "sha256": "8c37692847b59a0b5bb28cd933a4ca59f0bd6b12528314dae72b57e670035ea7",
+      "bytes": 5900
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/benchmarks.py",
+      "sha256": "4ee46a41f206233f3bedd99382da0b739541bd936eae463b3815a828f3b62431",
+      "bytes": 3532
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/candidates.py",
+      "sha256": "f019ac0a8c774dfd8d422890375d0f8e97d0b738916b4d8925bf1888d7e86142",
+      "bytes": 3767
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/clarifications-v2.json",
+      "sha256": "304e227f7719457292a4a9cbc5825d6a253f51b801512d84c0cc41587d504b3e",
+      "bytes": 6415
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/clarifications.json",
+      "sha256": "37a0e941166bd3684bb62ba4dcb2eed8c123f256608bce6a92ca69464f79a019",
+      "bytes": 9220
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/collect.py",
+      "sha256": "cc03824be37d7d3288576c2ec718ab4617774c30d4432da7c04eee87b9f5d9c1",
+      "bytes": 8452
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/deviations.json",
+      "sha256": "4161db806360c2b56afb3a721ad1757c8b7ca02ab09e365fb86b7709073bd4eb",
+      "bytes": 11002
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/evaluate.py",
+      "sha256": "c1c0b57f31ec96bcb34971e4cba58d89686cb3c195b60766c1e085318cacc65a",
+      "bytes": 42469
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/evaluate_v2.py",
+      "sha256": "d2007077ac7367e16061e49a645a54802fbb58c41d79d3b2da6417b0275b2fe4",
+      "bytes": 32994
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json",
+      "sha256": "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13",
+      "bytes": 6205
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/evidence/summary-dev-val-run-v1.json",
+      "sha256": "640307310aaeffdd41eb1d35393e44a22b881c0132059fdf462f40a0712928c2",
+      "bytes": 1869290
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/evidence/summary-v2-dev-val-run-v1.json",
+      "sha256": "8e6692901a4ccf2889c7ea65b0c9d098c2f39b1f7a12f963837820330d9c5551",
+      "bytes": 785331
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/features.py",
+      "sha256": "96b87f94778e951c437092d55ea15dfafaa8fd2eb8d4c5f83512862dac4aa296",
+      "bytes": 17705
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/features_v2.py",
+      "sha256": "a112dbf107bb198dd3cee8bb7dddded023b7cbe4af172121cd97ed0ac7308a8b",
+      "bytes": 14774
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/fees.json",
+      "sha256": "fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d",
+      "bytes": 7134
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/mover_scan.py",
+      "sha256": "c88e09cc25995945c3f4469a8c4880f866d04c8ed74f422dd70c382ed0a0d870",
+      "bytes": 17041
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/paper_compare.py",
+      "sha256": "5be539c8004f392943aa6a0461fc444bb5c5d234b21d9478bc249612ee5f4514",
+      "bytes": 5845
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/premarket_scan.py",
+      "sha256": "75abd9e3c2d70fb11319d9eff4f59df7a0bf774771dee24f7e1f5f2809349e45",
+      "bytes": 9679
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/protocol-v2.json",
+      "sha256": "9b10b432fda086561044419b63dabebd20bd10721ae168e2de1ff837c26ea16e",
+      "bytes": 10015
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/protocol.json",
+      "sha256": "ac31192552ff4f87065c2072e2e5920155b35ce660b9232973e57e812b80e4d8",
+      "bytes": 15824
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/quotes.py",
+      "sha256": "4116bf2809e0952f842f0e0fe35fd8b5ab11ea295637734ffe0d719ca72ee85e",
+      "bytes": 15673
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/rules.py",
+      "sha256": "d66156b3e57c6299f10e41a3f25c921c8be52571bd84417040190d926bf49450",
+      "bytes": 11456
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/sessions_io.py",
+      "sha256": "2a753cb8f9164f48c1dceb952eb42eeae17811f636fddf5fca082731c708e59a",
+      "bytes": 3918
+    },
+    {
+      "path": "blueprints/us-equities/mover-early-entry/summarize.py",
+      "sha256": "8af0f97b8f6581b9d74aa98f5eea7d76af2b782d0175747270c0345bd9f5344b",
+      "bytes": 3358
+    },
+    {
       "path": "blueprints/us-equities/nanosecond-replay/README.md",
       "sha256": "de230378bc13af4ffd17d39a142ae8c8a624a80bcc95272487ae0f0693b63644",
       "bytes": 5819
@@ -9433,8 +9553,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
-      "bytes": 19528
+      "sha256": "f9880956124e66995b9a34a47608c01a477d79b16414cd08ee4ea171508b04a2",
+      "bytes": 36779
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9828,8 +9948,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "47f0f8c2957a7b7906210766e7ce5eced81c019202ccb24f85249ea33bfb4539",
-      "bytes": 157126
+      "sha256": "a351cca93e2eb079d52a92d8fb270c527d8ae92d6058f21928e4019b897331ed",
+      "bytes": 157375
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -9848,8 +9968,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "3529b37f86b01619c718282c0d5208160bb25cb7f9120cc87b50eca9bc18dfee",
-      "bytes": 34723
+      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
+      "bytes": 35942
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -10245,6 +10365,11 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json",
+      "sha256": "28126926ceded78069556007c47379ab2f3568d6eb9ae2a44734671e0f171a59",
+      "bytes": 17599
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
@@ -28198,8 +28323,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "64a91a01eeaf500aa5eff8e51738e91d29faf60fd28e913cecc4eac9dd69f20b",
-      "bytes": 58202
+      "sha256": "e592060d0ab43d680eb2f9771cf2b89dd5a8d1b5809a50ec31603842704fe40e",
+      "bytes": 59537
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28213,8 +28338,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
-      "bytes": 16440
+      "sha256": "8edc71e983a2d42ee50cc717530b5750bc5b80b2b621c9cd8feb1c31c59795f3",
+      "bytes": 16871
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -28288,8 +28413,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "227e9d0827ba6509d5086d6c0611472149362fcd3b449c9e010a67644b53b8c5",
-      "bytes": 5817
+      "sha256": "690e855c0eb680e7b0541f8dcb7f09c97e11ac0b2fc7ff4adb6b6fd5473bfc71",
+      "bytes": 13776
     },
     {
       "path": "scripts/trading_gates.py",
@@ -28573,8 +28698,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
-      "bytes": 10546
+      "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
+      "bytes": 27591
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -28692,6 +28817,31 @@
       "bytes": 2188
     },
     {
+      "path": "tests/test_mover_early_entry_pipeline.py",
+      "sha256": "40ed413a957ad01d26d03464ecf1b51e76f89cdd5b4c4bb4875abb3474418339",
+      "bytes": 3402
+    },
+    {
+      "path": "tests/test_mover_early_entry_rules.py",
+      "sha256": "3672bfe74dd7d730b643d0036a774c8341b6060407cc2650c7054919a2815658",
+      "bytes": 10103
+    },
+    {
+      "path": "tests/test_mover_early_entry_scan.py",
+      "sha256": "59cbd6ecfee159c9ca09e4e34fcf80ee23090da18402699db7e8c6094dcbf8e8",
+      "bytes": 6120
+    },
+    {
+      "path": "tests/test_mover_early_entry_stats.py",
+      "sha256": "d648056ea91e08a2c4e9de0667d07abe195a78f9056699e615271d7eb7aecf2c",
+      "bytes": 7962
+    },
+    {
+      "path": "tests/test_mover_followup_v2.py",
+      "sha256": "1bd4e0225bfbc5e76d25de02a99a5780fa45e2f5091e78bb6307dc0ef98cc77c",
+      "bytes": 10184
+    },
+    {
       "path": "tests/test_nanosecond_replay.py",
       "sha256": "50c4be832b9b7fe1dadc196fcc6dcfa854267d2b1de89eec2c95fb6cc6776b48",
       "bytes": 6756
@@ -28798,8 +28948,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "170320841953c442ec85a1617b895624cba2979643abc2f9854bf7eeb9533fe2",
-      "bytes": 3752
+      "sha256": "d354bfc35e2403779bbfdb2d71784a84e11b7187d45153b79a3e67c292676216",
+      "bytes": 12926
     },
     {
       "path": "tests/test_render_config.py",

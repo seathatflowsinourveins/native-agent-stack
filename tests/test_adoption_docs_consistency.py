@@ -22,8 +22,17 @@ cover. Each test below names the drift it stops:
   pinned release lacks (scripts/release_due.py's ``due`` list) says "added after `<release_tag>`";
 - a new-host page that mentions an install input (bootstrap script or pin file) whose content
   differs between the pinned release and HEAD says "changed after `<release_tag>`" in a unit
-  that mentions it. release_due.py only reports missing paths, so this is the check that sees
-  a changed script.
+  that mentions it. release_due.py reports every changed new-machine file in its ``changed``
+  list; this check requires the per-page note for the install inputs;
+- bootstrap.md's plugin revision check quotes the same commits as the recipes/README.md rows
+  it names, and its install commands are the recipe's own commands (nothing else binds those
+  copies, and a marketplace source cannot enforce a commit);
+- no documented `claude plugin marketplace add` passes a commit as its ref: a Claude marketplace
+  source takes a branch or tag, and the `@<commit>` form exits 1 (dated records and retained
+  evidence, which quote that failure, are exempt);
+- every documented `gh attestation verify` of the catalog's own publication binds the commit
+  (--source-digest), and bootstrap.md's release archive check also binds the tag (--source-ref)
+  and runs `gh release verify-asset`.
 
 The markers name the release they were written against, so they stay true in every later
 checkout: at a newer release they are history, and a re-pin needs no documentation edit for
@@ -485,6 +494,165 @@ class UnreleasedStepMarkerTests(unittest.TestCase):
         disclosed = text.replace("prints the pins.", "prints the pins (changed after `v2000.01.01`).")
         self.assertEqual(self.unmarked_changes(disclosed, changed, "ok", "v2000.01.01"), [])
         self.assertEqual(self.unmarked_changes("## Other\n\nNo mention.\n", changed, "ok", "v2000.01.01"), [])
+
+
+class PluginRevisionCheckTests(unittest.TestCase):
+    """bootstrap.md's plugin revision check compares installed_plugins.json with a copy of the
+    recipe table's reviewed commits and repeats the recipe's install commands; neither copy may
+    drift from recipes/README.md. The real checks and their mutants call the same checkers."""
+
+    RECIPE_ROWS = {"context-mode@context-mode": "context-mode", "claude-hud@claude-hud": "claude-hud",
+                   "codex@openai-codex": "codex-for-claude"}
+    QUOTED_RE = re.compile(r'"([\w.-]+@[\w.-]+)": "([0-9a-f]{40})"')
+    PLUGIN_COMMAND_RE = re.compile(r"claude plugin (?:marketplace add|install) [^`\n#;]*[^`\n#;\s]")
+    INSTALL_RE = re.compile(r"claude plugin install ([\w.-]+@[\w.-]+)")
+
+    @classmethod
+    def recipe_commits(cls, recipe_text: str) -> dict[str, str | None]:
+        lines = recipe_text.splitlines()
+        commits = {}
+        for key, row in cls.RECIPE_ROWS.items():
+            line = next((line for line in lines if line.startswith(f"| `{row}` · ")), "")
+            match = HASH_RE.search(line)
+            commits[key] = match.group(0) if match else None
+        return commits
+
+    @classmethod
+    def revision_errors(cls, bootstrap_text: str, recipe_text: str) -> list[str]:
+        recipe = cls.recipe_commits(recipe_text)
+        errors = [f"recipes/README.md: the `{cls.RECIPE_ROWS[key]}` row carries no 40-hex commit"
+                  for key, sha in recipe.items() if sha is None]
+        quoted = dict(cls.QUOTED_RE.findall(bootstrap_text))
+        for key in sorted(set(recipe) | set(quoted)):
+            if quoted.get(key) != recipe.get(key):
+                errors.append(f"adoption/bootstrap.md quotes {key} = {quoted.get(key)}, "
+                              f"recipes/README.md gives {recipe.get(key)}")
+        return errors
+
+    @classmethod
+    def command_errors(cls, bootstrap_text: str, recipe_text: str) -> list[str]:
+        recipe = set(cls.PLUGIN_COMMAND_RE.findall(recipe_text))
+        commands = cls.PLUGIN_COMMAND_RE.findall(bootstrap_text)
+        errors = [f"adoption/bootstrap.md runs `{command}`, which recipes/README.md does not give"
+                  for command in commands if command not in recipe]
+        installed = {match for command in commands for match in cls.INSTALL_RE.findall(command)}
+        errors += [f"adoption/bootstrap.md installs no {key}, which its check expects"
+                   for key in cls.RECIPE_ROWS if key not in installed]
+        return errors
+
+    @staticmethod
+    def texts() -> tuple[str, str]:
+        return ((ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8"),
+                (ROOT / "recipes/README.md").read_text(encoding="utf-8"))
+
+    def test_the_bootstrap_check_quotes_the_recipe_rows(self):
+        self.assertEqual(self.revision_errors(*self.texts()), [])
+
+    def test_the_bootstrap_commands_are_the_recipe_commands(self):
+        self.assertEqual(self.command_errors(*self.texts()), [])
+
+    def test_the_checks_reject_drift(self):
+        bootstrap, recipe = self.texts()
+        quoted = dict(self.QUOTED_RE.findall(bootstrap))
+        reviewed = quoted["context-mode@context-mode"]
+        row = next(line for line in recipe.splitlines() if line.startswith("| `context-mode` · "))
+        mutants = {
+            "bootstrap commit": (self.revision_errors, bootstrap.replace(reviewed, "0" * 40), recipe),
+            "recipe row commit": (self.revision_errors, bootstrap, recipe.replace(row, row.replace(reviewed, "1" * 40))),
+            "recipe row without a commit": (self.revision_errors, bootstrap, recipe.replace(row, row.replace(reviewed, "reviewed"))),
+            "renamed plugin key": (self.revision_errors,
+                                   bootstrap.replace('"claude-hud@claude-hud":', '"claude-hud@hud":'), recipe),
+            "bootstrap command": (self.command_errors,
+                                  bootstrap.replace("claude-hud@v0.8.0 --scope user", "claude-hud@v0.7.0 --scope user"), recipe),
+            "missing install": (self.command_errors,
+                                bootstrap.replace("claude plugin install codex@openai-codex --scope user --json\n", ""), recipe),
+        }
+        for name, (check, bootstrap_text, recipe_text) in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(bootstrap_text + recipe_text, bootstrap + recipe, "the mutation must apply")
+                self.assertTrue(check(bootstrap_text, recipe_text))
+
+
+class MarketplaceCommitRefTests(unittest.TestCase):
+    """A Claude marketplace source takes a branch or tag and never a commit
+    (code.claude.com/docs/en/plugin-marketplaces); the `owner/repo@<commit>` form exited 1 on
+    2.1.281 (evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json)."""
+
+    COMMIT_REF_RE = re.compile(r"claude plugin marketplace add [^\s`\"'<>]+@[0-9a-f]{7,40}(?![0-9A-Za-z._-])")
+    # Dated records and retained runs quote the failed form as history.
+    EXEMPT = ("evidence/", "docs/decisions/", "docs/ecosystem/", "blueprints/")
+    SUFFIXES = (".md", ".json", ".sh", ".toml", ".yml", ".yaml")
+
+    @classmethod
+    def errors(cls, text: str, label: str) -> list[str]:
+        return [f"{label}: `{match}` passes a commit; use a tag, a branch or no ref and check gitCommitSha"
+                for match in cls.COMMIT_REF_RE.findall(text)]
+
+    def documents(self) -> list[str]:
+        tracked = git_tracked()
+        if tracked is None:
+            tracked = {rel(path) for path in ROOT.rglob("*") if path.is_file() and ".git" not in path.parts}
+        return sorted(path for path in tracked if path.endswith(self.SUFFIXES) and not path.startswith(self.EXEMPT))
+
+    def test_no_documented_claude_marketplace_add_passes_a_commit(self):
+        errors = [error for path in self.documents() if (ROOT / path).is_file()
+                  for error in self.errors((ROOT / path).read_text(encoding="utf-8", errors="replace"), path)]
+        self.assertEqual(errors, [])
+
+    def test_the_check_rejects_a_commit_ref_and_accepts_tags_and_no_ref(self):
+        self.assertEqual(len(self.errors(f"`claude plugin marketplace add mksglu/context-mode@{'a' * 40} --scope user`", "mutant")), 1)
+        self.assertEqual(len(self.errors("claude plugin marketplace add owner/repo@6f0cc68 --scope user", "mutant")), 1)
+        self.assertEqual(self.errors("claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user\n"
+                                     "claude plugin marketplace add mksglu/context-mode --scope user\n"
+                                     "codex plugin marketplace add mksglu/context-mode --ref " + "a" * 40, "ok"), [])
+
+
+class CatalogAttestationBindingTests(unittest.TestCase):
+    """Every documented check of the catalog's own attestation (signed by publish-catalog.yml)
+    binds the commit with --source-digest, and bootstrap.md's release archive check also binds the
+    tag with --source-ref. Without them `gh attestation verify` exited 0 for the attested archive
+    of unreleased commit 41d39b39 (workflow_dispatch run 35803145596) saved under the
+    v2026.09.23.1 file name; with --source-digest it exited 1 (2026-09-24)."""
+
+    COMMAND_RE = re.compile(r"gh attestation verify (?:[^\n]*\\\n)*[^\n]*")  # with backslash continuations
+    # Dated records and retained evidence may quote an older, unbound command as history.
+    EXEMPT = MarketplaceCommitRefTests.EXEMPT
+
+    def pages(self) -> list[Path]:
+        tracked = git_tracked()
+        if tracked is None:
+            tracked = {rel(path) for path in ROOT.rglob("*.md") if ".git" not in path.parts}
+        return sorted(ROOT / path for path in tracked if path.endswith(".md") and not path.startswith(self.EXEMPT))
+
+    @classmethod
+    def errors(cls, text: str, label: str, flags: tuple[str, ...] = ("--source-digest",)) -> list[str]:
+        return [f"{label}: `{' '.join(command.split())[:90]}…` lacks {flag}"
+                for command in cls.COMMAND_RE.findall(text) if "publish-catalog.yml" in command
+                for flag in flags if flag not in command]
+
+    def test_catalog_attestation_checks_bind_the_commit(self):
+        pages = self.pages()
+        errors = [error for path in pages if path.is_file()
+                  for error in self.errors(path.read_text(encoding="utf-8", errors="replace"), rel(path))]
+        self.assertEqual(errors, [])
+        # The publication guides that carry such a command are all in scope (not a fixed list).
+        self.assertTrue({"SECURITY.md", "adoption/bootstrap.md", "adoption/update.md", "docs/catalog-provenance.md",
+                         "docs/github-automation.md"} <= {rel(path) for path in pages})
+
+    def test_the_bootstrap_archive_check_binds_the_release_tag_and_commit(self):
+        text = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        self.assertTrue(any("publish-catalog.yml" in command for command in self.COMMAND_RE.findall(text)))
+        self.assertEqual(self.errors(text, "adoption/bootstrap.md",
+                                     ("--source-digest <release_commit>", "--source-ref refs/tags/<release_tag>")), [])
+        self.assertIn("gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz", text)
+
+    def test_the_check_rejects_an_unbound_command_and_ignores_other_signers(self):
+        unbound = ("gh attestation verify native-agent-stack-<c>.tar.gz \\\n  --repo o/r \\\n"
+                   "  --signer-workflow o/r/.github/workflows/publish-catalog.yml\n")
+        self.assertEqual(len(self.errors(unbound, "mutant")), 1)
+        bound = unbound.replace("publish-catalog.yml\n", "publish-catalog.yml \\\n  --source-digest <c>\n")
+        self.assertEqual(self.errors(bound, "ok"), [])
+        self.assertEqual(self.errors("gh attestation verify -R rhysd/actionlint actionlint.tar.gz\n", "ok"), [])
 
 
 if __name__ == "__main__":

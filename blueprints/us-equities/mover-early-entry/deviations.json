@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "protocol": "mover-early-entry-v1-20260924",
+  "note": "Dated departures from the frozen protocol.json, each recorded when it happened. protocol.json itself stays byte-identical.",
+  "deviations": [
+    {
+      "id": "D1",
+      "recorded_at": "2026-09-24T03:47:08Z",
+      "kind": "ordering_slip",
+      "what": "A 3-session trial of features.py in outcomes mode (the first three development sessions, 504 symbol-days) computed exit prices at 2026-09-24T03:42Z, before the cost table was fixed. costs.sample says no exit path is computed before then.",
+      "handling": "Only the trial's line count and hashes were printed (content sha256 d2c82a5f7926cfe8c805791432cb7ffc80a6964a5b3eba99facac78b98684f73). The file was deleted unread at 2026-09-24T03:43:33Z. The trial also read the asof=session collection that D2 replaces.",
+      "effect": "None on the cost table: it uses fixed, exit-agnostic quote timestamps and never reads exit fields. From here on only signals mode runs until the cost table is committed."
+    },
+    {
+      "id": "D2",
+      "recorded_at": "2026-09-24T03:47:08Z",
+      "kind": "data_identity_correction",
+      "protocol_text": "data.minute_bars: 'SIP 1-minute bars 04:00-20:00 ET, raw, asof = session' (collect.py also used asof = session for auctions)",
+      "problem": "The candidate list comes from the broad-universe daily dataset, whose collector requested bars by 2026-09-21 tickers with the provider's default asof (collect_daily.py: renamed issuers are returned under their current ticker). With asof = session, the API resolves that current ticker on the old date, so a renamed issuer returns nothing and a reused ticker can return a different issuer.",
+      "evidence": "Daily SIP bars for 2021-01-04 with asof = 2021-01-04 were empty for CATX, IMNN, META, BACK and GRCE; with asof = 2026-09-21 they returned the issuer's bars (META opened at 274.78, Facebook's open that day). On three sampled sessions, 26-30 candidates per session had no bars under asof = session.",
+      "change": "Bars and auctions are re-collected with asof = 2026-09-21, the naming date of the candidate list (collect.py --asof 2026-09-21), in four session-range parts: collect-asof20260921 and collect-asof20260921-p2..p4. The asof = session collections are retained for this record and are not used for evaluation.",
+      "news": "The news endpoint has no asof parameter; headlines are matched by the 2026-09-21 ticker, so a renamed issuer's older headlines tagged only with its old ticker are missed (news variant only).",
+      "effect_measurement": {
+        "measured_at": "2026-09-24T04:0x (approximate; the command printed no time)",
+        "development_candidate_symbol_days": 95230,
+        "with_minute_bars_asof_2026_09_21": 95020,
+        "with_minute_bars_asof_session": 79241,
+        "note": "The asof = session collection lacked bars for 16.8% of development candidates; the asof 2026-09-21 collection lacks them for 0.2%. A first check against the daily close used the last minute bar up to 20:00, which D3 shows is the wrong comparison (daily bars are regular-session bars)."
+      }
+    },
+    {
+      "id": "D3",
+      "recorded_at": "2026-09-24T04:13:15Z",
+      "kind": "completeness_correction",
+      "protocol_text": "universe.candidates: 'fully adjusted daily-bar high ... (both bars include extended-hours trades)' and the completeness_argument built on it",
+      "problem": "The daily bars are regular-session bars, so a pre-market price can exceed the daily high. A pre-market rule (07:00-09:25, and the 09:30 rule's 09:28 cutoff) can then fire on a symbol-day the daily-high superset leaves out: a day up 20% or more before the open that never reached it after 09:30. Those days are pre-market faders, so leaving them out biases every pre-market rule upward.",
+      "evidence": "On 51 sampled development sessions (every 15th): the daily high matched the maximum regular-session minute high within 0.1% on 99.2% of 6,344 symbol-days, against 75.0% for the maximum over 04:00-20:00; the daily low 99.2% against 64.5%; the daily open matched the first regular-session bar open on 96.0% against 25.9% for the first bar from 04:00. The daily close equalled the official closing print within 0.1% on 92.0% of 6,062 days (41.1% for the last regular-session bar close). On 943 of 4,956 candidate days that traded before the open (19.0%), the pre-market high exceeded the daily high by more than 0.1%.",
+      "change": "premarket_scan.py requests fully adjusted SIP 30-minute bars 04:00-09:29 ET (asof 2026-09-21) for every symbol-day with a previous daily row, and adds the symbol-days whose pre-market high reached 1.20 x the previous fully adjusted low and are not already candidates. Their intraday data is collected as for the other candidates. The evaluated universe is the union; supplement days are flagged so results can also be shown without them.",
+      "also_corrects": "clarifications C23: the daily dataset's previous raw close is the official close on 92% of sampled days, not an extended-hours close. The agent-lab executed-comparisons record's note that the broad-universe study's daily opens and closes include extended hours is wrong for the same reason.",
+      "remaining_gap": "A closing auction can print outside the regular-session low (ref >= previous low is then not guaranteed); not measured.",
+      "supplement_candidates_sha256": "e8ea2dc37ec83a44cfb054ffe797e6faee8e65793ded3bc0c374abd3bf48066f",
+      "supplement": {
+        "file": "candidates-premarket-20260924.csv (private)",
+        "new_symbol_days": 40354,
+        "premarket_touches_already_candidates": 88733,
+        "symbol_days_scanned": 14166453,
+        "sessions": 1434,
+        "finalized_at": "2026-09-24T04:33:03Z",
+        "scan_pages": 36185,
+        "scan_pages_non_200": 0
+      },
+      "known_gaps": [
+        "Splits after the daily dataset's 2026-09-21 adjustment date rescale the scan's provider-adjusted pre-market highs against the dataset's lows. Alpaca corporate actions (first page, ex-dates 2026-09-21..25) list 20 splits: one forward split (UNX 4:1, 2026-09-22), whose history can have missed pre-market touches, and 19 reverse splits, which can only add candidates (evaluated on raw bars, so harmless).",
+        "A symbol-day with pre-market trading but no regular-session trade (for example halted before the open) has no daily row and is in neither list.",
+        "For a reused ticker, headlines tagged with the ticker may belong to the previous holder (news variant only)."
+      ]
+    },
+    {
+      "id": "D4",
+      "recorded_at": "2026-09-24T05:09:59Z",
+      "kind": "input_window",
+      "protocol_text": "data.market: 'SPY daily closes from the daily dataset, 2020-01-02 onward (the 252-session window starts before 2021)'",
+      "problem": "A 252-session median of a 20-session volatility needs 272 closes before 2021-01-04; 2020 supplies about 253.",
+      "change": "SPY fully adjusted closes from 2019-11-01 (the daily dataset starts 2016-01-04), read only up to the stage's last session. Moved here from clarification C4 after the pre-outcome review."
+    },
+    {
+      "id": "D5",
+      "recorded_at": "2026-09-24T05:09:59Z",
+      "kind": "review_record",
+      "what": "An independent pre-outcome review (3 Opus reviewers, 2 refuters per blocking/major finding; workflow run wf_d470e1c6-e08) of commit 1c61c78f found 10 blocking/major findings (all survived refutation; 7 distinct) and 28 minor ones. All were resolved before any outcome: the 600 s news sensitivity is reported; portfolio slots rank every fire (C24); outcome and holdout reads are gated in code (C32); collections are identity- and count-checked; the live scanner uses the calendar's previous session and the signal cutoff (C31); holdout statistics cover only the evaluated rule-exits (C30); portfolio P&L is booked on the basis; exact-threshold fires (C25); early closes (C26); the daily-close fallback (C22); the table's own 90th percentile (C9); sensitivities and tie-breaks (C27-C29); coverage against the evaluated union; per-split completeness; input and runtime hash checks.",
+      "effect": "The cost sample's close-5m stamps on the four development early-close sessions move to 12:55 ET, so those stamps are re-fetched and the cost table rebuilt before it is committed."
+    },
+    {
+      "id": "D6",
+      "recorded_at": "2026-09-24T06:03:17Z",
+      "kind": "post_outcome_diagnostic_corrections",
+      "what": "After the v1 dev_val outcome, an independent result audit (workflow wf_a0e5858e-8a5; refuters upheld it) found that ref can be on the wrong price basis on rows with the C23 daily-close fallback or a split day, which contaminates the degree tiers (capture and replication) but not trade returns, which never use ref. capture() and replication() also compared gains without the C25 epsilon.",
+      "change": "Post hoc and labelled as such: capture and replication are also reported without basis-uncertain rows (ref from the daily-close fallback, or a split day: 6,845 development and 3,922 validation symbol-days), and both use the C25 epsilon. Selection, pass criteria and every trade metric are unchanged (verified: identical development and validation blocks), so the no-pass result stands.",
+      "effect": "Results sha256 9d8c3d5b... (two independent runs byte-identical). The >= 10x tier holds 62 symbol-days, 16 without basis-uncertain rows. Wave H: 62.9% (all rows) and 69.7% (without basis-uncertain rows, 1,212 days) were +20% at 09:25; Spearman 0.257 and 0.248.",
+      "v2": "Protocol v2 preregisters the same basis-uncertain sensitivity (clarifications-v2 V20) before any v2 outcome."
+    },
+    {
+      "id": "D7",
+      "recorded_at": "2026-09-24T06:31:21Z",
+      "kind": "post_outcome_correction",
+      "protocol": "mover-followup-v2-20260924",
+      "what": "Codex review on PR #162: a P trade held across a split or an ex-dividend date priced its exit as day d's raw close times the adjusted return, so fees used the pre-split share count and spread/SEC fees fell on dividend cash.",
+      "change": "P exits use the exit row's raw price; shares change by the daily dataset's split factor between d and the exit row (when it differs from 1 by more than 1e-2); the remainder of the adjusted close-to-close return is booked as cash per original share, without spread or fees. E and F are unaffected.",
+      "effect": "Results sha256 75a5004b... (two runs byte-identical): E and F blocks identical; P means change by at most 0.00002; no family has a development pass, as before.",
+      "also": "quotes.py now records each stamp's timestamp, reuses a completion only for the same timestamp, and table refuses a stamp whose quotes fall outside [ts - 60 s, ts]; the frozen cost table reproduces byte for byte under that check (all 4,725 stamps with quotes lie inside their windows). paper_compare.py pins asof to the trade session and uses the daily-close fallback."
+    }
+  ]
+}

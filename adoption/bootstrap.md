@@ -31,7 +31,8 @@ the checkout. After checkout, follow the documents in your checkout.
 The pages here name the release a step was written against. "Added after
 `vT`" means release `vT` lacks the file that step uses (a path in
 `release_due.py`'s `due` list); "changed after `vT`" means the file exists at
-`vT` but behaves as the note says there, not as main documents it. If your
+`vT` but behaves as the note says there, not as main documents it (its
+`changed` list names every new-machine file whose content differs from `vT`). If your
 checkout is `vT`, follow the note: run that step from a separate clone of the
 default branch (never the pinned one you install from; a result from it is
 main-only evidence) or wait for the next re-pin. If your checkout is a later
@@ -48,12 +49,26 @@ remains meaningful only as the comparison point `scripts/adoption_status.py`
 uses for its `baseline_matches`/`baseline_differs` `git` result, not as a
 checkout target.
 
-If downloading the release archive from an Actions run instead of
-`git clone` (e.g. no local git), verify its attested provenance before use:
+If installing from the release archive instead of `git clone` (e.g. no local
+git), download it from the GitHub Release and verify it before use. Both checks
+bind the file to this release: `verify-asset` to the immutable release's asset
+digest, and `--source-ref`/`--source-digest` to the tagged commit. Without them
+the attestation check also passes for an attested archive of any other commit
+(a `workflow_dispatch` run of `publish-catalog.yml`) saved under this name.
+`verify-asset` and `attestation verify` need a signed-in `gh` (`gh auth login`;
+without it both exit 4). Without a clone, read the pin from the default branch:
 ```sh
+gh api -H 'Accept: application/vnd.github.raw+json' \
+  repos/seathatflowsinourveins/native-agent-stack/contents/adoption/manifest.json \
+  | python3 -c "import json,sys; s=json.load(sys.stdin)['source']; print(s['release_tag'], s['release_commit'])"
+gh release download <release_tag> --repo seathatflowsinourveins/native-agent-stack \
+  --pattern 'native-agent-stack-<release_commit>.tar.gz'
+gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz \
+  --repo seathatflowsinourveins/native-agent-stack
 gh attestation verify native-agent-stack-<release_commit>.tar.gz \
   --repo seathatflowsinourveins/native-agent-stack \
-  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-ref refs/tags/<release_tag> --source-digest <release_commit>
 ```
 
 Read the platform page for the chosen
@@ -219,6 +234,47 @@ GitHub-hosted macOS runner; see
    `adoption/mcp/claude-user.json`) were added after `v2026.09.23`; at that
    tag, merge the rendered settings by hand.
 
+   **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
+   host's plugin registry, so it runs the same from any checkout). A Claude
+   marketplace source takes a branch or tag and never a commit
+   ([plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)):
+   an `owner/repo@<commit>` source fails to add (measured on Claude Code
+   2.1.281, [recipe](../recipes/README.md#native-context-mode-and-hooks)). The
+   template's `extraKnownMarketplaces` and the commands below therefore hold
+   `claude-hud` and `openai-codex` to a tag and give `context-mode` no ref, so
+   `context-mode` installs whatever its default branch holds. Install the three
+   plugins with their [recipe rows'](../recipes/README.md#component-catalog-install-and-check)
+   commands:
+   ```sh
+   claude plugin marketplace add mksglu/context-mode --scope user
+   claude plugin install context-mode@context-mode --scope user --json
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user
+   claude plugin install claude-hud@claude-hud --scope user --json
+   claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
+   claude plugin install codex@openai-codex --scope user --json
+   ```
+   Then compare the `gitCommitSha` that landed with the reviewed revisions in
+   those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
+   Code does):
+   ```sh
+   python3 - <<'EOF'
+   import json, os, pathlib
+   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude
+       "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
+       "claude-hud@claude-hud": "ef5f1c8b167572ad1443c70629763ea8780af96b",
+       "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+   }
+   config = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR") or pathlib.Path.home() / ".claude")
+   registry = json.loads((config / "plugins/installed_plugins.json").read_text())
+   for key, sha in reviewed.items():
+       found = [entry.get("gitCommitSha") for entry in registry.get("plugins", {}).get(key, [])]
+       print("ok" if found and set(found) == {sha} else "MISMATCH", key, found or "not installed")
+   EOF
+   ```
+   A `MISMATCH` means this host runs a plugin revision the catalog has not
+   reviewed: record the installed `gitCommitSha` in the step 7 receipt instead
+   of the recipe's revision, and review it before relying on the plugin.
+
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
@@ -228,8 +284,11 @@ GitHub-hosted macOS runner; see
    templates were added after `v2026.09.23`). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
-6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
-   reports command presence and recipe-path presence only; it never logs in,
+6. **Prerequisite report.** `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`
+   (changed after `v2026.09.23.1`, whose step 6 runs plain `python3`: the manifest
+   supports Python 3.13 only, so a `python3` that is 3.12, as on Ubuntu 24.04,
+   reports `prerequisites_missing` and exits 2; on a checkout of that release, run
+   this form instead) reports command presence and recipe-path presence only; it never logs in,
    edits configuration, starts services, or certifies functional acceptance
    (see its own docstring and `adoption/README.md`'s "Native verification
    tiers" table).
