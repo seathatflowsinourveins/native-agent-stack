@@ -6,34 +6,58 @@
       --start 2016-01-01 --end 2026-08-31 [--rate 6000] [--workers 16] --pilot 2   (then the same without --pilot)
   python backfill.py verify DATASET --out DIR
 
+Exit codes: 0 done; 1 task failures or an incomplete pilot; 2 refused (before any request, or a pilot whose disk
+projection does not fit); 3 stopped early (the STOP file or the disk re-check drained the run: resume with the same
+command); 4 the pilot raised a D2 overturn flag (a full run then needs --accept-pilot-flags REASON).
+
 Scope: DIR/<dataset>/scope.json records the sha256 of this file, the endpoint, the fixed request parameters, the
-sha256 of the symbol task list and the span. The first run writes it. A run whose scope differs in any field, a header
-that no longer hashes to its fingerprint, or a manifest without a header is refused (exit 2) before any request, so
-completed work is never reused for another scope (the rule broad-universe/collect_daily.py applies). Each page-capture
-manifest row also carries that fingerprint, and a row naming another one never counts as done. A lock file admits one
-run per dataset at a time.
+sha256 of the symbol task list, the span and the planned task count with the sha256 of the task ids. The first run
+writes it. A run whose scope differs in any field, a header that no longer hashes to its fingerprint, or a manifest
+without a header is refused (exit 2) before any request, so completed work is never reused for another scope (the rule
+broad-universe/collect_daily.py applies). Each page-capture manifest row also carries that fingerprint, and a row
+naming another one never counts as done. `verify` compares the recorded tasks with the planned ones and reports
+complete: false (exit 1) while any planned task has no row.
+
+Also refused with exit 2 before any request: an --out inside a git work tree (licensed provider data never lands in
+a checkout); a STOP file present at start; a second backfill on this host, whatever its dataset or --out (a host-wide
+lease, ~/.local/state/native-agent-stack/data-lake/backfill.lock, keeps the backfill pool one job at a time within
+the account's shared data limit); a second run on the same dataset (DIR/<dataset>/.lock).
 
 news keeps the record capture its 2015-2026 archive was collected with: one task per UTC calendar day, the day's
-records re-serialized (sorted keys) into DIR/news/<YYYY>/<MM>/<DD>.jsonl.gz, one manifest row per day.
+records re-serialized (sorted keys) into DIR/news/<YYYY>/<MM>/<DD>.jsonl.gz, one manifest row per day. A day is now
+requested from 00:00:00Z to 23:59:59.999999999Z (both bounds are inclusive); the archive's D+1T00:00:00Z end put two
+records stamped exactly at midnight into two day files, so its consumers dedupe by id.
 
 stock_bars_1min (convergence record 2026-09-24, D1-D2): SIP 1-minute bars, raw prices, extended hours, for every
 symbol of the asof-aware monthly universe (`universe`: each month's symbols with a daily SIP bar in the deduplicated
 broad-universe daily dataset, active and delisted alike, named as of that collection's request date, which becomes
 the request `asof`). A task is 100 symbols x one calendar month, from 04:00 ET on the first day to
 19:59:59.999999999 ET on the last. Each page is requested with Accept-Encoding: gzip, stored exactly as received and
-written as it arrives. The task's manifest row records every page's request parameters (the task parameters plus
-its page_token), sha256 and sizes, and lists bars outside 04:00-20:00 ET as quarantined instead of failing the task.
-A full run requires a passing pilot for the same scope: --pilot N fetches N (at most 20) evenly spread tasks, reports
-raw bytes per page, bytes per bar and peak RSS, and projects the disk the full span needs, refusing above 40% of free
-disk.
+written (fsynced) as it arrives. The task's manifest row records every page's request parameters (the task parameters
+plus its page_token), sha256, sizes and next page token, the bars per symbol and the requested symbols that returned
+none, and counts bars outside 04:00-20:00 ET as quarantined (listing the first 100) instead of failing the task. A
+task counts as done only while every recorded page file exists at its recorded size; a news day, likewise its file.
+
+A full run requires a pilot of the same scope: --pilot N fetches N (at most 20) evenly spread tasks, reports wire and
+stored bytes per page and per bar, pages by Content-Encoding, peak RSS and the symbol-months without bars, and projects
+the raw disk the span still needs. It refuses when that exceeds 40% of free disk or would leave less than a 20 GiB
+floor plus a reserve for the normalized layer (16.8 bytes per projected bar), and it gives verdict "overturn" when one
+of D2's overturn conditions holds (continuation pages under 95% full, or projected calls above 1.3x D2's estimate).
+While a run is going, free disk is re-read before each task starts: the run drains like STOP below the floor, and a
+full run also when storing the remaining projection would break that floor and reserve, or once it has stored more
+than 1.5x the projection.
 
 A shared token bucket keeps the whole run under --rate requests per minute (at most 6,000 of the account's
-10,000/min data limit measured on 2026-09-24, which every other data client shares), and an HTTP 429 waits for the
-limit's reset before retrying. GET only. Normalized Parquet is a separate, later layer.
+10,000/min data limit measured on 2026-09-24, which every other data client shares). An HTTP 429 waits for the limit's
+reset before retrying, and a response whose X-Ratelimit-Remaining is under 3,500 (the headroom the monitor, scans and
+engine always keep) pauses the bucket until the limit resets. Requests go to the fixed endpoint only: redirects are
+refused before any follow-up request (urllib would resend the key pair to the Location host, over plain http too) and
+environment proxies are ignored. GET only. Normalized Parquet is a separate, later layer.
 """
 from __future__ import annotations
 
 import argparse
+import collections
 import contextlib
 import functools
 import gzip
@@ -51,7 +75,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import zlib
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import date, datetime, time as dtime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -60,17 +85,35 @@ HERE = Path(__file__).resolve().parent
 DATA = "https://data.alpaca.markets"
 ET = ZoneInfo("America/New_York")
 MAX_RATE = 6000
-FREE_DISK_SHARE = 0.40  # a pilot refuses when the projected full-span disk use exceeds this share of free space
+RATELIMIT_FLOOR = 3500  # X-Ratelimit-Remaining the monitor, scans and engine always keep (critique B10, budget table)
+FREE_DISK_SHARE = 0.40  # a pilot refuses when the projected remaining disk use exceeds this share of free space
+DISK_FLOOR = 20 * 2 ** 30  # free bytes a page-capture run never takes the lake's filesystem below (shared with ~/.local/state)
+DISK_OVERRUN = 1.5  # a running full run drains once its stored bytes exceed this multiple of the pilot's projection
+# D1's normalized layer (DuckDB Zstd Parquet, DECIMAL(18,6)) measured 16.8 bytes/bar in the D2 proposal (DL-2: about
+# 70 GB for the span's 4.17e9 bars, X4's arithmetic). Both disk gates keep this much free beyond the floor, scaled by
+# the pilot's projected bars, so a raw backfill never leaves too little room to normalize it.
+NORMALIZED_BYTES_PER_BAR = 16.8
+QUARANTINE_EXAMPLES = 100  # a row lists at most this many quarantined bars (their count is exact; the pages keep them)
+HOST_LEASE = Path.home() / ".local/state/native-agent-stack/data-lake/backfill.lock"  # one backfill per host
 MAX_PILOT_TASKS = 20  # a pilot runs before any disk gate, so it stays a bounded sample and can never be the full run
 MAX_PAGES_PER_TASK = 2000  # 100 symbols x 23 sessions x 960 minutes fill at most 221 pages of 10,000 bars
+# D2's bar model: 4.171e9 bars for 2016-01-04..2026-09 (local fit on retained mover pages, held-out -3.2%/+5.0%), over
+# the retained universe's 24,195,741 symbol-sessions for 2016-01..2026-09: about 172.4 bars per symbol-session.
+D2_BARS_PER_SYMBOL_SESSION = 4.171e9 / 24_195_741
+D2_MIN_FULL = 0.95  # D2 overturn: continuation pages under 95% full ...
+D2_MAX_CALLS = 1.3  # ... or projected calls above 1.3x D2's estimate: per-day tasks replace month tasks
+EXIT_FAILED, EXIT_REFUSED, EXIT_STOPPED, EXIT_OVERTURN = 1, 2, 3, 4
 SYMBOL = re.compile(r"^[A-Z]+(\.[A-Z]+)?$")  # broad-universe/collect_daily.py DATA_SYMBOL: what the bars API accepts
 MONTH = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 PROVIDER_DEFAULT_ASOF = "provider default (request date)"  # broad-universe plan.json wording
 SCOPE_SCHEMA = "data-lake-scope/1"
 UNIVERSE_SCHEMA = "data-lake-monthly-universe/1"
-PILOT_SCHEMA = "data-lake-pilot/1"
+PILOT_SCHEMA = "data-lake-pilot/2"
 DATASETS = {
+    # start and end are both inclusive (the /v1beta1/news reference), so a day ends at 23:59:59.999999999Z: the
+    # retained archive's D+1T00:00:00Z end stored two records stamped exactly at midnight in two day files.
     "news": {"path": "/v1beta1/news", "key": "news", "capture": "records", "task": "calendar day (UTC)",
+             "window_utc": ["00:00:00", "23:59:59.999999999"],
              "params": {"limit": 50, "sort": "asc", "include_content": "true", "exclude_contentless": "false"}},
     "stock_bars_1min": {"path": "/v2/stocks/bars", "key": "bars", "capture": "pages", "task": "symbols x calendar month",
                         "batch_size": 100, "window_et": ["04:00", "19:59:59.999999999"],
@@ -81,6 +124,10 @@ DATASETS = {
 
 class Refused(Exception):
     """A governed refusal, raised before any request for the refused scope."""
+
+
+class Halted(Exception):
+    """The run is stopping after an exception in its main thread: no further request is sent."""
 
 
 class Bucket:
@@ -96,21 +143,44 @@ class Bucket:
             now = self.clock()
             start = max(now, self.next, self.paused_until)
             self.next = start + self.interval
-        wait = start - self.clock()
-        if wait > 0:
-            self.sleep(wait)
+        wait_for = start - self.clock()
+        if wait_for > 0:
+            self.sleep(wait_for)
 
     def pause(self, seconds: float) -> None:
         with self.lock:
             self.paused_until = max(self.paused_until, self.clock() + seconds)
 
 
+class RedirectRefused(urllib.request.HTTPRedirectHandler):
+    """Refuse every redirect before a follow-up request is built. The stdlib handler copies every header except
+    Content-Length and Content-Type into the redirected request, so a 3xx would resend the key pair to the Location
+    host, over plain http too (financial-data/sec_data.py NoRedirect; D12's fixed-endpoint redirect guard). The 3xx
+    becomes a non-retryable HTTPError that fails its task."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        fp.close()
+        raise urllib.error.HTTPError(req.full_url, code, f"redirect refused ({msg})", headers, None)
+
+
+def guarded_opener() -> urllib.request.OpenerDirector:
+    """The data client's opener: redirects refused, environment proxies ignored (the fixed endpoint only)."""
+    return urllib.request.build_opener(RedirectRefused(), urllib.request.ProxyHandler({}))
+
+
 class Client:
-    def __init__(self, headers: dict, bucket: Bucket, opener=urllib.request.urlopen, sleep=time.sleep):
-        self.headers, self.bucket, self.opener, self.sleep = headers, bucket, opener, sleep
-        self.requests = self.throttled = 0
+    def __init__(self, headers: dict, bucket: Bucket, opener=None, sleep=time.sleep, wall=time.time):
+        self.headers, self.bucket, self.sleep, self.wall = headers, bucket, sleep, wall
+        self.opener = opener or guarded_opener().open
+        self.requests = self.throttled = self.ratelimit_floor_pauses = 0
         self.ratelimit_remaining_min = None
+        self.halt = threading.Event()
         self.lock = threading.Lock()
+
+    def until_reset(self, headers, fallback: float) -> float:
+        """Seconds until X-Ratelimit-Reset (a Unix time), at least 1; `fallback` without a usable header."""
+        reset = headers.get("X-Ratelimit-Reset") if headers is not None else None
+        return max(1.0, float(reset) - self.wall()) if reset and str(reset).isdigit() else fallback
 
     def fetch(self, path: str, params: dict, accept_gzip: bool = False) -> tuple[bytes, str]:
         """One GET with bounded retries: (the body exactly as received, its Content-Encoding)."""
@@ -118,6 +188,8 @@ class Client:
         headers = {**self.headers, "Accept-Encoding": "gzip"} if accept_gzip else self.headers
         for attempt in range(8):
             self.bucket.acquire()
+            if self.halt.is_set():
+                raise Halted(f"the run is halting: {path} not requested")
             with self.lock:
                 self.requests += 1
             try:
@@ -125,11 +197,9 @@ class Client:
                     body, meta = r.read(), getattr(r, "headers", None)
             except urllib.error.HTTPError as exc:
                 if exc.code == 429:
-                    reset = exc.headers.get("X-Ratelimit-Reset") if exc.headers else None
-                    wait = max(1.0, float(reset) - time.time()) if reset and reset.isdigit() else 2.0 ** attempt
                     with self.lock:
                         self.throttled += 1
-                    self.bucket.pause(min(wait, 60.0))
+                    self.bucket.pause(min(self.until_reset(exc.headers, 2.0 ** attempt), 60.0))
                     continue
                 if exc.code >= 500:
                     self.sleep(min(30.0, 2.0 ** attempt))
@@ -143,9 +213,14 @@ class Client:
                 raise RuntimeError(f"unexpected Content-Encoding {encoding!r}: {path}")
             remaining = meta.get("X-Ratelimit-Remaining") if meta is not None else None
             if remaining is not None and str(remaining).isdigit():
+                remaining = int(remaining)
                 with self.lock:
                     low = self.ratelimit_remaining_min
-                    self.ratelimit_remaining_min = int(remaining) if low is None else min(low, int(remaining))
+                    self.ratelimit_remaining_min = remaining if low is None else min(low, remaining)
+                if remaining < RATELIMIT_FLOOR:  # leave the account's headroom to the other pools until the reset
+                    with self.lock:
+                        self.ratelimit_floor_pauses += 1
+                    self.bucket.pause(min(self.until_reset(meta, 1.0), 60.0))
             return body, encoding
         raise RuntimeError(f"gave up after retries: {path}")
 
@@ -182,13 +257,36 @@ def symbols_digest(symbols) -> str:
     return sha256_hex(",".join(symbols).encode())
 
 
-def write_private(target: Path, payload: bytes) -> None:
-    """Atomic owner-only write: a reader sees the previous file or the new one, never a torn one."""
+def write_private(target: Path, payload: bytes, sync_dir: bool = True) -> None:
+    """Atomic, durable owner-only write: the bytes are fsynced before the rename, so a reader or a crash sees the
+    previous file or the complete new one, never a torn or empty one; then the directory is fsynced, so the rename
+    itself survives a crash (scope.json must, before any manifest row names it). A caller writing many files into one
+    directory passes sync_dir=False and fsyncs that directory once."""
     tmp = target.with_name(target.name + ".tmp")
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "wb") as handle:
         handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
     os.replace(tmp, target)
+    if sync_dir:
+        fsync_dir(target.parent)
+
+
+def fsync_dir(path: Path) -> None:
+    """Make a directory's entries (new files, a rename into it) durable."""
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def append_row(handle, row: dict) -> None:
+    """Append one manifest row and make it durable before the next is recorded."""
+    handle.write(json.dumps(row, sort_keys=True) + "\n")
+    handle.flush()
+    os.fsync(handle.fileno())
 
 
 def repair_manifest_tail(manifest: Path) -> None:
@@ -204,38 +302,66 @@ def repair_manifest_tail(manifest: Path) -> None:
 
 
 @contextlib.contextmanager
-def dataset_lock(ds_dir: Path):
+def exclusive_lock(path: Path, note: str = ""):
+    """Hold a non-blocking flock on `path` for the block. A held lock is refused, never waited for; `note` (who holds
+    the lock) is written into the file so a refused run can name the holder."""
     import fcntl
-    fd = os.open(ds_dir / ".lock", os.O_WRONLY | os.O_CREAT, 0o600)
+    fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o600)
     try:
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            raise Refused(f"another backfill run holds {ds_dir / '.lock'}") from None
+            holder = os.pread(fd, 512, 0).decode("utf-8", "replace").strip()
+            raise Refused(f"another backfill run holds {path}" + (f": {holder}" if holder else "")) from None
+        if note:
+            os.ftruncate(fd, 0)
+            os.pwrite(fd, note.encode(), 0)
         yield
     finally:
         os.close(fd)  # closing the descriptor releases the lock
 
 
-def unless_stopped(stop_file: Path | None, task, *args):
-    """Run one task unless the STOP file exists; checked when the task starts, so STOP drains a running pool."""
-    if stop_file is not None and stop_file.exists():
-        return None
-    return task(*args)
+def git_work_tree(path: Path) -> Path | None:
+    """The nearest directory at or above `path` (symlinks resolved) that holds a .git entry, or None."""
+    resolved = path.resolve()
+    for candidate in (resolved, *resolved.parents):
+        if os.path.lexists(candidate / ".git"):
+            return candidate
+    return None
+
+
+def refuse_inside_git_work_tree(out: Path) -> None:
+    """Licensed provider data never lands in a git work tree: a routine `git add -A` would stage it, and this checkout
+    publishes to a public repository."""
+    tree = git_work_tree(out)
+    if tree is not None:
+        raise Refused(f"--out {out} lies inside the git work tree {tree}: keep licensed provider data outside any "
+                      "checkout (for example under ~/.local/state/native-agent-stack/research/data-lake)")
 
 
 # --------------------------------------------------------------------------- scope header
 
 
+def span_days(start: date, end: date) -> list:
+    return [start + timedelta(days=i) for i in range((end - start).days + 1)]
+
+
+def day_file(day: str) -> str:
+    return f"{day[:4]}/{day[5:7]}/{day[8:10]}.jsonl.gz"
+
+
 def dataset_scope(dataset: str, start: date, end: date, tasks: list | None = None, asof: str | None = None,
                   code: str | None = None) -> dict:
-    """Every field that changes WHICH records a completed task holds."""
+    """Every field that changes WHICH records a completed task holds, and the planned task list (its count and the
+    sha256 of its ids), so verify can tell a complete dataset from one missing tasks."""
     spec = DATASETS[dataset]
     params = {**spec["params"], **({"asof": asof} if asof else {})}
-    task = {"unit": spec["task"], **{k: spec[k] for k in ("batch_size", "window_et") if k in spec}}
+    task = {"unit": spec["task"], **{k: spec[k] for k in ("batch_size", "window_et", "window_utc") if k in spec}}
+    ids = [t["task"] for t in tasks] if tasks is not None else [d.isoformat() for d in span_days(start, end)]
     return {"dataset": dataset, "code_sha256": code or code_sha256(), "endpoint": DATA + spec["path"],
             "fixed_params": params, "span": {"start": start.isoformat(), "end": end.isoformat()},
             "symbols_sha256": None if tasks is None else sha256_hex(canonical([[t["task"], t["symbols"]] for t in tasks])),
+            "planned": {"tasks": len(ids), "task_ids_sha256": sha256_hex(canonical(ids))},
             "task": task, "capture": spec["capture"]}
 
 
@@ -455,8 +581,8 @@ def task_dir(task: dict) -> str:
 
 
 def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str, fingerprint: str) -> dict:
-    """Page one task to its terminal page, writing each wire page (gzip) as it arrives; returns its manifest row,
-    which carries the dataset's scope fingerprint so every task row names the scope it was collected under."""
+    """Page one task to its terminal page, writing each wire page (gzip, fsynced) as it arrives; returns its manifest
+    row, which carries the dataset's scope fingerprint so every task row names the scope it was collected under."""
     spec = DATASETS[dataset]
     rel = task_dir(task)
     final = root / dataset / rel
@@ -466,8 +592,8 @@ def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str, f
     part.mkdir(parents=True, mode=0o700)
     params = {"symbols": ",".join(task["symbols"]), **spec["params"], "asof": asof,
               "start": task["start"], "end": task["end"]}
-    wanted, unexpected, seen = set(task["symbols"]), set(), set()
-    pages, quarantine, bars, token, started = [], [], 0, None, time.monotonic()
+    wanted, unexpected, seen, by_symbol = set(task["symbols"]), set(), set(), collections.Counter()
+    pages, quarantine, quarantined, bars, token, started = [], [], 0, 0, None, time.monotonic()
     while True:
         wire, encoding = client.fetch(spec["path"], {**params, **({"page_token": token} if token else {})},
                                       accept_gzip=True)
@@ -484,29 +610,36 @@ def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str, f
                 unexpected.add(symbol)
             for bar in items:
                 count += 1
+                by_symbol[symbol] += 1
                 if outside_session_window(bar["t"]):
-                    quarantine.append({"page": len(pages), "symbol": symbol, "t": bar["t"]})
+                    quarantined += 1  # a row stays bounded however many the provider returns (overnight prints)
+                    if len(quarantine) < QUARANTINE_EXAMPLES:
+                        quarantine.append({"page": len(pages), "symbol": symbol, "t": bar["t"]})
         name = f"p{len(pages):05d}.json.gz"
-        write_private(part / name, stored)
-        next_token = body.get("next_page_token")
+        write_private(part / name, stored, sync_dir=False)  # the task directory is fsynced once, below
+        next_token = body.get("next_page_token") or None
         pages.append({"page": len(pages), "page_token": token, "file": f"{rel}/{name}", "content_encoding": encoding,
-                      "bytes": len(stored), "sha256": sha256_hex(stored), "json_bytes": len(body_bytes),
-                      "json_sha256": sha256_hex(body_bytes), "bars": count, "next_page_token": bool(next_token),
-                      "fetched_at": fetched_at})
+                      "wire_bytes": len(wire), "bytes": len(stored), "sha256": sha256_hex(stored),
+                      "json_bytes": len(body_bytes), "json_sha256": sha256_hex(body_bytes), "bars": count,
+                      "next_page_token": next_token, "fetched_at": fetched_at})
         bars += count
-        if not next_token:
+        if next_token is None:
             break
         if next_token in seen or len(pages) >= MAX_PAGES_PER_TASK:
             raise RuntimeError(f"{task['task']}: the page chain does not terminate ({len(pages)} pages)")
         seen.add(next_token)
         token = next_token
+    fsync_dir(part)
     if final.exists():
         shutil.rmtree(final)  # a completed attempt whose manifest row a crash lost
     os.replace(part, final)
+    fsync_dir(final.parent)
     return {"task": task["task"], "month": task["month"], "symbols": len(task["symbols"]),
             "symbols_sha256": symbols_digest(task["symbols"]), "scope_fingerprint": fingerprint, "params": params,
-            "pages": pages, "bars": bars, "quarantine": quarantine, "unexpected_symbols": sorted(unexpected),
-            "fetched_at": utc_now(), "seconds": round(time.monotonic() - started, 3)}
+            "pages": pages, "bars": bars, "bars_by_symbol": dict(sorted(by_symbol.items())),
+            "symbols_without_bars": sorted(wanted - set(by_symbol)), "quarantined": quarantined,
+            "quarantine": quarantine, "unexpected_symbols": sorted(unexpected), "fetched_at": utc_now(),
+            "seconds": round(time.monotonic() - started, 3)}
 
 
 def scope_rows(manifest: Path, fingerprint: str):
@@ -523,14 +656,30 @@ def scope_rows(manifest: Path, fingerprint: str):
                     yield row
 
 
-def done_tasks(manifest: Path, fingerprint: str) -> dict:
-    """{task: (symbols_sha256, stored page bytes)} for the tasks completed under this scope."""
+def row_intact(ds_dir: Path, row: dict) -> bool:
+    """Every page file the row records exists at its recorded size (a crash can leave a row whose pages never reached
+    the disk; verify re-hashes the content)."""
+    try:
+        return bool(row["pages"]) and all((ds_dir / page["file"]).stat().st_size == page["bytes"]
+                                          for page in row["pages"])
+    except (KeyError, TypeError, OSError):
+        return False
+
+
+def done_tasks(ds_dir: Path, fingerprint: str) -> dict:
+    """{task: (symbols_sha256, stored page bytes)} for the tasks completed under this scope. A task's last row
+    decides, and it counts only while its page files are intact."""
     done = {}
-    for row in scope_rows(manifest, fingerprint):
+    for row in scope_rows(ds_dir / "manifest.jsonl", fingerprint):
+        task = row.get("task")
         try:
-            done[row["task"]] = (row["symbols_sha256"], sum(page["bytes"] for page in row["pages"]))
+            entry = (row["symbols_sha256"], sum(page["bytes"] for page in row["pages"]))
         except (KeyError, TypeError):
-            continue
+            entry = None
+        if entry is not None and row_intact(ds_dir, row):
+            done[task] = entry
+        else:
+            done.pop(task, None)
     return done
 
 
@@ -559,43 +708,66 @@ def disk_bytes(path: Path) -> int:
     return max(info.st_size, getattr(info, "st_blocks", 0) * 512)
 
 
+def disk_problem(remaining: int, free: int, floor: int, normalized: int = 0) -> str | None:
+    """Why storing `remaining` more raw bytes does not fit `free` bytes, or None when it does: the remainder must stay
+    within FREE_DISK_SHARE of free disk and leave the floor plus the normalized layer's reserve free."""
+    if remaining > FREE_DISK_SHARE * free:
+        return (f"the remaining projected {remaining} bytes exceed {FREE_DISK_SHARE:.0%} of free disk "
+                f"({int(FREE_DISK_SHARE * free)} of {free} bytes free now)")
+    if free - remaining < floor + normalized:
+        return (f"storing the remaining projected {remaining} bytes would leave {free - remaining} of {free} bytes "
+                f"free, under the {floor}-byte floor plus the {normalized}-byte normalized-layer reserve")
+    return None
+
+
 def pilot_report(ds_dir: Path, dataset: str, fingerprint: str, tasks: list, selected: list, rows: dict, *,
-                 free_bytes: int, rss_bytes: int, seconds: float, requests: int, fetched_now: int,
-                 rate: float | None) -> dict:
-    """Measured pilot figures and the full-span disk projection. The projection takes the larger of two scalings of
-    the pilot's disk use (page files plus manifest rows): per planned task, and per bar with bars scaled by the
-    universe's symbol-sessions (the pilot's bars per symbol-session times the span's symbol-sessions)."""
+                 free_bytes: int, stored_bytes: int, disk_floor: int, rss_bytes: int, seconds: float, requests: int,
+                 fetched_now: int, rate: float | None) -> dict:
+    """Measured pilot figures and the full-span projection. Disk: the larger of two scalings of the pilot's disk use
+    (page files plus manifest rows), per planned task and per bar with bars scaled by the universe's symbol-sessions;
+    the verdict weighs what the span still needs (the projection less the `stored_bytes` already stored under this
+    scope) against free disk. Calls: the pilot's pages scaled the same two ways, against D2's estimate."""
     limit = DATASETS[dataset]["params"]["limit"]
     fetched = [rows[t["task"]] for t in selected if t["task"] in rows]
     pages = [page for row in fetched for page in row["pages"]]
     bars = sum(row["bars"] for row in fetched)
-    raw = sum(page["bytes"] for page in pages)
+    wire = sum(page["wire_bytes"] for page in pages)  # as received: gzip bytes, or the identity JSON body
+    stored = sum(page["bytes"] for page in pages)  # as written: identity pages are gzip-wrapped locally
     decoded = sum(page["json_bytes"] for page in pages)
     disk = (sum(disk_bytes(ds_dir / page["file"]) for page in pages)
             + sum(len(json.dumps(row, sort_keys=True)) + 1 for row in fetched))
     full = [page["bars"] / limit for page in pages if page["next_page_token"]]
     ideal = sum(max(1, math.ceil(row["bars"] / limit)) for row in fetched)
+    requested = sum(row["symbols"] for row in fetched)
+    silent = [f"{row['month']} {symbol}" for row in fetched for symbol in row["symbols_without_bars"]]
+    quarantined = [row["quarantined"] for row in fetched]
 
     def ratio(a, b):
         return round(a / b, 3) if b else None
 
     report = {"schema": PILOT_SCHEMA, "dataset": dataset, "fingerprint": fingerprint, "created_at": utc_now(),
-              "pilot_tasks": [t["task"] for t in selected], "free_disk_share": FREE_DISK_SHARE, "projection": None,
+              "pilot_tasks": [t["task"] for t in selected], "free_disk_share": FREE_DISK_SHARE,
+              "disk_floor_bytes": disk_floor, "projection": None,
               "metrics": {"tasks": len(fetched), "fetched_in_this_run": fetched_now, "pages": len(pages),
-                          "bars": bars, "raw_bytes": raw, "json_bytes": decoded, "disk_bytes": disk,
-                          "raw_bytes_per_page": ratio(raw, len(pages)), "json_bytes_per_page": ratio(decoded, len(pages)),
-                          "raw_bytes_per_bar": ratio(raw, bars), "disk_bytes_per_bar": ratio(disk, bars),
-                          "bars_per_page": ratio(bars, len(pages)),
-                          "quarantined_bars": sum(len(row["quarantine"]) for row in fetched),
+                          "pages_by_encoding": dict(sorted(collections.Counter(
+                              page["content_encoding"] for page in pages).items())),
+                          "bars": bars, "wire_bytes": wire, "stored_bytes": stored, "json_bytes": decoded,
+                          "disk_bytes": disk, "wire_bytes_per_page": ratio(wire, len(pages)),
+                          "stored_bytes_per_page": ratio(stored, len(pages)),
+                          "json_bytes_per_page": ratio(decoded, len(pages)), "wire_bytes_per_bar": ratio(wire, bars),
+                          "stored_bytes_per_bar": ratio(stored, bars), "disk_bytes_per_bar": ratio(disk, bars),
+                          "bars_per_page": ratio(bars, len(pages)), "quarantined_bars": sum(quarantined),
+                          "quarantined_bars_per_task_max": max(quarantined, default=0),
                           "full_page_share_nonterminal": round(sum(full) / len(full), 4) if full else None,
                           "calls_over_ideal": ratio(len(pages), ideal),
+                          "symbol_months_requested": requested, "symbol_months_without_bars": len(silent),
+                          "share_without_bars": ratio(len(silent), requested), "without_bars_examples": silent[:20],
                           "peak_rss_bytes": rss_bytes, "peak_rss_mib": round(rss_bytes / 2 ** 20, 1),
                           "requests": requests, "seconds": round(seconds, 3),
                           "calls_per_minute": ratio(requests * 60, seconds)},
-              # D2 overturn conditions, reported for the operator: under 95% full pages or more than 1.3x the ideal
-              # call count means per-day tasks should replace month tasks.
-              "flags": {"pages_under_95pct_full": (sum(full) / len(full) < 0.95) if full else None,
-                        "calls_over_1_3x_ideal": (len(pages) > 1.3 * ideal) if ideal else None}}
+              # D2's overturn conditions: either one switches the design to per-day tasks (verdict "overturn")
+              "flags": {"pages_under_95pct_full": (sum(full) / len(full) < D2_MIN_FULL) if full else None,
+                        "calls_over_1_3x_d2_estimate": None}}
     missing = [t["task"] for t in selected if t["task"] not in rows]
     pilot_sessions = sum(t["symbol_sessions"] for t in selected)
     if missing:
@@ -606,8 +778,12 @@ def pilot_report(ds_dir: Path, dataset: str, fingerprint: str, tasks: list, sele
     projected_bars = bars / pilot_sessions * total_sessions
     by_sessions, by_tasks = projected_bars * disk / bars, disk / len(fetched) * len(tasks)
     projected = math.ceil(max(by_sessions, by_tasks))
-    threshold = int(FREE_DISK_SHARE * free_bytes)
-    calls = math.ceil(projected_bars / limit) + len(tasks)
+    calls = math.ceil(max(len(pages) / pilot_sessions * total_sessions, len(pages) / len(fetched) * len(tasks)))
+    calls_upper = math.ceil(projected_bars / limit) + len(tasks)
+    d2_calls = math.ceil(D2_BARS_PER_SYMBOL_SESSION * total_sessions / limit) + len(tasks)
+    remaining = max(0, projected - stored_bytes)
+    normalized = math.ceil(projected_bars * NORMALIZED_BYTES_PER_BAR)
+    report["flags"]["calls_over_1_3x_d2_estimate"] = calls > D2_MAX_CALLS * d2_calls
     report["projection"] = {"planned_tasks": len(tasks), "symbol_sessions_total": total_sessions,
                             "symbol_sessions_pilot": pilot_sessions,
                             "bars_per_symbol_session": round(bars / pilot_sessions, 3),
@@ -615,43 +791,102 @@ def pilot_report(ds_dir: Path, dataset: str, fingerprint: str, tasks: list, sele
                             "projected_disk_bytes_by_sessions": math.ceil(by_sessions),
                             "projected_disk_bytes_by_tasks": math.ceil(by_tasks),
                             "projected_disk_bytes": projected, "projected_disk_gib": round(projected / 2 ** 30, 2),
-                            "free_disk_bytes": free_bytes, "threshold_bytes": threshold,
-                            "projected_calls_upper": calls,
-                            "projected_minutes_at_rate": round(calls / rate, 1) if rate else None}
-    within = projected <= threshold
-    return {**report, "verdict": "pass" if within else "refused",
-            "reason": f"projected {projected} bytes {'are within' if within else 'exceed'} "
-                      f"{FREE_DISK_SHARE:.0%} of free disk ({threshold} of {free_bytes} bytes)"}
+                            "stored_bytes": stored_bytes, "remaining_disk_bytes": remaining,
+                            "normalized_bytes_per_bar": NORMALIZED_BYTES_PER_BAR,
+                            "normalized_reserve_bytes": normalized,
+                            "free_disk_bytes": free_bytes, "threshold_bytes": int(FREE_DISK_SHARE * free_bytes),
+                            "projected_calls": calls, "projected_calls_upper": calls_upper,
+                            "d2_estimate_calls": d2_calls,
+                            "projected_minutes_at_rate": round(max(calls, calls_upper) / rate, 1) if rate else None}
+    problem = disk_problem(remaining, free_bytes, disk_floor, normalized)
+    if problem:
+        return {**report, "verdict": "refused", "reason": problem}
+    raised = sorted(name for name, value in report["flags"].items() if value)
+    if raised:
+        return {**report, "verdict": "overturn",
+                "reason": f"D2 overturn condition(s) {raised}: D2 switches to per-day tasks. A month-task full run "
+                          "needs --accept-pilot-flags REASON"}
+    return {**report, "verdict": "pass", "reason": f"the remaining projected {remaining} bytes fit "
+                                                   f"{FREE_DISK_SHARE:.0%} of the {free_bytes} bytes free and leave the "
+                                                   f"{disk_floor}-byte floor plus the {normalized}-byte normalized-layer "
+                                                   "reserve"}
 
 
-def require_pilot(ds_dir: Path, fingerprint: str, stored_bytes: int, free_bytes: int) -> None:
-    """A full run needs a passing pilot of the same scope, and its remaining projection must still fit free disk."""
+def require_pilot(ds_dir: Path, fingerprint: str, stored_bytes: int, free_bytes: int, disk_floor: int,
+                  accept_flags: str | None = None) -> tuple[int, int, dict]:
+    """A full run needs a pilot of the same scope whose verdict is "pass" (or "overturn" with --accept-pilot-flags),
+    and the remaining projection must still fit free disk. Returns (projected raw disk bytes, the normalized-layer
+    reserve, the pilot report)."""
     path = ds_dir / "pilot.json"
     if not path.exists():
         raise Refused(f"{ds_dir.name} has no pilot: run the same command with --pilot 2 first")
     try:
         report = json.loads(path.read_text())
         same_scope, verdict, reason = report.get("fingerprint") == fingerprint, report.get("verdict"), report.get("reason")
-        projected = int(report["projection"]["projected_disk_bytes"]) if verdict == "pass" else None
+        projected = normalized = None
+        if verdict in ("pass", "overturn"):
+            projected = int(report["projection"]["projected_disk_bytes"])
+            normalized = int(report["projection"]["normalized_reserve_bytes"])
+        raised = sorted(name for name, value in report["flags"].items() if value)
     except (ValueError, AttributeError, KeyError, TypeError):
         raise Refused(f"{path} is unreadable: run --pilot again") from None
     if not same_scope:
         raise Refused(f"{path} was measured under a different scope: run --pilot again")
-    if verdict != "pass":
+    if verdict == "overturn" and not accept_flags:
+        raise Refused(f"the pilot's verdict is 'overturn': {raised} hold, so D2 switches to per-day tasks. Run month "
+                      "tasks anyway only with --accept-pilot-flags REASON")
+    if verdict not in ("pass", "overturn"):
         raise Refused(f"the pilot's verdict is {verdict!r}: {reason}")
-    remaining = projected - stored_bytes
-    if remaining > FREE_DISK_SHARE * free_bytes:
-        raise Refused(f"the remaining projected {remaining} bytes exceed {FREE_DISK_SHARE:.0%} of the {free_bytes} "
-                      "bytes free now")
+    problem = disk_problem(max(0, projected - stored_bytes), free_bytes, disk_floor, normalized)
+    if problem:
+        raise Refused(problem)
+    return projected, normalized, report
 
 
 # --------------------------------------------------------------------------- runs
 
 
+def drain_pool(client: Client, workers: int, items: list, work, record, fail, stop_reason, totals: dict) -> None:
+    """Run work(item) for each item with at most `workers` in flight, so at most `workers` rows are held at once (a
+    row is dropped once recorded) and a stop leaves at most `workers` tasks to finish. stop_reason() is asked before
+    each submission: a reason stops submission and the items not submitted are counted as stopped. Only this thread
+    calls record(row) (the manifest append) and fail(item, exc). Any exception here, such as a failed manifest append
+    or Ctrl-C, halts the client and cancels queued work before it propagates, so nothing is fetched that could not be
+    recorded."""
+    pending, position = {}, 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        try:
+            while True:
+                while position < len(items) and len(pending) < workers:
+                    reason = stop_reason()
+                    if reason:
+                        totals["stopped"] += len(items) - position
+                        totals["stop_reason"] = reason
+                        position = len(items)
+                        break
+                    pending[pool.submit(work, items[position])] = items[position]
+                    position += 1
+                if not pending:
+                    return
+                finished, _ = wait(pending, return_when=FIRST_COMPLETED)
+                for future in finished:
+                    item = pending.pop(future)
+                    try:
+                        row = future.result()
+                    except Exception as exc:  # recorded and retried on the next run
+                        fail(item, exc)
+                        continue
+                    record(row)
+        except BaseException:
+            client.halt.set()
+            pool.shutdown(wait=True, cancel_futures=True)
+            raise
+
+
 def day_task(client: Client, dataset: str, day: date, root: Path) -> dict:
     spec = DATASETS[dataset]
-    params = {**spec["params"], "start": f"{day.isoformat()}T00:00:00Z",
-              "end": f"{(day + timedelta(days=1)).isoformat()}T00:00:00Z"}
+    first, last = spec["window_utc"]
+    params = {**spec["params"], "start": f"{day.isoformat()}T{first}Z", "end": f"{day.isoformat()}T{last}Z"}
     records, pages, token = [], 0, None
     while True:
         body = client.get(spec["path"], {**params, **({"page_token": token} if token else {})})
@@ -661,127 +896,179 @@ def day_task(client: Client, dataset: str, day: date, root: Path) -> dict:
         if not token:
             break
     payload = gzip.compress("".join(json.dumps(r, separators=(",", ":"), sort_keys=True) + "\n" for r in records).encode(), mtime=0)
-    target = root / dataset / f"{day:%Y}" / f"{day:%m}" / f"{day:%d}.jsonl.gz"
+    target = root / dataset / day_file(day.isoformat())
     target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    tmp = target.with_suffix(".tmp")
-    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    with os.fdopen(fd, "wb") as f:
-        f.write(payload)
-    os.replace(tmp, target)
+    write_private(target, payload)  # fsynced with its directory before the row that names it is appended
     return {"day": day.isoformat(), "records": len(records), "pages": pages, "sha256": hashlib.sha256(payload).hexdigest(),
             "bytes": len(payload), "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
 
 
-def done_days(manifest: Path) -> set:
+def done_days(ds_dir: Path) -> set:
+    """Days whose last manifest row names a day file that exists at its recorded size. A torn line or a malformed row
+    is skipped; a row whose file is missing or has another size (a crash kept the row but not the file) leaves its day
+    to be fetched again."""
+    manifest, days = ds_dir / "manifest.jsonl", set()
     if not manifest.exists():
-        return set()
-    days = set()
-    for line in manifest.read_text().splitlines():
-        try:
-            days.add(json.loads(line)["day"])
-        except (ValueError, KeyError):
-            continue  # a torn last line: that day is fetched again
+        return days
+    with open(manifest, encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            try:
+                row = json.loads(line)
+                day, size = row["day"], row["bytes"]
+                path = ds_dir / day_file(day)
+            except (ValueError, KeyError, TypeError):
+                continue  # a torn last line or a malformed row: its day is fetched again unless another row holds it
+            try:
+                intact = path.stat().st_size == size
+            except OSError:
+                intact = False
+            if intact:
+                days.add(day)
+            else:
+                days.discard(day)
     return days
 
 
 def run(client: Client, dataset: str, start: date, end: date, root: Path, workers: int, stop_file: Path | None = None,
         *, universe: dict | None = None, pilot: int = 0, code: str | None = None, disk_free=None, peak_rss=None,
-        rate: float | None = None) -> dict:
+        rate: float | None = None, accept_flags: str | None = None) -> dict:
     spec = DATASETS[dataset]
     if end < start:
         raise Refused(f"--end {end} precedes --start {start}")
     if not 0 <= pilot <= MAX_PILOT_TASKS:
         raise Refused(f"--pilot {pilot}: a pilot samples at most {MAX_PILOT_TASKS} tasks, because it runs before the "
                       "disk gate")
+    if spec["capture"] == "records" and (universe is not None or pilot or accept_flags is not None):
+        raise Refused(f"{dataset} is not symbol-scoped: it takes no --universe, --pilot or --accept-pilot-flags")
+    if spec["capture"] == "pages" and universe is None:
+        raise Refused(f"{dataset} needs --universe (built by `backfill.py universe`)")
+    if pilot and accept_flags is not None:
+        raise Refused("--accept-pilot-flags applies to a full run, not a pilot")
+    refuse_inside_git_work_tree(root)
+    if stop_file is not None and stop_file.exists():
+        raise Refused(f"{stop_file} exists: remove it to start a run (touching it drains a running one)")
+    lease = HOST_LEASE  # read at call time: one backfill per host, whatever the dataset or --out
+    lease.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    holder = json.dumps({"pid": os.getpid(), "dataset": dataset, "out": str(root), "started_at": utc_now()})
     ds_dir = root / dataset
-    refuse_headerless(ds_dir)  # before the lock file: a refused legacy directory is left untouched
-    ds_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
-    with dataset_lock(ds_dir):
-        if spec["capture"] == "records":
-            if universe is not None or pilot:
-                raise Refused(f"{dataset} is not symbol-scoped: it takes no --universe or --pilot")
-            check_scope(ds_dir, dataset_scope(dataset, start, end, code=code), {"created_at": utc_now()})
-            return run_days(client, dataset, start, end, root, workers, stop_file)
-        if universe is None:
-            raise Refused(f"{dataset} needs --universe (built by `backfill.py universe`)")
-        tasks = plan_month_tasks(universe, start, end, spec["batch_size"])
-        scope = dataset_scope(dataset, start, end, tasks=tasks, asof=universe["naming_asof"], code=code)
-        provenance = {"created_at": utc_now(), "universe": {key: universe.get(key) for key in
-                      ("file_sha256", "naming_asof", "covers_through", "rule", "source", "summary")}}
-        header = check_scope(ds_dir, scope, provenance)
-        return run_pages(client, dataset, tasks, root, workers, stop_file, header["fingerprint"],
-                         universe["naming_asof"], pilot, disk_free or (lambda path: shutil.disk_usage(path).free),
-                         peak_rss or peak_rss_bytes, rate)
+    with exclusive_lock(lease, holder):
+        refuse_headerless(ds_dir)  # before the lock file: a refused legacy directory is left untouched
+        ds_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with exclusive_lock(ds_dir / ".lock"):
+            if spec["capture"] == "records":
+                check_scope(ds_dir, dataset_scope(dataset, start, end, code=code), {"created_at": utc_now()})
+                return run_days(client, dataset, start, end, root, workers, stop_file)
+            tasks = plan_month_tasks(universe, start, end, spec["batch_size"])
+            scope = dataset_scope(dataset, start, end, tasks=tasks, asof=universe["naming_asof"], code=code)
+            # the ids hash to scope.planned, so verify can list planned tasks with no row (a news span lists its days)
+            provenance = {"created_at": utc_now(), "universe": {key: universe.get(key) for key in
+                          ("file_sha256", "naming_asof", "covers_through", "rule", "source", "summary")},
+                          "planned_task_ids": [t["task"] for t in tasks]}
+            if not pilot and read_header(ds_dir) is None:
+                # without a header there is no pilot of any scope: refuse before a header pins this (maybe mistyped) scope
+                raise Refused(f"{dataset} has no pilot: run the same command with --pilot 2 first")
+            header = check_scope(ds_dir, scope, provenance)
+            return run_pages(client, dataset, tasks, root, workers, stop_file, header["fingerprint"],
+                             universe["naming_asof"], pilot, disk_free or (lambda path: shutil.disk_usage(path).free),
+                             peak_rss or peak_rss_bytes, rate, accept_flags)
 
 
 def run_days(client: Client, dataset: str, start: date, end: date, root: Path, workers: int,
              stop_file: Path | None = None) -> dict:
     manifest = root / dataset / "manifest.jsonl"
     repair_manifest_tail(manifest)
-    skip = done_days(manifest)
-    days = [start + timedelta(days=i) for i in range((end - start).days + 1)]
+    skip = done_days(root / dataset)
+    days = span_days(start, end)
     todo = [d for d in days if d.isoformat() not in skip]
-    lock, totals = threading.Lock(), {"days": 0, "records": 0, "failed": [], "stopped": 0}
+    totals = {"days": 0, "records": 0, "failed": [], "stopped": 0, "stop_reason": None}
+
+    def stop_reason():
+        return f"{stop_file} exists" if stop_file is not None and stop_file.exists() else None
+
     fd = os.open(manifest, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
-    with os.fdopen(fd, "a", buffering=1) as log, ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(unless_stopped, stop_file, day_task, client, dataset, d, root): d for d in todo}
-        for future in as_completed(futures):
-            d = futures[future]
-            try:
-                row = future.result()
-            except Exception as exc:  # recorded and retried on the next run
-                totals["failed"].append({"day": d.isoformat(), "error": f"{type(exc).__name__}: {str(exc)[:120]}"})
-                continue
-            if row is None:
-                totals["stopped"] += 1
-                continue
-            with lock:
-                log.write(json.dumps(row, sort_keys=True) + "\n")
-                totals["days"] += 1
-                totals["records"] += row["records"]
-    return {**totals, "skipped_already_done": len(days) - len(todo), "requests": client.requests, "throttled": client.throttled}
+    with os.fdopen(fd, "a", buffering=1) as log:
+        def record(row):
+            append_row(log, row)
+            totals["days"] += 1
+            totals["records"] += row["records"]
+
+        def fail(day, exc):
+            totals["failed"].append({"day": day.isoformat(), "error": f"{type(exc).__name__}: {str(exc)[:120]}"})
+
+        drain_pool(client, workers, todo, lambda day: day_task(client, dataset, day, root), record, fail, stop_reason,
+                   totals)
+    return {**totals, "skipped_already_done": len(days) - len(todo), "requests": client.requests,
+            "throttled": client.throttled, "ratelimit_floor_pauses": client.ratelimit_floor_pauses}
 
 
 def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: int, stop_file: Path | None,
-              fingerprint: str, asof: str, pilot: int, disk_free, peak_rss, rate: float | None) -> dict:
+              fingerprint: str, asof: str, pilot: int, disk_free, peak_rss, rate: float | None,
+              accept_flags: str | None) -> dict:
     ds_dir = root / dataset
     manifest = ds_dir / "manifest.jsonl"
+    floor = DISK_FLOOR  # read at call time
     repair_manifest_tail(manifest)
-    done = done_tasks(manifest, fingerprint)
+    done = done_tasks(ds_dir, fingerprint)
+    state = {"stored": sum(size for _, size in done.values())}
     selected = pilot_tasks(tasks, pilot) if pilot else tasks
+    projected, normalized, accepted = None, 0, None
     if not pilot:
-        require_pilot(ds_dir, fingerprint, sum(size for _, size in done.values()), disk_free(ds_dir))
+        projected, normalized, report = require_pilot(ds_dir, fingerprint, state["stored"], disk_free(ds_dir), floor,
+                                                      accept_flags)
+        if report["verdict"] == "overturn":
+            accepted = accept_flags
+            if (report.get("acknowledged") or {}).get("reason") != accept_flags:
+                report["acknowledged"] = {"reason": accept_flags, "at": utc_now(),
+                                          "flags": sorted(name for name, value in report["flags"].items() if value)}
+                write_private(ds_dir / "pilot.json", (json.dumps(report, indent=1, sort_keys=True) + "\n").encode())
     todo = [t for t in selected if done.get(t["task"], (None,))[0] != symbols_digest(t["symbols"])]
-    totals = {"tasks": 0, "pages": 0, "bars": 0, "quarantined": 0, "failed": [], "stopped": 0}
+    totals = {"tasks": 0, "pages": 0, "bars": 0, "quarantined": 0, "failed": [], "stopped": 0, "stop_reason": None}
     started, requests_before = time.monotonic(), client.requests
+
+    def stop_reason():
+        """Checked before each task starts: STOP, then the disk (re-read every time, since the projection comes from
+        a few pilot tasks and the filesystem is shared with the engine's state)."""
+        if stop_file is not None and stop_file.exists():
+            return f"{stop_file} exists"
+        free = disk_free(ds_dir)
+        if free < floor:
+            return f"free disk fell to {free} bytes, under the {floor}-byte floor"
+        if projected is not None:
+            remaining = max(0, projected - state["stored"])
+            if free - remaining < floor + normalized:
+                return (f"free disk fell to {free} bytes: the remaining projected {remaining} bytes would leave less "
+                        f"than the {floor}-byte floor plus the {normalized}-byte normalized-layer reserve")
+            if state["stored"] > DISK_OVERRUN * projected:
+                return (f"the {state['stored']} bytes stored exceed {DISK_OVERRUN}x the pilot's projection "
+                        f"({projected} bytes): the pilot under-sampled the span")
+        return None
+
     fd = os.open(manifest, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
-    with os.fdopen(fd, "a", buffering=1) as log, ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(unless_stopped, stop_file, page_task, client, dataset, t, root, asof, fingerprint): t
-                   for t in todo}
-        for future in as_completed(futures):  # only this thread writes the manifest
-            task = futures[future]
-            try:
-                row = future.result()
-            except Exception as exc:  # recorded and retried on the next run
-                totals["failed"].append({"task": task["task"], "error": f"{type(exc).__name__}: {str(exc)[:160]}"})
-                continue
-            if row is None:
-                totals["stopped"] += 1
-                continue
-            log.write(json.dumps(row, sort_keys=True) + "\n")
+    with os.fdopen(fd, "a", buffering=1) as log:
+        def record(row):
+            append_row(log, row)
             totals["tasks"] += 1
             totals["pages"] += len(row["pages"])
             totals["bars"] += row["bars"]
-            totals["quarantined"] += len(row["quarantine"])
+            totals["quarantined"] += row["quarantined"]
+            state["stored"] += sum(page["bytes"] for page in row["pages"])
+
+        def fail(task, exc):
+            totals["failed"].append({"task": task["task"], "error": f"{type(exc).__name__}: {str(exc)[:160]}"})
+
+        drain_pool(client, workers, todo, lambda task: page_task(client, dataset, task, root, asof, fingerprint),
+                   record, fail, stop_reason, totals)
     result = {**totals, "planned_tasks": len(tasks), "selected_tasks": len(selected),
               "skipped_already_done": len(selected) - len(todo), "requests": client.requests,
-              "throttled": client.throttled, "ratelimit_remaining_min": client.ratelimit_remaining_min}
+              "throttled": client.throttled, "ratelimit_remaining_min": client.ratelimit_remaining_min,
+              "ratelimit_floor_pauses": client.ratelimit_floor_pauses, "pilot_flags_accepted": accepted}
     if pilot:
-        report = pilot_report(ds_dir, dataset, fingerprint, tasks, selected,
-                              task_rows(manifest, {t["task"] for t in selected}, fingerprint),
-                              free_bytes=disk_free(ds_dir),
-                              rss_bytes=peak_rss(), seconds=time.monotonic() - started,
-                              requests=client.requests - requests_before, fetched_now=totals["tasks"], rate=rate)
+        rows = {task: row for task, row in task_rows(manifest, {t["task"] for t in selected}, fingerprint).items()
+                if row_intact(ds_dir, row)}
+        report = pilot_report(ds_dir, dataset, fingerprint, tasks, selected, rows, free_bytes=disk_free(ds_dir),
+                              stored_bytes=state["stored"], disk_floor=floor, rss_bytes=peak_rss(),
+                              seconds=time.monotonic() - started, requests=client.requests - requests_before,
+                              fetched_now=totals["tasks"], rate=rate)
         write_private(ds_dir / "pilot.json", (json.dumps(report, indent=1, sort_keys=True) + "\n").encode())
         result["pilot"] = report
     return result
@@ -790,18 +1077,43 @@ def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: in
 # --------------------------------------------------------------------------- verification
 
 
+def planned_task_ids(header: dict, capture: str) -> list:
+    """The planned task ids of a header: a page dataset's provenance list, a record dataset's span days. ValueError
+    when they do not match the scope's planned count and sha256 (the provenance is not fingerprinted; the scope is)."""
+    scope = header["scope"]
+    if capture == "pages":
+        ids = header["provenance"]["planned_task_ids"]
+    else:
+        span = scope["span"]
+        ids = [d.isoformat() for d in span_days(date.fromisoformat(span["start"]), date.fromisoformat(span["end"]))]
+    planned = scope["planned"]
+    if not isinstance(ids, list) or len(ids) != planned["tasks"] or sha256_hex(canonical(ids)) != planned["task_ids_sha256"]:
+        raise ValueError("the planned task ids do not match the scope's planned count and sha256")
+    return ids
+
+
 def verify_dataset(root: Path, dataset: str, examples: int = 20) -> dict:
-    """Re-hash every recorded file against the manifest. For page capture, also check the scope header, that each
-    row names the header's fingerprint, each page chain and each bar total. A record-capture dataset may lack a
-    header: the news archive predates headers."""
+    """Re-hash every recorded file against the manifest. For page capture, also check the scope header and that each
+    task's row names its fingerprint, and decode every page: each body's next_page_token must name the next recorded
+    page's token (null on the last page), each body must hold the bars the row records for it, and the bodies must sum
+    to the row's total and its bars by symbol. A task's (or day's) last row decides; earlier rows for it (a refetch)
+    are counted as superseded. Under a header, the recorded tasks are also compared with the scope's planned tasks:
+    `complete` is false, and so is `ok`, while any planned task has no row (after a pilot, most of them). A missing
+    manifest or a malformed row is reported as a problem. A record-capture dataset may lack a header: the news archive
+    predates headers, so its plan is unknown (`complete` null)."""
     spec, ds_dir = DATASETS[dataset], root / dataset
     result = {"dataset": dataset, "scope_header": (ds_dir / "scope.json").exists(), "scope_fingerprint": None,
-              "rows": 0, "torn_lines": 0, "files": 0, "problems": 0, "examples": []}
+              "rows": 0, "torn_lines": 0, "malformed_rows": 0, "superseded_rows": 0, "files": 0, "problems": 0,
+              "examples": [], "planned_tasks": None, "missing_tasks": None, "missing_examples": [], "complete": None}
 
     def problem(detail: dict) -> None:
         result["problems"] += 1
         if len(result["examples"]) < examples:
             result["examples"].append(detail)
+
+    def malformed(number: int, detail: str = "malformed manifest row") -> None:
+        result["malformed_rows"] += 1
+        problem({"line": number, "problem": detail})
 
     try:
         header = read_header(ds_dir)
@@ -812,42 +1124,115 @@ def verify_dataset(root: Path, dataset: str, examples: int = 20) -> dict:
         if header is None and spec["capture"] == "pages":
             problem({"file": "scope.json", "problem": "missing"})
     fingerprint = result["scope_fingerprint"] = header["fingerprint"] if header else None
-    with open(ds_dir / "manifest.jsonl", encoding="utf-8") as handle:
-        for line in handle:
-            try:
-                row = json.loads(line)
-            except ValueError:
-                result["torn_lines"] += 1
-                continue
-            result["rows"] += 1
-            if spec["capture"] == "records":
-                day = row["day"]
-                checks = [(f"{day[:4]}/{day[5:7]}/{day[8:10]}.jsonl.gz", row["sha256"], None)]
-            else:
-                if fingerprint is not None and row.get("scope_fingerprint") != fingerprint:
-                    problem({"task": row["task"], "problem": "row names another scope fingerprint than the header"})
-                pages = row["pages"]
-                chained = (bool(pages) and pages[0]["page_token"] is None and not pages[-1]["next_page_token"]
-                           and all(page["next_page_token"] for page in pages[:-1])
-                           and all(page["page_token"] for page in pages[1:]))
-                if not chained:
-                    problem({"task": row["task"], "problem": "page chain does not run from no token to a null next token"})
-                if sum(page["bars"] for page in pages) != row["bars"]:
-                    problem({"task": row["task"], "problem": "page bars do not sum to the task total"})
-                checks = [(page["file"], page["sha256"], page["json_sha256"]) for page in pages]
-            for name, digest, json_digest in checks:
-                path = ds_dir / name
-                if not path.is_file():
-                    problem({"file": name, "problem": "missing"})
+    planned = None
+    if header is not None:
+        try:
+            planned = planned_task_ids(header, spec["capture"])
+        except (KeyError, TypeError, ValueError, AttributeError):
+            problem({"file": "scope.json", "problem": "planned task list missing or does not match the scope"})
+
+    def intact_file(name: str, digest: str) -> bytes | None:
+        path = ds_dir / name
+        if not path.is_file():
+            problem({"file": name, "problem": "missing"})
+            return None
+        stored = path.read_bytes()
+        result["files"] += 1
+        if sha256_hex(stored) != digest:
+            problem({"file": name, "problem": "sha256 differs from the manifest"})
+            return None
+        return stored
+
+    manifest = ds_dir / "manifest.jsonl"
+    latest = {}  # task or day -> its last row (pages: the line number; one pass to index, one to verify: bounded memory)
+    if not manifest.is_file():
+        problem({"file": "manifest.jsonl", "problem": "missing"})
+    else:
+        with open(manifest, "rb") as handle:
+            for number, line in enumerate(handle, 1):
+                try:
+                    row = json.loads(line)
+                except ValueError:
+                    result["torn_lines"] += 1
                     continue
-                stored = path.read_bytes()
-                result["files"] += 1
-                if sha256_hex(stored) != digest:
-                    problem({"file": name, "problem": "sha256 differs from the manifest"})
-                elif json_digest and sha256_hex(gzip.decompress(stored)) != json_digest:
-                    problem({"file": name, "problem": "decoded page sha256 differs from the manifest"})
-    result["ok"] = result["rows"] > 0 and result["problems"] == 0
+                result["rows"] += 1
+                if spec["capture"] == "records":
+                    try:
+                        digest, day = row["sha256"], date.fromisoformat(row["day"]).isoformat()
+                    except (KeyError, TypeError, ValueError):
+                        malformed(number)
+                    else:
+                        latest[day] = digest
+                elif isinstance(row, dict) and isinstance(row.get("task"), str):
+                    latest[row["task"]] = number
+                else:
+                    malformed(number)
+        result["superseded_rows"] = result["rows"] - result["malformed_rows"] - len(latest)
+        if spec["capture"] == "records":
+            for day, digest in latest.items():
+                intact_file(day_file(day), digest)
+        else:
+            wanted = set(latest.values())
+            with open(manifest, "rb") as handle:
+                for number, line in enumerate(handle, 1):
+                    if number in wanted:
+                        row = json.loads(line)
+                        try:
+                            verify_task_row(ds_dir, spec, row, fingerprint, intact_file, problem)
+                        except (KeyError, TypeError, AttributeError, ValueError, OSError, EOFError, zlib.error) as exc:
+                            malformed(number, f"malformed row or page for {row['task']} ({type(exc).__name__})")
+    if planned is not None:
+        planned_set = set(planned)
+        missing = [task for task in planned if task not in latest]
+        for task in sorted(set(latest) - planned_set):
+            problem({"task": task, "problem": "not a planned task of the scope"})
+        result.update({"planned_tasks": len(planned), "missing_tasks": len(missing),
+                       "missing_examples": missing[:examples], "complete": not missing})
+    result["ok"] = result["rows"] > 0 and result["problems"] == 0 and result["complete"] is not False
     return result
+
+
+def verify_task_row(ds_dir: Path, spec: dict, row: dict, fingerprint: str | None, intact_file, problem) -> None:
+    task = row.get("task")
+    if fingerprint is not None and row.get("scope_fingerprint") != fingerprint:
+        problem({"task": task, "problem": "row names another scope fingerprint than the header"})
+    pages = row.get("pages") or []
+    if not pages or pages[0].get("page_token") is not None:
+        problem({"task": task, "problem": "page chain does not start without a page token"})
+    decoded_all, counts = True, collections.Counter()
+    for index, page in enumerate(pages):
+        following = pages[index + 1].get("page_token") if index + 1 < len(pages) else None
+        if page.get("next_page_token") != following:
+            problem({"task": task, "page": index, "problem": "recorded next_page_token does not name the next page"})
+        stored = intact_file(page["file"], page["sha256"])
+        if stored is None:
+            decoded_all = False
+            continue
+        body_bytes = gzip.decompress(stored)
+        if sha256_hex(body_bytes) != page["json_sha256"]:
+            problem({"file": page["file"], "problem": "decoded page sha256 differs from the manifest"})
+            decoded_all = False
+            continue
+        body = json.loads(body_bytes)
+        if (body.get("next_page_token") or None) != following:
+            problem({"task": task, "page": index,
+                     "problem": "page body's next_page_token does not chain to the next recorded page" if following
+                     else "last page body carries a next_page_token: the chain was cut short"})
+        series = body.get(spec["key"]) or {}
+        in_body = 0
+        for symbol, items in series.items():
+            counts[symbol] += len(items)
+            in_body += len(items)
+        if in_body != page["bars"]:
+            problem({"task": task, "page": index, "problem": "recorded page bars differ from the page body"})
+    if sum(page["bars"] for page in pages) != row.get("bars"):
+        problem({"task": task, "problem": "page bars do not sum to the task total"})
+    if decoded_all and pages:
+        if "bars_by_symbol" in row and {s: n for s, n in counts.items() if n} != row["bars_by_symbol"]:
+            problem({"task": task, "problem": "bars by symbol differ from the page bodies"})
+        requested = set(str(row.get("params", {}).get("symbols", "")).split(","))
+        if "symbols_without_bars" in row and sorted(requested - {s for s, n in counts.items() if n}) != row["symbols_without_bars"]:
+            problem({"task": task, "problem": "symbols without bars differ from the page bodies"})
 
 
 # --------------------------------------------------------------------------- command line
@@ -870,6 +1255,11 @@ def universe_main(argv: list) -> int:
                     help="directory holding daily.parquet, plan.json, ledger.jsonl and identity-dedup.json")
     ap.add_argument("--out", type=Path, required=True, help="universe JSON to create; an existing file is never replaced")
     a = ap.parse_args(argv)
+    try:
+        refuse_inside_git_work_tree(a.out)  # it is derived from licensed daily bars
+    except Refused as exc:
+        print(f"REFUSED: {exc}", file=sys.stderr)
+        return EXIT_REFUSED
     if a.out.exists():
         raise SystemExit(f"{a.out} exists; a universe file is never replaced")
     rows, naming, source = read_daily_collection(a.daily_dataset)
@@ -910,6 +1300,9 @@ def main(argv=None, opener=None) -> int:
     ap.add_argument("--pilot", type=int, default=0, metavar="N",
                     help=f"fetch N (at most {MAX_PILOT_TASKS}) evenly spread tasks of the span, report bytes, bytes per "
                          "bar and peak RSS, project the span's disk use and record the verdict a full run requires")
+    ap.add_argument("--accept-pilot-flags", metavar="REASON",
+                    help="run month tasks although the pilot's verdict is 'overturn' (D2's per-day switch); the reason "
+                         "is recorded in pilot.json. Never overrides a disk refusal")
     a = ap.parse_args(argv)
     if not 1 <= a.rate <= MAX_RATE:
         raise SystemExit("--rate must leave headroom for the live monitor, scans and the engine (at most 6000/min)")
@@ -917,26 +1310,32 @@ def main(argv=None, opener=None) -> int:
         raise SystemExit(f"--workers must be at least 1 and --pilot between 0 and {MAX_PILOT_TASKS}")
     if DATASETS[a.dataset]["capture"] == "pages" and a.universe is None:
         raise SystemExit(f"{a.dataset} needs --universe (built by `backfill.py universe`)")
+    if a.accept_pilot_flags is not None and (a.pilot or DATASETS[a.dataset]["capture"] != "pages"
+                                             or not a.accept_pilot_flags.strip()):
+        raise SystemExit("--accept-pilot-flags REASON takes a non-empty reason and applies to a full page-capture run")
     try:
-        universe = load_universe(a.universe) if a.universe else None
-    except ValueError as exc:
-        raise SystemExit(str(exc))
-    key, secret = load_credentials(a.env_file)
-    client = Client({"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}, Bucket(a.rate),
-                    **({"opener": opener} if opener else {}))
-    started = time.time()
-    try:
+        refuse_inside_git_work_tree(a.out)  # before the universe or the credentials are read
+        try:
+            universe = load_universe(a.universe) if a.universe else None
+        except ValueError as exc:
+            raise SystemExit(str(exc))
+        key, secret = load_credentials(a.env_file)
+        client = Client({"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}, Bucket(a.rate),
+                        **({"opener": opener} if opener else {}))
+        started = time.time()
         result = run(client, a.dataset, a.start, a.end, a.out, a.workers, a.out / "STOP", universe=universe,
-                     pilot=a.pilot, rate=a.rate)
+                     pilot=a.pilot, rate=a.rate, accept_flags=a.accept_pilot_flags)
     except Refused as exc:
         print(f"REFUSED: {exc}", file=sys.stderr)
-        return 2
+        return EXIT_REFUSED
     result["seconds"] = round(time.time() - started, 1)
     print(json.dumps(result))
     if result["failed"]:
-        return 1
+        return EXIT_FAILED
+    if result["stopped"]:
+        return EXIT_STOPPED
     if a.pilot:
-        return {"pass": 0, "incomplete": 1}.get(result["pilot"]["verdict"], 2)
+        return {"pass": 0, "incomplete": EXIT_FAILED, "overturn": EXIT_OVERTURN}.get(result["pilot"]["verdict"], EXIT_REFUSED)
     return 0
 
 
