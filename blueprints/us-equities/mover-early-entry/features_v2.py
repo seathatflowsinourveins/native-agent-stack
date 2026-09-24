@@ -32,6 +32,8 @@ EF = PROTOCOL_V2["families"]["E_first_cross"]
 WINDOWS = [tuple(w) for w in EF["windows_et"]]
 E_GAINS, E_VOLUMES, E_NEWS = EF["gain_thresholds"], EF["min_dollar_volume"], EF["news_variants"]
 F_SETUPS = ("F1_orb5", "F2_orb15", "F3_premarket_high_break", "F4_vwap_reclaim")
+# protocol-v2 inputs.cost_table: v1's committed table (evidence/cost-table-run-v1.json)
+V1_COST_TABLE_SHA256 = "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13"
 Y_EXITS = ("Y1", "Y2", "Y3", "Y4")
 
 
@@ -74,6 +76,9 @@ def y_exits(bars: R.Bars, day, kb, entry, stop, start_after_entry, close, close_
     j0 = kb + 1 if start_after_entry else kb
     o, h, l, t = bars.o[j0:i1], bars.h[j0:i1], bars.l[j0:i1], bars.t[j0:i1]
     out = {"Y1": (close, close_ts, False)}
+    if stop >= entry:  # V6 (amended V15): a stop at or above the entry exits every stop-based rule at the next bar's open
+        nxt = (float(bars.o[kb + 1]), float(bars.t[kb + 1]), False) if kb + 1 < i1 else (close, close_ts, True)
+        return dict(out, Y2=nxt, Y3=nxt, Y4=nxt), True
     # Y2: the initial stop
     y2 = None
     for j in range(len(o)):
@@ -94,26 +99,21 @@ def y_exits(bars: R.Bars, day, kb, entry, stop, start_after_entry, close, close_
             break
         running = max(running, float(h[j]))
     out["Y3"] = y3 or (close, close_ts, True)
-    # Y4: stop or a 2R target, stop assumed first; a stop at or above the entry exits at the next bar's open
-    if stop >= entry:
-        out["Y4"] = (float(o[0]), float(t[0]), False) if len(o) else (close, close_ts, True)
-        degenerate = True
-    else:
-        target = entry + 2 * (entry - stop)
-        y4 = None
-        for j in range(len(o)):
-            if o[j] <= stop or o[j] >= target:
-                y4 = (float(o[j]), float(t[j]), False)
-                break
-            if l[j] <= stop:
-                y4 = (float(stop), float(t[j]), False)
-                break
-            if h[j] >= target:
-                y4 = (float(target), float(t[j]), False)
-                break
-        out["Y4"] = y4 or (close, close_ts, True)
-        degenerate = False
-    return out, degenerate
+    # Y4: stop or a 2R target, stop assumed first
+    target = entry + 2 * (entry - stop)
+    y4 = None
+    for j in range(len(o)):
+        if o[j] <= stop or o[j] >= target:
+            y4 = (float(o[j]), float(t[j]), False)
+            break
+        if l[j] <= stop:
+            y4 = (float(stop), float(t[j]), False)
+            break
+        if h[j] >= target:
+            y4 = (float(target), float(t[j]), False)
+            break
+    out["Y4"] = y4 or (close, close_ts, True)
+    return out, False
 
 
 def setups(bars: R.Bars, day):
@@ -133,7 +133,8 @@ def setups(bars: R.Bars, day):
     pm = np.flatnonzero((t >= e("04:00")) & (t < e("09:30")))
     if pm.size:
         pmh = float(h[pm].max())
-        cand = np.flatnonzero((t >= e("09:30")) & (t < e("11:00")) & (t < close_ts) & (h > pmh))
+        # V16: the breakout bar must start after the opening print's 09:30 bar (the official open sets the stop)
+        cand = np.flatnonzero((t >= e("09:31")) & (t < e("11:00")) & (t < close_ts) & (h > pmh))
         if cand.size:
             k = int(cand[0])
             out["F3_premarket_high_break"] = (k, float(max(o[k], pmh)), None, True)  # stop = official open x 0.90
@@ -175,8 +176,10 @@ def symbol_day_v2(session, sym, prev_date, gap, supp, rows, auc, news_ts, daily)
     i1 = bars.index(close_ts)
     close, close_src = ((oc, "official") if oc is not None else (daily.get("raw_c"), "daily_close") if daily.get("raw_c")
                         else (float(bars.c[i1 - 1]), "bar_close") if i1 else (None, None))
+    eventual = close / ref - 1 if (ref and close) else None
     rec = {"session": session, "symbol": sym, "supplement": supp, "gap_over_7": gap, "ref": ref, "ref_source": prev_src,
-           "split": split, "close_source": close_src, "E": {}, "F": {}}
+           "split": split, "close_source": close_src, "eventual_gain": eventual,
+           "basis_uncertain": prev_src == "daily_bar_close" or bool(split), "f_candidate_no_official_open": False, "E": {}, "F": {}}
     if not ref or close is None:
         return rec
     prev16 = R.et_epoch(prev_date, "16:00")
@@ -188,6 +191,7 @@ def symbol_day_v2(session, sym, prev_date, gap, supp, rows, auc, news_ts, daily)
             entry, ets = float(bars.o[k]), float(bars.t[k])
             ex, high, halt, src = R.exits_for(entry, ets, bars, session, oc, daily.get("raw_c"))
             cache[k] = {"entry": entry, "entry_ts": ets, "decision_dv": float(bars.cumdv[k - 1]), "decision_price": float(bars.c[k - 1]),
+                        "decision_gain": float(bars.c[k - 1]) / ref - 1, "high": high,
                         "entry_bar_dv": float(bars.dv[k]), "entry_cum_dv": float(bars.cumdv[k - 1]), "halt": halt,
                         "exits": {x: [p, ts, fb, bars.cum_dv(ts)] for x, (p, ts, fb) in ex.items()}}
         rec["E"][rid] = cache[k]
@@ -195,6 +199,8 @@ def symbol_day_v2(session, sym, prev_date, gap, supp, rows, auc, news_ts, daily)
     pre = bars.index(R.et_epoch(session, "09:30"))
     pre_price = float(bars.c[pre - 1]) if pre else None
     pre_dv = float(bars.cumdv[pre - 1]) if pre else 0.0
+    if oo is None and pre_price is not None and pre_price >= 1.20 * ref * (1 - 1e-12) and pre_price >= R.MIN_PRICE and pre_dv >= 250_000:
+        rec["f_candidate_no_official_open"] = True  # V3: outside the universe, counted
     if oo is not None and oo >= 1.20 * ref * (1 - 1e-12) and pre_price is not None and pre_price >= R.MIN_PRICE and pre_dv >= 250_000:
         found = setups(bars, session)
         vr = vwap_reclaim(bars, session, volume)
@@ -204,7 +210,10 @@ def symbol_day_v2(session, sym, prev_date, gap, supp, rows, auc, news_ts, daily)
             if stop is None:
                 stop = 0.90 * oo
             ex, degenerate = y_exits(bars, session, k, entry, stop, breakout, float(close), close_ts)
+            i1c = bars.index(close_ts)
+            high = float(max(entry, bars.h[k:i1c].max())) if i1c > k else entry
             rec["F"][name] = {"entry": entry, "entry_ts": float(bars.t[k]), "stop": stop, "breakout": breakout, "degenerate": degenerate,
+                              "high": high, "halt": R.halt_flag(bars, float(bars.t[k]), session),
                               "decision_dv": float(bars.cumdv[k - 1]) if k else 0.0, "decision_price": float(bars.c[k - 1]) if k else entry,
                               "entry_bar_dv": float(bars.dv[k]), "entry_cum_dv": float(bars.cumdv[k - 1]) if k else 0.0,
                               "exits": {y: [p, ts, fb, bars.cum_dv(ts)] for y, (p, ts, fb) in ex.items()}}
@@ -217,8 +226,7 @@ def _work(args):
     out = []
     for sym, prev_date, gap, supp in cands:
         rec = symbol_day_v2(session, sym, prev_date, gap, supp, bars.get(sym, []), auctions.get(sym, {}), news.get(sym, []), daily.get(sym, {}))
-        if rec["E"] or rec["F"]:
-            out.append(json.dumps(rec, sort_keys=True, separators=(",", ":")))
+        out.append(json.dumps(rec, sort_keys=True, separators=(",", ":")))  # every candidate day, for degree-tier capture
     return session, out
 
 
@@ -233,9 +241,13 @@ def main(argv=None) -> int:
     ap.add_argument("--workers", type=int, default=5)
     a = ap.parse_args(argv)
     gate = {"cost_table_sha256": F.sha256_file(a.cost_table)}
+    if gate["cost_table_sha256"] != V1_COST_TABLE_SHA256:
+        raise SystemExit("protocol v2 uses v1's committed cost table only")
     if a.split == "holdout":
-        if not a.dev_val or json.loads(a.dev_val.read_text()).get("stage") != "dev_val":
-            raise SystemExit("the holdout split is read only after v2 dev_val results exist (--dev-val)")
+        prior = json.loads(a.dev_val.read_text()) if a.dev_val else {}
+        if prior.get("stage") != "dev_val" or prior.get("protocol") != PROTOCOL_V2["id"] \
+                or prior.get("inputs", {}).get("cost_table_sha256") != gate["cost_table_sha256"]:
+            raise SystemExit("the v2 holdout split is read only after v2 dev_val results on this cost table exist (--dev-val)")
         gate["dev_val_sha256"] = F.sha256_file(a.dev_val)
     colls = sorted(p for p in a.state.glob(F.COLLECTION_GLOB) if (p / "ledger.jsonl").exists())
     supps = sorted(p for p in a.state.glob(F.SUPPLEMENT_GLOB) if (p / "ledger.jsonl").exists())
@@ -270,7 +282,7 @@ def main(argv=None) -> int:
     finally:
         os.umask(old)
     tmp.replace(a.out)
-    meta = {"protocol": PROTOCOL_V2["id"], "mode": "v2_trades", "split": a.split, "sessions": len(jobs), "symbol_days_with_trades": n,
+    meta = {"protocol": PROTOCOL_V2["id"], "mode": "v2_trades", "split": a.split, "sessions": len(jobs), "symbol_days": n,
             "content_sha256": h.hexdigest(), **gate}
     mp = Path(str(a.out) + ".meta.json")
     mp.write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")

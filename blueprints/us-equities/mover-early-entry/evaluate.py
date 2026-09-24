@@ -554,6 +554,11 @@ def evaluate_split(E: Entries, regime, portfolio: bool = True, only=None):
 # ---------------------------------------------------------------- capture, replication, gates
 
 
+def basis_uncertain(r) -> bool:
+    """D6: rows whose ref may be on the wrong price basis (the C23 daily-close fallback or a split day)."""
+    return r["ref_source"] == "daily_bar_close" or bool(r["split"])
+
+
 def capture(rows):
     rows = [r for r in rows if r.get("eventual_gain") is not None]
     tier = np.array([R.degree_tier_index(r["eventual_gain"]) for r in rows], dtype=int)
@@ -570,7 +575,7 @@ def capture(rows):
         for g in R.GAINS:
             for v in R.VOLUMES:
                 elig = (price >= R.MIN_PRICE) & (dv >= v)
-                base = elig & (gain >= g)
+                base = elig & (gain >= g - R.GAIN_EPS)  # C25, as the trade-level rule
                 for n in R.NEWS:
                     fired = base & news if n == "news_before_t" else base
                     cell = {}
@@ -591,7 +596,7 @@ def capture(rows):
 def replication(rows):
     rows = [r for r in rows if r.get("eventual_gain") is not None and r["eventual_gain"] >= 1.0]
     g = [r["t"]["09:25"]["gain"] for r in rows]
-    lead = sum(1 for x in g if x is not None and x >= 0.20)
+    lead = sum(1 for x in g if x is not None and x >= 0.20 - R.GAIN_EPS)
     d = [(x, r["eventual_gain"]) for x, r in zip(g, rows) if x is not None]
     return {"tier_ge_1_symbol_days": len(rows), "share_gain_at_0925_ge_0_20": rnd(lead / len(rows)) if rows else None,
             "spearman_gain_at_0925_vs_eventual": rnd(spearman([a for a, _ in d], [b for _, b in d])) if d else None,
@@ -727,8 +732,11 @@ def dev_val(a) -> int:
         "selection": {"development_passes": dev_pass, "validation": confirm, "validated": validated, "holdout_candidates": holdout_list,
                       "sensitivities": sens},
         "paper_candidate": candidate,
-        "capture": {"development": capture(dev_rows), "validation": capture(val_rows), "development_and_validation": capture(dev_rows + val_rows)},
+        "capture": {"development": capture(dev_rows), "validation": capture(val_rows), "development_and_validation": capture(dev_rows + val_rows),
+                    "development_and_validation_without_basis_uncertain_rows": capture([r for r in dev_rows + val_rows if not basis_uncertain(r)])},
         "replication_wave_h": replication(dev_rows + val_rows),
+        "replication_wave_h_without_basis_uncertain_rows": replication([r for r in dev_rows + val_rows if not basis_uncertain(r)]),
+        "basis_uncertain_rows": {"development": sum(map(basis_uncertain, dev_rows)), "validation": sum(map(basis_uncertain, val_rows))},
     }
     body = (json.dumps(results, indent=1, sort_keys=True) + "\n").encode()
     a.out.write_bytes(body)

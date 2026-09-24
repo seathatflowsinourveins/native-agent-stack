@@ -15,12 +15,15 @@ Departures are dated in `deviations.json` (D1-D5); readings the text leaves open
 
 ## Result so far (v1, development and validation)
 
-`evidence/summary-dev-val-run-v1.json` (aggregates; results sha256 `464f2bc2...`, reproduced byte for byte by two
-independent runs): **no rule-exit passes development** (0 of 768). Every rule-exit with at least 200 development trades
-has a negative mean net return (median -2.9% per trade; 16 are positive before costs, the best +0.43%); validation is
-worse. The leveraged portfolio of the most-traded rule loses at every rung. The holdout was not read. Coverage of the
-research package's verified +20% events is 83.8% (labelled survivorship-limited). Wave H: 62.8% of >= 100% gainers were
-already +20% at 09:25 (the package says 77%); Spearman of that gain with the eventual gain 0.26 (package: 0.04).
+`evidence/summary-dev-val-run-v1.json` (aggregates; results sha256 `9d8c3d5b...`, reproduced byte for byte by two
+independent runs): **no rule-exit passes development** (0 of 768). All 704 rule-exits with at least 200 development
+trades have a negative mean net return (the median of those means is -2.9%; 16 are positive before costs, the best
++0.43%). Validation is similar (median of rule-exit means -2.7%; 5 of 768 positive, as noise would give; none of them
+passed development). The leveraged portfolio of the most-traded rule loses at every rung. The holdout was not read.
+Coverage of the research package's verified +20% events is 83.8% (labelled survivorship-limited). Wave H: 62.9% of
+>= 100% gainers were already +20% at 09:25 (69.7% without basis-uncertain rows; the package says 77%); Spearman of that
+gain with the eventual gain 0.26 (package: 0.04). The >= 10x degree tier is mostly price-basis artifacts (62 days, 16
+clean; D6), so its capture numbers are reported with and without those rows.
 
 ## Pipeline and how to reproduce
 

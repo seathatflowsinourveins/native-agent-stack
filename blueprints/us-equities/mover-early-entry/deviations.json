@@ -69,6 +69,15 @@
       "kind": "review_record",
       "what": "An independent pre-outcome review (3 Opus reviewers, 2 refuters per blocking/major finding; workflow run wf_d470e1c6-e08) of commit 1c61c78f found 10 blocking/major findings (all survived refutation; 7 distinct) and 28 minor ones. All were resolved before any outcome: the 600 s news sensitivity is reported; portfolio slots rank every fire (C24); outcome and holdout reads are gated in code (C32); collections are identity- and count-checked; the live scanner uses the calendar's previous session and the signal cutoff (C31); holdout statistics cover only the evaluated rule-exits (C30); portfolio P&L is booked on the basis; exact-threshold fires (C25); early closes (C26); the daily-close fallback (C22); the table's own 90th percentile (C9); sensitivities and tie-breaks (C27-C29); coverage against the evaluated union; per-split completeness; input and runtime hash checks.",
       "effect": "The cost sample's close-5m stamps on the four development early-close sessions move to 12:55 ET, so those stamps are re-fetched and the cost table rebuilt before it is committed."
+    },
+    {
+      "id": "D6",
+      "recorded_at": "2026-09-24T06:03:17Z",
+      "kind": "post_outcome_diagnostic_corrections",
+      "what": "After the v1 dev_val outcome, an independent result audit (workflow wf_a0e5858e-8a5; refuters upheld it) found that ref can be on the wrong price basis on rows with the C23 daily-close fallback or a split day, which contaminates the degree tiers (capture and replication) but not trade returns, which never use ref. capture() and replication() also compared gains without the C25 epsilon.",
+      "change": "Post hoc and labelled as such: capture and replication are also reported without basis-uncertain rows (ref from the daily-close fallback, or a split day: 6,845 development and 3,922 validation symbol-days), and both use the C25 epsilon. Selection, pass criteria and every trade metric are unchanged (verified: identical development and validation blocks), so the no-pass result stands.",
+      "effect": "Results sha256 9d8c3d5b... (two independent runs byte-identical). The >= 10x tier holds 62 symbol-days, 16 without basis-uncertain rows. Wave H: 62.9% (all rows) and 69.7% (without basis-uncertain rows, 1,212 days) were +20% at 09:25; Spearman 0.257 and 0.248.",
+      "v2": "Protocol v2 preregisters the same basis-uncertain sensitivity (clarifications-v2 V20) before any v2 outcome."
     }
   ]
 }
