@@ -496,12 +496,17 @@ every request's lookback, not only its sessions; whether the holdout is read no 
 read is always evaluated, and a refused authorization cannot be held back and spent later); the transport is paced at
 the pinned rate limit; late collection is judged per session and holdout due times by signed reach times; every
 pre-freeze and stage fetch needs a pushed start line; and the transport check covers holdout snapshots with a seeded
-sample. The next steps are an
+sample. Review round 12 resolved two independent reviews of the study tree, one cross-family (Codex, 1 P1 and 4 P2)
+and one Claude (18 findings), with none rejected: identity dedup is decided as of each candidate session, so closes
+inside a candidate's own hold cannot remove it; a holdout evaluation reads only the base snapshots its seal pinned;
+quotes are ordered by exact nanosecond stamps; the diagnostic splits cluster by session; an undefined rebooking is
+excluded, not booked at -1; a sealed read may be retried after the deadline; the carried items are rechecked at the
+count and the read; and the freeze needs a passing identity probe and fetch margin at the pinned rate. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-11 (the restructure into the core, its two review rounds, the code-first round and the three study-tree reviews) are in
+`protocol-draft.json` (`review_record`); rounds 5-12 (the restructure into the core, its two review rounds, the code-first round and the four study-tree reviews) are in
 `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

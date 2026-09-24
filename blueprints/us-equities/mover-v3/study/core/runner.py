@@ -66,6 +66,20 @@ def check_coverage_decision(repo, protocol: dict) -> dict:
         raise guards.Refused("coverage_decision differs from the governing count-only output's item_rule")
     if out.get("coverage_rule_sha256") != rule_sha256(protocol):
         raise guards.Refused("the count-only output was decided under another coverage_rule")
+    # review round 12, F2 (second review): the code-decided freeze conditions, not only the item rule. Without a
+    # passing identity probe and fetch margin the protocol is not frozen as written (pre_freeze_access_path.
+    # identity_probe, freeze_preconditions), and the margin holds only at the rate limit the frozen protocol pins
+    for key in ("identity_probe", "fetch_margin"):
+        if (out.get(key) or {}).get("passes") is not True:
+            raise guards.Refused(f"the governing count-only output's {key} does not pass")
+    from core.count_only import pinned_rate_limit
+    try:
+        rate = pinned_rate_limit(protocol)
+    except ValueError as exc:
+        raise guards.Refused(str(exc)) from exc
+    if out.get("rate_limit") != rate:
+        raise guards.Refused("the count-only output was decided at a rate limit other than the frozen protocol's "
+                             "pre_freeze_access_path.rate_limit")
     rate = (((out.get("years") or {}).get("2020") or {}).get("rates") or {}).get("identity_unreached_rate")
     return {"dropped_years": frozenset(dy), "items_tested": tested,
             "validation_identity_limited": bool(out.get("validation_identity_limited")),
@@ -132,8 +146,9 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
     coverage = check_coverage_decision(repo, protocol)
     tip = guards.git(repo, "rev-parse", guards.MAIN)
     from datetime import datetime, timezone
+    late = guards.late_voids(repo, f"{RESULTS_DIR}/validation.json", void_scopes) if void_scopes else []
     return {"repo": repo, "protocol": protocol, "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
-            "pinned_tree": pinned_tree, "transport_deviation": deviation, "voids": void_scopes,
+            "pinned_tree": pinned_tree, "transport_deviation": deviation, "voids": void_scopes, "late_voids": late,
             "commit": guards.git(repo, "rev-parse", "HEAD"), "freeze_commit": freeze_commit, "freeze_ts": freeze_ts,
             "freeze_utc": datetime.fromtimestamp(freeze_ts, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "freeze_session": freeze_session, "n0_pinned": CH.n0(pinned, freeze_ts), "pinned_cal": pinned,

@@ -118,14 +118,21 @@ def bound(stats, q: float):
 
 # ---------------------------------------------------------------- Holm
 
-def holm(pvals: dict, normal_p: dict | None = None) -> dict:
-    """Holm-adjusted p per item over the 5-item family (an item not carried or not tested has p = 1). Ties are
-    broken by the normal-tail p, then by item id in bytewise ASCII order."""
+def holm_order(pvals: dict, normal_p: dict | None = None) -> list:
+    """The Holm step-down order (multiple_testing.tie_breaks): by p, ties broken by the normal-tail p, then by item
+    id in bytewise ASCII order. A tie's order never changes a Holm-adjusted p (the running maximum makes tied items
+    equal), so the order is reported with the results, where the rule is observable (review round 12, F5)."""
     normal_p = normal_p or {}
-    m = len(ITEM_IDS)
     if set(pvals) != set(ITEM_IDS):
         raise ValueError("the Holm family is exactly the 5 item_ids")
-    order = sorted(ITEM_IDS, key=lambda i: (pvals[i], normal_p.get(i, 1.0), i.encode("ascii")))
+    return sorted(ITEM_IDS, key=lambda i: (pvals[i], normal_p.get(i, 1.0), i.encode("ascii")))
+
+
+def holm(pvals: dict, normal_p: dict | None = None) -> dict:
+    """Holm-adjusted p per item over the 5-item family (an item not carried or not tested has p = 1), stepping
+    down in holm_order."""
+    m = len(ITEM_IDS)
+    order = holm_order(pvals, normal_p)
     adj, running = {}, 0.0
     for rank, item in enumerate(order):
         running = max(running, min(1.0, (m - rank) * pvals[item]))
@@ -221,10 +228,13 @@ PASS_NAME = {"development": "development pass", "validation": "screened", "holdo
 
 
 def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: bool, mde_ok: bool,
-               void: bool = False, sign_ok: bool = True, contaminated: bool = False, carried: bool = True) -> str:
+               void: bool = False, sign_ok: bool = True, contaminated: bool = False, carried: bool = True,
+               opposite: bool = False) -> str:
     """outcome_reporting.labels: the stage pass name, 'not_supported_mde_excluded' or 'underpowered'.
     p_stage is the unadjusted p at development and the Holm-adjusted p at validation and the holdout. At the holdout
-    an item that was not carried is 'not carried' whatever its sample (review round 9, M-1)."""
+    an item that was not carried is 'not carried' whatever its sample (review round 9, M-1). An estimate opposite a
+    one-sided alternative (opposite; core.evaluate.opposite_direction) never passes, by rule and not only because
+    its bootstrap p is large (outcome_reporting.rule; review round 12, F9)."""
     if stage == "holdout" and not carried:
         return "not carried"
     if void or not n_ok:
@@ -233,6 +243,7 @@ def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: 
     passes = p_stage <= TEST["alpha"] and (robust_ok or item not in TRADABLE or stage == "development")
     if stage == "holdout" and item == "H3-c":
         passes = passes and sign_ok
+    passes = passes and not opposite
     if passes:
         if stage == "holdout" and contaminated:
             return "screened (contaminated holdout)"
@@ -371,12 +382,25 @@ def benjamini_hochberg(pvals: dict, q: float = 0.10) -> dict:
     return {k: (i < cut) for i, (k, _) in enumerate(items)}
 
 
-def split_p(values, alternative: str) -> float:
-    """A diagnostic split's p: the normal approximation of its trade-level mean (mean / (sd / sqrt(n)))."""
+def split_p(values, sessions, alternative: str) -> float:
+    """A diagnostic split's p: the normal approximation of its trade-level mean, with a standard error clustered by
+    entry session (review round 12, Codex P2): trades that share a session are not independent, so
+    se^2 = G / (G - 1) x sum over the G sessions of (sum of the session's (x - mean) / n)^2. With one trade per
+    session this equals sd / sqrt(n). Fewer than 2 sessions, or se = 0, give p = 1."""
     x = np.asarray(values, dtype=float)
-    if len(x) < 2 or float(np.std(x, ddof=1)) == 0.0:
+    if len(x) != len(sessions):
+        raise ValueError("one session per value")
+    n = len(x)
+    sums = {}
+    for s, e in zip(sessions, (x - x.mean()) / n if n else []):
+        sums[s] = sums.get(s, 0.0) + float(e)
+    G = len(sums)
+    if n < 2 or G < 2:
         return 1.0
-    z = float(x.mean()) / (float(np.std(x, ddof=1)) / math.sqrt(len(x)))
+    se = math.sqrt(G / (G - 1.0) * sum(v * v for v in sums.values()))
+    if se == 0.0:
+        return 1.0
+    z = float(x.mean()) / se
     if alternative == "greater":
         return 1.0 - phi(z)
     if alternative == "less":

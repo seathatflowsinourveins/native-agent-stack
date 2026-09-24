@@ -117,12 +117,16 @@ def write(path: Path, data) -> Path:
     return path
 
 
+RATE_LIMIT = {"per_minute": 10000.0, "source": "synthetic"}
+
+
 def count_only_output(protocol: dict, enumeration_sha256: str, dropped=(), tested=True, rate=0.01) -> dict:
     return {"kind": "mover_v3_count_only_output", "coverage_rule_sha256": rule_sha256(protocol),
             "item_rule": {"items_tested": tested, "dropped_years": sorted(dropped)},
             "validation_identity_limited": rate > 0.02,
             "years": {"2020": {"rates": {"identity_unreached_rate": rate}}},
-            "part0": {"enumeration_sha256": enumeration_sha256}}
+            "part0": {"enumeration_sha256": enumeration_sha256},
+            "identity_probe": {"passes": True}, "fetch_margin": {"passes": True}, "rate_limit": dict(RATE_LIMIT)}
 
 
 def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-02T21:30:00+00:00",
@@ -154,6 +158,7 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
     if frozen:
         protocol["status"] = "frozen"
         protocol["frozen_before_outcomes"] = True
+        protocol["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(RATE_LIMIT)
         sc = protocol["run_discipline"]["study_code"]
         sc["tree"] = tree
         sc["fetch_tree"] = sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}/fetch")

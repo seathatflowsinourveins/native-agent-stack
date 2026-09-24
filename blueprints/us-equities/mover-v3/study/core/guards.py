@@ -251,6 +251,46 @@ def voids(repo) -> frozenset:
     return frozenset(out)
 
 
+def void_reach(repo, ref: str = None) -> dict:
+    """Review round 12, F6 (second review): {scope: the signed time the first 'void' deviation of that scope reached
+    origin/main} (the committer time of the first first-parent commit whose deviations.json holds it)."""
+    ref = ref or MAIN
+    out = {}
+    for row in git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref, "--", DEVIATIONS).splitlines():
+        commit, ct = row.split()
+        raw = committed_bytes(repo, commit, DEVIATIONS)
+        try:
+            devs = json.loads(raw).get("deviations", []) if raw else []
+        except ValueError:
+            continue
+        new = {d.get("scope") for d in devs if d.get("kind") == "void" and d.get("scope") in VOID_SCOPES} - set(out)
+        if new:
+            require_verified(repo, commit, "the first commit holding a void deviation")
+            out.update({scope: int(ct) for scope in new})
+    return out
+
+
+def first_reach(repo, path: str, ref: str = None):
+    """Committer epoch of the first first-parent commit of origin/main that holds path, or None."""
+    for row in git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref or MAIN, "--", path).splitlines():
+        commit, ct = row.split()
+        if committed_bytes(repo, commit, path) is not None:
+            require_verified(repo, commit, f"the first commit holding {path}")
+            return int(ct)
+    return None
+
+
+def late_voids(repo, validation_path: str, scopes) -> list:
+    """The 'tests' and 'validation' void scopes whose first record reached origin/main after the validation results
+    did. exposure_registry.update_rule wants such a read recorded before the freeze; one recorded after the validation
+    outcome still voids the holdout, and it is named as late wherever the void is reported."""
+    val = first_reach(repo, validation_path)
+    if val is None:
+        return []
+    reach = void_reach(repo)
+    return sorted(s for s in scopes if s in ("tests", "validation") and reach.get(s) is not None and reach[s] > val)
+
+
 def fetch_only_diff(repo, pinned: str, tree: str) -> bool:
     """The running tree differs from the pinned tree, and only in paths under fetch/."""
     if not pinned or not git_ok(repo, "cat-file", "-e", f"{pinned}^{{tree}}"):

@@ -52,6 +52,13 @@ and seeds its live sample with the first origin/main commit that holds the new t
 authorization cannot be spent. A read that sealed its snapshot is always evaluated, and one evaluated after the
 deadline carries `late-read`. Holdout due times are judged by the signed time the authorization reached origin/main.
 
+Review round 12: identity dedup runs as of each candidate session over rows of sessions up to it (`core/identity.py`
+`dedupe_asof`). A count's or read's `_fetch` line pins its base snapshots and collection batches, and the evaluation
+step reads only those; a read whose retry chain sealed a snapshot may be retried after the deadline. `count` and
+`read` refuse an authorization whose items differ from the governing validation file's validated items, or whose
+record is malformed. Every command refuses a frozen protocol whose count-only output lacks a passing identity probe
+and fetch margin at the pinned rate limit. A failed `count-only` or `dry-run` logs every part it sealed.
+
 ## Tests
 
 From the repository root:

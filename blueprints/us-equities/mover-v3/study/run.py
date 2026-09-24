@@ -92,27 +92,35 @@ def cmd_count_only(a) -> int:
     if out_path.exists():
         raise runner.RunRefused(f"{COUNT_ONLY_OUTPUT} exists")
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    # review round 12, F3: once a failed run has sealed part 1 (the rows its rates come from), a later run keeps its
+    # coverage_rule, so a rule is never changed after the rates it would be judged on could have been read
+    for x in ctx["run_log"]:
+        if x.get("purpose") == "count_only" and "part1" in (x.get("sealed_parts") or ()) and \
+                x.get("coverage_rule_sha256") != rule_sha256(ctx["protocol"]):
+            raise runner.RunRefused("an earlier count-only run sealed part 1 under another coverage_rule; the rule "
+                                    "cannot change after its rates could have been read")
     tr = transports(ctx["protocol"])
     si = runner.begin_or_resume(ctx, "pre_freeze", "count_only",
                                 {"coverage_rule_sha256": rule_sha256(ctx["protocol"])}, clock)   # review round 11, F4
     if si is None:
         print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
         return 0
-    start, status, digest, out = clock(), "failed", None, None
+    start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
         out = count_only.run(ctx["protocol"], cal, tr, a.snapshot_root, start[:10], rate["per_minute"],
-                             clock=clock)
+                             clock=clock, progress=progress)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate})
         digest = atomic_write_results(out_path, out)
         status = "complete"
     finally:
         if digest is None and out_path.exists():
             status, digest = "complete", sha256_file(out_path)
+        # every part sealed so far, also on a failed run (pre_freeze_access_path.runs; review round 12, F3)
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="count_only", commit=ctx["commit"], utc_start=start, utc_end=clock(),
-            snapshots=list((out or {}).get("snapshots", {}).values()), status=status, results_sha256=digest,
+            snapshots=list(progress.values()), status=status, results_sha256=digest,
             extra={"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT,
-                   "start_index": si}))
+                   "start_index": si, "sealed_parts": sorted(progress)}))
     print(json.dumps({"output_sha256": digest, "item_rule": out["item_rule"]}, sort_keys=True))
     return 0
 
@@ -139,9 +147,10 @@ def cmd_dry_run(a) -> int:
     if si is None:
         print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
         return 0
-    start, status, digest, out = clock(), "failed", None, None
+    start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
-        out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start[:10], clock=clock)
+        out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start[:10], clock=clock,
+                                 progress=progress)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"]})
         digest = atomic_write_results(out_path, out)
         status = "complete"
@@ -150,7 +159,7 @@ def cmd_dry_run(a) -> int:
             status, digest = "complete", sha256_file(out_path)
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="dry_run", commit=ctx["commit"], utc_start=start, utc_end=clock(),
-            snapshots=[out["snapshot_sha256"]] if out else [], status=status, results_sha256=digest,
+            snapshots=list(progress.values()), status=status, results_sha256=digest,
             extra={"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols),
                    "start_index": si}))
     print(json.dumps({"output_sha256": digest}, sort_keys=True))

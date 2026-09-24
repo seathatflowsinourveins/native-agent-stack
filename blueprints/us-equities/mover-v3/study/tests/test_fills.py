@@ -59,5 +59,24 @@ class FillQuote(unittest.TestCase):
         self.assertIsNone(fills.last_eligible_bid(self.cal, qs[:1], e, stamp))
 
 
+
+class NanosecondOrder(unittest.TestCase):
+    def test_updates_nanoseconds_apart_keep_their_order(self):
+        """Review round 12, Codex P2: stamps 9 ns apart collapsed to one float and were reordered by price, so an
+        older 10/10.2 quote became the prevailing one after a newer locked 9/9 update and filled."""
+        import json
+        from core import records
+        cal = synth.calendar()
+        body = {"quotes": {"AAA": [{"t": "2020-03-10T13:35:00.000000001Z", "bp": 10.0, "ap": 10.2, "bs": 1, "as": 1},
+                                   {"t": "2020-03-10T13:35:00.000000010Z", "bp": 9.0, "ap": 9.0, "bs": 1, "as": 1}]},
+                "next_page_token": None}
+        qs = records.merge_quotes([records.PARSERS["quotes"](json.loads(json.dumps(body)))["AAA"]])
+        self.assertEqual([q["bp"] for q in qs], [10.0, 9.0])
+        self.assertEqual(records.ts_ns("2020-03-10T13:35:00.000000010Z") - records.ts_ns("2020-03-10T13:35:00.000000001Z"), 9)
+        x = cal.at("2020-03-10", "09:35") + 0.5
+        self.assertIsNone(fills.fill_at(cal, qs, x, x + 300))  # the prevailing quote is the locked one: no entry
+        # a repeat of one update across a page boundary is kept once
+        self.assertEqual(len(records.merge_quotes([qs, qs[1:]])), 2)
+
 if __name__ == "__main__":
     unittest.main()

@@ -45,6 +45,17 @@ def ts_epoch(text: str) -> float:
     return base + (float("0." + frac) if frac else 0.0)
 
 
+def ts_ns(text: str) -> int:
+    """The same RFC 3339 stamp as exact integer nanoseconds since the epoch. A float epoch near 1.6e9 s resolves
+    only about 240 ns, so two quote updates a few nanoseconds apart would compare equal (review round 12, Codex
+    P2): quotes are ordered by this key, never by the float."""
+    head, _, frac = text.rstrip("Z").partition(".")
+    if "+" in head[10:]:
+        head = head[: 10] + head[10:].split("+")[0]
+    base = int(datetime.fromisoformat(head).replace(tzinfo=timezone.utc).timestamp())
+    return base * 1_000_000_000 + int((frac + "000000000")[:9])
+
+
 def et_date(ts: float) -> str:
     return datetime.fromtimestamp(ts, ET).strftime("%Y-%m-%d")
 
@@ -98,15 +109,18 @@ def quotes(body: dict) -> dict:
     out = {}
     for sym, items in (body.get("quotes") or {}).items():
         for q in items or []:
-            out.setdefault(sym, []).append({"t": ts_epoch(q["t"]), "bp": q.get("bp"), "ap": q.get("ap"),
-                                            "bs": q.get("bs"), "as": q.get("as")})
+            out.setdefault(sym, []).append({"t": ts_epoch(q["t"]), "ns": ts_ns(q["t"]), "bp": q.get("bp"),
+                                            "ap": q.get("ap"), "bs": q.get("bs"), "as": q.get("as")})
     return out
 
 
 def merge_quotes(chunks: list[list[dict]]) -> list[dict]:
+    """Pages in order, stably sorted by the exact nanosecond stamp: updates keep the provider's sequence, and a
+    price never decides which of two updates is later (review round 12, Codex P2). A repeat of one update across a
+    page boundary is kept once."""
     seen, out = set(), []
-    for q in sorted((q for chunk in chunks for q in chunk), key=lambda q: (q["t"], q["bp"] or 0, q["ap"] or 0)):
-        key = (q["t"], q["bp"], q["ap"], q["bs"], q["as"])
+    for q in sorted((q for chunk in chunks for q in chunk), key=lambda q: q["ns"]):
+        key = (q["ns"], q["bp"], q["ap"], q["bs"], q["as"])
         if key not in seen:
             seen.add(key)
             out.append(q)

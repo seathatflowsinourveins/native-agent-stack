@@ -199,13 +199,47 @@ class HoldoutPath(unittest.TestCase):
             main("authorize", "--purpose", "read")
             rid = access()[-1]["authorization_id"]
             push()
-            with mock.patch.object(holdout.STG, "evaluate_stage", lambda *a, **k: ORIG_EVAL(*a, **{**k, "B": 200})):
-                main("read", "--authorization", rid, "--snapshot-root", root)     # step 1: fetch and seal
-                self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
-                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["purpose"], "read_fetch")
-                push()
-                main("read", "--authorization", rid, "--snapshot-root", root)     # step 2: the read
+            pinned_ctx = runner_ctx(repo)
+            main("read", "--authorization", rid, "--snapshot-root", root)     # step 1: fetch and seal
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+            fetch_line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual(fetch_line["purpose"], "read_fetch")
+            # review round 12, Codex P2: the fetch line pins the ordered base snapshots and collection batches
+            self.assertEqual(len(fetch_line["collection_batches"]), 4)
+            self.assertEqual(fetch_line["base_snapshots"], [list(r) for r in holdout.sealed_refs(pinned_ctx)])
+            push()
+
+            def boom(*a, **k):
+                raise RuntimeError("synthetic failure after the seal")
+            with mock.patch.object(holdout.STG, "evaluate_stage", boom), self.assertRaises(RuntimeError):
+                main("read", "--authorization", rid, "--snapshot-root", root)     # step 2 fails after the seal
+            self.assertEqual((access()[-1]["record_kind"], access()[-1]["status"]), ("completion", "failed"))
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+            push()
+            # Codex P2: a collection batch completed after the seal enumerates a new symbol; it must not reach the
+            # retry's plan or rows (before the fix the retry needed unsealed screen requests for DDD)
+            m.assets += [{"symbol": "DDD", "status": "active", "class": "us_equity"}]
+            collect(cal.offset(last2, 8))
+            # F1 (second review): the retry comes after the read deadline; a sealed read is still evaluated
+            deadline = holdout.read_deadline(runner_ctx(repo), last2)
+            push(cal.at(cal.offset(last2, 16), "20:00"))
+            self.assertGreater(clock_now["t"], deadline)
+            main("authorize", "--purpose", "read", "--retry-of", rid)
+            self.assertEqual(access()[-1]["decision"], "granted", access()[-1])
+            rid2 = access()[-1]["authorization_id"]
+            push()
+            calls, seen = len(m.calls), {}
+
+            def evaluate_b200(*a, **k):
+                seen["signs"] = k.get("validation_signs")
+                return ORIG_EVAL(*a, **{**k, "B": 200})
+            with mock.patch.object(holdout.STG, "evaluate_stage", evaluate_b200):
+                main("read", "--authorization", rid2, "--snapshot-root", root)    # step 2 of the retry: the read
+            # review round 12, F2: the validation file's H3-c estimate sets the sign the holdout H3-c must have
+            self.assertEqual(seen["signs"], {"H3-c": 0.004})
+            self.assertEqual(len(m.calls), calls)                                   # no new provider data
             res = json.loads((repo / RESULTS_DIR / "holdout-read.json").read_text())
+            self.assertEqual(res["input_snapshot_sha256"], fetch_line["input_snapshot_sha256s"][0])
             # M-1: only the carried items are computed; the others have no estimate and are 'not carried'
             for i in ("H1-D", "H1-D-b_lane-low", "H3-b"):
                 self.assertEqual(res["labels"][i], "not carried")
@@ -215,13 +249,13 @@ class HoldoutPath(unittest.TestCase):
             self.assertEqual(res["items"]["H3-a"]["paper_exposed_fraction"], 1.0)    # the accrual log's order
             # review round 11, C8: the holdout's untouched status names its failed condition
             self.assertEqual(res["holdout_label"], ["paper-exposed fraction above 0.05: H3-a, H3-c"])
-            self.assertEqual((res["late_read"], res["void_after_seal"]), (False, []))     # F1
+            self.assertEqual((res["late_read"], res["void_after_seal"]), (True, []))     # F1; late: the retry
             self.assertEqual(res["labels"]["H3-a"], "underpowered")
             self.assertNotIn("b_lane:filled", res["counts"]["trades_by_arm_status"])
             self.assertEqual(access()[-1]["record_kind"], "completion")
             push()
-            with self.assertRaises(holdout.HoldoutRefused):          # the holdout is read once
-                main("read", "--authorization", rid, "--snapshot-root", root)
+            with self.assertRaises((holdout.HoldoutRefused, gate.NoAuthorization)):   # the holdout is read once
+                main("read", "--authorization", rid2, "--snapshot-root", root)
 
 
 ORIG_EVAL = holdout.STG.evaluate_stage
@@ -244,9 +278,8 @@ class NotRead(unittest.TestCase):
                                               "results_sha256": "c" * 64, "block": 0, "sessions": [ctx["n0_pinned"], last],
                                               "extension": {"extend": False, "below_minimum": [], "underpowered": []},
                                               "void": False})
-            logs.append_line(repo / ACCESS_LOG, {"utc": "x", "record_kind": "authorization", "authorization_id":
-                                                 "read-001", "purpose": "read", "decision": "granted", "refusal": None,
-                                                 "requested_items": ["H3-a"], "retry_of": None})
+            write_validation(repo, fx)
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted"))
             # review round 11, F1: an authorization that reached main after the deadline and sealed nothing
             late = ctx["cal"].close(ctx["cal"].offset(last, 16))
             FR.commit_push(repo, FR.git_date(late))
@@ -259,6 +292,35 @@ class NotRead(unittest.TestCase):
             self.assertEqual(body["verdicts"]["H3"]["verdict"], "not supported (holdout not read)")
             self.assertEqual(logs.read_lines(repo / ACCESS_LOG)[-1]["record_kind"], "completion")
 
+    def test_carried_items_must_equal_the_validated_items_at_the_read(self):
+        """Review round 12, F1: read() and count() recheck the authorization's items against the governing
+        validation file; a committed record listing a strict subset, or a malformed record, is refused."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            write_validation(repo, fx, screened=("H3-a", "H3-c"))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted", items=("H3-a",)))
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not the validated items"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
+            logs.append_line(repo / ACCESS_LOG, gate.completion("read-001", "x", "failed", None, 0, None, []))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("count-002", "count", "granted", items=("H3-c",)))
+            FR.commit_push(repo, FR.git_date(deadline + 180))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not the validated items"):
+                holdout.count(runner_ctx(repo), "count-002", root, {}, deadline + 240)
+            logs.append_line(repo / ACCESS_LOG, gate.completion("count-002", "x", "failed", None, 0, None, []))
+            bad = {k: v for k, v in auth_rec("read-003", "read", "granted", items=("H3-a", "H3-c")).items()
+                   if k not in ("code_revision", "study_code_tree")}
+            logs.append_line(repo / ACCESS_LOG, bad)
+            FR.commit_push(repo, FR.git_date(deadline + 300))
+            with self.assertRaisesRegex(gate.NoAuthorization, "malformed"):
+                holdout.read(runner_ctx(repo), "read-003", root, {}, deadline + 360)
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+
     def test_refused_read_and_missing_collection(self):
         with tempfile.TemporaryDirectory() as tmp:
             fx = FR.build(tmp)
@@ -270,9 +332,7 @@ class NotRead(unittest.TestCase):
             self.assertTrue(any("validation results file is missing" in r for r in refusals))
             self.assertTrue(any("validated items" in r for r in refusals))
             # a granted count with no collection batch is refused before any fetch
-            logs.append_line(repo / ACCESS_LOG, {"utc": "x", "record_kind": "authorization", "authorization_id":
-                                                 "count-001", "purpose": "count", "decision": "granted", "refusal": None,
-                                                 "requested_items": ["H3-a"], "retry_of": None})
+            logs.append_line(repo / ACCESS_LOG, auth_rec("count-001", "count", "granted", items=()))
             _, last = holdout.window(ctx, 0)
             t0 = ctx["cal"].close(last) - 3 * 86400
             FR.commit_push(repo, FR.git_date(t0))
@@ -312,10 +372,9 @@ class NotRead(unittest.TestCase):
                                               "results_sha256": "c" * 64, "block": 0, "sessions": [ctx["n0_pinned"], last],
                                               "extension": {"extend": False, "below_minimum": [], "underpowered": []},
                                               "void": False})
+            write_validation(repo, fx)
             FR.commit_push(repo, FR.git_date(deadline - 7200))
-            logs.append_line(repo / ACCESS_LOG, {"utc": "x", "record_kind": "authorization", "authorization_id":
-                                                 "read-001", "purpose": "read", "decision": "granted", "refusal": None,
-                                                 "requested_items": ["H3-a"], "retry_of": None})
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted"))
             FR.commit_push(repo, FR.git_date(deadline + 60))
             with self.assertRaises(guards.Refused):          # a clock before the tip commit
                 holdout.read(runner_ctx(repo), "read-001", str(Path(tmp) / "snap"), {}, deadline - 3600)
@@ -329,9 +388,24 @@ FINAL_COUNT = {"utc_start": "2027-12-10T00:00:00Z", "stage": "holdout", "purpose
                "extension": {"extend": False, "below_minimum": [], "underpowered": []}, "void": False}
 
 
-def auth_rec(aid, purpose, decision, refusal=None, retry_of=None):
-    return {"utc": "x", "record_kind": "authorization", "authorization_id": aid, "purpose": purpose,
-            "decision": decision, "refusal": refusal, "requested_items": ["H3-a"], "retry_of": retry_of}
+def auth_rec(aid, purpose, decision, refusal=None, retry_of=None, items=("H3-a",)):
+    """A well-formed authorization record (every gate.AUTH_FIELDS field; review round 12, F1)."""
+    return {"utc": "x", "record_kind": "authorization", "authorization_id": aid, "actor_role": "committed automation",
+            "protocol_id": "p", "protocol_sha256": "a" * 64, "code_revision": "c", "study_code_tree": "t",
+            "runtime_lock_sha256": "r", "data_file_sha256s": {}, "validation_results_sha256": "v",
+            "requested_items": list(items), "purpose": purpose, "decision": decision, "refusal": refusal,
+            "retry_of": retry_of}
+
+
+def write_validation(repo, fx, screened=("H3-a",)):
+    """A governing validation results file whose validated ('screened') items are `screened`."""
+    ids = ("H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c")
+    val = {"labels": {i: ("screened" if i in screened else "underpowered") for i in ids},
+           "items": {i: {"p_stage": 0.01 if i in screened else 1.0} for i in ids}}
+    FR.write(repo / RESULTS_DIR / "validation.json", json.dumps(val))
+    logs.append_line(repo / RUN_LOG, {"stage": "validation", "purpose": "evaluate", "status": "complete",
+                                      "results_sha256": sha256_file(repo / RESULTS_DIR / "validation.json"),
+                                      "study_tree": fx["tree"], "protocol_sha256": fx["protocol_sha256"]})
 
 
 class ReadDecidedBeforeOutcome(unittest.TestCase):
@@ -347,6 +421,7 @@ class ReadDecidedBeforeOutcome(unittest.TestCase):
             _, last = holdout.window(ctx, 0)
             deadline = holdout.read_deadline(ctx, last)
             logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            write_validation(repo, fx)
             FR.commit_push(repo, FR.git_date(deadline - 10 * 86400))
             # the manufactured refusal: a 'read' requested while a granted collect has no completion
             logs.append_line(repo / ACCESS_LOG, auth_rec("collect-001", "collect", "granted"))
@@ -359,7 +434,8 @@ class ReadDecidedBeforeOutcome(unittest.TestCase):
             logs.append_line(repo / RUN_LOG, {"utc_start": "x", "stage": "holdout", "purpose": "read_fetch",
                                               "status": "complete", "authorization_id": "read-004",
                                               "input_snapshot_sha256s": ["a" * 64], "snapshot_dir": "read-read-004",
-                                              "enumeration_fetch_date": "2027-12-20", "results_sha256": None})
+                                              "enumeration_fetch_date": "2027-12-20", "results_sha256": None,
+                                              "base_snapshots": [], "collection_batches": []})
             FR.commit_push(repo, FR.git_date(deadline - 5 * 86400))
             with self.assertRaisesRegex(holdout.HoldoutRefused, "sealed its snapshot"):
                 holdout.read(runner_ctx(repo), "read-002", root, {}, deadline - 4 * 86400)
@@ -382,6 +458,7 @@ class ReadDecidedBeforeOutcome(unittest.TestCase):
             _, last = holdout.window(ctx, 0)
             deadline = holdout.read_deadline(ctx, last)
             logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            write_validation(repo, fx)
             logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "refused", "x"))
             FR.commit_push(repo, FR.git_date(deadline - 6 * 86400))
             # before the deadline a refusal is a failed attempt, not a label
@@ -411,6 +488,7 @@ class SignedDueTimes(unittest.TestCase):
             ctx = runner_ctx(repo)
             cal = ctx["cal"]
             _, last = holdout.window(ctx, 0)
+            write_validation(repo, fx)
             logs.append_line(repo / ACCESS_LOG, auth_rec("count-001", "count", "granted"))
             FR.commit_push(repo, FR.git_date(cal.close(last) - 3600))
             with self.assertRaisesRegex(holdout.HoldoutRefused, "not due"):

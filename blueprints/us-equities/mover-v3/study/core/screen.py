@@ -63,14 +63,13 @@ def screen_rows(store, cal, sessions: list, symbols: list):
 
 
 def candidates(store, cal, sessions: list, symbols: list, renames: set, active: frozenset = frozenset()):
-    """Pass 2 after dedup. Returns (candidates, counts, dedupe report). Counts are per stage, by reason and year."""
+    """Pass 2, then identity dedup of the candidates as of each candidate's session, then the same-session guard.
+    Returns (candidates, counts, dedupe report). Counts are per stage, by reason and year; the per-reason counts are
+    over the screen rows before dedup."""
     rows, counts, unknown = screen_rows(store, cal, sessions, symbols)
     with_bar = {(r["symbol"], r["session"]) for r in rows}
     stage_symbols_with_bar = {r["symbol"] for r in rows}
     counts["enumerated_symbols_without_bar_in_stage"] = len(set(symbols) - stage_symbols_with_bar)
-    dd = identity.dedupe_screen(rows, renames, active)
-    counts["dedupe_rows_removed"] = len(dd["removed"])
-    removed = dd["removed"]
     found = []
     for s in sessions:
         y = year_of(s)
@@ -81,7 +80,7 @@ def candidates(store, cal, sessions: list, symbols: list, renames: set, active: 
             split = v["data"].get("screen_daily_split", {})
             prints = v["data"].get("screen_auctions", {})
             for sym in batch:
-                if (sym, s) in unknown or (sym, s) not in with_bar or (sym, s) in removed:
+                if (sym, s) in unknown or (sym, s) not in with_bar:
                     continue
                 pr = prints.get(sym, {})
                 label = FM.close_label(pr.get(s))
@@ -117,6 +116,11 @@ def candidates(store, cal, sessions: list, symbols: list, renames: set, active: 
                 found.append({"symbol": sym, "session": s, "close_t": close_t, "prev_close": prev_close,
                               "ohlcv": (b["o"], b["h"], b["l"], b["c"], b["v"]),
                               "ohlcv_prev": (bp.get("o"), bp.get("h"), bp.get("l"), bp.get("c"), bp.get("v") or 0)})
+    # identity dedup as of each candidate's own session: rows after t never decide membership at t (review round
+    # 12, Codex P1; universe_and_identity.dedup)
+    dd = identity.dedupe_asof(rows, renames, active, [(c["symbol"], c["session"]) for c in found])
+    counts["dedupe_candidates_removed"] = len(dd["removed"])
+    found = [c for c in found if (c["symbol"], c["session"]) not in dd["removed"]]
     kept, dropped = identity.same_session_guard(found, renames, active)
     counts["same_session_guard_removed"] = len(dropped)
     counts["candidates"] = len(kept)

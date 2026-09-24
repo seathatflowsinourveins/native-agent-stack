@@ -100,10 +100,11 @@ def bh_diagnostics(item: str, rows: list) -> dict:
         rec = r["rec"]
         for name, key in (("year", r["session"][:4]), ("price_tier", str(price_tier(rec["entry_mid"]))),
                           ("tercile", str(rec.get("tercile")))):
-            splits.setdefault(f"{name}={key}", []).append(r["value"])
-    pvals = {k: ST.split_p(v, ALTERNATIVE[item]) for k, v in sorted(splits.items())}
+            splits.setdefault(f"{name}={key}", []).append((r["value"], r["session"]))
+    pvals = {k: ST.split_p([v for v, _ in xs], [s for _, s in xs], ALTERNATIVE[item]) for k, xs in sorted(splits.items())}
     rejected = ST.benjamini_hochberg(pvals) if pvals else {}
-    return {k: {"n": len(splits[k]), "mean": _mean(splits[k]), "p": pvals[k], "bh_rejected": rejected[k]} for k in pvals}
+    return {k: {"n": len(splits[k]), "sessions": len({s for _, s in splits[k]}),
+                "mean": _mean([v for v, _ in splits[k]]), "p": pvals[k], "bh_rejected": rejected[k]} for k in pvals}
 
 
 def statistic(item: str, rows: list, value=None):
@@ -115,6 +116,15 @@ def statistic(item: str, rows: list, value=None):
         lo = [value(r) for r in rows if r["group"] == "low"]
         return (_mean(hi) - _mean(lo)) if hi and lo else None
     return _mean([value(r) for r in rows])
+
+
+def _rebook_undefined(r) -> bool:
+    """A terminal-zero trade with an eligible last bid whose rebooking has an undefined share factor or cash term
+    (terminal_rebooked_at_last_bid recorded as None). Like any undefined factor it is excluded from the
+    sensitivity and counted, never booked at the primary -1 (review round 12, Codex P2)."""
+    rec = r["rec"]
+    return rec.get("exit") in ("terminal_zero", "censored_terminal") and "terminal_rebooked_at_last_bid" in rec \
+        and rec["terminal_rebooked_at_last_bid"] is None
 
 
 def _rebooked(r):
@@ -137,7 +147,8 @@ def sensitivities(item: str, rows: list) -> dict:
         # a trade whose backward window is fetch-incomplete (and has no merger record) leaves this sensitivity only
         # (populations.fetch_failures; review round 9, L-1)
         out["terminal_zero_rebooked_at_last_bid"] = statistic(
-            item, [r for r in rows if not r["rec"].get("backward_incomplete")], _rebooked)
+            item, [r for r in rows if not r["rec"].get("backward_incomplete") and not _rebook_undefined(r)], _rebooked)
+        out["terminal_zero_rebooked_undefined_factor_n"] = sum(1 for r in rows if _rebook_undefined(r))
         out["ratio_rule_holds_removed"] = statistic(item, [r for r in rows if not r["rec"].get("ratio_rule_in_hold")])
         out["censored_removed"] = statistic(item, [r for r in rows if not r["rec"].get("censored")])
     out["least_exposed_slice"] = statistic(item, [r for r in rows if r["rec"].get("least_exposed")])
@@ -339,15 +350,19 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
             vs = (validation_signs or {}).get("H3-c")
             sign_ok = vs is not None and r["estimate"] is not None and np.sign(r["estimate"]) == np.sign(vs)
         contaminated = stage == "holdout" and r["paper_exposed_fraction"] > CHRONO["paper_exposed_max_fraction"]
+        r["opposite_direction"] = opposite_direction(i, stage, r["estimate"], (validation_signs or {}).get("H3-c"))
         labels[i] = ST.item_label(stage, i, p_stage=p_stage[i], n_ok=r["n_ok"] and tested,
                                   robust_ok=bool(r.get("robustness", {}).get("all_positive", True)),
                                   mde_ok=r["mde_excluded"], void=is_void, sign_ok=sign_ok,
-                                  contaminated=contaminated, carried=i in carried)
+                                  contaminated=contaminated, carried=i in carried,
+                                  opposite=r["opposite_direction"] and ALTERNATIVE[i] != "two-sided")
         r["p_stage"] = p_stage[i]
         r["label"] = labels[i]
         r["qualifiers"] = ST.qualifiers(stage, labels[i], r["lineage_confirmed"], qualifiers)
-        r["opposite_direction"] = opposite_direction(i, stage, r["estimate"], (validation_signs or {}).get("H3-c"))
+    # multiple_testing.tie_breaks: the step-down order is reported beside the Holm-adjusted p (review round 12, F5)
+    holm_order = None if stage == "development" else \
+        ST.holm_order(p_raw, {i: items[i].get("p_normal_tail", 1.0) for i in ITEM_IDS})
     return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
-            "stage_labels": stage_labels,
+            "stage_labels": stage_labels, "holm_order": holm_order,
             "verdicts": ST.hypothesis_verdict(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
             "descriptive": desc, "counts": counts}

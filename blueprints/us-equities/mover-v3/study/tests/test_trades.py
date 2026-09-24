@@ -158,10 +158,39 @@ class Arms(unittest.TestCase):
         f = costs.Fees(FEES)
         imp = costs.impact(1.0, 0.05, 20_000.0, 5_000_000.0)
         self.assertLess(abs(tr["nets"]["primary"] - (11.9 / 10.01 - 1)), 0.03)
+        # review round 12, F6: exactly the net with c_out = 0 and fees on the raw bid (populations.corporate_actions)
+        from core import formulas as FM
+        cum_in = FM.cum_dv_at(cal, self.ev["minute"], d[1], cal.at(d[1], "09:35"))
+        c_in = costs.per_side(CELLS[costs.cell_key(d[1], cal.at(d[1], "09:35"), 10.01, cum_in)], 0.02 / 20.02, imp)
+        want = costs.trade_net_return(20_000.0, 10.01, 11.9, 1.0, 0.0, c_in, 0.0, f, d[4])
+        self.assertAlmostEqual(tr["nets"]["primary"], want, places=12)
+        self.assertEqual(tr["exit_session"], d[4])
         # the acquirer side does not qualify
         acq = {**merger, "acquiree_symbol": "OTHER", "acquirer_symbol": "MOVR"}
         tr2 = resolve(self.ev, "b_lane", ctx_for(cal, actions=[acq]), Store(), {"MOVR": qs})
         self.assertEqual(tr2["exit"], "terminal_zero")
+
+    def test_merger_effective_window_is_entry_session_through_e_plus_5(self):
+        """Review round 12, F6: a merger record effective on the entry session or on E+5 qualifies; E+6 does not."""
+        cal, d = self.cal, self.d
+        qs = [book(cal, d[1], "09:35"), book(cal, d[4], "15:59", 11.9, 11.95)]
+        for day, want in ((d[1], "terminal_merger"), (d[10], "terminal_merger"), (d[11], "terminal_zero"),
+                          (d[0], "terminal_zero")):
+            merger = {"type": "cash_merger", "acquiree_symbol": "MOVR", "date": day}
+            tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[merger]), Store(), {"MOVR": qs})
+            self.assertEqual(tr["exit"], want, day)
+
+    def test_rename_window_is_after_the_entry_session_through_e_plus_5(self):
+        """Review round 12, F8: a name_change with process_date in (entry session, E+5] is counted and re-requested;
+        one on the entry session or on E+6 is not."""
+        cal, d = self.cal, self.d
+        for day, counted in ((d[8], True), (d[10], True), (d[11], False), (d[1], False)):
+            rn = {"type": "name_change", "old_symbol": "MOVR", "new_symbol": "NEWR", "date": day}
+            tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[rn]), Store(),
+                         {"MOVR": [book(cal, d[1], "09:35")], "NEWR": [book(cal, d[5], "15:55", 10.5, 10.6)]})
+            self.assertEqual(tr["exit"], "terminal_zero", day)
+            self.assertEqual(tr["rename_record_in_window"], counted, day)
+            self.assertEqual("rename_sensitivity" in tr, counted, day)
 
     def test_merger_without_any_bid_books_terminal_zero(self):
         cal, d = self.cal, self.d

@@ -276,6 +276,50 @@ class Round9(unittest.TestCase):
                     run.main(argv)
 
 
+class FailedRunRecord(unittest.TestCase):
+    def test_a_failed_run_logs_every_sealed_part_and_keeps_its_rule(self):
+        """Review round 12, F3 (second review): a count-only run that fails after sealing parts 0 and 1 names both
+        sha256s on its failed end line, and a later run under another coverage_rule is refused."""
+        import run
+        from core import logs, runner
+        from core.params import COUNT_ONLY_OUTPUT, PROTOCOL_PATH, RUN_LOG
+        from tests import fixture_repo as FR
+        cal = synth.calendar()
+        m = synth.FakeMarket(cal)
+        daily, prints = issuer_data(cal, "2020-05-01", "2020-06-30", lambda d: 3.0)
+        m.add("sa", [("2015-01-01", "SA")], daily=daily, auctions=prints)
+        m.assets = [{"symbol": "SA", "status": "active", "class": "us_equity"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, frozen=False)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            argv = ["count-only", "--snapshot-root", root]
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(m)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(CO, "PART1_RANGE", ("2020-06-01", "2020-06-03")):
+                (repo / COUNT_ONLY_OUTPUT).unlink()
+                proto = json.loads((repo / PROTOCOL_PATH).read_text())
+                proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(FR.RATE_LIMIT)
+                FR.write(repo / PROTOCOL_PATH, json.dumps(proto, indent=1) + "\n")
+                FR.commit_push(repo, "2026-09-25T12:00:00+00:00")
+                self.assertEqual(run.main(argv), 0)                     # the start line
+                FR.commit_push(repo, "2026-09-25T12:05:00+00:00")
+                with mock.patch.object(CO, "probe_list", side_effect=RuntimeError("after part 1")), \
+                        self.assertRaises(RuntimeError):
+                    run.main(argv)
+                end = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((end["purpose"], end["status"]), ("count_only", "failed"))
+                self.assertEqual(end["sealed_parts"], ["part0", "part1"])
+                self.assertEqual(len(end["input_snapshot_sha256s"]), 2)
+                for part, sha in zip(("part0", "part1"), end["input_snapshot_sha256s"]):
+                    Store.read(Path(root) / part, sha)                # each logged sha256 is the sealed part's
+                other = dict(end, coverage_rule_sha256="0" * 64)
+                logs.append_line(repo / RUN_LOG, other)
+                FR.commit_push(repo, "2026-09-25T12:10:00+00:00")
+                with self.assertRaisesRegex(runner.RunRefused, "sealed part 1 under another coverage_rule"):
+                    run.main(argv)
+
+
 class Probe(unittest.TestCase):
     def test_probe_list_counts_and_reuse(self):
         cal = synth.calendar()

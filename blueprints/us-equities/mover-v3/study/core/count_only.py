@@ -377,15 +377,19 @@ def dry_run_requests(cal, sessions: list, symbols: list) -> list:
 
 
 def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root, fetch_date: str,
-            clock=driver.utc_now) -> dict:
+            clock=driver.utc_now, progress: dict | None = None) -> dict:
     """freeze_preconditions: the native dry run through core/driver.py and the transport, sealed, re-read from the
-    seal and counted (counts only; run.py dry-run writes the output with its run-log line)."""
+    seal and counted (counts only; run.py dry-run writes the output with its run-log line). progress, when given,
+    receives the snapshot sha256 as soon as it is sealed, so a run that fails afterwards still logs it (review round
+    12, F3)."""
     dry_run_requests(cal, sessions, symbols)            # refuses before any fetch (review round 11, C1)
     store = Store()
     root = Path(snapshot_root) / "dry-run"
     res = driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,
                              clock=clock)
     sha = store.write(root)
+    if progress is not None:
+        progress["dry-run"] = sha
     return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha, "sessions": list(sessions),
             "symbols_count": len(symbols), "counts": dry_run_counts(Store.read(root, sha)),
             "incomplete_by_kind": res["incomplete_by_kind"]}
@@ -484,10 +488,12 @@ def fetch_estimate(cal, n_symbols: int, k_by_year: dict, rate_per_minute: float)
 
 
 def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, rate_per_minute: float,
-        clock=driver.utc_now, sessions: list | None = None) -> dict:
+        clock=driver.utc_now, sessions: list | None = None, progress: dict | None = None) -> dict:
     """Parts 0, 1 (with its second phase) and 3, each fetched through core.driver.stage_fetch, sealed, re-read from
     the seal and counted. coverage_rule's hash is checked before any fetch or read (coverage_rule.decided_by_code;
-    review round 9, L-3). Returns the output (counts, rates and decisions only) and the sealed snapshot hashes."""
+    review round 9, L-3). Returns the output (counts, rates and decisions only) and the sealed snapshot hashes.
+    progress, when given, receives each part's sha256 as soon as the part is sealed, so a run that fails after a seal
+    still logs every sealed part on its failed end line (pre_freeze_access_path.runs; review round 12, F3)."""
     checked_thresholds(protocol)
     root = Path(snapshot_root)
 
@@ -495,6 +501,8 @@ def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, r
         store = Store()
         driver.stage_fetch(planner, transports, store, fetch_date, clock=clock)
         sha = store.write(root / name)
+        if progress is not None:
+            progress[name] = sha
         return Store.read(root / name, sha), sha
 
     s0, sha0 = sealed("part0", lambda st: part0_requests(fetch_date))

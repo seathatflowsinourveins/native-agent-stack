@@ -184,6 +184,15 @@ class MinuteQuantities(unittest.TestCase):
         raw, split, _ = synth.series(cal, "2020-01-02", "2020-03-31", lambda d: closes[d])
         prints = synth.prints_from(raw)
         self.assertAlmostEqual(FM.sigma_d(cal, prints, raw, split, w), 0.0, places=12)
+        # review round 12, F7: sigma_d is the ddof = 1 sd of log(1 + r) over W(t)
+        sess = cal.range("2020-01-02", "2020-03-31")
+        wobbly = {d: 10.0 * (1.01 ** i) * (1.0 + 0.03 * ((i * 7) % 5 - 2)) for i, d in enumerate(sess)}
+        raw, split, _ = synth.series(cal, "2020-01-02", "2020-03-31", lambda d: wobbly[d])
+        prints = synth.prints_from(raw)
+        logs = np.log1p([wobbly[d] / wobbly[cal.offset(d, -1)] - 1.0 for d in w])
+        got = FM.sigma_d(cal, prints, raw, split, w)
+        self.assertAlmostEqual(got, float(np.std(logs, ddof=1)), places=12)
+        self.assertGreater(abs(got - float(np.std(logs, ddof=0))), 1e-4)
 
 
 class Exclusions(unittest.TestCase):

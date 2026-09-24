@@ -347,6 +347,20 @@ class ContextRefusals(unittest.TestCase):
             with self.assertRaises(guards.Refused):          # no pinned output
                 self.ctx(repo)
 
+    def test_coverage_decision_needs_a_passing_probe_and_margin_at_the_pinned_rate(self):
+        """Review round 12, F2 (second review): a freeze over a failed identity probe, a failed fetch margin or a
+        count-only output decided at another rate limit is refused before any command runs."""
+        with tempfile.TemporaryDirectory() as tmp:
+            self.ctx(FR.build(tmp)["repo"])                   # the passing fixture
+        for over, msg in (({"identity_probe": {"passes": False}}, "identity_probe"),
+                          ({"fetch_margin": {"passes": False}}, "fetch_margin"),
+                          ({"fetch_margin": {}}, "fetch_margin"),
+                          ({"rate_limit": {"per_minute": 20000.0, "source": "synthetic"}}, "rate limit")):
+            with tempfile.TemporaryDirectory() as tmp:
+                repo = FR.build(tmp, output_overrides=over)["repo"]
+                with self.assertRaisesRegex(guards.Refused, msg):
+                    self.ctx(repo)
+
     def test_transport_deviation_governs_only_with_its_logged_reproduction_check(self):
         """Review round 10, H1 and F6: a transport deviation governs only when it cites the committed output of a
         logged run.py transport-check run from its tree; a self-declared passes: true is refused."""
@@ -485,6 +499,19 @@ class ContextRefusals(unittest.TestCase):
             ctx = self.ctx(repo)
             g = holdout.gate_context(ctx, "count", ctx["cal"].at("2027-12-10", "20:00"))
             self.assertTrue(any("validation is void" in r for r in gate.evaluator_refusals(g)))
+            # review round 12, F6: the void above reached origin/main before the validation results; a void recorded
+            # after them is named as late in the refusal
+            self.assertEqual(ctx["late_voids"], [])
+            self.assertFalse(any("recorded after the validation results" in r for r in gate.evaluator_refusals(g)))
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                {"number": 1, "kind": "void", "scope": "tests", "cause": "a synthetic pre-freeze read"},
+                {"number": 2, "kind": "void", "scope": "validation", "cause": "a read found after the outcome"}]}))
+            FR.commit_push(repo, "2026-12-02T00:00:00+00:00")
+            ctx = self.ctx(repo)
+            self.assertEqual(ctx["late_voids"], ["validation"])
+            g = holdout.gate_context(ctx, "read", ctx["cal"].at("2027-12-10", "20:00"))
+            self.assertTrue(any("(validation) was recorded after the validation results" in r
+                                for r in gate.evaluator_refusals(g)))
 
 if __name__ == "__main__":
     unittest.main()

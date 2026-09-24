@@ -69,12 +69,18 @@ class TransportProcess:
         return decode(line)
 
     def close(self):
+        """Close the child's stdin, wait for it and close its stdout, so no pipe handle is left open (review round
+        12, F10: the unclosed stdout raised a ResourceWarning at teardown)."""
         if self.proc is not None:
             try:
                 self.proc.stdin.close()
                 self.proc.wait(timeout=30)
             except (OSError, subprocess.TimeoutExpired):
                 self.proc.kill()
+                self.proc.wait()
+            finally:
+                if self.proc.stdout is not None:
+                    self.proc.stdout.close()
             self.proc = None
 
 

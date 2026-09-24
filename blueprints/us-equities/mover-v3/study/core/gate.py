@@ -138,7 +138,10 @@ def evaluator_refusals(ctx: dict) -> list:
     if ctx["validation_present"] and not ctx.get("validation_complete", False):
         out.append("the validation results file does not hold all 5 validation p-values keyed by item_ids")
     if ctx.get("validation_void"):
-        out.append("validation is void: a recorded pre-freeze read (exposure_registry.update_rule)")
+        late = ctx.get("validation_void_late")
+        out.append("validation is void: a recorded pre-freeze read (exposure_registry.update_rule)"
+                   + (f"; the void ({', '.join(late)}) was recorded after the validation results reached origin/main, "
+                      "so the committed validation labels predate it" if late else ""))
     if ctx.get("holdout_void"):
         out.append("the holdout is void: a recorded read in the holdout window before the gate opened "
                    "(exposure_registry.update_rule)")
@@ -208,6 +211,11 @@ def require_granted(records: list, authorization_id: str, purpose: str) -> dict:
     a = seq["granted"].get(authorization_id)
     if a is None or a["purpose"] != purpose:
         raise NoAuthorization(f"no committed granted '{purpose}' authorization {authorization_id}")
+    # review round 12, F1: an authorization record that check_records would report (a field missing) is not one the
+    # committed automation wrote, and no action runs under it
+    missing = [f for f in AUTH_FIELDS if f not in a]
+    if missing:
+        raise NoAuthorization(f"authorization {authorization_id} is malformed: missing {missing}")
     if authorization_id in seq["completions"]:
         raise NoAuthorization(f"authorization {authorization_id} is already completed")
     return a

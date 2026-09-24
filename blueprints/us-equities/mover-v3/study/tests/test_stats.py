@@ -2,6 +2,7 @@
 MDE, labels and verdicts."""
 import math
 import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -96,6 +97,19 @@ class Holm(unittest.TestCase):
                                                        "H3-b": 0.2, "H3-c": 0.0}[i], i.encode()))
         self.assertEqual(order, ["H3-c", "H1-D-b_lane-low", "H3-a", "H3-b", "H1-D"])
 
+    def test_holm_order_is_the_tie_break_rule(self):
+        """Review round 12, F5: the step-down order comes from holm_order itself (holm steps down in it); tied p are
+        ordered by the normal-tail p, then by item id. The adjusted p of tied items cannot depend on their order."""
+        floor = 1 / 100_001
+        p = {i: floor for i in ITEM_IDS}
+        normal = {"H1-D": 0.3, "H1-D-b_lane-low": 0.1, "H3-a": 0.1, "H3-b": 0.2, "H3-c": 0.0}
+        self.assertEqual(ST.holm_order(p, normal), ["H3-c", "H1-D-b_lane-low", "H3-a", "H3-b", "H1-D"])
+        self.assertEqual(ST.holm_order(p), list(ITEM_IDS))                       # no normal p: item id order
+        self.assertEqual(ST.holm_order(dict(p, **{"H1-D": 0.5}), normal)[-1], "H1-D")   # p first
+        with mock.patch.object(ST, "holm_order", wraps=ST.holm_order) as spy:
+            ST.holm(p, normal)
+        spy.assert_called_once_with(p, normal)
+
 
 class Robustness(unittest.TestCase):
     def test_small_table(self):
@@ -144,6 +158,19 @@ class MDE(unittest.TestCase):
         wide = np.linspace(-0.2, 0.2, 1001)
         self.assertFalse(ST.mde_excluded("H3-a", wide, 0.05))
 
+    def test_mde_exclusion_uses_the_two_sided_level_for_h3c(self):
+        """Review round 12, F4: H3-c's bounds are at a = 0.05 / 10 on both sides. 8 of 1000 draws at -2 x MDE put
+        the 0.005 quantile outside -MDE and the 0.01 quantile inside, so only the protocol level keeps the size."""
+        mde = 0.01
+        stats = np.concatenate([np.full(8, -2 * mde), np.linspace(-0.5 * mde, 0.5 * mde, 992)])
+        self.assertLess(ST.bound(stats, 0.005), -mde)
+        self.assertGreater(ST.bound(stats, 0.01), -mde)
+        self.assertFalse(ST.mde_excluded("H3-c", stats, mde))
+        self.assertFalse(ST.mde_excluded("H3-c", -stats, mde))                  # the upper side too
+        self.assertTrue(ST.mde_excluded("H3-c", stats[8:], mde))
+        # a one-sided item uses a = 0.05 / 5 on its side: the same draws exclude the size for 'less'
+        self.assertTrue(ST.mde_excluded("H1-D", stats, mde))
+
 
 class Labels(unittest.TestCase):
     def test_stage_pass_names_and_rules(self):
@@ -164,6 +191,16 @@ class Labels(unittest.TestCase):
         self.assertEqual(ST.item_label("validation", "H3-a", p_stage=0.01, n_ok=False, robust_ok=True, mde_ok=True),
                          "underpowered")
         self.assertEqual(ST.item_label("validation", "H3-a", p_stage=0.01, void=True, **kw), "underpowered")
+
+    def test_an_estimate_opposite_a_one_sided_alternative_never_passes(self):
+        """Review round 12, F9: enforced by rule, whatever p_stage."""
+        kw = dict(n_ok=True, robust_ok=True, mde_ok=False)
+        for stage, name in (("development", "development pass"), ("validation", "screened"),
+                            ("holdout", "supported (confirmatory)")):
+            self.assertEqual(ST.item_label(stage, "H3-a", p_stage=0.001, **kw), name)
+            self.assertNotEqual(ST.item_label(stage, "H3-a", p_stage=0.001, opposite=True, **kw), name)
+        self.assertEqual(ST.item_label("validation", "H3-a", p_stage=0.001, opposite=True, n_ok=True, robust_ok=True,
+                                       mde_ok=True), "not_supported_mde_excluded")
 
     def test_h3c_holdout_needs_the_validation_sign(self):
         kw = dict(n_ok=True, robust_ok=True, mde_ok=False)
@@ -232,8 +269,20 @@ class Diagnostics(unittest.TestCase):
         out = ST.benjamini_hochberg({"a": 0.001, "b": 0.02, "c": 0.04, "d": 0.5})
         self.assertEqual(out, {"a": True, "b": True, "c": True, "d": False})
         self.assertEqual(ST.benjamini_hochberg({"a": 0.2, "b": 0.3}), {"a": False, "b": False})
-        self.assertLess(ST.split_p([0.1, 0.2, 0.15, 0.12], "greater"), 0.01)
-        self.assertEqual(ST.split_p([0.1], "greater"), 1.0)
+        self.assertLess(ST.split_p([0.1, 0.2, 0.15, 0.12], ["a", "b", "c", "d"], "greater"), 0.01)
+        self.assertEqual(ST.split_p([0.1], ["a"], "greater"), 1.0)
+
+    def test_split_p_clusters_trades_by_session(self):
+        """Review round 12, Codex P2: ten session returns [-.10, .12] x 5 give p = 0.39; repeating each session's
+        return across 100 trades adds no independent information and must not make the split significant."""
+        vals = [-0.10, 0.12] * 5
+        sess = [f"s{i}" for i in range(10)]
+        p1 = ST.split_p(vals, sess, "greater")
+        self.assertAlmostEqual(p1, 0.3925, places=3)
+        p100 = ST.split_p([v for v in vals for _ in range(100)], [s for s in sess for _ in range(100)], "greater")
+        self.assertAlmostEqual(p100, p1, places=12)
+        self.assertEqual(ST.benjamini_hochberg({"a": p100, "b": 0.5}), {"a": False, "b": False})
+        self.assertEqual(ST.split_p([0.1, 0.2, 0.3], ["a", "a", "a"], "greater"), 1.0)  # one session
 
     def test_two_way_cluster(self):
         vals = [0.1, -0.1, 0.2, 0.0]

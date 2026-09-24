@@ -146,7 +146,11 @@ class TransportProcess(unittest.TestCase):
             res = tr["trading"].get("/v2/assets", {"status": "active"})
             self.assertEqual(res, {"pages": [b"t/v2/assets", bytes(range(256))], "complete": True, "error": None})
             self.assertEqual(tr["data"].get("/x", {})["pages"][0], b"d/x")
+            child = tr["data"].proc.proc
             tr["data"].proc.close()
+            # review round 12, F10: close() leaves no pipe open (no ResourceWarning at teardown)
+            self.assertTrue(child.stdin.closed and child.stdout.closed)
+            self.assertIsNotNone(child.returncode)
 
     def test_a_malformed_reply_is_an_incomplete_request_and_a_dead_child_stops_the_run(self):
         from core import transport_proc as TP

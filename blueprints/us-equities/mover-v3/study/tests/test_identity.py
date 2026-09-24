@@ -41,7 +41,43 @@ class FbMeta(unittest.TestCase):
         cands, counts, report = screen.candidates(store, cal, sess, ["FB", "META"], renames)
         self.assertEqual([(c["symbol"], c["t"]) for c in cands], [("META", jump)])
         self.assertEqual(report["by_rule"], {"rename_record": 1})
-        self.assertEqual(counts["dedupe_rows_removed"], len(sess))
+        self.assertEqual(counts["dedupe_candidates_removed"], 1)
+
+    def test_rows_after_t_never_decide_membership_at_t(self):
+        """Review round 12, Codex P1: dedup over the whole stage let hold-window closes after t remove a candidate
+        at t. AAA and BBB serve one history; AAA alone jumps at t. When they agree again after t, a whole-stage
+        dedup puts t inside the shared span and drops AAA's row at t; when AAA's later closes differ, it keeps it.
+        Membership at t must be the same in both worlds."""
+        cal = synth.calendar()
+        sess = cal.range("2020-01-02", "2020-04-30")
+        t = sess[60]
+        found = {}
+        for world, after in (("agree_after_t", 10.0), ("differ_after_t", 12.5)):
+            m = synth.FakeMarket(cal)
+            for iid, sym, fn in (("a", "AAA", lambda d: 10.0 if d < t else (12.5 if d == t else after)),
+                                 ("b", "BBB", lambda d: 10.0)):
+                daily, prints = issuer_data(cal, cal.offset(sess[0], -1), sess[-1], fn)
+                m.add(iid, [("2015-01-01", sym)], daily=daily, auctions=prints)
+            store = Store()
+            reqs = [r for s in sess for r in plan.screen_requests(cal, s, ["AAA", "BBB"])]
+            driver.to_fixpoint(lambda st: reqs, transports(m), store, "2026-12-01", clock=fixed_clock)
+            cands, counts, _ = screen.candidates(store, cal, sess, ["AAA", "BBB"], set(), frozenset({"BBB"}))
+            found[world] = [(c["symbol"], c["t"]) for c in cands]
+        self.assertEqual(found["agree_after_t"], [("AAA", t)])
+        self.assertEqual(found["agree_after_t"], found["differ_after_t"])
+
+    def test_asof_dedup_uses_only_rows_up_to_t(self):
+        cal = synth.calendar()
+        sess = cal.range("2020-01-02", "2020-04-30")
+        rows = [{"symbol": sym, "session": s, "o": 1 + i, "h": 2 + i, "l": 0.5, "c": 1.5 + i, "v": 100}
+                for i, s in enumerate(sess) for sym in ("AAA", "BBB")]
+        late = [r for r in rows if not (r["symbol"] == "BBB" and r["session"] > sess[40])]
+        early = identity.dedupe_asof(rows, set(), frozenset({"BBB"}), [("AAA", sess[30]), ("AAA", sess[10])])
+        # 31 identical sessions as of sess[30]: AAA is the non-survivor; 11 as of sess[10]: no qualified pair
+        self.assertEqual(early["removed"], {("AAA", sess[30])})
+        self.assertEqual(identity.dedupe_asof(late, set(), frozenset({"BBB"}), [("AAA", sess[30])])["removed"],
+                         {("AAA", sess[30])})
+        self.assertEqual(identity.dedupe_asof(rows, set(), frozenset(), [("CCC", sess[30])])["removed"], set())
 
     def test_dedupe_without_rename_record_and_same_session_guard(self):
         rows = []

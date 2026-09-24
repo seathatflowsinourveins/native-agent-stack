@@ -89,6 +89,56 @@ def dedupe_screen(rows: list[dict], renames: set, active: frozenset = frozenset(
     return {"kept": after, "removed": before - after, "report": report}
 
 
+def dedupe_asof(rows: list[dict], renames: set, active: frozenset, queries: list) -> dict:
+    """Identity dedup decided as of each candidate session (review round 12, Codex P1). For a query (symbol, t),
+    the pinned dedupe_identity runs on the screen rows of sessions <= t only, so no row after t (a hold-window
+    close, a later rename or a later last trading day) can change whether the candidate at t is a member.
+
+    It runs on the rows of the symbols linked to `symbol` by a byte-identical raw OHLCV row (volume > 0) on some
+    session <= t. That is exact: dedupe_identity decides each component of qualified pairs from the rows of its
+    members only, and every qualified pair is such a link. A symbol with no link is never removed.
+    Returns {"removed": set of queries, "report": {"runs", "by_rule"}}."""
+    def key(r):
+        return (r["session"], float(r["o"]), float(r["h"]), float(r["l"]), float(r["c"]), float(r["v"]))
+
+    by_row = {}
+    for r in rows:
+        if float(r["v"]) > 0:
+            by_row.setdefault(key(r), set()).add(r["symbol"])
+    links = sorted((k[0], a, b) for k, syms in by_row.items() if len(syms) > 1
+                   for a in sorted(syms) for b in sorted(syms) if a < b)
+    parent = {}
+
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    removed, cache, by_rule, runs, i = set(), {}, {}, 0, 0
+    for sym, t in sorted(set(queries), key=lambda q: (q[1], q[0])):
+        while i < len(links) and links[i][0] <= t:
+            ra, rb = find(links[i][1]), find(links[i][2])
+            if ra != rb:
+                parent[rb] = ra
+            i += 1
+        root = find(sym)
+        members = frozenset(x for x in list(parent) if find(x) == root)
+        if len(members) < 2:
+            continue
+        ck = (t, members)
+        if ck not in cache:
+            part = [r for r in rows if r["symbol"] in members and r["session"] <= t]
+            cache[ck] = dedupe_screen(part, renames, active)
+            runs += 1
+            for rule, n in cache[ck]["report"]["by_rule"].items():
+                by_rule[rule] = by_rule.get(rule, 0) + n
+        if (sym, t) in cache[ck]["removed"]:
+            removed.add((sym, t))
+    return {"removed": removed, "report": {"runs": runs, "by_rule": by_rule}}
+
+
 def rank_key(symbol: str, other: str, renames: set, active: frozenset):
     """Survivor order for the same-session guard: the rename terminus, then active status, then lexicographic."""
     term = _rename_terminus([symbol, other], renames)

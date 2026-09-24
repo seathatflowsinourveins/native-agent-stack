@@ -134,10 +134,10 @@ def batches(ctx: dict) -> list:
     return out
 
 
-def sealed_stores(ctx: dict, snapshot_root, purposes=("collect", "count")) -> list:
-    """Every sealed snapshot named by a completion of a granted action of these purposes, in access-log order, read
-    from <root>/<purpose>-<authorization_id> of the action that sealed it and checked against its sha256 (a retry
-    that reused a failed attempt's snapshot names the same sha256, which is read once)."""
+def sealed_refs(ctx: dict, purposes=("collect", "count")) -> list:
+    """[(directory, sha256)] of every sealed snapshot named by a completion of a granted action of these purposes, in
+    access-log order: <purpose>-<authorization_id> of the action that sealed it (a retry that reused a failed
+    attempt's snapshot names the same sha256, which is listed once)."""
     granted = {a["authorization_id"]: a for a in ctx["access_log"]
                if a.get("record_kind") == "authorization" and a.get("decision") == "granted"}
     out, seen = [], set()
@@ -147,8 +147,13 @@ def sealed_stores(ctx: dict, snapshot_root, purposes=("collect", "count")) -> li
         if rec.get("record_kind") != "completion" or a is None or a["purpose"] not in purposes or not sha or sha in seen:
             continue
         seen.add(sha)
-        out.append(Store.read(Path(snapshot_root) / f"{a['purpose']}-{a['authorization_id']}", sha))
+        out.append((f"{a['purpose']}-{a['authorization_id']}", sha))
     return out
+
+
+def sealed_stores(ctx: dict, snapshot_root, purposes=("collect", "count")) -> list:
+    """The snapshots of sealed_refs, each read from <root>/<directory> and checked against its sha256."""
+    return [Store.read(Path(snapshot_root) / d, sha) for d, sha in sealed_refs(ctx, purposes)]
 
 
 def sealed_holdout_snapshots(ctx: dict, snapshot_root) -> list:
@@ -223,11 +228,14 @@ def gate_context(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
               "running_tree": ctx["tree"], "fetch_only_deviation_passed": ctx["transport_deviation"] is not None,
               "runtime_ok": True, "data_files_ok": True, "amendment_refusals": [],   # runner.context refused otherwise
               "validation_void": bool(voids & {"tests", "validation"}), "holdout_void": "holdout" in voids,
+              "validation_void_late": list(ctx.get("late_voids") or ()),                    # review round 12, F6
               "validated_items": validated, "requested_items": validated,
               "accrual_logs_complete": all(aid in seq["completions"] for aid, a in seq["granted"].items()
                                            if a["purpose"] == "collect"),
               "count_due": count_due(ctx, now), "same_snapshot": same_snapshot(ctx, purpose, retry_of),
-              "before_deadline": now < read_deadline(ctx, last),
+              # review round 12, F1 (second review): a read whose retry chain sealed a snapshot is only ever evaluated,
+              # whatever the time, so its retry is not bound by the deadline (it carries the 'late-read' qualifier)
+              "before_deadline": now < read_deadline(ctx, last) or sealed_retry_chain(ctx, purpose, retry_of),
               # review round 11, F1: a void count is known before the read is authorized, so it refuses the read
               "count_void": any(x.get("void") for x in count_lines(ctx["run_log"]))})
     # review round 11, C15/F5: 'count_outputs' is not an input. A count writes only count_unit by construction
@@ -252,6 +260,29 @@ def same_snapshot(ctx: dict, purpose: str, retry_of) -> bool:
                 shas.update(x.get("input_snapshot_sha256s") or ())
         a = by_id.get(a.get("retry_of")) if a.get("retry_of") else None
     return len(shas) <= 1
+
+
+def sealed_retry_chain(ctx: dict, purpose: str, retry_of) -> bool:
+    """A 'read' retry whose chain (retry_of, followed back) already has a committed 'read_fetch' line that sealed a
+    snapshot."""
+    if purpose != "read" or not retry_of:
+        return False
+    prev = next((r for r in ctx["access_log"] if r.get("record_kind") == "authorization"
+                 and r.get("authorization_id") == retry_of), None)
+    return prev is not None and fetch_line_of(ctx, "read", prev) is not None
+
+
+def require_validated_carried(ctx: dict, auth: dict) -> tuple:
+    """Review round 12, F1: the carried items are exactly the validated items of the governing validation file
+    (holdout_gate.opens_only_for), rechecked at the count and the read, not only at authorization. A committed record
+    that lists a subset would otherwise leave a validated item out of the read and out of the not-read label."""
+    res = validation_state(ctx)["results"]
+    validated = gate.validated_items(res) if res and gate.validation_complete(res) else []
+    carried = tuple(auth.get("requested_items") or ())
+    if sorted(carried) != sorted(validated):
+        raise HoldoutRefused(f"{auth.get('authorization_id')} carries {sorted(carried)}, not the validated items "
+                             f"{sorted(validated)} of the governing validation file")
+    return carried
 
 
 def authorize(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
@@ -418,11 +449,24 @@ def collect(ctx: dict, authorization_id: str, last: str, accrual: list, snapshot
 
 # ---------------------------------------------------------------- count and read
 
-def _setup(ctx: dict, purpose: str, authorization_id: str, snapshot_root):
+def _setup(ctx: dict, purpose: str, authorization_id: str, snapshot_root, fetch_line=None):
+    """The action's inputs. Before its seal, from every completed collection batch and sealed collect or count
+    snapshot; after it, from exactly the ordered base snapshots and batches its '_fetch' line pinned (review round
+    12, Codex P2), so a collection batch completed later can change neither the plan nor any row of step 2."""
     auth = gate.require_granted(ctx["access_log"], authorization_id, purpose)
     blocks = blocks_done(ctx["run_log"])
     n0, last = window(ctx, blocks)
     got = batches(ctx)
+    if fetch_line is None:
+        refs = sealed_refs(ctx, ("collect", "count"))
+    else:
+        refs = [tuple(x) for x in fetch_line.get("base_snapshots") or ()]
+        ids = fetch_line.get("collection_batches")
+        if fetch_line.get("base_snapshots") is None or ids is None:
+            raise HoldoutRefused("the sealed '_fetch' line does not pin its base snapshots and collection batches")
+        got = [b for b in got if b["authorization_id"] in set(ids)]
+        if [b["authorization_id"] for b in got] != list(ids):
+            raise HoldoutRefused("a collection batch pinned by the sealed '_fetch' line has no completion")
     collected = {d for b in got for d in ctx["cal"].range(*b["sessions"])}
     missing = [d for d in ctx["cal"].range(ctx["cal"].offset(n0, -1), last) if d not in collected]
     if missing:
@@ -430,9 +474,10 @@ def _setup(ctx: dict, purpose: str, authorization_id: str, snapshot_root):
     late = frozenset(plan.late_collected(ctx["cal"], [{"sessions": ctx["cal"].range(*b["sessions"]),
                                                       "reachable": b["reachable"]} for b in got]))
     exposed = frozenset((e["symbol"], e["session"]) for b in got for e in b["exposed"])
-    bases = sealed_stores(ctx, snapshot_root, ("collect", "count"))
+    bases = [Store.read(Path(snapshot_root) / d, sha) for d, sha in refs]
     first = [x for x in ctx["run_log"] if x.get("stage") == "holdout" and x.get("enumeration_fetch_date")]
-    return auth, blocks, n0, last, late, exposed, bases, first[0]["enumeration_fetch_date"] if first else None
+    pins = {"base_snapshots": [list(r) for r in refs], "collection_batches": [b["authorization_id"] for b in got]}
+    return auth, blocks, n0, last, late, exposed, bases, first[0]["enumeration_fetch_date"] if first else None, pins
 
 
 def fetch_line_of(ctx: dict, purpose: str, auth: dict):
@@ -465,7 +510,7 @@ def _planner(spec_for, mode, enum_date):
 
 
 def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_date, transports, clock, now,
-                sessions):
+                sessions, pins):
     """Step 1 of a count or read (review round 10, H2): fetch and seal the action's snapshot, and log a
     '<purpose>_fetch' run-log line with its sha256 and fetch-incomplete rate. No outcome is computed. The step
     that computes (step 2) runs only once this line is on origin/main, over this snapshot alone, so a discarded
@@ -486,6 +531,7 @@ def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_d
             utc_end=iso_utc(now), snapshots=[sha] if sha else [], status=status, results_sha256=None,
             extra={"authorization_id": auth["authorization_id"], "sessions": sessions,
                    "enumeration_fetch_date": enum_date, "snapshot_dir": f"{purpose}-{auth['authorization_id']}",
+                   **pins,
                    **({"fetch_incomplete_rate": rate["rate"], "fetch_incomplete_by_kind": rate["by_kind"],
                        "stage_void": rate["void"]} if rate else {})}))
         if status != "complete":
@@ -533,20 +579,21 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
     check_clock(ctx, now)
     check_record_times(ctx)
     auth = gate.require_granted(ctx["access_log"], authorization_id, "count")
-    if fetch_line_of(ctx, "count", auth) is None:
+    fl = fetch_line_of(ctx, "count", auth)
+    if fl is None:
         _, due_last = window(ctx, blocks_done(ctx["run_log"]))
         require_reached_after(ctx, authorization_id, ctx["cal"].close(due_last), f"the close of {due_last}")   # F2
-    auth, blocks, n0, last, late, exposed, bases, enum_date = _setup(ctx, "count", authorization_id, snapshot_root)
-    carried = tuple(auth["requested_items"])
+    carried = require_validated_carried(ctx, auth)
+    auth, blocks, n0, last, late, exposed, bases, enum_date, pins = _setup(ctx, "count", authorization_id,
+                                                                           snapshot_root, fl)
     enum_date = enum_date or iso_utc(now)[:10]
     path = Path(ctx["repo"]) / RESULTS_DIR / f"holdout-count-{blocks}.json"
     if path.exists():
         raise HoldoutRefused(f"the count of block {blocks} has its results file")
     spec_for = _spec_factory(ctx, n0, last, late, exposed, None)
-    fl = fetch_line_of(ctx, "count", auth)
     if fl is None:
         return _fetch_step(ctx, "count", auth, bases, snapshot_root, spec_for, "count", enum_date, transports, clock,
-                           now, [n0, last])
+                           now, [n0, last], pins)
     enum_date = fl["enumeration_fetch_date"]
     start, status, sha, digest, ext, void, rows = iso_utc(now), "failed", fl["input_snapshot_sha256s"][0], None, \
         None, None, 0
@@ -689,7 +736,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     path = Path(ctx["repo"]) / RESULTS_DIR / "holdout-read.json"
     if path.exists():
         raise HoldoutRefused("the holdout read results file exists: the holdout is read once")
-    carried = tuple(auth.get("requested_items") or ())
+    carried = require_validated_carried(ctx, auth)
     _, last = window(ctx, blocks_done(ctx["run_log"]))
     deadline = read_deadline(ctx, last)
     no_final = final_count(ctx["run_log"]) is None
@@ -716,11 +763,12 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
         require_reached_after(ctx, authorization_id, ctx["cal"].close(end) if end else float("inf"),
                               "the last terminal-search window ended")                  # F2
     start, status, sha, digest = iso_utc(now), "failed", None, None
-    auth, blocks, n0, last, late, exposed, bases, enum_date = _setup(ctx, "read", authorization_id, snapshot_root)
+    auth, blocks, n0, last, late, exposed, bases, enum_date, pins = _setup(ctx, "read", authorization_id,
+                                                                           snapshot_root, fl)
     spec_for = _spec_factory(ctx, n0, last, late, exposed, carried)
     if fl is None:
         return _fetch_step(ctx, "read", auth, bases, snapshot_root, spec_for, "plan", enum_date or iso_utc(now)[:10],
-                           transports, clock, now, [n0, last])
+                           transports, clock, now, [n0, last], pins)
     val = validation_state(ctx)["results"]
     signs = {"H3-c": ((val or {}).get("items", {}).get("H3-c") or {}).get("estimate")}
     deviated = ctx["transport_deviation"] is not None or any(
