@@ -80,7 +80,7 @@
       "cleanup_verified_zero_open": true,
       "unexpected_fill_qty": "0",
       "self_reported_passed": true,
-      "outcome": "capacity criteria met at a 200/min limit (self-reported); see independent-observation-20260924.json"
+      "outcome": "capacity criteria met at a 200/min limit (self-reported); see independent-observation-20260924.json (an unretained coordinator report: no listing output, SDK calls or library version were kept, so no hash is recorded)"
     }
   ],
   "not_measured": [

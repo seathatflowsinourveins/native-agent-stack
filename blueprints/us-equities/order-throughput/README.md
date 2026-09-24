@@ -328,7 +328,7 @@ IDs.
 |---|---|
 | Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff (including during cleanup), refusals, cleanup, and reconciliation, including a lost response for a created order. Also: per-page listing admission, several in-flight calls completing out of order, the real `ThreadPoolExecutor` path, failing in-flight port calls, and crash then journal recovery. See `tests/test_order_throughput.py`. |
 | Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
-| Measured (native paper, 2026-09-24) | One run at a 200/min trading limit met the frozen capacity criteria, with an independent SDK listing that matches its order counts. One pre-market refusal and one frozen opening-auction run are retained. See "Native paper evidence 2026-09-24". `alpaca_capacity_port.py` ran with alpaca-py 0.44.0 at revision `4911baf`. |
+| Measured (native paper, 2026-09-24) | One run at a 200/min trading limit met the frozen capacity criteria, and a coordinator-reported SDK listing (no retained artifact) matches its order counts. One pre-market refusal and one frozen opening-auction run are retained. See "Native paper evidence 2026-09-24". `alpaca_capacity_port.py` ran with alpaca-py 0.44.0 at revision `4911baf`. |
 | Not yet measured | 1000 order actions/min (the account reports `x-ratelimit-limit: 200`), any run with `--stream-timeout` raised, and any other host. |
 | Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination in practice (it is documented on the Trading API "Get All Orders" reference, updated 2026-05-27, as exclusive and not to be combined with `after`/`until`; adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |
 
@@ -362,7 +362,10 @@ the passing run's prefix since its `started_at`, all `canceled`, filled
 quantity 0, and 0 positions and 0 open orders. This matches the receipt's 496
 accepted submits and 496 acknowledged cancels. It confirms only those counts
 and states. It uses the same broker and account, and it does not check the
-per-window rates, latencies or websocket completeness.
+per-window rates, latencies or websocket completeness. The exact SDK calls,
+the alpaca-py version used for the listing and the raw listing output were not
+retained, privately or as a hash, so this is an unretained report by the
+coordinator rather than a retained observation artifact.
 
 **Finding and fix.** Paper cancel confirmations lagged about 16 s on
 `trade_updates` during the opening auction. That is longer than the 10 s
