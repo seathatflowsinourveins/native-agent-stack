@@ -1,0 +1,187 @@
+name: Saturation tracking
+
+# Weekly and deterministic: checks the append-only saturation ledger
+# (catalogs/saturation/ledger.json, scripts/saturation_ledger.py), reports the layers due for a
+# landscape sweep, their reopen triggers and any saturation candidates, and keeps ONE open issue
+# labelled saturation-tracking up to date. It makes no model or CLI-agent calls, uses no secret
+# beyond the job token, and never writes to the repository. A sweep itself is started by a person
+# in an agent-lab coordinator session (recipes/saturation-sweep.md).
+on:
+  schedule:
+    - cron: '53 7 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build the report and show the planned issue action without creating or editing an issue.'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Check the ledger and build the report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history: host_receipts validates each receipt's catalog_revision with
+          # `git cat-file -e` (receipt-staleness.yml does the same).
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Check the ledger (schema, hash chain, manifest and evidence bindings)
+        run: python3 scripts/saturation_ledger.py --check
+      - name: Build the receipt-staleness input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/saturation/inputs"
+          python3 scripts/receipt_staleness.py --json --out "$RUNNER_TEMP/saturation/inputs/receipt-staleness.json" > /dev/null
+      - name: Fetch the latest catalog-freshness manifest (read-only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Scheduled runs only: a manual dispatch may bound the fetch with max_repos, leaving
+          # components without upstream data. The manifest artifact is uploaded unless the run was
+          # cancelled, so a completed run whose test step failed still carries it; the report reads
+          # that artifact's github-freshness.json and marks the input partial on any upstream error.
+          run_id="$(gh run list --workflow catalog-freshness.yml --branch main --event schedule --status completed \
+            --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+          if [ -z "$run_id" ]; then
+            echo "No completed scheduled catalog-freshness run found; the report notes the missing input."
+            exit 0
+          fi
+          if ! gh run download "$run_id" --pattern 'catalog-freshness-*' --dir "$RUNNER_TEMP/saturation/freshness"; then
+            echo "catalog-freshness run $run_id has no downloadable artifact; the report notes the missing input."
+            exit 0
+          fi
+          echo "Read catalog-freshness run $run_id."
+      - name: Build the saturation report
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--staleness "$RUNNER_TEMP/saturation/inputs/receipt-staleness.json")
+          manifest="$(find "$RUNNER_TEMP/saturation/freshness" -type f -name 'manifest-*.json' 2>/dev/null | sort | tail -n 1 || true)"
+          if [ -n "$manifest" ]; then
+            args+=(--freshness-manifest "$manifest")
+            status="$(dirname "$manifest")/github-freshness.json"
+            if [ -f "$status" ]; then
+              args+=(--freshness-status "$status")
+            fi
+          fi
+          mkdir -p "$RUNNER_TEMP/saturation/report"
+          python3 scripts/saturation_ledger.py --report --json "${args[@]}" > "$RUNNER_TEMP/saturation/report/report.json"
+          python3 scripts/saturation_ledger.py --report "${args[@]}" > "$RUNNER_TEMP/saturation/report/issue-body.md"
+          cat "$RUNNER_TEMP/saturation/report/issue-body.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: saturation-report-${{ github.run_id }}
+          path: ${{ runner.temp }}/saturation/report/
+          if-no-files-found: error
+          retention-days: 30
+
+  # dry_run only: lists the labelled issues with a read-only token and prints the planned action.
+  plan:
+    name: Show the planned issue action (dry run)
+    needs: report
+    if: ${{ inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: List the labelled issues and print the planned action
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          label='saturation-tracking'
+          listing="$(gh issue list --label "$label" --state open --limit 100 \
+            --json number --jq 'sort_by(.number) | .[].number')"
+          read -r -a numbers <<< "${listing//$'\n'/ }"
+          if [ "${#numbers[@]}" -eq 0 ]; then
+            action="create"
+          else
+            action="edit #${numbers[0]}"
+          fi
+          echo "Open issues labelled $label: ${#numbers[@]}; planned action: $action."
+          echo "dry_run: no issue created, edited or closed."
+
+  # The only write-permitted job, skipped on a dry run: it upserts exactly one open issue labelled
+  # saturation-tracking from the report artifact. No checkout, no repository write, no model call.
+  issue:
+    name: Upsert the saturation-tracking issue
+    needs: report
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Download the report
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: saturation-report-${{ github.run_id }}
+          path: ${{ runner.temp }}/saturation-report
+      - name: Create or edit the single labelled issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          label='saturation-tracking'
+          title='Saturation tracking: layers due for a landscape sweep'
+          body="$RUNNER_TEMP/issue-body.md"
+          {
+            head -c 60000 "$RUNNER_TEMP/saturation-report/issue-body.md"
+            printf '\n\nUpdated by %s. Deterministic report; no model was called.\n' "$RUN_URL"
+          } > "$body"
+          # Assigned first so a failed listing stops the job instead of looking like "no issue".
+          listing="$(gh issue list --label "$label" --state open --limit 100 \
+            --json number --jq 'sort_by(.number) | .[].number')"
+          read -r -a numbers <<< "${listing//$'\n'/ }"
+          if [ "${#numbers[@]}" -eq 0 ]; then
+            gh label create "$label" --color 5319E7 \
+              --description 'Weekly saturation-tracking report (scripts/saturation_ledger.py)' --force
+            gh issue create --title "$title" --label "$label" --body-file "$body"
+          else
+            gh issue edit "${numbers[0]}" --title "$title" --body-file "$body"
+            for extra in "${numbers[@]:1}"; do
+              gh issue close "$extra" --comment "Duplicate of #${numbers[0]}; this workflow keeps one open saturation-tracking issue."
+            done
+          fi

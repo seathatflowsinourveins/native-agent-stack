@@ -1242,12 +1242,13 @@ class SealedWinnerBindingTests(GateFixture):
 
     def with_receipt(self, component_id, version):
         """Patch platform_status's context with one qualifying linux receipt for ``component_id`` at
-        ``version`` (an independently reviewed native_proven install pass on a second machine), and
+        ``version`` (an independently reviewed native_proven use pass on a second machine), and
         write and register its file, so it is base-trusted when a rebase() follows (fifth review)."""
         real = gate.platform_evidence.load_context
         path = f"evidence/hosts/second-host/{component_id}.json"
         receipt = {"shape_ok": True, "platform_identity_ok": True, "component_version": version,
-                   "evidence_class": "native_proven", "stage": "install", "result": "pass",
+                   # A use-stage pass: only a use pass can make a winner accepted (2026-09-24 decision).
+                   "evidence_class": "native_proven", "stage": "use", "result": "pass",
                    "second_physical_machine": True, "review_state": "agree", "host_id": "second-host",
                    "observed_at_utc": "2026-09-23T00:00:00Z", "path": path}
         self.write(path, dump({"component_id": component_id, "tool_versions": {component_id: version}}))

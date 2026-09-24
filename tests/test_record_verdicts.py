@@ -2017,7 +2017,7 @@ class NewWavePlatformStatusTests(NewWaveFixture):
             "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
                      "architecture": "arm64", "second_physical_machine": True},
             "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": component_id, "stage": "use",
-            "commands": [{"cmd": f"{component_id} --version", "exit": 0, "duration_s": 0.1,
+            "commands": [{"cmd": f"{component_id} run --input sample.json", "exit": 0, "duration_s": 0.1,
                           "output_sha256": "0" * 64, "output_excerpt": version}],
             "tool_versions": {component_id: version}, "observed_at_utc": "2026-09-23T01:00:00Z",
             "result": "pass", "claim": "Ran on a Mac", "limitations": ["One command"],

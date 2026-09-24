@@ -623,7 +623,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
                      "architecture": "arm64", "second_physical_machine": True},
             "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": "selected", "stage": "use",
-            "commands": [{"cmd": "selected --version", "exit": 0, "duration_s": 0.1,
+            "commands": [{"cmd": "selected run --input sample.json", "exit": 0, "duration_s": 0.1,
                           "output_sha256": "0" * 64, "output_excerpt": "1"}],
             "tool_versions": {"selected": "1"}, "observed_at_utc": "2026-09-23T01:00:00Z", "result": "pass",
             "claim": "Ran on a Mac", "limitations": ["One command"], "evidence_class": "native_proven",
