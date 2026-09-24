@@ -270,6 +270,25 @@ regexes = [
   '''^(?:\s*"[0-9a-f]{64}\s{2}[^"]+",?\s*\n?)+$''',
 ]
 
+# 2026-09-24 (PR #116, ai-memory scheduled learning evidence): the report's
+# learning.report.aggregate.repeated_rejection_fingerprints[].key values are ai-memory's
+# rejection_fingerprint, hex_sha256 over a rejection record's normalized target/kind/operation/
+# edit_mode/reason/summary (akitaonrails/ai-memory crates/ai-memory-store/src/auto_improve.rs), i.e.
+# content digests the generic-api-key rule reads as a "key" credential. Exempted: that exact file,
+# this rule only, and only a whole anchored "key" line whose value is exactly 64 lowercase hex; an
+# api_key/token field, or the same line shape in any other file, is still detected
+# (tests/test_gitleaks_config.py test_e/test_e2).
+[[rules.allowlists]]
+description = "ai-memory rejection fingerprints (SHA-256) under \"key\" in the scheduled-learning evidence"
+condition = "AND"
+paths = [
+  '''^observability/memory-scheduled-20260923\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''^\s*"key":\s*"[0-9a-f]{64}",?\s*$''',
+]
+
 [[rules]]
 id = "sourcegraph-access-token"
 

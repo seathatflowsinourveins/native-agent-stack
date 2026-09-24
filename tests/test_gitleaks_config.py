@@ -263,6 +263,38 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
 
+    def _fingerprint_fixture(self, target: Path, relative: str, extra: dict) -> None:
+        """The shape of ai-memory's scheduled-learning report: 64-hex rejection fingerprints under "key"."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        report = {"learning": {"report": {"aggregate": {"repeated_rejection_fingerprints": [
+            {"key": HEX64, "count": 10}, {"key": HEX64[::-1], "count": 8}], **extra}}}}
+        path.write_text(json.dumps(report, indent=2))
+
+    def test_e_memory_rejection_fingerprints_are_not_detected(self):
+        """ai-memory's SHA-256 rejection fingerprints in the reviewed evidence file are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {})
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], "rejection fingerprints in the reviewed file must not be flagged")
+
+    def test_e2_other_fields_and_other_paths_stay_detected(self):
+        """Only whole "key": <64-hex> lines of that exact file are exempt: an api_key in the same file, and
+        the same fingerprint lines in another file, are still generic-api-key findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {"api_key": HEX64})
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260924.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "generic-api-key":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260923.json", [])), 1,
+                             f"the api_key line in the reviewed file must still be detected: {by_file}")
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
+                             f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 
