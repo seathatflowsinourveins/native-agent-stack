@@ -176,6 +176,18 @@ REMOVE_GLOBS = (
     # Code and data that assert or name the incumbents, removed even if a packet referenced them (binding
     # re-review L8; cross-family review F3).
     "tools/sota-convergence/reconciliations-*.json",
+    # Membership lists and earlier verdict records that isolate a layer's winner among its adopted candidates
+    # (blindness re-review N1, per-layer subtraction check): the stack manifest, upstream snapshots, the
+    # saturation audit and the 2026-09-21 convergence and repository-evidence runs.
+    "manifests/stack.json",
+    "catalogs/landscape/upstream-snapshot.json",
+    "catalogs/us-equities/star-audit.json",
+    "blueprints/token-native-focus/saturation-audit.json",
+    "evidence/artifacts/claude-repository-evidence-*",
+    "evidence/artifacts/blind-catalog-convergence-*",
+    "evidence/artifacts/claude-upstream-checks-*/results.json",
+    "evidence/artifacts/full-stack-convergence-*/component-coverage.json",
+    "evidence/artifacts/full-stack-convergence-*/selected-upstream-releases.json",
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
@@ -320,8 +332,9 @@ def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only
         for key in list(node.keys()):
             pointer = f"{path_prefix}/{key}"
             value = node[key]
+            named = nonempty_keys(key) if callable(nonempty_keys) else key in nonempty_keys
             if (key in keys and (not only_labels or is_label_value(value))) or \
-                    (key in nonempty_keys and not _is_empty_value(value)):
+                    (named and not _is_empty_value(value)):
                 stripped.append({"path": pointer, "old_sha256": hmac_sha256_of(value, hmac_key)})
                 del node[key]
                 continue
@@ -333,9 +346,37 @@ def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only
                         nonempty_keys=nonempty_keys)
 
 
+# Keys that record a role rather than evidence (2026-09-24 blindness re-review N1, measured with a per-layer
+# subtraction check): a selection, retention, challenger or default label, a rationale or recommendation, or an
+# earlier run's verdict. Stripped wherever their value is non-empty, under catalogs/ and adoption/.
+ROLE_KEY = re.compile(r"^(selected|retained?|chosen|incumbents?|winners?|challengers?|default_profile)(_|$)"
+                      r"|challenger|why_not_default|why_selected|why_primary|adoption_recommendation|^rationale$"
+                      r"|disposition|sota_verdict|primary_stack|case_for_challenger|would_change_choice"
+                      r"|current_selection|^coordinator_|final_disposition|dual_lane_same_winner")
+# Under evidence/, only an earlier run's verdict fields go: receipts use selected_* for data (selected files).
+EVIDENCE_VERDICT_KEYS = frozenset({
+    "sota_verdict", "primary_stack", "strongest_challengers", "why_primary_for_requirement",
+    "strongest_case_for_challenger", "test_that_would_change_choice", "coordinator_disposition",
+    "claude_final_disposition", "why_selected", "winners", "incumbents", "challenger_repositories"})
+
+
+def _role_key(key) -> bool:
+    return isinstance(key, str) and (key in CATALOGS_NONEMPTY_KEYS or bool(ROLE_KEY.search(key)))
+
+
 def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
     _walk_strip(document, relative_path, stripped, CATALOGS_UNCONDITIONAL_KEYS, only_labels=False, hmac_key=hmac_key,
-                nonempty_keys=CATALOGS_NONEMPTY_KEYS)
+                nonempty_keys=_role_key)
+
+
+def strip_adoption_roles(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
+    _walk_strip(document, relative_path, stripped, frozenset(), only_labels=False, hmac_key=hmac_key,
+                nonempty_keys=_role_key)
+
+
+def strip_evidence_verdicts(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
+    _walk_strip(document, relative_path, stripped, frozenset(), only_labels=False, hmac_key=hmac_key,
+                nonempty_keys=EVIDENCE_VERDICT_KEYS)
 
 
 def strip_blueprint_labels(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
@@ -427,6 +468,17 @@ def strip_worktree(dest: Path, hmac_key: bytes) -> dict:
         before = json.dumps(document, sort_keys=True)
         strip_blueprint_labels(document, relative, stripped_fields, hmac_key)
         _rewrite_if_changed(path, before, document)
+
+    for tree, strip in (("adoption", strip_adoption_roles), ("evidence", strip_evidence_verdicts)):
+        for path in iter_json_files(dest, tree):
+            relative = path.relative_to(dest).as_posix()
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, ValueError):
+                continue
+            before = json.dumps(document, sort_keys=True)
+            strip(document, relative, stripped_fields, hmac_key)
+            _rewrite_if_changed(path, before, document)
 
     return {
         "schema_version": 1,
