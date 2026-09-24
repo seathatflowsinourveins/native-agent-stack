@@ -3,7 +3,7 @@
   "landscape_manifest": "catalogs/landscape/manifest.json",
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "628fa86d84b78883c858ecd813532ba01bfe0323",
+  "source_revision": "35cf9e35913f91d838b16dc518109ef2f8747e01",
   "publication_ref": "main",
   "layers": [
     {
