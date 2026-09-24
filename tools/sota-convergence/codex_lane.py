@@ -373,10 +373,32 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
     return report
 
 
+# The CODEX_HOME every blind child runs with (isolated_codex_home), or None to inherit the caller's.
+CHILD_CODEX_HOME = None
+
+
+def isolated_codex_home(work_dir: Path) -> Path:
+    """A run-scoped CODEX_HOME (``<work-dir>/codex-home``, mode 0700) holding only a symlink to the native
+    ``auth.json`` (never a copy). ``--ignore-user-config`` skips config.toml but not ``$CODEX_HOME/AGENTS.md``,
+    the user's global instructions, which name adopted tools (measured 2026-09-24: a child quoted its
+    "# AGENTS.md instructions" block; with this home it answered "none"). Sessions and logs the child writes stay
+    in the work dir. A missing native auth.json is left for the CLI to report."""
+    home = Path(work_dir).resolve() / "codex-home"
+    home.mkdir(parents=True, exist_ok=True)
+    home.chmod(0o700)
+    native = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "auth.json"
+    link = home / "auth.json"
+    if native.is_file() and not link.is_symlink():
+        link.unlink(missing_ok=True)
+        link.symlink_to(native)
+    return home
+
+
 def run_attempt(cmd: list, timeout: float) -> dict:
     started = time.monotonic()
+    env = dict(os.environ, CODEX_HOME=str(CHILD_CODEX_HOME)) if CHILD_CODEX_HOME is not None else None
     try:
-        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
         return {
             "exit_code": completed.returncode,
             "stdout": completed.stdout or "",
@@ -639,6 +661,10 @@ def main(argv=None) -> int:
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
 
+    global CHILD_CODEX_HOME
+    if not args.allow_git_history:
+        # Blind children never load the user's global Codex instructions (isolated_codex_home).
+        CHILD_CODEX_HOME = isolated_codex_home(work_dir)
     try:
         # A deliberately non-blind run (--allow-git-history) may read a checkout whose ignored .venv links leave
         # it (re-review L2); a blind export never has such links.

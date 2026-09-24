@@ -1625,14 +1625,41 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
     the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
 
-    On the 2026-09-23 packets the export holds 697 files (re-measured after the whole-tree export was dropped;
-    902 with tests/, tools/ and scripts/) with 0 missing references, against the whole
-    repository before.
+    On the 2026-09-23 packets the export now holds 666 files. Earlier counts were 902 with the tests/, tools/ and
+    scripts/ trees, and 697 before the role-label removal below. Before the allowlist it held the whole
+    repository.
 
-    **Disclosed limit:** a packet's own evidence references name 23 `docs/`, 12 `catalogs/`, 5 `recipes/`,
-    3 `adoption/` files and `manifests/stack.json`, whose prose can call the current choice "selected". They
-    are kept because leaving an incumbent's cited evidence out of the export would bias lanes against it; the
-    lane prompt and role forbid looking for the current choice.
+    **Role labels removed (final-round blindness review).** A per-layer subtraction check
+    (`tools/sota-convergence/export_isolation_check.py`, adapted from the reviewer's script) tests every
+    repository list in the export: does it isolate a layer's winner set among the layer's adopted candidates,
+    either by naming it alone or by leaving it over? The export therefore:
+    - removes membership lists and earlier verdict records: `manifests/stack.json`, the upstream snapshot,
+      star audit, automation interfaces and saturation audit, and the 2026-09-21 repository-evidence,
+      blind-catalog-convergence, upstream-check and full-stack coverage records;
+    - strips role keys (`selected_*`, `retained*`, `challenger*`, `rationale`, `disposition`, `why_not_default`,
+      `default_profile` and the like) under `catalogs/` and `adoption/`;
+    - strips earlier verdict fields (`sota_verdict`, `primary_stack`, `strongest_challengers`, ...) under
+      `evidence/`.
+
+    `tests/test_blind_checkout.py::RealExportIsolationTests` rebuilds the real export and fails on any isolating
+    list under a key that does not cite evidence. Isolating lists that remain all sit under evidence keys (a
+    receipt's `references` or `sources`) in 7 layers. That is evidence-volume asymmetry: what was exercised is
+    cited, and that is evidence, not a label.
+
+    **Disclosed limit: prose in cited files.** A packet's own evidence references name `docs/`, `catalogs/`,
+    `recipes/` and `adoption/` files whose prose can call the current choice "selected" or "retain". The reviewer
+    measured this for 10 of 32 layers. For 6 of those, nothing else in the packet signals the winner:
+    document-retrieval, instructions-skills, native-clients, semantic-rag, web-research and workers. A wave's
+    task record lists these layers as exposed to that prose. The files are kept, because leaving an incumbent's cited
+    evidence out of the export would bias lanes against it, and the lane prompt and role forbid looking for the
+    current choice.
+
+    **Codex global instructions.** `--ignore-user-config` skips `config.toml` but not `$CODEX_HOME/AGENTS.md`.
+    This host's global Codex instructions name nine catalog components (serena, jcodemunch, rtk, qmd, headroom,
+    beads, typesafe, zizmor, mcporter). So every blind Codex child, in `codex_lane` without `--allow-git-history`
+    and in `adjudicate codex`, runs with `CODEX_HOME=<work-dir>/codex-home`. That run-scoped home, mode 0700,
+    holds only a symlink to the native `auth.json`, never a copy. Measured 2026-09-24: a probe child without it
+    quoted its `# AGENTS.md instructions` block, and with it answered "none".
 
     **Disclosed trade-off (re-review L3):** `lane-prompt.md` and the vendored lane's evidence lens still accept an
     `overturn_when` naming a `tests/` path or a runnable command, and neither `tests/` nor `tools/` is exported
@@ -1704,7 +1731,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     adjudication whose provenance names another tree is rejected.
   - Windows host paths (`C:\x`, `C:/x`, `\Users\example\y`, `\\server\share\x`) are scrubbed and caught like
     POSIX ones.
-- **Audit roots (round 9):** the Codex adjudication audit allows `<work-dir>/adjudication-packets/`.
+- **Audit roots (round 9, narrowed in the independent review):** each Codex judge call's audit allows only the
+  repository, its own input file and its packet snapshot under `<work-dir>/adjudication-packets/`.
 - **Leak text (round 9):** a reported leak's text has every path form the input scrubbing removes replaced by
   `<outside-path>`, and is capped at 400 characters, before it is stored in `leaks.json`,
   `adjudication-leaks.json` or printed.

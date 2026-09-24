@@ -707,3 +707,39 @@ class AllowlistExportTests(BlindCheckoutFixture):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RealExportIsolationTests(unittest.TestCase):
+    """Independent re-review of #145, blindness N1: on this repository's real 2026-09-23 packets, no list in the
+    allowlisted blind export isolates a layer's winner among its adopted candidates under a non-evidence key
+    (a membership or role label). Evidence-reference lists that cite what was exercised stay (disclosed)."""
+
+    def test_the_real_export_carries_no_role_label_that_isolates_a_winner(self):
+        tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False)
+        if tracked.returncode != 0 or not tracked.stdout:
+            self.skipTest("not a git checkout")
+        lane_packets = load_module("lane_packets_for_isolation", "lane_packets.py")
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets_dir = scratch / "work" / "packets"
+        packets_dir.mkdir(parents=True)
+        packets = lane_packets.build_all_packets(
+            ROOT, catalogs=["foundation", "us-equities"], seed="20260923", checked_at="2026-09-23",
+            trading_candidates="manifest", withhold=True,
+            manifest="catalogs/sota-convergence/manifest-20260923.json", registered_receipts=True)
+        for name, text in packets.items():
+            (packets_dir / name).write_text(text, encoding="utf-8")
+        dest = scratch / "hosts" / "blind" / "checkout"
+        for relative in tracked.stdout.decode("utf-8").split("\0"):
+            source = ROOT / relative
+            if relative and source.is_file() and not source.is_symlink():
+                target = dest / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, target)
+        blind_checkout.strip_worktree(dest, b"k" * 32)
+        export = scratch / "hosts" / "blind" / "export"
+        blind_checkout.export_tree(dest, export, allow_from_packets=packets_dir)
+        report = isolation.isolation_hits(export, packets_dir, isolation.ledger_winners(ROOT))
+        self.assertGreaterEqual(len(report), 25)
+        self.assertEqual(isolation.role_label_hits(report), [])

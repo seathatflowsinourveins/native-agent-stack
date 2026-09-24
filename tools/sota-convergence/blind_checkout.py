@@ -778,8 +778,8 @@ def parse_args(argv=None):
                              "hand this copy, not the worktree, to the lanes.")
     parser.add_argument("--allow-from-packets", type=Path, metavar="PACKETS_DIR",
                         help="With --export: export only the paths the lane packets PACKETS_DIR/*__*.json reference, "
-                             "one level of evidence/ and blueprints/ paths named in included JSON files, tests/, "
-                             "tools/, scripts/ and the root instruction stubs.")
+                             "one level of evidence/ and blueprints/ paths named in included JSON files, and the root "
+                             "instruction stubs (no tree is exported whole).")
     args = parser.parse_args(argv)
     if args.allow_from_packets is not None and args.export is None:
         parser.error("--allow-from-packets requires --export")

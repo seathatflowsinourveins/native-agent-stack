@@ -833,6 +833,39 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
         self.assertIsInstance(codex_lane.tree_sha256(self.repo, allow_escaping_links=True), str)
 
 
+class IsolatedCodexHomeTests(CodexLaneFixture):
+    """2026-09-24 blindness: --ignore-user-config does not skip $CODEX_HOME/AGENTS.md, so blind children run
+    with a run-scoped CODEX_HOME that links, never copies, the native auth.json."""
+
+    def test_the_home_links_the_native_auth_and_children_get_it(self):
+        native = self.work_dir.parent / "native-codex"
+        native.mkdir()
+        (native / "auth.json").write_text("{}", encoding="utf-8")
+        (native / "AGENTS.md").write_text("# global instructions naming tools", encoding="utf-8")
+        with mock.patch.dict(os.environ, {"CODEX_HOME": str(native)}):
+            home = codex_lane.isolated_codex_home(self.work_dir)
+        self.assertTrue((home / "auth.json").is_symlink())
+        self.assertEqual(os.readlink(home / "auth.json"), str(native / "auth.json"))
+        self.assertFalse((home / "AGENTS.md").exists())
+        self.assertEqual(oct(home.stat().st_mode & 0o777), "0o700")
+        seen = {}
+
+        def fake_run(cmd, **kwargs):
+            seen["env"] = kwargs.get("env")
+            return mock.Mock(returncode=0, stdout="", stderr="")
+
+        with mock.patch.object(codex_lane, "CHILD_CODEX_HOME", home), \
+                mock.patch.object(codex_lane.subprocess, "run", side_effect=fake_run):
+            codex_lane.run_attempt(["codex", "exec"], 5)
+        self.assertEqual(seen["env"]["CODEX_HOME"], str(home))
+
+    def test_a_blind_run_sets_the_isolated_home(self):
+        self.write_packet("foundation", "native-clients")
+        with mock.patch.object(codex_lane, "CHILD_CODEX_HOME", None):
+            self.assertEqual(self.run_lane(), 0)
+            self.assertEqual(codex_lane.CHILD_CODEX_HOME, self.work_dir.resolve() / "codex-home")
+
+
 class ExactProvenanceResumeTests(CodexLaneFixture):
     """Round-8 review of #145: resume needs the recorded provenance to equal the current one exactly; a return
     carrying an extra or changed provenance field is not resumed."""

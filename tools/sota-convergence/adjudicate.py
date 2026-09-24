@@ -7,9 +7,11 @@ when their winner component sets, resolved against the layer packet with
 families, each in both presentation orders, and every judgment is attacked by one refuter:
 
 1. ``inputs``: writes ``<work-dir>/adjudication-inputs/<name>.AB.json`` and ``<name>.BA.json``, the two
-   scrubbed returns in complementary positions, plus ``<work-dir>/adjudication-index.json``. Which position
-   holds the Claude return is drawn per layer and recorded only in that index, outside the inputs directory, so
-   neither a file name nor this code tells a judge which family wrote A (independent review of #145).
+   scrubbed returns in complementary positions, plus the adjudication index (``index_path``: under
+   ``$NAS_ADJUDICATION_STATE_DIR`` or ``~/.local/state/native-agent-stack/adjudication/``, outside the work dir).
+   Which position holds the Claude return is drawn per layer and recorded only in that index, so neither a file
+   name nor this code tells a judge which family wrote A (independent review of #145); assemble also derives it
+   from the input contents.
    Scrubbing keeps only the judged content (SCRUB_KEEP) and drops any kept key present in one return
    but not the other, so lane identity, model and provenance are not shown to the judge.
 2. ``codex``: one ``codex exec`` judge call and one refuter call per input file, built like
@@ -726,6 +728,8 @@ def run_codex(args) -> int:
     entries_by_layer = {entry["layer"]: entry for entry in index.get("layers") or []}
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
     # The code, prompt and evidence tree this run judges with, captured at launch (Codex review of #145).
+    # Codex judges never load the user's global Codex instructions (codex_lane.isolated_codex_home).
+    codex_lane.CHILD_CODEX_HOME = codex_lane.isolated_codex_home(work_dir)
     try:
         run_provenance = adjudication_provenance(args.prompt, repo)
     except ValueError as error:  # an escaping symlink: not a blind export
