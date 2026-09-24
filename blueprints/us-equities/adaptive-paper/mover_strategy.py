@@ -72,7 +72,15 @@ class MoverStrategy(Strategy):
             return
         for intent in self.ledger.intents():
             if intent.client_id in open_ids and intent.terminal:
-                self.book.on_terminal(intent.client_id, intent.status)
+                self.book.on_terminal(intent.client_id, intent.status, pre_wire=intent.status == "not_sent",
+                                      at=self._clock())
+
+    def _pre_wire(self, client_id):
+        """Refused before any broker request: the ledger reserved no intent (the ledger or
+        NautilusTrader refused it first) or holds it as not_sent. A broker refusal keeps the
+        intent as broker_refused/rejected and is charged to the exit budget."""
+        intent = next((i for i in self.ledger.intents() if i.client_id == client_id), None)
+        return intent is None or intent.status == "not_sent"
 
     def _execute(self, actions):
         for action in actions:
@@ -116,13 +124,14 @@ class MoverStrategy(Strategy):
             self.ledger.freeze("broker_refusal_needs_reconciliation")
         else:
             self._mark_definitive_refusal(client_id)
-        self.book.on_terminal(client_id, "rejected", reason)
+        self.book.on_terminal(client_id, "rejected", reason, pre_wire=self._pre_wire(client_id), at=self._clock())
 
     def on_order_denied(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
         self._mark_definitive_refusal(client_id)
-        self.book.on_terminal(client_id, "denied", str(event.reason))
+        self.book.on_terminal(client_id, "denied", str(event.reason), pre_wire=self._pre_wire(client_id),
+                              at=self._clock())
 
     def on_order_cancel_rejected(self, event):
         self.book.on_cancel_rejected(str(event.client_order_id))

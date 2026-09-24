@@ -215,6 +215,28 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(self.port.snapshots, 3)
         self.assertEqual(self.ledger.accounting().halted_reason, "recovery_only")
 
+    def test_notional_mode_exit_uses_whole_shares_within_the_ledger_cap(self):
+        """In "notional" max_order_qty_mode the ledger caps a sell at floor(notional cap / bid)
+        shares. 11 shares bought at 90.00 face a 100.00 bid: the notional capacity at the
+        99.98 limit is 10.002 shares, which the ledger refuses; the exit must be 10 then 1."""
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / "notional.sqlite", RiskLimits(
+            cleanup_seconds=3, max_order_qty="100", max_order_qty_mode="notional"))
+        self.controller = Controller(self.ledger)
+        self.port = self.controller.port = FakePort(self.controller)
+        self.ledger.start_trial(self.start)
+        self.ledger.reserve_intent("entry-1", "SPY", "buy", "11", "90.00", quote=Quote("SPY", "89.99", "90.00", self.start),
+                                   now=self.start, market_open=True, session_close=self.controller.close)
+        self.assertEqual(self.ledger.request_budget(self.start, "submit", client_id="entry-1"), 0)
+        self.port.rows["entry-1"] = {"client_order_id": "entry-1", "id": "broker-entry-1", "symbol": "SPY",
+                                     "side": "buy", "qty": "11", "limit_price": "90.00", "filled_qty": "11",
+                                     "filled_avg_price": "90.00", "status": "filled", "updated_at_ns": time.time_ns()}
+        self.port.qty, self.port.cash = Decimal(11), self.port.cash - 11 * Decimal("90.00")
+        result = self.recover()
+        self.assertEqual((result["status"], result["errors"]), ("passed", []))
+        self.assertTrue(result["flat"])
+        self.assertEqual([(p["qty"], p["limit_price"]) for p in self.port.submissions], [("10", "99.98"), ("1", "99.98")])
+
     def test_pending_cancel_cannot_authorize_sell(self):
         self.original_buy("0.5", "partially_filled")
         self.port.mode = "cancel_pending"

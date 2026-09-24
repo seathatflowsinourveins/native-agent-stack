@@ -66,6 +66,16 @@ X3_TRAIL_FRACTION = D("0.85")
 X4_STOP_FRACTION = D("0.85")
 X4_TARGET_FRACTION = D("1.50")
 
+# Exit budget: at most max_exit_orders_per_symbol exit orders per leg, counted from the
+# latest grant (trial start, then once more when a force reason latches). A sell the
+# ledger or engine refused before any broker request is not charged; it is retried after
+# PRE_WIRE_RETRY_SECONDS and has its own bound of the same size. Once a force reason has
+# latched, the native loop hands every residual to recovery.recover when no exit has
+# filled for HANDOFF_EXIT_TIMEOUTS exit timeouts or every held leg's exits are blocked.
+PRE_WIRE_RETRY_SECONDS = 1.0
+HANDOFF_EXIT_TIMEOUTS = 3
+EXIT_BUDGET_EXHAUSTED = ("exit_orders_exhausted", "exit_refusals_exhausted")
+
 PRE_MARKET_OPEN_ET = dtime(4, 0)
 RTH_OPEN_ET = dtime(9, 30)
 RTH_CLOSE_ET = dtime(16, 0)
@@ -309,6 +319,12 @@ def load_mover_config(path):
                         min_entry_close_seconds=config["min_entry_close_seconds"],
                         overnight_gross_multiple=session_policy["overnight_gross_multiple"],
                         **({"leverage": leverage} if leverage is not None else {}))
+    if limits.max_order_qty_mode != "notional":
+        # recovery.recover sizes each exit within the ledger's effective_max_order_qty. Only
+        # "notional" mode makes that floor(max_order_notional_usd / bid) whole shares; in
+        # "fixed" mode a recovery chunk can be the fractional notional capacity, which a
+        # non-fractionable mover cannot sell.
+        raise ValueError("mover_requires_notional_order_qty_mode")
     benchmarks = config["benchmarks"]
     if not isinstance(benchmarks, list) or not 1 <= len(benchmarks) <= 3 or len(set(benchmarks)) != len(benchmarks):
         raise ValueError("invalid_mover_benchmarks")
@@ -629,14 +645,21 @@ class SymbolSizing:
     notional_usd: Decimal
     binding: str
     skip_reason: str | None
-    price_decimals: int = 2
+    price_decimals: int = 4
 
 
 def symbol_price_decimals(price_at_t):
-    """Native instrument precision for a scanned symbol: 4 below 1 USD (sub-penny
-    ticks), else 2. A 2-decimal symbol keeps whole-cent limits even if it later trades
-    below 1 USD, since NautilusTrader denies a price finer than its instrument."""
-    return 4 if D(price_at_t) < 1 else 2
+    """Native instrument precision for a scanned symbol: 4 for every mover symbol.
+
+    Below 1 USD quotes, limits and fills move in 0.0001 steps, and a mover scanned
+    above 1 USD can fall below it within the trial (X4's stop alone reaches it for any
+    entry up to about 1.17 USD). A 2-decimal instrument cannot carry such a fill: the
+    native adapter refuses a fill price finer than its instrument
+    (cumulative_fill_precision_requires_reconciliation). The pricing functions still
+    use the 0.01 tick at or above 1 USD, as Alpaca and the ledger's price-increment
+    check require; NautilusTrader accepts those coarser prices on a 4-decimal
+    instrument. ``price_at_t`` is unused; the signature is kept for the plan's callers."""
+    return 4
 
 
 def size_symbols(symbols, *, equity, leverage, gross_budget, per_order_cap, allowance):
@@ -799,15 +822,23 @@ def buy_limit_price(ask, cap_bps, decimals=4):
 
 def sell_limit_price(bid, cap_bps, decimals=4):
     """Marketable sell limit for a simulated stop or exit: bid x (1 - cap), rounded UP to
-    the tick so the sale is never priced below the cap. None when not positive."""
+    the tick so the sale is never priced below the cap, and never above the bid rounded
+    DOWN to the tick, so it stays marketable. The second bound only binds for a 2-decimal
+    instrument quoted below 1 USD in sub-penny increments, where no whole cent lies
+    between the cap and the bid: bid 0.9349 with a 50 bps cap gives 0.9302, which rounds
+    up to 0.94, above the bid; the limit is 0.93 (52 bps below that bid). None when not
+    positive (a 2-decimal bid below one cent)."""
     bid, cap = D(bid), D(cap_bps)
     raw = bid * (1 - cap / 10000)
     if raw <= 0:
         return None
     tick = tick_size(raw, decimals)
     limit = (raw / tick).to_integral_value(rounding=ROUND_CEILING) * tick
-    limit = limit.quantize(tick_size(limit, decimals))
-    return limit if limit > 0 else None
+    bid_tick = tick_size(bid, decimals)
+    limit = min(limit, (bid / bid_tick).to_integral_value(rounding=ROUND_FLOOR) * bid_tick)
+    if limit <= 0:
+        return None
+    return limit.quantize(tick_size(limit, decimals))
 
 
 def whole_shares(value):
@@ -866,6 +897,9 @@ class OrderRecord:
     cancel_requested: bool = False
     cancel_reason: str | None = None
     detail: str | None = None
+    # Refused before any broker request (no ledger intent was reserved, or it was proven
+    # not sent); such an exit is not charged to the leg's exit budget.
+    pre_wire: bool = False
 
     @property
     def filled_qty(self):
@@ -885,6 +919,7 @@ class OrderRecord:
                 "reference_price": text(self.reference_price), "submitted_at": _iso(self.created),
                 "accepted_at": _iso(self.accepted_at), "status": self.status, "detail": self.detail,
                 "cancel_requested": self.cancel_requested, "cancel_reason": self.cancel_reason,
+                "pre_wire_refusal": self.pre_wire,
                 "fills": [{"at": _iso(at), "qty": text(qty), "price": text(price)} for at, qty, price in self.fills],
                 "filled_qty": text(self.filled_qty),
                 "average_fill_price": None if average is None else text(average.quantize(D("0.000001")))}
@@ -907,6 +942,9 @@ class Leg:
     exit_reason: str | None = None
     exit_triggered_at: float | None = None
     exit_blocked: str | None = None
+    exit_wait_reason: str | None = None
+    exit_budget_from: int = 0
+    exit_retry_at: float | None = None
     entry_ask: Decimal | None = None
     entry_notional_usd: Decimal | None = None
     entry_leverage_i: Decimal | None = None
@@ -932,6 +970,13 @@ class MoverBook:
     transport only carries limit/DAY orders, re-priced after ``exit_timeout_seconds``
     and chunked to the ledger's per-order caps; a latched force reason (kill switch,
     risk halt, transport gap, hard flatten, ...) cancels open buys and flattens.
+
+    Exit budget: no sell is sent on a halted quote, a pre-wire refusal is retried after
+    PRE_WIRE_RETRY_SECONDS without being charged, a latched force reason grants each leg
+    one fresh budget, and a leg that exhausts its budget before any force latches the
+    book-wide force ``exit_orders_exhausted`` (or ``exit_refusals_exhausted``), so every
+    leg flattens through the book first. ``handoff_reason`` then tells the runner when to
+    stop the native loop and leave the residual to recovery.recover.
     """
 
     def __init__(self, plan, *, positions, quote, limits, trial_id, existing_client_ids=(), event_sink=None):
@@ -950,11 +995,18 @@ class MoverBook:
         self.force_reason = None
         self.force_at = None
         self.events = event_sink or (lambda event: None)
+        self._held_total = None      # held quantity at the previous evaluation
+        self._progress_at = None     # last evaluation that saw the held quantity fall
 
     # -- inputs ------------------------------------------------------------
     def set_force(self, reason, now):
         if self.force_reason is None and reason:
             self.force_reason, self.force_at = str(reason), now
+            for leg in self.legs.values():
+                # One fresh exit budget per leg for the flatten.
+                leg.exit_budget_from = len(leg.exits)
+                if leg.exit_blocked in EXIT_BUDGET_EXHAUSTED:
+                    leg.exit_blocked = None
             self.events({"type": "mover_force", "reason": self.force_reason, "at": now})
 
     def order(self, client_id):
@@ -989,18 +1041,24 @@ class MoverBook:
         if record.filled_qty >= record.qty:
             self.on_terminal(client_id, "filled")
 
-    def on_terminal(self, client_id, status, detail=None):
+    def on_terminal(self, client_id, status, detail=None, *, pre_wire=False, at=None):
+        """``pre_wire``: the caller proved the order was refused before any broker request
+        (the ledger holds no intent for it, or holds it as not_sent). Such a sell is not
+        charged to the exit budget and is retried after PRE_WIRE_RETRY_SECONDS from ``at``."""
         record = self.orders.get(client_id)
         if record is None or record.terminal:
             return
         record.terminal = True
         record.status = status
         record.detail = bounded_detail(detail) if detail is not None else record.detail
+        record.pre_wire = bool(pre_wire) and not record.fills and record.accepted_at is None
         leg = self.legs.get(record.symbol)
         if leg is None:
             return
         if record.side == "buy" and leg.state == "entry_open":
             leg.state = "holding" if record.filled_qty > 0 else "no_fill"
+        if record.side == "sell" and record.pre_wire:
+            leg.exit_retry_at = (record.created if at is None else at) + PRE_WIRE_RETRY_SECONDS
 
     def on_cancel_rejected(self, client_id):
         record = self.orders.get(client_id)
@@ -1040,6 +1098,7 @@ class MoverBook:
             self.set_force("hard_flatten", now)
         force = self.force_reason
         positions = self._positions()
+        self._note_progress(positions, now)
         guard = self._guard_symbol(positions)
         for symbol in (symbols if symbols is not None else tuple(self.legs)):
             leg = self.legs.get(symbol)
@@ -1068,13 +1127,61 @@ class MoverBook:
                         leg.exit_reason, leg.exit_triggered_at = reason, now
                         self.events({"type": "mover_exit_triggered", "symbol": symbol, "reason": reason, "at": now})
                         actions += self._cancels(leg, symbol, now, force)
-                if leg.exit_reason is not None and not self.open_orders(symbol) and fresh:
-                    action = self._exit(leg, symbol, quote, held, now)
-                    if action is not None:
-                        actions.append(action)
+                if leg.exit_reason is not None and not self.open_orders(symbol):
+                    leg.exit_wait_reason = self._exit_wait(leg, quote, fresh, now)
+                    if leg.exit_wait_reason is None:
+                        action = self._exit(leg, symbol, quote, held, now)
+                        if action is not None:
+                            actions.append(action)
             elif leg.state in ("holding", "exiting") and not self.open_orders(symbol):
                 leg.state, leg.closed_at = "closed", leg.closed_at or now
         return actions
+
+    def _note_progress(self, positions, now):
+        held = sum((p.qty for s, p in positions.items() if s in self.legs and p.qty > 0), ZERO)
+        if self._held_total is not None and held < self._held_total:
+            self._progress_at = now
+        self._held_total = held
+
+    @staticmethod
+    def _exit_wait(leg, quote, fresh, now):
+        """Why a triggered exit is not sent now (never charged to the budget), or None."""
+        if not fresh:
+            return "no_fresh_quote"
+        if getattr(quote, "halted", False):
+            return "quote_halted"   # a limit sell cannot fill during a halt; wait for it to lift
+        if leg.exit_retry_at is not None and now < leg.exit_retry_at:
+            return "pre_wire_refusal_backoff"
+        return None
+
+    def handoff_reason(self, now):
+        """Why the runner should stop the native loop and leave every residual to
+        recovery.recover, or None.
+
+        Only once a force reason has latched (every leg is then flattening through the
+        book) and while a position or an open order remains:
+
+        - ``exits_blocked``: every held leg's exits are blocked with nothing open for it
+          (budget exhausted after the force's fresh budget, a limit that is not positive, or
+          one share above the per-order cap);
+        - ``no_exit_progress``: the held quantity has not fallen for HANDOFF_EXIT_TIMEOUTS
+          exit timeouts since the latch or the last fill, which covers exits resting
+          unfilled, refused, waiting on a halt, or impossible without a fresh quote.
+
+        Before a force, a blocked leg keeps retrying on every evaluation and the other legs
+        keep their rules: recovery stops at its first failed symbol, so an early hand-off
+        could leave sellable legs unsold."""
+        if self.force_reason is None:
+            return None
+        held = [s for s, p in self._positions().items() if s in self.legs and p.qty > 0]
+        if not held and not self.open_orders():
+            return None
+        if held and all(self.legs[s].exit_blocked is not None and not self.open_orders(s) for s in held):
+            return "exits_blocked"
+        since = self.force_at if self._progress_at is None else max(self.force_at, self._progress_at)
+        if now - since >= HANDOFF_EXIT_TIMEOUTS * self.plan.timing.exit_timeout_seconds:
+            return "no_exit_progress"
+        return None
 
     def _cancels(self, leg, symbol, now, force):
         actions = []
@@ -1154,24 +1261,36 @@ class MoverBook:
                      "qty": quantity, "limit_price": price_text(limit), "ask": text(ask), "at": now})
         return Action("submit", record.client_id, record)
 
+    def _block_exit(self, leg, symbol, reason, now):
+        if leg.exit_blocked != reason:
+            leg.exit_blocked = reason
+            self.events({"type": "mover_exit_blocked", "symbol": symbol, "reason": reason, "at": now})
+
     def _exit(self, leg, symbol, quote, held, now):
-        if len(leg.exits) >= self.plan.max_exit_orders_per_symbol:
-            if leg.exit_blocked is None:
-                leg.exit_blocked = "exit_orders_exhausted"
-                self.events({"type": "mover_exit_blocked", "symbol": symbol, "reason": leg.exit_blocked, "at": now})
+        budget = leg.exits[leg.exit_budget_from:]
+        refused = sum(1 for record in budget if record.pre_wire)
+        exhausted = None
+        if len(budget) - refused >= self.plan.max_exit_orders_per_symbol:
+            exhausted = "exit_orders_exhausted"
+        elif refused >= self.plan.max_exit_orders_per_symbol:
+            exhausted = "exit_refusals_exhausted"
+        if exhausted is not None:
+            self._block_exit(leg, symbol, exhausted, now)
+            if self.force_reason is None:
+                # Flatten every leg through the book (one fresh budget each) before any
+                # hand-off: recovery stops at its first failed symbol.
+                self.set_force(exhausted, now)
             return None
         bid = D(quote.bid)
         limit = sell_limit_price(bid, self.plan.exit_cap_bps, leg.sizing.price_decimals)
         if limit is None:
-            leg.exit_blocked = "exit_price_not_positive"
+            self._block_exit(leg, symbol, "exit_price_not_positive", now)
             return None
         per_order = self.limits.max_order_notional_usd
         chunk = min(whole_shares(held), whole_shares(per_order / limit),
                     int(self.limits.effective_max_order_qty(limit, quote_price=bid)))
         if chunk < 1:
-            if leg.exit_blocked is None:
-                leg.exit_blocked = "exit_share_exceeds_per_order_cap"
-                self.events({"type": "mover_exit_blocked", "symbol": symbol, "reason": leg.exit_blocked, "at": now})
+            self._block_exit(leg, symbol, "exit_share_exceeds_per_order_cap", now)
             return None
         record = OrderRecord(self._next_client_id(), symbol, "sell", D(chunk), limit, leg.exit_reason, now, bid)
         self.orders[record.client_id] = record
@@ -1211,6 +1330,7 @@ class MoverBook:
                 "first_fill_at": _iso(leg.first_fill_at),
                 "running_high": text(leg.running_high),
                 "exit_reason": leg.exit_reason, "exit_triggered_at": _iso(leg.exit_triggered_at),
-                "exit_blocked": leg.exit_blocked, "closed_at": _iso(leg.closed_at),
+                "exit_blocked": leg.exit_blocked, "exit_wait_reason": leg.exit_wait_reason,
+                "exit_budget_from": leg.exit_budget_from, "closed_at": _iso(leg.closed_at),
                 "exits": [record.receipt() for record in leg.exits]})
         return rows

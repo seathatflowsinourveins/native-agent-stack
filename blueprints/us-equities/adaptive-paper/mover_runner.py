@@ -76,8 +76,10 @@ def _iso(epoch):
 
 def instrument_metadata(plan, benchmarks):
     """Native instruments at each symbol's plan precision (mover.symbol_price_decimals:
-    4 below 1 USD, else 2). Benchmarks are subscribed for stream liveness and preflight
-    readiness only; the mover never trades them unless the scan lists them."""
+    4 for every mover symbol, so a sub-penny fill below 1 USD is representable; the
+    order prices stay on the 0.01 tick at or above 1 USD). Benchmarks are subscribed for
+    stream liveness and preflight readiness only; the mover never trades them unless the
+    scan lists them."""
     rows, seen = [], set()
     for item in plan.symbols:
         symbol = item.scan.symbol
@@ -127,6 +129,44 @@ def mover_reconcile(ledger, snapshot, baseline_cash):
     return reconcile(ledger, {**snapshot, "orders": orders}, baseline_cash)
 
 
+def scope_recovery_adoption(port, ledger):
+    """Wrap a fresh recovery port so recovery.recover adopts only intents it can own.
+
+    recovery.recover adopts every intent the ledger has not retired, and a transport
+    refuses to adopt an intent for a symbol it does not subscribe (at most 30 symbols).
+    The mover ledger spans every session of the lane and each scan trades other symbols,
+    so adopting everything fails from the second session on. Every unresolved intent is
+    still adopted (a cancel needs it; the ports built here subscribe every held and
+    unresolved symbol, and one outside them still fails closed in the transport), as is
+    every terminal intent whose symbol the port subscribes. A terminal intent that is
+    skipped stays covered: the snapshot pages every order since the lane's first trial
+    (history_start) and reconciliation raises submitted_intent_absent for any attempted
+    ledger intent the snapshot lacks. The counts are kept on ``port.adoption_scope``."""
+    adopt = port.adopt_intents
+
+    def scoped(intents):
+        unresolved = {intent.client_id for intent in ledger.unresolved()}
+        subscribed = set(port.symbols)
+        intents = list(intents)
+        kept = [i for i in intents if i["client_order_id"] in unresolved or i["symbol"] in subscribed]
+        port.adoption_scope = {"adopted": len(kept), "skipped_terminal_unsubscribed": len(intents) - len(kept),
+                               "subscribed_symbols": len(subscribed)}
+        return adopt(kept)
+
+    port.adopt_intents = scoped
+    return port
+
+
+async def recover_mover(controller, metadata, config):
+    """recovery.recover on the controller's fresh, unstarted port with the mover's
+    adoption scope and reconciliation (mover_reconcile). Sell-only, as the engine's."""
+    from recovery import recover
+    port = scope_recovery_adoption(controller.port, controller.ledger)
+    result = await recover(controller, metadata, config, reconcile_fn=mover_reconcile)
+    result["adoption_scope"] = getattr(port, "adoption_scope", None)
+    return result
+
+
 def make_book(plan, controller):
     ledger = controller.ledger
     return MoverBook(plan, positions=ledger.positions, quote=controller.quotes.get, limits=ledger.limits,
@@ -142,8 +182,11 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
     adapter error, ledger halt, transport gap, session close, mark-to-market failure,
     or the plan's hard flatten) stops entries and flattens; quotes are marked every
     tick; a periodic broker snapshot is reconciled when nothing is in flight; the run
-    ends once every leg is resolved and the ledger is flat, or at the ledger's sell
-    window end, then takes a final reconciliation when no order is unresolved."""
+    ends once every leg is resolved and the ledger is flat, when the book hands off to
+    recovery (MoverBook.handoff_reason: after a force, every held leg's exits blocked or
+    no exit fill for mover.HANDOFF_EXIT_TIMEOUTS exit timeouts), or at the ledger's sell
+    window end, then takes a final reconciliation when no order is unresolved. The
+    caller runs recovery for any residual."""
     from native_adapter import build_node
     from mover_strategy import MoverStrategy
     ledger = controller.ledger
@@ -171,6 +214,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
     last_reconciliation = started
     reconciliation = None
     force_reason = None
+    handoff = None
     stop_path = Path(stop_file) if stop_file is not None else None
     try:
         while True:
@@ -227,6 +271,12 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                 strategy.tick(now, force_reason=force_reason)
                 if book.complete() and not ledger.unresolved() and not ledger.positions():
                     break
+                reason = book.handoff_reason(now)
+                if reason is not None:
+                    handoff = {"reason": reason, "at": _iso(now), "force_reason": book.force_reason,
+                               "seconds_after_force": round(now - book.force_at, 3)}
+                    controller.events.append({"type": "mover_handoff_to_recovery", "reason": reason, "at": now})
+                    break
             await asyncio.sleep(.1)
         strategy.enabled = False
         strategy.suspended = True
@@ -252,6 +302,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                "startup_reconciliation": session.reconciliation, "adapter_errors": list(session.errors),
                "flat": not ledger.positions() and not ledger.unresolved(),
                "force_reason": book.force_reason, "force_at": _iso(book.force_at),
+               "handoff_to_recovery": handoff,
                "legs": book.leg_receipts(), "events": list(controller.events),
                "foreign_terminal_orders_ignored": getattr(controller, "foreign_terminal_orders", 0),
                "requests": dict(Counter(r["kind"] for r in controller.requests)),
@@ -375,6 +426,7 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
                         "lifetime_gross_loss_usd": text(after.gross_loss_usd), "drawdown_usd": text(after.drawdown_usd),
                         "halted_reason": after.halted_reason},
         "force_reason": outcome.get("force_reason"), "force_at": outcome.get("force_at"),
+        "handoff_to_recovery": outcome.get("handoff_to_recovery"),
         "adapter_errors": outcome.get("adapter_errors", []), "error_type": outcome.get("error_type"),
         "error_reason": outcome.get("error_reason"),
         "foreign_terminal_orders_ignored": outcome.get("foreign_terminal_orders_ignored", 0),
@@ -611,7 +663,6 @@ def command_paper(args):
                 signal.signal(sig, lambda *_: setattr(controller, "stop", True))
 
             async def execute():
-                from recovery import recover
                 if plan.session.paused or all(item.skip_reason for item in plan.symbols):
                     return {"status": "completed_no_signals", "flat": True, "native_fill_events": 0,
                             "legs": make_book(plan, controller).leg_receipts(),
@@ -629,8 +680,8 @@ def command_paper(args):
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
                     controller.port = fresh_port(True)
-                    outcome = _apply_forced_recovery_outcome(outcome, await recover(
-                        controller, metadata, trial_config, reconcile_fn=mover_reconcile))
+                    outcome = _apply_forced_recovery_outcome(outcome, await recover_mover(
+                        controller, metadata, trial_config))
                 return outcome
 
             outcome = asyncio.run(execute())
@@ -660,7 +711,6 @@ def command_paper(args):
 def command_recover(args):
     global LAST_EVIDENCE_CLASS
     LAST_EVIDENCE_CLASS = "PAPER"
-    from recovery import recover
     from transport import AlpacaPaperTransport, TransportError, preflight
     config, limits, settings = load_mover_config(args.config)
     session_policy = validate_session_policy(config)
@@ -704,7 +754,7 @@ def command_recover(args):
                 feed=config["feed"], required_quote_symbols=recovering,
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                 extended_hours_allowed=session_policy["extended_hours"], include_margin=include_margin))
-            result = asyncio.run(recover(controller, metadata, trial_config, reconcile_fn=mover_reconcile))
+            result = asyncio.run(recover_mover(controller, metadata, trial_config))
             result.update(kind="mover_recovery_receipt", protocol=PROTOCOL_ID, evidence_class="PAPER",
                           trial_id=metadata["trial_id"])
             phase, exit_code = trial_phase_and_exit_code(result)

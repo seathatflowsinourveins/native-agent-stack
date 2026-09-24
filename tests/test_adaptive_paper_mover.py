@@ -134,6 +134,9 @@ class RuleAndConfig(unittest.TestCase):
         case("invalid_mover_block", lambda d: d["mover"].update(extra=True))
         case("unqualified_data_feed", lambda d: d.update(feed="IEX"))
         case("unqualified_mover_configuration", lambda d: d.update(protocol="other"))
+        # recovery.recover would size a "fixed"-mode chunk as the fractional notional capacity.
+        case("mover_requires_notional_order_qty_mode", lambda d: d.update(max_order_qty_mode="fixed"))
+        case("mover_requires_notional_order_qty_mode", lambda d: d.pop("max_order_qty_mode"))
         for reason, data in cases:
             with self.subTest(reason=reason), self.assertRaisesRegex(ValueError, "^" + re.escape(reason) + "$"):
                 load(data)
@@ -318,7 +321,7 @@ class SessionsSizingAndTiming(unittest.TestCase):
         self.assertEqual(plan.gross_budget_usd, D(1000))     # min(2000 / 2, 10000 x 1)
         self.assertEqual(plan.gross_guard_usd, D(1800))      # 0.9 x ledger gross cap
         self.assertEqual([s.notional_usd for s in plan.symbols], [D(200), D(200)])
-        self.assertEqual([s.price_decimals for s in plan.symbols], [2, 2])
+        self.assertEqual([s.price_decimals for s in plan.symbols], [4, 4])   # every mover instrument
         with self.assertRaisesRegex(mover.MoverRefusal, "invalid_evidence_class"):
             mover.build_plan(self.settings, self.limits, scan, session, trial_id="t1", evidence_class="LIVE",
                              t0=SCAN_TIME + 25, equity=D(10000))
@@ -357,6 +360,23 @@ class Pricing(unittest.TestCase):
         self.assertEqual(mover.sell_limit_price(D("1.0049"), D(50)), D("0.9999"))
         self.assertEqual(mover.sell_limit_price(D("0.97"), D(50), decimals=2), D("0.97"))
         self.assertEqual(mover.sell_limit_price(D("100.00"), D(50)), D("99.50"))
+
+    def test_two_decimal_sell_limit_never_rests_above_a_sub_penny_bid_below_one_dollar(self):
+        """A 2-decimal symbol keeps whole-cent limits below 1 USD (NautilusTrader refuses a
+        finer price) while its bid can be sub-penny. When no whole cent lies between the cap
+        and the bid, the limit is the bid rounded down, so the stop stays marketable."""
+        self.assertEqual(mover.sell_limit_price(D("0.9349"), D(50), decimals=2), D("0.93"))   # the cap's 0.94 > bid
+        self.assertEqual(mover.sell_limit_price(D("0.9999"), D(50), decimals=2), D("0.99"))
+        self.assertEqual(mover.sell_limit_price(D("0.9301"), D(50), decimals=2), D("0.93"))
+        self.assertEqual(mover.sell_limit_price(D("0.97"), D(50), decimals=2), D("0.97"))     # whole-cent bid: as before
+        self.assertIsNone(mover.sell_limit_price(D("0.0099"), D(50), decimals=2))              # below one cent
+        for ticks in range(100, 10000, 37):                                                    # bids 0.0100 .. 0.9975
+            bid = D(ticks) / 10000
+            with self.subTest(bid=bid):
+                limit = mover.sell_limit_price(bid, D(50), decimals=2)
+                self.assertEqual(limit, limit.quantize(D("0.01")))
+                self.assertLessEqual(limit, bid)
+                self.assertGreaterEqual(limit, bid * D("0.995") - D("0.01"))                  # within a tick of the cap
 
     def test_limits_satisfy_the_ledger_price_increment_and_cap(self):
         for text in ("0.1234", "0.5", "0.9999", "1.00", "1.01", "3.21", "45.50", "199.99"):
@@ -419,9 +439,10 @@ class ExitRules(unittest.TestCase):
 class BookHarness:
     """A MoverBook over mutable fake positions and quotes, with the example config's caps."""
 
-    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None):
+    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None, exit_orders=None):
         data = config_data()
         data["mover"]["exit"] = exit_rule
+        data["mover"]["exit_orders"].update(exit_orders or {})
         if exit_rule == "X1":
             data["mover"].update(session_scope="any_session", trial_end_et="16:00")
         _, self.limits, self.settings = load(data)
@@ -650,6 +671,193 @@ class BookStateMachine(unittest.TestCase):
         h.quote("ABCD", "3.21", "3.22", now)
         self.assertEqual(submits(book.evaluate(now, entries_enabled=True, symbols=("ABCD",)))[0].client_id,
                          "mvr-t1-0000008")
+
+
+class ExitBudgetAndHandoff(unittest.TestCase):
+    """What an exit may cost, and when the runner hands a residual to recovery.recover."""
+
+    def exit_due(self, max_orders):
+        """ABCD held (61 shares at 3.22) with its X2 exit due at the returned time."""
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1], exit_orders={"max_orders_per_symbol": max_orders})
+        now = h.t0 + 1
+        h.quote("ABCD", "3.21", "3.22", now)
+        buy = submits(h.evaluate(now), "buy")[0]
+        h.fill(buy, 61, "3.22", now)
+        return h, now + 3600
+
+    def reprice(self, h, sell, at):
+        """The sell rests for the exit timeout, is canceled for a re-price (a charged exit)."""
+        h.quote("ABCD", "3.20", "3.21", at + 10)
+        self.assertEqual(cancels(h.evaluate(at + 10)), [sell.client_id])
+        h.book.on_terminal(sell.client_id, "canceled")
+
+    def test_a_halted_quote_never_sends_or_charges_an_exit(self):
+        h, at = self.exit_due(1)
+        h.quote("ABCD", "3.20", "3.21", at, halted=True)
+        self.assertEqual(submits(h.evaluate(at)), [])
+        leg = h.book.legs["ABCD"]
+        self.assertEqual((leg.exit_reason, leg.exit_wait_reason, leg.exits), ("x2_time", "quote_halted", []))
+        h.quote("ABCD", "3.20", "3.21", at + 5)                     # the halt lifts; the one budgeted exit is intact
+        sell = submits(h.evaluate(at + 5), "sell")[0]
+        self.assertEqual((sell.qty, sell.reason, leg.exit_wait_reason), (D(61), "x2_time", None))
+
+    def test_a_pre_wire_refusal_backs_off_and_is_not_charged(self):
+        h, at = self.exit_due(2)
+        h.quote("ABCD", "3.20", "3.21", at)
+        refused = submits(h.evaluate(at), "sell")[0]
+        h.book.on_terminal(refused.client_id, "rejected", "quote_not_fresh", pre_wire=True, at=at)
+        self.assertTrue(refused.pre_wire)
+        h.quote("ABCD", "3.20", "3.21", at + 0.5)
+        self.assertEqual(submits(h.evaluate(at + 0.5)), [])
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, "pre_wire_refusal_backoff")
+        at += mover.PRE_WIRE_RETRY_SECONDS
+        for _ in range(2):                                          # both budgeted exits are still available
+            h.quote("ABCD", "3.20", "3.21", at)
+            self.reprice(h, submits(h.evaluate(at), "sell")[0], at)
+            at += 10.1
+        self.assertIsNone(h.book.force_reason)
+        h.quote("ABCD", "3.20", "3.21", at)
+        self.assertEqual(submits(h.evaluate(at)), [])               # two charged exits exhaust the budget,
+        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")   # which latches a book-wide flatten
+        self.assertEqual(len(h.book.legs["ABCD"].exits), 3)
+        h.quote("ABCD", "3.20", "3.21", at + 0.1)
+        self.assertEqual(submits(h.evaluate(at + 0.1), "sell")[0].reason, "x2_time")   # with one fresh budget
+
+    def test_pre_wire_refusals_have_their_own_bound(self):
+        h, at = self.exit_due(2)
+        for _ in range(2):
+            h.quote("ABCD", "3.20", "3.21", at)
+            sell = submits(h.evaluate(at), "sell")[0]
+            h.book.on_terminal(sell.client_id, "denied", "outstanding_order_cap_reached", pre_wire=True, at=at)
+            at += mover.PRE_WIRE_RETRY_SECONDS
+        h.quote("ABCD", "3.20", "3.21", at)
+        self.assertEqual(submits(h.evaluate(at)), [])
+        self.assertEqual(h.book.force_reason, "exit_refusals_exhausted")
+
+    def test_a_refusal_after_the_broker_saw_the_order_is_charged(self):
+        h, at = self.exit_due(1)
+        h.quote("ABCD", "3.20", "3.21", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        h.book.on_accepted(sell.client_id, at + 0.1, "ref")
+        h.book.on_terminal(sell.client_id, "rejected", "broker_rejected", pre_wire=True, at=at + 0.2)
+        self.assertFalse(sell.pre_wire)
+        h.quote("ABCD", "3.20", "3.21", at + 0.3)
+        self.assertEqual(submits(h.evaluate(at + 0.3)), [])
+        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")
+
+    def test_a_latched_force_grants_one_fresh_budget_then_blocked_exits_hand_off(self):
+        h, at = self.exit_due(1)
+        h.quote("ABCD", "3.20", "3.21", at)
+        first = submits(h.evaluate(at), "sell")[0]
+        h.book.set_force("kill_switch", at + 5)
+        self.assertEqual(h.book.legs["ABCD"].exit_budget_from, 1)
+        self.reprice(h, first, at)
+        second = submits(h.evaluate(at + 10.1), "sell")[0]         # beyond the budget of one: the force's grant
+        self.assertEqual(second.reason, "x2_time")
+        self.assertIsNone(h.book.handoff_reason(at + 10.1))
+        self.reprice(h, second, at + 10.1)
+        self.assertEqual(submits(h.evaluate(at + 20.2)), [])        # no second grant
+        self.assertEqual(h.book.legs["ABCD"].exit_blocked, "exit_orders_exhausted")
+        self.assertEqual(h.book.handoff_reason(at + 20.2), "exits_blocked")
+
+    def test_a_force_without_exit_progress_hands_off_after_the_bound(self):
+        h, at = self.exit_due(20)
+        bound = mover.HANDOFF_EXIT_TIMEOUTS * h.timing.exit_timeout_seconds
+        h.book.set_force("kill_switch", at)
+        h.quote("ABCD", "3.20", "3.21", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        self.assertIsNone(h.book.handoff_reason(at + bound - 0.1))
+        h.fill(sell, 30, "3.20", at + 1)                            # a partial fill is progress
+        h.quote("ABCD", "3.20", "3.21", at + 1)
+        h.evaluate(at + 1)
+        self.assertIsNone(h.book.handoff_reason(at + bound + 0.5))
+        self.assertEqual(h.book.handoff_reason(at + 1 + bound), "no_exit_progress")
+
+    def test_a_force_without_a_fresh_quote_hands_off_after_the_bound(self):
+        h, at = self.exit_due(20)
+        bound = mover.HANDOFF_EXIT_TIMEOUTS * h.timing.exit_timeout_seconds
+        h.book.set_force("transport_gap", at)
+        h.quote("ABCD", "3.20", "3.21", at - 10)                    # the feed stopped
+        self.assertEqual(submits(h.evaluate(at + bound - 1)), [])
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, "no_fresh_quote")
+        self.assertIsNone(h.book.handoff_reason(at + bound - 1))
+        self.assertEqual(h.book.handoff_reason(at + bound), "no_exit_progress")
+
+    def test_no_hand_off_before_a_force_or_once_flat(self):
+        h, at = self.exit_due(20)
+        self.assertIsNone(h.book.handoff_reason(at + 10000))        # without a force the rules keep running
+        h.quote("ABCD", "3.20", "3.21", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        h.book.set_force("kill_switch", at)
+        h.fill(sell, 61, "3.20", at + 0.5)
+        h.evaluate(at + 0.6)
+        self.assertIsNone(h.book.handoff_reason(at + 10000))        # flat, nothing open
+
+    def test_an_unsellable_leg_hands_off_only_once_a_force_latches(self):
+        # One share above the per-order cap cannot be sold by any engine path. Before a force
+        # the leg keeps retrying (the price may come back) and the other legs keep their rules.
+        h = BookHarness(self, symbols=[dict(scan_dict()["symbols"][1], rank=1)])       # WXYZ at 45.50
+        now = h.t0 + 1
+        h.quote("WXYZ", "45.40", "45.50", now)
+        buy = submits(h.evaluate(now), "buy")[0]
+        h.fill(buy, buy.qty, "45.50", now)
+        at = now + 3600
+        h.quote("WXYZ", "250.00", "250.10", at)
+        self.assertEqual(submits(h.evaluate(at)), [])
+        self.assertEqual(h.book.legs["WXYZ"].exit_blocked, "exit_share_exceeds_per_order_cap")
+        self.assertIsNone(h.book.handoff_reason(at))
+        h.book.set_force("hard_flatten", at + 1)
+        h.quote("WXYZ", "250.00", "250.10", at + 1)
+        h.evaluate(at + 1)
+        self.assertEqual(h.book.handoff_reason(at + 1), "exits_blocked")
+
+
+class RecoveryAdoptionScope(unittest.TestCase):
+    """A recovery port adopts every unresolved intent and terminal intents for its own
+    symbols only; the mover ledger spans sessions that traded other symbols."""
+
+    def test_terminal_intents_of_unsubscribed_symbols_are_skipped(self):
+        from recovery import _payload
+        _, limits, _ = mover.load_mover_config(CONFIG)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "ledger.sqlite3", limits)
+            try:
+                now, close = SCAN_TIME + 30, SCAN_TIME + 36000
+
+                def order(cid, symbol, side, qty, limit, quote, status, filled, price):
+                    ledger.reserve_intent(cid, symbol, side, qty, limit, quote=quote, now=quote.timestamp,
+                                          market_open=True, session_close=close)
+                    ledger.record_order(cid, "b-" + cid, status, filled, price, timestamp=quote.timestamp)
+
+                ledger.begin_next_trial(now, "s1")                   # session 1 traded AAA to flat
+                aaa = Quote("AAA", "10.00", "10.01", now)
+                order("mvr-s1-0000001", "AAA", "buy", "19", "10.06", aaa, "filled", "19", "10.01")
+                order("mvr-s1-0000002", "AAA", "sell", "19", "9.96", aaa, "filled", "19", "10.00")
+                ledger.begin_next_trial(now + 1, "s2")               # session 2 holds BBB with a resting sell
+                bbb = Quote("BBB", "8.00", "8.01", now + 1)
+                order("mvr-s2-0000001", "BBB", "buy", "24", "8.05", bbb, "filled", "24", "8.01")
+                order("mvr-s2-0000002", "BBB", "sell", "24", "7.96", bbb, "new", "0", None)
+                payloads = [_payload(i) for i in ledger.intents()]
+
+                class Port:
+                    symbols = ("BBB", "SPY")
+
+                    def adopt_intents(self, intents):
+                        self.received = [i["client_order_id"] for i in intents]
+
+                port = mover_runner.scope_recovery_adoption(Port(), ledger)
+                port.adopt_intents(payloads)
+                self.assertEqual(port.received, ["mvr-s2-0000001", "mvr-s2-0000002"])
+                self.assertEqual(port.adoption_scope, {"adopted": 2, "skipped_terminal_unsubscribed": 2,
+                                                       "subscribed_symbols": 2})
+                # An unresolved intent is always handed on, so an unsubscribed one fails closed in the transport.
+                port.symbols = ("SPY",)
+                port.adopt_intents(payloads)
+                self.assertEqual(port.received, ["mvr-s2-0000002"])
+                with self.assertRaises(TransportError):
+                    normalize_intent(payloads[3], port.symbols)
+            finally:
+                ledger.close()
 
 
 class ForeignOrdersOnASharedAccount(unittest.TestCase):

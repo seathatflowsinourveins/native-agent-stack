@@ -28,13 +28,20 @@ async def _invoke(callback, value):
 
 
 class MoverSimulatedPort:
-    def __init__(self, controller, symbols, *, path, interval=0.02, partial_fill=None, cash="100000"):
+    def __init__(self, controller, symbols, *, path, interval=0.02, partial_fill=None, cash="100000",
+                 extended_hours_allowed=False):
         """``path(symbol, elapsed_seconds)`` returns ``(bid, ask)`` as Decimals, or None for
         no quote at that instant (a quote gap). ``partial_fill`` maps a symbol to the
         fraction of each buy that fills; the remainder never fills. Setting
         ``fill_sells`` False leaves every sell resting (no liquidity), to exercise the
-        forced-recovery path."""
-        self.controller, self.symbols = controller, tuple(symbols)
+        forced-recovery path.
+
+        Intents follow transport.AlpacaPaperTransport's contract: ``submit`` and
+        ``adopt_intents`` apply transport.normalize_intent against this port's symbols
+        (an intent for an unsubscribed symbol raises TransportError), and ``cancel``
+        requires an intent this port submitted or adopted."""
+        self.controller, self.symbols = controller, tuple(sorted(set(symbols)))
+        self.extended_hours_allowed = bool(extended_hours_allowed)
         self.path, self.interval = path, interval
         self.partial_fill = {k: Decimal(str(v)) for k, v in (partial_fill or {}).items()}
         self.fill_sells = True
@@ -49,16 +56,41 @@ class MoverSimulatedPort:
         self.cash = Decimal(cash)
         self.quotes = {}
         self.payloads = []
+        self.adopted = {}
+        self._intents = {}   # client id -> normalized intent, as the transport keeps them
         self.started = self.stopped = 0
         self.on_quote = self.on_order = None
         self.task = None
         self.t0 = None
         self.id_prefix = "sim-" + secrets.token_hex(4)  # broker ids are unique across ports, as a broker's are
 
+    def successor(self, symbols=None, *, fill_sells=True):
+        """A new, unstarted port on the same synthetic account (orders, positions, cash)
+        and quote timeline, as mover_runner builds a fresh transport for recovery. Intents
+        this port submitted or adopted do not carry over; recovery must adopt them."""
+        port = MoverSimulatedPort(self.controller, self.symbols if symbols is None else symbols, path=self.path,
+                                  interval=self.interval, cash=format(self.cash, "f"),
+                                  extended_hours_allowed=self.extended_hours_allowed)
+        port.partial_fill = dict(self.partial_fill)
+        port.orders, port.positions, port.t0 = self.orders, self.positions, self.t0
+        port.fill_sells, port.snapshot_latency = fill_sells, self.snapshot_latency
+        return port
+
+    def _normalize(self, order):
+        from transport import normalize_intent
+        return normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
+
     def adopt_intents(self, intents):
-        """recovery.recover hands a fresh port its durable intents; this fixture keeps its
-        own order book across a stop/start, so there is nothing to adopt."""
-        self.adopted = list(intents)
+        """recovery.recover hands a fresh port its durable intents. As the transport does,
+        each must normalize against this port's symbols; the order book itself persists
+        across a stop/start (and across ports sharing it), as the broker's would."""
+        from transport import TransportError
+        for order in intents:
+            normalized = self._normalize(order)
+            key = normalized["client_order_id"]
+            if key in self._intents and self._intents[key] != normalized:
+                raise TransportError("durable intent changed")
+            self._intents[key] = self.adopted[key] = normalized
 
     async def start(self, on_quote, on_order):
         """Start (or, for recovery.recover, restart) the scripted feed; orders, positions
@@ -151,7 +183,9 @@ class MoverSimulatedPort:
                 await self._try_fill(order)
 
     async def submit(self, payload):
+        intent = self._normalize(payload)
         self.controller.before_submit(payload)
+        self._intents[intent["client_order_id"]] = intent
         await self.controller.before_request("submit", client_id=payload["client_order_id"])
         self.payloads.append(dict(payload))
         order = {key: payload[key] for key in ("client_order_id", "symbol", "side", "qty", "limit_price")}
@@ -163,6 +197,9 @@ class MoverSimulatedPort:
         return self._public(order)
 
     async def cancel(self, client_id):
+        if client_id not in self._intents:
+            from transport import TransportError
+            raise TransportError("cancellation requires an owned durable intent")
         await self.controller.before_request("cancel")
         order = self.orders.get(client_id)
         if order is None:
