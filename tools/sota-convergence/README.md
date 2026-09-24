@@ -1588,6 +1588,17 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
     adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
   - Leak records keep input basenames only.
+- **Round 14:**
+  - `adjudication-lane.js` echoes the prompt it read and each item's consumed input and packet paths.
+    `claude-collect` requires the prompt to hash to the snapshot's `prompt_sha256` and the repo to be the
+    snapshot's exactly; an item whose echoed paths are not the ones `claude-args` gave is a missing judgment.
+  - A leak from a run whose input, packet, tree, role or consumed arguments no longer hold is discarded, not
+    recorded.
+  - A deleted input is recorded as a missing judgment rather than raising.
+  - A spaced final path segment ending in a file extension (`/srv/My Project/private key.json`) is scrubbed
+    whole. An extension-less spaced final segment can still leave its last word.
+  - `codex` and `claude-args` check both the `--repo` as given (absolutized, symlinks kept) and its resolved
+    form: on macOS `/home` is a symlink whose target is deep enough to pass the depth rule.
 - **Round 13:**
   - `claude-collect` recomputes the `claude-args` snapshot's digest and refuses a snapshot edited under an
     unchanged `snapshot_id`.

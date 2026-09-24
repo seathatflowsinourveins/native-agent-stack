@@ -159,7 +159,10 @@ OUTSIDE = "<outside-path>"
 # path is replaced, each following space-separated token that continues it (holds a / or \ separator) is
 # absorbed too, so no suffix of it survives (Codex review of #145). Repository roots and work dirs cannot hold
 # spaces (root_issue, refuse_work_dir_inside), so only outside paths need this.
-_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>(?: +[^\s/\\'\"|;&<>()`,]*[/\\][^\s'\"|;&<>()`,]*)+")
+# A final segment with spaces ("/srv/My Project/private key.json") ends in a token with a file extension, which
+# is absorbed too; an extension-less final segment ("/srv/x/private key") can still leave its last word.
+_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>(?: +(?:[^\s/\\'\"|;&<>()`,]*[/\\][^\s'\"|;&<>()`,]*"
+                                   r"|[^\s/\\'\"|;&<>()`,]+\.[A-Za-z0-9]{1,8}(?![\w])[.,;:]?))+")
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
 # ~ path (~/x or ~user/x), $HOME or ${HOME}, or a <host-path> placeholder.
@@ -659,7 +662,10 @@ def run_codex(args) -> int:
         print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
               f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
         return 2
-    refusal = refuse_roots("--repo", [repo], must_exist=True) or refuse_git_repo(repo) or refuse_work_dir_inside(work_dir, repo)
+    # The path as given (absolutized, symlinks kept) and its resolved form must both pass: on macOS /home is a
+    # symlink whose target is deep enough to pass the depth check (Codex review of #145, macOS CI).
+    refusal = (refuse_roots("--repo", [Path(os.path.abspath(args.repo)), repo], must_exist=True)
+               or refuse_git_repo(repo) or refuse_work_dir_inside(work_dir, repo))
     if refusal:
         print(refusal, file=sys.stderr)
         return 2
@@ -982,12 +988,20 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     # The repository is the one claude-args validated and snapshotted (Codex review of #145); an override or a
     # returned value must name it exactly, since assemble relativizes paths under it.
     repo = snapshot_doc.get("repo")
-    for label, value in (("--repo", repo_override), ("the workflow result's repo",
-                                                     result.get("repo") if isinstance(result, dict) else None)):
+    for label, value in (("--repo", repo_override),):
         if value is not None and str(value) != repo:
             raise ValueError(f"adjudicate: {label} {str(value)!r} is not the claude-args repository {repo!r}")
     snapshot = snapshot_doc.get("inputs") or {}
     snapshot_provenance = snapshot_doc.get("provenance")
+    # What the workflow actually consumed (Codex review of #145): the prompt it echoes must hash to the snapshot's
+    # prompt_sha256 and its repo must be the snapshot's; each item's echoed paths are checked below.
+    consumed_prompt = result.get("prompt") if isinstance(result, dict) else None
+    if not (isinstance(consumed_prompt, str) and isinstance(snapshot_provenance, dict)
+            and hashlib.sha256(consumed_prompt.encode("utf-8")).hexdigest() == snapshot_provenance.get("prompt_sha256")):
+        raise ValueError("adjudicate: the workflow result's prompt is not the one claude-args snapshotted; rerun "
+                         "the workflow with the current claude-args output")
+    if (result.get("repo") if isinstance(result, dict) else None) != repo:
+        raise ValueError(f"adjudicate: the workflow result's repo is not the claude-args repository {repo!r}")
     # The evidence tree and code the workflow's judges read must still be what claude-args hashed (Codex
     # review of #145); a snapshot that cannot be recomputed counts as changed.
     try:
@@ -1005,7 +1019,10 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
             continue
         item = returned.get((name, order)) or {}
         judged_sha256 = snapshot.get(f"{name}.{order}")
-        input_changed = judged_sha256 != sha256_file(Path(input_path))
+        # A deleted input is a changed one (Codex review of #145), recorded as missing rather than a traceback.
+        input_changed = not Path(input_path).is_file() or judged_sha256 != sha256_file(Path(input_path))
+        consumed_other = bool(item) and (item.get("path") != input_path
+                                         or item.get("packet_path") != packet_paths(index).get(name))
         packet_changed = bool(packets_changed([{"name": name, "order": order,
                                                 "packet_path": packet_paths(index).get(name, ""),
                                                 "packet_sha256": packet_sha256}]))
@@ -1026,9 +1043,10 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
         if leak is not None:
             leak = {"stage": leak.get("stage"), "text": redact_leak_text(leak.get("text"))}
             judge, refuter = None, None
-            if not input_changed:
-                # A leak reported on an input rebuilt since the snapshot is about the old content: discarded,
-                # so it cannot mark the rebuilt input as leaked.
+            if not (input_changed or packet_changed or tree_changed or roles_changed or consumed_other):
+                # A leak from a run whose bindings no longer hold (a rebuilt input, a changed packet, tree or
+                # role, or other consumed arguments) is discarded, so it cannot mark a valid input as leaked
+                # (Codex review of #145).
                 both = {Path(entry_path).name: snapshot.get(f"{name}.{other}")
                         for other, entry_path in (layer_inputs_of(index, name) or {}).items()}
                 leaks.append((name, order, input_path, {**leak, "family": "anthropic",
@@ -1051,10 +1069,13 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
         elif packet_changed:
             # The immutable packet copy the judges read no longer holds its indexed bytes.
             failure, judge, refuter, leak = "the packet snapshot changed; rerun inputs", None, None, None
-        elif tree_changed and failure != LEAK:
-            failure, judge, refuter = TREE_CHANGED, None, None
-        elif roles_changed and failure != LEAK:
-            failure, judge, refuter = ROLE_CHANGED, None, None
+        elif consumed_other:
+            failure, judge, refuter, leak = ("the workflow judged other input or packet paths than claude-args "
+                                             "gave it"), None, None, None
+        elif tree_changed:
+            failure, judge, refuter, leak = TREE_CHANGED, None, None, None
+        elif roles_changed:
+            failure, judge, refuter, leak = ROLE_CHANGED, None, None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
             leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance))
@@ -1320,7 +1341,8 @@ def main(argv=None) -> int:
         project_role = run_dir / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
         # A project-level role in the directory the workflow runs from wins over --agent-file (Codex review of
         # #145), so both must be the vendored definition.
-        refusal = (refuse_roots("--repo", [repo], must_exist=True) or refuse_git_repo(repo)
+        refusal = (refuse_roots("--repo", [Path(os.path.abspath(args.repo)), repo], must_exist=True)
+                   or refuse_git_repo(repo)
                    or refuse_work_dir_inside(args.work_dir, repo) or adjudicator_role_issue(args.agent_file)
                    or (adjudicator_role_issue(project_role) if project_role.exists() else None))
         if refusal:

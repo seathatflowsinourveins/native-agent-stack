@@ -104,6 +104,25 @@ class AdjudicateFixture(unittest.TestCase):
         """The immutable packet copy judges read (Codex review of #145, round 8)."""
         return self.work / adjudicate.PACKET_SNAPSHOTS_DIR / (sha or self.sha) / "packets" / f"{name}.json"
 
+    def as_workflow(self, result):
+        """``result`` as adjudication-lane.js returns it (Codex review of #145): the prompt and repo it read and
+        each item's consumed input and packet paths, filled in where the test did not set them."""
+        if not isinstance(result, dict):
+            return result
+        index = adjudicate.load_index(self.work)
+        path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
+        snapshot = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        inputs = {(entry["layer"], order): input_path for entry in index.get("layers") or []
+                  for order, input_path in (entry.get("inputs") or {}).items()}
+        packets = adjudicate.packet_paths(index)
+        out = dict(result)
+        out.setdefault("prompt", adjudicate.PROMPT_PATH.read_text(encoding="utf-8"))
+        out.setdefault("repo", snapshot.get("repo"))
+        out["items"] = [{"path": inputs.get((item.get("name"), item.get("order"))),
+                         "packet_path": packets.get(item.get("name")), **item} if isinstance(item, dict) else item
+                        for item in result.get("items") or []]
+        return out
+
     def snapshot_id(self):
         path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
         return json.loads(path.read_text(encoding="utf-8")).get("snapshot_id") if path.is_file() else None
@@ -240,7 +259,7 @@ class AssembleTests(AdjudicateFixture):
                              "judge": {"preferred": "B", "why": WHY, "evidence_refs": []},
                              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
                             for order in adjudicate.ORDERS]}
-        missing = dict(adjudicate.collect_claude(self.work, result, "claude-opus-5-5"))
+        missing = dict(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5"))
         self.assertIn("input changed after claude-args", missing[f"{NAME}.AB"])
         self.assertNotIn(f"{NAME}.BA", missing)
 
@@ -330,7 +349,7 @@ class AssembleTests(AdjudicateFixture):
              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}},
             {"name": NAME, "order": "BA", "packet_sha256": self.sha, "judge": None, "refuter": None}]}
         result_path = self.base / "result.json"
-        result_path.write_text(json.dumps(result), encoding="utf-8")
+        result_path.write_text(json.dumps(self.as_workflow(result)), encoding="utf-8")
         code, err = quiet(adjudicate.main, ["claude-collect", "--work-dir", str(self.work), "--result",
                                             str(result_path), "--model", "claude-opus-5-5"])
         self.assertEqual(code, 1)
@@ -469,7 +488,7 @@ class CodexTests(AdjudicateFixture):
                             for order in adjudicate.ORDERS]}
         adjudicate.claude_args(self.work, self.repo)
         result["snapshot_id"] = self.snapshot_id()
-        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        missing = adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5")
         self.assertEqual(missing, [])
         code, _err, record = self.assemble()
         self.assertEqual(code, 0)
@@ -523,7 +542,7 @@ class LeakTests(AdjudicateFixture):
                          "leak_text": "sonnet"}}]}
         adjudicate.claude_args(self.work, self.repo)
         result["snapshot_id"] = self.snapshot_id()
-        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        missing = adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5")
         self.assertEqual(missing, [(f"{NAME}.AB", "leak"), (f"{NAME}.BA", "leak")])
         for order in adjudicate.ORDERS:
             data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.{order}.json")
@@ -565,14 +584,14 @@ class LeakTests(AdjudicateFixture):
         """Round-2 review (adjudication round 3): a second claude-collect overwrote the leaked judgment with a
         counted one."""
         adjudicate.claude_args(self.work, self.repo)
-        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(("AB",)), "claude-opus-5-5"),
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(self.claude_result(("AB",))), "claude-opus-5-5"),
                          [(f"{NAME}.AB", "leak")])
         # Both orders hold the same returns, so a leak in AB suppresses BA too (Codex review of #145).
         self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB", f"{NAME}.BA"])
         self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"], [])
         # The workflow is rerun anyway and returns a clean judgment for the leaked input. claude-args left the
         # leaked AB out of its snapshot, so collect does not touch AB's leak record at all.
-        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(), "claude-opus-5-5"), [])
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5"), [])
         data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertEqual((data["failure"], data["judge"]), ("leak", None))
         records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text(encoding="utf-8"))
@@ -613,11 +632,12 @@ class RereviewOf145Tests(AdjudicateFixture):
         for order in adjudicate.ORDERS:
             self.judgment("claude", order, "claude")
         before = (self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes()
-        empty = {"inputs": {}}
+        empty = {"inputs": {}, "repo": str(self.repo),
+                 "provenance": {"prompt_sha256": adjudicate.sha256_file(adjudicate.PROMPT_PATH)}}
         empty_id = hashlib.sha256(json.dumps(empty, sort_keys=True).encode("utf-8")).hexdigest()
         adjudicate.write_json(self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT,
                               {**empty, "snapshot_id": empty_id})
-        self.assertEqual(adjudicate.collect_claude(self.work, {"snapshot_id": empty_id, "items": []}, "claude-opus-5-5"), [])
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow({"snapshot_id": empty_id, "items": []}), "claude-opus-5-5"), [])
         self.assertEqual((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes(), before)
 
     def test_a_leak_on_an_input_rebuilt_after_claude_args_is_discarded(self):
@@ -626,7 +646,7 @@ class RereviewOf145Tests(AdjudicateFixture):
         ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
         result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha, "leak": {"stage": "judge",
                              "text": "the Codex lane"}}]}
-        adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5")
         self.assertEqual(adjudicate.recorded_leaks(self.work), set())
 
 
@@ -701,7 +721,7 @@ class ThirdRereviewOf145Tests(AdjudicateFixture):
                                / adjudicate.CLAUDE_ARGS_SNAPSHOT).read_text(encoding="utf-8"))["inputs"]
         result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha,
                              "leak": {"stage": "judge", "text": "the Codex lane"}}]}
-        adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5")
         records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text())["leaks"]
         self.assertEqual([record["input_sha256"] for record in records], [snapshot[f"{NAME}.AB"]])
 
@@ -746,7 +766,7 @@ class FifthRereviewOf145Tests(AdjudicateFixture):
         adjudicate.claude_args(self.work, self.repo)
         self.assertNotEqual(stale, self.snapshot_id())
         with self.assertRaisesRegex(ValueError, "not the current claude-args snapshot"):
-            adjudicate.collect_claude(self.work, {"snapshot_id": stale, "items": []}, "claude-opus-5-5")
+            adjudicate.collect_claude(self.work, self.as_workflow({"snapshot_id": stale, "items": []}), "claude-opus-5-5")
 
     def test_a_project_level_adjudicator_in_the_run_dir_must_be_the_vendored_one(self):
         run_dir = self.base / "hosts" / "blind" / "run"
@@ -942,7 +962,7 @@ class EighthRereviewOf145Tests(AdjudicateFixture):
         result = {"snapshot_id": args["snapshot_id"],
                   "items": [{"name": NAME, "order": order, "judge": verdict, "refuter": refute}
                             for order in adjudicate.ORDERS]}
-        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo)
+        missing = adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", self.repo)
         self.assertEqual({reason for _, reason in missing}, {"the packet snapshot changed; rerun inputs"})
 
     def test_a_snapshot_changed_during_a_codex_call_voids_the_judgment(self):
@@ -1039,10 +1059,10 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
                   "items": [{"name": NAME, "order": order, "judge": self.JUDGE, "refuter": self.REFUTE}
                             for order in adjudicate.ORDERS]}
         (self.repo / "evidence" / "receipt.json").write_text('{"changed": true}', encoding="utf-8")
-        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo)
+        missing = adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", self.repo)
         self.assertEqual({reason for _, reason in missing}, {adjudicate.TREE_CHANGED})
         (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
-        self.assertEqual(adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo), [])
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", self.repo), [])
 
     def test_leak_text_is_redacted_before_it_is_retained_or_printed(self):
         raw = "found /home/example/code/nas-wt-codex-blind/x.json, ~/notes and /évidence/private.json"
@@ -1081,10 +1101,10 @@ class TenthRereviewOf145Tests(AdjudicateFixture):
         args = adjudicate.claude_args(self.work, self.repo)
         result = {"snapshot_id": args["snapshot_id"], "items": []}
         with self.assertRaisesRegex(ValueError, "is not the claude-args repository"):
-            adjudicate.collect_claude(self.work, result, "claude-opus-5-5", "/")
+            adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", "/")
         with self.assertRaisesRegex(ValueError, "is not the claude-args repository"):
-            adjudicate.collect_claude(self.work, dict(result, repo=str(self.base)), "claude-opus-5-5")
-        self.assertEqual(len(adjudicate.collect_claude(self.work, result, "claude-opus-5-5", str(self.repo))), 2)
+            adjudicate.collect_claude(self.work, self.as_workflow(dict(result, repo=str(self.base))), "claude-opus-5-5")
+        self.assertEqual(len(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", str(self.repo))), 2)
 
     def run_codex_with_input_checks(self, check_results):
         checks = iter(check_results)
@@ -1190,7 +1210,7 @@ class TwelfthRereviewOf145Tests(AdjudicateFixture):
                   "items": [{"name": NAME, "order": order, "judge": NinthRereviewOf145Tests.JUDGE,
                              "refuter": NinthRereviewOf145Tests.REFUTE} for order in adjudicate.ORDERS]}
         role.write_text(role.read_text(encoding="utf-8") + "\nextra rule\n", encoding="utf-8")
-        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", str(self.repo))
+        missing = adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5", str(self.repo))
         self.assertEqual({reason for _, reason in missing}, {adjudicate.ROLE_CHANGED})
 
     def test_a_missing_repository_is_refused_before_hashing(self):
@@ -1227,8 +1247,59 @@ class ThirteenthRereviewOf145Tests(AdjudicateFixture):
         snapshot["inputs"] = {key: "0" * 64 for key in snapshot["inputs"]}
         path.write_text(json.dumps(snapshot), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "does not hash to its snapshot_id"):
-            adjudicate.collect_claude(self.work, {"snapshot_id": args["snapshot_id"], "items": []},
+            adjudicate.collect_claude(self.work, self.as_workflow({"snapshot_id": args["snapshot_id"], "items": []}),
                                       "claude-opus-5-5", str(self.repo))
+
+
+class FourteenthRereviewOf145Tests(AdjudicateFixture):
+    """Round-14 review of #145: collection verifies what the workflow consumed, leaks of invalidated runs are
+    discarded, a deleted input is a missing judgment, and spaced final segments are scrubbed whole."""
+
+    def result(self, **item_overrides):
+        args = adjudicate.claude_args(self.work, self.repo)
+        items = [{"name": NAME, "order": order, "packet_sha256": self.sha, "judge": NinthRereviewOf145Tests.JUDGE,
+                  "refuter": NinthRereviewOf145Tests.REFUTE, **item_overrides} for order in adjudicate.ORDERS]
+        return self.as_workflow({"snapshot_id": args["snapshot_id"], "items": items})
+
+    def test_other_consumed_arguments_are_refused(self):
+        self.inputs()
+        other = self.base / "elsewhere" / f"{NAME}.AB.json"
+        missing = adjudicate.collect_claude(self.work, self.result(path=str(other)), "claude-opus-5-5")
+        self.assertEqual({reason for _, reason in missing},
+                         {"the workflow judged other input or packet paths than claude-args gave it"})
+        for change, message in (({"prompt": "edited prompt <!-- refuter -->"}, "prompt is not the one"),
+                                ({"repo": None}, "repo is not the claude-args repository")):
+            with self.assertRaisesRegex(ValueError, message):
+                adjudicate.collect_claude(self.work, {**self.result(), **change}, "claude-opus-5-5")
+
+    def test_a_leak_from_an_invalidated_run_is_not_recorded(self):
+        (self.repo / "evidence").mkdir()
+        (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
+        self.inputs()
+        result = self.result(judge=None, refuter=None, leak={"stage": "judge", "text": "provenance: x"})
+        (self.repo / "evidence" / "receipt.json").write_text('{"changed": true}', encoding="utf-8")
+        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        self.assertEqual({reason for _, reason in missing}, {adjudicate.TREE_CHANGED})
+        self.assertEqual(adjudicate.recorded_leaks(self.work), set())
+
+    def test_a_deleted_input_is_a_missing_judgment_not_a_traceback(self):
+        self.inputs()
+        result = self.result()
+        (self.work / "adjudication-inputs" / f"{NAME}.BA.json").unlink()
+        missing = dict(adjudicate.collect_claude(self.work, result, "claude-opus-5-5"))
+        self.assertEqual(missing[f"{NAME}.BA"], "the input changed after claude-args; rerun claude-args")
+
+    def test_spaced_final_segments_are_scrubbed_whole(self):
+        packets = str(self.work / "packets")
+        for text in ("see /srv/My Project/private key.json now", r"see C:\Users\example user\private file.json now"):
+            self.assertEqual(adjudicate.scrub_text(text, packets), "see <outside-path> now", text)
+            self.assertEqual(adjudicate.redact_leak_text(text), "see <outside-path> now", text)
+
+    def test_the_workflow_echoes_what_it_consumed(self):
+        source = (TOOL_DIR / "adjudication-lane.js").read_text(encoding="utf-8")
+        self.assertIn("path: i.path, packet_path: i.packet_path", source)
+        self.assertEqual(source.count("...echo(i)"), 5)
+        self.assertIn("prompt: PROMPT", source)
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")

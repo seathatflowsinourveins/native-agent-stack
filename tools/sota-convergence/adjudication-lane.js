@@ -44,21 +44,25 @@ const judgeOk = (v) => v && typeof v === 'object' && (v.preferred === 'A' || v.p
 const refuteOk = (v) => v && typeof v === 'object' && typeof v.refuted === 'boolean' && typeof v.reason === 'string' && refs(v)
 // One chain per item (judge -> refuter) through parallel(): no barrier between items. A lost or malformed agent
 // is null, and adjudicate.py claude-collect records that judgment as missing, never as unrefuted.
+// Every returned item echoes the input and packet paths it consumed (Codex review of #145): claude-collect
+// requires them to be the ones claude-args gave it, so edited arguments cannot pass under the snapshot_id.
+const echo = (i) => ({ name: i.name, order: i.order, packet_sha256: i.packet_sha256, path: i.path, packet_path: i.packet_path })
 const chain = async (i) => {
   const tag = `${i.name}.${i.order}`
   const got = await agent(PACKET + '\n' + BLIND + '\n' + fill(JUDGE_TEMPLATE, i), { label: `judge:${tag}`, phase: 'Judge', agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: JUDGE }).catch(() => null)
   const judgeLeak = leakOf(got, 'judge')
-  if (judgeLeak) return { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge: null, refuter: null, leak: judgeLeak }
+  if (judgeLeak) return { ...echo(i), judge: null, refuter: null, leak: judgeLeak }
   const judge = judgeOk(got) ? { preferred: got.preferred, why: got.why, evidence_refs: got.evidence_refs } : null
-  if (!judge) return { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge: null, refuter: null }
+  if (!judge) return { ...echo(i), judge: null, refuter: null }
   const vote = await agent(PACKET + '\n' + BLIND + '\n' + fill(REFUTE_TEMPLATE, i, judge), { label: `refute:${tag}`, phase: 'Refute', agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: REFUTE }).catch(() => null)
   const refuteLeak = leakOf(vote, 'refuter')
-  if (refuteLeak) return { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge: null, refuter: null, leak: refuteLeak }
+  if (refuteLeak) return { ...echo(i), judge: null, refuter: null, leak: refuteLeak }
   const refuter = refuteOk(vote) ? { refuted: vote.refuted, reason: vote.reason, evidence_refs: vote.evidence_refs } : null
-  return { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge, refuter }
+  return { ...echo(i), judge, refuter }
 }
 const results = await parallel(items.map((i) => () => chain(i).catch(() => null)))
-const out = items.map((i, n) => (Array.isArray(results) && results[n]) || { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge: null, refuter: null })
+const out = items.map((i, n) => (Array.isArray(results) && results[n]) || { ...echo(i), judge: null, refuter: null })
 log(`items: ${out.length}, ${out.filter((r) => r.judge).length} judged, ${out.filter((r) => r.refuter).length} refuter votes, ${out.filter((r) => r.refuter && r.refuter.refuted).length} refuted, ${out.filter((r) => r.leak).length} leak refusals`)
 // The claude-args snapshot these items came from, echoed so claude-collect binds this result to it.
-return { family: 'anthropic', model: MODEL, repo: REPO, snapshot_id: typeof a.snapshot_id === 'string' ? a.snapshot_id : null, items: out }
+// The prompt text is echoed too: claude-collect requires it to hash to the snapshot's prompt_sha256.
+return { family: 'anthropic', model: MODEL, repo: REPO, prompt: PROMPT, snapshot_id: typeof a.snapshot_id === 'string' ? a.snapshot_id : null, items: out }
