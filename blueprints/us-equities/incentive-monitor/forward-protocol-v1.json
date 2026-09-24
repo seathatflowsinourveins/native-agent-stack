@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "incentive-board-forward-v1-20260924",
+  "status": "frozen_before_first_order",
+  "evidence_class": "paper_forward_prospective",
+  "question": "Do early-stage names on the incentive board (a non-price incentive present, price not yet up 10% from the reference close) earn a positive net return over the engine's X2 one-hour hold on Alpaca paper, and more than matched no-incentive controls?",
+  "why_forward": "Several board components have no usable history: option-trade flow is recorded from 2026-09-24 (Alpaca OPRA history starts 2024-02 and has no receive times), and halt and news receive times exist only from the monitor's first day. A prospective paper study is therefore the first honest test; it is preregistered here before any order and is never tuned on its own outcomes.",
+  "decision_times_et": ["10:30", "13:30"],
+  "selection": {
+    "board_max_age_seconds": 150,
+    "min_score": 3.0,
+    "stage": "early",
+    "required_any_component": ["news", "material_8k", "mna_filing", "news_halt", "volatility_halt", "short_dated_calls", "large_option_prints"],
+    "excluded_components": ["dilution_filing"],
+    "min_price_usd": 2.0,
+    "max_spread_bps": 50.0,
+    "min_day_dollar_volume_usd": 1000000,
+    "min_gain": 0.0,
+    "max_gain_exclusive": 0.10,
+    "max_last_trade_age_seconds": 120,
+    "max_symbols": 5,
+    "order": "score descending, then relative volume descending (missing last), then symbol"
+  },
+  "controls": {
+    "pool": "every name in a fresh full-market SIP snapshot at the decision time that passes the same price, spread, dollar-volume, gain and last-trade filters and is not on the board",
+    "count": 20,
+    "draw": "sha256(protocol id | session date | decision time | symbol) ascending, first 20",
+    "traded": false,
+    "outcome": "SIP minute bars after the session: first bar open at or after the decision time to the bar open 60 minutes later, less the measured cost table's per-side cost for the name's price tier"
+  },
+  "execution": {
+    "engine": "adaptive-paper mover trial mode (blueprints/us-equities/adaptive-paper, merged #172); its scan field protocol stays the engine's execution protocol mover-early-entry-v1-20260924 and the scan's source names this study",
+    "rule_template": "HH:MM|G0|V1000000|any",
+    "exit": "X2 (60 minutes after the first entry fill)",
+    "entry_cap_usd": 200,
+    "limit_cap_bps": 50,
+    "leverage": "1x",
+    "account": "isolated Alpaca paper account (alpaca-paper-2)"
+  },
+  "outcomes": {
+    "primary": "net return per round trip after fees from the engine receipt's fills",
+    "secondary": ["selected minus control mean one-hour model return", "per-component means (reported, not tested)"],
+    "analysis_after": {"min_sessions": 20, "min_round_trips": 100},
+    "test": "one-sided 95% circular block bootstrap lower bound of the primary mean, blocks of 5 sessions, B = 20000, seed = int(sha256(id)[:16], 16)",
+    "pass": "lower bound > 0 and the secondary difference positive"
+  },
+  "stop_rules": ["the engine's own lifetime gross-loss and drawdown caps (1000 USD)", "three sessions ending with needs_attention", "any parameter change, which starts a new protocol version instead"],
+  "gate_relation": "A pass is paper performance evidence for strategy-paper-performance. The live gate also requires strategy-historical-holdout, which this study cannot supply for its history-less components; whether a preregistered forward period may stand in for that holdout is an open gate decision, not assumed here.",
+  "limitations": ["the board score is a heuristic detector fixed on 2026-09-24 without outcome data", "paper fills are simulated by Alpaca and can differ from live fills", "two decisions per session share market conditions, so sessions (not trades) are the bootstrap unit"]
+}
