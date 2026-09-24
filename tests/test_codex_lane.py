@@ -42,6 +42,18 @@ def load_module(name, filename):
 
 
 codex_lane = load_module("codex_lane", "codex_lane.py")
+# The suite does not depend on the PATH this host's login shell ends up with (independent review of #206, R2-3): a new
+# PC with npm globals in /usr/local/bin would otherwise refuse every blind fixture run. The real probe is tested below.
+REAL_LOGIN_SHELL_PATH = codex_lane.login_shell_path
+_SHELL_PATH = mock.patch.object(codex_lane, "login_shell_path", return_value=codex_lane.BLIND_CHILD_PATH)
+
+
+def setUpModule():
+    _SHELL_PATH.start()
+
+
+def tearDownModule():
+    _SHELL_PATH.stop()
 
 
 def canned_return(**overrides):
@@ -779,6 +791,249 @@ class BlindIsolationTests(CodexLaneFixture):
                         "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'for f in a b; do cat $f; done'"):
             self.assertEqual(self.audit_reasons(command), [], command)
 
+
+
+class BlindPathAndPrecisionTests(CodexLaneFixture):
+    """2026-09-24 re-record: 15 of 32 blind layers were voided with no read outside the export. Retrieval-CLI names were
+    search terms or Python list items, a quoted '/' joined path parts, and Path.cwd()/ref and 'https://' read as
+    absolute paths. A blind child's PATH now resolves no retrieval CLI (enforced, and refused otherwise), so the audit
+    stops looking for their names; the root and path rules skip those Python forms."""
+
+    def reasons(self, command, tools=codex_lane.AUDIT_TOOLS):
+        events = self.work_dir / "audit-events.jsonl"
+        events.write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")], tools)
+        return [reason for item in report["flagged_commands"] for reason in item["reasons"]]
+
+    def test_the_voided_re_record_commands_are_clean(self):
+        for command in (
+                "/bin/bash -lc \"rg -n -i 'qmd|original|body| get |context.hub' evidence/receipts\"",
+                "/bin/bash -lc \"rg --files fixtures | rg -i 'rag|socraticode|qdrant'\"",
+                "/bin/bash -lc \"python3 - <<'PY'\nfor t in ['serena','ast-grep','mcporter','ai-memory']: print(t)\nPY\"",
+                "/bin/bash -lc \"python3 - <<'PY'\ndef walk(v,p=''):\n for k,x in v.items(): walk(x,p+'/'+k)\n "
+                "for i,x in enumerate(v): walk(x, p + '/' + str(i))\nPY\"",
+                "/bin/bash -lc \"python3 - <<'PY'\nfrom pathlib import Path\nfor ref in refs: print(Path.cwd()/ref)\nPY\"",
+                "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n if not ref.startswith('https://'): print(ref)\nPY\"",
+                "/bin/bash -lc \"rg -n 'https://github.com/org/repo' catalogs\""):
+            with self.subTest(command=command):
+                self.assertEqual(self.reasons(command), [])
+
+    def test_real_reaches_still_flag(self):
+        expected = {
+            "/bin/bash -lc 'ls /'": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"import os; print(os.listdir('/'))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 - <<'PY'\nimport os\nprint(os.listdir('/'))\nPY\"": "names the filesystem root /",
+            "/bin/bash -lc 'git log -p'": "runs git",
+            "/bin/bash -lc 'curl -s https://example.invalid/x'": "runs curl",
+            "/bin/bash -lc 'cat /home/example/.codex/AGENTS.md'":
+                "path outside the repository and packets: /home/example/.codex/AGENTS.md",
+            "/bin/bash -lc \"python3 -c \\\"print(open('/home/example/notes.md').read())\\\"\"":
+                "path outside the repository and packets: /home/example/notes.md",
+            "/bin/bash -lc 'cat https:/etc/passwd'": "path outside the repository and packets: /etc/passwd",
+            "/bin/bash -lc 'cat x:/etc/passwd'": "path outside the repository and packets: /etc/passwd",
+            "/bin/bash -lc '/home/example/.local/share/codex-ecosystem/bin/qmd search verdict'":
+                "path outside the repository and packets: /home/example/.local/share/codex-ecosystem/bin/qmd",
+        }
+        for command, reason in expected.items():
+            with self.subTest(command=command):
+                self.assertIn(reason, self.reasons(command))
+
+    def test_a_non_blind_run_still_looks_for_retrieval_cli_names(self):
+        extended = codex_lane.AUDIT_TOOLS + codex_lane.BLIND_UNRESOLVABLE
+        self.assertIn("runs qmd", self.reasons("/bin/bash -lc 'qmd search verdict'", extended))
+        self.assertIn("runs codex", self.reasons("/bin/bash -lc 'codex exec --search x'", extended))
+        self.assertEqual(self.reasons("/bin/bash -lc 'qmd search verdict'"), [])
+
+    def test_a_blind_child_gets_the_system_path_and_the_callers_codex(self):
+        env = codex_lane.child_env(self.work_dir / "home-probe")
+        self.assertEqual(env["PATH"], codex_lane.BLIND_CHILD_PATH)
+        self.assertEqual(codex_lane.child_executable("codex"), shutil.which("codex"))
+        self.assertEqual(codex_lane.child_executable("/opt/x/codex"), "/opt/x/codex")
+
+    def test_a_path_that_resolves_a_retrieval_cli_is_refused(self):
+        bin_dir = self.work_dir / "sysbin"
+        bin_dir.mkdir()
+        self.assertIsNone(codex_lane.blind_path_issue(str(bin_dir)))
+        (bin_dir / "qmd").write_text("#!/bin/sh\n", encoding="utf-8")
+        self.assertIsNone(codex_lane.blind_path_issue(str(bin_dir)), "a file that is not executable resolves nothing")
+        (bin_dir / "qmd").chmod(0o755)
+        (bin_dir / "codex").write_text("#!/bin/sh\n", encoding="utf-8")
+        (bin_dir / "codex").chmod(0o755)
+        issue = codex_lane.blind_path_issue(str(bin_dir))
+        self.assertIn(f"qmd ({bin_dir / 'qmd'})", issue)
+        self.assertIn(f"codex ({bin_dir / 'codex'})", issue)
+        # The default measures what the login shell adds, and refuses when it cannot.
+        with mock.patch.object(codex_lane, "login_shell_path", return_value=str(bin_dir)):
+            self.assertIn("qmd", codex_lane.blind_path_issue())
+        with mock.patch.object(codex_lane, "login_shell_path", side_effect=codex_lane.PathUnmeasured("`/bin/sh -c` exited 2")):
+            self.assertIn("could not be measured (`/bin/sh -c` exited 2)", codex_lane.blind_path_issue())
+
+    def test_a_non_blind_lane_reports_a_retrieval_cli_and_a_blind_one_does_not(self):
+        self.write_packet("foundation", "native-clients")
+        command = json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": "/bin/bash -lc 'qmd search verdict'"}})
+        self.events_file.write_text(command + "\n" + CANNED_EVENTS, encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(["--allow-git-history"]), 0)
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        reasons = [r for item in audit["layers"]["foundation__native-clients"]["flagged_commands"] for r in item["reasons"]]
+        self.assertIn("runs qmd", reasons)
+        # The same events in a blind run: qmd cannot resolve on the child's PATH, so the name is not flagged.
+        (self.work_dir / "codex" / "foundation__native-clients.json").unlink()
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(), 0)
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        self.assertEqual(audit["layers"]["foundation__native-clients"]["flagged_commands"], [])
+
+    def test_an_env_style_launcher_runs_with_the_callers_interpreter(self):
+        # Codex review of #206 (P1): npm's codex is `#!/usr/bin/env node`, and a blind child's PATH has no node.
+        bin_dir = self.work_dir / "npm-bin"
+        bin_dir.mkdir()
+        (bin_dir / "fakenode").write_text("#!/bin/sh\nexec python3 \"$@\"\n", encoding="utf-8")
+        body = (FIXTURE_BIN / "codex").read_text(encoding="utf-8").split("\n", 1)[1]
+        (bin_dir / "codex").write_text("#!/usr/bin/env fakenode\n" + body, encoding="utf-8")
+        for name in ("fakenode", "codex"):
+            (bin_dir / name).chmod(0o755)
+        with mock.patch.dict(os.environ, {"PATH": str(bin_dir) + os.pathsep + os.environ["PATH"]}):
+            self.assertEqual(codex_lane.blind_child_argv(["codex", "exec", "x"]),
+                             [str(bin_dir / "fakenode"), str(bin_dir / "codex"), "exec", "x"])
+            self.write_packet("foundation", "native-clients")
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(self.run_lane(), 0)
+        self.assertTrue((self.work_dir / "codex" / "foundation__native-clients.json").is_file())
+        # `env -S` with interpreter arguments, an absolute shebang, a binary, and an interpreter nobody resolves.
+        (bin_dir / "s").write_text("#!/usr/bin/env -S fakenode -u -S\n", encoding="utf-8")
+        (bin_dir / "a").write_text("#!/bin/sh\n", encoding="utf-8")
+        (bin_dir / "b").write_bytes(b"\x7fELF\x02\x01")
+        (bin_dir / "u").write_text("#!/usr/bin/env no-such-interpreter\n", encoding="utf-8")
+        with mock.patch.dict(os.environ, {"PATH": str(bin_dir)}):
+            self.assertEqual(codex_lane.blind_child_argv([str(bin_dir / "s"), "x"]),
+                             [str(bin_dir / "fakenode"), "-u", "-S", str(bin_dir / "s"), "x"])
+            for name in ("a", "b", "u"):
+                self.assertEqual(codex_lane.blind_child_argv([str(bin_dir / name), "x"]), [str(bin_dir / name), "x"])
+            self.assertEqual(codex_lane.blind_child_argv(["missing-cli", "x"]), ["missing-cli", "x"])
+
+    def test_a_cli_run_by_absolute_path_and_a_file_url_still_flag(self):
+        # Codex review of #206 (P2 x2): /usr/local/bin/qmd is an exempt system executable token, and file:// is local.
+        repo = self.repo
+        expected = {
+            "/bin/bash -lc '/usr/local/bin/qmd search verdict'": "runs qmd by path: /usr/local/bin/qmd",
+            "/usr/local/bin/mcporter call x": "runs mcporter by path: /usr/local/bin/mcporter",
+            "/bin/bash -lc 'cat https: //etc/passwd'": "path outside the repository and packets: //etc/passwd",
+            "/bin/bash -lc \"python3 -c \\\"import subprocess; subprocess.run(['/opt/tools/serena'])\\\"\"":
+                "runs serena by path: /opt/tools/serena",
+            "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('file:///etc/os-release')\\\"\"":
+                "path outside the repository and packets: ///etc/os-release",
+        }
+        for command, reason in expected.items():
+            with self.subTest(command=command):
+                self.assertIn(reason, self.reasons(command))
+        for command in (f"/bin/bash -lc 'rg -n x {repo}/docs/qmd'", "/bin/bash -lc 'rg -n ssh://host/x docs'",
+                        "/bin/bash -lc \"rg -n 'https://github.com/tobi/qmd' catalogs\"",
+                        "/bin/bash -lc \"rg -n 'qmd://docs/verdict|s3://bucket/key|attachment://x/y' catalogs\"",
+                        "/bin/bash -lc \"rg -n 'https://example.invalid/tools/serena/' catalogs\"",
+                        "/bin/bash -lc \"rg -n 'wss://host/x|sftp://h/y' docs\""):
+            with self.subTest(command=command):
+                self.assertEqual(self.reasons(command), [])
+
+    def test_independent_review_of_206_reaches_still_flag(self):
+        # C2: a '/' joined on one side only builds an absolute path; C1: file:/// and https:/// are no network authority.
+        expected = {
+            "/bin/bash -lc \"python3 -c \\\"print(open('/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"x = 'etc' ; print(open('/' + x))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"print(open(''+'/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc 'python3 - <<\"PY\"\nprint(open(\"/\"+\"etc\"))\nPY'": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"x='a'; print(open(x+'/'+'etc'))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"x='etc'; print(open(''+'/'+x))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc 'cat https:///etc/passwd'": "path outside the repository and packets: ///etc/passwd",
+            "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
+                "path outside the repository and packets: //localhost/etc/passwd",
+            "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
+            "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
+                "runs qmd by path: /usr/local/bin/qmd",
+        }
+        for command, reason in expected.items():
+            with self.subTest(command=command):
+                self.assertIn(reason, self.reasons(command))
+
+    def test_the_measured_path_covers_a_shell_without_path_and_ignores_profile_output(self):
+        # C3: subprocess.run(..., shell=True, env={}) starts /bin/sh with its compiled default PATH (/usr/local/bin);
+        # C5: a profile that prints something must not turn it into a directory.
+        calls = []
+
+        def run(argv, env=None, **_kwargs):
+            calls.append((argv, env))
+            noise = "profile says hi\n" if "-lc" in argv else ""
+            measured = "/login/bin" if "-lc" in argv else ("/sh/default" if argv[0] == "/bin/sh" else "/shell/default")
+            return subprocess.CompletedProcess(argv, 0, noise + "\n" + codex_lane.PATH_SENTINEL + measured, "")
+
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=run):
+            measured = REAL_LOGIN_SHELL_PATH()
+        self.assertEqual(measured.split(os.pathsep),
+                         [*os.defpath.split(os.pathsep), "/login/bin", "/sh/default", "/shell/default"])
+        self.assertEqual([env for _argv, env in calls][1:], [{}, {}])
+        self.assertEqual(calls[0][1]["PATH"], codex_lane.BLIND_CHILD_PATH)
+        self.assertEqual(calls[1][0][0], "/bin/sh")
+        failing = lambda argv, env=None, **_kwargs: subprocess.CompletedProcess(argv, 0, "no sentinel", "profile broke")
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=failing):
+            with self.assertRaisesRegex(codex_lane.PathUnmeasured, "without printing its PATH: profile broke"):
+                REAL_LOGIN_SHELL_PATH()
+        # R2-4: a probe that raises is named, and so is non-UTF-8 profile output, which no longer escapes.
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=subprocess.TimeoutExpired("sh", 30)):
+            with self.assertRaisesRegex(codex_lane.PathUnmeasured, "timed out"):
+                REAL_LOGIN_SHELL_PATH()
+        self.assertIn("/usr/bin", REAL_LOGIN_SHELL_PATH().split(os.pathsep))
+        # A login shell whose profile prints bytes that are not UTF-8 is still measured (R2-4).
+        noisy = self.work_dir / "noisy-shell"
+        noisy.write_bytes(b'#!/bin/sh\nprintf "\\377\\376 profile noise\\n"\nexec /bin/sh "$@"\n')
+        noisy.chmod(0o755)
+        import pwd
+        with mock.patch.object(pwd, "getpwuid", return_value=mock.Mock(pw_shell=str(noisy))):
+            self.assertIn("/usr/bin", REAL_LOGIN_SHELL_PATH().split(os.pathsep))
+
+    def test_a_shell_script_codex_launcher_is_refused_up_front(self):
+        # Independent review of #206, R2-2: pnpm's cmd-shim runs `exec node ...` by name, which exits 127 in a blind child.
+        bin_dir = self.work_dir / "shim-bin"
+        bin_dir.mkdir()
+        (bin_dir / "codex").write_text('#!/bin/sh\nexec node "$0.js" "$@"\n', encoding="utf-8")
+        (bin_dir / "codex").chmod(0o755)
+        with mock.patch.dict(os.environ, {"PATH": str(bin_dir) + os.pathsep + os.environ["PATH"]}):
+            self.assertIn("is a shell-script launcher (/bin/sh)", codex_lane.codex_launch_issue())
+            self.write_packet("foundation", "native-clients")
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                self.assertEqual(self.run_lane(), 2)
+        self.assertIn("shell-script launcher", err.getvalue())
+        self.assertFalse(self.argv_log.exists() and self.argv_log.read_text(encoding="utf-8").strip())
+        # The fixture's env-style launcher, a missing codex and a binary are not refused.
+        self.assertIsNone(codex_lane.codex_launch_issue())
+        self.assertIsNone(codex_lane.codex_launch_issue("no-such-codex"))
+        (bin_dir / "native").write_bytes(b"\x7fELF\x02\x01")
+        (bin_dir / "native").chmod(0o755)
+        self.assertIsNone(codex_lane.codex_launch_issue(str(bin_dir / "native")))
+
+    def test_a_failed_childs_stderr_reaches_the_console_not_the_record(self):
+        # Independent review of #206, R2-2: "codex exec exited 127" alone did not say why.
+        self.write_packet("foundation", "native-clients")
+        failed = {"exit_code": 127, "stdout": "", "timed_out": False, "stopped": False, "elapsed": 0.1,
+                  "stderr": "Reading additional input from stdin...\n/usr/bin/env: 'node': No such file or directory\n"}
+        err = io.StringIO()
+        with mock.patch.object(codex_lane, "run_attempt", return_value=failed), contextlib.redirect_stderr(err):
+            self.assertEqual(self.run_lane(), 1)
+        self.assertIn("codex exec exited 127: /usr/bin/env: 'node': No such file or directory", err.getvalue())
+        self.assertNotIn("Reading additional input", err.getvalue())
+        failures = json.loads((self.work_dir / "codex" / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertEqual(failures[0]["reason"], "failed after retry: codex exec exited 127")
+
+    def test_a_blind_run_is_refused_when_the_child_path_resolves_one(self):
+        self.write_packet("foundation", "native-clients")
+        with mock.patch.object(codex_lane, "blind_path_issue", return_value="a blind child's PATH resolves qmd"):
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                self.assertEqual(self.run_lane(), 2)
+        self.assertIn("resolves qmd", err.getvalue())
+        self.assertFalse(self.argv_log.exists() and self.argv_log.read_text(encoding="utf-8").strip())
 
 
 class InterruptionTests(CodexLaneFixture):

@@ -25,6 +25,17 @@ CHECK_SYNTAX = ROOT / "examples" / "claude-native" / "workflows" / "check-syntax
 spec = importlib.util.spec_from_file_location("adjudicate", TOOL_DIR / "adjudicate.py")
 adjudicate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adjudicate)
+# The suite does not depend on the PATH this host's login shell ends up with (independent review of #206, R2-3).
+_SHELL_PATH = mock.patch.object(adjudicate.codex_lane, "login_shell_path",
+                                return_value=adjudicate.codex_lane.BLIND_CHILD_PATH)
+
+
+def setUpModule():
+    _SHELL_PATH.start()
+
+
+def tearDownModule():
+    _SHELL_PATH.stop()
 # adjudicate put the repo root on sys.path.
 from scripts.landscape import (  # noqa: E402
     SEALED_CANDIDATE_FIELDS, judge_adjudication, sealed_candidate_labels, sealed_candidates_sha256)
