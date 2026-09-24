@@ -35,18 +35,25 @@ and news.
 
 ## Board
 
-`score()` adds fixed components: relative volume, news in the last 30 minutes, M&A filings (Schedule 13D, SC TO-T,
-425), material 8-K items, dilution filings (negative), news or volatility halts, short-dated call premium and large
-option prints. `early` means the price is within 10% of the reference close. The weights were fixed on 2026-09-24
-without outcome data; the board is an unvalidated detector, never a strategy by itself.
+`score()` adds fixed components: relative volume, distinct news articles in the last 30 minutes, M&A filings
+(Schedule 13D, SC TO-T, 425) credited to the subject company only, material 8-K items, dilution filings (negative),
+today's news or volatility halts, short-dated call premium and large option prints (option roots mapped to equities,
+including adjusted and class roots). The board's `early` label means the price is within 10% of the reference close
+in either direction. `board.json` also lists every symbol with any non-price component (`incentive_symbols`) and the
+monitor's start time, restored counts and stream downtime. After a restart the monitor rebuilds the session's
+filings, news window and option totals from its own files. The weights were fixed on 2026-09-24 without outcome
+data; the board is an unvalidated detector, never a strategy by itself.
 
 ## Forward study
 
 [forward-protocol-v1.json](forward-protocol-v1.json) (`incentive-board-forward-v1-20260924`) is frozen before its first
-order. At 10:30 and 13:30 ET, `board_scan.py` takes at most five early-stage names with a non-price incentive from a
-fresh board, re-checks each with a fresh SIP snapshot, records 20 deterministic untraded controls, and writes the
-engine's mover scan (`HH:MM|G0|V1000000|any`, exit X2, 200 USD per entry, 1x). The analysis waits for at least 20
-sessions and 100 round trips. It is paper forward evidence only: the live gate also needs a historical holdout,
+order and was amended before that order after an independent review (its `amendments_before_first_order`). At 10:30
+and 13:30 ET (refused after 13:35 or 10:35), `board_scan.py` takes at most five names with a non-price incentive
+whose fresh SIP snapshot is 0-10% above the reference close, records four untraded incentive-free controls per name
+from the same gain bucket, writes a selection record with the sha256 of the code, protocol, pinned config
+([config-forward-1030.json](config-forward-1030.json), [config-forward-1330.json](config-forward-1330.json)) and scan,
+and then the engine's mover scan (`HH:MM|G0|V1000000|any`, exit X2, 200 USD per entry, 1x). The analysis runs once,
+after the first trading day with at least 20 sessions and 100 round trips. It is paper forward evidence only: the live gate also needs a historical holdout,
 which this study cannot supply for its history-less components.
 
 ## Checks

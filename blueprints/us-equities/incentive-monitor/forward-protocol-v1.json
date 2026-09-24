@@ -3,15 +3,16 @@
   "id": "incentive-board-forward-v1-20260924",
   "status": "frozen_before_first_order",
   "evidence_class": "paper_forward_prospective",
-  "question": "Do early-stage names on the incentive board (a non-price incentive present, price not yet up 10% from the reference close) earn a positive net return over the engine's X2 one-hour hold on Alpaca paper, and more than matched no-incentive controls?",
+  "question": "Do early-stage names on the incentive board, meaning a non-price incentive present (news, a material 8-K, an M&A filing naming the name as subject, a news halt, short-dated call flow or large option prints) and a price 0-10% above the reference close, earn a positive net return over the engine's X2 one-hour hold on Alpaca paper, and more than gain-matched controls without any non-price incentive?",
   "why_forward": "Several board components have no usable history: option-trade flow is recorded from 2026-09-24 (Alpaca OPRA history starts 2024-02 and has no receive times), and halt and news receive times exist only from the monitor's first day. A prospective paper study is therefore the first honest test; it is preregistered here before any order and is never tuned on its own outcomes.",
   "decision_times_et": ["10:30", "13:30"],
+  "late_guard_seconds": 300,
   "selection": {
     "board_max_age_seconds": 150,
     "min_score": 3.0,
-    "stage": "early",
-    "required_any_component": ["news", "material_8k", "mna_filing", "news_halt", "volatility_halt", "short_dated_calls", "large_option_prints"],
+    "required_any_component": ["news", "material_8k", "mna_filing", "news_halt", "short_dated_calls", "large_option_prints"],
     "excluded_components": ["dilution_filing"],
+    "symbol_pattern": "^[A-Z]{1,5}(?:[.-][A-Z])?$",
     "min_price_usd": 2.0,
     "max_spread_bps": 50.0,
     "min_day_dollar_volume_usd": 1000000,
@@ -19,32 +20,55 @@
     "max_gain_exclusive": 0.10,
     "max_last_trade_age_seconds": 120,
     "max_symbols": 5,
-    "order": "score descending, then relative volume descending (missing last), then symbol"
+    "order": "score descending, then relative volume descending (missing last), then symbol",
+    "note": "The board's own stage label is not used; the gain range is checked on a fresh SIP snapshot taken after the decision time. volatility_halt (a price-triggered pause) is scored by the board but does not count as a non-price incentive."
   },
   "controls": {
-    "pool": "every name in a fresh full-market SIP snapshot at the decision time that passes the same price, spread, dollar-volume, gain and last-trade filters and is not on the board",
-    "count": 20,
-    "draw": "sha256(protocol id | session date | decision time | symbol) ascending, first 20",
+    "pool": "names in the same fresh full-market snapshot that pass every price, spread, dollar-volume, gain, liveness and symbol filter and have no non-price incentive component at the decision (monitor board.json incentive_symbols, which lists every symbol with any component other than relvol, regardless of score)",
+    "matching": "gain bucket at the decision: [0, 3%), [3%, 6%), [6%, 10%)",
+    "count": "4 per selected name from its gain bucket, drawn without replacement across the session's selections",
+    "draw": "ascending sha256(protocol id | session date | decision time | symbol)",
     "traded": false,
-    "outcome": "SIP minute bars after the session: first bar open at or after the decision time to the bar open 60 minutes later, less the measured cost table's per-side cost for the name's price tier"
+    "outcome": "SIP 1-minute bars after the session: open of the first bar that starts strictly after the selection record's snapshot_completed_at, to the open of the bar 60 minutes later, less a round-trip cost of twice the cost table's half-spread for the name's cell (rules.time_bucket of the decision time, rules.price_tier of the snapshot price, rules.dv_tier of the snapshot day dollar volume) plus rules.sell_fees on the exit"
   },
   "execution": {
-    "engine": "adaptive-paper mover trial mode (blueprints/us-equities/adaptive-paper, merged #172); its scan field protocol stays the engine's execution protocol mover-early-entry-v1-20260924 and the scan's source names this study",
+    "engine": "adaptive-paper mover trial mode (blueprints/us-equities/adaptive-paper, merged #172); the scan's protocol field stays the engine's execution protocol mover-early-entry-v1-20260924 and its source field names this study",
+    "configs": {
+      "10:30": {"path": "blueprints/us-equities/incentive-monitor/config-forward-1030.json", "sha256": "71b8b0222aed48b8a089d591762d9d92b72699888995ccca996052db1e9c1dc8"},
+      "13:30": {"path": "blueprints/us-equities/incentive-monitor/config-forward-1330.json", "sha256": "5f21ad1d5e8c135b3c708c6a705a3cddf412bc8e0c9217c7cadee0e389b0bae5"}
+    },
     "rule_template": "HH:MM|G0|V1000000|any",
     "exit": "X2 (60 minutes after the first entry fill)",
     "entry_cap_usd": 200,
     "limit_cap_bps": 50,
-    "leverage": "1x",
-    "account": "isolated Alpaca paper account (alpaca-paper-2)"
+    "leverage": "1x (rung 1 for engine sessions 1-400)",
+    "account": "isolated Alpaca paper account (alpaca-paper-2) with its own engine state root, so these sessions, sizing equity and loss budgets are not shared with other mover trials",
+    "bound_code": "each selection record carries the sha256 of monitor.py, board_scan.py, this protocol, the engine config and the written scan, and is written before the scan"
   },
   "outcomes": {
-    "primary": "net return per round trip after fees from the engine receipt's fills",
-    "secondary": ["selected minus control mean one-hour model return", "per-component means (reported, not tested)"],
-    "analysis_after": {"min_sessions": 20, "min_round_trips": 100},
-    "test": "one-sided 95% circular block bootstrap lower bound of the primary mean, blocks of 5 sessions, B = 20000, seed = int(sha256(id)[:16], 16)",
-    "pass": "lower bound > 0 and the secondary difference positive"
+    "primary": "per round trip, net return = (exit fill value - entry fill value - rules.sell_fees on the exit, fees.json sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d) / entry fill value, from the engine receipt's fills; Alpaca paper charges no commission and fills at quotes, so spread cost is inside the fills",
+    "secondary": ["mean control-matched difference: selected model return minus the mean of its matched controls' model returns (both on the controls' outcome definition)", "per-component means (reported, not tested)"],
+    "cost_table": {"path": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json", "sha256": "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13"},
+    "session_unit": "a trading day (both decisions of a day belong to one session)",
+    "analysis_point": "exactly once, after the first trading day at whose end at least 20 sessions with a started decision and at least 100 completed round trips exist; no interim test is run",
+    "estimator": "pooled mean of per-round-trip net returns over the sessions in the sample",
+    "test": "circular block bootstrap over sessions in calendar order, blocks of 5 sessions, B = 20000 resamples of the same session count; each resample's statistic is the pooled mean of the round trips in its sessions (sessions without trades contribute none); one-sided 95% lower bound = 5th percentile (numpy.percentile, method linear); RNG numpy.random.default_rng(int(sha256(id).hexdigest()[:16], 16))",
+    "pass": "lower bound > 0 and the secondary mean difference > 0"
   },
-  "stop_rules": ["the engine's own lifetime gross-loss and drawdown caps (1000 USD)", "three sessions ending with needs_attention", "any parameter change, which starts a new protocol version instead"],
+  "stop_rules": [
+    "the engine's own lifetime gross-loss and drawdown budgets (1000 USD) and its drawdown pause (beyond 20% pauses entries for that and the next nine engine sessions)",
+    "three consecutive trading days that each end with a needs_attention receipt",
+    "any parameter or code change bound in the selection record, which starts a new protocol version instead"
+  ],
+  "missed_sessions": "a stale board, an early or late run, or a refused scan writes a refusal record; such decisions count as sessions without trades",
   "gate_relation": "A pass is paper performance evidence for strategy-paper-performance. The live gate also requires strategy-historical-holdout, which this study cannot supply for its history-less components; whether a preregistered forward period may stand in for that holdout is an open gate decision, not assumed here.",
-  "limitations": ["the board score is a heuristic detector fixed on 2026-09-24 without outcome data", "paper fills are simulated by Alpaca and can differ from live fills", "two decisions per session share market conditions, so sessions (not trades) are the bootstrap unit"]
+  "amendments_before_first_order": "2026-09-24, from the independent pre-outcome review (no order placed yet): volatility_halt removed from the non-price list; controls restricted to names without any non-price incentive and matched on gain bucket; the control outcome window starts after the snapshot completes; a single analysis point, estimator, bootstrap, RNG, fees and cost table fixed; rung schedule extended to 400 engine sessions and the configs pinned by sha256; code, config and scan hashes recorded before the scan; a 300 s late guard and refusal records; M&A filings credited to the subject only; monitor state restored from its files after a restart, with its start time and stream downtime recorded.",
+  "limitations": [
+    "the board score is a heuristic detector fixed on 2026-09-24 without outcome data",
+    "relative volume assumes a linear volume clock, so it reads higher at 10:30 than at 13:30 for the same activity",
+    "some Benzinga articles are themselves price-driven (movers lists), so the news component is partly price-derived",
+    "session option totals and news windows depend on the monitor's uptime; restarts restore them from the monitor's files, and each record carries the monitor start time and stream downtime",
+    "paper fills are simulated by Alpaca and can differ from live fills",
+    "two decisions per session share market conditions, so sessions (not trades) are the bootstrap unit"
+  ]
 }

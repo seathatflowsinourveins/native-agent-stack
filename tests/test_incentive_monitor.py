@@ -136,8 +136,77 @@ class Scoring(unittest.TestCase):
         state.features = {"A": {"s": "A", "chg": 0.02, "p": 1, "v": None, "spr_bps": None}, "B": {"s": "B", "chg": 0.06, "p": 1, "v": None, "spr_bps": None}}
         state.halts["A"].append({"IssueSymbol": "A", "ReasonCode": "T1"})
         state.filings["C"].append({"form": "SC TO-T", "items": []})
-        board = M.build_board(state, datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc))
+        board, incentive = M.build_board(state, datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc))
         self.assertEqual([r["symbol"] for r in board], ["A"])  # B has no incentive, C scores 1.5 < 2
+        self.assertEqual(incentive, ["A", "C"])  # every non-price incentive, whatever its score
+
+    def test_news_counts_articles_once_inside_30_minutes(self):
+        state = M.State()
+        at = datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc)
+        state.news["N"] = {1: at.timestamp() - 60, 2: at.timestamp() - 3600}
+        state.halts["N"].append({"IssueSymbol": "N", "ReasonCode": "T1"})
+        board, _ = M.build_board(state, at)
+        self.assertEqual(board[0]["parts"]["news"], 1.0)
+        self.assertEqual(list(state.news["N"]), [1])  # the expired article is pruned
+
+    def test_option_roots_map_to_equities(self):
+        universe = {"TSLA", "BRK.B", "SPY"}
+        self.assertEqual([M.root_symbol(r, universe) for r in ("TSLA", "TSLA1", "BRKB", "SPXW", "X")], ["TSLA", "TSLA", "BRK.B", None, None])
+        state = M.State()
+        state.universe = universe
+        state.options.day["TSLA1"].update({"C_premium": 900_000, "P_premium": 1, "C_premium_0_7": 300_000, "large_prints": 3})
+        board, incentive = M.build_board(state, datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc))
+        self.assertEqual(([r["symbol"] for r in board], incentive), (["TSLA"], ["TSLA"]))
+
+    def test_filings_credit_the_issuer_not_the_filer(self):
+        state = M.State()
+        M.attach_filing(state, {"form": "SC TO-T", "role": "Filed by", "tickers": ["BIDDER"]})
+        M.attach_filing(state, {"form": "SC TO-T", "role": "Subject", "tickers": ["TARGET"]})
+        M.attach_filing(state, {"form": "8-K", "role": "Filer", "tickers": ["ISSUER"]})
+        self.assertEqual(sorted(state.filings), ["ISSUER", "TARGET"])
+
+
+class Restart(unittest.TestCase):
+    def test_restore_rebuilds_session_state_from_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            day = Path(tmp)
+            rows = {"edgar": [{"accession": "a1", "cik": 1, "role": "Subject", "form": "SC TO-T", "tickers": ["T"]},
+                              {"accession": "a1", "cik": 1, "role": "Subject", "form": "SC TO-T", "tickers": ["T"]}],
+                    "news": [{"id": 7, "received_at": "2026-09-24T14:00:00+00:00", "symbols": ["N"]}],
+                    "options-minute": [{"root": "R", "cells": {"C|0-7": [10, 1000.0, 2], "P|31+": [1, 50.0, 1]}}],
+                    "options-large": [{"root": "R"}]}
+            for name, items in rows.items():
+                (day / f"{name}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in items) + "not json\n")
+            state = M.State()
+            counts = M.restore(state, day)
+            self.assertEqual((counts["edgar"], counts["news"], counts["options_minutes"], counts["options_large"]), (1, 1, 1, 1))
+            self.assertEqual(counts["news_unreadable"], 1)
+            self.assertEqual(len(state.filings["T"]), 1)
+            self.assertEqual(state.news["N"], {7: datetime(2026, 9, 24, 14, tzinfo=timezone.utc).timestamp()})
+            self.assertEqual(dict(state.options.day["R"]), {"C_volume": 10, "C_premium": 1000.0, "C_premium_0_7": 1000.0, "P_volume": 1, "P_premium": 50.0, "large_prints": 1})
+
+
+class Halts(unittest.TestCase):
+    def test_only_today_and_changes_are_kept(self):
+        class FakeHttp:
+            def __init__(self, payload):
+                self.payload = payload
+
+            def get(self, url, kind, headers, timeout=20):
+                assert "sec.gov" not in url and "@" not in headers["User-Agent"]
+                return self.payload
+        state = M.State()
+        state.today = date(2026, 9, 24)
+        old = HALTS.replace(b"<ndaq:HaltDate>09/24/2026", b"<ndaq:HaltDate>09/23/2026")
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            self.assertEqual(M.poll_halts(FakeHttp(old), state, sink), 0)
+            self.assertEqual(M.poll_halts(FakeHttp(HALTS), state, sink), 1)
+            self.assertEqual(M.poll_halts(FakeHttp(HALTS), state, sink), 0)
+            resumed = HALTS.replace(b"<ndaq:ResumptionTradeTime />", b"<ndaq:ResumptionTradeTime>10:20:00</ndaq:ResumptionTradeTime>")
+            self.assertEqual(M.poll_halts(FakeHttp(resumed), state, sink), 1)
+            self.assertEqual(len(state.halts["PMAX"]), 1)
+            sink.close()
 
 
 class SinkFiles(unittest.TestCase):

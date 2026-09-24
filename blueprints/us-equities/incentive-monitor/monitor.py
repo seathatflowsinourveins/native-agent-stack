@@ -27,6 +27,7 @@ import os
 import re
 import statistics
 import sys
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -96,25 +97,28 @@ class Sink:
     """Append-only JSON lines per ET day and stream, owner-only files."""
 
     def __init__(self, root: Path):
-        self.root, self.files = root, {}
+        self.root, self.files, self.lock = root, {}, threading.Lock()  # written from the loop and from poll threads
 
     def path(self, name: str, day: str | None = None) -> Path:
         return self.root / (day or datetime.now(ET).strftime("%Y%m%d")) / name
 
     def write(self, name: str, record: dict) -> None:
-        path = self.path(f"{name}.jsonl")
-        handle = self.files.get(path)
-        if handle is None:
-            for old in [p for p in self.files if p.parent != path.parent]:
-                self.files.pop(old).close()
-            path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            handle = self.files[path] = os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600), "a", buffering=1)
-        handle.write(json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n")
+        line = json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n"
+        with self.lock:
+            path = self.path(f"{name}.jsonl")
+            handle = self.files.get(path)
+            if handle is None:
+                for old in [p for p in self.files if p.parent != path.parent]:
+                    self.files.pop(old).close()
+                path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                handle = self.files[path] = os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600), "a", buffering=1)
+            handle.write(line)
 
     def close(self) -> None:
-        for handle in self.files.values():
-            handle.close()
-        self.files.clear()
+        with self.lock:
+            for handle in self.files.values():
+                handle.close()
+            self.files.clear()
 
     def replace(self, name: str, payload: bytes) -> Path:
         path = self.path(name)
@@ -308,15 +312,68 @@ class Http:
 
 class State:
     def __init__(self):
-        self.news = defaultdict(deque)      # symbol -> monotonic receive times
-        self.filings = defaultdict(list)    # symbol -> filing rows (this session)
-        self.halts = defaultdict(list)      # symbol -> halt rows (this session)
+        self.news = defaultdict(dict)       # symbol -> {article id: epoch received}; updates of one article count once
+        self.filings = defaultdict(list)    # symbol -> filing rows (this session, issuer role only)
+        self.halts = defaultdict(list)      # symbol -> halt rows (today's halt date only)
         self.seen_accessions, self.halt_rows = set(), {}
-        self.features, self.adv, self.cik_tickers = {}, {}, {}
+        self.features, self.adv, self.cik_tickers, self.universe = {}, {}, {}, set()
         self.options = OptionsAggregator()
         self.last_trade = {}
         self.today = datetime.now(ET).date()
         self.stream_counts = defaultdict(int)
+        self.started_at = now_utc()
+        self.down_since, self.down_seconds = {}, defaultdict(float)  # stream -> epoch it went down; total seconds down
+        self.restored = {}
+
+
+def restore(state: State, day_dir: Path) -> dict:
+    """Rebuild this session's filings, news window and option totals from today's files after a restart."""
+    counts = defaultdict(int)
+    def lines(name):
+        path = day_dir / f"{name}.jsonl"
+        if path.exists():
+            with path.open() as f:
+                for line in f:
+                    try:
+                        yield json.loads(line)
+                    except ValueError:
+                        counts[f"{name}_unreadable"] += 1
+    for row in lines("edgar"):
+        key = (row.get("accession"), row.get("cik"))
+        if key not in state.seen_accessions:
+            state.seen_accessions.add(key)
+            attach_filing(state, row)
+            counts["edgar"] += 1
+    for row in lines("news"):
+        received = datetime.fromisoformat(row["received_at"]).timestamp() if row.get("received_at") else None
+        for symbol in row.get("symbols") or []:
+            if received is not None and row.get("id") is not None:
+                state.news[symbol].setdefault(row["id"], received)
+        counts["news"] += 1
+    for row in lines("options-minute"):
+        totals = state.options.day[row["root"]]
+        for cell, (volume, premium, _trades) in row.get("cells", {}).items():
+            right, bucket = cell.split("|")
+            totals[f"{right}_volume"] += volume
+            totals[f"{right}_premium"] += premium
+            if bucket == "0-7":
+                totals[f"{right}_premium_0_7"] += premium
+        counts["options_minutes"] += 1
+    for row in lines("options-large"):
+        state.options.day[row["root"]]["large_prints"] += 1
+        counts["options_large"] += 1
+    return dict(counts)
+
+
+def root_symbol(root: str, universe: set) -> str | None:
+    """The equity for an option root: itself, an adjusted root less its digit (TSLA1), or a class root (BRKB -> BRK.B)."""
+    if root in universe:
+        return root
+    stripped = root.rstrip("0123456789")
+    if stripped != root and stripped in universe:
+        return stripped
+    dotted = f"{root[:-1]}.{root[-1]}" if len(root) > 1 else None
+    return dotted if dotted in universe else None
 
 
 def load_universe(http: Http) -> list[str]:
@@ -342,7 +399,7 @@ def load_adv(http: Http, symbols: list[str], today: date) -> dict:
 def load_cik_tickers(http: Http) -> dict:
     mapping = defaultdict(list)
     for row in json.loads(http.sec(EDGAR_TICKERS)).values():
-        mapping[int(row["cik_str"])].append(row["ticker"])
+        mapping[int(row["cik_str"])].append(row["ticker"].replace("-", "."))  # SEC BRK-B is Alpaca BRK.B
     return dict(mapping)
 
 
@@ -363,6 +420,14 @@ def sweep_snapshots(http: Http, symbols: list[str], state: State, sink: Sink, at
     return rows
 
 
+def attach_filing(state: "State", row: dict) -> None:
+    """Credit a filing to its issuer only: a bidder or holder ("Filed by") is not the incentive's subject."""
+    if row.get("role") == "Filed by":
+        return
+    for ticker in row.get("tickers") or []:
+        state.filings[ticker].append(row)
+
+
 def poll_edgar(http: Http, state: State, sink: Sink) -> int:
     new = 0
     for query, keep in EDGAR_FORMS.items():
@@ -374,8 +439,7 @@ def poll_edgar(http: Http, state: State, sink: Sink) -> int:
             state.seen_accessions.add(key)
             row["tickers"] = state.cik_tickers.get(row["cik"], [])
             sink.write("edgar", row)
-            for ticker in row["tickers"]:
-                state.filings[ticker].append(row)
+            attach_filing(state, row)
             new += 1
         time.sleep(0.15)  # SEC fair access: well under 10 requests per second
     return new
@@ -385,6 +449,8 @@ def poll_halts(http: Http, state: State, sink: Sink) -> int:
     changed = 0
     # A generic agent here: the declared SEC contact is sent to SEC only.
     for row in parse_halts(http.get(HALTS_RSS, "nasdaq", {"User-Agent": "Mozilla/5.0 (compatible; incentive-monitor)"}), now_utc()):
+        if row.get("HaltDate") != state.today.strftime("%m/%d/%Y"):
+            continue  # the feed can still list earlier days' halts
         key = (row["IssueSymbol"], row.get("HaltDate"), row.get("HaltTime"))
         body = {k: v for k, v in row.items() if k != "received_at"}
         if state.halt_rows.get(key) != body:
@@ -396,24 +462,37 @@ def poll_halts(http: Http, state: State, sink: Sink) -> int:
     return changed
 
 
-def build_board(state: State, at: datetime, top: int = 100) -> list[dict]:
+NON_PRICE_PARTS = {"news", "mna_filing", "material_8k", "dilution_filing", "news_halt", "volatility_halt", "short_dated_calls", "large_option_prints"}
+
+
+def build_board(state: State, at: datetime, top: int = 100) -> tuple[list[dict], list[str]]:
+    """(board, incentive_symbols): rows scoring at least 2, and every symbol with any component other than relvol."""
     fraction = session_fraction(at)
-    horizon = time.monotonic() - 1800
-    candidates = set(state.filings) | set(state.halts) | set(state.news) | set(state.options.day)
+    horizon = at.timestamp() - 1800
+    options = {}
+    for root, totals in state.options.day.items():
+        symbol = root_symbol(root, state.universe) if state.universe else root
+        if symbol:
+            merged = options.setdefault(symbol, defaultdict(float))
+            for key, value in totals.items():
+                merged[key] += value
+    candidates = set(state.filings) | set(state.halts) | set(state.news) | set(options)
     candidates |= {s for s, f in state.features.items() if f["chg"] is not None and abs(f["chg"]) >= 0.05}
-    board = []
+    board, incentive = [], []
     for symbol in candidates:
         feat = state.features.get(symbol)
         adv = state.adv.get(symbol)
         relvol = (feat["v"] / (adv * fraction)) if (feat and feat.get("v") and adv and fraction) else None
-        recent = state.news.get(symbol) or deque()
-        while recent and recent[0] < horizon:
-            recent.popleft()
-        row = score(symbol, feat, relvol, len(recent), state.filings.get(symbol, []), state.halts.get(symbol, []), state.options.day.get(symbol))
+        articles = state.news.get(symbol) or {}
+        for article in [a for a, received in articles.items() if received < horizon]:
+            del articles[article]
+        row = score(symbol, feat, relvol, len(articles), state.filings.get(symbol, []), state.halts.get(symbol, []), options.get(symbol))
+        if set(row["parts"]) & NON_PRICE_PARTS:
+            incentive.append(symbol)
         if row["score"] >= 2:
             board.append(row)
     board.sort(key=lambda r: (-r["score"], r["symbol"]))
-    return board[:top]
+    return board[:top], sorted(incentive)
 
 
 # ---------------------------------------------------------------- streams
@@ -427,6 +506,8 @@ async def stream(name: str, url: str, subscribe: dict, headers: dict, on_message
             async with websockets.connect(url, additional_headers=({**headers, "Content-Type": "application/msgpack"} if packed else headers),
                                           max_size=None, ping_interval=20) as ws:
                 await ws.send(msgpack.packb(subscribe) if packed else json.dumps(subscribe))
+                if name in state.down_since:
+                    state.down_seconds[name] += time.time() - state.down_since.pop(name)
                 sink.write("monitor", {"event": "stream_connected", "stream": name, "at": now_utc()})
                 while not stop.is_set():
                     try:
@@ -447,6 +528,7 @@ async def stream(name: str, url: str, subscribe: dict, headers: dict, on_message
             raise
         except Exception as exc:  # reconnect with bounded backoff; every disconnect is recorded
             attempt += 1
+            state.down_since.setdefault(name, time.time())
             sink.write("monitor", {"event": "stream_down", "stream": name, "error": f"{type(exc).__name__}: {str(exc)[:200]}", "attempt": attempt, "at": now_utc()})
             try:
                 await asyncio.wait_for(stop.wait(), timeout=min(60, 2 ** attempt))
@@ -462,14 +544,18 @@ async def run(args) -> int:
     sink.write("monitor", {"event": "start", "at": now_utc(), "mode": args.mode, "until_et": args.until_et, "sweep_seconds": args.sweep_seconds,
                            "pid": os.getpid(), "sources": ["sip_snapshots", "opra_trades", "news", "edgar", "nasdaq_halts"]})
     symbols = await asyncio.to_thread(load_universe, http)
+    state.universe = set(symbols)
     state.cik_tickers = await asyncio.to_thread(load_cik_tickers, http)
+    state.restored = restore(state, sink.path(""))
+    sink.write("monitor", {"event": "restored", "at": now_utc(), "counts": state.restored})
     adv_task = asyncio.create_task(asyncio.to_thread(load_adv, http, symbols, state.today))
 
     def on_news(msg):
         received = now_utc()
         sink.write("news", news_record(msg, received))
         for symbol in msg.get("symbols") or []:
-            state.news[symbol].append(time.monotonic())
+            if msg.get("id") is not None:
+                state.news[symbol].setdefault(msg["id"], time.time())
 
     def on_opra(msg):
         if msg.get("T") == "t":
@@ -483,26 +569,35 @@ async def run(args) -> int:
     try:
         while True:
             started, at = time.monotonic(), datetime.now(timezone.utc)
-            if adv_task.done() and not state.adv:
-                state.adv = adv_task.result()
-                sink.replace("adv20.json", json.dumps(state.adv, sort_keys=True).encode())
             stats = {"event": "sweep", "at": at.isoformat(timespec="seconds")}
+            if adv_task.done() and not state.adv:
+                try:
+                    state.adv = adv_task.result()
+                    sink.replace("adv20.json", json.dumps(state.adv, sort_keys=True).encode())
+                except Exception as exc:  # retried next sweep; relvol stays empty meanwhile
+                    stats["adv_error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
+                    adv_task = asyncio.create_task(asyncio.to_thread(load_adv, http, symbols, state.today))
             for label, job in (("snapshots", lambda: len(sweep_snapshots(http, symbols, state, sink, at))),
                                ("edgar_new", lambda: poll_edgar(http, state, sink)), ("halt_changes", lambda: poll_halts(http, state, sink))):
                 try:
                     stats[label] = await asyncio.to_thread(job)
                 except Exception as exc:  # one failing source never stops the others
                     stats[f"{label}_error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
-            minute = at.astimezone(ET).strftime("%Y-%m-%dT%H:%M")
-            rows, large = state.options.drain(minute)
+            # Labelled with the drain time: a row holds trades received up to this moment.
+            rows, large = state.options.drain(datetime.now(ET).isoformat(timespec="seconds"))
             for row in rows:
                 sink.write("options-minute", row)
             for row in large:
                 sink.write("options-large", row)
             if state.features:
                 sink.write("regime", regime(list(state.features.values()), state.adv, at))
-            board = build_board(state, at)
-            payload = {"at": at.isoformat(timespec="seconds"), "evidence_class": "unvalidated_detector", "board": board}
+            board, incentive = build_board(state, at)
+            down = {name: round(state.down_seconds[name] + (time.time() - since if (since := state.down_since.get(name)) else 0), 1)
+                    for name in ("news", "opra")}
+            payload = {"at": at.isoformat(timespec="seconds"), "evidence_class": "unvalidated_detector", "board": board,
+                       "incentive_symbols": incentive,
+                       "monitor": {"started_at": state.started_at, "restored": state.restored, "stream_down_seconds": down,
+                                   "adv_loaded": bool(state.adv), "sweep_errors": sorted(k for k in stats if k.endswith("_error"))}}
             sink.replace("board.json", json.dumps(payload, indent=1).encode())
             sink.write("board", {"at": payload["at"], "board": board[:50]})
             stats.update({"board": len(board), "early": sum(r["stage"] == "early" for r in board), "calls": dict(http.calls),

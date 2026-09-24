@@ -27,16 +27,28 @@ class Selection(unittest.TestCase):
         self.assertEqual(B.PROTOCOL["status"], "frozen_before_first_order")
         self.assertEqual(B.PROTOCOL["selection"]["max_symbols"], 5)
         self.assertEqual(set(B.PROTOCOL["decision_times_et"]), {"10:30", "13:30"})
+        self.assertNotIn("volatility_halt", B.PROTOCOL["selection"]["required_any_component"])
+        for at, pin in B.PROTOCOL["execution"]["configs"].items():
+            self.assertEqual(B.sha(ROOT / pin["path"]), pin["sha256"], at)
+            config = json.loads((ROOT / pin["path"]).read_text())
+            self.assertEqual(config["mover"]["rule"], B.PROTOCOL["execution"]["rule_template"].replace("HH:MM", at))
+            self.assertEqual(config["mover"]["rung_schedule"], [{"from_session": 1, "to_session": 400, "rung": "1"}])
+        for key in ("cost_table",):
+            ref = B.PROTOCOL["outcomes"][key]
+            self.assertEqual(B.sha(ROOT / ref["path"]), ref["sha256"])
 
     def test_filters_and_reasons(self):
         features = {"OK": feat("OK"), "PENNY": feat("PENNY", p=1.5), "WIDE": feat("WIDE", spr=80.0), "THIN": feat("THIN", v=50_000),
                     "UP": feat("UP", chg=0.12), "DOWN": feat("DOWN", chg=-0.01), "STALE": feat("STALE", tt="2026-09-24T17:20:00Z")}
+        features["BAD1"] = feat("BAD1")
         board = [row(s) for s in features] + [row("LOW", score=2.5), row("PRICEONLY", parts={"relvol": 3.0}),
+                                              row("LUDP", parts={"volatility_halt": 1.0, "relvol": 2.0}),
                                               row("DIL", parts={"news": 1.0, "dilution_filing": -1.0, "news_halt": 2.0, "relvol": 1.5}), row("GONE")]
         chosen, rejected = B.select(board, features, NOW)
         self.assertEqual([r["symbol"] for r in chosen], ["OK"])
         self.assertEqual(rejected, {"PENNY": "price", "WIDE": "spread", "THIN": "dollar_volume", "UP": "gain", "DOWN": "gain", "STALE": "stale_last_trade",
-                                    "LOW": "score", "PRICEONLY": "no_non_price_component", "DIL": "excluded_component", "GONE": "no_snapshot"})
+                                    "BAD1": "symbol", "LOW": "score", "PRICEONLY": "no_non_price_component", "LUDP": "no_non_price_component",
+                                    "DIL": "excluded_component", "GONE": "no_snapshot"})
 
     def test_order_and_cap(self):
         features = {s: feat(s) for s in "ABCDEFG"}
@@ -44,13 +56,26 @@ class Selection(unittest.TestCase):
         chosen, _ = B.select(board, features, NOW)
         self.assertEqual([r["symbol"] for r in chosen], ["B", "D", "C", "E", "A"])
 
-    def test_controls_are_deterministic_and_exclude_board(self):
-        features = {s: feat(s) for s in ("A", "B", "C", "D")} | {"X": feat("X", p=1.0)}
-        first = B.controls(features, {"A"}, NOW, "2026-09-24", "13:30", 2)
-        self.assertEqual(first, B.controls(features, {"A"}, NOW, "2026-09-24", "13:30", 2))
-        self.assertEqual(len(first), 2)
-        self.assertFalse({"A", "X"} & set(first))
-        self.assertNotEqual(B.controls(features, set(), NOW, "2026-09-25", "13:30", 4), [])
+    def test_controls_are_matched_deterministic_and_incentive_free(self):
+        features = {"SELA": feat("SELA", chg=0.01), "SELB": feat("SELB", chg=0.07)}
+        features |= {f"L{c}": feat(f"L{c}", chg=0.02) for c in "ABCDEF"} | {f"H{c}": feat(f"H{c}", chg=0.08) for c in "ABC"}
+        features |= {"NEWSY": feat("NEWSY", chg=0.02), "PENNY": feat("PENNY", p=1.0, chg=0.02)}
+        chosen = [row("SELA"), row("SELB")]
+        excluded = {"SELA", "SELB", "NEWSY"}
+        first = B.controls(chosen, features, excluded, NOW, "2026-09-24", "13:30")
+        self.assertEqual(first, B.controls(chosen, features, excluded, NOW, "2026-09-24", "13:30"))
+        self.assertEqual(len(first["SELA"]), 4)
+        self.assertTrue(all(s.startswith("L") for s in first["SELA"]))
+        self.assertEqual(sorted(first["SELB"]), ["HA", "HB", "HC"])
+        self.assertFalse({"NEWSY", "PENNY"} & set(first["SELA"] + first["SELB"]))
+        self.assertEqual(len(B.controls([row("SELA"), row("SELC")], features | {"SELC": feat("SELC", chg=0.02)}, excluded | {"SELC"}, NOW, "d", "13:30")["SELC"]), 2)  # 6 low-bucket names, 4 used
+
+    def test_timing_guard(self):
+        at = lambda h, m, s=0: datetime(2026, 9, 24, h, m, s, tzinfo=B.M.ET)
+        self.assertEqual(B.timing_refusal(at(13, 29, 59), "13:30"), "before_decision_time")
+        self.assertIsNone(B.timing_refusal(at(13, 30), "13:30"))
+        self.assertIsNone(B.timing_refusal(at(13, 35), "13:30"))
+        self.assertEqual(B.timing_refusal(at(13, 35, 1), "13:30"), "after_late_guard")
 
     def test_engine_scan_shape(self):
         features = {"OK": feat("OK", p=12.345678901234, chg=0.0312)}
