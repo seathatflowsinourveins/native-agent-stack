@@ -173,6 +173,12 @@ REMOVE_GLOBS = (
     "catalogs/landscape/blind-convergence.json",
     "catalogs/sota-convergence/manifest-*.json",
     "catalogs/sota-convergence/sdk-runtime-coverage-*",
+    # Code and data that assert or name the incumbents, removed even if a packet referenced them (binding
+    # re-review L8; cross-family review F3).
+    "tools/sota-convergence/reconciliations-*.json",
+    "tests/test_catalogs.py",
+    "tests/test_new_host_grand_list.py",
+    "tests/test_handbook_summary.py",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/

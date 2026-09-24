@@ -815,13 +815,22 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
         (self.repo / "outside-link").unlink()
         os.symlink("loop-b", self.repo / "loop-a")
         os.symlink("loop-a", self.repo / "loop-b")
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "symlink loop"):  # on 3.12 and 3.13 alike (delta review D1)
             codex_lane.tree_sha256(self.repo)
+        os.symlink("missing-target", self.repo / "dangling")
+        (self.repo / "loop-a").unlink()
+        (self.repo / "loop-b").unlink()
+        self.assertIsInstance(codex_lane.tree_sha256(self.repo), str)  # a dangling internal link is hashed
+        (self.repo / "dangling").unlink()
+        os.symlink("loop-b", self.repo / "loop-a")
+        os.symlink("loop-a", self.repo / "loop-b")
         (self.repo / "loop-a").unlink()
         (self.repo / "loop-b").unlink()
         os.mkfifo(self.repo / "pipe")
         with self.assertRaisesRegex(ValueError, "non-regular entry"):
             codex_lane.tree_sha256(self.repo)
+        # A non-blind run tolerates git's fsmonitor socket and similar entries (delta review L3).
+        self.assertIsInstance(codex_lane.tree_sha256(self.repo, allow_escaping_links=True), str)
 
 
 class ExactProvenanceResumeTests(CodexLaneFixture):

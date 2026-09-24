@@ -1644,17 +1644,26 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
     and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a
     packet references it.
-  - **Escaping symlinks.** `codex_lane.tree_sha256` refuses a symlink that is absolute or resolves outside the
-    tree, and every lane and adjudication entry point exits 2 on it.
+  - **Escaping symlinks, loops and special files.** For a blind run, `codex_lane.tree_sha256` refuses a symlink
+    that is absolute or resolves outside the tree, a symlink loop (found by `os.stat` ELOOP, so on Python 3.12 and
+    3.13 alike), and a FIFO, socket or device. The blind lane and adjudication entry points exit 2 on any of them.
+    A deliberately non-blind `codex_lane --allow-git-history` run hashes such entries by their link text or
+    skips them, because a working checkout can hold a `.venv` link or git's fsmonitor socket.
   - **Position map integrity and location.** `assemble` derives each order's Claude position from the input
     contents, re-scrubbing the hash-bound lane returns, and refuses a judgment whose index map disagrees. The
     index moves out of the work dir, to `$NAS_ADJUDICATION_STATE_DIR` or
     `~/.local/state/native-agent-stack/adjudication/<sha256(work dir)[:16]>/adjudication-index.json`. One
     directory accumulates per work dir. After a wave is recorded, remove it with
     `rm -r "$(python3 -c 'import sys; sys.path.insert(0, "tools/sota-convergence"); import adjudicate; print(adjudicate.index_path(sys.argv[1]).parent)' <work-dir>)"`.
-  - **Audit and instruction boundaries.** A Codex judge call flagged by its blind audit voids that judgment.
-    Claude judges' reads are instruction-bound: the role and prompt name only three paths, and no filesystem
-    sandbox enforces that.
+  - **Audit and instruction boundaries.** Each Codex judge call is audited inside its worker, before its record is
+    written. A flagged call (web search, an MCP tool, or a command reaching outside its repository, input and
+    packet) voids the judgment, and a Codex judgment counts only when its record says `audit_clean`, so an
+    interrupted or resumed run cannot count a flagged call. Claude judges' reads are instruction-bound: the role
+    and prompt name only three paths, and no filesystem sandbox enforces that. That also covers the lane return
+    files in `<work-dir>/claude/` and `<work-dir>/codex/`, which would identify A and B.
+  - **One checkout.** `adjudicate` relativizes lane returns against the catalog checkout it runs from, and
+    `record_verdicts.py` against its `--root`. Run both from the same checkout; a mismatch fails closed (the
+    adjudication is rejected).
   - **Packet paths.** The Claude lane layers echo `packet_path` (agent-lab #47), and `claude_lane.py` requires
     it to be the work dir's packet with the layer's `packet_sha256`.
   - **Unresolved path check.** `claude_lane_args.py` checks the `--repo` as given, not only resolved.
@@ -1666,7 +1675,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     recorded.
   - A deleted input is recorded as a missing judgment rather than raising.
   - A spaced final path segment ending in a file extension (`/srv/My Project/private key.json`) is scrubbed
-    whole. An extension-less spaced final segment can still leave its last word.
+    whole. Since the 3d0943cc review, the rest of the sentence after any outside path is absorbed (up to a
+    delimiter, a line end, or the first token ending a sentence, whose punctuation is kept), so an
+    extension-less spaced segment cannot leave a word either. Text after that sentence end is kept.
   - `codex` and `claude-args` check both the `--repo` as given (absolutized, symlinks kept) and its resolved
     form: on macOS `/home` is a symlink whose target is deep enough to pass the depth rule.
 - **Round 13:**

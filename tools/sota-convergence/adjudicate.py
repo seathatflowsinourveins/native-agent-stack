@@ -209,16 +209,17 @@ OUTSIDE = "<outside-path>"
 # the clause after an outside path is absorbed: every following space-separated token up to a delimiter
 # (,;()"'`|&<>), a line end, or a token ending a sentence (. ! ? :), whose punctuation is kept (Codex review of
 # #145). Prose after a host path is lost; a private basename never survives.
-_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?: +[^\s'\"|;&<>()`,]+)+)")
+_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?:[ \t]+[^\s'\"|;&<>()`,]+)+)")
 
 
 def _absorb_clause(match) -> str:
-    kept = ""
-    for token in match.group(1).split():
-        if token[-1] in ".!?:":
-            kept = token[-1]
-            break
-    return OUTSIDE + kept
+    """Absorb the tokens after an outside path up to and including the first that ends a sentence (keeping its
+    punctuation); the text after that sentence end is kept (delta review of #145)."""
+    text = match.group(1)
+    for token in re.finditer(r"[^ \t]+", text):
+        if token.group(0)[-1] in ".!?:":
+            return OUTSIDE + token.group(0)[-1] + text[token.end():]
+    return OUTSIDE
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
 # ~ path (~/x or ~user/x), $HOME or ${HOME}, or a <host-path> placeholder.
@@ -630,6 +631,9 @@ def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None, entr
         return "judged a different packet"
     if data.get("leak") or data.get("failure") == LEAK:
         return LEAK
+    if family == "openai" and data.get("audit_clean") is not True:
+        # A Codex judgment counts only when its own calls' blind audit was clean (binding re-review N2).
+        return data.get("failure") or "no clean blind audit recorded for this judgment"
     if valid_judge(data.get("judge")) is None:
         return data.get("failure") or "no valid judge object"
     if valid_refuter(data.get("refuter")) is None:
@@ -775,7 +779,12 @@ def run_codex(args) -> int:
             with lock:
                 failures.append((stem, "the input changed after `inputs` built it; rerun inputs"))
             return
-        judged_sha256 = sha256_file(Path(input_path))
+        try:
+            judged_sha256 = sha256_file(Path(input_path))
+        except OSError:  # deleted between the check and the read
+            with lock:
+                failures.append((stem, "the input changed after `inputs` built it; rerun inputs"))
+            return
         # Both orders' content before the call: a leak suppresses both, bound to what was judged.
         both_sha256 = layer_input_hashes(index, name)
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
@@ -804,6 +813,15 @@ def run_codex(args) -> int:
         elif inputs_changed(index, [stem]):
             # The input changed while the judges read it (Codex review of #145).
             judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
+        # This call's own audit, before its record is written (binding re-review N2): a flagged call is void even if
+        # the run is interrupted before the end-of-run audit, and a resume never counts it.
+        call_roots = [str(repo), str(Path(input_path).resolve()), str(Path(packets.get(name, "")).resolve())]
+        flagged_calls = [stage for stage in ("judge", "refute")
+                         if (events_dir / f"{stem}.{stage}.jsonl").is_file()
+                         and audit_flagged(codex_lane.blind_audit(events_dir / f"{stem}.{stage}.jsonl", call_roots))]
+        audit_clean = not flagged_calls
+        if flagged_calls:
+            judge, refuter, leak, failure = None, None, None, AUDIT_FLAGGED
         if leak:
             # Held until the run's tree and audit checks pass (Codex review of #145): a leak from a voided call is
             # not persisted, so it cannot suppress later valid runs.
@@ -812,10 +830,12 @@ def run_codex(args) -> int:
                                                         "inputs_sha256": both_sha256}))
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
-        write_json(out_path, judgment_record(
+        record = judgment_record(
             "openai", name, order, input_path, packet_sha256, model, repo, None if leak else judge,
             refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak, judged_sha256, args.effort,
-            run_provenance))
+            run_provenance)
+        record["audit_clean"] = audit_clean
+        write_json(out_path, record)
         if refute_model and refute_model != judge_model:
             print(f"adjudicate: {stem} judge model {judge_model!r} and refuter model {refute_model!r} differ",
                   file=sys.stderr)
@@ -829,7 +849,11 @@ def run_codex(args) -> int:
     else:
         for item in pending:
             process(item)
-    if pending and adjudication_provenance(args.prompt, repo) != run_provenance:
+    try:
+        provenance_after = adjudication_provenance(args.prompt, repo)
+    except ValueError:  # an escaping link, loop or FIFO appeared: not the tree the judges were bound to
+        provenance_after = None
+    if pending and provenance_after != run_provenance:
         # The evidence tree (or the code, prompt or schemas) changed while the judges read it (Codex review of
         # #145): no judgment of this run is bound to what it read, so none counts.
         for name, order, _input_path, _packet_sha256, out_path in pending:
@@ -897,6 +921,11 @@ def redact_leak_text(text):
         text = pattern.sub(OUTSIDE, text)
     text = _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
     return text[:LEAK_TEXT_LIMIT]
+
+
+def audit_flagged(entry: dict) -> bool:
+    """A blind-audit entry that voids its judgment: web search, an MCP tool, or a flagged command."""
+    return bool(entry.get("web_search") or entry.get("mcp_tool_calls") or entry.get("flagged_commands"))
 
 
 def input_key(input_path):
@@ -1432,7 +1461,10 @@ def layer_set(text):
 def main(argv=None) -> int:
     args = parse_args(argv)
     if args.command == "inputs":
-        roots = [str(root.resolve()) for root in args.lane_repo_root]
+        # Each root in both spellings, as given (absolutized) and resolved: a lane records the paths it opened in
+        # whichever spelling it was given, and on macOS /tmp resolves to /private/tmp (validate-macos, #145).
+        roots = list(dict.fromkeys(spelling for root in args.lane_repo_root
+                                   for spelling in (os.path.abspath(root), str(root.resolve()))))
         refusal = refuse_roots("--lane-repo-root", roots)
         if refusal:
             print(refusal, file=sys.stderr)

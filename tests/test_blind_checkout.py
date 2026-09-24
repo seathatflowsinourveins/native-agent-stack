@@ -404,7 +404,8 @@ class ExportTests(BlindCheckoutFixture):
 
     def test_a_shallow_export_is_refused_before_anything_is_created(self):
         # Independent review of #145, O3: the lanes and the adjudicator refuse such a root, so refuse it here.
-        shallow = self.dest.parent / "export"
+        # A fixed two-component path stays shallow whatever TMPDIR is (binding re-review L7).
+        shallow = Path("/srv/blind-export-shallow")
         with self.assertRaises(SystemExit) as raised:
             blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(self.dest),
                                  "--export", str(shallow)])

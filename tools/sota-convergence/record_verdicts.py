@@ -67,6 +67,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import date
@@ -1274,9 +1275,11 @@ def main(argv=None) -> int:
             sealed_writes.extend(process_row(
                 row, root, catalog, row["layer_id"], work_dir, checked_at, args.adjudications,
                 identities, aliases, sha256sums, rejections,
-                # Resolved, as adjudicate records them (re-review L1): a symlinked or relative export must
-                # relativize the same way on both sides of the lane_returns_sha256 binding.
-                tuple(str(Path(root).resolve()) for root in args.lane_repo_root),
+                # Both spellings of each root, as adjudicate records them (re-review L1; validate-macos): a lane's
+                # recorded paths match whichever spelling it was given, and relativizing either way gives the same
+                # repository-relative form, so both sides of the lane_returns_sha256 binding agree.
+                tuple(dict.fromkeys(spelling for root in args.lane_repo_root
+                                    for spelling in (os.path.abspath(root), str(Path(root).resolve())))),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
                 lane_code=lane_code, failures=failures))

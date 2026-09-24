@@ -103,6 +103,8 @@ class AdjudicateFixture(unittest.TestCase):
             {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []},
             input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None,
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
+        if lane == "codex":
+            record["audit_clean"] = True  # the Codex runner records its calls' clean blind audit
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
     def input_body(self, order="AB"):
@@ -1260,7 +1262,10 @@ class ThirteenthRereviewOf145Tests(AdjudicateFixture):
                                ("/home/example/a b/c d/e.json end", "<outside-path>"),
                                ("see /srv/My Project/private key now", "see <outside-path>"),
                                (r"at C:\Users\example user\private key, then", "at <outside-path>, then"),
-                               ("see /home/example user/private.json. Next sentence.", "see <outside-path>.")):
+                               ("see /home/example user/private.json. Next sentence.",
+                                "see <outside-path>. Next sentence."),
+                               ("/srv/x/y is missing. c2 wins because docs/b.md shows it.",
+                                "<outside-path>. c2 wins because docs/b.md shows it.")):
             self.assertEqual(adjudicate.scrub_text(text, packets), expected, text)
             self.assertEqual(adjudicate.redact_leak_text(text), expected, text)
         self.assertEqual(adjudicate.scrub_text("evidence/a.json and plain words", packets),
@@ -1450,6 +1455,22 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
                                                 "--model", "gpt-6-astra", "--jobs", "1"])
         self.assertEqual(code, 1)
         self.assertIn("the input changed after `inputs` built it", err)
+
+    def test_a_resumed_codex_judgment_without_a_clean_audit_does_not_count(self):
+        # Binding re-review N2: an interrupted run could leave a flagged call's record counted.
+        self.inputs()
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "claude")
+        path = self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json"
+        record = json.loads(path.read_text(encoding="utf-8"))
+        record.pop("audit_clean")
+        path.write_text(json.dumps(record), encoding="utf-8")
+        self.assertEqual(adjudicate.usable_judgment(record, "openai", "AB", self.sha),
+                         "no clean blind audit recorded for this judgment")
+        code, err, result = self.assemble()
+        self.assertIsNone(result["winner_lane"])
+        self.assertIn("openai", result["missing_families"])
 
     def test_a_flagged_codex_audit_voids_the_judgment(self):
         self.inputs()

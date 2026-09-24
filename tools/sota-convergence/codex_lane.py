@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import errno
 import json
 import os
 import re
@@ -521,9 +522,13 @@ def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
         if path.is_symlink():
             target = os.readlink(path)
             try:
-                resolved = (path.parent / target).resolve(strict=False)
-            except (OSError, RuntimeError) as error:  # a link loop
-                raise ValueError(f"evidence repository {repo} has an unresolvable symlink: {relative} ({error})")
+                # A loop is found by stat (ELOOP) on every Python version: 3.13's resolve() no longer raises on one
+                # (delta review of #145). A dangling internal link (ENOENT) is hashed by its text.
+                os.stat(path)
+            except OSError as error:
+                if error.errno == errno.ELOOP and not allow_escaping_links:
+                    raise ValueError(f"evidence repository {repo} has a symlink loop: {relative}")
+            resolved = (path.parent / target).resolve(strict=False)
             if not allow_escaping_links and (os.path.isabs(target)
                                              or not (resolved == root or root in resolved.parents)):
                 # Content behind an escaping link could change under an unchanged digest (Codex review of #145);
@@ -533,9 +538,9 @@ def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
             digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
         elif path.is_file():
             digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
-        elif not path.is_dir():
+        elif not path.is_dir() and not allow_escaping_links:
             # A FIFO, socket or device is not evidence and would otherwise be skipped silently (cross-family
-            # review of #145).
+            # review of #145). A deliberately non-blind run may hold git's fsmonitor socket, so it is not refused.
             raise ValueError(f"evidence repository {repo} has a non-regular entry: {relative}")
     return digest.hexdigest()
 

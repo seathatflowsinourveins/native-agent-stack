@@ -1718,6 +1718,31 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
         build_landscape(self.root)
 
+    def test_a_symlinked_lane_root_binds_like_its_resolved_path(self):
+        # Re-review L1: record_verdicts resolves --lane-repo-root as adjudicate records it.
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        real = scratch / "hosts" / "blind" / "export"
+        real.mkdir(parents=True)
+        link = scratch / "export-link"
+        link.symlink_to(real)
+        # The lane may record either spelling (macOS: /tmp is /private/tmp); both relativize (validate-macos).
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2",
+                                  claude={"sources_read": [f"{real}/evidence/receipt.json",
+                                                           f"{link}/evidence/receipt.json (lines 1-2)"]})
+        lanes = {lane: json.loads((self.work_dir / lane / f"{catalog}__wave-crossfamily-layer.json")
+                                  .read_text(encoding="utf-8")) for lane in ("claude", "codex")}
+        relative = record_verdicts.with_relative_sources(lanes["claude"], self.root, (str(link), str(real)))
+        self.assertEqual(relative["sources_read"], ["evidence/receipt.json", "evidence/receipt.json (lines 1-2)"])
+        bound = {lane: hashlib.sha256(record_verdicts.sealed_text(record_verdicts.with_relative_sources(
+            data, self.root, (str(link), str(real)))).encode("utf-8")).hexdigest() for lane, data in lanes.items()}
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), lane_returns_sha256=bound))
+        code, output = self.run_wave(adjudications=adjudications, lane_roots=(str(link),))
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")
         adjudications = self.work_dir / "adjudications"
