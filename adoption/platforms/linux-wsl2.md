@@ -81,7 +81,15 @@ itself evidence the WSL UVA gap closed.
    `adoption/bootstrap-linux.sh` and its pins changed after `v2026.09.23`
    (native `claude-code` pin, uv-tool `markitdown`/`tavily-cli`,
    `--configure-claude-user-profile`); at `v2026.09.23` the script installs
-   the npm `claude-code` 2.1.278 pin and has no profile step.
+   the npm `claude-code` 2.1.278 pin and has no profile step. The script and
+   its `claude-code` pin also changed after `v2026.09.24.1`: at that tag the
+   pin is 2.1.280 and the script reinstalls it even over a newer Claude Code,
+   so a re-run downgrades a native auto-updated install. On main the pin is
+   2.1.281 and a floor: the script keeps a `~/.local/bin/claude` whose
+   `--version` reports 2.1.281 or newer (logging `Kept installed claude-code
+   <version>`, with nothing downloaded or installed) and runs the
+   checksum-verified install only when that launcher is missing, older or
+   unreadable.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

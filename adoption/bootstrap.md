@@ -127,13 +127,19 @@ GitHub-hosted macOS runner; see
    `adoption/pins-macos-arm64.json` has no `socraticode` pin (the script skips
    it by default, so `macos-arm64-foundation` installs 7 of 8), no pinned
    darwin binary for Codex or Claude Code (npm resolves those unverified) and
-   no embedding-model pin. Linux/WSL2's script and pins are the same at
-   `v2026.09.23` as on main.
+   no embedding-model pin. Linux/WSL2's script and pins changed after
+   `v2026.09.23` too: at that tag `adoption/bootstrap-linux.sh` installs the
+   npm `claude-code` 2.1.278 pin and has no `--configure-claude-user-profile`
+   step, and `adoption/pins-linux-x86_64.json` has no `markitdown`,
+   `tavily-cli`, `orx` or `agent-browser` pin.
 
-   The macOS script and both claude-code pins changed after `v2026.09.23.1`:
-   at that tag the pins are 2.1.280 and `adoption/bootstrap-macos.sh` reinstalls
-   the pin even over a newer Claude Code; on main the pins are 2.1.281 and the
-   script keeps an installed launcher at or above the pin.
+   Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
+   that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and
+   `adoption/bootstrap-macos.sh` reinstall the pin even over a newer Claude
+   Code; on main the pins are 2.1.281 and both scripts keep an installed
+   `~/.local/bin/claude` at or above the pin (logging `Kept installed
+   claude-code <version>`), running the checksum-verified install only when
+   that launcher is missing, older or unreadable.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
