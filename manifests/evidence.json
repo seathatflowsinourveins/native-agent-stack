@@ -8097,6 +8097,46 @@
       "bytes": 8993
     },
     {
+      "path": "blueprints/us-equities/extreme-gainer-audit/README.md",
+      "sha256": "b23721b4f8532403e90e266d0add2ef0e43244dcb82150ea0bf78b3245a0db35",
+      "bytes": 5818
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/audit.py",
+      "sha256": "17797b36cc5372eed63401b04e9b65c915d1812e993f519b2ce45b7913e4ad7f",
+      "bytes": 24332
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/deviations.json",
+      "sha256": "cdedd5e30b4b411c06f3653aea1aedae06a337581289c4f411c534f30d9bb6c5",
+      "bytes": 5627
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/fetch-log-run-20260924a.json",
+      "sha256": "e828bbdef6c53d6c630e4c2c751df46afe653c402b7361b3a07a0578ad1aef24",
+      "bytes": 198
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924a.json",
+      "sha256": "2fa638bfd43a02b71bbde3941dbd5a4695decb34f553db46f5e4d445d1ad60e1",
+      "bytes": 2188
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924b.json",
+      "sha256": "1712bf738699b3e948252ed29e34fbbefa4453dbf75e154c2235d09db3da166b",
+      "bytes": 2508
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/plan.json",
+      "sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+      "bytes": 5076
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/posthoc.py",
+      "sha256": "8ab3c71ddaaaf610c1fa104f0de351bdf4cf242330a59abb95638187cd83bcac",
+      "bytes": 6423
+    },
+    {
       "path": "blueprints/us-equities/financial-data/README.md",
       "sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
       "bytes": 8176
@@ -28500,6 +28540,11 @@
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
+    },
+    {
+      "path": "tests/test_extreme_gainer_audit.py",
+      "sha256": "bfdf6e71700f259bdec3df2381328d07d0eb5c85622bf8a6d09a613de1cc75a4",
+      "bytes": 15815
     },
     {
       "path": "tests/test_financial_data.py",
