@@ -74,13 +74,10 @@ The 24 GB Mac is being replaced (see the upgrade table below). On the replacemen
    ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). Where
    those services exist, skip the launchd agents of `adoption/bootstrap-macos.sh` in step 1: they
    would start a second Qdrant and a second ai-memory store.
-1. Pinned clone, then `adoption/bootstrap-macos.sh`. The Homebrew prerequisite install, the
-   `socraticode`, darwin-binary and embedding-model pins, the launchd agents and the embedding
-   acceptance script all came in #94, after `v2026.09.23`: at that tag the script brews only `jq`
-   and installs 7 of the 8 `macos-arm64-foundation` components, and the launchd and embedding steps
-   run from a default-branch clone, as the [macOS page](../adoption/platforms/macos-arm64.md) marks.
-   A release cut after #94 and re-pinned ([moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release))
-   removes these differences.
+1. Pinned clone, then `adoption/bootstrap-macos.sh`. The pinned release contains #94 (the Homebrew
+   prerequisite install, the `socraticode`, darwin-binary and embedding-model pins, the launchd
+   agents and the embedding acceptance script), so every step on the
+   [macOS page](../adoption/platforms/macos-arm64.md) runs from the pinned checkout.
 2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM

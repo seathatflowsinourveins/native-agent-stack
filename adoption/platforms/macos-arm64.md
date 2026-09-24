@@ -59,15 +59,7 @@ release, the note is history and the step is in your checkout (`test -e
    steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
    with this host's own `adoption/hosts/<host>.json`).
 4. launchd services and the embedding acceptance ("launchd services" and
-   "Embedding backend decision" below). `adoption/launchd/launchd-agents.sh`
-   and `tools/adoption/embed_acceptance.py` were added after `v2026.09.23`, and
-   so were their inputs: at that tag `bootstrap-macos.sh` neither downloads the
-   embedding model (`models[0]` in main's darwin pins) into `state/models` nor
-   writes `config/qdrant.yaml`, which the qdrant and llama-embed agents need.
-   **Until main is re-pinned to a release that contains the macOS clean install
-   (#94), run this page from step 2 onward from a default-branch clone** and
-   record the receipts with that clone's `catalog_revision` (main-only
-   evidence, labelled as such).
+   "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`
    (changed after `v2026.09.23.1`, which runs plain `python3`; the manifest supports
    Python 3.13 only, so run this form there too),

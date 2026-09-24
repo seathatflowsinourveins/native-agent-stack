@@ -3305,8 +3305,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "2d6cf4b8c002c427040efb69a15251737c3da896e42d4efcd0a1244cdcc2423f",
-      "bytes": 38219
+      "sha256": "1d77596f63b7af5022e2d29df3fb3fc83726c4b41e56225b9c0f6ad8c1a707ed",
+      "bytes": 37605
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -10096,8 +10096,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "aa6824a2acad9721de6af12d4db3de3b79bb6954d51f81601d597dbdf4d216b3",
-      "bytes": 11260
+      "sha256": "e32fb119c3585a614a11eeb7bb6bc169302ea8e44e455b9212e7dc223f0fd4a9",
+      "bytes": 10963
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -28166,23 +28166,23 @@
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "8ad444fdb16049eb7481e6c703250a0de887fbb537b259da6e72ebff7f3016cc",
-      "bytes": 2068
+      "sha256": "3aa5e3f0aac4b43f7196cb46aee3ce1ef06e795ae93ba2a925ea53ac62f5e256",
+      "bytes": 2456
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "ca683553bcc9fb824f8b642e77c55be3c5d77115004f6aa57144f0d326b0ca2d",
-      "bytes": 2013
+      "sha256": "946c56b2287da1268944128cfbaabeb005aaf26a79e5f7f02e41c4b63fd0a99f",
+      "bytes": 2072
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "52cdd8b58e9900ad43ea2195e4de0a11d95aa3b8c9a2ff6e4eabd149b68e96d9",
-      "bytes": 1561
+      "sha256": "5b0fc7e5451054baa40d879194d95d537e2ec5e0c44cbf7fe620f9c2e871ef6c",
+      "bytes": 1703
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "035251c0168cc17d66861605f402cfc98ed76bddc5177a4fe28ef3acd35d2534",
-      "bytes": 1826
+      "sha256": "44c5ffb97ed53e30b90402a49a6f0a2b738843c2c0d14103474b4b7c4ff6e929",
+      "bytes": 2045
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",

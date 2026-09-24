@@ -22,7 +22,8 @@ cover. Each test below names the drift it stops:
   pinned release lacks (scripts/release_due.py's ``due`` list) says "added after `<release_tag>`";
 - a new-host page that mentions an install input (bootstrap script, pin file, or an asset the
   Claude profile installer copies onto the host: the agent and hook directories and the MCP
-  template) whose content differs between the pinned release and HEAD says "changed after
+  template; the installed scripts/hooks/secret_path_guard.py is covered through its hash in
+  adoption/hooks/claude/SHA256SUMS) whose content differs between the pinned release and HEAD says "changed after
   `<release_tag>`" in a unit that mentions it. release_due.py reports every changed new-machine
   file in its ``changed`` list; this check requires the per-page note for these install inputs;
 - bootstrap.md's plugin revision check quotes the same commits as the recipes/README.md rows
@@ -70,8 +71,10 @@ COVERAGE_RE = re.compile(rf"^(all \d+|none of \d+|\d+ of \d+)(?: \((all \d+|none
 HISTORICAL_TAG_RE = re.compile(rf"(?:\b(?:added|changed) after|\d+\)? at) `?{TAG}`?", re.I)
 INSTALL_INPUTS = ("adoption/bootstrap-linux.sh", "adoption/bootstrap-macos.sh",
                   "adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json",
-                  # What tools/adoption/install_claude_profile.py copies onto the host. A directory
-                  # (trailing slash) changed when its tracked files or any one file's text differ.
+                  # What tools/adoption/install_claude_profile.py copies onto the host (it also copies
+                  # scripts/hooks/secret_path_guard.py, whose hash sits in adoption/hooks/claude/SHA256SUMS,
+                  # so a change there changes that directory). A directory (trailing slash) changed when
+                  # its tracked files or any one file's text differ.
                   "adoption/agents/claude/", "adoption/hooks/claude/", "adoption/mcp/claude-user.json")
 # Independent store_true flags where one silently wins, so argparse cannot reject the pair.
 EXCLUSIVE_IN_EFFECT = {"component_matrix.py": [frozenset({"--write", "--check"})]}  # write_mode = write and not check

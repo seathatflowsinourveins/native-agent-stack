@@ -14,7 +14,8 @@ instead.
   change here, and the two blind lane roles arrived at `max` with #145), all byte-identical
   to agent-lab's `.claude/agents/` copies at agent-lab `b31f640` (the `max` change is agent-lab
   #43; `source-scout`'s `maxTurns: 100` is agent-lab #46);
-- a new committed project settings file for this repository (`.claude/settings.json`) and
+- this repository's committed project settings (`.claude/settings.json`, added on main by
+  #182 for the secret guard), which gain the ultracode keys, and
   the coordinator rule in [`AGENTS.md`](../../AGENTS.md);
 - the portable examples: [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md),
   the agents in `examples/claude-native/agents/`, the saved workflows (`review-changes.js`,
@@ -232,9 +233,10 @@ Revisit this record when any of these happens:
 - **Not executed:** an Ultracode or effort run of `claude-code-action`, and cloud
   sessions (documentation and source only; the action's CI smoke above tested
   replies and a settings-level permission rule, not Ultracode or effort).
-- **Released tags predate this change.** `v2026.09.23.1`, pinned since #148 and this
-  record's first base, ships the five agent definitions at `medium`/`high`, so
-  `adoption/bootstrap.md` marks them "changed after `v2026.09.23.1`". A host installing
+- **Released tags predate this change.** `v2026.09.24.1`, the current pin, ships the five
+  installer agents at `medium`/`high` and neither blind role, so `adoption/bootstrap.md`
+  marks `adoption/agents/claude/` (and `adoption/hooks/claude/`) "changed after
+  `v2026.09.24.1`". A host installing
   from that tag gets the `max` definitions after the next release and re-pin, or by
   running `tools/adoption/install_claude_profile.py --only agents` from a default-branch
   clone; the installer replaces any differing catalog-owned agent file.
