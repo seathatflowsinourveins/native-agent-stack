@@ -327,14 +327,15 @@ counterexamples show why each assumption matters, not just in the abstract:
   repeated-DELETE case (assumption (1) violated) compounding a broker-side,
   unlogged cancellation (assumption (2)).
 - **(b) A DELETE that loses the race to a fill, inside the clock-offset
-  window.** A cancel request is logged (host clock) for an order that
-  actually fills a few milliseconds later (broker clock). If that fill lands
-  within the measured **≥41ms** host-clock lead documented above, the
-  fill-vs-cancel ordering as seen through the two different clocks can
-  disagree, and a request that (on the broker's clock) arrived *after* the
-  fill could still look, on the host clock, like it preceded it -- letting a
-  request meant for a now-filled order masquerade as available for a
-  different, genuinely-canceled one.
+  window.** The host clock leads the broker's by at least ~41ms (above), so
+  a cancel request sent at broker time 10.000s is logged at about 10.050s.
+  If the targeted order fills at broker time 10.020s, after the request was
+  sent but before the broker acted on it, the logged request appears to come
+  *after* the fill. The algorithm then treats the targeted order as already
+  terminal at the request time and excludes it, so the request can be
+  attributed to a different, genuinely canceled order that is still open.
+  If the offset ran the other way, the filled order would stay open at the
+  request time and the pairing would be refused as ambiguous instead.
 
 Both failure modes trace back to the same root cause: `requests[]` records
 neither `client_order_id` nor symbol. Logging `client_order_id` on cancel

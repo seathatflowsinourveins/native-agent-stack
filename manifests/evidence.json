@@ -9125,8 +9125,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
-      "sha256": "2a6f64983a039e8c455441016531301f91f34c86d2a8cc2721e483ef2e6ea2ea",
-      "bytes": 35790
+      "sha256": "5b6065ba0fe6b143a34221e2678a4cd18abca4d855224be1059cd05571e67570",
+      "bytes": 35911
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json",
