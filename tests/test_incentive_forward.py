@@ -139,6 +139,38 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class BoardVersion(unittest.TestCase):
+    """Protocol v1 runs on board version 1 only (board.json); board-v2.json and unversioned boards are refused."""
+
+    def test_protocol_v1_pins_board_version_1_without_editing_the_frozen_file(self):
+        self.assertEqual((B.BOARD_VERSION, B.M.BOARD_VERSION), (1, 1))
+        self.assertNotIn("board_version", B.PROTOCOL)
+
+    def decide(self, board: dict):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "board.json").write_text(json.dumps(board))
+            at = B.PROTOCOL["decision_times_et"][0]
+            pin = B.PROTOCOL["execution"]["configs"][at]["path"]
+            with mock.patch.object(B, "timing_refusal", lambda now, at: None):
+                rc = B.main(["--env-file", str(tmp / "absent.env"), "--board", str(tmp / "board.json"), "--at-et", at, "--config", str(ROOT / pin),
+                             "--engine-dir", str(ROOT / "blueprints/us-equities/adaptive-paper"), "--records", str(tmp / "ledger"), "--out", str(tmp / "scan.json")])
+            (refusal,) = list((tmp / "ledger").glob("*-refused-*.json"))
+            return rc, json.loads(refusal.read_text())
+
+    def test_boards_of_another_version_are_refused(self):
+        v1, v2 = B.M.board_payloads(datetime.now(timezone.utc), [], [], [], [], {"code_sha256": B.sha(B.HERE / "monitor.py")})
+        unversioned = {k: v for k, v in v1.items() if k != "board_version"}
+        for board in (v2, unversioned, {**v1, "board_version": True}, {**v1, "board_version": "1"}):
+            rc, record = self.decide(board)
+            self.assertEqual((rc, record["reason"], record["protocol_board_version"]), (4, "board_version_mismatch", 1), board.get("board_version"))
+            self.assertEqual(record["board_version"], board.get("board_version"))
+        rc, record = self.decide(v1)  # version 1 passes and stops later, at the absent credential file (nothing is read)
+        self.assertEqual((rc, record["reason"], record["board_version"]), (4, "snapshot_failed", 1))
+
+
 class MonitorBinding(unittest.TestCase):
     def test_board_from_other_monitor_code_is_refused(self):
         import tempfile
