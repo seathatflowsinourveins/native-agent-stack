@@ -1,0 +1,218 @@
+{
+  "cancel_timestamp_assumption": "canceled paper orders have no recorded cancel timestamp in broker-orders.json; the replay cancels the simulated order 1ns before the next same-symbol/side order's paper submit timestamp (build_decisions())",
+  "completed_utc": "2026-09-24T17:32:31.607880+00:00",
+  "data_provenance": {
+    "adjustment": "n/a (quotes)",
+    "alpaca_py_declared_version": "0.44.0",
+    "asof": "2026-09-23",
+    "feed": "sip",
+    "page_ledger_sha256": "08117d4acbc965c238b28ab156347f2f049d472402e9503317d0cfca1d188291",
+    "quote_counts": {
+      "GOOGL": 10285,
+      "INTC": 21856
+    },
+    "source": "Alpaca historical quotes, GET https://data.alpaca.markets/v2/stocks/quotes",
+    "symbols": [
+      "GOOGL",
+      "INTC"
+    ],
+    "window_utc": [
+      "2026-09-23T16:46:36.955177000Z",
+      "2026-09-23T16:52:17.583866000Z"
+    ]
+  },
+  "engine": {
+    "account_type": "CASH",
+    "book_type": "L1_MBP",
+    "engine_version": "2.0.0rc5",
+    "fee_model": {
+      "class": "FixedFeeModel",
+      "commission_usd": "0",
+      "source": "reused from engine-nautilus/equity-replay baseline case"
+    },
+    "fill_model": {
+      "class": "nautilus_trader.execution.FillModel (native default, unconfigured)",
+      "note": "native default nautilus_trader.execution.FillModel(); matches limit orders against the fed L1 top-of-book quotes deterministically (no probabilistic slippage or partial-fill draw), the same baseline configuration used by engine-nautilus/equity-replay's zero-fee case"
+    },
+    "liquidity_consumption": false,
+    "oms_type": "NETTING",
+    "reports": {
+      "fills": {
+        "rows": 4,
+        "sha256": "7eaf2d025e4b6daa5070456aab7f2e532900360e7b2ef356a01ce7f4bd91595b"
+      },
+      "orders": {
+        "rows": 5,
+        "sha256": "61af37484c66784ca73a10162ef92d2814a157f199a00e5b270b91f958d012b0"
+      }
+    }
+  },
+  "inputs_sha256": {
+    "broker_orders_json": "7f84a869e033e4692bcb755486dcffa05278fd441e9cafb541a470de9b8047c3",
+    "ingest_receipt_json": "3f340e37b1254578197c27bc75652ee626ac6966bb43642ebf8c7f49a2df3bb4",
+    "paper_output_json": "3e2603c8c9e883ed6284e6f9b5f11dbb87b1ed127f8195b47e4e064882041c73"
+  },
+  "kind": "sim_vs_paper_fill_comparison",
+  "network_interfaces": [
+    [
+      1,
+      "lo"
+    ],
+    [
+      2,
+      "eth0"
+    ],
+    [
+      3,
+      "eth1"
+    ],
+    [
+      4,
+      "loopback0"
+    ],
+    [
+      5,
+      "eth2"
+    ],
+    [
+      6,
+      "br-9c69f217f15a"
+    ],
+    [
+      7,
+      "br-d80006bed4da"
+    ],
+    [
+      8,
+      "docker0"
+    ],
+    [
+      9,
+      "br-92ba17c21ed8"
+    ],
+    [
+      10,
+      "veth3624c08"
+    ],
+    [
+      11,
+      "veth01bc30c"
+    ]
+  ],
+  "protocol": "sim-paper-compare-v1-20260924",
+  "replay_from_retained_pages_only": true,
+  "results": {
+    "aggregates": {
+      "abs_fill_price_delta_bps_max": 0.8295313148071339,
+      "abs_fill_price_delta_bps_mean": 0.37495210665844053,
+      "abs_fill_price_delta_bps_median": 0.2953250051681876,
+      "abs_fill_time_delta_s_max": 0.837071865,
+      "abs_fill_time_delta_s_mean": 0.7760921789999999,
+      "abs_fill_time_delta_s_median": 0.816296049,
+      "both_filled": 3,
+      "fill_agreement_rate": 0.6,
+      "fill_agreements": 3,
+      "orders": 5
+    },
+    "rows": [
+      {
+        "client_order_id": "adp-adaptive-20260923g-0000001",
+        "fill_agreement": true,
+        "fill_price_delta_bps": 0.0,
+        "fill_time_delta_s": -0.674908623,
+        "limit_price": "120.6",
+        "paper_fill_price": "120.57",
+        "paper_fill_ts": "2026-09-23T16:47:37.632753000Z",
+        "paper_filled": true,
+        "paper_status": "filled",
+        "qty": 1,
+        "side": "BUY",
+        "sim_fill_price": "120.57",
+        "sim_fill_ts": "2026-09-23T16:47:36.957844377Z",
+        "sim_filled": true,
+        "sim_present": true,
+        "symbol": "INTC"
+      },
+      {
+        "client_order_id": "adp-adaptive-20260923g-0000002",
+        "fill_agreement": true,
+        "fill_price_delta_bps": -0.8295313148071339,
+        "fill_time_delta_s": -0.816296049,
+        "limit_price": "120.52",
+        "paper_fill_price": "120.55",
+        "paper_fill_ts": "2026-09-23T16:47:43.962040000Z",
+        "paper_filled": true,
+        "paper_status": "filled",
+        "qty": 1,
+        "side": "SELL",
+        "sim_fill_price": "120.54",
+        "sim_fill_ts": "2026-09-23T16:47:43.145743951Z",
+        "sim_filled": true,
+        "sim_present": true,
+        "symbol": "INTC"
+      },
+      {
+        "client_order_id": "adp-adaptive-20260923g-0000003",
+        "fill_agreement": true,
+        "fill_price_delta_bps": 0.2953250051681876,
+        "fill_time_delta_s": -0.837071865,
+        "limit_price": "338.64",
+        "paper_fill_price": "338.61",
+        "paper_fill_ts": "2026-09-23T16:50:59.643745000Z",
+        "paper_filled": true,
+        "paper_status": "filled",
+        "qty": 1,
+        "side": "BUY",
+        "sim_fill_price": "338.62",
+        "sim_fill_ts": "2026-09-23T16:50:58.806673135Z",
+        "sim_filled": true,
+        "sim_present": true,
+        "symbol": "GOOGL"
+      },
+      {
+        "client_order_id": "adp-adaptive-20260923g-0000004",
+        "fill_agreement": false,
+        "fill_price_delta_bps": null,
+        "fill_time_delta_s": null,
+        "limit_price": "338.42",
+        "paper_fill_price": null,
+        "paper_fill_ts": null,
+        "paper_filled": false,
+        "paper_status": "canceled",
+        "qty": 1,
+        "side": "SELL",
+        "sim_fill_price": "338.44",
+        "sim_fill_ts": "2026-09-23T16:51:06.696451192Z",
+        "sim_filled": true,
+        "sim_present": true,
+        "symbol": "GOOGL"
+      },
+      {
+        "client_order_id": "adp-adaptive-20260923g-0000005",
+        "fill_agreement": false,
+        "fill_price_delta_bps": null,
+        "fill_time_delta_s": null,
+        "limit_price": "338.33",
+        "paper_fill_price": "338.35",
+        "paper_fill_ts": "2026-09-23T16:51:17.583866000Z",
+        "paper_filled": true,
+        "paper_status": "filled",
+        "qty": 1,
+        "side": "SELL",
+        "sim_fill_price": null,
+        "sim_fill_ts": null,
+        "sim_filled": false,
+        "sim_present": true,
+        "symbol": "GOOGL"
+      }
+    ]
+  },
+  "runner_sha256": "fd8fef223b3cf70b0f17750148c67a5b41a6a02e8ba69cfc5a9f2cc0c529a39b",
+  "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime.",
+  "trading_lane_audit_gap": 7,
+  "trial": "20260923g-main-passed",
+  "trial_window_utc": [
+    "2026-09-23T16:46:00Z",
+    "2026-09-23T16:53:00Z"
+  ]
+}
