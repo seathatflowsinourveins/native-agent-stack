@@ -1605,6 +1605,26 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     row's sealed `lanes.<lane>.sealed_sha256` (the sealed form, so CI recomputes it). `record_verdicts.py` and
     `scripts/landscape.py` both check this, and CI also requires both sealed lane returns to name one tree.
   - **UTF-8 only (L2).** Lane returns are decoded as UTF-8 before parsing, so a BOM or UTF-16/32 is refused.
+  - **Allowlisted export (F1, F2).** `blind_checkout.py --export … --allow-from-packets <work-dir>/packets` exports
+    only the following, and nothing else:
+    - the paths the lane packets reference (evidence refs, registered receipts, recipe refs; directories
+      recursively);
+    - one level of `evidence/` and `blueprints/` paths named inside those JSON files;
+    - the `tests/`, `tools/` and `scripts/` trees;
+    - the root instruction stubs.
+
+    Files that name every layer's winners are removed even when referenced (component-evidence-matrix,
+    new-host-grand-list, blind-convergence, the sota-convergence manifests and SDK coverage), and non-empty
+    winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
+    the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
+
+    On the 2026-09-23 packets the export holds 902 files with 0 missing references, against the whole
+    repository before.
+
+    **Disclosed limit:** a packet's own evidence references name 23 `docs/`, 12 `catalogs/`, 5 `recipes/`,
+    3 `adoption/` files and `manifests/stack.json`, whose prose can call the current choice "selected". They
+    are kept because leaving an incumbent's cited evidence out of the export would bias lanes against it; the
+    lane prompt and role forbid looking for the current choice.
 - **Round 14:**
   - `adjudication-lane.js` echoes the prompt it read and each item's consumed input and packet paths.
     `claude-collect` requires the prompt to hash to the snapshot's `prompt_sha256` and the repo to be the
