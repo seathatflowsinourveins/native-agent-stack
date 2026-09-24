@@ -107,8 +107,12 @@ It is separate from the engine transport and ledger. It made these GETs:
 - positions;
 - open orders.
 
-It ran at 19:33:47Z. Its stdout is retained byte-identical as
-`observe-ladder-trial.stdout.json`; stderr was empty and the exit code 0. It saw
+The retained run is from 19:45:36Z. Its stdout is kept byte-identical as
+`observe-ladder-trial.stdout.json`; stderr was empty and the exit code 0. That
+run used the committed version of the script, which reports any failure as a
+fixed error code plus the exception class name, never a path or a message. An
+earlier read at 19:33:47Z, made before that change, returned the same orders
+and fills. It saw
 4 orders, all `filled`, with the same quantities and average prices as the
 engine ledger. It saw 5 fill activities (above), 0 positions and 0 open orders.
 It uses the same broker API and account, so it is independent of the engine code

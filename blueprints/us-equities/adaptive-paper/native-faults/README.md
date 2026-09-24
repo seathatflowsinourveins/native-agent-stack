@@ -101,10 +101,10 @@ removed. The receipt does not record the process exit code. By harness design,
 C05 differs from the expectation written before the run: Alpaca paper answered
 the DELETE of an already-canceled order with 204, not the 422 its DELETE
 reference suggests ("The order status is not cancelable"). The plan accepts 204,
-404 or 422 as data. So `broker_refusal_observed` is false, and the case shows
-that the engine sends the repeat DELETE and stays consistent with any of the
-three answers. It does not show how the engine handles a 422 cancel refusal;
-that path is covered only offline.
+404 or 422 as data. So `broker_refusal_observed` is false. Natively, the case
+shows only that the engine sends the repeat DELETE and stays consistent with a
+204 answer (both native runs received 204). Its handling of a 404 or 422
+answer to that DELETE is covered only by the offline tests.
 
 **What C04's definitive refusal rests on.** Alpaca documents that orders
 exceeding the minimum price variance "will be rejected", with the body
@@ -320,8 +320,10 @@ Bounds:
 ## C04 choice: the documented sub-penny rejection
 
 The alternative was a fault Alpaca answers with 401, 403 or 404, keeping the
-pre-send check for every client id. Within this plan's bounds no such fault is
-reachable:
+pre-send check for every client id. No reproducible way to cause such a fault
+was identified within this plan's bounds. This is an inference from the
+documentation and the engine's own pre-send checks, not an observation that
+those statuses cannot occur:
 
 - The create-order reference
   (https://docs.alpaca.markets/us/reference/postorder.md) documents only two

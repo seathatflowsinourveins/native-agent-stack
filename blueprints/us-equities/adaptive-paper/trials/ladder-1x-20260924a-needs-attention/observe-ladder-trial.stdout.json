@@ -2,7 +2,7 @@
  "method": "alpaca-py TradingClient.get_orders(status=all, after) filtered by client-id prefix; GET /v2/account/activities/FILL (after) joined to those orders; get_all_positions; open orders",
  "alpaca_py_version": "0.44.0",
  "python": "3.12.3",
- "observed_at": "2026-09-24T15:33:47.988649-04:00",
+ "observed_at": "2026-09-24T15:45:36.379888-04:00",
  "prefix": "adp-ladder-1x-20260924a-",
  "listing_after": "2026-09-24T19:27:00+00:00",
  "orders_listed_since_after": 4,
