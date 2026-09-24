@@ -186,10 +186,19 @@ def _is_symlink_component(dir_fd, name) -> bool:
     is already reported as `REASON_SYMLINK` by `_try`). Without this, such
     a component would fall into the generic `REASON_MISSING` bucket even
     though it is specifically a symlink. One extra `lstat`, only on this
-    failure path (never the common success path), tells the two apart."""
+    failure path (never the common success path), tells the two apart.
+
+    Round-5 fix: catches `(OSError, ValueError, UnicodeError)`, not only
+    `OSError` -- `name` can itself carry a NUL byte (`ValueError`) or a
+    surrogate that cannot round-trip through the filesystem encoding
+    (`UnicodeEncodeError`, whose `.object` attribute would otherwise retain
+    the ancestor component name). Either way this function must still
+    return a plain bool so the caller's already-sanitized `REASON_MISSING`
+    code applies, rather than letting a new, unsanitized exception escape
+    from this refinement step."""
     try:
         info = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
-    except OSError:
+    except (OSError, ValueError, UnicodeError):
         return False
     return stat.S_ISLNK(info.st_mode)
 
@@ -391,16 +400,23 @@ def open_verified(path, *, follow_symlinks: bool):
     # _check_file_metadata above), so the read the caller does through this
     # object is an ordinary blocking read.
     #
-    # Built in two steps rather than one `os.fdopen(file_fd, "rb")` call, to
-    # avoid a double-close: if `io.FileIO.__init__` itself fails after
-    # accepting ownership of `file_fd` (`closefd=True`), CPython already
-    # closes that fd as part of its own failure cleanup -- a second
-    # `os.close(file_fd)` here would then either raise EBADF (masking the
-    # real error) or, worse, close an unrelated fd the OS has since reused
-    # for something else. Only the already-successfully-constructed `raw`
-    # *object* is closed on a later failure (wrapping it in a
-    # `BufferedReader`), never the bare integer.
-    raw = io.FileIO(file_fd, "rb", closefd=True)
+    # Built in two steps rather than one `os.fdopen(file_fd, "rb")` call, so
+    # cleanup never closes the same fd twice. `io.FileIO(file_fd, "rb",
+    # closefd=True)` does NOT take ownership of `file_fd` until it returns
+    # successfully -- if its own construction fails, CPython leaves
+    # `file_fd` open (verified against CPython's `_io.FileIO.__init__`),
+    # so that failure is handled here with a plain `os.close(file_fd)`.
+    # Once `raw` exists, it *does* own the fd; a later failure (wrapping it
+    # in a `BufferedReader`) is handled by closing that already-constructed
+    # `raw` object instead, never the bare integer again -- closing both
+    # would double-close the same fd, which either raises `EBADF` (masking
+    # the real error) or, worse, closes an unrelated fd the OS has since
+    # reused for something else.
+    try:
+        raw = io.FileIO(file_fd, "rb", closefd=True)
+    except BaseException:
+        os.close(file_fd)
+        raise
     try:
         return io.BufferedReader(raw)
     except BaseException:

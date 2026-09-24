@@ -210,5 +210,39 @@ source tree and runs the actually-named tests against that copy in a subprocess 
 <test-id>`) -- first on the unmutated copy, requiring every named test to pass, then on the mutated copy,
 counting a kill only for a genuine `unittest` "FAIL" (never an "ERROR", never merely a non-zero exit) --
 reporting a genuine kill/survive result per mutation rather than an in-process claim. `MutationDriverSelfTests`
-exercises the driver itself: an empty mutation, an unrelated-import-breaking mutation, and a mistyped test id
-must each report "not killed". No broker call is made and no live credentials file is read or referenced.
+exercises the driver itself: an empty mutation, an unrelated-import-breaking mutation, a mistyped test id, and
+(round 5) a test the driver's own copy makes report `"skipped"` must each report `"not killed"` --
+`"skipped"` specifically as `"inconclusive"`, not silently folded into `"survived"` (a skipped test proves
+nothing either way, which the driver's returned `killed` flag must not conflate with a real pass). No broker
+call is made and no live credentials file is read or referenced.
+
+## Round 5 (both reviewers, final small items)
+
+- **`_is_symlink_component()`'s failure-path `lstat` escaped normalization.** It caught only `OSError`; a NUL
+  byte in an ancestor directory component raised a bare `ValueError`, and a surrogate raised
+  `UnicodeEncodeError` (whose `.object` attribute retains the ancestor's own name). Now catches `(OSError,
+  ValueError, UnicodeError)`, so the already-sanitized `REASON_MISSING` code applies instead. Tested for both
+  cases, asserting no path in the message, `.object`, `__context__`, or `__cause__`.
+- **The `io.FileIO` double-close fix's own comment was wrong, and one real gap remained.** `io.FileIO(fd,
+  "rb", closefd=True)` does **not** take ownership of `fd` until its constructor returns successfully --
+  verified directly against CPython (a construction failure on a directory fd leaves that fd open) -- so the
+  prior comment claiming CPython closes it on failure was incorrect, and `open_verified()` was leaking `fd`
+  in that specific case. Fixed: `try: raw = io.FileIO(file_fd, "rb", closefd=True) except BaseException:
+  os.close(file_fd); raise`; after that point only `raw` (never the bare integer) is closed. Two new tests:
+  one patches `io.FileIO` itself to fail and confirms no leak; the other captures the constructed `raw` object
+  when the later `BufferedReader` wrap fails and asserts `raw.closed` is `True` -- the deterministic way to
+  tell a proper `raw.close()` apart from a bypassing `os.close(file_fd)` (`io.FileIO.close()` is implemented
+  in C and never calls Python's `os.close()`, so counting `os.close()` calls cannot observe this at all).
+- **The stricter immediate-parent rule (round 4) had no test that failed when it was reverted entirely.**
+  Four new tests, each chosen so only the strict parent rule (not the generic, sticky-excused ancestor rule)
+  can be what rejects it: a real 0600 file placed directly in the real `/tmp`; a simulated root-owned `0755`
+  parent; a simulated sticky `1777` parent; and a bare `/file`.
+- **The double-close fix had no test that failed when reverted.** The existing leak test patches
+  `cg.io.BufferedReader`, which `os.fdopen`'s (or this module's own) failure path never uses to detect a
+  *double*-close specifically -- only a leak. The new test above (`raw.closed`) is what actually distinguishes
+  the two.
+- **A symlinked directory component's `symlink` reporting (added round 4) had no direct test.** Added one.
+- **Driver (Codex, low): a `"skipped"` result fell through to `"survived"`.** Fixed as described above; the
+  docstring at the top of `tests/_credential_mutation_driver.py` also now notes that a `"FAIL"` can come from
+  `setUp()`, not only the named test method's own body -- this driver does not currently distinguish those
+  two sources of a `"FAIL"`, only that `unittest` marked the named id `"FAIL"` and not `"ERROR"`.

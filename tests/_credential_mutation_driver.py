@@ -26,10 +26,21 @@ completely unchanged code. This version:
      drawn from what happens next;
   3. only then applies the mutation and re-runs the same test id(s);
   4. counts a kill only when a named test id is present in the mutated
-     run's output as a "FAIL" (a real `assert*` failure) -- never an
-     "ERROR" (an exception raised outside the test body itself: an import
-     failure, a collection failure, a bug in test setup) and never merely
-     "the subprocess exited non-zero", which conflates the two.
+     run's output as a "FAIL" -- never an "ERROR" (an exception raised
+     outside an `assert*` call: an import failure, a collection failure,
+     or a bug in test setup/teardown) and never merely "the subprocess
+     exited non-zero", which conflates the two. Note that a "FAIL" can
+     itself come from `setUp()` (unittest reports a `setUp()` failure that
+     raises via `self.fail`/`assertX` as "FAIL", the same as one from the
+     test method body) -- this driver does not currently distinguish "the
+     named test method's own assertion caught the mutation" from "its
+     fixture setup did", only "unittest, taken as a whole, marked this
+     specific test id FAIL and not ERROR".
+  5. a "skipped" result -- the named test declined to run at all (e.g. an
+     `@unittest.skipUnless` guard) -- is reported as "inconclusive", not
+     folded into "survived": nothing was actually exercised, so nothing
+     was actually proven either way, and the overall mutation-kill gate
+     must fail on it exactly as it fails on a genuine survival.
 """
 from __future__ import annotations
 
@@ -189,11 +200,20 @@ def run_mutation(name: str, mutation: list[tuple[str, str, str, int]], test_ids:
         collected = {t: mutated["results"].get(t) for t in test_ids}
         killed_by = [t for t, status in collected.items() if status == "FAIL"]
         uncollected = [t for t, status in collected.items() if status is None]
+        skipped = [t for t, status in collected.items() if status is not None and status.startswith("skipped")]
+        # Order matters: a "FAIL" always wins (genuinely killed); otherwise
+        # any uncollected or skipped test id makes the result inconclusive
+        # -- nothing was actually exercised for that id, so nothing was
+        # actually proven, and that must not be conflated with "survived"
+        # (which specifically means the mutated code really did run and
+        # really did pass).
         verdict = ("killed" if killed_by else
                    "not_collected" if uncollected else
+                   "inconclusive" if skipped else
                    "error_not_fail" if any(status == "ERROR" for status in collected.values()) else
                    "survived")
-        return {"mutation": name, "test_ids": test_ids, "killed": bool(killed_by), "timed_out": False,
+        killed = bool(killed_by) and verdict == "killed"
+        return {"mutation": name, "test_ids": test_ids, "killed": killed, "timed_out": False,
                 "returncode": mutated["returncode"], "diff_lines": diff.count("\n"), "verdict": verdict,
                 "killed_by": killed_by, "mutated_results": collected,
                 "stdout_tail": mutated["stdout_tail"], "stderr_tail": mutated["stderr_tail"]}

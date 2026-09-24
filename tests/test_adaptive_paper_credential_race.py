@@ -22,6 +22,7 @@ an independent security review as not establishing what it claimed to.
 from __future__ import annotations
 
 import contextlib
+import gc
 import os
 import signal
 import stat
@@ -360,6 +361,32 @@ class NoPathLeakInErrors(unittest.TestCase):
         finally:
             os.chmod(blocked, 0o700)
 
+    def test_nul_byte_in_an_ancestor_directory_component_never_leaks(self):
+        # G-round-5 item 1: _is_symlink_component()'s failure-path lstat
+        # (invoked when the directory-open itself already failed) used to
+        # catch only OSError, so a NUL byte in an *ancestor* component (as
+        # opposed to the final file name, covered above) raised a bare,
+        # uncaught ValueError instead of the sanitized CredentialGuardError.
+        bad = str(self.root) + "/tell\x00tale-dir/paper.env"
+        with self.assertRaises(cg.CredentialGuardError) as ctx:
+            cg.open_verified(bad, follow_symlinks=False)
+        self._assert_clean(ctx, "tell", "tale-dir")
+        self.assertRegex(str(ctx.exception), "credential_file_permissions:missing")
+
+    def test_surrogate_in_an_ancestor_directory_component_never_leaks(self):
+        # Same fix, the other escaping exception type: a lone surrogate (as
+        # os.fsdecode's surrogateescape error handler would produce from an
+        # invalid byte) raises UnicodeEncodeError when re-encoded for the
+        # stat() syscall, whose `.object` attribute holds the string that
+        # contains the ancestor's own name.
+        bad = str(self.root) + "/tell\udcfftale-dir/paper.env"
+        with self.assertRaises(cg.CredentialGuardError) as ctx:
+            cg.open_verified(bad, follow_symlinks=False)
+        self._assert_clean(ctx, "tell", "tale-dir")
+        self.assertRegex(str(ctx.exception), "credential_file_permissions:missing")
+        for attr in ("object", "args"):
+            self.assertNotIn("tale-dir", repr(getattr(ctx.exception, attr, None)))
+
 
 class DotDotIsRejected(unittest.TestCase):
     """Fix-round item 3 (both reviewers): a `..` component must never be
@@ -396,6 +423,33 @@ class DotDotIsRejected(unittest.TestCase):
             cg.open_verified(path, follow_symlinks=False)
 
 
+class SymlinkedDirectoryComponentReporting(unittest.TestCase):
+    """Fix-round-5 item 5: a symlinked *directory* component (as opposed to
+    the final file, already covered elsewhere) must report the specific
+    `symlink` reason code, not the generic `missing` one. On Linux,
+    `O_DIRECTORY | O_NOFOLLOW` against a symlink surfaces as `ENOTDIR`, not
+    `ELOOP` (unlike the final component's plain `O_NOFOLLOW` open, which
+    does get `ELOOP`), so this specifically exercises
+    `_is_symlink_component()`'s failure-path refinement."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_symlinked_ancestor_directory_reports_symlink_not_missing(self):
+        real = self.root / "real"
+        real.mkdir(mode=0o700)
+        _write_env(real, name="paper.env")
+        link = self.root / "link"
+        link.symlink_to(real)
+        path = link / "paper.env"
+        with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:symlink"):
+            cg.open_verified(path, follow_symlinks=False)
+
+
 class FdOpenFailureCleanup(unittest.TestCase):
     """Fix-round item 4 (Codex, LOW): if fdopen() fails after the file
     descriptor is otherwise fully verified, the descriptor must not leak."""
@@ -422,6 +476,70 @@ class FdOpenFailureCleanup(unittest.TestCase):
                 cg.open_verified(path, follow_symlinks=True)
         after = _open_fd_count()
         self.assertEqual(before, after, "the verified descriptor leaked when wrapping it failed")
+
+    def test_fileio_construction_failure_closes_the_fd(self):
+        # Round-5 item 2: io.FileIO(fd, "rb", closefd=True) does NOT take
+        # ownership of fd until it returns successfully -- verified
+        # separately against CPython (a failed construction on a directory
+        # fd leaves it open) -- so open_verified() must close file_fd
+        # itself with a plain os.close() when *this* constructor call is
+        # what fails, not merely when the later BufferedReader wrap does.
+        path = _write_env(self.root)
+        before = _open_fd_count()
+        with patch.object(cg.io, "FileIO", side_effect=OSError("simulated FileIO construction failure")):
+            with self.assertRaises(OSError):
+                cg.open_verified(path, follow_symlinks=True)
+        after = _open_fd_count()
+        self.assertEqual(before, after, "the verified descriptor leaked when io.FileIO() itself failed")
+
+    def test_wrap_failure_does_not_double_close_a_reused_fd(self):
+        # Round-5 item 4: the fix under test is *specifically* that the
+        # cleanup path closes the already-constructed `raw` object (whose
+        # own bookkeeping then knows it is closed), not a bare
+        # os.close(file_fd) that bypasses that bookkeeping. Reverting to
+        # the bare os.close() leaves `raw` (an io.FileIO with
+        # closefd=True) believing it still owns file_fd; when `raw` is
+        # later garbage-collected, its own finalizer closes that fd number
+        # *again* -- by which point the OS may have already reused it for
+        # something else entirely, silently closing that unrelated file
+        # out from under its owner. Patching cg.io.BufferedReader (as the
+        # sibling leak test above does) only proves no *leak*; it does not
+        # by itself distinguish a clean close from a bypassed one, since
+        # both leave the fd count unchanged -- `raw.closed` is what must be
+        # examined afterward, since `io.FileIO.close()` is implemented in C
+        # and never goes through `os.close()` at all (so patching or
+        # counting `os.close()` calls would not observe it either).
+        path = _write_env(self.root)
+        captured_raw = []
+
+        def _capture_and_fail(raw, *args, **kwargs):
+            captured_raw.append(raw)
+            raise OSError("simulated wrapping failure")
+
+        with patch.object(cg.io, "BufferedReader", side_effect=_capture_and_fail):
+            with self.assertRaises(OSError):
+                cg.open_verified(path, follow_symlinks=True)
+        self.assertEqual(len(captured_raw), 1)
+        raw = captured_raw[0]
+        self.assertTrue(
+            raw.closed,
+            "the cleanup path did not close `raw` itself (bypassed via a bare os.close(file_fd)?) -- "
+            "raw's own finalizer would then attempt a second, real close of whatever fd number the OS "
+            "has since reused for something else entirely, the double-close this fix prevents")
+
+        # Belt-and-suspenders best-effort corroboration (not the primary
+        # assertion, since fd-number reuse timing is not guaranteed): a
+        # fresh file opened right after a *correctly* closed `raw` is free
+        # to receive the same low fd number, and forcing raw's finalizer to
+        # run again (a no-op once already closed) must not disturb it.
+        reused = tempfile.TemporaryFile()
+        try:
+            del raw, captured_raw
+            gc.collect()
+            reused.write(b"still usable")
+            reused.flush()
+        finally:
+            reused.close()
 
 
 class FdLeakOnRefusal(unittest.TestCase):
@@ -506,6 +624,73 @@ class RootDirectoryOwnershipIsChecked(unittest.TestCase):
         with _FakeFstat(os.sep, uid=os.getuid() + 1, mode=stat.S_IFDIR | 0o777):
             with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:ancestor"):
                 cg.open_verified(path, follow_symlinks=True)
+
+
+class ImmediateParentStrictRule(unittest.TestCase):
+    """Fix-round-5 item 3: nothing previously failed when the stricter
+    immediate-parent rule (round 4) was reverted entirely -- the generic,
+    sticky-excused ancestor rule would still reject most of these cases for
+    an unrelated reason, masking whether the parent-specific rule itself is
+    what fired. Each case here is chosen so *only* the strict parent rule
+    (not the generic ancestor rule) can be what rejects it."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_file_directly_in_real_tmp_is_refused(self):
+        # A real, compliant-looking 0600 file placed directly in the real
+        # /tmp (not a subdirectory): a strict parent rule with no sticky
+        # exception refuses it because /tmp itself is not owned by exactly
+        # getuid() (root ownership does not excuse a *parent*, only a
+        # container ancestor); the generic ancestor rule, by contrast,
+        # would accept /tmp as an ancestor outright (sticky exception), so
+        # this specific case only fails under the strict parent rule.
+        path = Path(tempfile.gettempdir()) / f"round5-parent-rule-tell-tale-{os.getpid()}.env"
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, 0o600)
+        try:
+            with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:parent_"):
+                cg.open_verified(path, follow_symlinks=True)
+        finally:
+            path.unlink()
+
+    def test_root_owned_0755_parent_is_refused(self):
+        # Root ownership alone excuses an *ancestor* (generic rule) but
+        # never a *parent* (strict rule); 0755 (not group/other-writable)
+        # means the generic rule's writability branch would never fire
+        # either, isolating the parent-specific owner check.
+        sub = self.root / "sub"
+        sub.mkdir(mode=0o700)
+        path = _write_env(sub)
+        with _FakeFstat("sub", uid=0, mode=stat.S_IFDIR | 0o755):
+            with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:parent_owner"):
+                cg.open_verified(path, follow_symlinks=True)
+
+    def test_sticky_1777_parent_is_refused(self):
+        # Owned by the caller (so the generic rule's owner check would
+        # pass) and sticky (so the generic rule's writability exception
+        # would also pass it) -- only the strict parent rule's "no sticky
+        # exception at all" refuses this.
+        sub = self.root / "sub"
+        sub.mkdir(mode=0o700)
+        path = _write_env(sub)
+        with _FakeFstat("sub", uid=os.getuid(), mode=stat.S_IFDIR | 0o1777):
+            with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:parent_mode"):
+                cg.open_verified(path, follow_symlinks=True)
+
+    def test_bare_slash_file_is_refused(self):
+        # "/file": root ("/") is genuinely the immediate parent here (no
+        # intermediate directory components at all), and the real "/" is
+        # root-owned on every POSIX host, which the strict parent rule
+        # never excuses. follow_symlinks=False never calls resolve(), so
+        # this does not require the (nonexistent, unwritable-by-us) file to
+        # actually exist at "/" for the parent check itself to fire first.
+        with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:parent_"):
+            cg.open_verified("/round5-bare-slash-tell-tale-does-not-exist.env", follow_symlinks=False)
 
 
 class ForeignFileOwnerAloneIsRejected(unittest.TestCase):
@@ -799,15 +984,6 @@ MUTATIONS = {
                      "test_dotdot_through_a_symlinked_component_is_refused_not_normalized_away"],
         "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
     },
-    "leak_fd_on_fdopen_failure": {
-        "mutation": [(CG, "    raw = io.FileIO(file_fd, \"rb\", closefd=True)\n    try:\n"
-                          "        return io.BufferedReader(raw)\n    except BaseException:\n"
-                          "        raw.close()\n        raise\n",
-                          "    raw = io.FileIO(file_fd, \"rb\", closefd=True)\n    return io.BufferedReader(raw)\n", 1)],
-        "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup."
-                     "test_fd_is_closed_when_wrapping_the_verified_descriptor_raises"],
-        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
-    },
     "disable_root_ancestor_check": {
         "mutation": [(CG, "        if dir_names:\n"
                           "            _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
@@ -829,6 +1005,47 @@ MUTATIONS = {
         "test_ids": ["tests.test_adaptive_paper_runner.CredentialFilePermissions."
                      "test_oversized_file_is_rejected_not_silently_truncated_and_accepted"],
         "extra_test_files": ["tests/test_adaptive_paper_runner.py"],
+    },
+    "revert_strict_parent_rule": {
+        # Reverts both call sites back to the lenient, sticky-excused
+        # generic ancestor rule (round 3's behavior) -- proves the round-4
+        # tightening (item 5) is what these new tests actually depend on.
+        # Each `old` string includes enough preceding context to be unique:
+        # the bare 12-space call is otherwise also a substring of the
+        # 16-space one (same text, four more leading spaces), which made an
+        # earlier draft of this mutation match twice for the shorter string.
+        "mutation": [
+            (CG, "        else:\n"
+                 "            # The file sits directly in \"/\" -- root is the immediate parent,\n"
+                 "            # not merely a container ancestor, so the strict (not\n"
+                 "            # sticky-excused) parent rule applies here too: this rejects\n"
+                 "            # \"/file\" the same way it rejects \"/tmp/file\".\n"
+                 "            _check_parent_directory(os.fstat(current_fd))\n",
+                 "        else:\n"
+                 "            _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
+                 "                                       reason_writable=REASON_ANCESTOR)\n", 1),
+            (CG, "            if is_immediate_parent:\n"
+                 "                _check_parent_directory(os.fstat(current_fd))\n",
+                 "            if is_immediate_parent:\n"
+                 "                _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
+                 "                                           reason_writable=REASON_ANCESTOR)\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.ImmediateParentStrictRule."
+                     "test_sticky_1777_parent_is_refused"],
+        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
+    },
+    "double_close_on_bufferedreader_failure": {
+        # Round-5 item 4: reverts `raw.close()` back to a direct
+        # `os.close(file_fd)`, bypassing `raw`'s own bookkeeping -- `raw`
+        # (an io.FileIO with closefd=True) still believes it owns file_fd
+        # and will close it again on garbage collection, by then possibly
+        # an unrelated, since-reused fd.
+        "mutation": [(CG, "    try:\n        return io.BufferedReader(raw)\n    except BaseException:\n"
+                          "        raw.close()\n        raise\n",
+                          "    try:\n        return io.BufferedReader(raw)\n    except BaseException:\n"
+                          "        os.close(file_fd)\n        raise\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup."
+                     "test_wrap_failure_does_not_double_close_a_reused_fd"],
+        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
     },
 }
 
@@ -878,6 +1095,25 @@ class MutationDriverSelfTests(unittest.TestCase):
             ["tests/test_adaptive_paper_runner.py"])
         self.assertFalse(result["killed"], result)
         self.assertNotEqual(result.get("verdict"), "pristine_baseline_failed", result)
+
+    def test_skipped_test_is_inconclusive_not_survived(self):
+        # Round-5 item 6 (Codex, low): a "skipped" result used to fall
+        # through to "survived", indistinguishable from the mutated code
+        # genuinely having been exercised and passed. Injects a real
+        # `@unittest.skip(...)` decorator directly above the target test
+        # method (a textual "mutation" applied to the *test* file, not
+        # credential_guard.py) and confirms the driver reports
+        # "inconclusive", not "killed" and not silently "survived".
+        result = driver.run_mutation(
+            "selftest-skip",
+            [("tests/test_adaptive_paper_runner.py",
+              "    def test_hard_link_is_rejected(self):\n",
+              "    @unittest.skip(\"round5 driver self-test\")\n"
+              "    def test_hard_link_is_rejected(self):\n", 1)],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+        self.assertEqual(result.get("verdict"), "inconclusive", result)
 
 
 class RealMutationKills(unittest.TestCase):
