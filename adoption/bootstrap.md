@@ -115,6 +115,11 @@ GitHub-hosted macOS runner; see
    no embedding-model pin. Linux/WSL2's script and pins are the same at
    `v2026.09.23` as on main.
 
+   The macOS script and both claude-code pins changed after `v2026.09.23.1`:
+   at that tag the pins are 2.1.280 and `adoption/bootstrap-macos.sh` reinstalls
+   the pin even over a newer Claude Code; on main the pins are 2.1.281 and the
+   script keeps an installed launcher at or above the pin.
+
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
    Use each client's own device flow:
