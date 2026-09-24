@@ -495,8 +495,7 @@
         "token-practice-coverage-20260920",
         "velanext-native-quality-tools-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921",
-        "gitleaks-macos-memory-bound-20260924"
+        "claude-repository-evidence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/gitleaks/gitleaks"

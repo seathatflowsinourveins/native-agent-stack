@@ -28171,8 +28171,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "da34251ae5759ac60d6c915b024bde99664bcd49660ac9f9a980bff06671f397",
-      "bytes": 87753
+      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163",
+      "bytes": 87705
     },
     {
       "path": "observability/README.md",
