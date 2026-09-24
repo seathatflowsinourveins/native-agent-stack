@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-24T07:04:57Z",
+  "recorded_at_utc": "2026-09-24T15:52:10Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -30,15 +30,15 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault behaviour partial (C01 C02 native)",
+      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault gate established 2026-09-24 (definitive rejection and repeat cancel only)",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
       "kind": "gate",
       "id": "alpaca-paper-rate",
       "title": "Alpaca observed Trading API rate",
-      "state": "observed200REST/min / adaptive submits180 plus management reserve / actual throughput pending",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "state": "observed200REST/min / native paper capacity 180 actions/min passed 2026-09-24 (self-reported / counts independently listed) / 1000/min not measured",
+      "evidence_ref": "blueprints/us-equities/order-throughput/evidence/index-20260924.json"
     },
     {
       "kind": "gate",
