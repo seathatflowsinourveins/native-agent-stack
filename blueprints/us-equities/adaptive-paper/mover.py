@@ -1137,9 +1137,9 @@ class MoverBook:
         ``symbols``, included. Entries come last, under the force as it then stands, so no
         buy is sent in an evaluation that latched a force (none is sent and canceled in
         one batch either)."""
+        force_before = self.force_reason  # read before the hard-flatten latch, so that latch also sweeps every leg
         if self.force_reason is None and now >= self.plan.timing.hard_flatten_at:
             self.set_force("hard_flatten", now)
-        force_before = self.force_reason
         positions = self._positions()
         self._note_progress(positions, now)
         guard = self._guard_symbol(positions)

@@ -860,6 +860,24 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         self.assertEqual(h.book.force_reason, "exit_orders_exhausted")
         self.assertEqual({s.symbol: s.reason for s in sells}, {"WXYZ": "x4_stop", "ABCD": "exit_orders_exhausted"})
 
+    def test_a_hard_flatten_latched_by_one_symbols_evaluation_flattens_every_leg(self):
+        # The hard flatten latches inside evaluate; a one-symbol evaluation at that moment still
+        # flattens every leg in the same evaluation (the pre-pass force is read before the latch).
+        rows = [dict(scan_dict()["symbols"][1], rank=1), dict(scan_dict()["symbols"][0], rank=2)]
+        h = BookHarness(self, exit_rule="X2", symbols=rows)
+        now = h.t0 + 1
+        h.quote("WXYZ", "45.40", "45.50", now)
+        h.quote("ABCD", "3.21", "3.22", now)
+        buys = {b.symbol: b for b in submits(h.evaluate(now), "buy")}
+        for buy, price in ((buys["WXYZ"], "45.50"), (buys["ABCD"], "3.22")):
+            h.fill(buy, buy.qty, price, now + 0.1)
+        at = h.timing.hard_flatten_at
+        h.quote("WXYZ", "45.40", "45.50", at)
+        h.quote("ABCD", "3.21", "3.22", at)
+        sells = submits(h.evaluate(at, symbols=("WXYZ",)), "sell")
+        self.assertEqual(h.book.force_reason, "hard_flatten")
+        self.assertEqual(sorted(s.symbol for s in sells), ["ABCD", "WXYZ"])
+
     def test_a_latched_force_grants_one_fresh_budget_then_blocked_exits_hand_off(self):
         h, at = self.exit_due(1)
         h.quote("ABCD", "3.20", "3.21", at)
