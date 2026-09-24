@@ -153,7 +153,7 @@ class TranscriptAuditTests(unittest.TestCase):
         self.record()
         (self.run / "agent-z0.jsonl").write_text((self.run / "agent-a.jsonl").read_text(encoding="utf-8"),
                                                  encoding="utf-8")
-        self.assertIn("extra", transcript_audit.audit(self.run, self.items)["run_issue"])
+        self.assertIn("does not account", transcript_audit.audit(self.run, self.items)["run_issue"])
         self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "a", "attempt": 2}])
         self.assertIsNone(transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)["run_issue"])
         (self.run / "agent-z0.jsonl").write_text(json.dumps({"type": "user", "cwd": str(self.export), "message": {
@@ -167,7 +167,7 @@ class TranscriptAuditTests(unittest.TestCase):
         nested = self.run / "nested"
         nested.mkdir()
         (nested / "agent-z.jsonl").write_text("", encoding="utf-8")
-        self.assertIn("extra", transcript_audit.audit(self.run, self.items)["run_issue"])
+        self.assertIn("does not account", transcript_audit.audit(self.run, self.items)["run_issue"])
         (nested / "agent-z.jsonl").unlink()
         # A flagged agent naming no item flags every item.
         self.agent("b", [("Read", {"file_path": "/etc/hostname"})], prompt="an orchestration step")
@@ -177,6 +177,37 @@ class TranscriptAuditTests(unittest.TestCase):
         # Without its run record the transcripts are not one run's.
         (self.session / "workflows" / "wf_1.json").unlink()
         self.assertIn("no workflow run record", transcript_audit.audit(self.run, self.items)["run_issue"])
+
+    def test_earlier_attempts_are_accounted_per_retried_item(self):
+        # Each extra transcript maps to an item whose agent was retried, at most attempt - 1 per item; an extra on a
+        # non-retried item, beyond the item's retries, or naming no item fails the run.
+        other = self.base / "work" / "packets" / "foundation__other.json"
+        other.write_text("{}", encoding="utf-8")
+        items = dict(self.items, other={"marker": str(other), "roots": [str(self.export), str(other)]})
+        self.agent("a", [("Read", {"file_path": str(self.packet)})])
+        self.agent("b", [("Read", {"file_path": str(other)})], prompt=f"Read the packet at {other}")
+        entries = [{"type": "workflow_agent", "agentId": "a", "attempt": 2},
+                   {"type": "workflow_agent", "agentId": "b", "attempt": 1}]
+        self.record(workflowProgress=entries)
+
+        def extra(name, prompt):
+            (self.run / f"agent-{name}.jsonl").write_text(json.dumps({"type": "user", "cwd": str(self.export),
+                                                                      "message": {"content": prompt}}) + "\n",
+                                                          encoding="utf-8")
+
+        def issue():
+            return transcript_audit.audit(self.run, items, export=self.export, result=RESULT)["run_issue"]
+
+        extra("x1", f"Read the packet at {self.packet}")
+        self.assertIsNone(issue(), "one earlier attempt of the retried item")
+        extra("x2", f"Read the packet at {self.packet}")
+        self.assertIn("x2", issue(), "more extras than the item's attempt - 1")
+        (self.run / "agent-x2.jsonl").unlink()
+        extra("x3", f"Read the packet at {other}")
+        self.assertIn("x3", issue(), "an extra on an item that was not retried")
+        (self.run / "agent-x3.jsonl").unlink()
+        extra("x4", "an unrelated task")
+        self.assertIn("x4", issue(), "an extra that names no item")
 
     def test_an_agent_naming_another_audits_item_is_skipped_only_with_its_prefix(self):
         self.agent("a", [("Read", {"file_path": str(self.packet)})])

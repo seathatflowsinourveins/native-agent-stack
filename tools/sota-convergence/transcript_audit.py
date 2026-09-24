@@ -64,8 +64,30 @@ def _canonical(value) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+def _agent_id(path: Path) -> str:
+    return path.name[len("agent-"):-len(".jsonl")]
+
+
+def _attempt(entry: dict) -> int:
+    value = entry.get("attempt")
+    return value if isinstance(value, int) and not isinstance(value, bool) and value > 0 else 1
+
+
+def run_agents(directory) -> dict:
+    """{agent id: attempt} of the run record's agents (each agent's final attempt), or {} without a readable record."""
+    record_path = run_record_path(directory)
+    try:
+        record = json.loads(record_path.read_text(encoding="utf-8")) if record_path is not None else None
+    except (OSError, ValueError):
+        record = None
+    entries = record.get("workflowProgress") if isinstance(record, dict) else None
+    return {entry.get("agentId"): _attempt(entry) for entry in entries or []
+            if isinstance(entry, dict) and entry.get("type") == "workflow_agent"}
+
+
 def run_issue(directory, files, result=None):
-    """Why the transcripts are not one completed run's complete record (of ``result``, when given), or None."""
+    """Why the transcripts are not one completed run's record (of ``result``, when given), or None. Transcripts the
+    record does not list are earlier attempts, which ``audit`` accounts per item."""
     record_path = run_record_path(directory)
     if record_path is None or not record_path.is_file():
         return "no workflow run record next to the transcripts (<session>/workflows/<run id>.json)"
@@ -75,18 +97,10 @@ def run_issue(directory, files, result=None):
         return "the workflow run record is unreadable"
     if not isinstance(record, dict) or record.get("status") != "completed":
         return "the workflow run did not complete"
-    entries = [entry for entry in record.get("workflowProgress") or []
-               if isinstance(entry, dict) and entry.get("type") == "workflow_agent"]
-    agents = {entry.get("agentId") for entry in entries}
-    present = {path.name[len("agent-"):-len(".jsonl")] for path in files}
-    # The record lists each agent's final attempt; an earlier attempt of a retried agent (attempt n > 1) leaves its
-    # own transcript, which is audited like any other (measured on real runs retried after a usage limit).
-    retries = sum(max(0, entry.get("attempt") - 1) for entry in entries
-                  if isinstance(entry.get("attempt"), int) and not isinstance(entry.get("attempt"), bool))
-    missing, extra = agents - present, present - agents
-    if not agents or missing or len(extra) > retries:
-        return (f"the transcripts ({len(present)}) are not the run's agents ({len(agents)}, {retries} earlier "
-                f"attempt(s)): missing {sorted(missing)[:3]}, extra {sorted(extra)[:3]}")
+    agents = set(run_agents(directory))
+    missing = agents - {_agent_id(path) for path in files}
+    if not agents or missing:
+        return f"the run's agents ({len(agents)}) have no transcript: missing {sorted(missing)[:3]}"
     if result is not None:
         returned = record.get("result")
         candidates = [result] + ([result["result"]] if isinstance(result, dict) and "result" in result else [])
@@ -189,9 +203,36 @@ def audit(directory, items: dict, marker_prefix: str = None, export=None, result
               "run_issue": run_issue(directory, files, result),
               "items": {key: {"agents": 0, "flagged": []} for key in items}, "unmapped_flagged": []}
     export_real = os.path.realpath(export) if export else None
+    attempts = run_agents(directory)
+    parsed = {path: _parse(path) for path in files}
+    mapped = {path: [key for key, item in items.items() if item["marker"] and item["marker"] in parsed[path][0]]
+              for path in files}
+    # The record lists each agent's final attempt; a retried agent's earlier attempts (attempt n > 1) leave their own
+    # transcripts. Each such extra must map to the item of an agent retried at least that often, and is audited
+    # against that item's boundary; any other extra fails the run (a planted transcript cannot hide in another item's
+    # allowance).
+    allowance = {key: 0 for key in items}
     for path in files:
-        prompt, calls, cwd, unreadable = _parse(path)
-        keys = [key for key, item in items.items() if item["marker"] and item["marker"] in prompt]
+        attempt = attempts.get(_agent_id(path))
+        if attempt and attempt > 1 and len(mapped[path]) == 1:
+            allowance[mapped[path][0]] += attempt - 1
+    unaccounted = []
+    for path in files:
+        if _agent_id(path) in attempts:
+            continue
+        keys = mapped[path]
+        if not keys and marker_prefix and marker_prefix in parsed[path][0]:
+            continue  # an earlier attempt for an item outside this audit, accounted in that item's audit
+        if len(keys) == 1 and allowance[keys[0]] > 0:
+            allowance[keys[0]] -= 1
+        else:
+            unaccounted.append(path.name)
+    if unaccounted and not report["run_issue"]:
+        report["run_issue"] = (f"transcripts the run record does not account for as an earlier attempt of their "
+                               f"item: {unaccounted[:3]}")
+    for path in files:
+        prompt, calls, cwd, unreadable = parsed[path]
+        keys = mapped[path]
         if not keys and marker_prefix and marker_prefix in prompt:
             continue
         roots = items[keys[0]]["roots"] if len(keys) == 1 else union
