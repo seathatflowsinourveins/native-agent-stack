@@ -411,6 +411,14 @@ class ExportTests(BlindCheckoutFixture):
         self.assertIn("path components", str(raised.exception))
         self.assertFalse(self.dest.exists())
 
+    def test_an_export_inside_a_repository_is_refused(self):
+        # Re-review N5: git history would recover every stripped label.
+        inside = self.source / "hosts" / "blind" / "export"
+        with self.assertRaises(SystemExit) as raised:
+            blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(self.dest),
+                                 "--export", str(inside)])
+        self.assertIn("inside the git repository", str(raised.exception))
+
     def test_the_export_replaces_every_project_instruction_file_and_leaves_the_worktree_alone(self):
         """PR #141 review (P1): AGENTS.md and CLAUDE.md were copied unchanged, so a Codex child started with
         -C <export> read the incumbent choices (AGENTS.md names the selected destination engine)."""

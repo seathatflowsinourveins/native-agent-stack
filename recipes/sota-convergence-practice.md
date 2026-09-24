@@ -71,9 +71,11 @@ lane's `winner_evidence_class`.
 
 ```sh
 # Layout: WORK_DIR and BLIND_DIR sit outside every repository, and BLIND_DIR/export is at least four
-# directories deep, outside home and /tmp. Every blind tool below refuses otherwise (the shared root rule in
-# tools/sota-convergence/codex_lane.py). AL is a clean agent-lab checkout whose .claude/workflows/
-# layer-verdict-lane.js is the vendored examples/claude-native/workflows/ copy.
+# directories deep (not /, /home, /tmp or a home directory itself). Every blind tool below refuses otherwise (the
+# shared root rule in tools/sota-convergence/codex_lane.py). CATALOG is this checkout; AL is a clean agent-lab
+# checkout whose .claude/workflows/layer-verdict-lane.js and .claude/agents/blind-*.md are the vendored
+# examples/claude-native/ copies, installed as ~/.claude/agents/blind-*.md.
+CATALOG=$(pwd -P)
 
 # 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached. Never pass
 #    --gap-receipts in a blind wave (it names the previous winner; refused with --withhold-labels).
@@ -91,7 +93,7 @@ git worktree remove --force "$BLIND_DIR/checkout"
 #    which the workflow echoes; run it headless from the export root with hooks disabled (every stage runs as
 #    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
 python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
-  --agent-file ~/.claude/agents/blind-lane-reviewer.md > "$WORK_DIR/claude-args.json"
+  --agent-file ~/.claude/agents/blind-lane-reviewer.md --agentlab-root "$AL" > "$WORK_DIR/claude-args.json"
 (cd "$BLIND_DIR/export" && claude -p --settings '{"disableAllHooks": true}' "Use a workflow. Run the saved \
 workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the JSON \
 object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
@@ -100,21 +102,26 @@ python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("re
   "$WORK_DIR/claude-workflow-output.json" "$WORK_DIR/claude-result.json"
 python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.json" --work-dir "$WORK_DIR" \
   --agentlab-root "$AL" --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo "$BLIND_DIR/export" \
-  --resolved-model claude-opus-5-5   # the resolved child model: node $AL/.claude/workflows/child-usage.mjs --latest
+  --resolved-model claude-opus-5-5
+#    The resolved child model, read from the session the lane ran in:
+#    (cd "$BLIND_DIR/export" && node "$AL/.claude/workflows/child-usage.mjs" --latest)
 
 # 4. Codex lane on the same export (a separate account/quota, resumable; codex_lane.py refuses a --repo below
 #    any .git). A deliberately non-blind run passes --allow-git-history --repo . instead.
 python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --model <openai model> --effort high --jobs 2
 
-# 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication").
+# 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication"). inputs exits
+#    1 whenever it skips a layer (listed on stderr, for example a missing lane return); when it indexes no
+#    disagreeing layer, the rest of this step has nothing to judge and can be skipped.
 python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export"
 python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --model <openai model> --jobs 2
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
-#    Run tools/sota-convergence/adjudication-lane.js headless from the export root as in step 3, with
-#    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
+#    Run $CATALOG/tools/sota-convergence/adjudication-lane.js (the export has no tools/) headless from the
+#    export root as in step 3, with adjudication-claude-args.json as args, and write the workflow's result to
+#    adjudication-claude-result.json.
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \
   --result "$WORK_DIR/adjudication-claude-result.json" --model claude-opus-5-5
 python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --out "$WORK_DIR/adjudications"
@@ -129,7 +136,21 @@ python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR
 python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
   --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --check
 
-# 7. Register the new wave document, refresh the narrative and rerun the standing checks.
+# 7. Register the new wave document and the newly sealed files, refresh the derived catalogs and narrative, and
+#    rerun the standing checks. A changed winner also needs scripts/component_matrix.py --write and any
+#    handbook display entry for a new component id.
+python3 - <<'EOF'
+import hashlib, json, pathlib
+path = pathlib.Path("manifests/evidence.json"); doc = json.loads(path.read_text(encoding="utf-8"))
+listed = {entry["path"] for entry in doc["files"]}
+for file in sorted(pathlib.Path("evidence/artifacts").rglob("*")):
+    if file.is_file() and file.as_posix() not in listed:
+        data = file.read_bytes()
+        doc["files"].append({"path": file.as_posix(), "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+EOF
+python3 scripts/evidence_manifest.py --write
+python3 scripts/component_matrix.py --write
 python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
   --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
 python3 scripts/landscape.py --root .

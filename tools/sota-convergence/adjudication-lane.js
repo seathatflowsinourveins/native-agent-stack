@@ -3,8 +3,8 @@ export const meta = {
   description: 'Run the Claude family of the two-family, counterbalanced layer adjudication: for every adjudication input (one disagreeing layer in one presentation order, returns A and B with lane identity scrubbed) an Opus judge picks A or B on retained evidence, then an Opus refuter tries to refute that pick; items run without a barrier between them; the script writes nothing and never decides a winner - adjudicate.py assemble applies the two-family rule',
   whenToUse: 'After tools/sota-convergence/adjudicate.py inputs wrote the adjudication inputs: args = {repo: "<blind export>", items: [{name, order, path, packet_path, packet_sha256}], prompt: "<adjudication-prompt.md text whose labelled lines Input file: {INPUT_PATH}, Packet file: {PACKET_PATH} and Repository root: {REPO_ROOT} are filled per item, with a <!-- refuter --> section holding {JUDGMENT}>"} (adjudicate.py claude-args prints them); feed the return to adjudicate.py claude-collect',
   phases: [
-    { title: 'Judge', detail: 'blind-adjudicator per input file, Opus high, checks for a reviewer-identity leak, then picks A or B', model: 'opus' },
-    { title: 'Refute', detail: 'blind-adjudicator per judgment, Opus high, checks for a leak, then tries to refute the pick', model: 'opus' },
+    { title: 'Judge', detail: 'blind-adjudicator per input file, Opus max, checks for a reviewer-identity leak, then picks A or B', model: 'opus' },
+    { title: 'Refute', detail: 'blind-adjudicator per judgment, Opus max, checks for a leak, then tries to refute the pick', model: 'opus' },
   ],
 }
 const a = args && typeof args === 'object' ? args : {}
@@ -19,9 +19,9 @@ const items = Array.isArray(a.items) ? a.items.filter(validItem) : []
 if (!items.length) issues.push('items must be a nonempty array of {name, order AB|BA, path, packet_path, packet_sha256}')
 if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
 const [JUDGE_TEMPLATE, REFUTE_TEMPLATE] = [PROMPT.split(MARKER)[0].trim(), PROMPT.split(MARKER).slice(1).join(MARKER).trim()]
-// Every agent() call below binds the literal model 'opus' / effort 'high'; adjudicate.py claude-collect records
+// Every agent() call below binds the literal model 'opus' / effort 'max'; adjudicate.py claude-collect records
 // the resolved child model it is given (child-usage.mjs --latest), not this alias.
-const MODEL = { name: 'opus', effort: 'high' }
+const MODEL = { name: 'opus', effort: 'max' }
 const PACKET = [
   'Worker packet contract: bounded objective, only the listed sources, no writes except what an acceptance command named in your task itself produces, return only the schema.',
   'Cite every claim with file path and section/line or the exact command. Copy numbers exactly. Never print credential or env values. Never claim token savings.',
@@ -49,12 +49,12 @@ const refuteOk = (v) => v && typeof v === 'object' && typeof v.refuted === 'bool
 const echo = (i) => ({ name: i.name, order: i.order, packet_sha256: i.packet_sha256, path: i.path, packet_path: i.packet_path })
 const chain = async (i) => {
   const tag = `${i.name}.${i.order}`
-  const got = await agent(PACKET + '\n' + BLIND + '\n' + fill(JUDGE_TEMPLATE, i), { label: `judge:${tag}`, phase: 'Judge', agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: JUDGE }).catch(() => null)
+  const got = await agent(PACKET + '\n' + BLIND + '\n' + fill(JUDGE_TEMPLATE, i), { label: `judge:${tag}`, phase: 'Judge', agentType: 'blind-adjudicator', model: 'opus', effort: 'max', schema: JUDGE }).catch(() => null)
   const judgeLeak = leakOf(got, 'judge')
   if (judgeLeak) return { ...echo(i), judge: null, refuter: null, leak: judgeLeak }
   const judge = judgeOk(got) ? { preferred: got.preferred, why: got.why, evidence_refs: got.evidence_refs } : null
   if (!judge) return { ...echo(i), judge: null, refuter: null }
-  const vote = await agent(PACKET + '\n' + BLIND + '\n' + fill(REFUTE_TEMPLATE, i, judge), { label: `refute:${tag}`, phase: 'Refute', agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: REFUTE }).catch(() => null)
+  const vote = await agent(PACKET + '\n' + BLIND + '\n' + fill(REFUTE_TEMPLATE, i, judge), { label: `refute:${tag}`, phase: 'Refute', agentType: 'blind-adjudicator', model: 'opus', effort: 'max', schema: REFUTE }).catch(() => null)
   const refuteLeak = leakOf(vote, 'refuter')
   if (refuteLeak) return { ...echo(i), judge: null, refuter: null, leak: refuteLeak }
   const refuter = refuteOk(vote) ? { refuted: vote.refuted, reason: vote.reason, evidence_refs: vote.evidence_refs } : null

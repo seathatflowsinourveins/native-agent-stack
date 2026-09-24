@@ -783,9 +783,11 @@ file, seals the accepted ones as retained evidence and derives the row's
 ```sh
 python3 tools/sota-convergence/record_verdicts.py \
   --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
-  [--adjudications /path/to/adjudications] --write
+  [--adjudications /path/to/adjudications] [--lane-repo-root /path/to/state/blind/export] --write
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] --check
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
+  [--adjudications /path/to/adjudications] [--lane-repo-root /path/to/state/blind/export] --check
+# --check needs the same --adjudications and --lane-repo-root the --write used.
 ```
 
 `--checked-at` (the date stamped on every re-recorded row) defaults to the
@@ -978,8 +980,8 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   response text), `model.effort` is `--effort` and `model.family` is
   `"openai"`; the strict schema it passes to `codex exec` omits `provenance`
   and `model.family`. The
-  vendored Claude workflow returns only `model {name: "opus", effort: "high"}`
-  and writes no files; `claude_lane.py` is the step that writes
+  vendored Claude workflow returns `model {name: "opus", effort: "max"}` (with its echoed `launch`, `prompt` and
+  per-layer `packet_path`) and writes no files; `claude_lane.py` is the step that writes
   `<work-dir>/claude/<catalog>__<layer_id>.json` from the workflow result,
   adding `model.family: "anthropic"`, the resolved model name and
   `provenance`. It exits 2 when the agent-lab workflow file differs from that
@@ -988,7 +990,7 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   ```sh
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
-    --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/blind-export \
+    --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/state/blind/export \
     --resolved-model claude-opus-5-5
   ```
 
@@ -1124,9 +1126,12 @@ previous run (or the checked-in ledger) already chose.
 
 ```sh
 python3 tools/sota-convergence/blind_checkout.py \
-  --source . --rev HEAD --dest /path/to/blind-checkout --export /path/to/blind-export
-# ... run the blind lanes against /path/to/blind-export (no .git, no BLIND-MANIFEST.json) ...
-git worktree remove --force /path/to/blind-checkout
+  --source . --rev HEAD --dest /path/to/state/blind/checkout --export /path/to/state/blind/export \
+  --allow-from-packets /path/to/work-dir/packets
+# ... run the blind lanes against /path/to/state/blind/export (no .git, no BLIND-MANIFEST.json) ...
+git worktree remove --force /path/to/state/blind/checkout
+# The export must be at least four directories deep (not /, /home, /tmp or a home directory itself) and outside
+# every repository; blind_checkout, both lane runners and adjudicate refuse otherwise.
 ```
 
 `--export` copies the stripped tree without `.git` or `BLIND-MANIFEST.json`. The worktree's `.git` reaches
@@ -1644,7 +1649,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   - **Position map integrity and location.** `assemble` derives each order's Claude position from the input
     contents, re-scrubbing the hash-bound lane returns, and refuses a judgment whose index map disagrees. The
     index moves out of the work dir, to `$NAS_ADJUDICATION_STATE_DIR` or
-    `~/.local/state/native-agent-stack/adjudication/<sha256(work dir)[:16]>/adjudication-index.json`.
+    `~/.local/state/native-agent-stack/adjudication/<sha256(work dir)[:16]>/adjudication-index.json`. One
+    directory accumulates per work dir. After a wave is recorded, remove it with
+    `rm -r "$(python3 -c 'import sys; sys.path.insert(0, "tools/sota-convergence"); import adjudicate; print(adjudicate.index_path(sys.argv[1]).parent)' <work-dir>)"`.
   - **Audit and instruction boundaries.** A Codex judge call flagged by its blind audit voids that judgment.
     Claude judges' reads are instruction-bound: the role and prompt name only three paths, and no filesystem
     sandbox enforces that.

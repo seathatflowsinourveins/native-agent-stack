@@ -978,8 +978,8 @@ def recorded_leaks(work_dir: Path) -> set:
 # ---------------------------------------------------------------- claude
 
 CLAUDE_ARGS_SNAPSHOT = "args-snapshot.json"
-# adjudication-lane.js binds every agent() call to effort 'high' (inline literal, contract style).
-CLAUDE_LANE_EFFORT = "high"
+# adjudication-lane.js binds every agent() call to effort 'max' (inline literal, contract style; agent-lab #43).
+CLAUDE_LANE_EFFORT = "max"
 
 
 def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, layers=None, role_files=None) -> dict:
@@ -1053,6 +1053,10 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     if hashlib.sha256(json.dumps(unsealed, sort_keys=True).encode("utf-8")).hexdigest() != snapshot_doc.get("snapshot_id"):
         raise ValueError("adjudicate: the claude-args snapshot does not hash to its snapshot_id (it was edited); "
                          "rerun claude-args and the workflow")
+    if not snapshot_doc.get("inputs"):
+        # Nothing disagreed, so claude-args gave the workflow no items and there is nothing to collect (re-review):
+        # the workflow then returns an argument issue without a snapshot_id.
+        return []
     if returned_id is None or returned_id != snapshot_doc.get("snapshot_id"):
         # The result came from another claude-args run (Codex review of #145): its judgments ran under that
         # snapshot's inputs and evidence tree, not this one's.

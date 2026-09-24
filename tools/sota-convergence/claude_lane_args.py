@@ -9,7 +9,7 @@ blind-lane-reviewer role, or whose echoed prompt is not lane-prompt.md (independ
 
 Usage:
   python3 tools/sota-convergence/claude_lane_args.py --work-dir W --repo <blind export> \
-    --agent-file ~/.claude/agents/blind-lane-reviewer.md > claude-args.json
+    --agent-file ~/.claude/agents/blind-lane-reviewer.md --agentlab-root <agent-lab checkout> > claude-args.json
 
 Exit 2 when the export fails the blind root rule, sits inside a git repository, or the role file is not the
 vendored one. Stdlib only.
@@ -30,7 +30,7 @@ import claude_lane  # noqa: E402
 from codex_lane import tree_sha256  # noqa: E402
 
 
-def lane_args(work_dir: Path, repo: Path, agent_file: Path) -> dict:
+def lane_args(work_dir: Path, repo: Path, agent_file: Path, agentlab_root: Path = None) -> dict:
     given = Path(os.path.abspath(repo))
     repo = repo.resolve()
     if not repo.is_dir():
@@ -42,6 +42,11 @@ def lane_args(work_dir: Path, repo: Path, agent_file: Path) -> dict:
         if issue:
             raise claude_lane.ProvenanceError(issue)
     role = claude_lane.agent_sha256(agent_file)
+    if agentlab_root is not None:
+        # The collector's checks, before the costly run (re-review N1): the agent-lab workflow is committed and
+        # vendored, and its project-level role, if any, is the vendored one.
+        claude_lane.lane_provenance(Path(agentlab_root).resolve(), claude_lane.DEFAULT_WORKFLOW,
+                                    claude_lane.vendored_sums(), agent_file)
     packets = []
     for path in sorted((Path(work_dir).resolve() / "packets").glob("*__*.json")):
         catalog, layer_id = path.stem.split("__", 1)
@@ -66,9 +71,12 @@ def main(argv=None) -> int:
     parser.add_argument("--repo", type=Path, required=True, help="The blind export the lane reads.")
     parser.add_argument("--agent-file", type=Path, required=True,
                         help="The blind-lane-reviewer definition the headless session will load.")
+    parser.add_argument("--agentlab-root", type=Path, required=True,
+                        help="The clean agent-lab checkout whose .claude/workflows/layer-verdict-lane.js the lane runs; "
+                             "checked as claude_lane.py will check it, before launch.")
     args = parser.parse_args(argv)
     try:
-        print(json.dumps(lane_args(args.work_dir, args.repo, args.agent_file), indent=1))
+        print(json.dumps(lane_args(args.work_dir, args.repo, args.agent_file, args.agentlab_root), indent=1))
     except claude_lane.ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2

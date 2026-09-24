@@ -743,8 +743,13 @@ def main(argv=None) -> int:
         for candidate in (Path(os.path.abspath(args.export)), export):
             issue = root_issue(candidate)
             if issue:
-                raise SystemExit(f"--export {issue}; place the blind export at least four directories deep, outside "
-                                 "home, /tmp and every repository")
+                raise SystemExit(f"--export {issue}; place the blind export at least four directories deep (not /, "
+                                 "/home, /tmp or a home directory itself) and outside every repository")
+        # Git history would recover every stripped label (re-review N5): refuse an export inside a repository.
+        for ancestor in export.parents:
+            if (ancestor / ".git").exists():
+                raise SystemExit(f"--export {export} is inside the git repository {ancestor}; place it outside every "
+                                 "repository")
     if packets is not None:
         packet_references(packets)  # refuses a directory without packets before the worktree is created
     manifest = run_blind_checkout(source, args.rev, dest)

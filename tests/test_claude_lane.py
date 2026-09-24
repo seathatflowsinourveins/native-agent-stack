@@ -152,7 +152,7 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT)
+        args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
         self.assertEqual(args["launch"], {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                           "agent_sha256": self.role})
         self.assertEqual(args["prompt"], (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"))
@@ -161,6 +161,14 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                           for layer_id in ("l1", "l2")])
         with self.assertRaises(module.claude_lane.ProvenanceError):
             module.lane_args(self.work, self.agentlab, claude_lane.VENDORED_AGENT)
+        # Re-review N1: a project-level role in the agent-lab checkout that differs from the vendored one fails
+        # before launch, not after the run.
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_text("---\nname: blind-lane-reviewer\neffort: high\n---\n",
+                                                          encoding="utf-8")
+        with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "name the definition the lane loaded"):
+            module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
 
     def test_a_layer_run_on_another_packet_path_is_refused(self):
         # Codex review of #145: edited args could run another packet under the same hash.

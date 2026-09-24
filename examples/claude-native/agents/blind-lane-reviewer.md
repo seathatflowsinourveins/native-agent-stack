@@ -3,7 +3,7 @@ name: blind-lane-reviewer
 description: Propose, refute or re-check one stripped layer-verdict packet from the files under its named repository root only; no skills, memory, index or shell tools, and no project instructions.
 tools: Read, Glob, Grep
 model: opus
-effort: high
+effort: max
 maxTurns: 100
 omitClaudeMd: true
 ---

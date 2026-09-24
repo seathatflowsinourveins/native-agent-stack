@@ -3,7 +3,7 @@ name: blind-adjudicator
 description: Judge, or refute a judgment on, one anonymous two-return adjudication input for a layer-verdict disagreement; reads only that input, its packet and the named repository root, and refuses an input that reveals which reviewer wrote a return.
 tools: Read, Glob, Grep
 model: opus
-effort: high
+effort: max
 maxTurns: 60
 omitClaudeMd: true
 ---

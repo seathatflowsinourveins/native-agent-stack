@@ -1399,6 +1399,17 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
         self.assertIn("does not match the input contents", err)
         self.assertIsNone(record)
 
+    def test_collect_has_nothing_to_do_when_no_layer_disagrees(self):
+        # Re-review: with no disagreeing layer the workflow returns an argument issue without a snapshot_id.
+        (self.work / "codex" / f"{NAME}.json").write_text(
+            (self.work / "claude" / f"{NAME}.json").read_text(encoding="utf-8").replace('"lane": "claude"', '"lane": "codex"'),
+            encoding="utf-8")
+        self.write_return("codex", "c1")
+        self.inputs()
+        adjudicate.claude_args(self.work, self.repo)
+        self.assertEqual(adjudicate.collect_claude(self.work, {"status": "incomplete", "argument_issues": ["items"]},
+                                                   "claude-opus-5-5"), [])
+
     def test_a_leak_from_a_voided_codex_call_is_not_recorded(self):
         # Codex review of #145 at 3d0943cc: a leak from a call the audit voids must not become sticky.
         self.inputs()
@@ -1538,7 +1549,7 @@ class WorkflowSyntaxTests(unittest.TestCase):
         source = (TOOL_DIR / "adjudication-lane.js").read_text(encoding="utf-8")
         calls = source.count("await agent(")
         self.assertEqual(calls, 2)
-        self.assertEqual(source.count("agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: "),
+        self.assertEqual(source.count("agentType: 'blind-adjudicator', model: 'opus', effort: 'max', schema: "),
                          calls)
         self.assertNotIn("blind-lane-reviewer", source)
         for key in ("leak", "leak_text"):
