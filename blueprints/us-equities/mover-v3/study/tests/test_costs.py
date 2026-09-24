@@ -170,26 +170,56 @@ class NetReturn(unittest.TestCase):
         e, x = s[1], s[5]
         # an ordinary 1% dividend on s[3]: cash booked, F = 1
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.8, cash_at={s[3]: 0.2})
-        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.2, places=9)
+        self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 0.2, places=9)
         # a special 5% dividend: cash, never a share change (split-adjusted closes carry no dividend)
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.0, cash_at={s[3]: 1.0})
         from core import formulas as FM
         self.assertEqual(FM.share_factor(raw, split, e, x), 1.0)
         self.assertFalse(FM.suspected_at(cal, raw, split, s[3]))
-        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 1.0, places=9)
+        self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 1.0, places=9)
         # a 2:1 split: F = 2, cash 0
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 10.0, split_at={s[3]: 2.0})
         self.assertEqual(FM.share_factor(raw, split, e, x), 2.0)
-        self.assertEqual(costs.cash_term(raw, split, allc, e, x), 0.0)
+        self.assertEqual(costs.cash_term(cal, raw, split, allc, e, x), 0.0)
         # a 2:1 split before a $0.20 dividend per new share: 2 new shares per original share receive 0.40
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[2] else (10.0 if d < s[3] else 9.8),
                                         split_at={s[2]: 2.0}, cash_at={s[3]: 0.2})
-        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.4, places=9)
-        # a missing bar inside the hold is skipped; a missing bar at e or x leaves the cash undefined
+        self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 0.4, places=9)
+        # a missing bar inside the hold with no step across it books as before; a missing bar at e or x, or the
+        # missing close before an ex-date, leaves the cash undefined (review of 202968f, Codex P2)
+        raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.8, cash_at={s[3]: 0.2},
+                                        missing=(s[4],))
+        self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 0.2, places=9)
+        self.assertIsNone(costs.cash_term(cal, raw, split, allc, s[4], x))
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.8, cash_at={s[3]: 0.2},
                                         missing=(s[2],))
-        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.2, places=9)
-        self.assertIsNone(costs.cash_term(raw, split, allc, s[2], x))
+        self.assertIsNone(costs.cash_term(cal, raw, split, allc, e, x))
+
+    def test_a_dividend_whose_previous_close_is_missing_is_never_priced_at_an_older_close(self):
+        """Review of 202968f, Codex P2: closes $20, $40, $39, $39, $39 over e .. x and a $1 dividend ex on the third
+        session. With every bar the cash is $1 (at the $40 close). With only the second session's split bar (or only
+        its all bar) missing, the loop took the $20 close of e as the dividend's previous close and booked $0.50; the
+        close immediately before the ex-date is unknown, so the cash is undefined and the trade is excluded."""
+        cal = synth.calendar()
+        s = cal.range("2020-06-01", "2020-06-12")
+        e, x = s[1], s[5]
+        closes = {s[0]: 20.0, s[1]: 20.0, s[2]: 40.0}
+
+        def build():
+            return synth.series(cal, s[0], s[-1], lambda d: closes.get(d, 39.0), cash_at={s[3]: 1.0})
+        raw, split, allc = build()
+        self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 1.0, places=9)
+        raw, split, allc = build()
+        del split[s[2]]
+        self.assertIsNone(costs.cash_term(cal, raw, split, allc, e, x))
+        raw, split, allc = build()
+        allc[s[2]] = {**allc[s[2]], "c": None}
+        self.assertIsNone(costs.cash_term(cal, raw, split, allc, e, x))
+        # the trade path books it as an undefined cash term, never as $0.50
+        from core import trades
+        raw, split, allc = build()
+        del split[s[2]]
+        self.assertIsNone(trades._cash(cal, {"raw": raw, "split": split, "all": allc}, e, x, 1.0))
 
     def test_cash_does_not_move_with_prices_after_the_ex_date(self):
         """Review round 14, Codex P2: entry close $20, a $1 dividend ex on x, an overnight exit at x's open. D7's
@@ -200,7 +230,21 @@ class NetReturn(unittest.TestCase):
         for close_x in (19.0, 38.0):
             raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < x else close_x,
                                             cash_at={x: 1.0})
-            self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 1.0, places=9)
+            self.assertAlmostEqual(costs.cash_term(cal, raw, split, allc, e, x), 1.0, places=9)
+
+    def test_the_trade_path_books_the_per_ex_date_cash(self):
+        """trades._cash is the cash term of core.costs.cash_term, not D7's raw_c(e) x all_c(x) / all_c(e) - F x
+        raw_c(x): with a $1 dividend ex on x and x's close at $38, D7's formula books $2; the booked cash is $1."""
+        from core import trades
+        cal = synth.calendar()
+        s = cal.range("2020-06-01", "2020-06-05")
+        e, x = s[1], s[2]
+        for close_x in (19.0, 38.0):
+            raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < x else close_x,
+                                            cash_at={x: 1.0})
+            ev = {"raw": raw, "split": split, "all": allc}
+            self.assertAlmostEqual(trades._cash(cal, ev, e, x, 1.0), 1.0, places=9)
+        self.assertEqual(trades._cash(cal, ev, e, e, 1.0), 0.0)
 
     def test_cash_band_is_symmetric(self):
         # 5e-4 adjustment noise of either sign books 0 (review round 8, E6); a 5e-3 step books with its sign
@@ -210,7 +254,7 @@ class NetReturn(unittest.TestCase):
         raw = {d: bar(10.0) for d in s}
         for eps, want in ((5e-4, 0.0), (-5e-4, 0.0), (-5e-3, 10.0 * (1 - 1 / (1 - 5e-3)))):
             allc = {d: bar(10.0 * (1 + eps) if d == s[3] else 10.0) for d in s}
-            self.assertAlmostEqual(costs.cash_term(raw, raw, allc, s[1], s[3]), want, places=12)
+            self.assertAlmostEqual(costs.cash_term(cal, raw, raw, allc, s[1], s[3]), want, places=12)
 
 
 if __name__ == "__main__":

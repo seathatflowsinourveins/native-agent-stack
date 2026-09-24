@@ -721,6 +721,200 @@ class OpenList(unittest.TestCase):
             self.assertEqual((repo / ACCESS_LOG).read_text(), "")
 
 
+def _gap_fees(n0):
+    """Fee rows with an SEC Section 31 gap from the session after N0 (cost_model.fees)."""
+    from core import costs
+    return costs.Fees({"sec_section31_usd_per_million_of_sales": [{"from": "2016-01-01", "to": n0, "rate": 8.0}],
+                       "finra_taf_covered_equity_sales": [{"from": "2016-01-01", "to": "2030-12-31",
+                                                           "usd_per_share": 0.000166, "max_per_trade": 8.3}]})
+
+
+def _granted(tmp, purpose, aid, final_count=False):
+    """A frozen fixture repository with the governing validation file and a granted authorization that reached
+    origin/main after its due time (the close of the window's last session for a count; the end of the last
+    terminal-search window, before the read deadline, for a read). Returns (repo, ctx, now, setup), setup being
+    what _setup returns for block 0."""
+    fx = FR.build(tmp)
+    repo = fx["repo"]
+    ctx = runner_ctx(repo)
+    cal, n0 = ctx["cal"], ctx["n0_pinned"]
+    _, last = holdout.window(ctx, 0)
+    write_validation(repo, fx)
+    if final_count:
+        from core.calendar import iso_utc
+        logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [n0, last],
+                                          "utc_start": iso_utc(cal.close(last) + 30)})
+    logs.append_line(repo / ACCESS_LOG, auth_rec(aid, purpose, "granted"))
+    t = cal.close(cal.offset(last, 5) if purpose == "read" else last) + 60
+    FR.commit_push(repo, FR.git_date(t))
+    ctx = runner_ctx(repo)
+    auth = holdout._authorization(ctx, aid)
+    return repo, ctx, t + 60, (auth, 0, n0, last, frozenset(), frozenset(), [], None, {})
+
+
+class FeeCoverageBeforeFetch(unittest.TestCase):
+    def test_count_and_read_call_require_fee_coverage_before_the_fetch_step(self):
+        """Review round 14, F2: count() and read() refuse a fee gap in their sessions (a read's fee_span) before
+        the fetch step runs; with full coverage the same call reaches the fetch step."""
+        for purpose, aid, final in (("count", "count-001", False), ("read", "read-001", True)):
+            with self.subTest(purpose=purpose), tempfile.TemporaryDirectory() as tmp:
+                repo, ctx, now, setup = _granted(tmp, purpose, aid, final_count=final)
+                act = getattr(holdout, purpose)
+                fetched = []
+                with mock.patch.object(holdout, "_setup", return_value=setup), \
+                        mock.patch.object(holdout, "_fetch_step",
+                                          side_effect=lambda *a, **k: fetched.append(a[1]) or {"step": "fetch"}):
+                    with self.assertRaisesRegex(holdout.HoldoutRefused, "no governing fee row"):
+                        act(dict(ctx, fees=_gap_fees(ctx["n0_pinned"])), aid, str(Path(tmp) / "snap"), {}, now)
+                    self.assertEqual(fetched, [])
+                    act(ctx, aid, str(Path(tmp) / "snap"), {}, now)
+                    self.assertEqual(fetched, [purpose])
+
+
+class Step2Recovery(unittest.TestCase):
+    """Step 2 of a count or read over a sealed snapshot, with the sealed inputs stubbed (review round 14, Codex P2)."""
+    FL = {"stage": "holdout", "status": "complete", "input_snapshot_sha256s": ["a" * 64],
+          "enumeration_fetch_date": "2027-12-20"}
+
+    def _mocks(self, setup, fl, sealed_error=None):
+        from types import SimpleNamespace
+        from core import count_unit as CU
+        sealed = SimpleNamespace(bases=[], live=Store())
+        return [mock.patch.object(holdout, "fetch_line_of", return_value=fl),
+                mock.patch.object(holdout, "_setup", return_value=setup),
+                mock.patch.object(holdout, "_spec_factory", return_value=lambda store: None),
+                mock.patch.object(holdout, "_sealed", side_effect=sealed_error, return_value=(sealed, "a" * 64)),
+                mock.patch.object(holdout, "_rate", return_value={"rate": 0.0, "void": False, "by_kind": {}}),
+                mock.patch.object(holdout.STG, "count_stage", return_value={"H3-a": 3}),
+                mock.patch.object(CU, "extension_decision",
+                                  return_value={"extend": False, "below_minimum": [], "underpowered": ["H3-a"]})]
+
+    def _run(self, patches, fn):
+        import contextlib
+        with contextlib.ExitStack() as stack:
+            for p in patches:
+                stack.enter_context(p)
+            return fn()
+
+    def test_count_step_2_recomputes_and_replaces_an_uncited_results_file(self):
+        """A holdout-count file that no line cites (a hard kill after its rename) is recomputed and replaced; the
+        line cites the new bytes and records the replaced sha256."""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, ctx, now, setup = _granted(tmp, "count", "count-001")
+            fl = {**self.FL, "purpose": "count_fetch", "authorization_id": "count-001",
+                  "snapshot_dir": "count-count-001"}
+            path = repo / RESULTS_DIR / "holdout-count-0.json"
+            FR.write(path, json.dumps({"extension": {"extend": True}, "void": False, "left_by": "a hard kill"}))
+            orphan = sha256_file(path)
+            out = self._run(self._mocks(setup, fl),
+                            lambda: holdout.count(ctx, "count-001", str(Path(tmp) / "snap"), {}, now))
+            body = json.loads(path.read_text())
+            self.assertNotIn("left_by", body)
+            self.assertEqual((body["counts"], body["extension"]["extend"]), ({"H3-a": 3}, False))
+            self.assertEqual(out["results_sha256"], sha256_file(path))
+            self.assertNotEqual(out["results_sha256"], orphan)
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["purpose"], line["status"], line["results_sha256"],
+                              line["replaced_uncited_results_sha256"]),
+                             ("count", "complete", sha256_file(path), orphan))
+            self.assertEqual(logs.read_lines(repo / ACCESS_LOG)[-1]["status"], "complete")
+
+    def test_a_failed_count_or_read_does_not_adopt_an_uncited_file_it_did_not_write(self):
+        """The 'finally' of count and read adopts a results file only when this run wrote it (its sha256 differs
+        from the uncited one found at the start); a step 2 that fails before its write logs 'failed' and leaves
+        the uncited file for the retry."""
+        for purpose, aid, name in (("count", "count-001", "holdout-count-0.json"),
+                                   ("read", "read-001", "holdout-read.json")):
+            with self.subTest(purpose=purpose), tempfile.TemporaryDirectory() as tmp:
+                repo, ctx, now, setup = _granted(tmp, purpose, aid, final_count=purpose == "read")
+                fl = {**self.FL, "purpose": f"{purpose}_fetch", "authorization_id": aid,
+                      "snapshot_dir": f"{purpose}-{aid}"}
+                ctx = dict(ctx, run_log=[*ctx["run_log"], fl])
+                path = repo / RESULTS_DIR / name
+                FR.write(path, json.dumps({"extension": {"extend": True}, "void": False, "left_by": "a hard kill"}))
+                before = path.read_bytes()
+                with self.assertRaisesRegex(RuntimeError, "sealed snapshot unreadable"):
+                    self._run(self._mocks(setup, fl, RuntimeError("sealed snapshot unreadable")),
+                              lambda: getattr(holdout, purpose)(ctx, aid, str(Path(tmp) / "snap"), {}, now))
+                self.assertEqual(path.read_bytes(), before)
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((line["purpose"], line["status"], line["results_sha256"]), (purpose, "failed", None))
+                done = logs.read_lines(repo / ACCESS_LOG)[-1]
+                self.assertEqual((done["record_kind"], done["status"]), ("completion", "failed"))
+
+
+class SealedStoreCalendar(unittest.TestCase):
+    def test_fetch_step_and_sealed_give_the_holdout_store_the_calendar(self):
+        """Review round 14, F1 through its callers: _fetch_step's live store and the store its rate is taken over,
+        and _sealed's store, date base responses by ctx['cal'], so a count's per-event response fetched before its
+        data end is fetched again by the read and is never read from the base."""
+        from core import driver
+        cal = synth.calendar()
+        t, last = "2020-06-01", "2020-06-05"
+        end = cal.offset(last, 5)
+        early = plan.event_requests(cal, "AAA", t, end, holdout=True)
+        done = plan.event_requests(cal, "AAA", t, last, holdout=True)
+        base = Store()
+        for r in early + done:
+            base.put(r, True, [b'{"bars": {}}'], synth.iso_us(cal.close(last) + 60)[:19] + "Z")
+        calls, rated = [], []
+
+        class Stub:
+            def get(self, endpoint, params):
+                calls.append(params["end"])
+                return {"complete": True, "pages": [b'{"bars": {}}'], "error": None}
+
+        def rate(ctx, sealed, planner):
+            rated.append(sealed)
+            return {"rate": 0.0, "void": False, "by_kind": {}}
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / RUN_LOG).parent.mkdir(parents=True)
+            root = Path(tmp) / "snap"
+            ctx = {"repo": Path(tmp), "cal": cal, "commit": "c", "tree": "t", "runtime_lock_sha256": "r",
+                   "protocol_sha256": "p"}
+            with mock.patch.object(holdout, "_planner", return_value=lambda st: early + done), \
+                    mock.patch.object(holdout, "_rate", side_effect=rate):
+                out = holdout._fetch_step(ctx, "read", {"authorization_id": "read-001"}, [base], str(root), None,
+                                          "plan", "2020-06-20", {"data": Stub(), "trading": Stub()},
+                                          lambda: synth.iso_us(cal.close(end) + 60)[:19] + "Z", cal.close(end) + 60,
+                                          [t, last], {})
+            self.assertEqual(len(calls), len(early))
+            self.assertEqual(len(rated), 1)
+            self.assertIs(rated[0].cal, cal)
+            self.assertTrue(all(rated[0]._holder(r["key"]) is rated[0].live for r in early))
+            # _sealed over a sealed snapshot that lacks the early responses: the stale base copy is not held
+            empty = Store().write(root / "count-count-001")
+            hs, sha = holdout._sealed(ctx, {"input_snapshot_sha256s": [empty], "snapshot_dir": "count-count-001"},
+                                      [base], str(root))
+            self.assertEqual(sha, empty)
+            self.assertIs(hs.cal, cal)
+            self.assertTrue(all(not hs.has(r["key"]) for r in early))
+            self.assertTrue(all(hs.has(r["key"]) for r in done))
+            self.assertIsNotNone(out["snapshot_sha256"])
+
+
+class ValidationBinding(unittest.TestCase):
+    def test_the_governing_line_must_name_the_working_bytes(self):
+        """Review round 14, Codex P1, third clause alone: the working file equals the authorization's bound sha256,
+        but the governing run-log line names other bytes; the count or read is refused."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            bound = write_validation(repo, fx)
+            FR.commit_push(repo, FR.git_date(ctx["cal"].close(last)))
+            ctx = runner_ctx(repo)
+            auth = auth_rec("count-009", "count", "granted", val=bound)
+            carried, _ = holdout.require_validated_carried(ctx, auth)
+            self.assertEqual(carried, ("H3-a",))
+            other = dict(ctx, run_log=[dict(x, results_sha256="e" * 64) if x.get("stage") == "validation" else x
+                                       for x in ctx["run_log"]])
+            self.assertEqual(holdout.validation_state(other)["sha256"], bound)
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "changed after the authorization"):
+                holdout.require_validated_carried(other, auth)
+
+
 class Collection(unittest.TestCase):
     def test_late_batches_and_plan(self):
         cal = synth.calendar("2026-06-01", "2027-06-30")

@@ -177,6 +177,18 @@ class HardKill(unittest.TestCase):
                 self.assertTrue(results.exists())
                 self.assertEqual(len(logs.read_lines(repo / RUN_LOG)), n)
                 orphan = canon.sha256_file(results)
+                # a run that fails before its own write never adopts the uncited file it found: its line is 'failed'
+                with mock.patch.object(ST, "evaluate_stage", side_effect=RuntimeError("synthetic failure")):
+                    with self.assertRaisesRegex(RuntimeError, "synthetic failure"):
+                        run.main(evaluate)
+                failed = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((failed["purpose"], failed["status"], failed["results_sha256"]),
+                                 ("evaluate", "failed", None))
+                self.assertEqual(canon.sha256_file(results), orphan)
+                FR.commit_push(repo, "2026-12-01T01:40:00+00:00")
+                run.main(evaluate)                                  # the failed line ended that start: a new one
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["purpose"], "evaluate_start")
+                FR.commit_push(repo, "2026-12-01T01:50:00+00:00")
                 self.assertEqual(run.main(evaluate), 0)
                 last = logs.read_lines(repo / RUN_LOG)[-1]
                 self.assertEqual((last["status"], last["results_sha256"], last["replaced_uncited_results_sha256"]),

@@ -73,9 +73,11 @@ authorization recorded and the governing run-log line's, and the read takes the 
 per-event or quote response that an earlier count fetched before its data end is fetched again for the read
 (`core/holdout_store.py`). Fee amendment lines supersede earlier rows by precedence, overlapping base rows are
 refused at load, and a count or read refuses a fee gap before it fetches. The dividend cash is taken per ex-date at
-the previous close. A results file left without its line by a hard kill is recomputed and replaced on the retry,
-and a fetch step refuses a sealed ledger that no committed line names. `authorize --purpose count` refuses while the
-protocol's `open_before_first_holdout_count` list has an entry.
+the close of the session immediately before it; when that session's split or all bar is missing the cash is undefined
+and the trade is excluded like an undefined share factor, never priced at an older close. A results file left without
+its line by a hard kill is recomputed and replaced on the retry, and a fetch step refuses a sealed ledger that no
+committed line names. `authorize --purpose count` refuses while the protocol's `open_before_first_holdout_count` list
+has an entry.
 
 ## Tests
 

@@ -156,28 +156,38 @@ class Fees:
         return sec * sell_value / 1e6 + min(taf * shares, cap)
 
 
-def cash_term(raw: dict, split: dict, allc: dict, e: str, x: str):
+def cash_term(cal, raw: dict, split: dict, allc: dict, e: str, x: str):
     """The cash per original share from entry session e to exit session x (review round 14, Codex P2), or None
-    without the raw, split and all bars of e and x.
+    without the raw, split and all bars of e and x, or when a dividend's previous close is missing.
 
-    D(d) = all_c(d) / split_c(d) is the dividend-only adjustment of session d. Between consecutive sessions p < k
-    of [e, x] that have split and all bars, the step s_k = 1 - D(p) / D(k) is an ex-dividend on k; the cash per
-    split-adjusted share is split_c(p) x s_k (the dividend at the previous close, D7's arithmetic at the ex-date),
-    and per original share it is a(e) x split_c(p) x s_k, a(e) = raw_c(e) / split_c(e). A step with |s_k| at or
-    below 2e-3 is adjustment-rounding noise (review round 8, E6) and books nothing, and the sum is kept with its
-    sign only when |cash| > 2e-3 x raw_c(e). No price after the ex-date enters: D7's raw_c(e) x all_c(x) /
+    D(d) = all_c(d) / split_c(d) is the dividend-only adjustment of session d. For consecutive XNYS sessions p < k
+    of [e, x], the step s_k = 1 - D(p) / D(k) is an ex-dividend on k; the cash per split-adjusted share is
+    split_c(p) x s_k (the dividend at the close of the session immediately before its ex-date, D7's arithmetic at
+    the ex-date), and per original share it is a(e) x split_c(p) x s_k, a(e) = raw_c(e) / split_c(e). A step with
+    |s_k| at or below 2e-3 is adjustment-rounding noise (review round 8, E6) and books nothing, and the sum is kept
+    with its sign only when |cash| > 2e-3 x raw_c(e). No price after the ex-date enters: D7's raw_c(e) x all_c(x) /
     all_c(e) - F x raw_c(x) scaled the dividend by the close of x, so an exit at the open of x booked cash that
-    moved with x's later intraday return."""
+    moved with x's later intraday return.
+
+    Review of 202968f, Codex P2: a session of [e, x] without its split or all bar is not skipped. The step across
+    it cannot name the ex-date or its previous close (closes $20, $40, $39: a $1 dividend ex on the third session
+    with the second session's split bar missing booked 20 x 0.025 = $0.50, not $1), so a step outside the band
+    across a missing bar leaves the cash undefined (populations.corporate_actions: the trade or H3-c event is
+    excluded and counted like an undefined F); a step inside the band there books nothing, as between any two
+    sessions."""
     r_e = raw.get(e)
-    days = [d for d in sorted(set(split) & set(allc)) if e <= d <= x
-            and (split[d] or {}).get("c") and (allc[d] or {}).get("c")]
+    sessions = cal.range(e, x)
+    days = [d for d in sessions if (split.get(d) or {}).get("c") and (allc.get(d) or {}).get("c")]
     if not r_e or not r_e.get("c") or not days or days[0] != e or days[-1] != x:
         return None
+    pos = {d: i for i, d in enumerate(sessions)}
     a_e = float(r_e["c"]) / float(split[e]["c"])
     total = 0.0
     for p_, k in zip(days, days[1:]):
         step = 1.0 - (allc[p_]["c"] / split[p_]["c"]) / (allc[k]["c"] / split[k]["c"])
         if abs(step) > C["cash_band"]:
+            if pos[k] - pos[p_] != 1:
+                return None
             total += float(split[p_]["c"]) * step
     cash = a_e * total
     return cash if abs(cash) > C["cash_band"] * float(r_e["c"]) else 0.0

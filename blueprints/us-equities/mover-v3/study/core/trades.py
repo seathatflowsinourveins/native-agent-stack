@@ -100,14 +100,15 @@ def _factor(ev, e, x):
     return FM.share_factor(ev["raw"], ev["split"], e, x)
 
 
-def _cash(ev, e, x, F):
+def _cash(cal, ev, e, x, F):
     """populations.corporate_actions (review round 14, Codex P2): the dividend cash of the ex-dates in (e, x], each
-    at its own previous close, so nothing after the exit session's ex-date moves it. F is booked on the shares."""
+    at the close of the session immediately before it, so nothing after the exit session's ex-date moves it; None
+    when that close is missing. F is booked on the shares."""
     if e == x:
         return 0.0
     if not (ev["raw"].get(x) or {}).get("c"):
         return None
-    return costs.cash_term(ev["raw"], ev["split"], ev["all"], e, x)
+    return costs.cash_term(cal, ev["raw"], ev["split"], ev["all"], e, x)
 
 
 def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
@@ -192,7 +193,7 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
         F = _factor(ev, d1, x_session)
         if F is None:
             return None
-        cash = _cash(ev, d1, x_session, F)
+        cash = _cash(cal, ev, d1, x_session, F)
         if cash is None:
             return None
         res, parts = {}, None
@@ -302,7 +303,7 @@ def h3c_event(ev: dict, ctx: Ctx) -> dict:
     for k in range(1, 5):
         e, x = d[k], d[k + 1]
         F = FM.share_factor(ev["raw"], ev["split"], e, x)
-        cash = _cash(ev, e, x, F) if F is not None else None
+        cash = _cash(ctx.cal, ev, e, x, F) if F is not None else None
         if F is None or cash is None:
             return {**out, "status": "undefined_factor"}
         num = opens[k + 1] * F + cash
