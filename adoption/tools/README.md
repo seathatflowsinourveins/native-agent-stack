@@ -4,13 +4,20 @@ Two host-local launchers that keep a heavy maintenance job, and every process it
 spawns, inside its own native systemd scope with hard memory, task and runtime
 limits, plus a CPU quota where the user manager delegates the cpu controller. They exist because an unbounded scan or build on a WSL2 host can exhaust
 the VM and take the whole session down; the scope kills the job instead.
+A third script, `gitleaks-guarded-macos`, applies the same Gitleaks caps on
+macOS, which has no per-job cgroup (see "macOS" below).
 
 | Script | Role |
 | --- | --- |
 | `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied, and `CPUQuota` where cpu is delegated (see "CPU quota" below). Refuses to run at all when it cannot contain the job. |
 | `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
+| `gitleaks-guarded-macos` | macOS Gitleaks front end: the same argument and exit-code semantics, a per-user lock that waits up to 60 s, and a footprint watchdog that kills the scan's whole process tree above 6 GiB or after 600 s. Python 3 standard library only. |
 
 ## Provenance
+
+`gitleaks-guarded-macos` has no external source: it was written in this
+repository on 2026-09-24, after the macOS memory incident described below. The
+rest of this section covers the two Linux scripts.
 
 - Source: the `bin` directory of the private `codex-ecosystem` checkout on the
   WSL2 host that developed them (not published here; the two files below are the
@@ -163,7 +170,7 @@ incomplete coverage.
 
 ## Runtime boundary
 
-These scripts are **Linux-only**, and only on a host that provides all of:
+`ecosystem-bounded-run` and `gitleaks-guarded` are **Linux-only**, and run only on a host that provides all of:
 
 - **cgroup v2** — `ecosystem-bounded-run` requires
   `/sys/fs/cgroup/cgroup.controllers` to exist. Without it the memory and task
@@ -184,15 +191,102 @@ being prevented. `gitleaks-guarded` refuses the same way (78) when the native
 binary, the runner or the private runtime directory is unavailable — before any
 scan begins.
 
-**macOS has no equivalent.** launchd provides no per-job memory cgroup, so there
-is no way to reproduce `MemoryMax`/`MemorySwapMax` containment for a transient
-scope. The "always run Gitleaks through the guarded launcher" rule is therefore
-scoped to Linux/WSL2 hosts; a macOS bootstrap must not pretend to satisfy it by
-installing an unbounded shim. The same holds for the CPU quota: a macOS host
-installs neither script, so it has no per-job CPU cap. This is a recorded
-limitation, not a gap this repository closes.
+**macOS has no cgroup equivalent.** launchd provides no per-job memory cgroup,
+so `MemoryMax`/`MemorySwapMax` containment for a transient scope cannot be
+reproduced there, and neither script above runs on macOS. For Gitleaks, a macOS
+host uses `gitleaks-guarded-macos` instead (next section): a user-space
+watchdog with the same caps, which is weaker than a kernel limit. Other heavy
+jobs still have no macOS containment, and no macOS job has a CPU cap.
+
+## macOS: `gitleaks-guarded-macos` (2026-09-24)
+
+**Why.** At 09:45 and 09:46 EDT on 2026-09-24, Jetsam on a 24 GB MacBook Pro
+recorded three concurrent Gitleaks 8.30.1 processes at a combined 52.8 GiB,
+then 58.2 GiB, and killed 405, then 4,255 other processes. The two largest came
+from the global pre-commit hook (`gitleaks git --pre-commit --staged --redact`)
+on scratch commits made by `tests/test_catalog_freshness_propose.py`, before
+#181 made the tests' Git configuration hermetic. `TrackedExplorerSubprocessTests`
+force-adds the generated explorer. The mechanism is upstream redaction:
+`filter()` calls `report.Finding.Redact` for every finding, and `Redact` copies
+the finding's whole line. In Git mode a hunk holds whole lines, so the
+explorer's 2,335 findings on one 12,889,851-byte line retain about 28 GiB. The
+same happens to `gitleaks git --redact=100` over this repository's all-refs
+history, where 240 commits touch that file. `dir` mode reads files in bounded
+chunks and stayed at about 0.13 GiB, even for 714 MB with nested worktrees. The
+measurements are in
+[the receipt](../../evidence/receipts/gitleaks-macos-memory-bound-20260924.json).
+
+**What it does.**
+
+- It keeps Gitleaks' arguments, output and exit status. `version`, `--version`,
+  `--help` and `-h` on their own exec the native binary with no lock or
+  watchdog.
+- One scan runs per user, across worktrees and clients. The front end holds an
+  exclusive `flock` on `~/.local/state/ecosystem-gitleaks.lock`, and the scan
+  inherits it. A second scan waits up to `ECOSYSTEM_GITLEAKS_LOCK_WAIT` seconds
+  (default 60; `0` gives the Linux launcher's fail-fast behaviour) and then exits
+  **75**. A read-only descriptor is enough to take the lock, so sandboxed
+  clients can use it, but only an unsandboxed run can create the file.
+- Every 50 ms it sums the physical footprint (the figure Jetsam acts on) of the
+  scan's whole process tree, including its `git` child. Above **6 GiB** it
+  SIGKILLs the tree and exits **137**. After **600 s** it sends SIGTERM, then
+  SIGKILL 5 s later, and exits **124**. `ECOSYSTEM_JOB_MEMORY_MAX` and
+  `ECOSYSTEM_JOB_SECONDS` can lower either cap, never raise it.
+- It refuses with **78** before any scan in these cases: off macOS; the native
+  binary is missing (default
+  `${MISE_DATA_DIR:-~/.local/share/mise}/installs/gitleaks/8.30.1/gitleaks`, or
+  `GITLEAKS_NATIVE`); that path is the front end itself; the lock is unusable or
+  a symbolic link; a limit is malformed; or process footprints cannot be read.
+  A scan whose footprint becomes unreadable while it runs is killed and exits
+  with the same 78.
+  A signal to the front end stops the tree and exits 128 plus the signal
+  number.
+- The scan stays in the caller's process group, so a group signal from the
+  caller, such as Ctrl-C or a tool timeout, reaches it too.
+
+**What it is not.** It is a user-space watchdog, not a kernel limit. The
+measured overshoot was 0.04-0.20 GiB above the cap at the observed allocation
+rates. If the front end itself is SIGKILLed, the scan continues unwatched but
+keeps the lock, so no second scan can start. There is no CPU or task cap. A scan
+stopped at the cap produced no result: that is fail-closed, not coverage.
+
+**Rejected alternatives**, measured on the same host:
+
+- `--max-target-megabytes` fails open. Gitleaks skips an oversized fragment at
+  debug log level, so the staged explorer's 2,335 findings became `no leaks
+  found` with exit 0.
+- Path exclusions in `.gitleaks.toml`: a top-level path allowlist skips whole
+  files in both modes (see that file's header), and `dir` memory was already
+  bounded.
+- `GOMEMLIMIT`: at 4 GiB the history scan still crossed the cap, because the
+  growth is live findings, not garbage.
+- A kernel memory limit: `memorystatus_control` refuses unprivileged callers
+  with EPERM.
+
+**Install (the host's owner).**
+
+```bash
+install -m 0755 adoption/tools/gitleaks-guarded-macos "$HOME/.local/bin/gitleaks-guarded-macos"
+gitleaks-guarded-macos version                     # execs the native binary directly
+: > "$HOME/.local/state/ecosystem-gitleaks.lock"  # once, outside any sandbox
+```
+
+Every caller must invoke the front end, not the native binary. That includes
+the global pre-commit hook, which the agent-ecosystem repository installs; the
+hook change is handed off to that repository's owner. Do not raise the caps to
+retry a scan the front end killed. Narrow the scope instead, for example to the
+CI history scope (`--log-opts=HEAD --max-target-megabytes 2`, measured at
+2.9 GiB), and record any size-based skip as incomplete coverage.
 
 ## What the tests establish
+
+`tests/test_gitleaks_guarded_macos.py` covers the macOS front end. Structural
+checks run on every host, plus a refusal check off macOS. On macOS, integration
+checks against stub binaries cover exit-status propagation, the memory cap on an
+allocating grandchild, the runtime cap, the lock (busy, waiting, serialised,
+held during the scan) and every refusal. The stubs are synthetic fixtures; the
+Gitleaks measurements are in the receipt above. The rest of this section covers
+the Linux scripts.
 
 `tests/test_adoption_guarded_runners.py` covers two different evidence classes,
 and prints which containment branch it took.
