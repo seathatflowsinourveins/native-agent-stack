@@ -9647,8 +9647,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6fcbe0068c22be5ec55d9188dd04c2579acc5f09f80abbb22e1da75c45611ab1",
-      "bytes": 14377
+      "sha256": "a52ce845034f04c6486a7c9c7e294f585d6cf0d51639a5c391214ce5ab421930",
+      "bytes": 14602
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",

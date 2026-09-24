@@ -33,7 +33,7 @@
     "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
     "supported_python": ">=3.12,<3.15; vanilla CPython",
     "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
-    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. SPY/LEAN parity, realistic liquidity and native broker adapter acceptance remain open.",
+    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. SPY/LEAN parity is established for the historical one_zero case only (gate spy-lean-parity, blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json; one case, and the open-fill proxy is not a general market-on-open equivalent). Realistic liquidity and rc5 native broker adapter acceptance remain open.",
     "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
     "sources": [
       "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
