@@ -13,13 +13,13 @@ import contextlib
 import hashlib
 import io
 import json
-import os
 import subprocess
 import tempfile
 import unittest
 from unittest import mock
 from pathlib import Path
 
+import tests
 from scripts import landscape
 from scripts import verdict_review_gate as gate
 
@@ -89,6 +89,12 @@ def adjudication(judgments=None, winner_lane="claude"):
 
 class GateFixture(unittest.TestCase):
     def setUp(self):
+        # The gate drops inherited GIT_* variables, as git() below does; both keep the test package's
+        # hermetic git configuration, so a global core.hooksPath (a gitleaks pre-commit or post-checkout
+        # hook) never runs in the scratch repository or the gate's head worktree (#179).
+        hermetic = mock.patch.object(gate, "git_environment", tests.hermetic_git_environment)
+        hermetic.start()
+        self.addCleanup(hermetic.stop)
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name).resolve()
@@ -110,10 +116,10 @@ class GateFixture(unittest.TestCase):
 
     # -- repository helpers -------------------------------------------------------------------
     def git(self, *args):
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
         return subprocess.run(["git", "-C", str(self.root), "-c", "user.name=fixture",
                                "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", *args],
-                              env=environment, check=True, capture_output=True, text=True).stdout.strip()
+                              env=tests.hermetic_git_environment(), check=True, capture_output=True,
+                              text=True).stdout.strip()
 
     def write(self, path, data: bytes):
         target = self.root / path
@@ -1716,10 +1722,9 @@ print(json.dumps({"code": code, "reads": sorted(reads), "modules": modules}))
 
     def trace(self, data_root, mode, *arguments):
         import sys
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
         result = subprocess.run([sys.executable, "-c", self.READ_TRACER, str(self.ROOT), str(data_root), mode,
-                                 *map(str, arguments)], capture_output=True, text=True, env=environment,
-                                cwd=str(self.ROOT))
+                                 *map(str, arguments)], capture_output=True, text=True,
+                                env=tests.hermetic_git_environment(), cwd=str(self.ROOT))
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout.strip().splitlines()[-1])
 
