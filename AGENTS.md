@@ -65,6 +65,15 @@ Use upstream executables and supported integration formats. Keep client accounts
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
 
+This repository commits `.claude/settings.json` with Ultracode on. The Claude
+coordinator stays at `xhigh` under Ultracode, because a `max` session turns its
+workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value
+overrides every child's effort). Pass `effort: 'max'` with an explicit
+task-matched `model` on every ad-hoc workflow `agent()` call: a stage without
+its own `effort` inherits the coordinator's `xhigh` unless its agent's
+frontmatter sets one. Probes and overturn conditions:
+`docs/decisions/2026-09-23-max-effort-default.md`.
+
 For general engineering and ecosystem changes, start with
 `docs/convergence-architecture.md`. New convergence claims use
 `scripts/validate_convergence.py` with a scoped experiment record. Preserve failed

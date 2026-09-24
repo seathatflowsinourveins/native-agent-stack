@@ -182,6 +182,13 @@
           "peak_memory_gb": 0.288
         }
       }
+    },
+    {
+      "id": "macos-m5pro-20260924",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 24 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/macos-m5pro-20260924/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
     }
   ]
 }

@@ -8,8 +8,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.landscape import (MANIFEST, build_landscape, judge_adjudication, verify_sealed_waves,
-                               withhold_policy_labels)
+from scripts.landscape import (MANIFEST, SEALED_CANDIDATE_FIELDS, build_landscape, judge_adjudication,
+                               SEALED_COMMITMENT_KEY, sealed_candidate_labels, sealed_candidates_sha256,
+                               verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels)
 from scripts import platform_status
 
 
@@ -31,16 +32,50 @@ NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "fami
                    "codex": {"name": "gpt-6-astra", "effort": "high", "family": "openai"}}
 NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40},
-    "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64},
+               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64,
+               "prompt_sha256": "d" * 64, "transcript_audit_py_sha256": "9" * 64, "repo_tree_sha256": "7" * 64},
+    "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
 }
 # The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
 NEW_WAVE_REGISTRY = {
     "claude": [{"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                 "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-                "workflow_sha256": "a" * 64}],
+                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64, "prompt_sha256": "d" * 64,
+                "transcript_audit_py_sha256": "9" * 64}],
     "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
+    "adjudication": [{key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
+                                                "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
+                                                "adjudicator_role_sha256", "transcript_audit_py_sha256")}],
 }
+
+class AdjudicationBindingTests(unittest.TestCase):
+    """Independent review of #145, M2: a new-wave adjudication must name the sealed lane returns, the lanes' one
+    evidence tree and registered adjudication code."""
+
+    def setUp(self):
+        from scripts import landscape
+        self.landscape = landscape
+        self.code = dict(NEW_WAVE_REGISTRY["adjudication"][0])
+        self.raw = {"lane_returns_sha256": {"claude": "1" * 64, "codex": "2" * 64},
+                    "provenance": {**self.code, "repo_tree_sha256": "7" * 64}}
+        self.registry = {"adjudication": [self.code]}
+
+    def issue(self, raw=None, sealed=None, trees=None):
+        return self.landscape.adjudication_binding_issue(
+            raw or self.raw, sealed or {"claude": "1" * 64, "codex": "2" * 64},
+            trees or {"claude": "7" * 64, "codex": "7" * 64}, self.registry)
+
+    def test_a_bound_adjudication_passes(self):
+        self.assertIsNone(self.issue())
+
+    def test_other_returns_trees_or_unregistered_code_are_refused(self):
+        self.assertIn("sealed lane returns", self.issue(sealed={"claude": "1" * 64, "codex": "3" * 64}))
+        self.assertIn("one tree", self.issue(trees={"claude": "7" * 64, "codex": "8" * 64}))
+        self.assertIn("one tree", self.issue(raw=dict(self.raw, provenance={**self.code, "repo_tree_sha256": "9" * 64})))
+        edited = dict(self.raw, provenance={**self.code, "prompt_sha256": "0" * 64, "repo_tree_sha256": "7" * 64})
+        self.assertIn("not listed", self.issue(raw=edited))
+        self.assertIn("must carry", self.issue(raw=dict(self.raw, provenance={"repo_tree_sha256": "7" * 64})))
+
 
 class LandscapeTests(unittest.TestCase):
     def setUp(self):
@@ -428,17 +463,25 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         bound to the run manifest; ``agreement`` is what the two returns establish."""
         models = models or NEW_WAVE_MODELS
         provenance = provenance or NEW_WAVE_PROVENANCE
+        # The candidates' manifest fields are sealed in the wave's packet-keys document (review of #145).
+        sealed = {"c1": {"component_id": "selected", "upstream": {}}, "c2": {"component_id": None, "upstream": {}}}
         packet = {"schema_version": 1, "catalog": "foundation", "layer_id": layer_id, "requirement": "Find the source",
                   "candidates": [
-                      {"key": "c1", "component_id": "selected", "repository": self.candidate["repository"],
-                       "adopted": True, "upstream": {}},
-                      {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
-                       "adopted": True, "upstream": {}}],
-                  "sota_components_not_in_candidates": [], "withheld": withhold_policy_labels("Find the source"),
+                      {"key": "c1", "repository": self.candidate["repository"], "adopted": True},
+                      {"key": "c2", "repository": "https://github.com/example/alternative", "adopted": True}],
+                  "sota_components_not_in_candidates": [],
+                  "withheld": withhold_policy_labels("Find the source") + sealed_candidate_labels()
+                              + withheld_candidate_label_labels(),
                   **(packet_extra or {})}
+        restore = {candidate["key"]: {**sealed.get(candidate["key"], {}),
+                                      **{field: candidate[field] for field in SEALED_CANDIDATE_FIELDS if field in candidate}}
+                   for candidate in packet["candidates"]}
+        packet.setdefault(SEALED_COMMITMENT_KEY, sealed_candidates_sha256(restore))
         name = f"foundation__{layer_id}.json"
         self.write(f"{NEW_WAVE_BASE}/packets/{name}", packet)
         packet_sha256 = hashlib.sha256(json.dumps(packet).encode("utf-8")).hexdigest()
+        keys = {"schema_version": 1, "packets": {name: {"packet_sha256": packet_sha256, "candidates": restore}}}
+        self.write(f"{NEW_WAVE_BASE}/packet-keys.json", keys)
         sums = f"{packet_sha256}  {name}\n"
         (self.root / NEW_WAVE_BASE / "packets" / "SHA256SUMS").write_text(sums, encoding="utf-8")
         agreement = "same_winner" if codex_winner == "c1" else "disagree"
@@ -456,12 +499,20 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             digest = hashlib.sha256(json.dumps(sealed).encode("utf-8")).hexdigest()
             lanes[lane] = {"run_id": run_id, "sealed_sha256": digest}
             manifest_entry_lanes[lane] = {"outcome": "sealed", "run_id": run_id, "sealed_sha256": digest}
+        # Every new wave seals its prose exposure (Codex review of #145 at 68e74f2c); this layer is not scored.
+        exposure = {"schema_version": 1, "layers": {f"foundation::{layer_id}": {
+            "scored": False, "cited_files": [], "export_files": [], "packet_sha256": packet_sha256,
+            "lane_root_tree_sha256": "7" * 64}}}
+        self.write(f"{NEW_WAVE_BASE}/prose-exposure.json", exposure)
+        lanes["prose_exposed"] = None
         self.write(f"{NEW_WAVE_BASE}/run-manifest.json", {
             "schema_version": 1, "run_id": NEW_WAVE, "sealed_base": NEW_WAVE_BASE,
             "packets_sha256sums": sums, "retained_packets": [{"name": name, "sha256": packet_sha256}],
             "packets": [{"catalog": "foundation", "layer_id": layer_id, "packet_sha256": packet_sha256,
                          "lanes": manifest_lanes or manifest_entry_lanes}],
             "rejections": [],
+            "packet_keys_sha256": hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest(),
+            "prose_exposure_sha256": hashlib.sha256(json.dumps(exposure).encode("utf-8")).hexdigest(),
         })
         self.bind_manifest(lanes)
         self.write(NEW_WAVE_RECEIPT, {"exit_code": 0, "scope": "A registered local fixture receipt"})
@@ -789,6 +840,11 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 judgments.append(judgment)
         adjudication = {"winner_lane": winner_lane, "why": "Retained receipt decides it.",
                         "evidence_refs": ["receipt.json"], "judgments": judgments}
+        if lanes is not None and all(isinstance(lanes.get(lane), dict) for lane in ("claude", "codex")):
+            # A new-wave adjudication names the sealed returns it compared, the lanes' evidence tree and
+            # registered adjudication code (independent review of #145, M2).
+            adjudication["lane_returns_sha256"] = {lane: lanes[lane].get("sealed_sha256") for lane in ("claude", "codex")}
+            adjudication["provenance"] = {**NEW_WAVE_REGISTRY["adjudication"][0], "repo_tree_sha256": "7" * 64}
         self.write(f"{base}/adjudication/{run_id}.json", adjudication)
         if lanes is not None:
             digest = hashlib.sha256(json.dumps(adjudication).encode("utf-8")).hexdigest()
@@ -850,6 +906,32 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "macos-arm64 declares 'conditional'.*at most 'untested'"):
             self.build()
 
+    def test_a_new_wave_without_its_prose_exposure_is_rejected(self):
+        # Codex review of #145 at 68e74f2c: every new wave binds its prose exposure.
+        lanes = self.seal_new_wave()
+        self.edit_manifest(lanes, lambda manifest: manifest.pop("prose_exposure_sha256"))
+        lanes.pop("prose_exposed")
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "prose_exposure_sha256"):
+            self.build()
+
+    def test_a_measure_over_another_packet_or_tree_is_rejected(self):
+        # Round 8, NEW-2: each row's prose-exposure measure names its retained packet and its lanes' tree.
+        for field, value, reason in (("packet_sha256", "0" * 64, "over its retained packet"),
+                                     ("lane_root_tree_sha256", "0" * 64, "measured over")):
+            with self.subTest(field=field):
+                lanes = self.seal_new_wave()
+                path = self.root / NEW_WAVE_BASE / "prose-exposure.json"
+                exposure = json.loads(path.read_text(encoding="utf-8"))
+                for entry in exposure["layers"].values():
+                    entry[field] = value
+                self.write(f"{NEW_WAVE_BASE}/prose-exposure.json", exposure)
+                self.edit_manifest(lanes, lambda manifest: manifest.update(
+                    prose_exposure_sha256=hashlib.sha256(json.dumps(exposure).encode("utf-8")).hexdigest()))
+                self.layer.update(self.recorded_fields(lanes=lanes))
+                with self.assertRaisesRegex(ValueError, reason):
+                    self.build()
+
     def test_a_hand_edited_new_wave_codex_absent_row_without_run_ids_is_rejected(self):
         # Re-review finding 2, case 1: the new-wave block ran only when some lane had a run_id.
         (self.root / "decisions").mkdir()
@@ -857,7 +939,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                                                                      encoding="utf-8")
         lanes = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""},
                  "agreement": "codex_absent", "sealed_base": NEW_WAVE_BASE,
-                 "single_lane_decision": "decisions/2026-09-23-single-lane.md"}
+                 "single_lane_decision": "decisions/2026-09-23-single-lane.md", "prose_exposed": None}
         # The wave's run manifest (both lanes missing for this layer) and registry exist.
         self.seal_new_wave(manifest_lanes={"claude": {"outcome": "missing"}, "codex": {"outcome": "missing"}})
         self.bind_manifest(lanes)
@@ -938,7 +1020,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
 
     def test_new_wave_sealed_provenance_must_be_registered_lane_code(self):
         forged = {"claude": NEW_WAVE_PROVENANCE["claude"],
-                  "codex": {"codex_lane_py_sha256": "9" * 64, "prompt_sha256": "d" * 64}}
+                  "codex": {"codex_lane_py_sha256": "9" * 64, "prompt_sha256": "d" * 64,
+                            "repo_tree_sha256": "7" * 64}}
         self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(provenance=forged)))
         with self.assertRaisesRegex(ValueError, "not listed in tools/sota-convergence/lane-provenance.json"):
             self.build()
@@ -1089,13 +1172,42 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "SHA256SUMS must be retained and equal"):
             self.build()
 
+    def test_the_sealed_packet_keys_are_bound_and_decide_the_winner_component(self):
+        # Review of #145 (F5): a retained packet's candidates carry no manifest fields; the wave's packet-keys
+        # document, bound by the run manifest, restores them for the winner check.
+        lanes = self.seal_new_wave()
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        self.build()
+        keys = json.loads((self.root / NEW_WAVE_BASE / "packet-keys.json").read_text(encoding="utf-8"))
+        keys["packets"]["foundation__retrieval.json"]["candidates"]["c1"]["component_id"] = "other"
+        self.write(f"{NEW_WAVE_BASE}/packet-keys.json", keys)
+        with self.assertRaisesRegex(ValueError, "packet_keys_sha256"):
+            self.build()
+        digest = hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest()
+        lanes = self.edit_manifest(lanes, lambda manifest: manifest.update(packet_keys_sha256=digest))
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        # Re-bound in the manifest, the changed entry is not the sealed values the packet commits to (round 5,
+        # INT-R5-1), so the relabelled component is refused.
+        with self.assertRaisesRegex(ValueError, "is not the sealed values the packet commits to"):
+            self.build()
+        (self.root / NEW_WAVE_BASE / "packet-keys.json").unlink()
+        with self.assertRaisesRegex(ValueError, "packet-keys.json"):
+            self.build()
+
+    def test_retained_packets_with_gap_receipts_are_refused(self):
+        # Round-2 review: a blind wave cannot seal packets built with lane_packets.py --gap-receipts.
+        lanes = self.seal_new_wave(packet_extra={"gap_receipts": ["evidence/artifacts/gap-wave2/x/0-check.json"],
+                                                 "gap_receipts_note": "gap_receipts lists receipts"})
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "carries withheld keys \\['gap_receipts', 'gap_receipts_note'\\]"):
+            self.build()
+
     def test_retained_packets_are_checked_at_every_depth(self):
         # Review of the #122 fix round: CI only looked where withhold_popularity strips, so a nested
         # release date, a top-level newcomers list or a disposition label passed.
-        c1 = {"key": "c1", "component_id": "selected", "repository": self.candidate["repository"],
-              "adopted": True, "review_status": None, "upstream": {}}
-        c2 = {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
-              "adopted": True, "review_status": None, "upstream": {}}
+        c1 = {"key": "c1", "repository": self.candidate["repository"], "adopted": True, "review_status": None}
+        c2 = {"key": "c2", "repository": "https://github.com/example/alternative", "adopted": True,
+              "review_status": None}
         cases = {
             "candidates[].upstream.latest_flag": {"candidates": [
                 c1, dict(c2, upstream={"latest_flag": {"tag": "release/2025-11-28"}})]},
@@ -1104,7 +1216,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             "candidates[].decisions[].selection": {"candidates": [
                 c1, dict(c2, decisions=[{"id": "d1", "selection": "default"}])]},
             "newcomers": {"newcomers": ["c2"]},
-            "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]},
+            "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]
+                                                             + sealed_candidate_labels()
+                                                             + withheld_candidate_label_labels()},
         }
         for label, extra in cases.items():
             with self.subTest(label):
@@ -1236,6 +1350,23 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.domain["layers"][0]["layer_id"] = "renamed"
         data = self.build()
         self.assertEqual(data["layers"][1]["layer_id"], "renamed")
+
+
+class PacketKeysShapeTests(unittest.TestCase):
+    """Round 7, INT-R7-1: a sealed component_id or pin of the wrong type is a clean refusal, not a TypeError."""
+
+    def test_wrong_typed_ids_and_pins_are_refused(self):
+        from scripts import landscape
+        packet = {"candidates": [{"key": "c1"}, {"key": "c2"}]}
+        for fields in ({"component_id": {"x": 1}}, {"component_id": ["a"]}, {"component_id": 7},
+                       {"component_id": "a", "pin": 3}):
+            sealed = {"c1": fields, "c2": {"component_id": "b"}}
+            packet[landscape.SEALED_COMMITMENT_KEY] = landscape.sealed_candidates_sha256(sealed)
+            keys = {"schema_version": landscape.PACKET_KEYS_SCHEMA_VERSION,
+                    "packets": {"p.json": {"packet_sha256": "0" * 64, "candidates": sealed}}}
+            issue = landscape.packet_keys_issue(keys, "p.json", "0" * 64, packet)
+            self.assertIsNotNone(issue, fields)
+            self.assertIn("c1", issue)
 
 
 if __name__ == "__main__":

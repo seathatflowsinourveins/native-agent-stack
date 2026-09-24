@@ -3,7 +3,7 @@ name: semantic-evidence-reviewer
 description: Review supplied source claims and advisory TypeSafe semantic judgments against original source within a bounded evidence task. It is read-only (Read, Glob, Grep, with the typesafe-ai skill preloaded), makes no service calls and needs any TypeSafe inference result supplied by the coordinator; use evidence-reviewer for patches and general source review.
 tools: Read, Glob, Grep
 model: opus
-effort: high
+effort: max
 skills:
   - typesafe-ai
 ---
