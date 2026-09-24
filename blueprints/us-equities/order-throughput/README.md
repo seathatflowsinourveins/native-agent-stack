@@ -362,10 +362,12 @@ the passing run's prefix since its `started_at`, all `canceled`, filled
 quantity 0, and 0 positions and 0 open orders. This matches the receipt's 496
 accepted submits and 496 acknowledged cancels. It confirms only those counts
 and states. It uses the same broker and account, and it does not check the
-per-window rates, latencies or websocket completeness. The exact SDK calls,
-the alpaca-py version used for the listing and the raw listing output were not
-retained, privately or as a hash, so this is an unretained report by the
-coordinator rather than a retained observation artifact.
+per-window rates, latencies or websocket completeness. The first coordinator
+listing was not retained, so it was re-run at 14:16Z as a retained script
+(`evidence/observe-capacity-20260924.py`; alpaca-py 0.44.0, Python 3.12.3). It
+reproduced the same counts. Its stdout is kept as
+`evidence/observe-capacity-20260924.stdout.json`, with the hashes, the redacted argv and
+the exit code in `independent-observation-20260924.json`.
 
 **Finding and fix.** Paper cancel confirmations lagged about 16 s on
 `trade_updates` during the opening auction. That is longer than the 10 s
