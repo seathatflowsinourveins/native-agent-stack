@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "mover-v3-h6-execution-parity-draft-20260924",
+  "kind": "draft_engineering_preregistration",
+  "status": "draft_pending_independent_pre_outcome_review",
+  "frozen_before_outcomes": false,
+  "drafted_at": "2026-09-24",
+  "base_commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+  "parent_plan": "blueprints/us-equities/mover-v3/README.md",
+  "split_from": "blueprints/us-equities/mover-v3/protocol-draft.json (H6), in the 2026-09-24 review fix round",
+  "evidence_class": "Official broker documentation read on 2026-09-24 plus repository source reads. No native execution, no paper order and no outcome. Paper fills are simulated by Alpaca, so any result is sim-to-paper evidence, not market evidence.",
+  "question": "Do broker-held exits (Alpaca trailing_stop and OCO) realize exit prices equivalent to the client-side cancel-then-new ratchet, relative to the same trigger reference, at fewer REST calls per closed position?",
+  "independence": "Engineering, not alpha. This protocol has its own two-test family and its own paper timeline. It uses no slot of the mover-v3 alpha family (m = 35), H1-H5 never wait for it, and no result here opens or informs the alpha holdout. Its paper positions are mechanics-only unless a v3 rule has passed its holdout; they are logged as accrual exposure under protocol-draft.json chronology.holdout.accrual_exposure.",
+  "evidence": [
+    {"source": "https://docs.alpaca.markets/docs/orders-at-alpaca", "status": "read on 2026-09-24. trailing_stop (trail_price or trail_percent) and OCO for a held position ('the entry order is already filled, and you can submit the take-profit and stop-loss in one order submission') are documented. Constraints quoted verbatim: 'Trailing stop orders are currently supported only with single orders. However, we plan to support trailing stop as the stop loss leg of bracket/OCO orders in the future.' and 'you would not be able to submit two conditional closing orders since Alpaca's system would view one of the two orders as exceeding the available position quantity'."},
+    {"source": "https://docs.alpaca.markets/reference/deleteallorders-1", "status": "survives"},
+    {"source": "native_adapter.py builds only LIMIT/DAY orders; native_strategy.replace_exit cancels and resubmits when the price basis moves; exits.py rule chain (stop_loss, take_profit with take_profit_fraction, trailing)", "status": "repository source read at aa6fc79"}
+  ],
+  "population": "positions opened in Alpaca paper by the paper candidate after the OCO and trailing_stop adapter paths exist. No order is created for the test itself.",
+  "arm_assignment": {
+    "rule": "arm = a if the first byte of sha256('mover-v3-h6|' + symbol + '|' + entry session (YYYY-MM-DD) + '|' + k) is even, else b, where k is the 1-based count of this symbol's entries in this session in decision order",
+    "commit": "the assignment is written to the durable order ledger before the entry order is sent. client_order_id is not an input, so the client that generates IDs cannot re-roll an assignment. A position whose ledger assignment is missing or written after the submit is excluded and counted."
+  },
+  "exit_arms": {
+    "a_client": "the current exits.py chain on the whole position with cancel-then-new replacement",
+    "b_broker": {
+      "constraint": "each share carries at most one broker-held closing order (the documented rule above): a trailing_stop cannot be an OCO leg, and a second conditional closing order on the same shares is rejected as exceeding the available quantity",
+      "structure": "the filled quantity q is split into two tranches. Tranche P (take-profit tranche) = floor(q x f_p) shares, carrying one OCO (take-profit limit at take_profit_bps and stop at stop_bps). Tranche T (trailing tranche) = q - P shares, carrying one trailing_stop with trail_percent = effective_trailing_bps at entry / 100, which is also that tranche's only stop. f_p = take_profit_fraction when it is below 1; when take_profit_fraction = 1 (the strategies_v1 default), f_p = 0.5, fixed here. A tranche of 0 shares is not sent, and the whole position carries the other tranche's single order.",
+      "client_side": "time, risk-off, force, quote-stale and halt exits stay client-side. A client-side exit first cancels both tranche orders (one call each), then sends one closing order for the remaining quantity.",
+      "difference_from_a": "arm b is not a byte-identical copy of arm a's rule chain: tranche T has no separate fixed stop and tranche P no trailing rule. H6-e therefore compares execution quality against each fill's own trigger reference, not P&L."
+    }
+  },
+  "shadow": "for each position, the other arm's trigger time and reference price are computed from the same quote stream for paired diagnostics, never traded",
+  "call_count_expectation": {
+    "arm_a": "1 entry + 1 initial exit order + 2 per ratchet step (cancel, new): 2 + 2r per closed position at a full fill; 8 at r = 3",
+    "arm_b_broker_closed": "1 entry + 1 OCO + 1 trailing_stop = 3 calls, with no further calls when the broker legs fill (1 entry + 1 order when a tranche is empty = 2)",
+    "arm_b_client_closed": "3 + 2 cancels + 1 closing order = 6 calls",
+    "ratio": "with a share s of positions closed client-side, arm b averages 3 + 3s calls. At r = 3 the H6-c alternative (a/b > 2) needs s <= 1/3. The realized s and r are reported with H6-c."
+  },
+  "primary_tests": [
+    {"id": "H6-e", "statistic": "median of (realized exit price - trigger reference) in bps, arm b minus arm a", "alternative": "equivalence within +/-25 bps (TOST)", "p_value": "p = max(p_lower, p_upper), the larger of the two one-sided bootstrap p-values; this p enters Holm"},
+    {"id": "H6-c", "statistic": "log(mean REST calls per closed position, arm a / arm b)", "alternative": "greater than log(2)"}
+  ],
+  "also_not_supported_if": "any paper partial-fill, trigger-price or trigger-reference behaviour that departs from the documented semantics, or any rejection of a tranche order as exceeding the available quantity (recorded per event)",
+  "multiple_testing": {
+    "family": "H6-e and H6-c only, m = 2",
+    "procedure": "Holm at family-wise alpha 0.05 at validation and at the holdout; strictest level 0.025",
+    "development_screen": "unadjusted p <= 0.05 with the development sample; nominates for validation only"
+  },
+  "stages": {
+    "order": "closed positions in close-time order, counted per arm",
+    "development": "first 100 closed positions per arm",
+    "validation": "next 200 per arm",
+    "holdout": "next 200 per arm, read only for items that passed validation, with an access log entry in blueprints/us-equities/mover-v3/h6-access-log.jsonl committed before the read",
+    "minimum": "each stage's size is its minimum; a stage that has not reached it is underpowered and cannot pass",
+    "note": "prospective paper only; disjoint from every historical window and independent of the alpha protocol's stages"
+  },
+  "power": {
+    "planning_sigma_bps": 50,
+    "sigma_provenance": "assumption, no measured source",
+    "median_efficiency": "standard error of a median difference taken as sigma x sqrt(2/n) x sqrt(pi/2) (normal approximation)",
+    "development": "n = 100 per arm, alpha 0.05: SE 8.9 bps, TOST interval half-width 14.6 bps, equivalence passes if the observed difference is within +/-10.4 bps, power about 0.76 at a true difference of 0",
+    "validation_and_holdout": "n = 200 per arm, alpha 0.025: SE 6.3 bps, half-width 12.3 bps, passes within +/-12.7 bps, power about 0.96 at a true difference of 0",
+    "previous_draft": "the earlier 40 / 60 / 150 per arm at 0.05/37 could not pass development or validation by construction (half-width above the 25 bps margin at 60 per arm)"
+  },
+  "outcome_reporting": "the three labels of protocol-draft.json outcome_reporting (supported; not supported with the excluded size stated; underpowered)",
+  "sizing": "parent sizing at 1x",
+  "data_status": "available now (Alpaca paper) once the adapter change lands; paper fills are simulated, so this is sim-to-paper evidence, not market evidence",
+  "freeze_preconditions": [
+    "An independent pre-outcome review from a different session and model family, findings resolved in a dated record",
+    "Adapter paths for OCO and trailing_stop committed with synthetic tests, including a test that one share never carries two closing orders",
+    "The arm-assignment ledger write tested to precede the entry submit",
+    "status set to frozen and the sha256 recorded in a pushed commit"
+  ]
+}

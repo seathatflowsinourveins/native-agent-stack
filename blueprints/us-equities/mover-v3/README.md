@@ -1,7 +1,8 @@
 # Mover study v3: research plan (2026-09-24)
 
 **Status: draft plan. Nothing here is frozen, and no outcome has been computed.** The preregistration draft is
-[`protocol-draft.json`](protocol-draft.json), status `draft_pending_independent_pre_outcome_review`. The catalog
+[`protocol-draft.json`](protocol-draft.json), status `draft_pending_independent_pre_outcome_review`. The engineering
+hypothesis H6 has its own draft, [`h6-execution-parity-draft.json`](h6-execution-parity-draft.json). The catalog
 decisions from the same sweep are in
 [`catalogs/us-equities/mover-v3-sweep-20260924.json`](../../../catalogs/us-equities/mover-v3-sweep-20260924.json).
 
@@ -13,11 +14,13 @@ refutation the sweep's synthesis judged weak. Those are labelled *contested* whe
 was fetched, no study code was run, and no paper order was placed. The sweep input (sha256 `e2120c05...64d1`) stays
 private because its verifier notes contain host paths. This README and the supplement carry its content.
 
-**Relation to PR #162.** PR #162 (open, owner active) holds the mover early-entry v1 and v2 studies
-(`blueprints/us-equities/mover-early-entry/**`). **v1: 0 of 768 rule-exits pass development. v2: no pass in families
-E, F or P (commit `92062e8`).** v3 does not modify those files. It reuses their pipeline only by reference, pinned to
-commit `92062e8`, and it does not read their reserved holdout. The 2021 control segment of the catalyst experiment is
-permanently inspected and is not a fresh holdout.
+**Relation to PR #162.** PR #162 merged to main on 2026-09-24 as squash commit `aa6fc79`. It holds the mover
+early-entry v1 and v2 studies (`blueprints/us-equities/mover-early-entry/**`). **v1: 0 of 768 rule-exits pass
+development. v2: no pass in families E, F or P** (results sha256 `75a5004b...` after deviation D7). v3 does not modify
+those files. It reuses their pipeline only by reference, pinned to main at `aa6fc79` with git-blob and sha256 hashes
+for `rules.py`, `quotes.py` and the cost table (`protocol-draft.json`). The pin includes D7's stamp-window guard in
+`quotes.py`. The earlier pin `92062e8` survives only on the PR branch. v3 does not read #162's reserved holdout. The
+2021 control segment of the catalyst experiment is permanently inspected and is not a fresh holdout.
 
 ## Why continuation is not supported
 
@@ -27,15 +30,18 @@ evidence below points the other way. It is consistent with #162's result, not a 
 | Evidence | What it says | Sweep status |
 |---|---|---|
 | Bali, Cakici, Whitelaw (2011), "Maxing Out", *JFE* 99(2) ([PDF](https://pages.stern.nyu.edu/~rwhitela/papers/max%20jfe.pdf); [NBER w14804](https://www.nber.org/system/files/working_papers/w14804/w14804.pdf)) | Stocks with the largest recent daily return (MAX) earn *lower* subsequent risk-adjusted returns: lottery demand, then reversal | **survives** (both PDFs opened) |
-| Hong, Li, Ni, Scheinkman, Yan, "Days to Cover and Stock Returns" ([NBER w21166](https://www.nber.org/system/files/working_papers/w21166/w21166.pdf)) | High days-to-cover predicts *lower* returns. Squeezes are episodic, not a base rate | **survives** (opened) |
+| Hong, Li, Ni, Scheinkman, Yan, "Days to Cover and Stock Returns" ([NBER w21166](https://www.nber.org/system/files/working_papers/w21166/w21166.pdf)) | High days-to-cover predicts *lower* returns. The paper makes no squeeze claim | **survives** (opened) |
 | Barber & Odean (2008), *RFS* 21(2) ([PDF](https://faculty.haas.berkeley.edu/odean/papers/Attention/All%20that%20Glitters.pdf)); Barber, Huang, Odean, Schwarz (2022), *JF* ([10.1111/jofi.13183](https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.13183)); Barber, Lin, Odean (2023), *JFQA* | Retail buying of extreme-return, high-volume names is well documented and not profitable for the buyer | *contested*: the refutation concerned a citation and the fit, not the direction. It is used only as a prior on retail P&L, not as a strategy backtest |
-| Lou, Polk, Skouras (2019), "A Tug of War: Overnight versus Intraday Expected Returns", *JFE*; Akbas, Boehmer, Jiang, Koch (2022), *JFE* | Overnight and intraday legs behave asymmetrically, so a flat multi-session hold mixes two opposing effects | *contested*: the original citation pointed at a secondary summary. The corrected primaries still need a direct read (DOIs unverified). Evidence comes from large, liquid names |
+| Lou, Polk, Skouras (2019), "A tug of war: Overnight versus intraday expected returns", *JFE* 134(1):192-213 ([10.1016/j.jfineco.2019.03.011](https://doi.org/10.1016/j.jfineco.2019.03.011)); Akbas, Boehmer, Jiang, Koch (2022), "Overnight returns, daytime reversals, and future stock returns", *JFE* 145(3):850-875 ([10.1016/j.jfineco.2021.09.019](https://doi.org/10.1016/j.jfineco.2021.09.019)) | Overnight and intraday legs behave asymmetrically, so a flat multi-session hold mixes two opposing effects | *contested*: the original citation pointed at a secondary summary. Both DOIs resolve in Crossref (metadata checked 2026-09-24); the full texts still need a direct read. Evidence comes from large, liquid names |
 | Martineau (2022), *Critical Finance Review* 11:613-646, and the 2025 revival papers | Whether PEAD survives costs is unsettled | *contested*: deferred, not a v3 hypothesis |
 
 Repository evidence points the same way. #162's v1 has **no pass among 768 rule-exits**. All 704 with at least 200
 development trades have a negative mean net return. v2 has no pass across its 244 rule-exits (216 E, 16 F, 12 P).
 The broad-universe study (`blueprints/us-equities/broad-universe/README.md`) reports that its flags "find
 *volatility*, not direction".
+
+The sweep also stated that "squeezes are episodic, not a base rate". Its only source for that is an unverified S3
+Partners conference draft (EFMA 2025), not Hong et al., so v3 gives its squeeze test (H5-s) no directional prior.
 
 The literature is monthly, cross-sectional and mostly large-cap. Whether it carries over to catalyst-conditioned
 movers priced at $1 to $50 is what v3 tests; it is not an assumed result.
@@ -53,19 +59,35 @@ from `rules.py` by reference:
   `dollar_volume_at_t >= $1M`, with `price_at_t >= $1`. The entry is the first eligible quote at or after
   decision + 60 s.
 
+H1-H3 use no halt data. As in the catalyst experiment, a halt is never inferred from missing data: fills need an
+eligible quote, so a trade set never depends on a later halt-data purchase. Halt state enters only H4.
+
 The sweep's phrase "v1 lanes" mixes two protocols: the catalyst experiment's daily and intraday lanes, and #162's
 +20% grid. v3 settles this with D and I above. G = 0.20 and V = $1M are v1's loosest gain and middle volume floor,
 chosen for sample size. They were chosen after v1's dev/val results were seen, in which every cell is negative; the
 exposure registry records this.
 
-| H | Question | Entry | Exit arms | Sizing | Falsified if | Data |
+| H | Question | Entry | Exit arms | Sizing | Not supported if | Data |
 |---|---|---|---|---|---|---|
-| H1 | Does MAX (lottery) conditioning flip the sign? | D and I, with trailing MAX(21 sessions) terciles within each decision date as a covariate; no new thresholds | (a) exit at min(entry + 30 min, 15:55); (b) the lane horizon (D: 15:55 on the 5th session; I: entry + 60 min); (c) same-session 15:55 | 1x, equal notional, capacity-capped | high-MAX minus low-MAX cost-net mean for arm (b) is not negative at the corrected level; or no arm-by-tercile cell passes. A high-MAX outperformance rejects the reversal prior | **available now** (Alpaca SIP bars) |
+| H1 | Does MAX (lottery) conditioning flip the sign? | D and I, with MAX(21 sessions) terciles as a covariate. Breakpoints come from the same population's events in the prior 252 sessions, so they are known at the decision; no new thresholds | (a) exit at min(entry + 30 min, 15:55); (b) the lane horizon (D: 15:55 on the 5th session; I: entry + 60 min); (c) same-session 15:55 | 1x, equal notional, capacity-capped | not supported: the high-MAX minus low-MAX cost-net mean for arm (b) excludes a negative effect of the MDE size, and no arm-by-tercile cell passes. A high-MAX outperformance is outside the one-sided test and supports no claim | **available now** (Alpaca SIP bars) |
 | H2 | Do catalyst-verified moves beat pure attention spikes? | D and I, split by an 8-K Item 1.01 accepted before the decision (the existing `catalyst.py` contract) vs no qualifying filing | the lane horizon only | 1x | catalyst minus attention-only is not above 0 at the corrected level, or both groups fail | **available now** (SEC EDGAR, 10 req/s; SIP bars) |
-| H3 | Do the overnight and intraday legs differ? | D | (a) intraday only: enter at 09:35, exit at 15:55 the same session; (b) overnight only: enter at 15:55, exit at the first eligible quote after the next 09:30 open; (c) the 5-session hold split ex post into its legs (a diagnostic, not traded) | 1x. Arm (b) stays at 1x in any later paper use until the 2x rung and its overnight cap are clean | the legs do not differ at the corrected level, or neither traded arm passes | **available now** |
-| H4 | Does a halt-conditional exit beat ignoring the halt? | No new entry. Applies to every H1-H3 traded-arm trade that meets an LULD limit state or pause (not only passing arms, so that a no-pass outcome still leaves a sample) | (a) exit at the reopening print or the first post-reopen quote; (b) hold to the arm's horizon. No fills during a halt. Pause length is logged as a covariate, not a signal | inherits the parent arm | the (a) minus (b) difference fails the corrected level, or fewer than the minimum halted trades occur (then the halt state stays a safety rule only) | **gated** (Databento XNAS.ITCH status schema, paid; Nasdaq Trader history as a short pilot) |
-| H5 | Does days-to-cover crowding filter movers? | D split by days-to-cover tercile (short interest / ADV), using the latest FINRA figure published before the decision, with its settlement lag | the lane horizon | 1x; a filter, never a size input | primary: high minus low DTC is not negative. Secondary squeeze test: the high-DTC tercile does not beat the others | **gated** (FINRA short-interest access and terms) |
-| H6 | Engineering, not alpha: do broker-held exits match the client-side ratchet at fewer calls? | positions of the paper candidate, assigned to an arm by hash; no extra orders | (a) the current `exits.py` chain with cancel-then-new; (b) an Alpaca `trailing_stop` (trail_percent from `effective_trailing_bps` at entry) plus an OCO for the stop and take-profit legs. Time, risk-off, force and halt exits stay client-side | parent sizing, 1x | median exit slippage vs the same trigger reference differs by more than 25 bps (TOST); or paper partial-fill or trigger behaviour departs from the docs; or arm (b) does not use at least 2x fewer REST calls per closed trade | **available now** (Alpaca paper), after an adapter change |
+| H3 | Do the overnight and intraday legs differ? | D | (a) intraday only: enter at 09:35, exit at 15:55 the same session; (b) overnight only: enter at 15:55, exit at the first eligible quote after the next 09:30 open; (c) the 5-session hold split ex post into 4 overnight legs (official close to official open) and 4 intraday legs (official open to official close), comparing mean per-leg returns (a diagnostic, not traded) | 1x. Arm (b) stays at 1x in any later paper use until the 2x rung and its overnight cap are clean | not supported: the per-leg difference excludes the MDE, and neither traded arm passes | **available now** |
+| H4 | Does a halt-conditional exit beat ignoring the halt? | No new entry. Applies to every D and I lane-horizon (b_lane) trade, deduplicated by symbol, session and entry time, that meets a halt or, for a Nasdaq-listed name, an LULD pause (not only passing arms, so that a no-pass outcome still leaves a sample) | (a) exit at the reopening print or the first post-reopen quote; (b) hold to the lane horizon. No fills during a halt. Pause length is logged as a covariate, not a signal | inherits the parent arm | not supported: the (a) minus (b) difference excludes the MDE. Below the minimum halted trades it is underpowered. Either way the halt state stays a safety rule only | **gated** (Databento XNAS.ITCH status schema, paid, *contested*: corrected from raw ITCH messages to the normalized schema; Nasdaq Trader history as a short pilot) |
+| H5 | Does days-to-cover crowding filter movers? | D split by days-to-cover tercile (short interest / ADV; trailing 252-session breakpoints), using the latest FINRA figure published before the decision, with its settlement lag | the lane horizon | 1x; a filter, never a size input | primary: high minus low DTC excludes a negative effect of the MDE size. Secondary squeeze test (no sourced prior): the high-DTC tercile excludes an outperformance of the MDE size | **gated** (FINRA short-interest access and terms) |
+| H6 | Engineering, not alpha, in its own draft and two-test family: do broker-held exits match the client-side ratchet at fewer calls? | positions of the paper candidate, assigned to an arm by a hash of symbol, session and entry count, written to the ledger before the order is sent; no extra orders | (a) the current `exits.py` chain with cancel-then-new; (b) the quantity split into two tranches, each with exactly one broker-held closing order: an OCO (take-profit and stop) on the take-profit tranche and a `trailing_stop` (trail_percent from `effective_trailing_bps` at entry) on the rest. Time, risk-off, force and halt exits stay client-side | parent sizing, 1x | not supported: median exit slippage vs the same trigger reference is not shown equivalent within ±25 bps (TOST, 200 per arm per confirmatory stage); or paper partial-fill or trigger behaviour departs from the docs; or arm (b) does not use at least 2x fewer REST calls per closed trade | **available now** (Alpaca paper), after an adapter change |
+
+**Outcome labels.** Each test ends in one of three preregistered labels: *supported*; *not supported*, with the
+excluded effect size stated; or *underpowered*. At the minimum samples the detectable effects are 4-24% (the MDE table
+in the protocol draft), far above the literature's roughly 1% a month, so a miss on H1, H2 or H5 will most likely be
+labelled underpowered. v3 can detect only large mover-specific effects.
+
+**Exposure and chronology.** Development is 2017-2019, validation 2020, and the holdout is the first 252 sessions
+after the validation results are committed. The 2017-2020 windows are disjoint from #162's v1 and v2, but not
+unseen. The broad-universe study computed outcomes for 2017-2021 on a descriptive lane covering every name with a
+close of at least $1 and a median dollar volume of at least $2M. That lane is a superset of most of D and I. This
+plan's author also read its S2 volume-shock headline for that period. Development and validation are therefore
+**screening stages only**: validation decides which items the holdout opens for, and only the prospective holdout can
+support a confirmatory claim.
 
 H1 rests on BCW 2011 (**survives**) and the relative-volume/price-return ranking in
 `catalyst-experiment/protocol.json`, which is structurally a MAX-like selection. H2 rests on the Barber/Odean line
@@ -82,10 +104,13 @@ state, a 5-minute pause, and pauses in the last 10 minutes folding into the clos
 and the [Nasdaq Trader halt pages](https://www.nasdaqtrader.com/trader.aspx?id=TradeHalts) (**survives**; a web/RSS
 interface with a limited lookback, not a bulk archive).
 
-H5 rests on Hong et al. (**survives**). H6 rests on
+H5 rests on Hong et al. (**survives**) for H5-p only. H6 rests on
 [orders-at-alpaca](https://docs.alpaca.markets/docs/orders-at-alpaca). `trailing_stop` **survives**. The bracket
 proposal was *contested* and corrected to OCO: a bracket's take-profit closes the whole position, so it cannot
-express `take_profit_fraction` < 1.
+express `take_profit_fraction` < 1. The same page limits how legs combine: "Trailing stop orders are currently
+supported only with single orders", and "you would not be able to submit two conditional closing orders since
+Alpaca's system would view one of the two orders as exceeding the available position quantity". So a share can carry
+either a trailing stop or an OCO, never both.
 
 ## Data plan
 
@@ -93,9 +118,9 @@ express `take_profit_fraction` < 1.
 |---|---|---|---|
 | PIT daily and minute SIP bars, official prices, corporate actions (H1-H3, H6) | Alpaca market data (SIP), already entitled; used by `broad-universe` and `extreme-gainer-audit` | **available** (daily bars from 2016-01-04, minute bars from 2016-01-01) | private hashed snapshots. Before 2020, survivorship is limited (`broad-universe/README.md`), so results for 2017-2019 carry that label |
 | 8-K Item 1.01 acceptance times (H2) | SEC EDGAR through the catalyst-provenance and catalyst-dataset recipes | **available** | acceptance must precede the decision, with zero late-source leakage |
-| Shares outstanding and public float (screen only) | [SEC XBRL frames](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) | **available** as a screen (*contested*: one misattributed source corrected) | frames returns the latest filed fact with no accession, so a name that clears the screen must be confirmed from companyfacts' dated per-accession fact |
-| Historical halt, LULD and status events (H4, halt fidelity in simulation) | Databento XNAS.ITCH normalized status schema (`databento/dbn`, Apache-2.0), cross-checked against the Nasdaq Trader halt history | **gated on paid data the user must buy** (Databento is metered). A free short-window pilot is possible | get a `Historical.metadata.get_cost` quote for one symbol-year; confirm the coverage start and the licence. ITCH covers Nasdaq-listed names only |
-| Survivorship-free delisted history before 2020 | Norgate Data US Platinum ([prices](https://norgatedata.com/prices.php)) vs the in-repo SEC Form-25 proxy | **gated on paid data the user must buy** | read the EULA's derived-data terms and what happens when the subscription lapses. Compare only |
+| Shares outstanding and public float (screen only) | [SEC XBRL frames](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) | **available** as a screen (*contested*: one misattributed source corrected) | frames give one last-filed value per entity. Each row carries `accn` but no filed date, and superseded vintages are absent. A name that clears the screen must be confirmed from companyfacts (or submissions by `accn`) for the filed date and the original vintage before the float counts as point-in-time |
+| Historical halt, LULD and status events (H4, halt fidelity in simulation) | Databento XNAS.ITCH normalized status schema (`databento/dbn`, Apache-2.0; *contested*: corrected from raw ITCH H/h/J messages to the normalized schema), cross-checked against the Nasdaq Trader halt history | **gated on paid data the user must buy** (Databento is metered). A free short-window pilot is possible | get a `Historical.metadata.get_cost` quote for one symbol-year; confirm the coverage start and the licence. Per the TotalView-ITCH 5.0 spec, halt and resume state (H, Q, T) covers every security traded on the Nasdaq execution system, including other exchanges' listings; the LULD pause state (P) and the auction collar (J) are for Nasdaq-listed names only, and a pause in another listing appears as a halt |
+| Survivorship-free delisted history before 2020 | Norgate Data US Platinum ([prices](https://norgatedata.com/prices.php); *contested*: facts confirmed, but not new, since it is already named in `catalogs/sota-convergence/manifest-20260923.json`) vs the in-repo SEC Form-25 proxy | **gated on paid data the user must buy** | read the EULA's derived-data terms and what happens when the subscription lapses. Compare only |
 | Short interest (H5) | FINRA consolidated short interest (`blueprints/us-equities/acceptance-wave/factors-regimes.md`) | **gated** on access and terms the user must establish | model the publication and settlement lag; a bi-monthly overlay only |
 | Order latency and fill agreement | Alpaca paper `trade_updates` timestamps plus `x-ratelimit-*` headers | **available** (paper) | probe orders come out of the 20-call management reserve and are labelled as measurement |
 | Earnings surprise (deferred lane) | Benzinga via Alpaca news, or a licensed calendar with revision history | gated on paid data; **not a v3 priority** | PEAD after costs is contested |
@@ -104,12 +129,15 @@ express `take_profit_fraction` < 1.
 
 **Exits are deterministic and preregistered, and each sits at the cheapest correct layer.**
 
-1. **Broker-held legs handle price triggers where the semantics fit.** For a position already held, an OCO carries
-   the stop-loss and take-profit legs. A bracket is used only when both legs close the whole position. An Alpaca
-   `trailing_stop` with `trail_percent` replaces the client-side cancel-and-resubmit ratchet. Its percentage is sized
-   from `effective_trailing_bps` at entry and re-armed only on a fixed schedule. A partial take-profit becomes
-   separate tranches, each with its own OCO. Paper-fill semantics for these order classes are undocumented, and H6
-   measures them before anything relies on them.
+1. **Broker-held legs handle price triggers where the semantics fit, with at most one closing order per share.**
+   Alpaca rejects a second conditional closing order on the same shares, and a `trailing_stop` cannot be an OCO or
+   bracket leg (both quoted above). So the position is split into tranches, and each tranche carries exactly one
+   broker-held order. The take-profit tranche carries an OCO (stop-loss and take-profit). The rest carries an Alpaca
+   `trailing_stop` with `trail_percent`, which replaces the client-side cancel-and-resubmit ratchet and is that
+   tranche's only stop. Its percentage is sized from `effective_trailing_bps` at entry and re-armed only on a fixed
+   schedule. A bracket is used only for a new entry whose two legs close the whole position. The docs define these
+   order classes, but Alpaca's simulated paper fills for them (partials, trigger price, trigger reference) are
+   unmeasured. H6 measures them before anything relies on them.
 2. **Client-side rules keep everything that depends on state**, in the existing precedence: force_exit, risk_off,
    halt state, quote_stale, price rules, time_exit. Gap risk stays in `native_strategy.evaluate_gap_risk`. A
    client-side exit first cancels that position's broker-held legs. Cancel-then-new stays the default because of the
@@ -271,10 +299,14 @@ The sweep's catalog actions are dated records in
 [`catalogs/us-equities/mover-v3-sweep-20260924.json`](../../../catalogs/us-equities/mover-v3-sweep-20260924.json):
 
 - **Registered with the decision index** (`python3 scripts/catalog_decisions.py --write --supplement
-  catalogs/us-equities/mover-v3-sweep-20260924.json#/repository_decisions`): the records that name a GitHub
+  catalogs/us-equities/mover-v3-sweep-20260924.json#/repository_decisions`): every record that names a GitHub
   repository (`alpacahq/alpaca-py`, `databento/dbn`, `nkaz001/hftbacktest`, `cvxgrp/kelly_code`,
-  `microsoft/RD-Agent`, `microsoft/qlib`, `polakowo/vectorbt`). Every one of these repositories was already in the
-  union, so the repository count is unchanged.
+  `microsoft/RD-Agent`, `microsoft/qlib`, `polakowo/vectorbt`, `mementum/backtrader`), with one intentional
+  exception below. Every registered repository was already in the union, so the repository count is unchanged.
+- **Intentionally not registered:** the no-change record for `VladPetrariu/Qullamaggie-breakout-scanner`. The scanner
+  is absent from the union, and registering a duplicate that is not adopted would add a new identity to the grand
+  union and to the token-native saturation audit's identity partition, for no decision value. The record stays in
+  `/non_repository_decisions` so the next sweep still finds it.
 - **Kept as data in the same file** (`/non_repository_decisions`): papers, broker APIs, SEC/Nasdaq pages and data
   vendors. The union accepts only repository records.
 
@@ -308,7 +340,7 @@ into another:
 | order-action-budget-arithmetic (as a catalog artifact) | a duplicate; its arithmetic (corrected) is used directly in the table above |
 | pead-cost-adjusted-contested (as a v3 hypothesis) | wrong journal cited (pii S0148619524000584 is the *Journal of Economics and Business*); the evidence is unsettled |
 | p6-oto-single-leg-order | folded into the OCO/trailing path; the savings are marginal |
-| qullamaggie-breakout-scanner (as a new entry) | duplicates the catalogued `tradermonty/claude-trading-skills` vcp-screener; recorded as no-change |
+| qullamaggie-breakout-scanner (as a new entry) | duplicates the catalogued `tradermonty/claude-trading-skills` vcp-screener; recorded as no-change (not registered; see Catalog decisions) |
 
 ## Open questions
 
@@ -316,8 +348,10 @@ into another:
   the docs? H6 depends on it.
 - Does paper `x-ratelimit-limit` ever show an upgraded tier, and can a higher tier be qualified in paper at all?
 - Are IOC and FOK supported on the Nautilus/`native_adapter` path, and are IOC semantics in Alpaca paper documented?
-- Can SIP trade and quote conditions rebuild historical halts and LULD states, or is XNAS.ITCH (Nasdaq only) plus an
-  NYSE feed required? What are the cost and the coverage start?
+- Can SIP trade and quote conditions rebuild historical halts and LULD states? XNAS.ITCH carries halt state for every
+  Nasdaq-traded security but distinguishes an LULD pause only for Nasdaq-listed names. Is another venue's feed needed
+  to separate pauses from halts in NYSE-listed names, or is H4's pause stratum restricted to Nasdaq listings? What are
+  the cost and the coverage start?
 - Should v3 add a short side for the MAX-reversal prior? Borrow, hard-to-borrow fees and SEC Rule 201 were not
   examined.
 - Do latency probes (unfillable, then cancelled) comply with the engine's no-manufactured-trades rule? This needs an
@@ -336,5 +370,8 @@ into another:
 - a development-only cost re-measure for 2017-2019 and fee rates dated for 2017-2020;
 - metadata-only coverage checks for H4 and H5;
 - study code committed with synthetic tests before any outcome is computed.
+
+H6 has its own preconditions in `h6-execution-parity-draft.json`, including a test that one share never carries two
+closing orders.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

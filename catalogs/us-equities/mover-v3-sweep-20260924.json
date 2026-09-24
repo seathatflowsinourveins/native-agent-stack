@@ -15,7 +15,8 @@
     "live_repository_metadata": "a live GitHub API recheck of push date, licence and archive state",
     "existing_record": "already recorded elsewhere in this repository with equal or stronger evidence"
   },
-  "registration": "Only /repository_decisions is registered with the decision index (python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/mover-v3-sweep-20260924.json#/repository_decisions), because the union accepts only records that name a GitHub repository. /non_repository_decisions holds the papers, APIs, exchange pages and vendors as data.",
+  "registration": "Only /repository_decisions is registered with the decision index (python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/mover-v3-sweep-20260924.json#/repository_decisions), because the union accepts only records that name a GitHub repository. Every record that names a GitHub repository is in /repository_decisions, including the no-change duplicate mementum/backtrader, with one intentional exception: the no-change record for VladPetrariu/Qullamaggie-breakout-scanner (mover-v3-qullamaggie-scanner-no-change) stays in /non_repository_decisions, because the scanner is absent from the union and registering a non-adopted duplicate would add a new identity to the grand union and the token-native saturation audit partition for no decision value. Every registered repository was already in the union, so the repository count is unchanged. /non_repository_decisions holds the papers, APIs, exchange pages and vendors as data.",
+  "revised_at": "2026-09-24 review fix round, rebased on main aa6fc791bbd4af3499317673989d2e90a522c257 (PR #162 merged)",
   "repository_decisions": [
     {
       "id": "mover-v3-alpaca-py-order-classes",
@@ -24,7 +25,8 @@
       "decision": "add_execution_method_candidate",
       "sweep_status": "trailing_stop and DELETE /v2/orders survive; bracket contested and corrected to OCO for a held position; OTO folded into the OCO/trailing path",
       "evidence_level": "official_docs_metadata",
-      "native_execution": "none; Alpaca paper semantics for trailing_stop, OCO and bracket are undocumented and are what H6 measures",
+      "native_execution": "none; Alpaca's simulated paper fills for trailing_stop, OCO and bracket (partials, trigger price, trigger reference) are unmeasured and are what the H6 engineering draft measures",
+      "documented_constraints": "orders-at-alpaca, read 2026-09-24: 'Trailing stop orders are currently supported only with single orders. However, we plan to support trailing stop as the stop loss leg of bracket/OCO orders in the future.' and 'you would not be able to submit two conditional closing orders since Alpaca's system would view one of the two orders as exceeding the available position quantity'. Each share therefore carries at most one broker-held closing order: a trailing_stop alone or an OCO alone, per quantity tranche.",
       "reason": "The SDK path to the broker-held exit order classes and single-call cancel-all that the v3 exit policy needs. native_adapter.py builds only LIMIT/DAY orders and cancels in a per-order loop today. A verifier named TradingClient.cancel_orders() as the SDK method for DELETE /v2/orders; that method was not source-read in this record.",
       "links": ["mover-v3-alpaca-order-classes", "mover-v3-alpaca-cancel-all"],
       "sources": [
@@ -40,7 +42,7 @@
       "sweep_status": "contested: corrected from raw ITCH H/h/J messages to Databento's normalized status schema",
       "evidence_level": "unpinned_source_read",
       "native_execution": "none; the cost quote and XNAS.ITCH coverage start are unverified",
-      "reason": "Candidate source for historical halt and LULD state (H4 and simulation halt fidelity), closing the open item in evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/README.md. ITCH covers Nasdaq-listed names only. The existing pinned record in catalogs/us-equities/architecture/trading.json is unchanged; access goes through databento/databento-python (already conditional), whose Historical.metadata.get_cost gives the quote.",
+      "reason": "Candidate source for historical halt and LULD state (H4 and simulation halt fidelity), closing the open item in evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/README.md. Per the TotalView-ITCH 5.0 specification (section 1.2.2, read 2026-09-24), ITCH covers 'all exchange-listed equities securities traded via the Nasdaq execution system': halt and resume state (H, Q, T) is available for every Nasdaq-traded security, while the LULD pause state (P, 'Nasdaq-listed securities only') and the J auction collar are Nasdaq-listed only, and a pause in another listing is 'treated simply as a halt'. The existing pinned record in catalogs/us-equities/architecture/trading.json is unchanged; access goes through databento/databento-python (already conditional), whose Historical.metadata.get_cost gives the quote.",
       "sources": [
         "https://databento.com/docs/venues-and-datasets/xnas-itch",
         "https://github.com/databento/dbn/blob/main/rust/dbn/src/record.rs",
@@ -114,6 +116,19 @@
       "sources": [
         "https://github.com/polakowo/vectorbt"
       ]
+    },
+    {
+      "id": "mover-v3-backtrader-no-change",
+      "repository": "https://github.com/mementum/backtrader",
+      "catalog_action": "no-change",
+      "decision": "no_change_duplicate_of_catalog",
+      "sweep_status": "killed: backtrader-family-closed duplicates the catalog",
+      "evidence_level": "live_repository_metadata",
+      "native_execution": "none",
+      "reason": "Already catalogued. Recorded so the next sweep does not re-search it: GPL-3.0, last push 2024-08-19.",
+      "sources": [
+        "https://github.com/mementum/backtrader"
+      ]
     }
   ],
   "non_repository_decisions": [
@@ -137,10 +152,12 @@
       "sweep_status": "contested: the original citation was a secondary Lachance (2023) summary; the substance was not refuted",
       "evidence_level": "literature_metadata",
       "native_execution": "none",
-      "reason": "The corrected primaries replace the secondary summary. Both still need a direct read (DOIs unverified). Evidence comes from large, liquid names.",
+      "reason": "The corrected primaries replace the secondary summary: Lou, Polk, Skouras, 'A tug of war: Overnight versus intraday expected returns', JFE 134(1):192-213 (2019); Akbas, Boehmer, Jiang, Koch, 'Overnight returns, daytime reversals, and future stock returns', JFE 145(3):850-875 (2022). Both DOIs resolved in Crossref metadata on 2026-09-24; neither full text was read. The sweep's original source, Lachance (2023), Review of Financial Economics, doi 10.1002/rfe.1180, is a secondary summary, kept only as the refuted original citation and not as evidence. Evidence comes from large, liquid names.",
       "sources": [
-        "https://onlinelibrary.wiley.com/doi/full/10.1002/rfe.1180"
-      ]
+        "https://doi.org/10.1016/j.jfineco.2019.03.011",
+        "https://doi.org/10.1016/j.jfineco.2021.09.019"
+      ],
+      "refuted_original_citation": "https://onlinelibrary.wiley.com/doi/full/10.1002/rfe.1180"
     },
     {
       "id": "mover-v3-attention-buying",
@@ -163,7 +180,7 @@
       "sweep_status": "survives",
       "evidence_level": "literature_source_review",
       "native_execution": "none",
-      "reason": "Days to cover beats the raw short ratio, and high days to cover predicts lower returns. Squeezes are episodic. Bi-monthly publication makes it an overlay only.",
+      "reason": "Days to cover beats the raw short ratio, and high days to cover predicts lower returns. The paper makes no squeeze claim: the sweep's 'squeezes are episodic, not a base rate' came from an unverified S3 Partners EFMA 2025 conference draft, which is not recorded as evidence here, so the H5 squeeze test has no sourced prior. Bi-monthly publication makes it an overlay only.",
       "sources": [
         "https://www.nber.org/system/files/working_papers/w21166/w21166.pdf"
       ]
@@ -175,7 +192,7 @@
       "sweep_status": "trailing_stop survives; bracket contested and corrected to OCO for a held position (a bracket's take-profit closes the whole position); OTO folded",
       "evidence_level": "official_docs_metadata",
       "native_execution": "none; native paper execution is missing (H6)",
-      "reason": "Broker-held legs replace the client-side cancel-and-resubmit ratchet and cost no further calls when they fill.",
+      "reason": "Broker-held legs replace the client-side cancel-and-resubmit ratchet and cost no further calls when they fill. Documented constraint: a trailing_stop is supported only as a single order, and a second conditional closing order on the same shares is rejected as exceeding the available quantity, so each quantity tranche carries either one trailing_stop or one OCO.",
       "sources": [
         "https://docs.alpaca.markets/docs/orders-at-alpaca"
       ]
@@ -228,7 +245,7 @@
       "sweep_status": "contested: one misattributed source corrected; the claim stands",
       "evidence_level": "official_docs_metadata",
       "native_execution": "none",
-      "reason": "Public domain, 10 req/s. Frames returns the latest filed fact with no accession ID, so a name that clears the screen must be confirmed from companyfacts' dated per-accession fact before the float counts as point-in-time.",
+      "reason": "Public domain, 10 req/s. Frames give one last-filed value per entity for the requested period; each row carries accn, cik, entityName, loc, end and val (checked on a live frames response on 2026-09-24) but no filed date, and superseded vintages are absent. A name that clears the screen must be confirmed from companyfacts (or submissions by accn) for the filed date and the original vintage before the float counts as point-in-time.",
       "sources": [
         "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
         "https://www.sec.gov/os/webmaster-faq"
@@ -286,16 +303,16 @@
       ]
     },
     {
-      "id": "mover-v3-no-change-duplicates",
-      "item": "Qullamaggie breakout scanner (duplicates the catalogued tradermonty/claude-trading-skills vcp-screener) and the backtrader family",
+      "id": "mover-v3-qullamaggie-scanner-no-change",
+      "item": "VladPetrariu/Qullamaggie-breakout-scanner (https://github.com/VladPetrariu/Qullamaggie-breakout-scanner), a duplicate of the catalogued tradermonty/claude-trading-skills vcp-screener",
       "catalog_action": "no-change",
-      "sweep_status": "scanner contested (duplicate); backtrader-family-closed killed (duplicates the catalog)",
+      "decision": "no_change_duplicate_not_adopted",
+      "sweep_status": "contested: duplicates the catalogued tradermonty/claude-trading-skills vcp-screener",
       "evidence_level": "live_repository_metadata",
       "native_execution": "none",
-      "reason": "Recorded so the next sweep does not re-search them. The scanner is a single-maintainer, yfinance-only project (MIT, pushed 2026-09-16); only its feature vocabulary is of interest, and it is already covered. backtrader: GPL-3.0, last push 2024-08-19.",
+      "reason": "Recorded so the next sweep does not re-search it; not adopted and not a candidate. A single-maintainer, yfinance-only project (MIT, pushed 2026-09-16); only its feature vocabulary is of interest, and that is already covered. Intentionally not registered in the decision index: it is the only repository-naming record here that is absent from the union, and registering a non-adopted duplicate would add a new identity to the grand union and to the token-native saturation audit's identity partition for no decision value.",
       "sources": [
-        "https://github.com/VladPetrariu/Qullamaggie-breakout-scanner",
-        "https://github.com/mementum/backtrader"
+        "https://github.com/VladPetrariu/Qullamaggie-breakout-scanner"
       ]
     },
     {

@@ -386,7 +386,7 @@
     "repositories": 844,
     "public_star_repositories": 342,
     "beyond_public_stars": 502,
-    "references": 1968,
+    "references": 1969,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
@@ -12035,6 +12035,14 @@
           "id": "backtrader",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/7",
+          "id": "mover-v3-backtrader-no-change",
+          "decision": "no_change_duplicate_of_catalog",
+          "evidence_level": "live_repository_metadata"
         }
       ]
     },

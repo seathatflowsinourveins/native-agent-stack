@@ -5,9 +5,11 @@
   "status": "draft_pending_independent_pre_outcome_review",
   "frozen_before_outcomes": false,
   "drafted_at": "2026-09-24",
-  "base_commit": "4a4c8a285630412ecfa8715c290a1e049ed03cb2",
+  "revised_at": "2026-09-24 (review fix round: exposure registry, H6 moved to its own engineering draft, trailing breakpoints, three-outcome reporting, leg-matched H3-c, halt-free H1-H3, H4 parent set, cost lookup pins, repin to merged #162)",
+  "base_commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
   "plan": "blueprints/us-equities/mover-v3/README.md",
   "catalog_decisions": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+  "engineering_protocol": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
   "evidence_class": "Literature and metadata evidence, plus unpinned source reads, from a read-only sweep on 2026-09-24 (5 angles, 37 items; 5 survive, 24 contested, 8 killed). No native execution, no market data fetched and no outcome computed. Not a frozen protocol: no window named here may be read for outcomes until status is frozen under freeze_preconditions.",
   "sweep_input": {
     "sha256": "e2120c0578dd02c9784c0abcd0af89e5e61d3dfb004a9bed55d278891b8764d1",
@@ -15,31 +17,40 @@
     "publication": "private scratch input, not committed: its verifier notes contain host paths. The README and the catalog supplement carry its content."
   },
   "relation_to_prior_protocols": {
-    "mover-early-entry-v1-20260924": "PR #162 (open). 0 of 768 rule-exits pass development; the holdout was not read. Reused by reference only, pinned to commit 92062e8: rules.py definitions (ref, price_at_t, dollar_volume_at_t, gain_at_t, official prices, split factor), quotes.py cost-sample method and evidence/cost-table-run-v1.json. v3 never modifies blueprints/us-equities/mover-early-entry/**.",
-    "mover-followup-v2-20260924": "PR #162, commit 92062e8: no pass in families E (216), F (16) or P (12); no holdout read. Not reused.",
-    "catalyst-experiment-v1-20260920": "Its lane timing (16:15 decision, 09:35 entry, +60 s minimum latency, 5-session and 60-minute horizons) and the catalyst.py Item 1.01 contract are reused by reference. Its 2021Q1 ETF control is permanently inspected and is never a holdout.",
-    "broad-universe-mover-v1-20260921": "Different population (close >= $5, median dollar volume >= $20M). Its evaluated segments are named in exposure_registry."
+    "mover-early-entry-v1-20260924": "PR #162, merged to main on 2026-09-24 as squash commit aa6fc79. 0 of 768 rule-exits pass development; the holdout was not read. Reused by reference only, pinned to main at aa6fc79 (paths under blueprints/us-equities/mover-early-entry/): rules.py (git blob 9be164c9e1a49a451d3a2381205349ed5003a993, sha256 d66156b3e57c6299f10e41a3f25c921c8be52571bd84417040190d926bf49450; definitions ref, price_at_t, dollar_volume_at_t, gain_at_t, official prices, split factor), quotes.py (git blob caebf6f6a72fee6bb7ae637ebb698f8c5f6b3850, sha256 4116bf2809e0952f842f0e0fe35fd8b5ab11ea295637734ffe0d719ca72ee85e; the cost-sample method including the D7 stamp-window guard: a completion is reused only for the same timestamp, and the table refuses quotes outside [ts - 60 s, ts]) and evidence/cost-table-run-v1.json (hashes under cost_model.base_table). The draft's earlier pin 92062e8 is reachable only from the PR branch, and its quotes.py lacks the D7 guard. v3 never modifies blueprints/us-equities/mover-early-entry/**.",
+    "mover-followup-v2-20260924": "PR #162 at aa6fc79: no pass in families E (216), F (16) or P (12); no holdout read. After deviation D7 (P exits across splits and ex-dividend dates), the v2 results sha256 is 75a5004b... (README and deviations.json at aa6fc79). Not reused.",
+    "catalyst-experiment-v1-20260920": "Its lane timing (16:15 decision, 09:35 entry, +60 s minimum latency, 5-session and 60-minute horizons) and the catalyst.py Item 1.01 contract are reused by reference, as is its rule 'Do not infer a halt from missing data'. Its 2021Q1 ETF control is permanently inspected and is never a holdout.",
+    "broad-universe-mover-v1-20260921": "Main universe close >= $5 and median dollar volume >= $20M, plus a descriptive lane on the unrestricted $1 / $2M universe (protocol.json descriptive_microcap_lane; evaluation-results.json calls it a strict superset of the main universe). Both lanes computed outcomes over development 2017-2021, validation 2022-2023 and reserved 2024-01-01 to 2026-08-14. Most D-population symbol-sessions with median dollar volume >= $2M lie inside that lane, so 2017-2020 is exposed at aggregate level (exposure_registry)."
   },
-  "question": "Among US-equity extreme movers, which conditioning (MAX lottery demand, catalyst versus attention, overnight versus intraday leg, halt state, days-to-cover crowding) changes the sign or size of the cost-net forward return, and can broker-held exits match client-side exits at fewer API calls? Continuation is one tested outcome, not the premise.",
+  "question": "Among US-equity extreme movers, which conditioning (MAX lottery demand, catalyst versus attention, overnight versus intraday leg, halt state, days-to-cover crowding) changes the sign or size of the cost-net forward return? Continuation is one tested outcome, not the premise. Whether broker-held exits match client-side exits at fewer API calls is a separate engineering question (engineering_protocol).",
   "direction": "long only (a short side for the MAX-reversal prior is an open question; borrow, hard-to-borrow fees and SEC Rule 201 were not examined)",
   "exposure_registry": {
     "already_looked_at": [
       {"window": ["2021-01-04", "2023-12-29"], "what": "mover-early-entry v1 and v2 development outcomes (1,012 rule-exits) on the +20% candidate universe; the v1 cost table's quote sample was drawn from these development sessions"},
       {"window": ["2024-01-02", "2025-12-31"], "what": "mover-early-entry v1 and v2 validation outcomes"},
       {"window": ["2026-01-02", "2026-09-18"], "what": "the reserved holdout of mover-early-entry v1/v2, unread by #162 and owned by it. It is also exposed at event level: extreme-gainer-audit computed T+1/T+5/T+20 forward returns for 957 package events from 2021 to September 2026. v3 excludes this window."},
-      {"window": ["2017-01-01", "2026-08-14"], "what": "broad-universe-mover-v1: development 2017-2021, validation 2022-2023 and reserved 2024-01-01 to 2026-08-14 were evaluated for daily signals on the close >= $5, median dollar volume >= $20M universe, including +20% one-day labels. Only liquid names overlap with the v3 population."},
+      {"window": ["2017-01-01", "2021-12-31"], "what": "broad-universe-mover-v1 development segment, computed on two lanes: the main universe (close >= $5, median dollar volume >= $20M) and the descriptive lane on the unrestricted close >= $1, median dollar volume >= $2M universe (a strict superset of the main universe; receipt.json reports its development outcomes, for example 4,563,385 C0 H1 events). Outcomes include +20% one-day labels and S2 volume-shock continuation (r1 >= 5%, dv >= 3 x med20, clv >= 0.5), a superset of D's same-session arm on names with median dollar volume >= $2M. This covers all of v3 development (2017-2019) and validation (2020) at aggregate level."},
+      {"window": ["2022-01-01", "2026-08-14"], "what": "broad-universe-mover-v1 validation 2022-2023 and reserved 2024-01-01 to 2026-08-14, both lanes"},
       {"window": ["2019-12-02", "2020-04-30"], "what": "historical-simulation: six LEAN margin-stress scenarios on bundled SPY history; no mover-population outcome"},
       {"window": ["2021-01-01", "2021-03-31"], "what": "catalyst-experiment 2021Q1 ETF control, permanently inspected"},
       {"window": "2020 and 2022 single-name samples", "what": "LEAN/AAPL 2020, FB/META 2022, SPY parity and corporate-action diagnostics; engine and data checks, not mover outcomes"}
     ],
-    "draft_author_exposure": "Before this draft the author read: #162's README results and v1 dev/val summary aggregates (per-rule means; P5/P95 of the 07:00|G0.20|V1000000 rule-exits, used only for sigma planning below); the v1 cost-table cells; the #162 review findings; the broad-universe README headlines; the sweep. No 2017-2020 mover-population outcome, and no halt, short-interest or MAX statistic for any window, has been computed or seen.",
-    "update_rule": "Every later read of data in any v3 window, before the freeze, is appended here with its date and purpose. A read of outcomes in a v3 validation or holdout window before the freeze voids that window."
+    "draft_author_exposure": "Before this draft the author read: #162's README results and v1 dev/val summary aggregates (per-rule means; P5/P95 of the 07:00|G0.20|V1000000 rule-exits, used only for sigma planning below); the v1 cost-table cells; the #162 review findings; the broad-universe README headlines, including the development | validation | reserved table of date-clustered mean net excess over C0 for S1-S5 at H1/H5/H20 (for example S2 H1 development -0.33%, 2017-2021, main universe) and its reserved-segment precision and recall for +10% and +20% next-day movers; the sweep. The review fix round (same day) reread broad-universe protocol.json (lane definitions), evaluation-results.json's descriptive_microcap_scope note and the same README table, and opened no descriptive-lane outcome row; the 4,563,385 event count above is a count quoted from the review finding, not a return. No v3-defined statistic (a D or I outcome, a MAX, halt or short-interest tercile) has been computed or seen for any window.",
+    "consequence": "2017-2020 is exposed at aggregate level through broad-universe development (both lanes) and the S2 headline above. v3 therefore treats development (2017-2019) and validation (2020) as screening stages only. Validation still decides which items the holdout gate opens for, but a validation pass is labelled 'screened', never confirmatory. Only the prospective holdout can support a confirmatory claim. A validation-window statistic restricted to names that lane never covered (20-session median dollar volume < $2M at the decision) is reported beside each validation result as the least-exposed slice; it is a sensitivity, not a separate test.",
+    "update_rule": "Every later read of data in any v3 window, before the freeze, is appended here with its date and purpose. A read of v3-defined outcomes in the validation window before the freeze voids validation; a read in the holdout window before the gate opens voids the holdout."
   },
   "populations": {
     "D_daily": "symbol-sessions t with split-consistent official-close gain close[t]/ref - 1 >= 0.20, official close >= $1.00 and completed regular-session dollar volume >= $1,000,000; decision at 16:15 ET on t; entry at the first eligible quote at or after 09:35 ET on t+1 and at or after decision + 60 s; entry timeout 300 s, else no entry (counted)",
-    "I_intraday": "the first minute m in 09:35-10:30 ET on a session at which gain_at_t >= 0.20, dollar_volume_at_t >= $1,000,000 and price_at_t >= $1.00 (rules.py definitions at 92062e8); entry at the first eligible quote at or after m + 60 s; timeout 60 s",
-    "exclusions": "OTC; warrants, units and rights by #162's regex; a known halt at decision time blocks entry (as catalyst-experiment); symbols with fewer than 21 prior sessions of bars",
+    "I_intraday": "the first minute m in 09:35-10:30 ET on a session at which gain_at_t >= 0.20, dollar_volume_at_t >= $1,000,000 and price_at_t >= $1.00 (rules.py definitions at aa6fc79); entry at the first eligible quote at or after m + 60 s; timeout 60 s",
+    "exclusions": "OTC; warrants, units and rights by #162's regex; symbols with fewer than 21 prior sessions of bars. No halt exclusion: H1-H3 use no halt data (see halts).",
+    "halts": "H1-H3 use no halt source, historically or prospectively, so their trade sets cannot depend on a later data purchase. As in catalyst-experiment, a halt is never inferred from missing data: an entry or exit fills only at an eligible quote (bid > 0, ask >= bid, quote age <= 1000 ms), an entry without one inside its timeout is a counted no-entry, and an exit without one waits for the next eligible quote. Limitation: a trade that sits through an unobserved halt is not flagged, and a fill at the first post-halt quote is not distinguished from a normal fill. Halt state enters only H4, as an overlay on already-defined trades.",
     "parameter_provenance": "G = 0.20 and V = $1M are v1's loosest gain and middle volume floor, fixed for sample size after v1's all-negative dev/val grid was seen (disclosed exposure). They are not tuned on any v3 window."
+  },
+  "tercile_rule": {
+    "breakpoints": "For a covariate X (MAX21 in H1, DTC in H5) and a population P, the breakpoints for an event decided in session s are the 1/3 and 2/3 empirical quantiles (numpy 'linear' method) of X over all P events whose decision session lies in the 252 sessions strictly before s. Every input is known at the decision, including for I, whose later same-morning triggers are never used.",
+    "assignment": "low if X <= the 1/3 breakpoint, high if X > the 2/3 breakpoint, middle otherwise (a value equal to a breakpoint goes to the lower tercile)",
+    "minimum": "if fewer than 60 prior P events lie in the trailing window, the event is unassigned: it is counted and reported, and it enters no tercile cell or difference test. The 2016 warm-up year supplies the first window.",
+    "small_dates": "Terciles never depend on the number of movers on the event's own date, so a date with fewer than 3 movers needs no special rule."
   },
   "chronology": {
     "warmup": ["2016-01-04", "2016-12-30"],
@@ -47,16 +58,25 @@
     "validation": ["2020-01-02", "2020-12-31"],
     "holdout": {
       "kind": "prospective",
-      "window": "the first 252 full NYSE sessions strictly after the session in which the frozen protocol commit is pushed",
+      "window": "the first 252 full NYSE sessions strictly after the session in which the validation results file's sha256 is committed and pushed (which follows the freeze)",
       "extension": "if any holdout-eligible item has fewer than its minimum holdout trades, extend in 63-session blocks, at most 2, decided on trade counts alone with outcome labels uncomputed",
-      "why_prospective": "No retrospective window disjoint from v1/v2 remains: 2021-2025 is v1/v2 dev/val, 2026-01-02 to 2026-09-18 is #162's reserved holdout and is event-level exposed, and 2016 is warm-up."
+      "why_prospective": "No retrospective window free of prior mover outcomes remains: 2021-2025 is v1/v2 dev/val, 2026-01-02 to 2026-09-18 is #162's reserved holdout and is event-level exposed, 2017-2026-08-14 is broad-universe exposed at aggregate level, and 2016 is warm-up.",
+      "accrual_exposure": "Any paper operation that trades mover positions during the holdout window (including the mechanics-only positions of the engineering protocol) logs, per collection batch, which symbol-sessions it traded and whether their P&L was seen. Those symbol-sessions are then excluded from the holdout sample for every item, and the count is reported."
     },
     "labels": {
-      "development": "disjoint from v1/v2; overlaps broad-universe development for liquid names; survivorship-limited before 2020 (names delisted in 2016-2019 without a retained corporate action cannot be discovered)",
-      "validation": "disjoint from v1/v2; overlaps broad-universe development for liquid names; the 2020 COVID regime is reported separately and never dropped",
-      "holdout": "untouched by construction"
+      "development": "disjoint from v1/v2; exposed at aggregate level through broad-universe development (both lanes, 2017-2021); screening only; survivorship-limited before 2020 (names delisted in 2016-2019 without a retained corporate action cannot be discovered)",
+      "validation": "disjoint from v1/v2; exposed at aggregate level through broad-universe development (both lanes include 2020) and the S2 headline the author read; screening only, never confirmatory; the 2020 COVID regime is reported separately and never dropped",
+      "holdout": "prospective; untouched only if the validation results sha256 was pushed before its first session, no read preceded a committed granted access-log entry, and accrual exposure was logged and excluded as above"
     },
-    "boundaries": "Segments are assigned by entry session. A trade whose exit crosses a segment end is censored and counted. Multi-session arms leave a 6-session gap at each boundary."
+    "boundaries": "Segments are assigned by entry session. A trade whose exit crosses a segment end is censored and counted in the earlier segment. For multi-session arms, the later segment gives up its first 6 sessions as entry sessions (an embargo after the censored crossing trades); same-session arms need no gap."
+  },
+  "outcome_reporting": {
+    "labels": {
+      "supported": "the item passes its stage rule (development: the screen; validation: Holm in the 35-item family plus minimum sample and, for a tradable cell, the robustness means, labelled 'screened'; holdout: the same at the holdout, labelled confirmatory)",
+      "not_supported_mde_excluded": "the stage has at least its minimum sample, the item does not pass, and the one-sided confidence bound in the hypothesized direction at the item's corrected level excludes an effect of the preregistered MDE for the realized n (minimum_detectable_effect)",
+      "underpowered": "the stage is below its minimum sample, or the item neither passes nor excludes the MDE"
+    },
+    "rule": "Only these three labels are used. A miss is never reported as 'falsified' or as proof of no effect; 'not supported' always states the size it excludes. A result in the direction opposite to a one-sided alternative is reported descriptively with its estimate and interval and supports no claim, because it was not tested."
   },
   "hypotheses": {
     "H1": {
@@ -66,7 +86,7 @@
         {"source": "catalyst-experiment/protocol.json ranks by relative_volume then price_return, a MAX-like selection", "status": "repository source read"}
       ],
       "populations": ["D_daily", "I_intraday"],
-      "covariate": "MAX21 = the largest split-consistent daily close-to-close return over the 21 sessions ending t-1 (D) or the previous session (I), from data known at the decision; terciles within each decision date (ties by symbol)",
+      "covariate": "MAX21 = the largest split-consistent daily close-to-close return over the 21 sessions ending t-1 (D) or the previous session (I), from data known at the decision; terciles by tercile_rule (trailing 252-session breakpoints of the same population)",
       "exit_arms": {
         "a_fast": "first eligible quote at or after min(entry + 30 min, 15:55 ET)",
         "b_lane": "D: first eligible quote at or after 15:55 ET on the 5th holding session (entry session = 1); I: at or after min(entry + 60 min, 15:55)",
@@ -79,7 +99,7 @@
         {"id": "H1-I", "statistic": "same, population I", "alternative": "less than 0"}
       ],
       "tradable_cells": "2 populations x 3 arms x 3 terciles = 18; each tested for mean net > 0",
-      "falsifier": "Falsified if H1-D and H1-I both fail the corrected level, or if no tradable cell passes development. A significant high-MAX outperformance rejects the reversal prior.",
+      "not_supported_if": "H1-D and H1-I are both labelled not_supported_mde_excluded, and no tradable cell passes development. A high-MAX outperformance is outside the one-sided alternative, is reported descriptively only, and supports no claim about the reversal prior.",
       "data_status": "available now (Alpaca SIP daily and minute bars, official prices)",
       "chronology": "common (development 2017-2019, validation 2020, prospective holdout)"
     },
@@ -97,113 +117,101 @@
         {"id": "H2-I", "statistic": "same, population I", "alternative": "greater than 0"}
       ],
       "tradable_cells": "2 populations x 2 groups = 4",
-      "falsifier": "Falsified if H2-D and H2-I both fail the corrected level, or both groups fail development: the catalyst filter adds nothing beyond the volume filter.",
+      "not_supported_if": "H2-D and H2-I are both labelled not_supported_mde_excluded and neither group passes development: the catalyst filter adds nothing beyond the volume filter at the detectable size.",
       "data_status": "available now (SEC EDGAR, public domain, 10 req/s, existing recipes; Alpaca SIP)",
       "chronology": "common"
     },
     "H3": {
       "name": "Overnight versus intraday legs of mover holds",
       "evidence": [
-        {"source": "Lou, Polk, Skouras (2019) 'A Tug of War: Overnight Versus Intraday Expected Returns', JFE; Akbas, Boehmer, Jiang, Koch (2022) JFE", "status": "contested: original citation was a secondary summary; substance not refuted; DOIs unverified; large, liquid names"},
+        {"source": "Lou, Polk, Skouras (2019) 'A tug of war: Overnight versus intraday expected returns', JFE 134(1):192-213, doi 10.1016/j.jfineco.2019.03.011; Akbas, Boehmer, Jiang, Koch (2022) 'Overnight returns, daytime reversals, and future stock returns', JFE 145(3):850-875, doi 10.1016/j.jfineco.2021.09.019", "status": "contested: the original citation was a secondary summary; substance not refuted; both DOIs resolved in Crossref metadata on 2026-09-24, full texts not read; large, liquid names"},
         {"source": "Maroy, SSRN 5095349 (posted 2025-01-12), VWAP and ladder exits", "status": "contested: HTTP 403, not read; excluded from the confirmatory family"}
       ],
       "populations": ["D_daily"],
+      "price_sources": "official open = the primary listing's opening auction print from the auctions collection (collect.py, sessions_io.official_price 'o' at aa6fc79); official close likewise ('c'). A leg with a missing official print is dropped and counted; no bar or quote substitutes in H3-c.",
       "exit_arms": {
         "a_intraday": "enter at the first eligible quote at or after 09:35 on t+1; exit at or after 15:55 the same session",
         "b_overnight": "enter at the first eligible quote at or after 15:55 on t+1; exit at the first eligible quote at or after 09:30 on t+2",
-        "c_decomposition": "diagnostic only, not traded: the 5-session b_lane hold split into overnight (prior 15:55 to next open) and intraday (open to 15:55) legs"
+        "c_decomposition": "diagnostic only, not traded: over the sessions t+1 .. t+5 of the D b_lane hold, overnight legs k = 1..4 are official close of t+k to official open of t+k+1, and intraday legs k = 2..5 are official open to official close of t+k. The partial first-session leg is excluded, so each trade has 4 legs of each kind, and together they decompose official close(t+1) to official close(t+5)."
       },
       "sizing": "1x; arm b stays at 1x in any later paper use until leverage-ladder-2x and its overnight cap are clean",
       "primary_tests": [
         {"id": "H3-a", "statistic": "mean net(a_intraday)", "alternative": "greater than 0"},
         {"id": "H3-b", "statistic": "mean net(b_overnight)", "alternative": "greater than 0"},
-        {"id": "H3-c", "statistic": "mean over trades of (sum of overnight leg returns - sum of intraday leg returns) within the 5-session hold, gross", "alternative": "not equal to 0"}
+        {"id": "H3-c", "statistic": "mean over trades of (mean of the 4 overnight leg log returns - mean of the 4 intraday leg log returns), gross, legs as in c_decomposition", "alternative": "not equal to 0"}
       ],
       "tradable_cells": "H3-a and H3-b are the tradable cells (counted once)",
-      "falsifier": "Falsified if H3-c fails the corrected level, or neither H3-a nor H3-b passes after costs.",
-      "data_status": "available now (Alpaca SIP minute bars with session open and prior close)",
+      "not_supported_if": "H3-c is labelled not_supported_mde_excluded, and neither H3-a nor H3-b passes after costs.",
+      "data_status": "available now (Alpaca SIP minute bars; official opening and closing auction prints)",
       "chronology": "common"
     },
     "H4": {
-      "name": "Halt-conditional exit around LULD pauses",
+      "name": "Halt-conditional exit around LULD pauses and halts",
       "evidence": [
         {"source": "SEC DERA LULD white papers, https://www.sec.gov/files/dera-luld-white-paper.pdf and https://www.sec.gov/files/marketstructure/research/dera_wp_luld_and_extraordinary_transitory_volatility.pdf", "status": "contested: the execution-state idea survives; the pause-duration claim is a literature-review statement, not a DERA finding"},
         {"source": "Nasdaq 'All About LULDs' and the NasdaqTrader LULD FAQ (15 s limit state, 5-minute pause, last-10-minute pauses fold into the close)", "status": "contested: opened by the reviewer; band tiers must be checked against the current plan text before any hardcoding"},
-        {"source": "https://www.nasdaqtrader.com/trader.aspx?id=TradeHalts plus halt search and history", "status": "survives: web/RSS, limited lookback"}
+        {"source": "https://www.nasdaqtrader.com/trader.aspx?id=TradeHalts plus halt search and history", "status": "survives: web/RSS, limited lookback"},
+        {"source": "Nasdaq TotalView-ITCH 5.0 specification (NQTVITCHSpecification.pdf) section 1.2.2 Stock Trading Action: coverage is 'all exchange-listed equities securities traded via the Nasdaq execution system'; state H is 'Halted across all U.S. equity markets / SROs'; P (paused) is 'Nasdaq-listed securities only', and 'Trading pauses on non-NASDAQ listed securities will be treated simply as a halt'; the J LULD Auction Collar applies to a paused security reopening", "status": "read on 2026-09-24 in the review fix round; the Databento XNAS.ITCH status schema that carries it is contested (sweep p1-databento-xnas-itch-halt-luld) and its cost and coverage start are unverified"}
       ],
-      "population": "every trade of the H1-H3 traded arms whose security enters an LULD limit state or trading pause between entry and exit. The sweep conditioned this on passing arms; v3 uses all traded-arm trades, so a no-pass outcome still leaves a sample.",
+      "parent_trades": "the b_lane trades of populations D and I (the trades H1, H2 and H5 share), deduplicated by symbol|entry session|entry timestamp. Other arms (H1 a_fast and c_session, H3 a and b) are not parents. The unit of analysis and of the session block bootstrap is one deduplicated parent trade.",
+      "population": "every parent trade whose security, during the holding interval, is in state H (halted across all US markets) or, for a Nasdaq-listed security, P (LULD pause), per the covered halt source. The two strata are reported separately: an LULD pause is identified only for Nasdaq-listed names; for other listings the source reports a pause as a halt.",
       "exit_arms": {
         "a_reopen": "exit at the reopening-auction print, else the first eligible post-reopen quote",
-        "b_ignore": "hold to the parent arm's exit, ignoring the halt"
+        "b_ignore": "hold to the parent b_lane exit, ignoring the halt"
       },
       "rules": "No fills during a halt; a resting stop fills through the gap at the first print. Pause duration is logged as a covariate only.",
       "sizing": "inherits the parent arm",
       "primary_tests": [
-        {"id": "H4", "statistic": "mean over halted trades of net(a_reopen) - net(b_ignore)", "alternative": "not equal to 0"}
+        {"id": "H4", "statistic": "mean over halted parent trades of net(a_reopen) - net(b_ignore)", "alternative": "not equal to 0"}
       ],
       "minimum_halted_trades": {"development": 60, "validation": 40, "holdout": 40},
-      "falsifier": "Falsified if H4 fails the corrected level or a stage has fewer than its minimum halted trades; the halt state then stays a safety rule only.",
-      "data_status": "gated: Databento XNAS.ITCH status schema (paid, metered; Nasdaq-listed only; cost and coverage start unverified), or Nasdaq Trader halt history (free, limited lookback, pilot only). Whether SIP conditions can rebuild halts is unverified.",
-      "chronology": "common, restricted to the halt source's covered listings and sessions as established by metadata before any outcome. A Nasdaq Trader pilot is exploratory and cannot pass. If the covered development span is shorter than 1 year, H4 is not tested and scores p = 1 in the family."
+      "not_supported_if": "H4 is labelled not_supported_mde_excluded. A stage below its minimum halted trades is underpowered, not a miss; either way the halt state stays a safety rule only.",
+      "data_status": "gated: Databento XNAS.ITCH status schema (paid, metered; covers halt and resume state for every security traded on the Nasdaq execution system, with the P pause state and J auction collar for Nasdaq-listed securities only; cost and coverage start unverified; *contested*), or Nasdaq Trader halt history (free, limited lookback, pilot only). Whether SIP conditions can rebuild halts is unverified.",
+      "chronology": "common, restricted to the halt source's covered sessions as established by metadata before any outcome. A Nasdaq Trader pilot is exploratory and cannot pass. If the covered development span is shorter than 1 year, H4 is not tested and scores p = 1 in the family. The halt source is used only for H4 and never changes the H1-H3 trade sets."
     },
     "H5": {
       "name": "Days-to-cover crowding overlay",
       "evidence": [
-        {"source": "Hong, Li, Ni, Scheinkman, Yan, 'Days to Cover and Stock Returns', NBER w21166, SSRN 10.2139/ssrn.2568768", "status": "survives: high DTC predicts lower returns"},
+        {"source": "Hong, Li, Ni, Scheinkman, Yan, 'Days to Cover and Stock Returns', NBER w21166, SSRN 10.2139/ssrn.2568768", "status": "survives: high DTC predicts lower returns. The paper makes no squeeze claim."},
+        {"source": "S3 Partners crowding and short-squeeze paper, EFMA 2025 conference draft (http://www.efmaefm.org/0EFMAMEETINGS/EFMA%20ANNUAL%20MEETINGS/2025-Greece/papers/Manuscript-with-author-details223.pdf)", "status": "unverified conference draft, not confirmed as published; the sweep's only source for 'squeezes are episodic, not a base rate'. Not a prior for H5-s."},
         {"source": "blueprints/us-equities/acceptance-wave/factors-regimes.md: FINRA consolidatedShortInterest is not a realtime squeeze signal", "status": "repository source read"}
       ],
       "population": "D_daily",
-      "covariate": "DTC = the most recent FINRA short interest published before the decision (publication and settlement lag respected) / 20-session median share volume ending t; terciles within each decision date",
+      "covariate": "DTC = the most recent FINRA short interest published before the decision (publication and settlement lag respected) / 20-session median share volume ending t; terciles by tercile_rule (trailing 252-session breakpoints of D)",
       "exit_arms": {"b_lane": "as H1"},
       "sizing": "1x; the overlay filters and never sizes",
       "primary_tests": [
         {"id": "H5-p", "statistic": "mean net(high DTC) - mean net(low DTC)", "alternative": "less than 0"},
-        {"id": "H5-s", "statistic": "mean net(high DTC) - mean net(middle and low DTC pooled)", "alternative": "greater than 0 (squeeze)"}
+        {"id": "H5-s", "statistic": "mean net(high DTC) - mean net(middle and low DTC pooled)", "alternative": "greater than 0 (squeeze)", "prior": "none sourced: Hong et al. point the other way (H5-p) and the squeeze base-rate statement rests on an unverified draft. H5-s is a secondary test with no directional prior and is expected to be not supported."}
       ],
       "tradable_cells": "3 DTC terciles",
-      "falsifier": "H5-p is falsified if the difference is not negative at the corrected level; H5-s if the high-DTC tercile does not beat the rest.",
+      "not_supported_if": "H5-p (or H5-s) is labelled not_supported_mde_excluded.",
       "data_status": "gated on FINRA short-interest access and terms, which the user must establish; bi-monthly, an overlay only",
       "chronology": "common, restricted to sessions whose decision has a published figure. If published history does not cover at least 1 development year and the whole validation year, H5 is not tested and both tests score p = 1."
     },
     "H6": {
       "name": "Execution parity: broker-held exits versus client-side ratchet (engineering, not alpha)",
-      "evidence": [
-        {"source": "https://docs.alpaca.markets/docs/orders-at-alpaca (trailing_stop with trail_price or trail_percent; OCO; bracket; OTO)", "status": "trailing_stop survives; bracket contested and corrected to OCO for a held position"},
-        {"source": "https://docs.alpaca.markets/reference/deleteallorders-1", "status": "survives"},
-        {"source": "native_adapter.py builds only LIMIT/DAY orders; native_strategy.replace_exit cancels and resubmits when the price basis moves", "status": "repository source read"}
-      ],
-      "population": "positions opened in Alpaca paper by the paper candidate (mechanics-only unless a v3 rule has passed its holdout), after the OCO and trailing_stop adapter paths exist. Each position's arm is the parity of the first byte of sha256(client_order_id). No order is created for the test itself.",
-      "exit_arms": {
-        "a_client": "the current exits.py chain with cancel-then-new replacement",
-        "b_broker": "trailing_stop with trail_percent = effective_trailing_bps at entry / 100, plus an OCO for the stop and take-profit legs; time, risk-off, force and halt exits stay client-side"
-      },
-      "shadow": "for each position, the other arm's trigger time and reference price are computed from the same quote stream for paired diagnostics, never traded",
-      "primary_tests": [
-        {"id": "H6-e", "statistic": "median of (realized exit price - trigger reference) in bps, arm b minus arm a", "alternative": "equivalence within +/-25 bps (TOST)"},
-        {"id": "H6-c", "statistic": "log(mean REST calls per closed position, arm a / arm b)", "alternative": "greater than log(2)"}
-      ],
-      "also_falsified_by": "any paper partial-fill, trigger-price or trigger-reference behaviour that departs from the documented semantics (recorded per event)",
-      "sizing": "parent sizing at 1x",
-      "data_status": "available now (Alpaca paper) once the adapter change lands; paper fills are simulated, so this is sim-to-paper evidence, not market evidence",
-      "chronology": {"development": "first 40 closed positions per arm", "validation": "next 60 per arm", "holdout": "next 150 per arm", "note": "prospective paper only; disjoint from every historical window"}
+      "moved_to": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
+      "why": "H6 accrues on a live paper timeline unrelated to the 2020 validation window or the 252-session holdout, and its equivalence test needs larger stages than this family's. It is its own engineering protocol with its own two-test family; it uses no slot of the alpha family, H1-H5 never wait for it, and its result never opens this protocol's holdout."
     }
   },
   "multiple_testing": {
-    "family": "one family across H1-H6: the 10 non-tradable primary tests (H1-D, H1-I, H2-D, H2-I, H3-c, H4, H5-p, H5-s, H6-e, H6-c) plus the 27 tradable cells (H1 18, H2 4, H3 2, H5 3), m = 37",
-    "procedure": "Holm step-down at family-wise alpha 0.05, applied separately at validation and at the holdout. An item not carried to a stage scores p = 1 there. Two-sided tests use 2 x min(one-sided p).",
-    "strictest_level": 0.0013514,
+    "family": "one family across H1-H5: the 8 non-tradable primary tests (H1-D, H1-I, H2-D, H2-I, H3-c, H4, H5-p, H5-s) plus the 27 tradable cells (H1 18, H2 4, H3 2, H5 3), m = 35. H6 is not in this family.",
+    "procedure": "Holm step-down at family-wise alpha 0.05, applied separately at validation and at the holdout. An item not carried to a stage, or not tested for lack of data, scores p = 1 there. Two-sided tests (H3-c, H4) use 2 x min(one-sided p).",
+    "strictest_level": 0.0014286,
     "development_screen": "unadjusted p <= 0.05 in the stated direction, with the minimum sample; development only nominates items for validation",
-    "lineage_sensitivity": "The mover question has already tried 1,012 rule-exits (v1 768, v2 244) on other windows. Every validation and holdout p is also reported against Bonferroni 0.05 / (1012 + 37) = 4.77e-5. An item that passes Holm but not this level is labelled v3-family significant, lineage-unconfirmed.",
+    "lineage_sensitivity": "The mover question has already tried 1,012 rule-exits (v1 768, v2 244) on other windows. Every validation and holdout p is also reported against Bonferroni 0.05 / (1012 + 35) = 4.78e-5. With B = 100,000 the smallest bootstrap p is 1.0e-5 one-sided and 2.0e-5 two-sided, both below that level. Each p is reported beside a normal-tail p from the same bootstrap standard error. An item that passes Holm but not this level is labelled v3-family significant, lineage-unconfirmed.",
     "tests_not_in_family": "BH (q = 0.10) diagnostics across tercile, year, price-tier and halt-covariate splits are reported but can never open the holdout"
   },
   "minimum_sample": {
     "tradable_cell": {"development": 300, "validation": 150, "holdout": 150},
     "difference_test_per_group": {"development": 150, "validation": 100, "holdout": 100},
-    "rule": "A stage below its minimum reports the item as underpowered; it cannot pass that stage."
+    "rule": "A stage below its minimum reports the item as underpowered (outcome_reporting); it cannot pass that stage."
   },
   "minimum_detectable_effect": {
-    "formula": "MDE = (z(1 - 0.05/37) + z(0.80)) x sigma x sqrt(DEFF / n) for one cell; x sqrt(2) for a two-group difference with n per group",
-    "z_sum": 3.8413,
+    "formula": "MDE = (z_alpha + z(0.80)) x sigma x sqrt(DEFF / n) for one cell; x sqrt(2) for a two-group difference with n per group. z_alpha = z(1 - 0.05/35) = 2.983 for one-sided tests and z(1 - 0.05/70) = 3.189 for the two-sided H3-c and H4.",
+    "z_sum_one_sided": 3.8243,
+    "z_sum_two_sided": 4.0304,
     "design_effect_DEFF": 1.5,
     "sigma_planning": {
       "30_to_60_minute_arms": 0.10,
@@ -211,32 +219,41 @@
       "5_session_arms": 0.35
     },
     "sigma_provenance": "0.10 and 0.25 are (P95 - P5) / 3.29 from #162 v1 development aggregates (07:00|G0.20|V1000000 X2 and X1: P5 -15.0% / P95 +18.0%, and P5 -42.1% / P95 +39.5%); normal approximation, which understates fat tails. 0.35 is an assumption with no measured source. DEFF 1.5 for session clustering is an assumption.",
-    "mde_percent_single_cell": {
-      "n100": {"sigma_0.10": 4.70, "sigma_0.25": 11.76, "sigma_0.35": 16.47},
-      "n200": {"sigma_0.10": 3.33, "sigma_0.25": 8.32, "sigma_0.35": 11.64},
-      "n300": {"sigma_0.10": 2.72, "sigma_0.25": 6.79, "sigma_0.35": 9.51},
-      "n600": {"sigma_0.10": 1.92, "sigma_0.25": 4.80, "sigma_0.35": 6.72}
+    "mde_percent_single_cell_one_sided": {
+      "n100": {"sigma_0.10": 4.68, "sigma_0.25": 11.71, "sigma_0.35": 16.39},
+      "n200": {"sigma_0.10": 3.31, "sigma_0.25": 8.28, "sigma_0.35": 11.59},
+      "n300": {"sigma_0.10": 2.70, "sigma_0.25": 6.76, "sigma_0.35": 9.46},
+      "n600": {"sigma_0.10": 1.91, "sigma_0.25": 4.78, "sigma_0.35": 6.69}
     },
-    "mde_percent_two_group_difference": {
-      "n100": {"sigma_0.10": 6.65, "sigma_0.25": 16.63, "sigma_0.35": 23.29},
-      "n200": {"sigma_0.10": 4.70, "sigma_0.25": 11.76, "sigma_0.35": 16.47},
-      "n300": {"sigma_0.10": 3.84, "sigma_0.25": 9.60, "sigma_0.35": 13.44},
-      "n600": {"sigma_0.10": 2.72, "sigma_0.25": 6.79, "sigma_0.35": 9.51}
+    "mde_percent_two_group_difference_one_sided": {
+      "n100": {"sigma_0.10": 6.62, "sigma_0.25": 16.56, "sigma_0.35": 23.18},
+      "n200": {"sigma_0.10": 4.68, "sigma_0.25": 11.71, "sigma_0.35": 16.39},
+      "n300": {"sigma_0.10": 3.82, "sigma_0.25": 9.56, "sigma_0.35": 13.39},
+      "n600": {"sigma_0.10": 2.70, "sigma_0.25": 6.76, "sigma_0.35": 9.46}
     },
-    "h6_equivalence": "TOST margin 25 bps at the strictest family level (two one-sided tests at 0.05/37, a 1 - 2 x 0.00135 interval, z = 3.00); planning sigma of exit slippage 50 bps (assumption). At the 150-per-arm holdout the interval half-width is about 3.00 x 50 x sqrt(2/150) = 17 bps, so equivalence passes only if the observed difference is under about 8 bps; at 60 per arm the half-width (27 bps) exceeds the margin and no pass is possible",
-    "reading": "Only large effects can pass. A miss at these sizes is reported as underpowered for smaller effects, never as proof of no effect."
+    "mde_percent_two_group_difference_two_sided": {
+      "n100": {"sigma_0.10": 6.98, "sigma_0.25": 17.45, "sigma_0.35": 24.43},
+      "n200": {"sigma_0.10": 4.94, "sigma_0.25": 12.34, "sigma_0.35": 17.28},
+      "n300": {"sigma_0.10": 4.03, "sigma_0.25": 10.08, "sigma_0.35": 14.11},
+      "n600": {"sigma_0.10": 2.85, "sigma_0.25": 7.12, "sigma_0.35": 9.97}
+    },
+    "reading": "Only large effects can pass or be excluded. The literature's effects (about 1% a month for MAX and days to cover) are far below these MDEs, so a miss on H1-D, H1-I or H5 will most likely be labelled underpowered, and v3 is informative only about large mover-specific effects."
   },
   "cost_model": {
     "base_table": {
       "path": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json",
-      "commit": "92062e8",
+      "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
       "git_blob": "197e71ada3c8249f2b49b168e4ce00a2cdf28628",
       "sha256": "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13",
-      "note": "the same sha256 is recorded as inputs.cost_table_sha256 in #162's evidence/summary-dev-val-run-v1.json. Reused by reference; v3 refuses a table with another hash."
+      "note": "unchanged from the PR branch commit 92062e8 to main at aa6fc79; D7 records that the frozen table reproduces byte for byte under the stamp-window check. The same sha256 is recorded as inputs.cost_table_sha256 in #162's evidence/summary-dev-val-run-v1.json. Reused by reference; v3 refuses a table with another hash."
+    },
+    "lookup": {
+      "cell_key": "time_bucket|price_tier|dv_tier, per side, from that side's fill: time bucket of the fill timestamp, price tier of the fill price, and dv tier of the session's cumulative dollar volume at the fill timestamp (rules.py Bars.cum_dv, the summed vwap x volume of bars starting before the timestamp; the same input v1 evaluate.py passes as entry_cum_dv and exit_cum_dv). For a D entry at 09:35 this is t+1's cumulative dollar volume at 09:35; for a 5-session exit it is the exit session's cumulative dollar volume at the exit timestamp.",
+      "buckets": "time buckets 04:00-08:00, 08:00-09:30, 09:30-10:00, 10:00-16:01 ET; price tiers < $2, $2-5, $5-20, >= $20; dv tiers < $1M, $1-5M, >= $5M"
     },
     "fix_1_monotone_dollar_volume": {
       "finding": "#162 review item costs-F1: cells under $1M dollar volume fall back to a time x price pool that costs about half the $1-5M cell (for example 3|2|0 0.24% vs 3|2|1 0.75%)",
-      "rule": "for each time x price bucket, hs'(>= $5M) = hs(>= $5M); hs'($1-5M) = max(hs($1-5M), hs'(>= $5M)); hs'(< $1M) = max(hs(< $1M), hs'($1-5M)). A less liquid tier is never cheaper than a more liquid one.",
+      "rule": "for each time x price bucket, hs'(>= $5M) = hs(>= $5M); hs'($1-5M) = max(hs($1-5M), hs'(>= $5M)); hs'(< $1M) = max(hs(< $1M), hs'($1-5M)). A less liquid tier is never cheaper than a more liquid one. Applied last, after out_of_period_spreads.",
       "cells_changed_bps_before_after": {
         "1|0|0": [34.29, 38.04],
         "1|1|0": [27.97, 44.16],
@@ -246,7 +263,7 @@
         "3|1|0": [27.04, 57.09],
         "3|2|0": [24.09, 74.50]
       },
-      "cell_key": "time_bucket|price_tier|dv_tier; time buckets 04:00-08:00, 08:00-09:30, 09:30-10:00, 10:00-16:01 ET; price tiers < $2, $2-5, $5-20, >= $20; dv tiers < $1M, $1-5M, >= $5M"
+      "note": "the before/after values are for the base table alone; the final values follow the 2017-2019 re-measure."
     },
     "fix_2_impact_and_capacity": {
       "finding": "#162 review item costs-F4: pass statistics use a fixed $20k notional with no impact term and assume full fills",
@@ -254,42 +271,47 @@
       "impact": "impact per side (return) = c x sigma_d x sqrt(q), where q = filled notional / 20-session median dollar volume and sigma_d = 20-session standard deviation of daily log returns, both known at the decision. Primary c = 1.0; sensitivities c = 0.5 and 2.0.",
       "provenance": "The square-root functional form and the c grid are design choices bracketing the unknown; the sweep supplies no source for them."
     },
-    "out_of_period_spreads": "The base table was measured on 2021-2023 quotes. Before the freeze, a 1-in-20 hash sample of development (2017-2019) entries is quoted with quotes.py's method at 92062e8; each cell's cost is then max(hs' from the base table, the 2017-2019 cell). Quotes are read at exit-agnostic timestamps only; no exit path is computed.",
+    "out_of_period_spreads": {
+      "sample": "Before the freeze, 1 in 20 development (2017-2019) D and I entries is selected by quotes.py's sample_key at aa6fc79: int.from_bytes(sha256('symbol|session|hhmm')[:8], 'big') % 20 == 0, with the v3 entry's symbol, entry session and entry HH:MM ET. Each selected entry is stamped at its entry timestamp, entry + 15 min, entry + 60 min and 5 minutes before that session's close (the v1 stamp set), all exit-agnostic; no exit path is computed.",
+      "table": "cells are built with quotes.py's table method at aa6fc79, including the D7 stamp-window guard and v1's sparse-cell fallbacks: a cell with >= 30 observations (MIN_CELL) uses its trimmed mean, else the time x price pool if it has >= 30, else the table's 90th percentile",
+      "combine": "each cell's cost is max(hs from the base table, hs from the 2017-2019 table); fix_1 is then applied to the result"
+    },
     "per_side": "1.25 x hs' + impact, for continuous and auction sides alike (v1's 0.5x auction discount is not reused)",
-    "fees": "#162 fees.json (sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d) by reference, extended before the freeze with SEC Section 31 and FINRA TAF rates in force during 2017-2020 from primary sources; Alpaca commission 0; IBKR tiered as a broker variant",
+    "fees": "#162 fees.json at aa6fc79 (sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d) by reference, extended before the freeze with SEC Section 31 and FINRA TAF rates in force during 2017-2020 from primary sources; Alpaca commission 0; IBKR tiered as a broker variant",
     "stress": "2 x (spread + slippage) with c = 2.0",
     "break_even": "the cost multiple at which each cell's mean net return reaches 0 is reported"
   },
   "statistics": {
     "estimator": "trade-level mean net return; also median, 1%-winsorised mean, mean without the top 5 sessions and mean of per-session means",
-    "bootstrap": "circular session block bootstrap, B = 20,000; block length 5 sessions for same-session arms and 10 sessions for multi-session arms; difference tests resample sessions jointly for both groups; seed = the first 8 bytes of sha256(frozen protocol id), big-endian",
-    "p_value": "one-sided p = (1 + #{b : stat_b on the null side of 0}) / (B + 1)",
+    "bootstrap": "circular session block bootstrap, B = 100,000; block length 5 sessions for same-session arms and 10 sessions for multi-session arms; difference tests resample sessions jointly for both groups; seed = the first 8 bytes of sha256(frozen protocol id), big-endian",
+    "p_value": "one-sided p = (1 + #{b : stat_b on the null side of 0}) / (B + 1); two-sided p = min(1, 2 x the smaller one-sided p)",
     "robustness_required_for_a_pass": "a tradable cell's validation and holdout passes also need a positive winsorised mean, mean without the top 5 sessions and mean of per-session means",
-    "sensitivities": ["two-way (session, symbol) clustering", "without split-day and fallback-price rows", "2020 reported alone", "survivorship-limited label before 2020"]
+    "sensitivities": ["two-way (session, symbol) clustering", "without split-day and fallback-price rows", "2020 reported alone", "survivorship-limited label before 2020", "validation restricted to names with 20-session median dollar volume < $2M (outside broad-universe's descriptive lane)"]
   },
   "holdout_gate": {
-    "opens_only_for": "items that passed validation: a primary test or tradable cell with Holm-adjusted validation p <= 0.05 in the 37-item family, the minimum validation sample and, for a tradable cell, the robustness means. At most 5 tradable cells (lowest validation p) and every validated primary test.",
+    "opens_only_for": "items that passed validation: a primary test or tradable cell with Holm-adjusted validation p <= 0.05 in the 35-item family, the minimum validation sample and, for a tradable cell, the robustness means. At most 5 tradable cells (lowest validation p) and every validated primary test.",
+    "h4_scope": "a validated H4 authorizes computing, in the holdout, the a_reopen and b_ignore exits of halted parent trades only (H4 parent_trades), whether or not any parent cell validated. It authorizes no non-halted parent outcome and no tradable-cell statistic.",
     "no_pass": "If nothing validates, the holdout is never labelled or read, and that is the result.",
     "prospective_collection": "Holdout-window data are collected forward into a sealed private snapshot whose sha256 is committed per collection batch. No outcome label, forward return or exit is computed from it before the gate opens.",
     "evaluator_refusals": [
       "protocol status is not frozen, or its sha256 differs from the frozen commit",
-      "the validation results file is missing or its sha256 differs from the one committed",
+      "the validation results file is missing, its sha256 differs from the one committed, or that commit is not earlier than the first holdout session",
       "the list of validated items is empty",
-      "a requested item is not in that list",
+      "a requested item is not in that list, or a requested H4 read asks for more than h4_scope",
       "the access log has no committed 'granted' entry for this run",
       "a previous holdout run exists (the holdout is read once; failed or partial runs stay in the log and are never called untouched)"
     ],
     "access_log": {
       "path": "blueprints/us-equities/mover-v3/holdout-access-log.jsonl",
       "mode": "append-only JSON lines, committed and pushed before the read it authorizes",
-      "fields": ["utc", "actor_role", "protocol_id", "protocol_sha256", "code_revision", "validation_results_sha256", "requested_items", "purpose", "decision (granted or refused)", "snapshot_sha256", "rows_read", "results_sha256"],
-      "rule": "Any holdout read without a preceding committed granted entry voids the holdout for every item. Refusals are logged too. Collection batches are logged with purpose 'collect' and rows_read 0."
+      "fields": ["utc", "actor_role", "protocol_id", "protocol_sha256", "code_revision", "validation_results_sha256", "requested_items", "purpose", "decision (granted or refused)", "snapshot_sha256", "rows_read", "results_sha256", "exposed_symbol_sessions"],
+      "rule": "Any holdout read without a preceding committed granted entry voids the holdout for every item. Refusals are logged too. Collection batches are logged with purpose 'collect' and rows_read 0, and list the accrual exposure of that batch (chronology.holdout.accrual_exposure)."
     }
   },
-  "leverage_and_exits": "Research runs use 1x equal notional. Paper use of any passing rule follows the README's exit and leverage policy: broker-held OCO/trailing legs where the semantics fit, the leverage-schedule-v1-20260922 ceiling, and the leverage-ladder-1x/2x/4x gate rows in catalogs/us-equities/gates-20260922.json, one rung at a time with automatic step-down. The edge-shrink (fractional Kelly) term stays 0 until a holdout pass.",
+  "leverage_and_exits": "Research runs use 1x equal notional. Paper use of any passing rule follows the README's exit and leverage policy: at most one broker-held closing order per share (a trailing_stop or an OCO per quantity tranche, as the Alpaca docs require), the leverage-schedule-v1-20260922 ceiling, and the leverage-ladder-1x/2x/4x gate rows in catalogs/us-equities/gates-20260922.json, one rung at a time with automatic step-down. The edge-shrink (fractional Kelly) term stays 0 until a holdout pass.",
   "freeze_preconditions": [
     "An independent pre-outcome review of this draft from a different session and model family, with every finding resolved in a dated record",
-    "Direct reads of Lou-Polk-Skouras 2019, Akbas-Boehmer-Jiang-Koch 2022 and MacLean-Thorp-Ziemba 2010, or removal of every claim that depends on them",
+    "Direct full-text reads of Lou-Polk-Skouras 2019, Akbas-Boehmer-Jiang-Koch 2022 and MacLean-Thorp-Ziemba 2010, or removal of every claim that depends on them (the two JFE DOIs resolve in Crossref; that is metadata only)",
     "The 2017-2019 development cost sample fixed by rule and measured; fees extended to 2017-2020 from primary sources",
     "Metadata-only coverage checks: the Databento get_cost quote and XNAS.ITCH coverage start (H4); FINRA short-interest history start and terms (H5). No outcome is computed.",
     "Study code implementing this protocol committed with synthetic tests before any outcome, and the evaluator's holdout refusals tested",
