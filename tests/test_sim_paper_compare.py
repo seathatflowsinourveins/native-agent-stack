@@ -759,7 +759,7 @@ class PageFetcherTests(unittest.TestCase):
         self.assertEqual(bodies, [{"ok": True}])
         self.assertEqual(fetcher.from_cache, 1)
         self.assertEqual(fetcher.from_network, 0)
-        self.assertEqual(fetcher.page_events, [{"key": fetcher.page_events[0]["key"], "source": "cache"}])
+        self.assertEqual(fetcher.page_events, [{"request_digest": fetcher.page_events[0]["request_digest"], "source": "cache"}])
 
     def test_replay_with_no_retained_page_refuses_rather_than_network_fetching(self):
         pages = self.tmp / "pages"

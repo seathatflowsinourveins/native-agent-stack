@@ -40,7 +40,7 @@
     "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either the host clock or the broker clock is not established by this replay",
     "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)"
   },
-  "completed_utc": "2026-09-24T22:07:33.398378+00:00",
+  "completed_utc": "2026-09-24T22:22:56.205645+00:00",
   "data_provenance": {
     "adjustment": "n/a (quotes)",
     "asof": "2026-09-23",
@@ -51,19 +51,19 @@
       "network": 0,
       "pages": [
         {
-          "key": "f446ecfc5ec66a738ad982e22dff0a1e",
+          "request_digest": "f446ecfc5ec66a738ad982e22dff0a1e",
           "source": "cache"
         },
         {
-          "key": "683981be50de0eab8e90c79c0527f277",
+          "request_digest": "683981be50de0eab8e90c79c0527f277",
           "source": "cache"
         },
         {
-          "key": "c047dedc7968b47db6dc8d9c82fedc20",
+          "request_digest": "c047dedc7968b47db6dc8d9c82fedc20",
           "source": "cache"
         },
         {
-          "key": "cc532baacda3d925d1ac0532cf20ffce",
+          "request_digest": "cc532baacda3d925d1ac0532cf20ffce",
           "source": "cache"
         }
       ]
@@ -1455,13 +1455,13 @@
       }
     ]
   },
-  "runner_sha256": "25715675af74c76f35c911bd95d5d4af13022ff0600c996efb106c12bf01ef89",
+  "runner_sha256": "fab6a7c490828527f9dc67f0fcb7543ae34e73f2be844f92624576cbfe376037",
   "runtime_environment": {
     "alpaca_py_installed_version": "0.44.0",
     "note": "alpaca-py is installed in this runtime but not used by this script's fetch path (urllib.request directly); recorded for environment reproducibility only."
   },
   "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime. The order-4/order-5 timing explanation in the README is a hypothesis consistent with this receipt's data, not a demonstrated broker-side mechanism.",
-  "started_utc": "2026-09-24T22:07:26.740873+00:00",
+  "started_utc": "2026-09-24T22:22:49.651544+00:00",
   "stdout_sha256": "1b901b223399972f1395e7ca2d4cb91230207c4f8d6958436e292cdf7610113d",
   "stdout_sha256_basis": "exact_bytes_written",
   "trial": "20260923g-main-passed",

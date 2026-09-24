@@ -224,7 +224,7 @@ class PageFetcher:
                 if digest_bytes(raw) != rec["sha256"]:
                     raise SystemExit(f"page hash mismatch {rec['file']}")
                 status = rec["status"]
-                self.page_events.append({"key": key, "source": "cache"})
+                self.page_events.append({"request_digest": key, "source": "cache"})
             else:
                 url = base + path + "?" + urllib.parse.urlencode(q)
                 try:
@@ -241,7 +241,7 @@ class PageFetcher:
                 # Opened and closed per write (not held open for the fetcher's lifetime).
                 with (self.pages / "ledger.jsonl").open("a") as lf:
                     lf.write(json.dumps(rec) + "\n")
-                self.page_events.append({"key": key, "source": "network"})
+                self.page_events.append({"request_digest": key, "source": "network"})
             if status != 200:
                 raise SystemExit(f"GET {path} returned {status}")
             body = json.loads(raw)
