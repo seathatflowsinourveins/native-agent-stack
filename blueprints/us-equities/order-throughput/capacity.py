@@ -337,14 +337,47 @@ class Journal:
             self._stream.close()
 
 
+def _journal_stat_refusal(info):
+    """The lstat guard for every journal path: None for a regular file of at most
+    JOURNAL_CHECK_MAX_BYTES; a FIFO, device, directory or symlink, or a larger
+    file, is never opened or read."""
+    if not stat.S_ISREG(info.st_mode):
+        return "journal_not_regular_file"
+    if info.st_size > JOURNAL_CHECK_MAX_BYTES:
+        return "journal_too_large"
+    return None
+
+
 def read_journal(path):
     """Parse a run journal; a torn final line (crash mid-write) is ignored.
 
-    The caller checks the start record's recorded mode with ``journal_origin_refusal``."""
+    Guarded as ``existing_journal_refusal`` is (lstat, S_ISREG, 64 MiB), so recover
+    and audit never block on a FIFO or read a huge file. The file is opened without
+    following a symlink and without blocking, must still be that regular file, and
+    at most JOURNAL_CHECK_MAX_BYTES are read. The caller checks the start record's
+    recorded mode with ``journal_origin_refusal``."""
     try:
-        lines = Path(path).read_text().splitlines()
+        info = os.lstat(path)
     except OSError:
         raise HarnessRefusal("journal_unreadable") from None
+    reason = _journal_stat_refusal(info)
+    if reason:
+        raise HarnessRefusal(reason)
+    try:
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(fd, "rb") as stream:
+            opened = os.fstat(stream.fileno())
+            if (opened.st_dev, opened.st_ino) != (info.st_dev, info.st_ino):
+                raise HarnessRefusal("journal_unreadable")  # replaced between lstat and open
+            reason = _journal_stat_refusal(opened)
+            if reason:
+                raise HarnessRefusal(reason)
+            raw = stream.read(JOURNAL_CHECK_MAX_BYTES + 1)
+    except OSError:
+        raise HarnessRefusal("journal_unreadable") from None
+    if len(raw) > JOURNAL_CHECK_MAX_BYTES:
+        raise HarnessRefusal("journal_too_large")
+    lines = raw.decode("utf-8", errors="replace").splitlines()
     start, intents, end = None, [], None
     for line in lines:
         try:
@@ -601,6 +634,12 @@ class CapacityRun:
         status = getattr(response, "status", None)
         return not getattr(response, "not_sent", True) and status is not None and 200 <= status < 300
 
+    @staticmethod
+    def _error_responses(exc):
+        """The Responses a failed port call kept (status and rate-limit headers only),
+        e.g. the native port's positions read that raised on a 429."""
+        return [response for response in (getattr(exc, "responses", None) or ()) if isinstance(response, Response)]
+
     def _dispatch(self, kind, fn, *args, key):
         action = {"t": self.clock.monotonic(), "kind": kind, "ok": None}
         self.actions.append(action)
@@ -702,6 +741,8 @@ class CapacityRun:
             result = fn(*args)
         except Exception as exc:
             action["ok"] = False
+            for response in self._error_responses(exc):  # a 429 still reaches the governor
+                self._record("read" if kind == "read" else "cancel", response, phase)
             self._port_error(exc)
             return None
         # Listings and positions return tuples ending in their responses; cancels return one.
@@ -1591,6 +1632,10 @@ LIVE_HEADROOM = 0.9
 LIVE_MAX_QUOTE_AGE_SECONDS = 10.0
 LIVE_REQUOTE_SECONDS = 5.0
 LIVE_STALE_REQUOTE_SECONDS = 1.0
+# Quote age and go expiry use the host clock, so the live preflight refuses a host
+# clock that may differ from the broker clock (GET /v2/clock) by more than this.
+LIVE_MAX_HOST_CLOCK_SKEW_SECONDS = 1.0
+BROKER_TIMESTAMP = re.compile(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2})\Z", re.ASCII)
 # A journal start record's mode names its trading origin.
 JOURNAL_MODE_ORIGINS = {"paper": PAPER_URL, "live": LIVE_URL}
 JOURNAL_CHECK_MAX_BYTES = 64 * 1024 * 1024
@@ -1692,11 +1737,46 @@ def existing_journal_refusal(path, trading_origin):
         return None
     except OSError:
         return "journal_unavailable"
-    if stat.S_ISREG(info.st_mode) and info.st_size <= JOURNAL_CHECK_MAX_BYTES:
+    if _journal_stat_refusal(info) is None:
         reason = recorded_journal_refusal(path, trading_origin)
         if reason in ("live_journal_in_paper_mode", "paper_journal_in_live_mode"):
             return reason
     return "journal_exists"
+
+
+def broker_timestamp_wall(value):
+    """Unix seconds of a broker RFC 3339 timestamp with an offset (``Z`` or ``+HH:MM``)
+    and up to nanosecond digits, as GET /v2/clock returns it; None if unreadable."""
+    match = BROKER_TIMESTAMP.fullmatch(value) if isinstance(value, str) else None
+    if match is None:
+        return None
+    seconds, fraction, zone = match.groups()
+    try:
+        moment = datetime.fromisoformat(seconds + ("+00:00" if zone == "Z" else zone))
+    except ValueError:
+        return None
+    return moment.timestamp() + int((fraction or "0").ljust(9, "0")) / 1e9
+
+
+def host_clock_check(broker_clock):
+    """Compare the host clock with the broker clock read at preflight.
+
+    ``broker_clock`` holds the broker's ``timestamp`` and the host wall times just
+    before and just after that request. The skew is host minus broker at the
+    request's midpoint; half the round trip is added as the reading's uncertainty,
+    so ``within_limit`` means the clocks differ by at most 1 s whenever the broker
+    read its clock. None if the reading is missing or unreadable."""
+    clock = broker_clock if isinstance(broker_clock, dict) else {}
+    broker = broker_timestamp_wall(clock.get("timestamp"))
+    sent, received = clock.get("host_sent_wall"), clock.get("host_received_wall")
+    walls = (sent, received)
+    if broker is None or not all(type(v) in (int, float) and math.isfinite(v) for v in walls) or received < sent:
+        return None
+    skew = (sent + received) / 2.0 - broker
+    round_trip = received - sent
+    return {"skew_seconds": round(skew, 6), "round_trip_seconds": round(round_trip, 6),
+            "max_skew_seconds": LIVE_MAX_HOST_CLOCK_SKEW_SECONDS,
+            "within_limit": abs(skew) + round_trip / 2.0 <= LIVE_MAX_HOST_CLOCK_SKEW_SECONDS}
 
 
 def _receipt_symbol(value):
@@ -1924,9 +2004,10 @@ class LiveCapacityRun(CapacityRun):
     caps = min(CLI, go file, live ceilings)), the live env-file name, the live
     configuration bounds (SPY, QQQ, IWM or DIA only; headroom 0.9; quotes at most
     10 s old), no file at the journal path and regular trading hours; then both
-    STOP files, and at preflight an account with zero open orders and a broker
-    clock that is open. While running: probes priced only from a quote at most 10 s
-    old (submissions hold until a fresh quote, and the REST worker re-checks the age
+    STOP files, and at preflight an account with zero open orders, a host clock
+    within 1 s of the broker clock and a broker clock that is open. While running:
+    probes priced only from a quote at most 10 s old (submissions hold until a fresh
+    quote; the REST worker and then the live port at the wire re-check the age
     before each submit), a total order-action cap that always leaves room for
     cleanup cancels, the go file's expiry, a periodic re-read of the go file
     (revoked, invalid or changed stops submissions) and a governed periodic position
@@ -1954,7 +2035,9 @@ class LiveCapacityRun(CapacityRun):
         self.position_changes = {}  # symbol -> {"before", "after", "seen_by"}
         self.foreign_fill_events = 0
         self.position_checks = {"sent": 0, "completed": 0, "failed": 0, "changes_detected": 0}
-        self.quote_stats = {"stale_quotes_refused": 0, "submit_holds": 0, "stale_at_dispatch": 0}
+        self.quote_stats = {"stale_quotes_refused": 0, "submit_holds": 0, "stale_at_dispatch": 0,
+                            "stale_at_wire": 0}
+        self.host_clock = None  # the preflight's host-versus-broker clock comparison
         self._quote_hold = False
         self.go_rechecks = {"performed": 0, "stopped_by": None}
         self._position_future = None
@@ -2011,6 +2094,13 @@ class LiveCapacityRun(CapacityRun):
                 # Zero open orders, so no cancel of this run can touch another client's order.
                 raise HarnessRefusal("live_account_has_open_orders") from None
             raise
+        # Quote age and go expiry are judged on the host clock: it must agree with the
+        # broker's within 1 s. The measurement is kept for the receipt either way.
+        self.host_clock = host_clock_check(pre.get("broker_clock"))
+        if self.host_clock is None:
+            raise HarnessRefusal("broker_clock_unreadable")
+        if not self.host_clock["within_limit"]:
+            raise HarnessRefusal("host_clock_skew")
         if pre.get("market_open") is not True:
             raise HarnessRefusal("live_broker_reports_market_closed")
         return pre
@@ -2042,19 +2132,24 @@ class LiveCapacityRun(CapacityRun):
 
     def _submit_call(self):
         """The port's submit, preceded on the REST worker by one more age check of the
-        price's quote, so a submit that waited in the executor is never sent stale."""
+        price's quote, so a submit that waited in the executor is never sent stale.
+        The quote's wall time is passed on (as the sixth argument) to the live port,
+        which checks the age a last time at the wire, after it took a pooled client
+        and immediately before the POST (``quote_stale_at_wire``, not sent)."""
         submit, quote_wall, limit = self.port.submit, self.quote_wall, self.config.max_quote_age_seconds
 
         def fresh_submit(*args):
             age = None if quote_wall is None else self.clock.time() - quote_wall
             if age is None or not -QUOTE_FUTURE_TOLERANCE_SECONDS <= age <= limit:
                 return Response(None, error="quote_stale_at_dispatch", not_sent=True)
-            return submit(*args)
+            return submit(*args, quote_wall)
         return fresh_submit
 
     def _on_submit(self, probe, response, done_at=None):
         if response.not_sent and response.error == "quote_stale_at_dispatch":
             self.quote_stats["stale_at_dispatch"] += 1
+        if response.not_sent and response.error == "quote_stale_at_wire":
+            self.quote_stats["stale_at_wire"] += 1
         super()._on_submit(probe, response, done_at)
 
     # -- total order-action cap ----------------------------------------------------
@@ -2198,8 +2293,10 @@ class LiveCapacityRun(CapacityRun):
         receipt. A finished read is handled in the same pass, before the next submit
         decision. Any failed read fails closed (``live_position_check_failed``) and
         is not retried: an exception (the native port raises on every error status,
-        429 and 5xx included), a response that is not 2xx (fed to the governor first,
-        so a 429 still backs off cleanup) or unreadable rows."""
+        429 and 5xx included), a response that is not 2xx or unreadable rows. Every
+        response, including one an exception kept (the native port's 429 with its
+        Retry-After), is fed to the governor before the freeze, so cleanup cancels
+        honour the backoff."""
         now = self.clock.monotonic()
         if self._last_go_check is None:
             self._last_go_check = now
@@ -2224,8 +2321,10 @@ class LiveCapacityRun(CapacityRun):
         try:
             (rows, responses), _ = future.result()
             responses = list(responses)
-        except Exception:
+        except Exception as exc:
             action["ok"] = False
+            for response in self._error_responses(exc):
+                self._record("read", response, "run")
             self.position_checks["failed"] += 1
             self._freeze("live_position_check_failed")
             return
@@ -2344,6 +2443,7 @@ class LiveCapacityRun(CapacityRun):
             "quote_freshness": dict(self.quote_stats, max_quote_age_seconds=config.max_quote_age_seconds,
                                     requote_seconds=config.requote_seconds,
                                     stale_requote_seconds=LIVE_STALE_REQUOTE_SECONDS),
+            "host_clock": None if self.host_clock is None else dict(self.host_clock),
             "fills": fills,
             "filled_qty_total": str(total),
             "auto_sell": False,
@@ -2613,8 +2713,27 @@ def main(argv=None):
         summary.update(mode=receipt["mode"], by_status=receipt["broker_orders_with_prefix"]["by_status"])
     if "live" in receipt:
         summary.update(filled_qty_total=receipt["live"]["filled_qty_total"])
-    print(json.dumps(summary))
+    try:
+        print(json.dumps(summary), flush=True)
+    except OSError:
+        # After SIGHUP the terminal is gone and this write fails (EIO). The receipt is
+        # saved; the run's exit code stands, not 1 from a traceback.
+        _stdout_to_devnull()
     return code
+
+
+def _stdout_to_devnull():
+    """Point stdout's descriptor at /dev/null, so the interpreter's final flush of
+    the unwritten summary cannot fail as well and turn the exit status into 120
+    (the pattern the Python ``signal`` documentation gives for SIGPIPE)."""
+    try:
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        try:
+            os.dup2(devnull, sys.stdout.fileno())
+        finally:
+            os.close(devnull)
+    except (OSError, ValueError, AttributeError):
+        pass
 
 
 if __name__ == "__main__":

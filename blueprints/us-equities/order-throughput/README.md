@@ -79,7 +79,9 @@ evidence of strategy quality.
    exception. The stop signals are SIGINT, SIGTERM, SIGHUP (the terminal or
    WSL session closed) and SIGQUIT. In a run, each stops new submissions;
    cleanup, reconciliation, the receipt and the journal end record still run.
-   `recover` and `audit` finish their work instead of stopping. SIGKILL cannot
+   If the terminal is gone by then, the one-line summary on stdout cannot be
+   written (EIO). That failure is ignored: the receipt is already saved, and the
+   exit code is still the run's. `recover` and `audit` finish their work instead of stopping. SIGKILL cannot
    be caught (see the journal below). Cleanup cancels every live probe
    individually. It then lists open
    orders and cancels anything left with this run's `client_order_id` prefix,
@@ -165,6 +167,11 @@ evidence of strategy quality.
   disagree refuse it (`journal_origin_unknown`). A run refuses any file already
   at its journal path before any request (`journal_exists`), and names another
   mode's journal (`live_journal_in_paper_mode`, `paper_journal_in_live_mode`).
+  `recover` and `audit` read the journal through the same guard: only a
+  regular file (by `lstat`, so not a FIFO, device, directory or symlink) of at
+  most 64 MiB is opened, without following a symlink and without blocking. Anything
+  else is refused before any credential (`journal_not_regular_file`,
+  `journal_too_large`).
 - **Existing exposure.** The run is refused unless the exact number of
   existing nonzero positions and open orders matches `--acknowledge-positions`
   and `--acknowledge-open-orders` (both default 0).
@@ -245,7 +252,8 @@ Exit codes:
 | 2 | Refused before any order |
 | 3 | `needs_attention`, `failed`, or cleanup/reconciliation not clean |
 
-The `live` command uses the same exit codes.
+The `live` command uses the same exit codes. A summary line that cannot be
+written to a closed terminal (after SIGHUP) does not change the code.
 
 ## Live (user-gated capacity probes)
 
@@ -353,7 +361,14 @@ Only after these gates is the env file read, through adaptive-paper
 Its `APCA_API_BASE_URL` may be unset or the live origin. A paper URL refuses
 the run (`paper_base_url_in_live_env`). Next, the read-only preflight must see
 zero open orders on the account (`live_account_has_open_orders`), so no
-cancel can touch another client's order. The broker clock must also report
+cancel can touch another client's order. Quote age and go expiry are judged
+on the host clock, so the host clock must agree with the broker clock
+(`GET /v2/clock` `timestamp`) within 1 s. The port records the host time just
+before and after that read. The skew is host minus broker at the read's
+midpoint, and half the round trip is added as uncertainty. Over 1 s refuses
+the run (`host_clock_skew`), and an unreadable timestamp refuses it too
+(`broker_clock_unreadable`). The receipt's `live.host_clock` records the
+measured `skew_seconds` and `round_trip_seconds` either way. The broker clock must also report
 the market open. The whole run, cleanup included, must fit before the close
 (`session_ends_too_soon`). As in paper, the run holds adaptive-paper's account-writer
 lock for its whole duration. The lock is keyed by the live account's hashed
@@ -373,7 +388,11 @@ identity and kept in adaptive-paper's lock directory.
     refresh is refused and counted. The first fresh quote reprices the probes,
     and submissions resume. Cancels continue during a hold.
   - The REST worker checks the quote's age once more immediately before each
-    submit. A submit that waited too long is not sent.
+    submit. A submit that waited too long is not sent (`stale_at_dispatch`).
+  - The worker passes the quote's time to the live port. The port checks the
+    age a last time at the wire, after it took a pooled client and immediately
+    before the POST, next to the STOP files and the go's expiry. Over 10 s, or
+    no quote time, is refused and counted as not sent (`stale_at_wire`).
   - A failed, halted or otherwise unusable refresh stops submissions, as in
     paper.
 - The budget is `floor(min(--cap, observed x-ratelimit-limit) * 0.9)` calls
@@ -397,7 +416,10 @@ identity and kept in adaptive-paper's lock directory.
   the preflight snapshot. Any failed read stops submissions
   (`live_position_check_failed`) and is not retried. A failed read is an
   exception (the native port raises on every error status, 429 and 5xx
-  included), a response that is not 2xx, or unreadable rows.
+  included), a response that is not 2xx, or unreadable rows. The native
+  port's exception keeps the response's status and rate-limit headers. The
+  governor records it before the freeze, so cleanup cancels honour a 429's
+  Retry-After.
 - SIGINT, SIGTERM, SIGHUP (the terminal or WSL session closed) and SIGQUIT
   stop submissions, and cleanup still cancels this run's probes. SIGKILL
   cannot be caught; see [Not implemented](#not-implemented).
@@ -446,8 +468,11 @@ contains:
 - `order_actions`, with the actions sent and the cap;
 - `quote_freshness`: the age limit, the refresh interval, and counts of stale
   refreshes refused (`stale_quotes_refused`), submission holds
-  (`submit_holds`) and submits not sent by the worker's age check
-  (`stale_at_dispatch`);
+  (`submit_holds`), submits not sent by the worker's age check
+  (`stale_at_dispatch`) and submits not sent by the port's check at the wire
+  (`stale_at_wire`);
+- `host_clock`: the preflight's measured `skew_seconds` (host minus broker),
+  `round_trip_seconds`, `max_skew_seconds` (1.0) and `within_limit`;
 - `fills`, `position_checks` and `stop_files_seen` (labels, not paths).
 
 Like the paper receipt, it contains no account id, account hash, balance or
@@ -555,7 +580,7 @@ IDs.
 |---|---|
 | Measured (offline fixture) | The governor and engine under 200 and 1000 headers, a header rise, 429 freeze/backoff (including during cleanup), refusals, cleanup, and reconciliation, including a lost response for a created order. Also: per-page listing admission, several in-flight calls completing out of order, the real `ThreadPoolExecutor` path, failing in-flight port calls, and crash then journal recovery. See `tests/test_order_throughput.py`. |
 | Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
-| Measured (offline fixture, live mode) | Each live gate's refusal: go file, acknowledgement flag, env-file names both ways, symbol, headroom, quote age and refresh limits, band, an existing journal, RTH including an early close, open orders, both STOP files, cancel-all. Also: caps from min(CLI, go file, live ceilings), the order-action cap on the worst-case cancel path, and go expiry, revocation or change mid-run. Fills and position changes stop the run without selling; they end `needs_attention` even with a port error, and the receipt keeps another order's fill quantity and price. A 25 s quote-feed stall: no probe priced from a quote over 10 s old, submissions hold, then resume. SIGHUP and SIGQUIT stop the run and cleanup runs. A failed position read fails closed. Paper `recover` and `audit` refuse a live journal, including one without the mode fields, before reading credentials. See `LiveCapacityTests` and `LivePortTests` in `tests/test_order_throughput.py`. |
+| Measured (offline fixture, live mode) | Each live gate's refusal: go file, acknowledgement flag, env-file names both ways, symbol, headroom, quote age and refresh limits, band, an existing journal, RTH including an early close, open orders, both STOP files, cancel-all. Also: caps from min(CLI, go file, live ceilings), the order-action cap on the worst-case cancel path, and go expiry, revocation or change mid-run. Fills and position changes stop the run without selling; they end `needs_attention` even with a port error, and the receipt keeps another order's fill quantity and price. A 25 s quote-feed stall: no probe priced from a quote over 10 s old, submissions hold, then resume. SIGHUP and SIGQUIT stop the run and cleanup runs. A failed position read fails closed. Paper `recover` and `audit` refuse a live journal, including one without the mode fields, before reading credentials. Also: the live port's quote-age check at the wire (a stub SDK client, no network) and its count as not sent; the exit code kept when the summary cannot be written (EIO, in-process and through a closed pseudo-terminal); the host-clock skew gate and its receipt field; a 429 on the position read backing off cleanup cancels by its Retry-After; `recover`/`audit` refusing a FIFO, symlinked or over-64 MiB journal. See `LiveCapacityTests` and `LivePortTests` in `tests/test_order_throughput.py`. |
 | Measured (SDK objects, no network) | Under alpaca-py 0.44.0 (the adaptive-paper pinned venv, Python 3.12): the live `TradingClient` and its `GuardedSession` use only `https://api.alpaca.markets`, and the live stream only `wss://api.alpaca.markets/stream`. The paper port's objects use only the paper origin. The live preflight, run against stub clients, returns an identity hash and no account id or balance. These tests build SDK objects and send no request. They are skipped where alpaca-py is not installed. |
 | Not exercised with SDK objects | The order request (`LimitOrderRequest`); the port's submit, cancel, listing, positions and quote-refresh calls through SDK clients; a running `trade_updates` stream. Their logic is tested with stub clients only. |
 | Not yet measured | Any native paper run of this harness. Any live run, and either port against Alpaca's REST or websocket endpoints. |

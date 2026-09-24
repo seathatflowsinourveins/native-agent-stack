@@ -28,7 +28,9 @@ its ``trade_updates`` stream is pinned to wss://api.alpaca.markets/stream. It
 keeps the same method/path allowlist (no cancel-all path), is constructed only
 with a verified, unexpired ``capacity.LiveGo`` and one of ``capacity.LIVE_SYMBOLS``
 (SPY, QQQ, IWM, DIA), submits only that symbol, and re-checks the host and
-alpaca-live STOP files and the go file's expiry before every POST. The paper
+alpaca-live STOP files, the go file's expiry and the age (at most 10 s) of the
+quote behind the probe's price before every POST. Its preflight brackets the
+broker clock read with host wall times for the engine's clock-skew gate. The paper
 port above never admits the live origin. The live port has not been run
 against Alpaca or its network endpoints.
 """
@@ -49,7 +51,8 @@ for _path in (str(HERE), str(ADAPTIVE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from capacity import LIVE_SYMBOLS, LIVE_URL, LIVE_WS, LiveGo, Response  # noqa: E402
+from capacity import (LIVE_MAX_QUOTE_AGE_SECONDS, LIVE_SYMBOLS, LIVE_URL, LIVE_WS,  # noqa: E402
+                      QUOTE_FUTURE_TOLERANCE_SECONDS, LiveGo, Response)
 from safety import DEFAULT_STOP, SafetyError  # noqa: E402
 import transport  # noqa: E402
 
@@ -59,6 +62,16 @@ MAX_PAGES = 20
 
 def _order_view(raw, fields=ORDER_FIELDS):
     return {name: str(raw.get(name) or "") for name in fields}
+
+
+class ReadFailed(transport.TransportError):
+    """A failed read (an error status or unreadable rows). ``responses`` keeps its
+    sanitized Response (status and rate-limit headers only), so the engine still
+    feeds a 429 and its Retry-After to the rate governor before it freezes."""
+
+    def __init__(self, message, responses):
+        super().__init__(message)
+        self.responses = list(responses)
 
 
 class AlpacaCapacityPort:
@@ -241,7 +254,7 @@ class AlpacaCapacityPort:
     def positions(self):
         response, rows = self._call(lambda client: client.get_all_positions())
         if response.error or not isinstance(rows, list):
-            raise transport.TransportError("positions unavailable")
+            raise ReadFailed("positions unavailable", [response])
         return [{"symbol": str(r["symbol"]), "qty": transport.decimal_string(r["qty"])} for r in rows], [response]
 
     # -- trade_updates stream (owner callbacks mirror AlpacaPaperTransport) ---------
@@ -387,20 +400,45 @@ class AlpacaLiveCapacityPort(AlpacaCapacityPort):
         super().__init__(api_key, secret_key, symbol, feed=feed, workers=workers, stop_file=stop_files[0])
         self.go = go
         self.stop_files = stop_files
+        self._wall = time.time  # the host clock behind the go-expiry and quote-age checks
 
-    def submit(self, client_order_id, symbol, qty, limit_price, extended_hours):
+    def submit(self, client_order_id, symbol, qty, limit_price, extended_hours, quote_wall=None):
+        """``quote_wall`` is the Unix time of the quote behind ``limit_price``. Its age is
+        checked again at the wire (``_before_request``), after this worker took a pooled
+        client and immediately before the POST; without it the submit is not sent."""
         # This port's own allowlisted symbol only; refused before any SDK object is built.
         if symbol != self.symbol or symbol not in LIVE_SYMBOLS:
             return Response(None, error="live_symbol_not_allowed", not_sent=True)
-        return super().submit(client_order_id, symbol, qty, limit_price, extended_hours)
+        # The SDK sends the POST from this thread, so the boundary check reads these.
+        self._local.quote_wall, self._local.refusal = quote_wall, None
+        try:
+            response = super().submit(client_order_id, symbol, qty, limit_price, extended_hours)
+        finally:
+            self._local.quote_wall = None
+        if response.not_sent and self._local.refusal:
+            response.error = self._local.refusal  # e.g. quote_stale_at_wire, counted as not sent
+        return response
+
+    def _submit_refusal(self):
+        if any(path.exists() for path in self.stop_files):
+            return "stop_blocks_entry"
+        now = self._wall()
+        if now >= self.go.expires_at:
+            return "live_go_expired"
+        quote_wall = getattr(self._local, "quote_wall", None)
+        age = None if type(quote_wall) not in (int, float) else now - quote_wall
+        if age is None or not -QUOTE_FUTURE_TOLERANCE_SECONDS <= age <= LIVE_MAX_QUOTE_AGE_SECONDS:
+            return "quote_stale_at_wire"
+        return None
 
     def _before_request(self, kind, client_id=None):
         # Final boundary: GuardedSession turns this refusal into SubmissionNotSent.
+        # Both STOP files, the go's expiry and the price's quote age (at most 10 s).
         if kind == "submit":
-            if any(path.exists() for path in self.stop_files):
-                raise SafetyError("stop_blocks_entry")
-            if time.time() >= self.go.expires_at:
-                raise SafetyError("live_go_expired")
+            reason = self._submit_refusal()
+            if reason:
+                self._local.refusal = reason
+                raise SafetyError(reason)
         return None
 
     def _trading_client(self, before_request, observer, *, read_only=False, lock=None):
@@ -423,7 +461,9 @@ class AlpacaLiveCapacityPort(AlpacaCapacityPort):
 
     def preflight(self):
         """Read-only live preflight: account (identity hash only), clock, positions,
-        open orders, asset and latest quote. No account id or balance is returned."""
+        open orders, asset and latest quote. No account id or balance is returned.
+        ``broker_clock`` carries the broker clock's timestamp and the host wall times
+        just before and after that read, for the engine's clock-skew gate."""
         from alpaca.data.enums import DataFeed
         from alpaca.data.requests import StockLatestQuoteRequest
         observations, attempts = [], []
@@ -444,7 +484,12 @@ class AlpacaLiveCapacityPort(AlpacaCapacityPort):
         try:
             raw_account = trading.get_account()
             identity = hashlib.sha256(str(raw_account["id"]).encode()).hexdigest()
-            market_open = trading.get_clock().get("is_open") is True
+            sent = self._wall()
+            raw_clock = trading.get_clock()
+            received = self._wall()
+            market_open = raw_clock.get("is_open") is True
+            broker_clock = {"timestamp": raw_clock.get("timestamp"), "host_sent_wall": sent,
+                            "host_received_wall": received}
             positions = [{"symbol": str(row["symbol"]), "qty": transport.decimal_string(row["qty"])}
                          for row in trading.get_all_positions()]
             raw_orders = trading.get("/orders", {"status": "open", "limit": 500, "nested": False})
@@ -467,7 +512,8 @@ class AlpacaLiveCapacityPort(AlpacaCapacityPort):
                 "open_orders": [_order_view(o, self.order_fields) for o in orders],
                 "open_orders_complete": isinstance(raw_orders, list) and len(raw_orders) < 500,
                 "asset_tradable": bool(asset.get("tradable")) and asset.get("status") == "active",
-                "market_open": market_open, "quote": quote, "observations": observations}
+                "market_open": market_open, "broker_clock": broker_clock, "quote": quote,
+                "observations": observations}
 
     def recovery_preflight(self):
         raise transport.TransportError("live recovery is not implemented")
