@@ -31,7 +31,8 @@ the checkout. After checkout, follow the documents in your checkout.
 The pages here name the release a step was written against. "Added after
 `vT`" means release `vT` lacks the file that step uses (a path in
 `release_due.py`'s `due` list); "changed after `vT`" means the file exists at
-`vT` but behaves as the note says there, not as main documents it. If your
+`vT` but behaves as the note says there, not as main documents it (its
+`changed` list names every new-machine file whose content differs from `vT`). If your
 checkout is `vT`, follow the note: run that step from a separate clone of the
 default branch (never the pinned one you install from; a result from it is
 main-only evidence) or wait for the next re-pin. If your checkout is a later
@@ -48,12 +49,21 @@ remains meaningful only as the comparison point `scripts/adoption_status.py`
 uses for its `baseline_matches`/`baseline_differs` `git` result, not as a
 checkout target.
 
-If downloading the release archive from an Actions run instead of
-`git clone` (e.g. no local git), verify its attested provenance before use:
+If installing from the release archive instead of `git clone` (e.g. no local
+git), download it from the GitHub Release and verify it before use. Both checks
+bind the file to this release: `verify-asset` to the immutable release's asset
+digest, and `--source-ref`/`--source-digest` to the tagged commit. Without them
+the attestation check also passes for an attested archive of any other commit
+(a `workflow_dispatch` run of `publish-catalog.yml`) saved under this name:
 ```sh
+gh release download <release_tag> --repo seathatflowsinourveins/native-agent-stack \
+  --pattern 'native-agent-stack-<release_commit>.tar.gz'
+gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz \
+  --repo seathatflowsinourveins/native-agent-stack
 gh attestation verify native-agent-stack-<release_commit>.tar.gz \
   --repo seathatflowsinourveins/native-agent-stack \
-  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-ref refs/tags/<release_tag> --source-digest <release_commit>
 ```
 
 Read the platform page for the chosen
