@@ -1032,7 +1032,7 @@ class EvidenceFileTests(unittest.TestCase):
     def test_rate_limit_evidence_is_current_and_matches_brief(self):
         data = evidence.build()
         totals = data["repository_observations"]["totals_by_origin_and_limit"]
-        self.assertEqual(totals, {"data:10000": 9, "trading:200": 419})
+        self.assertEqual(totals, {"data:10000": 13, "trading:200": 641})
         self.assertEqual(len(data["sources"]["items"]), 4)
         committed = json.loads((SOURCE / "rate-limit-evidence-20260924.json").read_text())
         self.assertEqual(committed, data)
