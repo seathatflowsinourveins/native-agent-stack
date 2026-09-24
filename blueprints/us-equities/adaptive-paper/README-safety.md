@@ -71,7 +71,10 @@ limit-order mechanism guarantees a flat finish.
   (`"sub_penny_minimum_price_variance"`), which the transport assigns only to the
   documented body code 42210000 with "sub-penny increment does not fulfill minimum
   pricing criteria" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md: such
-  orders "will be rejected"). The ledger also requires the intent's own durable
+  orders "will be rejected"). That page documents the body, not the HTTP status;
+  the 422 is inferred from the code prefix and the POST /v2/orders 422 entry and
+  awaits native confirmation, so the same body under any other status stays
+  ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
   limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
   otherwise). Any other 422, including "client_order_id must be unique", stays
   ambiguous. `reserve_intent` still refuses such a price before send

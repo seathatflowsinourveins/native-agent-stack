@@ -45,7 +45,10 @@ minimum-price-variance refusal: a 422 whose body code is 42210000 and whose mess
 contains "sub-penny increment does not fulfill minimum pricing criteria", for a
 first POST whose limit price really has more than two decimals at or above $1.00
 (four below), followed by an absent-ID lookup. Alpaca states such orders "will be
-rejected" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md); the transport
+rejected" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md). That page
+documents the body but not the HTTP status; 422 is inferred from the code prefix and
+the POST /v2/orders 422 entry, pending native confirmation, and the message, not the
+code, is the discriminator. The transport
 raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
 the body with those constants only, never retaining or raising it. The engine's
 own Ledger refuses such prices before send, so only the native-fault harness,

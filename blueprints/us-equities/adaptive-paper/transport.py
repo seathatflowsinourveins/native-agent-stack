@@ -60,10 +60,13 @@ class RejectedSubmission(TransportError):
 # ambiguous (it also carries "client_order_id must be unique", which proves an order
 # exists) except the one Alpaca documents as a rejection: a limit price in excess of
 # the minimum price variance, body code 42210000 with the message below
-# (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny increments";
-# POST /v2/orders 422 "Input parameters are not recognized",
-# https://docs.alpaca.markets/us/reference/postorder.md). The body is only compared
-# with these constants; it is never retained or raised.
+# (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny increments").
+# That page documents the body, not the HTTP status; 422 is inferred from the code
+# prefix and POST /v2/orders 422 "Input parameters are not recognized"
+# (https://docs.alpaca.markets/us/reference/postorder.md), pending native
+# confirmation, so any other status stays ambiguous. The message is the
+# discriminator; the code alone is not sufficient. The body is only compared with
+# these constants; it is never retained or raised.
 SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
 SUB_PENNY_CODE = 42210000
 SUB_PENNY_MESSAGE = "sub-penny increment does not fulfill minimum pricing criteria"

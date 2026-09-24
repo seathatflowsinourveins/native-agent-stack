@@ -16,7 +16,8 @@ the engine and harness, so a live run can now reach `native_faults_passed`:
   shows it terminal. Alpaca's answer is data. A 404 or 422 is accepted without a
   freeze when the follow-up lookup shows the order terminal. The repeated terminal
   observation changes no ledger state.
-- C04: the one documented definitive 422 is recognised. See "C04 choice" below.
+- C04: Alpaca's documented sub-penny rejection body (HTTP 422 inferred, not yet
+  observed) is recognised as definitive. See "C04 choice" below.
   The harness's `FaultLedger` lets only the C04 client id past the pre-send
   `invalid_price_increment` check, so Alpaca itself answers the fault.
 
@@ -26,9 +27,11 @@ and engine hashes and stays `native_faults_incomplete` until a new paper run
 replaces it.
 
 The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
-harness commit) went exactly that way. The plan and engine source hashes in
-the receipt match this tree; its `harness_sha256` (742fb666...) is the harness
-as run. `harness.py` was changed after the run, following review: an
+harness commit) predates the engine change. It produced the incomplete result
+in the table below. Its `plan_sha256`, `harness_sha256` (742fb666...) and
+`engine_sources_sha256` (runner.py, safety.py, transport.py) are the
+pre-change hashes and do not match this tree. Before the engine change,
+`harness.py` was also changed after the run, following review: an
 exception inside cleanup still writes `CLEANUP_REQUIRED` and a receipt (the run
 itself cleaned up without error), a leftover marker from an earlier run
 refuses a new start, the write-ahead marker is fsynced, and a failed transport
@@ -78,7 +81,7 @@ transport:
 | C01 accept_resting_buy | SPY qty-1 DAY limit at 50% of the streamed bid, rounded down to the cent | Broker accepts; ledger shows submitted, broker id recorded, open, zero filled |
 | C02 cancel_resting | Engine cancel | Ledger `canceled`, zero filled; a fresh broker snapshot shows `canceled` |
 | C05 cancel_again | Engine cancel of the already-canceled order | The DELETE is sent and answered 204, 404 or 422. No exception, no new transport freeze reason, ledger and effect unchanged. Receipt records `delete_sent`, `cancel_http_statuses` and `broker_refusal_observed` |
-| C04 definitive_rejection | SPY qty-1 limit at 40% of the bid plus $0.0001 (at least $1), sent by the only client id `FaultLedger` exempts | Either the ledger records `broker_refused` for the documented sub-penny 422 with refusal `sub_penny_minimum_price_variance`, or every submit status is 401, 403 or 404. The client-id lookup returns 404, and there is no position or cash effect. Any other 400, 422, 429 or 5xx fails. If the engine still refuses before send, the case is `unobserved` with reason `engine_refused_before_send: ...` |
+| C04 definitive_rejection | SPY qty-1 limit at 40% of the bid plus $0.0001 (at least $1), sent by the only client id `FaultLedger` exempts | Either the ledger records `broker_refused` for a 422 carrying the documented sub-penny body, with refusal `sub_penny_minimum_price_variance`, or every submit status is 401, 403 or 404. The client-id lookup returns 404, and there is no position or cash effect. Any other 400, 422, 429 or 5xx fails. If the engine still refuses before send, the case is `unobserved` with reason `engine_refused_before_send: ...` |
 
 The plan's `c04_sub_penny_increment` must be strictly between 0 and 0.01.
 
@@ -134,7 +137,7 @@ Bounds:
 - The price reference is the engine's streamed quote bid. The engine transport
   has no last-trade read.
 
-## C04 choice: the documented sub-penny 422
+## C04 choice: the documented sub-penny rejection
 
 The alternative was a fault Alpaca answers with 401, 403 or 404, keeping the
 pre-send check for every client id. Within this plan's bounds no such fault is
@@ -163,6 +166,16 @@ will be rejected", and gives the body `{"code": 42210000, "message": "invalid
 limit_price 290.123. sub-penny increment does not fulfill minimum pricing
 criteria"}`.
 
+That page documents the body and the rejection, not the HTTP status. The 422
+is an inference: the code's 422 prefix and the create-order reference's only
+input-refusal status, 422 "Input parameters are not recognized."
+(https://docs.alpaca.markets/us/reference/postorder.md). The next native run
+must confirm it. The engine fails closed if it is wrong: `documented_refusal`
+requires status 422, and any other status with this body stays ambiguous.
+The code 42210000 alone is not treated as sufficient, since it may be shared
+by other 422 refusals (the offline fixtures use it for several). The message
+match is the discriminator, and the transport requires both.
+
 422 is not definitive in general. Alpaca also returns it for "client_order_id
 must be unique"
 (https://alpaca.markets/learn/how-to-fix-common-trading-api-errors-at-alpaca),
@@ -170,7 +183,7 @@ which proves that an order exists. The transport therefore requires all of the
 following before it raises `RejectedSubmission(422,
 "sub_penny_minimum_price_variance")`:
 
-- the documented code and message;
+- the documented code and, as the discriminator, the documented message;
 - a limit price that really violates the documented increment;
 - the first POST of this client id (SDK retries are disabled);
 - a client-id lookup that returns 404.
@@ -193,11 +206,14 @@ this tree's plan, harness and engine hashes:
 - C01 and C02 as before: submit 200 and an open status, then cancel 204 and
   `canceled` in the ledger and in a fresh broker snapshot.
 - C05 with evidence `native_paper`, `delete_sent: true` and requests `cancel`
-  then `read`. The DELETE status is expected to be 422, since Alpaca documents
+  then `read`. The DELETE status is expected to be 422, since Alpaca's DELETE
+  reference documents
   "The order status is not cancelable"; 204 or 404 is also accepted as data.
   `new_transport_freeze_reasons` must be empty and `ledger_before` must equal
   `ledger_after`, both `canceled` with zero filled.
 - C04 with evidence `native_paper` and requests `submit` 422 then `read` 404.
+  This observation is what confirms the inferred HTTP 422 for the documented
+  sub-penny body.
   The ledger shows `broker_refused` with `ledger_refusal` `{"http_status": 422,
   "refusal": "sub_penny_minimum_price_variance"}`, and `effect_before` equals
   `effect_after`.

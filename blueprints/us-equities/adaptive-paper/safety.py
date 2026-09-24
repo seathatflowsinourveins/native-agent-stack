@@ -38,9 +38,12 @@ RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5, "broker_refused": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
 DEFINITIVE_REFUSAL_STATUSES = (401, 403, 404)
-# The one documented 422 that is a definitive refusal: Alpaca states that orders in
-# excess of the minimum price variance "will be rejected" and documents the body
-# code 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
+# The one 422 treated as a definitive refusal: Alpaca states that orders in excess
+# of the minimum price variance "will be rejected" and documents the body code
+# 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
+# The page does not state the HTTP status; 422 is inferred from the code prefix and
+# the POST /v2/orders 422 entry, pending native confirmation. The message, not the
+# code, is the discriminator.
 # Every other 422 (for example "client_order_id must be unique", which proves an
 # order exists) stays ambiguous.
 SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
