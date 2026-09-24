@@ -1,0 +1,148 @@
+{
+ "schema_version": 1,
+ "id": "native-sec-new-host-20260924",
+ "kind": "native_cli_e2e",
+ "component_ids": [
+  "edgartools"
+ ],
+ "claim": "New-host observation on the WSL2 Threadripper workstation: native EdgarTools 5.58.0, in an isolated runtime whose installed packages equal requirements.lock, completed the bounded get_filings request for 2020-03-02 with one SEC archive GET answered 200, 371 8-K/8-K/A index rows and the same five selected CIK/accession rows as the 2026-09-19 receipt. It adds a host; it does not replace the 2026-09-19 receipt.",
+ "limitations": [
+  "One native upstream metadata request (the quarterly form index) on one host at one time. The provenance adapter (catalyst.py acquire and packet) was not run on this host, so no daily index, header bytes or temporal packets are observed here.",
+  "Unique-accession counts, forms breakdown and the complete compressed source's bytes and gzip validation were measured in 2026-09-19 and are not re-measured by this output, which records only the cohort count and five selected rows.",
+  "The exact command line was not retained. The output's keys and fields match native_edgar.py's native_network receipt, but that the file came from this repository's native_edgar.py is inferred from its schema, not recorded.",
+  "The runtime package check (installed packages equal requirements.lock) was made when this receipt was written, after the request; the request-time environment is inferred from it.",
+  "The contact identity is private. Its unsalted SHA-256 in the private output is withheld from the committed copy, because a guessed contact could be confirmed against it; a matching contact between the two hosts is therefore not shown.",
+  "Successful access on this host does not establish historical availability, as-known data or a strategy result; 2020 filing dates do not imply this runtime observed the filings then.",
+  "Not a host_receipts.py receipt: that recorder executes its own commands, so it cannot import an earlier output. No platform_status, landscape verdict or trading gate changes because of this file."
+ ],
+ "recorded_at_utc": "2026-09-24T15:55:00Z",
+ "relation_to_earlier": {
+  "earlier_receipt": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+  "earlier_receipt_id": "native-sec-access-resolution-20260919",
+  "replaces_earlier": false,
+  "same_cohort_count": true,
+  "same_five_selected_cik_accessions": true,
+  "selected": [
+   "12208-0001193125-20-059087",
+   "13239-0000013239-20-000002",
+   "16918-0000016918-20-000035",
+   "18349-0000018349-20-000014",
+   "2186-0001654954-20-002156"
+  ]
+ },
+ "host": {
+  "host_class": "WSL2 Threadripper workstation (Linux x86_64 under Windows)",
+  "platform_id": "linux-wsl2-x86_64",
+  "cpu_model_at_recording": "AMD Ryzen Threadripper PRO 5975WX 32-Cores (lscpu)",
+  "new_host_for_this_component": true,
+  "note": "Named a new host by the recording coordinator. The 2026-09-19 receipt does not record its host hardware, so this file does not itself verify that the two hosts differ. No second_physical_machine claim is made."
+ },
+ "native_upstream": {
+  "package": "edgartools",
+  "version": "5.58.0",
+  "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+  "runtime": "isolated CPython 3.13.15 environment under the private catalyst runtime; uv pip freeze equals blueprints/us-equities/catalyst-provenance/requirements.lock (42 packages) at recording time",
+  "requirements_lock_sha256": "5aeadfb5a8f2ca7b26548ca3acaadcf1fe626230aff671011b6a341beeeb61df",
+  "native_edgar_py_sha256_at_recording": "72af6528dad542842f63fc3c765c3a3c21867d36942126f69f3f03c298983df7",
+  "documented_recipe_with_this_output_name": ". \"$SEC_CONTACT_ENV\"; export EDGAR_IDENTITY=\"$SEC_USER_AGENT\"; EDGAR_LOCAL_DATA_DIR=\"$CATALYST_RUNTIME/native-cache\" timeout --signal=TERM --kill-after=5s 60s \"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --out \"$CATALYST_RUNTIME/native-network-20260924.json\"",
+  "api": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+  "status": "complete",
+  "mode": "native_network",
+  "http_observations": [
+   {
+    "method": "GET",
+    "status": 200,
+    "url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz"
+   }
+  ],
+  "automatic_retries": 0,
+  "cohort_rows": 371,
+  "selected_context_rows": 5,
+  "context_truncated": false,
+  "started_at_utc": "2026-09-24T13:15:14.870379Z",
+  "finished_at_utc": "2026-09-24T13:15:16.514251Z"
+ },
+ "output": {
+  "private_original": "<private>/catalyst-runtime/native-network-20260924.json",
+  "private_original_mode": "0600",
+  "private_original_sha256": "ed92e3406e1fa5d2f230469d9be8b2ea85b7fae060fd79672f19de6bac0bd07e",
+  "private_original_bytes": 2145,
+  "private_content_check": "read in full before copying: no email address, host path or contact text; the only identity-derived field is identity_sha256",
+  "withheld_fields": [
+   "identity_sha256"
+  ],
+  "committed_copy_sha256": "8b1720cafc546e03ce35b5730c13e642eb1261125ca50720c38e1564d6c883c4",
+  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (indent 2, sorted keys); committed_copy_sha256 is over that serialization",
+  "native_output": {
+   "automatic_retries": 0,
+   "cohort_count": 371,
+   "day": "2020-03-02",
+   "edgartools": "5.58.0",
+   "finished_at": "2026-09-24T13:15:16.514251Z",
+   "first_observed_at": "2026-09-24T13:15:16.509932Z",
+   "forms": [
+    "8-K",
+    "8-K/A"
+   ],
+   "historical_point_in_time": false,
+   "http_observations": [
+    {
+     "method": "GET",
+     "status": 200,
+     "url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz"
+    }
+   ],
+   "method": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+   "mode": "native_network",
+   "native_context": "FILINGS COLLECTION\n\nTotal: 5 filings\nForms: 8-K\nDate Range: 2020-03-02 to 2020-03-02\n\nAVAILABLE ACTIONS:\n  - Use .latest() to get most recent filing\n  - Use [index] to access specific filing (e.g., filings[0])\n  - Use .filter(form='C') to narrow by form type\n  - Use .docs for detailed API documentation",
+   "native_context_truncated": false,
+   "omitted_empty_proxy_variables": [],
+   "schema_version": 1,
+   "selected": [
+    {
+     "accession_number": "0001654954-20-002156",
+     "cik": 2186,
+     "company": "BK Technologies Corp",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0001193125-20-059087",
+     "cik": 12208,
+     "company": "BIO-RAD LABORATORIES, INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000013239-20-000002",
+     "cik": 13239,
+     "company": "HEXION INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000016918-20-000035",
+     "cik": 16918,
+     "company": "CONSTELLATION BRANDS, INC.",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    },
+    {
+     "accession_number": "0000018349-20-000014",
+     "cik": 18349,
+     "company": "SYNOVUS FINANCIAL CORP",
+     "filing_date": "2020-03-02T00:00:00.000",
+     "form": "8-K"
+    }
+   ],
+   "started_at": "2026-09-24T13:15:14.870379Z",
+   "status": "complete"
+  }
+ },
+ "evidence_class": "native_proven",
+ "not_run": [
+  "catalyst.py acquire / packet on this host",
+  "any SEC request beyond the one recorded GET",
+  "host_receipts.py record / review"
+ ]
+}

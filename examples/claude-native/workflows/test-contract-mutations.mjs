@@ -20,20 +20,54 @@ const relativeBindings = BINDINGS.filter(([, v]) => typeof v === 'string' && !v.
 const DEPTH = Math.max(0, ...relativeBindings.map(([, v]) => v.split('/').filter((seg) => seg === '..').length - 1)) + 2
 let passed = 0, failed = 0
 const expect = (n, c) => { console.log((c ? 'PASS ' : 'FAIL ') + n); if (c) passed++; else failed++ }
+// Bound files as the copied tree places them (relative to its root), so the mutations below hold in every
+// layout contract.config.json may describe; settings mutations start from the real env so each drifts one value.
+const SETTINGS_FILE = join('workflows', CONFIG.settings)
+const INSTRUCTIONS_FILE = join('workflows', CONFIG.instructions)
+const ROUTING_DOC_FILE = join('workflows', CONFIG.routing_doc)
+const ENV = JSON.parse(readFileSync(resolve(HERE, CONFIG.settings), 'utf8')).env || {}
 const MUTATIONS = [
   ['a later stage names a nonexistent agent', 'workflows/review-changes.js', "agentType: 'evidence-reviewer'", "agentType: 'evidence-reviwer'", 'names only valid project agents in every stage'],
-  ['a later stage drops its model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'high'", "agentType: 'evidence-reviewer', effort: 'high'", 'binds model and effort inside every options literal'],
+  ['a later stage drops its model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', effort: 'max'", 'binds model and effort inside every options literal'],
   ['the packet drifts by one space', 'workflows/readiness-audit.js', 'only the listed sources, no writes', 'only the listed sources,  no writes', 'PACKET text is byte-identical'],
   ['the reviewer regains a bare server grant', 'agents/evidence-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, ToolSearch, mcp__serena, ', 'never a bare server prefix'],
   ['the reviewer gains a file-creating tool', 'agents/evidence-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, ToolSearch, mcp__serena__create_text_file, ', 'tool surface is exactly the reviewed list'],
-  ['an agent drops its effort', 'agents/source-scout.md', 'effort: medium\n', '', 'declares an explicit model and effort'],
-  ['an agent( hides inside a template literal', 'workflows/readiness-audit.js', "phase('Verify')", "phase('Verify')\nconst never = () => `${agent('x', { label: 'h', model: 'opus', effort: 'high' })}`", 'has no agent( inside a template literal'],
+  ['an agent drops its effort', 'agents/source-scout.md', 'effort: max\n', '', 'declares an explicit model and effort'],
+  ['an agent( hides inside a template literal', 'workflows/readiness-audit.js', "phase('Verify')", "phase('Verify')\nconst never = () => `${agent('x', { label: 'h', model: 'opus', effort: 'max' })}`", 'has no agent( inside a template literal'],
   ['a stage drops the shared packet but keeps its label', 'workflows/review-changes.js', "PACKET + '\\nYou are an independent reviewer.", "'Worker packet contract:' + '\\nYou are an independent reviewer.", 'starts every worker prompt with the full shared packet'],
   ['the review stage is routed to the builder', 'workflows/review-changes.js', "agentType: 'evidence-reviewer'", "agentType: 'isolated-builder'", 'routes each stage to its reviewed agent, model and effort'],
   ['a stage loses its agentType', 'workflows/readiness-audit.js', "agentType: 'source-scout', ", '', 'routes each stage to its reviewed agent, model and effort'],
   ['a call is written as agent (', 'workflows/review-changes.js', "phase('Inventory')", "phase('Inventory')\nif (a.extraStage) await agent ('extra', { label: 'extra' })", 'binds model and effort inside every options literal'],
-  ['a later duplicate key overrides the model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'high' }", "agentType: 'evidence-reviewer', model: 'opus', effort: 'high', model: undefined }", 'declares model and effort exactly once'],
+  ['a later duplicate key overrides the model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max' }", "agentType: 'evidence-reviewer', model: 'opus', effort: 'max', model: undefined }", 'declares model and effort exactly once'],
   ['the builder loses worktree isolation', 'agents/isolated-builder.md', 'isolation: worktree\n', '', 'runs in its own worktree'],
+  // Effort max (docs/decisions/2026-09-23-max-effort-default.md): a stage or agent that drops its effort, or binds
+  // any level other than max, must fail; a stage without effort would inherit the coordinator's xhigh.
+  ['a later stage drops its effort', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus'", 'binds model and effort inside every options literal'],
+  ['a default-child stage drops its effort', 'workflows/readiness-audit.js', "schema: VERIFY, model: 'opus', effort: 'max'", "schema: VERIFY, model: 'opus'", 'binds model and effort inside every options literal'],
+  ['a review stage runs at effort high', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus', effort: 'high'", 'binds effort max in every options literal'],
+  ['a scout stage runs at effort medium', 'workflows/review-changes.js', "schema: RECHECK, agentType: 'source-scout', model: 'sonnet', effort: 'max'", "schema: RECHECK, agentType: 'source-scout', model: 'sonnet', effort: 'medium'", 'binds effort max in every options literal'],
+  ['a default-child stage runs at effort xhigh', 'workflows/readiness-audit.js', "schema: VERIFY, model: 'opus', effort: 'max'", "schema: VERIFY, model: 'opus', effort: 'xhigh'", 'binds effort max in every options literal'],
+  ['a reader stage names ultracode as its effort', 'workflows/readiness-audit.js', "agentType: 'source-scout', model: 'sonnet', effort: 'max'", "agentType: 'source-scout', model: 'sonnet', effort: 'ultracode'", 'binds effort max in every options literal'],
+  ['a lane stage runs at effort low while MODEL records max', 'workflows/layer-verdict-lane.js', "phase: 'Propose', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'max'", "phase: 'Propose', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'low'", 'records in MODEL, when declared, the same model and effort it binds'],
+  ['the lane MODEL literal records high while every call binds max', 'workflows/layer-verdict-lane.js', "const MODEL = { name: 'opus', effort: 'max' }", "const MODEL = { name: 'opus', effort: 'high' }", 'records in MODEL, when declared, the same model and effort it binds'],
+  ['the lane MODEL literal records a full model id while the calls bind aliases', 'workflows/layer-verdict-lane.js', "const MODEL = { name: 'opus', effort: 'max' }", "const MODEL = { name: 'claude-opus-5-5', effort: 'max' }", 'records in MODEL, when declared, the same model and effort it binds'],
+  ['an agent runs at effort low', 'agents/source-scout.md', 'effort: max\n', 'effort: low\n', 'runs at effort max on a single effort line'],
+  ['an agent runs at effort medium', 'agents/isolated-builder.md', 'effort: max\n', 'effort: medium\n', 'runs at effort max on a single effort line'],
+  ['an agent runs at effort high', 'agents/evidence-reviewer.md', 'effort: max\n', 'effort: high\n', 'runs at effort max on a single effort line'],
+  ['an agent runs at effort xhigh', 'agents/semantic-evidence-reviewer.md', 'effort: max\n', 'effort: xhigh\n', 'runs at effort max on a single effort line'],
+  ['an agent gains a second, lower effort line', 'agents/blind-lane-reviewer.md', 'effort: max\n', 'effort: max\neffort: high\n', 'runs at effort max on a single effort line'],
+  ['the routing table restates source-scout at medium', ROUTING_DOC_FILE, 'running acceptance commands | `source-scout` | Sonnet, max |', 'running acceptance commands | `source-scout` | Sonnet, medium |', 'lists every project agent once with the model and effort its file declares'],
+  ['the routing table restates a default child at high', ROUTING_DOC_FILE, '| default workflow subagent | Opus, max |', '| default workflow subagent | Opus, high |', 'every default workflow subagent row binds a model at effort max'],
+  ['the routing table moves the coordinator off xhigh under ultracode', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, xhigh under `ultracode`', '| coordinator | Opus 5.5, max', 'the coordinator row stays at xhigh under ultracode'],
+  ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds'],
+  // CLAUDE_CODE_EFFORT_LEVEL overrides every stage's and agent's effort at any value (docs; probes P6 and P9 at max), and any
+  // value other than xhigh also turns ultracode's orchestration off (P1); an effort cap below max clamps the stages.
+  ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=max', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'max' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
+  ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=xhigh', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'xhigh' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
+  ['the settings cap every model at xhigh', SETTINGS_FILE, 'maxEffortLevel', 'xhigh', 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
+  ['a per-model settings entry caps Sonnet at high', SETTINGS_FILE, 'modelSettings', { 'claude-sonnet-5': { maxEffortLevel: 'high' } }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
+  ['a harmless max cap in the settings', SETTINGS_FILE, 'maxEffortLevel', 'max', null],
+  ['a harmless comment mentions a lower effort', 'workflows/review-changes.js', "phase('Review')", "phase('Review') // before 2026-09-23 this stage bound effort: 'high'", null],
   // Config mutations are applied as JSON edits (key, new value) so they hold in every
   // layout the config may describe, not only the one whose strings appear here.
   ['the configured contract heading is absent from the contract doc', 'workflows/contract.config.json', 'contract_heading', '## Workflow contrac', 'contract_heading names the documented contract section'],

@@ -128,11 +128,13 @@ class SecretGuardProfileTests(unittest.TestCase):
 
 
 class AgentsInstallTests(unittest.TestCase):
-    def test_installs_all_five_agents(self):
+    def test_installs_every_adoption_agent(self):
+        # Seven since 2026-09-23: the blind layer-verdict roles (blind-lane-reviewer, blind-adjudicator) joined.
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
-            self.assertEqual(len(results), 5)
+            self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
+            self.assertEqual(len(results), 7)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -146,6 +148,39 @@ class AgentsInstallTests(unittest.TestCase):
             icp.install_agents(home, dry_run=False)
             results = icp.install_agents(home, dry_run=False)
             self.assertTrue(all(r == "skipped" for r in results))
+
+
+class ShippedAgentEffortTests(unittest.TestCase):
+    """Every shipped agent runs at effort max beside its task-matched model
+    (docs/decisions/2026-09-23-max-effort-default.md): an agent's frontmatter effort
+    is what a stage without its own effort runs at, and a second, lower effort line
+    must not hide behind the first."""
+
+    @staticmethod
+    def frontmatter(path: Path) -> list[str]:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if not lines or lines[0] != "---" or "---" not in lines[1:]:
+            return []
+        return lines[1:lines.index("---", 1)]
+
+    def test_each_shipped_agent_has_exactly_one_effort_max_line(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
+                self.assertEqual(effort_lines, ["effort: max"])
+
+    def test_the_check_rejects_a_lower_or_repeated_effort(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for body in ("---\nname: a\nmodel: opus\neffort: high\n---\nx\n",
+                         "---\nname: a\nmodel: opus\neffort: max\neffort: high\n---\nx\n",
+                         "---\nname: a\nmodel: opus\n---\neffort: max\n"):
+                path = Path(tmp) / "a.md"
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
+                    self.assertNotEqual(effort_lines, ["effort: max"])
 
 
 class McpMatchTests(unittest.TestCase):

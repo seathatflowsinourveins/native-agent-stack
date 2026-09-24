@@ -1,0 +1,138 @@
+{
+ "schema_version": 1,
+ "id": "macos-foundation-alignment-20260924",
+ "date": "2026-09-24",
+ "question": "On the macOS host, are memory, RAG and the other foundation layers current, which models suit the Mac foundation, and what must the replacement Mac pick up?",
+ "scope": "Assessment and measurement only. This record changed no Mac global state. The single writer of Mac global state and shared foundation services is the foundation-lane-setup session (user decision 2026-09-24, agent-ecosystem#28); changes land there through agent-ecosystem pull requests.",
+ "evidence_levels": {
+  "native_proven": "Observed on macos-m5pro-20260924 by the recording session.",
+  "reported_by_owner": "Stated on 2026-09-24 by the foundation-lane-setup or mac-coordinator-agent-setup session; not re-read by the recording session.",
+  "existing_record": "Already recorded in this repository or in agent-ecosystem at the cited path.",
+  "official_docs_metadata": "An official vendor page read live on 2026-09-24.",
+  "live_repository_metadata": "Hugging Face API metadata read on 2026-09-24; not quality evidence."
+ },
+ "verdict": "Partly aligned. The architecture follows current practice (hybrid memory retrieval, local code RAG with a current embedder, per-host indexes, one writer for shared state). No layer is closed as current by this repository's own rule, the memory vector lane is off, there is no reranking stage, and the Mac's embedder is not the measured benchmark winner.",
+ "saturation": {
+  "source": "python3 scripts/saturation_ledger.py --report (2026-09-24)",
+  "evidence_level": "existing_record",
+  "sweeps": "2 records, 1 completed (landscape-sweep-20260923)",
+  "layers_due": 32,
+  "saturation_candidates": 0,
+  "rule": "A layer becomes a candidate after 3 consecutive clean completed sweeps at least 7 days apart; every layer's clean count is 0 because the completed sweep's votes were not retained.",
+  "survivors_pending": {
+   "foundation/document-retrieval": ["datalab-to/marker", "opendatalab/MinerU", "PaddlePaddle/PaddleOCR"],
+   "foundation/semantic-rag": ["ollama/ollama"],
+   "foundation/web-research": ["exa-labs/exa-mcp-server"],
+   "foundation/observation-inference": ["grafana/tempo"],
+   "foundation/secrets-credentials": ["trufflesecurity/trufflehog", "betterleaks/betterleaks"],
+   "foundation/git-github-automation": ["anthropics/claude-code-action"],
+   "us-equities/research-factors-ml": ["lightgbm-org/LightGBM", "microsoft/RD-Agent"]
+  },
+  "comparison_required": ["workers", "document-retrieval", "durable-memory", "token-efficiency", "quality-evaluation"],
+  "comparison_source": "catalogs/landscape/research-state.json next_action rows"
+ },
+ "mac_layers": [
+  {"layer": "native-clients", "state": "present", "detail": "Claude Code 2.1.281; codex-cli 0.155.0-alpha.16.3; Claude and Codex desktop apps. Newer upstream: Codex CLI 0.156.0 with GPT-6 Sol and Luna (2026-09-22).", "level": "native_proven"},
+  {"layer": "instructions-skills", "state": "present", "detail": "User skills include ecosystem-catalog, qmd, the Tavily skills and playwright-cli.", "level": "native_proven"},
+  {"layer": "workers", "state": "present", "detail": "Native workers; research-state marks the layer comparison_required.", "level": "native_proven"},
+  {"layer": "isolation", "state": "present", "detail": "Git worktrees and the Claude Code Seatbelt sandbox.", "level": "native_proven"},
+  {"layer": "code-navigation", "state": "partial", "detail": "ripgrep 15.2.0 and ast-grep 0.45.3 present. Serena and jCodeMunch are not adopted on macOS (no macOS pins; agent-ecosystem docs/native-harness.md Mac overlay, keep-but-compare).", "level": "native_proven; Mac overlay decision reported_by_owner"},
+  {"layer": "document-retrieval", "state": "partial", "detail": "QMD 2.8.3 in keyword mode with named indexes (ecosystem, native-agent-stack-catalog); the default index is empty by design. Retrieval smoke: QMD 3/10 hit@3. MarkItDown and Poppler are not installed.", "level": "native_proven; index contents reported_by_owner; smoke existing_record"},
+  {"layer": "semantic-rag", "state": "present, RAM-constrained", "detail": "SocratiCode 1.14.0, Qdrant 1.19.1 and Ollama qwen3-embedding:4b (Q4_K_M, 2560 dimensions). Retrieval smoke: 9/10 hit@3, 7/10 hit@1. The embedder loads at 4.09 GiB and the service unloads it after 30 s.", "level": "native_proven; smoke existing_record"},
+  {"layer": "durable-memory", "state": "present, vectors off", "detail": "ai-memory 2.3.2 over HTTP on loopback; config.toml has no embedding keys, so retrieval is keyword, entity and graph fusion; an all-MiniLM-L6-v2 directory (87 MB) sits in its data directory. The owner keeps it explicit-only and independent of Ollama by design.", "level": "native_proven; design intent reported_by_owner"},
+  {"layer": "web-research", "state": "present", "detail": "The desktop app's built-in browser and the Tavily CLI (tvly).", "level": "native_proven"},
+  {"layer": "token-efficiency", "state": "present", "detail": "RTK 0.49.0 and Context Mode 1.0.169; jCodeMunch not adopted on macOS.", "level": "native_proven"},
+  {"layer": "quality-evaluation", "state": "partial", "detail": "shellcheck 0.11.0 and playwright-cli 0.1.21 present; promptfoo not installed.", "level": "native_proven"},
+  {"layer": "ci-supply-chain", "state": "present", "detail": "actionlint 1.7.12 and gitleaks 8.30.1 (runaway bound in #193); zizmor runs through agent-ecosystem's locked verify.sh; syft is a trial and not installed.", "level": "native_proven; zizmor path reported_by_owner"},
+  {"layer": "scheduling-supervision", "state": "present", "detail": "Dagu 2.17.0; launchd agents for ai-memory, ollama, qdrant and maintenance.", "level": "native_proven"},
+  {"layer": "hosting-services", "state": "partial", "detail": "node 24 and uv present; no PostgreSQL fixture and no container runtime (the layer says only as needed).", "level": "native_proven"},
+  {"layer": "recovery-portability", "state": "partial", "detail": "restic 0.19.1 present; restore and lifecycle acceptance are open gaps for mac-coordinator in the ecosystem catalog.", "level": "native_proven; gaps existing_record"},
+  {"layer": "observation-inference", "state": "not on this host", "detail": "No local telemetry stack (the workstation's lane). The local generation trial is not feasible here (upgrade-evidence.json item macos-local-generation-27b).", "level": "native_proven"},
+  {"layer": "agent-sdks", "state": "present", "detail": "Codex CLI and SDK.", "level": "native_proven"},
+  {"layer": "mcp-surfaces", "state": "partial", "detail": "User-scope MCP servers: ai-memory, context-mode and socraticode, plus the Claude Docs and OpenAI docs connectors; mcporter not installed.", "level": "native_proven"},
+  {"layer": "secrets-credentials", "state": "present", "detail": "Native per-client sign-ins, gitleaks, and the project settings that deny reads of credential paths.", "level": "native_proven"},
+  {"layer": "git-github-automation", "state": "present", "detail": "worktrunk 0.79.0 and gh 2.101.0; difftastic is a discovery entry and not installed.", "level": "native_proven"}
+ ],
+ "memory": {
+  "assessment": "The design is current: ai-memory fuses FTS5, entity-match and graph-neighbour results with optional vector RRF. The vector lane is off on the Mac, and ai-memory has not been compared against alternatives (durable-memory is comparison_required).",
+  "measured_embedder_ranking": {
+   "source": "evidence/artifacts/local-model-alignment-20260923/memory-embedder-dense-benchmark.json",
+   "evidence_level": "existing_record (one WSL2 host, one run per arm, dense cosine retrieval only)",
+   "full_ndcg10": {"nvidia/Nemotron-3-Embed-1B-BF16": 0.8584, "Qwen/Qwen3-Embedding-0.6B": 0.8201, "ibm-granite/granite-embedding-english-r2": 0.8187, "Qwen/Qwen3-Embedding-4B": 0.8117, "sentence-transformers/all-MiniLM-L6-v2 (reference)": 0.7128}
+  },
+  "wiring": "ai-memory accepts AI_MEMORY_EMBEDDING_PROVIDER=openai-compat with AI_MEMORY_EMBEDDING_BASE_URL, AI_MEMORY_EMBEDDING_MODEL and AI_MEMORY_EMBEDDING_DIM (upstream docs/llm-providers.md on main; confirm on the pinned 2.3.2). Its LLM features (session consolidation, LLM reranking) would summarize sessions automatically, which the user's practice keeps off."
+ },
+ "rag": {
+  "assessment": "Code retrieval works (9/10 hit@3), document keyword retrieval is weak (3/10 hit@3), and there is no reranking stage. The two catalogs disagree on the Mac's embedding runtime: agent-ecosystem runs Ollama; catalogs/foundation/decisions.json (macos-embedding-backend) drafts llama.cpp Metal with embeddinggemma-300M-Q8_0. Ollama also survived the 2026-09-23 sweep.",
+  "retrieval_smoke": {
+   "source": "agent-ecosystem commit 8c40da8705d5c07a9f73209e247b1272258097f1, evidence/foundation-lane-2026-09-24/retrieval-check.json",
+   "evidence_level": "existing_record (local_integration)",
+   "summary": {"questions": 10, "socraticode_hit_at_3": 9, "socraticode_hit_at_1": 7, "qmd_hit_at_3": 3},
+   "memory_pressure_free_during_indexing": "65-66% (six samples, 10 s apart)",
+   "limits": "One run per tool, one annotator, questions written after the corpus was known; a smoke check, not a benchmark."
+  }
+ },
+ "native_clients": {
+  "openai": "GPT-6 Sol and GPT-6 Luna rolled out to Codex on 2026-09-22, with Codex CLI 0.156.0 the same day (learn.chatgpt.com/docs/changelog, codex-2026-09-22-gpt-6-sol-luna). The catalog default is gpt-6-astra (catalogs/us-equities/models.md, checked 2026-09-19); the Mac runs codex-cli 0.155.0-alpha.16.3 against the Mac pin 0.155.1.",
+  "anthropic": "Claude Opus 5.5 (model id claude-opus-5-5) is in use in native sessions on this host and is not listed in catalogs/us-equities/models.md, whose default is claude-opus-5[1m].",
+  "rule": "A newer release is recorded as a candidate and compared on a frozen task; it does not change native defaults by itself."
+ },
+ "model_candidates_macos": {
+  "evidence_level": "live_repository_metadata unless marked; no candidate was downloaded or run for this record",
+  "embedders": [
+   {"model": "qwen3-embedding:4b (Ollama, Q4_K_M)", "role": "current Mac embedder", "params_b": 4.02, "license": "apache-2.0", "dims": 2560, "measured_loaded_gib": 4.09, "memory_benchmark_ndcg10": 0.8117},
+   {"model": "nvidia/Nemotron-3-Embed-1B-BF16", "role": "benchmark winner; Linux vLLM deployment", "params_b": 1.14, "license": "other (OpenMDW-1.1)", "dims": 2048, "memory_benchmark_ndcg10": 0.8584, "mac_builds": "community GGUF (nanoandrew4 BF16 and Q8_0 1.22 GB, zenmagnets Q4_K_M; GGUF architecture mistral3) and mlx-community BF16 and 8-bit; no publisher GGUF", "note": "The owner states the WSL vLLM deployment is not portable to macOS as is; a Mac build needs its own parity and retrieval comparison."},
+   {"model": "Qwen/Qwen3-Embedding-0.6B", "params_b": 0.60, "license": "apache-2.0", "dims": 1024, "memory_benchmark_ndcg10": 0.8201, "mac_builds": "publisher GGUF Q8_0 0.64 GB; mlx-community 8-bit, mxfp8 and 4-bit DWQ"},
+   {"model": "ibm-granite/granite-embedding-english-r2", "params_b": 0.15, "license": "apache-2.0", "memory_benchmark_ndcg10": 0.8187},
+   {"model": "google/embeddinggemma-300m", "role": "drafted Mac default in catalogs/foundation/decisions.json", "params_b": 0.30, "license": "gemma", "dims": 768, "mac_builds": "ggml-org GGUF Q8_0 0.33 GB", "note": "Not in the memory benchmark."},
+   {"model": "jinaai/jina-embeddings-v5-omni (nano, small)", "created": "2026-05", "params_b": 1.56, "license": "cc-by-nc-4.0", "mac_builds": "publisher MLX and GGUF", "note": "Eligible under the user's 2026-09-24 license decision; never benchmarked here."}
+  ],
+  "rerankers": [
+   {"model": "jinaai/jina-reranker-v3.5", "created": "2026-07", "params_b": 0.60, "license": "cc-by-nc-4.0", "mac_builds": "publisher MLX and GGUF", "note": "Listwise; catalogs/us-equities/models.md notes its GGUF needs a special projector/scorer and llama.cpp support."},
+   {"model": "Qwen/Qwen3-Reranker-0.6B", "params_b": 0.60, "license": "apache-2.0", "mac_builds": "ggml-org GGUF Q8_0 0.64 GB; mlx-community mxfp8"},
+   {"model": "Alibaba-NLP/core-reranker-2b", "created": "2026-08-30", "params_b": 2.13, "license": "cc-by-4.0", "note": "Publisher recipe uses custom Qwen3-VL wrappers."},
+   {"model": "ibm-granite/granite-embedding-reranker-english-r2", "params_b": 0.15, "license": "apache-2.0"},
+   {"model": "mixedbread-ai/mxbai-rerank-base-v2", "params_b": 0.49, "license": "apache-2.0"}
+  ],
+  "generation": [
+   {"model": "Qwen/Qwen3.8-27B", "params_b": 27.78, "mac_builds": "lmstudio-community MLX 4-, 5-, 6- and 8-bit; unsloth GGUF", "fit": "Not feasible at 24 GB (see upgrade-evidence.json); a test run fits at 64 GB."},
+   {"model": "Qwen/Qwen3.8-Flash-Next", "params_b": 180.0, "fit": "About 94 GiB of weights at 4.5 bits; cluster-class, not a Mac candidate."}
+  ]
+ },
+ "user_decisions": [
+  {"date": "2026-09-24", "statement": "The license is not applicable to this project's model selection.", "effect": "Non-commercially licensed candidates (jina-embeddings-v5, jina-reranker-v3.5, TimesFM 3.0) become eligible for comparison. Their catalog statuses change only when the owning lanes re-record them."}
+ ],
+ "open_items_for_the_replacement_mac": [
+  "Record the new host through the new-host loop (docs/contributing-evidence.md section 0): hardware_profile.py --record-host with a new host id, then host receipts.",
+  "Apply the shared foundation from agent-ecosystem through its single writer (agent-ecosystem#28). Do not also load adoption/bootstrap-macos.sh's launchd agents: they would duplicate the local.agent-ecosystem Qdrant and ai-memory services.",
+  "Run the RAM-fit matrix (measurement only, scratch processes; claim on agent-ecosystem#28): Serena 1.7.0, jCodeMunch 1.108.319, mcporter 0.14.1, syft 1.52.0, difftastic 0.71.0, and a scratch llama.cpp b11057 with Qwen3-Embedding-0.6B, Nemotron-3-Embed-1B Q8_0, embeddinggemma-300M and Qwen3-Reranker-0.6B against qwen3-embedding:4b. About 2.9 GB of downloads, pending the user's approval.",
+  "Compare embedders on frozen questions (Nemotron-3-Embed-1B Mac build with a parity check against the Linux reference vectors, Qwen3-Embedding-0.6B, jina-embeddings-v5, against qwen3-embedding:4b), then decide the memory vector lane with the foundation-lane owner.",
+  "Compare rerankers on the same questions: jina-reranker-v3.5, Qwen3-Reranker-0.6B and core-reranker-2b.",
+  "Decide the pending survivors listed under saturation.",
+  "Record GPT-6 Sol and Luna, Codex CLI 0.156.0 and Claude Opus 5.5 as candidates and compare them on a frozen task.",
+  "Run the next saturation sweep on or after 2026-09-30 with votes retained.",
+  "In flight elsewhere: #185 (this Mac's hardware profile and use receipts), #160 (workstation acceptance), #193 (gitleaks bound), #169 (Alpaca native faults C04 and C05)."
+ ],
+ "sources": [
+  "https://code.claude.com/docs/en/desktop",
+  "https://code.claude.com/docs/en/remote-control",
+  "https://learn.chatgpt.com/docs/changelog#codex-2026-09-22-gpt-6-sol-luna",
+  "https://raw.githubusercontent.com/akitaonrails/ai-memory/main/docs/llm-providers.md",
+  "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+  "https://huggingface.co/nanoandrew4/Nemotron-3-Embed-1B-GGUF",
+  "https://huggingface.co/mlx-community/Nemotron-3-Embed-1B-BF16",
+  "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF",
+  "https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF",
+  "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+  "https://huggingface.co/jinaai/jina-reranker-v3.5",
+  "https://huggingface.co/Alibaba-NLP/core-reranker-2b",
+  "https://huggingface.co/Qwen/Qwen3.8-27B",
+  "https://huggingface.co/Qwen/Qwen3.8-Flash-Next"
+ ],
+ "limits": [
+  "Facts marked reported_by_owner were not re-read by the recording session.",
+  "Hugging Face metadata is not quality evidence; no candidate model was downloaded or run for this record.",
+  "The memory benchmark ran on one WSL2 host with one run per arm and dense retrieval only; the retrieval smoke has 10 questions and one annotator.",
+  "The OpenAI documentation search result (95,760 characters) was scanned programmatically for model names and dates; only the 2026-09-22 Codex changelog entry was read in full."
+ ]
+}

@@ -9,7 +9,8 @@ absolute path, the repository root and ``LANE=codex``, then run
     codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
         -c model_reasoning_effort=<effort> \
-        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <prompt>
+        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
+        -c 'web_search="disabled"' -c 'cli_auth_credentials_store="file"' <prompt>
 
 capturing the JSON event stream to
 ``<work-dir>/codex/events/<catalog>__<layer_id>.jsonl`` and a usage row per
@@ -48,12 +49,16 @@ a landscape-schema validator, so it does not import scripts/landscape.py.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
+import errno
 import json
+import os
 import re
 import shlex
 import shutil
 import subprocess
+import tempfile
 import sys
 import threading
 import time
@@ -175,15 +180,36 @@ def discover_packets(work_dir: Path, layers: "set[str] | None") -> list:
     return found
 
 
-def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str) -> bool:
+def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str,
+                             provenance: dict = None, configured_model: str = None,
+                             configured_effort: str = None, audit_roots=None) -> bool:
     """Resumable-skip check: the file must parse as a JSON object already
     forced onto this lane and this exact packet. A present-but-different
     ``packet_sha256`` (the packet changed since the file was written) is
     treated as invalid so the layer reruns; a missing ``packet_sha256`` on an
     otherwise-matching old file is not itself disqualifying -- a rerun would
-    only fill it in, so there is nothing to gain by discarding the file."""
+    only fill it in, so there is nothing to gain by discarding the file.
+
+    ``provenance`` is the current ``lane_provenance(prompt_path)``: when given, the file's own
+    ``provenance`` must equal it field for field. A return written by older lane code or from an older
+    prompt (or one without provenance) is stale: record_verdicts.py rejects it, so skipping it would
+    leave the layer rejected on every later run (PR #141 review). It reruns instead.
+
+    A return whose ``model.name`` is ``"unknown"`` (no model was configured or observed; record_verdicts.py
+    rejects it by family pattern), or differs from a given ``configured_model`` (the ``--model`` of this
+    run), also reruns (round-2 review).
+
+    ``audit_roots`` (a blind run's export and packets) re-audits the layer's retained events: a return whose events
+    are missing or flagged reruns, so a return an interrupted run wrote before its audit is never resumed as clean
+    (independent review of #145, round 7, REG7-1/ISO-R7-1)."""
     if not out_path.exists():
         return False
+    if audit_roots is not None:
+        events_path = out_path.parent / "events" / f"{out_path.stem}.jsonl"
+        # A child always emits events: an empty stream is a truncated one (round 8, NEW-1), never a clean audit.
+        if not events_path.is_file() or not parse_events(events_path.read_text(encoding="utf-8", errors="replace")) \
+                or audit_is_flagged(blind_audit(events_path, audit_roots)):
+            return False
     try:
         data = load_json(out_path)
     except (json.JSONDecodeError, OSError, UnicodeDecodeError):
@@ -196,6 +222,20 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
         return False
     existing_hash = data.get("packet_sha256")
     if existing_hash and existing_hash != packet_sha256:
+        return False
+    if provenance is not None:
+        # Field for field and nothing more: landscape.py rejects a provenance object with extra keys, so a
+        # return carrying one is rerun, not skipped (Codex review of #145).
+        if data.get("provenance") != provenance:
+            return False
+    model = data.get("model") if isinstance(data.get("model"), dict) else {}
+    if model.get("name") in (None, "", "unknown"):
+        return False
+    if configured_model and model.get("name") != configured_model:
+        return False
+    # A changed --effort reruns the layer too (Codex review of #145): the requested reasoning setting must
+    # not be silently ignored by resuming a return made at another effort.
+    if configured_effort and model.get("effort") != configured_effort:
         return False
     return True
 
@@ -237,13 +277,22 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
 # - Lifecycle hooks are off (``features.hooks``, ``features.plugin_hooks``).
 # - Native web search is off (``web_search="disabled"``): without it a probe child ran a web search, with
 #   it the child reported no web search tool.
-# Not denied: shell reads under ``--sandbox read-only`` (any host path, and CLIs such as ai-memory on PATH)
-# and ``$CODEX_HOME/AGENTS.md``, which a probe child still quoted. Those rest on lane-prompt.md rule 1,
-# a repository without ``.git`` (refused unless --allow-git-history) and the post-run blind audit below.
+# - A blind child runs with a run-scoped CODEX_HOME and an empty HOME (isolated_codex_home): the flags do not skip
+#   ``$CODEX_HOME/AGENTS.md`` or user skills under ``~/.agents/skills``, which probe children loaded otherwise.
+# Not denied: shell reads under ``--sandbox read-only`` (any host path, and CLIs such as ai-memory on PATH).
+# Those rest on lane-prompt.md rule 1, a repository without ``.git`` (refused unless --allow-git-history) and the
+# post-run blind audit below. A non-blind --allow-git-history run inherits the native Codex home.
 # Per-server ``mcp_servers.<name>.enabled=false`` overrides are not used: codex rejects them as a partial
 # table ("invalid transport") when the loaded config does not define that server.
+# The file credential store is pinned (round 5, ISO-R5-4): a keyring or auto store from a system or managed layer
+# would save a blind child's rotated tokens apart from the native auth.json.
+# No shell_environment_policy override (round 6, ISO-R6-4): measured 2026-09-24 with codex-cli 0.155.1, the model's
+# shell in `codex exec` got the same variables under inherit="core", inherit="none", include_only=["PATH"] and no
+# override (a planted non-core SSL_CERT_DIR reached it every time), so it protects nothing here. Instead a blind child
+# never receives an API key: child_env forwards none, and codex_home_issue requires the native auth.json.
+# Overturn: a codex exec probe in which such an override removes a non-core variable from the model's shell.
 ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false",
-                  "-c", 'web_search="disabled"')
+                  "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
 AUDIT_NAME = "blind-audit.json"
 # CLIs that reach memory stores, code indexes, session history, git history or the network.
@@ -251,15 +300,87 @@ AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode
                "sqlite3", "curl", "wget")
 ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
+# Any other environment variable used as a path (``$CODEX_HOME/AGENTS.md``, ``${XDG_DATA_HOME}/x``) can point
+# outside the repository; only its value, which the event does not show, says where (round-2 review).
+VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]\w*)/[^\s'\"|;&<>()`]*")
+# Only an expansion that transforms its value (${X%/*}, ${X:-/p}, ${X/a/b}, ${!X}) hides the path it builds; a plain
+# ${name} is caught by VARIABLE_PATH when a path follows it, and by INHERITED_DIRECTORY when it is itself the
+# directory argument (``rg -l x ${TMPDIR}``, ``cp -r $SSL_CERT_DIR .``; round 6, REG6-3). A child's TMPDIR is a fresh,
+# empty directory of its run home, so it names no lane data either way.
+INHERITED_DIRECTORY = re.compile(r"\$\{?(?:TMPDIR|SSL_CERT_DIR|SSL_CERT_FILE|OLDPWD)\b\}?")
+CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
+# A command that reads the environment, where the Codex home's path is (``printenv CODEX_HOME | xargs dirname``;
+# round 7, ISO-R7-9). The bare word in a search (``rg -n CODEX_HOME docs``) is not one (round 8, REG8-3).
+ENVIRONMENT_READ = re.compile(r"(?:^|[\s;&|(`'\"])(printenv|env|export\s+-p|declare\s+-p)(?=$|[\s;&|)`'\"])")
+COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
+# All of these match the raw command text (round 8, REG8-1): a stricter reading of which spans bash expands let
+# double-quoted apostrophes, escaped quotes, heredocs and nested shells hide reads. A literal backtick in a
+# single-quoted search pattern is voided too (REG7-3, a known low: a benign void is cheaper than a missed read).
+PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
+# A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
+# ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
+CD_TARGET = re.compile(r"(?:^|[;&|\n(]|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*cd(?=$|[\s;&|)'\"])([^;&|\n)]*)")
+UNNAMED_CD_TARGETS = re.compile(r"-|~|\$[A-Za-z_]\w*|\$\{[A-Za-z_]\w*\}|")
 PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
 ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
-SYSTEM_PREFIXES = ("/bin/", "/usr/", "/dev/null")
+# Only the executable token of a command segment is exempt, and only when it is a system executable: the
+# first word at the start, after ``;``, ``&&``, ``||``, ``|`` or a newline, or right after ``bash -lc '``
+# (``sh -c "`` and the like). Every other absolute path outside the roots is flagged, a ``/usr/...`` or
+# ``/bin/...`` data path included -- ``/bin/cat /usr/local/share/prior-verdict.json`` reads data (PR #141
+# review). ``/dev/null`` stays exempt wherever it appears.
+EXECUTABLE_TOKEN = re.compile(r"(?:^|;|&&|\|\||\||\n|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*(?=/)")
+# ``/usr/`` only for its executable directories: ``bash -lc '/usr/local/share/verdicts/show'`` runs a script
+# kept with data and is flagged (round-2 review).
+SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/")
+EXEMPT_PATHS = ("/dev/null",)
+
+
+def audit_is_flagged(report: dict) -> bool:
+    """Whether a blind_audit report flags anything: web search, an MCP tool call or a flagged command."""
+    return bool(report.get("web_search") or report.get("mcp_tool_calls") or report.get("flagged_commands"))
+
+
+def executable_token_starts(command: str) -> set:
+    """Offsets where a command segment's executable token begins, when that token is an absolute path."""
+    return {match.end() for match in EXECUTABLE_TOKEN.finditer(command)}
+
+
+def outside_paths(command: str, allowed_roots) -> list:
+    """Absolute paths in ``command`` outside ``allowed_roots``, except /dev/null and a segment's system
+    executable token."""
+    executables = executable_token_starts(command)
+    found = []
+    for match in ABSOLUTE_PATH.finditer(command):
+        path = match.group(1)
+        if path in EXEMPT_PATHS:
+            continue
+        if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
+            continue
+        if any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots):
+            continue
+        found.append(path)
+    return found
+
+
+def unnamed_cd_targets(command: str) -> list:
+    """The raw argument of every ``cd`` in ``command`` that goes home or back rather than to a named path."""
+    found = []
+    for match in CD_TARGET.finditer(command):
+        target = match.group(1).strip().strip("'\"").strip()
+        if UNNAMED_CD_TARGETS.fullmatch(target):
+            found.append(target or "(home)")
+    return found
 
 
 def blind_audit(events_path: Path, allowed_roots) -> dict:
-    """Report-only reading of one child's event stream: web searches, MCP tool calls, and commands that
-    name an absolute path outside ``allowed_roots`` (the repository and the packets directory) or run a
-    CLI in AUDIT_TOOLS. A flag is evidence for the coordinator to review and disclose, not a verdict."""
+    """Reading of one child's event stream: web searches, MCP tool calls, and commands that name an absolute path
+    outside ``allowed_roots`` (the repository and the packets directory) or run a CLI in AUDIT_TOOLS. In a blind run
+    a flagged layer is void: its return is set aside before it is written, and a resume re-audits a kept return
+    (round 7, REG7-1); in a non-blind run the report is for review and disclosure.
+
+    This is a heuristic lower bound, not a boundary: it reads command text only, so a path a program
+    computes (``python3 -c`` joining parts, a glob, a variable set earlier) and anything a command reads
+    indirectly (a script's own reads, a config it loads, a symlink under the repository) are not seen."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
         return report
@@ -280,11 +401,20 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
             reasons = [f"path outside the repository and packets: {path}"
-                       for path in ABSOLUTE_PATH.findall(command)
-                       if not path.startswith(SYSTEM_PREFIXES)
-                       and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+                       for path in outside_paths(command, allowed_roots)]
             reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
+            reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
+            # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
+            # (independent review of #145, BIND-R4-7).
+            reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
+            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
+            # A blind child never needs its CODEX_HOME or the environment, and a command substitution builds a path
+            # the event does not show (round 6, ISO-R6-2).
+            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
+            reasons += [f"reads the environment: {match}" for match in ENVIRONMENT_READ.findall(command)]
+            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
+            reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
             reasons += [f"runs {tool}" for tool in AUDIT_TOOLS if tool in words]
@@ -293,36 +423,316 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
     return report
 
 
-def run_attempt(cmd: list, timeout: float) -> dict:
-    started = time.monotonic()
-    try:
-        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-        return {
-            "exit_code": completed.returncode,
-            "stdout": completed.stdout or "",
-            "stderr": completed.stderr or "",
-            "elapsed": time.monotonic() - started,
-            "timed_out": False,
-        }
-    except subprocess.TimeoutExpired as exc:
-        # subprocess.run kills the child and re-raises after collecting
-        # whatever communicate() had already buffered. On POSIX the partial
-        # output arrives as bytes even with text=True, so decode it rather
-        # than discard the events and usage an attempt produced before timing out.
-        def decoded(value):
-            if isinstance(value, bytes):
-                return value.decode("utf-8", errors="replace")
-            return value if isinstance(value, str) else ""
+# The CODEX_HOME every blind child runs with (isolated_codex_home), or None to inherit the caller's.
+CHILD_CODEX_HOME = None
+# Where run-scoped Codex homes live: outside the work dir (which holds both lanes' returns) and outside the
+# adjudication state dir (the position index). The default base shares a parent with that state dir, so a path a
+# child derives from its CODEX_HOME can reach it; the blind audit flags any use of CODEX_HOME and any path outside
+# the export and packets, as far as command text shows (independent review of #145, BIND-R4-7; round 7, ISO-R7-9).
+# Each run gets a fresh directory there (mkdtemp); nothing is ever removed to make one (round 5, INT-R5-2: removing
+# a home that was, or held, the native home deleted it).
+CODEX_HOME_BASE_ENV = "NAS_CODEX_HOME_DIR"
+DEFAULT_CODEX_HOME_BASE = Path("~/.local/state/native-agent-stack/codex-home")
 
-        stdout = decoded(exc.stdout)
-        stderr = decoded(exc.stderr)
-        return {
-            "exit_code": None,
-            "stdout": stdout,
-            "stderr": stderr,
-            "elapsed": time.monotonic() - started,
-            "timed_out": True,
-        }
+
+class CodexHomeRefused(ValueError):
+    """The run-scoped Codex home cannot be set up without touching a credential or a lane input."""
+
+
+def codex_home_base() -> Path:
+    """``$NAS_CODEX_HOME_DIR``, else ``~/.local/state/native-agent-stack/codex-home``, absolutized."""
+    return Path(os.environ.get(CODEX_HOME_BASE_ENV) or DEFAULT_CODEX_HOME_BASE).expanduser().absolute()
+
+
+def codex_home_prefix(work_dir: Path) -> str:
+    """The name prefix of ``work_dir``'s run homes under codex_home_base: sha256(resolved work dir)[:16]."""
+    return hashlib.sha256(str(Path(work_dir).resolve()).encode("utf-8")).hexdigest()[:16]
+
+
+def native_codex_home() -> Path:
+    """The native Codex home: ``$CODEX_HOME``, else ``~/.codex``, absolutized."""
+    return Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().absolute()
+
+
+def native_auth_path() -> Path:
+    """The native Codex credential, ``native_codex_home()/auth.json``."""
+    return native_codex_home() / "auth.json"
+
+
+def _contains(outer: Path, inner: Path) -> bool:
+    return inner == outer or outer in inner.parents
+
+
+def _overlap(first: Path, second: Path) -> bool:
+    spellings = [(a, b) for a in {first, Path(os.path.realpath(first))} for b in {second, Path(os.path.realpath(second))}]
+    return any(_contains(a, b) or _contains(b, a) for a, b in spellings)
+
+
+def codex_home_issue(work_dir: Path, repo: Path = None):
+    """Why a run-scoped Codex home cannot be set up, or None; creates nothing, so a dry run and the lock run it first
+    (round 6, ISO-R6-5). Refused: a base that is, holds or sits inside the native Codex home (either spelling), a
+    base overlapping the work dir or ``repo``, and no native auth.json: a blind child never gets an API key, which
+    its shell would inherit (round 6, ISO-R6-4); `codex login --with-api-key` makes a native auth.json from one."""
+    base = codex_home_base()
+    native_home = native_codex_home()
+    if _overlap(base, native_home):
+        return (f"the run-scoped Codex homes' base {base} and the native Codex home {native_home} overlap; set "
+                f"{CODEX_HOME_BASE_ENV} to a directory apart from the native home")
+    for place in (Path(work_dir).resolve(), *([Path(repo).resolve()] if repo is not None else [])):
+        if _overlap(base, place):
+            return (f"the run-scoped Codex homes' base {base} overlaps {place}; set {CODEX_HOME_BASE_ENV} to a "
+                    "directory outside the work dir and the export")
+    native = native_auth_path()
+    if not native.is_file():
+        return (f"no native Codex credential at {native}; sign in natively with `codex login` (with an API key: "
+                "`codex login --with-api-key`); a blind child is never given an API key variable")
+    for key in PROXY_VARIABLES:
+        if PROXY_USERINFO.match(os.environ.get(key) or ""):
+            # Every variable a child gets is exported into the model's shell (round 7, ISO-R7-5).
+            return (f"{key} carries credentials (user:password@host); every variable a blind child gets reaches the "
+                    "model's shell and its events, so use a proxy without inline credentials for a blind run")
+    return None
+
+
+def codex_home_lock(work_dir: Path) -> Path:
+    """The homes' base lock for a work dir, held with work_run_lock by both codex_lane and adjudicate codex, so
+    neither sweeps or shares the other's credential link (review of 52344da8; round 6, ISO-R6-1)."""
+    return codex_home_base() / f"{codex_home_prefix(work_dir)}.lock"
+
+
+def work_run_lock(work_dir: Path) -> Path:
+    """The work dir's own lock, shared by both runners: two runs of one work dir with different homes' bases would
+    otherwise both run and interleave the events files (round 7, REG7-2/ISO-R7-4)."""
+    return Path(work_dir) / ".codex-run.lock"
+
+
+IN_USE_NAME = ".in-use"
+# The current run home's in-use lock handle; every child inherits it (run_attempt pass_fds), so the flock stays held
+# while any child lives, even after the lane is SIGKILLed (round 7, ISO-R7-2).
+IN_USE_HANDLE = None
+
+
+def home_in_use(home: Path) -> bool:
+    """Whether a live process (a run, or a child it started) still holds ``home``'s in-use lock."""
+    import fcntl
+    marker = Path(home) / IN_USE_NAME
+    if not marker.is_file():
+        return False
+    with open(marker, "a", encoding="utf-8") as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return True
+        fcntl.flock(handle, fcntl.LOCK_UN)
+    return False
+
+
+def sweep_stale_links(work_dir: Path) -> None:
+    """Remove the credential links an interrupted (SIGKILLed) earlier run of this work dir left in its homes; only
+    symlinks named auth.json are removed, and never in a home whose in-use lock a live child still holds (round 7,
+    ISO-R7-2). The caller holds the run locks (round 6, ISO-R6-1)."""
+    for home in codex_home_base().glob(f"{codex_home_prefix(work_dir)}-*"):
+        if home.is_dir() and not home_in_use(home):
+            remove_codex_home_link(home)
+
+
+def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
+    """Create a fresh run-scoped CODEX_HOME (mode 0700) under codex_home_base, holding only a symlink to the native
+    ``auth.json`` (never a copy), the child's empty HOME and an empty TMPDIR. ``--ignore-user-config`` skips
+    config.toml but not ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools
+    (measured 2026-09-24: a child quoted its "# AGENTS.md instructions" block; with this home it answered "none").
+    A fresh directory per run (tempfile.mkdtemp) means no leftover AGENTS.md or config is loaded and nothing is
+    removed to make it; the caller removes the credential link when the run ends (remove_codex_home_link). The
+    child's sessions and logs stay in the run home for inspection.
+
+    The child's HOME is the empty ``<run home>/home`` (child_home): Codex also discovers user Agent Skills under
+    ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child with this
+    CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it listed only the
+    CLI's bundled skills). Its TMPDIR is the empty ``<run home>/tmp``, not the caller's (round 6, REG6-3).
+
+    Raises CodexHomeRefused, creating nothing, for any codex_home_issue."""
+    issue = codex_home_issue(work_dir, repo)
+    if issue:
+        raise CodexHomeRefused(issue)
+    base = codex_home_base()
+    native = native_auth_path()
+    import fcntl
+    global IN_USE_HANDLE
+    private_dir(base)
+    home = Path(tempfile.mkdtemp(prefix=f"{codex_home_prefix(work_dir)}-", dir=base))
+    home.chmod(0o700)
+    child_home(home).mkdir(mode=0o700)
+    (home / "tmp").mkdir(mode=0o700)
+    IN_USE_HANDLE = open(home / IN_USE_NAME, "a", encoding="utf-8")
+    fcntl.flock(IN_USE_HANDLE, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    if native.is_file():
+        (home / "auth.json").symlink_to(native)
+    return home
+
+
+def release_codex_home(home) -> None:
+    """End a run's use of its home: stop and wait for every live child, then remove the credential link and release
+    the in-use lock, in that order, so no child outlives its link (round 7, ISO-R7-2)."""
+    global IN_USE_HANDLE
+    terminate_children()
+    remove_codex_home_link(home)
+    if IN_USE_HANDLE is not None:
+        IN_USE_HANDLE.close()
+        IN_USE_HANDLE = None
+
+
+def private_dir(path: Path) -> None:
+    """Create ``path`` (and its parents) if missing; a directory created here is mode 0700 (round 7, ISO-R7-8)."""
+    path = Path(path)
+    if not path.is_dir():
+        path.mkdir(parents=True, exist_ok=True)
+        path.chmod(0o700)
+
+
+def remove_codex_home_link(home) -> None:
+    """Remove the run-scoped home's credential link at the end of a run (independent review of #145, OPS-4); the
+    child's sessions and logs stay for inspection. Only a symlink is ever removed."""
+    if home is None:
+        return
+    link = Path(home) / "auth.json"
+    if link.is_symlink():
+        link.unlink()
+
+
+RUN_LOCK_NAME = ".run.lock"
+
+
+class RunLocked(RuntimeError):
+    """Another run holds this work dir's lock."""
+
+
+@contextlib.contextmanager
+def exclusive_run_lock(path: Path):
+    """Hold an exclusive, non-blocking flock on ``path`` for the run (independent review of #145, BIND-R4-5): two
+    runs on one work dir would recreate each other's Codex home and interleave each other's events files."""
+    import fcntl
+    private_dir(path.parent)
+    handle = open(path, "a", encoding="utf-8")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        raise RunLocked(f"another run holds {path}; wait for it to finish") from None
+    try:
+        yield
+    finally:
+        fcntl.flock(handle, fcntl.LOCK_UN)
+        handle.close()
+
+
+# The environment a blind child gets (independent review of #145, round 5, ISO-R5-2): not the caller's, which
+# carries the coordinator's transcript pointer, cross-session messaging socket and token, and broker variables.
+CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
+                       "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "ALL_PROXY", "https_proxy", "http_proxy", "no_proxy",
+                       "all_proxy")
+# Extra variable-name prefixes a child keeps; empty in production (the test fixtures' fake codex reads its own).
+CHILD_ENV_EXTRA_PREFIXES = ()
+
+
+PROXY_VARIABLES = tuple(key for key in CHILD_ENV_ALLOWLIST if key.lower().endswith("_proxy") and "no_" not in
+                        key.lower())
+# userinfo before the host, with or without a scheme, up to the last '@' (round 7, ISO-R7-6).
+PROXY_USERINFO = re.compile(r"^((?:[A-Za-z][A-Za-z0-9+.-]*://)?)[^/\s]*@")
+
+
+def redact_userinfo(value: str) -> str:
+    """A proxy URL's user:password@ as ***@ in printed output (round 6, ISO-R6-5; round 7, ISO-R7-6)."""
+    return PROXY_USERINFO.sub(r"\1***@", value) if isinstance(value, str) else value
+
+
+# Set by a stop signal: no attempt starts, no return is written, and every live child is terminated (independent
+# review of #145, round 7, REG7-1/ISO-R7-3). Cleared when a run starts.
+STOP = threading.Event()
+_LIVE_CHILDREN: set = set()
+_LIVE_LOCK = threading.Lock()
+STOP_GRACE_SECONDS = 10.0
+
+
+def terminate_children(grace: float = STOP_GRACE_SECONDS) -> None:
+    """Terminate every live child, wait up to ``grace`` seconds, then kill those still running."""
+    with _LIVE_LOCK:
+        children = list(_LIVE_CHILDREN)
+    for child in children:
+        if child.poll() is None:
+            child.terminate()
+    deadline = time.monotonic() + grace
+    for child in children:
+        try:
+            child.wait(timeout=max(0.0, deadline - time.monotonic()))
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+
+
+@contextlib.contextmanager
+def terminate_on_signal():
+    """While held, SIGTERM, SIGHUP and SIGINT set STOP, terminate the live children and raise SystemExit, so the
+    caller's cleanup (release_codex_home) runs with no child left; a second signal changes nothing, so it cannot
+    interrupt that cleanup (round 6, ISO-R6-1; round 7, ISO-R7-2/ISO-R7-3). A SIGKILLed run leaves its link for the
+    next run's sweep_stale_links, which skips a home a live child still holds."""
+    import signal
+    def stop(signum, _frame):
+        if STOP.is_set():
+            return
+        STOP.set()
+        terminate_children()
+        raise SystemExit(128 + signum)
+    STOP.clear()
+    previous = {signum: signal.signal(signum, stop) for signum in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)}
+    try:
+        yield
+    finally:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
+
+
+def child_env(codex_home: Path) -> dict:
+    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME and TMPDIR.
+    No API key variable: the child authenticates through the linked native auth.json (round 6, ISO-R6-4)."""
+    env = {key: value for key, value in os.environ.items()
+           if key in CHILD_ENV_ALLOWLIST or (CHILD_ENV_EXTRA_PREFIXES and key.startswith(CHILD_ENV_EXTRA_PREFIXES))}
+    env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home)),
+                "TMPDIR": str(Path(codex_home) / "tmp")})
+    return env
+
+
+def child_home(codex_home: Path) -> Path:
+    """The empty HOME a blind child runs with, inside its run-scoped CODEX_HOME (isolated_codex_home)."""
+    return Path(codex_home) / "home"
+
+
+def run_attempt(cmd: list, timeout: float) -> dict:
+    """Run one child to completion or ``timeout``; after a stop (STOP) none starts and ``stopped`` is true."""
+    started = time.monotonic()
+    if STOP.is_set():
+        return {"exit_code": None, "stdout": "", "stderr": "", "elapsed": 0.0, "timed_out": False, "stopped": True}
+    env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
+    # The in-use lock rides along (round 7, ISO-R7-2); no stdin (round 5, ISO-R5-3): codex exec appends a
+    # non-terminal stdin to the prompt and waits for its end.
+    pass_fds = (IN_USE_HANDLE.fileno(),) if IN_USE_HANDLE is not None else ()
+    child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             text=True, env=env, pass_fds=pass_fds)
+    with _LIVE_LOCK:
+        _LIVE_CHILDREN.add(child)
+    if STOP.is_set():
+        child.terminate()
+    timed_out = False
+    try:
+        stdout, stderr = child.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        child.kill()
+        stdout, stderr = child.communicate()
+        timed_out = True
+    finally:
+        with _LIVE_LOCK:
+            _LIVE_CHILDREN.discard(child)
+    return {"exit_code": None if timed_out else child.returncode, "stdout": stdout or "", "stderr": stderr or "",
+            "elapsed": time.monotonic() - started, "timed_out": timed_out, "stopped": STOP.is_set()}
 
 
 def parse_events(stdout_text: str) -> list:
@@ -395,10 +805,90 @@ def extract_events_summary(events: list):
 LANE_FAMILY = "openai"
 
 
-def lane_provenance(prompt_path: Path) -> dict:
-    """What produced a return: this runner file's and the filled prompt template's sha256."""
-    return {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
-            "prompt_sha256": sha256_file(Path(prompt_path))}
+# The repository roots the blind-adjudicator role refuses (agent-lab PR #40), enforced by every blind tool:
+# blind_checkout --export, both lane runners and adjudicate (round-2 review; independent review of #145, O3).
+MIN_ROOT_COMPONENTS = 4
+REFUSED_ROOTS = ("/", "/home", "/tmp", "/Users", "/root")
+
+
+def root_issue(path) -> str:
+    """None when ``path`` is a repository root blind-adjudicator accepts, else why not: it must be absolute with
+    no ``.``/``..`` segment, ``~``, ``$`` or wildcard, and not ``/``, ``/home``, ``/tmp``, a home directory
+    (``/home/<name>``, ``/Users/<name>``, ``/root`` or this user's home) or a path of fewer than four
+    components."""
+    text = str(path)
+    parts = [part for part in text.split("/") if part]
+    if not text.startswith("/"):
+        return f"{text!r} is not an absolute path"
+    if any(part in (".", "..") for part in parts) or any(char in text for char in "~$*?["):
+        return f"{text!r} has a '.', '..', '~', '$' or wildcard segment"
+    if any(char.isspace() for char in text):
+        # Path scrubbing tokenizes on whitespace, so a root with a space could not be recognized in the returns.
+        return f"{text!r} contains whitespace"
+    if not re.fullmatch(r"[A-Za-z0-9._/-]+", text):
+        # Parentheses, quotes, backticks and the other tokenizer delimiters would split the root in scrubbing.
+        return f"{text!r} contains a character outside [A-Za-z0-9._/-]"
+    home = str(Path.home()).rstrip("/")
+    if (text.rstrip("/") or "/") in REFUSED_ROOTS or text.rstrip("/") == home or (
+            len(parts) == 2 and parts[0] in ("home", "Users")):
+        return f"{text!r} is /, /home, /tmp or a home directory"
+    if len(parts) < MIN_ROOT_COMPONENTS:
+        return f"{text!r} has {len(parts)} path components; a repository root needs at least {MIN_ROOT_COMPONENTS}"
+    return None
+
+
+def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
+    """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted,
+    and each retained symlink's text. The packet names evidence paths, not their bytes, so a return (and an
+    adjudication judgment) is bound to the tree it read."""
+    repo = Path(repo)
+    if not repo.is_dir():
+        # An empty walk would hash to a valid-looking digest (Codex review of #145).
+        raise NotADirectoryError(f"evidence repository {repo} is not an existing directory")
+    digest = hashlib.sha256()
+    root = repo.resolve()
+    for path in sorted(repo.rglob("*")):
+        relative = path.relative_to(repo).as_posix()
+        if path.is_symlink():
+            target = os.readlink(path)
+            try:
+                # A loop is found by stat (ELOOP) on every Python version: 3.13's resolve() no longer raises on one
+                # (delta review of #145). A dangling internal link (ENOENT) is hashed by its text.
+                os.stat(path)
+            except OSError as error:
+                if error.errno == errno.ELOOP:
+                    if not allow_escaping_links:
+                        raise ValueError(f"evidence repository {repo} has a symlink loop: {relative}")
+                    # A non-blind run hashes a looping link by its text without resolving it: 3.12's resolve()
+                    # raises RuntimeError on a loop (independent review of #145, R4-REG-4).
+                    digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
+                    continue
+            resolved = (path.parent / target).resolve(strict=False)
+            if not allow_escaping_links and (os.path.isabs(target)
+                                             or not (resolved == root or root in resolved.parents)):
+                # Content behind an escaping link could change under an unchanged digest (Codex review of #145);
+                # blind_checkout --export removes such links, so one here means the tree is not a blind export.
+                raise ValueError(f"evidence repository {repo} has a symlink leaving it: {relative} -> {target}")
+            # A retained internal link: its text is part of the tree (the target file is hashed on its own).
+            digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
+        elif path.is_file():
+            digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
+        elif not path.is_dir() and not allow_escaping_links:
+            # A FIFO, socket or device is not evidence and would otherwise be skipped silently (cross-family
+            # review of #145). A deliberately non-blind run may hold git's fsmonitor socket, so it is not refused.
+            raise ValueError(f"evidence repository {repo} has a non-regular entry: {relative}")
+    return digest.hexdigest()
+
+
+def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: bool = False) -> dict:
+    """What produced a return: this runner file's and the filled prompt template's sha256, and (given
+    ``repo``) the digest of the evidence tree the lane read, so a resume against another export reruns
+    (Codex review of #145)."""
+    provenance = {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
+                  "prompt_sha256": sha256_file(Path(prompt_path))}
+    if repo is not None:
+        provenance["repo_tree_sha256"] = tree_sha256(Path(repo), allow_escaping_links)
+    return provenance
 
 
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
@@ -456,12 +946,30 @@ def main(argv=None) -> int:
         print(f"codex_lane: output schema not found: {schema_path}", file=sys.stderr)
         return 2
     template = prompt_path.read_text(encoding="utf-8")
+    if not repo.is_dir():
+        print(f"codex_lane: --repo {repo} is not an existing directory", file=sys.stderr)
+        return 2
+    if not args.allow_git_history:
+        # The blind export must sit where the adjudicator role accepts it, checked as given and resolved (O3).
+        for candidate in (Path(os.path.abspath(args.repo)), repo):
+            issue = root_issue(candidate)
+            if issue:
+                print(f"codex_lane: --repo {issue}; place the blind export at least four directories deep (not /, "
+                      "/home, /tmp or a home directory itself) and outside every repository", file=sys.stderr)
+                return 2
     git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
     if git_dirs and not args.allow_git_history:
         # git walks up from a subdirectory, so an export inside any repository still reaches history.
         print(f"codex_lane: {git_dirs[0]} has .git, whose history a child can read from {repo}; run the lane on a "
               "blind_checkout.py --export copy placed outside every repository, or pass --allow-git-history "
               "outside a blind wave", file=sys.stderr)
+        return 2
+
+    work_repos = [str(path) for path in (work_dir, *work_dir.parents) if (path / ".git").exists()]
+    if work_repos and not args.allow_git_history:
+        # WORK_DIR sits outside every repository, as the recipe says (independent review of #145, round 4, OPS-6).
+        print(f"codex_lane: --work-dir {work_dir} is inside the git repository {work_repos[0]}; place it outside "
+              "every repository", file=sys.stderr)
         return 2
 
     layers_filter = None
@@ -473,22 +981,48 @@ def main(argv=None) -> int:
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
 
+    global CHILD_CODEX_HOME
+    try:
+        # A deliberately non-blind run (--allow-git-history) may read a checkout whose ignored .venv links leave
+        # it (re-review L2); a blind export never has such links.
+        provenance = lane_provenance(prompt_path, repo, allow_escaping_links=args.allow_git_history)
+    except ValueError as error:  # an escaping symlink: not a blind export
+        print(f"codex_lane: {error}", file=sys.stderr)
+        return 2
+    blind = not args.allow_git_history
+    audit_roots = [str(repo), str((work_dir / "packets").resolve())]
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256):
+        # A blind return counts only with clean retained events (round 7, REG7-1/ISO-R7-1).
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model,
+                                    args.effort, audit_roots=audit_roots if blind else None):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
+    if blind:
+        # The home refusals create nothing, so they run before the dry run and the lock (round 6, ISO-R6-5).
+        issue = codex_home_issue(work_dir, repo)
+        if issue:
+            print(f"codex_lane: {issue}", file=sys.stderr)
+            return 2
     if args.dry_run:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
+        # A blind child's environment is printed with its command; the dry run creates no home (OPS-4).
+        run_home = codex_home_base() / f"{codex_home_prefix(work_dir)}-<run>"
+        if blind:
+            print(f"# a real run creates a fresh {run_home} (mkdtemp) and runs each child with only this environment",
+                  file=sys.stderr)
+        # Never an API key value on stdout: the printed environment omits the key variables.
+        env_prefix = ["env", "-i", *(f"{key}={redact_userinfo(value)}" for key, value in child_env(run_home).items()
+                                     if key not in ("CODEX_API_KEY", "OPENAI_API_KEY"))] if blind else []
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
-            print(shlex.join(cmd))
+            print(shlex.join(env_prefix + cmd))
         return 0
 
     if pending and shutil.which("codex") is None:
@@ -496,20 +1030,70 @@ def main(argv=None) -> int:
         print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
               "(see adoption/) before running the Codex lane", file=sys.stderr)
         return 2
+    with contextlib.ExitStack() as stack:
+        if pending:
+            try:
+                # The work dir's own lock, then the homes' base lock, both shared by the two runners (round 6,
+                # ISO-R6-1; round 7, REG7-2/ISO-R7-4).
+                stack.enter_context(exclusive_run_lock(work_run_lock(work_dir)))
+                stack.enter_context(exclusive_run_lock(codex_home_lock(work_dir)))
+            except RunLocked as error:
+                print(f"codex_lane: {error}", file=sys.stderr)
+                return 2
+            stack.enter_context(terminate_on_signal())
+            sweep_stale_links(work_dir)
+        if pending and blind:
+            # Blind children never load the user's global Codex instructions or user skills (isolated_codex_home),
+            # set up only once every refusal has passed, the run holds its lock and something is to run (R4-REG-3).
+            try:
+                CHILD_CODEX_HOME = isolated_codex_home(work_dir, repo)
+            except CodexHomeRefused as error:
+                print(f"codex_lane: {error}", file=sys.stderr)
+                return 2
+        try:
+            return run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path,
+                               pending, provenance)
+        finally:
+            release_codex_home(CHILD_CODEX_HOME)
+            CHILD_CODEX_HOME = None
 
+
+def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
+                provenance) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
-    provenance = lane_provenance(prompt_path)
     usage_lock = threading.Lock()
+    audit_lock = threading.Lock()
     failures: list = []
+    blind = not args.allow_git_history
+    roots = [str(repo), str((work_dir / "packets").resolve())]
+    audit_path = codex_dir / AUDIT_NAME
+    try:
+        audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
+    except ValueError:
+        audit = {}
+    audit_layers = audit.get("layers") if isinstance(audit.get("layers"), dict) else {}
+
+    def record_audit(name, report):
+        # Written as each layer is audited, so an interrupted run keeps what it audited.
+        with audit_lock:
+            audit_layers[name] = report
+            audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": audit_layers},
+                                             indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
     def process(item):
         catalog, layer_id, packet_path, packet_sha256, out_path = item
+        name = f"{catalog}__{layer_id}"
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
-        tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
+        tmp_out = codex_dir / f"{name}.out.tmp"
         cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
                             ISOLATION_ARGS)
-        events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
+        events_path = events_dir / f"{name}.jsonl"
+        if STOP.is_set():
+            return
+        # The layer is pending, so its old return does not count: remove it before its events are rewritten, so an
+        # interrupted rerun never leaves it beside a truncated, clean-looking stream (round 8, NEW-1).
+        out_path.unlink(missing_ok=True)
         events_path.write_text("", encoding="utf-8")
 
         succeeded = False
@@ -522,6 +1106,8 @@ def main(argv=None) -> int:
             # produced a stale earlier attempt's (or run's) output.
             tmp_out.unlink(missing_ok=True)
             result = run_attempt(cmd, args.timeout)
+            if result.get("stopped") and not result["stdout"]:
+                return  # stopped before a child ran
             events = parse_events(result["stdout"])
             with events_path.open("a", encoding="utf-8") as handle:
                 for line in result["stdout"].splitlines():
@@ -540,6 +1126,10 @@ def main(argv=None) -> int:
             usage_row.update(usage)
             with usage_lock, usage_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(usage_row, sort_keys=True) + "\n")
+            if STOP.is_set():
+                # After a stop nothing is promoted and no retry starts (round 7, REG7-1/ISO-R7-3).
+                tmp_out.unlink(missing_ok=True)
+                return
 
             if result["timed_out"] or result["exit_code"] != 0:
                 last_failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
@@ -561,51 +1151,85 @@ def main(argv=None) -> int:
 
             final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
                                          provenance, configured_model=args.model)
-            out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
+            # This layer's own audit, before its return is written (round 7, REG7-1/ISO-R7-1): in a blind run a
+            # flagged layer (a read outside the export and packets, web search or an MCP tool) is void, as an
+            # adjudication judgment is, since it may have read the packet keys or another lane's return (Codex review
+            # of #145). Its return is kept only as <name>.json.audit-flagged, and the layer is recorded as failed.
+            report = blind_audit(events_path, roots)
+            record_audit(name, report)
+            if blind and audit_is_flagged(report):
+                out_path.unlink(missing_ok=True)
+                out_path.with_name(out_path.name + ".audit-flagged").write_text(
+                    json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+                last_failure = None
+                failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
+                                                     "outside the export and packets)"))
+                return
+            if STOP.is_set():
+                return
+            out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             succeeded = True
             break
 
         if not succeeded:
             # A stale return (e.g. one rejected for an older packet hash) must
             # not survive, so record_verdicts.py records this `failed` reason.
+            record_audit(name, blind_audit(events_path, roots))
             out_path.unlink(missing_ok=True)
             failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
 
     if args.jobs > 1:
-        with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+        executor = ThreadPoolExecutor(max_workers=args.jobs)
+        try:
             list(executor.map(process, pending))
+        finally:
+            # A stop cancels the queued layers; the in-flight ones return at once (round 7, ISO-R7-3).
+            executor.shutdown(wait=True, cancel_futures=True)
     else:
         for item in pending:
             process(item)
 
-    audit_path = codex_dir / AUDIT_NAME
     try:
-        audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
+        tree_after = tree_sha256(repo, allow_escaping_links=args.allow_git_history)
     except ValueError:
-        audit = {}
-    layers = audit.get("layers") if isinstance(audit.get("layers"), dict) else {}
-    roots = [str(repo), str((work_dir / "packets").resolve())]
-    for catalog, layer_id, _packet_path, _packet_sha256, _out_path in pending:
-        layers[f"{catalog}__{layer_id}"] = blind_audit(events_dir / f"{catalog}__{layer_id}.jsonl", roots)
-    audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": layers},
-                                     indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    flagged = sorted(name for name, entry in layers.items()
-                     if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
+        tree_after = None
+    if pending and tree_after != provenance["repo_tree_sha256"]:
+        # The evidence changed while the children read it (Codex review of #145): no return of this run is
+        # bound to one tree, so each is set aside (kept for inspection, never resumed or sealed).
+        for catalog, layer_id, _packet_path, _packet_sha256, out_path in pending:
+            if out_path.is_file():
+                out_path.replace(out_path.with_name(out_path.name + ".tree-changed"))
+            failures.append((catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export"))
+
+    flagged = sorted(name for name, entry in audit_layers.items() if isinstance(entry, dict) and audit_is_flagged(entry))
     if flagged:
         print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
               + ", ".join(flagged), file=sys.stderr)
 
     failures_path = codex_dir / FAILURES_NAME
-    if failures:
+    # A --layers rerun keeps the recorded failures of the layers it did not select, so record_verdicts still seals
+    # their reasons (Codex review of #145 at a4dfd99e).
+    kept = []
+    if args.layers and failures_path.is_file():
+        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
+        try:
+            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
+        except (ValueError, AttributeError):
+            earlier = []
+        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
+                if isinstance(entry, dict) and entry.get("layer_id") not in selected
+                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
+    recorded = sorted(set(failures) | set(kept))
+    if recorded:
         failures_path.write_text(json.dumps({"lane": LANE, "failures": [
             {"catalog": catalog, "layer_id": layer_id, "reason": reason}
-            for catalog, layer_id, reason in sorted(failures)]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        for catalog, layer_id, _reason in sorted(failures):
-            print(f"codex_lane: {catalog}__{layer_id} failed after retry", file=sys.stderr)
-        return 1
-    failures_path.unlink(missing_ok=True)
-    return 0
+            for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    else:
+        failures_path.unlink(missing_ok=True)
+    for catalog, layer_id, reason in sorted(failures):
+        print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

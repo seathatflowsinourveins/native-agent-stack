@@ -114,6 +114,20 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("mode_not_0600", result.stdout)
 
+    def test_unsafe_optional_file_also_fails_but_missing_optional_does_not(self):
+        path = self.store / "typesafe.env"
+        path.write_text(f"export TYPESAFE_API_KEY={self.fake_a}\n")
+        path.chmod(0o644)
+        report = self.report()
+        self.assertEqual(self.entry(report, "typesafe")["state"], "unsafe")
+        self.assertEqual(report["unsafe_stored"], ["typesafe"])
+        self.assertEqual(report["unsafe_required"], [])
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 1)
+        path.unlink()
+        self.assertEqual(self.entry(self.report(), "typesafe")["state"], "missing")
+        self.assertEqual(self.run_cli().returncode, 0)
+
     def test_open_store_directory_is_unsafe(self):
         self.write_alpaca()
         self.store.chmod(0o755)

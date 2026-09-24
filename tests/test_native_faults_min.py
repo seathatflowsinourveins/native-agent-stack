@@ -33,8 +33,14 @@ SPEC = importlib.util.spec_from_file_location("native_faults_min_harness", HARNE
 h = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(h)
 import safety  # noqa: E402  (same module object the harness imported)
-from transport import (TERMINAL, AmbiguousSubmission, RejectedSubmission, SUB_PENNY_REFUSAL,  # noqa: E402
-                       TransportError, documented_refusal, violates_minimum_price_variance)
+from transport import (TERMINAL, AmbiguousSubmission, OrderContractRefused, RejectedSubmission,  # noqa: E402
+                       SUB_PENNY_REFUSAL, TransportError, check_wire_submission, documented_refusal,
+                       violates_minimum_price_variance)
+try:
+    import alpaca  # noqa: F401
+    HAS_SDK = True
+except ImportError:
+    HAS_SDK = False
 
 try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
     from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
@@ -273,7 +279,10 @@ class HarnessRuns(unittest.TestCase):
         self.assertEqual(c04["detail"]["ledger_refusal"], {"http_status": 422, "refusal": SUB_PENNY_REFUSAL})
         self.assertEqual(c04["detail"]["effect_before"], c04["detail"]["effect_after"])
         self.assertEqual(receipt["c04_pre_send_exemption"],
-                         "FaultLedger exempts only client id %sc04 from invalid_price_increment" % prefix)
+                         "FaultLedger exempts only client id %sc04 from invalid_price_increment; FaultTransport "
+                         "exempts only its limit price increment from the order-contract boundary" % prefix)
+        self.assertEqual(set(receipt["engine_sources_sha256"]),
+                         {"transport.py", "safety.py", "runner.py", "../order-contract/order_contract.py"})
         self.assertEqual(port.posts, 2)
         self.assertEqual(port.deletes, [prefix + "c01", prefix + "c01"])
         self.assertEqual(receipt["cleanup"]["cancels"], [])
@@ -284,6 +293,18 @@ class HarnessRuns(unittest.TestCase):
             self.assertEqual(cases[case]["evidence_class"], "native_paper")
         plan_sha = __import__("hashlib").sha256((HARNESS.parent / "plan.json").read_bytes()).hexdigest()
         self.assertEqual(receipt["plan_sha256"], plan_sha)
+
+    def test_default_factory_is_the_fault_transport_for_the_c04_id(self):
+        requested = []
+
+        def fault_transport(client_id):
+            requested.append(client_id)
+            return FakePort
+        FakePort.scenario = {}
+        with patch.object(h, "fault_transport", side_effect=fault_transport):
+            h.run(self.env, self.root, self.out)
+        receipt = json.loads(self.out.read_text())
+        self.assertEqual(requested, [receipt["client_id_prefix"] + "c04"])
 
     def test_legacy_short_circuit_is_never_native_evidence(self):
         # The engine as run on 2026-09-23: a client-id GET found the order terminal, no DELETE.
@@ -511,6 +532,28 @@ class Units(unittest.TestCase):
             self.assertTrue(ledger.reserve_intent("nf-x-c04", "SPY", "buy", "1", "240.0001", **args).newly_reserved)
             self.assertTrue(ledger.reserve_intent("nf-x-c01", "SPY", "buy", "1", "240.00", **args).newly_reserved)
             ledger.close()
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_fault_transport_exempts_only_the_c04_price_increment(self):
+        port = h.fault_transport("nf-x-c04")(KEY, SECRET, ["SPY"], before_request=lambda *a, **k: None,
+                                             before_submit=lambda order: None,
+                                             sink_observation=lambda order: None)
+        self.addCleanup(port._client._session.close)
+        self.assertIsInstance(port, h.FaultTransport)
+        order = {"client_order_id": "nf-x-c04", "symbol": "SPY", "side": "buy", "qty": "1",
+                 "limit_price": "240.0001", "extended_hours": False}
+        envelope, request = port._validated_request(order)
+        self.assertEqual(envelope["intent"]["limit_price"], "240.0001")
+        # The C04 POST body must still equal its envelope at the wire gate.
+        self.assertIs(check_wire_submission({"nf-x-c04": envelope}, request.to_request_fields()), envelope)
+        for cid in ("nf-x-c01", "nf-x-c040", "other"):
+            with self.subTest(client_order_id=cid), self.assertRaises(OrderContractRefused):
+                port._validated_request(dict(order, client_order_id=cid))
+        for change in ({"symbol": "BRK-B"}, {"qty": "0.5"}, {"extended_hours": True}):
+            with self.subTest(change=change), self.assertRaises(OrderContractRefused):
+                port._validated_request(dict(order, **change))  # every other rule still applies to C04
+        self.assertEqual(port._validated_request(dict(order, limit_price="240.01"))[0]["intent"]["limit_price"],
+                         "240.01")
 
     def test_c01_c02_judges_use_ledger_state(self):
         state = {"status": "new", "filled_qty": "0", "submit_attempted": True, "broker_id_recorded": True}
