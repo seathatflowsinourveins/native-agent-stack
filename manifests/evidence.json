@@ -9398,8 +9398,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "8770a37156ba80a589a9f3750bb630bc4e8365083b8ba9feacd3dd89e1b09a43",
-      "bytes": 8637
+      "sha256": "07d524b9c9c63949df656f16832daa5a7a7bebcff2f2ad5e39c27b590e33410d",
+      "bytes": 11632
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -28233,8 +28233,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "90827450efd0a4ab2736e3c7d32cf5060d6504350f24d43a0572c5364bd2bc35",
-      "bytes": 11257
+      "sha256": "4abd327373c12ed49dd9a149a507d6bdd7044ff4c6b3685cde1a1c57c0c5b548",
+      "bytes": 11623
     },
     {
       "path": "observability/native-data/README.md",

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-23T23:45:00Z",
+  "recorded_at_utc": "2026-09-24T06:56:42Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -212,8 +212,15 @@
       "kind": "gate",
       "id": "sota-convergence-20260922",
       "title": "SOTA repository convergence and practice",
-      "state": "28 layers vs 396 upstream repositories / 33 newcomers and 1 targeted candidate / practice tooling and workflow recorded / Codex review established (7 passes)",
-      "evidence_ref": "catalogs/sota-convergence/README.md"
+      "state": "32-layer landscape sweep 2026-09-23 / 11 newcomers survived both refuters / source review only / 28-layer review and Codex review (7 passes) retained",
+      "evidence_ref": "catalogs/sota-convergence/manifest-20260923.json"
+    },
+    {
+      "kind": "gate",
+      "id": "mover-early-entry-studies",
+      "title": "Mover early-entry studies v1 and v2",
+      "state": "v1 768 and v2 244 preregistered rule-exits / no development pass in any family / holdout unread / research result not strategy acceptance",
+      "evidence_ref": "blueprints/us-equities/mover-early-entry/README.md"
     }
   ],
   "workers": [
