@@ -1,15 +1,68 @@
 {
-  "cancel_timestamp_assumption": "canceled paper orders have no recorded cancel timestamp in broker-orders.json; the replay cancels the simulated order 1ns before the next same-symbol/side order's paper submit timestamp (build_decisions())",
-  "completed_utc": "2026-09-24T17:32:31.607880+00:00",
+  "argv": [
+    "--trial",
+    "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed",
+    "--pages",
+    "<redacted>",
+    "--out",
+    "<redacted>",
+    "--replay",
+    "--receipt",
+    "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json"
+  ],
+  "cancel_timestamp_resolution": {
+    "by_client_order_id": {
+      "adp-adaptive-20260923g-0000004": {
+        "cancel_ts_ns": 1790182276776666000,
+        "source": "recorded_cancel_request"
+      }
+    },
+    "order_timeout_seconds": 10,
+    "order_timeout_seconds_source": "matched_config:config-sip.json"
+  },
+  "completed_utc": "2026-09-24T19:25:26.868092+00:00",
   "data_provenance": {
     "adjustment": "n/a (quotes)",
-    "alpaca_py_declared_version": "0.44.0",
+    "alpaca_py_version": "0.44.0",
+    "alpaca_py_version_measured": true,
     "asof": "2026-09-23",
     "feed": "sip",
     "page_ledger_sha256": "08117d4acbc965c238b28ab156347f2f049d472402e9503317d0cfca1d188291",
+    "page_sources": {
+      "cache": 4,
+      "network": 0,
+      "pages": [
+        {
+          "key": "f446ecfc5ec66a738ad982e22dff0a1e",
+          "source": "cache"
+        },
+        {
+          "key": "683981be50de0eab8e90c79c0527f277",
+          "source": "cache"
+        },
+        {
+          "key": "c047dedc7968b47db6dc8d9c82fedc20",
+          "source": "cache"
+        },
+        {
+          "key": "cc532baacda3d925d1ac0532cf20ffce",
+          "source": "cache"
+        }
+      ]
+    },
     "quote_counts": {
-      "GOOGL": 10285,
+      "GOOGL": 10284,
       "INTC": 21856
+    },
+    "quote_drop_counts": {
+      "GOOGL": {
+        "crossed": 1,
+        "one_sided_or_nonpositive": 0
+      },
+      "INTC": {
+        "crossed": 0,
+        "one_sided_or_nonpositive": 0
+      }
     },
     "source": "Alpaca historical quotes, GET https://data.alpaca.markets/v2/stocks/quotes",
     "symbols": [
@@ -34,71 +87,133 @@
       "class": "nautilus_trader.execution.FillModel (native default, unconfigured)",
       "note": "native default nautilus_trader.execution.FillModel(); matches limit orders against the fed L1 top-of-book quotes deterministically (no probabilistic slippage or partial-fill draw), the same baseline configuration used by engine-nautilus/equity-replay's zero-fee case"
     },
+    "latency_model": null,
     "liquidity_consumption": false,
     "oms_type": "NETTING",
+    "queue_position": false,
     "reports": {
       "fills": {
         "rows": 4,
-        "sha256": "7eaf2d025e4b6daa5070456aab7f2e532900360e7b2ef356a01ce7f4bd91595b"
+        "sha256_excluding_init_id": "9f73243d44ea9ceee2eac8935a4066a2aa9facf79b02d548283123c24d7e97b4"
       },
       "orders": {
         "rows": 5,
-        "sha256": "61af37484c66784ca73a10162ef92d2814a157f199a00e5b270b91f958d012b0"
+        "sha256_excluding_init_id": "63e6130c07075389711f29439a8c62d223b3ab213b7f8a6596d6a876b839752f"
       }
     }
   },
+  "evidence_class": "local_integration_check",
+  "exit_code": 0,
   "inputs_sha256": {
     "broker_orders_json": "7f84a869e033e4692bcb755486dcffa05278fd441e9cafb541a470de9b8047c3",
     "ingest_receipt_json": "3f340e37b1254578197c27bc75652ee626ac6966bb43642ebf8c7f49a2df3bb4",
     "paper_output_json": "3e2603c8c9e883ed6284e6f9b5f11dbb87b1ed127f8195b47e4e064882041c73"
   },
   "kind": "sim_vs_paper_fill_comparison",
-  "network_interfaces": [
-    [
-      1,
-      "lo"
-    ],
-    [
-      2,
-      "eth0"
-    ],
-    [
-      3,
-      "eth1"
-    ],
-    [
-      4,
-      "loopback0"
-    ],
-    [
+  "latency_sensitivity_sweep": {
+    "declared_sweep_ms": [
+      0,
       5,
-      "eth2"
+      50,
+      70,
+      100,
+      250,
+      650,
+      1000
     ],
-    [
-      6,
-      "br-9c69f217f15a"
+    "points": [
+      {
+        "abs_fill_price_delta_bps_mean": 0.37495210665844053,
+        "abs_fill_time_delta_s_mean": 0.863054,
+        "both_filled": 3,
+        "disagreeing_client_order_ids": [
+          "adp-adaptive-20260923g-0000004",
+          "adp-adaptive-20260923g-0000005"
+        ],
+        "fill_agreement_rate": 0.6,
+        "fill_agreements": 3,
+        "latency_ms": 0,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.37495210665844053,
+        "abs_fill_time_delta_s_mean": 0.7626041066666667,
+        "both_filled": 3,
+        "disagreeing_client_order_ids": [
+          "adp-adaptive-20260923g-0000004",
+          "adp-adaptive-20260923g-0000005"
+        ],
+        "fill_agreement_rate": 0.6,
+        "fill_agreements": 3,
+        "latency_ms": 5,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.3749062394546139,
+        "abs_fill_time_delta_s_mean": 0.7254351323333333,
+        "both_filled": 3,
+        "disagreeing_client_order_ids": [
+          "adp-adaptive-20260923g-0000004",
+          "adp-adaptive-20260923g-0000005"
+        ],
+        "fill_agreement_rate": 0.6,
+        "fill_agreements": 3,
+        "latency_ms": 50,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.2811796795909604,
+        "abs_fill_time_delta_s_mean": 0.6443640025,
+        "both_filled": 4,
+        "disagreeing_client_order_ids": [],
+        "fill_agreement_rate": 1.0,
+        "fill_agreements": 5,
+        "latency_ms": 70,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.4885625082927439,
+        "abs_fill_time_delta_s_mean": 0.6311470582500001,
+        "both_filled": 4,
+        "disagreeing_client_order_ids": [],
+        "fill_agreement_rate": 1.0,
+        "fill_agreements": 5,
+        "latency_ms": 100,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.2811796795909604,
+        "abs_fill_time_delta_s_mean": 0.45712327875000003,
+        "both_filled": 4,
+        "disagreeing_client_order_ids": [],
+        "fill_agreement_rate": 1.0,
+        "fill_agreements": 5,
+        "latency_ms": 250,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.28123641411242023,
+        "abs_fill_time_delta_s_mean": 0.06607391125,
+        "both_filled": 4,
+        "disagreeing_client_order_ids": [],
+        "fill_agreement_rate": 1.0,
+        "fill_agreements": 5,
+        "latency_ms": 650,
+        "orders": 5
+      },
+      {
+        "abs_fill_price_delta_bps_mean": 0.28127081451529024,
+        "abs_fill_time_delta_s_mean": 0.28362891375,
+        "both_filled": 4,
+        "disagreeing_client_order_ids": [],
+        "fill_agreement_rate": 1.0,
+        "fill_agreements": 5,
+        "latency_ms": 1000,
+        "orders": 5
+      }
     ],
-    [
-      7,
-      "br-d80006bed4da"
-    ],
-    [
-      8,
-      "docker0"
-    ],
-    [
-      9,
-      "br-92ba17c21ed8"
-    ],
-    [
-      10,
-      "veth3624c08"
-    ],
-    [
-      11,
-      "veth01bc30c"
-    ]
-  ],
+    "purpose": "Sensitivity check, not a calibration: shows how fill agreement changes as StaticLatencyModel's broker/network latency assumption increases from the zero-latency default."
+  },
   "protocol": "sim-paper-compare-v1-20260924",
   "replay_from_retained_pages_only": true,
   "results": {
@@ -106,9 +221,9 @@
       "abs_fill_price_delta_bps_max": 0.8295313148071339,
       "abs_fill_price_delta_bps_mean": 0.37495210665844053,
       "abs_fill_price_delta_bps_median": 0.2953250051681876,
-      "abs_fill_time_delta_s_max": 0.837071865,
-      "abs_fill_time_delta_s_mean": 0.7760921789999999,
-      "abs_fill_time_delta_s_median": 0.816296049,
+      "abs_fill_time_delta_s_max": 1.093899,
+      "abs_fill_time_delta_s_mean": 0.863054,
+      "abs_fill_time_delta_s_median": 0.817687,
       "both_filled": 3,
       "fill_agreement_rate": 0.6,
       "fill_agreements": 3,
@@ -119,54 +234,72 @@
         "client_order_id": "adp-adaptive-20260923g-0000001",
         "fill_agreement": true,
         "fill_price_delta_bps": 0.0,
-        "fill_time_delta_s": -0.674908623,
+        "fill_time_delta_s": -0.677576,
         "limit_price": "120.6",
         "paper_fill_price": "120.57",
         "paper_fill_ts": "2026-09-23T16:47:37.632753000Z",
         "paper_filled": true,
+        "paper_filled_qty": 1,
+        "paper_slippage_vs_limit_bps": -2.487562189054726,
         "paper_status": "filled",
         "qty": 1,
         "side": "BUY",
         "sim_fill_price": "120.57",
-        "sim_fill_ts": "2026-09-23T16:47:36.957844377Z",
+        "sim_fill_ts": "2026-09-23T16:47:36.955177000Z",
         "sim_filled": true,
+        "sim_filled_qty": 1,
         "sim_present": true,
+        "sim_reject_reason": null,
+        "sim_slippage_vs_limit_bps": -2.487562189054726,
+        "sim_status": "FILLED",
         "symbol": "INTC"
       },
       {
         "client_order_id": "adp-adaptive-20260923g-0000002",
         "fill_agreement": true,
         "fill_price_delta_bps": -0.8295313148071339,
-        "fill_time_delta_s": -0.816296049,
+        "fill_time_delta_s": -0.817687,
         "limit_price": "120.52",
         "paper_fill_price": "120.55",
         "paper_fill_ts": "2026-09-23T16:47:43.962040000Z",
         "paper_filled": true,
+        "paper_filled_qty": 1,
+        "paper_slippage_vs_limit_bps": -2.489213408562894,
         "paper_status": "filled",
         "qty": 1,
         "side": "SELL",
         "sim_fill_price": "120.54",
-        "sim_fill_ts": "2026-09-23T16:47:43.145743951Z",
+        "sim_fill_ts": "2026-09-23T16:47:43.144353000Z",
         "sim_filled": true,
+        "sim_filled_qty": 1,
         "sim_present": true,
+        "sim_reject_reason": null,
+        "sim_slippage_vs_limit_bps": -1.659475605708596,
+        "sim_status": "FILLED",
         "symbol": "INTC"
       },
       {
         "client_order_id": "adp-adaptive-20260923g-0000003",
         "fill_agreement": true,
         "fill_price_delta_bps": 0.2953250051681876,
-        "fill_time_delta_s": -0.837071865,
+        "fill_time_delta_s": -1.093899,
         "limit_price": "338.64",
         "paper_fill_price": "338.61",
         "paper_fill_ts": "2026-09-23T16:50:59.643745000Z",
         "paper_filled": true,
+        "paper_filled_qty": 1,
+        "paper_slippage_vs_limit_bps": -0.8858965272856131,
         "paper_status": "filled",
         "qty": 1,
         "side": "BUY",
         "sim_fill_price": "338.62",
-        "sim_fill_ts": "2026-09-23T16:50:58.806673135Z",
+        "sim_fill_ts": "2026-09-23T16:50:58.549846000Z",
         "sim_filled": true,
+        "sim_filled_qty": 1,
         "sim_present": true,
+        "sim_reject_reason": null,
+        "sim_slippage_vs_limit_bps": -0.5905976848570753,
+        "sim_status": "FILLED",
         "symbol": "GOOGL"
       },
       {
@@ -178,13 +311,19 @@
         "paper_fill_price": null,
         "paper_fill_ts": null,
         "paper_filled": false,
+        "paper_filled_qty": 0,
+        "paper_slippage_vs_limit_bps": null,
         "paper_status": "canceled",
         "qty": 1,
         "side": "SELL",
         "sim_fill_price": "338.44",
-        "sim_fill_ts": "2026-09-23T16:51:06.696451192Z",
+        "sim_fill_ts": "2026-09-23T16:51:06.688616000Z",
         "sim_filled": true,
+        "sim_filled_qty": 1,
         "sim_present": true,
+        "sim_reject_reason": null,
+        "sim_slippage_vs_limit_bps": -0.5909816204716033,
+        "sim_status": "FILLED",
         "symbol": "GOOGL"
       },
       {
@@ -196,20 +335,27 @@
         "paper_fill_price": "338.35",
         "paper_fill_ts": "2026-09-23T16:51:17.583866000Z",
         "paper_filled": true,
+        "paper_filled_qty": 1,
+        "paper_slippage_vs_limit_bps": -0.5911388289539798,
         "paper_status": "filled",
         "qty": 1,
         "side": "SELL",
         "sim_fill_price": null,
         "sim_fill_ts": null,
         "sim_filled": false,
+        "sim_filled_qty": 0,
         "sim_present": true,
+        "sim_reject_reason": "Short selling not permitted on a CASH account with position GOOGL.SIM-ScheduledReplay-000 and order LimitOrder(SELL 1 GOOGL.SIM LIMIT @ 338.33 DAY, status=SUBMITTED, client_order_id=adp-adaptive-20260923g-0000005, venue_order_id=None, position_id=None, exec_algorithm_id=None, exec_spawn_id=None, tags=None)",
+        "sim_slippage_vs_limit_bps": null,
+        "sim_status": "REJECTED",
         "symbol": "GOOGL"
       }
     ]
   },
-  "runner_sha256": "fd8fef223b3cf70b0f17750148c67a5b41a6a02e8ba69cfc5a9f2cc0c529a39b",
+  "runner_sha256": "2a86a1825f1e6b90b0900082abc02cfa2be7656e7ea965195c1ce566854ed70a",
   "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime.",
-  "trading_lane_audit_gap": 7,
+  "started_utc": "2026-09-24T19:25:25.284601+00:00",
+  "stdout_sha256": "5b2bdcf8d66b5c5a2f1b7819bed2fa8fde5e0c77f56f77807c219f2b67d028fd",
   "trial": "20260923g-main-passed",
   "trial_window_utc": [
     "2026-09-23T16:46:00Z",
