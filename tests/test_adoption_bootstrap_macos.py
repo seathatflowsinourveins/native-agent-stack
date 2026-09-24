@@ -218,11 +218,11 @@ class NativeClaudeCodePinTests(unittest.TestCase):
     def test_claude_code_is_a_native_pin(self):
         tool = self.by_id["claude-code"]
         self.assertEqual(tool["kind"], "native")
-        self.assertEqual(tool["version"], "2.1.280")
+        self.assertEqual(tool["version"], "2.1.281")
         self.assertEqual(tool["version"], self.linux_by_id["claude-code"]["version"])
         self.assertRegex(tool["sha256"], SHA256_HEX)
         self.assertIn("darwin-arm64", tool["url"])
-        self.assertIn("2.1.280", tool["url"])
+        self.assertIn("2.1.281", tool["url"])
         self.assertNotIn("platform_dependency", tool)
 
     def test_claude_code_sha256_differs_from_linux_binary(self):
@@ -813,6 +813,124 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
 
 
 NPM = shutil.which("npm")
+
+
+class NativeInstallFloorTests(unittest.TestCase):
+    """2026-09-24: a native pin is a floor, not a ceiling. install_pin,
+    install_native and fetch are extracted verbatim and run against a one-pin
+    fixture: only `curl` is shimmed (it logs the URL and copies a stub native
+    installer whose real sha256 the fixture pin records), and HOME is a
+    temporary directory whose ~/.local/bin/claude, when present, answers
+    --version with a chosen line. A launcher at or above the pin is kept with
+    no download and no install; anything else takes the unchanged
+    checksum-verified install."""
+
+    PIN = "2.1.281"
+    URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/darwin-arm64/claude"
+    KEPT = ("2.1.281 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
+            "10.0.0 (Claude Code)", "2.1.281")
+    # 2.1.99 sorts after 2.1.281 as text but is older; a pre-release suffix,
+    # a non-version first word and empty output are not trusted as a version.
+    INSTALLED = ("2.1.280 (Claude Code)", "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
+                 "2.1.290-dev (Claude Code)", "Claude Code", "")
+
+    def _run(self, tmp_path: Path, version_line=None, launcher_exit=0, sha256=None, bash="bash"):
+        home = tmp_path / "home"
+        (home / ".local" / "bin").mkdir(parents=True)
+        launcher = home / ".local" / "bin" / "claude"
+        if version_line is not None:
+            launcher.write_text(f"#!/bin/sh\nprintf '%s\\n' {json.dumps(version_line)}\nexit {launcher_exit}\n")
+            launcher.chmod(0o755)
+        installs, downloads = tmp_path / "installs.log", tmp_path / "downloads.log"
+        installer = tmp_path / "native-installer"
+        installer.write_text(f'#!/bin/sh\nprintf "%s\\n" "$*" >> {json.dumps(str(installs))}\n')
+        shim = tmp_path / "curl-shim"
+        shim.mkdir()
+        (shim / "curl").write_text(
+            "#!/bin/sh\n"
+            'out=""; prev=""; url=""\n'
+            'for arg in "$@"; do\n'
+            '  if [ "$prev" = "--output" ]; then out="$arg"; fi\n'
+            '  case "$arg" in https://*) url="$arg" ;; esac\n'
+            '  prev="$arg"\n'
+            "done\n"
+            f'printf "%s\\n" "$url" >> {json.dumps(str(downloads))}\n'
+            f'cp {json.dumps(str(installer))} "$out"\n'
+        )
+        (shim / "curl").chmod(0o755)
+        eco = tmp_path / "eco"
+        for child in ("bin", "downloads"):
+            (eco / child).mkdir(parents=True)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [{
+            "id": "claude-code", "version": self.PIN, "kind": "native", "url": self.URL,
+            "sha256": sha256 or hashlib.sha256(installer.read_bytes()).hexdigest(),
+            "install_note": "fixture", "bin": "claude",
+        }]}))
+        harness = tmp_path / "install-native-floor-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_native", "install_pin")
+            + f"pins_path={json.dumps(str(pins_path))}\n"
+            + f"bin_dir={json.dumps(str(eco / 'bin'))}\n"
+            + f"cache_dir={json.dumps(str(eco / 'downloads'))}\n"
+            + "plan_mode=0\n"
+            + "install_pin claude-code\n"
+        )
+        result = subprocess.run(
+            [bash, str(harness)], capture_output=True, text=True, timeout=60,
+            env={**os.environ, "HOME": str(home), "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"},
+        )
+        logs = [path.read_text() if path.exists() else "" for path in (installs, downloads)]
+        return result, *logs, eco, launcher
+
+    def assert_kept(self, version_line, **kwargs):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, eco, launcher = self._run(Path(tmp), version_line, **kwargs)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(f"Kept installed claude-code {version_line.split()[0]}: at or above the "
+                          f"pinned floor {self.PIN}", result.stdout)
+            self.assertNotIn("Installed claude-code", result.stdout)
+            self.assertEqual((downloads, installs), ("", ""), "a kept launcher must not be fetched or installed")
+            self.assertEqual(list((eco / "downloads").iterdir()), [])
+            self.assertIn(json.dumps(version_line), launcher.read_text(), "the kept launcher was modified")
+            # The ecosystem's own launcher still execs the kept native install.
+            self.assertIn('exec "$HOME/.local/bin/claude"', (eco / "bin" / "claude").read_text())
+
+    def assert_installed(self, version_line, **kwargs):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, _, _ = self._run(Path(tmp), version_line, **kwargs)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(f"Installed claude-code {self.PIN} (native)", result.stdout)
+            self.assertNotIn("Kept installed", result.stdout)
+            self.assertEqual(downloads.splitlines(), [self.URL])
+            self.assertEqual(installs.splitlines(), [f"install {self.PIN}"])
+
+    def test_a_launcher_at_or_above_the_pin_is_kept_without_download_or_install(self):
+        for version_line in self.KEPT:
+            with self.subTest(version_line=version_line):
+                self.assert_kept(version_line)
+
+    def test_a_missing_older_or_unreadable_launcher_takes_the_verified_install(self):
+        for version_line in (None, *self.INSTALLED):
+            with self.subTest(version_line=version_line):
+                self.assert_installed(version_line)
+
+    def test_a_failing_version_probe_takes_the_verified_install(self):
+        self.assert_installed("2.1.290 (Claude Code)", launcher_exit=1)
+
+    def test_the_install_path_still_fails_closed_on_a_checksum_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, installs, downloads, _, _ = self._run(Path(tmp), "2.1.280 (Claude Code)", sha256="0" * 64)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Checksum mismatch", result.stderr)
+            self.assertEqual(downloads.splitlines(), [self.URL])
+            self.assertEqual(installs, "", "an unverified download must never run")
+
+    @unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+    def test_the_floor_check_runs_under_real_bash_32(self):
+        self.assert_kept("2.1.290 (Claude Code)", bash=BASH32)
+        self.assert_installed("2.1.99 (Claude Code)", bash=BASH32)
 
 
 class EmbeddingModelInstallTests(unittest.TestCase):

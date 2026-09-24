@@ -68,7 +68,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | accepted | untested | — |  |
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | accepted | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | conditional | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | conditional | untested | observability |  |
@@ -89,7 +89,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
 |  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | conditional | untested | — |  |
 
 ## Trading layers (north star)

@@ -3122,8 +3122,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "69dfc36b845b2a2fffe49431a8a5d3c267257ca795a80603e10f53cb012e8977",
-      "bytes": 507
+      "sha256": "34283e818b7bcc6f7a4c80bf32af737a846dc4d4c6bdd0271d417635676ca317",
+      "bytes": 674
     },
     {
       "path": ".gitleaks.toml",
@@ -3162,8 +3162,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "87101a069cd70cefcde02fa05d1fbc1ef32851dd816e75508fd16a24e25e6431",
-      "bytes": 15085
+      "sha256": "448231dce80a50a6f7b706394d045169d32aa6e06a7a9528c4f0a409d69b82f0",
+      "bytes": 15399
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -3172,13 +3172,13 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "c12ec11732ec79de29808155af3ae6029850b9d008f3b9add73ac14db41ef9f6",
-      "bytes": 58122
+      "sha256": "16ccb010c259da420f6338e4dadd6d77881dc6d4c0c3ff6c097321c5709e767b",
+      "bytes": 60165
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b39e002f6f8821025d765033f45c627167839530c4d5c6f06fc8301d1fe238c2",
-      "bytes": 20514
+      "sha256": "e1448d005ceebc1e2c15d0c79c65126fefdd3e90cfd6fe9a7e7afb98cfa7cfc8",
+      "bytes": 20811
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3262,13 +3262,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "31a96d867d084d1b399f5d6da71544b04a842cbb016bfe56d41235e7cdca4c8c",
-      "bytes": 11269
+      "sha256": "526282fc882e203c88bb774721d0fb38e262d1bd5fa332ba35fc7a4b4e5548a6",
+      "bytes": 11911
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "b393868aee89534bf3986470c11584463116b8748d433da3fb2ac25a067956eb",
-      "bytes": 17677
+      "sha256": "0f331e263a69a5bc9dcdd81dbc910680a15132364ff07c209dfb5e6f0efe55c9",
+      "bytes": 18309
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3277,8 +3277,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "146e5065d42199409327668fefd6f88c890ffe8060adbe9b7c21b9105bcedc16",
-      "bytes": 40489
+      "sha256": "7534cb50c083f87b065709e0e48172617880c6a51772c1ab031113458912b058",
+      "bytes": 41178
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3317,8 +3317,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a85d53f83852b289a1dafd1767b863bd22f4d6f24a15b4bbbf0588e665b44b55",
-      "bytes": 6480
+      "sha256": "89f625d2766feb87bd3ff7849a32aee41724d272a353ed9f3e38a3c63bb511d7",
+      "bytes": 6490
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -9153,7 +9153,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "a9170e7561003ef37b33d85dec97926371c5ea8d8545c4ed565c5032deec1fdb",
+      "sha256": "4ef0ac921654844d59ba5ac7e49c84beab2ec678cf2de6a511e18ab8b57ba342",
       "bytes": 75466
     },
     {
@@ -9878,7 +9878,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "bf0afa11ebd1e9b041ab066eed974277b1139595f4f63e941767b74ce0a20d4f",
+      "sha256": "5b2334efa6bbe9626928b2a8c93d8c72ec0b54241a81ead45c7d007d7f262a9b",
       "bytes": 14902
     },
     {
@@ -28598,8 +28598,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "adb957701308abd587555a3161791e4c53ab56747aa768b594f03d5d15949e36",
-      "bytes": 165300
+      "sha256": "cb5d1ee7900b5e4632cdcd10f5f96b7a96f37383b09cd29bd1c1ebd46e4cc785",
+      "bytes": 172006
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -28978,8 +28978,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "98d96dd2597166ba9d01d8b60b0e163e4eb49f70e9eb3b9f7aaa7c4b9a430ff7",
-      "bytes": 10919
+      "sha256": "a5e6291c0312462edb484c315eb1ff32209f979934d95e97e7323a5ba20cdb5c",
+      "bytes": 14337
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -29088,8 +29088,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "ca30b4f62c3df35e96c1da766ac8cd76e21af23a4a5d913317b4a4d77f28c819",
-      "bytes": 10586
+      "sha256": "41f4f0c46df96a60bd340bbb1f007b8fe5f58014dc8ca985ebf25f675f108df9",
+      "bytes": 11586
     },
     {
       "path": "tools/adoption/render_launchd.py",
