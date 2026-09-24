@@ -1077,7 +1077,9 @@ class ManifestNewcomersTests(LanePacketsFixture):
 
     def test_the_cli_flag_reaches_the_packets(self):
         with contextlib.redirect_stdout(io.StringIO()):
+            # --withhold-labels needs --keys-out outside --out (#145: sealed candidate fields).
             self.assertEqual(lane_packets.main(["--root", str(self.root), "--out", str(self.out),
+                                                "--keys-out", str(self.root / "keys" / "packet-keys.json"),
                                                 "--manifest-newcomers", "--withhold-labels"]), 0)
         packet = json.loads((self.out / "packets" / "foundation__layer-a.json").read_text(encoding="utf-8"))
         self.assertIn("https://github.com/new/alpha", [c["repository"] for c in packet["candidates"]])
