@@ -3169,8 +3169,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "3fb9db3cf3e48d0fb76606dfaef6a968b39bdddee5c6d2edbb749165ac9baff4",
-      "bytes": 25471
+      "sha256": "93f7d5a685e88f8a0b48d458375e10fd5a11ebe96d2113a267171fd6bebfa32c",
+      "bytes": 27136
     },
     {
       "path": ".gitleaksignore",
@@ -6520,8 +6520,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/credential_guard.py",
-      "sha256": "e5d1c5af355c3bb5268a9524283bccd9c6ed4c7a060e36aaffa40ae332bd5bbb",
-      "bytes": 21241
+      "sha256": "f5a3d0d038ed3f01d486493ce416395039fb260762232785bb0a9073c777da7e",
+      "bytes": 22201
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
@@ -6675,7 +6675,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "1d5f323adb544925dc8b55dd64c58cffe5a870ff6063c5a7d11a675e33328a67",
+      "sha256": "5a9cf606cddb4d251d0f4e6ecc7f04f6c3778dd01ddd2ef90d8b4ce7016ed2f7",
       "bytes": 6229
     },
     {
@@ -9925,8 +9925,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "610283d32df3cdbd4155a75822c21fe77e7866f0f9a04af7adfdafa8696e1ec8",
-      "bytes": 22773
+      "sha256": "2b16c53efcdc0dd1c06d82226e4f595d37133855217d718cfa021d16e7e02530",
+      "bytes": 23985
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -28940,8 +28940,8 @@
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
-      "sha256": "34f2d5b07f42cb60d415abf24e4feef64b9088d1071163ab8427f0d958ebf7ee",
-      "bytes": 4061
+      "sha256": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
+      "bytes": 5384
     },
     {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
@@ -28990,13 +28990,13 @@
     },
     {
       "path": "tests/test_adaptive_market_research.py",
-      "sha256": "c5803515fa6e1a5a3c1e027596428c1effd2ea98c58fab8d5c2e51f88ca2c398",
-      "bytes": 26962
+      "sha256": "772b4fd467d4405bd098a440c54de4bfd61f91bbb80693c052077b867f9e2fd6",
+      "bytes": 27215
     },
     {
       "path": "tests/test_adaptive_paper_credential_race.py",
-      "sha256": "7b2ff2c234d612ba4852a6ae64aec25a79a1059b35475701eae9f3ac851e824a",
-      "bytes": 65092
+      "sha256": "1b0b6521045858fc9c974fc9e50e390ac888c7091f5f92606feb1bf49f7ef022",
+      "bytes": 66824
     },
     {
       "path": "tests/test_adaptive_paper_leverage.py",
@@ -29235,8 +29235,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "7ae277702e707230df21041df67d9fb212463bf8c560b3a018c617863d9a185f",
-      "bytes": 37816
+      "sha256": "169a3f73638d7c674d6ca8444ef8346faaeb750983e98f5c30528b7f9f848346",
+      "bytes": 43494
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

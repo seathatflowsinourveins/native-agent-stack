@@ -34,6 +34,11 @@ def _deadline(seconds):
         signal.signal(signal.SIGALRM, previous)
 
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import real_tmp_root
+except ImportError:
+    from adaptive_paper_hermetic import real_tmp_root  # noqa: E402
+
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
 PATH = SOURCE / "market_research.py"
@@ -164,7 +169,7 @@ class NewsNormalization(unittest.TestCase):
 
     def test_env_file_only_parses_selected_literals(self):
         with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "fixture.env"
+            path = real_tmp_root(tmp) / "fixture.env"
             path.write_text("UNRELATED=ignored\nexport APCA_API_KEY_ID='fixture-key'\nAPCA_API_SECRET_KEY=fixture-secret\n")
             os.chmod(path, 0o600)
             self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
@@ -183,7 +188,7 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()

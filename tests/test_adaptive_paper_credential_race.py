@@ -39,6 +39,11 @@ import credential_guard as cg  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _credential_mutation_driver as driver  # noqa: E402
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import real_tmp_root
+except ImportError:
+    from adaptive_paper_hermetic import real_tmp_root  # noqa: E402
+
 CG = "blueprints/us-equities/adaptive-paper/credential_guard.py"
 MR = "blueprints/us-equities/adaptive-paper/market_research.py"
 RUNNER = "blueprints/us-equities/adaptive-paper/runner.py"
@@ -75,7 +80,15 @@ def _write_env(directory, name="paper.env", mode=0o600):
 
 
 def _open_fd_count():
-    return len(os.listdir(f"/proc/{os.getpid()}/fd"))
+    """Number of this process's currently open file descriptors, portably:
+    Linux exposes /proc/<pid>/fd; macOS has no /proc at all but exposes the
+    same information at /dev/fd (a fdescfs mount, present by default).
+    Whichever exists on this platform is used; if neither does, that is a
+    real environment problem, not something to silently paper over."""
+    for candidate in (f"/proc/{os.getpid()}/fd", "/dev/fd"):
+        if os.path.isdir(candidate):
+            return len(os.listdir(candidate))
+    raise RuntimeError("no portable open-fd directory found (neither /proc/<pid>/fd nor /dev/fd exists)")
 
 
 class _FakeFstat:
@@ -131,7 +144,7 @@ class HookInjectedRaces(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
         self._hook_patch = patch.object(cg, "_hook", side_effect=lambda stage, name: None)
         self.mock_hook = self._hook_patch.start()
         self.addCleanup(self._hook_patch.stop)
@@ -236,7 +249,7 @@ class AncestorRenameResistance(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -313,7 +326,7 @@ class NoPathLeakInErrors(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -423,7 +436,7 @@ class DotDotIsRejected(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -461,7 +474,7 @@ class SymlinkedDirectoryComponentReporting(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -483,7 +496,7 @@ class FdOpenFailureCleanup(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -602,7 +615,7 @@ class FdLeakOnRefusal(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -690,7 +703,7 @@ class ImmediateParentStrictRule(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -708,14 +721,25 @@ class ImmediateParentStrictRule(unittest.TestCase):
         # ancestor rule, by contrast, would accept /tmp as an ancestor
         # outright (sticky exception), so this specific case only fails
         # under the strict parent rule.
-        real_tmp = Path("/tmp")
+        # os.path.realpath("/tmp"), not the literal "/tmp": on macOS "/tmp"
+        # is itself a symlink to "/private/tmp" (like "/var" ->
+        # "/private/var"), and follow_symlinks=False's no-follow mode (used
+        # elsewhere in this file) would refuse a symlinked ancestor
+        # component before ever reaching the parent-ownership check this
+        # test means to exercise. follow_symlinks=True (used here) resolves
+        # it internally either way, but stat-ing and mkstemp-ing against
+        # the resolved path directly keeps this test's own reasoning about
+        # exactly which directory it is checking unambiguous. The resolved
+        # target (/private/tmp on macOS) is still sticky and world-writable,
+        # so it is still refused as parent_owner/parent_mode, never symlink.
+        real_tmp = Path(os.path.realpath("/tmp"))
         if not real_tmp.is_dir():
             self.skipTest("/tmp does not exist on this host")
         tmp_info = real_tmp.stat()
         if (stat.S_IMODE(tmp_info.st_mode) & 0o1000) == 0 or (stat.S_IMODE(tmp_info.st_mode) & 0o002) == 0:
             self.skipTest("/tmp is not sticky and world-writable on this host; "
                           "this test assumes the conventional shared /tmp")
-        fd, name = tempfile.mkstemp(dir="/tmp", prefix="round6-parent-rule-tell-tale-")
+        fd, name = tempfile.mkstemp(dir=str(real_tmp), prefix="round6-parent-rule-tell-tale-")
         path = Path(name)
         try:
             os.write(fd, b"APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
@@ -770,7 +794,7 @@ class ForeignFileOwnerAloneIsRejected(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -791,7 +815,7 @@ class FstatNotPathnameStat(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
         self.real_stat = os.stat
 
     def tearDown(self):
@@ -822,7 +846,7 @@ class BoundedReadIsActuallyBounded(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = real_tmp_root(self.tmp.name)
 
     def tearDown(self):
         self.tmp.cleanup()

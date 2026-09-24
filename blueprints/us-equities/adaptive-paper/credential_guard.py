@@ -25,6 +25,21 @@ substituted at *any* position after the one-time initial resolution --
 including an ancestor directory, not only the final file -- makes the
 matching `dir_fd`-relative open fail with `ELOOP` or `ENOTDIR`.
 
+`follow_symlinks=False` (`market_research.credentials()`) refuses **every**
+symlink component this way, with no exception for one the operating system
+itself provides rather than an attacker: on macOS, `/tmp` is a symlink to
+`/private/tmp` and `/var` (hence `/var/folders/...`, the default
+`tempfile` root) is a symlink to `/private/var`, exactly like any other
+symlinked ancestor this mode is documented to reject. This is deliberate,
+not a portability gap to work around here: a caller in this mode must
+supply an already symlink-free path. The documented credential store this
+loader is meant to be pointed at -- a private path under `$HOME` (e.g.
+`~/.config/<tool>/paper.env`, `/Users/<name>/.config/...` on macOS) --
+contains no such symlink, so this never affects normal use; it only means a
+test fixture built from `tempfile`'s default root must resolve it first
+(`os.path.realpath`) before handing this loader a path in `follow_symlinks=
+False` mode.
+
 Every ancestor directory from `/` down through -- but not including -- the
 immediate parent is checked with the OpenSSH `safe_path`/`secure_filename`
 model as a *container*: it must be owned by root or by the caller, and if it

@@ -150,6 +150,19 @@ file in code before any line is read:
    Lexically collapsing `..` (the way `os.path.normpath` would) can select a different file through an
    intermediate symlinked component without ever refusing that symlink -- contradicting "a symlinked
    component is always refused". A `..` component is refused outright instead of normalized away.
+8. **For `follow_symlinks=False`, every symlink component is refused, including one the operating
+   system itself provides.** macOS's `/tmp` is a symlink to `/private/tmp`, and `/var` (hence
+   `/var/folders/...`, `tempfile`'s default root there) is a symlink to `/private/var`; this rule
+   refuses them the same way it refuses any other symlinked ancestor, with no exception for an
+   OS-provided one. A caller in this mode must supply an already symlink-free path -- the documented
+   credential store this loader is meant to be pointed at, a private path under `$HOME` (e.g.
+   `~/.config/<tool>/paper.env`, `/Users/<name>/.config/...` on macOS), contains no such symlink, so
+   this never affects normal use. It does mean a test fixture built from a platform's default
+   temporary-file root must resolve it first (`os.path.realpath`) before exercising this mode;
+   `tests/adaptive_paper_hermetic.py`'s `real_tmp_root()` is the shared helper both
+   `tests/test_adaptive_market_research.py` and `tests/test_adaptive_paper_credential_race.py` use for
+   every fixture root this mode's tests build. This guard is not weakened to trust a root-owned
+   symlink here; the fix is in the fixtures, not the rule.
 
 Every rule above is bound to the exact `dir_fd`-chained traversal that produces the descriptor read from --
 see `blueprints/us-equities/adaptive-paper/credential_guard.py`'s module docstring for precisely what that

@@ -207,7 +207,6 @@ condition = "AND"
 paths = [
   '''^blueprints/convergence-practice/service-reboot/attempt-1/freeze\.json$''',
   '''^blueprints/convergence-practice/service-reboot/attempt-2/freeze\.json$''',
-  '''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''',
   '''^blueprints/us-equities/execution-realism/inputs\.json$''',
   '''^evidence/artifacts/catalog-clean-install-20260921/source-manifest\.json$''',
   '''^evidence/artifacts/full-stack-convergence-20260921/native-token-workflow\.json$''',
@@ -225,6 +224,31 @@ paths = [
 regexTarget = "line"
 regexes = [
   '''^\s*"(?:[A-Za-z0-9_$][A-Za-z0-9_\-./$]*[./][A-Za-z0-9_\-.$]*|\.[A-Za-z0-9_\-./$]+|Dockerfile|LICENSE|Makefile|SHA256SUMS)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
+]
+
+# 2026-09-24 (round-7 tightening, Codex "not ready" on the shared allowlist above):
+# blueprints/us-equities/adaptive-paper/source-hashes.json maps engine/test file paths
+# under this module (several path-shaped keys contain "credential", e.g.
+# credential_guard.py) to their sha256, which the shared filename-shaped-key allowlist
+# above would also have suppressed for a real hex secret under a credential-shaped key
+# such as "credential.key" in this same file (that allowlist's key alternative accepts
+# any filename-shaped key, not only a real repo path). This dedicated, rule-scoped
+# allowlist instead requires the ENTIRE key to be a repo path specifically under
+# blueprints/us-equities/adaptive-paper/ or tests/, ending in .py, .json, .sh, or .txt, mapped to
+# exactly 64 lowercase hex -- scripts/validate.py and
+# tests/test_adaptive_paper_source_hashes_manifest.py independently enforce that every
+# entry in this exact file really is that path's own sha256 and that no other keys
+# exist, so a secret can never sit in this manifest without failing CI's validate job
+# regardless of this allowlist. A credential-shaped key (api_key, credential.key, ...)
+# in this same file, a non-hex value, a second secret on the same line, or this same
+# path-keyed shape in any other file, is still detected (tests/test_gitleaks_config.py).
+[[rules.allowlists]]
+description = "Content digests (64-hex) under adaptive-paper/tests repo-path keys in the pinned source-hashes manifest"
+condition = "AND"
+paths = ['''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''']
+regexTarget = "line"
+regexes = [
+  '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/[A-Za-z0-9_\-./]+\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',
 ]
 
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
