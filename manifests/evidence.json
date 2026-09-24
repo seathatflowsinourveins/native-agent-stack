@@ -3054,6 +3054,27 @@
         "Raw stderr, reports and the Jetsam files stay on the host; published values are sanitized (paths replaced by placeholders, no process or session identifiers)."
       ],
       "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json"
+    },
+    {
+      "id": "env-freshness-wsl-ubuntu-main-20260924",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "duckdb",
+        "pandas",
+        "edgartools",
+        "exchange-calendars",
+        "vllm"
+      ],
+      "claim": "On one WSL Ubuntu host, 13 isolated tool environments were inventoried with their own interpreters and the watched trading/foundation packages compared with PyPI on 2026-09-24: 34 current, 2 on the newest pre-release (nautilus-trader 2.0.0rc5), 11 behind the latest stable (deltalake 1.6.4 vs 1.6.6, openai-codex 0.154.0 vs 0.156.1, and the numpy/torch/vllm pins inside the vllm 0.25/0.29/0.30 environments).",
+      "limitations": [
+        "PyPI index only: git-pinned or other-index installs read as ahead_of_index or unknown.",
+        "CLIs and non-Python tools are covered by the catalog GitHub freshness snapshot, not by this report.",
+        "One host; each PC publishes its own report under the same schema.",
+        "Reports status only; upgrades and adoption stay with the SOTA-convergence lane review."
+      ],
+      "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
     }
   ],
   "files": [
@@ -10742,6 +10763,11 @@
       "path": "evidence/artifacts/direct-desktop-search.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
+      "sha256": "45104744c02f09434292e5562689426c76543c8a782cf9e3e491947022094025",
+      "bytes": 13084
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -27869,6 +27895,11 @@
       "bytes": 1298
     },
     {
+      "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
+      "sha256": "a860492d5ffb82b9d73cc031e34e03ccc8c8c898b68f29c20a2354bef092359b",
+      "bytes": 2807
+    },
+    {
       "path": "evidence/receipts/exchange-calendars-native-check-20260922.json",
       "sha256": "ee5ec2a85edf415b1c440c2704b3252c348fe3da9ff01d83a9266b711c2b9efe",
       "bytes": 3320
@@ -28839,6 +28870,11 @@
       "bytes": 19904
     },
     {
+      "path": "scripts/env_freshness.py",
+      "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
+      "bytes": 7138
+    },
+    {
       "path": "scripts/git-hooks/pre-commit",
       "sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
       "bytes": 608
@@ -29172,6 +29208,11 @@
       "path": "tests/test_effort_default_guard.py",
       "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
       "bytes": 27591
+    },
+    {
+      "path": "tests/test_env_freshness.py",
+      "sha256": "0eb7bb209a38fd5b680776b67b99e448f50b1f1c29b2c550b33483b2404919f3",
+      "bytes": 3446
     },
     {
       "path": "tests/test_execution_realism.py",
