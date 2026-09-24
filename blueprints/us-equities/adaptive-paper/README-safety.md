@@ -62,6 +62,10 @@ limit-order mechanism guarantees a flat finish.
   that no HTTP request was sent; a timeout or other ambiguous send must remain
   unresolved and be queried by its existing client ID. Observed orders cannot
   be marked not sent, and a later broker observation of such an ID fails closed.
+  The transport's pre-submission order-contract boundary (`README-transport.md`)
+  is one such definitive pre-send refusal: `Controller.bind` passes its reason
+  `order_contract_refused`, so the ledger records a local `not_sent`, never
+  `broker_refused`. Other not-sent refusals seen by `bind` keep `transport_proven_not_sent`.
 - `mark_broker_refused(client_id, http_status, refusal=None)` records distinct local terminal
   status `broker_refused` for an attempted zero-fill order without broker ID.
   Only HTTP 401/403/404 qualify, and transport must first establish that the
@@ -80,7 +84,9 @@ limit-order mechanism guarantees a flat finish.
   otherwise). Any other 422, including "client_order_id must be unique", stays
   ambiguous. `reserve_intent` still refuses such a price before send
   (`invalid_price_increment`, via the overridable `_check_price_increment`); only
-  the native-fault harness's `FaultLedger` exempts its single C04 client ID.
+  the native-fault harness's `FaultLedger` exempts its single C04 client ID (its
+  `FaultTransport` exempts the same ID, and only its price increment, from the
+  transport's order-contract boundary, which otherwise refuses such a price too).
   Neither local terminal status is
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
