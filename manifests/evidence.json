@@ -3194,7 +3194,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "376d92f5e4818c8a6d6ec1d34830c099f808ebe144ce50a62410cd5855000b44",
+      "sha256": "6138ad3a3ebec4ef0146893b9d95340849f7faced088898f0bb31fc31a373b0f",
       "bytes": 22907
     },
     {
@@ -6415,8 +6415,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "50eee2f1231d3b34e04a327f900250cbcae6a1f37ec5f499cf149f90b02c265e",
-      "bytes": 479422
+      "sha256": "f7af07f2501a28fb82ab4ad9256a80ae43be4bc61edcaea3691cdc7de3c3ae09",
+      "bytes": 479570
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9515,8 +9515,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "9add859b3528ad05c7e830261b1ae42c2deb4dca5961108ee876ac02a9c5819e",
-      "bytes": 15649
+      "sha256": "a5a2fe2ffaf45d9ec27d37360d99d278343909fc0ae6482c94826018ddd261d0",
+      "bytes": 15799
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -9630,8 +9630,8 @@
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "95aba0ec682fd0f51da6f8dce30d8f8893cccf9b4d871e0b18014ac4abb0c990",
-      "bytes": 82627
+      "sha256": "a06f57eb7c7360c1426755e24dd4b5cd38aec8bd1a422c4299975e9f46db57b8",
+      "bytes": 85304
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -9660,8 +9660,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "43e3b625548ffffa63035c3562ab934748dfe074a371e1f8ab7ac299ef88a394",
-      "bytes": 722880
+      "sha256": "41088e48f2fe41affcd98f9ef654144213d7ad8f7aee88f4578e387f78cf00f5",
+      "bytes": 731809
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -9710,8 +9710,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "ff36afff7587efbae3f7c14d1c410d4ef9a868d4961c361dcdc972254619e058",
-      "bytes": 3160
+      "sha256": "903cca2b70ae70b0b2642bb655d6356ea4f774e3aa316147d3f054e899356368",
+      "bytes": 3215
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -9800,13 +9800,18 @@
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
-      "sha256": "5995022fb7f53e8bc10e1069a1ce5f9e1fff859dcdfd69f165c89300742c4e5f",
-      "bytes": 561666
+      "sha256": "4b8fc0ce3d29be3351e0fcd4a14d951ff14f59a94db821fcb97c71ea04c61dba",
+      "bytes": 642865
     },
     {
       "path": "catalogs/us-equities/star-audit.md",
-      "sha256": "215d1f80c0eb56f6778aed47fb46a6abe84e96fdb0b9721eb55849538ba3d525",
-      "bytes": 16681
+      "sha256": "6742e0b8a24d8615e8ec29110c785f493131a20df7bb57da6354fb99e98f70cc",
+      "bytes": 28080
+    },
+    {
+      "path": "catalogs/us-equities/star-refresh-20260924.json",
+      "sha256": "a9d9cb6ae7c68346a1291f55d356f6b8bc67f36bef646209d7e78a5478cd499e",
+      "bytes": 3205
     },
     {
       "path": "catalogs/us-equities/verification.json",
