@@ -3,13 +3,15 @@
 Both `runner.credentials()` and `market_research.credentials()` call
 `open_verified()` before any line of the file is read, so the ownership,
 permission, and Git-worktree-location rules cannot drift between the two
-loaders. Every failure raises `CredentialGuardError` with one fixed message
-(`GUARD_DENIED`) -- never the checked path, its basename, or any exception
-text that could carry a path -- so no failure mode can leak filesystem
-layout.
+loaders. Every failure raises `CredentialGuardError` with one of a small,
+fixed set of `REASON_*` reason codes (all sharing the `credential_file_
+permissions:` prefix runner's tests assert) -- never the checked path, its
+basename, or any exception text that could carry a path -- so no failure
+mode can leak filesystem layout, and an operator can still tell *which*
+rule was violated without that leak.
 
-Only stdlib imports (`os`, `stat`, `pathlib`) so importing it never pulls
-heavier modules (sqlite3, fcntl, threading, ...) into either caller.
+Only stdlib imports (`os`, `stat`, `errno`, `pathlib`) so importing it never
+pulls heavier modules (sqlite3, fcntl, threading, ...) into either caller.
 
 What is (and is not) guaranteed
 --------------------------------
@@ -21,13 +23,23 @@ lookup on an already-resolved path), and the final component is opened with
 `O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_NOCTTY` the same way. A symlink
 substituted at *any* position after the one-time initial resolution --
 including an ancestor directory, not only the final file -- makes the
-matching `dir_fd`-relative open fail with `ELOOP` or `ENOTDIR`, which this
-module turns into the same fixed `CredentialGuardError`. This closes the
-classic gap where checks are computed against a resolved pathname string and
-the open happens against that string again later: here, once a directory
-component's fd is open, every check and every subsequent open on that
-subtree is by `dir_fd`, so nothing between the checks and the read can
-substitute a different directory or file for the one already verified.
+matching `dir_fd`-relative open fail with `ELOOP` or `ENOTDIR`.
+
+Every ancestor directory from `/` down through the immediate parent -- not
+only the immediate parent -- is checked (the OpenSSH `safe_path`/
+`secure_filename` model): it must be owned by root or by the caller, and if
+it is group- or world-writable it must also carry the sticky bit (`S_ISVTX`,
+e.g. a `1777 /tmp`). A writable, non-sticky ancestor anywhere in the chain
+is refused outright, regardless of what it contains -- this is what stops
+an attacker who can write to `/shared` from renaming a victim-owned
+`/shared/private` (already opened and checked) into `/shared/repo` (which
+has a `.git`): `/shared` itself fails the ancestor check the moment it is
+opened, before the file is ever reached, and does not depend on where the
+attacker later moves anything. The sticky-bit exception is why a private,
+caller-owned directory under `/tmp` still passes: `/tmp` is trusted only as
+a *container* (its own writability is excused by the sticky bit); whatever
+is directly inside it is independently checked in the next loop iteration,
+by the same rule.
 
 What is explicitly NOT guaranteed:
   - **External Git worktrees.** Worktree detection only recognizes an
@@ -36,17 +48,23 @@ What is explicitly NOT guaranteed:
     purely through `GIT_DIR`/`GIT_WORK_TREE` environment variables or
     `core.worktree`, with no `.git` entry anywhere in the credential file's
     own ancestor chain, is Git-tracked but invisible to this check. There is
-    no general, file-local way to detect that case.
+    no general, file-local way to detect that case. Likewise, a bind mount
+    that makes a repository subdirectory appear at a path with no `.git`
+    ancestor in its own mount namespace is invisible to this check; that
+    requires mount authority (or an existing mount) to set up.
   - **A same-shaped replacement file.** If an attacker can atomically
     replace the target name with a *different* regular file that itself
-    already satisfies every rule (owned by you, mode 0600, one link, in a
-    directory you own that is not group/other-writable, outside any
-    ancestor `.git`) at the instant of the real `open()` syscall, that
-    replacement is indistinguishable from the legitimate file and is
-    accepted -- there is no TOCTOU here (the fd that gets read is the exact
-    fd whose metadata was just checked), but content substitution by a
-    cooperating, equally-privileged actor is out of scope for a filesystem
-    permission check.
+    already satisfies every rule (owned by you, mode 0600, one link, an
+    ancestor chain that passes) at the instant of the real `open()`
+    syscall, that replacement is indistinguishable from the legitimate file
+    and is accepted -- there is no TOCTOU here (the fd that gets read is the
+    exact fd whose metadata was just checked), but content substitution by
+    an equally-privileged actor who can already write there is out of scope
+    for a filesystem permission check. `runner.credentials()`
+    (`follow_symlinks=True`) documents this same acceptance for the
+    symlink case it deliberately tolerates: if the symlink's target changes
+    between the initial resolve and the traversal, the rules simply apply
+    to whatever now-compliant file is actually opened.
   - **Concurrent privileged tampering after the descriptor is returned.**
     Checks run once, at open time, against the descriptor this call
     returns; nothing continues to monitor the file while the caller reads
@@ -56,32 +74,56 @@ Hard links: a target with more than one link (`st_nlink != 1`) is refused,
 since a second, differently-located name for the same inode would let a
 file that looks compliant at one path be simultaneously reachable (and
 possibly git-tracked) at another.
+
+Error content: every failure is built and raised *after* any internal
+`try/except` has already exited (see `_try` below), specifically so Python
+never attaches the original, possibly path-bearing exception as
+`__context__` on the raised `CredentialGuardError` -- setting `__cause__`
+via `from None` alone does not clear `__context__`, since the interpreter
+re-populates it at the `raise` statement itself if one is still executing
+inside a handler.
 """
 from __future__ import annotations
 
+import errno
 import os
 import stat
 from pathlib import Path
 
-# A single, fixed, path-free error message reused for every rejection. Never
-# interpolate a path, basename, or upstream OSError's `.filename`/`.strerror`
-# into it -- see the module docstring's leak-avoidance guarantee.
-GUARD_DENIED = (
-    "credential_file_permissions: refused; the env file must exist, be a regular "
-    "file with exactly one hard link, mode exactly 0600, owned by you, in a "
-    "directory you own that is not group- or world-writable, and outside any "
-    "Git worktree"
-)
+_PREFIX = "credential_file_permissions"
+
+# Fixed, path-free reason codes. Every one starts with `_PREFIX` so
+# runner.credentials()'s tests (which only assert that substring) keep
+# passing regardless of which specific rule fired.
+REASON_MISSING = f"{_PREFIX}:missing"
+REASON_NOT_REGULAR = f"{_PREFIX}:not_regular"
+REASON_SYMLINK = f"{_PREFIX}:symlink"
+REASON_OWNER = f"{_PREFIX}:owner"
+REASON_MODE = f"{_PREFIX}:mode"
+REASON_HARDLINK = f"{_PREFIX}:hardlink"
+REASON_WORKTREE = f"{_PREFIX}:worktree"
+REASON_ANCESTOR = f"{_PREFIX}:ancestor"
+REASON_PARENT_OWNER = f"{_PREFIX}:parent_owner"
+REASON_PARENT_MODE = f"{_PREFIX}:parent_mode"
+REASON_ENCODING = f"{_PREFIX}:encoding"
+REASON_SIZE = f"{_PREFIX}:size"
+
+# The size cap both loaders enforce by reading at most this many bytes plus
+# one from the already-open descriptor, never by trusting an earlier
+# fstat-reported size (which a concurrent writer could grow past).
+MAX_CREDENTIAL_BYTES = 65536
 
 # Directories may be group/other readable+executable (0755) but never
-# group- or other-writable.
-_PARENT_FORBIDDEN_BITS = 0o022
+# group- or other-writable, unless the sticky bit excuses it (see module
+# docstring).
+_WRITABLE_BITS = 0o022
 
 
 class CredentialGuardError(RuntimeError):
-    """A guard rule refused the credential path. The message is always the
-    fixed `GUARD_DENIED` string -- never file content, a path, or a
-    basename."""
+    """A guard rule refused the credential path. The message is always one
+    of the fixed `REASON_*` codes above -- never file content, a path, or a
+    basename, and never carries the original exception as `__context__` or
+    `__cause__` (see the module docstring)."""
 
 
 def _hook(stage, name):
@@ -92,6 +134,31 @@ def _hook(stage, name):
     relying on actual concurrent timing. `stage` is one of "pre_dir_open",
     "pre_file_open", or "pre_file_fstat"; `name` is the path component (or,
     for "pre_file_fstat", the opened fd) relevant to that stage."""
+
+
+def _try(func, *args, **kwargs):
+    """Run `func(*args, **kwargs)`, returning `(result, reason)`.
+
+    On success, `reason` is `None`. On failure, `result` is `None` and
+    `reason` is a fixed `REASON_*` code chosen from the exception actually
+    raised -- `OSError` (covering "not found", permission, and every other
+    ordinary open/stat failure), `RuntimeError` (a circular symlink:
+    `Path.resolve(strict=True)` raises this, not `OSError`, on the native
+    Python 3.12 runtime), and `ValueError` (e.g. an embedded NUL byte in the
+    path). The original exception is fully consumed inside this function's
+    `except` clauses and never returned or re-raised: callers raise a fresh
+    `CredentialGuardError(reason)` themselves, from their own, already-clean
+    control flow (outside any `except` block), which is what keeps
+    `__context__` clear -- see the module docstring.
+    """
+    try:
+        return func(*args, **kwargs), None
+    except OSError as error:
+        return None, (REASON_SYMLINK if error.errno == errno.ELOOP else REASON_MISSING)
+    except RuntimeError:
+        return None, REASON_SYMLINK
+    except ValueError:
+        return None, REASON_MISSING
 
 
 def _ancestor_has_git_entry(dir_fd) -> bool:
@@ -110,22 +177,32 @@ def _ancestor_has_git_entry(dir_fd) -> bool:
         return True
 
 
-def _check_parent_directory(info) -> None:
+def _check_ancestor_directory(info, *, reason_owner, reason_writable) -> None:
+    """The OpenSSH `safe_path`/`secure_filename` rule, applied to one
+    already-opened ancestor directory (root included): owned by root or the
+    caller, and -- if group- or world-writable -- sticky. See the module
+    docstring for why this specific combination is what makes `/tmp`
+    trustworthy as a container while an ordinary attacker-writable shared
+    directory is refused outright, independent of what it contains or what
+    gets renamed into it afterward."""
     if not stat.S_ISDIR(info.st_mode):
-        raise CredentialGuardError(GUARD_DENIED)
-    if info.st_uid != os.getuid() or (stat.S_IMODE(info.st_mode) & _PARENT_FORBIDDEN_BITS) != 0:
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(reason_owner)
+    if info.st_uid not in (0, os.getuid()):
+        raise CredentialGuardError(reason_owner)
+    mode = stat.S_IMODE(info.st_mode)
+    if (mode & _WRITABLE_BITS) != 0 and not (mode & stat.S_ISVTX):
+        raise CredentialGuardError(reason_writable)
 
 
 def _check_file_metadata(info) -> None:
     if not stat.S_ISREG(info.st_mode):
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_NOT_REGULAR)
     if info.st_nlink != 1:
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_HARDLINK)
     if info.st_uid != os.getuid():
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_OWNER)
     if stat.S_IMODE(info.st_mode) != 0o600:
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_MODE)
 
 
 def _target_components(path, *, follow_symlinks: bool):
@@ -133,9 +210,11 @@ def _target_components(path, *, follow_symlinks: bool):
     exactly once. `follow_symlinks=True` fully resolves the path first
     (runner's existing behavior: the rules apply to whatever the symlink
     chain currently points at). `follow_symlinks=False` never dereferences a
-    symlink -- only a syntactic (`os.path.normpath`) absolute form is
-    computed, so a symlinked component is left in place for the traversal
-    below to refuse with O_NOFOLLOW (market_research's existing behavior).
+    symlink and never lexically collapses a `..` component (unlike
+    `os.path.normpath`, which would silently skip over an intermediate
+    symlinked component named by a `..` segment without ever refusing it,
+    contradicting the "a symlinked component is always refused" guarantee)
+    -- any `..` component is refused outright instead.
 
     Either way this one-time computation is *not* itself the security
     boundary: `open_verified` re-derives every guarantee from the
@@ -144,16 +223,23 @@ def _target_components(path, *, follow_symlinks: bool):
     """
     given = Path(path)
     if follow_symlinks:
-        try:
-            resolved = given.resolve(strict=True)
-        except OSError:
-            raise CredentialGuardError(GUARD_DENIED) from None
+        resolved, reason = _try(given.resolve, strict=True)
+        if reason:
+            raise CredentialGuardError(reason)
     else:
-        base = given if given.is_absolute() else Path.cwd() / given
-        resolved = Path(os.path.normpath(str(base)))
+        if given.is_absolute():
+            base = given
+        else:
+            cwd, reason = _try(Path.cwd)
+            if reason:
+                raise CredentialGuardError(reason)
+            base = cwd / given
+        if ".." in base.parts:
+            raise CredentialGuardError(REASON_SYMLINK)
+        resolved = base
     parts = resolved.parts
     if not parts or parts[0] != os.sep:
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_MISSING)
     return parts[1:-1], (parts[-1] if len(parts) > 1 else None)
 
 
@@ -165,18 +251,19 @@ def open_verified(path, *, follow_symlinks: bool):
     Every rule below is bound to the traversal that produces the returned
     descriptor (see the module docstring for exactly what that does and
     does not guarantee), and every failure raises `CredentialGuardError`
-    with the single fixed `GUARD_DENIED` message, strictly before any byte
-    of file content is read:
-      1. every ancestor directory opens as a real directory, never a
-         symlink (`O_DIRECTORY | O_NOFOLLOW`), and is checked for an
-         ancestor `.git` entry;
-      2. the immediate parent directory is owned by you and not group- or
-         other-writable;
-      3. the final component opens as a regular file, never a symlink
+    with one of the fixed `REASON_*` codes, strictly before any byte of
+    file content is read:
+      1. every ancestor directory from `/` down opens as a real directory,
+         never a symlink (`O_DIRECTORY | O_NOFOLLOW`); is checked for an
+         ancestor `.git` entry; and must be owned by root or the caller,
+         group/other-writable only if sticky (the immediate parent uses
+         its own, more specific `parent_owner`/`parent_mode` codes; every
+         other ancestor uses the generic `ancestor` code);
+      2. the final component opens as a regular file, never a symlink
          (`O_NOFOLLOW`), never blocking on a FIFO or special file
          (`O_NONBLOCK`), never becoming a controlling terminal
          (`O_NOCTTY`);
-      4. that file has exactly one hard link, is owned by you, and its
+      3. that file has exactly one hard link, is owned by you, and its
          mode is exactly 0600.
 
     `follow_symlinks=True` first resolves `path` (runner's existing
@@ -187,38 +274,41 @@ def open_verified(path, *, follow_symlinks: bool):
     """
     dir_names, file_name = _target_components(path, follow_symlinks=follow_symlinks)
     if file_name is None:
-        raise CredentialGuardError(GUARD_DENIED)
+        raise CredentialGuardError(REASON_MISSING)
 
-    try:
-        root_fd = os.open(os.sep, os.O_DIRECTORY | os.O_RDONLY)
-    except OSError:
-        raise CredentialGuardError(GUARD_DENIED) from None
+    root_fd, reason = _try(os.open, os.sep, os.O_DIRECTORY | os.O_RDONLY)
+    if reason:
+        raise CredentialGuardError(reason)
 
     opened = [root_fd]
     try:
         current_fd = root_fd
+        _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,
+                                   reason_writable=REASON_ANCESTOR)
         if _ancestor_has_git_entry(current_fd):
-            raise CredentialGuardError(GUARD_DENIED)
-        for name in dir_names:
+            raise CredentialGuardError(REASON_WORKTREE)
+        for index, name in enumerate(dir_names):
+            is_immediate_parent = index == len(dir_names) - 1
             _hook("pre_dir_open", name)
-            try:
-                next_fd = os.open(name, os.O_DIRECTORY | os.O_NOFOLLOW | os.O_RDONLY, dir_fd=current_fd)
-            except OSError:
-                raise CredentialGuardError(GUARD_DENIED) from None
+            next_fd, reason = _try(os.open, name, os.O_DIRECTORY | os.O_NOFOLLOW | os.O_RDONLY, dir_fd=current_fd)
+            if reason:
+                raise CredentialGuardError(reason)
             opened.append(next_fd)
             current_fd = next_fd
+            if is_immediate_parent:
+                _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_PARENT_OWNER,
+                                           reason_writable=REASON_PARENT_MODE)
+            else:
+                _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,
+                                           reason_writable=REASON_ANCESTOR)
             if _ancestor_has_git_entry(current_fd):
-                raise CredentialGuardError(GUARD_DENIED)
-
-        parent_info = os.fstat(current_fd)
-        _check_parent_directory(parent_info)
+                raise CredentialGuardError(REASON_WORKTREE)
 
         _hook("pre_file_open", file_name)
-        try:
-            file_fd = os.open(file_name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_NOCTTY,
-                               dir_fd=current_fd)
-        except OSError:
-            raise CredentialGuardError(GUARD_DENIED) from None
+        file_fd, reason = _try(os.open, file_name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_NOCTTY,
+                                dir_fd=current_fd)
+        if reason:
+            raise CredentialGuardError(reason)
     finally:
         for fd in opened:
             os.close(fd)
@@ -234,4 +324,8 @@ def open_verified(path, *, follow_symlinks: bool):
     # defines no effect on a regular file (already enforced by
     # _check_file_metadata above), so the read the caller does through this
     # object is an ordinary blocking read.
-    return os.fdopen(file_fd, "rb")
+    try:
+        return os.fdopen(file_fd, "rb")
+    except BaseException:
+        os.close(file_fd)
+        raise

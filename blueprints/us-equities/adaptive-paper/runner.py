@@ -20,7 +20,7 @@ import shlex
 import signal
 import time
 
-from credential_guard import CredentialGuardError, open_verified
+from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_ENCODING, REASON_SIZE, open_verified
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
@@ -68,16 +68,23 @@ def credentials(path):
     only ever emits ASCII. A byte outside that range is refused before any
     line is parsed, deliberately, rather than accepted as UTF-8 and only
     failing later (or not at all) inside the per-variable value parser.
+
+    The read is bounded the same way `market_research.credentials()`'s is:
+    at most `MAX_CREDENTIAL_BYTES + 1` bytes are read from the already-open
+    descriptor, and a longer result is refused, rather than trusting an
+    earlier `fstat`-reported size a concurrent writer could grow past.
     """
     try:
         with open_verified(path, follow_symlinks=True) as handle:
-            raw = handle.read()
+            raw = handle.read(MAX_CREDENTIAL_BYTES + 1)
     except CredentialGuardError as error:
         raise SafetyError(str(error)) from None
+    if len(raw) > MAX_CREDENTIAL_BYTES:
+        raise SafetyError(REASON_SIZE)
     try:
         text = raw.decode("ascii")
     except UnicodeDecodeError:
-        raise SafetyError("credential_file_encoding: env file must be ASCII") from None
+        raise SafetyError(REASON_ENCODING) from None
     result = {}
     for line in text.splitlines():
         line = line.strip()

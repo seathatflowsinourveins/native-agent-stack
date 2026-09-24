@@ -15,7 +15,8 @@ import re
 import sys
 from urllib.parse import urlsplit
 
-from credential_guard import CredentialGuardError, open_verified
+from credential_guard import (CredentialGuardError, MAX_CREDENTIAL_BYTES as GUARD_MAX_CREDENTIAL_BYTES,
+                              REASON_ENCODING, open_verified)
 from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
@@ -352,7 +353,7 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
         boundary.close()
 
 
-MAX_CREDENTIAL_BYTES = 65536
+MAX_CREDENTIAL_BYTES = GUARD_MAX_CREDENTIAL_BYTES  # single source of truth: credential_guard.MAX_CREDENTIAL_BYTES
 
 
 def credentials(path):
@@ -387,7 +388,7 @@ def credentials(path):
     try:
         lines = raw.decode("ascii").splitlines()
     except UnicodeDecodeError:
-        raise ResearchError("credential_file_encoding") from None
+        raise ResearchError(REASON_ENCODING) from None
     found = {}
     for line in lines:
         name, separator, value = line.strip().removeprefix("export ").partition("=")

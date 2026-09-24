@@ -1,13 +1,38 @@
 """Synthetic native SDK research integration; no real credentials or network."""
+import contextlib
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 import os
 from pathlib import Path
+import signal
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+
+
+class _DeadlineExceeded(Exception):
+    """Raised by a SIGALRM handler; never a real timeout the OS enforces."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds):
+    """Hard wall-clock bound for one call, via signal.alarm: a blocking
+    syscall (e.g. open() on a FIFO without O_NONBLOCK) is interrupted with
+    EINTR and, since the handler raises rather than returning, Python does
+    not auto-retry it (PEP 475) -- so a real hang fails this test fast
+    instead of freezing the suite."""
+    def _on_alarm(signum, frame):
+        raise _DeadlineExceeded(f"exceeded {seconds}s deadline")
+    previous = signal.signal(signal.SIGALRM, _on_alarm)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
+
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
@@ -207,8 +232,9 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
     def test_fifo_is_rejected_and_does_not_hang(self):
         fifo = self.root / "fifo.env"
         os.mkfifo(fifo, mode=0o600)
-        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
-            m.credentials(fifo)
+        with _deadline(10):
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(fifo)
 
     def test_hard_link_is_rejected(self):
         target = self._write_env(self.root, name="real.env")
@@ -268,7 +294,7 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
         path = self.root / "paper.env"
         path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
         os.chmod(path, 0o600)
-        with self.assertRaisesRegex(m.ResearchError, "credential_file_encoding"):
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:encoding"):
             m.credentials(path)
 
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
