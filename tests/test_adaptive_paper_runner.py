@@ -1869,18 +1869,32 @@ class AchievedLeverageGateTraceTests(unittest.TestCase):
                 state, dt_seconds=0.0 if index == 0 else tick_seconds, achieved_leverage=Decimal(achieved),
                 ceiling=max_leverage, next_lower_ceiling=threshold)
         # Mirrors run_native's outcome["leverage"] serialization of these fields.
+        block = {"config_max_leverage": str(max_leverage),
+                 "next_lower_rung_ceiling": str(threshold) if threshold is not None else None,
+                 "peak_achieved_leverage": str(state["peak_achieved_leverage"]),
+                 "ceiling_at_peak_achieved_leverage": str(state["ceiling_at_peak"]),
+                 "seconds_above_next_lower_rung_ceiling": state["seconds_above_next_lower_rung_ceiling"]}
+        # A synthetic stand-in for the certified run's committed paper-output.json,
+        # which the gate's source_matches member binds the receipt to by sha256.
+        source = (json.dumps({"status": "passed", "leverage": block}, indent=2, sort_keys=True) + "\n").encode("utf-8")
+        digest = hashlib.sha256(source).hexdigest()
+        path = f"blueprints/us-equities/adaptive-paper/ladder/{rung}x/trace-{digest[:12]}/paper-output.json"
+        self._sources[path] = source
         return {"schema_version": 1, "kind": "leverage_ladder_rung_receipt", "rung": f"{rung}x", "needs_attention": 0,
-                "leverage": {"config_max_leverage": str(max_leverage),
-                             "next_lower_rung_ceiling": str(threshold) if threshold is not None else None,
-                             "peak_achieved_leverage": str(state["peak_achieved_leverage"]),
-                             "ceiling_at_peak_achieved_leverage": str(state["ceiling_at_peak"]),
-                             "seconds_above_next_lower_rung_ceiling": state["seconds_above_next_lower_rung_ceiling"]}}
+                "source": {"paper_output_path": path, "paper_output_sha256": digest, "certified_run_status": "passed"},
+                "leverage": json.loads(json.dumps(block))}
+
+    def setUp(self):
+        self._sources = {}
 
     def _holds(self, rung, receipt):
         gate = {**self.gates_by_id[f"leverage-ladder-{rung}x"], "status": "not_established", "evidence_class": "none"}
         with tempfile.TemporaryDirectory() as root:
+            for relative, data in self._sources.items():
+                (Path(root) / relative).parent.mkdir(parents=True, exist_ok=True)
+                (Path(root) / relative).write_bytes(data)
             path = Path(root) / gate["receipt_path"]
-            path.parent.mkdir(parents=True)
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps(receipt), encoding="utf-8")
             return self.gates.condition_holds(Path(root), gate)
 
@@ -1896,6 +1910,9 @@ class AchievedLeverageGateTraceTests(unittest.TestCase):
                 self.assertEqual(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
                 holds, detail = self._holds(rung, receipt)
                 self.assertFalse(holds, detail)
+                # Only the achievement members fail; the receipt is otherwise well formed and bound.
+                self.assertIn("2 of 10 failed", detail)
+                self.assertNotIn("source_matches", detail)
 
     def test_trial_that_exceeds_the_lower_cap_satisfies_the_rung(self):
         traces = {"1": ["0", "0.4", "0.62", "0.7", "0.4"],

@@ -6418,8 +6418,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "f2fb97d2cf81a00c6f2063dc228ab44fad333fa6488e12226fcbdca1f99daf11",
-      "bytes": 19917
+      "sha256": "b9baa532929c04b8c4229479afed637ce468e1d3c7b3ee60a0a762f61f34f5d3",
+      "bytes": 20734
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
@@ -6618,7 +6618,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3fcd4adc5ad8a3ca090a19ecc331dab016c41d0fdb7d670bad91778cace4d2fb",
+      "sha256": "3e4db253db3bf18d51dd219e5f6345a93cb435f80de847ae03297bef22d4a689",
       "bytes": 5870
     },
     {
@@ -8613,8 +8613,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/README.md",
-      "sha256": "8c38831b377a8131454a9797a54974c004216d4baf8cf1e40f9d63436cea9c9b",
-      "bytes": 51951
+      "sha256": "af4403163bd8571920dbbba35d508d2c001100d9449c1ff2b3203d797144cb59",
+      "bytes": 52178
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-pins.json",
@@ -9548,8 +9548,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "92843ffd06ea2ed539224a9842765b6a7f07f8cdb08d31a6900ed36039005802",
-      "bytes": 47352
+      "sha256": "4d03c6781b5459c9721ad0f556bc143c7b3463ec9cca0aad5b17f6229b98e567",
+      "bytes": 52662
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -28688,8 +28688,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "227a56478965d66a6c39d57ba3f3b02e210b5ac5edbb8135831c8271ed812543",
-      "bytes": 13577
+      "sha256": "d45d107448f6aaa73c6c01963048fdae2694ca3ecb6d9a68355ac3911abdbdb1",
+      "bytes": 17749
     },
     {
       "path": "scripts/validate.py",
@@ -28813,8 +28813,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "3648b9573f3efd3e94f1d34b6bcc56755badd76085fecf5f5c348bc9a005997f",
-      "bytes": 139041
+      "sha256": "9c12e7214b222478008dd725f785be8e4fd5767dbaabe2059751f40546dbba7c",
+      "bytes": 140119
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -29293,8 +29293,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "7cd99cb452123e30f49ca8172960061a7707075f33362016217e1a8b1b8a4ca1",
-      "bytes": 26613
+      "sha256": "10b1ce5b0cec4d3e68d792c83a9ad2b4fcbb70863305b0496961650deb34214f",
+      "bytes": 35512
     },
     {
       "path": "tests/test_validate.py",

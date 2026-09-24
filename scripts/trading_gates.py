@@ -10,8 +10,13 @@ flip the status with a dated commit (the checker never flips anything itself).
 
 Condition types: ``exists`` (non-empty file), ``equals`` (type-strict JSON value
 at a pointer), ``array_contains_id``, ``greater_than`` (the value at a pointer is
-a JSON number or a decimal string strictly greater than ``than``) and
-``all_of`` (every listed ``equals``/``array_contains_id``/``greater_than``
+a JSON number or a decimal string strictly greater than ``than``),
+``source_matches`` (the receipt names an in-tree source file by path and
+sha256 at ``path_pointer``/``sha256_pointer``; the file's bytes must hash to
+that value and, for each ``[receipt_pointer, source_pointer]`` in ``pairs``, the
+receipt value must equal the source value exactly -- same JSON types, same
+contents) and ``all_of`` (every listed
+``equals``/``array_contains_id``/``greater_than``/``source_matches``
 sub-condition holds against the same receipt; no nesting and no ``exists``).
 
 Rung readiness is arithmetic: a rung is ready when every ``required`` gate of
@@ -21,7 +26,9 @@ validation error or on an established gate whose evidence is missing or false.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import sys
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -30,9 +37,10 @@ GATES = "catalogs/us-equities/gates-20260922.json"
 STATUSES = {"established", "blocked", "not_established", "paid_entitlement", "user_decision"}
 OWNERS = {"this-effort", "peer:sota-workflow-resolution", "user-decision"}
 EVIDENCE = {"native_proven", "local_integration", "synthetic", "source_review", "none"}
-CONDITIONS = {"exists", "equals", "array_contains_id", "greater_than", "all_of"}
-# Sub-conditions an all_of may list: pointer conditions judged against one parsed receipt.
-COMPOUND_MEMBERS = {"equals", "array_contains_id", "greater_than"}
+CONDITIONS = {"exists", "equals", "array_contains_id", "greater_than", "source_matches", "all_of"}
+# Sub-conditions an all_of may list: conditions judged against one parsed receipt.
+COMPOUND_MEMBERS = {"equals", "array_contains_id", "greater_than", "source_matches"}
+SHA256_HEX = re.compile(r"[0-9a-f]{64}")
 LAYERS = {
     "market-data-reference", "identity-provenance", "storage-compute", "data-quality-orchestration",
     "research-factors-ml", "backtesting-engine", "execution-broker", "portfolio-risk",
@@ -88,8 +96,63 @@ def decimal_value(value) -> Decimal | None:
     return result if result.is_finite() else None
 
 
-def pointer_condition_holds(document, condition: dict) -> tuple[bool, str]:
-    """Judge one equals/array_contains_id/greater_than condition against a parsed receipt."""
+def in_tree_path(value) -> bool:
+    """A relative, forward-slash, in-tree path (no absolute path, no '..', no backslash)."""
+    return (isinstance(value, str) and bool(value) and not value.startswith("/") and "\\" not in value
+            and ".." not in Path(value).parts)
+
+
+def canonical(value) -> str:
+    """Type-strict JSON identity: 1, 1.0, true and "1" all differ."""
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
+def source_matches_holds(root: Path, document, condition: dict) -> tuple[bool, str]:
+    """The receipt's named source file exists in the tree, hashes to the
+    recorded sha256, and agrees with the receipt at every listed pointer pair."""
+    try:
+        source_path = pointer(document, condition["path_pointer"])
+        recorded_sha = pointer(document, condition["sha256_pointer"])
+    except (KeyError, IndexError, ValueError):
+        return False, "source_matches: source path or sha256 pointer absent"
+    if not in_tree_path(source_path):
+        return False, f"source_matches: {condition['path_pointer']} is not a relative in-tree path"
+    if not (isinstance(recorded_sha, str) and SHA256_HEX.fullmatch(recorded_sha)):
+        return False, f"source_matches: {condition['sha256_pointer']} is not a lowercase sha256 hex digest"
+    try:
+        resolved = (root / source_path).resolve()
+        resolved.relative_to(root.resolve())
+    except (OSError, ValueError):
+        return False, f"source_matches: {source_path} resolves outside the tree"
+    if not resolved.is_file():
+        return False, f"source_matches: source file missing: {source_path}"
+    data = resolved.read_bytes()
+    actual_sha = hashlib.sha256(data).hexdigest()
+    if actual_sha != recorded_sha:
+        return False, f"source_matches: {source_path} sha256 {actual_sha[:12]} != recorded {recorded_sha[:12]}"
+    try:
+        source_document = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as error:
+        return False, f"source_matches: source unreadable: {error.__class__.__name__}"
+    mismatched = []
+    for receipt_pointer, source_pointer in condition["pairs"]:
+        try:
+            left = pointer(document, receipt_pointer)
+            right = pointer(source_document, source_pointer)
+        except (KeyError, IndexError, ValueError):
+            mismatched.append(f"{receipt_pointer} vs source {source_pointer} (absent)")
+            continue
+        if canonical(left) != canonical(right):
+            mismatched.append(f"{receipt_pointer} != source {source_pointer}")
+    if mismatched:
+        return False, f"source_matches: {source_path}: " + ", ".join(mismatched)
+    return True, f"source_matches: {source_path} sha256 {actual_sha[:12]} and {len(condition['pairs'])} pair(s) agree"
+
+
+def pointer_condition_holds(root: Path, document, condition: dict) -> tuple[bool, str]:
+    """Judge one equals/array_contains_id/greater_than/source_matches condition against a parsed receipt."""
+    if condition["type"] == "source_matches":
+        return source_matches_holds(root, document, condition)
     try:
         value = pointer(document, condition["pointer"])
     except (KeyError, IndexError, ValueError):
@@ -126,12 +189,12 @@ def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
     except (OSError, ValueError) as error:
         return False, f"receipt unreadable: {error.__class__.__name__}"
     if condition["type"] == "all_of":
-        results = [pointer_condition_holds(document, member) for member in condition["conditions"]]
+        results = [pointer_condition_holds(root, document, member) for member in condition["conditions"]]
         failed = [detail for holds, detail in results if not holds]
         if failed:
             return False, f"all_of: {len(failed)} of {len(results)} failed: " + "; ".join(failed)
         return True, f"all_of: {len(results)} of {len(results)} hold: " + "; ".join(detail for _, detail in results)
-    return pointer_condition_holds(document, condition)
+    return pointer_condition_holds(root, document, condition)
 
 
 def validate_pointer_condition(gate_id: str, condition, allowed: set[str]) -> None:
@@ -146,6 +209,17 @@ def validate_pointer_condition(gate_id: str, condition, allowed: set[str]) -> No
         require(set(condition) == {"type", "pointer", "than"}, f"{gate_id}: greater_than condition needs pointer and than")
         require(decimal_value(condition["than"]) is not None,
                 f"{gate_id}: greater_than.than must be a finite JSON number or decimal string")
+    elif kind == "source_matches":
+        require(set(condition) == {"type", "path_pointer", "sha256_pointer", "pairs"},
+                f"{gate_id}: source_matches condition needs path_pointer, sha256_pointer and pairs")
+        pairs = condition["pairs"]
+        require(isinstance(pairs, list) and bool(pairs) and all(
+            isinstance(pair, list) and len(pair) == 2 and all(isinstance(p, str) and p.startswith("/") for p in pair)
+            for pair in pairs), f"{gate_id}: source_matches.pairs must be a non-empty list of [receipt, source] JSON pointers")
+        for key in ("path_pointer", "sha256_pointer"):
+            require(isinstance(condition[key], str) and condition[key].startswith("/"),
+                    f"{gate_id}: source_matches.{key} must be a JSON pointer starting with '/'")
+        return
     else:
         require(set(condition) == {"type"}, f"{gate_id}: exists condition takes no other fields")
     if kind != "exists":

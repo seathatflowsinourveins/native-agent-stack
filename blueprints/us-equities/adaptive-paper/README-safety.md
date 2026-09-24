@@ -225,8 +225,15 @@ exposure never exceeded the next-lower rung's cap. Each
 that reads the runner's decimal strings and JSON numbers exactly) over the
 rung receipt preregistered in the gate note -- `{"schema_version": 1,
 "kind": "leverage_ladder_rung_receipt", "rung", "needs_attention",
-"leverage"}`, where `leverage` is the certified run's `paper-output.json`
-`leverage` block copied verbatim: `/needs_attention == 0`,
+"source": {"paper_output_path", "paper_output_sha256",
+"certified_run_status"}, "leverage"}`, where `leverage` is the certified
+run's `paper-output.json` `leverage` block copied verbatim: the receipt's
+`schema_version`, `kind` and `rung`, `/needs_attention == 0`,
+`/source/certified_run_status == "passed"`, a `source_matches` binding (the
+named in-tree `paper-output.json` must hash to the recorded sha256 and its
+`/leverage` and `/status` must equal the receipt's `/leverage` and
+`/source/certified_run_status` exactly, so the leverage block and the passed
+status come from one hashed run; fix round 2026-09-24),
 `/leverage/config_max_leverage` equal to the rung, `/leverage/
 next_lower_rung_ceiling` equal to the rung's threshold,
 `/leverage/peak_achieved_leverage` greater than it and
@@ -245,7 +252,12 @@ exceeds the lower cap does not satisfy its rung. These are offline unit tests
 rung receipt exists yet. Limits: `seconds_above_next_lower_rung_ceiling` is a
 per-tick approximation, and no minimum duration above the threshold is set --
 any positive time satisfies the checker, so how long the rung was used is
-judged at the manual qualification before a dated flip commit. `runner.py`
+judged at the manual qualification before a dated flip commit.
+`needs_attention` counts every run at the rung and is not bound to the
+hashed file, so it too is checked against the rung's trial directories at
+that qualification. The binding needs the certified `paper-output.json`
+committed in the tree; it proves the receipt matches those bytes, not that
+the bytes came from a real broker session. `runner.py`
 was left byte-identical so the native-fault receipt's engine-source binding
 still holds; its inline comments that say the 1x threshold is `None` and that
 no gate row reads these fields predate this change and are superseded here.

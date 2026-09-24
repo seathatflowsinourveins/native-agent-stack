@@ -250,7 +250,9 @@ plus recorded achieved leverage and time above the next-lower cap, 0.5x for 1x) 
 automatically:
 
 - any `needs_attention`;
-- any `seconds_above_next_lower_rung_ceiling` breach (`runner.py`);
+- achieved gross-to-equity leverage above the ceiling in force (a proposed v3 rule: `runner.py` records
+  `peak_achieved_leverage` and `ceiling_at_peak_achieved_leverage` but has no step-down on it today;
+  `seconds_above_next_lower_rung_ceiling` is a promotion input, not a step-down trigger);
 - a preflight multiplier below the request.
 
 The ladder qualifies the engine, not a strategy. Leverage stays paper-only, and live trading is out of scope. The
