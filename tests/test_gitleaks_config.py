@@ -263,12 +263,16 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
 
-    def _fingerprint_fixture(self, target: Path, relative: str, extra: dict) -> None:
+    # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
+    # .gitleaks.toml entry pins by value.
+    REVIEWED_FINGERPRINTS = ["ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db", "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0", "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1", "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9"]
+
+    def _fingerprint_fixture(self, target: Path, relative: str, extra: dict, values=None) -> None:
         """The shape of ai-memory's scheduled-learning report: 64-hex rejection fingerprints under "key"."""
         path = target / relative
         path.parent.mkdir(parents=True, exist_ok=True)
-        report = {"learning": {"report": {"aggregate": {"repeated_rejection_fingerprints": [
-            {"key": HEX64, "count": 10}, {"key": HEX64[::-1], "count": 8}], **extra}}}}
+        rows = [{"key": value, "count": 10 - i} for i, value in enumerate(values or self.REVIEWED_FINGERPRINTS[:2])]
+        report = {"learning": {"report": {"aggregate": {"repeated_rejection_fingerprints": rows}, **extra}}}
         path.write_text(json.dumps(report, indent=2))
 
     def test_e_memory_rejection_fingerprints_are_not_detected(self):
@@ -280,18 +284,20 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(findings, [], "rejection fingerprints in the reviewed file must not be flagged")
 
     def test_e2_other_fields_and_other_paths_stay_detected(self):
-        """Only whole "key": <64-hex> lines of that exact file are exempt: an api_key in the same file, and
-        the same fingerprint lines in another file, are still generic-api-key findings."""
+        """Only the reviewed digests on whole "key" lines of that exact file are exempt: an unreviewed 64-hex
+        "key" value and an api_key in the same file, and the same lines in another file, are still findings."""
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)
-            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {"api_key": HEX64})
+            # The reviewed file: one exempt digest, one unreviewed 64-hex "key" value, and an api_key.
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {"api_key": HEX64},
+                                      values=[self.REVIEWED_FINGERPRINTS[0], HEX64[::-1]])
             self._fingerprint_fixture(target, "observability/memory-scheduled-20260924.json", {})
             by_file = {}
             for f in self._scan(target):
                 if f["RuleID"] == "generic-api-key":
                     by_file.setdefault(f["File"], []).append(f["StartLine"])
-            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260923.json", [])), 1,
-                             f"the api_key line in the reviewed file must still be detected: {by_file}")
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260923.json", [])), 2,
+                             f"the unreviewed key value and the api_key in the reviewed file must be detected: {by_file}")
             self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
                              f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 

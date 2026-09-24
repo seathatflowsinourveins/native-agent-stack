@@ -270,13 +270,14 @@ regexes = [
   '''^(?:\s*"[0-9a-f]{64}\s{2}[^"]+",?\s*\n?)+$''',
 ]
 
-# 2026-09-24 (PR #116, ai-memory scheduled learning evidence): the report's
+# 2026-09-23 (PR #116, ai-memory scheduled learning evidence): the report's
 # learning.report.aggregate.repeated_rejection_fingerprints[].key values are ai-memory's
 # rejection_fingerprint, hex_sha256 over a rejection record's normalized target/kind/operation/
 # edit_mode/reason/summary (akitaonrails/ai-memory crates/ai-memory-store/src/auto_improve.rs), i.e.
 # content digests the generic-api-key rule reads as a "key" credential. Exempted: that exact file,
-# this rule only, and only a whole anchored "key" line whose value is exactly 64 lowercase hex; an
-# api_key/token field, or the same line shape in any other file, is still detected
+# this rule only, and only a whole anchored "key" line holding one of the 4 reviewed digests (pinned
+# by value, like the QuantConnect entry above, so a later 64-hex value under "key" is still caught);
+# an api_key/token field, another "key" value, or the same lines in any other file are still detected
 # (tests/test_gitleaks_config.py test_e/test_e2).
 [[rules.allowlists]]
 description = "ai-memory rejection fingerprints (SHA-256) under \"key\" in the scheduled-learning evidence"
@@ -286,7 +287,7 @@ paths = [
 ]
 regexTarget = "line"
 regexes = [
-  '''^\s*"key":\s*"[0-9a-f]{64}",?\s*$''',
+  '''^\s*"key":\s*"(?:ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db|ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0|125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1|683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9)",?\s*$''',
 ]
 
 [[rules]]
