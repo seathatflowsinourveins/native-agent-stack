@@ -367,8 +367,21 @@ def network_authority(command: str, match) -> bool:
     which is no filesystem path (2026-09-24 re-record); ``file://`` and ``https:///`` are not one (Codex review of
     #206, P2; independent review of #206, C1)."""
     path = match.group(1)
-    scheme = URL_SCHEME_BEFORE.search(command[max(0, match.start(1) - 32):match.start(1)])
+    start = match.start(1)
+    # A bare quoted "'://'" (a Python `'://' in ref` URL test) is a separator literal and names no path (wave 20260924
+    # re-record); `cat //` and an unquoted `://x` stay checked.
+    quote = command[start - 2:start - 1]
+    if path == "//" and command[start - 1:start] == ":" and quote in ("'", '"') and command[match.end(1):match.end(1) + 1] == quote:
+        return True
+    scheme = URL_SCHEME_BEFORE.search(command[max(0, start - 32):start])
     return path.startswith("//") and not path.startswith("///") and bool(scheme) and not local_scheme(scheme.group(1))
+
+
+def regex_anchored(command: str, match) -> bool:
+    """Whether an ABSOLUTE_PATH match is a regex fragment ending in the ``$`` anchor inside a group or alternation
+    (``rg '(test_x\\.py$|/runner.py$)'``, wave 20260924 re-record), which names no file. Only before ``)`` or ``|``:
+    a quote after the ``$`` can be bash's ``$''`` quoting, which would hide a real path's end."""
+    return match.group(1).endswith("$") and command[match.end(1):match.end(1) + 1] in (")", "|")
 
 
 def local_scheme(scheme: str) -> bool:
@@ -387,7 +400,7 @@ def outside_paths(command: str, allowed_roots) -> list:
         path = match.group(1)
         if path in EXEMPT_PATHS:
             continue
-        if network_authority(command, match):
+        if network_authority(command, match) or regex_anchored(command, match):
             continue
         if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
             continue
@@ -478,7 +491,7 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
             # A network URL ending in a CLI's name (``https://github.com/tobi/qmd``) is a search term (Codex review of
             # #206 at 882ba4b9).
             reasons += [f"runs {name} by path: {path}" for match in ABSOLUTE_PATH.finditer(command)
-                        if not network_authority(command, match)
+                        if not network_authority(command, match) and not regex_anchored(command, match)
                         for path in [match.group(1)] for name in [os.path.basename(path.rstrip("/"))]
                         if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
                         and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]

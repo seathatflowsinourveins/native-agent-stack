@@ -1416,7 +1416,9 @@ What remains and how it is handled:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
     (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
     `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://`, `local://`, any `unix` scheme (`http+unix://%2F...`)
-    and `https:///` do. A URL reaches nothing from a blind child without the network or a CLI it cannot resolve.
+    and `https:///` do. Two shapes that voided layers in the wave 20260924 run are exempt too: a bare quoted `'://'`
+    (Python's `'://' in ref`), and a path ending in the regex anchor `$` before `)` or `|` (an rg fragment like
+    `(...|/runner.py$)`). `cat //`, an unquoted `://x`, `/etc/passwd$''` and `'/runner.py$'` stay flagged. A URL reaches nothing from a blind child without the network or a CLI it cannot resolve.
     Measured the same day, a blind child could create an AF_UNIX socket, but its `connect()` to a probe-owned
     socket that the caller had just reached failed with `PermissionError: [Errno 1] Operation not permitted`. So
     local sockets (the peer sessions' `/run/user/<uid>/cc-socks`) are closed to it too. Measured

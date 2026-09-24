@@ -932,6 +932,9 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         for command in (f"/bin/bash -lc 'rg -n x {repo}/docs/qmd'", "/bin/bash -lc 'rg -n ssh://host/x docs'",
                         "/bin/bash -lc \"rg -n 'https://github.com/tobi/qmd' catalogs\"",
                         "/bin/bash -lc \"rg -n 'qmd://docs/verdict|s3://bucket/key|attachment://x/y' catalogs\"",
+                        # Wave 20260924 re-record: a Python URL test and an rg regex fragment voided two layers.
+                        "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY\"",
+                        "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\"",
                         "/bin/bash -lc \"rg -n 'https://example.invalid/tools/serena/' catalogs\"",
                         "/bin/bash -lc \"rg -n 'wss://host/x|sftp://h/y' docs\""):
             with self.subTest(command=command):
@@ -947,6 +950,12 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             "/bin/bash -lc \"python3 -c \\\"x='a'; print(open(x+'/'+'etc'))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x='etc'; print(open(''+'/'+x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'cat https:///etc/passwd'": "path outside the repository and packets: ///etc/passwd",
+            "/bin/bash -lc \"cat /etc/passwd$''\"": "path outside the repository and packets: /etc/passwd$",
+            "/bin/bash -lc \"rg -n '/runner.py$' x\"": "path outside the repository and packets: /runner.py$",
+            "/bin/bash -lc 'cat ://x'": "path outside the repository and packets: //x",
+            "/bin/bash -lc 'ls //'": "path outside the repository and packets: //",
+            "/bin/bash -lc 'rg -n \"://|file\" docs'": "path outside the repository and packets: //",
+            "/bin/bash -lc \"python3 -c \\\"print(':'+'//etc')\\\"\"": "path outside the repository and packets: //etc",
             "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
                 "path outside the repository and packets: //localhost/etc/passwd",
             "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
