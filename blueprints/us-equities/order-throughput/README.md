@@ -67,8 +67,11 @@ evidence of strategy quality.
    is cancelled individually (`DELETE /v2/orders/{id}`) once the stream shows
    it was acknowledged (`pending_new`/`new`/`accepted`). Cancels always take
    priority over new submits. If a probe gets no acknowledgement or no
-   terminal event within `stream_timeout_seconds` (10 s), submissions freeze
-   and the run cleans up. Stream events are timestamped on the stream thread
+   terminal event within `stream_timeout_seconds` (`--stream-timeout`,
+   default 10 s, bounds 0.5-120 s), submissions freeze and the run cleans up.
+   Paper cancel confirmations lagged about 16 s in the 2026-09-24 opening
+   auction, so the default freezes there (see "Native paper evidence
+   2026-09-24"). Stream events are timestamped on the stream thread
    when they arrive, and REST completions are timestamped on the REST worker.
    Latencies therefore exclude the time an event waits for the main loop.
    A port defect (an exception instead of an HTTP outcome) is recorded, not
@@ -229,6 +232,16 @@ PY="$ADAPTIVE_PAPER_VENV/bin/python"
 
 If the header still reports 200 when `--cap 1000` is given, the budget stays
 at 180/min. The receipt then shows `effective_limit: 200`.
+
+**Avoid the opening auction.** Start paper runs at least about 15 minutes
+after the 09:30 ET open. On 2026-09-24 the paper endpoint took about 16 s to
+confirm cancels on `trade_updates` right after the open, and the default
+10 s stream timeout froze the run (`stream_terminal_missing`). If a run must
+start earlier, raise the timeout, for example `--stream-timeout 30`
+(`stream_timeout_seconds`, 0.5-120 s, default 10; recorded in the receipt's
+`config`). A raised timeout only avoids the freeze. With `--max-open-orders`
+10 and 16 s confirmations, throughput is bounded well below the target, so an
+opening-auction run is not expected to meet the capacity criteria.
 
 After a crash, or when a receipt shows `verified_zero_open: false`:
 
@@ -573,6 +586,7 @@ IDs.
 | `capacity_fixture.py` | Offline fake clock, broker and `trade_updates` stream |
 | `rate-limit-evidence-20260924.json` | Cited limits, repository-measured header counts, round-trip arithmetic |
 | `rate_limit_evidence.py` | Rebuilds or `--check`s that JSON from the committed trial receipts |
+| `evidence/` | Native paper receipts of 2026-09-24, their sanitization index and the independent observation |
 
 ## Evidence status (2026-09-24)
 
@@ -583,5 +597,61 @@ IDs.
 | Measured (offline fixture, live mode) | Each live gate's refusal: go file, acknowledgement flag, env-file names both ways, symbol, headroom, quote age and refresh limits, band, an existing journal, RTH including an early close, open orders, both STOP files, cancel-all. Also: caps from min(CLI, go file, live ceilings), the order-action cap on the worst-case cancel path, and go expiry, revocation or change mid-run. Fills and position changes stop the run without selling; they end `needs_attention` even with a port error, and the receipt keeps another order's fill quantity and price. A 25 s quote-feed stall: no probe priced from a quote over 10 s old, submissions hold, then resume. SIGHUP and SIGQUIT stop the run and cleanup runs. A failed position read fails closed. Paper `recover` and `audit` refuse a live journal, including one without the mode fields, before reading credentials. Also: the live port's quote-age check at the wire (a stub SDK client, no network) and its count as not sent; the exit code kept when the summary cannot be written (EIO, in-process and through a closed pseudo-terminal); the host-clock skew gate and its receipt field; a 429 on the position read backing off cleanup cancels by its Retry-After; `recover`/`audit` refusing a FIFO, symlinked or over-64 MiB journal. See `LiveCapacityTests` and `LivePortTests` in `tests/test_order_throughput.py`. |
 | Measured (SDK objects, no network) | Under alpaca-py 0.44.0 (the adaptive-paper pinned venv, Python 3.12): the live `TradingClient` and its `GuardedSession` use only `https://api.alpaca.markets`, and the live stream only `wss://api.alpaca.markets/stream`. The paper port's objects use only the paper origin. The live preflight, run against stub clients, returns an identity hash and no account id or balance. These tests build SDK objects and send no request. They are skipped where alpaca-py is not installed. |
 | Not exercised with SDK objects | The order request (`LimitOrderRequest`); the port's submit, cancel, listing, positions and quote-refresh calls through SDK clients; a running `trade_updates` stream. Their logic is tested with stub clients only. |
-| Not yet measured | Any native paper run of this harness. Any live run, and either port against Alpaca's REST or websocket endpoints. |
+| Measured (native paper, 2026-09-24) | One run at a 200/min trading limit met the frozen capacity criteria, and a coordinator-reported SDK listing (no retained artifact) matches its order counts. One pre-market refusal and one frozen opening-auction run are retained. See "Native paper evidence 2026-09-24". `alpaca_capacity_port.py` ran with alpaca-py 0.44.0 at revision `4911baf`. |
+| Not yet measured | 1000 order actions/min (the paper account reports `x-ratelimit-limit: 200`), any live run, either port against Alpaca's live REST or websocket endpoints, any run with `--stream-timeout` raised, and any other host. |
 | Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination in practice (it is documented on the Trading API "Get All Orders" reference, updated 2026-05-27, as exclusive and not to be combined with `after`/`until`; adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |
+
+## Native paper evidence 2026-09-24
+
+These are **capacity measurements, not strategy trades**. Every order was a
+non-marketable 1-share SPY DAY limit buy placed 5% below the bid and cancelled
+individually. No order filled and no position changed. Nothing here counts as a
+strategy trade, fill, signal or performance result. **1000/min is not
+measured**, because the account reported `x-ratelimit-limit: 200`.
+
+- **Host class:** WSL2 workstation (Linux x86_64 under Windows), Python 3.12.3,
+  alpaca-py 0.44.0, harness revision `4911baf` with default configuration.
+  That revision predates `--stream-timeout`, so every run used the 10 s default.
+- **Account tier:** every trading-endpoint rate header seen reported
+  `x-ratelimit-limit: 200` (1001 headers in the passing run). The data endpoint reported
+  10000. The budget was therefore 180 calls/min (headroom 0.9) and the frozen
+  target was 170 completed order actions per full 60 s window.
+
+| Receipt (`evidence/`) | Start (UTC) | Session | Result |
+|---|---|---|---|
+| `capacity-200-20260924.json` | 13:15:31 | PRE | Refused before any order: `quote_stale` (exit 2). Retained non-pass. |
+| `capacity-200-20260924-rth.json` | 13:31:31 | RTH (open auction) | 10 orders submitted and accepted, then frozen with `stream_terminal_missing` (exit 3, `needs_attention`). Submit-to-stream-terminal latency was p50 16.1 s and max 16.8 s. Of 15 cancel requests for the 10 orders, 11 returned 204 and 4 returned 422. Cleanup ended with one harness order still open (`verified_zero_open: false`), and reconciliation found seq 10 non-terminal. Retained non-pass. |
+| `capacity-200-20260924-rth-recover.json` | 13:32 | recover | About 20 s after the frozen run ended, the broker listed all 10 of that prefix's orders as `canceled`. Recover issued 0 cancels and verified zero open (exit 0). |
+| `capacity-200-20260924-rth2.json` | 13:50:01 | RTH | **Capacity criteria met (self-reported).** 5 full windows at 180 order actions each (about 90 submits and 90 cancels), 496 submits and 496 cancels, all 2xx. 0 HTTP 429, websocket completeness 1.0 (1488 events), clean reconciliation, 0 open, no fills. Submit-to-stream-terminal latency was p50 0.37 s and p99 2.06 s. Exit 0. |
+
+**Independent observation** (`independent-observation-20260924.json`). On
+2026-09-24 the workflow coordinator listed the paper account through the
+alpaca-py SDK, separately from the harness code path. It found 496 orders with
+the passing run's prefix since its `started_at`, all `canceled`, filled
+quantity 0, and 0 positions and 0 open orders. This matches the receipt's 496
+accepted submits and 496 acknowledged cancels. It confirms only those counts
+and states. It uses the same broker and account, and it does not check the
+per-window rates, latencies or websocket completeness. The first coordinator
+listing was not retained, so it was re-run at 14:16Z as a retained script
+(`evidence/observe-capacity-20260924.py`; alpaca-py 0.44.0, Python 3.12.3). It
+reproduced the same counts. Its stdout is kept as
+`evidence/observe-capacity-20260924.stdout.json`, with the hashes, the redacted argv and
+the exit code in `independent-observation-20260924.json`.
+
+**Finding and fix.** Paper cancel confirmations lagged about 16 s on
+`trade_updates` during the opening auction. That is longer than the 10 s
+stream timeout, so the harness froze. The fix is a `--stream-timeout` flag
+(`stream_timeout_seconds`, 0.5-120 s, default unchanged at 10) plus the
+operating rule above: avoid about the first 15 minutes after the open, or
+raise the flag. `tests/test_order_throughput.py` (`StreamTimeoutTests`)
+reproduces a 16 s confirmation lag in the offline fixture. The default
+timeout freezes, and a 30 s timeout completes without a freeze. That is
+fixture evidence only. No native run with a raised timeout has been made.
+
+**Sanitization.** `index-20260924.json` records the SHA-256 of each private
+original and of each committed copy. It also records host-path redactions,
+of which there were none: the harness already writes `<path>` for argv
+paths and stores no credentials, account identifiers or broker order IDs,
+so the four committed receipts are byte-identical to the originals. The run
+journals and stdout captures stay private and only their hashes are recorded.
+

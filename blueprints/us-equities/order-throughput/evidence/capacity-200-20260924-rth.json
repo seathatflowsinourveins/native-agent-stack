@@ -1,0 +1,280 @@
+{
+  "acceptance": {
+    "best_consecutive_full_windows_at_target": 0,
+    "capacity_criteria_met": false,
+    "cleanup_verified_zero_open": false,
+    "evidence_class_qualifies": true,
+    "frozen_criteria": {
+      "configured_at_or_above": true,
+      "required_windows_min": 5,
+      "target_actions_ratio_min": 0.85
+    },
+    "independent_observation_required": "Native acceptance also needs an observation by a separate method, e.g. the Alpaca dashboard or account-activity export for this prefix, checked against the receipt counts.",
+    "no_health_freezes": false,
+    "no_unexpected_fills": true,
+    "passed": false,
+    "passed_blockers": [
+      "capacity_criteria_not_met"
+    ],
+    "passed_is_self_reported": true,
+    "reconciliation_clean": false,
+    "required_consecutive_full_windows": 5,
+    "sustained": false,
+    "target_order_actions_per_window": 170,
+    "target_rule": "ceil(target_actions_ratio * effective_limit); each broker-accepted submit and each acknowledged (2xx) cancel is one completed order action",
+    "unhandled_http_429": 0,
+    "websocket_completeness_is_1": true
+  },
+  "cleanup": {
+    "cancel_all_decision": "not_enabled",
+    "cancel_all_used": false,
+    "ceiling_seconds": 240.0,
+    "individual_cancels": 2,
+    "open_harness_orders_after": 1,
+    "open_listing_complete": true,
+    "rest_sweep_cancels": 3,
+    "seconds": 11.4,
+    "step_errors": [],
+    "verification_rounds": 3,
+    "verified_zero_open": false
+  },
+  "config": {
+    "acknowledged_open_orders": 0,
+    "acknowledged_positions": 0,
+    "allow_cancel_all": false,
+    "allow_extended_hours": true,
+    "band_bps": 500,
+    "base_url": "https://paper-api.alpaca.markets",
+    "burst": null,
+    "cleanup_timeout_seconds": 60.0,
+    "configured_cap_per_minute": 200,
+    "headroom": 0.9,
+    "inflight": 4,
+    "max_consecutive_rejections": 10,
+    "max_duration_seconds": 330.0,
+    "max_http_429": 5,
+    "max_open_notional_usd": "10000",
+    "max_open_orders": 10,
+    "max_order_notional_usd": "1000",
+    "max_orders": 600,
+    "max_quote_age_seconds": 60.0,
+    "qty": 1,
+    "required_windows": 5,
+    "requote_seconds": 60.0,
+    "stream_start_timeout_seconds": 15.0,
+    "stream_timeout_seconds": 10.0,
+    "symbol": "SPY",
+    "target_actions_ratio": 0.85
+  },
+  "counts_as_strategy_trades": false,
+  "error_type": null,
+  "evidence_class": "native_paper",
+  "extended_hours_orders": false,
+  "harness": "order-throughput/1",
+  "health_freezes": [
+    "stream_terminal_missing"
+  ],
+  "http_429": {
+    "handled": 0,
+    "total": 0,
+    "unhandled": 0
+  },
+  "http_status_counts": {
+    "data:data_read:200": 1,
+    "trading:cancel:204": 11,
+    "trading:cancel:422": 4,
+    "trading:read:200": 13,
+    "trading:submit:200": 10
+  },
+  "latency": {
+    "submit_rest_ack": {
+      "count": 10,
+      "max_ms": 108.403,
+      "p50_ms": 21.983,
+      "p95_ms": 108.403,
+      "p99_ms": 108.403
+    },
+    "submit_to_stream_ack": {
+      "count": 10,
+      "max_ms": 105.483,
+      "p50_ms": 31.027,
+      "p95_ms": 105.483,
+      "p99_ms": 105.483
+    },
+    "submit_to_stream_terminal": {
+      "count": 10,
+      "max_ms": 16776.857,
+      "p50_ms": 16142.431,
+      "p95_ms": 16776.857,
+      "p99_ms": 16776.857
+    }
+  },
+  "observed_rate_limit_headers": {
+    "counts_by_origin_and_limit": {
+      "data:10000": 1,
+      "trading:200": 38
+    },
+    "min_remaining_by_origin": {
+      "data": 9999,
+      "trading": 191
+    }
+  },
+  "orders": {
+    "cancel_requests": 15,
+    "rest_accepted": 10,
+    "rest_rejections": {},
+    "submit_attempts": 10,
+    "unexpected_fill_qty": "0"
+  },
+  "policy": "Execution-capacity qualification only. Harness orders are non-marketable probes that are cancelled individually; they are not strategy trades and must never be counted as strategy trades, fills, signals or performance.",
+  "port_errors": 0,
+  "preflight": {
+    "acknowledged_open_orders": 0,
+    "acknowledged_positions": 0,
+    "asset_tradable": true,
+    "data_limit_headers_seen": [
+      "10000"
+    ],
+    "open_orders": 0,
+    "open_orders_complete": true,
+    "positions": 0,
+    "trading_limit_header": 200,
+    "trading_limit_headers_seen": [
+      200
+    ]
+  },
+  "probe_plan": {
+    "band_bps_below_bid": 500,
+    "cancel": "individual DELETE /v2/orders/{order_id}",
+    "client_order_id_prefix": "cap-20260924t133130-5719c2-",
+    "limit_price": "725.82",
+    "marketable": false,
+    "side": "buy",
+    "time_in_force": "day",
+    "type": "limit"
+  },
+  "provenance": {
+    "alpaca_py_version": "0.44.0",
+    "argv": [
+      "paper",
+      "--env-file",
+      "<path>",
+      "--output",
+      "<path>"
+    ],
+    "ended_at": "2026-09-24T13:31:53.039330+00:00",
+    "exit_code": 3,
+    "git_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+    "journal_used": true,
+    "python_version": "3.12.3",
+    "source_sha256": {
+      "adaptive-paper/runner.py": "03427aa9bf65c2d0863ae147fd1daa135dc1f7379bafcd82aa2ba3b1c19de73a",
+      "adaptive-paper/safety.py": "8cc67464ab55794b232cedb9988c264b86c8ec11ebe1734a94fb71480a269fa0",
+      "adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
+      "adaptive-paper/transport.py": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "order-throughput/alpaca_capacity_port.py": "e4c7bd0b834b4e851b6b2fede43bbc7aff3cf62e106ab59f1dee63ac1c61f02e",
+      "order-throughput/capacity.py": "70947e8e43a0c98eb84fb48f9fce336d39cb7e5ba5615b2fadfcb237f5feeb41",
+      "order-throughput/capacity_fixture.py": "553d3ec76cfb48c3e51fb6dbf5589375743226b0018b454779e043a369a849fa",
+      "order-throughput/rate_governor.py": "f6ce579a20072d640bebbbd396ac9fff562f60b8453c55343ef513aee8489ed5"
+    }
+  },
+  "rate": {
+    "admitted": {
+      "cancel": 15,
+      "read": 8,
+      "submit": 10
+    },
+    "backoff_seconds": 0.0,
+    "backoffs": [],
+    "backoffs_over_max": 0,
+    "bucket_capacity": 9.0,
+    "budget_per_minute": 180,
+    "configured_cap_per_minute": 200,
+    "denied": {
+      "frozen": 0,
+      "server_remaining": 0,
+      "tokens": 672,
+      "window": 0
+    },
+    "effective_limit": 200,
+    "external_calls_noted": 5,
+    "headroom": 0.9,
+    "http_429": 0,
+    "observed_limit": 200,
+    "reserve_per_minute": 20
+  },
+  "rate_limit_changes": [
+    {
+      "budget": 180,
+      "effective_limit": 200,
+      "limit": 200,
+      "seconds_from_start": -0.132
+    }
+  ],
+  "reconciliation": {
+    "all_positions_unchanged": true,
+    "ambiguous_submits": {
+      "existed": 0,
+      "not_created": 0,
+      "unresolved": 0
+    },
+    "broker_orders_with_prefix": 10,
+    "changed_position_symbols": 0,
+    "clean": false,
+    "filled_probes": [],
+    "listing_complete": true,
+    "local_probes": 10,
+    "missing_from_broker": [],
+    "non_terminal_at_end": [
+      10
+    ],
+    "performed": true,
+    "position_unchanged": true,
+    "status_mismatches": [],
+    "unknown_prefix_orders": 0
+  },
+  "refusal_reason": null,
+  "schema_version": 1,
+  "session_kind": "RTH",
+  "stage": "reconciliation",
+  "started_at": "2026-09-24T13:31:31.290840+00:00",
+  "status": "needs_attention",
+  "stop_reason": "frozen:stream_terminal_missing",
+  "strategy_trades": 0,
+  "throughput": {
+    "full_windows": 0,
+    "max_order_actions_full_window": null,
+    "min_order_actions_full_window": null,
+    "min_submits_full_window": null,
+    "order_actions_attempted_in_phase": 20,
+    "order_actions_in_phase": 20,
+    "order_actions_not_completed_in_phase": 0,
+    "order_actions_per_minute_mean": 116.807,
+    "submission_phase_seconds": 10.273,
+    "windows": [
+      {
+        "cancels": 11,
+        "cancels_attempted": 15,
+        "full": false,
+        "index": 0,
+        "order_actions": 21,
+        "order_actions_attempted": 25,
+        "reads": 8,
+        "submits": 10,
+        "submits_attempted": 10
+      }
+    ]
+  },
+  "websocket": {
+    "ack_observed": 10,
+    "complete": 10,
+    "completeness": 1.0,
+    "events_this_run": 30,
+    "events_total": 30,
+    "foreign_events_ignored": 0,
+    "malformed_events": 0,
+    "orders_expected": 10,
+    "terminal_observed": 10,
+    "unknown_harness_events": 0
+  }
+}
