@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-askalf-truecopy",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/askalf/truecopy",
+ "reviewed_commit": "42f8f1186400b8126ee446af5c645724aefe4f6c",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of the repository askalf/truecopy at commit 42f8f1186400b8126ee446af5c645724aefe4f6c (license MIT), read from README.md at that revision. Repository description: \"Own your agent skills: vet, sign and pin every skill and MCP server before it runs, then fail the build when the bytes change.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@42f8f1186400b8126ee446af5c645724aefe4f6c",
+   "text": "Own your agent skills. Vet, sign, and pin every skill & MCP server before it runs."
+  },
+  {
+   "source": "README.md@42f8f1186400b8126ee446af5c645724aefe4f6c",
+   "text": "68,560 skills poison-scanned: the official Claude Code plugin directory, nine community marketplaces and all of ClawHub. The official directory is re-scanned every day; the watch badge above is the live result."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/askalf/truecopy/tree/42f8f1186400b8126ee446af5c645724aefe4f6c",
+  "https://github.com/askalf/truecopy/blob/42f8f1186400b8126ee446af5c645724aefe4f6c/README.md"
+ ]
+}

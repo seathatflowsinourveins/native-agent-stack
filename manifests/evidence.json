@@ -3104,8 +3104,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "9e0519773005b847ebc9fa1e8935765e93b74259fd7c8a4f15a4721cb7271107",
-      "bytes": 23008
+      "sha256": "78246d3ff1fab05fca2aec90714f86683e40cbe8ba804de64e412908c2a8334f",
+      "bytes": 24041
     },
     {
       "path": ".gitleaksignore",
@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "e02687288e2c122887b334014291fade4bdb3db799656e7a4a9556cc142480aa",
-      "bytes": 1072229
+      "sha256": "06114a79dbe0f5695510f2fafd6d2d0228fa3afd9d6469f4e04b6d9337b20241",
+      "bytes": 1061495
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -23950,58 +23950,38 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
-      "sha256": "4aa078e6e3e4d3e3332b95fd1d58aa63442edda2207e6b539c6eddab711391fb",
-      "bytes": 2383
+      "sha256": "913e4f203d0354b7d4071a82e7579cfc4d60157b77e01c14b01d2c882689fa5d",
+      "bytes": 1655
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
-      "sha256": "1f7a4866ca45dd9d12ff19339eac627a0d9e07cf765db54db1ebd3ec0fa9aebe",
-      "bytes": 2145
-    },
-    {
-      "path": "evidence/artifacts/landscape-sweep-20260923/github-gh-aw.json",
-      "sha256": "b92d05fb96cf8376dab347182274911346dfa51514a34376a0d576a25cf6e93b",
-      "bytes": 1748
-    },
-    {
-      "path": "evidence/artifacts/landscape-sweep-20260923/google-osv-scanner.json",
-      "sha256": "5ba83a051383ebdc83dee26e99b960525cfcfb34d1f44d884a8d914f61638227",
-      "bytes": 1948
+      "sha256": "ee102a697e91aecef91e6170cbe3d8071dee81328eab0b44af08f3aa6776407a",
+      "bytes": 1543
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/grafana-tempo.json",
-      "sha256": "ad0458b68275d1fdbcb4645ba16b6b8a20fb31a641e22bd840c5f6bdafc5b6cf",
-      "bytes": 2333
+      "sha256": "35fa627ba09194e9b2dd119963f46373e38ea90b6ce71a86ce34a8acd552f176",
+      "bytes": 1810
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json",
-      "sha256": "d8a1a10c941678730717652074529f7ec0cb0572820362f08f12bf6c3ff1a1d7",
-      "bytes": 2361
+      "sha256": "770faea1a967a524e5060c5d6ef34d3b2963b972d0d751d90d98729a2ff883d4",
+      "bytes": 1862
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
-      "sha256": "198b6fd93adad5f64deb4be5278ce60f7f08aa3bdb353198b9d92dd45048ade2",
-      "bytes": 2677
+      "sha256": "d99c0ee451e3128a13a744fa3c1121f9cf5d58dcfe15f0f23dc6737b6c64086f",
+      "bytes": 2121
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
-      "sha256": "5685f37ec035c4731f15022b3fed238801634f00f790ce6558ab28e8e50c43a1",
-      "bytes": 2204
-    },
-    {
-      "path": "evidence/artifacts/landscape-sweep-20260923/ossf-scorecard.json",
-      "sha256": "c665cbdd566b629b8eca9d6862758c2bdf08a77b14248f2218ee55d93f39ad47",
-      "bytes": 2948
-    },
-    {
-      "path": "evidence/artifacts/landscape-sweep-20260923/renovatebot-renovate.json",
-      "sha256": "cdb7d31adb612cfa2d94db5362fa71b88d59ce7913bb99404e318243ed9ee2b8",
-      "bytes": 2989
+      "sha256": "76e52c9ecae5e87f8006ee8e2b85117fbd2b611b25a633a8ab1c8d0124838d0b",
+      "bytes": 1877
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
-      "sha256": "0850142cb2705dea092cae9812458fa4f10d5ba42b7e78df76d79b5b914a290d",
-      "bytes": 2890
+      "sha256": "3c66c6ba6d3ab26c5dd0dc8bd75c7fc42417f5333268fd37b3ef7656f4c5c973",
+      "bytes": 2174
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
@@ -26559,6 +26539,261 @@
       "bytes": 2564
     },
     {
+      "path": "evidence/artifacts/source-review-20260923/afrojuju1-nautilus_trader.json",
+      "sha256": "76327812cf9c997eea46093a1dad1597cf66cf949d39fcb18b6fe736f857c99e",
+      "bytes": 2989
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/alibaba-open-code-review.json",
+      "sha256": "42e881b52cb1c0479fb4d52a994b23014af0e10ac5b9673e1a1b427c48e178a2",
+      "bytes": 2246
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/anthropics-claude-agent-sdk-typescript.json",
+      "sha256": "5bb2664a0ac85c3966b9b9ff93f93e985a7e3a895f15fe78234c1ff4b5502f77",
+      "bytes": 1726
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/askalf-truecopy.json",
+      "sha256": "d8f93a741717941ae4ff397db8402f51b2d33703d39904ef69bc231695517ccf",
+      "bytes": 1744
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/atilaahmettaner-tradingview-mcp.json",
+      "sha256": "7289dadba1268bc919ede0489dd8d0f8344811346a6506805f588869fd36f0e6",
+      "bytes": 2236
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/blackfalcondata-org-delisted-stocks-list.json",
+      "sha256": "6656a2c521581a8595665add2761e3785c1fa846a4ee8db78319a755ed7e098a",
+      "bytes": 1826
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/casey-just.json",
+      "sha256": "2499dcc2330ab27f83e0e190758aab5b4937868fa08dca67ce637efaa0ee7b7d",
+      "bytes": 1507
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/clash-verge-rev-clash-verge-rev.json",
+      "sha256": "ae9cd5e70b25cb0bf6d052fd3a3103cc25f677f78e2951f08cd16301acdb1b20",
+      "bytes": 1568
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/coir-team-coir.json",
+      "sha256": "976b0a2973ee6b201a46d094040a101c8cf62d2a7c7105938c178c34d3463abf",
+      "bytes": 1839
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/dagger-container-use.json",
+      "sha256": "abaec4bd3ad564aecf88f2e5d902009f41b6da67dc90f00e4495812fdd83022b",
+      "bytes": 1884
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/edtechre-pybroker.json",
+      "sha256": "d227409e22239ec807e4e10fb988e0ba6b7eb14af818fe4ab190ebd6856058d9",
+      "bytes": 3008
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/eyuansu62-agent-retrieval-bench.json",
+      "sha256": "be300d13724b0936ddb16ca3e26113ac3e9fe16b140222e7e0879528cb4fba40",
+      "bytes": 2013
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/garethgeorge-backrest.json",
+      "sha256": "b4d384ce35d65672cd3147ff50ff6d82ca16502b3d215a5f6da9beeb32ae6e7a",
+      "bytes": 2851
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/generalaction-emdash.json",
+      "sha256": "9ef80b3e23a35b49a4bccc3fe9b75c2c01fcd774d11bd75ac431e2925e6f9651",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/ggml-org-llama.cpp.json",
+      "sha256": "0d4fe83038fd90ee5e81160e62d28a97e9e811362813dfc0f30ff563d312ae74",
+      "bytes": 1375
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-google-gemma-4-26b-a4b-it.json",
+      "sha256": "c0a23cd83f250d49aaf2d657a544ac3000737fd7755abcc1715287f5c554e71b",
+      "bytes": 2009
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-ibm-granite-granite-embedding-311m-multilingual-r2.json",
+      "sha256": "965a0f49bf91f6587794d361f72a2ee6e81a360b262d0193674ccf0320cbb71f",
+      "bytes": 2131
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-kalm-embedding-kalm-reranker-v1-nano-r2.json",
+      "sha256": "1f2b07252539170f620870a010c4188d6f2b9c1ca424d7f8caf88f8c3b0b8e26",
+      "bytes": 2494
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-microsoft-harrier-oss-v1-0.6b.json",
+      "sha256": "8d13e431d90da064c01da56687f1e28331c4785baf9e93dbf2c584950eb07804",
+      "bytes": 2001
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-nvidia-nemotron-3-embed-1b-nvfp4.json",
+      "sha256": "098f8ef58c6e18081eacee6d9916c31c8591918c9e3be14d319d7326570d9437",
+      "bytes": 2022
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-qwen-qwen3.6-35b-a3b.json",
+      "sha256": "2a6cf9fc8253f903a839527c22093b19d96fc478d1effa7f34ec5514c26eaa43",
+      "bytes": 1737
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/huggingface-skills.json",
+      "sha256": "3fce9932025804207677efc6e6bab2c133f2e2481e983e778283e17100a61858",
+      "bytes": 1678
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/jerbouma-financedatabase.json",
+      "sha256": "7ebc5d2f079dcc830c20d9f8a8b6c85712fcd3fa789e5b82e4f57c8609abceb6",
+      "bytes": 2107
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/jerbouma-financetoolkit.json",
+      "sha256": "76bf40f5639f2d84a30bfa4407c396ac670c3895399fdff8b65a49a3acbea2a1",
+      "bytes": 2106
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/johannesjo-parallel-code.json",
+      "sha256": "d7d482206545ada660a9e5ff5026a46de3f217fe43c71c54a77df014ee12c443",
+      "bytes": 1645
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/john-friedman-datamule-python.json",
+      "sha256": "c9ee62d817e26bf8577563e63f783efac7467330de1eb83aa50afe5d3b86e97f",
+      "bytes": 1718
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/kopia-kopia.json",
+      "sha256": "ac07d2c36922b994b4101e916979b86387f12ef59d25d1050582d921a713131e",
+      "bytes": 2264
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/loopx-project-loopx.json",
+      "sha256": "c1e5d6e1a1289eb9762c087b9e0605294812b9983261c95fd335788c1ef0f0e8",
+      "bytes": 1971
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/memorilabs-memori.json",
+      "sha256": "d69f20a0cc0453679ce69b8eb34210fd62746dbf539afaa89e7697b19c460a39",
+      "bytes": 1759
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/mhallsmoore-qstrader.json",
+      "sha256": "d2270253a832d54102c4b39c00d3ee7b4738c8690937a70a580df2513c014b7d",
+      "bytes": 1673
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
+      "sha256": "bf8eb18ff610036e5ee16a88ae229ef6aee8a9b6f0213d5747f1b32f403c22fa",
+      "bytes": 1990
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/msitarzewski-agency-agents.json",
+      "sha256": "fdf03d0573b77c81b544d5bdf23bddcbcdb087c12895e5bbfee1d82001f54c5f",
+      "bytes": 1887
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/nexting-ai-nexting.json",
+      "sha256": "40fecca8293f971a7f66e40b45cf692595a4d65e5c0c20be610d588ec08ff490",
+      "bytes": 2082
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/nolabs-ai-nono.json",
+      "sha256": "41ab389c6a53d3388b373182dc8b72dd562d099cc2fd3e924d95ef72c587f3c8",
+      "bytes": 1912
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/opensandbox-group-opensandbox.json",
+      "sha256": "64304303b4d888a7bd607e30c3c5b9ffdc50038e29f874dd9688227fed20bb44",
+      "bytes": 3503
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/plastic-labs-honcho.json",
+      "sha256": "9eb9983d8b1ad9a3492e5896b4d3cca741c3f0f2e5c881efae2d870654e6d204",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/pst-group-pysystemtrade.json",
+      "sha256": "cf6e3544e17de78207be2f69f6251f216b214c6a0ec205b157509eac7ed3139d",
+      "bytes": 1737
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/quantconnect-mcp-server.json",
+      "sha256": "6cb8e48df591e0c6e60c7c173f439bf837e341f79e3aba9e7a0aa111df91de3f",
+      "bytes": 1791
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/restatedev-restate.json",
+      "sha256": "d3d3ed98b5bf40cf94affb13826e22668b893cbb31f09868fad16f6d38720945",
+      "bytes": 1697
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/rohitg00-agentmemory.json",
+      "sha256": "1dc83661cd88c054c09ee8f79273a770c331b76ceb8746425479f74bd6b8dd85",
+      "bytes": 1811
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/shiyu-coder-kronos.json",
+      "sha256": "4e9967747fd01ae789ea7dd8faeead4414ac9349a882171d80901f87adbaf8ff",
+      "bytes": 1883
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/snyk-agent-scan.json",
+      "sha256": "82cd93c467cb6799763c178cd4721282ef0a702b7a9a5f4c26008c159efd0def",
+      "bytes": 2077
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/stefan-jansen-machine-learning-for-trading.json",
+      "sha256": "734c1f183099eda212ceef20ff660258fffe7653a98e54ea1de7fed51991575a",
+      "bytes": 1956
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/stefan-jansen-pyfolio-reloaded.json",
+      "sha256": "365a4cefcd6b09f5a9cd61287b288a0cebc60c9fbbcae3144c09a8d674835b65",
+      "bytes": 1788
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/storybloq-storybloq.json",
+      "sha256": "98d1f4969e3100eaf36b3c72cae637d3cb11afae41fd17d1d578ef900640d5ec",
+      "bytes": 1979
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/temporalio-sdk-python.json",
+      "sha256": "2d001125e063e210cea57d2ce72bf1abee3bec592b3460e778c680fe97256b98",
+      "bytes": 1655
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/tw93-mole.json",
+      "sha256": "e491a4ded660c992956ffa2d9147a7175695a593ac21e37807fcf6bbb9e788ea",
+      "bytes": 2693
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/tylerjforstrom-stock-data.json",
+      "sha256": "43eca93682acd600d85a68d33a351772aa0ece9ce669950ac06f5f7d970a45a5",
+      "bytes": 1821
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/untrivial-ai-agent-orchestrator.json",
+      "sha256": "899d155269fed6359f45e1918b4b428dcfb9dd5c31ad6b481c96a5f5bd81fdb9",
+      "bytes": 2049
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/zilliztech-claude-context.json",
+      "sha256": "febfec52a3be1e156a375860fd7a3b4296881fef1f4d6c34d4f3d7a9b42b9f9d",
+      "bytes": 1706
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/zouuup-landrun.json",
+      "sha256": "6cedfb4eaa10ba3e1680ab769d9259782abcbf177496ca31ed3d9753f2657265",
+      "bytes": 2639
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -28120,8 +28355,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "49138ec57925d5d94c64b92df08eeea2dfdec5cdf95229f9d91a08225399e77e",
-      "bytes": 31926
+      "sha256": "eabadbe44b38a3c4e4fd7ae180fb83b060deac3d1e221adadc3d6d74eb4f97a6",
+      "bytes": 34344
     },
     {
       "path": "tests/test_gpu_inference.py",

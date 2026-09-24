@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-skillopt",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/SkillOpt",
+ "reviewed_commit": "79124b37e9a6371e13b753f8bcd7adb1e493ade1",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "evaluation-experiments",
+  "instructions-skills",
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of the repository microsoft/SkillOpt at commit 79124b37e9a6371e13b753f8bcd7adb1e493ade1 (license MIT), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@79124b37e9a6371e13b753f8bcd7adb1e493ade1",
+   "text": "SkillOpt treats the skill document as the trainable state of a frozen agent, and trains it with the discipline that makes weight-space optimization reproducible. A textual learning-rate budget, a rejected-edit buffer, and an epoch-wise slow / meta update make skill training stable while adding zero inference-time model calls at deployment."
+  },
+  {
+   "source": "README.md@79124b37e9a6371e13b753f8bcd7adb1e493ade1",
+   "text": "The deployed artifact is a compact bestskill.md (typically 300\u20132,000 tokens) that runs against the unchanged target model. Optimized skill artifacts transfer across model scales, between Codex and Claude Code harnesses, and to nearby benchmarks without further optimization."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/microsoft/SkillOpt/tree/79124b37e9a6371e13b753f8bcd7adb1e493ade1",
+  "https://github.com/microsoft/SkillOpt/blob/79124b37e9a6371e13b753f8bcd7adb1e493ade1/README.md"
+ ]
+}

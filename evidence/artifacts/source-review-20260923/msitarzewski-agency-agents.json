@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-msitarzewski-agency-agents",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/msitarzewski/agency-agents",
+ "reviewed_commit": "053ddbbf392a1688fc7043d81529f47ef2cf86c8",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "agents-models-workers"
+ ],
+ "claim": "Source and documentation review of the repository msitarzewski/agency-agents at commit 053ddbbf392a1688fc7043d81529f47ef2cf86c8 (license MIT), read from README.md at that revision. Repository description: \"A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@053ddbbf392a1688fc7043d81529f47ef2cf86c8",
+   "text": "Born from a Reddit thread and months of iteration, The Agency is a growing collection of meticulously crafted AI agent personalities. Each agent is:"
+  },
+  {
+   "source": "README.md@053ddbbf392a1688fc7043d81529f47ef2cf86c8",
+   "text": "Think of it as: Assembling your dream team, except they're AI specialists who never sleep, never complain, and always deliver."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/msitarzewski/agency-agents/tree/053ddbbf392a1688fc7043d81529f47ef2cf86c8",
+  "https://github.com/msitarzewski/agency-agents/blob/053ddbbf392a1688fc7043d81529f47ef2cf86c8/README.md"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-rohitg00-agentmemory",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/rohitg00/agentmemory",
+ "reviewed_commit": "e04ba88819c365c9acf9d6661ea802143e728bd6",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of the repository rohitg00/agentmemory at commit e04ba88819c365c9acf9d6661ea802143e728bd6 (license Apache-2.0), read from README.md at that revision. Repository description: \"#1 Persistent memory for AI coding agents based on real-world benchmarks\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@e04ba88819c365c9acf9d6661ea802143e728bd6",
+   "text": "Your coding agent remembers everything. No more re-explaining. Built on iii engine Persistent memory for Claude Code, GitHub Copilot CLI, Cursor, Gemini CLI, Codex CLI, Hermes, OpenClaw, pi, OpenCode, and any MCP client."
+  },
+  {
+   "source": "README.md@e04ba88819c365c9acf9d6661ea802143e728bd6",
+   "text": "The gist extends Karpathy's LLM Wiki pattern with confidence scoring, lifecycle, knowledge graphs, and hybrid search: agentmemory is the implementation."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/rohitg00/agentmemory/tree/e04ba88819c365c9acf9d6661ea802143e728bd6",
+  "https://github.com/rohitg00/agentmemory/blob/e04ba88819c365c9acf9d6661ea802143e728bd6/README.md"
+ ]
+}

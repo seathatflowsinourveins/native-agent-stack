@@ -10,7 +10,7 @@
  "layers": [
   "web-research"
  ],
- "claim": "Source and documentation review of exa-labs/exa-mcp-server at commit f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97 (license MIT), read from README.md at that commit. Repository description: \"Exa MCP for web search and web crawling!\". Reviewer summary of the upstream documentation: Official MCP server from Exa Labs exposing Exa's neural/semantic web search, crawling and entity discovery (people, companies, code, papers) as bounded MCP tool calls; backed by the official exa-labs/exa-js SDK. Requirement part it addresses (web-research): \"Retrieve attributable primary sources ...",
+ "claim": "Source and documentation review of exa-labs/exa-mcp-server at commit f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97 (license MIT), read from README.md at that commit. Repository description: \"Exa MCP for web search and web crawling!\".",
  "documentation_excerpts": [
   {
    "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
@@ -18,18 +18,15 @@
   },
   {
    "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
-   "text": "Documentation &nbsp;\u00b7&nbsp; NPM Package &nbsp;\u00b7&nbsp; Get your API key"
+   "text": "Most clients can be configured manually with the standard mcpServers shape:"
   }
  ],
  "limitations": [
   "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
-  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
  ],
  "sources": [
   "https://github.com/exa-labs/exa-mcp-server/tree/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
-  "https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md",
-  "https://exa.ai/versus/tavily",
-  "https://www.tavily.com/blog/7-best-exa-alternatives-for-ai-agents-in-2026",
-  "https://medium.com/@unicodeveloper/tavily-alternatives-in-2026-after-the-nebius-acquisition-9de526780686"
+  "https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md"
  ]
 }

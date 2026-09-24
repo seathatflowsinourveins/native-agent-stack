@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tylerjforstrom-stock-data",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/TylerJForstrom/Stock-Data",
+ "reviewed_commit": "782f3a6537535da411fcfca1be9fcbf087ea7904",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of the repository TylerJForstrom/Stock-Data at commit 782f3a6537535da411fcfca1be9fcbf087ea7904 (license MIT), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@782f3a6537535da411fcfca1be9fcbf087ea7904",
+   "text": "It is the companion data layer for Stock-Grader; every dataset ships with a manifest.json (schema version, source URLs, fetch timestamp, sha256, row counts, license note) so downstream consumers can verify what they are reading."
+  },
+  {
+   "source": "README.md@782f3a6537535da411fcfca1be9fcbf087ea7904",
+   "text": "The daily symbol-directory snapshot is the point-in-time universe archive: each day's diff is a free listing/delisting/ticker-change event stream. The archive only covers dates after the archiver started \u2014 which is why it runs first."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/TylerJForstrom/Stock-Data/tree/782f3a6537535da411fcfca1be9fcbf087ea7904",
+  "https://github.com/TylerJForstrom/Stock-Data/blob/782f3a6537535da411fcfca1be9fcbf087ea7904/README.md"
+ ]
+}

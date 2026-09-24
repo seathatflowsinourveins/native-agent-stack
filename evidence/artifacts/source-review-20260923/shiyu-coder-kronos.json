@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-shiyu-coder-kronos",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/shiyu-coder/Kronos",
+ "reviewed_commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of the repository shiyu-coder/Kronos at commit 67b630e67f6a18c9e9be918d9b4337c960db1e9a (license MIT), read from README.md at that revision. Repository description: \"Kronos: A Foundation Model for the Language of Financial Markets\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "text": "Kronos: A Foundation Model for the Language of Financial Markets"
+  },
+  {
+   "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+   "text": "Kronos is a family of decoder-only foundation models, pre-trained specifically for the \"language\" of financial markets\u2014K-line sequences. It leverages a novel two-stage framework: 1. A specialized tokenizer first quantizes continuous, multi-dimensional K-line data (OHLCV) into hierarchical discrete tokens. 2. A large, autoregressive Transformer is then pre-trained on these tokens, enabling it to se"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/shiyu-coder/Kronos/tree/67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+  "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/README.md"
+ ]
+}

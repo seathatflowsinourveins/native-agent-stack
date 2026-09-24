@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-coir-team-coir",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/CoIR-team/coir",
+ "reviewed_commit": "89d0e769c18f0576a766072ba1071d4e04cca3dd",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the repository CoIR-team/coir at commit 89d0e769c18f0576a766072ba1071d4e04cca3dd (license Apache-2.0), read from README.md at that revision. Repository description: \"(ACL 2025 Main) A Comprehensive Benchmark for Code Information Retrieval.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@89d0e769c18f0576a766072ba1071d4e04cca3dd",
+   "text": "CoIR (Code Information Retrieval) benchmark, is designed to evaluate code retrieval capabilities. CoIR includes 10 curated code datasets, covering 8 retrieval tasks across 7 domains. It also provides a common and easy Python framework, installable via pip, and shares the same data schema as benchmarks like MTEB and BEIR for easy cross-benchmark evaluations."
+  },
+  {
+   "source": "README.md@89d0e769c18f0576a766072ba1071d4e04cca3dd",
+   "text": "For models leaderboard, checkout out leaderboard page: CoIR Leaderboard."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/CoIR-team/coir/tree/89d0e769c18f0576a766072ba1071d4e04cca3dd",
+  "https://github.com/CoIR-team/coir/blob/89d0e769c18f0576a766072ba1071d4e04cca3dd/README.md"
+ ]
+}

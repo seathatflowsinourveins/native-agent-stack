@@ -10,7 +10,7 @@
  "layers": [
   "document-retrieval"
  ],
- "claim": "Source and documentation review of opendatalab/MinerU at commit 9227669985a7876abe5d3181b1cda11a844e7322, read from README.md at that commit. Repository description: \"Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for your Agentic workflows.\". Reviewer summary of the upstream documentation: OpenDataLab/Shanghai AI Lab's open-source pipeline transforming complex PDFs and Office documents (multi-column, tables, formulas, CJK) into LLM-ready Markdown/JSON; Requirement part it addresses (document-retrieval): arbitrary filings' left unaddressed.",
+ "claim": "Source and documentation review of opendatalab/MinerU at commit 9227669985a7876abe5d3181b1cda11a844e7322, read from README.md at that commit. Repository description: \"Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for your Agentic workflows.\".",
  "documentation_excerpts": [
   {
    "source": "README.md@9227669985a7876abe5d3181b1cda11a844e7322",
@@ -23,7 +23,7 @@
  ],
  "limitations": [
   "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
-  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
  ],
  "sources": [
   "https://github.com/opendatalab/MinerU/tree/9227669985a7876abe5d3181b1cda11a844e7322",

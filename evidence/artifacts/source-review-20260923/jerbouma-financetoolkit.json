@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-jerbouma-financetoolkit",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/JerBouma/FinanceToolkit",
+ "reviewed_commit": "9fa19f9e97fee229dad4d65cf9c1448597af5df5",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of the repository JerBouma/FinanceToolkit at commit 9fa19f9e97fee229dad4d65cf9c1448597af5df5 (license MIT), read from README.md at that revision. Repository description: \"Transparent and Efficient Financial Analysis\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9fa19f9e97fee229dad4d65cf9c1448597af5df5",
+   "text": "While browsing a variety of websites, I repeatedly observed significant fluctuations in the same financial metric among different sources. Similarly, the reported financial statements often didn't line up, and there was limited information on the methodology used to calculate each metric."
+  },
+  {
+   "source": "README.md@9fa19f9e97fee229dad4d65cf9c1448597af5df5",
+   "text": "For example, Microsoft's Price-to-Earnings (PE) ratio on the 6th of May, 2023 is reported to be 28.93 (Stockopedia), 32.05 (Morningstar), 32.66 (Macrotrends), 33.09 (Finance Charts), 33.66 (Y Charts), 33.67 (Wall Street Journal), 33.80 (Yahoo Finance) and 34.4 (Companies Market Cap). Therefore, collecting data from multiple sources can lead to wrong interpretation of the results given that one sou"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/JerBouma/FinanceToolkit/tree/9fa19f9e97fee229dad4d65cf9c1448597af5df5",
+  "https://github.com/JerBouma/FinanceToolkit/blob/9fa19f9e97fee229dad4d65cf9c1448597af5df5/README.md"
+ ]
+}

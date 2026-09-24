@@ -229,6 +229,40 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
 
+    def _manifest_fixture(self, target: Path, relative: str, extra: dict) -> None:
+        """A manifest-shaped file whose text names Sourcegraph, so the sourcegraph-access-token
+        rule's keyword is present and its 40-hex pattern is live for every value in the file."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        rows = [{"id": "a", "pin": HEX40}, {"id": "b", "pin": f"1.0.6 @ {HEX40}"},
+                {"evidence": ["https://sourcegraph.com/blog/announcing-scip"]}, extra]
+        path.write_text(json.dumps({"foundation": rows}, indent=1))
+
+    def test_d_manifest_pin_commit_ids_are_not_detected(self):
+        """The dated SOTA manifest's "pin" git commit ids (plain or "<version> @ <id>") are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260923.json", {})
+            findings = self._scan(target)
+            self.assertEqual([f for f in findings if f["RuleID"] == "sourcegraph-access-token"], [],
+                             "pin commit ids in the reviewed manifest must not be flagged")
+
+    def test_d2_other_fields_and_other_paths_stay_detected(self):
+        """Only "pin" lines of that exact file are exempt: the same 40-hex under another field in the
+        file, and the same pin lines in any other file, are still sourcegraph-access-token findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260923.json", {"token": HEX40})
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260924.json", {})
+            findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
+            by_file = {}
+            for f in findings:
+                by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260923.json", [])), 1,
+                             f"the non-pin token line in the reviewed manifest must still be detected: {by_file}")
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
+                             f"pin lines outside the exact reviewed path must still be detected: {by_file}")
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 

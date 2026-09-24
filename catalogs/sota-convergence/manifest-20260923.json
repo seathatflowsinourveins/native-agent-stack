@@ -773,6 +773,7 @@
      "repository": "https://github.com/microsoft/SkillOpt",
      "why_not_default": "Star-audit targeted_candidate for validation-gated skill optimization; no execution in any record; a previous dated lane refuted it for lack of a named gap.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
       "star-candidates.json star_candidates[microsoft/SkillOpt].decision=targeted_candidate",
       "github-freshness.json microsoft/skillopt v0.2.0 2026-07-02, pushed 2026-09-05"
      ],
@@ -788,6 +789,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Evidence that the installed hf-cli skill is stale or diverges from this upstream on a Hub task fixture.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/huggingface-skills.json",
       "gh api graphql repository(huggingface/skills): stargazerCount 11088, pushedAt 2026-09-22, license Apache-2.0, no latestRelease"
      ],
      "upstream_now": {
@@ -1203,6 +1205,7 @@
      "repository": "https://github.com/loopx-project/loopx",
      "why_not_default": "Star-audit targeted_candidate (stateful objectives, gates, quota, handoff); source review only.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/loopx-project-loopx.json",
       "star-candidates.json star_candidates[loopx-project/loopx].decision=targeted_candidate"
      ],
      "comparison_that_would_overturn": "A multi-session bounded research task where loopx gates/handoffs recover an interrupted worker that native resume + Beads cannot.",
@@ -1212,6 +1215,7 @@
      "repository": "https://github.com/Untrivial-ai/agent-orchestrator",
      "why_not_default": "Star disposition is 'alternative': per-task workspaces and supervision overlap native coordination and Worktrunk, and the always-on services need an operations requirement. Current upstream is active.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/untrivial-ai-agent-orchestrator.json",
       "star-candidates.json star_candidates[repository=https://github.com/Untrivial-ai/agent-orchestrator] decision alternative",
       "gh api graphql: ComposioHQ/agent-orchestrator resolves to Untrivial-ai/agent-orchestrator, stargazerCount 12274, pushedAt 2026-09-22, Apache-2.0, v0.13.0 2026-09-12"
      ],
@@ -1222,6 +1226,7 @@
      "repository": "https://github.com/temporalio/sdk-python",
      "why_not_default": "Closure L84 marks it 'Deferred until required; adds a service and distinct effect/recovery semantics'. trading-catalog.json id=temporal is decision conditional, the 'preferred escalation when jobs must survive host loss, await approvals or span days', and notes 'Activities retry by default; unlimited defaults are unsuitable for quota errors or uncertain broker writes'. The critic said Temporal 'was not considered'. Considered now: the pin is current (closure 1.33.0 = GitHub latest 1.33.0), and no application yet meets the overturn_when condition.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/temporalio-sdk-python.json",
       "gh api graphql (this lane) temporalio/sdk-python: 1197 stars, pushedAt 2026-09-22T23:06:27Z, MIT, archived false, latestRelease 1.33.0 2026-09-15T00:57:27Z",
       "github-freshness.json temporalio/temporal: v1.32.0 2026-09-11, 23247 stars, MIT"
      ],
@@ -1232,6 +1237,7 @@
      "repository": "https://github.com/restatedev/restate",
      "why_not_default": "sdk-runtime-coverage-20260922.json rows: keep_but_compare, 3/3 votes. The license is BUSL-1.1. landscape/foundation.json records that 'replay alone would not establish exactly-once external effects'. The packet's comparison had no incumbent arm.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/restatedev-restate.json",
       "gh api graphql (this lane): 4461 stars, pushedAt 2026-09-22, NOASSERTION (BUSL-1.1 per coverage row), v1.7.12 2026-09-22T17:47:50Z"
      ],
      "comparison_that_would_overturn": "The same host-loss effect comparison with the incumbent arm included.",
@@ -1246,6 +1252,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The parallel-writer fixture above, plus a WSL headless-operation check.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/generalaction-emdash.json",
       "gh api graphql repository(generalaction/emdash): stargazerCount 5808, pushedAt 2026-09-22, createdAt 2025-08-28, Apache-2.0, latestRelease v1.2.6 2026-09-21",
       "https://www.augmentcode.com/tools/open-source-agent-orchestrators"
      ],
@@ -1283,6 +1290,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The parallel-writer fixture above.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/johannesjo-parallel-code.json",
       "gh api graphql repository(johannesjo/parallel-code): stargazerCount 1018, pushedAt 2026-09-22, createdAt 2026-02-18, MIT, latestRelease v3.0.1 2026-09-19",
       "https://github.com/johannesjo/parallel-code"
      ],
@@ -1557,6 +1565,7 @@
      "repository": "https://github.com/opensandbox-group/OpenSandbox",
      "why_not_default": "Catalog conditional, source_review only; Docker/Kubernetes operations not yet justified.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/opensandbox-group-opensandbox.json",
       "trading-catalog.json id=opensandbox decision=conditional evidence_level=source_review",
       "github-freshness.json opensandbox-group/opensandbox release-1.1.0 2026-09-21"
      ],
@@ -1582,6 +1591,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The same fallback 8-probe comparison, run only if srt fails the reviewer receipt.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/zouuup-landrun.json",
       "gh api graphql (this lane): 2298 stars, pushedAt 2026-07-23T12:23:09Z, MIT, archived false, latestRelease v0.1.17 2026-07-22T16:29:10Z (no push for two months)"
      ],
      "upstream_now": {
@@ -1619,6 +1629,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The escape fixture above.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/dagger-container-use.json",
       "gh api graphql repository(dagger/container-use): stargazerCount 4046, pushedAt 2026-09-21, Apache-2.0, latestRelease v0.4.2 2025-08-19"
      ],
      "upstream_now": {
@@ -1655,6 +1666,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Only if srt fails the reviewer-role write-denial receipt: run nono on the same preregistered 8-probe fixture used for srt vs coop, and adopt only if it denies every probe srt denies at comparable latency.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/nolabs-ai-nono.json",
       "gh api graphql (this lane): 4189 stars, pushedAt 2026-09-21T17:23:52Z, Apache-2.0, archived false, latestRelease v0.78.0 2026-09-16T15:39:40Z",
       "README lists macOS, Linux and WSL2 but does not state the Linux mechanism (unknown)"
      ],
@@ -2563,6 +2575,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A publisher GGUF that loads in QMD's ranking context and wins the held-out A/B.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-kalm-embedding-kalm-reranker-v1-nano-r2.json",
       "HF API: createdAt 2026-08-14T03:22:16Z, sha 32b242bb7fd7, apache-2.0, gated False, params 786029296, downloads 43, likes 2",
       "Card BEIR table: Nano R2 58.54 (vs V1 57.41); MIRACL 71.11. Uses Matryoshka embedding pooling, so QMD/node-llama-cpp ranking compatibility is unknown"
      ],
@@ -3076,6 +3089,7 @@
      "repository": "https://github.com/zilliztech/claude-context",
      "why_not_default": "Star-audit alternative; current SocratiCode/codebase-memory already accepted. Default branch not pushed since 2026-07-14.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/zilliztech-claude-context.json",
       "star-candidates.json star_candidates[zilliztech/claude-context].decision=alternative",
       "github-freshness.json zilliztech/claude-context pushed 2026-07-14, no release"
      ],
@@ -3086,6 +3100,7 @@
      "repository": "https://github.com/ggml-org/llama.cpp",
      "why_not_default": "Drafted-not-accepted macOS embedding backend candidate (decision macos-embedding-backend, source_review, no evidence_ids).",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/ggml-org-llama.cpp.json",
       "foundation-layers.json decision macos-embedding-backend candidate llama-cpp-metal-macos-embedding"
      ],
      "comparison_that_would_overturn": "The macOS acceptance test in adoption/platforms/macos-arm64.md executed on Apple Silicon.",
@@ -3095,6 +3110,7 @@
      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
      "why_not_default": "trading-catalog.json id=foundation-agent-retrieval-bench is conditional/source_review, and 'No benchmark download/evaluation performed'. Maintenance signal is weak: 8 stars, last push 2026-08-04, v0.2.1 2026-07-26 (github-freshness.json).",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/eyuansu62-agent-retrieval-bench.json",
       "github-freshness.json eyuansu62/agent-retrieval-bench"
      ],
      "comparison_that_would_overturn": "A run on its 427 examples showing it separates the incumbent from an alternative where the sealed agent-lab set does not.",
@@ -3104,6 +3120,9 @@
      "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4",
      "why_not_default": "Quantized variant of the same family. models.json says NVFP4 kernel compatibility and quality are unverified on this host.",
      "comparison_that_would_overturn": "Recall parity on the sealed harness at lower VRAM, on the RTX 5090 Laptop (Blackwell).",
+     "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-nvidia-nemotron-3-embed-1b-nvfp4.json"
+     ],
      "lane": "critic-models-sources"
     }
    ],
@@ -3115,6 +3134,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "MTEB dropping or changing the CoIR tasks so that the standalone package is the only faithful source.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/coir-team-coir.json",
       "gh api graphql (this lane): 154 stars, pushedAt 2025-06-30T02:01:36Z, Apache-2.0, archived false, latestRelease null"
      ],
      "upstream_now": {
@@ -3151,6 +3171,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Only a CPU-only or low-VRAM host profile where Nemotron-1B cannot be served, measured on the same sealed harness.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-ibm-granite-granite-embedding-311m-multilingual-r2.json",
       "HF API: createdAt 2026-04-20T15:16:51Z, sha 443995599303, apache-2.0, gated False, params 311664384",
       "Card evaluation table (L296-301): MTEB ML Retrieval 65.2, MTEB Retrieval eng v2 52.6, MTEB Code v1 63.8, LongEmbed 71.7, 768 dims, ModernBERT; card L284 'Ollama does not currently support ModernBERT-based models'",
       "MTEB results repo (mteb 2.14.2): Code1Retrieval 87.73, EnglishFinance1Retrieval 65.00, below the incumbent"
@@ -3188,6 +3209,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A code-retrieval result on the sealed 35-question harness beating Nemotron-1B. Its public RTEB code and finance scores are lower, so this is unlikely.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-microsoft-harrier-oss-v1-0.6b.json",
       "HF API: createdAt 2026-03-30T08:00:39Z, sha f9b9dc8d367d, license mit, gated False, params 596049920, downloads 225060, likes 308",
       "Card L111-115: MTEB v2 (multilingual) 69.0 (0.6b), 66.5 (270m), 74.3 (27b); queries need instruction prompts (card L142-176)",
       "MTEB results repo (mteb 2.13.1): Code1Retrieval 92.02, EnglishFinance1Retrieval 71.33, EnglishFinance3Retrieval 69.86. All are below Nemotron-3-Embed-1B (93.65/85.28/74.93)."
@@ -3643,6 +3665,7 @@
      "repository": "https://github.com/rohitg00/agentmemory",
      "why_not_default": "Star-audit alternative (cross-agent memory service); would duplicate the memory of record.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/rohitg00-agentmemory.json",
       "star-candidates.json star_candidates[rohitg00/agentmemory].decision=alternative",
       "github-freshness.json rohitg00/agentmemory v0.9.29 2026-08-16"
      ],
@@ -3653,6 +3676,7 @@
      "repository": "https://github.com/rohitg00/agentmemory",
      "why_not_default": "The star disposition is 'alternative': it duplicates ai-memory, and its advertised recall and savings are unevaluated. It is the most-starred coding-agent memory newcomer found (created 2026-02-25).",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/rohitg00-agentmemory.json",
       "star-candidates.json star_candidates[repository=https://github.com/rohitg00/agentmemory] decision alternative",
       "github-freshness.json: stars 28727, pushed_at 2026-09-21, latest_release v0.9.29 2026-08-16; gh api graphql: Apache-2.0, createdAt 2026-02-25"
      ],
@@ -3668,6 +3692,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The same recall and privacy fixture, plus a license clarification.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/memorilabs-memori.json",
       "gh api graphql repository(GibsonAI/memori -> MemoriLabs/Memori): stargazerCount 16905, pushedAt 2026-09-18, license NOASSERTION, latestRelease v3.3.6 2026-05-28",
       "https://evermind.ai/blogs/best-open-source-agent-memory-frameworks-2026"
      ],
@@ -3705,6 +3730,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A cross-harness handoff task that ai-memory handoffs demonstrably fail and Storybloq completes, after a license review clears PolyForm Shield.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/storybloq-storybloq.json",
       "github-freshness.json: 755 stars, pushed_at 2026-09-23T00:28:56Z, latest_release v1.15.9 2026-09-20T04:41:06Z, license NOASSERTION, archived False",
       "star-candidates.json rationale: 'PolyForm Shield1.0 requires deliberate license/behavior review before adoption'"
      ],
@@ -3745,6 +3771,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The same recall fixture.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/plastic-labs-honcho.json",
       "gh api graphql repository(plastic-labs/honcho): stargazerCount 7304, pushedAt 2026-09-22, AGPL-3.0, no latestRelease"
      ],
      "upstream_now": {
@@ -4523,6 +4550,7 @@
      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
      "why_not_default": "Catalog conditional 'acceptance framework for code-context quality per fixed context budget'; 8 stars, never run.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/eyuansu62-agent-retrieval-bench.json",
       "trading-catalog.json id=foundation-agent-retrieval-bench decision=conditional evidence_level=source_review",
       "github-freshness.json eyuansu62/agent-retrieval-bench v0.2.1, pushed 2026-08-04"
      ],
@@ -5220,6 +5248,7 @@
      "repository": "https://github.com/microsoft/SkillOpt",
      "why_not_default": "Star-audit targeted_candidate; optimizes skills rather than measuring them; no execution.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
       "star-candidates.json star_candidates[microsoft/SkillOpt]"
      ],
      "comparison_that_would_overturn": "See instructions-skills.",
@@ -5229,6 +5258,7 @@
      "repository": "https://github.com/alibaba/open-code-review",
      "why_not_default": "Star-audit targeted_candidate for review delegation; native independent review already covers the role.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/alibaba-open-code-review.json",
       "star-candidates.json star_candidates[alibaba/open-code-review].decision=targeted_candidate",
       "github-freshness via star-candidates list: 39,763 stars, pushed 2026-09-23"
      ],
@@ -5951,6 +5981,7 @@
      "repository": "https://github.com/snyk/agent-scan",
      "why_not_default": "Carried as targeted_candidate in the prior dated record (catalogs/sota-convergence/README.md L48) for agent/MCP/skill scanning; its documented invocation needs a separate SNYK_TOKEN (sdk-runtime-coverage-20260922.md L64), i.e. an external service, unlike the offline-security-inventory decision.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/snyk-agent-scan.json",
       "gh api repos/snyk/agent-scan -> 3,080 stars, created 2025-04-07, pushed 2026-09-22, Apache-2.0, archived=false",
       "gh api repos/snyk/agent-scan/releases/latest -> v0.6.4 2026-09-21"
      ],
@@ -5959,93 +5990,6 @@
     }
    ],
    "candidates": [
-    {
-     "repository": "https://github.com/ossf/scorecard",
-     "source": "landscape-sweep-20260923: gh search repos \"openssf\" --sort stars, cross-checked with WebSearch \"OpenSSF Scorecard Token-Permissions check GitHub Actions least privilege 2026\" and a WebFetch of ossf/sc",
-     "demonstrated_gap": "Targets open gap #1 verbatim: 'No retained zizmor negative control shows it rejecting over-broad workflow permissions... The scoped-permissions axis rests on configuration and source re[view].' Scorecard's Token-Permissions check is a maintained, externally documented, quantified spec for exactly that axis, run as a second independent hosted check distinct from zizmor's offline lint and from actions/attest's one-off attestation.",
-     "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Build a fixture pair of workflows (one `permissions: write-all` at top level, one correctly scoped) of the kind zizmor's own tests already use for unpinned-uses; run zizmor and Scorecard's Token-Permissions check against both and record whether Scorecard correctly separates them where the catalog currently has no retained fixture proving any tool does. Adopt only if it does.",
-     "evidence": [
-      "evidence/artifacts/landscape-sweep-20260923/ossf-scorecard.json",
-      "gh api repos/ossf/scorecard",
-      "gh api repos/ossf/scorecard/releases/latest",
-      "gh search repos \"openssf\" --sort stars --limit 15",
-      "https://github.com/ossf/scorecard/blob/main/docs/checks.md (WebFetch of raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md)",
-      "https://scorecard.dev"
-     ],
-     "upstream_now": {
-      "latest": "v5.5.0",
-      "released_at": "2026-04-23",
-      "prerelease": false,
-      "pushed_at": "2026-09-21",
-      "stars": 5701,
-      "license": "Apache-2.0",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": true,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api repos/ossf/scorecard resolves directly (200 OK, no redirect Location header), fork=false, parent/mirror_url/source=null, archived=false, disabled=false. Not present in sweep-known-all.json or the layer's known_repositories (grep -i 0 hits for scorecard/ossf). pushed_at 2026-09-21T08:29:07Z matches exactly; stars 5702 observed vs 5701 claimed (~0.02% diff); latest tag v5.5.0 and released_at"
-       },
-       {
-        "lens": 1,
-        "refuted": false,
-        "confidence": "medium",
-        "reasoning": "Fit and standing hold (OpenSSF, 5,702 stars, weekly top-1M scan). Gap #1 is real: zizmor's test_issue_336_repro shows top-level write perms in single-job workflows suppressed at regular persona, and this repo's fixture and 9/14 workflows are single-job, which Scorecard penalizes. Caveats: already report-only here (66 hosted runs, no code scanning); the adoption rule must require beating zizmor."
-       }
-      ]
-     },
-     "disposition": "targeted_candidate",
-     "lane": "landscape-sweep-20260923"
-    },
-    {
-     "repository": "https://github.com/renovatebot/renovate",
-     "source": "landscape-sweep-20260923: WebSearch comparison articles cross-checked with gh api repos/renovatebot/renovate for stars/activity/license/fork status",
-     "demonstrated_gap": "direct competitor to dependabot-core: open gap #5 on this layer records 'Python and binary pins have no automated updater' under Dependabot. Dependabot-core's parsers only cover its fixed list of recognized manifest files; Renovate's customManagers point a regex at any file (a script, README, or CI step) and bump an arbitrary version pin -- the concrete capability Dependabot structurally lacks, per multiple 2026 comparison sources and Dependabot-core's own repo listing no equivalent feature.",
-     "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Point a Renovate custom regex manager at this repo's actual unmanaged Python/binary version pins (the ones open gap #5 says Dependabot cannot track) and measure whether it opens a correct version-bump PR; Dependabot-core cannot attempt this for non-manifest files. Adopt only if Renovate produces a correct PR where Dependabot produces none.",
-     "evidence": [
-      "evidence/artifacts/landscape-sweep-20260923/renovatebot-renovate.json",
-      "gh api repos/renovatebot/renovate",
-      "gh api repos/renovatebot/renovate/releases/latest",
-      "gh search repos \"renovate dependency updates\" --sort stars --limit 10",
-      "WebSearch \"Renovate vs Dependabot 2026 custom regex manager pin version\" (appsecsanta.com, konvu.com, luca-becker.me, alexlazarescu.com)"
-     ],
-     "upstream_now": {
-      "latest": "44.111.4",
-      "released_at": "2026-09-23",
-      "prerelease": false,
-      "pushed_at": "2026-09-23",
-      "stars": 22576,
-      "license": "AGPL-3.0",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": true,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api repos/renovatebot/renovate resolves directly (200 OK, no redirect), fork=false, parent/mirror_url/source=null, archived=false. Not present in sweep-known-all.json or layer known_repositories (grep -i 0 hits for renovate). pushed_at 2026-09-23T22:53:14Z matches; stars 22576 matches exactly; latest tag 44.111.4 and released_at match exactly; license AGPL-3.0 matches. Description ('Home of the"
-       },
-       {
-        "lens": 1,
-        "refuted": false,
-        "confidence": "medium",
-        "reasoning": "Serious contender (22,576 stars). Dependabot docs list only fixed ecosystems, and the catalog records it misses requirements-ci.lock and the curl-tarball pins. Renovate source supports regex currentValue/currentDigest, release-asset sha256 lookup and pip hashin, so the PR test is real. Caveat: automation.json already records Renovate 44.104.0, and a lock rename lets Dependabot own the Python pin."
-       }
-      ]
-     },
-     "disposition": "targeted_candidate",
-     "lane": "landscape-sweep-20260923"
-    },
     {
      "repository": "https://github.com/NVIDIA/SkillSpector",
      "source": "hesreallyhim/awesome-claude-code README section 'Security'",
@@ -6082,49 +6026,6 @@
      },
      "disposition": "refuted_targeted_candidate",
      "lane": "beyond"
-    },
-    {
-     "repository": "https://github.com/step-security/harden-runner",
-     "source": "landscape-sweep-20260923: WebSearch surfaced step-security/harden-runner and StepSecurity's own incident blog; non-fork/non-archived/license/activity confirmed via gh api",
-     "demonstrated_gap": "direct complement to zizmor and Syft, closing part of open gap #6: 'Offline zizmor analysis... does not cover online advisories, secrets or provenance.' Both zizmor (static lint) and Syft (point-in-time SBOM) are offline; Harden-Runner is the layer's only runtime/online-detection mechanism. StepSecurity's own incident writeup credits it with detecting the compromised trivy-action -- already in this project's known toolset -- exfiltrating CI secrets via anomalous egress, a live-compromise class no static tool in the known set observes.",
-     "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run a workflow step making an outbound call to a non-baselined domain (modeling the trivy-action-style exfiltration StepSecurity documented) through the current zizmor+Syft-only pipeline versus the same workflow with Harden-Runner's egress policy enabled; adopt only if Harden-Runner flags/blocks the call the static-only pipeline passes silently.",
-     "evidence": [
-      "gh api repos/step-security/harden-runner",
-      "gh api repos/step-security/harden-runner/releases/latest",
-      "WebSearch \"StepSecurity Harden-Runner egress monitoring GitHub Actions supply chain attack detection\"",
-      "https://www.stepsecurity.io/blog/stepsecurity-harden-runner-secures-over-5-000-open-source-projects",
-      "https://docs.stepsecurity.io/github-actions/harden-runner"
-     ],
-     "upstream_now": {
-      "latest": "v2.21.1",
-      "released_at": "2026-08-30",
-      "prerelease": false,
-      "pushed_at": "2026-08-31",
-      "stars": 1274,
-      "license": "Apache-2.0",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": false,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api repos/step-security/harden-runner resolves directly (200 OK, no redirect), fork=false, parent/mirror_url/source=null, archived=false. Not present in sweep-known-all.json or layer known_repositories (grep -i 0 hits for harden/step-security). pushed_at 2026-08-31T05:03:59Z (~3 weeks old, well within 6mo bar); stars 1274 matches exactly; latest tag v2.21.1 and released_at match exactly; licens"
-       },
-       {
-        "lens": 1,
-        "refuted": true,
-        "confidence": "high",
-        "reasoning": "Gap #6 (ci-security README L48-52) is zizmor offline mode lacking its online audits, secrets and provenance; Harden-Runner provides none of these, and egress telemetry is not Syft's package inventory. The comparison is won by construction (static tools never see egress). It is already audit-deployed in 11 workflows with its own block-mode overturn rule. The Trivy detection claim itself is true."
-       }
-      ]
-     },
-     "disposition": "refuted_targeted_candidate",
-     "lane": "landscape-sweep-20260923"
     },
     {
      "repository": "https://github.com/ossf/allstar",
@@ -6208,6 +6109,7 @@
    "open_gaps": [
     "Clean CI exercises RTK/QMD/Repomix/TOON on fixtures only; distinct from native client tasks (full-stack L132-137).",
     "agent-lab-hosting is candidate/source_review with no evidence_ids.",
+    "landscape-sweep-20260923: https://github.com/ossf/scorecard is a scheduled report-only lane (ossf/scorecard-action) in this repository's own automation (catalogs/foundation/automation.json) but is not a component or candidate of this layer; reconcile the layer row with the automation it runs.",
     "new-pc-bootstrap-ci is candidate/source_review with no workflow file and no hosted run (foundation-layers.json decision new-pc-bootstrap-ci activation text).",
     "new-pc-bootstrap-ci remains a source_review candidate (foundation-layers.json layers[ci-supply-chain].decisions[new-pc-bootstrap-ci]). jdx/mise (see recovery-portability) is the only star-audited candidate aimed at it."
    ]
@@ -6955,6 +6857,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "None within the north star; network routing changes are outside scope.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/clash-verge-rev-clash-verge-rev.json",
       "github-freshness.json: 146505 stars, pushed_at 2026-09-23T01:46:42Z, latest_release v2.5.5 2026-09-22T13:38:49Z, GPL-3.0, archived False"
      ],
      "upstream_now": {
@@ -6994,6 +6897,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A recorded Mac host disk or cache pressure incident on the 64 GB Apple Silicon host that native tools do not resolve.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/tw93-mole.json",
       "github-freshness.json: 68123 stars, pushed_at 2026-09-22T07:11:57Z, latest_release V1.55.0 2026-09-20T01:55:39Z, GPL-3.0, archived False"
      ],
      "upstream_now": {
@@ -7509,6 +7413,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Compare it with mise tasks in the same bootstrap fixture.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/casey-just.json",
       "gh api graphql repository(casey/just): stargazerCount 35962, pushedAt 2026-09-22, CC0-1.0, latestRelease 1.58.0 2026-08-03"
      ],
      "upstream_now": {
@@ -7545,6 +7450,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A measured restore of the same synthetic snapshot where kopia succeeds on the chosen off-host destination and restic fails or is materially slower.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/kopia-kopia.json",
       "gh api graphql (this lane) kopia/kopia: 14181 stars, pushedAt 2026-09-20T12:22:55Z, Apache-2.0, archived false, latestRelease v0.23.1 2026-06-16T01:27:33Z"
      ],
      "upstream_now": {
@@ -8392,12 +8298,18 @@
      "repository": "https://huggingface.co/google/gemma-4-26B-A4B-it",
      "why_not_default": "Apache-2.0, created 2026-03-11, 25.8B MoE. It is older than Qwen3.8 (2026-08). This lane did not verify the card's benchmark column attribution.",
      "comparison_that_would_overturn": "The same local packet.",
+     "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-google-gemma-4-26b-a4b-it.json"
+     ],
      "lane": "critic-models-sources"
     },
     {
      "repository": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
      "why_not_default": "Apache-2.0, created 2026-04-15. It is superseded within its family by Qwen3.8, and the Qwen3.8 card compares against Qwen3.6-27B, which scores lower.",
      "comparison_that_would_overturn": "Only a throughput-bound workload where the 3B-active MoE matters.",
+     "evidence": [
+      "evidence/artifacts/source-review-20260923/hf-qwen-qwen3.6-35b-a3b.json"
+     ],
      "lane": "critic-models-sources"
     }
    ],
@@ -8699,6 +8611,7 @@
      "repository": "https://github.com/anthropics/claude-agent-sdk-typescript",
      "why_not_default": "sdk-runtime-coverage-20260922.json gated_items: 0.3.280 arm B still lists the 'doctor' skill, so the locked 'no skills' bar FAILED. Disposition keep_but_compare.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/anthropics-claude-agent-sdk-typescript.json",
       "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json items[claude-agent-sdk-typescript].corrections[0]"
      ],
      "comparison_that_would_overturn": "A release in which disableBundledSkills yields zero listed skills, then the same task as the Python SDK.",
@@ -9079,6 +8992,7 @@
      "repository": "https://github.com/snyk/agent-scan",
      "why_not_default": "See ci-supply-chain; external token required.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/snyk-agent-scan.json",
       "gh api repos/snyk/agent-scan (v0.6.4 2026-09-21)"
      ],
      "comparison_that_would_overturn": "See ci-supply-chain.",
@@ -9093,6 +9007,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A recorded need for remote phone control of a native session that native Remote Control cannot meet.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/nexting-ai-nexting.json",
       "github-freshness.json: 1787 stars, pushed_at 2026-09-11T03:12:02Z, latest_release mac-0.1.0 2026-09-11T03:12:03Z, MIT, archived False"
      ],
      "upstream_now": {
@@ -9132,6 +9047,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The critic's offline scan comparison over the installed skills directory: any scanner finding a real issue the manual star-audit review missed, with a maintenance and adoption signal.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/askalf-truecopy.json",
       "README description: 'vet, sign and pin every skill and MCP server before it runs, then fail the build when the bytes change'",
       "GraphQL: 1 star, pushed 2026-09-22, MIT, latest release v0.10.3, archived False",
       "The other skill/MCP scanners matched are equally weak: epistemedeus/skillguard 0 stars, no license; GUCCI-atlasv/skillssafe-mcp 1 star; jamesdfinance-dev/lazaretto-mcp 0 stars (paid behavioural scan). The strongest Security-section hit, duriantaco/skylos (828 stars, Apache-2.0, v4.39.0 2026-09-23), is a PR code scanner, not a skill/MCP scanner. semgrep/mcp is archived."
@@ -9871,6 +9787,7 @@
      "repository": "https://github.com/alibaba/open-code-review",
      "why_not_default": "Star-audit targeted_candidate; see quality-evaluation.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/alibaba-open-code-review.json",
       "star-candidates.json star_candidates[alibaba/open-code-review]"
      ],
      "comparison_that_would_overturn": "See quality-evaluation.",
@@ -9878,48 +9795,6 @@
     }
    ],
    "candidates": [
-    {
-     "repository": "https://github.com/github/gh-aw",
-     "source": "landscape-sweep-20260923: already named in the project's own docs/github-automation.md as the PR-automation candidate for open_gaps #2; confirmed absent from sweep-known-all.json and refreshed via gh ",
-     "demonstrated_gap": "Layer open_gaps #2, verbatim: 'No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate. The gh-aw agentic workflow candidate is public preview and not activated (docs/github-automation.md lines 138-157).' gh-aw is exactly the tool the project's own docs already named for this unestablished capability; it just has never been added to the machine-readable known-repositories list or run.",
-     "proposed_label": "keep_but_compare",
-     "comparison_that_would_overturn": "Run `gh aw` read-only with a bounded model allowance on one real agent-lab change (the docs already prescribe this bounded pilot), and measure whether its proposed-PR output passes the same acceptance gates (validate, token-report) with correct scope and no unsupervised destructive action, versus the status quo of manual `gh pr create`/`gh pr review` via cli/cli. A correctly-scoped, safely-gated PR with less manual effort than today's gh-only flow promotes it; unsafe or over-broad output keeps it at keep-but-compare.",
-     "evidence": [
-      "evidence/artifacts/landscape-sweep-20260923/github-gh-aw.json",
-      "gh api repos/github/gh-aw (2026-09-23): stars 5174, pushed_at 2026-09-23T23:18:34Z, archived false, license MIT, fork false",
-      "gh api repos/github/gh-aw/releases/latest: tag v0.89.21 published 2026-09-23T20:29:04Z, prerelease false",
-      "https://docs.github.com/en/copilot/how-tos/github-agentic-workflows/creating-github-agentic-workflows (official creation guide, cited in project docs)"
-     ],
-     "upstream_now": {
-      "latest": "v0.89.21",
-      "released_at": "2026-09-23",
-      "prerelease": false,
-      "pushed_at": "2026-09-23",
-      "stars": 5174,
-      "license": "MIT",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": true,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api confirms repo exists, fork=false, archived=false, disabled=false, owned by github org (topics include gh-extension, github-actions \u2014 matches 'GitHub's own' claim). Direct fetch returned 200 with no redirect, so not renamed. Absent from sweep-known-all.json (259 entries, grep -i + python substring scan) and from the layer's own known_repositories (9 entries). Observed: stars 5174 (exact), la"
-       },
-       {
-        "lens": 1,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "Official GitHub extension; README names pull-request review, safe-outputs include create-pull-request and submit-pull-request-review, staged mode allows a no-write pilot. GitHub Docs confirm public preview. Catalog gap-resolution-20260922 gaps[9] says gh-aw lacks a packet entry; overturn arms already pair a gh-aw read-only pilot with gh direct. Minor: agent-lab CI has no token-report gate."
-       }
-      ]
-     },
-     "disposition": "keep_but_compare",
-     "lane": "landscape-sweep-20260923"
-    },
     {
      "repository": "https://github.com/The-PR-Agent/pr-agent",
      "source": "landscape-sweep-20260923: WebSearch 'best open source AI PR code review tool 2026 GitHub' ranked PR-Agent as the most capable fully open-source, self-hostable option, distinct from the closed Qodo hos",
@@ -10432,6 +10307,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "None for 2016-2019: a forward-only archive begun 2026-07 cannot backfill history; it could only matter for forward PIT capture, which the project can do itself.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/tylerjforstrom-stock-data.json",
       "gh api repos/TylerJForstrom/Stock-Data -> 0 stars, MIT, created 2026-07-28",
       "README (gh api .../readme raw) line 19: listing/delisting events from daily git-scraped symbol-directory diffs - forward-only from creation"
      ],
@@ -10463,6 +10339,7 @@
      "proposed_label": "keep_but_compare",
      "comparison_that_would_overturn": "Evidence that it provides entitled, point-in-time data that closes one broad-universe gate.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/atilaahmettaner-tradingview-mcp.json",
       "github-freshness.json repositories[\"https://github.com/atilaahmettaner/tradingview-mcp\"]: stars 4614, pushed_at 2026-09-01, MIT, latest_tag v0.8.0, no latest_release",
       "blueprints/us-equities/broad-universe/README.md open data gates (per task packet)"
      ],
@@ -10490,6 +10367,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Evidence that it carries dated, point-in-time classification history.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/jerbouma-financedatabase.json",
       "gh api graphql repository(JerBouma/FinanceDatabase): stargazerCount 9320, pushedAt 2026-09-20, MIT, latestRelease 2.4.0 2026-06-02"
      ],
      "upstream_now": {
@@ -10513,6 +10391,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The filing-timestamp fixture above.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/john-friedman-datamule-python.json",
       "gh api graphql repository(john-friedman/datamule-python): stargazerCount 557, pushedAt 2026-08-14, MIT, no latestRelease"
      ],
      "upstream_now": {
@@ -10943,6 +10822,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A licensed, maintained release that adds price paths through delisting and point-in-time tickers, not just filing lists.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/blackfalcondata-org-delisted-stocks-list.json",
       "gh api repos/BlackFalconData-org/delisted-stocks-list -> 0 stars, no license, created and last pushed 2026-04-17",
       "description: 36,000+ delisted stocks from SEC EDGAR since 2002 with ticker, CIK, filing dates - same EDGAR Form 25 class the project already classified in evidence/receipts/pre-2020-delisting-coverage.json"
      ],
@@ -12596,6 +12476,7 @@
      "proposed_label": "keep_but_compare",
      "comparison_that_would_overturn": "The chronological US-equity forecast comparison above.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/shiyu-coder-kronos.json",
       "github-freshness.json repositories[\"https://github.com/shiyu-coder/Kronos\"]: stars 39351, pushed_at 2026-04-13, MIT, no latest_release",
       "trading-by-layer.json layers[research-factors-ml]: amazon-science/chronos-forecasting conditional, google-research/timesfm conditional"
      ],
@@ -12636,6 +12517,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Compute ratios on the same filings with edgartools and FinanceToolkit, and check point-in-time availability.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/jerbouma-financetoolkit.json",
       "gh api graphql repository(JerBouma/FinanceToolkit): stargazerCount 5372, pushedAt 2026-09-10, MIT, latestRelease v2.2.0 2026-08-18"
      ],
      "upstream_now": {
@@ -12672,6 +12554,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Not applicable. It is reference material only.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/stefan-jansen-machine-learning-for-trading.json",
       "gh api graphql repository(stefan-jansen/machine-learning-for-trading): stargazerCount 20978, pushedAt 2026-09-22, MIT, latestRelease v3.1.0-artifacts 2026-09-20"
      ],
      "upstream_now": {
@@ -13015,6 +12898,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "Reconsider only if LEAN is re-selected and cloud-API research is authorized.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/quantconnect-mcp-server.json",
       "gh api graphql repository(QuantConnect/mcp-server): stargazerCount 77, pushedAt 2026-05-07, Apache-2.0, latestRelease 0.0.10 2025-08-22"
      ],
      "upstream_now": {
@@ -13051,6 +12935,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The runtime-target overturning comparison.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/edtechre-pybroker.json",
       "gh api graphql repository(edtechre/pybroker): stargazerCount 3544, pushedAt 2026-09-21, license NOASSERTION, latestRelease v2.0.1 2026-08-28"
      ],
      "upstream_now": {
@@ -13087,6 +12972,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "None. The maintenance signal fails.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/mhallsmoore-qstrader.json",
       "gh api graphql repository(mhallsmoore/qstrader): stargazerCount 3470, pushedAt 2024-06-30, MIT, latestRelease v0.3.0 2024-06-24"
      ],
      "upstream_now": {
@@ -13123,6 +13009,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The runtime-target overturning comparison on US equities.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/pst-group-pysystemtrade.json",
       "gh api graphql repository(pst-group/pysystemtrade): stargazerCount 3523, pushedAt 2026-09-21, GPL-3.0, latestRelease 1.8.2 2024-11-06"
      ],
      "upstream_now": {
@@ -13513,6 +13400,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The fork (or an upstream merge from it) publishes a released, equities-scoped generic adapter with reconciliation, and it passes the custom adapter's 27 lifecycle cases.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/afrojuju1-nautilus_trader.json",
       "gh api repos/afrojuju1/nautilus_trader: stars 0, pushed_at 2026-07-07T19:32:53Z, archived false, license LGPL-3.0, fork true",
       "gh api repos/afrojuju1/nautilus_trader/releases/latest -> 404 (no release)",
       "gh api .../contents/crates/adapters?ref=develop -> contains 'alpaca'",
@@ -14084,6 +13972,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "The metrics fixture above.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/stefan-jansen-pyfolio-reloaded.json",
       "gh api graphql repository(stefan-jansen/pyfolio-reloaded): stargazerCount 616, pushedAt 2025-12-15, Apache-2.0, latestRelease 0.9.9 2025-07-23"
      ],
      "upstream_now": {
@@ -14411,6 +14300,7 @@
      "proposed_label": "targeted_candidate",
      "comparison_that_would_overturn": "Optimize one research skill under a fixed budget and score it on held-out cases against the unoptimized skill. Drop the candidate if held-out gains are within noise or if risk rules are touched.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
       "github-freshness.json repositories[\"https://github.com/microsoft/SkillOpt\"]: stars 17367, pushed_at 2026-09-05, MIT, latest_release v0.2.0 2026-07-02"
      ],
      "upstream_now": {
@@ -15131,6 +15021,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A frozen task set where a persona from the collection, loaded as an agentType, beats the matching project agent at equal model and effort.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/msitarzewski-agency-agents.json",
       "github-freshness.json: 154208 stars, pushed_at 2026-09-22T02:38:53Z, MIT, archived False, latest_release None, created 2025",
       "star-candidates.json rationale: 'Persona templates overlap bounded worker roles; labels such as specialist or proven deliverables do not establish competence or financial approval authority.'"
      ],
@@ -15922,6 +15813,7 @@
      "proposed_label": "not_adopted",
      "comparison_that_would_overturn": "A scheduled restic job under Dagu or systemd fails in ways backrest's orchestration would catch.",
      "evidence": [
+      "evidence/artifacts/source-review-20260923/garethgeorge-backrest.json",
       "gh api graphql repository(garethgeorge/backrest): stargazerCount 7389, pushedAt 2026-09-21, GPL-3.0, latestRelease v1.14.1 2026-07-12"
      ],
      "upstream_now": {
@@ -16216,49 +16108,6 @@
    "alternatives_keep_but_compare": [],
    "candidates": [
     {
-     "repository": "https://github.com/google/osv-scanner",
-     "source": "landscape-sweep-20260923: found via this session's own working-tree inspection (git status pointer to an already-downloaded osv-scanner binary), then verified against GitHub via gh api and checked abs",
-     "demonstrated_gap": "Direct competitor to grype. Grype draws from Anchore's own vulnerability-db feed; OSV-Scanner draws from OSV.dev (Google/OpenSSF-backed, a distinct upstream pipeline aggregating GHSA, PyPA, OSS-Fuzz and others). The two named open gaps -- the Grype-scanned-the-wrong-target mismatch and the single-database, single-date-stamped 'zero matches' result -- are both instances of relying on one tool/one feed for a completeness claim the record itself says it cannot support.",
-     "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run grype and osv-scanner against the identical Syft SBOM of the actual NautilusTrader/IBKR-adapter dependency set on the same date; adopt/add only if osv-scanner surfaces true-positive vulnerabilities grype's feed misses (or the reverse), measured on that concrete fixture rather than on stars or recency.",
-     "evidence": [
-      "evidence/artifacts/landscape-sweep-20260923/google-osv-scanner.json",
-      "gh api repos/google/osv-scanner -> stars 11079, archived false, pushed_at 2026-09-23T20:57:01Z, license Apache-2.0",
-      "gh api repos/google/osv-scanner/releases/latest -> v2.6.0, published 2026-09-14T02:55:16Z, prerelease false",
-      "agent-lab working tree git status shows an untracked '?? osv-scanner' directory (~55MB, no .git, single-binary layout) already present locally -- the tool is already being trialed in this project",
-      "sweep-layers.json us-equities/security-supply-chain open_gaps (Grype-scan-target mismatch; 'Zero Grype matches... says nothing about later disclosures')"
-     ],
-     "upstream_now": {
-      "latest": "v2.6.0",
-      "released_at": "2026-09-14",
-      "prerelease": false,
-      "pushed_at": "2026-09-23",
-      "stars": 11079,
-      "license": "Apache-2.0",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": true,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api confirms repo exists, resolves to itself, org-owned, fork/mirror/parent all null/false. Absent from catalog-wide known list and layer known_repositories (grep -i clean both). archived=false, pushed_at 2026-09-23 (same day). upstream_now exact match: stars 11079, v2.6.0 released 2026-09-14, Apache-2.0, prerelease false."
-       },
-       {
-        "lens": 1,
-        "refuted": false,
-        "confidence": "medium",
-        "reasoning": "Fit and standing hold. It is the official OSV.dev frontend (README; 11079 stars; v2.6.0 per gh api). It reads Syft's runtime.cdx.json via -L. OSV adds PyPA advisories that Grype's vunnel providers lack, and the catalog already lists it as a supply-chain candidate. Overstated: the wrong-target gap is operator error (grype sbom: works), --sbom is deprecated, GHSA is shared, and it is not a trial."
-       }
-      ]
-     },
-     "disposition": "targeted_candidate",
-     "lane": "landscape-sweep-20260923"
-    },
-    {
      "repository": "https://github.com/semgrep/semgrep",
      "source": "landscape-sweep-20260923: found via this project's own earlyoom process-preference record naming it alongside the three current winners, then verified against GitHub via gh api (including the returnto",
      "demonstrated_gap": "Closes the recorded gap directly rather than competing with a named winner: grype/syft/gitleaks are composition-inventory, vulnerability-database-matching and secret-pattern tools respectively -- none of them statically analyze first-party application source for exploitable code-level defects. Semgrep is a distinct capability (SAST) that the open_gaps text names as missing ('code outside the scanned venv'), not a duplicate of an existing winner's function.",
@@ -16345,7 +16194,8 @@
     }
    ],
    "open_gaps": [
-    "cosign and openbao conditionals have no receipt use."
+    "cosign and openbao conditionals have no receipt use.",
+    "landscape-sweep-20260923: https://github.com/google/osv-scanner is an active pull-request check (OSV-Scanner) in this repository's own automation (catalogs/foundation/automation.json) but is not a component or candidate of this layer; reconcile the layer row with the automation it runs."
    ]
   }
  ],
@@ -17231,7 +17081,7 @@
   "trading_layers_note": "trading_layers counts only taxonomy layers with at least one selected entry, unlike foundation_layers (which counts every row); trading[] itself always has one row per taxonomy id, so len(manifest[\"trading\"]) can exceed trading_layers whenever a taxonomy layer happens to have zero selected entries",
   "components_confirmed": 120,
   "pins_behind_upstream": 51,
-  "candidates_total": 171,
+  "candidates_total": 166,
   "pins_behind_upstream_unique_components": 25,
   "pins_behind_upstream_by_review_status": {
    "not_individually_reviewed": 11,
@@ -17255,11 +17105,11 @@
   },
   "pins_not_compared_note": "rows whose pin the generator could not compare with upstream (the exclusions above, plus a pin or upstream latest with no parseable version, reason unversioned) carry pin_behind_upstream null and pin_comparison not_compared, never a definite false",
   "candidates_by_disposition": {
-   "refuted_targeted_candidate": 85,
+   "refuted_targeted_candidate": 84,
    "refuted_keep_but_compare": 36,
    "not_adopted_confirmed": 29,
-   "targeted_candidate": 9,
-   "keep_but_compare": 3,
+   "targeted_candidate": 6,
+   "keep_but_compare": 2,
    "refuted_not_adopted": 3,
    "keep_but_compare_unverified": 1,
    "not_adopted_unverified": 4,

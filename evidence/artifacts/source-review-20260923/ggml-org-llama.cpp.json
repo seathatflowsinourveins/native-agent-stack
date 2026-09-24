@@ -1,0 +1,28 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ggml-org-llama.cpp",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ggml-org/llama.cpp",
+ "reviewed_commit": "bd4f514db14d87fded667787a7a963bfbaa98e89",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the repository ggml-org/llama.cpp at commit bd4f514db14d87fded667787a7a963bfbaa98e89 (license MIT), read from README.md at that revision. Repository description: \"LLM inference in C/C++\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@bd4f514db14d87fded667787a7a963bfbaa98e89",
+   "text": "ggml / ops / maintainer PRs%20sort%3Aupdated-desc) / dev stats / lib llama API / llama-server REST API"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/ggml-org/llama.cpp/tree/bd4f514db14d87fded667787a7a963bfbaa98e89",
+  "https://github.com/ggml-org/llama.cpp/blob/bd4f514db14d87fded667787a7a963bfbaa98e89/README.md"
+ ]
+}

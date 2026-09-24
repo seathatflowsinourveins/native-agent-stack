@@ -1,0 +1,41 @@
+{
+ "schema_version": 1,
+ "id": "source-review-snyk-agent-scan",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/snyk/agent-scan",
+ "reviewed_commit": "a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "ci-supply-chain",
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of the repository snyk/agent-scan at commit a83ccab7ae93a277c9460d0cb06b70d94d49e88e (license Apache-2.0), read from README.md at that revision. Repository description: \"Security scanner for AI agents, MCP servers and agent skills.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+   "text": "Discover and scan agent components on your machine for prompt injections and vulnerabilities (including agents, MCP servers, skills)."
+  },
+  {
+   "source": "README.md@a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+   "text": "Both versions scan MCP servers, tools, prompts, resources, and skills, and automatically discover supported agent configurations such as Claude Code/Desktop, Cursor, Gemini CLI, and Windsurf."
+  },
+  {
+   "source": "README.md@a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+   "text": "Auto-discover MCP configurations, agent tools, skills"
+  },
+  {
+   "source": "README.md@a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+   "text": "Scanning of Claude, Cursor, GitHub Copilot, Windsurf, Gemini CLI, Amp, Amazon Q, and other agents."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/snyk/agent-scan/tree/a83ccab7ae93a277c9460d0cb06b70d94d49e88e",
+  "https://github.com/snyk/agent-scan/blob/a83ccab7ae93a277c9460d0cb06b70d94d49e88e/README.md"
+ ]
+}

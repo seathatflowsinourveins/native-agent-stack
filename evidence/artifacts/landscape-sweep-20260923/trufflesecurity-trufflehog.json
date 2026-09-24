@@ -10,7 +10,7 @@
  "layers": [
   "secrets-credentials"
  ],
- "claim": "Source and documentation review of trufflesecurity/trufflehog at commit 4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab (license AGPL-3.0), read from README.md at that commit. Repository description: \"Find, verify, and analyze leaked credentials\". Reviewer summary of the upstream documentation: Go CLI secret scanner that detects 800+ credential types and, uniquely, performs live verification by calling the provider API each secret belongs to, confirming whether it is still active. Requirement part it addresses (secrets-credentials): Serves \"detect accidental secret exposure before publication\" \u2014 scans filesystems, git history, and CI/CD systems for leaked credentials before they reach a release.",
+ "claim": "Source and documentation review of trufflesecurity/trufflehog at commit 4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab (license AGPL-3.0), read from README.md at that commit. Repository description: \"Find, verify, and analyze leaked credentials\".",
  "documentation_excerpts": [
   {
    "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
@@ -18,7 +18,7 @@
   },
   {
    "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
-   "text": "Are you interested in continuously monitoring Git, Jira, Slack, Confluence, Microsoft Teams, Sharepoint (and more) for credentials? We have an enterprise product that can help! Learn more at ."
+   "text": "We take the revenue from the enterprise product to fund more awesome open source projects that the whole community can benefit from."
   },
   {
    "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
@@ -35,12 +35,10 @@
  ],
  "limitations": [
   "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
-  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
  ],
  "sources": [
   "https://github.com/trufflesecurity/trufflehog/tree/4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
-  "https://github.com/trufflesecurity/trufflehog/blob/4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab/README.md",
-  "https://github.com/trufflesecurity/trufflehog",
-  "https://www.jit.io/resources/appsec-tools/trufflehog-vs-gitleaks-a-detailed-comparison-of-secret-scanning-tools"
+  "https://github.com/trufflesecurity/trufflehog/blob/4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab/README.md"
  ]
 }

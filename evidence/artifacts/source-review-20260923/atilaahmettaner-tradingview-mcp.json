@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-atilaahmettaner-tradingview-mcp",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+ "reviewed_commit": "a1e54b07e5c21b375363607920f297c5adfbeed4",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of the repository atilaahmettaner/tradingview-mcp at commit a1e54b07e5c21b375363607920f297c5adfbeed4 (license MIT), read from README.md at that revision. Repository description: \"TradingView MCP server \\u2014 real-time market data, technical analysis, screeners & backtesting for Claude, ChatGPT, Cursor & any MCP client. Stocks, crypto, forex & futures across global exchanges. Hosted or self-host.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a1e54b07e5c21b375363607920f297c5adfbeed4",
+   "text": "TradingView MCP server \u2014 real-time market data, technical indicators, screeners, and backtesting for Claude, ChatGPT, Cursor, Copilot, and any MCP client. Stocks, crypto, forex & futures across global exchanges. Backtesting + live sentiment + Yahoo Finance + 37 technical-analysis tools \u2014 the most complete TradingView MCP toolkit, all in one server."
+  },
+  {
+   "source": "README.md@a1e54b07e5c21b375363607920f297c5adfbeed4",
+   "text": "\ud83c\udd95 The hosted server now draws. Ask for a chart and an interactive candlestick view (1d / 1h / 15m, optional Bollinger overlay) renders live inside the conversation via MCP Apps \u2014 and the AI reads the band values back to you:"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/atilaahmettaner/tradingview-mcp/tree/a1e54b07e5c21b375363607920f297c5adfbeed4",
+  "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md"
+ ]
+}

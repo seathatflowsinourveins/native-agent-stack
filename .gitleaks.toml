@@ -273,6 +273,25 @@ regexes = [
 [[rules]]
 id = "sourcegraph-access-token"
 
+# 2026-09-23 (landscape-sweep lane, PR #153): catalogs/sota-convergence/manifest-20260923.json
+# gained lane text that names Sourcegraph (the SCIP index format's former sourcegraph/scip home and
+# its announcement URL). The rule's keyword then makes every 40-hex value in the file a candidate,
+# and 5 existing component pins matched: "pin": "<40-hex>" and "pin": "<version> @ <40-hex>", git
+# commit ids that the generator copies from the catalog layer files. Exempted: that exact file,
+# this rule only, and only a whole anchored "pin" line whose value is a 40-hex id with an optional
+# "<version> @ " prefix; any other field holding a 40-hex value in the same file is still detected
+# (tests/test_gitleaks_config.py test_d/test_d2).
+[[rules.allowlists]]
+description = "Git commit ids under the \"pin\" field of the dated SOTA manifest"
+condition = "AND"
+paths = [
+  '''^catalogs/sota-convergence/manifest-20260923\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''^\s*"pin":\s*"(?:[0-9A-Za-z.+_-]+ @ )?[0-9a-f]{40}",?\s*$''',
+]
+
 # Same named-field allowlist as generic-api-key above (source_head_pin and friends
 # also match the sourcegraph-access-token rule's 40-hex pattern in these files).
 [[rules.allowlists]]

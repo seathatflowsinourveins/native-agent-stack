@@ -10,7 +10,7 @@
  "layers": [
   "document-retrieval"
  ],
- "claim": "Source and documentation review of datalab-to/marker at commit 8a1d2344de25d7ec4c5209133aed7af565874ff0 (license Apache-2.0), read from README.md at that commit. Repository description: \"Convert PDF to markdown + JSON quickly with high accuracy\". Reviewer summary of the upstream documentation: Datalab's open-source pipeline converting PDFs, images, DOCX/PPTX/XLSX, HTML and EPUB to Markdown/JSON/chunks, using its own Surya OCR/layout/table/equation models on GPU, CPU or MPS, with an optional LLM-refinement pass. Requirement part it addresses (document-retrieval): Directly produces 'source-grounded Markdown/document content' through 'controlled ingestion' of PDFs/Office/HTML: per its own README it reads the PDF text layer and OCRs selectively, so extracted text stays grounded in the original page content and reading order, including tables/equations/multi-column layout.",
+ "claim": "Source and documentation review of datalab-to/marker at commit 8a1d2344de25d7ec4c5209133aed7af565874ff0 (license Apache-2.0), read from README.md at that commit. Repository description: \"Convert PDF to markdown + JSON quickly with high accuracy\".",
  "documentation_excerpts": [
   {
    "source": "README.md@8a1d2344de25d7ec4c5209133aed7af565874ff0",
@@ -23,11 +23,10 @@
  ],
  "limitations": [
   "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
-  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
  ],
  "sources": [
   "https://github.com/datalab-to/marker/tree/8a1d2344de25d7ec4c5209133aed7af565874ff0",
-  "https://github.com/datalab-to/marker/blob/8a1d2344de25d7ec4c5209133aed7af565874ff0/README.md",
-  "https://jimmysong.io/blog/pdf-to-markdown-open-source-deep-dive/"
+  "https://github.com/datalab-to/marker/blob/8a1d2344de25d7ec4c5209133aed7af565874ff0/README.md"
  ]
 }

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-jerbouma-financedatabase",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/JerBouma/FinanceDatabase",
+ "reviewed_commit": "d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of the repository JerBouma/FinanceDatabase at commit d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e (license MIT), read from README.md at that revision. Repository description: \"This is a database of 300.000+ symbols containing Equities, ETFs, Funds, Indices, Currencies, Cryptocurrencies and Money Markets.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e",
+   "text": "As a private investor, the sheer amount of information that can be found on the internet is rather daunting. Sure, the most traded companies and ETFs can quickly be found simply because they are known to the public (for example, Microsoft, Tesla, S&P 500 ETF, or an All-World ETF). However, what else is out there is often unknown."
+  },
+  {
+   "source": "README.md@d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e",
+   "text": "This database tries to solve that. It features 300,000+ symbols containing Equities, ETFs, Funds, Indices, Currencies, Cryptocurrencies, and Money Markets. It therefore allows you to obtain a broad overview of sectors, industries, types of investments, and much more."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/JerBouma/FinanceDatabase/tree/d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e",
+  "https://github.com/JerBouma/FinanceDatabase/blob/d0b95bd51f9c594c81bac0b20c7ab6cbd084c51e/README.md"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mhallsmoore-qstrader",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/mhallsmoore/qstrader",
+ "reviewed_commit": "4c59e1584e83fcc2be644b820f827c0dd1b45c02",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of the repository mhallsmoore/qstrader at commit 4c59e1584e83fcc2be644b820f827c0dd1b45c02 (license MIT), read from README.md at that revision. Repository description: \"QuantStart.com - QSTrader backtesting simulation engine.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@4c59e1584e83fcc2be644b820f827c0dd1b45c02",
+   "text": "QSTrader is a free Python-based open-source modular schedule-driven backtesting framework for long-short equities and ETF based systematic trading strategies."
+  },
+  {
+   "source": "README.md@4c59e1584e83fcc2be644b820f827c0dd1b45c02",
+   "text": "The software is currently under active development and is provided under a permissive \"MIT\" license."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/mhallsmoore/qstrader/tree/4c59e1584e83fcc2be644b820f827c0dd1b45c02",
+  "https://github.com/mhallsmoore/qstrader/blob/4c59e1584e83fcc2be644b820f827c0dd1b45c02/README.md"
+ ]
+}
