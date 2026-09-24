@@ -63,6 +63,9 @@ def load_events(package_dir: Path) -> list[dict]:
     for i, r in enumerate(rows):
         primary = (r.get("Ticker_Used") or r["Ticker"]).strip()
         symbols = [primary]
+        # deviations.json D3: the original Ticker is tried before the alias when Ticker_Used differs.
+        if r["Ticker"].strip() and r["Ticker"].strip() not in symbols:
+            symbols.append(r["Ticker"].strip())
         alias = aliases.get((r["Date"], r["Ticker"]))
         if alias and alias not in symbols:
             symbols.append(alias)
@@ -82,8 +85,18 @@ def num(text):
 
 # ----------------------------------------------------------------------------- pure rules
 
-def official_close(day_auction: dict | None, bar_close: float | None):
-    """(price, source) for one trading day under plan.json official_close_rule."""
+RULES = ("v1", "v2")
+SPLIT_TOLERANCE = {"v1": 1e-6, "v2": 1e-2}
+
+
+def official_close(day_auction: dict | None, bar_close: float | None, rules: str = "v1"):
+    """(price, source) for one trading day under plan.json official_close_rule.
+
+    v1 is the implementation the preregistered run used: the first condition-6 print from any
+    exchange. v2 (deviations.json D1) takes the listing exchange's print, the exchange of the
+    day's condition-O opening records, and the largest-size print when that exchange has several."""
+    if rules == "v2":
+        return official_close_v2(day_auction, bar_close)
     if day_auction:
         closes = day_auction.get("c") or []
         prints = [c for c in closes if c.get("c") == "6"]
@@ -99,6 +112,26 @@ def official_close(day_auction: dict | None, bar_close: float | None):
     return None, None
 
 
+def official_close_v2(day_auction: dict | None, bar_close: float | None):
+    if day_auction:
+        closes = day_auction.get("c") or []
+        listing = {o.get("x") for o in (day_auction.get("o") or []) if o.get("c") == "O"}
+        on_listing = [c for c in closes if c.get("c") == "6" and c.get("x") in listing]
+        if on_listing:
+            best = max(on_listing, key=lambda c: c.get("s") or 0)
+            return float(best["p"]), "closing_print_listing_exchange"
+        official = [c for c in closes if c.get("c") == "M" and c.get("x") in listing]
+        if official:
+            return float(official[0]["p"]), "official_close_listing_exchange"
+        prints = [c for c in closes if c.get("c") == "6"]
+        if prints:
+            best = max(prints, key=lambda c: c.get("s") or 0)
+            return float(best["p"]), "closing_print_other_exchange"
+    if bar_close is not None:
+        return float(bar_close), "bar_close_fallback"
+    return None, None
+
+
 def by_date(items, key="t"):
     """Map YYYY-MM-DD to the item (daily bars carry an RFC-3339 timestamp; auctions a d field)."""
     out = {}
@@ -108,17 +141,17 @@ def by_date(items, key="t"):
     return out
 
 
-def event_gain(event_date: str, auctions: dict, raw_bars: dict, split_bars: dict):
+def event_gain(event_date: str, auctions: dict, raw_bars: dict, split_bars: dict, rules: str = "v1"):
     """Returns a dict with gain, flags and the closes' sources, or a no-data reason."""
     event_bar = raw_bars.get(event_date)
-    ev_close, ev_src = official_close(auctions.get(event_date), event_bar["c"] if event_bar else None)
+    ev_close, ev_src = official_close(auctions.get(event_date), event_bar["c"] if event_bar else None, rules)
     if ev_close is None:
         return {"reason": "no_source_data"}
     earlier = sorted(d for d in set(auctions) | set(raw_bars) if d < event_date)
     prev_date = prev_close = prev_src = None
     for d in reversed(earlier):
         bar = raw_bars.get(d)
-        price, src = official_close(auctions.get(d), bar["c"] if bar else None)
+        price, src = official_close(auctions.get(d), bar["c"] if bar else None, rules)
         if price is not None:
             prev_date, prev_close, prev_src = d, price, src
             break
@@ -126,7 +159,7 @@ def event_gain(event_date: str, auctions: dict, raw_bars: dict, split_bars: dict
         return {"reason": "no_prev_close"}
     out = {"prev_date": prev_date, "event_close_source": ev_src, "prev_close_source": prev_src, "split_between": False}
     f_ev, f_prev = split_factor(raw_bars.get(event_date), split_bars.get(event_date)), split_factor(raw_bars.get(prev_date), split_bars.get(prev_date))
-    if f_ev and f_prev and abs(f_prev / f_ev - 1) > 1e-6:
+    if f_ev and f_prev and abs(f_prev / f_ev - 1) > SPLIT_TOLERANCE[rules]:
         out["split_between"] = True
         gain = (ev_close / f_ev) / (prev_close / f_prev) - 1
     else:
@@ -161,15 +194,17 @@ def agrees(alpaca: float, package: float, tol: dict) -> bool:
     return abs(alpaca - package) <= max(tol["abs_pct_points"], tol["rel_fraction"] * abs(package))
 
 
-def verdict_for(event: dict, result: dict) -> tuple[str, float | None, str]:
-    """(verdict, package_reference, reference_field)."""
+def verdict_for(event: dict, result: dict, rules: str = "v1") -> tuple[str, float | None, str]:
+    """(verdict, package_reference, reference_field). Under v2 (deviations.json D4) a Status OK
+    row without a computed gain is package_uncomputed_*, not recovered_*."""
     if "reason" in result:
         return result["reason"], None, ""
     tol = PLAN["tolerance"]["event_gain"]
     if event["status"] == "OK" and event["computed_gain"] is not None:
         ref, field, prefix = event["computed_gain"], "Computed_Gain_Pct", ""
     elif event["dataset_gain"] is not None:
-        ref, field, prefix = event["dataset_gain"], "Gain_Pct_Dataset", "recovered_"
+        ref, field = event["dataset_gain"], "Gain_Pct_Dataset"
+        prefix = "package_uncomputed_" if rules == "v2" and event["status"] == "OK" else "recovered_"
     else:
         return "no_package_reference", None, ""
     return prefix + ("match" if agrees(result["gain_pct"], ref, tol) else "mismatch"), ref, field
@@ -229,6 +264,48 @@ class Client:
                 return {key: items}
 
 
+def has_event_data(resp: dict, day: str) -> bool:
+    return day in by_date((resp.get("bars_raw") or {}).get("bars")) or day in by_date((resp.get("auctions") or {}).get("auctions"))
+
+
+def fetch_symbol(client, sym: str, day: str) -> dict:
+    d = date.fromisoformat(day)
+    w = PLAN["source"]["window_calendar_days"]
+    start, end = (d - timedelta(days=w["before"])).isoformat(), (d + timedelta(days=w["after"])).isoformat()
+    base = {"start": start, "end": end, "feed": "sip", "asof": day}
+    path = f"/v2/stocks/{urllib.parse.quote(sym)}"
+    return {"symbol": sym,
+            "auctions": client.get(path + "/auctions", start=start, end=day, feed="sip", asof=day),
+            "bars_raw": client.get(path + "/bars", timeframe="1Day", adjustment="raw", **base),
+            "bars_split": client.get(path + "/bars", timeframe="1Day", adjustment="split", **base)}
+
+
+def supplement(args) -> int:
+    """Try the remaining candidate symbols for events the snapshot has no event-date data for."""
+    check_inputs(args.package_dir)
+    snapshot = json.loads(args.snapshot.read_text())
+    client = Client(*credentials(args.env_file))
+    out = {"plan_sha256": snapshot["plan_sha256"], "base_snapshot_sha256": sha256_file(args.snapshot),
+           "fetched_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "events": {}}
+    for ev in load_events(args.package_dir):
+        tried = snapshot["events"].get(ev["id"]) or []
+        if any(has_event_data(t, ev["date"]) for t in tried):
+            continue
+        done = {t["symbol"] for t in tried}
+        for sym in ev["symbols"]:
+            if sym in done:
+                continue
+            resp = fetch_symbol(client, sym, ev["date"])
+            out["events"].setdefault(ev["id"], []).append(resp)
+            if has_event_data(resp, ev["date"]):
+                break
+    args.out.write_text(json.dumps(out, sort_keys=True) + "\n")
+    os.chmod(args.out, 0o600)
+    print(json.dumps({"supplement_events": len(out["events"]), "requests": len(client.log),
+                      "sha256": sha256_file(args.out)}))
+    return 0
+
+
 def fetch(args) -> int:
     check_inputs(args.package_dir)
     events = load_events(args.package_dir)
@@ -275,24 +352,33 @@ def compare(args) -> int:
     snapshot = json.loads(args.snapshot.read_text())
     if snapshot["plan_sha256"] != sha256_file(HERE / "plan.json"):
         raise SystemExit("snapshot was fetched under a different plan.json")
+    rules = getattr(args, "rules", "v1")
+    supplement_doc = None
+    if getattr(args, "supplement", None):
+        supplement_doc = json.loads(args.supplement.read_text())
+        if supplement_doc["base_snapshot_sha256"] != sha256_file(args.snapshot):
+            raise SystemExit("supplement was fetched against a different snapshot")
     results, counts = [], {}
     fwd_counts = {n: {"match": 0, "mismatch": 0, "compared": 0} for n in HORIZONS}
     for ev in events:
-        tried = snapshot["events"].get(ev["id"]) or []
+        tried = list(snapshot["events"].get(ev["id"]) or [])
+        if supplement_doc:
+            tried += supplement_doc["events"].get(ev["id"]) or []
+        fetch_errors = sorted({k for resp in tried for k in ("auctions", "bars_raw", "bars_split") if "error" in (resp.get(k) or {})})
         result, used = {"reason": "no_source_data"}, None
         for resp in tried:
             r = event_gain(ev["date"], by_date(resp["auctions"].get("auctions")),
-                           by_date(resp["bars_raw"].get("bars")), by_date(resp["bars_split"].get("bars")))
+                           by_date(resp["bars_raw"].get("bars")), by_date(resp["bars_split"].get("bars")), rules)
             if "reason" not in r or r["reason"] == "no_prev_close":
                 result, used = r, resp
                 break
-        verdict, ref, field = verdict_for(ev, result)
+        verdict, ref, field = verdict_for(ev, result, rules)
         counts[verdict] = counts.get(verdict, 0) + 1
         row = {"id": ev["id"], "date": ev["date"], "ticker": ev["ticker"], "symbol_used": used["symbol"] if used else None,
                "package_status": ev["status"], "package_reference_field": field, "package_gain_pct": ref,
                "alpaca_gain_pct": result.get("gain_pct"),
                "diff_pct_points": round(result["gain_pct"] - ref, 4) if ref is not None and "gain_pct" in result else None,
-               "verdict": verdict}
+               "verdict": verdict, **({"fetch_errors": fetch_errors} if fetch_errors else {})}
         row.update({k: v for k, v in result.items() if k not in ("gain_pct", "reason")})
         if used and "gain_pct" in result:
             fr = forward_returns(ev["date"], by_date(used["bars_split"].get("bars")))
@@ -314,7 +400,13 @@ def compare(args) -> int:
                "bar_close_fallback_rows": sum(1 for r in results if "bar_close_fallback" in (r.get("event_close_source"), r.get("prev_close_source"))),
                "forward_returns": {f"T{n}": fwd_counts[n] for n in HORIZONS},
                "overturn_triggered": bool(both and counts.get("mismatch", 0) / both > 0.05)}
-    out = {"kind": "extreme_gainer_price_audit_results", "plan_sha256": sha256_file(HERE / "plan.json"),
+    extra = {}
+    if rules != "v1" or supplement_doc:
+        # v1 without a supplement keeps the preregistered run's exact output bytes.
+        summary["rules"] = rules
+        summary["fetch_error_rows"] = sum(1 for r in results if r.get("fetch_errors"))
+        extra = {"rules": rules, "supplement_sha256": sha256_file(args.supplement) if supplement_doc else None}
+    out = {"kind": "extreme_gainer_price_audit_results", "plan_sha256": sha256_file(HERE / "plan.json"), **extra,
            "inputs": {k: PLAN["inputs"][k]["sha256"] for k in ("forward_returns_csv", "alias_map_csv")},
            "snapshot_sha256": sha256_file(args.snapshot), "snapshot_fetched_at_utc": snapshot["fetched_at_utc"],
            "summary": summary, "events": results}
@@ -334,8 +426,15 @@ def main(argv=None) -> int:
     c.add_argument("--snapshot", type=Path, required=True)
     c.add_argument("--package-dir", type=Path, required=True)
     c.add_argument("--out", type=Path, required=True)
+    c.add_argument("--rules", choices=RULES, default="v1", help="v1 = the preregistered run's implementation; v2 = deviations.json")
+    c.add_argument("--supplement", type=Path, default=None)
+    s = sub.add_parser("supplement")
+    s.add_argument("--env-file", type=Path, required=True)
+    s.add_argument("--snapshot", type=Path, required=True)
+    s.add_argument("--package-dir", type=Path, required=True)
+    s.add_argument("--out", type=Path, required=True)
     a = ap.parse_args(argv)
-    return fetch(a) if a.cmd == "fetch" else compare(a)
+    return {"fetch": fetch, "compare": compare, "supplement": supplement}[a.cmd](a)
 
 
 if __name__ == "__main__":

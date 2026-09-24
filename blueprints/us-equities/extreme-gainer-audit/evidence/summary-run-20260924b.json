@@ -1,0 +1,78 @@
+{
+ "deviations": "deviations.json D1-D4",
+ "inputs": {
+  "alias_map_csv": "6a75792c73faa572434346af0f79dbbf87008960d89431cb7fab235f714099da",
+  "forward_returns_csv": "d4f80668ea33191a955d2b86b125e2d4dfcbe3263421410117920e73fde48ec0"
+ },
+ "kind": "extreme_gainer_price_audit_summary",
+ "plan_sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+ "posthoc": {
+  "agree_bar_close_gain": 627,
+  "agree_bar_only": 60,
+  "agree_neither": 16,
+  "agree_official_close_gain": 567,
+  "bar_vs_official_abs_pct": {
+   "days": 1346,
+   "median": 0.0,
+   "p90": 0.0,
+   "p95": 0.294,
+   "share_over_0_5": 0.0453
+  },
+  "mismatch_leg_classes": {
+   "both_closes_differ": 4,
+   "closes_match_bar_not_official": 66,
+   "event_close_differs": 1,
+   "package_flagged": 8,
+   "prev_close_differs": 4,
+   "split_between": 1
+  },
+  "note": "Explains the preregistered mismatches; the plan.json verdicts and overturn stand.",
+  "preregistered": false,
+  "unflagged_ok_rows_compared": 643
+ },
+ "privacy": "per-event results and the raw snapshot and supplement stay private",
+ "private_posthoc_sha256": "256c7c034e6ade8b317be855837c348271f686a5581af369e3007b14a40dbea5",
+ "private_results_sha256": "c0c251a136a2dd697857b8b47d6692e9a4c6e8453d180a3df8a7e60cb44ee6c4",
+ "rules": "v2",
+ "run": "run-20260924b (v2 rules on the run-20260924a snapshot plus supplement)",
+ "snapshot_sha256": "0d98909f091fb4d0562c03a981a81ff0602e6a8665e2aa736c2133adb93e6e49",
+ "summary": {
+  "bar_close_fallback_rows": 19,
+  "events": 957,
+  "fetch_error_rows": 0,
+  "forward_returns": {
+   "T1": {
+    "compared": 673,
+    "match": 659,
+    "mismatch": 14
+   },
+   "T20": {
+    "compared": 646,
+    "match": 631,
+    "mismatch": 15
+   },
+   "T5": {
+    "compared": 662,
+    "match": 653,
+    "mismatch": 9
+   }
+  },
+  "mismatch_rate_where_both_have_prices": 0.1248,
+  "overturn_triggered": true,
+  "recovered_mismatch_rate": 0.1685,
+  "recovered_rows": 267,
+  "rules": "v2",
+  "split_between_rows": 3,
+  "verdicts": {
+   "match": 589,
+   "mismatch": 84,
+   "no_prev_close": 6,
+   "no_source_data": 4,
+   "package_uncomputed_match": 6,
+   "package_uncomputed_mismatch": 1,
+   "recovered_match": 222,
+   "recovered_mismatch": 45
+  }
+ },
+ "supplement_sha256": "3eb7b59b227028ec3f0b7d877a17a4ee5409392dd426a3b2fe947dc06763e344"
+}

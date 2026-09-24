@@ -36,12 +36,19 @@ def main(argv=None) -> int:
     ap.add_argument("--package-dir", type=Path, required=True)
     ap.add_argument("--results", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--supplement", type=Path, default=None)
     a = ap.parse_args(argv)
     A.check_inputs(a.package_dir)
     snap = json.loads(a.snapshot.read_text())
     results = json.loads(a.results.read_text())
     if results["snapshot_sha256"] != A.sha256_file(a.snapshot):
         raise SystemExit("results were computed from a different snapshot")
+    if a.supplement:
+        sup = json.loads(a.supplement.read_text())
+        if results.get("supplement_sha256") != A.sha256_file(a.supplement):
+            raise SystemExit("results were computed without this supplement")
+        for eid, tried in sup["events"].items():
+            snap["events"][eid] = list(snap["events"].get(eid) or []) + tried
     rows = list(csv.DictReader((a.package_dir / A.FORWARD_CSV).open(newline="")))
     res = {e["id"]: e for e in results["events"]}
     tol = A.PLAN["tolerance"]["event_gain"]
@@ -78,6 +85,7 @@ def main(argv=None) -> int:
     n = sum(basis.values())
     q = statistics.quantiles(gaps, n=20) if len(gaps) > 20 else []
     out = {"kind": "extreme_gainer_price_audit_posthoc", "preregistered": False,
+           **({"rules": results["rules"]} if "rules" in results else {}),
            "note": "Explains the preregistered mismatches; the plan.json verdicts and overturn stand.",
            "snapshot_sha256": results["snapshot_sha256"], "results_sha256": A.sha256_file(a.results),
            "unflagged_ok_rows_compared": n,

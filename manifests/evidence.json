@@ -7965,13 +7965,18 @@
     },
     {
       "path": "blueprints/us-equities/extreme-gainer-audit/README.md",
-      "sha256": "44f34a6c2e03fba5f809787e4bea009a479dc4aeb9d577d34d6491c9f858b5b6",
-      "bytes": 4036
+      "sha256": "f3978a7ad1c57dec6cfbe329a258ad3ef4f84f2a0317abd78f7c5acaf9cbc741",
+      "bytes": 4975
     },
     {
       "path": "blueprints/us-equities/extreme-gainer-audit/audit.py",
-      "sha256": "152f415bb12f1b5c413cad3c022ac7aee756b7ed4c39b2e746781d0100e740df",
-      "bytes": 16469
+      "sha256": "a3a5572754b220d32f170712a62fdc6605292ef02b4bcfda0e2d9c3df4518f4f",
+      "bytes": 21997
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/deviations.json",
+      "sha256": "6d4c060967098aa485c071381b460e3be68df63a711a94aced728ac33fbd3d20",
+      "bytes": 3888
     },
     {
       "path": "blueprints/us-equities/extreme-gainer-audit/evidence/fetch-log-run-20260924a.json",
@@ -7984,14 +7989,19 @@
       "bytes": 2137
     },
     {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924b.json",
+      "sha256": "7391cff476d708472096eb9db8f98963ee7503bac445fdb50607c0e66652e622",
+      "bytes": 2303
+    },
+    {
       "path": "blueprints/us-equities/extreme-gainer-audit/plan.json",
       "sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
       "bytes": 5076
     },
     {
       "path": "blueprints/us-equities/extreme-gainer-audit/posthoc.py",
-      "sha256": "ca6aec7795aa263e56172d43d73d3fd16debf0b47319452b0c532d0295c8464b",
-      "bytes": 5263
+      "sha256": "ca3d3db56ce903972d65671133ec14062a744053e5029cbd2cff1271cd2f6a5e",
+      "bytes": 5751
     },
     {
       "path": "blueprints/us-equities/financial-data/README.md",
@@ -28395,8 +28405,8 @@
     },
     {
       "path": "tests/test_extreme_gainer_audit.py",
-      "sha256": "177ec71512a19062e691a3efe354bcac3c2c7ed5074fb2c1d605afc21423273c",
-      "bytes": 11225
+      "sha256": "2ece08c161b8d83775edbf70c0437e99165c69d26896e0bebb9ba8c1819163bc",
+      "bytes": 13864
     },
     {
       "path": "tests/test_financial_data.py",
