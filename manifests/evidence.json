@@ -27090,7 +27090,7 @@
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "092ccd5dc1d1c3bfea74ba216e71dc127370e070e4676a7b9108c493efa3af0f",
+      "sha256": "c2936d349d96a22a7959b946ccd84b0ba8f424574e84debd682499338a8bc8f0",
       "bytes": 1129
     },
     {
@@ -27140,8 +27140,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "6e34267daccb3dee5d6717f45d4f13da98a767f2193fec4da8807fd0b0b537a6",
-      "bytes": 44503
+      "sha256": "bb9314dc3c24de168149ba795351821957ec03e7afc05574708edb492adc7c29",
+      "bytes": 44501
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",

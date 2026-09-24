@@ -879,9 +879,9 @@ class InputScrubTests(AdjudicateFixture):
         body = self.input_body()
         self.assertEqual(set(body), {"layer", "packet_sha256", "A", "B"})
         self.assertEqual(body["A"]["sources_read"], ["PACKET", "evidence/receipt.json"])
-        self.assertEqual(body["A"]["why_selected"], "c1: see docs/a.md, <outside-path> and "
+        self.assertEqual(body["A"]["why_selected"], "c1: see docs/a.md, <outside-path> "
                                                     "<outside-path> (https://github.com/example/one).")
-        self.assertEqual(body["B"]["limits"], ["could not read <outside-path> or <outside-path>"])
+        self.assertEqual(body["B"]["limits"], ["could not read <outside-path> <outside-path>"])
         self.assertEqual(adjudicate.unscrubbed_paths(body), [])
         self.assertNotIn(str(self.base), json.dumps(body))
         index = adjudicate.load_index(self.work)
@@ -1089,14 +1089,14 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
     def test_leak_text_is_redacted_before_it_is_retained_or_printed(self):
         raw = "found /home/example/code/nas-wt-codex-blind/x.json, ~/notes and /évidence/private.json"
         self.assertEqual(adjudicate.redact_leak_text(raw),
-                         "found <outside-path>, <outside-path> and <outside-path>")
+                         "found <outside-path>, <outside-path> <outside-path>")
         self.inputs()
         index = adjudicate.load_index(self.work)
         input_path = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
         with contextlib.redirect_stderr(io.StringIO()) as err:
             records = adjudicate.record_leaks(self.work / "leaks.json", index, [
                 (NAME, "AB", input_path, {"family": "openai", "stage": "judge", "text": raw})])
-        self.assertEqual(records[0]["text"], "found <outside-path>, <outside-path> and <outside-path>")
+        self.assertEqual(records[0]["text"], "found <outside-path>, <outside-path> <outside-path>")
         self.assertNotIn("/home/example", err.getvalue())
         self.assertNotIn("/home/example", (self.work / "leaks.json").read_text(encoding="utf-8"))
 
@@ -1104,7 +1104,7 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
         for path in ("/évidence/private.json", "/-private/codex.json", "/@host/path"):
             text = f"see {path} for details"
             self.assertEqual(adjudicate.scrub_text(text, str(self.work / "packets")),
-                             "see <outside-path> for details", path)
+                             "see <outside-path>", path)
             self.assertTrue(adjudicate.unscrubbed_paths([text]), path)
         for prose in ("a +/- 2% band", "and/or", "A / B", "3/4 of runs"):
             self.assertEqual(adjudicate.scrub_text(prose, str(self.work / "packets")), prose)
@@ -1184,7 +1184,7 @@ class EleventhRereviewOf145Tests(AdjudicateFixture):
                      r"\\server\share\x.json", "C:/Users/example/y.json"):
             text = f"see {path} for details"
             self.assertEqual(adjudicate.scrub_text(text, str(self.work / "packets")),
-                             "see <outside-path> for details", path)
+                             "see <outside-path>", path)
             self.assertTrue(adjudicate.unscrubbed_paths([text]), path)
             self.assertNotIn("Users", adjudicate.redact_leak_text(text))
         for prose in ("Section C: done", r"a regex \d+ here", "and/or"):
@@ -1254,10 +1254,13 @@ class ThirteenthRereviewOf145Tests(AdjudicateFixture):
 
     def test_host_paths_with_spaces_leave_no_suffix(self):
         packets = str(self.work / "packets")
-        for text, expected in (("see /home/example user/private.json now", "see <outside-path> now"),
+        for text, expected in (("see /home/example user/private.json now", "see <outside-path>"),
                                (r"at C:\Users\Example User\private.json", "at <outside-path>"),
-                               ("~/My Docs/x.json and more", "<outside-path> and more"),
-                               ("/home/example/a b/c d/e.json end", "<outside-path> end")):
+                               ("~/My Docs/x.json and more", "<outside-path>"),
+                               ("/home/example/a b/c d/e.json end", "<outside-path>"),
+                               ("see /srv/My Project/private key now", "see <outside-path>"),
+                               (r"at C:\Users\example user\private key, then", "at <outside-path>, then"),
+                               ("see /home/example user/private.json. Next sentence.", "see <outside-path>.")):
             self.assertEqual(adjudicate.scrub_text(text, packets), expected, text)
             self.assertEqual(adjudicate.redact_leak_text(text), expected, text)
         self.assertEqual(adjudicate.scrub_text("evidence/a.json and plain words", packets),
@@ -1316,8 +1319,8 @@ class FourteenthRereviewOf145Tests(AdjudicateFixture):
     def test_spaced_final_segments_are_scrubbed_whole(self):
         packets = str(self.work / "packets")
         for text in ("see /srv/My Project/private key.json now", r"see C:\Users\example user\private file.json now"):
-            self.assertEqual(adjudicate.scrub_text(text, packets), "see <outside-path> now", text)
-            self.assertEqual(adjudicate.redact_leak_text(text), "see <outside-path> now", text)
+            self.assertEqual(adjudicate.scrub_text(text, packets), "see <outside-path>", text)
+            self.assertEqual(adjudicate.redact_leak_text(text), "see <outside-path>", text)
 
     def test_the_workflow_echoes_what_it_consumed(self):
         source = (TOOL_DIR / "adjudication-lane.js").read_text(encoding="utf-8")
@@ -1395,6 +1398,47 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
         code, err, record = self.assemble()
         self.assertIn("does not match the input contents", err)
         self.assertIsNone(record)
+
+    def test_a_leak_from_a_voided_codex_call_is_not_recorded(self):
+        # Codex review of #145 at 3d0943cc: a leak from a call the audit voids must not become sticky.
+        self.inputs()
+        events = self.work / "adjudication-judgments" / "codex" / "events"
+        events.mkdir(parents=True, exist_ok=True)
+        (events / f"{NAME}.AB.judge.jsonl").write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": f"cat {adjudicate.index_path(self.work)}"}}) + "\n", encoding="utf-8")
+        leak_answer = (None, "gpt-6-astra", [0], None, "provenance: codex_lane_py_sha256")
+        clean = [(self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)]
+        call = mock.Mock(side_effect=[leak_answer] + clean)
+        with mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
+                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                    "--model", "gpt-6-astra", "--jobs", "1"])
+        self.assertEqual(adjudicate.recorded_leaks(self.work), set())
+
+    def test_a_deleted_input_is_a_failure_not_a_traceback(self):
+        self.inputs()
+        real = adjudicate.inputs_changed
+        calls = []
+
+        def inputs_changed(index, stems):
+            # Both scheduling checks pass; the AB input disappears right after them, before its worker starts.
+            calls.append(stems)
+            if len(calls) <= 2:
+                if len(calls) == 2:
+                    (self.work / "adjudication-inputs" / f"{NAME}.AB.json").unlink()
+                return []
+            return real(index, stems)
+
+        with mock.patch.object(adjudicate, "inputs_changed", side_effect=inputs_changed), \
+                mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
+                mock.patch.object(adjudicate, "run_codex_call", mock.Mock(side_effect=[
+                    (self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2)), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                                "--model", "gpt-6-astra", "--jobs", "1"])
+        self.assertEqual(code, 1)
+        self.assertIn("the input changed after `inputs` built it", err)
 
     def test_a_flagged_codex_audit_voids_the_judgment(self):
         self.inputs()

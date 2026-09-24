@@ -205,10 +205,20 @@ OUTSIDE = "<outside-path>"
 # path is replaced, each following space-separated token that continues it (holds a / or \ separator) is
 # absorbed too, so no suffix of it survives (Codex review of #145). Repository roots and work dirs cannot hold
 # spaces (root_issue, refuse_work_dir_inside), so only outside paths need this.
-# A final segment with spaces ("/srv/My Project/private key.json") ends in a token with a file extension, which
-# is absorbed too; an extension-less final segment ("/srv/x/private key") can still leave its last word.
-_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>(?: +(?:[^\s/\\'\"|;&<>()`,]*[/\\][^\s'\"|;&<>()`,]*"
-                                   r"|[^\s/\\'\"|;&<>()`,]+\.[A-Za-z0-9]{1,8}(?![\w])[.,;:]?))+")
+# Where a spaced path ends cannot be told from prose ("/srv/My Project/private key" then "now"), so the rest of
+# the clause after an outside path is absorbed: every following space-separated token up to a delimiter
+# (,;()"'`|&<>), a line end, or a token ending a sentence (. ! ? :), whose punctuation is kept (Codex review of
+# #145). Prose after a host path is lost; a private basename never survives.
+_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?: +[^\s'\"|;&<>()`,]+)+)")
+
+
+def _absorb_clause(match) -> str:
+    kept = ""
+    for token in match.group(1).split():
+        if token[-1] in ".!?:":
+            kept = token[-1]
+            break
+    return OUTSIDE + kept
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
 # ~ path (~/x or ~user/x), $HOME or ${HOME}, or a <host-path> placeholder.
@@ -277,7 +287,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
     text = HOME_TEXT_PATH.sub(outside, text)
     text = PARENT_TEXT_PATH.sub(outside, text)
     text = ABSOLUTE_TEXT_PATH.sub(absolute, text)
-    return _OUTSIDE_CONTINUATION.sub(OUTSIDE, text)
+    return _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
 
 
 def scrub_strings(value, packets_dir: str, repo_roots=()):
@@ -759,12 +769,13 @@ def run_codex(args) -> int:
         name, order, input_path, packet_sha256, out_path = item
         stem = f"{name}.{order}"
         leak = None
-        judged_sha256 = sha256_file(Path(input_path))
         if inputs_changed(index, [stem]):
-            # Rebuilt or edited after the scheduling check (Codex review of #145): never judge unindexed bytes.
+            # Rebuilt, edited or deleted after the scheduling check (Codex review of #145): never judge unindexed
+            # bytes, and a missing input is a failure rather than a traceback.
             with lock:
                 failures.append((stem, "the input changed after `inputs` built it; rerun inputs"))
             return
+        judged_sha256 = sha256_file(Path(input_path))
         # Both orders' content before the call: a leak suppresses both, bound to what was judged.
         both_sha256 = layer_input_hashes(index, name)
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
@@ -786,9 +797,6 @@ def run_codex(args) -> int:
             failure = f"judge {failure}"
         if leak:
             failure = LEAK
-            with lock:
-                leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256,
-                                                        "inputs_sha256": both_sha256}))
         if packets_changed([{"name": name, "order": order, "packet_path": packets.get(name, ""),
                              "packet_sha256": packet_sha256}]):
             # The packet copy changed while the judges ran: nothing they returned counts.
@@ -796,6 +804,12 @@ def run_codex(args) -> int:
         elif inputs_changed(index, [stem]):
             # The input changed while the judges read it (Codex review of #145).
             judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
+        if leak:
+            # Held until the run's tree and audit checks pass (Codex review of #145): a leak from a voided call is
+            # not persisted, so it cannot suppress later valid runs.
+            with lock:
+                leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256,
+                                                        "inputs_sha256": both_sha256}))
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
@@ -823,7 +837,7 @@ def run_codex(args) -> int:
                 record = load_json(out_path)
             except (OSError, ValueError):
                 continue
-            record.update({"judge": None, "refuter": None, "failure": TREE_CHANGED})
+            record.update({"judge": None, "refuter": None, "leak": None, "failure": TREE_CHANGED})
             write_json(out_path, record)
             failures.append((f"{name}.{order}", TREE_CHANGED))
 
@@ -852,10 +866,11 @@ def run_codex(args) -> int:
             record = load_json(record_path)
         except (OSError, ValueError):
             continue
-        record.update({"judge": None, "refuter": None, "failure": AUDIT_FLAGGED})
+        record.update({"judge": None, "refuter": None, "leak": None, "failure": AUDIT_FLAGGED})
         write_json(record_path, record)
         failures.append((stem, AUDIT_FLAGGED))
-    record_leaks(out_dir / LEAKS_NAME, index, leaks)
+    voided = {stem for stem, failure in failures if failure in (TREE_CHANGED, AUDIT_FLAGGED)}
+    record_leaks(out_dir / LEAKS_NAME, index, [leak for leak in leaks if f"{leak[0]}.{leak[1]}" not in voided])
     for stem, failure in sorted(failures):
         print(f"adjudicate: codex {stem}: {failure}", file=sys.stderr)
     return 1 if failures else 0
@@ -880,7 +895,7 @@ def redact_leak_text(text):
     for pattern in (WINDOWS_TEXT_PATH, HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH,
                     *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
-    text = _OUTSIDE_CONTINUATION.sub(OUTSIDE, text)
+    text = _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
     return text[:LEAK_TEXT_LIMIT]
 
 
