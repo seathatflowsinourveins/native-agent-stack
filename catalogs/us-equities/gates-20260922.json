@@ -254,52 +254,232 @@
       "id": "leverage-ladder-1x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 1x completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 1x completes with zero needs_attention and achieved gross leverage above 0.5x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/1x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "1x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "1"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "0.5"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "0.5"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-1x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-1x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"1x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"1x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"1\", /leverage/next_lower_rung_ceiling == \"0.5\" (leverage.next_lower_rung_ceiling for this rung -- the documented 0.5x minimum exposure, since 1x has no lower rung), /leverage/peak_achieved_leverage > 0.5 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 0.5x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 0.5x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. No paper rung has run; the 1x adaptive trial comes first. leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
     },
     {
       "id": "leverage-ladder-2x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 2x completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 2x completes with zero needs_attention and achieved gross leverage above 1x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/2x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "2x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "2"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "1"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "1"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-2x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-1x established first."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-2x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"2x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"2x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"2\", /leverage/next_lower_rung_ceiling == \"1\" (leverage.next_lower_rung_ceiling for this rung -- the 1x rung's cap), /leverage/peak_achieved_leverage > 1 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 1x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 1x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-1x established first."
     },
     {
       "id": "leverage-ladder-4x",
       "rung": "live",
       "layer": "portfolio-risk",
-      "title": "Paper leverage ladder rung 4x (intraday cap; 2x overnight) completes with zero needs_attention",
+      "title": "Paper leverage ladder rung 4x (intraday cap; 2x overnight) completes with zero needs_attention and achieved gross leverage above 2x",
       "status": "not_established",
       "owner": "peer:sota-workflow-resolution",
       "evidence_class": "none",
       "required": true,
       "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/4x/receipt.json",
       "flip_condition": {
-        "type": "equals",
-        "pointer": "/needs_attention",
-        "equals": 0
+        "type": "all_of",
+        "conditions": [
+          {
+            "type": "equals",
+            "pointer": "/schema_version",
+            "equals": 1
+          },
+          {
+            "type": "equals",
+            "pointer": "/kind",
+            "equals": "leverage_ladder_rung_receipt"
+          },
+          {
+            "type": "equals",
+            "pointer": "/rung",
+            "equals": "4x"
+          },
+          {
+            "type": "equals",
+            "pointer": "/needs_attention",
+            "equals": 0
+          },
+          {
+            "type": "equals",
+            "pointer": "/source/certified_run_status",
+            "equals": "passed"
+          },
+          {
+            "type": "source_matches",
+            "path_pointer": "/source/paper_output_path",
+            "sha256_pointer": "/source/paper_output_sha256",
+            "pairs": [
+              [
+                "/leverage",
+                "/leverage"
+              ],
+              [
+                "/source/certified_run_status",
+                "/status"
+              ]
+            ]
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/config_max_leverage",
+            "equals": "4"
+          },
+          {
+            "type": "equals",
+            "pointer": "/leverage/next_lower_rung_ceiling",
+            "equals": "2"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/peak_achieved_leverage",
+            "than": "2"
+          },
+          {
+            "type": "greater_than",
+            "pointer": "/leverage/seconds_above_next_lower_rung_ceiling",
+            "than": 0
+          }
+        ]
       },
-      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-4x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-2x established first; kill switch => 0 leverage."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-4x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. Required rung receipt schema, preregistered 2026-09-24 (audit gap #5; no ladder receipt exists yet): {\"schema_version\": 1, \"kind\": \"leverage_ladder_rung_receipt\", \"rung\": \"4x\", \"needs_attention\": <int count of runs that ended needs_attention>, \"source\": {\"paper_output_path\": <repository-relative path of the certified run's committed paper-output.json>, \"paper_output_sha256\": <that file's sha256>, \"certified_run_status\": <that file's top-level \"status\">}, \"leverage\": <that file's \"leverage\" block (runner.run_native's outcome), copied verbatim>}. flip_condition is an all_of: /schema_version == 1, /kind == \"leverage_ladder_rung_receipt\", /rung == \"4x\", /needs_attention == 0, /source/certified_run_status == \"passed\", a source_matches binding (scripts/trading_gates.py: the file at /source/paper_output_path must exist in the tree and hash to /source/paper_output_sha256, and its /leverage and /status must equal the receipt's /leverage and /source/certified_run_status exactly, so the leverage block and the certified run's passed status come from the one hashed run), /leverage/config_max_leverage == \"4\", /leverage/next_lower_rung_ceiling == \"2\" (leverage.next_lower_rung_ceiling for this rung -- the 2x rung's cap), /leverage/peak_achieved_leverage > 2 and /leverage/seconds_above_next_lower_rung_ceiling > 0 (scripts/trading_gates.py greater_than accepts the runner's decimal strings and JSON numbers). A trial that never exceeds 2x gross-to-equity leverage therefore cannot flip this gate (tests/test_trading_gates.py LeverageLadderFlipConditionTests). Limits: needs_attention counts every run at this rung and is not bound to the hashed file, so it is checked against the rung's trial directories at the manual qualification; seconds_above is a per-tick approximation (runner._leverage_achievement_step attributes the whole tick gap), and no minimum duration above 2x is set -- any positive time satisfies the condition, so how long the rung was used is read from the receipt and judged at the manual qualification before the dated flip commit. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-2x established first; kill switch => 0 leverage."
     },
     {
       "id": "native-fault-behaviour",

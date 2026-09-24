@@ -32,6 +32,31 @@ def intent(**changes):
     return value
 
 
+def wire(**changes):
+    """A POST body shaped as alpaca-py 0.44.0 serializes intent() (floats for decimals)."""
+    value = {"symbol": "SPY", "qty": 1.0, "side": "buy", "type": "limit", "time_in_force": "day",
+             "extended_hours": False, "client_order_id": "trial-1", "limit_price": 100.01}
+    value.update(changes)
+    return value
+
+
+def allow_sub_penny(port):
+    """Test mirror of native-faults FaultTransport: a sub-penny limit price passes the
+    order-contract boundary (on-cent validation, exact wire price) so these tests can
+    reach the transport's own 422 classification. Every other rule still applies."""
+    original = port._validated_request
+
+    def validated(intent):
+        price = t.Decimal(intent["limit_price"])
+        if not t.violates_minimum_price_variance(price):
+            return original(intent)
+        on_cent = dict(intent, limit_price=str(price.quantize(t.Decimal("0.01"), "ROUND_DOWN")))
+        envelope = t.order_envelope(on_cent, extended_hours_allowed=port.extended_hours_allowed)
+        envelope["intent"]["limit_price"] = intent["limit_price"]
+        return envelope, t.limit_order_request(envelope)
+    port._validated_request = validated
+
+
 def order(**changes):
     value = dict(intent(), id=ID, filled_qty="0", filled_avg_price=None,
                  status="new", updated_at="2026-09-21T15:00:00.000000001Z")
@@ -126,6 +151,92 @@ class Normalization(unittest.TestCase):
             t.normalize_order(order(filled_qty="2"))
 
 
+class OrderContractBoundary(unittest.TestCase):
+    """SDK-free checks of the pre-submission order-contract boundary."""
+
+    def test_envelope_validates_the_sdk_bound_projection_only(self):
+        normalized = t.normalize_intent(intent(tags=["a"], strategy="s", reason="r"), ["SPY"])
+        envelope = t.order_envelope(normalized)
+        self.assertEqual((envelope["mode"], envelope["submission_enabled"]), ("offline", False))
+        self.assertEqual(envelope["intent"], {"symbol": "SPY", "qty": "1", "side": "buy", "type": "limit",
+                                              "time_in_force": "day", "client_order_id": "trial-1",
+                                              "order_class": "simple", "extended_hours": False,
+                                              "limit_price": "100.01"})
+
+    def test_engine_semantics_kept_fractional_sell_and_allowed_extended_hours(self):
+        exit_ = t.normalize_intent(intent(side="sell", qty="0.123456789"), ["SPY"])
+        self.assertEqual(t.order_envelope(exit_)["intent"]["qty"], "0.123456789")
+        extended = t.normalize_intent(intent(extended_hours=True), ["SPY"], allow_extended_hours=True)
+        self.assertIs(t.order_envelope(extended, extended_hours_allowed=True)["intent"]["extended_hours"], True)
+        with self.assertRaises(t.OrderContractRefused):
+            t.order_envelope(extended)
+
+    def test_contract_refusals_are_local_not_broker_refusals(self):
+        # Each passes normalize_intent (and, except the price, the ledger) but not the contract.
+        for changes, symbols in (({"client_order_id": "_leading"}, ["SPY"]),
+                                 ({"client_order_id": "-leading"}, ["SPY"]),
+                                 ({"symbol": "BRK-B"}, ["BRK-B"]),
+                                 ({"limit_price": "100.001"}, ["SPY"]),
+                                 ({"limit_price": "0.12345"}, ["SPY"])):
+            with self.subTest(changes=changes):
+                normalized = t.normalize_intent(intent(**changes), symbols)
+                with self.assertRaises(t.OrderContractRefused) as caught:
+                    t.order_envelope(normalized)
+                error = caught.exception
+                self.assertIsInstance(error, t.SubmissionNotSent)
+                self.assertNotIsInstance(error, t.RejectedSubmission)
+                self.assertTrue(error.not_sent and error.definitive_rejection)
+                self.assertEqual((error.local_refusal, error.not_sent_reason),
+                                 ("order_contract", "order_contract_refused"))
+                self.assertFalse(hasattr(error, "status_code"))
+
+    def test_wire_gate_requires_the_exact_validated_body(self):
+        envelope = t.order_envelope(t.normalize_intent(intent(), ["SPY"]))
+        envelopes = {"trial-1": envelope}
+        self.assertIs(t.check_wire_submission(envelopes, wire()), envelope)
+        self.assertIs(t.check_wire_submission(envelopes, wire(order_class="simple")), envelope)
+        for label, found, body in (
+                ("unregistered", {}, wire()),
+                ("other-id", envelopes, wire(client_order_id="trial-2")),
+                ("dropped-field", envelopes, {k: v for k, v in wire().items() if k != "extended_hours"}),
+                ("added-field", envelopes, wire(advanced_instructions={"algorithm": "TWAP"})),
+                ("changed-price", envelopes, wire(limit_price=100.0)),
+                ("changed-qty", envelopes, wire(qty=2.0)),
+                ("changed-side", envelopes, wire(side="sell")),
+                ("bool-qty", envelopes, wire(qty=True)),
+                ("non-dict", envelopes, None)):
+            with self.subTest(label=label), self.assertRaises(t.OrderContractRefused):
+                t.check_wire_submission(found, body)
+
+    def test_float_that_loses_the_exact_decimal_is_refused(self):
+        exit_ = t.normalize_intent(intent(side="sell", qty="12345678.123456789"), ["SPY"])
+        envelope = t.order_envelope(exit_)
+        self.assertFalse(t.wire_matches_envelope(wire(side="sell", qty=float("12345678.123456789")), envelope))
+
+    def test_boundary_status_is_active_and_fails_closed(self):
+        status = t.order_contract_status(["SPY", "BRK.B"])
+        self.assertTrue(status["active"])
+        self.assertEqual(status["symbols_checked"], 2)
+        self.assertEqual(status["contract_sha256"],
+                         __import__("hashlib").sha256(t.ORDER_CONTRACT_PATH.read_bytes()).hexdigest())
+        with self.assertRaisesRegex(t.TransportError, "configured_symbol_outside_contract"):
+            t.order_contract_status(["SPY", "BRK-B"])
+
+        class Permissive:  # a contract that accepts anything is not an active boundary
+            __file__ = str(t.ORDER_CONTRACT_PATH)
+            ContractError = ValueError
+
+            @staticmethod
+            def build_envelope(value, **_):
+                return {"intent": dict(value)}
+        with patch.object(t, "order_contract", Permissive):
+            with self.assertRaisesRegex(t.TransportError, "order_contract_boundary_inactive:invalid_sentinel"):
+                t.order_contract_status()
+        with patch.object(t, "order_contract", type("Missing", (), {"__file__": "/elsewhere.py"})):
+            with self.assertRaisesRegex(t.TransportError, "contract_module_not_loaded"):
+                t.order_contract_status()
+
+
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class HTTPBoundary(unittest.TestCase):
     def setUp(self):
@@ -150,8 +261,9 @@ class HTTPBoundary(unittest.TestCase):
 
     def test_every_attempt_budgeted_timeouts_and_headers_sanitized(self):
         raw = response({}, headers={"X-Ratelimit-Limit": "200", "Authorization": "fixture-secret"})
+        self.session.expect_submission(t.order_envelope(intent()))
         with patch.object(self.session._session, "request", return_value=raw) as request:
-            self.session.request("POST", t.PAPER_URL + "/v2/orders", json=intent())
+            self.session.request("POST", t.PAPER_URL + "/v2/orders", json=wire())
             self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + ID)
             self.session.request("GET", t.PAPER_URL + "/v2/account")
         self.assertEqual(self.budget.call_args_list[0].kwargs, {"client_id": "trial-1"})
@@ -173,10 +285,36 @@ class HTTPBoundary(unittest.TestCase):
 
     def test_positive_submission_delay_is_deferred_without_sending(self):
         self.budget.return_value = 60
+        self.session.expect_submission(t.order_envelope(intent()))
         with patch.object(self.session._session, "request") as request:
-            with self.assertRaises(t.SubmissionNotSent):
-                self.session.request("POST", t.PAPER_URL + "/v2/orders", json=intent())
+            with self.assertRaises(t.SubmissionNotSent) as caught:
+                self.session.request("POST", t.PAPER_URL + "/v2/orders", json=wire())
+        self.assertNotIsInstance(caught.exception, t.OrderContractRefused)
+        self.budget.assert_called_once()
         request.assert_not_called()
+
+    def test_unvalidated_order_body_is_refused_before_budget_and_http(self):
+        with patch.object(self.session._session, "request") as request:
+            with self.assertRaises(t.OrderContractRefused):
+                self.session.request("POST", t.PAPER_URL + "/v2/orders", json=wire())
+            self.session.expect_submission(t.order_envelope(intent()))
+            with self.assertRaises(t.OrderContractRefused):  # SDK-side field loss
+                self.session.request("POST", t.PAPER_URL + "/v2/orders",
+                                     json={k: v for k, v in wire().items() if k != "limit_price"})
+            self.session.withdraw_submission("trial-1")
+            with self.assertRaises(t.OrderContractRefused):  # admitted only for its own call
+                self.session.request("POST", t.PAPER_URL + "/v2/orders", json=wire())
+        self.budget.assert_not_called()
+        self.observer.assert_not_called()
+        request.assert_not_called()
+
+    def test_sdk_serialization_of_an_envelope_passes_the_wire_gate(self):
+        for changes in ({}, {"side": "sell", "qty": "0.123456789"}, {"limit_price": "0.1234"},
+                        {"qty": "250", "limit_price": "999.99"}):
+            with self.subTest(changes=changes):
+                envelope = t.order_envelope(t.normalize_intent(intent(**changes), ["SPY"]))
+                body = t.limit_order_request(envelope).to_request_fields()
+                self.assertTrue(t.wire_matches_envelope(body, envelope))
 
     def test_preflight_is_read_only_and_hashes_identity(self):
         payloads = {"/v2/account": {"id": "fixture-account-id", "cash": "1000", "equity": "1000", "buying_power": "1000"},
@@ -458,6 +596,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         body = {"code": 42210000,
                 "message": "invalid limit_price 100.0101. sub-penny increment does not fulfill minimum pricing criteria"}
         missing = response({"code": 40410000, "message": "not found"}, 404)
+        allow_sub_penny(self.port)
         with patch.object(self.port._client._session._session, "request",
                           side_effect=[response(body, 422), missing]) as request:
             with self.assertRaises(t.RejectedSubmission) as caught:
@@ -483,6 +622,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                                         "sub-penny increment does not fulfill minimum pricing criteria"}),
             ("no-json", "100.0101", None),
         ]
+        allow_sub_penny(self.port)
         for index, (label, price, body) in enumerate(cases):
             with self.subTest(label=label):
                 self.port._reasons.clear()
@@ -494,6 +634,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
 
     async def test_sub_penny_422_with_visible_order_is_not_a_refusal(self):
         body = {"code": 42210000, "message": "sub-penny increment does not fulfill minimum pricing criteria"}
+        allow_sub_penny(self.port)
         with patch.object(self.port._client._session._session, "request",
                           side_effect=[response(body, 422), response(order(limit_price="100.0101"))]):
             found = await self.port.submit(intent(limit_price="100.0101"))
@@ -506,6 +647,44 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         for price in ("1", "1.01", "0.9999", "0.5", "100.0101", "1.001", "0.99991", "307.6601"):
             self.assertEqual(t.violates_minimum_price_variance(price),
                              not safety.price_increment_valid(__import__("decimal").Decimal(price)), price)
+
+    async def test_invalid_envelope_never_reaches_the_fake_broker(self):
+        self.port.symbols = ("SPY", "BRK-B")  # both pass the transport's own symbol syntax
+        self.port._quote_values["BRK-B"] = {"ts_ns": time.time_ns()}
+        cases = [intent(client_order_id="_leading"), intent(client_order_id="bad-symbol", symbol="BRK-B"),
+                 intent(client_order_id="sub-penny", limit_price="100.001")]
+        with patch.object(self.port._client, "submit_order") as sdk_submit, \
+                patch.object(self.port._client._session._session, "request") as broker:
+            for payload in cases:
+                with self.subTest(client_order_id=payload["client_order_id"]):
+                    with self.assertRaises(t.OrderContractRefused) as caught:
+                        await self.port.submit(payload)
+                    self.assertNotIsInstance(caught.exception, t.RejectedSubmission)
+                    self.assertIn(payload["client_order_id"], self.port._not_sent)
+                    self.assertNotIn(payload["client_order_id"], self.port._rejected)
+                    # A replay stays a local refusal and never looks the order up.
+                    with self.assertRaises(t.SubmissionNotSent):
+                        await self.port.submit(payload)
+        sdk_submit.assert_not_called()
+        broker.assert_not_called()
+        self.assertEqual(self.budgets, [])  # no request budget was ever reserved
+        self.assertEqual(self.port.health["reasons"], [])
+        self.assertEqual([i["client_order_id"] for i in self.intents],
+                         ["_leading", "bad-symbol", "sub-penny"])  # risk ran; the contract refused after it
+
+    async def test_valid_submit_posts_exactly_its_envelope(self):
+        calls = []
+        def request(method, url, **kwargs):
+            calls.append((method, kwargs))
+            return response(order(side="sell", qty="0.123456789", client_order_id="exit-1"))
+        payload = intent(client_order_id="exit-1", side="sell", qty="0.123456789")
+        with patch.object(self.port._client._session._session, "request", side_effect=request):
+            result = await self.port.submit(payload)
+        self.assertEqual(result["client_order_id"], "exit-1")
+        self.assertEqual([m for m, _ in calls], ["POST"])
+        envelope = t.order_envelope(t.normalize_intent(payload, ["SPY"]))
+        self.assertTrue(t.wire_matches_envelope(calls[0][1]["json"], envelope))
+        self.assertEqual(self.port._client._session._envelopes, {})  # withdrawn after the call
 
     async def test_proven_not_sent_intent_does_not_break_flat_snapshot(self):
         self.port.adopt_intents([intent()])

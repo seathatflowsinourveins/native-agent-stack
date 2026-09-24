@@ -9,7 +9,8 @@ it prints path templates, variable names and reason codes, never values or
 expanded host paths. Environment checks report variable NAMES that are set,
 never their values.
 
-Exit status is 1 only when an entry whose status is "required" is unsafe, and 2
+Exit status is 1 when any credential file that exists is unsafe (whatever the
+entry's status, since a stored optional or paid key leaks just as badly), and 2
 for an invalid inventory. Missing entries and warnings are informational.
 """
 
@@ -353,9 +354,11 @@ def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
     }
     if with_client_guards:
         report["client_guards"] = client_guards(env)
-    unsafe_required = [e["id"] for e in entries if e["status"] == "required" and e["state"] == "unsafe"]
-    report["unsafe_required"] = unsafe_required
-    report["result"] = "unsafe" if unsafe_required else "ok"
+    unsafe_stored = [e["id"] for e in entries if e["state"] == "unsafe"]
+    report["unsafe_required"] = [i for i in unsafe_stored
+                                 if next(e for e in entries if e["id"] == i)["status"] == "required"]
+    report["unsafe_stored"] = unsafe_stored
+    report["result"] = "unsafe" if unsafe_stored else "ok"
     return report
 
 
@@ -410,7 +413,7 @@ def main(argv=None) -> int:
         return 2
     report = inspect(args.root, inventory, with_client_guards=args.client_guards)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
-    return 1 if report["unsafe_required"] else 0
+    return 1 if report["unsafe_stored"] else 0
 
 
 if __name__ == "__main__":
