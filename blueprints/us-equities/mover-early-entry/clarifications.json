@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "protocol": "mover-early-entry-v1-20260924",
+  "recorded_at": "2026-09-24T03:47:08Z",
+  "note": "Implementation readings of protocol.json where its text leaves a choice open. All were fixed before any post-entry return or quote sample was computed (see deviations.json D1 for the one trial that computed exits, deleted unread). Code cites these ids.",
+  "clarifications": {
+    "C1": "Entry 'within 5 minutes of t' means a bar starting before t + 5 minutes.",
+    "C2": "The halt flag counts runs of 5+ bar-less minutes between max(entry, 09:30) and 16:00, including the run before the first bar and after the last bar.",
+    "C3": "Cost time buckets are [04:00, 08:00), [08:00, 09:30), [09:30, 10:00) and [10:00, 16:00]. The protocol writes the second as 08:00-09:25, which leaves the 09:25 rule's entries (09:25-09:29 bars) without a bucket.",
+    "C4": "Regime: SPY fully adjusted daily closes (all_c) from 2019-11-01, so that the first session has a full 252-session window (data.market's '2020-01-02 onward' is about 20 sessions short of it). The 20-session mean and the 20-session realised volatility (standard deviation of 20 daily log returns) end at the previous session; the 252-session median is over that volatility series ending at the previous session.",
+    "C5": "The cost sample holds the entries the loosest rule (G 0.20, V $250k, any news) fires that have an entry fill; every rule's fired entries are a subset of these. An entry is sampled when int.from_bytes(sha256('symbol|session|HH:MM').digest()[:8], 'big') % 20 == 0, with HH:MM the rule time.",
+    "C6": "Net return at notional N: shares q = N / entry; basis = q x entry x (1 + c_in) (+ IBKR commission); proceeds = q x exit x (1 - c_out) - SEC fee - FINRA TAF (- IBKR commission); net = proceeds / basis - 1. Trade-level metrics use N = $20,000 ($100k across 5 positions at 1x); fractional shares; fees are not rounded to the cent.",
+    "C7": "Stress doubles each side's spread-plus-slippage cost; regulatory fees and commissions are unchanged.",
+    "C8": "The break-even multiple is the k at which the mean net return with k x (spread + slippage) and unchanged fees is 0, found by bisection on [0, 1000]; null when the mean is at or below 0 at k = 0.",
+    "C9": "For a bucket still below 30 samples after the time x price fallback, 'the table's 90th percentile' is the 90th percentile of all pooled half-spread samples.",
+    "C10": "The 5%-trimmed mean drops floor(0.05 n) samples from each tail.",
+    "C11": "Bootstrap: circular block bootstrap of 5 consecutive sessions over the split's full session calendar (sessions without trades included). Returns are quantised to 1e-6 so replicate sums are exact in floating point. A replicate with no trades counts as mean <= 0. Seed = int.from_bytes(sha256(b'mover-early-entry-v1-20260924').digest()[:8], 'big') with numpy default_rng (PCG64); one replicate matrix per split is shared by every rule-exit. The one-sided lower bound is the 5th percentile of the replicate means.",
+    "C12": "'Mean without the top 5 sessions' drops every trade in the 5 sessions with the highest summed net return. The top 1% share is the sum of the top ceil(0.01 n) net returns over the total net sum (null when the total is <= 0). Profit factor = sum of gains / |sum of losses| (null without losses). Percentiles are numpy linear; the 1%-winsorised mean clips at the 1st and 99th percentiles.",
+    "C13": "The concurrent-fire count is the number of symbols the same rule fires in the same session, grouped 1, 2-5, 6-20, >20. V tiers are $250k-1M, $1-5M and >= $5M of dollar_volume_at_t.",
+    "C14": "Two-way clustering: V = V_session + V_symbol - V_symbol-day for the mean, with max(V_session, V_symbol) when negative; one-sided normal p.",
+    "C15": "Portfolio: equity marked at t equals the session's starting equity (each rule enters at one time and holds nothing overnight). Sub-$5 names use min(leverage, 1). Capacity uses the entry bar's dollar volume (the opening auction: the listing exchange's opening print price x size). Fees use each position's actual notional. Drawdown is measured at each session start against the running peak of session-end equity: factor 1 within 10%, 0.5 within 10-20%; beyond 20% a 10-session no-entry cooldown starts, after which 0.5 applies; the cooldown re-arms only after the drawdown has returned within 20%.",
+    "C16": "IWM's official open-to-close uses official_price on IWM's auctions (fetched with asof 2026-09-21); it stands in for every holding window and is flagged as a proxy.",
+    "C17": "The placebo enters at t + 30 minutes under the entry rule for that time (09:00 + 30 is the 09:30 opening auction).",
+    "C18": "Capture: per degree tier, time, G, V and news variant. Recall 'among days meeting price and volume' conditions on price_t >= $1 and dollar_volume_at_t >= V. An undefined gain_at_t does not fire. The entry-to-close and entry-to-session-high returns are gross.",
+    "C19": "Replication: gain_at_09:25 uses bars starting before 09:25; an undefined gain counts as below 0.20; Spearman uses average ranks over days with a defined gain.",
+    "C20": "Paper-candidate tie-break for 'the most-traded development rule-exit': trades descending, then development p ascending, then rule id.",
+    "C21": "Coverage: an audit event (verdict match or recovered_match, official gain >= +20%) is present when (symbol_used, date) or (ticker, date) is a candidate; tiers use the audit's official gain.",
+    "C22": "eventual_gain uses the session's last bar close before 16:00 when there is no official close (flagged and also reported without such rows).",
+    "C23": "When the previous session has no official close, ref uses the daily dataset's previous raw close, flagged (the daily close is the official closing print on 92% of sampled days; deviations.json D3)."
+  },
+  "amended_at": "2026-09-24T04:13:15Z (C23 wording, before any outcome)"
+}

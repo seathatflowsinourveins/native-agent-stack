@@ -3,9 +3,13 @@
 Candidates are symbol-days whose fully adjusted daily-bar high reached at least +20% over the
 previous adjusted close (``candidates.py`` builds the list from the broad-universe dataset). Every
 early-entry rule tested at a +20% or higher threshold is therefore evaluated on all days that met
-it, winners and faders alike. Days are processed one session at a time, with ``asof`` set to that
-session so each symbol resolves to the entity that traded that day. For each session this writes
-one gzip page set:
+it, winners and faders alike. Days are processed one session at a time. ``--asof`` sets the date
+that identifies each symbol's issuer for bars and auctions. It must match the naming date of the
+candidate list: the broad-universe daily dataset names issuers by their 2026-09-21 tickers (its
+collector used the provider default asof on that date), so the candidates need ``--asof 2026-09-21``.
+``--asof session`` (the frozen protocol's text) resolves a current ticker on the old date and
+returns nothing, or another issuer, for renamed and reused tickers (deviations.json D2). For each
+session this writes one gzip page set:
 
   bars      1-minute SIP bars 04:00-20:00 ET, raw prices (every page kept)
   auctions  official opening/closing auction prints for the session and the previous session
@@ -121,7 +125,10 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--per-second", type=float, default=20.0)
     ap.add_argument("--max-sessions", type=int, default=0)
+    ap.add_argument("--asof", default="session", help="'session' or the YYYY-MM-DD naming date of the candidate list")
     a = ap.parse_args(argv)
+    if a.asof != "session":
+        date.fromisoformat(a.asof)
     a.out.mkdir(parents=True, exist_ok=True, mode=0o700)
     ledger_path = a.out / "ledger.jsonl"
     by_day, prev = load_candidates(a.candidates)
@@ -133,19 +140,20 @@ def main(argv=None) -> int:
     with ledger_path.open("a") as ledger:
         ledger.write(json.dumps({"event": "run_start", "at": datetime.now(ET).isoformat(),
                                  "candidates_sha256": hashlib.sha256(a.candidates.read_bytes()).hexdigest(),
-                                 "sessions_todo": len(todo)}) + "\n")
+                                 "sessions_todo": len(todo), "asof": a.asof}) + "\n")
         for n, day_s in enumerate(todo, 1):
             day = date.fromisoformat(day_s)
             syms = sorted(by_day[day_s])
+            asof = day_s if a.asof == "session" else a.asof
             sdir = a.out / "sessions" / day_s
             sdir.mkdir(parents=True, exist_ok=True)
             specs = []
             for i in range(0, len(syms), BATCH):
                 chunk = ",".join(syms[i:i + BATCH])
                 specs.append(("bars", i, "/v2/stocks/bars", {"symbols": chunk, "timeframe": "1Min", "start": et_iso(day, 4),
-                              "end": et_iso(day, 20), "feed": "sip", "adjustment": "raw", "asof": day_s, "limit": 10000, "sort": "asc"}))
+                              "end": et_iso(day, 20), "feed": "sip", "adjustment": "raw", "asof": asof, "limit": 10000, "sort": "asc"}))
                 specs.append(("auctions", i, "/v2/stocks/auctions", {"symbols": chunk, "start": prev[day_s], "end": day_s,
-                              "feed": "sip", "asof": day_s, "limit": 10000}))
+                              "feed": "sip", "asof": asof, "limit": 10000}))
                 specs.append(("news", i, "/v1beta1/news", {"symbols": chunk, "start": et_iso(date.fromisoformat(prev[day_s]), 16),
                               "end": et_iso(day, 20), "limit": 50, "sort": "asc", "include_content": "false"}))
             ok = True
