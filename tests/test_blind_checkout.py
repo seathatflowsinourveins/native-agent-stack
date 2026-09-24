@@ -12,6 +12,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -208,9 +209,10 @@ class LedgerV1LabelTests(BlindCheckoutFixture):
         for candidate in row["candidates"]:
             for key in ("disposition", "rationale", "review_status"):
                 self.assertNotIn(key, candidate)
-        # The candidate's name/repository/evidence fields are kept.
-        self.assertEqual(row["candidates"][0]["name"], "Codex")
-        self.assertEqual(row["candidates"][0]["repository"], "https://github.com/openai/codex")
+        # The candidate's name/repository/evidence fields are kept (the order is neutral; see
+        # LedgerCandidateOrderTests).
+        by_name = {candidate["name"]: candidate for candidate in row["candidates"]}
+        self.assertEqual(by_name["Codex"]["repository"], "https://github.com/openai/codex")
 
 
 class CatalogsUnconditionalTests(BlindCheckoutFixture):
@@ -488,6 +490,199 @@ class ExportSymlinkTests(BlindCheckoutFixture):
             path = export / relative
             self.assertFalse(path.is_symlink(), relative)
             self.assertEqual(path.read_text(encoding="utf-8"), blind_checkout.EXPORT_INSTRUCTION_STUB, relative)
+
+
+def ordered_candidates(dispositions):
+    """Three candidates in the checked-in order (selected first), with the given dispositions."""
+    names = (("Zeta", "https://github.com/zz/zeta"), ("Alpha", "https://github.com/aa/alpha"),
+             ("Mid", "https://github.com/mm/mid"))
+    return [{"name": name, "repository": repository, "disposition": disposition, "evidence_refs": []}
+            for (name, repository), disposition in zip(names, dispositions)]
+
+
+class LedgerCandidateOrderTests(BlindCheckoutFixture):
+    """2026-09-24 blindness review (F2): candidates[0] was the selected incumbent on every ledger row."""
+
+    def test_candidates_are_exported_in_a_neutral_order_independent_of_dispositions(self):
+        first = ledger_row(layer_id="a", candidates=ordered_candidates(("selected", "conditional", "rejected")))
+        first["candidates"][0]["review_status"] = "confirmed_default"
+        permuted = ledger_row(layer_id="b", candidates=list(reversed(
+            ordered_candidates(("rejected", "selected", "conditional")))))
+        self.write("catalogs/landscape/foundation.json", {"schema_version": 2, "layers": [first, permuted]})
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "ordered ledger"], self.source)
+        manifest = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        rows = json.loads((self.dest / "catalogs/landscape/foundation.json").read_text(encoding="utf-8"))["layers"]
+        # The selected candidate (Zeta, whose repository sorts last) is exported last, not first.
+        self.assertEqual([c["name"] for c in rows[0]["candidates"]], ["Alpha", "Mid", "Zeta"])
+        self.assertEqual([c["name"] for c in rows[1]["candidates"]], ["Alpha", "Mid", "Zeta"])
+        # Every stripped pointer names the exported index.
+        paths = {entry["path"] for entry in manifest["stripped_fields"]}
+        self.assertIn("catalogs/landscape/foundation.json#/layers/0/candidates/2/review_status", paths)
+        self.assertNotIn("catalogs/landscape/foundation.json#/layers/0/candidates/0/review_status", paths)
+
+
+class CatalogWinnerKeyTests(BlindCheckoutFixture):
+    """2026-09-24 blindness review (F1): catalogs/ files that name the current winners."""
+
+    def test_no_catalog_json_in_the_export_carries_a_winner_or_incumbent_value(self):
+        self.write("catalogs/landscape/component-evidence-matrix.json",
+                   {"rows": [{"layer": "x", "winners": ["codex"]}]})
+        self.write("catalogs/landscape/new-host-grand-list.json", {"layers": [{"winners": ["codex"]}]})
+        self.write("catalogs/landscape/blind-convergence.json", {"rows": [{"coordinator_disposition": "codex"}]})
+        self.write("catalogs/sota-convergence/manifest-20260923.json",
+                   {"components": [{"id": "codex", "why_selected": "incumbent"}]})
+        self.write("catalogs/sota-convergence/sdk-runtime-coverage-20260923.json", {"incumbents": ["codex"]})
+        self.write("catalogs/foundation/community-practice-20260920.json",
+                   {"incumbent_decision_ids": ["d1"], "incumbent_decisions_path": "catalogs/x.json",
+                    "items": [{"winners": [{"id": "codex"}], "why_selected": "chosen",
+                               "claude_final_disposition": "codex", "current_selection_record": "r",
+                               "dual_lane_same_winner": True, "empty_winners": [], "winners_note": ""}]})
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "winner catalogs"], self.source)
+        export = self.dest.parent / "export"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(export)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+        for removed in ("catalogs/landscape/component-evidence-matrix.json",
+                        "catalogs/landscape/new-host-grand-list.json", "catalogs/landscape/blind-convergence.json",
+                        "catalogs/sota-convergence/manifest-20260923.json",
+                        "catalogs/sota-convergence/sdk-runtime-coverage-20260923.json"):
+            self.assertFalse((export / removed).exists(), removed)
+        pattern = re.compile(r"winners|incumbent|disposition|why_selected|current_selection_record", re.IGNORECASE)
+        offending = []
+
+        def walk(node, pointer):
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    if pattern.search(key) and value not in (None, "", [], {}):
+                        offending.append(f"{pointer}/{key}")
+                    walk(value, f"{pointer}/{key}")
+            elif isinstance(node, list):
+                for index, value in enumerate(node):
+                    walk(value, f"{pointer}/{index}")
+
+        scanned = 0
+        for path in sorted((export / "catalogs").rglob("*.json")):
+            walk(json.loads(path.read_text(encoding="utf-8")), path.relative_to(export).as_posix())
+            scanned += 1
+        self.assertGreater(scanned, 0)
+        self.assertEqual(offending, [])
+        community = json.loads((export / "catalogs/foundation/community-practice-20260920.json").read_text("utf-8"))
+        # Empty values state nothing and are kept, so a pending ledger row keeps winners: [].
+        self.assertEqual(community["items"][0]["empty_winners"], [])
+        on_disk = json.loads((self.dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
+        paths = {entry["path"] for entry in on_disk["stripped_fields"]}
+        self.assertIn("catalogs/foundation/community-practice-20260920.json/items/0/why_selected", paths)
+        self.assertIn("catalogs/foundation/community-practice-20260920.json/incumbent_decision_ids", paths)
+
+
+class ExportTimestampTests(BlindCheckoutFixture):
+    def test_every_exported_path_has_the_same_fixed_timestamp(self):
+        export = self.dest.parent / "export"
+        self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        blind_checkout.export_tree(self.dest, export)
+        paths = [export, *export.rglob("*")]
+        self.assertTrue(any(path.is_file() for path in paths))
+        for path in paths:
+            stat = os.lstat(path)
+            self.assertEqual(stat.st_mtime, 0, path)
+            if path.is_file():
+                # Listing a directory (this test's rglob) refreshes its atime, so atime is asserted only for
+                # files, which this test never reads.
+                self.assertEqual(stat.st_atime, 0, path)
+
+
+class AllowlistExportTests(BlindCheckoutFixture):
+    """2026-09-24 blindness review (F1): with --allow-from-packets the export holds only what the packets name."""
+
+    def setUp(self):
+        super().setUp()
+        self.write("README.md", "# Catalog\n\nThe selected stack is Codex.\n")
+        self.write("evidence/receipts/a.json", {"see": "evidence/receipts/b.md#L3",
+                                                "catalog": "catalogs/other/decisions.json",
+                                                "doc": "docs/keep-me.md", "readme": "README.md"})
+        self.write("evidence/receipts/b.md", "transitive\n")
+        self.write("evidence/receipts/c.json", {"next": "evidence/receipts/d.json"})
+        self.write("evidence/receipts/d.json", {"next": "evidence/receipts/e.md"})
+        self.write("evidence/receipts/e.md", "two levels away\n")
+        self.write("evidence/receipts/unreferenced.md", "not named\n")
+        self.write("evidence/dir/x.txt", "x\n")
+        self.write("evidence/dir/sub/y.txt", "y\n")
+        self.write("blueprints/bp/recipe.md", "recipe\n")
+        self.write("tests/test_example.py", "# test\n")
+        self.write("tools/example/tool.py", "# tool\n")
+        self.write("scripts/example.sh", "#!/bin/sh\n")
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "allowlist fixture"], self.source)
+        packets_parent = tempfile.TemporaryDirectory()
+        self.addCleanup(packets_parent.cleanup)
+        self.packets = Path(packets_parent.name).resolve() / "packets"
+        self.packets.mkdir()
+        packet = {
+            "catalog": "foundation", "layer_id": "native-clients",
+            "candidates": [
+                {"name": "Codex", "evidence_refs": ["evidence/receipts/a.json", "evidence/dir/",
+                                                    "catalogs/landscape/foundation.json:12",
+                                                    "evidence/missing.md, see notes",
+                                                    "https://github.com/openai/codex", "/etc/hostname",
+                                                    "../outside/file.md"],
+                 "registered_receipts": [{"id": "withheld", "path": "evidence/receipts/c.json"}],
+                 "recipe_ref": "blueprints/bp/recipe.md:L12"},
+                {"name": "Other", "evidence_refs": [], "recipe_ref": None},
+            ],
+            "sota_components_not_in_candidates": [
+                {"registered_receipts": [{"path": "evidence/dir/sub/y.txt;"}]}],
+        }
+        (self.packets / "foundation__native-clients.json").write_text(json.dumps(packet), encoding="utf-8")
+        (self.packets / "SHA256SUMS").write_text("ignored\n", encoding="utf-8")
+        self.export = self.dest.parent / "export"
+        self.out = io.StringIO()
+        with contextlib.redirect_stdout(self.out):
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(self.export),
+                                                  "--allow-from-packets", str(self.packets)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+
+    def test_export_holds_only_referenced_transitive_and_code_paths(self):
+        exported = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*") if p.is_file())
+        self.assertEqual(exported, sorted([
+            "AGENTS.md", "CLAUDE.md",
+            "blueprints/bp/recipe.md",
+            "catalogs/landscape/foundation.json",
+            "evidence/dir/sub/y.txt", "evidence/dir/x.txt",
+            "evidence/receipts/a.json", "evidence/receipts/b.md", "evidence/receipts/c.json",
+            "evidence/receipts/d.json",
+            "scripts/example.sh", "tests/test_example.py", "tools/example/tool.py",
+        ]))
+        for excluded in ("README.md", "docs/keep-me.md", "catalogs/other/decisions.json",
+                         "evidence/receipts/e.md", "evidence/receipts/unreferenced.md"):
+            self.assertFalse((self.export / excluded).exists(), excluded)
+        # Included files still get the export's stripping and stubs.
+        self.assertEqual((self.export / "AGENTS.md").read_text(encoding="utf-8"),
+                         blind_checkout.EXPORT_INSTRUCTION_STUB)
+        row = json.loads((self.export / "catalogs/landscape/foundation.json").read_text(encoding="utf-8"))["layers"][0]
+        self.assertEqual(row["winners"], [])
+        self.assertNotIn("current_choice", row)
+
+    def test_counts_and_missing_references_are_reported(self):
+        printed = json.loads(self.out.getvalue())
+        self.assertEqual(printed["export_missing_refs"], ["evidence/missing.md"])
+        self.assertEqual(printed["export_transitive_refs"], 2)  # b.md (from a.json) and d.json (from c.json)
+        self.assertEqual(printed["export_allowlisted_files"], 11)
+
+    def test_bare_reference_reduction(self):
+        reduce = blind_checkout.bare_reference
+        self.assertEqual(reduce("docs/x.md#section"), "docs/x.md")
+        self.assertEqual(reduce("tools/a.py:12"), "tools/a.py")
+        self.assertEqual(reduce("tools/a.py:L12-L40,"), "tools/a.py")
+        self.assertEqual(reduce("(evidence/a.json)"), "evidence/a.json")
+        self.assertEqual(reduce("./evidence/dir/ plus prose"), "evidence/dir")
+        for rejected in ("https://example.com/a", "/etc/hostname", "../x", "a/../../b", "", None, 3):
+            self.assertIsNone(reduce(rejected), rejected)
 
 
 if __name__ == "__main__":

@@ -17,8 +17,16 @@ What is stripped, and how each strip is recorded in
 - **Removed outright** (recorded under ``removed_files``, one entry per file
   actually deleted): ``evidence/artifacts/layer-verdicts-*/`` (recursively),
   ``catalogs/sota-convergence/layer-verdicts-*.json``,
-  ``docs/grand-catalog-handbook.md``, ``docs/ecosystem/index.html`` and
-  ``docs/ecosystem/manifest.json``.
+  ``docs/grand-catalog-handbook.md``, ``docs/ecosystem/index.html``,
+  ``docs/ecosystem/manifest.json``, and the files that name each layer's
+  current winners throughout: ``catalogs/landscape/{component-evidence-matrix,
+  new-host-grand-list,blind-convergence}.json``,
+  ``catalogs/sota-convergence/manifest-*.json`` and
+  ``catalogs/sota-convergence/sdk-runtime-coverage-*``.
+- **Ledger candidate order**: each ledger row's ``candidates`` list is sorted
+  by lowercased ``(repository, name)`` before anything else is stripped (the
+  checked-in order lists the selected incumbent first), so every recorded
+  ``candidates/{index}`` pointer names the exported position.
 - **The layer-verdict schema v2 fields** of both ledgers
   (``catalogs/landscape/{foundation,us-equities}.json``): every row is reset
   to ``verdict_status: "pending_lanes"`` with empty ``winners``/
@@ -35,7 +43,9 @@ What is stripped, and how each strip is recorded in
   above, redundantly but harmlessly, since those keys are already gone by
   the time this pass runs): the keys ``selection``, ``decision``,
   ``disposition``, ``current_choice`` and ``review_status`` are removed
-  wherever they appear, at any nesting depth, regardless of their value.
+  wherever they appear, at any nesting depth, regardless of their value;
+  and the winner/incumbent keys in ``CATALOGS_NONEMPTY_KEYS`` (``winners``,
+  ``incumbents``, ``why_selected`` ...) wherever their value is non-empty.
 - **Every JSON file under ``blueprints/``**: the same five keys are removed
   only when the value itself is a label from a closed selection vocabulary
   (``is_label_value``/``LABEL_VALUES`` below, enumerated from every string
@@ -114,10 +124,21 @@ LEDGER_RELATIVE_FILES = (
 # ledgers, since it is not on this task's data-vs-label boundary there).
 CATALOGS_UNCONDITIONAL_KEYS = frozenset({"selection", "decision", "disposition", "current_choice", "review_status"})
 
-# The same five keys, but under blueprints/ they are stripped only when the
+# Keys that name a layer's current winner/incumbent directly (2026-09-24 blindness review, F1): stripped at
+# any depth from every JSON file under catalogs/ whenever the value is non-empty. An empty value ([], {}, "",
+# None) states no selection and is left in place, so the ledger rows' pending-lanes ``winners: []`` reset
+# survives and a second strip pass finds nothing (idempotence). Each strip is recorded in stripped_fields.
+CATALOGS_NONEMPTY_KEYS = frozenset({
+    "winners", "incumbents", "incumbent_decision_ids", "incumbent_decisions_path", "coordinator_disposition",
+    "claude_final_disposition", "why_selected", "current_selection_record", "dual_lane_same_winner",
+})
+
+# The original five keys, but under blueprints/ they are stripped only when the
 # value is itself a label (see is_label_value); a mapping/rule value or a
 # plain data value (e.g. "top_20") under one of these keys is left alone.
-BLUEPRINT_CONDITIONAL_KEYS = CATALOGS_UNCONDITIONAL_KEYS
+# Deliberately not extended with CATALOGS_NONEMPTY_KEYS: the blueprint label vocabulary
+# and its classification test cover exactly these five keys.
+BLUEPRINT_CONDITIONAL_KEYS = frozenset({"selection", "decision", "disposition", "current_choice", "review_status"})
 
 LEDGER_ROW_LABEL_KEYS = ("current_choice", "decision", "rationale")
 LEDGER_CANDIDATE_LABEL_KEYS = ("disposition", "rationale", "review_status")
@@ -144,6 +165,13 @@ REMOVE_GLOBS = (
     "docs/grand-catalog-handbook.md",
     "docs/ecosystem/index.html",
     "docs/ecosystem/manifest.json",
+    # Files that name each layer's current winners/incumbents throughout (2026-09-24 blindness review, F1):
+    # removed outright, also from an allowlisted export.
+    "catalogs/landscape/component-evidence-matrix.json",
+    "catalogs/landscape/new-host-grand-list.json",
+    "catalogs/landscape/blind-convergence.json",
+    "catalogs/sota-convergence/manifest-*.json",
+    "catalogs/sota-convergence/sdk-runtime-coverage-*",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/
@@ -237,7 +265,19 @@ def is_label_value(value) -> bool:
     return False
 
 
+def neutral_candidate_key(candidate) -> tuple:
+    """Sort key for a ledger row's candidates that ignores every label: the checked-in ledgers list the
+    selected incumbent first on every row (2026-09-24 blindness review, F2), so the original order is itself
+    a label."""
+    if not isinstance(candidate, dict):
+        return ("", "", json.dumps(candidate, sort_keys=True))
+    return (str(candidate.get("repository") or "").lower(), str(candidate.get("name") or "").lower())
+
+
 def strip_ledger_row(row: dict, pointer_prefix: str, stripped: list, hmac_key: bytes) -> None:
+    # Reorder first, so every candidates/{index} pointer recorded below names the exported position.
+    if isinstance(row.get("candidates"), list):
+        row["candidates"] = sorted(row["candidates"], key=neutral_candidate_key)
     for key, default in PENDING_LANES.items():
         if row.get(key) != default:
             if key in row:
@@ -263,24 +303,32 @@ def strip_ledger_document(document: dict, relative_path: str, stripped: list, hm
             strip_ledger_row(row, f"{relative_path}#/layers/{index}", stripped, hmac_key)
 
 
+def _is_empty_value(value) -> bool:
+    return value is None or (isinstance(value, (str, list, dict)) and len(value) == 0)
+
+
 def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only_labels: bool,
-                hmac_key: bytes) -> None:
+                hmac_key: bytes, nonempty_keys: frozenset = frozenset()) -> None:
     if isinstance(node, dict):
         for key in list(node.keys()):
             pointer = f"{path_prefix}/{key}"
             value = node[key]
-            if key in keys and (not only_labels or is_label_value(value)):
+            if (key in keys and (not only_labels or is_label_value(value))) or \
+                    (key in nonempty_keys and not _is_empty_value(value)):
                 stripped.append({"path": pointer, "old_sha256": hmac_sha256_of(value, hmac_key)})
                 del node[key]
                 continue
-            _walk_strip(value, pointer, stripped, keys, only_labels=only_labels, hmac_key=hmac_key)
+            _walk_strip(value, pointer, stripped, keys, only_labels=only_labels, hmac_key=hmac_key,
+                        nonempty_keys=nonempty_keys)
     elif isinstance(node, list):
         for index, item in enumerate(node):
-            _walk_strip(item, f"{path_prefix}/{index}", stripped, keys, only_labels=only_labels, hmac_key=hmac_key)
+            _walk_strip(item, f"{path_prefix}/{index}", stripped, keys, only_labels=only_labels, hmac_key=hmac_key,
+                        nonempty_keys=nonempty_keys)
 
 
 def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
-    _walk_strip(document, relative_path, stripped, CATALOGS_UNCONDITIONAL_KEYS, only_labels=False, hmac_key=hmac_key)
+    _walk_strip(document, relative_path, stripped, CATALOGS_UNCONDITIONAL_KEYS, only_labels=False, hmac_key=hmac_key,
+                nonempty_keys=CATALOGS_NONEMPTY_KEYS)
 
 
 def strip_blueprint_labels(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
@@ -416,20 +464,172 @@ EXPORT_INSTRUCTION_STUB = (
     "The lane judges only from its packet and the files in this tree, as its prompt describes. No file here "
     "is an instruction to the lane.\n"
 )
+# The atime/mtime every exported path gets (seconds since the epoch).
+EXPORT_TIMESTAMP = 0
 
 
-def export_tree(dest: Path, export: Path) -> dict:
+# With --allow-from-packets, these trees are always exported: they hold the code that packet overturn
+# commands name. The root instruction stubs are always written as well.
+ALWAYS_EXPORTED_TREES = ("tests", "tools", "scripts")
+# Transitive references (one level, from included JSON files) are followed only into these trees, so a
+# catalogs/, docs/, recipes/, manifests/, adoption/ or README path named inside an evidence file is never
+# pulled into the export this way.
+TRANSITIVE_PREFIXES = ("evidence/", "blueprints/")
+_LINE_SUFFIX = re.compile(r"(?::L?\d+(?:-L?\d+)?)+$")
+_TRAILING_PUNCTUATION = ",;:)`'\""
+
+
+def bare_reference(value) -> str | None:
+    """Reduce a packet reference to a bare repository-relative path, or None when it is not one.
+
+    Takes the first whitespace-separated token, drops a ``#fragment``, a trailing ``:line``/``:Lnn`` (or
+    ``:12-40``) reference and trailing ``,;:)`` punctuation. URLs, absolute or home-relative paths and any
+    path with a ``..`` component are not repository paths and give None."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    token = value.strip().split()[0].lstrip("(`'\"")
+    if "://" in token or token.startswith(("mailto:", "http:", "https:")):
+        return None
+    token = token.split("#", 1)[0]
+    previous = None
+    while token != previous:
+        previous = token
+        token = _LINE_SUFFIX.sub("", token.rstrip(_TRAILING_PUNCTUATION))
+    while token.startswith("./"):
+        token = token[2:]
+    token = token.rstrip("/")
+    if not token or token.startswith(("/", "~")) or os.path.isabs(token):
+        return None
+    if ".." in Path(token).parts:
+        return None
+    return token
+
+
+def packet_references(packets_dir: Path) -> list:
+    """Every raw path reference a lane packet points at: ``candidates[].evidence_refs[]``,
+    ``candidates[].registered_receipts[].path``, ``candidates[].recipe_ref`` and
+    ``sota_components_not_in_candidates[].registered_receipts[].path`` of each ``*__*.json`` packet."""
+    packet_files = sorted(p for p in Path(packets_dir).glob("*__*.json") if p.is_file())
+    if not packet_files:
+        raise SystemExit(f"--allow-from-packets {packets_dir} has no *__*.json packet files")
+    references: list = []
+
+    def receipts(entry):
+        for receipt in entry.get("registered_receipts") or []:
+            if isinstance(receipt, dict):
+                references.append(receipt.get("path"))
+
+    for packet_file in packet_files:
+        packet = json.loads(packet_file.read_text(encoding="utf-8"))
+        for candidate in packet.get("candidates") or []:
+            if not isinstance(candidate, dict):
+                continue
+            references.extend(candidate.get("evidence_refs") or [])
+            receipts(candidate)
+            references.append(candidate.get("recipe_ref"))
+        for component in packet.get("sota_components_not_in_candidates") or []:
+            if isinstance(component, dict):
+                receipts(component)
+    return references
+
+
+def _expand_reference(root: Path, relative: str) -> set:
+    """The repository-relative files (and symlinks) ``relative`` names under ``root``: itself, or, for a
+    real directory, everything below it (not following symlinked directories)."""
+    path = root / relative
+    if path.is_symlink() or path.is_file():
+        return {relative}
+    if not path.is_dir():
+        return set()
+    found = set()
+    for directory, dirs, files in os.walk(path, followlinks=False):
+        for name in files + [d for d in dirs if (Path(directory) / d).is_symlink()]:
+            found.add((Path(directory) / name).relative_to(root).as_posix())
+    return found
+
+
+def _string_values(node):
+    if isinstance(node, str):
+        yield node
+    elif isinstance(node, dict):
+        for value in node.values():
+            yield from _string_values(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _string_values(value)
+
+
+def build_allowlist(dest: Path, packets_dir: Path) -> dict:
+    """The export allowlist for ``dest`` (the stripped worktree) from the lane packets in ``packets_dir``.
+
+    Returns ``files`` (repository-relative paths to export), ``missing_refs`` (packet references with no
+    path in ``dest``, sorted) and ``transitive_refs`` (the evidence/ and blueprints/ paths added from
+    included JSON files, one level only, sorted)."""
+    files: set = set()
+    missing: set = set()
+    for raw in packet_references(packets_dir):
+        relative = bare_reference(raw)
+        if relative is None:
+            continue
+        if not os.path.lexists(dest / relative):
+            missing.add(relative)
+            continue
+        files |= _expand_reference(dest, relative)
+    for tree in ALWAYS_EXPORTED_TREES:
+        files |= _expand_reference(dest, tree)
+    transitive: set = set()
+    transitive_files: set = set()
+    # One level: only the files selected above are scanned; files added here are not scanned in turn.
+    for relative in sorted(files):
+        path = dest / relative
+        if not relative.endswith(".json") or path.is_symlink() or not path.is_file():
+            continue
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError):
+            continue
+        for value in _string_values(document):
+            reference = bare_reference(value)
+            if reference is None or not reference.startswith(TRANSITIVE_PREFIXES):
+                continue
+            if not os.path.lexists(dest / reference):
+                continue
+            added = _expand_reference(dest, reference) - files
+            if added:
+                transitive.add(reference)
+                transitive_files |= added
+    files |= transitive_files
+    return {"files": files, "missing_refs": sorted(missing), "transitive_refs": sorted(transitive)}
+
+
+def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> dict:
     """Copy the stripped worktree to ``export`` without ``.git`` or ``BLIND-MANIFEST.json``: the worktree's
     ``.git`` reaches the source repository's history, where ``git show <rev>:<path>`` recovers every
     stripped value, and the manifest is the operator's audit trail. Lanes are given this copy.
 
     In the export only, every project instruction file (INSTRUCTION_FILE_NAMES, at any depth) is replaced
     by EXPORT_INSTRUCTION_STUB and every INSTRUCTION_DIR_NAMES directory is left out. Returns the
-    export-relative paths of both, sorted. Markdown prose elsewhere (README.md, docs/, blueprints/ and
-    others) is copied unchanged and can still name the incumbent choices; see the README's limits."""
+    export-relative paths of both, sorted. Without ``allow_from_packets``, Markdown prose elsewhere
+    (README.md, docs/, blueprints/ and others) is copied unchanged and can still name the incumbent choices.
+
+    With ``allow_from_packets`` (a lane-packets directory), the export holds only the paths those packets
+    reference, one level of evidence/ and blueprints/ paths named inside included JSON files, the
+    ALWAYS_EXPORTED_TREES and the root instruction stubs (see build_allowlist); the result then also carries
+    ``allowlisted_files`` (count), ``missing_refs`` (sorted list) and ``transitive_refs`` (count).
+
+    Every regular file, directory and symlink in the export gets the same fixed atime/mtime (0), so a
+    stripped file cannot be told apart from an untouched one by its timestamp."""
     if export.exists():
         raise SystemExit(f"--export {export} already exists")
     removed_dirs: list = []
+    allowlist = build_allowlist(dest, allow_from_packets) if allow_from_packets is not None else None
+    allowed_files = allowlist["files"] if allowlist is not None else None
+    allowed_dirs: set = set()
+    if allowed_files is not None:
+        for relative in allowed_files:
+            parts = relative.split("/")
+            for depth in range(1, len(parts)):
+                allowed_dirs.add("/".join(parts[:depth]))
 
     def ignore(directory, names):
         skipped = set(shutil.ignore_patterns(".git", "BLIND-MANIFEST.json")(directory, names))
@@ -437,6 +637,14 @@ def export_tree(dest: Path, export: Path) -> dict:
             if name in INSTRUCTION_DIR_NAMES:
                 skipped.add(name)
                 removed_dirs.append((Path(directory) / name).relative_to(dest).as_posix())
+            elif allowed_files is not None and name not in skipped:
+                path = Path(directory) / name
+                relative = path.relative_to(dest).as_posix()
+                if path.is_dir() and not path.is_symlink():
+                    if relative not in allowed_dirs:
+                        skipped.add(name)
+                elif relative not in allowed_files:
+                    skipped.add(name)
         return skipped
 
     shutil.copytree(dest, export, symlinks=True, ignore=ignore)
@@ -480,8 +688,22 @@ def export_tree(dest: Path, export: Path) -> dict:
             root_file.write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
             if name not in replaced:
                 replaced.append(name)
-    return {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs),
-            "removed_escaping_symlinks": sorted(removed_links)}
+    # A stripped (rewritten) file would otherwise carry a newer mtime than an untouched one.
+    for directory, dirs, files in os.walk(export, topdown=False, followlinks=False):
+        for name in files + dirs:
+            path = Path(directory) / name
+            if path.is_symlink():
+                if os.utime in os.supports_follow_symlinks:
+                    os.utime(path, (EXPORT_TIMESTAMP, EXPORT_TIMESTAMP), follow_symlinks=False)
+            else:
+                os.utime(path, (EXPORT_TIMESTAMP, EXPORT_TIMESTAMP))
+    os.utime(export, (EXPORT_TIMESTAMP, EXPORT_TIMESTAMP))
+    result = {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs),
+              "removed_escaping_symlinks": sorted(removed_links)}
+    if allowlist is not None:
+        result.update({"allowlisted_files": len(allowed_files), "missing_refs": allowlist["missing_refs"],
+                       "transitive_refs": len(allowlist["transitive_refs"])})
+    return result
 
 
 def parse_args(argv=None):
@@ -492,7 +714,14 @@ def parse_args(argv=None):
     parser.add_argument("--export", type=Path,
                         help="Also copy the stripped tree here without .git or BLIND-MANIFEST.json (must not exist); "
                              "hand this copy, not the worktree, to the lanes.")
-    return parser.parse_args(argv)
+    parser.add_argument("--allow-from-packets", type=Path, metavar="PACKETS_DIR",
+                        help="With --export: export only the paths the lane packets PACKETS_DIR/*__*.json reference, "
+                             "one level of evidence/ and blueprints/ paths named in included JSON files, tests/, "
+                             "tools/, scripts/ and the root instruction stubs.")
+    args = parser.parse_args(argv)
+    if args.allow_from_packets is not None and args.export is None:
+        parser.error("--allow-from-packets requires --export")
+    return args
 
 
 def main(argv=None) -> int:
@@ -500,10 +729,13 @@ def main(argv=None) -> int:
     source = args.source.resolve()
     dest = args.dest.resolve()
     export = args.export.resolve() if args.export else None
+    packets = args.allow_from_packets.resolve() if args.allow_from_packets else None
     if export is not None and export.exists():
         raise SystemExit(f"--export {export} already exists")
+    if packets is not None:
+        packet_references(packets)  # refuses a directory without packets before the worktree is created
     manifest = run_blind_checkout(source, args.rev, dest)
-    sanitized = export_tree(dest, export) if export is not None else None
+    sanitized = export_tree(dest, export, allow_from_packets=packets) if export is not None else None
     key_path = dest.parent / f"{dest.name}.hmac-key"
     # Owner-only, created exclusively: the key reverses the keyed hashes over a small
     # vocabulary, so no lane that can read the parent directory may read it.
@@ -516,7 +748,10 @@ def main(argv=None) -> int:
                        "export": str(export) if export is not None else None,
                        "export_instruction_files_replaced": sanitized["replaced_instruction_files"] if sanitized else None,
                        "export_instruction_dirs_removed": sanitized["removed_instruction_dirs"] if sanitized else None,
-                       "export_escaping_symlinks_removed": sanitized["removed_escaping_symlinks"] if sanitized else None},
+                       "export_escaping_symlinks_removed": sanitized["removed_escaping_symlinks"] if sanitized else None,
+                       "export_allowlisted_files": sanitized.get("allowlisted_files") if sanitized else None,
+                       "export_missing_refs": sanitized.get("missing_refs") if sanitized else None,
+                       "export_transitive_refs": sanitized.get("transitive_refs") if sanitized else None},
                       sort_keys=True))
     return 0
 
