@@ -1673,6 +1673,46 @@ class CredentialFilePermissions(unittest.TestCase):
         with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
             credentials(fifo)
 
+    def test_hard_link_is_rejected(self):
+        # G-fix-round item 2: a second name for the same inode (e.g. one outside a
+        # worktree, one inside) must not pass because the checked name alone looks
+        # compliant -- credential_guard checks st_nlink on the opened fd.
+        target = self._write_env(self.root, name="real.env")
+        other_name = self.root / "second-name.env"
+        os.link(target, other_name)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(target)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(other_name)
+
+    def test_group_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o770)
+        try:
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_world_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o707)
+        try:
+            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_0700_and_0755_owned_parent_directories_still_pass(self):
+        # Coordinator requirement: runner's accepted configurations are unchanged.
+        for mode in (0o700, 0o755):
+            with self.subTest(mode=oct(mode)):
+                directory = self.root / oct(mode)
+                directory.mkdir(mode=mode)
+                os.chmod(directory, mode)  # mkdir's mode is subject to umask; force the exact bits
+                path = self._write_env(directory)
+                self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
         path = self._write_env(self.root)
         self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
@@ -1683,6 +1723,20 @@ class CredentialFilePermissions(unittest.TestCase):
             credentials(path)
         self.assertNotIn("fixture-key", str(ctx.exception))
         self.assertNotIn("fixture-secret", str(ctx.exception))
+
+    def test_error_never_includes_path_or_basename(self):
+        path = self._write_env(self.root, name="tell-tale-name.env", mode=0o644)
+        with self.assertRaises(SafetyErrorAlways) as ctx:
+            credentials(path)
+        self.assertNotIn("tell-tale-name", str(ctx.exception))
+        self.assertNotIn(str(self.root), str(ctx.exception))
+
+    def test_non_ascii_content_is_rejected(self):
+        path = self.root / "paper.env"
+        path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_encoding"):
+            credentials(path)
 
 
 class SharedCredentialGuardParity(unittest.TestCase):

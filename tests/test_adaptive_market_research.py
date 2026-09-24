@@ -210,6 +210,67 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
         with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
             m.credentials(fifo)
 
+    def test_hard_link_is_rejected(self):
+        target = self._write_env(self.root, name="real.env")
+        other_name = self.root / "second-name.env"
+        os.link(target, other_name)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(target)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(other_name)
+
+    def test_group_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o770)
+        try:
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_world_writable_parent_directory_is_rejected(self):
+        path = self._write_env(self.root, mode=0o600)
+        os.chmod(self.root, 0o707)
+        try:
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+        finally:
+            os.chmod(self.root, 0o700)
+
+    def test_0700_and_0755_owned_parent_directories_still_pass(self):
+        for mode in (0o700, 0o755):
+            with self.subTest(mode=oct(mode)):
+                directory = self.root / oct(mode)
+                directory.mkdir(mode=mode)
+                os.chmod(directory, mode)  # mkdir's mode is subject to umask; force the exact bits
+                path = self._write_env(directory)
+                self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
+
+    def test_content_over_the_size_cap_is_rejected_by_a_bounded_read(self):
+        # G-fix-round item 7: the cap is enforced by reading MAX+1 bytes from the
+        # opened fd, not by trusting an earlier fstat-reported size.
+        path = self.root / "paper.env"
+        oversized = "APCA_API_KEY_ID=" + ("k" * (m.MAX_CREDENTIAL_BYTES + 64)) + "\nAPCA_API_SECRET_KEY=s\n"
+        path.write_text(oversized)
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(m.ResearchError, "invalid_credential_file"):
+            m.credentials(path)
+
+    def test_content_at_the_size_cap_is_accepted(self):
+        path = self.root / "paper.env"
+        filler = "k" * (m.MAX_CREDENTIAL_BYTES - len("APCA_API_KEY_ID=\nAPCA_API_SECRET_KEY=s\n"))
+        path.write_text(f"APCA_API_KEY_ID={filler}\nAPCA_API_SECRET_KEY=s\n")
+        os.chmod(path, 0o600)
+        self.assertEqual(len(path.read_bytes()), m.MAX_CREDENTIAL_BYTES)
+        self.assertEqual(m.credentials(path), (filler, "s"))
+
+    def test_non_ascii_content_is_rejected(self):
+        path = self.root / "paper.env"
+        path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_encoding"):
+            m.credentials(path)
+
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
         path = self._write_env(self.root)
         self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
@@ -220,6 +281,13 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
             m.credentials(path)
         self.assertNotIn("fixture-key", str(ctx.exception))
         self.assertNotIn("fixture-secret", str(ctx.exception))
+
+    def test_error_never_includes_path_or_basename(self):
+        path = self._write_env(self.root, name="tell-tale-name.env", mode=0o644)
+        with self.assertRaises(m.ResearchError) as ctx:
+            m.credentials(path)
+        self.assertNotIn("tell-tale-name", str(ctx.exception))
+        self.assertNotIn(str(self.root), str(ctx.exception))
 
 
 class ResearchFeedSelection(unittest.TestCase):

@@ -56,17 +56,28 @@ def credentials(path):
     ownership, or location before any content is read. File contents are
     never included in a raised error or log.
 
-    The ownership/mode/worktree-location rules and their TOCTOU-safe
+    The ownership/mode/worktree-location rules and their fd-traversal-bound
     open live in `credential_guard.open_verified()`, shared with
     `market_research.credentials()` so the two loaders cannot drift; this
     keeps `follow_symlinks=True`, i.e. a symlinked env file is resolved and
     the rules applied to its target, matching this loader's prior behavior.
+
+    The file's `KEY=value` lines are required to be plain ASCII: an Alpaca
+    key id/secret is itself an ASCII token, and every writer of this file
+    (`tools/credentials/set_credential.py`, a human `chmod 600`'d text file)
+    only ever emits ASCII. A byte outside that range is refused before any
+    line is parsed, deliberately, rather than accepted as UTF-8 and only
+    failing later (or not at all) inside the per-variable value parser.
     """
     try:
         with open_verified(path, follow_symlinks=True) as handle:
-            text = handle.read().decode("utf-8")
+            raw = handle.read()
     except CredentialGuardError as error:
         raise SafetyError(str(error)) from None
+    try:
+        text = raw.decode("ascii")
+    except UnicodeDecodeError:
+        raise SafetyError("credential_file_encoding: env file must be ASCII") from None
     result = {}
     for line in text.splitlines():
         line = line.strip()
