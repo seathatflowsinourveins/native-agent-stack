@@ -2,7 +2,9 @@
 
 **Status: draft plan. Nothing here is frozen, and no outcome has been computed.** The governing preregistration
 draft is the core, [`protocol-core-draft.json`](protocol-core-draft.json), with status
-`draft_pending_independent_pre_outcome_review` and `frozen_before_outcomes: false`. It covers H1 and H3 only. The
+`draft_pending_independent_verification_of_review_resolutions` and `frozen_before_outcomes: false` (the independent
+cross-family review of 2026-09-24 is resolved in review round 8; a verification of those resolutions is pending).
+It covers H1 and H3 only. The
 earlier full draft, [`protocol-draft.json`](protocol-draft.json), is archived with status
 `superseded_by_core_draft_20260924`. It was never frozen or run, and no rule in it governs. The execution study H6
 keeps its own draft, [`h6-execution-parity-draft.json`](h6-execution-parity-draft.json), which is **not part of the
@@ -46,7 +48,7 @@ evidence below points the other way. It is consistent with #162's result, not a 
 | Bali, Cakici, Whitelaw (2011), "Maxing Out", *JFE* 99(2) ([PDF](https://pages.stern.nyu.edu/~rwhitela/papers/max%20jfe.pdf); [NBER w14804](https://www.nber.org/system/files/working_papers/w14804/w14804.pdf)) | Stocks with the largest recent daily return (MAX) earn *lower* subsequent risk-adjusted returns: lottery demand, then reversal | **survives** (both PDFs opened) |
 | Hong, Li, Ni, Scheinkman, Yan, "Days to Cover and Stock Returns" ([NBER w21166](https://www.nber.org/system/files/working_papers/w21166/w21166.pdf)) | High days-to-cover predicts *lower* returns. The paper makes no squeeze claim | **survives** (opened) |
 | Barber & Odean (2008), *RFS* 21(2) ([PDF](https://faculty.haas.berkeley.edu/odean/papers/Attention/All%20that%20Glitters.pdf)); Barber, Huang, Odean, Schwarz (2022), *JF* ([10.1111/jofi.13183](https://onlinelibrary.wiley.com/doi/abs/10.1111/jofi.13183)); Barber, Lin, Odean (2023), *JFQA* | Retail buying of extreme-return, high-volume names is well documented and not profitable for the buyer | *contested*: the refutation concerned a citation and the fit, not the direction. It is used only as a prior on retail P&L, not as a strategy backtest |
-| Lou, Polk, Skouras (2019), "A tug of war: Overnight versus intraday expected returns", *JFE* 134(1):192-213 ([10.1016/j.jfineco.2019.03.011](https://doi.org/10.1016/j.jfineco.2019.03.011)); Akbas, Boehmer, Jiang, Koch (2022), "Overnight returns, daytime reversals, and future stock returns", *JFE* 145(3):850-875 ([10.1016/j.jfineco.2021.09.019](https://doi.org/10.1016/j.jfineco.2021.09.019)) | Overnight and intraday legs behave asymmetrically, so a flat multi-session hold mixes two opposing effects | *contested*: the original citation pointed at a secondary summary. Both DOIs resolve in Crossref (metadata checked 2026-09-24); the full texts still need a direct read. Evidence comes from large, liquid names |
+| Lou, Polk, Skouras (2019), "A tug of war: Overnight versus intraday expected returns", *JFE* 134(1):192-213 ([10.1016/j.jfineco.2019.03.011](https://doi.org/10.1016/j.jfineco.2019.03.011); [author-hosted PDF](https://personal.lse.ac.uk/polk/research/TugOfWar.pdf)) | Monthly value-weight decile spreads (US stocks >= $5 outside the bottom NYSE size quintile, 1993-2013, gross of costs) earn their premia overnight or intraday, typically with opposite signs; the one-month reversal spread is +0.93%/month overnight and -1.05%/month intraday with no close-to-close effect. Untested on daily movers or multi-session holds | **survives**: full text read 2026-09-24 (sha256 in `freeze_preconditions[1]`). The sweep had marked it *contested* because its original citation pointed at a secondary summary |
 | Martineau (2022), *Critical Finance Review* 11:613-646, and the 2025 revival papers | Whether PEAD survives costs is unsettled | *contested*: deferred, not a v3 hypothesis |
 
 Repository evidence points the same way. #162's v1 has **no pass among 768 rule-exits**. All 704 with at least 200
@@ -57,8 +59,9 @@ The broad-universe study (`blueprints/us-equities/broad-universe/README.md`) rep
 The sweep also stated that "squeezes are episodic, not a base rate". Its only source for that is an unverified S3
 Partners conference draft (EFMA 2025), not Hong et al., so v3 gives its squeeze test (H5-s) no directional prior.
 
-The literature is monthly, cross-sectional and mostly large-cap. Whether it carries over to catalyst-conditioned
-movers priced at $1 to $50 is what v3 tests; it is not an assumed result.
+The literature is monthly, cross-sectional and mostly large-cap. Lou, Polk and Skouras (LPS 2019) exclude stocks under $5, so D's
+$1-$5 band has no literature coverage. Whether it carries over to catalyst-conditioned movers priced at $1 to $50 is what v3 tests;
+it is not an assumed result.
 
 ## Core hypotheses: H1 and H3
 
@@ -78,11 +81,14 @@ exchange, or a missing previous close, means no event, with no bar fallback. A s
 within 1% of an integer split ratio with no adjustment is treated as an unadjusted split and is excluded before
 membership. Inside a hold that ratio rule is only a sensitivity, because hold-period ratios are outcomes: a trade is
 excluded only when a retained split record falls in the hold and the adjusted bars do not carry it. Split factors come
-from split-adjusted bars, so a large cash dividend is booked as cash, not as a share change (a stated departure from
-#162's D7 code, which used all-adjusted bars). They telescope across sessions with bars, so a split on a session with
+from split-adjusted bars, checked against retained split records, so a large cash dividend is never booked as a share
+change (a stated departure from #162's D7 code, which used all-adjusted bars). They telescope across sessions with bars, so a split on a session with
 no bar is still booked, and a missing input makes a factor undefined rather than 1. Hold-period daily bars are fetched
-per event under the as-known symbol with `asof` = the decision session, and the share factor and dividend cash use only
-those responses. The net-return formula and D7's cash clamp are stated exactly in the core draft. OTC names are excluded by as-known
+per event under the as-known symbol with `asof` = the decision session, and the share factor uses only
+those responses. Dividend cash comes from the corporate-action records' per-share rates, never from all-adjusted
+closes, so no leg or trade moves with a price after its exit; a spin-off, stock dividend or other non-cash distribution
+in the hold excludes the trade (review round 8 replaced D7's cash residual). The net-return formula is stated exactly
+in the core draft. OTC names are excluded by as-known
 session data (no listing-exchange opening print), never by today's asset flags. Every such case is counted.
 
 **Universe and identity.** The 2016-2020 symbol list is the Alpaca asset master (active and inactive, every current
@@ -91,8 +97,10 @@ broad-universe's supplement method, which found that the asset list alone misses
 bars, auctions and quotes request carries Alpaca's `asof` set to a session date, never the fetch date. The screen for
 session s uses `asof = s`. Every request for an event decided on session t uses the symbol as known on t, with
 `asof = t`. The fetch date is stored separately as the vintage. Duplicate histories (FB and META both carrying Meta's
-bars) are removed with broad-universe's pinned `coverage.dedupe_identity` before membership. Empty responses are
-counted, never silently dropped.
+bars) are removed with broad-universe's pinned `coverage.dedupe_identity` before membership, using only sessions up to
+the decision session and never today's asset status. Empty responses are counted, never silently dropped. Development
+and validation inputs are retrospective reconstructions from the provider's history as fetched after the freeze, and
+carry that qualifier; holdout decisions use only inputs that the collector seals within one session of each decision.
 
 **Symbols that stop quoting.** An exit waits for an eligible quote for at most 5 sessions after the planned exit
 session. A position still without one is terminal (a delisting, a move to OTC, a suspension, or a halt that does not
@@ -110,15 +118,16 @@ V = $1M are v1's loosest gain and middle volume floor, chosen for sample size af
 | H1-D | H1, primary test | mean net(5-session hold, high MAX21 tercile) - mean net(same, low tercile) | less than 0 | the direct test of BCW's reversal prediction, on the D horizon closest to BCW's holding period |
 | H1-D-b_lane-low | H1, tradable cell | mean net(5-session hold, low MAX21 tercile) | greater than 0 | in a long-only study, the one H1 cell for which the prior predicts the best relative return; the high and middle cells are reported descriptively only |
 | H3-a | H3, tradable cell | mean net(enter 09:35, exit 15:55 on t+1) | greater than 0 | the intraday leg as a trade |
-| H3-b | H3, tradable cell | mean net(enter 15:55 on t+1, exit at the first eligible quote from 09:30 on t+2) | greater than 0 | the overnight leg as a trade; neither leg has a sourced sign for movers, so both are kept |
+| H3-b | H3, tradable cell | mean net(enter 15:55 on t+1, exit at the first eligible quote from 09:30 on t+2) | greater than 0 | the overnight leg as a trade; neither leg has a mover-specific sourced sign, so both are kept |
 | H3-c | H3, primary test | mean of (mean of 4 overnight official-print log legs - mean of 4 intraday legs) over t+1 .. t+5 | two-sided at every stage, never locked to the survivorship-limited development sign; a holdout pass also needs validation's sign | the direct test of "overnight versus intraday". It uses official prints only, so it needs no fill or cost model |
 
 MAX21 is the largest of the 21 split-consistent official-close returns before the decision session. Its terciles use
 breakpoints from D events in the prior 252 sessions, so they are known at the decision. Research sizing is 1x equal
 notional, capacity-capped. Costs per side are 1.25 x the larger of the v1 table cell (pinned by sha256, monotone in
-dollar volume) and the fill quote's own half-spread, plus a square-root impact term. H1 is not supported if H1-D
-excludes a negative effect of the MDE size and the low-MAX cell does not pass. H3 is not supported if H3-c excludes
-the MDE and neither H3-a nor H3-b passes. A high-MAX outperformance is outside H1-D's one-sided test and supports no
+dollar volume) and the fill quote's own half-spread, plus a square-root impact term. H1's verdict comes from H1-D
+alone, and H3's from H3-c alone. Each tradable cell has its own profitability verdict, which claims only that its own
+trade is profitable after costs: a profitable low-MAX cell is not evidence for H1, and a profitable intraday or
+overnight trade is not evidence for H3. A high-MAX outperformance is outside H1-D's one-sided test and supports no
 claim.
 
 **Outcome labels.** Each test ends in one of three preregistered labels: a pass; *not supported*, with the excluded
@@ -126,14 +135,19 @@ effect size stated; or *underpowered*. A pass is named by its stage: a descripti
 nothing, *screened* at validation and *supported (confirmatory)* only at the holdout. Development (2017-2019) is
 survivorship-limited, so every item enters validation whatever its development result, no development output feeds
 validation or the holdout, and validation's tercile breakpoints use validation sessions only. Holm runs over the five core items only. At the
-minimum samples the detectable effects are roughly 2-19% (the MDE tables in the core draft), far above the
-literature's roughly 1% a month for MAX, so a miss on H1-D will most likely be labelled underpowered. v3 can detect
-only large mover-specific effects.
+minimum samples the planning detectable effects are roughly 2-19 percentage points of mean net return (the MDE
+tables in the core draft; H3-c's are in log-return-difference units), far above the literature's roughly 1% a month
+for MAX, so a miss on H1-D will most likely be labelled underpowered. Most of their sigmas and the design effect are
+assumptions, so they are not demonstrated power, and every result reports its occupied entry sessions beside its n.
+v3 can detect only large mover-specific effects.
 
 **Data status is fixed at the freeze.** One coverage rule covers all five items, with one set of kept years: a
 2016-2020 year below 90% official-close coverage or 80% eligible-quote coverage (fetch-incomplete stamps count against
 it), or with more than 10% of sampled histories unreachable by `asof` = session screening, is dropped for every item.
-The count-only code applies the rule itself, and the rule text is pinned by hash. Without 2020, no item is tested;
+Each rate has one denominator cohort with its numerator inside it, and an empty or unavailable cohort drops the year
+(fail closed). The count-only code applies the rule itself, and its governing run is bound by hash to the whole
+protocol text, the study tree and its inputs: the freeze is refused if any of them changed after the rates were seen,
+apart from an enumerated list of metadata fields. Without 2020, no item is tested;
 development years condition nothing. A dropped year's edges are segment boundaries,
 its events leave the tercile windows and the bootstrap wraps over the kept sessions. Data from a new source or a new
 historical range obtained after the freeze can only start a new protocol version (v3.1+), so it cannot change this
@@ -160,7 +174,11 @@ one file, so a crashed run writes nothing and may be retried from the unchanged 
 a numbered deviation whose results are reported beside the governing ones with no label, and a stage that cannot
 complete without one is void. The only exception is a fetch-transport fix confined to `study/fetch/`, accepted only if
 it reproduces already-sealed pages byte for byte. Calendar and fee
-amendments go in append-only data files outside the study tree, so appending one never changes the tree.
+amendments go in append-only data files outside the study tree, so appending one never changes the tree. Their
+line format is fixed in the core draft, a SEC fee row is selected by settlement date and a FINRA TAF row by trade date,
+and a rate announced before the freeze changes the base fee file and its pin instead. Collection batches and
+amendments are authorized without any validation result, so collection starts at the freeze; only the holdout count
+and read wait for validation.
 
 The 2017-2020 windows are disjoint from #162's v1 and v2, but not unseen. The broad-universe study computed forward
 returns for every eligible symbol-session in 2017-2021 (its C0 control), including a descriptive lane covering names
@@ -172,9 +190,9 @@ Development and validation are therefore **screening stages only**: validation d
 for, and only the prospective holdout can support a confirmatory claim.
 
 H1 rests on BCW 2011 (**survives**) and the relative-volume/price-return ranking in
-`catalyst-experiment/protocol.json`, which is structurally a MAX-like selection. H3 rests on LPS 2019 and ABJK 2022
-(*contested*). Their full texts must be read before the freeze, and H3-c is two-sided at every stage, so no test
-depends on their sign. A VWAP-loss or ladder arm, from Maróy's SSRN 5095349 (posted 2025-01-12, returned HTTP 403,
+`catalyst-experiment/protocol.json`, which is structurally a MAX-like selection. H3 rests on LPS 2019 (read in full
+2026-09-24; value-weight, >= $5, 1993-2013, gross of costs), and H3-c is two-sided at every stage, so no test depends
+on its sign. A VWAP-loss or ladder arm, from Maróy's SSRN 5095349 (posted 2025-01-12, returned HTTP 403,
 never read), is **excluded from the confirmatory family**.
 
 ## Data plan
@@ -434,16 +452,19 @@ into another:
 - Do latency probes (unfillable, then cancelled) comply with the engine's no-manufactured-trades rule? This needs an
   explicit decision. The same decision is needed for H6's mechanics-only strategy; if the answer is no, H6 is dropped.
 - What are the terms of FINRA short-interest access and of the Norgate EULA on derived data?
-- The citations that need a direct read before exact wording is cited: the LPS 2019 and ABJK 2022 DOIs, SSRN 5095349
-  and the full MacLean-Thorp-Ziemba text.
+- The citations that still need a direct read before exact wording is cited: SSRN 5095349 and the full
+  MacLean-Thorp-Ziemba text. (LPS 2019 was read in full on 2026-09-24; ABJK 2022 could not be obtained and is no
+  longer cited.)
 
 ## Before any freeze
 
 `protocol-core-draft.json` lists the preconditions (`freeze_preconditions`). The main ones:
 
 - an independent pre-outcome review of the core, from a different session and model family, with every finding
-  resolved in a dated record;
-- direct reads of the LPS 2019 and ABJK 2022 full texts, or removal of the claims that depend on them;
+  resolved in a dated record (done: review round 8 of 2026-09-24, one entry per finding), and an independent
+  verification of those resolutions before the count-only run;
+- direct reads of the cited literature, or removal of the claims that depend on it (done 2026-09-24: LPS 2019 read in
+  full and pinned by sha256; ABJK 2022 could not be obtained, and its claims were removed);
 - the session calendar, the fee file and their empty append-only amendment files committed as data files outside the
   study tree and pinned;
 - the enumerated symbol list and the pre-freeze snapshot sealed and pinned, every request with `asof` = its session;
@@ -455,16 +476,21 @@ into another:
   the share of histories that `asof` = session screening cannot reach;
 - a native count-only probe of `asof` identity on 2016-2020 renames and ticker reuses, with match thresholds;
 - H1 and H3 recorded as tested or permanently not tested by the coverage rule;
-- the documented market-data rate limit and a fetch-time estimate, from the sampled candidate count, with margin under
-  the 40 sessions before the holdout;
+- a conservative full-pipeline fetch budget from the snapshot fetch's own throughput evidence (pagination, retries,
+  storage, evaluation and merge time included; the market-data and Trading API quotas kept separate), with a 50% margin
+  under the 40 sessions before the holdout and under each overnight collection window;
 - the holdout collector committed and scheduled so that its first batch covers the freeze session;
 - the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed, including
   terminal exits, renames and ticker reuse, split and ex-dividend crossings, early-close sessions, segment-end
   censoring and the embargo, validation's independence from development outputs, the access-log authorization and
-  completion records and the evaluator's refusals.
+  completion records and the evaluator's refusals, and the round-8 cases (record-based dividend cash, completed-bar
+  cost tiers, coverage cohorts, the hash binding of the count run, analyzable counts, degenerate bootstrap cases,
+  purpose-specific authorizations and fee-date boundaries);
+- each precondition met by the committed artifact or sanitized receipt that `freeze_acceptance` names for it.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-7 (the restructure into the core and its two review rounds) are in `protocol-core-draft.json`.
+`protocol-draft.json` (`review_record`); rounds 5-8 (the restructure into the core, its two review rounds and the independent cross-family review of
+2026-09-24, one entry per finding) are in `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.
 
