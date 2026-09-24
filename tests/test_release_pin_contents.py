@@ -94,8 +94,12 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
                                       "Run adoption/tools/runner, see [the sums](hooks/SHA256SUMS).\n"
                                       "Profiles live in adoption/manifest.json; hashes in "
                                       "[the index](../manifests/evidence.json). Install per "
-                                      "adoption/tools/README.md.\n"),
-            "adoption/tools/README.md": "Install adoption/tools/guarded with install -m 0755; see adoption/tools/more.md.\n",
+                                      "adoption/tools/README.md. Render [the templates](templates/); "
+                                      "diff fixtures/before.py.\n"),
+            "adoption/templates/app.json": "{\"v\": 1}\n",
+            "fixtures/before.py": "print('before v1')\n",
+            "adoption/tools/README.md": ("Install the runner; see adoption/tools/more.md.\n\n```sh\n"
+                                         "install -m 0755 adoption/tools/guarded $HOME/.local/bin/\n```\n"),
             "adoption/tools/more.md": "Then run [the deep step](deep).\n",
             "adoption/tools/deep": "#!/bin/sh\necho deep v1\n",
             "adoption/tools/guarded": "#!/bin/sh\necho guarded v1\n",
@@ -188,6 +192,12 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         self.write("adoption/tools/deep", "#!/bin/sh\necho deep v2\n")
         self.commit()
         self.assertEqual(self.report()[1]["changed"], ["adoption/tools/deep"])
+
+    def test_linked_directories_and_paths_under_any_top_level_directory_are_compared(self):
+        self.write("adoption/templates/app.json", "{\"v\": 2}\n")
+        self.write("fixtures/before.py", "print('before v2')\n")
+        self.commit()
+        self.assertEqual(self.report()[1]["changed"], ["adoption/templates/app.json", "fixtures/before.py"])
 
     def test_a_mode_or_kind_change_is_drift_even_with_the_same_bytes(self):
         (self.repo / "adoption/tools/runner").chmod(0o755)

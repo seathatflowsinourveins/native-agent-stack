@@ -51,7 +51,9 @@ DRIFT_EXEMPT = frozenset({"manifests/evidence.json"})
 PIN_FIELDS = ("release_tag", "release_commit")
 START_HERE = "README.md#start-here"
 LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
-BARE_PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])((?:\.github|scripts|tools|tests|adoption|docs|recipes|catalogs)/[A-Za-z0-9_./-]+)")
+# Any repository-relative token with a directory part (fixtures/before.py, manifests/stack.json ...); a token
+# counts only if it names a file in the repository, and a URL never matches (":" and "/" are excluded before it).
+BARE_PATH_RE = re.compile(r"(?<![A-Za-z0-9_./:-])([A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+)")
 # Referenced install guides (Markdown under these prefixes) are followed through nested guides.
 GUIDE_PREFIXES = ("adoption/", "recipes/")
 
@@ -136,18 +138,28 @@ def repo_file(rel: str) -> str | None:
     return rel if (path.is_file() or path.is_symlink()) and not path.is_dir() else None
 
 
+def tracked_under(directory: str) -> list[str]:
+    return [rel for rel in git("ls-files", "-z", "--", directory).stdout.split("\0") if rel]
+
+
 def linked_or_bare(doc: str, text: str) -> set[str]:
     """Files a document names without a matching PATH_RE extension: relative Markdown link
-    targets (resolved against the document's directory) and bare repository paths such as
-    adoption/tools/ecosystem-bounded-run or adoption/hooks/claude/SHA256SUMS."""
+    targets (resolved against the document's directory; a linked directory contributes its tracked
+    files) and bare repository paths under any top-level directory, such as
+    adoption/tools/ecosystem-bounded-run, adoption/hooks/claude/SHA256SUMS or fixtures/before.py."""
     base = posixpath.dirname(doc)
     found = set()
     for target in LINK_RE.findall(text):
         target = target.split("#", 1)[0].split("?", 1)[0]
         if target and not re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I):
-            rel = repo_file(posixpath.join(base, target) if not target.startswith("/") else target.lstrip("/"))
+            joined = posixpath.normpath(posixpath.join(base, target) if not target.startswith("/") else target.lstrip("/"))
+            rel = repo_file(joined)
             if rel:
                 found.add(rel)
+            elif not joined.startswith(("../", "evidence/")) and (ROOT / joined).is_dir():
+                # A linked directory (adoption/templates/, adoption/agents/claude/) is an install input as a
+                # whole: every tracked file under it. evidence/ holds records, not inputs.
+                found |= {rel for rel in tracked_under(joined) if repo_file(rel)}
     for token in BARE_PATH_RE.findall(text):
         rel = repo_file(token.rstrip("./,"))
         if rel:
