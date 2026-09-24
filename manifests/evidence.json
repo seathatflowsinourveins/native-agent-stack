@@ -3152,8 +3152,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "5fc4f760395c2e8a7412e7352a546a9fb2eeb457babddb1c7bf05f7e96ff4da0",
-      "bytes": 22841
+      "sha256": "376d92f5e4818c8a6d6ec1d34830c099f808ebe144ce50a62410cd5855000b44",
+      "bytes": 22907
     },
     {
       "path": "SECURITY.md",
@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "3e7a7012830915b1def9c803f2ffa9d7a39cffeb113ba1bab83d29e40af5633f",
-      "bytes": 19046
+      "sha256": "b39e002f6f8821025d765033f45c627167839530c4d5c6f06fc8301d1fe238c2",
+      "bytes": 20514
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3272,13 +3272,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "c26ba0ed11ba0ebcade4ba0f86183244b9e04375c2e1a6820dd39ca6eaf3c620",
-      "bytes": 6206
+      "sha256": "cd517021c129ee2ef93ef8f44e2ffba693dccfbb0226ae7223fe15dab747aab8",
+      "bytes": 6401
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "920ba6279fee6ac61a59385e52b9c95df90d952c891267c1b02a281ace3ad3d8",
-      "bytes": 40322
+      "sha256": "146e5065d42199409327668fefd6f88c890ffe8060adbe9b7c21b9105bcedc16",
+      "bytes": 40489
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3347,8 +3347,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "34052c3aca3a02d6a27213e3e31b603492bde71a830319751428c64042106f3d",
-      "bytes": 16401
+      "sha256": "bbf6953c9c72a2fec61727a44a13d8d0ff96097f4ba044241a3cfd5ef0025dbf",
+      "bytes": 17042
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -28383,8 +28383,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "227e9d0827ba6509d5086d6c0611472149362fcd3b449c9e010a67644b53b8c5",
-      "bytes": 5817
+      "sha256": "690e855c0eb680e7b0541f8dcb7f09c97e11ac0b2fc7ff4adb6b6fd5473bfc71",
+      "bytes": 13776
     },
     {
       "path": "scripts/trading_gates.py",
@@ -28908,8 +28908,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "170320841953c442ec85a1617b895624cba2979643abc2f9854bf7eeb9533fe2",
-      "bytes": 3752
+      "sha256": "d354bfc35e2403779bbfdb2d71784a84e11b7187d45153b79a3e67c292676216",
+      "bytes": 12926
     },
     {
       "path": "tests/test_render_config.py",

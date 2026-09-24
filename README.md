@@ -208,7 +208,7 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-linux.sh --profile foundation-cpu
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
-python3 scripts/adoption_status.py --profile foundation-cpu --json
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
 codex login   # and/or: claude
 ```
 
@@ -230,7 +230,7 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
-python3 scripts/adoption_status.py --profile macos-arm64-foundation --json
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json
 codex login   # and/or: claude
 ```
 
