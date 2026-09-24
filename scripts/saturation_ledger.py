@@ -9,14 +9,18 @@ canonical JSON of the record before it (the first one chains to the policy), and
 
 Derived per layer, never stored:
 
-- a completed sweep is **clean** for a layer when that layer's per-vote returns were retained
-  (``votes: retained``), nothing survived and nothing reopened it;
+- a completed sweep is **clean** for a layer when that layer's discovery return and per-vote
+  returns were retained (``votes: retained`` with a ``discovery_ref``), nothing survived and
+  nothing reopened it;
 - ``saturation_candidate`` means ``policy.K`` consecutive clean completed sweeps, each at least
   ``policy.min_gap_days`` after the last one counted, under an unchanged requirement hash and
   platform-profile hash;
 - a stopped sweep neither counts nor resets; a survivor, a reopen entry, a changed requirement or
-  platform-profile hash, a sweep without retained votes, or a current ``pin_moved``/``stale``
-  receipt flag or archived/renamed/relicensed selection resets the count to 0.
+  platform-profile hash, or a sweep without retained returns resets the count to 0, durably;
+- a current ``pin_moved``/``stale`` receipt flag or an archived/renamed/relicensed selection is a
+  *current* trigger: it holds the count at 0 only while it stands, because the report reads it
+  from today's files and the weekly workflow never writes the ledger. It becomes a durable reset
+  when the next sweep records it as a ``reopen`` entry (recipes/saturation-sweep.md).
 
 A saturation candidate is only an input to closure. Closing a layer still goes through
 ``catalogs/landscape/research-state.json`` ``closure_refs``, owned by the landscape owners; this
@@ -25,8 +29,8 @@ script never writes that file or anything under ``catalogs/landscape/`` or
 
   python3 scripts/saturation_ledger.py --check                  # schema, chain and bindings
   python3 scripts/saturation_ledger.py --check --base origin/main  # also: base ledger is a prefix
-  python3 scripts/saturation_ledger.py --report [--json] \\
-      [--staleness receipt-staleness.json] [--freshness-manifest manifest-YYYYMMDD.json]
+  python3 scripts/saturation_ledger.py --report [--json] [--staleness receipt-staleness.json] \\
+      [--freshness-manifest manifest-YYYYMMDD.json --freshness-status github-freshness.json]
   python3 scripts/saturation_ledger.py --append RESULT.json     # append one sweep (see README)
   python3 scripts/saturation_ledger.py --derive-seed            # print the 2026-09-23 seed results
 
@@ -67,7 +71,15 @@ REOPEN_TRIGGERS = ("requirement_changed", "platform_profile_changed", "retained_
 RESETTING_RECEIPT_FLAGS = {"pin_moved": "pin_moved", "stale": "stale_receipt"}
 HEX64 = re.compile(r"[0-9a-f]{64}")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
-COMPUTED_FIELDS = ("prev_sha256", "manifest_sha256", "usage_sha256", "record_sha256")
+COMPUTED_FIELDS = ("prev_sha256", "manifest_sha256", "usage_sha256", "returns_sha256", "record_sha256")
+SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "manifest_sha256", "lane",
+                "prompts_sha256", "usage_ref", "usage_sha256", "lower_bound_usage", "returns_ref",
+                "returns_sha256", "record_ref", "lane_calls", "lost_workers", "not_retained", "notes",
+                "prev_sha256", "layers")
+LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "votes_note",
+                "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
+# A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
+LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
 COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "known", "new")
 
 # The 2026-09-23 seed: every value --derive-seed emits is read from these files.
@@ -244,6 +256,14 @@ def entry_survives(entry: dict) -> bool:
     return len(votes) == 2 and all(vote == "not_refuted" for _, vote, _ in votes)
 
 
+def valid_date(value: str) -> bool:
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def empty_ledger(K: int = 3, min_gap_days: int = 7) -> dict:
     ledger = {"schema_version": SCHEMA_VERSION, "policy": {"K": K, "min_gap_days": min_gap_days}, "sweeps": []}
     ledger["head_sha256"] = genesis_sha256(ledger)
@@ -295,28 +315,33 @@ class Checker:
             return False
         return True
 
-    def check_ref(self, ref, label: str, expected_vote: str | None):
-        """A vote reference: a registered file, optionally with a #/json/pointer to an object
-        whose boolean ``refuted`` must agree with the recorded vote."""
+    def pointed(self, ref, label: str, required_file):
+        """Resolve ``path#/json/pointer``: the path must be ``required_file`` (a registered file)
+        and the pointer must be present and resolve. Returns the target, or None after an error."""
         if not isinstance(ref, str) or not ref:
             self.error(f"{label}: missing ref")
-            return
+            return None
         path, _, pointer = ref.partition("#")
-        if not self.registered(path, label):
-            return
         if not pointer:
-            return
+            self.error(f"{label}: {ref} needs a #/json/pointer to the retained return it cites")
+            return None
+        if not isinstance(required_file, str) or path != required_file:
+            self.error(f"{label}: {ref} must point into {required_file or 'the sweep returns_ref'}")
+            return None
+        if not self.registered(path, label):
+            return None
         try:
-            target = resolve_pointer(self.document(path), pointer)
+            return resolve_pointer(self.document(path), pointer)
         except LedgerError as error:
             self.error(f"{label}: {error}")
-            return
-        if expected_vote is not None:
-            refuted = target.get("refuted") if isinstance(target, dict) else None
-            if not isinstance(refuted, bool):
-                self.error(f"{label}: {ref} has no boolean refuted")
-            elif ("refuted" if refuted else "not_refuted") != expected_vote:
-                self.error(f"{label}: vote {expected_vote} disagrees with {ref}")
+            return None
+
+    def check_vote_value(self, target, ref: str, label: str, expected_vote) -> None:
+        refuted = target.get("refuted") if isinstance(target, dict) else None
+        if not isinstance(refuted, bool):
+            self.error(f"{label}: {ref} has no boolean refuted")
+        elif ("refuted" if refuted else "not_refuted") != expected_vote:
+            self.error(f"{label}: vote {expected_vote} disagrees with {ref}")
 
     def check(self, ledger) -> list[str]:
         if not isinstance(ledger, dict):
@@ -355,8 +380,8 @@ class Checker:
                 self.error(f"{label}: duplicate sweep_id {sweep_id}")
             seen_ids.add(sweep_id)
             sweep_date = sweep.get("date")
-            if not isinstance(sweep_date, str) or not DATE.fullmatch(sweep_date):
-                self.error(f"{label}: date must be YYYY-MM-DD")
+            if not isinstance(sweep_date, str) or not DATE.fullmatch(sweep_date) or not valid_date(sweep_date):
+                self.error(f"{label}: date must be a calendar date YYYY-MM-DD")
             else:
                 if last_date is not None and sweep_date < last_date:
                     self.error(f"{label}: dates must not go backwards")
@@ -367,10 +392,7 @@ class Checker:
         return self.errors
 
     def check_sweep(self, sweep: dict, label: str, proposals_so_far: dict) -> None:
-        allowed = {"sweep_id", "date", "workflow_run", "status", "manifest_ref", "manifest_sha256", "lane",
-                   "prompts_sha256", "usage_ref", "usage_sha256", "lower_bound_usage", "record_ref",
-                   "lane_calls", "not_retained", "notes", "prev_sha256", "layers"}
-        extra = set(sweep) - allowed
+        extra = set(sweep) - set(SWEEP_FIELDS)
         if extra:
             self.error(f"{label}: unknown keys {sorted(extra)}")
         status = sweep.get("status")
@@ -400,12 +422,31 @@ class Checker:
                     self.error(f"{label}: a completed sweep's usage must not be a lower bound")
                 if usage_status != "complete":
                     self.error(f"{label}: a completed sweep needs complete usage (child_usage.status is {usage_status!r})")
+            self.check_lost_workers(sweep, usage, label)
+        elif sweep.get("lost_workers") is not None:
+            self.error(f"{label}: lost_workers needs a readable usage_ref to bind to")
         if not isinstance(sweep.get("usage_sha256"), str):
             self.error(f"{label}: usage_sha256 required")
         if status == "stopped" and lower is not True:
             self.error(f"{label}: a stopped sweep's usage must be marked lower_bound_usage")
         if sweep.get("record_ref") is not None:
             self.registered(sweep.get("record_ref"), f"{label}.record_ref")
+        # Retained lane returns: one registered file per sweep, distinct from the manifest, the
+        # usage output and the run record, that every retained vote and discovery ref cites.
+        returns_ref = sweep.get("returns_ref")
+        retained = any(isinstance(layer, dict) and layer.get("votes") == "retained"
+                       for layer in sweep.get("layers") or [])
+        if returns_ref is None:
+            if retained:
+                self.error(f"{label}: a layer with votes retained needs the sweep's returns_ref")
+        else:
+            if returns_ref in {sweep.get("manifest_ref"), sweep.get("usage_ref"), sweep.get("record_ref")}:
+                self.error(f"{label}: returns_ref must be the retained lane returns, not the manifest, "
+                           "usage or run record")
+            if not isinstance(sweep.get("returns_sha256"), str):
+                self.error(f"{label}: returns_sha256 required with returns_ref")
+            else:
+                self.registered(returns_ref, f"{label}.returns_ref", sweep["returns_sha256"])
         manifest = None
         manifest_ref = sweep.get("manifest_ref")
         if manifest_ref is not None:
@@ -435,10 +476,24 @@ class Checker:
             self.check_layer(sweep, layer, layer_label, manifest, lane, proposals_so_far.get(key, set()))
             proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer))
 
+    def check_lost_workers(self, sweep: dict, usage, label: str) -> None:
+        """Each lost worker names a child of the usage output that never returned."""
+        lost = sweep.get("lost_workers")
+        if lost is None:
+            return
+        if not (isinstance(lost, list) and all(isinstance(item, str) and item for item in lost)
+                and len(set(lost)) == len(lost)):
+            self.error(f"{label}: lost_workers must be a list of unique child labels")
+            return
+        children = ((usage.get("child_usage") or {}).get("children") or []) if isinstance(usage, dict) else []
+        incomplete = {child.get("label") for child in children
+                      if isinstance(child, dict) and child.get("complete") is False}
+        for item in lost:
+            if item not in incomplete:
+                self.error(f"{label}: lost worker {item} is not an incomplete child in {sweep.get('usage_ref')}")
+
     def check_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
-        allowed = {"catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "votes_note",
-                   "calls", "proposed", "known", "new", "survived", "refuted", "reopen"}
-        extra = set(layer) - allowed
+        extra = set(layer) - set(LAYER_FIELDS)
         if extra:
             self.error(f"{label}: unknown keys {sorted(extra)}")
         catalog, layer_id = layer.get("catalog"), layer.get("layer_id")
@@ -453,6 +508,8 @@ class Checker:
             self.error(f"{label}: votes must be one of {VOTES}")
         if votes != "retained" and not (isinstance(layer.get("votes_note"), str) and layer["votes_note"].strip()):
             self.error(f"{label}: votes {votes} needs a votes_note saying what was not retained")
+        if votes == "retained" and layer.get("discovery_ref") is None:
+            self.error(f"{label}: votes retained needs a discovery_ref to the layer's retained discovery return")
         calls = layer.get("calls")
         if calls is not None and not (isinstance(calls, dict) and all(
                 isinstance(v, int) and not isinstance(v, bool) and v >= 0 for v in calls.values())):
@@ -468,6 +525,8 @@ class Checker:
         if not all(isinstance(repo, str) for repo in proposed) or len({norm_repo(r) for r in proposed if isinstance(r, str)}) != len(proposed):
             self.error(f"{label}: proposed must be unique repository strings")
             return
+        if layer.get("discovery_ref") is not None:
+            self.check_discovery(sweep, layer, f"{label}.discovery_ref", proposed)
         # known/new partition proposed, recomputed from the manifest baseline and earlier sweeps.
         located = manifest_layer(manifest, catalog, layer_id) if manifest is not None else None
         if manifest is not None and located is None:
@@ -514,6 +573,23 @@ class Checker:
                     and isinstance(entry.get("ref"), str) and entry["ref"].strip()):
                 self.error(f"{label}.reopen[{position}]: needs a trigger in {REOPEN_TRIGGERS} and a ref")
 
+    def check_discovery(self, sweep, layer, label, proposed) -> None:
+        """The layer's retained discovery return: an object in the sweep's returns file naming this
+        layer and exactly the recorded proposals (an empty list is evidence only when retained)."""
+        ref = layer.get("discovery_ref")
+        target = self.pointed(ref, label, sweep.get("returns_ref"))
+        if target is None:
+            return
+        if not isinstance(target, dict) or target.get("layer_id") != layer.get("layer_id") \
+                or target.get("catalog") != layer.get("catalog"):
+            self.error(f"{label}: {ref} is not the discovery return of {layer.get('catalog')}/{layer.get('layer_id')}")
+            return
+        returned = target.get("proposed")
+        if not (isinstance(returned, list) and all(isinstance(repo, str) for repo in returned)):
+            self.error(f"{label}: {ref} has no proposed list")
+        elif {norm_repo(repo) for repo in returned} != {norm_repo(repo) for repo in proposed}:
+            self.error(f"{label}: proposed does not equal the retained discovery return {ref}")
+
     def check_votes(self, layer, entry, label, located, lane, sweep) -> None:
         votes = layer.get("votes")
         if votes == "retained":
@@ -524,7 +600,14 @@ class Checker:
                 if not (isinstance(vote, dict) and vote.get("vote") in VOTE_VALUES):
                     self.error(f"{label}: {role} vote required ({'/'.join(VOTE_VALUES)} with a ref)")
                     continue
-                self.check_ref(vote.get("ref"), f"{label}.{role}", vote.get("vote"))
+                target = self.pointed(vote.get("ref"), f"{label}.{role}", sweep.get("returns_ref"))
+                if target is None:
+                    continue
+                self.check_vote_value(target, vote["ref"], f"{label}.{role}", vote["vote"])
+                if not isinstance(target, dict) or target.get("role") != role:
+                    self.error(f"{label}.{role}: {vote['ref']} is not a {role} vote")
+                elif norm_repo(str(target.get("repository", ""))) != norm_repo(entry["repo"]):
+                    self.error(f"{label}.{role}: {vote['ref']} is a vote on a different repository")
             return
         lens_votes = entry.get("lens_votes")
         if not (isinstance(lens_votes, list) and len(lens_votes) == 2
@@ -533,10 +616,21 @@ class Checker:
             self.error(f"{label}: both lens votes (0 and 1) are required")
             return
         for vote in lens_votes:
-            ref = vote.get("ref")
-            self.check_ref(ref, f"{label}.lens {vote.get('lens')}", vote.get("vote"))
-            if isinstance(ref, str) and ref.partition("#")[0] != sweep.get("manifest_ref"):
-                self.error(f"{label}: lens votes must cite the sweep's manifest_ref")
+            vote_label = f"{label}.lens {vote.get('lens')}"
+            target = self.pointed(vote.get("ref"), vote_label, sweep.get("manifest_ref"))
+            if target is None:
+                continue
+            self.check_vote_value(target, vote["ref"], vote_label, vote["vote"])
+            if not isinstance(target, dict) or target.get("lens") != vote.get("lens"):
+                self.error(f"{vote_label}: {vote['ref']} is not lens {vote.get('lens')}")
+            # The pointer must name this layer's lane row for this repository.
+            match = LENS_POINTER.fullmatch(vote["ref"].partition("#")[2])
+            if match is None or located is None or match.group(1) != located[0] or int(match.group(2)) != located[1]:
+                self.error(f"{vote_label}: {vote['ref']} is not a vote of this layer's manifest row")
+                continue
+            candidate = (located[2].get("candidates") or [])[int(match.group(3))]
+            if candidate.get("lane") != lane or norm_repo(str(candidate.get("repository", ""))) != norm_repo(entry["repo"]):
+                self.error(f"{vote_label}: {vote['ref']} is a vote on a different candidate row")
 
     def check_survivor(self, entry, label, layer_id, located, lane) -> None:
         if located is None:
@@ -565,11 +659,21 @@ def check_ledger(root: Path, ledger) -> list[str]:
 
 
 def check_append_only(root: Path, ledger: dict, base: str) -> list[str]:
-    """The ledger at ``base`` must be a prefix of this one (same policy, same records)."""
-    result = subprocess.run(["git", "-C", str(root), "show", f"{base}:{LEDGER}"],
-                            capture_output=True, text=True, check=False)
+    """The ledger at ``base`` must be a prefix of this one (same policy, same records). An unknown
+    ``base`` is an error; only a valid commit without the ledger file means "no ledger yet"."""
+    git = ["git", "-C", str(root)]
+    verified = subprocess.run([*git, "rev-parse", "--verify", "--quiet", f"{base}^{{commit}}"],
+                              capture_output=True, text=True, check=False)
+    if verified.returncode != 0:
+        return [f"append-only: {base} is not a commit in this checkout"]
+    commit = verified.stdout.strip()
+    present = subprocess.run([*git, "cat-file", "-e", f"{commit}:{LEDGER}"],
+                             capture_output=True, text=True, check=False)
+    if present.returncode != 0:
+        return []  # a valid base without the ledger file: no ledger at the base yet
+    result = subprocess.run([*git, "show", f"{commit}:{LEDGER}"], capture_output=True, text=True, check=False)
     if result.returncode != 0:
-        return []  # no ledger at the base yet
+        return [f"append-only: cannot read {base}:{LEDGER} ({result.stderr.strip()})"]
     try:
         old = json.loads(result.stdout, object_pairs_hook=_unique)
     except ValueError as error:
@@ -590,7 +694,12 @@ def check_append_only(root: Path, ledger: dict, base: str) -> list[str]:
 def derive(ledger: dict, current: dict | None = None) -> dict:
     """Per-layer consecutive-clean count. ``current`` optionally carries today's inputs:
     {"requirements": {(catalog, layer_id): sha}, "platform_profiles_sha256": sha,
-     "triggers": {(catalog, layer_id): [{"trigger", "ref"}]}}."""
+     "triggers": {(catalog, layer_id): [{"trigger", "ref"}]}}.
+
+    Resets recorded in the ledger (survivors, reopen entries, hash changes between sweeps, missing
+    returns) are durable. ``current`` inputs hold the count at 0 only while they stand: a receipt
+    flag that clears before the next sweep no longer holds it. The recipe makes such a trigger
+    durable by recording it as a reopen entry in the next sweep."""
     policy = ledger.get("policy") or {}
     K, gap = policy.get("K", 3), policy.get("min_gap_days", 7)
     state: dict = {}
@@ -618,6 +727,8 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
                           for item in layer.get("survived") or []]
             if layer.get("votes") != "retained":
                 not_clean.append({"trigger": f"votes_{layer.get('votes')}", "ref": sweep["sweep_id"]})
+            elif not layer.get("discovery_ref"):
+                not_clean.append({"trigger": "no_discovery_return", "ref": sweep["sweep_id"]})
             if not_clean:
                 entry.update(count=0, last_counted=None, counted_sweeps=[])
                 entry["reset"] = reasons + not_clean
@@ -711,12 +822,33 @@ def external_triggers(baseline: dict | None, staleness: dict | None, freshness: 
     return triggers, notes
 
 
-def build_report(root: Path, ledger: dict, staleness=None, freshness=None) -> dict:
+def freshness_input(freshness, status) -> tuple[str, list]:
+    """"read" only for a catalog-freshness manifest whose github-freshness.json reports no upstream
+    errors or partial errors; "partial" otherwise, since unfetched components carry no archived,
+    renamed or license data and would silently show no selection_changed trigger."""
+    if freshness is None:
+        return "not available", []
+    if not isinstance(status, dict):
+        return "partial", ["catalog-freshness input partial: no github-freshness.json beside the manifest, so "
+                           "its upstream errors are unknown; selection_changed triggers may be missing"]
+    errors, partial = status.get("errors"), status.get("partial_errors")
+    if not all(isinstance(v, int) and not isinstance(v, bool) for v in (errors, partial)):
+        return "partial", ["catalog-freshness input partial: github-freshness.json has no integer errors/"
+                           "partial_errors; selection_changed triggers may be missing"]
+    if errors or partial:
+        return "partial", [f"catalog-freshness input partial: {errors} upstream error(s) and {partial} partial "
+                           "error(s); selection_changed triggers may be missing for those components"]
+    return "read", []
+
+
+def build_report(root: Path, ledger: dict, staleness=None, freshness=None, freshness_status=None) -> dict:
     rows = research_rows(root)
     adoption = load_json(root, ADOPTION)
     manifest_ref = latest_manifest_ref(ledger)
     baseline = load_json(root, manifest_ref) if manifest_ref else None
     triggers, notes = external_triggers(baseline, staleness, freshness)
+    freshness_state, freshness_notes = freshness_input(freshness, freshness_status)
+    notes = freshness_notes + notes
     current = {"requirements": {key: requirement_sha256(row) for key, row in rows.items()},
                "platform_profiles_sha256": platform_profiles_sha256(adoption), "triggers": triggers}
     state = derive(ledger, current)
@@ -737,7 +869,7 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None) -> di
         "sweeps": len(ledger.get("sweeps") or []),
         "completed_sweeps": len(completed),
         "last_completed": {"sweep_id": completed[-1]["sweep_id"], "date": completed[-1]["date"]} if completed else None,
-        "inputs": {"staleness": staleness is not None, "freshness": freshness is not None,
+        "inputs": {"staleness": staleness is not None, "freshness": freshness_state,
                    "baseline_manifest": manifest_ref},
         "notes": notes,
         "due": [f"{l['catalog']}/{l['layer_id']}" for l in layers if l["due"]],
@@ -761,7 +893,8 @@ def render_markdown(report: dict) -> str:
         f"Ledger: {report['sweeps']} sweep record(s), {report['completed_sweeps']} completed; last completed: "
         + (f"`{last['sweep_id']}` ({last['date']})" if last else "none") + ".",
         f"Inputs: receipt staleness {'read' if report['inputs']['staleness'] else 'not available'}; "
-        f"catalog-freshness manifest {'read' if report['inputs']['freshness'] else 'not available'}.",
+        f"catalog-freshness manifest {report['inputs']['freshness']}. Receipt-flag and catalog-freshness "
+        "triggers hold a layer at 0 only while they stand; the next sweep records them as reopen entries.",
         "",
         f"**Due layers: {len(report['due'])}** · saturation candidates: {len(report['saturation_candidates'])} · "
         f"layers with current reopen triggers: {len(report['current_reopen_triggers'])}",
@@ -804,6 +937,10 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
     if usage_sha is None:
         raise LedgerError("usage_ref must name an existing, registered usage file")
     record["usage_sha256"] = usage_sha
+    if record.get("returns_ref") is not None:
+        record["returns_sha256"] = file_sha256(root, record["returns_ref"]) if isinstance(record["returns_ref"], str) else None
+        if record["returns_sha256"] is None:
+            raise LedgerError(f"returns_ref {record['returns_ref']} does not exist")
     manifest = load_json(root, record["manifest_ref"]) if record.get("manifest_ref") else None
     earlier: dict = {}
     for sweep in ledger.get("sweeps") or []:
@@ -823,7 +960,7 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         ordered = {"catalog": key[0], "layer_id": key[1],
                    "requirement_sha256": requirement_sha256(rows[key]),
                    "platform_profiles_sha256": profiles}
-        for field in ("votes", "votes_note", "calls", "proposed"):
+        for field in ("votes", "votes_note", "discovery_ref", "calls", "proposed"):
             if field in layer:
                 ordered[field] = layer[field]
         ordered["known"], ordered["new"] = known, new
@@ -835,11 +972,8 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         layers.append(ordered)
     record["layers"] = layers
     record["prev_sha256"] = ledger.get("head_sha256")
-    order = ["sweep_id", "date", "workflow_run", "status", "manifest_ref", "manifest_sha256", "lane",
-             "prompts_sha256", "usage_ref", "usage_sha256", "lower_bound_usage", "record_ref", "lane_calls",
-             "not_retained", "notes", "prev_sha256", "layers"]
-    return {field: record[field] for field in order if field in record} | {
-        field: value for field, value in record.items() if field not in order}
+    return {field: record[field] for field in SWEEP_FIELDS if field in record} | {
+        field: value for field, value in record.items() if field not in SWEEP_FIELDS}
 
 
 def append(root: Path, ledger: dict, result: dict) -> dict:
@@ -902,6 +1036,7 @@ def derive_seed(root: Path) -> list[dict]:
     completed_run = attempt["superseded_by"]
     completed_usage_ref = f"{attempts_dir}/child-usage-{completed_run}.json"
     completed_usage = load_json(root, completed_usage_ref)
+    stopped_usage = load_json(root, attempt["provider_usage"]["retained_output"])
     usage_status = completed_usage["child_usage"]["status"]
     discovered = [child["label"].split(":", 1)[1] for child in completed_usage["child_usage"]["children"]
                   if child.get("label", "").startswith("discover:")]
@@ -922,10 +1057,19 @@ def derive_seed(root: Path) -> list[dict]:
         "usage_ref": attempt["provider_usage"]["retained_output"],
         "lower_bound_usage": attempt["provider_usage"]["lower_bound"],
         "record_ref": attempt_ref,
+        "lost_workers": [child["label"] for child in stopped_usage["child_usage"]["children"]
+                         if child.get("complete") is False],
         "not_retained": ["prompts_sha256", "lane_returns"],
-        "notes": [attempt["stop_reason"], *attempt.get("limitations", [])],
+        "notes": [attempt["stop_reason"], *attempt.get("limitations", []),
+                  f"The attempt record has no date of its own; date is {manifest_ref}#/checked_at, the date of "
+                  f"the superseding run {completed_run}.",
+                  f"This run produced no manifest; manifest_ref is the known/new baseline only, and the "
+                  f"{attempt['provider_usage']['children_stopped_in_flight']} children stopped in flight are "
+                  "lost_workers, with no layer entry."],
         "layers": [],
     }
+    if len(stopped["lost_workers"]) != attempt["provider_usage"]["children_stopped_in_flight"]:
+        raise LedgerError(f"{attempt_ref}: children_stopped_in_flight disagrees with the usage output")
     for layer in attempt["layers"]:
         stopped["layers"].append({
             "catalog": catalog_of[layer["layer_id"]], "layer_id": layer["layer_id"],
@@ -1000,6 +1144,8 @@ def main(argv=None) -> int:
     parser.add_argument("--staleness", type=Path, help="with --report: scripts/receipt_staleness.py --json output")
     parser.add_argument("--freshness-manifest", type=Path,
                         help="with --report: the rebuilt manifest from a catalog-freshness artifact")
+    parser.add_argument("--freshness-status", type=Path,
+                        help="with --report: that artifact's github-freshness.json (its error counts)")
     args = parser.parse_args(argv)
     root = args.root.resolve()
     ledger_path = args.ledger or root / LEDGER
@@ -1021,7 +1167,9 @@ def main(argv=None) -> int:
             staleness = json.loads(args.staleness.read_text(encoding="utf-8")) if args.staleness else None
             freshness = (json.loads(args.freshness_manifest.read_text(encoding="utf-8"))
                          if args.freshness_manifest else None)
-            report = build_report(root, ledger, staleness, freshness)
+            status = (json.loads(args.freshness_status.read_text(encoding="utf-8"))
+                      if args.freshness_status else None)
+            report = build_report(root, ledger, staleness, freshness, status)
             print(json.dumps(report, indent=1) if args.json else render_markdown(report), end="" if not args.json else "\n")
             return 0
         result = json.loads(args.append.read_text(encoding="utf-8"), object_pairs_hook=_unique)

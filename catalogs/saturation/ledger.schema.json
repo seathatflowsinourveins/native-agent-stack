@@ -2,7 +2,7 @@
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "catalogs/saturation/ledger.schema.json",
  "title": "Saturation ledger",
- "description": "Append-only record of landscape sweeps per layer. Structure only: scripts/saturation_ledger.py --check also verifies the hash chain, the manifest/evidence bindings, known/new, and recomputes survival from the votes.",
+ "description": "Append-only record of landscape sweeps per layer. Structure only: scripts/saturation_ledger.py --check also verifies the hash chain, the manifest/evidence/returns bindings, known/new, and recomputes survival from the votes.",
  "type": "object",
  "additionalProperties": false,
  "required": ["schema_version", "policy", "sweeps", "head_sha256"],
@@ -30,7 +30,7 @@
    "required": ["vote", "ref"],
    "properties": {
     "vote": {"enum": ["refuted", "not_refuted"]},
-    "ref": {"type": "string", "minLength": 1, "description": "Registered evidence file, optionally with #/json/pointer to an object carrying boolean refuted."}
+    "ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's returns_ref file with a #/json/pointer to an object carrying boolean refuted, the role (facts or fit) and the repository."}
    }
   },
   "lens_vote": {
@@ -40,7 +40,7 @@
    "properties": {
     "lens": {"enum": [0, 1]},
     "vote": {"enum": ["refuted", "not_refuted"]},
-    "ref": {"type": "string", "minLength": 1}
+    "ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's manifest_ref with a pointer to this layer's lane row vote for the repository."}
    }
   },
   "outcome": {
@@ -82,6 +82,7 @@
     "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},
     "votes": {"enum": ["retained", "not_retained", "not_returned"]},
     "votes_note": {"type": "string", "minLength": 1},
+    "discovery_ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's returns_ref file with a pointer to this layer's retained discovery return: {catalog, layer_id, proposed[]}."},
     "calls": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}}]},
     "proposed": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
     "known": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
@@ -91,6 +92,7 @@
     "reopen": {"type": "array", "items": {"$ref": "#/$defs/reopen"}}
    },
    "if": {"properties": {"votes": {"const": "retained"}}},
+   "then": {"required": ["discovery_ref"]},
    "else": {"required": ["votes_note"]}
   },
   "sweep": {
@@ -109,8 +111,11 @@
     "usage_ref": {"$ref": "#/$defs/path"},
     "usage_sha256": {"$ref": "#/$defs/sha256"},
     "lower_bound_usage": {"type": "boolean"},
+    "returns_ref": {"$ref": "#/$defs/path", "description": "Registered retained lane returns (discovery returns and per-vote returns); required when any layer has votes retained."},
+    "returns_sha256": {"$ref": "#/$defs/sha256"},
     "record_ref": {"$ref": "#/$defs/path"},
     "lane_calls": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "lost_workers": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}, "description": "Labels of children in usage_ref that never returned."},
     "not_retained": {"type": "array", "items": {"type": "string"}},
     "notes": {"type": "array", "items": {"type": "string"}},
     "prev_sha256": {"$ref": "#/$defs/sha256"},
@@ -118,6 +123,7 @@
    },
    "allOf": [
     {"if": {"properties": {"status": {"const": "stopped"}}}, "then": {"properties": {"lower_bound_usage": {"const": true}}}},
+    {"if": {"required": ["returns_ref"]}, "then": {"required": ["returns_sha256"]}},
     {"if": {"properties": {"status": {"const": "completed"}}}, "then": {"required": ["manifest_ref", "manifest_sha256"], "properties": {"lower_bound_usage": {"const": false}}}}
    ]
   }

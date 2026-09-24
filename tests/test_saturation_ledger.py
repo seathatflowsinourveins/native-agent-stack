@@ -1,10 +1,11 @@
 """Tests for scripts/saturation_ledger.py and .github/workflows/saturation-tracking.yml.
 
 Three groups: the consecutive-clean arithmetic (pure ``derive`` fixtures), integrity (hash chain,
-survivor-to-manifest binding, both votes with survival recomputed, usage registration) in a
-synthetic fixture checkout, and separation (the ledger never writes research-state.json or any
-verdict path). The committed ledger is checked against this checkout, and its seed is re-derived
-from the retained files and compared byte for byte.
+survivor-to-manifest binding, both votes with survival recomputed, retained returns, usage
+registration) in a synthetic fixture checkout, and separation (the ledger never writes
+research-state.json or any verdict path). The committed ledger is checked against this checkout
+and against the ledger at the merge base, and its seed records are re-derived from the retained
+files; their requirement and platform-profile hashes are recomputed at the commits they cite.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import copy
 import hashlib
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -37,11 +39,15 @@ WORKFLOW = ROOT / ".github/workflows/saturation-tracking.yml"
 # --------------------------------------------------------------------------- arithmetic
 
 
-def layer(layer_id="alpha", *, votes="retained", survived=(), reopen=(), req=REQ, plat=PLAT, catalog="foundation"):
-    return {"catalog": catalog, "layer_id": layer_id, "requirement_sha256": req, "platform_profiles_sha256": plat,
-            "votes": votes, "proposed": [], "known": [], "new": [],
-            "survived": [{"repo": repo} for repo in survived], "refuted": [],
-            "reopen": [{"trigger": trigger, "ref": "fixture"} for trigger in reopen]}
+def layer(layer_id="alpha", *, votes="retained", survived=(), reopen=(), req=REQ, plat=PLAT, catalog="foundation",
+          discovery=True):
+    value = {"catalog": catalog, "layer_id": layer_id, "requirement_sha256": req, "platform_profiles_sha256": plat,
+             "votes": votes, "proposed": [], "known": [], "new": [],
+             "survived": [{"repo": repo} for repo in survived], "refuted": [],
+             "reopen": [{"trigger": trigger, "ref": "fixture"} for trigger in reopen]}
+    if discovery:
+        value["discovery_ref"] = f"returns.json#/discovery/{layer_id}"
+    return value
 
 
 def sweep(sweep_id, day, *layers, status="completed"):
@@ -145,6 +151,21 @@ class ArithmeticTests(unittest.TestCase):
         staleness = {"rows": [{"platform_id": "linux", "component_id": "tool", "flags": ["no_bound_receipt"]}]}
         self.assertEqual(sl.external_triggers(manifest, staleness, None)[0], {})
 
+    def test_a_receipt_flag_holds_the_count_only_while_it_stands_until_a_sweep_records_it(self):
+        clean = (sweep("s1", "2026-10-01"), sweep("s2", "2026-10-08"), sweep("s3", "2026-10-15"))
+        flagged = {"triggers": {KEY: [{"trigger": "pin_moved", "ref": "receipt_staleness:linux/tool"}]}}
+        self.assertEqual(self.state(*clean, current=flagged)["count"], 0)
+        # The report reads receipt flags from today's files: once the flag clears, nothing in the
+        # ledger remembers it ...
+        self.assertTrue(self.state(*clean)["saturation_candidate"])
+        # ... so the next sweep records it as a reopen entry, which is a durable reset.
+        recorded = sweep("s4", "2026-10-22", layer(reopen=["pin_moved"]))
+        entry = self.state(*clean, recorded)
+        self.assertEqual(entry["count"], 0)
+        self.assertFalse(entry["saturation_candidate"])
+        entry = self.state(*clean, recorded, sweep("s5", "2026-10-29"))
+        self.assertEqual(entry["count"], 1)
+
     def test_an_archived_renamed_or_relicensed_selection_is_a_reopen_trigger(self):
         before = {"foundation": [{"layer": "alpha", "components": [
             {"id": "tool", "repository": "https://github.com/o/tool",
@@ -168,6 +189,13 @@ class ArithmeticTests(unittest.TestCase):
                                    sweep("s3", "2026-10-15", layer(votes=votes)))
                 self.assertEqual(entry["count"], 0)
 
+    def test_retained_votes_without_a_discovery_return_are_never_clean(self):
+        entry = self.state(sweep("s1", "2026-10-01", layer(discovery=False)),
+                           sweep("s2", "2026-10-08", layer(discovery=False)),
+                           sweep("s3", "2026-10-15", layer(discovery=False)))
+        self.assertEqual(entry["count"], 0)
+        self.assertEqual(entry["reset"][0]["trigger"], "no_discovery_return")
+
     def test_layers_are_counted_independently(self):
         state = sl.derive(ledger_of(
             sweep("s1", "2026-10-01", layer(), layer("beta")),
@@ -184,14 +212,26 @@ LANE = "fx-lane"
 MANIFEST = "catalogs/sota-convergence/manifest-fx.json"
 USAGE = "evidence/artifacts/fx/child-usage-complete.json"
 USAGE_PARTIAL = "evidence/artifacts/fx/child-usage-partial.json"
-VOTES = "evidence/artifacts/fx/votes.json"
+RETURNS = "evidence/artifacts/fx/returns.json"
 REVIEW = "evidence/artifacts/fx/o-surv.json"
 SURV, REF, OTHER = "https://github.com/o/surv", "https://github.com/o/ref", "https://github.com/o/other"
-# The retained per-vote returns the fixture cites (one file, one object per vote).
-VOTE_DATA = {
-    "surv": {"facts": {"refuted": False}, "fit": {"refuted": False}},
-    "ref": {"facts": {"refuted": False}, "fit": {"refuted": True}},
-    "beta": {"facts": {"refuted": True}, "fit": {"refuted": True}},
+BETA = "https://github.com/o/beta"
+# The retained lane returns the fixture cites: one discovery return per layer and one object per vote.
+RETURN_DATA = {
+    "discovery": {
+        "alpha": {"catalog": "foundation", "layer_id": "alpha", "proposed": [SURV, REF]},
+        "beta": {"catalog": "us-equities", "layer_id": "beta", "proposed": [BETA]},
+        "gamma": {"catalog": "foundation", "layer_id": "gamma", "proposed": []},
+        "gamma-nonempty": {"catalog": "foundation", "layer_id": "gamma", "proposed": [OTHER]},
+    },
+    "votes": {
+        "surv": {"facts": {"role": "facts", "repository": SURV, "refuted": False},
+                 "fit": {"role": "fit", "repository": SURV, "refuted": False}},
+        "ref": {"facts": {"role": "facts", "repository": REF, "refuted": False},
+                "fit": {"role": "fit", "repository": REF, "refuted": True}},
+        "beta": {"facts": {"role": "facts", "repository": BETA, "refuted": True},
+                 "fit": {"role": "fit", "repository": BETA, "refuted": True}},
+    },
 }
 
 
@@ -203,7 +243,7 @@ def write(root: Path, relative: str, value) -> None:
 
 def register(root: Path) -> None:
     files = []
-    for relative in (MANIFEST, USAGE, USAGE_PARTIAL, VOTES, REVIEW, "evidence/artifacts/fx/other-review.json"):
+    for relative in (MANIFEST, USAGE, USAGE_PARTIAL, RETURNS, REVIEW, "evidence/artifacts/fx/other-review.json"):
         raw = (root / relative).read_bytes()
         files.append({"path": relative, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
     write(root, sl.EVIDENCE, {"schema_version": 1, "receipts": [], "files": sorted(files, key=lambda f: f["path"])})
@@ -214,7 +254,9 @@ def build_fixture(root: Path) -> None:
         {"catalog": "foundation", "layer_id": "alpha", "status": "comparison_required",
          "next_action": "compare alpha", "decision_ref": "catalogs/landscape/foundation.json"},
         {"catalog": "us-equities", "layer_id": "beta", "status": "on_requirement_change",
-         "next_action": "compare beta", "decision_ref": "catalogs/landscape/trading.json"}]})
+         "next_action": "compare beta", "decision_ref": "catalogs/landscape/trading.json"},
+        {"catalog": "foundation", "layer_id": "gamma", "status": "comparison_required",
+         "next_action": "compare gamma", "decision_ref": "catalogs/landscape/foundation.json"}]})
     write(root, sl.ADOPTION, {"platform_profiles": [{"id": "linux-x86_64", "os": "linux"}]})
 
     def row(repo, survives):
@@ -226,12 +268,15 @@ def build_fixture(root: Path) -> None:
         "checked_at": "2026-10-01",
         "foundation": [{"layer": "alpha", "components": [{"id": "sel", "repository": "https://github.com/o/sel"}],
                         "alternatives_keep_but_compare": [{"repository": OTHER}],
-                        "candidates": [row(SURV, True), row(REF, False)]}],
-        "trading": [{"layer": "beta", "entries": [], "candidates": [row("https://github.com/o/beta", False)]}],
+                        "candidates": [row(SURV, True), row(REF, False)]},
+                       {"layer": "gamma", "components": [], "candidates": []}],
+        "trading": [{"layer": "beta", "entries": [], "candidates": [row(BETA, False)]}],
     })
-    write(root, USAGE, {"child_usage": {"status": "complete"}})
-    write(root, USAGE_PARTIAL, {"child_usage": {"status": "incomplete"}})
-    write(root, VOTES, VOTE_DATA)
+    write(root, USAGE, {"child_usage": {"status": "complete", "children": [
+        {"label": "discover:alpha", "complete": True}]}})
+    write(root, USAGE_PARTIAL, {"child_usage": {"status": "incomplete", "children": [
+        {"label": "discover:alpha", "complete": True}, {"label": "discover:beta", "complete": False}]}})
+    write(root, RETURNS, RETURN_DATA)
     write(root, REVIEW, {"repository": SURV, "layers": ["alpha"]})
     write(root, "evidence/artifacts/fx/other-review.json", {"repository": OTHER, "layers": ["alpha"]})
     register(root)
@@ -239,28 +284,51 @@ def build_fixture(root: Path) -> None:
 
 
 def vote(name, role):
-    return {"vote": "refuted" if VOTE_DATA[name][role]["refuted"] else "not_refuted", "ref": f"{VOTES}#/{name}/{role}"}
+    return {"vote": "refuted" if RETURN_DATA["votes"][name][role]["refuted"] else "not_refuted",
+            "ref": f"{RETURNS}#/votes/{name}/{role}"}
 
 
 def result(sweep_id="fx-1", day="2026-10-01", **overrides):
     value = {
         "sweep_id": sweep_id, "date": day, "workflow_run": f"wf_{sweep_id}", "status": "completed",
         "manifest_ref": MANIFEST, "lane": LANE, "prompts_sha256": "c" * 64, "usage_ref": USAGE,
-        "lower_bound_usage": False,
+        "lower_bound_usage": False, "returns_ref": RETURNS,
         "layers": [
-            {"catalog": "foundation", "layer_id": "alpha", "votes": "retained", "calls": {"web_search": 2},
+            {"catalog": "foundation", "layer_id": "alpha", "votes": "retained",
+             "discovery_ref": f"{RETURNS}#/discovery/alpha", "calls": {"web_search": 2},
              "proposed": [SURV, REF],
              "survived": [{"repo": SURV, "source_review": REVIEW, "facts": vote("surv", "facts"), "fit": vote("surv", "fit")}],
              "refuted": [{"repo": REF, "facts": vote("ref", "facts"), "fit": vote("ref", "fit")}],
              "reopen": []},
-            {"catalog": "us-equities", "layer_id": "beta", "votes": "retained", "calls": None,
-             "proposed": ["https://github.com/o/beta"], "survived": [],
-             "refuted": [{"repo": "https://github.com/o/beta", "facts": vote("beta", "facts"), "fit": vote("beta", "fit")}],
+            {"catalog": "us-equities", "layer_id": "beta", "votes": "retained",
+             "discovery_ref": f"{RETURNS}#/discovery/beta", "calls": None,
+             "proposed": [BETA], "survived": [],
+             "refuted": [{"repo": BETA, "facts": vote("beta", "facts"), "fit": vote("beta", "fit")}],
              "reopen": []},
         ],
     }
     value.update(overrides)
     return value
+
+
+def gamma(discovery="gamma", proposed=()):
+    value = {"catalog": "foundation", "layer_id": "gamma", "votes": "retained", "calls": None,
+             "proposed": list(proposed), "survived": [], "refuted": [], "reopen": []}
+    if discovery is not None:
+        value["discovery_ref"] = f"{RETURNS}#/discovery/{discovery}"
+    return value
+
+
+def lens_layer(refs):
+    """alpha recorded with votes not_retained and the manifest's lens votes, refs overridable."""
+    def lens_votes(row, lens_refuted):
+        return [{"lens": lens, "vote": "refuted" if refuted else "not_refuted",
+                 "ref": refs.get((row, lens), f"{MANIFEST}#/foundation/0/candidates/{row}/adversarial_verification/votes/{lens}")}
+                for lens, refuted in enumerate(lens_refuted)]
+    return {"catalog": "foundation", "layer_id": "alpha", "votes": "not_retained",
+            "votes_note": "per-vote returns not retained", "calls": None, "proposed": [SURV, REF],
+            "survived": [{"repo": SURV, "source_review": REVIEW, "lens_votes": lens_votes(0, (False, False))}],
+            "refuted": [{"repo": REF, "lens_votes": lens_votes(1, (False, True))}], "reopen": []}
 
 
 class FixtureCase(unittest.TestCase):
@@ -350,6 +418,14 @@ class IntegrityTests(FixtureCase):
         self.assertTrue(sl.check_append_only(self.root, forged, "HEAD"))
         extended = sl.append(self.root, ledger, result("fx-3", "2026-10-15"))
         self.assertEqual(sl.check_append_only(self.root, extended, "HEAD"), [])
+        # An unknown base is an error, not "no ledger yet" ...
+        self.assertEqual(sl.check_append_only(self.root, forged, "no-such-ref-xyz"),
+                         ["append-only: no-such-ref-xyz is not a commit in this checkout"])
+        self.assertEqual(quiet_main(["--root", str(self.root), "--check", "--base", "no-such-ref-xyz"]), 1)
+        # ... while a valid commit without the ledger file is.
+        (self.root / sl.LEDGER).unlink()
+        subprocess.run([*git, "commit", "-q", "-am", "no ledger"], check=True)
+        self.assertEqual(sl.check_append_only(self.root, forged, "HEAD"), [])
 
     def test_survivor_must_bind_to_a_surviving_manifest_lane_row(self):
         ledger = self.appended(result())
@@ -398,7 +474,7 @@ class IntegrityTests(FixtureCase):
         flipped = copy.deepcopy(ledger)
         flipped["sweeps"][0]["layers"][0]["refuted"][0]["fit"]["vote"] = "not_refuted"
         errors = sl.check_ledger(self.root, sl_rechain(flipped))
-        self.assertTrue(any("disagrees with evidence/artifacts/fx/votes.json#/ref/fit" in e for e in errors), errors)
+        self.assertTrue(any("disagrees with evidence/artifacts/fx/returns.json#/votes/ref/fit" in e for e in errors), errors)
         self.assertTrue(any("listed as refuted but its votes give survived" in e for e in errors), errors)
 
     def test_a_completed_sweep_must_adjudicate_every_manifest_lane_row(self):
@@ -441,6 +517,87 @@ class IntegrityTests(FixtureCase):
         with self.assertRaisesRegex(sl.LedgerError, "needs a votes_note"):
             sl.append(self.root, self.ledger(), missing_note)
 
+    def test_a_retained_layer_needs_its_retained_discovery_return(self):
+        # An empty retained layer is evidence only through its discovery return.
+        with self.assertRaisesRegex(sl.LedgerError, "needs a discovery_ref"):
+            sl.append(self.root, self.ledger(), result(layers=[gamma(discovery=None)]))
+        with self.assertRaisesRegex(sl.LedgerError, "does not equal the retained discovery return"):
+            sl.append(self.root, self.ledger(), result(layers=[gamma("gamma-nonempty")]))
+        with self.assertRaisesRegex(sl.LedgerError, "is not the discovery return of foundation/gamma"):
+            sl.append(self.root, self.ledger(), result(layers=[gamma("alpha")]))
+        with self.assertRaisesRegex(sl.LedgerError, "needs the sweep's returns_ref"):
+            without = result(layers=[gamma()])
+            del without["returns_ref"]
+            sl.append(self.root, self.ledger(), without)
+        ledger = self.appended(*(result(f"fx-{n}", day, layers=[gamma()])
+                                 for n, day in enumerate(("2026-10-01", "2026-10-08", "2026-10-15"))))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertTrue(sl.derive(ledger)[("foundation", "gamma")]["saturation_candidate"])
+        # The reviewer's case: retained, empty, and no discovery return, three times.
+        stripped = copy.deepcopy(ledger)
+        for record in stripped["sweeps"]:
+            del record["layers"][0]["discovery_ref"]
+        stripped = sl_rechain(stripped)
+        self.assertErrorMatches(stripped, r"needs a discovery_ref")
+        self.assertFalse(sl.derive(stripped)[("foundation", "gamma")]["saturation_candidate"])
+
+    def test_retained_vote_refs_point_at_a_matching_vote_in_the_returns_file(self):
+        ledger = self.appended(result())
+        cases = {
+            "pointer-less file": (REVIEW, r"needs a #/json/pointer"),
+            "pointer-less returns file": (RETURNS, r"needs a #/json/pointer"),
+            "usage file": (f"{USAGE}#/child_usage", r"must point into evidence/artifacts/fx/returns\.json"),
+            "manifest": (f"{MANIFEST}#/foundation/0", r"must point into evidence/artifacts/fx/returns\.json"),
+            "other role": (f"{RETURNS}#/votes/ref/fit", r"is not a facts vote"),
+            "other repository": (f"{RETURNS}#/votes/surv/facts", r"is a vote on a different repository"),
+            "unresolved": (f"{RETURNS}#/votes/ref/nope", r"does not resolve"),
+        }
+        for name, (ref, pattern) in cases.items():
+            with self.subTest(case=name):
+                edited = copy.deepcopy(ledger)
+                edited["sweeps"][0]["layers"][0]["refuted"][0]["facts"]["ref"] = ref
+                self.assertErrorMatches(sl_rechain(edited), pattern)
+        for field in (MANIFEST, USAGE):
+            with self.subTest(returns_ref=field):
+                with self.assertRaisesRegex(sl.LedgerError, "must be the retained lane returns"):
+                    sl.append(self.root, self.ledger(), result(returns_ref=field))
+
+    def test_lens_votes_point_at_this_layers_lane_row_for_the_repository(self):
+        ledger = self.appended(result(layers=[lens_layer({})]))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        cases = {
+            "pointer-less": (MANIFEST, r"needs a #/json/pointer"),
+            "other file": (f"{RETURNS}#/votes/surv/facts", r"must point into catalogs/sota-convergence/manifest-fx\.json"),
+            "other candidate": (f"{MANIFEST}#/foundation/0/candidates/1/adversarial_verification/votes/0",
+                                r"is a vote on a different candidate row"),
+            "other layer": (f"{MANIFEST}#/trading/0/candidates/0/adversarial_verification/votes/0",
+                            r"is not a vote of this layer's manifest row"),
+            "other lens": (f"{MANIFEST}#/foundation/0/candidates/0/adversarial_verification/votes/1", r"is not lens 0"),
+        }
+        for name, (ref, pattern) in cases.items():
+            with self.subTest(case=name):
+                with self.assertRaisesRegex(sl.LedgerError, pattern):
+                    sl.append(self.root, self.ledger(), result(layers=[lens_layer({(0, 0): ref})]))
+
+    def test_a_date_must_be_a_calendar_date(self):
+        with self.assertRaisesRegex(sl.LedgerError, "calendar date"):
+            sl.append(self.root, self.ledger(), result(day="2026-02-30"))
+        ledger = self.appended(result())
+        ledger["sweeps"][0]["date"] = "2026-02-30"
+        self.assertErrorMatches(sl_rechain(ledger), r"date must be a calendar date")
+
+    def test_lost_workers_name_incomplete_children_of_the_usage_output(self):
+        stopped = result(status="stopped", usage_ref=USAGE_PARTIAL, lower_bound_usage=True,
+                         lost_workers=["discover:beta"],
+                         layers=[{"catalog": "foundation", "layer_id": "alpha", "votes": "not_returned",
+                                  "votes_note": "stopped before any refuter returned", "calls": None,
+                                  "proposed": [SURV], "survived": [], "refuted": [], "reopen": []}])
+        self.assertEqual(sl.check_ledger(self.root, sl.append(self.root, self.ledger(), stopped)), [])
+        for lost in (["discover:alpha"], ["discover:gone"]):
+            with self.subTest(lost=lost):
+                with self.assertRaisesRegex(sl.LedgerError, "is not an incomplete child"):
+                    sl.append(self.root, self.ledger(), dict(stopped, lost_workers=lost))
+
     def test_command_line_append_check_and_report(self):
         path = self.root.parent / f"{self.root.name}-result.json"
         try:
@@ -454,6 +611,21 @@ class IntegrityTests(FixtureCase):
         self.assertIn("foundation/alpha", report["due"])
         self.assertEqual(report["saturation_candidates"], [])
         self.assertIn("Saturation tracking", sl.render_markdown(report))
+        self.assertEqual(report["inputs"]["freshness"], "not available")
+
+    def test_a_partial_freshness_input_is_reported_as_partial(self):
+        manifest = json.loads((self.root / MANIFEST).read_text())
+        ledger = self.appended(result())
+        cases = ((None, "partial"), ({"errors": 0, "partial_errors": 2}, "partial"),
+                 ({"errors": 1, "partial_errors": 0}, "partial"), ({"errors": "0"}, "partial"),
+                 ({"errors": 0, "partial_errors": 0}, "read"))
+        for status, expected in cases:
+            with self.subTest(status=status):
+                report = sl.build_report(self.root, ledger, None, manifest, status)
+                self.assertEqual(report["inputs"]["freshness"], expected)
+                self.assertEqual(any("catalog-freshness input partial" in n for n in report["notes"]),
+                                 expected == "partial")
+                self.assertIn(f"catalog-freshness manifest {expected}", sl.render_markdown(report))
 
 
 def sl_rechain(ledger):
@@ -536,11 +708,73 @@ class RepositoryLedgerTests(unittest.TestCase):
         ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
         self.assertEqual(sl.check_ledger(ROOT, ledger), [])
 
-    def test_the_seed_is_rederived_from_the_retained_files(self):
+    # The requirement and platform-profile hashes are computed from the research-state and adoption
+    # files at append time. They legitimately differ from today's files after a landscape edit, so
+    # the seed comparison leaves them out and recomputes them at the commits the README cites.
+    SEED_HASH_COMMITS = ("9eac1f9", "0465141", "4a4c8a2")
+
+    @staticmethod
+    def without_append_time_hashes(record):
+        record = copy.deepcopy(record)
+        record.pop("prev_sha256", None)  # the chain itself is verified by --check
+        for layer_ in record["layers"]:
+            layer_.pop("requirement_sha256", None)
+            layer_.pop("platform_profiles_sha256", None)
+        return record
+
+    def test_the_seed_records_are_rederived_from_the_retained_files(self):
+        committed = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
+        self.assertEqual(committed["policy"], sl.empty_ledger()["policy"])
         ledger = sl.empty_ledger()
         for item in sl.derive_seed(ROOT):
             ledger = sl.append(ROOT, ledger, item)
-        self.assertEqual(sl.dump(ledger), (ROOT / sl.LEDGER).read_text(encoding="utf-8"))
+        seed = ledger["sweeps"]
+        self.assertEqual(seed[0]["prev_sha256"], committed["sweeps"][0]["prev_sha256"])
+        self.assertEqual([self.without_append_time_hashes(record) for record in seed],
+                         [self.without_append_time_hashes(record) for record in committed["sweeps"][:len(seed)]])
+
+    def test_the_seed_hashes_match_the_files_at_the_commits_they_cite(self):
+        committed = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))["sweeps"][:2]
+        checked = 0
+        for commit in self.SEED_HASH_COMMITS:
+            files = {}
+            for relative in (sl.RESEARCH_STATE, sl.ADOPTION):
+                shown = subprocess.run(["git", "-C", str(ROOT), "show", f"{commit}:{relative}"],
+                                       capture_output=True, text=True, check=False)
+                if shown.returncode != 0:
+                    break
+                files[relative] = json.loads(shown.stdout)
+            if len(files) != 2:
+                continue  # a shallow or partial clone lacks the commit
+            rows = {(row.get("catalog"), row.get("layer_id")): row for row in files[sl.RESEARCH_STATE]["layers"]}
+            profiles = sl.platform_profiles_sha256(files[sl.ADOPTION])
+            for record in committed:
+                for layer_ in record["layers"]:
+                    key = (layer_["catalog"], layer_["layer_id"])
+                    with self.subTest(commit=commit, layer=key):
+                        self.assertEqual(layer_["requirement_sha256"], sl.requirement_sha256(rows[key]))
+                        self.assertEqual(layer_["platform_profiles_sha256"], profiles)
+            checked += 1
+        if not checked:
+            self.skipTest("none of the cited commits is in this clone")
+
+    def test_the_ledger_extends_the_one_at_the_merge_base(self):
+        """Append-only across commits: the ledger at the merge base with the target branch must be
+        an unchanged prefix of this one, which catches a rewrite that recomputes every hash. In a
+        pull_request run (GITHUB_BASE_REF set) with full history the base must resolve."""
+        if shutil.which("git") is None:
+            self.skipTest("git unavailable")
+        target = f"origin/{os.environ.get('GITHUB_BASE_REF') or 'main'}"
+        git = ["git", "-C", str(ROOT)]
+        shallow = subprocess.run([*git, "rev-parse", "--is-shallow-repository"],
+                                 capture_output=True, text=True, check=False).stdout.strip() == "true"
+        base = subprocess.run([*git, "merge-base", "HEAD", target], capture_output=True, text=True, check=False)
+        if base.returncode != 0:
+            if os.environ.get("GITHUB_BASE_REF") and not shallow:
+                self.fail(f"cannot find the merge base with {target}: {base.stderr.strip()}")
+            self.skipTest(f"no merge base with {target} in this clone")
+        ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
+        self.assertEqual(sl.check_append_only(ROOT, ledger, base.stdout.strip()), [])
 
     def test_no_seed_layer_counts_as_clean(self):
         ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
@@ -555,6 +789,12 @@ class RepositoryLedgerTests(unittest.TestCase):
         self.assertTrue(all(entry["source_review"] for entry in survivors))
         state = sl.derive(ledger)
         self.assertTrue(all(entry["count"] == 0 and not entry["saturation_candidate"] for entry in state.values()))
+        # The stopped attempt's provenance: its date comes from the superseding run's manifest, and
+        # its eight in-flight children are lost workers without a layer entry.
+        self.assertEqual(len(stopped["lost_workers"]), 8)
+        self.assertTrue(any("no date of its own" in note for note in stopped["notes"]))
+        self.assertFalse({label.split(":", 1)[1] for label in stopped["lost_workers"]}
+                         & {layer["layer_id"] for layer in stopped["layers"]})
 
     def test_the_schema_matches_when_jsonschema_is_available(self):
         schema = json.loads((ROOT / "catalogs/saturation/ledger.schema.json").read_text(encoding="utf-8"))
@@ -582,15 +822,20 @@ class WorkflowTests(unittest.TestCase):
         blocks = permission_blocks(self.text)
         self.assertEqual(blocks[0], {"contents": "read"})
         self.assertRegex(self.text, r"(?m)^permissions:\n  contents: read\n")
-        self.assertEqual(len(blocks), 3)
+        self.assertEqual(len(blocks), 4)
         job_map = jobs(self.text)
-        self.assertEqual(list(job_map), ["report", "issue"])
+        self.assertEqual(list(job_map), ["report", "plan", "issue"])
         self.assertEqual(permission_blocks(job_map["report"]), [{"contents": "read", "actions": "read"}])
+        self.assertEqual(permission_blocks(job_map["plan"]), [{"issues": "read"}])
         self.assertEqual(permission_blocks(job_map["issue"]), [{"issues": "write"}])
         self.assertEqual(self.text.count("issues: write"), 1)
         self.assertNotRegex(self.text, r"(?m)(contents|pull-requests|actions|id-token): write")
-        self.assertIn("needs: report", job_map["issue"])
-        self.assertNotIn("actions/checkout@", job_map["issue"])
+        for job_id in ("plan", "issue"):
+            self.assertIn("needs: report", job_map[job_id])
+            self.assertNotIn("actions/checkout@", job_map[job_id])
+        # A dry run never mints the write token: the write job is skipped and the plan job reads.
+        self.assertIn("    if: ${{ !inputs.dry_run }}\n", job_map["issue"])
+        self.assertIn("    if: ${{ inputs.dry_run }}\n", job_map["plan"])
 
     def test_every_job_starts_with_harden_runner(self):
         for job_id, job_text in jobs(self.text).items():
@@ -608,21 +853,30 @@ class WorkflowTests(unittest.TestCase):
         self.assertNotRegex(self.text, r"(?i)uses:\s*\S*(claude|anthropic|openai|codex)")
 
     def test_one_labelled_issue_is_upserted_and_dry_run_writes_nothing(self):
-        job = jobs(self.text)["issue"]
+        job_map = jobs(self.text)
+        job = job_map["issue"]
         self.assertIn("gh issue list --label \"$label\" --state open", job)
         self.assertIn("gh issue edit", job)
         self.assertIn("gh issue create", job)
         self.assertIn("label='saturation-tracking'", job)
-        dry = job.index('if [ "$DRY_RUN" = "true" ]')
+        plan = job_map["plan"]
+        self.assertIn("gh issue list --label \"$label\" --state open", plan)
+        self.assertIn("label='saturation-tracking'", plan)
         for write_command in ("gh issue create", "gh issue edit", "gh issue close", "gh label create"):
-            self.assertGreater(job.index(write_command), dry, write_command)
-        self.assertIn("DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}", job)
+            self.assertNotIn(write_command, plan)
+            self.assertNotIn(write_command, job_map["report"])
+        self.assertNotIn("DRY_RUN", self.text)
 
     def test_the_report_job_checks_before_reporting(self):
         job = jobs(self.text)["report"]
         self.assertLess(job.index("saturation_ledger.py --check"), job.index("saturation_ledger.py --report"))
         self.assertIn("receipt_staleness.py --json", job)
         self.assertIn("gh run download", job)
+        # Only scheduled freshness runs (no max_repos bound), with their error counts.
+        self.assertIn("--event schedule", job)
+        self.assertIn("--freshness-status", job)
+        # The unit tests run in validate.yml; running them here would block the report.
+        self.assertNotIn("unittest", job)
 
 
 if __name__ == "__main__":

@@ -48,10 +48,12 @@ Retain each of these under `evidence/artifacts/<lane>/` and `<lane>-attempts/`:
   the raw-output sha256;
 - a stopped or superseded run as its own record, with its usage marked as a lower bound;
 - lost workers, per-layer call counts and critic follow-ups;
-- **the retained per-vote returns**: each candidate's facts and fit votes, with their cited
-  references, in a JSON file. A vote `ref` points into it (`path#/json/pointer`) at an object that
-  carries a boolean `refuted`. Without these returns, a layer is recorded as
-  `votes: not_retained` and never counts as clean;
+- **the retained lane returns**, one JSON file per sweep (the record's `returns_ref`): each
+  layer's discovery return as `{catalog, layer_id, proposed[]}`, and each candidate's facts and
+  fit votes as `{role, repository, refuted, ...}` with their cited references. A layer's
+  `discovery_ref` and each vote `ref` point into it (`path#/json/pointer`). Without these returns,
+  a layer is recorded as `votes: not_retained` and never counts as clean. A retained layer with no
+  proposals still needs its discovery return;
 - one source review per survivor. See the files under
   `evidence/artifacts/landscape-sweep-20260923/` for the shape.
 
@@ -66,7 +68,7 @@ python3 scripts/validate.py
 ## 4. Append the record
 
 Write `RESULT.json`. Leave out every computed field: `prev_sha256`, `manifest_sha256`,
-`usage_sha256`, `requirement_sha256`, `platform_profiles_sha256`, `known` and `new`. `--append`
+`usage_sha256`, `returns_sha256`, `requirement_sha256`, `platform_profiles_sha256`, `known` and `new`. `--append`
 computes them from today's files.
 
 ```json
@@ -75,13 +77,15 @@ computes them from today's files.
  "status": "completed", "manifest_ref": "catalogs/sota-convergence/manifest-YYYYMMDD.json",
  "lane": "landscape-sweep-YYYYMMDD", "prompts_sha256": "<64 hex>",
  "usage_ref": "evidence/artifacts/<lane>-attempts/child-usage-wf_....json", "lower_bound_usage": false,
+ "returns_ref": "evidence/artifacts/<lane>/returns.json",
  "layers": [
   {"catalog": "foundation", "layer_id": "document-retrieval", "votes": "retained",
+   "discovery_ref": "evidence/artifacts/<lane>/returns.json#/discovery/document-retrieval",
    "calls": {"web_search": 6, "web_fetch": 2, "gh_api": 24},
    "proposed": ["https://github.com/o/a", "https://github.com/o/b"],
    "survived": [{"repo": "https://github.com/o/a", "source_review": "evidence/artifacts/<lane>/o-a.json",
-                 "facts": {"vote": "not_refuted", "ref": "evidence/artifacts/<lane>/votes.json#/document-retrieval/0/facts"},
-                 "fit": {"vote": "not_refuted", "ref": "evidence/artifacts/<lane>/votes.json#/document-retrieval/0/fit"}}],
+                 "facts": {"vote": "not_refuted", "ref": "evidence/artifacts/<lane>/returns.json#/votes/document-retrieval/0/facts"},
+                 "fit": {"vote": "not_refuted", "ref": "evidence/artifacts/<lane>/returns.json#/votes/document-retrieval/0/fit"}}],
    "refuted": [{"repo": "https://github.com/o/b", "facts": {"vote": "not_refuted", "ref": "..."},
                 "fit": {"vote": "refuted", "ref": "..."}}],
    "reopen": []}
@@ -97,9 +101,12 @@ python3 scripts/saturation_ledger.py --check --base origin/main
 python3 -m unittest tests.test_saturation_ledger
 ```
 
+The pull request that adds the record runs the same append-only comparison in `validate.yml`,
+against the merge base with the target branch.
+
 Record a stopped run the same way: set `"status": "stopped"` and `"lower_bound_usage": true`,
-and give each layer `votes: not_returned` with a `votes_note`. A stopped run neither counts nor
-resets.
+give each layer `votes: not_returned` with a `votes_note`, and list the children that never
+returned in `lost_workers`. A stopped run neither counts nor resets.
 
 Add a `reopen` entry, `{trigger, ref}`, when the sweep finds any of these:
 
@@ -109,15 +116,20 @@ Add a `reopen` entry, `{trigger, ref}`, when the sweep finds any of these:
 - a credible missing capability
 - a comparison that changes a result
 
-Each one resets that layer's count.
+Also copy each of the report's current reopen triggers for a covered layer (`pin_moved`,
+`stale_receipt`, `selection_changed`, and a requirement or platform-profile change) into that
+layer's `reopen`. The report reads those from today's files, so they hold a layer at 0 only while
+they stand; the ledger entry keeps the reset after the flag clears. Each reopen entry resets that
+layer's count.
 
 `--append` refuses in these cases:
 
 - the existing ledger does not check
 - the `sweep_id` is already recorded
 - the new record fails any binding: a survivor without a surviving manifest row or a registered
-  source review, a missing vote, survival that disagrees with the votes, or unregistered or
-  incomplete usage
+  source review, a missing vote or discovery return, a vote or discovery `ref` without a pointer
+  into `returns_ref`, survival that disagrees with the votes, an invalid date, or unregistered
+  or incomplete usage
 
 `--append` never rewrites earlier records, and it never writes `research-state.json`. When a
 layer reaches `saturation_candidate`, the landscape owners decide whether to add `closure_refs`.

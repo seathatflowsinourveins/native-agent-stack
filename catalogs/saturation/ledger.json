@@ -18,6 +18,16 @@
    "usage_sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
    "lower_bound_usage": true,
    "record_ref": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
+   "lost_workers": [
+    "discover:token-efficiency",
+    "discover:quality-evaluation",
+    "discover:ci-supply-chain",
+    "discover:scheduling-supervision",
+    "discover:hosting-services",
+    "discover:recovery-portability",
+    "discover:observation-inference",
+    "discover:agent-sdks"
+   ],
    "not_retained": [
     "prompts_sha256",
     "lane_returns"
@@ -25,7 +35,9 @@
    "notes": [
     "Stopped by the coordinator when the user's effort policy changed to effort max for every worker; relaunched with identical prompts at effort max as wf_38aa6d5d-d6c.",
     "Retained for audit only; nothing here was merged into manifest-20260923. No refuter evaluated these returns.",
-    "Repositories not proposed again by the completed run are not candidates of this wave; they are dated inputs for a later sweep."
+    "Repositories not proposed again by the completed run are not candidates of this wave; they are dated inputs for a later sweep.",
+    "The attempt record has no date of its own; date is catalogs/sota-convergence/manifest-20260923.json#/checked_at, the date of the superseding run wf_38aa6d5d-d6c.",
+    "This run produced no manifest; manifest_ref is the known/new baseline only, and the 8 children stopped in flight are lost_workers, with no layer entry."
    ],
    "prev_sha256": "6f7d7f8287906f08303525fe308d21a199c23fc9a5992da4690bdb52ba7cff8b",
    "layers": [
@@ -300,7 +312,7 @@
     "Lane limits: catalogs/sota-convergence/manifest-20260923.json#/lane_limits/landscape-sweep-20260923.",
     "Per-vote returns were not retained; the manifest keeps each vote's refuted flag and a 400-character reasoning excerpt by lens index, without naming which lens was the facts or fit refuter, so no layer of this sweep counts as clean."
    ],
-   "prev_sha256": "89771da00f3a28b896c0ba120f9761b417869e26efab2ff146665d215fc32cc5",
+   "prev_sha256": "5d20ef4b9b416f09f69879f108a3d91720af66af5e1bb815878011fb00c5c588",
    "layers": [
     {
      "catalog": "foundation",
@@ -2715,5 +2727,5 @@
    ]
   }
  ],
- "head_sha256": "e2e78909363a23555504d3bfe7aa67b9cff422122a56d6e08458aad1e4a593fc"
+ "head_sha256": "7f9f4619e052f685303ccd021c01067a90062141d5eaf7afc712d8213e468cd6"
 }

@@ -48,8 +48,6 @@ jobs:
         with:
           python-version: '3.13'
           check-latest: false
-      - name: Run the ledger's unit tests
-        run: python3 -m unittest tests.test_saturation_ledger -v
       - name: Check the ledger (schema, hash chain, manifest and evidence bindings)
         run: python3 scripts/saturation_ledger.py --check
       - name: Build the receipt-staleness input
@@ -65,12 +63,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Its manifest artifact is uploaded unless the run was cancelled, so a completed run
-          # whose test step failed still carries it.
-          run_id="$(gh run list --workflow catalog-freshness.yml --branch main --status completed --limit 1 \
-            --json databaseId --jq '.[0].databaseId // empty')"
+          # Scheduled runs only: a manual dispatch may bound the fetch with max_repos, leaving
+          # components without upstream data. The manifest artifact is uploaded unless the run was
+          # cancelled, so a completed run whose test step failed still carries it; the report reads
+          # that artifact's github-freshness.json and marks the input partial on any upstream error.
+          run_id="$(gh run list --workflow catalog-freshness.yml --branch main --event schedule --status completed \
+            --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
           if [ -z "$run_id" ]; then
-            echo "No completed catalog-freshness run found; the report notes the missing input."
+            echo "No completed scheduled catalog-freshness run found; the report notes the missing input."
             exit 0
           fi
           if ! gh run download "$run_id" --pattern 'catalog-freshness-*' --dir "$RUNNER_TEMP/saturation/freshness"; then
@@ -86,6 +86,10 @@ jobs:
           manifest="$(find "$RUNNER_TEMP/saturation/freshness" -type f -name 'manifest-*.json' 2>/dev/null | sort | tail -n 1 || true)"
           if [ -n "$manifest" ]; then
             args+=(--freshness-manifest "$manifest")
+            status="$(dirname "$manifest")/github-freshness.json"
+            if [ -f "$status" ]; then
+              args+=(--freshness-status "$status")
+            fi
           fi
           mkdir -p "$RUNNER_TEMP/saturation/report"
           python3 scripts/saturation_ledger.py --report --json "${args[@]}" > "$RUNNER_TEMP/saturation/report/report.json"
@@ -99,11 +103,45 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  # The only write-permitted job: it upserts exactly one open issue labelled saturation-tracking
-  # from the report artifact. No checkout, no repository write, no model call.
+  # dry_run only: lists the labelled issues with a read-only token and prints the planned action.
+  plan:
+    name: Show the planned issue action (dry run)
+    needs: report
+    if: ${{ inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: List the labelled issues and print the planned action
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          label='saturation-tracking'
+          listing="$(gh issue list --label "$label" --state open --limit 100 \
+            --json number --jq 'sort_by(.number) | .[].number')"
+          read -r -a numbers <<< "${listing//$'\n'/ }"
+          if [ "${#numbers[@]}" -eq 0 ]; then
+            action="create"
+          else
+            action="edit #${numbers[0]}"
+          fi
+          echo "Open issues labelled $label: ${#numbers[@]}; planned action: $action."
+          echo "dry_run: no issue created, edited or closed."
+
+  # The only write-permitted job, skipped on a dry run: it upserts exactly one open issue labelled
+  # saturation-tracking from the report artifact. No checkout, no repository write, no model call.
   issue:
     name: Upsert the saturation-tracking issue
     needs: report
+    if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -122,7 +160,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
@@ -138,16 +175,6 @@ jobs:
           listing="$(gh issue list --label "$label" --state open --limit 100 \
             --json number --jq 'sort_by(.number) | .[].number')"
           read -r -a numbers <<< "${listing//$'\n'/ }"
-          if [ "${#numbers[@]}" -eq 0 ]; then
-            action="create"
-          else
-            action="edit #${numbers[0]}"
-          fi
-          echo "Open issues labelled $label: ${#numbers[@]}; planned action: $action."
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "dry_run: no issue created, edited or closed."
-            exit 0
-          fi
           if [ "${#numbers[@]}" -eq 0 ]; then
             gh label create "$label" --color 5319E7 \
               --description 'Weekly saturation-tracking report (scripts/saturation_ledger.py)' --force

@@ -26,7 +26,10 @@ Each sweep record holds these fields:
 - `lane` and `prompts_sha256`
 - `usage_ref` and `usage_sha256`: the registered `child-usage.mjs` output
 - `lower_bound_usage`
-- optional `record_ref`, `lane_calls`, `not_retained` and `notes`
+- `returns_ref` and `returns_sha256`: the registered retained lane returns (each layer's discovery
+  return and each facts and fit vote). Required when any layer has `votes: retained`.
+- optional `record_ref`, `lane_calls`, `lost_workers` (labels of `usage_ref` children that never
+  returned), `not_retained` and `notes`
 - `prev_sha256`
 - `layers[]`
 
@@ -37,11 +40,15 @@ Each layer entry holds these fields:
   layer's `research-state.json` row
 - `platform_profiles_sha256`: the sha256 of the canonical `adoption/manifest.json#/platform_profiles`
 - `votes`: `retained`, `not_retained` or `not_returned`, with a `votes_note` unless `retained`
+- `discovery_ref`, required with `votes: retained`: `returns_ref#/pointer` to the layer's
+  discovery return, `{catalog, layer_id, proposed[]}`
 - `calls`
 - `proposed`, `known` and `new`
 - `survived[]` and `refuted[]`: each entry names a `repo` and its two votes. With retained
-  votes, the votes are `facts` and `fit`, each `{vote, ref}`. Otherwise they are
-  `lens_votes[0..1]`. A survivor also names its `source_review`.
+  votes, the votes are `facts` and `fit`, each `{vote, ref}`, where `ref` is
+  `returns_ref#/pointer` to `{role, repository, refuted}`. Otherwise they are `lens_votes[0..1]`,
+  each pointing at that lens's vote in this layer's lane row of `manifest_ref`. A survivor also
+  names its `source_review`.
 - `reopen[]` of `{trigger, ref}`
 
 `known` lists the proposals that the manifest layer already names outside this lane, or that an
@@ -53,11 +60,18 @@ to `{schema_version, policy}`, so changing `policy` also breaks the chain.
 
 ## What `--check` verifies
 
-- The structure, and that `prev_sha256` and `head_sha256` match. Editing, reordering or deleting
-  a record fails. With `--base REF`, the ledger at `REF` must be an unchanged prefix. This catches
-  a rewrite that recomputes every hash.
-- `manifest_ref`, `usage_ref`, `record_ref`, every `source_review` and every vote `ref` file must
-  be registered in `manifests/evidence.json` with a matching sha256.
+- The structure, calendar dates, and that `prev_sha256` and `head_sha256` match. Editing,
+  reordering or deleting a record fails. With `--base REF`, the ledger at `REF` must be an
+  unchanged prefix. This catches a rewrite that recomputes every hash. `REF` must be a commit; a
+  commit without the ledger file means there is no earlier ledger.
+- `manifest_ref`, `usage_ref`, `returns_ref`, `record_ref`, every `source_review` and every vote
+  and discovery `ref` file must be registered in `manifests/evidence.json` with a matching sha256.
+- A retained layer needs a `discovery_ref` whose `proposed` equals the layer's `proposed`, so an
+  empty layer is evidence only through its retained discovery return. Every vote and discovery
+  `ref` needs a JSON pointer: a retained vote must resolve in `returns_ref` (not the manifest, the
+  usage output or the run record) to an object with the same role and repository, and a lens vote
+  must resolve to that lens in this layer's lane row for the same repository.
+- Each `lost_workers` label must be a child of `usage_ref` that never completed.
 - A completed sweep needs `child_usage.status == complete` and `lower_bound_usage: false`. A
   stopped sweep needs `lower_bound_usage: true`.
 - Each refuted or survived entry needs both votes. Survival is recomputed: the entry survives only
@@ -68,13 +82,21 @@ to `{schema_version, policy}`, so changing `policy` also breaks the chain.
   that names the layer.
 - `known` and `new` are recomputed.
 
+### Where append-only is enforced
+
+`tests/test_saturation_ledger.py` runs `check_append_only` against the merge base of `HEAD` and
+`origin/$GITHUB_BASE_REF` (or `origin/main`). `validate.yml` runs the full unit test suite with
+full history on every pull request, so a pull request that rewrites an earlier record fails there
+even when it recomputes every hash. In a pull-request run with full history, a missing merge base
+fails the test; in a shallow clone it is skipped.
+
 ## Derived state
 
 `--report` derives these values and never stores them.
 
 A completed sweep is **clean** for a layer when all three hold:
 
-- `votes` is `retained`
+- `votes` is `retained`, with a `discovery_ref`
 - nothing survived
 - `reopen` is empty
 
@@ -86,18 +108,26 @@ The count changes as follows:
 
 - A stopped sweep neither counts nor resets.
 - A sweep closer than the gap neither counts nor resets.
-- Each of these resets the count to 0:
+- Each of these resets the count to 0, durably, because the ledger records it:
   - a survivor
   - a reopen entry
-  - a sweep whose votes were not retained
-  - a changed requirement or platform-profile hash, whether between sweeps or against today's
-    files
+  - a sweep whose votes or discovery return were not retained
+  - a changed requirement or platform-profile hash between sweeps
+- Each of these holds the count at 0 only while it stands, because `--report` reads it from
+  today's files and the weekly workflow never writes the ledger:
+  - a changed requirement or platform-profile hash against today's files
   - a current `pin_moved` or `stale` flag from `scripts/receipt_staleness.py --json` on a selected
-    component
-  - a selection that the latest `catalog-freshness` manifest shows as archived, renamed or
-    relicensed
+    component (it clears when the host re-records the receipt)
+  - a selection that the latest scheduled `catalog-freshness` manifest shows as archived, renamed
+    or relicensed
 
-The weekly workflow reads those last two inputs. Every layer that is not a candidate is **due**.
+  The next sweep over that layer records each current trigger as a `reopen` entry, which makes the
+  reset durable ([recipe](../../recipes/saturation-sweep.md#4-append-the-record)).
+
+The weekly workflow reads the receipt and freshness inputs. It marks the freshness input `partial`
+when that run's `github-freshness.json` reports upstream errors or partial errors, since
+unfetched components carry no archived, renamed or license data. Every layer that is not a
+candidate is **due**.
 
 ## Seed (2026-09-23)
 
@@ -111,11 +141,18 @@ from these files:
 - the 11 source reviews under
   [`evidence/artifacts/landscape-sweep-20260923/`](../../evidence/artifacts/landscape-sweep-20260923/)
 
-`tests/test_saturation_ledger.py` rebuilds the seed and compares it byte for byte.
+`tests/test_saturation_ledger.py` rebuilds both seed records and compares them with the committed
+ones. The requirement and platform-profile hashes are left out of that comparison, because they
+are computed from today's files at append time. The test recomputes them instead from
+`research-state.json` and `adoption/manifest.json` at each commit named below.
 
 1. **`landscape-sweep-20260923-attempt-1`** (workflow run `wf_28d47bbc-1b5`) is `stopped`, with
    `lower_bound_usage: true`. It covers 9 layers and the 27 repositories they proposed, with their
    per-layer calls. No refuter returned, so every layer has `votes: not_returned` and no outcome.
+   Its 8 children stopped in flight are `lost_workers`, from the stopped run's usage output. The
+   attempt record has no date of its own: `date` is the manifest's `checked_at`, the superseding
+   run's date. The run produced no manifest; `manifest_ref` is only the known/new baseline. Both
+   points are in the record's `notes`.
 2. **`landscape-sweep-20260923`** (workflow run `wf_38aa6d5d-d6c`) is `completed`, with complete
    usage. It covers 32 layers and 107 proposals: 11 survivors and 96 refuted.
 
