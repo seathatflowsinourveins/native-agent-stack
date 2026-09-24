@@ -11,23 +11,40 @@ that sets `modelSettings.<model>.effortLevel` or an applicable top-level `effort
 Source: https://code.claude.com/docs/en/settings-reference (fetched 2026-09-23).
 
 Events:
-  SessionStart: predictive warning when the resolved level for the model (if the event carries
-    `model`; headless sessions omit it) is below xhigh.
+  SessionStart: predictive warning when the resolved level for the event's `model` is below
+    xhigh. The event can omit `model` (hooks reference, SessionStart: for example after /clear
+    or a conversation recovery); such an event does nothing and leaves pending notices for the
+    next one that carries it. An event with `model` also shows, once, the notices SessionEnd left
+    in NOTICES. It resolves the warning first, then claims each notice with an atomic rename,
+    prints everything as one JSON object and deletes the claimed files only after printing; if
+    printing fails, the claims are renamed back for a later start. A notice that another start
+    claimed first is skipped, so simultaneous starts show it exactly once. Notices, claimed
+    leftovers and temporary files older than STALE_SECONDS (7 days) are deleted unseen.
   SessionEnd: reads the finished transcript for the model and effort the session actually used
-    (Stop hooks run before the turn's assistant row is written, so they cannot see the model). When that effort is below xhigh only because the model has no saved
-    per-model level anywhere, saves `modelSettings.<model>.effortLevel = "xhigh"` in the user
-    settings (what `/effort xhigh` writes) and says so. Never overrides a saved level, never
-    blocks, and exits 0 on any error.
+    (Stop hooks run before the turn's assistant row is written, so they cannot see the model).
+    When that effort is below xhigh only because the model has no saved per-model level
+    anywhere, saves `modelSettings.<model>.effortLevel = "xhigh"` in the user settings (what
+    `/effort xhigh` writes). Claude Code discards SessionEnd hook output
+    (https://code.claude.com/docs/en/hooks, SessionEnd: "discards their JSON output fields, such
+    as systemMessage"), so the save also leaves a one-line notice file in NOTICES for the next
+    SessionStart to show. Each notice is its own file, written under a temporary name and renamed
+    into place, so a start never reads half a notice and nothing appends to a claimed file.
+    Never overrides a saved level, never blocks, and exits 0 on any error.
 """
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
+import time
 
 WANT = "xhigh"
 RANK = {"low": 0, "medium": 1, "high": 2, "xhigh": 3, "max": 4}
 USER = os.path.expanduser("~/.claude/settings.json")
+NOTICES = os.path.join(os.path.dirname(USER), "effort-default-guard.notices")
+STALE_SECONDS = 7 * 24 * 3600
+NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 MANAGED = "/etc/claude-code/managed-settings.json"
 # Models where a USER-settings top-level effortLevel still applies (docs: "Opus 5, Fable 5.1, and
 # earlier models"; Sonnet 5 observed at xhigh from the top-level key on 2026-09-23).
@@ -150,11 +167,111 @@ def observed(transcript):
     return model, effort
 
 
+def start_warning(name, cwd):
+    """The SessionStart warning for model `name`, or None when it resolves to xhigh or above."""
+    level, source, capped = resolve(name, cwd)
+    if level in RANK and RANK[level] >= RANK[WANT]:
+        return None
+    why = (f"capped at {level} by maxEffortLevel ({capped})" if capped else
+           f"set to {level} by {source}" if level else "without a saved level, so it runs at the model's own default")
+    return (f"Effort default check: {name} is {why}; the ecosystem default is {WANT}. "
+            f"Run `/effort {WANT}` to save it for this model (user-settings top-level effortLevel does not apply to Opus 5.5 and later).")
+
+
+def leave_notice(msg):
+    """Leave one notice file for the next SessionStart (mode 0600, in a 0700 directory)."""
+    tmp = None
+    try:
+        os.makedirs(NOTICES, mode=0o700, exist_ok=True)
+        if os.path.islink(NOTICES):
+            return
+        fd, tmp = tempfile.mkstemp(dir=NOTICES, prefix=".", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(" ".join(msg.split()) + "\n")
+        os.rename(tmp, os.path.join(NOTICES, f"{time.time_ns()}-{os.getpid()}-{os.urandom(4).hex()}.notice"))
+        tmp = None
+    except OSError:
+        pass
+    finally:
+        if tmp:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
+
+def claim_notices():
+    """Claim every pending notice; return [(claimed_path, pending_path, lines)], oldest first.
+
+    A rename claims a notice atomically: when it fails, another SessionStart claimed it first and
+    this one skips it. Entries older than STALE_SECONDS are deleted unseen. A claimed file of a
+    start that is still printing, and a temporary file of a SessionEnd still writing, are left
+    alone until they are that old. A notice that is not a regular file is claimed but never read."""
+    if os.path.islink(NOTICES):
+        return []
+    try:
+        names = sorted(os.listdir(NOTICES))
+    except OSError:
+        return []
+    now = time.time()
+    claims = []
+    for name in names:
+        path = os.path.join(NOTICES, name)
+        try:
+            info = os.lstat(path)
+        except OSError:
+            continue  # already claimed or deleted by another start
+        if now - info.st_mtime > STALE_SECONDS:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+            continue
+        if not name.endswith(".notice"):
+            continue
+        claimed = f"{path}.claimed-{os.getpid()}-{os.urandom(4).hex()}"
+        try:
+            os.rename(path, claimed)
+        except OSError:
+            continue  # another SessionStart claimed it first
+        text = ""
+        if stat.S_ISREG(info.st_mode):
+            try:
+                with os.fdopen(os.open(claimed, os.O_RDONLY | NOFOLLOW), encoding="utf-8", errors="replace") as f:
+                    text = f.read(4096)
+            except OSError:
+                text = ""
+        claims.append((claimed, path, [line.strip() for line in text.splitlines() if line.strip()]))
+    return claims
+
+
+def release(claims):
+    """Printing failed: give each claimed notice back to a later SessionStart."""
+    for claimed, pending, _ in claims:
+        try:
+            os.rename(claimed, pending)
+        except OSError:
+            pass
+
+
+def finish(claims):
+    """The notices are printed: delete the claimed files."""
+    for claimed, _, _ in claims:
+        try:
+            os.remove(claimed)
+        except OSError:
+            pass
+
+
 def emit(msg, event):
+    """Write one JSON object to stdout unbuffered, so a failed write raises here, before any
+    claimed notice is deleted, and leaves nothing for interpreter shutdown to flush."""
     out = {"systemMessage": msg}
     if event == "SessionStart":
         out["hookSpecificOutput"] = {"hookEventName": "SessionStart", "additionalContext": msg}
-    print(json.dumps(out))
+    data = (json.dumps(out) + "\n").encode("utf-8")
+    while data:
+        data = data[os.write(1, data):]
 
 
 def main():
@@ -167,17 +284,23 @@ def main():
     if event == "SessionStart":
         model = data.get("model")
         if not isinstance(model, str) or not model:
-            return
+            return  # pending notices wait for a SessionStart that reports its model
         name = canonical(model)
-        if not name.startswith("claude-"):
-            return
-        level, source, capped = resolve(name, cwd)
-        if level in RANK and RANK[level] >= RANK[WANT]:
-            return
-        why = (f"capped at {level} by maxEffortLevel ({capped})" if capped else
-               f"set to {level} by {source}" if level else "without a saved level, so it runs at the model's own default")
-        emit(f"Effort default check: {name} is {why}; the ecosystem default is {WANT}. "
-             f"Run `/effort {WANT}` to save it for this model (user-settings top-level effortLevel does not apply to Opus 5.5 and later).", event)
+        warning = None
+        if name.startswith("claude-"):
+            try:
+                warning = start_warning(name, cwd)
+            except Exception:
+                warning = None  # a settings file the guard cannot read costs the warning, never a notice
+        claims = claim_notices()
+        notes = [line for _, _, lines in claims for line in lines] + ([warning] if warning else [])
+        if notes:
+            try:
+                emit("\n".join(notes), event)
+            except OSError:
+                release(claims)
+                return
+        finish(claims)
         return
     if event != "SessionEnd":
         return
@@ -193,6 +316,10 @@ def main():
     if capped or level is not None:
         return  # some settings file already gives this model a level; a lower effort was an explicit session choice (--effort, /effort)
     if save_user_level(name):
+        leave_notice(f"Effort default: a previous {name} session ran at {effort} because the model had no saved effort level, "
+                     f"so the guard saved modelSettings.{name}.effortLevel = {WANT} in ~/.claude/settings.json; "
+                     f"new {name} sessions start at {WANT}.")
+        # Claude Code discards this SessionEnd output; the notice above reaches the next SessionStart.
         emit(f"Effort default: {name} ran this session at {effort} because it had no saved effort level. "
              f"Saved modelSettings.{name}.effortLevel = {WANT} in ~/.claude/settings.json, so new sessions start at {WANT}; "
              f"use `/effort {WANT}` to raise this session now.", event)

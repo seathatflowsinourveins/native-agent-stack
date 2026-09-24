@@ -95,6 +95,17 @@ The manifest is
 | 256 GB RAM on the workstation | Not needed now | No selected model needs RAM offload; candidates are unverified here |
 | Laptop RAM, disk, MacBook | Not needed | 24-26 GiB RAM free under full load; 827 GB disk free |
 
+Status on 2026-09-24:
+- **CPU limit.** It is implemented in
+  [`adoption/tools/ecosystem-bounded-run`](../adoption/tools/README.md#cpu-quota-2026-09-24): a per-job
+  `CPUQuota` of (CPUs − 2) × 100%, checked inside the scope, on hosts whose user manager delegates cpu
+  (systemd 252 and later). The default leaves two CPUs free, so it does not throttle the measured 8.4-core
+  scan. The interactive-contention part stays open until the comparison named on that page has run.
+- **Retention.** The authoring host has a report-only retention rule for its wave state and caches. It
+  deletes nothing, and on 2026-09-24 it found no eligible candidate, because committed evidence cites wave
+  paths. Archiving when a wave's record closes still needs a wave-closure marker and the export of cited
+  raw files.
+
 If a selected local model later outgrows 24 GB, buy GPU memory first (a 48 or 96 GB workstation card
 or a second GPU); system RAM only helps mixture-of-experts models served partly from RAM.
 Trillion-parameter checkpoints are hosted-API models for every listed host (for example

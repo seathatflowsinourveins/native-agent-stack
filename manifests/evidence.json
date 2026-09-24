@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "defcb98c6f907029f19ab5c4b82c1159ff431ab18c6d84172f61dbdd71fbb9d7",
-      "bytes": 16897
+      "sha256": "5741c9f88d7fffa2a6384210d7a6989891f63c6434933a9658e444929d30f58c",
+      "bytes": 19343
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3332,18 +3332,18 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "f905ea9c5c90a5493679ff6b79a2fdabc1f44fb4998db68337c2dd175e93583d",
-      "bytes": 16611
+      "sha256": "1b65bcdc3f9424c053f00eda03c38d97e0767e1a11ed91efa93543deb46239c3",
+      "bytes": 21822
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "77c47d2dfea465a64ec7c7af8c80fe932d4bc43047d7608eee45ef13f6838a70",
-      "bytes": 5949
+      "sha256": "cde3374b1a6146d89a768fbe99d80ef934c150e0bad1a50e53bc73d3bc3c9c0e",
+      "bytes": 8312
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
-      "sha256": "61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655",
-      "bytes": 1938
+      "sha256": "7ead675d3a539b964e6d432427e5564cc9fa228e9196e715731d51c916a3acc9",
+      "bytes": 1968
     },
     {
       "path": "adoption/update.md",
@@ -9403,8 +9403,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
-      "bytes": 19528
+      "sha256": "f9880956124e66995b9a34a47608c01a477d79b16414cd08ee4ea171508b04a2",
+      "bytes": 36779
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9713,8 +9713,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "6bc157c9a92b98e6a3b05399c7ff09e35ea6d33dbd64f8d3f35dba24a7fcdeec",
-      "bytes": 7666
+      "sha256": "84a0dc27cba7f857a0a3a3fa96c30eeb68abb6d4b9ed7edd9fe79d22f74f0e3a",
+      "bytes": 8472
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -9798,8 +9798,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "47f0f8c2957a7b7906210766e7ce5eced81c019202ccb24f85249ea33bfb4539",
-      "bytes": 157126
+      "sha256": "a351cca93e2eb079d52a92d8fb270c527d8ae92d6058f21928e4019b897331ed",
+      "bytes": 157375
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -9818,8 +9818,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "3529b37f86b01619c718282c0d5208160bb25cb7f9120cc87b50eca9bc18dfee",
-      "bytes": 34723
+      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
+      "bytes": 35942
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -10215,6 +10215,11 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json",
+      "sha256": "28126926ceded78069556007c47379ab2f3568d6eb9ae2a44734671e0f171a59",
+      "bytes": 17599
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
@@ -28168,8 +28173,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "64a91a01eeaf500aa5eff8e51738e91d29faf60fd28e913cecc4eac9dd69f20b",
-      "bytes": 58202
+      "sha256": "e592060d0ab43d680eb2f9771cf2b89dd5a8d1b5809a50ec31603842704fe40e",
+      "bytes": 59537
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28183,8 +28188,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
-      "bytes": 16440
+      "sha256": "8edc71e983a2d42ee50cc717530b5750bc5b80b2b621c9cd8feb1c31c59795f3",
+      "bytes": 16871
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -28418,8 +28423,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "bf515ac2b8cd6900809cfa16ffb4da9f09a495fd1e10ed30e273e37a4292e66d",
-      "bytes": 30901
+      "sha256": "3764227feeb48844f7f51052ea9bb5747f564354975835a9980b0f77944564ff",
+      "bytes": 40864
     },
     {
       "path": "tests/test_adoption_launchd.py",
@@ -28533,8 +28538,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
-      "bytes": 10546
+      "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
+      "bytes": 27591
     },
     {
       "path": "tests/test_execution_realism.py",
