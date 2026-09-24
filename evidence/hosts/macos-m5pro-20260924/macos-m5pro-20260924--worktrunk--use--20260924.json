@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--worktrunk--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "2d11464c5ec1564846bb4a8f81e8cce5a3d7d1bb",
+  "recorded_by": {
+    "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "worktrunk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "command -v wt && cd \"${CONTROL_PLANE_ROOT:?}\" && python3 -c 'import json; c = {x[\"id\"]: x for x in json.load(open(\"manifest.json\"))[\"components\"]}[\"worktrunk\"]; print(\"manifest.json pins worktrunk\", c[\"version\"])'",
+      "exit": 0,
+      "duration_s": 0.016,
+      "output_sha256": "b43341fe0d3ce7f3e4eb59dd6b19637e5cb0f358c49124324dc6e0df40d02595",
+      "output_excerpt": "~/.local/bin/wt\nmanifest.json pins worktrunk 0.79.0\n"
+    },
+    {
+      "cmd": "wt --version",
+      "exit": 0,
+      "duration_s": 0.008,
+      "output_sha256": "9512ab58c08960cc92ea5a7e78533c3552339031950dc49f9674eeb7b15d20a2",
+      "output_excerpt": "wt v0.79.0\n"
+    },
+    {
+      "cmd": "mkdir \"${TMPDIR:?}/wt-probe\" && git init -q -b main \"$TMPDIR/wt-probe/repo\" && cd \"$TMPDIR/wt-probe/repo\" && printf \"worktrunk probe\\n\" > README.md && git add README.md && git -c core.hooksPath=/dev/null -c commit.gpgsign=false -c user.name=wt-probe -c user.email=wt-probe@example.invalid commit -q -m \"probe: initial commit\" && git log --oneline && git worktree list",
+      "exit": 0,
+      "duration_s": 0.049,
+      "output_sha256": "3b04d79f2fc23d9479bd69ecb078e342d25692e01cc9812b7f235a8f8965ebcc",
+      "output_excerpt": "e533921 probe: initial commit\n/private/tmp/claude-501/wt-probe/repo  e533921 [main]\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt switch --create wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.131,
+      "output_sha256": "b7018398c3e0b92afa9063c4ba9066c58d41c33db848d04ee8670401d582359a",
+      "output_excerpt": "\u2713 Created branch wt-probe from main and worktree @ /tmp/claude-501/wt-probe/repo.wt-probe\n\u21b3 To customize worktree locations, run wt config create\n\u25b2 Cannot change directory \u2014 shell integration installed but not active\n\u21b3 A shell restart usually activates shell integration; if it doesn't, ask an agent to debug with the docs @ https://worktrunk.dev/llms.txt\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt list </dev/null",
+      "exit": 0,
+      "duration_s": 0.088,
+      "output_sha256": "bfab80888445ce275a76cb31f6ae71f81431bf6d84e6660b6a2698622f5161cc",
+      "output_excerpt": "  Branch    Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path              Commit    Age  Message\n@ main          ^                                             .                 e533921   now  probe: initial commit\n+ wt-probe      _                                             ../repo.wt-probe  e533921   now  probe: initial commit\n\n\u25cb Showing 2 worktrees\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt remove --foreground wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.141,
+      "output_sha256": "b65946691e8333c83f7a61aed9c861bf6ce971c3d2c01c0ffa0d738d33cda934",
+      "output_excerpt": "\u25ce Removing wt-probe worktree...\n\u2713 Removed wt-probe worktree & branch (same commit as main, _) (2 files \u00b7 91 B)\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt list </dev/null",
+      "exit": 0,
+      "duration_s": 0.056,
+      "output_sha256": "59fb9af961d4429d1c7760f73b5cc6e7c2710fc5f061446fcb2ec20137ecc2dd",
+      "output_excerpt": "  Branch  Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ main        ^                                             .     e533921   now  probe: initial commit\n\n\u25cb Showing 1 worktree\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && git worktree list && git branch --list && ls \"$TMPDIR/wt-probe\"",
+      "exit": 0,
+      "duration_s": 0.018,
+      "output_sha256": "b94a9f982c9b39c8b8ed583e4cc8e7fbafe9708f1c6e49caf90665c93d02eaa7",
+      "output_excerpt": "/private/tmp/claude-501/wt-probe/repo  e533921 [main]\n* main\nrepo\n"
+    },
+    {
+      "cmd": "rm -rf \"${TMPDIR:?}/wt-probe\" && test ! -e \"$TMPDIR/wt-probe\" && echo \"throwaway probe directory removed\"",
+      "exit": 0,
+      "duration_s": 0.009,
+      "output_sha256": "1cb6ed90a8a9c13b1532f0441d3bf2acc3495ef6c14a1766644122bba5a2c271",
+      "output_excerpt": "throwaway probe directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "worktrunk": "0.79.0"
+  },
+  "observed_at_utc": "2026-09-24T15:50:13Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), worktrunk 0.79.0 (wt, the catalog pin) ran a full worktree lifecycle in a throwaway one-commit git repository created under $TMPDIR. wt switch --create wt-probe created the branch and a sibling worktree, and wt list showed both worktrees. wt remove --foreground wt-probe then removed the worktree and deleted the branch (same commit as main). A second wt list, git worktree list, git branch --list and a directory listing showed only the main worktree left, and the probe directory was then deleted (all commands exit 0). worktrunk is installed at ~/.local/bin/wt (command -v wt) and pinned outside this repository: the host control plane's manifest.json, cited by its repository-relative path, pins worktrunk 0.79.0, which matches wt --version (both in the first two commands' output).",
+  "limitations": [
+    "Hooks were inspected before any wt command ran. wt config show and the file system found no worktrunk user config (~/.config/worktrunk/config.toml absent), so there were no user hooks, no approvals file, and the default worktree-path template applied. There was also no system config, no WORKTRUNK_* or XDG_CONFIG_* override, and no project .config/wt.toml in the throwaway repository or in this repository. Every wt lifecycle command ran with stdin from /dev/null and without --yes or --no-hooks, so a hook approval prompt would have failed closed; none appeared. worktrunk's Claude Code plugin registers only Claude Code event hooks (status markers and Claude's own WorktreeCreate/WorktreeRemove), which a wt CLI run does not trigger.",
+    "Scope: one create/list/remove cycle of a branch at the same commit as main, in a repository with no remote. wt ran from a non-interactive /bin/sh without active shell integration, so wt switch created the worktree but could not change the calling shell's directory, as its output says. wt remove ran with --foreground so that the next wt list saw the finished removal. Not exercised: the default background removal, wt merge, hooks, generated commit messages, CI-status columns and remote branches.",
+    "The first command reads the pin from the control plane's manifest.json through CONTROL_PLANE_ROOT, an environment variable holding that private repository's root; the root path is not recorded. The throwaway repository's one commit used a fixed probe identity, commit.gpgsign=false and core.hooksPath=/dev/null, so the host's global git hooks and commit signing did not touch that setup commit. The wt commands ran with the host's normal git configuration. TMPDIR pointed at this session's temporary directory. A dry run of the same sequence just before this recording created no worktrunk state directory under the home directory and left the global git config files unmodified.",
+    "This receipt replaces two earlier recordings from the same day under the same id; the recorder derives the id from host, component, stage and UTC date. The list-only version and its needs_changes review are preserved at commit cef7a74 on PR #185, and the first lifecycle version at commit e2ff6b7. It was re-recorded to retain the install and pin evidence and to use the updated limitation wording. This copy was re-recorded from main commit 2d11464 so that its catalog_revision stays reachable after a squash merge; the previous copy, recorded at 3772eb5 and given independent agree reviews in cfa7574 and aebc492, remains in PR #185's history.",
+    "Recorded outside Claude Code's Seatbelt sandbox, in a scratch clone of this repository (adoption/update.md), not in the host's pinned install checkout. adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T15:50:13Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#185 re-review at d5c93c4: catalog_revision 2d11464 verified on origin/main; commands and claim identical to the ea31d6f copy reproduced by this session; gitleaks positive control re-run (exit 1, leaks found: 1)",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T15:54:59Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#185 independent review by agent-lab-e9 (WSL authoring host): wf_b3b5c3b4-c85 at bc8cee52, fixes re-checked at cfa7574f, main-bound re-record at 6f24cd0e diffed against the reviewed copy (commands, exits, claim, class, host identical; one history limitation sentence added)",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:09:35Z",
+      "reviewer": {
+        "identity_sha256": "a8c58742b9c83b2a9f3b226bcdf09fd461d938ed3c4f2ef62e0bc1949e3ed771",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
