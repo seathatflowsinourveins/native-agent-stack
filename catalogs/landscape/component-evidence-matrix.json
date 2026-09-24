@@ -117,7 +117,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "gitleaks",
           "repository": "https://github.com/gitleaks/gitleaks"
@@ -708,11 +708,11 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
+              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
+              "derived_status": "not_established",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
@@ -1319,11 +1319,11 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
+              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
+              "derived_status": "not_established",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
@@ -2359,14 +2359,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T14:20:45Z",
                 "pass": 1
               },
@@ -2671,14 +2671,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T14:20:45Z",
                 "pass": 1
               },
@@ -3132,11 +3132,11 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
+              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
+              "derived_status": "not_established",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
@@ -4583,14 +4583,14 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
-              "derived_status": "conditional",
-              "e2e_state": "untested",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-24T14:20:45Z",
                 "pass": 1
               },
@@ -5130,12 +5130,6 @@
         },
         {
           "catalog": "foundation",
-          "component_id": "gitleaks",
-          "e2e_state": "untested",
-          "layer_id": "secrets-credentials"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "qdrant",
           "e2e_state": "untested",
           "layer_id": "semantic-rag"
@@ -5161,12 +5155,6 @@
         {
           "catalog": "foundation",
           "component_id": "headroom",
-          "e2e_state": "untested",
-          "layer_id": "token-efficiency"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "rtk",
           "e2e_state": "untested",
           "layer_id": "token-efficiency"
         },
@@ -5301,12 +5289,6 @@
           "component_id": "skfolio",
           "e2e_state": "untested",
           "layer_id": "research-factors-ml"
-        },
-        {
-          "catalog": "us-equities",
-          "component_id": "gitleaks",
-          "e2e_state": "untested",
-          "layer_id": "security-supply-chain"
         },
         {
           "catalog": "us-equities",
