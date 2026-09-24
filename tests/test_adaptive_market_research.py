@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -140,10 +141,85 @@ class NewsNormalization(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "fixture.env"
             path.write_text("UNRELATED=ignored\nexport APCA_API_KEY_ID='fixture-key'\nAPCA_API_SECRET_KEY=fixture-secret\n")
+            os.chmod(path, 0o600)
             self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
             path.write_text("APCA_API_KEY_ID=$(echo nope)\nAPCA_API_SECRET_KEY=fixture-secret\n")
+            os.chmod(path, 0o600)
             with self.assertRaises(m.ResearchError):
                 m.credentials(path)
+
+
+class MarketResearchCredentialFilePermissions(unittest.TestCase):
+    """market_research.credentials() fails closed on env-file mode, ownership,
+    symlinks, and Git-worktree location before any line of the file is
+    parsed -- the gap closed by sharing runner.credentials()'s rules via
+    credential_guard.open_verified() (catalogs/us-equities/gates-20260922.json,
+    docs/decisions/2026-09-22-broker-credential-handling.md)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write_env(self, directory, name="paper.env", mode=0o600):
+        path = directory / name
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, mode)
+        return path
+
+    def test_wrong_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(path)
+
+    def test_group_or_other_readable_mode_is_rejected(self):
+        path = self._write_env(self.root, mode=0o640)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(path)
+
+    def test_wrong_owner_is_rejected(self):
+        path = self._write_env(self.root)
+        with patch.object(m.os, "getuid", return_value=os.getuid() + 1):
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+
+    def test_symlink_is_rejected(self):
+        target = self._write_env(self.root, name="real.env")
+        link = self.root / "linked.env"
+        link.symlink_to(target)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(link)
+
+    def test_inside_git_worktree_is_rejected(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        self.assertTrue((repo_root / ".git").exists(), "test assumes this checkout is a Git worktree")
+        with tempfile.TemporaryDirectory(dir=repo_root) as inside:
+            path = self._write_env(Path(inside))
+            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                m.credentials(path)
+
+    def test_missing_file_is_rejected(self):
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(self.root / "does-not-exist.env")
+
+    def test_fifo_is_rejected_and_does_not_hang(self):
+        fifo = self.root / "fifo.env"
+        os.mkfifo(fifo, mode=0o600)
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+            m.credentials(fifo)
+
+    def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
+        path = self._write_env(self.root)
+        self.assertEqual(m.credentials(path), ("fixture-key", "fixture-secret"))
+
+    def test_error_never_includes_file_contents(self):
+        path = self._write_env(self.root, mode=0o644)
+        with self.assertRaises(m.ResearchError) as ctx:
+            m.credentials(path)
+        self.assertNotIn("fixture-key", str(ctx.exception))
+        self.assertNotIn("fixture-secret", str(ctx.exception))
 
 
 class ResearchFeedSelection(unittest.TestCase):

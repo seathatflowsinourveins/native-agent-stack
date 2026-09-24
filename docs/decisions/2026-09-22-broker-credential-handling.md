@@ -7,12 +7,19 @@ does not change; this decision only tightens the precondition on the env file th
 it is opened. No broker call, no live credentials file, and no new secret store are introduced.
 
 `market_research.py` (same directory) has its own, differently implemented `credentials(path)` that also
-reads an Alpaca env file named by its own `--env-file` flag, but it is **not** touched by this decision: it
-still opens the file with `O_NOFOLLOW` and a size cap only, and enforces no `0600` mode, no current-uid
-ownership, and no outside-any-Git-worktree check. A reader must not assume the research CLI fails closed the
-same way the paper runner now does. Extending the same three preconditions to `market_research.py`'s
-`credentials(path)` (it is not part of this unit's owned paths or test scope) is an open follow-up, tracked
-here so it is not silently dropped.
+reads an Alpaca env file named by its own `--env-file` flag. **Closed 2026-09-24** (see
+`catalogs/us-equities/gates-20260922.json`'s `credential-handling` gate): both loaders now call a shared
+`blueprints/us-equities/adaptive-paper/credential_guard.open_verified()` for the ownership (current uid),
+mode (exactly `0600`), and outside-any-Git-worktree rules, with a TOCTOU-safe fstat-vs-lstat re-check on the
+opened descriptor (the pattern `tools/credentials/alpaca_rate_limit_probe.py:read_env_file` already used).
+`market_research.py` keeps its size cap and its original `O_NOFOLLOW` symlink-refusal behavior
+(`follow_symlinks=False`); `runner.py` keeps its original symlink-resolving behavior
+(`follow_symlinks=True`) so this runner's asserted error-string substrings are unchanged. Covered by
+`tests.test_adaptive_paper_runner.CredentialFilePermissions` (existing, still passing, plus new
+`test_symlink_to_a_valid_target_is_resolved_and_accepted` and `test_fifo_is_rejected_and_does_not_hang`),
+the new `tests.test_adaptive_paper_runner.SharedCredentialGuardParity`, and the new
+`tests.test_adaptive_market_research.MarketResearchCredentialFilePermissions` (wrong mode, wrong owner,
+symlink, inside a Git worktree, missing file, a FIFO that must not hang, and a valid file).
 
 ## Decision
 

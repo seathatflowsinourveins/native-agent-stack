@@ -20,6 +20,7 @@ import shlex
 import signal
 import time
 
+from credential_guard import CredentialGuardError, open_verified
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
@@ -50,40 +51,24 @@ def save(path, data):
         os.close(fd)
 
 
-def _inside_git_worktree(path):
-    """Walk parents for a `.git` entry (directory in a normal clone, file in
-    a linked worktree). Resolved so a symlink cannot hide the real location."""
-    current = path.parent
-    while True:
-        if (current / ".git").exists() or (current / ".git").is_symlink():
-            return True
-        parent = current.parent
-        if parent == current:
-            return False
-        current = parent
-
-
 def credentials(path):
     """Fail closed on a paper-credential env file with unsafe permissions,
     ownership, or location before any content is read. File contents are
-    never included in a raised error or log."""
-    resolved = Path(path).resolve()
+    never included in a raised error or log.
+
+    The ownership/mode/worktree-location rules and their TOCTOU-safe
+    open live in `credential_guard.open_verified()`, shared with
+    `market_research.credentials()` so the two loaders cannot drift; this
+    keeps `follow_symlinks=True`, i.e. a symlinked env file is resolved and
+    the rules applied to its target, matching this loader's prior behavior.
+    """
     try:
-        info = resolved.stat()
-    except OSError:
-        raise SafetyError("credential_file_permissions: cannot stat the env file; "
-                           "create it at a private path outside this repository with `chmod 600`")
-    if info.st_uid != os.getuid():
-        raise SafetyError("credential_file_permissions: env file is not owned by the current user; "
-                           "chown it to your own account (never share a paper credential file)")
-    if info.st_mode & 0o777 != 0o600:
-        raise SafetyError("credential_file_permissions: env file mode must be exactly 0600; "
-                           f"run `chmod 600 {resolved.name}`")
-    if _inside_git_worktree(resolved):
-        raise SafetyError("credential_file_permissions: env file must live outside any Git worktree; "
-                           "move it to a private, non-repository path (e.g. under your home config directory)")
+        with open_verified(path, follow_symlinks=True) as handle:
+            text = handle.read().decode("utf-8")
+    except CredentialGuardError as error:
+        raise SafetyError(str(error)) from None
     result = {}
-    for line in resolved.read_text().splitlines():
+    for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue

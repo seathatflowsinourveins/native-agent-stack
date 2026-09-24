@@ -16,6 +16,7 @@ import stat
 import sys
 from urllib.parse import urlsplit
 
+from credential_guard import CredentialGuardError, open_verified
 from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
@@ -353,17 +354,25 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
 
 
 def credentials(path):
-    """Parse only explicit Alpaca variables, never execute an environment file."""
-    path = Path(path)
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    """Fail closed on a paper-credential env file with unsafe permissions,
+    ownership, or location before any content is read; then parse only
+    explicit Alpaca variables, never execute an environment file.
+
+    The ownership/mode/worktree-location rules and their TOCTOU-safe open
+    live in `credential_guard.open_verified()`, shared with
+    `runner.credentials()` so the two loaders cannot drift; this keeps
+    `follow_symlinks=False`, i.e. a symlinked path is refused outright,
+    matching this loader's prior O_NOFOLLOW behavior. The 64 KiB size cap
+    and regular-file check stay local since only this loader needs them.
+    """
     try:
-        details = os.fstat(fd)
-        if not stat.S_ISREG(details.st_mode) or details.st_size > 65536:
-            raise ResearchError("invalid_credential_file")
-        with os.fdopen(fd, "r", closefd=False) as stream:
-            lines = stream.read().splitlines()
-    finally:
-        os.close(fd)
+        with open_verified(path, follow_symlinks=False) as handle:
+            details = os.fstat(handle.fileno())
+            if not stat.S_ISREG(details.st_mode) or details.st_size > 65536:
+                raise ResearchError("invalid_credential_file")
+            lines = handle.read().decode("utf-8").splitlines()
+    except CredentialGuardError as error:
+        raise ResearchError(str(error)) from None
     found = {}
     for line in lines:
         name, separator, value = line.strip().removeprefix("export ").partition("=")

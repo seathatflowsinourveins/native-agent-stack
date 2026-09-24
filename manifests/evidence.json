@@ -6550,8 +6550,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
-      "sha256": "692f0f16f56709204002d587d2e4da8045f0ffe8249294055cf36b51e29abe68",
-      "bytes": 22176
+      "sha256": "5c9cede642dd476c84182273ce5a5ac19d5c959e5f26223271bea6670c0fe6b5",
+      "bytes": 22837
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
@@ -6640,8 +6640,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "8bb8d577d1c62dedb0dc68c996e1e41ed0aa5036a3071de801bbc6c9e013f240",
-      "bytes": 100410
+      "sha256": "7e04dbf0bd5130f819123d497e6b0bc422ec40eb3e005d9b8b99e4fee89f8096",
+      "bytes": 99634
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6665,7 +6665,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "5997a3cfb8a7311b454a2419a2157fea636e32924a237aa8529fab74d49b440d",
+      "sha256": "75acac96abbdbc44b254d00d81a218375f7d69c64637693e28901246a83f0792",
       "bytes": 5870
     },
     {
@@ -9600,8 +9600,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "9fe924db2965496f3aacf04d2edc829cc28093384127c4586de5f76d95951589",
-      "bytes": 53802
+      "sha256": "02b60a858ac37e7cc6e85eeeeed521b555db2977eac5f3ce76edbdeac9a9b6c5",
+      "bytes": 54717
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9855,8 +9855,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "4e32f464b3466e03be4122471fec9cc46886238f602a7ec3d128bfe2eac4e9e7",
-      "bytes": 4241
+      "sha256": "d4f7c8a9d2e966257fd4b2652f80f7dcbadac9c7e8906ad60529a7fc541df5fc",
+      "bytes": 4953
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -28920,8 +28920,8 @@
     },
     {
       "path": "tests/test_adaptive_market_research.py",
-      "sha256": "dfd7a09380a7b1b10633c2edf05daf5a35bfcb48498fff130a2d84ff7190e395",
-      "bytes": 18284
+      "sha256": "76ef601b3356ffabffd57c112af6a1021e4e5dd0915e9052494f1346c5c912f9",
+      "bytes": 21651
     },
     {
       "path": "tests/test_adaptive_paper_leverage.py",
@@ -28960,8 +28960,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "66ffa87b471d48a8edeec7105e5d12a703cee29ab4b625e557449a86d6d13af8",
-      "bytes": 147445
+      "sha256": "4de0347514c89f5e8f047d8611fdffdb71105cabece5a17351ffb17264e0b603",
+      "bytes": 149735
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",

@@ -1657,6 +1657,22 @@ class CredentialFilePermissions(unittest.TestCase):
         with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
             credentials(self.root / "does-not-exist.env")
 
+    def test_symlink_to_a_valid_target_is_resolved_and_accepted(self):
+        # runner.credentials() keeps its prior symlink-tolerant behavior (unlike
+        # market_research.credentials(), which refuses a symlink outright): the
+        # shared guard resolves the path first when follow_symlinks=True, then
+        # applies every rule to the resolved target.
+        target = self._write_env(self.root, name="real.env")
+        link = self.root / "linked.env"
+        link.symlink_to(target)
+        self.assertEqual(credentials(link), ("fixture-key", "fixture-secret"))
+
+    def test_fifo_is_rejected_and_does_not_hang(self):
+        fifo = self.root / "fifo.env"
+        os.mkfifo(fifo, mode=0o600)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(fifo)
+
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
         path = self._write_env(self.root)
         self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
@@ -1667,6 +1683,37 @@ class CredentialFilePermissions(unittest.TestCase):
             credentials(path)
         self.assertNotIn("fixture-key", str(ctx.exception))
         self.assertNotIn("fixture-secret", str(ctx.exception))
+
+
+class SharedCredentialGuardParity(unittest.TestCase):
+    """runner.credentials() and market_research.credentials() cannot silently
+    drift: both import the same credential_guard.open_verified(), and a
+    permission violation that fails one fails the other the same way."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("market_research_parity", SOURCE / "market_research.py")
+        self.market_research = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.market_research)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_both_loaders_share_the_same_guard_function(self):
+        import credential_guard
+        self.assertIs(runner_module.open_verified, credential_guard.open_verified)
+        self.assertIs(self.market_research.open_verified, credential_guard.open_verified)
+
+    def test_wrong_mode_rejected_by_both_loaders(self):
+        path = self.root / "paper.env"
+        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(path, 0o644)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+            credentials(path)
+        with self.assertRaisesRegex(self.market_research.ResearchError, "credential_file_permissions"):
+            self.market_research.credentials(path)
 
 
 def _scratch_registry(root):
