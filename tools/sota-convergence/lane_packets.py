@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import re
 import sys
@@ -63,8 +64,10 @@ from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E40
 # The withheld-key policy is shared with scripts/landscape.py, which re-checks every packet a new
 # wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
 from scripts.landscape import (  # noqa: E402
-    COPY_WITHHELD_FIELDS, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS, is_withheld_packet_key,
-    requirement_names, withhold_policy_labels,
+    COPY_WITHHELD_FIELDS, PACKET_KEYS_SCHEMA_VERSION, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS,
+    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, WITHHELD_CANDIDATE_LABELS, is_withheld_packet_key,
+    requirement_names, sealed_candidates_sha256,
+    sealed_candidate_labels, withheld_candidate_label_labels, withheld_packet_keys, withhold_policy_labels,
 )
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
 
@@ -426,32 +429,162 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     return packet
 
 
-def registered_receipts_by_component(root: Path) -> dict:
-    """component_id -> [{id, kind, path}] from manifests/evidence.json ``receipts`` (the registered receipt
-    list that scripts/platform_status.py and component_matrix.py read), sorted by path. A packet otherwise
-    carries only the ledger's evidence_refs, so a lane cannot see, cite or judge a registered native receipt
-    the ledger row never named (2026-09-23 re-record)."""
-    index: dict = {}
+STACK_MANIFEST_PATH = "manifests/stack.json"
+RECEIPT_ALIASES_PATH = "tools/sota-convergence/receipt-component-aliases.json"
+
+
+def registered_receipts_index(root: Path, sota_doc: dict) -> dict:
+    """The receipts manifests/evidence.json registers (the list scripts/platform_status.py and
+    component_matrix.py read), indexed two ways for ``receipts_for``:
+
+    - ``by_id``: receipt component id -> [{id, kind, path}].
+    - ``by_repository``: repository slug -> {"stack_id", "entries"}, only for a slug exactly one
+      manifests/stack.json component uses; ``entries`` are that component's receipts.
+    - ``sota_ids_by_repository``: repository slug -> the sota manifest component ids (both catalogs) using it.
+
+    Receipts name components in the manifests/stack.json id space, which differs from the sota manifest's
+    for some components (``nautilus-trader`` there, ``nautilustrader`` here; ``duckdb``/``data-duckdb``), so a
+    repository match can reach a receipt an id match misses. It must not reach another component that
+    shares the repository (PR #142 re-review): ``nautilus-ibkr-adapter`` shares NautilusTrader's repository
+    and ``codex-native-sdk`` shares the Codex CLI's."""
+    stack_ids_by_slug: dict = {}
+    for component in load_json(root / STACK_MANIFEST_PATH).get("components") or []:
+        slug = github_repo_slug(component.get("repository") or "")
+        if slug:
+            stack_ids_by_slug.setdefault(slug, set()).add(component["id"])
+    unique_stack = {slug: next(iter(ids)) for slug, ids in stack_ids_by_slug.items() if len(ids) == 1}
+    sota_ids_by_slug: dict = {}
+    for components in sota_layer_index(sota_doc).values():
+        for component in components:
+            slug = github_repo_slug(component.get("repository") or "")
+            if slug:
+                sota_ids_by_slug.setdefault(slug, set()).add(component["id"])
+    stack_slug = {stack_id: slug for slug, ids in stack_ids_by_slug.items() for stack_id in ids}
+    sota_slug = {sota_id: slug for slug, ids in sota_ids_by_slug.items() for sota_id in ids}
+    aliases_path = root / RECEIPT_ALIASES_PATH
+    aliases = (load_json(aliases_path).get("aliases") or {}) if aliases_path.is_file() else {}
+    for stack_id, sota_id in aliases.items():
+        # An alias is only a respelling: both ids must name one repository, or it would move a receipt to
+        # a different component.
+        if stack_slug.get(stack_id) is None or stack_slug.get(stack_id) != sota_slug.get(sota_id):
+            raise ValueError(f"{RECEIPT_ALIASES_PATH}: {stack_id} -> {sota_id} do not share one repository")
+    by_id: dict = {}
+    by_alias: dict = {}
     for receipt in load_json(root / EVIDENCE_MANIFEST_PATH).get("receipts") or []:
         entry = {"id": receipt["id"], "kind": receipt["kind"], "path": receipt["path"]}
         for component_id in receipt.get("component_ids") or []:
-            index.setdefault(component_id, []).append(entry)
-    return {component_id: sorted(entries, key=lambda item: item["path"]) for component_id, entries in index.items()}
+            by_id.setdefault(component_id, []).append(entry)
+            if component_id in aliases:
+                by_alias.setdefault(aliases[component_id], []).append(entry)
+    by_repository = {slug: {"stack_id": stack_id, "entries": by_id[stack_id]}
+                     for slug, stack_id in unique_stack.items() if stack_id in by_id}
+    return {"by_id": by_id, "by_alias": by_alias, "by_repository": by_repository,
+            "sota_ids_by_repository": sota_ids_by_slug}
 
 
-REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists, for each candidate and component, the receipts "
-                            "manifests/evidence.json registers for its component id. They are evidence to open "
-                            "and judge like evidence_refs: a receipt's kind and content, not its presence, "
-                            "decide the evidence class.")
+def receipts_for(item: dict, component_id, index: dict, withhold: bool = False) -> list:
+    """Receipts for one candidate or component, sorted by path, each marked ``matched_by``.
+
+    ``component_id``: every receipt that names the component's own id. ``alias``: every receipt naming the
+    manifests/stack.json id that receipt-component-aliases.json maps to this id. ``repository``: used only when
+    (a) the own id matches no receipt, (b) exactly one manifests/stack.json component uses the item's
+    repository slug and the receipt names that component, and (c) no other sota manifest component id, in
+    either catalog, uses that slug. Otherwise nothing is attached by repository. Under ``withhold`` the
+    receipt id is dropped: ids such as ``native-session-defaults-20260920`` can name the incumbent's role."""
+    own = index["by_id"].get(component_id, []) if component_id else []
+    matched = [(entry, "component_id") for entry in own]
+    seen = {entry["path"] for entry in own}
+    aliased = [entry for entry in index.get("by_alias", {}).get(component_id, []) if entry["path"] not in seen]
+    matched += [(entry, "alias") for entry in aliased]
+    own = own + aliased
+    slug = github_repo_slug(item.get("repository") or "")
+    if not own and slug and slug in index["by_repository"]:
+        other_ids = index["sota_ids_by_repository"].get(slug, set()) - {component_id}
+        if not other_ids:
+            matched = [(entry, "repository") for entry in index["by_repository"][slug]["entries"]]
+    result = []
+    for entry, matched_by in sorted(matched, key=lambda pair: pair[0]["path"]):
+        if withhold and label_bearing_receipt(entry):
+            # The path would carry what the withheld id carried (Codex review of #145): left out of a blind
+            # packet; attach_registered_receipts counts it in the packet's withheld list.
+            continue
+        # matched_by component_id or alias exists only for a manifest component, so a blind packet drops it
+        # with the other membership fields (review of #145; scripts/landscape.py SEALED_CANDIDATE_FIELDS).
+        result.append({"kind": entry["kind"], "path": entry["path"]} if withhold
+                      else {**entry, "matched_by": matched_by})
+    return result
 
 
-def attach_registered_receipts(packet: dict, index: dict) -> dict:
+# A receipt id or file name that names a selection role (for example native-session-defaults-20260920,
+# adoption/receipt.json) repeats the incumbent label the blind packet withholds.
+LABEL_BEARING_RECEIPT = re.compile(r"default|adopt|select|winner|incumbent|chosen|retain", re.I)
+
+
+def label_bearing_receipt(entry: dict) -> bool:
+    return bool(LABEL_BEARING_RECEIPT.search(entry.get("id") or "")
+                or LABEL_BEARING_RECEIPT.search(entry.get("path") or ""))
+
+
+REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/evidence.json registers for a "
+                            "candidate's component: matched_by component_id when the receipt names its id, alias when it names "
+                            "the same component under its manifests/stack.json spelling, "
+                            "repository when the receipt names the only registered component with its repository "
+                            "and no other manifest component shares that repository. A receipt may name several "
+                            "components, and its kind is the registrant's label, not a checked evidence class: "
+                            "open it and judge what it actually ran for this component, as for evidence_refs.")
+BLIND_REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/evidence.json registers for a "
+                                  "candidate. A receipt may name several components, and its kind is the "
+                                  "registrant's label, not a checked evidence class: open it and judge what it "
+                                  "actually ran for this candidate, as for evidence_refs.")
+# Listed in a packet's withheld list when --withhold-labels drops the receipt ids and match routes.
+WITHHELD_RECEIPT_ID_LABELS = ("candidates[].registered_receipts[].id",
+                              "sota_components_not_in_candidates[].registered_receipts[].id",
+                              "candidates[].registered_receipts[].matched_by",
+                              "sota_components_not_in_candidates[].registered_receipts[].matched_by")
+
+
+def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False) -> dict:
     for item in packet.get("candidates") or []:
-        item["registered_receipts"] = list(index.get(item.get("component_id"), []))
+        item["registered_receipts"] = receipts_for(item, item.get("component_id"), index, withhold)
     for item in packet.get("sota_components_not_in_candidates") or []:
-        item["registered_receipts"] = list(index.get(item.get("id"), []))
-    packet["registered_receipts_note"] = REGISTERED_RECEIPTS_NOTE
+        item["registered_receipts"] = receipts_for(item, item.get("id"), index, withhold)
+    packet["registered_receipts_note"] = BLIND_REGISTERED_RECEIPTS_NOTE if withhold else REGISTERED_RECEIPTS_NOTE
+    if withhold:
+        withheld = list(packet.get("withheld", []))
+        withheld.extend(label for label in WITHHELD_RECEIPT_ID_LABELS if label not in withheld)
+        label = "registered_receipts[] whose id or path names a selection role (default, adopt, select, winner)"
+        if label not in withheld:
+            withheld.append(label)
+        packet["withheld"] = withheld
     return packet
+
+
+GAP_LEDGER_GLOB = "catalogs/landscape/gap-wave*--*.json"
+# Not blind (round-2 review): the list is the set of checks run against the layer's previous winner; 111 of
+# 249 joined receipt files repeat the ledger gap text word for word, 13 name the winner, and file names such
+# as 7-winner-readiness-today.json name it too. Only non-blind runs pass --gap-receipts; scripts/landscape.py
+# TOP_LEVEL_WITHHELD_KEYS refuses gap_receipts/gap_receipts_note in a new wave's retained packets.
+GAP_RECEIPTS_NOTE = ("gap_receipts lists receipts from the gap-resolution waves for this layer: checks run against "
+                     "the layer's previous winner, recorded after its previous verdict. They are not blind: many "
+                     "repeat the previous gap text and some name the previous winner, in their content or file "
+                     "name. Open and judge them like evidence_refs; a receipt's content, not its presence, decides "
+                     "what it establishes. A blind wave never carries this list.")
+
+
+def gap_receipts_index(root: Path) -> dict:
+    """(catalog, layer_id) -> sorted receipt paths from every gap-wave owner ledger
+    (catalogs/landscape/gap-wave*--*.json). Only paths are carried: a gap's text and status derive from the
+    previous verdict rows' open_gaps, which can name the incumbent (2026-09-23 re-record)."""
+    index: dict = {}
+    for ledger in sorted(root.glob(GAP_LEDGER_GLOB)):
+        for layer in load_json(ledger).get("layers") or []:
+            key = (layer.get("catalog"), layer.get("layer_id"))
+            for gap in layer.get("gaps") or []:
+                for receipt in gap.get("receipts") or []:
+                    path = receipt.get("path")
+                    if isinstance(path, str) and (root / path).is_file():
+                        index.setdefault(key, set()).add(path)
+    return {key: sorted(paths) for key, paths in index.items()}
 
 
 def serialize(document: dict) -> str:
@@ -464,6 +597,297 @@ def serialize(document: dict) -> str:
 
 def packet_filename(catalog: str, layer_id: str) -> str:
     return f"{catalog}__{layer_id}.json"
+
+
+# Under --withhold-labels, the ledger's shared prose (requirement, limitations, existing_overturn_when) keeps only
+# sentences that name no packet candidate and use no selection word (Codex review of #145): "Use the selected
+# NautilusTrader destination..." names the incumbent before the lane reads any evidence.
+PROSE_FIELDS = ("requirement", "limitations", "existing_overturn_when")
+SELECTION_WORD = re.compile(r"\b(selected|select|default|defaults|retain(?:ed|s)?|incumbents?|chosen|choose|winners?"
+                            r"|adopt(?:ed|s)?|keep|kept|current (?:choice|selection|destination))\b", re.I)
+NEUTRAL_REQUIREMENT = "Judge fit against the layer title and layer_scope_terms; the ledger's requirement text is withheld."
+
+
+# Parts of a candidate name too generic to identify it on their own.
+GENERIC_NAME_PARTS = frozenset({"python", "server", "client", "engine", "trader", "tools", "agent", "agents",
+                                "stack", "local", "cloud", "native", "model", "models", "store", "check", "checks",
+                                # Ordinary technical nouns (round 5): as terms they would redact prose that names no
+                                # candidate ("retrieval context", "research adapter").
+                                "research", "context", "adapter", "retrieval", "memory", "search", "browser",
+                                "workflow", "workflows", "runner", "index", "cache", "proxy", "gateway", "bridge",
+                                "monitor", "trading", "market", "data", "service", "services", "runtime", "worker",
+                                "workers", "review", "reviews", "skills", "plugin", "plugins", "config", "manager"})
+
+
+# A phrase that states the catalog's own choice without naming a candidate (round 5, N1: a bare "keep", "retain",
+# "select" or "default" verb is not one; "selected pages" or "Keep the receipt" name no choice).
+CHOICE_PHRASE = re.compile(r"\b(?:incumbents?|winners?|current (?:choice|selection|destination|default)|"
+                           r"(?:selected|chosen|retained|adopted) (?:destination|choice|stack|engine|runtime|path|"
+                           r"component|candidate|default|layer)|implementation choice|"
+                           r"prior (?:\S+ )?(?:oracle|choice|default|selection|engine|winner)|"
+                           # Adoption lifecycle status ("use stage is partial_acceptance", "not a newly qualified
+                           # component").
+                           r"use stage|lifecycle stage|partial_acceptance|qualified component|adoption (?:stage|status)|"
+                           # Catalog membership status (Codex review of #145 at a516c477: "gh CLI has no separate
+                           # manifests/stack.json inventory entry").
+                           r"stack\.json|inventory entry|stack (?:entry|inventory|membership)|"
+                           # A broker path's status (round 7, BL7-5: "IBKR is this catalog's selected live-primary
+                           # broker path").
+                           r"live-primary)", re.I)
+CANDIDATE_PLACEHOLDER = "<candidate>"
+CHOICE_WINDOW = 25
+# Short names that are ordinary words are never terms ("one" as a component id is not the word "one").
+COMMON_SHORT_WORDS = frozenset({"one", "two", "six", "ten", "all", "any", "and", "the", "for", "new", "run", "use",
+                                "set", "get", "not", "yes", "off", "on", "in", "at", "to", "by", "of", "is", "it",
+                                "as", "or", "an", "be", "do", "no", "up", "so", "we", "us", "if", "id", "ok"})
+# Ordinary words that are also another layer's candidate name or name part ("Temporal", "LangGraph", "adaptive-paper",
+# "OpenTelemetry"): as catalog-wide terms they matched plain prose and dropped a requirement clause ("retain scoped
+# telemetry ...") (independent review of #145, round 7, BL7-3). Such a catalog name matches only as written.
+ORDINARY_WORDS = frozenset({"graph", "exact", "paper", "inference", "actions", "action", "security", "token", "tokens",
+                            "temporal", "telemetry", "optional", "foundation", "lineage", "official", "registry",
+                            "exchange", "route", "testing", "financial", "basic", "software", "semantic", "modal",
+                            "containers", "container", "subagent", "reference", "contrib", "practice", "support",
+                            "companion", "sandbox", "inspect", "efficient", "awesome", "calendars", "calendar",
+                            "attest", "servers", "collector", "timestamp", "pandas", "tracing", "evaluation"})
+NEUTRAL_REQUIREMENT_NO_SCOPE = "Judge fit against the layer title; the ledger's requirement text is withheld."
+# Candidate prose a lane reads besides the shared fields (round 5, N2).
+CANDIDATE_PROSE_FIELDS = ("role", "card_limitations")
+
+
+class CandidateMatcher:
+    """Finds the candidates a text names: full names, repository names, component ids and owners and name parts
+    unique to one candidate (four characters or longer, case-insensitive, with -/_/space variants), shorter names
+    such as gh, uv or RTK as whole case-sensitive tokens (round 5, N2; review of 52344da8), and ``exact_terms`` (other
+    layers' name parts and ordinary-word names) only as written and never inside a path (round 7, BL7-3)."""
+
+    def __init__(self, long_terms, short_terms, exact_terms=()):
+        # A selection word is never a name term, even when a candidate's name holds it (round 5, N2).
+        long_terms = {term for term in long_terms if not SELECTION_WORD.fullmatch(term.strip())}
+        short_terms = {term for term in short_terms if not SELECTION_WORD.fullmatch(term.strip())}
+        exact_terms = {term for term in exact_terms if not SELECTION_WORD.fullmatch(term.strip())}
+        self.long = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(long_terms, key=len, reverse=True))
+                               + r")(?![A-Za-z0-9])", re.I) if long_terms else None
+        self.short = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(short_terms, key=len, reverse=True))
+                                + r")(?![A-Za-z0-9])") if short_terms else None
+        # '-' and '/' join words ("Nautilus-native", "Codex/Claude"), so they bound a term too; only a match inside
+        # a path token is skipped (round 8, REG8-4).
+        self.exact = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(exact_terms, key=len, reverse=True))
+                                + r")(?![A-Za-z0-9])") if exact_terms else None
+
+    def patterns(self):
+        return [pattern for pattern in (self.long, self.short, self.exact) if pattern is not None]
+
+    def _matches(self, text: str):
+        for pattern in self.patterns():
+            for match in pattern.finditer(text):
+                if pattern is self.exact and _inside_path(text, match.start(), match.end()):
+                    continue
+                yield match
+
+    def search(self, text: str) -> bool:
+        return any(True for _ in self._matches(text))
+
+    def spans(self, text: str) -> list:
+        return [match.span() for match in self._matches(text)]
+
+    def sub(self, replacement: str, text: str) -> str:
+        for pattern in self.patterns():
+            skip_paths = pattern is self.exact
+            text = pattern.sub(lambda match: match.group(0) if skip_paths and _inside_path(
+                match.string, match.start(), match.end()) else replacement, text)
+        return text
+
+
+_PATH_TOKEN = re.compile(r"[^\s]*/[^\s]*\.[A-Za-z0-9]+")
+
+
+def _inside_path(text: str, start: int, end: int) -> bool:
+    """Whether text[start:end] sits inside a whitespace-free token that names a file path (a '/' and an extension)."""
+    left = text.rfind(" ", 0, start) + 1
+    right = text.find(" ", end)
+    token = text[left:right if right != -1 else len(text)].strip("()[]{}<>'\",;:")
+    return bool(_PATH_TOKEN.fullmatch(token.rstrip(".")))
+
+
+def _variants(value: str) -> set:
+    lowered = value.strip().lower()
+    return {lowered, re.sub(r"[-_ ]", "-", lowered), re.sub(r"[-_ ]", "_", lowered), re.sub(r"[-_ ]", " ", lowered)}
+
+
+def _name_terms(candidate: dict, long_terms: set, short_terms: set) -> None:
+    """Add a candidate's whole-name terms: name, repository name, component id, and each parenthesized alias of the
+    name ("GitHub CLI (gh)" gives gh; Codex review of #145 at a516c477)."""
+    repository = (candidate.get("repository") or "").rstrip("/")
+    name = candidate.get("name") if isinstance(candidate.get("name"), str) else ""
+    component = re.sub(r"^(?:candidate:|foundation-|data-)", "", str(candidate.get("component_id") or ""))
+    aliases = re.findall(r"\(([^()]+)\)", name)
+    for value in (re.sub(r"\s*\([^()]*\)", "", name), name, repository.split("/")[-1], component, *aliases):
+        if not isinstance(value, str) or not value.strip():
+            continue
+        if len(value.strip()) >= 4:
+            long_terms |= _variants(value)
+        elif len(value.strip()) >= 2 and value.strip().lower() not in COMMON_SHORT_WORDS:
+            short_terms.add(value.strip())
+
+
+def candidate_matcher(candidates, layer_words=(), catalog_candidates=()) -> CandidateMatcher:
+    """The CandidateMatcher of ``candidates`` (name, repository and component_id each); a name part or owner counts
+    only when one candidate has it and the layer's own title and scope words (``layer_words``) do not.
+    ``catalog_candidates`` (every layer's) add their whole names, so a packet does not name another layer's incumbent
+    either (Codex review of #145 at a516c477: a factor layer's prose named Nautilus, LEAN and Alpaca)."""
+    long_terms, short_terms, exact_terms = set(), set(), set()
+    owned_parts: dict = {}
+    layer = {word.lower() for word in layer_words}
+    for candidate in catalog_candidates or ():
+        if isinstance(candidate, dict):
+            # Other layers' candidates: their whole names, except that a single ordinary word ("Temporal") matches
+            # only as written; their name parts only capitalized, as a proper noun ("Nautilus", "Alpaca"), never as
+            # the ordinary word ("telemetry", "graph", "exact") or a path segment (round 7, BL7-3).
+            catalog_long, catalog_short = set(), set()
+            _name_terms(candidate, catalog_long, catalog_short)
+            short_terms |= catalog_short
+            for term in catalog_long:
+                if term in ORDINARY_WORDS:
+                    exact_terms.update(value for value in (candidate.get("name"), candidate.get("component_id"))
+                                       if isinstance(value, str) and value.lower() == term and not value.islower())
+                else:
+                    long_terms.add(term)
+            for value in (candidate.get("name"), (candidate.get("repository") or "").rstrip("/").split("/")[-1]):
+                for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
+                    if (len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS | ORDINARY_WORDS
+                            and part.lower() not in layer):
+                        exact_terms.add(part[:1].upper() + part[1:].lower())
+    for index, candidate in enumerate(candidates or []):
+        if not isinstance(candidate, dict):
+            continue
+        repository = (candidate.get("repository") or "").rstrip("/")
+        pieces = repository.split("/")
+        basename, owner = pieces[-1], (pieces[-2] if len(pieces) >= 2 else "")
+        _name_terms(candidate, long_terms, short_terms)
+        for value in (candidate.get("name"), basename):
+            for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
+                if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS | ORDINARY_WORDS:
+                    owned_parts.setdefault(part.lower(), set()).add(index)
+        if len(owner) >= 4:
+            owned_parts.setdefault(owner.lower(), set()).add(index)
+    long_terms |= {part for part, owners in owned_parts.items() if len(owners) == 1 and part not in layer}
+    return CandidateMatcher(long_terms, short_terms, exact_terms)
+
+
+def states_choice(sentence: str, matcher: CandidateMatcher, own: CandidateMatcher = None) -> bool:
+    """Whether a sentence states the catalog's choice: a choice phrase, or a selection word next to a candidate name
+    (within CHOICE_WINDOW characters: "the selected NautilusTrader destination", "Nautilus stays the default").
+    A selection verb elsewhere in the sentence ("Keep ... across Claude and Codex sessions") is not one (round 5,
+    N1).
+
+    ``own`` (a candidate's own names, for its role and limitations): a selection word next to the candidate's own name
+    describes it ("Brokerage model defaults include NullSlippageModel"), and a sentence carrying a result marker is
+    evidence, so neither drops a sentence by proximity; a choice phrase always does (round 7, BL7-4)."""
+    if CHOICE_PHRASE.search(sentence):
+        return True
+    selections = [match.span() for match in SELECTION_WORD.finditer(sentence)]
+    if not selections:
+        return False
+    names = matcher.spans(sentence)
+    if own is not None:
+        if RESULT_MARKER.search(sentence):
+            return False
+        own_spans = set(own.spans(sentence))
+        names = [span for span in names if not any(o_start <= span[0] and span[1] <= o_end
+                                                   for o_start, o_end in own_spans)]
+    return any(max(0, max(s_start, n_start) - min(s_end, n_end)) <= CHOICE_WINDOW
+               for s_start, s_end in selections for n_start, n_end in names)
+
+
+# A sentence of a candidate's own role or limitations that states its status (round 6, B6-5; round 7, BL7-4/BL7-5):
+# - a copula naming the status: "is the selected ...", "remains default", "is this catalog's selected live-primary
+#   broker path" ("retained" and "adopted" need a determiner, since "usage is retained" states behaviour);
+# - or an opening selection adjective that labels: after "the" ("The selected GitHub CLI."), before a role noun
+#   ("Selected north-star engine", "Default backend") or as a short label of at most four words ("Selected GitHub
+#   CLI"), but not "Default examples use model API credentials", "Selected-file handoff bundles" or "Retained local
+#   sanitized operational logs and LogQL queries".
+# A choice phrase or a copula is status whatever else the sentence says; an opening adjective is not when the sentence
+# carries a result marker.
+_STATUS_ROLE = (r"(?:engine|runtime|stack|choice|destination|path|backend|broker|option|candidate|component|tool|"
+                r"implementation|provider|store|layer|winner|solution|lane|adapter|framework|service|default|primary)s?")
+STATUS_COPULA = re.compile(
+    r"\b(?:is|was|are|remains?|stays?|kept as|serves as)\s+(?:(?:the|this|a|an|our|its|this catalog's|the catalog's)"
+    r"\s+(?:[\w'-]+\s+){0,2}?(?:current\s+)?(?:selected|default|chosen|retained|adopted|incumbent|preferred)|"
+    r"(?:current\s+)?(?:selected|default|chosen|incumbent|preferred))\b", re.I)
+_STATUS_ADJECTIVE = r"(?:selected|default|chosen|retained|adopted|incumbent|preferred)(?![\w-])"
+STATUS_OPENING = re.compile(r"^\W*(?:the\s+" + _STATUS_ADJECTIVE + r"|" + _STATUS_ADJECTIVE + r"\s+(?:[\w'/-]+\s+){0,3}?"
+                            + _STATUS_ROLE + r"\b)", re.I)
+STATUS_LABEL = re.compile(r"^\W*" + _STATUS_ADJECTIVE + r"(?:\s+[\w'/()-]+){0,3}\W*$", re.I)
+
+
+def opens_with_status(sentence: str) -> bool:
+    """Whether a sentence opens with a selection adjective that labels its subject (STATUS_OPENING, STATUS_LABEL)."""
+    return bool(STATUS_OPENING.search(sentence) or STATUS_LABEL.search(sentence))
+# Evidence in a sentence: a pass/fail/blocked result (also inside an underscore-joined status token such as
+# reported_execution_blocked_review_incomplete), an exit code, a count such as 4/6, a repository path or a bare
+# evidence file name (round 7, BL7-4: the marker was case-sensitive and needed a slash path).
+RESULT_MARKER = re.compile(r"(?<![A-Za-z])(?:pass(?:ed|es)?|fail(?:ed|s|ure)?|blocked)(?![A-Za-z])|"
+                           r"\bexit(?: code)? \d+\b|\b\d+/\d+\b|"
+                           r"(?<![\w.])[\w.-]+/[\w./-]+\.\w+|"
+                           r"\b[\w.-]+\.(?:json|jsonl|md|txt|ya?ml|py|csv|log|sha256|SHA256SUMS)\b", re.I)
+
+
+def states_candidate_status(sentence: str) -> bool:
+    return bool(CHOICE_PHRASE.search(sentence) or STATUS_COPULA.search(sentence)
+                or (opens_with_status(sentence) and not RESULT_MARKER.search(sentence)))
+
+
+def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = False,
+                 own: CandidateMatcher = None) -> str:
+    """``text`` without the sentences that state the choice, and with every other candidate name replaced by
+    <candidate> (round 5, N1: redact the name rather than empty the sentence). A candidate's own role or
+    limitations (``about_candidate``, with its own names ``own``) also lose a sentence that states that candidate's
+    status, and keep one whose selection word only describes the candidate itself or sits beside a result marker
+    (round 7, BL7-4)."""
+    kept = []
+    for sentence in re.split(r"(?<=[.!?;])\s+", text.strip()):
+        if (not sentence or states_choice(sentence, matcher, own if about_candidate else None)
+                or (about_candidate and states_candidate_status(sentence))):
+            continue
+        kept.append(matcher.sub(CANDIDATE_PLACEHOLDER, sentence))
+    return " ".join(kept)
+
+
+def withhold_prose(packet: dict, catalog_candidates=()) -> dict:
+    layer_words = re.findall(r"[A-Za-z0-9]+", str(packet.get("title") or "")) + [
+        word for term in packet.get("layer_scope_terms") or [] for word in re.findall(r"[A-Za-z0-9]+", str(term))]
+    matcher = candidate_matcher(packet.get("candidates") or [], layer_words, catalog_candidates)
+    reduced = []
+    for field in PROSE_FIELDS:
+        value = packet.get(field)
+        if isinstance(value, str):
+            kept = reduce_prose(value, matcher)
+        elif isinstance(value, list):
+            kept = [item for item in (reduce_prose(str(entry), matcher) for entry in value) if item]
+        else:
+            continue
+        if kept != value:
+            reduced.append(field)
+        packet[field] = kept
+    for candidate in packet.get("candidates") or []:
+        own = candidate_matcher([candidate], layer_words)
+        for field in CANDIDATE_PROSE_FIELDS:
+            value = candidate.get(field)
+            if isinstance(value, str):
+                candidate[field] = reduce_prose(value, matcher, about_candidate=True, own=own) or None
+            elif isinstance(value, list):
+                candidate[field] = [item for item in (reduce_prose(str(entry), matcher, about_candidate=True, own=own)
+                                                      for entry in value) if item]
+    if not packet.get("requirement"):
+        # Only a packet that carries layer_scope_terms is pointed at them (round 5, N1/N4).
+        packet["requirement"] = NEUTRAL_REQUIREMENT if packet.get("layer_scope_terms") else NEUTRAL_REQUIREMENT_NO_SCOPE
+    withheld = list(packet.get("withheld", []))
+    label = ("sentences of requirement, limitations, existing_overturn_when and candidates' role and card_limitations "
+             "that state the current choice; other candidate names there are written <candidate>")
+    if label not in withheld:
+        withheld.append(label)
+    packet["withheld"] = withheld
+    return packet
 
 
 def withhold_labels(packet: dict) -> dict:
@@ -484,14 +908,93 @@ def withhold_labels(packet: dict) -> dict:
     return packet
 
 
+# Packet references to files blind_checkout.py removes from every blind export (membership lists, selection
+# records and earlier verdicts): a lane pointed at one finds nothing (independent review of #145, F4/OPS-1: 5 such
+# references on the 2026-09-23 packets). The label is listed on every blind packet, dropped reference or not.
+REMOVED_REFS_LABEL = ("candidates[].evidence_refs[] and registered_receipts[] naming a file the blind export removes "
+                      "(membership, selection or earlier-verdict records)")
+
+
+def removed_reference(reference) -> bool:
+    from blind_checkout import bare_reference, removed_from_blind_export
+    bare = bare_reference(reference)
+    return bare is not None and removed_from_blind_export(bare)
+
+
+def withhold_removed_refs(packet: dict) -> tuple:
+    """(packet, dropped count): every candidate's evidence_refs and every registered receipt that names a file the
+    blind export removes are dropped, and REMOVED_REFS_LABEL is listed in the packet's withheld list."""
+    dropped = 0
+    for collection in ("candidates", "sota_components_not_in_candidates"):
+        for item in packet.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            if collection == "candidates" and item.get("evidence_refs"):
+                kept = [reference for reference in item["evidence_refs"] if not removed_reference(reference)]
+                dropped += len(item["evidence_refs"]) - len(kept)
+                item["evidence_refs"] = kept
+            if item.get("registered_receipts"):
+                kept = [receipt for receipt in item["registered_receipts"]
+                        if not (isinstance(receipt, dict) and removed_reference(receipt.get("path")))]
+                dropped += len(item["registered_receipts"]) - len(kept)
+                item["registered_receipts"] = kept
+    withheld = list(packet.get("withheld", []))
+    if REMOVED_REFS_LABEL not in withheld:
+        withheld.append(REMOVED_REFS_LABEL)
+    packet["withheld"] = withheld
+    return packet, dropped
+
+
+def withhold_candidate_labels(packet: dict) -> dict:
+    """Drop WITHHELD_CANDIDATE_LABELS from every candidate and list them in withheld: a selected candidate must carry
+    a strong evidence_kind (scripts/landscape.py), so the kind held exactly the winners in 7 of the 2026-09-23 layers
+    (round 5, N5). The lane judges the evidence it opens instead."""
+    for candidate in packet.get("candidates") or []:
+        for field in WITHHELD_CANDIDATE_LABELS:
+            candidate.pop(field, None)
+    withheld = list(packet.get("withheld", []))
+    withheld.extend(label for label in withheld_candidate_label_labels() if label not in withheld)
+    packet["withheld"] = withheld
+    return packet
+
+
+def seal_candidate_fields(packet: dict) -> tuple:
+    """(packet, {candidate key: {field: value}}): every candidate's SEALED_CANDIDATE_FIELDS moved out of a
+    --withhold-labels packet and listed in its withheld list. Their presence alone marks a sota-manifest
+    component, which singled out the catalog's current choice among the adopted candidates (review of #145;
+    scripts/landscape.py SEALED_CANDIDATE_FIELDS has the measurement); record_verdicts.py and adjudicate.py
+    restore them from --keys-out."""
+    sealed = {}
+    for candidate in packet.get("candidates") or []:
+        sealed[candidate["key"]] = {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
+        # A selection word in a candidate's own name labels it (round 6, B6-6).
+        if isinstance(candidate.get("name"), str):
+            bare = re.sub(r"[(\[]\s*[)\]]", "", SELECTION_WORD.sub("", candidate["name"]))  # "Tool (selected)"
+            candidate["name"] = re.sub(r"\s{2,}", " ", bare).strip() or candidate["name"]
+    # The commitment covers the values as the document stores them (sanitized, as serialize and record_verdicts'
+    # sealed_text write them; round 6, INT-R6-1).
+    sealed = sanitize_value(sealed)
+    # The packet commits to the sealed values (scripts/landscape.py sealed_candidates_sha256), so only this
+    # build's document restores them and every return, bound to the packet's bytes, is bound to them too.
+    packet[SEALED_COMMITMENT_KEY] = sealed_candidates_sha256(sealed)
+    withheld = list(packet.get("withheld", []))
+    withheld.extend(label for label in sealed_candidate_labels() if label not in withheld)
+    packet["withheld"] = withheld
+    return packet, sealed
+
+
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
-                      manifest: str = None, registered_receipts: bool = False) -> dict:
+                      manifest: str = None, registered_receipts: bool = False,
+                      gap_receipts: bool = False, sealed_keys: dict = None, removed_refs: dict = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
     packets); pass the same value used for build_verdicts.py's --manifest so
-    the packets and the verdict catalog agree on the pins."""
+    the packets and the verdict catalog agree on the pins. Under ``withhold``,
+    each packet's sealed candidate fields (seal_candidate_fields) go to
+    ``sealed_keys`` ({filename: {packet_sha256, candidates}}) when it is given, and the number of references to
+    files the blind export removes that each packet dropped (withhold_removed_refs) to ``removed_refs``."""
     rules = load_rules()
     sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
@@ -501,8 +1004,24 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     manifest_mode = trading_candidates == "manifest"
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
-    receipts_index = registered_receipts_by_component(root) if registered_receipts else None
+    receipts_index = registered_receipts_index(root, sota_doc) if registered_receipts else None
+    if gap_receipts and withhold:
+        # Gap receipts are checks run against the previous winner; a blind (label-withheld) build must not carry
+        # them, and refusing here stops lanes from ever opening them (Codex review of #145).
+        raise ValueError("--gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
+                         "previous winner")
+    gap_index = gap_receipts_index(root) if gap_receipts else None
 
+    # Every catalog candidate's name, so no packet's prose names another layer's incumbent.
+    catalog_candidates = [candidate for relative in LEDGER_FILES.values()
+                          for row in load_json(root / relative).get("layers", [])
+                          for candidate in row.get("candidates") or [] if isinstance(candidate, dict)]
+    catalog_candidates += [{"name": entry.get("id"), "repository": entry.get("repository"), "component_id": entry.get("id")}
+                           for layer in trading_layers.values() for entry in layer.get("entries", [])
+                           if isinstance(entry, dict)]
+    catalog_candidates += [{"repository": item.get("repository"), "component_id": item.get("id")}
+                           for rows in (sota_doc.get("foundation") or [],) for row in rows if isinstance(row, dict)
+                           for item in row.get("components") or [] if isinstance(item, dict)]
     packets = {}
     for catalog in catalogs:
         ledger = load_json(root / LEDGER_FILES[catalog])
@@ -526,11 +1045,32 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 packet = withhold_labels(packet)
             if withhold:
                 # Every packet, manifest-mode trading packets included, loses popularity and
-                # recency signals; the default (no --withhold-labels) build is unchanged.
+                # recency signals; the default (no --withhold-labels) build is unchanged. Prose first, so
+                # the archived/license gating reads the requirement the lanes see (round 5, N4).
+                packet = withhold_prose(packet, catalog_candidates)
                 packet = withhold_popularity(packet)
+            if gap_index is not None:
+                packet["gap_receipts"] = gap_index.get((catalog, row["layer_id"]), [])
+                packet["gap_receipts_note"] = GAP_RECEIPTS_NOTE
             if receipts_index is not None:
-                packet = attach_registered_receipts(packet, receipts_index)
-            packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
+                packet = attach_registered_receipts(packet, receipts_index, withhold)
+            name = packet_filename(catalog, row["layer_id"])
+            sealed = None
+            if withhold:
+                packet = withhold_candidate_labels(packet)
+                packet, dropped = withhold_removed_refs(packet)
+                if removed_refs is not None and dropped:
+                    removed_refs[name] = dropped
+                # Last, after receipts were matched by component id.
+                packet, sealed = seal_candidate_fields(packet)
+                found = withheld_packet_keys(packet)
+                if found:
+                    # CI and record_verdicts.py refuse such a packet once both lanes ran on it (round 5, N4).
+                    raise ValueError(f"{name} would carry withheld keys {found}")
+            packets[name] = serialize(packet)
+            if sealed is not None and sealed_keys is not None:
+                sealed_keys[name] = {"packet_sha256": hashlib.sha256(packets[name].encode("utf-8")).hexdigest(),
+                                     "candidates": sealed}
     return packets
 
 
@@ -562,10 +1102,23 @@ def parse_args(argv=None):
                              "and any key naming a release) at any depth of every candidate and component copy "
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
+    parser.add_argument("--keys-out", type=Path, default=None,
+                        help="With --withhold-labels (required there): write the candidates' sealed manifest fields "
+                             "(component_id, pin, upstream, recipe_ref, decisions) to this packet-keys JSON file, "
+                             "outside --out so no lane reads it; record_verdicts.py --packet-keys and adjudicate.py "
+                             "inputs --packet-keys restore them.")
     parser.add_argument("--registered-receipts", action="store_true",
-                        help="Attach to every candidate and component its receipts registered in "
-                             "manifests/evidence.json (id, kind, path), so a lane can open and cite them. Off "
-                             "by default so the 2026-09-22 packets reproduce.")
+                        help="Attach to every candidate and component the receipts registered in "
+                             "manifests/evidence.json for it (kind, path and matched_by; id too unless "
+                             "--withhold-labels), matched by component id, or by repository only when no other "
+                             "component shares it, so a lane can open and cite them. Off by default so the "
+                             "2026-09-22 packets reproduce.")
+    parser.add_argument("--gap-receipts", action="store_true",
+                        help="Attach to every packet the receipt paths the gap-wave owner ledgers "
+                             "(catalogs/landscape/gap-wave*--*.json) list for its layer; paths only, no gap text. "
+                             "Not blind: the receipts are checks of the previous winner and many name it, so a "
+                             "blind wave must not pass this (a new wave's retained packets refuse it). Off by "
+                             "default: the default build path is unchanged.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -578,16 +1131,71 @@ def main(argv=None) -> int:
     root = args.root.resolve()
     catalogs = [args.catalog] if args.catalog else sorted(LEDGER_FILES)
 
+    if args.gap_receipts and args.withhold_labels:
+        print("lane_packets: --gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
+              "previous winner", file=sys.stderr)
+        return 2
+    if args.withhold_labels != (args.keys_out is not None):
+        print("lane_packets: --keys-out is required with --withhold-labels and only meaningful there: the sealed "
+              "candidate fields are needed to record verdicts", file=sys.stderr)
+        return 2
+    if args.keys_out is not None:
+        keys_out, out = args.keys_out.resolve(), args.out.resolve()
+        if keys_out == out or out in keys_out.parents:
+            print("lane_packets: --keys-out must be outside --out, where lanes read packets", file=sys.stderr)
+            return 2
+    manifest_relative = str(args.manifest) if args.manifest else None
+    if args.withhold_labels:
+        # A blind build never overwrites a wave's packets or keys (independent review of #145, round 6, OPR6-3): a
+        # re-check goes to new directories.
+        for existing in (args.out / "packets", args.keys_out):
+            if existing is not None and existing.exists():
+                print(f"lane_packets: {existing} already exists; write a blind build to new directories",
+                      file=sys.stderr)
+                return 2
+        # Lanes read --out, and --keys-out names the winners: neither may sit in a repository, whose history or
+        # siblings a worker can read (round 7, OPR7-5).
+        for flag, place in (("--out", args.out), ("--keys-out", args.keys_out)):
+            # Both spellings: a symlink can lead into a checkout (round 8, REG8-5).
+            spellings = {Path(os.path.abspath(place)), Path(place).resolve()}
+            repository = next((str(path) for spelling in spellings for path in (spelling, *spelling.parents)
+                               if (path / ".git").exists()), None)
+            absolute = Path(os.path.abspath(place))
+            if repository:
+                print(f"lane_packets: {flag} {absolute} is inside the git repository {repository}; place a blind "
+                      "build outside every repository", file=sys.stderr)
+                return 2
+        if args.manifest:
+            # The keys document records the manifest relative to --root, where record_verdicts finds it (round 7,
+            # REG7-4: an absolute path was sanitized to <host-path> and refused only at step 6).
+            manifest_path = Path(args.manifest)
+            resolved = (manifest_path if manifest_path.is_absolute() else root / manifest_path).resolve()
+            if root not in resolved.parents or not resolved.is_file():
+                print(f"lane_packets: --manifest {args.manifest} is not a file under --root {root}", file=sys.stderr)
+                return 2
+            manifest_relative = resolved.relative_to(root).as_posix()
+    sealed_keys, removed_refs = {}, {}
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
-                                manifest=str(args.manifest) if args.manifest else None,
-                                registered_receipts=args.registered_receipts)
+                                manifest=manifest_relative,
+                                registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
+                                sealed_keys=sealed_keys, removed_refs=removed_refs)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, text in packets.items():
         (out_dir / name).write_text(text, encoding="utf-8")
     (out_dir / "SHA256SUMS").write_text(sha256sums(packets), encoding="utf-8")
+    if args.keys_out is not None:
+        args.keys_out.parent.mkdir(parents=True, exist_ok=True)
+        # The manifest the sealed component ids come from, by path and sha256: record_verdicts.py checks every
+        # sealed id against it (round 6, INT-R6-2).
+        manifest_relative = manifest_relative or SOTA_MANIFEST_PATH
+        manifest_bytes = (root / manifest_relative).read_bytes()
+        args.keys_out.write_text(serialize({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": sealed_keys,
+                                            "manifest": {"path": manifest_relative,
+                                                         "sha256": hashlib.sha256(manifest_bytes).hexdigest()}}),
+                                 encoding="utf-8")
 
     unmatched_counts = {}
     for name, text in packets.items():
@@ -602,7 +1210,7 @@ def main(argv=None) -> int:
     # leak marker never reaches stdout either.
     print(json.dumps({
         "status": "written", "packet_count": len(packets), "out_dir": sanitize_value(str(out_dir)),
-        "unmatched_sota_components": unmatched_counts,
+        "unmatched_sota_components": unmatched_counts, "dropped_removed_file_refs": removed_refs,
     }))
     return 0
 

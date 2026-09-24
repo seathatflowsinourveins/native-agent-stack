@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1919,7 +1919,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3036,6 +3036,24 @@
         "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
       ],
       "path": "evidence/receipts/wsl-retrieval-20260920.json"
+    },
+    {
+      "id": "gitleaks-macos-memory-bound-20260924",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "gitleaks"
+      ],
+      "claim": "On one MacBook Pro (Apple M5 Pro, 24 GB, macOS 26.5.1) with gitleaks 8.30.1, the 2026-09-24 09:45 Jetsam events were reproduced: a staged generated explorer (one 12,889,851-byte line, 2,335 findings) drives the global pre-commit hook's `gitleaks git --pre-commit --staged --redact` past 6 GiB in about 17 s, and the recipe's all-refs `gitleaks git --redact=100` past 8 GiB in 36 s, because upstream redaction copies the whole line for every finding. Through adoption/tools/gitleaks-guarded-macos the same scans stop at the 6 GiB footprint cap with exit 137 (the hook then blocks the commit), concurrent scans run one at a time under the per-user lock, and dir scans, the CI-scope history scan and small hook scans keep their upstream results and exit codes.",
+      "limitations": [
+        "One host and one repository state (source 5af3581); a different history, staged content or Gitleaks release can change every peak.",
+        "The guard is a user-space watchdog that samples the process tree's physical footprint every 50 ms, not a kernel limit: measured overshoot was 0.04-0.20 GiB above the 6 GiB cap across the development and final passes, and a scan keeps running unwatched if the guard itself is SIGKILLed (it still holds the lock).",
+        "Measured with the lock at a scratch path (ECOSYSTEM_GITLEAKS_LOCK); the default per-user lock file, installation on PATH and the global hook change were not installed on this host by this unit and remain the agent-ecosystem owner's step.",
+        "No CPU or task cap on macOS: the killed history scan used about 16 cores for 37 s.",
+        "Scans that exceed the cap produce no result (exit 137). This is fail-closed, not coverage: the all-refs history of this repository still has no complete redacted Gitleaks pass on macOS.",
+        "The incident attribution (a test scratch commit through the global hook, before #181 made the tests hermetic) is inferred from process ages, coalitions and session records; the Jetsam reports carry no argv.",
+        "Raw stderr, reports and the Jetsam files stay on the host; published values are sanitized (paths replaced by placeholders, no process or session identifiers)."
+      ],
+      "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json"
     }
   ],
   "files": [
@@ -3201,8 +3219,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "08cf412e162594ce05e1de224850a81dcdd8e26c6e83c1d8cb6ddbf0c4de6c96",
-      "bytes": 21262
+      "sha256": "6a8bc180930f45402f0e7502e42cba656250c7fa70b0d8b3d3e554faa8981467",
+      "bytes": 21263
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3361,8 +3379,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "1b65bcdc3f9424c053f00eda03c38d97e0767e1a11ed91efa93543deb46239c3",
-      "bytes": 21822
+      "sha256": "d3f22f9e886bf99b032dc0b9e02b2c4c183e30836446efaa7db8c9e4157b9d04",
+      "bytes": 27484
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -3375,9 +3393,14 @@
       "bytes": 1968
     },
     {
+      "path": "adoption/tools/gitleaks-guarded-macos",
+      "sha256": "fc76d3a11d076b02ad9878b2cc7cfd078058e84a86df285cf53da1ca82fd6ce5",
+      "bytes": 9628
+    },
+    {
       "path": "adoption/update.md",
-      "sha256": "bbf6953c9c72a2fec61727a44a13d8d0ff96097f4ba044241a3cfd5ef0025dbf",
-      "bytes": 17042
+      "sha256": "7a1cae2502167096ebc666e9e6dace7cf1c7d6a96440a7628240638bdcbc6120",
+      "bytes": 17264
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -5421,7 +5444,7 @@
       "bytes": 126
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
       "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
       "bytes": 111
     },
@@ -8642,13 +8665,13 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-pins.json",
-      "sha256": "757d0686bce3a3b3bb0acebe7420aadc81524566017f9dae3c6b360ea25a11d8",
+      "sha256": "a17c7c0af288d5af175a6f26b6ca9a6078f63c19527bddc97636cf452661e02c",
       "bytes": 4425
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
-      "sha256": "88bb18f8eace8dd8d2a1e09c3a10b3cef60b3b950994015483bcb8b245511903",
-      "bytes": 8258
+      "sha256": "c646bcd8deda457e6009e62c3eb507f3295ca9a69cfea209ec19068447923b04",
+      "bytes": 8306
     },
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
@@ -8672,8 +8695,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
-      "sha256": "fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965",
-      "bytes": 502703
+      "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+      "bytes": 514006
     },
     {
       "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
@@ -9292,8 +9315,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "44e20f2c66969b6281af5c47f585a2871c2e271427a3cab4dfaca9cfc03edf8c",
-      "bytes": 181016
+      "sha256": "ab6e87803b74ffd3d4f027e6c2436a1c02a3eaa18b33442ec482499263a198a8",
+      "bytes": 180203
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9347,8 +9370,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "a9170e7561003ef37b33d85dec97926371c5ea8d8545c4ed565c5032deec1fdb",
-      "bytes": 75466
+      "sha256": "b511a3f313dd15942b745bb8f7ccf66158d844a7fd4872ab3c3c23fdacdaa19c",
+      "bytes": 76641
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9782,8 +9805,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "2ce1d8e7950a6cb087bf91cc108a39cf98727978ec79414341dab7df8ebb23aa",
-      "bytes": 18656
+      "sha256": "687cd2f40ea575b892848d1e25d4b5ab70e0bdf8142ecd981ef75b5da6935114",
+      "bytes": 18246
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10087,8 +10110,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "bf0afa11ebd1e9b041ab066eed974277b1139595f4f63e941767b74ce0a20d4f",
-      "bytes": 14902
+      "sha256": "516114c5801eb11eb19c4689ef106cf5a1bc0c5f7136fd92ef1f54253d2b0c4b",
+      "bytes": 15138
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10097,8 +10120,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "84a0dc27cba7f857a0a3a3fa96c30eeb68abb6d4b9ed7edd9fe79d22f74f0e3a",
-      "bytes": 8472
+      "sha256": "aa6824a2acad9721de6af12d4db3de3b79bb6954d51f81601d597dbdf4d216b3",
+      "bytes": 11260
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -24476,6 +24499,11 @@
       "bytes": 22807
     },
     {
+      "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
+      "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
+      "bytes": 5904
+    },
+    {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
       "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
       "bytes": 3576
@@ -24514,6 +24542,21 @@
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
       "sha256": "746b8bac3212d2a1df220db6c25b203de44208a37ea4741d352fa599d4ab884c",
       "bytes": 7401
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/foundation-alignment.json",
+      "sha256": "06defa2553eb0a9bcca24a49ea1de9b9e0a35b2886fc50b2a798d312c5fa1711",
+      "bytes": 16235
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json",
+      "sha256": "067d5349bfc1ccad0a76cd24ccf221c2d8702d1e32cdafb80c4cc412bca99686",
+      "bytes": 12326
+    },
+    {
+      "path": "evidence/artifacts/hw-profiles/macos-m5pro-20260924/profile.json",
+      "sha256": "894e6d16b9e8b45da3de4c7293ed46556d0ef1e26502aa5296e43196beb53bf0",
+      "bytes": 2024
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
@@ -27546,9 +27589,24 @@
       "bytes": 8721
     },
     {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
+      "sha256": "842219f23e3d68e4974a3d7f03661b7854aa042d2e459f0eaff1fdde6b5bead0",
+      "bytes": 9319
+    },
+    {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
       "sha256": "b90aa27b31398d1ee5319f134ac2468cafa2c6576cd2475db3287489e610ebb8",
       "bytes": 9533
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",
+      "sha256": "28e04ed3156acbcf9571223d3062bd7a3631db972485899942f69d3f760f5b01",
+      "bytes": 5047
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--worktrunk--use--20260924.json",
+      "sha256": "d524f6df375ae5eaa4f64ef333264626beb5f936bffae1268cd1993981080199",
+      "bytes": 10269
     },
     {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
@@ -27739,6 +27797,11 @@
       "path": "evidence/receipts/github-automation-newpc-20260922.json",
       "sha256": "531713a7a8062ff78d8f541ea92ea57eb665d28c7a1f875f538fe3cd26d38a63",
       "bytes": 5836
+    },
+    {
+      "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json",
+      "sha256": "d368ccd2e8ff264b4ee7033e851983632822911d7cf8ed746669e1557def5be0",
+      "bytes": 43255
     },
     {
       "path": "evidence/receipts/hf-memory-models-20260921.json",
@@ -28172,12 +28235,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "f863ee722a8cdde7340db0166fc9dc9b052875909b0cb11bef69f9a016a43b3a",
-      "bytes": 17480
+      "sha256": "fd2bb74cb0f15f52ef96f241c056b5be010cb66b6a35e53cea7e894c9a8b3052",
+      "bytes": 17670
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "cb039d7b829d2aa37307e1d3f021690c72cc3c5099d08c97dbbebe6fb027568c",
+      "sha256": "c659b36ea75690467e353d73f9b9f44caaa8c9b8832bbfc5b09d0d0e6eb18d7d",
       "bytes": 1129
     },
     {
@@ -28227,8 +28290,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "53e25add00eada875b792ae2179249958ae2d1dc10527c86bf6485ee9bf65251",
-      "bytes": 44508
+      "sha256": "bb9314dc3c24de168149ba795351821957ec03e7afc05574708edb492adc7c29",
+      "bytes": 44501
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -28602,8 +28665,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "72ec65d971f2ecb3fe6f8e624994f48157290540a7e6adac6b909e31b600f2f8",
-      "bytes": 59773
+      "sha256": "dd50ed2e69b074d5cd07795bd4230acafe37b31956877dc06d9db2c94202691a",
+      "bytes": 60035
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28632,8 +28695,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "900853f08b4ae9629aa3d6d80548c9f338422c07d31a3cb1fe4622898e1f1117",
-      "bytes": 10681
+      "sha256": "d17ddbcdb518d687cc0e46ce0bd9ee58728cdc3adb7c8c2f305cdd94120c5202",
+      "bytes": 25043
     },
     {
       "path": "recipes/tavily.md",
@@ -28682,8 +28745,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "f9b06d2605fe66feae35928fb7d135dd93221f8b07b36a2a4092510d2dd5c4ac",
-      "bytes": 87819
+      "sha256": "617f882a89ad3d789d9b8f5c3d491c3b37676defd4bbe88d4a7e872448ba48b3",
+      "bytes": 103824
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -29041,6 +29104,11 @@
       "bytes": 37816
     },
     {
+      "path": "tests/test_gitleaks_guarded_macos.py",
+      "sha256": "6bf6ed16c7bbb7e8f3f58454628139e5ffb57b505733c987adf40b6ab9c65c98",
+      "bytes": 13339
+    },
+    {
       "path": "tests/test_gpu_inference.py",
       "sha256": "1e15d3750823bc9aad9a160f303d49be69fc04fd282f5673ef65bd8665127ee1",
       "bytes": 4753
@@ -29082,8 +29150,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "8372146abfc8c87a68092fa937e2dfb62dfbb8d5095c82e78bd5ec98960c0860",
-      "bytes": 17718
+      "sha256": "e57a159819925000baddff8f7ee00f315382287cb3402f8910415a5f2ebb01ad",
+      "bytes": 17923
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -29092,13 +29160,13 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "bbb15581188b795aadd6823374d2bd406a93291454c3147776a4f5a52b1a0fc0",
-      "bytes": 77642
+      "sha256": "3d6f9fd29aa451a0054109b8c0eaabf40d91657eb32a5f95d40bfcd2e7b67d05",
+      "bytes": 86746
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "67bb83708593472f08578e76b06187e406b9f939528ee649d71449277419b173",
-      "bytes": 29814
+      "sha256": "ee85d714bdd00edcc217e20441d0e59a2b3382c0533496428558d75b764c9267",
+      "bytes": 30275
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -29142,8 +29210,8 @@
     },
     {
       "path": "tests/test_mover_v3_data.py",
-      "sha256": "38c644ba7129ff4e82a25c9e97ba22ef083849298c3946b6547095ce45cf9ab2",
-      "bytes": 15989
+      "sha256": "babc35795dee09e905a432373cb6b2031b5e4949097f5cbc0151e89e34f45241",
+      "bytes": 16325
     },
     {
       "path": "tests/test_nanosecond_replay.py",
@@ -29387,8 +29455,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "5f3e431981748d60ac211b946ee42d0ee5bd144699adabfe69d24e1f05a3e936",
-      "bytes": 83474
+      "sha256": "94a15d87aab17b5ecdc8eb0d5aaa0173c02c291a68e1261deb22aa255dbaf583",
+      "bytes": 167815
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -29397,8 +29465,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "c51e7c3d079f6c695b835e62aa79ac6fc1fe7f74a5fbf9a0b86c5fabb359c4b3",
-      "bytes": 26592
+      "sha256": "715c98a3ea23e71768326b19250cac5ce3e3bc1c568f540771ba64e45976a4ee",
+      "bytes": 27482
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
