@@ -38,7 +38,8 @@ the Codex side.
 2. Copy `contract.config.json` beside the workflows and point its paths at the
    project: `settings` (the project's `.claude/settings.json`, merged from
    [`ultracode.settings.json`](../ultracode.settings.json)), `instructions` (the
-   file that carries the sizing sentence, for example `AGENTS.md`),
+   file that carries the sizing sentence and the `effort: 'max'` stage rule,
+   for example `AGENTS.md`),
    `contract_doc` (a document holding this README's `## Workflow contract`
    section) and, when the project keeps usage receipts, `usage_receipts_dir`,
    `routing_doc` and `task_record`. A configured path that does not exist fails

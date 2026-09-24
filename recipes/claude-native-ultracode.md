@@ -288,7 +288,8 @@ rule, auto or bypass permission mode, or a hook that allows the call
 ([workflows](https://code.claude.com/docs/en/workflows#approve-the-plan-before-it-runs),
 fetched 2026-09-23). Such a job fails at a usage limit instead of waiting. This
 repository's committed [`.claude/settings.json`](../.claude/settings.json) is
-the settings example above, byte for byte. Per the official
+byte-identical to the linked settings example file (the inline JSON above
+omits its `$schema` line). Per the official
 [cloud-session settings](https://code.claude.com/docs/en/settings#settings-in-cloud-sessions)
 docs, a cloud session on this one repository reads it, while a session with
 several repositories reads only its `enabledPlugins` and

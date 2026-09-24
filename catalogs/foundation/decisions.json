@@ -2659,7 +2659,7 @@
       ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
-      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/max) for extraction, inventories and acceptance commands, `evidence-reviewer` (Opus/max, read-only) for independent review, `isolated-builder` (Sonnet/max, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort, and since 2026-09-23 bind effort `max` on every stage and agent with the models unchanged while the coordinator stays at xhigh under Ultracode (docs/decisions/2026-09-23-max-effort-default.md); run `workflowSizeGuideline: unrestricted` with three concurrent agents and size by task; record every run with `child-usage.mjs --latest`.",
+      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/max) for extraction, inventories and acceptance commands, `evidence-reviewer` (Opus/max, read-only) for independent review, `isolated-builder` (Sonnet/max, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort, and since 2026-09-23 bind effort `max` on every stage and agent with the models unchanged while the coordinator stays at xhigh under Ultracode (docs/decisions/2026-09-23-max-effort-default.md); run `workflowSizeGuideline: unrestricted` with `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=8` (the committed settings example) and size by task; record every run with `child-usage.mjs --latest`.",
       "component_ids": [
         "claude-code",
         "codex"
