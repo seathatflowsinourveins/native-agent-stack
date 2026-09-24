@@ -22,3 +22,8 @@ adoption/hosts/*.json
 # attestation, never committed. See docs/decisions/2026-09-23-generated-
 # explorer-sorted-manifest.md.
 /docs/ecosystem/index.html
+
+# Claude Code: personal project-local settings, and the worktrees
+# `claude --worktree` creates inside the repository.
+.claude/settings.local.json
+.claude/worktrees/
