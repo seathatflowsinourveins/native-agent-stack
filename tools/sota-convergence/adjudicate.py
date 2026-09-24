@@ -75,19 +75,24 @@ def claude_position(entry: dict, order: str):
     return value if value in ("A", "B") else None
 
 
-def current_return_sha256(path: Path):
+def current_return_sha256(path: Path, lane_roots=()):
     """sealed_form_sha256 of the lane return at ``path`` now, or None when it is missing or not UTF-8 JSON."""
     try:
-        return sealed_form_sha256(json.loads(Path(path).read_bytes().decode("utf-8")))
+        return sealed_form_sha256(json.loads(Path(path).read_bytes().decode("utf-8")), lane_roots)
     except (OSError, ValueError):
         return None
 
 
-def sealed_form_sha256(data) -> str:
-    """sha256 of a lane return in the form record_verdicts.py seals it (sanitized, sorted, indent 1, newline):
-    the adjudication binds these, so CI can compare them with the row's lanes.<lane>.sealed_sha256 (independent
-    review of #145, M2)."""
-    return hashlib.sha256((json.dumps(sanitize_value(data), sort_keys=True, indent=1) + "\n").encode("utf-8")).hexdigest()
+def sealed_form_sha256(data, lane_roots=()) -> str:
+    """sha256 of a lane return in exactly the form record_verdicts.py seals it: sources_read under a lane root
+    relativized (``record_verdicts.with_relative_sources`` against this catalog checkout and the same
+    ``lane_roots`` that record_verdicts gets as --lane-repo-root), then sanitized, sorted, indent 1, newline.
+    The adjudication binds these, so CI can compare them with the row's lanes.<lane>.sealed_sha256 (independent
+    review of #145, M2 and re-review R2)."""
+    from record_verdicts import with_relative_sources  # the sealing code itself, not a copy of it
+    relative = with_relative_sources(data, REPO_ROOT, tuple(Path(root) for root in lane_roots))
+    return hashlib.sha256((json.dumps(sanitize_value(relative), sort_keys=True, indent=1) + "\n")
+                          .encode("utf-8")).hexdigest()
 FAMILIES = {"claude": "anthropic", "codex": "openai"}
 assert FAMILIES == LANE_FAMILIES
 SCRUB_KEEP = ("winner_keys", "why_selected", "winner_evidence_class", "winner_evidence_refs", "alternatives",
@@ -373,7 +378,7 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
         for lane, path in paths.items():
             try:
                 data = json.loads(path.read_bytes().decode("utf-8"))
-                return_sha256[lane] = sealed_form_sha256(data)
+                return_sha256[lane] = sealed_form_sha256(data, repo_roots)
             except (OSError, ValueError) as error:
                 reasons.append(f"{lane} return does not parse: {error}")
                 continue
@@ -404,7 +409,10 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
                  "components": {lane: components_list(components[lane]) for lane in FAMILIES},
                  # The lane return files these inputs were built from (Codex review of #145): assemble and
                  # record_verdicts.py refuse the adjudication for any other returns.
-                 "lane_returns_sha256": dict(return_sha256)}
+                 "lane_returns_sha256": dict(return_sha256),
+                 # The lane roots the hashes were relativized against; record_verdicts.py must get the same
+                 # --lane-repo-root, and assemble rechecks with these.
+                 "lane_repo_roots": [str(root) for root in repo_roots]}
         if components["claude"] == components["codex"]:
             entry["agreement"] = "agree"
             index["layers"].append(entry)
@@ -1245,7 +1253,8 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
             continue
         indexed_returns = entry.get("lane_returns_sha256") or {}
         changed_returns = [lane for lane in FAMILIES
-                           if indexed_returns.get(lane) != current_return_sha256(work_dir / lane / f"{name}.json")]
+                           if indexed_returns.get(lane) != current_return_sha256(work_dir / lane / f"{name}.json",
+                                                                                 entry.get("lane_repo_roots") or ())]
         if changed_returns:
             # A lane was rerun after `inputs` (Codex review of #145): the judges compared other returns.
             issues.append((name, f"the {', '.join(changed_returns)} lane return changed after `inputs`; rerun "

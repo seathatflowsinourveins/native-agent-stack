@@ -122,9 +122,11 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --o
 # 6. Record: validate every lane file (a rejected file is reported and treated as absent, never aborts the
 #    run), seal the accepted ones and the adjudications, and write the ledger rows. Pass the same
 #    --adjudications to --check. --run-id is required; the grandfathered 20260922 wave is never re-recorded.
-python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+#    --lane-repo-root must name the export adjudicate inputs got: the adjudication binds the sealed form of
+#    each return, whose sources_read are relativized against it.
+python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
   --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --write
-python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
   --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --check
 
 # 7. Register the new wave document, refresh the narrative and rerun the standing checks.

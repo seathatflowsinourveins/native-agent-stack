@@ -1356,6 +1356,16 @@ class IndependentReviewOf145Tests(AdjudicateFixture):
         self.assertEqual(raised.exception.code, 2)
 
 
+class RereviewR2Tests(unittest.TestCase):
+    def test_the_bound_form_is_the_one_record_verdicts_seals(self):
+        # Re-review R2: sources_read under a lane root are relativized before sealing; the binding must match.
+        import record_verdicts
+        data = {"schema_version": 1, "sources_read": ["/x/hosts/blind/export/README.md (intro)"], "why_selected": "w"}
+        roots = ("/x/hosts/blind/export",)
+        sealed = record_verdicts.sealed_text(record_verdicts.with_relative_sources(data, adjudicate.REPO_ROOT, roots))
+        self.assertEqual(adjudicate.sealed_form_sha256(data, roots), hashlib.sha256(sealed.encode("utf-8")).hexdigest())
+
+
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
 class CodexLeakTests(AdjudicateFixture):
     def setUp(self):

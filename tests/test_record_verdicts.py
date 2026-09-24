@@ -1696,6 +1696,28 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(code, 1, output)
         self.assertIn("unreadable or invalid JSON", output)
 
+    def test_an_adjudication_binds_the_relativized_sealed_form_ci_checks(self):
+        # Re-review R2: with --lane-repo-root the sealed returns relativize sources_read, so the adjudication
+        # must bind that form, or landscape.py fails the recorded row.
+        lane_root = "/x/hosts/blind/export"
+        self.assertTrue((self.root / "evidence" / "receipt.json").is_file())
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2",
+                                  claude={"sources_read": [f"{lane_root}/evidence/receipt.json"]})
+        lanes = {lane: json.loads((self.work_dir / lane / f"{catalog}__wave-crossfamily-layer.json")
+                                  .read_text(encoding="utf-8")) for lane in ("claude", "codex")}
+        relativized = {lane: hashlib.sha256(record_verdicts.sealed_text(record_verdicts.with_relative_sources(
+            data, self.root, (lane_root,))).encode("utf-8")).hexdigest() for lane, data in lanes.items()}
+        raw_form = {lane: hashlib.sha256(record_verdicts.sealed_text(data).encode("utf-8")).hexdigest()
+                    for lane, data in lanes.items()}
+        self.assertNotEqual(relativized["claude"], raw_form["claude"])
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), lane_returns_sha256=relativized))
+        code, output = self.run_wave(adjudications=adjudications, lane_roots=(lane_root,))
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+        build_landscape(self.root)
+
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")
         adjudications = self.work_dir / "adjudications"

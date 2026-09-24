@@ -65,6 +65,14 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         self.assertIn(current, listed, "append the current codex_lane.py/lane-prompt.md hashes to "
                                        "tools/sota-convergence/lane-provenance.json")
 
+    def test_the_vendored_lane_echoes_what_the_collector_requires(self):
+        """Re-review R1: claude_lane.py requires the result's prompt and launch, so the vendored workflow must
+        return both and refuse a promptless real run (agent-lab #42 and #45)."""
+        source = (ROOT / "examples" / "claude-native" / "workflows" / "layer-verdict-lane.js").read_text(encoding="utf-8")
+        self.assertIn("return { lane: 'claude', launch: LAUNCH, prompt: PROMPT,", source)
+        self.assertIn("prompt must be the lane-prompt.md text when packets are given", source)
+        self.assertIn("launch must be an object whose repo equals repo", source)
+
     def test_the_current_adjudication_code_is_registered(self):
         """Independent review of #145, M2: record_verdicts.py and scripts/landscape.py refuse a new-wave
         adjudication whose code is not listed, so the current adjudicate.py, prompt, schemas, workflow and

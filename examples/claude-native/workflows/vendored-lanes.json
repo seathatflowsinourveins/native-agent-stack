@@ -1,14 +1,14 @@
 {
  "files": [
   {
-   "agentlab_commit": "d47e8355c780aa6e69d646f1d3d20f9fb4d05728",
+   "agentlab_commit": "4f69769952f6d63680ac786d096d7811817082b1",
    "path": "layer-verdict-lane.js",
-   "records_in_its_return": "model {name: 'opus', effort: 'high'}, launch (args.launch echoed unchanged, null when absent; a launch whose repo is not args.repo stops the lane) and, per layer, refutation {status, final_source, proposal_status, revision_status, votes} (both lens votes are required on the sealed object; final is null when it was refuted or a vote is missing); tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result, copying refutation and adding model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit, agent_sha256, repo_tree_sha256}, requiring the echoed launch to name the --repo export and its current tree digest, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry, and lists every layer without a final in <work-dir>/claude/failures.json",
-   "sha256": "35e793a07b65ccffda9b5650e6db7b1b0d911d336177de5fcc87e2409ea3999c",
+   "records_in_its_return": "model {name: 'opus', effort: 'max'}, prompt (args.prompt, required when packets are given), launch (args.launch echoed unchanged, null when absent; a launch whose repo is not args.repo stops the lane) and, per layer, refutation {status, final_source, proposal_status, revision_status, votes} (both lens votes are required on the sealed object; final is null when it was refuted or a vote is missing); tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result, copying refutation and adding model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit, agent_sha256, repo_tree_sha256}, requiring the echoed launch to name the --repo export and its current tree digest, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry, and lists every layer without a final in <work-dir>/claude/failures.json",
+   "sha256": "ca5d5a2b65f2d1a7e3597a388944ee41b0de5f9f75c97221b2ff47e26dd1f8c6",
    "source_path": ".claude/workflows/layer-verdict-lane.js",
    "source_repository": "agent-lab",
    "supersedes_sha256": "f824999f81af9027c10c849cd050aac84e3ebcfcb5995bf4b5979bb486f27508",
-   "verified_identical_at_agentlab_commit": "d47e8355c780aa6e69d646f1d3d20f9fb4d05728"
+   "verified_identical_at_agentlab_commit": "4f69769952f6d63680ac786d096d7811817082b1"
   }
  ],
  "schema_version": 1,

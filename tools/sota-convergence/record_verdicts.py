@@ -861,7 +861,10 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             current = {}
             for lane in LANES:
                 try:
-                    current[lane] = hashlib.sha256(sealed_text(valid[lane]).encode("utf-8")).hexdigest()
+                    # The same relativized form the lane is sealed in below (re-review R2), so the binding is
+                    # to the row's lanes.<lane>.sealed_sha256 that CI compares.
+                    current[lane] = hashlib.sha256(sealed_text(with_relative_sources(valid[lane], root, lane_roots))
+                                                   .encode("utf-8")).hexdigest()
                 except ValueError:  # LeakDetected: the return cannot be sealed, so nothing binds to it
                     current[lane] = None
             lanes_tree = valid["claude"]["provenance"].get("repo_tree_sha256")
