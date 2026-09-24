@@ -1,0 +1,306 @@
+{
+ "schema_version": 1,
+ "kind": "macos_synthetic_engine_run",
+ "date": "2026-09-24",
+ "base_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+ "host_receipt": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
+ "evidence_class": "local_integration (SYN broker ports); not paper or live broker acceptance",
+ "host": {
+  "host_id": "macos-m5pro-20260924",
+  "platform_id": "macos-arm64",
+  "model_identifier": "Mac17,8",
+  "chip": "Apple M5 Pro",
+  "cores": "18 (6 Super and 12 Performance)",
+  "memory_bytes": 25769803776,
+  "macos": "26.5.1",
+  "macos_build": "25F80",
+  "architecture": "arm64"
+ },
+ "runtime": {
+  "python": "CPython 3.12.14 (uv-managed cpython-3.12.14-macos-aarch64-none, installed with --no-bin into the worktree's gitignored .runtime/)",
+  "uv": "0.12.18",
+  "direct_pins": "blueprints/us-equities/adaptive-paper/requirements.txt (nautilus-trader==2.0.0rc5, alpaca-py==0.44.0) plus numpy==2.5.3 and pandas==3.0.6 from blueprints/us-equities/engine-nautilus/README.md",
+  "lock": {
+   "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+   "sha256": "d756583bbdb6aff7d43394d628070a6ec9297401468b466005420eef9bc04da9",
+   "packages": 20,
+   "pins": [
+    "alpaca-py==0.44.0",
+    "annotated-types==0.8.0",
+    "certifi==2026.7.22",
+    "charset-normalizer==3.5.1",
+    "idna==3.20",
+    "msgpack==1.2.2",
+    "nautilus-trader==2.0.0rc5",
+    "numpy==2.5.3",
+    "pandas==3.0.6",
+    "pydantic==2.13.5",
+    "pydantic-core==2.46.5",
+    "python-dateutil==2.9.0.post0",
+    "pytz==2026.4",
+    "requests==2.34.2",
+    "six==1.17.0",
+    "sseclient-py==1.9.0",
+    "typing-extensions==4.16.0",
+    "typing-inspection==0.4.4",
+    "urllib3==2.8.0",
+    "websockets==17.1"
+   ]
+  },
+  "install": "uv pip sync --require-hashes --index-url https://pypi.org/simple (UV_NO_CONFIG=1; uv cache and managed Python inside the worktree)",
+  "wheels": "nautilus_trader-2.0.0rc5-cp312-cp312-macosx_11_0_arm64.whl (PyPI, requires_python >=3.12,<3.15), alpaca_py-0.44.0-py3-none-any.whl"
+ },
+ "sandboxed_attempt": {
+  "sandbox": "Claude Code Seatbelt (filesystem and network restricted; ~/.config/native-agent-stack unreadable)",
+  "runs": [
+   {
+    "label": "adaptive-paper suites",
+    "exit": 1,
+    "wall_s": 110.8,
+    "result": [
+     "Ran 732 tests in 110.506s",
+     "FAILED (errors=3, skipped=1)"
+    ],
+    "errors": [
+     "test_adaptive_paper_metrics.MetricsHttpServerTests.test_server_binds_loopback_only",
+     "test_adaptive_paper_metrics.MetricsHttpServerTests.test_serves_metrics_over_real_loopback_http",
+     "test_adaptive_paper_metrics.MetricsHttpServerTests.test_unknown_path_is_404"
+    ],
+    "cause": "PermissionError: [Errno 1] Operation not permitted at socket.bind(('127.0.0.1', 0)): the sandbox denies local port binding"
+   },
+   {
+    "label": "native-faults offline cases",
+    "exit": 0,
+    "wall_s": 0.2,
+    "result": [
+     "Ran 17 tests in 0.048s",
+     "OK"
+    ]
+   },
+   {
+    "label": "market research",
+    "exit": 0,
+    "wall_s": 0.4,
+    "result": [
+     "Ran 28 tests in 0.275s",
+     "OK"
+    ]
+   },
+   {
+    "label": "mover_runner.py synthetic",
+    "exit": 0,
+    "wall_s": 4.7,
+    "result": [
+     "{\"status\": \"passed\", \"flat\": true, \"evidence_class\": \"SYN\"}"
+    ]
+   },
+   {
+    "label": "benchmark.py",
+    "exit": 0,
+    "wall_s": 60.7,
+    "result": [
+     "{'status': 'passed', 'synthetic_submissions': 180, 'native_fill_events': 180, 'elapsed_seconds': 60.418031499983044}"
+    ]
+   }
+  ],
+  "rerun_without_sandbox": {
+   "label": "adaptive-paper suites",
+   "exit": 0,
+   "wall_s": 111.8,
+   "result": [
+    "Ran 732 tests in 111.585s",
+    "OK (skipped=1)"
+   ]
+  }
+ },
+ "recorded_run": {
+  "sandbox": "disabled (loopback bind)",
+  "recorder": "scripts/host_receipts.py record",
+  "commands": [
+   {
+    "label": "host facts",
+    "exit": 0,
+    "duration_s": 0.219,
+    "output_sha256": "675626ed3c9ed4547e6955b53f6ac5717836728c0b594978e3d6ee01b3a30cbe"
+   },
+   {
+    "label": "runtime pins, lock match and uv pip check",
+    "exit": 0,
+    "duration_s": 0.059,
+    "output_sha256": "87b94672cfe0e89dc1a60eb6fa3b6ba91155bc0bbb4160529fe9d54023909a8a"
+   },
+   {
+    "label": "adaptive-paper suites (test_adaptive_paper_*.py)",
+    "exit": 0,
+    "duration_s": 112.269,
+    "output_sha256": "cf92e50c9e38ab96be4c4e677bd094c0e89b7467810f5dd96b88b305e410e319"
+   },
+   {
+    "label": "native-faults offline cases (test_native_faults_min.py)",
+    "exit": 0,
+    "duration_s": 0.151,
+    "output_sha256": "94e2db3dd01d4e8de25a25f177bcbce7eccad0ff0ed2d350536d4a436e273e86"
+   },
+   {
+    "label": "market research (test_adaptive_market_research.py)",
+    "exit": 0,
+    "duration_s": 0.295,
+    "output_sha256": "725811a1a68f545b771faa5cbdc92f3ff1479e97a09f241ce648a550990d3317"
+   },
+   {
+    "label": "mover trial mode: mover_runner.py synthetic",
+    "exit": 0,
+    "duration_s": 4.647,
+    "output_sha256": "9554ac77996147b9e5cddc548613dd161e25e188a76e69d84a554b4912a1af27"
+   },
+   {
+    "label": "adaptive engine: benchmark.py synthetic capacity",
+    "exit": 0,
+    "duration_s": 60.625,
+    "output_sha256": "687da862a0e0173e3d952a54a838a2b3c70b1c5ed8010f5a0036a777ae4913d5"
+   },
+   {
+    "label": "host engine state absent",
+    "exit": 0,
+    "duration_s": 0.004,
+    "output_sha256": "c9edd21722798204d538dfb0a257d0ee2e9b1baa49be350dd3d7e1d32fb27de0"
+   }
+  ]
+ },
+ "tests_per_module": {
+  "test_adaptive_paper_exits": 87,
+  "test_adaptive_paper_leverage": 50,
+  "test_adaptive_paper_live_manifest": 10,
+  "test_adaptive_paper_metrics": 23,
+  "test_adaptive_paper_mover": 67,
+  "test_adaptive_paper_mover_native": 21,
+  "test_adaptive_paper_native": 16,
+  "test_adaptive_paper_recovery": 22,
+  "test_adaptive_paper_runner": 118,
+  "test_adaptive_paper_safety": 60,
+  "test_adaptive_paper_selector": 52,
+  "test_adaptive_paper_sessions": 113,
+  "test_adaptive_paper_strategies": 34,
+  "test_adaptive_paper_transport": 59,
+  "test_native_faults_min": 17,
+  "test_adaptive_market_research": 28
+ },
+ "skips": [
+  {
+   "test_module": "test_adaptive_paper_sessions",
+   "reason": "exchange_calendars is not installed in this shared engine environment"
+  }
+ ],
+ "syn_results": {
+  "mover_trial": {
+   "artifact": "evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-receipt.json",
+   "scan": "evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-scan.json",
+   "command": "mover_runner.py synthetic --allow-stale-scan (default hold 4 s, config-mover.json exit X2)",
+   "status": "passed",
+   "flat": true,
+   "evidence_class": "SYN",
+   "totals": {
+    "buy_notional_usd": "383.17",
+    "entries_filled": 2,
+    "entries_submitted": 2,
+    "exit_orders_submitted": 2,
+    "ledger_cash_delta_usd": "-22.09",
+    "ledger_realized_pnl_delta_usd": "-22.09",
+    "native_fill_events": 4,
+    "native_rejections": 0,
+    "pnl_consistent": true,
+    "realized_pnl_usd": "-22.0900",
+    "sell_notional_usd": "361.08",
+    "symbols": 2
+   },
+   "legs": [
+    {
+     "symbol": "ZZSA",
+     "entry": {
+      "qty": "61",
+      "avg_price": "3.220000",
+      "status": "filled"
+     },
+     "exits": [
+      {
+       "qty": "61",
+       "avg_price": "3.030000",
+       "status": "filled"
+      }
+     ],
+     "exit_reason": "x2_time",
+     "realized_pnl_usd": "-11.5900"
+    },
+    {
+     "symbol": "ZZSB",
+     "entry": {
+      "qty": "15",
+      "avg_price": "12.450000",
+      "status": "filled"
+     },
+     "exits": [
+      {
+       "qty": "15",
+       "avg_price": "11.750000",
+       "status": "filled"
+      }
+     ],
+     "exit_reason": "x2_time",
+     "realized_pnl_usd": "-10.5000"
+    }
+   ],
+   "reconciliation": {
+    "end": {
+     "cash_delta_usd": "-22.09",
+     "cash_match": true,
+     "open_orders": 0,
+     "positions": 0,
+     "positions_match": true
+    },
+    "recovery": null,
+    "start": {
+     "checked_by": "runner.validate_preflight and the native adapter's startup snapshot",
+     "flat_account_and_no_open_orders": true
+    }
+   },
+   "handoff_to_recovery": null,
+   "unsellable_positions": [],
+   "note": "Prices follow mover_runner.synthetic_path on invented tickers; fills and P&L are not outcomes."
+  },
+  "adaptive_capacity": {
+   "artifact": "evidence/artifacts/macos-syn-e2e-20260924/synthetic-capacity.json",
+   "status": "passed",
+   "engine": "NautilusTrader LiveNode 2.0.0rc5",
+   "broker_connections": 0,
+   "paper_orders": 0,
+   "synthetic_submissions": 180,
+   "native_fill_events": 180,
+   "completed_synthetic_roundtrips": 90,
+   "peak_submissions_in_60_seconds": 179,
+   "native_portfolio_flat": true,
+   "reconciliation": {
+    "cash_delta_usd": "-5.40",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+   }
+  }
+ },
+ "hermeticity": [
+  "~/.local/state/native-agent-stack (engine STOP, locks, ledgers) did not exist before the runs and did not exist after them.",
+  "All sandboxed runs had ~/.config/native-agent-stack unreadable and made no broker connection; only the loopback bind failed."
+ ],
+ "macos_notes": [
+  "No engine, mover or native-faults test failed on macOS; the only failures were the sandbox's loopback-bind denial.",
+  "The sandbox also blocks sysctl (EPERM); host facts come from system_profiler.",
+  "The trading-nautilus profile lists bwrap, which macOS lacks, so the network-namespaced engine replay of engine-nautilus is not covered."
+ ],
+ "not_run": [
+  "mover-early-entry study tests (study runtime and data)",
+  "live native-faults harness (needs credentials)",
+  "paper/recover commands",
+  "full repository suite in this runtime",
+  "42 unchanged upstream adapter tests"
+ ]
+}

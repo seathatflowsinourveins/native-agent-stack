@@ -1520,6 +1520,11 @@ def build_parser():
     parser.add_argument("--max-open-notional", default="10000")
     parser.add_argument("--inflight", type=int, default=4)
     parser.add_argument("--required-windows", type=int, default=5)
+    parser.add_argument("--stream-timeout", type=float, default=10.0,
+                        help="seconds to wait for a probe's trade_updates acknowledgement or terminal event "
+                             "before freezing (stream_timeout_seconds, 0.5-120). Paper cancel confirmations "
+                             "took about 16 s in the 2026-09-24 opening auction; raise this or avoid the "
+                             "first ~15 minutes after the open")
     parser.add_argument("--no-extended-hours", action="store_true")
     parser.add_argument("--allow-cancel-all", action="store_true",
                         help="permit DELETE /v2/orders only when cancel_all_guard proves no foreign open orders")
@@ -1545,7 +1550,8 @@ def config_from_args(args):
                           allow_cancel_all=args.allow_cancel_all,
                           acknowledged_positions=args.acknowledge_positions,
                           acknowledged_open_orders=args.acknowledge_open_orders,
-                          required_windows=args.required_windows)
+                          required_windows=args.required_windows,
+                          stream_timeout_seconds=args.stream_timeout)
 
 
 def exit_code_for(receipt):

@@ -3047,8 +3047,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "17e278caa3aebadd81ca5d67a494253f6482ea487b87e8839545e51b1efdabb7",
-      "bytes": 8378
+      "sha256": "6fada93b561e3bdbc740d65e4a2d70884f9e70c0ff551815fc512c177c919e1f",
+      "bytes": 8725
     },
     {
       "path": ".github/pull_request_template.md",
@@ -25032,6 +25032,36 @@
       "bytes": 20209
     },
     {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-receipt.json",
+      "sha256": "ae79d036b0a69cd6b5d381d427da1805facf887af7d71b7aca80a00b5a2929bb",
+      "bytes": 12641
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-scan.json",
+      "sha256": "a9ed86f3c55b8f574535a7c1b553dcaf698096396186b208a48df46636092605",
+      "bytes": 530
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
+      "sha256": "e73a1cf12f8ab42f780a68b741b9d4c045c8feffb993ad37771f1291cab51922",
+      "bytes": 232
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+      "sha256": "d756583bbdb6aff7d43394d628070a6ec9297401468b466005420eef9bc04da9",
+      "bytes": 60036
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/summary.json",
+      "sha256": "8df838edb64f58eb835886c5b98342823d09745f9aec65f907c265b91bd161bf",
+      "bytes": 9659
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/synthetic-capacity.json",
+      "sha256": "0d3a947cd967f323c0f83c784dac530daeedda88ab7723ba3118a5f7c089a50b",
+      "bytes": 1304
+    },
+    {
       "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
       "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
       "bytes": 125442
@@ -27327,6 +27357,11 @@
       "bytes": 11763
     },
     {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
+      "sha256": "b90aa27b31398d1ee5319f134ac2468cafa2c6576cd2475db3287489e610ebb8",
+      "bytes": 9533
+    },
+    {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
       "sha256": "3d5a293615e6ddd3e82e9323e54f8784d46d7adaa94606ec373b81f9426a2a4e",
       "bytes": 3875
@@ -28518,8 +28553,8 @@
     },
     {
       "path": "tests/__init__.py",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "bytes": 0
+      "sha256": "25483dd35a347fdf64bb721397a27a2d57e64fd67b09bea8d031a859bfd11435",
+      "bytes": 930
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
