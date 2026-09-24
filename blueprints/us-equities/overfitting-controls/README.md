@@ -37,7 +37,6 @@ excluded.
 | **Deflated Sharpe ratio** | **0.552** |
 | **PBO** (S = 16, mean-label metric, 12,870 splits) | **0.776** |
 | Probability that the selected trial loses out of sample | 0.480 |
-| Out-of-sample on in-sample degradation slope | -0.727 |
 | Walk-forward selected series: Sharpe / PSR(0), 249 episodes | -0.0151 / 0.405 |
 
 All sensitivity cells give PBO (lambda <= 0) between 0.76 and 0.96. The cells
@@ -47,12 +46,22 @@ DSR stays between 0.55 and 0.58. The [receipt](receipt.json) retains every cell,
 the strict lambda < 0 shares, input and source hashes, commands and the
 independent recomputation.
 
+The receipt also keeps the paper's degradation slope (the selected trial's
+out-of-sample metric regressed on its in-sample metric; -0.727 in the primary
+cell). It is not used as evidence. With the mean metric and equal complementary
+halves, each trial's in-sample mean plus its out-of-sample mean equals twice its
+mean over all used rows. Every split that selects the same trial therefore lies
+on a line of slope exactly -1, and momentum120 is selected in 5,490 of the
+12,870 splits. The pooled slope is pulled towards -1 by construction, and it
+says almost nothing about whether rankings persist.
+
 **Conclusion.** These retained candidates show no deflated-Sharpe evidence of
 skill. The in-sample best candidate usually ranks below the out-of-sample
-median. The evidence is consistent with selection noise, or mild
-anti-persistence of in-sample ranking, not skill. This negative diagnostic
-covers only this three-ETF control lane. It does not tune, promote or reject any
-future strategy.
+median. With four trials and no skill, PBO would be about 0.5, so 0.776 is
+consistent with selection noise or mild anti-persistence of in-sample ranking,
+not skill. The CSCV splits overlap heavily and PBO has no p-value, so this
+reading is descriptive. This negative diagnostic covers only this three-ETF
+control lane. It does not tune, promote or reject any future strategy.
 
 ## Boundaries
 

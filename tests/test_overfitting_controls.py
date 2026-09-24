@@ -150,6 +150,27 @@ class PboTests(unittest.TestCase):
         self.assertEqual(result["pbo"], 1.0)
         self.assertEqual(result["pbo_strict"], 0.0)
 
+    def test_mean_metric_degradation_slope_is_an_identity(self):
+        # With the mean metric and equal complementary halves, in-sample + out-of-sample
+        # equals twice the trial's mean over the used rows, so a trial that is always
+        # selected gives a slope of exactly -1 whatever its skill.
+        rng = random.Random(7)
+        matrix = [[rng.gauss(0, 1) + 10.0] + [rng.gauss(0, 1) for _ in range(5)] for _ in range(160)]
+        result = of.cscv_pbo(matrix, partitions=8)
+        self.assertEqual(result["pbo"], 0.0)
+        self.assertAlmostEqual(result["degradation_slope"], -1.0, places=12)
+        # Mixed selection: the selected in- and out-of-sample means still sum to twice
+        # the selection-weighted full means.
+        rng = random.Random(3)
+        matrix = [[rng.gauss(0.001 * c, 0.02) for c in range(4)] for _ in range(103)]
+        result = of.cscv_pbo(matrix, partitions=8)
+        used = matrix[result["rows_dropped_earliest"]:]
+        full = [statistics.fmean(r[c] for r in used) for c in range(4)]
+        weighted = math.fsum(k * f for k, f in zip(result["in_sample_selection_counts"], full)) / result["combinations"]
+        self.assertGreater(sum(k > 0 for k in result["in_sample_selection_counts"]), 1)
+        self.assertAlmostEqual(result["selected_in_sample_mean"] + result["selected_out_of_sample_mean"],
+                               2.0 * weighted, places=14)
+
     def test_rejects_invalid_configuration(self):
         for args in ([[1.0, 2.0]] * 8, 3), ([[1.0]] * 8, 2), ([[1.0, 2.0]] * 3, 2), ([[1.0, float("nan")]] * 8, 2):
             with self.assertRaises(ValueError):

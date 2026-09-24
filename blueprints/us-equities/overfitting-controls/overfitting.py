@@ -136,6 +136,17 @@ def cscv_pbo(matrix, partitions=16, metric="mean"):
     sample): n* = argmax in-sample metric (ties by column order), omega = average
     ascending out-of-sample rank of n* / (N + 1), lambda = logit(omega).
     PBO is the share of combinations with lambda <= 0.
+
+    degradation_slope is the paper's pooled OLS slope of the selected trial's
+    out-of-sample metric on its in-sample metric. It is not evidence of ranking
+    persistence here. With metric="mean" and equal complementary halves, every
+    trial satisfies in_sample + out_of_sample = 2 * (its mean over the used rows),
+    so all splits that select the same trial lie on a line of slope exactly -1.
+    The pooled slope is therefore mostly this identity, mixed with the spread
+    between the full-sample means of the trials that get selected. With
+    metric="sharpe" the identity is not exact, but the complementary halves still
+    induce the same negative within-trial dependence. Judge persistence by PBO
+    against its no-skill level (about 0.5 for continuous ranks), not by the slope.
     """
     rows = [[float(x) for x in row] for row in matrix]
     if not rows or any(len(r) != len(rows[0]) for r in rows):

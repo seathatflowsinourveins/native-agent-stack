@@ -54,7 +54,7 @@
   "implementation": {
     "overfitting.py": {
       "path": "blueprints/us-equities/overfitting-controls/overfitting.py",
-      "sha256": "c44a5f7d00f8cb2b9787ab8f408e76731a99e4ac7e67f69f3efbb34b4b7eebdf"
+      "sha256": "1747e058c0a5830db4ae43f4101cdd4a6825422f4b5b386fd8eb7e51f803811a"
     },
     "evaluate.py": {
       "path": "blueprints/us-equities/overfitting-controls/evaluate.py",
@@ -101,9 +101,23 @@
       "exit": 0,
       "stderr_bytes": 0,
       "stdout_sha256": "3815782f85fcb7c8aebd6defce82ae9540039f6bf408a82a83ff47dd0a83ff43"
+    },
+    {
+      "id": "fix-round-runs",
+      "argv": [
+        "python3",
+        "blueprints/us-equities/overfitting-controls/evaluate.py"
+      ],
+      "cwd": "checkout root",
+      "runtime": "CPython 3.13.15 (two runs) and CPython 3.12.3 pinned adaptive-paper runtime (one run)",
+      "started_utc": "2026-09-24T16:22:00Z",
+      "exit": 0,
+      "stderr_bytes": 0,
+      "stdout_sha256": "6bacc72f585348e624a63826ce1b65d30773fd8c50fe02e7357ebf9ceea6dbe5",
+      "note": "Re-run after the review fix that documented the degradation-slope identity in the overfitting.py docstring. All three stdouts are byte-identical. Only results.inputs.overfitting_py_sha256 differs from runs 1-3; every numeric result is unchanged. Runs 1-3 are kept as the original observation; their stdout hash predates the docstring change."
     }
   ],
-  "determinism": "All three runs produced byte-identical stdout; the results object below is that stdout.",
+  "determinism": "Runs 1-3 produced byte-identical stdout (3815782f...). After the docstring-only fix, three further runs (fix-round-runs) produced byte-identical stdout (6bacc72f...), differing from the original only in the overfitting.py source hash. The results object below is the fix-round stdout.",
   "independent_observation": {
     "method": "crosscheck.py recomputes the primary DSR and PBO with numpy 2.5.3 (array moments, direct row slicing of all 12870 CSCV combinations, explicit average ranks, math.erf CDF), sharing only statistics.NormalDist.inv_cdf and the ledger with the module under test.",
     "runtime": "CPython 3.12.3 pinned adaptive-paper runtime, exit 0, empty stderr",
@@ -126,12 +140,12 @@
     "classes": {
       "published_worked_example": "Bailey and Lopez de Prado (2014) numerical example (N=100, annualized V=1/2, SR=2.5, T=1250, skew -3, kurtosis 10): SR0 0.1132 and DSR 0.9004 reproduced to four decimals. Expected values are transcribed from the paper; the paper text was not re-fetched in this offline session.",
       "reference_value": "Expected maximum of 100 iid standard normals (order-statistic tables, 2.50759) within the approximation's 1.5% tolerance.",
-      "synthetic_fixture": "Locally constructed PBO cases: exact reversal (PBO 1), dominant trial (PBO 0), pure-noise mean near 0.5 over 20 seeds, block-merge equality with a brute-force recomputation, tie handling and invalid configurations. No published PBO numerical example with exact expected values was available offline.",
+      "synthetic_fixture": "Locally constructed PBO cases: exact reversal (PBO 1), dominant trial (PBO 0), pure-noise mean near 0.5 over 20 seeds, block-merge equality with a brute-force recomputation, tie handling, the mean-metric degradation-slope identity (slope exactly -1 for an always-selected trial; the selected in-sample plus out-of-sample means equal twice the selection-weighted full means) and invalid configurations. No published PBO numerical example with exact expected values was available offline.",
       "replay": "Recomputes this receipt's results object from the retained ledger (float tolerance 1e-9 relative)."
     },
     "observed": {
-      "focused": "13 tests passed, 0 skipped on CPython 3.13.15; with tests.test_research_evaluation, 25 passed, 0 skipped on CPython 3.12.3 (pinned runtime)",
-      "full_suite": "python3 -m unittest on CPython 3.13.15 (system interpreter without numpy, jsonschema or PyYAML): 4031 tests OK, 490 skipped; none of the skips are in tests.test_overfitting_controls"
+      "focused": "After the fix round: 14 tests passed, 0 skipped on CPython 3.13.15; with tests.test_research_evaluation, 26 passed, 0 skipped on CPython 3.12.3 (pinned runtime)",
+      "full_suite": "python3 -m unittest on CPython 3.13.15 (system interpreter without numpy, jsonschema or PyYAML): 4032 tests OK, 490 skipped; none of the skips are in tests.test_overfitting_controls"
     }
   },
   "results": {
@@ -289,7 +303,7 @@
     "inputs": {
       "evaluate_py_sha256": "e62af085613c0b341ffdfc2a0eac94255551325f430844f29e317a26ede6cedc",
       "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
-      "overfitting_py_sha256": "c44a5f7d00f8cb2b9787ab8f408e76731a99e4ac7e67f69f3efbb34b4b7eebdf",
+      "overfitting_py_sha256": "1747e058c0a5830db4ae43f4101cdd4a6825422f4b5b386fd8eb7e51f803811a",
       "params_sha256": "0e371da46601c673453a40ebcb608e38512348c37bf95a63ac7793d263c21487",
       "research_receipt_sha256": "92a2c4c1984c7cd38af21fbc9b5290395805fed3177522b19d408ad50c59d56b"
     },
@@ -1122,14 +1136,15 @@
   },
   "conclusion": [
     "DSR of the best retained selection candidate is 0.552 (momentum120), far below a 0.95 confidence threshold, even though only four trials are deflated; its undeflated PSR(0) is 0.667. Adding the equal-weight control (best: equalweight, DSR 0.575) or restricting to momentum rules (DSR 0.561) does not change this.",
-    "PBO is 0.776 for the primary set (S=16, mean label): the in-sample best candidate ranks below the out-of-sample median in about three of four CSCV splits (N=4, so no split lands exactly on the median), and the selected candidate's out-of-sample mean regresses negatively on its in-sample mean (slope -0.727). Every sensitivity cell (S 8 to 16, mean or Sharpe metric, three trial sets) has PBO (lambda <= 0) between 0.76 and 0.96; the strict lambda < 0 share is lower where an odd trial count allows exact median ties (momentum-only N=3: 0.34 to 0.48; with the control N=5: 0.62 to 0.76).",
+    "PBO is 0.776 for the primary set (S=16, mean label): the in-sample best candidate ranks below the out-of-sample median in about three of four CSCV splits (N=4, so no split lands exactly on the median). Every sensitivity cell (S 8 to 16, mean or Sharpe metric, three trial sets) has PBO (lambda <= 0) between 0.76 and 0.96; the strict lambda < 0 share is lower where an odd trial count allows exact median ties (momentum-only N=3: 0.34 to 0.48; with the control N=5: 0.62 to 0.76). The retained degradation_slope values (primary -0.727) are not used as evidence: with the mean metric and equal complementary halves, a trial's in-sample plus out-of-sample mean equals twice its mean over the used rows, so splits selecting the same trial lie on a slope of exactly -1 (momentum120 is selected in 5490 of 12870 splits).",
     "The frozen walk-forward selector's development out-of-sample series (249 episodes over 20 folds) has negative mean and Sharpe -0.0151, PSR(0) 0.405. This is consistent with the research-evaluation README, which makes no persistent-advantage claim for the training-selected rule.",
-    "Conclusion: over these retained candidates the evidence is consistent with selection noise (or mild anti-persistence of in-sample ranking), not skill. This is a negative diagnostic for this three-ETF control lane; it neither tunes, promotes nor rejects any future strategy."
+    "Conclusion: over these retained candidates the evidence is consistent with selection noise, not skill. The no-skill PBO for four exchangeable trials is about 0.5, so a PBO of 0.776 is also consistent with mild anti-persistence of in-sample ranking; the CSCV splits overlap heavily and PBO carries no p-value, so this reading is descriptive. This is a negative diagnostic for this three-ETF control lane; it neither tunes, promotes nor rejects any future strategy."
   ],
   "limitations": [
     "Inputs are raw-price five-session labels less a fixed 20bp proxy, not portfolio returns; the Sharpe ratios are per-episode label ratios, not investable or annualized Sharpe ratios.",
     "The trial count is only this lane's frozen candidate set (4, sensitivity 3 and 5). Trials run elsewhere in the research program are not counted, so the DSR here is an optimistic upper bound relative to program-wide multiple testing; no effective-N clustering was applied although momentum60 and momentum120 share 60% of development labels.",
     "CSCV with three to five highly correlated trials gives only a few distinct relative ranks (four logit values in the primary S=16 run) and assumes the contiguous 18-episode blocks are exchangeable; PBO is descriptive and carries no p-value.",
+    "The CSCV degradation slope is dominated by a construction identity: with the mean metric and equal complementary halves, in-sample + out-of-sample = 2 x the trial's mean over the used rows, so within one selected trial the slope is exactly -1 and the pooled slope mixes that with the spread of the selected trials' full-sample means. It is retained for completeness and is not evidence about ranking persistence; no between-trial decomposition was computed. With the Sharpe metric the identity is not exact, but the same complementary-half dependence applies.",
     "Only development episodes (2015-01-02 to 2020-12-16) are used; the inspected 2021Q1 reserved segment (11 episodes) is excluded and was not re-scored.",
     "The earliest T mod S rows (13 at S=16) are dropped; results for other truncation choices were not computed.",
     "The DSR worked-example constants are transcribed from the paper rather than re-fetched; the PBO tests are locally constructed synthetic fixtures, not upstream tests.",
