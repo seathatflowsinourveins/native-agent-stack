@@ -28,6 +28,9 @@ remain in `catalogs/foundation/manifest.json`, and trading limitations in
 `catalogs/us-equities/runtime-target.json` and its linked domain receipts. Historical receipts are reference
 evidence, never a new host's passed status. Keep host paths and native sign-ins
 private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
+Credentials follow `docs/secret-storage.md` (per-provider 0600 files outside every
+worktree, native sign-ins left native); check them with the value-free
+`scripts/credential_status.py`, and never read, print or copy a credential value.
 
 This is a portable reference stack with evidence, native recipes and examples. Preserve the distinction between historical host execution, reproducible artifact checks and live provider/GPU acceptance. Never describe a version check or recorded receipt replay as a new model run.
 
