@@ -52,10 +52,14 @@ PIN_FIELDS = ("release_tag", "release_commit")
 START_HERE = "README.md#start-here"
 LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 BARE_PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])((?:\.github|scripts|tools|tests|adoption|docs|recipes|catalogs)/[A-Za-z0-9_./-]+)")
+# Install guides one reference away from the new-host documents are followed one more hop.
+GUIDE_PREFIXES = ("adoption/", "recipes/")
 
 
 def git(*args: str, check: bool = False) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True, check=check)
+    # UTF-8 whatever the locale: README's Start here section is compared with its release copy.
+    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True, encoding="utf-8",
+                          check=check)
 
 
 def start_here_section(text: str) -> str:
@@ -151,16 +155,25 @@ def linked_or_bare(doc: str, text: str) -> set[str]:
     return found
 
 
+def mentioned(doc: str, text: str) -> set[str]:
+    return {rel for rel in referenced([text]) if repo_file(rel)} | linked_or_bare(doc, text)
+
+
 def new_machine_files() -> set[str]:
-    """Every file a new machine follows or runs: the new-host documents and platform pages, and
-    every file they (or README's Start here section) reference, on main, not git-ignored."""
+    """Every file a new machine follows or runs: the new-host documents and platform pages, every
+    file they (or README's Start here section) reference, and every file referenced by a referenced
+    install guide (a Markdown file under adoption/ or recipes/, e.g. adoption/tools/README.md, which
+    installs the guarded runners), on main, not git-ignored."""
     texts = {doc: (ROOT / doc).read_text(encoding="utf-8") for doc in new_host_docs()}
     readme = ROOT / "README.md"
     if readme.is_file():
         texts["README.md"] = start_here_section(readme.read_text(encoding="utf-8"))
     files = set(texts) - {"README.md"}
     for doc, text in texts.items():
-        files |= {rel for rel in referenced([text]) if repo_file(rel)} | linked_or_bare(doc, text)
+        files |= mentioned(doc, text)
+    for guide in sorted(rel for rel in files - set(texts)
+                        if rel.endswith(".md") and rel.startswith(GUIDE_PREFIXES) and (ROOT / rel).is_file()):
+        files |= mentioned(guide, (ROOT / guide).read_text(encoding="utf-8"))
     return {rel for rel in files if not ignored(rel)}
 
 

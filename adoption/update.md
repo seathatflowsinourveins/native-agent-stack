@@ -83,7 +83,10 @@ flow, recorded so a host can check what it receives.
    (and `updated_at`) in `adoption/manifest.json` and re-registers its hash in
    `manifests/evidence.json`. `python3 scripts/release_due.py --strict` must
    print `"status": "current"` (empty `due` and `changed`: tag the latest `main`
-   and open the re-pin PR before other new-machine changes land, or cut again);
+   and open the re-pin PR before other new-machine changes land, or cut again;
+   update the PR branch from `main` right before merging, because the main
+   ruleset does not require an up-to-date branch and the post-merge push run of
+   `validate.yml` is not strict);
    `validate.yml` runs
    `release_due.py --strict-if-repinned origin/main`, which is strict because
    the pinned commit changed, and `tests/test_release_pin_contents.py` checks

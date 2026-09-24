@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "7276196abc9caeb603582de964eda400ffb33cea408213fe19d35e0fae762b84",
-      "bytes": 19983
+      "sha256": "412da169efcadb679eaaf96d843d9f4c63ef666b293f17c8397ed55deb1eaa7b",
+      "bytes": 20394
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3347,8 +3347,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "875569ce7bcd71f2d2bda7fdbea8ef323f724afc42ee8840120065188fc47e42",
-      "bytes": 16854
+      "sha256": "bbf6953c9c72a2fec61727a44a13d8d0ff96097f4ba044241a3cfd5ef0025dbf",
+      "bytes": 17042
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -28263,8 +28263,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "f6abb6cc41caa9d0b4b72243fda60b290b3e54ac363b5f6a9bdf819214490375",
-      "bytes": 11897
+      "sha256": "7c88158cbb1647cb8168f72f524e0d694e56c1613c76595e4c630f7c8b38ad13",
+      "bytes": 12674
     },
     {
       "path": "scripts/trading_gates.py",
@@ -28763,8 +28763,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "a8707108794a9d5920abdf984b5eee6a2a6e4bb21b15e73417631c044e60b5a3",
-      "bytes": 10572
+      "sha256": "0a1428533f74ff0eb8df25fad027308e22f098012c53f3269f734a8171334964",
+      "bytes": 11772
     },
     {
       "path": "tests/test_render_config.py",

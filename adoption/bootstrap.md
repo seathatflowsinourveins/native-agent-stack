@@ -54,8 +54,13 @@ git), download it from the GitHub Release and verify it before use. Both checks
 bind the file to this release: `verify-asset` to the immutable release's asset
 digest, and `--source-ref`/`--source-digest` to the tagged commit. Without them
 the attestation check also passes for an attested archive of any other commit
-(a `workflow_dispatch` run of `publish-catalog.yml`) saved under this name:
+(a `workflow_dispatch` run of `publish-catalog.yml`) saved under this name.
+`verify-asset` and `attestation verify` need a signed-in `gh` (`gh auth login`;
+without it both exit 4). Without a clone, read the pin from the default branch:
 ```sh
+gh api -H 'Accept: application/vnd.github.raw+json' \
+  repos/seathatflowsinourveins/native-agent-stack/contents/adoption/manifest.json \
+  | python3 -c "import json,sys; s=json.load(sys.stdin)['source']; print(s['release_tag'], s['release_commit'])"
 gh release download <release_tag> --repo seathatflowsinourveins/native-agent-stack \
   --pattern 'native-agent-stack-<release_commit>.tar.gz'
 gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz \

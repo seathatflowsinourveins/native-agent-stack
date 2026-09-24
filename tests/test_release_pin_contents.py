@@ -91,7 +91,12 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         files = {
             "README.md": "# Catalog\n\n## Start here\n\nFollow adoption/bootstrap.md.\n\n## Other\n\nNotes.\n",
             "adoption/bootstrap.md": ("Run `scripts/tool.py`, then read docs/next-host-stages.md.\n"
-                                      "Run adoption/tools/runner, see [the sums](hooks/SHA256SUMS).\n"),
+                                      "Run adoption/tools/runner, see [the sums](hooks/SHA256SUMS).\n"
+                                      "Profiles live in adoption/manifest.json; hashes in "
+                                      "[the index](../manifests/evidence.json). Install per "
+                                      "adoption/tools/README.md.\n"),
+            "adoption/tools/README.md": "Install adoption/tools/guarded with install -m 0755.\n",
+            "adoption/tools/guarded": "#!/bin/sh\necho guarded v1\n",
             "adoption/platforms/linux-wsl2.md": "Linux page.\n",
             "adoption/tools/runner": "#!/bin/sh\necho v1\n",
             "adoption/hooks/SHA256SUMS": "aaaa  guard.py\n",
@@ -129,9 +134,9 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         self.write("manifests/evidence.json", '{"files": ["re-registered"]}\n')
         self.commit("re-pin")
 
-    def report(self, *args):
+    def report(self, *args, env=None):
         proc = subprocess.run([sys.executable, str(self.repo / "scripts/release_due.py"), *args],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding="utf-8", env=env)
         return proc.returncode, json.loads(proc.stdout)
 
     def test_a_re_pin_alone_is_current(self):
@@ -164,6 +169,18 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         self.commit()
         self.assertEqual(self.report()[1]["changed"], ["adoption/hooks/SHA256SUMS", "adoption/tools/runner"])
 
+    def test_a_non_ascii_start_here_section_is_read_as_utf8_in_any_locale(self):
+        # README's Start here section has em dashes; the git output was decoded with the locale codec.
+        self.write("README.md", "# Catalog\n\n## Start here\n\nFollow adoption/bootstrap.md \u2014 then run.\n")
+        self.commit()
+        env = {**os.environ, "LC_ALL": "C", "PYTHONUTF8": "0", "PYTHONCOERCECLOCALE": "0", "PYTHONIOENCODING": "utf-8"}
+        self.assertEqual(self.report(env=env)[1]["changed"], [rd.START_HERE])
+
+    def test_a_file_named_only_by_a_referenced_install_guide_is_compared(self):
+        self.write("adoption/tools/guarded", "#!/bin/sh\necho guarded v2\n")
+        self.commit()
+        self.assertEqual(self.report()[1]["changed"], ["adoption/tools/guarded"])
+
     def test_a_mode_or_kind_change_is_drift_even_with_the_same_bytes(self):
         (self.repo / "adoption/tools/runner").chmod(0o755)
         self.commit()
@@ -180,8 +197,8 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         self.assertEqual(self.report()[1]["changed"], ["adoption/manifest.json"])
 
     def test_a_missing_path_or_platform_page_is_due_and_takes_precedence(self):
-        self.write("adoption/bootstrap.md", "Run `scripts/tool.py` and `scripts/new.py`.\n"
-                                            "Run adoption/tools/runner, see [the sums](hooks/SHA256SUMS).\n")
+        self.write("adoption/bootstrap.md", (self.repo / "adoption/bootstrap.md").read_text(encoding="utf-8")
+                   + "Then run `scripts/new.py`.\n")
         self.write("scripts/new.py", "print('new')\n")
         self.write("adoption/platforms/macos-arm64.md", "A new platform page.\n")
         self.commit()
