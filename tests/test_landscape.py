@@ -500,7 +500,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             manifest_entry_lanes[lane] = {"outcome": "sealed", "run_id": run_id, "sealed_sha256": digest}
         # Every new wave seals its prose exposure (Codex review of #145 at 68e74f2c); this layer is not scored.
         exposure = {"schema_version": 1, "layers": {f"foundation::{layer_id}": {
-            "scored": False, "cited_files": [], "export_files": []}}}
+            "scored": False, "cited_files": [], "export_files": [], "packet_sha256": packet_sha256,
+            "lane_root_tree_sha256": "7" * 64}}}
         self.write(f"{NEW_WAVE_BASE}/prose-exposure.json", exposure)
         lanes["prose_exposed"] = None
         self.write(f"{NEW_WAVE_BASE}/run-manifest.json", {
@@ -912,6 +913,23 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.layer.update(self.recorded_fields(lanes=lanes))
         with self.assertRaisesRegex(ValueError, "prose_exposure_sha256"):
             self.build()
+
+    def test_a_measure_over_another_packet_or_tree_is_rejected(self):
+        # Round 8, NEW-2: each row's prose-exposure measure names its retained packet and its lanes' tree.
+        for field, value, reason in (("packet_sha256", "0" * 64, "over its retained packet"),
+                                     ("lane_root_tree_sha256", "0" * 64, "measured over")):
+            with self.subTest(field=field):
+                lanes = self.seal_new_wave()
+                path = self.root / NEW_WAVE_BASE / "prose-exposure.json"
+                exposure = json.loads(path.read_text(encoding="utf-8"))
+                for entry in exposure["layers"].values():
+                    entry[field] = value
+                self.write(f"{NEW_WAVE_BASE}/prose-exposure.json", exposure)
+                self.edit_manifest(lanes, lambda manifest: manifest.update(
+                    prose_exposure_sha256=hashlib.sha256(json.dumps(exposure).encode("utf-8")).hexdigest()))
+                self.layer.update(self.recorded_fields(lanes=lanes))
+                with self.assertRaisesRegex(ValueError, reason):
+                    self.build()
 
     def test_a_hand_edited_new_wave_codex_absent_row_without_run_ids_is_rejected(self):
         # Re-review finding 2, case 1: the new-wave block ran only when some lane had a run_id.

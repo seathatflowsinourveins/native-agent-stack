@@ -110,10 +110,12 @@ keys() {  # rebuild the keys document for these packets; it replaces any earlier
     && python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$KEYS_DIR/rebuild" \
       --keys-out "$KEYS_DIR/rebuild-keys/packet-keys.json" >/dev/null \
     && cmp "$KEYS_DIR/rebuild/packets/SHA256SUMS" "$WORK_DIR/packets/SHA256SUMS" \
-    && mv "$KEYS_DIR/rebuild-keys/packet-keys.json" "$KEYS_DIR/packet-keys.json"
+    && mv "$KEYS_DIR/rebuild-keys/packet-keys.json" "$KEYS_DIR/packet-keys.json" \
+    || { rm -rf "$KEYS_DIR/rebuild-keys"; return 1; }   # a failed call leaves no keys document (round 8, OPR8-4)
 }
-#    Resume (any later shell): set CATALOG, WORK_DIR, BLIND_DIR, KEYS_DIR and AL again, cd "$CATALOG", and
-#    define packets_args and keys as above (never rewrite wave.env); every step below then runs unchanged.
+#    Resume (any later shell): set CATALOG, WORK_DIR, BLIND_DIR, KEYS_DIR and AL again, cd "$CATALOG", define
+#    packets_args and keys as above and run packets_args once (never rewrite wave.env), which sets WAVE_DATE and
+#    WAVE_MANIFEST; every step below then runs unchanged (round 8, OPR8-3).
 
 # 2. Blind export: only what the packets reference, labels stripped, no .git.
 #    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
@@ -196,6 +198,7 @@ keys && python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$
 #    (tests/test_handbook_summary.py checks them): make those edits first. After any later edit, a remedy below
 #    included, run the registration block and evidence_manifest.py --write again before the checks (round 7,
 #    OPR7-6).
+packets_args   # WAVE_DATE and WAVE_MANIFEST, also in a resumed shell (round 8, OPR8-3)
 python3 scripts/component_matrix.py --write
 python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "${WAVE_DATE//-/}" \
   --checked-at "$WAVE_DATE" --manifest "$WAVE_MANIFEST"
@@ -227,6 +230,9 @@ python3 scripts/evidence_manifest.py --write
 #      real label; a REVIEWED_EVIDENCE_PATHS entry, with its reason, in export_isolation_check.py for an evidence
 #      list; REMOVE_GLOBS last, listing the evidence references the rebuilt packets then drop (their withheld);
 #    - packet_role_label_hits, a packet field on exactly the winners: withhold it in lane_packets.py.
+#    Each remedy edits a verdict-review-gate trust file, and the gate refuses rules that change beside verdict data
+#    (round 8, OPR8-2). So land it first as a rules-only PR (the edit and its tests, no wave files); then, on the
+#    merged main, rebuild this wave's step-7 outputs, re-check, and open the wave PR on top.
 #    record_label_hits, evidence_role_word_hits, packet_evidence_field_hits and the prose exposure are reported,
 #    not failed (round 7, OPR7-2: intrinsic fields such as license isolate a new winner by coincidence); note any
 #    real label among them in the PR. tests/test_blind_checkout.py runs the failing check in CI.
@@ -242,9 +248,9 @@ git worktree remove --force "$CHECK_DIR/hosts/blind/checkout"
 #    The validate job's offline steps, in its order (zizmor, actionlint, the secret scan and the network checks
 #    run in CI only; round 7, OPR7-4):
 (cd examples/claude-native/workflows && sha256sum --check --strict SHA256SUMS)
-python3 scripts/release_due.py --strict-if-repinned origin/main
 python3 scripts/validate.py
 python3 scripts/host_receipts.py validate
+python3 scripts/release_due.py --strict-if-repinned origin/main
 python3 scripts/validate_catalogs.py
 python3 scripts/validate_foundation.py --root . --json
 python3 scripts/landscape.py --root .
@@ -253,11 +259,11 @@ python3 scripts/validate_convergence.py --all-recorded --root . --json
 python3 tools/sota-convergence/build_verdicts.py --check
 python3 scripts/component_matrix.py --check
 python3 scripts/new_host_grand_list.py --check
+python3 scripts/verdict_flip_candidates.py
 python3 tools/sota-convergence/gap_crosswalk.py build --check
 python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 \
   --owner gap-resolution --check
 python3 scripts/build_ecosystem.py --check
-python3 scripts/verdict_flip_candidates.py
 python3 -m unittest
 node --test blueprints/native-skill-practice/test-contract.cjs
 #    The verdict-review-gate job runs the base commit's gate against the committed wave, so commit first:

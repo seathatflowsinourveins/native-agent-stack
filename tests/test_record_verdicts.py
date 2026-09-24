@@ -1611,7 +1611,11 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(code, 0, output)
         exposure_path = self.sealed_base() / PROSE_EXPOSURE_NAME
         exposure = json.loads(exposure_path.read_text(encoding="utf-8"))
-        self.assertEqual(exposure["measured_against"], "the ledger before this wave's rows were written")
+        self.assertEqual(exposure["measured_against"], "the ledger before each layer's row was written")
+        # Each measure records what it was measured on (round 8, NEW-2).
+        entry = exposure["layers"][f"{catalog}::wave-same-layer"]
+        self.assertEqual(entry["lane_root_tree_sha256"], REPO_TREE_SHA256)
+        self.assertEqual(entry["packet_sha256"], self.run_manifest()["packets"][0]["packet_sha256"])
         self.assertIn(f"{catalog}::wave-same-layer", exposure["layers"])
         self.assertEqual(self.run_manifest()["prose_exposure_sha256"],
                          hashlib.sha256(exposure_path.read_bytes()).hexdigest())
@@ -1632,6 +1636,39 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         (self.root / relative).write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
         with self.assertRaisesRegex(Exception, "prose_exposed"):
             build_landscape(self.root)
+
+    def test_the_sealed_prose_exposure_is_bound_and_never_adopted(self):
+        # Round 8, NEW-2: a pre-placed document was adopted, an append laundered an edit, and an append without the
+        # export measured nothing.
+        catalog = self.both_lanes("wave-same-layer")
+        exposure = self.sealed_base() / PROSE_EXPOSURE_NAME
+        exposure.parent.mkdir(parents=True)
+        exposure.write_text(json.dumps({"schema_version": 1, "layers": {}}), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "exists before the wave's first --write"):
+            self.run_wave()
+        exposure.unlink()
+        self.assertEqual(self.run_wave()[0], 0)
+        exposure.write_text(exposure.read_text(encoding="utf-8").replace('"scored": false', '"scored": true'),
+                            encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "edited"):
+            self.run_main(write=False, run_id=NEW_RUN)
+        self.assertEqual(catalog, "foundation")
+
+    def test_an_append_without_the_export_is_refused(self):
+        self.both_lanes("wave-same-layer")
+        self.assertEqual(self.run_wave()[0], 0)
+        work_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp.cleanup)
+        self.work_dir = Path(work_temp.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        self.both_lanes("wave-append-layer")
+        args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22",
+                "--run-id", NEW_RUN, "--append-rows", "foundation/wave-append-layer", "--write"]
+        keys = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if keys.is_file():
+            args += ["--packet-keys", str(keys)]
+        with self.assertRaisesRegex(SystemExit, "measures its rows' prose exposure"):
+            record_verdicts.main(args)
 
     def test_a_new_wave_without_its_exposure_inputs_is_refused(self):
         # Codex review of #145 at 68e74f2c: without --lane-repo-root a new wave sealed no prose exposure at all.
@@ -2212,8 +2249,16 @@ class ReviewOf122Tests(NewWaveFixture):
         held = next(entry for entry in manifest["packets"] if entry["layer_id"] == "wave-same-layer")
         self.assertEqual(held, first_manifest["packets"][0])
         for relative, data in first_sealed.items():
-            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS", "packet-keys.json")):
+            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS", "packet-keys.json",
+                                      "prose-exposure.json")):
                 self.assertEqual((self.root / relative).read_bytes(), data, relative)
+        # The prose exposure is extended the same way: the held layer's measure is carried unchanged, and the appended
+        # layer is measured at the append, before its row (round 8, NEW-2).
+        first_exposure = json.loads(first_sealed[f"{NEW_SEALED_BASE}/prose-exposure.json"])
+        exposure = json.loads((self.sealed_base() / "prose-exposure.json").read_text(encoding="utf-8"))
+        self.assertEqual(exposure["layers"]["foundation::wave-same-layer"],
+                         first_exposure["layers"]["foundation::wave-same-layer"])
+        self.assertIn("foundation::wave-append-layer", exposure["layers"])
         # The wave's packet-keys document is extended like SHA256SUMS: the held packet's entry is carried unchanged.
         first_keys = json.loads(next(data for relative, data in first_sealed.items()
                                      if relative.endswith("packet-keys.json")))["packets"]

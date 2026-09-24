@@ -3,7 +3,7 @@
   {
    "adjudicate_py_sha256": "ea79735f8a75218abfa5ec4413a9123476dece549630cd15a63079a3f818d675",
    "adjudicator_role_sha256": "f6f68e3a672c94612ebf89efcfc8b5d8f9688e8783b01170a300d8f40bbfb18e",
-   "codex_lane_py_sha256": "121d36787c86fe2c70533669b42306ecc0a5e841289fc47f50e36954d1e4e8aa",
+   "codex_lane_py_sha256": "b48bb785f37c4ef89f601aa2b2e6ce1994565fa92a32ef127c2b26a7e923b5a4",
    "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
    "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
    "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
@@ -97,7 +97,7 @@
    "registered_at": "2026-09-23"
   },
   {
-   "codex_lane_py_sha256": "121d36787c86fe2c70533669b42306ecc0a5e841289fc47f50e36954d1e4e8aa",
+   "codex_lane_py_sha256": "b48bb785f37c4ef89f601aa2b2e6ce1994565fa92a32ef127c2b26a7e923b5a4",
    "prompt_sha256": "9b8a8364f13ff3fcb9fc690198c4ca8849c29cc12b81e8526121a46114517f54",
    "registered_at": "2026-09-24"
   }

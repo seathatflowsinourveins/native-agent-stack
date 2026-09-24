@@ -1181,19 +1181,27 @@ def load_packet_keys(path) -> dict:
     return document
 
 
-def prose_exposure_text(root: Path, work_dir: Path, lane_root, packet_keys: dict) -> str:
-    """The wave's sealed prose exposure (independent review of #145, round 7, BL7-2): which exported prose files state
-    each layer's winner, measured with export_isolation_check.prose_exposure against the ledger as it stands before
-    this wave's rows are written, over the export the lanes read (``lane_root``) and this run's packets."""
+def prose_exposure_layers(root: Path, work_dir: Path, lane_root, packet_keys: dict, only=None) -> dict:
+    """The wave's prose exposure by layer (independent review of #145, round 7, BL7-2): which exported prose files
+    state each layer's winner, measured with export_isolation_check.prose_exposure against the ledger as it stands
+    before these rows are written, over the export the lanes read (``lane_root``) and this run's packets. Each entry
+    records what it was measured on (round 8, NEW-2): its packet's sha256, the export's tree and the ledgers'
+    digest. ``only`` (packet names) limits it to an append's rows."""
     import export_isolation_check
     report = export_isolation_check.prose_exposure(Path(lane_root), work_dir / "packets",
                                                    export_isolation_check.ledger_winners(root), packet_keys)
-    sums = (work_dir / "packets" / "SHA256SUMS").read_bytes()
-    return sealed_text({"schema_version": 1,
-                        "measured_against": "the ledger before this wave's rows were written",
-                        "lane_root_tree_sha256": lane_root_tree(lane_root),
-                        "packets_sha256sums_sha256": hashlib.sha256(sums).hexdigest(),
-                        "layers": report})
+    ledgers = hashlib.sha256()
+    for relative in sorted(LEDGER_FILES.values()):
+        ledgers.update(f"{relative}\0{hashlib.sha256((root / relative).read_bytes()).hexdigest()}\n".encode("utf-8"))
+    tree = lane_root_tree(lane_root)
+    layers = {}
+    for layer, entry in report.items():
+        name = layer.replace("::", "__", 1) + ".json"
+        if only is not None and name not in only:
+            continue
+        layers[layer] = dict(entry, packet_sha256=hashlib.sha256((work_dir / "packets" / name).read_bytes()).hexdigest(),
+                             lane_root_tree_sha256=tree, ledgers_sha256=ledgers.hexdigest())
+    return layers
 
 
 def manifest_component_ids(manifest: dict) -> set:
@@ -1388,18 +1396,53 @@ def main(argv=None) -> int:
     exposure_text = None
     if not grandfathered:
         retained_exposure = root / sealed_base / PROSE_EXPOSURE_NAME
-        if retained_exposure.is_file():
+        if manifest_path.is_file():
+            # An append or a --check reads the exposure the wave's earlier --write measured, only as its run manifest
+            # binds it (round 8, NEW-2: a retained document was adopted unverified, so an append laundered an edit).
+            bound = json.loads(manifest_path.read_text(encoding="utf-8")).get("prose_exposure_sha256")
+            if not (bound and retained_exposure.is_file()
+                    and hashlib.sha256(retained_exposure.read_bytes()).hexdigest() == bound):
+                raise SystemExit(f"{sealed_base}/{PROSE_EXPOSURE_NAME} is missing, not bound by the run manifest or "
+                                 "edited; a sealed layer's prose exposure is measured once, when its row is written")
             exposure_text = retained_exposure.read_text(encoding="utf-8")
-        elif write_mode and args.lane_repo_root and packet_keys is not None:
-            exposure_text = prose_exposure_text(root, work_dir, args.lane_repo_root[0], packet_keys)
-        elif write_mode and args.lane_repo_root:
-            pass  # without --packet-keys the sealed packets are refused below, with that reason
-        else:
+            if write_mode and only is not None:
+                # An append measures its own rows now, before they are written: for them the ledger is still pre-wave.
+                if not args.lane_repo_root or packet_keys is None:
+                    raise SystemExit("an --append-rows --write measures its rows' prose exposure: pass --lane-repo-root "
+                                     "and --packet-keys")
+                held = json.loads(exposure_text)
+                measured = prose_exposure_layers(root, work_dir, args.lane_repo_root[0], packet_keys, only)
+                again = sorted(set(measured) & set(held.get("layers") or {}))
+                if again:
+                    raise SystemExit(f"{PROSE_EXPOSURE_NAME} already measured {again}")
+                exposure_text = sealed_text(dict(held, layers={**(held.get("layers") or {}), **measured}))
+        elif retained_exposure.exists():
+            raise SystemExit(f"{sealed_base}/{PROSE_EXPOSURE_NAME} exists before the wave's first --write; this recorder "
+                             "did not measure it: remove it")
+        elif not (write_mode and args.lane_repo_root):
             # Every new wave discloses it (Codex review of #145 at 68e74f2c): a wave written without it could never
             # gain it, since a later --check reads only what the first --write sealed.
             raise SystemExit(f"a new wave records its prose exposure: --write needs --lane-repo-root (the export the "
                              f"lanes read) and --packet-keys, and --check needs the wave's {PROSE_EXPOSURE_NAME}")
+        elif packet_keys is not None:
+            # Measured now, before any row is written: the incumbents are those the lanes' export showed.
+            exposure_text = sealed_text({"schema_version": 1,
+                                         "measured_against": "the ledger before each layer's row was written",
+                                         "layers": prose_exposure_layers(root, work_dir, args.lane_repo_root[0],
+                                                                         packet_keys, only)})
+        # (Without --packet-keys the sealed packets are refused below, with that reason.)
     exposure_doc = json.loads(exposure_text) if exposure_text is not None else None
+    if exposure_doc is not None:
+        # Each of this run's layers was measured over its packet here and the export these lanes read (round 8,
+        # NEW-2).
+        for packet in sorted((work_dir / "packets").glob("*__*.json")):
+            if only is not None and packet.name not in only:
+                continue
+            entry = (exposure_doc.get("layers") or {}).get(packet.stem.replace("__", "::", 1))
+            if not isinstance(entry, dict) or entry.get("packet_sha256") != hashlib.sha256(packet.read_bytes()).hexdigest():
+                raise SystemExit(f"{PROSE_EXPOSURE_NAME} holds no measure of {packet.name} as this run holds it")
+            if lane_root_trees and entry.get("lane_root_tree_sha256") not in lane_root_trees.values():
+                raise SystemExit(f"{PROSE_EXPOSURE_NAME} measured {packet.name} over another tree than --lane-repo-root")
 
     rejections: list = []
     sealed_writes: list = []
@@ -1494,7 +1537,7 @@ def main(argv=None) -> int:
             # Never overwrite a sealed file with other bytes; only the manifest and the retained
             # SHA256SUMS are extended by an append.
             replaceable = {manifest_path, root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS",
-                           root / sealed_base / PACKET_KEYS_NAME}
+                           root / sealed_base / PACKET_KEYS_NAME, root / sealed_base / PROSE_EXPOSURE_NAME}
             conflicts = sorted(sealed_path.relative_to(root).as_posix() for sealed_path, text in sealed_writes
                                if sealed_path not in replaceable and sealed_path.is_file()
                                and sealed_path.read_text(encoding="utf-8") != text)

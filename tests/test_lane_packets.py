@@ -1179,6 +1179,16 @@ class RealPacketProseTests(unittest.TestCase):
         for sentence in ("selected destination runtime", "selected live-primary"):
             self.assertNotIn(sentence, self.text)
 
+    def test_joined_proper_nouns_are_redacted_but_paths_are_not(self):
+        # Round 8, REG8-4: '-' and '/' join words; only a path token keeps its segments.
+        matcher = lane_packets.candidate_matcher(
+            [{"name": "Qlib", "repository": "https://github.com/microsoft/qlib"}],
+            catalog_candidates=[{"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader"}])
+        self.assertEqual(matcher.sub("<candidate>", "a Nautilus-native adapter"), "a <candidate>-native adapter")
+        self.assertEqual(matcher.sub("<candidate>", "Qlib/Nautilus parity"), "<candidate>/<candidate> parity")
+        path = "see blueprints/us-equities/engine-Nautilus/spy-parity/verdict.json here"
+        self.assertEqual(matcher.sub("<candidate>", path), path)
+
     def test_the_status_rules(self):
         cases = {"Failed-turn usage is retained.": False, "Default examples use model API credentials;": False,
                  "Default random/K-fold validation is inappropriate.": False, "Selected-file handoff bundles": False,
@@ -1222,8 +1232,11 @@ class BlindBuildPlacementTests(unittest.TestCase):
     def test_outputs_inside_a_repository_are_refused(self):
         repo = self.scratch / "repo"
         (repo / ".git").mkdir(parents=True)
+        (self.scratch / "link-into-repo").symlink_to(repo)
         relative = "catalogs/sota-convergence/manifest-20260923.json"
-        for out, keys in ((repo / "w", self.scratch / "k" / "keys.json"), (self.scratch / "w", repo / "k.json")):
+        # Round 8, REG8-5: a symlink leading into the checkout is refused too.
+        for out, keys in ((repo / "w", self.scratch / "k" / "keys.json"), (self.scratch / "w", repo / "k.json"),
+                          (self.scratch / "link-into-repo" / "w", self.scratch / "k2" / "keys.json")):
             code, err = self.build(out, keys, relative)
             self.assertEqual(code, 2)
             self.assertIn("inside the git repository", err)

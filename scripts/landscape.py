@@ -929,7 +929,20 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(exposure_file.is_file() and hashlib.sha256(exposure_file.read_bytes()).hexdigest()
                     == run_manifest.get("prose_exposure_sha256"),
                     str(key) + f" needs {sealed_base}/{PROSE_EXPOSURE_NAME} with the run manifest's prose_exposure_sha256")
-            expected = expected_prose_exposed(json.loads(exposure_file.read_text(encoding="utf-8")), key[0], key[1])
+            exposure_doc = json.loads(exposure_file.read_text(encoding="utf-8"))
+            # This row's measure was taken over its retained packet and the export its lanes read (round 8, NEW-2).
+            measure = ((exposure_doc.get("layers") if isinstance(exposure_doc, dict) else None) or {}).get(
+                f"{key[0]}::{key[1]}")
+            row_packet = next((entry.get("packet_sha256") for entry in run_manifest.get("packets") or []
+                               if isinstance(entry, dict) and (entry.get("catalog"), entry.get("layer_id")) == key), None)
+            require(isinstance(measure, dict) and measure.get("packet_sha256") == row_packet,
+                    str(key) + f" has no measure in the wave's {PROSE_EXPOSURE_NAME} over its retained packet")
+            for lane_name, sealed_return in parsed_returns.items():
+                tree = (sealed_return.get("provenance") or {}).get("repo_tree_sha256")
+                require(tree == measure.get("lane_root_tree_sha256"),
+                        str(key) + f".lanes.{lane_name} read the tree {tree!r}, not the one its prose exposure was "
+                                   "measured over")
+            expected = expected_prose_exposed(exposure_doc, key[0], key[1])
             require("prose_exposed" in lanes_field and lanes_field.get("prose_exposed") == expected,
                     str(key) + f".lanes.prose_exposed must be {expected!r}, as the wave's {PROSE_EXPOSURE_NAME} records")
         else:

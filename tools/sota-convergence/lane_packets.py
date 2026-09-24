@@ -669,22 +669,44 @@ class CandidateMatcher:
                                + r")(?![A-Za-z0-9])", re.I) if long_terms else None
         self.short = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(short_terms, key=len, reverse=True))
                                 + r")(?![A-Za-z0-9])") if short_terms else None
-        self.exact = re.compile(r"(?<![A-Za-z0-9/._-])(?:" + "|".join(re.escape(t) for t in sorted(exact_terms, key=len, reverse=True))
-                                + r")(?![A-Za-z0-9/_-])") if exact_terms else None
+        # '-' and '/' join words ("Nautilus-native", "Codex/Claude"), so they bound a term too; only a match inside
+        # a path token is skipped (round 8, REG8-4).
+        self.exact = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(exact_terms, key=len, reverse=True))
+                                + r")(?![A-Za-z0-9])") if exact_terms else None
 
     def patterns(self):
         return [pattern for pattern in (self.long, self.short, self.exact) if pattern is not None]
 
+    def _matches(self, text: str):
+        for pattern in self.patterns():
+            for match in pattern.finditer(text):
+                if pattern is self.exact and _inside_path(text, match.start(), match.end()):
+                    continue
+                yield match
+
     def search(self, text: str) -> bool:
-        return any(pattern.search(text) for pattern in self.patterns())
+        return any(True for _ in self._matches(text))
 
     def spans(self, text: str) -> list:
-        return [match.span() for pattern in self.patterns() for match in pattern.finditer(text)]
+        return [match.span() for match in self._matches(text)]
 
     def sub(self, replacement: str, text: str) -> str:
         for pattern in self.patterns():
-            text = pattern.sub(replacement, text)
+            skip_paths = pattern is self.exact
+            text = pattern.sub(lambda match: match.group(0) if skip_paths and _inside_path(
+                match.string, match.start(), match.end()) else replacement, text)
         return text
+
+
+_PATH_TOKEN = re.compile(r"[^\s]*/[^\s]*\.[A-Za-z0-9]+")
+
+
+def _inside_path(text: str, start: int, end: int) -> bool:
+    """Whether text[start:end] sits inside a whitespace-free token that names a file path (a '/' and an extension)."""
+    left = text.rfind(" ", 0, start) + 1
+    right = text.find(" ", end)
+    token = text[left:right if right != -1 else len(text)].strip("()[]{}<>'\",;:")
+    return bool(_PATH_TOKEN.fullmatch(token.rstrip(".")))
 
 
 def _variants(value: str) -> set:
@@ -1134,8 +1156,11 @@ def main(argv=None) -> int:
         # Lanes read --out, and --keys-out names the winners: neither may sit in a repository, whose history or
         # siblings a worker can read (round 7, OPR7-5).
         for flag, place in (("--out", args.out), ("--keys-out", args.keys_out)):
+            # Both spellings: a symlink can lead into a checkout (round 8, REG8-5).
+            spellings = {Path(os.path.abspath(place)), Path(place).resolve()}
+            repository = next((str(path) for spelling in spellings for path in (spelling, *spelling.parents)
+                               if (path / ".git").exists()), None)
             absolute = Path(os.path.abspath(place))
-            repository = next((str(path) for path in (absolute, *absolute.parents) if (path / ".git").exists()), None)
             if repository:
                 print(f"lane_packets: {flag} {absolute} is inside the git repository {repository}; place a blind "
                       "build outside every repository", file=sys.stderr)

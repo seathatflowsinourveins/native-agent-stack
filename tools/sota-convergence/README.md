@@ -1719,6 +1719,37 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-8 review of 68e74f2c (regressions, binding and resume, operability, disclosure), and the
+  transcript-audit hardening ahead of round 9:**
+  - **Audit reads the raw command text again (REG8-1, REG8-3).** Round 7's reading of which spans bash expands
+    let double-quoted apostrophes, escaped quotes, heredocs and nested `sh -c` scripts hide reads; substitution,
+    `$CODEX_HOME` and inherited directories are matched in the raw text (a literal backtick in a single-quoted
+    search voids a layer again: REG7-3 is a known low). The bare word `CODEX_HOME` flags only in a command that
+    reads the environment (`printenv`, `env`, `export -p`, `declare -p`), so `rg -n CODEX_HOME docs` is benign.
+  - **Interrupted reruns (NEW-1).** A pending layer's old return is removed before its events are rewritten, and a
+    resume counts a kept return only beside a non-empty, clean event stream.
+  - **Prose exposure bound per layer (NEW-2).** Each layer's measure records its packet's sha256, the export's
+    tree and the ledgers' digest. It is taken when the layer's row is first written (a wave's first `--write`, or
+    the `--append-rows` that adds it, still before that row); a document present before the first write is
+    refused, and an append or `--check` reads the retained one only as the run manifest binds it. `landscape.py`
+    requires each row's measure to name its retained packet and its lanes' tree.
+  - **CI test scope and the step-7 remedy (OPR8-1, OPR8-2).** The real-export test asserts only the failing kinds,
+    with no winner-pinned prose assertion. A step-7 remedy edits a verdict-review-gate trust file, so it lands
+    first as a rules-only PR and the wave PR follows on the merged main.
+  - **Packet prose (REG8-4).** Another layer's proper nouns match next to `-` and `/` ("Nautilus-native",
+    "Codex/Claude"); only a path token keeps its segments. Prose placeholders are 186 spans, 76 in shared fields.
+  - **Lows taken where the code was open:** a symlink into a checkout is refused as `--out` or `--keys-out`
+    (REG8-5); `keys()` removes its rebuilt document on failure and step 7 and the resume note run `packets_args`
+    (OPR8-3, OPR8-4); step 7 follows CI's order (OPR8-6); `blind_checkout` imports `lane_packets` from its own
+    directory (OPR8-5).
+  - **Transcript audit, bound and fail-closed.** See "Claude family" above: the run record binds the transcripts to
+    the completed run, its agents and the collected result; agents must run from the export; paths compare
+    resolved; unmodelled, server-side and MCP tool calls, unreadable lines and climbing globs flag. Its tests cover
+    each evasion case, and nine mutants of its checks are all killed. The exact-id fix resolves `data-mlflow` to
+    one candidate in evaluation-experiments (the winner-change sweep then has 32 trips in 296 scenarios).
+  - **Not taken:** LOW-1 (pre-existing: a blind resume would count a clean return written by a non-blind run on the
+    same export) and R8-DIS-1/3/4 (exposure over-reporting through generic table headers, sentence-start capitals,
+    two OTel role strings) stay disclosed lows.
 - **Codex review at 68e74f2c:**
   - **Claude read boundary (P1).** A Claude judge or lane agent could open the sibling lane returns next to its
     input. Both Claude-family surfaces are now audited on their agents' transcripts (see "Claude family" above).

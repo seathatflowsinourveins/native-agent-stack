@@ -206,7 +206,9 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
         return False
     if audit_roots is not None:
         events_path = out_path.parent / "events" / f"{out_path.stem}.jsonl"
-        if not events_path.is_file() or audit_is_flagged(blind_audit(events_path, audit_roots)):
+        # A child always emits events: an empty stream is a truncated one (round 8, NEW-1), never a clean audit.
+        if not events_path.is_file() or not parse_events(events_path.read_text(encoding="utf-8", errors="replace")) \
+                or audit_is_flagged(blind_audit(events_path, audit_roots)):
             return False
     try:
         data = load_json(out_path)
@@ -306,13 +308,14 @@ VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]
 # directory argument (``rg -l x ${TMPDIR}``, ``cp -r $SSL_CERT_DIR .``; round 6, REG6-3). A child's TMPDIR is a fresh,
 # empty directory of its run home, so it names no lane data either way.
 INHERITED_DIRECTORY = re.compile(r"\$\{?(?:TMPDIR|SSL_CERT_DIR|SSL_CERT_FILE|OLDPWD)\b\}?")
-# The bare name too (``printenv CODEX_HOME | xargs dirname``; round 7, ISO-R7-9).
-CODEX_HOME_REFERENCE = re.compile(r"\$?\{?\bCODEX_HOME\b[^\s'\"]*")
+CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
+# A command that reads the environment, where the Codex home's path is (``printenv CODEX_HOME | xargs dirname``;
+# round 7, ISO-R7-9). The bare word in a search (``rg -n CODEX_HOME docs``) is not one (round 8, REG8-3).
+ENVIRONMENT_READ = re.compile(r"(?:^|[\s;&|(`'\"])(printenv|env|export\s+-p|declare\s+-p)(?=$|[\s;&|)`'\"])")
 COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
-# These three match the shell-active text only: the script a ``sh -c`` wrapper runs, with its single-quoted spans
-# removed, since bash expands nothing inside single quotes (round 7, REG7-3/ISO-R7-7: ``rg -n '`component_id`' docs``
-# is a read inside the export).
-SHELL_WRAPPERS = ("sh", "bash", "zsh", "dash")
+# All of these match the raw command text (round 8, REG8-1): a stricter reading of which spans bash expands let
+# double-quoted apostrophes, escaped quotes, heredocs and nested shells hide reads. A literal backtick in a
+# single-quoted search pattern is voided too (REG7-3, a known low: a benign void is cheaper than a missed read).
 PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
@@ -330,18 +333,6 @@ EXECUTABLE_TOKEN = re.compile(r"(?:^|;|&&|\|\||\||\n|\b(?:ba|z|da)?sh\s+-l?c\s+[
 # kept with data and is flagged (round-2 review).
 SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/")
 EXEMPT_PATHS = ("/dev/null",)
-
-
-def shell_active_text(command: str) -> str:
-    """The text of ``command`` a shell expands: a ``sh -c``/``-lc`` wrapper's script, else the command, with its
-    single-quoted spans emptied."""
-    try:
-        argv = shlex.split(command)
-    except ValueError:
-        argv = []
-    script = (argv[2] if len(argv) >= 3 and Path(argv[0]).name in SHELL_WRAPPERS and argv[1] in ("-c", "-lc")
-              else command)
-    return re.sub(r"'[^']*'", "''", script)
 
 
 def audit_is_flagged(report: dict) -> bool:
@@ -417,12 +408,12 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
             # (independent review of #145, BIND-R4-7).
             reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
-            active = shell_active_text(command)
-            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(active)]
-            # A blind child never needs its CODEX_HOME, and a command substitution builds a path the event does not
-            # show (round 6, ISO-R6-2).
-            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(active)]
-            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(active)][:1]
+            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
+            # A blind child never needs its CODEX_HOME or the environment, and a command substitution builds a path
+            # the event does not show (round 6, ISO-R6-2).
+            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
+            reasons += [f"reads the environment: {match}" for match in ENVIRONMENT_READ.findall(command)]
+            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
             reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
@@ -1100,6 +1091,9 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         events_path = events_dir / f"{name}.jsonl"
         if STOP.is_set():
             return
+        # The layer is pending, so its old return does not count: remove it before its events are rewritten, so an
+        # interrupted rerun never leaves it beside a truncated, clean-looking stream (round 8, NEW-1).
+        out_path.unlink(missing_ok=True)
         events_path.write_text("", encoding="utf-8")
 
         succeeded = False

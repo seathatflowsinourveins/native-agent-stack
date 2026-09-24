@@ -834,6 +834,34 @@ class InterruptionTests(CodexLaneFixture):
                     self.run_lane(["--model", "gpt-6-astra", "--effort", "high"])
                 self.assertEqual(len(self.argv_calls()), 1, "a kept return with flagged or missing events reruns")
 
+    def test_an_interrupted_rerun_never_leaves_a_countable_old_return(self):
+        # Round 8, NEW-1: the rerun truncated the events and was interrupted, leaving the old return beside an empty,
+        # clean-looking stream that the next resume counted.
+        packet_path = self.write_packet("foundation", "native-clients")
+        codex_dir = self.work_dir / "codex"
+        (codex_dir / "events").mkdir(parents=True)
+        out_path = codex_dir / "foundation__native-clients.json"
+        out_path.write_text(json.dumps(canned_return(
+            packet_sha256=hashlib.sha256(packet_path.read_bytes()).hexdigest(),
+            provenance=codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo),
+            model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})), encoding="utf-8")
+        events_path = codex_dir / "events" / "foundation__native-clients.jsonl"
+        events_path.write_text(self.FLAGGED, encoding="utf-8")
+        os.environ["CODEX_FAKE_TERM_PARENT_MATCH"] = "foundation__native-clients"
+        os.environ["CODEX_FAKE_TERM_SLEEP"] = "30"
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            self.run_lane(["--model", "gpt-6-astra", "--effort", "high"])
+        self.assertFalse(out_path.exists(), "the rerun removed the old return before rewriting its events")
+        # And a kept return beside an empty stream is never counted.
+        out_path.write_text(json.dumps(canned_return(
+            packet_sha256=hashlib.sha256(packet_path.read_bytes()).hexdigest(),
+            provenance=codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo),
+            model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})), encoding="utf-8")
+        events_path.write_text("", encoding="utf-8")
+        self.assertFalse(codex_lane.existing_output_is_valid(
+            out_path, "foundation", "native-clients", hashlib.sha256(packet_path.read_bytes()).hexdigest(),
+            audit_roots=[str(self.repo)]))
+
     def test_a_stop_with_jobs_2_writes_no_return_and_starts_no_retry(self):
         self.write_packet("foundation", "a-layer")
         self.write_packet("foundation", "b-layer")
@@ -1103,15 +1131,21 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         # Round 7, ISO-R7-8: the homes' base is private.
         self.assertEqual(oct(codex_lane.codex_home_base().stat().st_mode & 0o777), "0o700")
 
-    def test_round7_audit_reads_only_shell_active_text(self):
-        # REG7-3/ISO-R7-7: bash expands nothing inside single quotes; ISO-R7-9: the bare name CODEX_HOME.
+    def test_the_audit_reads_the_raw_command_text(self):
+        # Round 8, REG8-1: a narrower reading of what bash expands hid reads; the raw text is matched. REG8-3: the
+        # bare word CODEX_HOME in a search is benign, reading the environment is not.
         events = self.work_dir / "active-events.jsonl"
-        commands = {"/bin/bash -lc \"rg -n '`component_id`' docs catalogs\"": False,
-                    "/bin/bash -lc \"rg -n --fixed-strings '$(' tools\"": False,
+        commands = {"/bin/bash -lc \"rg -n CODEX_HOME docs\"": False,
                     "/bin/bash -lc \"rg -n 'CODEX_HOME' docs\"": False,
                     "/bin/bash -lc 'cat $(dirname x)/y'": True,
+                    "/bin/bash -lc \"echo \\\"it's\\\" $(pwd)\"": True,
+                    "/bin/bash -lc \"cat <<EOF\n$(cat evidence/x)\nEOF\"": True,
+                    "/bin/bash -c \"sh -c 'ls $CODEX_HOME'\"": True,
                     "/bin/bash -lc 'printenv CODEX_HOME | xargs dirname'": True,
-                    "/bin/bash -lc 'rg -l winner ${TMPDIR}'": True}
+                    "/bin/bash -lc 'env | grep HOME'": True,
+                    "/bin/bash -lc 'rg -l winner ${TMPDIR}'": True,
+                    # A known low (REG7-3): a literal backtick in a single-quoted pattern is voided too.
+                    "/bin/bash -lc \"rg -n '`component_id`' docs\"": True}
         for command, flagged in commands.items():
             events.write_text(json.dumps({"type": "item.completed", "item": {
                 "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
