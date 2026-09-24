@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "e21847a0b76840639216177fefb89682b518221d8c5e686a0b57db0d777f99b4",
-      "bytes": 1062213
+      "sha256": "2b9dc0fd80da25f1eb30442087d7e7eb3e8735f19e14d0fdc74490d923885052",
+      "bytes": 1061957
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -23950,8 +23950,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
-      "sha256": "913e4f203d0354b7d4071a82e7579cfc4d60157b77e01c14b01d2c882689fa5d",
-      "bytes": 1655
+      "sha256": "da2873ea8322fb8674302860163b3bc4453336fc3f40bfcfd1bb347592b17ec6",
+      "bytes": 1840
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
@@ -26560,8 +26560,8 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/atilaahmettaner-tradingview-mcp.json",
-      "sha256": "7289dadba1268bc919ede0489dd8d0f8344811346a6506805f588869fd36f0e6",
-      "bytes": 2236
+      "sha256": "c16d129dd839f938f64230b197cdf9b1f157585a92471130f78a795fc7ea844a",
+      "bytes": 2092
     },
     {
       "path": "evidence/artifacts/source-review-20260923/blackfalcondata-org-delisted-stocks-list.json",
@@ -26580,8 +26580,8 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/coir-team-coir.json",
-      "sha256": "976b0a2973ee6b201a46d094040a101c8cf62d2a7c7105938c178c34d3463abf",
-      "bytes": 1839
+      "sha256": "badedc6c8013770cb30e0d6dba2b556e32ee193bd99326afbd3653f3d2792adc",
+      "bytes": 1876
     },
     {
       "path": "evidence/artifacts/source-review-20260923/dagger-container-use.json",
@@ -26595,8 +26595,8 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/eyuansu62-agent-retrieval-bench.json",
-      "sha256": "be300d13724b0936ddb16ca3e26113ac3e9fe16b140222e7e0879528cb4fba40",
-      "bytes": 2013
+      "sha256": "33418fba21133334f02bf41c0572ebd292fa5f5cf880ec8764eb6a33964bcead",
+      "bytes": 2022
     },
     {
       "path": "evidence/artifacts/source-review-20260923/garethgeorge-backrest.json",
@@ -26650,13 +26650,13 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/jerbouma-financedatabase.json",
-      "sha256": "7ebc5d2f079dcc830c20d9f8a8b6c85712fcd3fa789e5b82e4f57c8609abceb6",
-      "bytes": 2107
+      "sha256": "fb7274caa794fc5b861846e2ce7d4fb5a7687c6d7abc999b5439c277e7cb7b84",
+      "bytes": 2116
     },
     {
       "path": "evidence/artifacts/source-review-20260923/jerbouma-financetoolkit.json",
-      "sha256": "76bf40f5639f2d84a30bfa4407c396ac670c3895399fdff8b65a49a3acbea2a1",
-      "bytes": 2106
+      "sha256": "ebff5cbd3ccc46f162c55907dda4fd1069d8a4b5f71e3eca28b3a47e124866c6",
+      "bytes": 2111
     },
     {
       "path": "evidence/artifacts/source-review-20260923/johannesjo-parallel-code.json",
@@ -26690,8 +26690,8 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
-      "sha256": "bf8eb18ff610036e5ee16a88ae229ef6aee8a9b6f0213d5747f1b32f403c22fa",
-      "bytes": 1990
+      "sha256": "3826653e352ef145d36febbe2d89afc6ea270216f3965b1e2f98218c388e83a2",
+      "bytes": 2008
     },
     {
       "path": "evidence/artifacts/source-review-20260923/msitarzewski-agency-agents.json",
@@ -26735,13 +26735,13 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/rohitg00-agentmemory.json",
-      "sha256": "1dc83661cd88c054c09ee8f79273a770c331b76ceb8746425479f74bd6b8dd85",
-      "bytes": 1811
+      "sha256": "b6e9c6858d8d94b27e9ffa63d9c64ff4b725d0a4be00e3efedc63930c3967d4a",
+      "bytes": 1709
     },
     {
       "path": "evidence/artifacts/source-review-20260923/shiyu-coder-kronos.json",
-      "sha256": "4e9967747fd01ae789ea7dd8faeead4414ac9349a882171d80901f87adbaf8ff",
-      "bytes": 1883
+      "sha256": "06ffc0c83514dbe17d897994776a3e67b47a1067df77599835466312d8d99f78",
+      "bytes": 1888
     },
     {
       "path": "evidence/artifacts/source-review-20260923/snyk-agent-scan.json",
@@ -26775,8 +26775,8 @@
     },
     {
       "path": "evidence/artifacts/source-review-20260923/tylerjforstrom-stock-data.json",
-      "sha256": "43eca93682acd600d85a68d33a351772aa0ece9ce669950ac06f5f7d970a45a5",
-      "bytes": 1821
+      "sha256": "b30cca8700b9a024d92be7ea43cfcff89798f9dbb1ceb5e84a1fb7c1ffbdf959",
+      "bytes": 1830
     },
     {
       "path": "evidence/artifacts/source-review-20260923/untrivial-ai-agent-orchestrator.json",

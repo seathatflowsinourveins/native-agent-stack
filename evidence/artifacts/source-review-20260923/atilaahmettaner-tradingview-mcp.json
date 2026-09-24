@@ -14,7 +14,7 @@
  "documentation_excerpts": [
   {
    "source": "README.md@a1e54b07e5c21b375363607920f297c5adfbeed4",
-   "text": "TradingView MCP server \u2014 real-time market data, technical indicators, screeners, and backtesting for Claude, ChatGPT, Cursor, Copilot, and any MCP client. Stocks, crypto, forex & futures across global exchanges. Backtesting + live sentiment + Yahoo Finance + 37 technical-analysis tools \u2014 the most complete TradingView MCP toolkit, all in one server."
+   "text": "TradingView MCP server \u2014 real-time market data, technical indicators, screeners, and backtesting for Claude, ChatGPT, Cursor, Copilot, and any MCP client. Stocks, crypto, forex & futures across global exchanges."
   },
   {
    "source": "README.md@a1e54b07e5c21b375363607920f297c5adfbeed4",

@@ -18,7 +18,7 @@
   },
   {
    "source": "README.md@782f3a6537535da411fcfca1be9fcbf087ea7904",
-   "text": "The daily symbol-directory snapshot is the point-in-time universe archive: each day's diff is a free listing/delisting/ticker-change event stream. The archive only covers dates after the archiver started \u2014 which is why it runs first."
+   "text": "The daily symbol-directory snapshot is the point-in-time universe archive: each day's diff is a free listing/delisting/ticker-change event stream. [\u2026] The archive only covers dates after the archiver started \u2014 which is why it runs first."
   }
  ],
  "limitations": [

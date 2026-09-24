@@ -18,7 +18,7 @@
   },
   {
    "source": "README.md@8a1d2344de25d7ec4c5209133aed7af565874ff0",
-   "text": "If you have high volume workloads, we offer a batch processing service that has processed 1B+ pages per week \u2014 we manage the infrastructure so your workloads finish on time."
+   "text": "For the highest accuracy, pass the --use_llm flag to use an LLM alongside marker. This will do things like merge tables across pages, handle inline math, format tables properly, and extract values from forms. It works with Gemini, Claude, OpenAI-compatible, Azure, Vertex, OpenRouter, or Ollama models. By default, it uses gemini-3.5-flash. See below for details."
   }
  ],
  "limitations": [

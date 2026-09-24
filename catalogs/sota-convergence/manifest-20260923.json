@@ -14037,7 +14037,6 @@
    "open_gaps": [
     "Targeted star candidate pydantic (v2.13.5, push 2026-09-23) supports order-intent schema strictness but cannot enforce economic limits; no gate closed.",
     "empyrical-reloaded (conditional) last release 2025-06-01, last push 2025-12-12 - weak maintenance signal; cvxportfolio last release 2025-07-06, push 2026-04-27.",
-    "landscape-sweep-20260923: https://github.com/mementum/backtrader has no push since 2024-08-19 (gh api repos/mementum/backtrader: archived false; no end-of-life notice found); aging maintenance to weigh in a measured comparison, not a status change.",
     "leverage-ladder-1x/2x/4x (gates L254/L271/L288) are not repository gaps. The policy leverage-schedule-v1-20260922 is implemented (synthetic). The rungs are sequential and wait on adaptive-paper-broker-trial first ('No paper rung has run; the 1x adaptive trial comes first'). The ladder/ receipt directory does not exist yet (ls blueprints/us-equities/adaptive-paper/ladder -> missing). The 4x intraday rung also depends on the paper account's intraday margin buying power, which is a broker/account attribute and was not verified here."
    ]
   },

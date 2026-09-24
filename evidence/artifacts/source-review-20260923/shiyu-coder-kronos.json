@@ -18,7 +18,7 @@
   },
   {
    "source": "README.md@67b630e67f6a18c9e9be918d9b4337c960db1e9a",
-   "text": "Kronos is a family of decoder-only foundation models, pre-trained specifically for the \"language\" of financial markets\u2014K-line sequences. It leverages a novel two-stage framework: 1. A specialized tokenizer first quantizes continuous, multi-dimensional K-line data (OHLCV) into hierarchical discrete tokens. 2. A large, autoregressive Transformer is then pre-trained on these tokens, enabling it to se"
+   "text": "Kronos is a family of decoder-only foundation models, pre-trained specifically for the \"language\" of financial markets\u2014K-line sequences. [\u2026] It leverages a novel two-stage framework: 1. A specialized tokenizer first quantizes continuous, multi-dimensional K-line data (OHLCV) into hierarchical discrete tokens. 2. A large, autoregressive Transformer is then pre-trained on these tokens, enabling it t"
   }
  ],
  "limitations": [

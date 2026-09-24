@@ -19,7 +19,7 @@
   },
   {
    "source": "README.md@07014c986f3deadb1548c62b32c0ffbe6a81465d",
-   "text": "ARB differs from generic semantic code search in its relevance definition. A failure trace may expose a test while the needed file is its root-cause implementation; a review comment may name one file while the missing constraint lives elsewhere."
+   "text": "ARB differs from generic semantic code search in its relevance definition. [\u2026] A failure trace may expose a test while the needed file is its root-cause implementation; a review comment may name one file while the missing constraint lives elsewhere."
   }
  ],
  "limitations": [
