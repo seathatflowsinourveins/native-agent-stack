@@ -2694,50 +2694,6 @@
    ],
    "candidates": [
     {
-     "repository": "https://github.com/PaddlePaddle/PaddleOCR",
-     "source": "landscape-sweep-20260923: completeness-critic follow-up (PaddleOCR pre-labeled targeted_candidate, metrics pre-supplied) independently re-verified via gh api graphql and cross-checked against the inde",
-     "demonstrated_gap": "Direct gap-filler for the layer's own named OCR/inferred-layout gap. On opendatalab's OmniDocBench v1.6 leaderboard PaddleOCR-VL-1.6 ranks 1st Overall (96.34), ahead of MinerU2.5-Pro (95.75) and MinerU-Pipeline (86.47); on the independent Ai2 olmOCR-bench, PaddleOCR-VL scores 80.0+/-1.0 Overall (self-reported by PaddlePaddle per that table's footnote), second only to Chandra (83.1, also self-reported) and above Marker's Ai2-in-house-reproduced 76.1 and MinerU 2.5.4's self-reported 75.2.",
-     "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run PP-StructureV3 and PaddleOCR-VL-1.6, alongside poppler+MarkItDown (current winners) and Marker/MinerU/Chandra, on the project's own frozen scanned+born-digital corpus (the critic's own protocol); score text edit distance, table TEDS, and whether QMD can retrieve the source body, and record GPU/CPU cost on this WSL host. If poppler+MarkItDown with a lighter OCR fallback, or another candidate, matches PaddleOCR's accuracy at materially lower compute, PaddleOCR is not warranted.",
-     "evidence": [
-      "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
-      "gh api graphql repository(owner:\"PaddlePaddle\",name:\"PaddleOCR\") this session: stargazerCount 90099, pushedAt 2026-09-16T03:31:50Z, isArchived false, isFork false, licenseInfo Apache-2.0, latestRelease v3.7.0 @ 2026-06-11T12:09:14Z (exactly matches the critic-supplied figures)",
-      "https://github.com/PaddlePaddle/PaddleOCR",
-      "opendatalab/OmniDocBench README v1.6_full leaderboard (as quoted by the completeness critic, itself from gh api repos/opendatalab/OmniDocBench/readme): PaddleOCR-VL-1.6 Overall 96.34, rank 1",
-      "allenai/olmocr README olmOCR-bench table, fetched via gh api repos/allenai/olmocr/readme this session (cached at docret-aOTu/olmocr_bench_readme.md): PaddleOCR-VL* Overall 80.0+/-1.0; footnote: 'Results are reproduced in-house, except those marked with *, which are reported by model authors'",
-      "https://huggingface.co/PaddlePaddle/PaddleOCR-VL (WebFetch this session): ~1.0B params (0.9B VLM + 0.3B ERNIE-4.5 LM), 7,841 monthly downloads, 1.66k likes, 27 Spaces"
-     ],
-     "upstream_now": {
-      "latest": "v3.7.0",
-      "released_at": "2026-06-11",
-      "prerelease": false,
-      "pushed_at": "2026-09-16",
-      "stars": 90099,
-      "license": "Apache-2.0",
-      "archived": false,
-      "renamed_to": null
-     },
-     "adversarial_verification": {
-      "survives": true,
-      "votes": [
-       {
-        "lens": 0,
-        "refuted": false,
-        "confidence": "high",
-        "reasoning": "gh api graphql+REST: exists, resolves to itself (isFork/isMirror false, parent null), not archived. Absent from 259-entry known list and layer's 7 known_repositories. pushed_at 2026-09-16 (6d ago, within 6mo). upstream_now exact match: stars 90099, latest v3.7.0@2026-06-11T12:09:14Z, Apache-2.0, archived=false. All claimed facts independently verified."
-       },
-       {
-        "lens": 1,
-        "refuted": false,
-        "confidence": "medium",
-        "reasoning": "Fit/standing hold: PP-StructureV3/PaddleOCR-VL-1.6 emit Markdown/JSON with coordinates for poppler's OCR gap; 90,099 stars; Apache-2.0 code+weights; overturn vs poppler+MarkItDown is measurable. Correct: OmniDocBench v1.6 rank is 3rd (TeleOCR 96.91, OvisOCR2 96.47; commit 6ab5f3067e, 2026-09-11), not 1st, voiding the targeted_candidate basis; Docling (catalog layout candidate) is not an arm."
-       }
-      ]
-     },
-     "disposition": "targeted_candidate",
-     "lane": "landscape-sweep-20260923"
-    },
-    {
      "repository": "https://github.com/datalab-to/marker",
      "source": "landscape-sweep-20260923: WebSearch 'best open source PDF to Markdown document parsing library 2026 leader' + WebSearch 'MinerU vs Marker vs Docling document parsing benchmark 2026' + gh api repos/dat",
      "demonstrated_gap": "The layer's own open gap says poppler's acceptance covers only 'designed born-digital Latin pages with explicit table geometry' and that 'OCR, inferred layouts, arbitrary filings and semantic questions remain unqualified.' Marker is purpose-built for exactly that unqualified territory. On the third-party olmocr-bench (Ai2's benchmark, not Datalab's own), Marker's README reports balanced mode at 76.0% overall / 83.5% on born-digital PDFs, 'ahead of MinerU and docling,' at ~5x MinerU's pages/sec in the apples-to-apples pipeline comparison -- a direct competitor to poppler (and to known-but-non-winner docling) on the flagged OCR/layout gap.",
@@ -2824,6 +2780,50 @@
       ]
      },
      "disposition": "targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/PaddlePaddle/PaddleOCR",
+     "source": "landscape-sweep-20260923: completeness-critic follow-up (PaddleOCR pre-labeled targeted_candidate, metrics pre-supplied) independently re-verified via gh api graphql and cross-checked against the inde",
+     "demonstrated_gap": "Direct gap-filler for the layer's own named OCR/inferred-layout gap. On opendatalab's OmniDocBench v1.6 leaderboard (README at commit f133a71e9e, 2026-09-11) PaddleOCR-VL-1.6 is 3rd Overall (96.34), behind TeleOCR (96.91) and OvisOCR2 (96.47) and ahead of MinerU2.5-Pro (95.75); on Ai2's olmOCR-bench, PaddleOCR-VL scores 80.0+/-1.0 Overall (self-reported by PaddlePaddle per that table's footnote). These are leaderboard or self-reported figures, not measured here.",
+     "proposed_label": "keep_but_compare",
+     "comparison_that_would_overturn": "Run PP-StructureV3 and PaddleOCR-VL-1.6, alongside poppler+MarkItDown (current winners) and Marker/MinerU/Chandra, on the project's own frozen scanned+born-digital corpus (the critic's own protocol); score text edit distance, table TEDS, and whether QMD can retrieve the source body, and record GPU/CPU cost on this WSL host. If poppler+MarkItDown with a lighter OCR fallback, or another candidate, matches PaddleOCR's accuracy at materially lower compute, PaddleOCR is not warranted.",
+     "evidence": [
+      "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
+      "gh api graphql repository(owner:\"PaddlePaddle\",name:\"PaddleOCR\") this session: stargazerCount 90099, pushedAt 2026-09-16T03:31:50Z, isArchived false, isFork false, licenseInfo Apache-2.0, latestRelease v3.7.0 @ 2026-06-11T12:09:14Z (exactly matches the critic-supplied figures)",
+      "https://github.com/PaddlePaddle/PaddleOCR",
+      "gh api repos/opendatalab/OmniDocBench/readme?ref=f133a71e9e (2026-09-11 leaderboard update): v1.6 Overall order TeleOCR 96.91, OvisOCR2 96.47, PaddleOCR-VL-1.6 96.34, MinerU2.5-Pro 95.75",
+      "allenai/olmocr README olmOCR-bench table, fetched via gh api repos/allenai/olmocr/readme this session: PaddleOCR-VL* Overall 80.0+/-1.0; footnote: 'Results are reproduced in-house, except those marked with *, which are reported by model authors'",
+      "https://huggingface.co/PaddlePaddle/PaddleOCR-VL (WebFetch this session): ~1.0B params (0.9B VLM + 0.3B ERNIE-4.5 LM), 7,841 monthly downloads, 1.66k likes, 27 Spaces"
+     ],
+     "upstream_now": {
+      "latest": "v3.7.0",
+      "released_at": "2026-06-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-16",
+      "stars": 90099,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": true,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api graphql+REST: exists, resolves to itself (isFork/isMirror false, parent null), not archived. Absent from 259-entry known list and layer's 7 known_repositories. pushed_at 2026-09-16 (6d ago, within 6mo). upstream_now exact match: stars 90099, latest v3.7.0@2026-06-11T12:09:14Z, Apache-2.0, archived=false. All claimed facts independently verified."
+       },
+       {
+        "lens": 1,
+        "refuted": false,
+        "confidence": "medium",
+        "reasoning": "Fit/standing hold: PP-StructureV3/PaddleOCR-VL-1.6 emit Markdown/JSON with coordinates for poppler's OCR gap; 90,099 stars; Apache-2.0 code+weights; overturn vs poppler+MarkItDown is measurable. Correct: OmniDocBench v1.6 rank is 3rd (TeleOCR 96.91, OvisOCR2 96.47; commit 6ab5f3067e, 2026-09-11), not 1st, voiding the targeted_candidate basis; Docling (catalog layout candidate) is not an arm."
+       }
+      ]
+     },
+     "disposition": "keep_but_compare",
      "lane": "landscape-sweep-20260923"
     },
     {
@@ -10275,12 +10275,12 @@
      "source": "landscape-sweep-20260923: relayed by completeness critic (follow-up round: anthropics/claude-code-action), verified via gh api metadata + action.yml + README content fetch",
      "demonstrated_gap": "Layer open_gaps #2: \"No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate.\" None of the 3 current winners (worktrunk, cli/cli, difftastic) run an automated review; cli/cli only wraps `gh pr review` for a human/script to invoke. claude-code-action is the official Anthropic-authenticated action that performs that review autonomously on PR events.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run claude-code-action on a disposable repo's PR (scoped permissions contents:read, pull-requests:write) against a clean diff and a deliberately-broken diff; capture its posted review comments, its behavior on the failing diff, and its OAuth-token vs anthropic_api_key secret handling. Diff that output against (i) the local /codex:review lane and (ii) github/gh-aw's Claude-engine workflow on the identical diff, scored on review precision/recall and secret hygiene. NOT run in this pass -- see limits.",
+     "comparison_that_would_overturn": "Run claude-code-action on a disposable repo's PR (scoped permissions contents:read, pull-requests:write) against a clean diff and a deliberately-broken diff; capture its posted review comments, its behavior on the failing diff, and its OAuth-token vs anthropic_api_key secret handling. Diff that output against (i) the local /codex:review lane and (ii) github/gh-aw's Claude-engine workflow on the identical diff, scored on review precision/recall and secret hygiene. NOT run in this pass -- see limits. Prior records: the 2026-09-22 SDK/runtime sweep holds it as targeted_candidate (3 votes) with an executed CI smoke arm (catalogs/sota-convergence/sdk-runtime-coverage-20260922.json /rows/11 and /gated_items/rows/0), and decision HOST-09 (docs/harness-rules-convergence-20260922.md) keeps it unadopted until a pinned-commit check of the action repository itself is run; this comparison is that check.",
      "evidence": [
       "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
       "gh api repos/anthropics/claude-code-action -> stars 8934, pushed_at 2026-09-23T19:41:08Z, archived false, license MIT, fork false",
       "gh api repos/anthropics/claude-code-action/tags -> newest v1.0.233 (git tags run ahead of the GitHub Release object)",
-      "gh api repos/anthropics/claude-code-action/releases/latest -> tag_name v1, published_at 2025-08-26T17:01:10Z, prerelease false (older Release object; no Release exists specifically for v1.0.233)",
+      "gh api repos/anthropics/claude-code-action/releases/latest -> tag_name v1, published_at 2025-08-26T17:01:10Z, prerelease false (an older Release object; a Release for v1.0.233 also exists, published 2026-09-23T19:40:57Z)",
       "gh api repos/anthropics/claude-code-action/contents/action.yml -> claude_code_oauth_token described as \"Claude Code OAuth token (alternative to anthropic_api_key)\"",
       "gh api repos/anthropics/claude-code-action/contents/README.md -> Solutions Guide bullets \"Automatic PR Code Review\" and \"Path-Specific Reviews\""
      ],
@@ -13037,7 +13037,7 @@
      "source": "landscape-sweep-20260923: gh search repos 'RD-Agent quant' returned nothing, so queried gh api repos/microsoft/RD-Agent directly; WebFetch of the README confirmed the quant-finance scenario built on Q",
      "demonstrated_gap": "None of the 40 known repositories automate the factor+model research loop itself: qlib supplies the platform and data pipeline, and a human (or this workflow's own agents) must still manually design factors/models and run the qualification cycle. RD-Agent(Q) is Microsoft's own actively developed agentic layer performing exactly that on top of Qlib, reporting (per its own README/tech report, unverified on this project's data) roughly 2x the annualized return of benchmark factor libraries using over 70% fewer factors.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "On this project's own PIT equity universe and purged/embargoed folds: run RD-Agent(Q)'s automated factor+model co-evolution for a fixed wall-clock/compute budget against a human-run qlib LGBModel baseline workflow. Reserve a final segment before the run that RD-Agent's loop never sees (its feedback step selects iterations on the test segment's IC/ARR, so that segment is not held out), and score both on it only once, after factor/model evolution has finished: IC, realized Sharpe net of costs, and factor count. If RD-Agent's loop does not beat the human-run baseline net of its own compute cost on that untouched segment, it stays keep-but-compare.",
+     "comparison_that_would_overturn": "On this project's own PIT equity universe and purged/embargoed folds: run RD-Agent(Q)'s automated factor+model co-evolution for a fixed wall-clock/compute budget against a human-run qlib LGBModel baseline workflow. Reserve a final segment before the run that RD-Agent's loop never sees (its feedback step selects iterations on the test segment's IC/ARR, so that segment is not held out), and score both on it only once, after factor/model evolution has finished: IC, realized Sharpe net of costs, and factor count. If RD-Agent's loop does not beat the human-run baseline net of its own compute cost on that untouched segment, or does not reproduce its published return/factor-count advantage on this project's actual panel (versus the paper's benchmark), it stays keep-but-compare.",
      "evidence": [
       "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
       "https://github.com/microsoft/RD-Agent",
@@ -17462,9 +17462,9 @@
    "upstream_now values are as observed by the researcher's gh api calls during the run (2026-09-23/24 UTC), not a github_freshness.py fetch.",
    "Call counts cover the discovery agents only; refuter and critic calls are not counted here. Completed run wf_38aa6d5d-d6c: 119 agents (32 discovery, 31+31 refuters, 1 critic, 8 follow-up discovery with 8+8 refuters), 12,123,864 subagent tokens, 2,823 tool uses, 6,615 s wall clock, as reported by the workflow runtime.",
    "The completeness critic's follow-up round (8 critic-flagged layers, same two-refuter rule) is merged into this lane with the first round.",
-   "Prior documentary records of survivors (no catalog decision, so they remain candidates): PaddlePaddle/PaddleOCR is discovery_only in catalogs/landscape/claude-independent-discovery.json, where a 2026-09-21 refuter recorded PP-StructureV3 below MinerU2.5 on OmniDocBench; anthropics/claude-code-action is keep_but_compare in catalogs/sota-convergence/sdk-runtime-coverage-20260922.json (an SDK/runtime coverage study, not this layer).",
+   "Prior documentary records of survivors (no catalog decision, so they remain candidates): PaddlePaddle/PaddleOCR is discovery_only in catalogs/landscape/claude-independent-discovery.json, where a 2026-09-21 refuter recorded PP-StructureV3 below MinerU2.5 on OmniDocBench; anthropics/claude-code-action is targeted_candidate (3 votes) in catalogs/sota-convergence/sdk-runtime-coverage-20260922.json with an executed CI smoke arm (/gated_items/rows/0), and decision HOST-09 (docs/harness-rules-convergence-20260922.md) keeps it unadopted until a pinned-commit check of the action repository is run.",
    "A first run (workflow wf_28d47bbc-1b5) at lower worker effort (discovery Sonnet high, refuters Sonnet medium and Opus high) was stopped after 9 of 32 discovery returns and no refuter returns, when the effort policy changed to max for every worker. It is retained, not merged, at evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json with each returned repository, its call counts, and whether this run re-proposed it; its provider usage was not captured (unknown).",
-   "Post-review amendments (Codex cross-family review of #153, 2026-09-24), votes and survival unchanged: RD-Agent's comparison now scores on a final segment its feedback loop never sees; both TruffleHog comparisons use a controlled, revocable credential for the verification arm; MinerU's stale v1.0-era OmniDocBench figures and CJK framing are removed from its gap and comparison."
+   "Post-review amendments (Codex cross-family review of #153, 2026-09-24), votes and survival unchanged: RD-Agent's comparison now scores on a final segment its feedback loop never sees; both TruffleHog comparisons use a controlled, revocable credential for the verification arm; MinerU's stale v1.0-era OmniDocBench figures and CJK framing are removed from its gap and comparison. Final review of #153: PaddleOCR's rank-1 OmniDocBench claim is corrected to 3rd (README at f133a71e9e) and its proposed label lowered from targeted_candidate to keep_but_compare, because its fit vote's text called the rank-1 basis void while recording refuted=false; claude-code-action's comparison cites its prior records and its Release evidence is corrected; RD-Agent keeps both stay conditions."
   ]
  },
  "reconciliations": [
@@ -17718,8 +17718,8 @@
    "refuted_targeted_candidate": 91,
    "refuted_keep_but_compare": 39,
    "not_adopted_confirmed": 29,
-   "targeted_candidate": 9,
-   "keep_but_compare": 3,
+   "targeted_candidate": 8,
+   "keep_but_compare": 4,
    "refuted_not_adopted": 3,
    "keep_but_compare_unverified": 1,
    "not_adopted_unverified": 4,

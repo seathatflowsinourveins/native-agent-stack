@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "512cbb18602ee4ebe9ba793cf66926c8295e5a8cf52c47448334b3ae530f15a6",
-      "bytes": 1116799
+      "sha256": "65ff427f8598190cdb85bf50bc6979abf6f20e6f62fb6f338fb1c1855dec6513",
+      "bytes": 1117835
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
