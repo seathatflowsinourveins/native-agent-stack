@@ -1,0 +1,44 @@
+{
+ "schema_version": 1,
+ "id": "source-review-trufflesecurity-trufflehog",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/trufflesecurity/trufflehog",
+ "reviewed_commit": "4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of trufflesecurity/trufflehog at commit 4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab (license AGPL-3.0), read from README.md at that commit. Repository description: \"Find, verify, and analyze leaked credentials\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+   "text": "To learn more about TruffleHog and its features and capabilities, visit our product page."
+  },
+  {
+   "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+   "text": "We take the revenue from the enterprise product to fund more awesome open source projects that the whole community can benefit from."
+  },
+  {
+   "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+   "text": "verified: Credential confirmed as valid and active by API testing"
+  },
+  {
+   "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+   "text": "unverified: Credential detected but not confirmed valid (may be invalid, expired, or verification disabled)"
+  },
+  {
+   "source": "README.md@4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+   "text": "unknown: Verification attempted but failed due to errors, such as a network or API failure"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/trufflesecurity/trufflehog/tree/4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab",
+  "https://github.com/trufflesecurity/trufflehog/blob/4b8eb0e1e1052263d28bbfde7b4d3cb64a354aab/README.md"
+ ]
+}

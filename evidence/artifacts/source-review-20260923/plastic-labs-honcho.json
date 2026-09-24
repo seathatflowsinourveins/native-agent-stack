@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-plastic-labs-honcho",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/plastic-labs/honcho",
+ "reviewed_commit": "79cb31645f4efdef626d1bd9316a648adb5da89b",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of the repository plastic-labs/honcho at commit 79cb31645f4efdef626d1bd9316a648adb5da89b (license AGPL-3.0), read from README.md at that revision. Repository description: \"Memory library for building stateful agents\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@79cb31645f4efdef626d1bd9316a648adb5da89b",
+   "text": "Honcho is memory infrastructure for building stateful agents that understand changing people, agents, groups, projects, and ideas over time."
+  },
+  {
+   "source": "README.md@79cb31645f4efdef626d1bd9316a648adb5da89b",
+   "text": "Store messages and events, let Honcho reason in the background, then query peer representations, session context, search results, or natural-language insights from any model or framework. Use it managed at api.honcho.dev, run a local stack with honcho start, or self-host the FastAPI server yourself."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/plastic-labs/honcho/tree/79cb31645f4efdef626d1bd9316a648adb5da89b",
+  "https://github.com/plastic-labs/honcho/blob/79cb31645f4efdef626d1bd9316a648adb5da89b/README.md"
+ ]
+}

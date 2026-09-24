@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ollama-ollama",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ollama/ollama",
+ "reviewed_commit": "b2da9e468af2479058ae18c6d908ed29de410684",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of ollama/ollama at commit b2da9e468af2479058ae18c6d908ed29de410684 (license MIT), read from README.md at that commit. Repository description: \"Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@b2da9e468af2479058ae18c6d908ed29de410684",
+   "text": "The official Ollama Docker image ollama/ollama is available on Docker Hub."
+  },
+  {
+   "source": "README.md@b2da9e468af2479058ae18c6d908ed29de410684",
+   "text": "Supported integrations include Claude Code, Codex, Copilot CLI, DeepSeek Harness, Droid, and OpenCode."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/ollama/ollama/tree/b2da9e468af2479058ae18c6d908ed29de410684",
+  "https://github.com/ollama/ollama/blob/b2da9e468af2479058ae18c6d908ed29de410684/README.md"
+ ]
+}

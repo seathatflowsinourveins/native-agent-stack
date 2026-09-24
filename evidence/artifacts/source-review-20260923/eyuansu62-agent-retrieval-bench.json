@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "id": "source-review-eyuansu62-agent-retrieval-bench",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+ "reviewed_commit": "07014c986f3deadb1548c62b32c0ffbe6a81465d",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag",
+  "token-efficiency"
+ ],
+ "claim": "Source and documentation review of the repository eyuansu62/agent-retrieval-bench at commit 07014c986f3deadb1548c62b32c0ffbe6a81465d (license MIT), read from README.md at that revision. Repository description: \"Agentic code retrieval benchmark for coding agents\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@07014c986f3deadb1548c62b32c0ffbe6a81465d",
+   "text": "Agent Retrieval Bench (ARB) evaluates the context-acquisition layer of coding agents: given a real workflow signal and a repository at a frozen base commit, can a retriever find the files an agent needs to read next, or correctly decide that the repository contains no useful local context?"
+  },
+  {
+   "source": "README.md@07014c986f3deadb1548c62b32c0ffbe6a81465d",
+   "text": "ARB differs from generic semantic code search in its relevance definition. [\u2026] A failure trace may expose a test while the needed file is its root-cause implementation; a review comment may name one file while the missing constraint lives elsewhere."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/eyuansu62/agent-retrieval-bench/tree/07014c986f3deadb1548c62b32c0ffbe6a81465d",
+  "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md"
+ ]
+}

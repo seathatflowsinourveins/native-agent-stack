@@ -1,0 +1,28 @@
+{
+ "schema_version": 1,
+ "id": "source-review-clash-verge-rev-clash-verge-rev",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/clash-verge-rev/clash-verge-rev",
+ "reviewed_commit": "afc32f568ac9b3bf7c49d03238249ad4e842923a",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "hosting-services"
+ ],
+ "claim": "Source and documentation review of the repository clash-verge-rev/clash-verge-rev at commit afc32f568ac9b3bf7c49d03238249ad4e842923a (license GPL-3.0), read from README.md at that revision. Repository description: \"A modern GUI client based on Tauri, designed to run in Windows, macOS and Linux for tailored proxy experience\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@afc32f568ac9b3bf7c49d03238249ad4e842923a",
+   "text": "Clash Verge Rev does not collect any user data; configuration and logs stay on your own device. See the Privacy Policy for details."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/clash-verge-rev/clash-verge-rev/tree/afc32f568ac9b3bf7c49d03238249ad4e842923a",
+  "https://github.com/clash-verge-rev/clash-verge-rev/blob/afc32f568ac9b3bf7c49d03238249ad4e842923a/README.md"
+ ]
+}

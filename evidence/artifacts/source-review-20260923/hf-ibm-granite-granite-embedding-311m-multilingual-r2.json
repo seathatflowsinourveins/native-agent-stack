@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hf-ibm-granite-granite-embedding-311m-multilingual-r2",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2",
+ "reviewed_commit": "44399559930365213510b1ee2eb15ded83374f0e",
+ "readme_path": "README.md",
+ "license": "apache-2.0",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the model repository ibm-granite/granite-embedding-311m-multilingual-r2 at sha 44399559930365213510b1ee2eb15ded83374f0e (license apache-2.0), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@44399559930365213510b1ee2eb15ded83374f0e",
+   "text": "Model Summary: Granite-Embedding-311M-Multilingual-R2 is a 311M parameter dense embedding model from the Granite Embeddings collection for high-quality multilingual text embeddings. It produces 768-dimensional vectors with a context length of up to 32,768 tokens. The model supports 200+ languages (based on the multilingual pretraining corpus of the underlying encoder), with enhanced support for 52"
+  },
+  {
+   "source": "README.md@44399559930365213510b1ee2eb15ded83374f0e",
+   "text": "Built using contrastive fine-tuning, knowledge distillation, and model merging, the Granite Embedding 311M Multilingual R2 model is optimized to ensure strong alignment between query and passage embeddings across many languages."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2/tree/44399559930365213510b1ee2eb15ded83374f0e",
+  "https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2/blob/44399559930365213510b1ee2eb15ded83374f0e/README.md"
+ ]
+}

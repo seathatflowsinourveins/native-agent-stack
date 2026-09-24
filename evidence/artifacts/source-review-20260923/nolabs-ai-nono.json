@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nolabs-ai-nono",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/nolabs-ai/nono",
+ "reviewed_commit": "99aeb74288c3bdd6e9e3766bfa26b35e706bd672",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of the repository nolabs-ai/nono at commit 99aeb74288c3bdd6e9e3766bfa26b35e706bd672 (license Apache-2.0), read from README.md at that revision. Repository description: \"secure multiplexed execution paths for agents - zero trust, zero setup, zero latency.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@99aeb74288c3bdd6e9e3766bfa26b35e706bd672",
+   "text": "Run AI agents in a zero latency sandbox in seconds and with zero setup \u2014 Claude Code, Codex, Pi, CoPilot, Hermes, OpenCode, OpenClaw and more \u2014 nono gets you up and running within seconds, with no daemon, no container, no VM, and no disk space usage. Out of the box, nono enforces a least-privilege sandbox and supports macOS, Linux, and Windows (WSL2)."
+  },
+  {
+   "source": "README.md@99aeb74288c3bdd6e9e3766bfa26b35e706bd672",
+   "text": "From here fork the config, tweak it, theme it, make it your own, and share it with your team or the community via the nono registry."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/nolabs-ai/nono/tree/99aeb74288c3bdd6e9e3766bfa26b35e706bd672",
+  "https://github.com/nolabs-ai/nono/blob/99aeb74288c3bdd6e9e3766bfa26b35e706bd672/README.md"
+ ]
+}

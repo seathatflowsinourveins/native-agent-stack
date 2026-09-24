@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-09-20",
+  "completed_offline_on": "2026-09-23",
+  "scope": "Selected fields from the retained official-source preflight; no new network lookup, installation, or native rerun during completion.",
+  "base_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+  "components": [
+    {
+      "id": "BurntSushi/ripgrep",
+      "selected_pin": "15.2.0",
+      "current_official_source": {
+        "source_commit": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+        "release_url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
+        "latest_release_matches_selected_pin": true,
+        "verified_date": "2026-09-20",
+        "verification": "Current GitHub latest-release and selected-tag commit APIs; tagged license files read and hashed, not default-branch license inference.",
+        "license": {
+          "spdx": "MIT OR Unlicense",
+          "files": {
+            "LICENSE-MIT": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+            "UNLICENSE": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+          }
+        },
+        "license_urls": [
+          "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/LICENSE-MIT",
+          "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/UNLICENSE"
+        ],
+        "archive": {
+          "url": "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+          "sha256": "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c",
+          "verification": "Downloaded into memory, archive digest matched current release metadata, extracted executable hash matched observed host binary; no install/file extraction."
+        }
+      }
+    },
+    {
+      "id": "ast-grep/ast-grep",
+      "selected_pin": "0.45.3",
+      "current_official_source": {
+        "source_commit": "979c143639e3588c31f563091e69398683ed34f0",
+        "release_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+        "latest_release_matches_selected_pin": true,
+        "verified_date": "2026-09-20",
+        "verification": "Current GitHub latest-release and selected-tag commit APIs; tagged license files read and hashed, not default-branch license inference.",
+        "license": {
+          "spdx": "MIT",
+          "files": {
+            "LICENSE": "81471889c77b2161a3e4dcdb1b2e6ca382e485766132d92d5fe1d7497e7dd2d9"
+          }
+        },
+        "license_urls": [
+          "https://github.com/ast-grep/ast-grep/blob/979c143639e3588c31f563091e69398683ed34f0/LICENSE"
+        ],
+        "archive": {
+          "url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-x86_64-unknown-linux-gnu.zip",
+          "sha256": "f8ac830881339d1edee6b2652f54798c0f4da5a827f2db38a08ee31117783ce8",
+          "verification": "Downloaded into memory, archive digest matched current release metadata, extracted executable hash matched observed host binary; no install/file extraction."
+        }
+      }
+    },
+    {
+      "id": "tobi/qmd",
+      "selected_pin": "2.8.3",
+      "current_official_source": {
+        "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+        "release_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "latest_release_matches_selected_pin": true,
+        "verified_date": "2026-09-20",
+        "verification": "Current GitHub latest-release and selected-tag commit APIs; tagged license files read and hashed, not default-branch license inference.",
+        "license": {
+          "spdx": "MIT",
+          "files": {
+            "LICENSE": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa"
+          }
+        },
+        "license_urls": [
+          "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE"
+        ],
+        "package_source_sha256": "14462e2764e9d140afbeb3c924e6dd81c0448177e97785822e763d901d70f20b",
+        "readme_sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+        "requirements_url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "package_url": "https://registry.npmjs.org/@tobilu%2fqmd/2.8.3",
+        "package_integrity_advertised": "sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==",
+        "package_payload_downloaded": false
+      }
+    },
+    {
+      "id": "giancarloerra/socraticode",
+      "selected_pin": "1.14.0",
+      "current_official_source": {
+        "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+        "release_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+        "latest_release_matches_selected_pin": true,
+        "verified_date": "2026-09-20",
+        "verification": "Current GitHub latest-release and selected-tag commit APIs; tagged license files read and hashed, not default-branch license inference.",
+        "license": {
+          "spdx": "AGPL-3.0-only",
+          "files": {
+            "LICENSE": "644937712a0d0e36507a8739c289074625c9953668ba9ccbcfe7e74efb09a86e"
+          }
+        },
+        "license_urls": [
+          "https://github.com/giancarloerra/SocratiCode/blob/2218f25153d0f3f4a76ee240a5643dbc873e80be/LICENSE"
+        ],
+        "package_source_sha256": "0834757f6538e4a857c0b9be5357925a5160e49a60cbbb4aaecd90b6c7f23424",
+        "readme_sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d",
+        "requirements_url": "https://github.com/giancarloerra/SocratiCode/blob/2218f25153d0f3f4a76ee240a5643dbc873e80be/README.md",
+        "package_url": "https://registry.npmjs.org/socraticode/1.14.0",
+        "package_integrity_advertised": "sha512-YuE23PmDgBnUGgxE7/cpXJl4KjvtZCQuwDva2nnXq0B1V9PgG8t4zhQKqKJjSq9IPzn5igWXDNwR9KaPnSOfWA==",
+        "package_payload_downloaded": false
+      }
+    }
+  ],
+  "limits": [
+    "Release currency applies to the September 20 preflight only.",
+    "The QMD package payload was not downloaded during that preflight; later package and installation identities are in pins.json, package-lock.json, install-receipt.json and install-inventory.json.",
+    "Private host paths, accounts, active-client configuration and raw transcripts are excluded."
+  ]
+}

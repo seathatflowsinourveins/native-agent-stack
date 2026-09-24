@@ -1,0 +1,7 @@
+start 2026-09-23T18:56:25Z trial=adaptive-20260923-e2e config_sha256=77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3
+{"row_count": 480, "coverage_problems": {}, "sessions_range": ["2026-08-25", "2026-09-22"], "snapshot_sha256": "e4739154ccf3b256bf116783b4e1f7bfebf5fd5fcb5f73de4da618dd2b782e66"}
+{"status": "pass", "row_count": 480}
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "completed_no_signals", "flat": true, "native_fill_events": 0}
+end 2026-09-23T18:58:56Z runner_rc=0

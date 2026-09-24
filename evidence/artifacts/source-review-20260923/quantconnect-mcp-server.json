@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-quantconnect-mcp-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/QuantConnect/mcp-server",
+ "reviewed_commit": "1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of the repository QuantConnect/mcp-server at commit 1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c (license Apache-2.0), read from README.md at that revision. Repository description: \"Official Python MCP server for local interactions with the QuantConnect API\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c",
+   "text": "This is the OFFICIAL implementation of QuantConnect's MCP, maintained by the QuantConnect team. We recommend using the official version to ensure security of your code and API tokens. Our implementation is tested and dockerized for easy cross-platform deployment."
+  },
+  {
+   "source": "README.md@1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c",
+   "text": "This tool may interact with an \"open world\" of external entities."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/QuantConnect/mcp-server/tree/1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c",
+  "https://github.com/QuantConnect/mcp-server/blob/1f0fa4e4f465bae4cffb2d69eb4701ad1ddff20c/README.md"
+ ]
+}

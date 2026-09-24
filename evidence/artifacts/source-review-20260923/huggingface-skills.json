@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-huggingface-skills",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/huggingface/skills",
+ "reviewed_commit": "a45d887031922ddbd7af533fc735feb098963ab7",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of the repository huggingface/skills at commit a45d887031922ddbd7af533fc735feb098963ab7 (license Apache-2.0), read from README.md at that revision. Repository description: \"Give your agents the power of the Hugging Face ecosystem\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a45d887031922ddbd7af533fc735feb098963ab7",
+   "text": "The client plugin marketplaces expose the hf-cli skill as the bootstrap path for core Hub operations;"
+  },
+  {
+   "source": "README.md@a45d887031922ddbd7af533fc735feb098963ab7",
+   "text": "Each folder includes a SKILL.md file with YAML frontmatter (name and description) followed by the guidance your coding agent follows while the skill is active."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/huggingface/skills/tree/a45d887031922ddbd7af533fc735feb098963ab7",
+  "https://github.com/huggingface/skills/blob/a45d887031922ddbd7af533fc735feb098963ab7/README.md"
+ ]
+}

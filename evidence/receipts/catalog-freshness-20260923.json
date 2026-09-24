@@ -3,16 +3,21 @@
   "id": "catalog-freshness-20260923",
   "kind": "upstream_provenance",
   "component_ids": [
-    "codex"
+    "claude-code",
+    "codex",
+    "llama-cpp",
+    "mcp-inspector",
+    "openresearch",
+    "skfolio"
   ],
-  "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248) rebuilt the SOTA-convergence manifest and found 2 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+  "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35934519434) rebuilt the SOTA-convergence manifest and found 13 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
   "limitations": [
     "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
     "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
     "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) have their upstream comparison excluded; a pin change on such a row is still reported as drift (the pin comes from the local catalogs), with its fresh upstream fields empty. A component fetched successfully but with no GitHub release or tag at all is also not counted as drift.",
     "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
   ],
-  "recorded_at_utc": "2026-09-23T05:31:07Z",
-  "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248",
-  "drifted_component_count": 2
+  "recorded_at_utc": "2026-09-23T23:43:17Z",
+  "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35934519434",
+  "drifted_component_count": 13
 }

@@ -2963,9 +2963,14 @@
       "id": "catalog-freshness-20260923",
       "kind": "upstream_provenance",
       "component_ids": [
-        "codex"
+        "claude-code",
+        "codex",
+        "llama-cpp",
+        "mcp-inspector",
+        "openresearch",
+        "skfolio"
       ],
-      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248) rebuilt the SOTA-convergence manifest and found 2 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35934519434) rebuilt the SOTA-convergence manifest and found 13 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
       "limitations": [
         "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
         "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
@@ -2994,6 +2999,24 @@
         "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
       ],
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
+    },
+    {
+      "id": "wsl-retrieval-20260920",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "ast-grep",
+        "qmd"
+      ],
+      "claim": "Incomplete historical WSL fixture reference: selected receipts report 22 source checks/six commands and 70 QMD lexical checks/17 commands. Offline byte and result consistency can be checked, but missing command argv/cwd, unrecovered raw logs and unsupported historical QMD installation prevent native E2E or adoption acceptance.",
+      "limitations": [
+        "Historical reference only; not live verification, native E2E acceptance or adoption evidence. No new host/native/client acceptance follows from these artifacts.",
+        "Historical command facts omit argv and cwd. Exact raw-log locations are unavailable; no invocation was reconstructed or represented as observed.",
+        "The unchanged historical install receipt records npm --ignore-scripts --omit=optional. Future installation must use the current supported recipe with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency scripts enabled.",
+        "Both executed runner versions and the initial URI-checker failure are retained byte-for-byte. The future runner adds command provenance capture without changing past evidence.",
+        "Receipt-reported 22/70 checks and 6/17 commands describe selected local/synthetic fixtures. Five failed-attempt commands remain separate; no upstream-suite, semantic RAG, production, client or service acceptance.",
+        "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
+      ],
+      "path": "evidence/receipts/wsl-retrieval-20260920.json"
     }
   ],
   "files": [
@@ -3016,6 +3039,11 @@
       "path": ".github/main-ruleset.json",
       "sha256": "fedbe641236d9089c6d5e5f417efc8f63af7409a579458d41c98f87e00776b8f",
       "bytes": 1633
+    },
+    {
+      "path": ".github/osv-scanner-lockfiles.json",
+      "sha256": "17e278caa3aebadd81ca5d67a494253f6482ea487b87e8839545e51b1efdabb7",
+      "bytes": 8378
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3044,8 +3072,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0854b72fc1e91f0bf1feb2ced04044b49cdf09998c87d23afc16028fc5afbd21",
-      "bytes": 19983
+      "sha256": "473e24d15ca8c2d991ad25667251d18632514386cfd03c6fbf05f549aa81375a",
+      "bytes": 20376
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3089,8 +3117,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "9efab8fdab0c762ad785f751e7f267a8874f75180971463447bc13265cb21d84",
-      "bytes": 16743
+      "sha256": "2752d215e78278e4937107bf98fde5f4ad95c31a5447104417ec0cad5a176e7e",
+      "bytes": 17272
     },
     {
       "path": ".gitignore",
@@ -3099,8 +3127,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "9e0519773005b847ebc9fa1e8935765e93b74259fd7c8a4f15a4721cb7271107",
-      "bytes": 23008
+      "sha256": "35a3e985b43c6a869718cb2d7373de5b977913fc18812a33a9bbc282f2aa2e69",
+      "bytes": 25402
     },
     {
       "path": ".gitleaksignore",
@@ -3149,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b893dbed2998fa75dbed24a4e122fc78ebb814577456baa89176c972564863c1",
-      "bytes": 16601
+      "sha256": "d94bf46e40dae6b9ec49a57c6cbb17b8d3bf12aa3a5616c061d2d62c6dd6643a",
+      "bytes": 19047
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3304,18 +3332,18 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "f905ea9c5c90a5493679ff6b79a2fdabc1f44fb4998db68337c2dd175e93583d",
-      "bytes": 16611
+      "sha256": "1b65bcdc3f9424c053f00eda03c38d97e0767e1a11ed91efa93543deb46239c3",
+      "bytes": 21822
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "77c47d2dfea465a64ec7c7af8c80fe932d4bc43047d7608eee45ef13f6838a70",
-      "bytes": 5949
+      "sha256": "cde3374b1a6146d89a768fbe99d80ef934c150e0bad1a50e53bc73d3bc3c9c0e",
+      "bytes": 8312
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
-      "sha256": "61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655",
-      "bytes": 1938
+      "sha256": "7ead675d3a539b964e6d432427e5564cc9fa228e9196e715731d51c916a3acc9",
+      "bytes": 1968
     },
     {
       "path": "adoption/update.md",
@@ -3995,8 +4023,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "0c630a8bce5202fe21986e5d1eed30654a07bfc28ec9fdb475b568d2f1ff9d76",
-      "bytes": 4949
+      "sha256": "19fd6c29d75ddb583d5612054e43b4379b3d9c6a3f4dbe76e3241bead7c063d5",
+      "bytes": 5308
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -5289,6 +5317,116 @@
       "bytes": 2429
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
+      "sha256": "e15a193803dfee256bd81d303ff1b309820b42ca16b2af9252f66d7137a494b3",
+      "bytes": 6575
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
+      "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd",
+      "bytes": 11713
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+      "sha256": "a029dc2d8de56dd387202e5bffc341ad9d0a163e93f7bc01954b932f4ecf0244",
+      "bytes": 11528
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
+      "sha256": "e2a082ad9b9ada2f2382a9293718f36f2ce48d02a6acca506d5651c70d287742",
+      "bytes": 617
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-receipt.json",
+      "sha256": "8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654",
+      "bytes": 699
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/oracle.json",
+      "sha256": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c",
+      "bytes": 2300
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+      "bytes": 82463
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+      "bytes": 174
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/pins.json",
+      "sha256": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d",
+      "bytes": 1877
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
+      "sha256": "452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6",
+      "bytes": 4158
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
+      "sha256": "cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527",
+      "bytes": 12226
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
+      "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0",
+      "bytes": 14888
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
+      "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2",
+      "bytes": 15192
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
+      "sha256": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136",
+      "bytes": 126
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
+      "bytes": 111
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/recovery.md",
+      "sha256": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c",
+      "bytes": 121
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/scope.md",
+      "sha256": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67",
+      "bytes": 123
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "bytes": 1972
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
+      "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01",
+      "bytes": 6253
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-review.json",
+      "sha256": "9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423",
+      "bytes": 6338
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/verification.json",
+      "sha256": "1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe",
+      "bytes": 3872
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md",
       "sha256": "aeff50d1e1ca29825c8a6b09cbc43dea9fc094de4e666cbad4bf66f92df3cecb",
       "bytes": 5203
@@ -6484,6 +6622,51 @@
       "bytes": 553
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md",
+      "sha256": "ca7fdd9c1891ed058f9fb6ae11834b050927cbd47a65e8b7d8f230a3696b2b8f",
+      "bytes": 4513
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/config-post-liquid-9967f44d.json",
+      "sha256": "9967f44d5ec26e83664e81531101fcba0f7dce45c5cd0e7f6da48390276c3b53",
+      "bytes": 1828
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/frozen-40828dfe.SHA256SUMS",
+      "sha256": "77045c6b1ef269cd994583af8f6163fd3c10d1c943f045abe9440003fbfa0985",
+      "bytes": 60298
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/gate-result.json",
+      "sha256": "a4f70e0a3993b99630bfeffe21ffd4426de5b97a144a9bf40fe24be71ff86a6d",
+      "bytes": 1478
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/ingest-receipt.json",
+      "sha256": "187622bd71debfe7da68607f5a349ee900ca1ebeb535c8c238ad4074ec16d912",
+      "bytes": 627
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/paper-output.json",
+      "sha256": "e902f278dcc8182a9508018f616821064939d649b63d0b59d6fddecea662142d",
+      "bytes": 7722
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/quote-cadence-20260923T232026Z.json",
+      "sha256": "1a7876363013cb7fb0f0d1bd747cc26e1ac60620b4d72870dff2c29352272299",
+      "bytes": 20657
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/quote_cadence_sample.py",
+      "sha256": "291e35b7c90f9fee8c8ddb180713559916cf18181782ad714ad946a7a3e58682",
+      "bytes": 3553
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/scheduled-trial.log",
+      "sha256": "fc491ee10354a593f434da54860c7060a60b087dfac84cc662ebf927a6e9b044",
+      "bytes": 611
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/README.md",
       "sha256": "8d91fce7ff3c3217e20921e94c56987a1d258aa0e512eb7ec9a451cd776c8147",
       "bytes": 2421
@@ -6702,6 +6885,41 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/scheduled-trial.log",
       "sha256": "5a2f0def21633aa4e86ae31bb221fbed515635b1d8ebeb6a8d8cacd1680c78b2",
       "bytes": 540
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/README.md",
+      "sha256": "0e64fd2537a67d075c514879ee83b5419a348f76d2f98f53a7ae9c6aea7898ae",
+      "bytes": 2958
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/config-sip-77244c39.json",
+      "sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+      "bytes": 1470
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/frozen-fbda2409.SHA256SUMS",
+      "sha256": "2e77ad2533929c506bf2888caf900e82d71e9337c9afbebeae2b3745065f4fac",
+      "bytes": 60298
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/gate-result.json",
+      "sha256": "9bf02a80852025c506cdcbc5399b2d57c85e4de571837f72a45ca01786cb88fa",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/ingest-receipt.json",
+      "sha256": "c43be743fcce30b8982b22a64d13fc24be2ca47f6629ed728322e704b254d2d9",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/paper-output.json",
+      "sha256": "a2598f49b6b6f045d4d98922fd5e04c08ffc50234a08cc219caeb7c9a7bd289c",
+      "bytes": 31336
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/scheduled-trial.log",
+      "sha256": "9cc3aa18b3b73a9dec5e635d4c5b7c52d3a37294018ac701207b7d7bd1a71c21",
+      "bytes": 642
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -7409,6 +7627,71 @@
       "bytes": 2741
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
+      "sha256": "9ccf5b974c79fb94fe28e4968a9278f531ebc4054e67784f04eb58126bc8d5b3",
+      "bytes": 21207
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS",
+      "sha256": "8bf9a89cf74e49bb5f06ca617a1ff40f324de19e84e1544fd9138c1bb52c3533",
+      "bytes": 12450
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c5468df1.SHA256SUMS",
+      "sha256": "2ef3ccead8a01598e278b4110e9ea0909eb24646d1e17f884140132b210860be",
+      "bytes": 1044
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/plan-post.json.4500c917e11e",
+      "sha256": "4500c917e11e3d756f181432bbd297614acbfe5014d2a7e9d0c4332f87af1a51",
+      "bytes": 9003
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/plan.json.9f2942c49bbd",
+      "sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
+      "bytes": 8876
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/run.py.676a375a472a",
+      "sha256": "676a375a472a016096b56abdf95d9ba32b9fb821aee27a027b6d34094271a8e6",
+      "bytes": 89528
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/run.py.9f6c08f1835f",
+      "sha256": "9f6c08f1835fe05c3848f318f7e9ca9162fb0580231ed79fb8f1b3a14a1d1b76",
+      "bytes": 87254
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+      "sha256": "e813c655d664966a6910926d284887815d933ac81d0552d2c985aadbdb5d43dc",
+      "bytes": 13273
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-post-incomplete.json",
+      "sha256": "3e88b88012ce7e05b127d7149ba5ae5a362ef39278f42dadbf3525b2e125663e",
+      "bytes": 17732
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-refused-read-only-api.json",
+      "sha256": "cb6ece766ca5eb26f1022e9bc7e2fb566277a2e10f1a3ae101de2d2ac5d1fb5f",
+      "bytes": 5770
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/plan-post.json",
+      "sha256": "4500c917e11e3d756f181432bbd297614acbfe5014d2a7e9d0c4332f87af1a51",
+      "bytes": 9003
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/plan.json",
+      "sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
+      "bytes": 8876
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/run.py",
+      "sha256": "1b697f237275a725a0dcc39ee886c4f07aa27bfba1c2b442982b3c76b02e1012",
+      "bytes": 92700
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
       "sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30",
       "bytes": 2625
@@ -7812,6 +8095,46 @@
       "path": "blueprints/us-equities/execution-realism/run.py",
       "sha256": "d42ab4b8d6a311fd3dc033b5faba975a9e97f58965905ffe4d98c60543f6b061",
       "bytes": 8993
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/README.md",
+      "sha256": "b23721b4f8532403e90e266d0add2ef0e43244dcb82150ea0bf78b3245a0db35",
+      "bytes": 5818
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/audit.py",
+      "sha256": "17797b36cc5372eed63401b04e9b65c915d1812e993f519b2ce45b7913e4ad7f",
+      "bytes": 24332
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/deviations.json",
+      "sha256": "cdedd5e30b4b411c06f3653aea1aedae06a337581289c4f411c534f30d9bb6c5",
+      "bytes": 5627
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/fetch-log-run-20260924a.json",
+      "sha256": "e828bbdef6c53d6c630e4c2c751df46afe653c402b7361b3a07a0578ad1aef24",
+      "bytes": 198
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924a.json",
+      "sha256": "2fa638bfd43a02b71bbde3941dbd5a4695decb34f553db46f5e4d445d1ad60e1",
+      "bytes": 2188
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924b.json",
+      "sha256": "1712bf738699b3e948252ed29e34fbbefa4453dbf75e154c2235d09db3da166b",
+      "bytes": 2508
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/plan.json",
+      "sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+      "bytes": 5076
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/posthoc.py",
+      "sha256": "8ab3c71ddaaaf610c1fa104f0de351bdf4cf242330a59abb95638187cd83bcac",
+      "bytes": 6423
     },
     {
       "path": "blueprints/us-equities/financial-data/README.md",
@@ -8695,8 +9018,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "af508c44366d965993bf8269d9f3152394ae53552455fb3616dd4599f67ec448",
-      "bytes": 747906
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+      "bytes": 1118651
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -8885,8 +9208,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "fb890019006f1ad48fe71933bb3c809d18bb2d74c1b39d39fd3b26be35b4bfd6",
-      "bytes": 34172
+      "sha256": "5cfa39ba0f927505497b06a2777be7a7c001ac655b96a58095905dc7fd382cfe",
+      "bytes": 36072
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9080,8 +9403,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
-      "bytes": 19528
+      "sha256": "f9880956124e66995b9a34a47608c01a477d79b16414cd08ee4ea171508b04a2",
+      "bytes": 36779
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9170,8 +9493,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "0db04ef8bb14b8ed8d2d37c2fad7b0753c730df09d5b284b1947bc16b3fc9935",
-      "bytes": 40857
+      "sha256": "0885a5ef19e36623e41104fd8d32286ad875bcf1f1e49fcf8a8313db09600fa5",
+      "bytes": 41473
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -9390,8 +9713,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "6bc157c9a92b98e6a3b05399c7ff09e35ea6d33dbd64f8d3f35dba24a7fcdeec",
-      "bytes": 7666
+      "sha256": "84a0dc27cba7f857a0a3a3fa96c30eeb68abb6d4b9ed7edd9fe79d22f74f0e3a",
+      "bytes": 8472
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -9475,8 +9798,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "47f0f8c2957a7b7906210766e7ce5eced81c019202ccb24f85249ea33bfb4539",
-      "bytes": 157126
+      "sha256": "a351cca93e2eb079d52a92d8fb270c527d8ae92d6058f21928e4019b897331ed",
+      "bytes": 157375
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -9495,8 +9818,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "3529b37f86b01619c718282c0d5208160bb25cb7f9120cc87b50eca9bc18dfee",
-      "bytes": 34723
+      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
+      "bytes": 35942
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -9685,13 +10008,13 @@
     },
     {
       "path": "evidence/artifacts/catalog-freshness-20260923/drift.md",
-      "sha256": "ba8563ad05c077cf5403822314efe246a408edc279c800279bb8d1960cd6c282",
-      "bytes": 5789
+      "sha256": "9c9706c7296fd68c459276e66d616f04ac5b698196c35d1d921f8757be0510e3",
+      "bytes": 9091
     },
     {
       "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
-      "sha256": "24be193752ce980c04aa2f70ce4f1200263532015da8742367eb4376f307e267",
-      "bytes": 165458
+      "sha256": "ec6f40a94567c8f0a95a3d22688ec7cefc412ef97de94f99a2803676e6954290",
+      "bytes": 166445
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -9892,6 +10215,11 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json",
+      "sha256": "28126926ceded78069556007c47379ab2f3568d6eb9ae2a44734671e0f171a59",
+      "bytes": 17599
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
@@ -23799,6 +24127,76 @@
       "bytes": 7401
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
+      "sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
+      "bytes": 14819
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_38aa6d5d-d6c.json",
+      "sha256": "865fe3ad94f8cc0e8690e6f6b78b1b74dde5b9883fe2df12b52226a4c029bddc",
+      "bytes": 94478
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
+      "sha256": "369f69715b1406408622925de72b8cb809c87f1125d52ebbb47cd1f176ce953a",
+      "bytes": 6345
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+      "sha256": "3def2204893bc2df60d65a50ef5a9d2d2494d8a9c3bbf56f53ce85a6bb35d257",
+      "bytes": 3133
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/betterleaks-betterleaks.json",
+      "sha256": "c01632833de3bd4700416f250eab5d1a18cfad84add3fcba4382a895956c7e24",
+      "bytes": 2039
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
+      "sha256": "c283eb9a8c254f61311d7640ae8ecc59d1873bddd55b65d6f54f3d7c98d303fd",
+      "bytes": 2278
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
+      "sha256": "ee102a697e91aecef91e6170cbe3d8071dee81328eab0b44af08f3aa6776407a",
+      "bytes": 1543
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/grafana-tempo.json",
+      "sha256": "35fa627ba09194e9b2dd119963f46373e38ea90b6ce71a86ce34a8acd552f176",
+      "bytes": 1810
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json",
+      "sha256": "770faea1a967a524e5060c5d6ef34d3b2963b972d0d751d90d98729a2ff883d4",
+      "bytes": 1862
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
+      "sha256": "d99c0ee451e3128a13a744fa3c1121f9cf5d58dcfe15f0f23dc6737b6c64086f",
+      "bytes": 2121
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/ollama-ollama.json",
+      "sha256": "a21bc0b12ec95c1b8631852be2f4e1d6088114c05e51f53f2394d4952444b504",
+      "bytes": 1563
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
+      "sha256": "76e52c9ecae5e87f8006ee8e2b85117fbd2b611b25a633a8ab1c8d0124838d0b",
+      "bytes": 1877
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
+      "sha256": "3571f9400d931202581a357fba4172100a40311af86bed8829946f6fc17be3ea",
+      "bytes": 1846
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
+      "sha256": "3c66c6ba6d3ab26c5dd0dc8bd75c7fc42417f5333268fd37b3ef7656f4c5c973",
+      "bytes": 2174
+    },
+    {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
       "sha256": "ea63e60442960a996b29432e74465859bd25fe381b54ca66cbc2bf61856de178",
       "bytes": 879
@@ -26354,6 +26752,261 @@
       "bytes": 2564
     },
     {
+      "path": "evidence/artifacts/source-review-20260923/afrojuju1-nautilus_trader.json",
+      "sha256": "76327812cf9c997eea46093a1dad1597cf66cf949d39fcb18b6fe736f857c99e",
+      "bytes": 2989
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/alibaba-open-code-review.json",
+      "sha256": "42e881b52cb1c0479fb4d52a994b23014af0e10ac5b9673e1a1b427c48e178a2",
+      "bytes": 2246
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/anthropics-claude-agent-sdk-typescript.json",
+      "sha256": "5bb2664a0ac85c3966b9b9ff93f93e985a7e3a895f15fe78234c1ff4b5502f77",
+      "bytes": 1726
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/askalf-truecopy.json",
+      "sha256": "d8f93a741717941ae4ff397db8402f51b2d33703d39904ef69bc231695517ccf",
+      "bytes": 1744
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/atilaahmettaner-tradingview-mcp.json",
+      "sha256": "c16d129dd839f938f64230b197cdf9b1f157585a92471130f78a795fc7ea844a",
+      "bytes": 2092
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/blackfalcondata-org-delisted-stocks-list.json",
+      "sha256": "6656a2c521581a8595665add2761e3785c1fa846a4ee8db78319a755ed7e098a",
+      "bytes": 1826
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/casey-just.json",
+      "sha256": "2499dcc2330ab27f83e0e190758aab5b4937868fa08dca67ce637efaa0ee7b7d",
+      "bytes": 1507
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/clash-verge-rev-clash-verge-rev.json",
+      "sha256": "ae9cd5e70b25cb0bf6d052fd3a3103cc25f677f78e2951f08cd16301acdb1b20",
+      "bytes": 1568
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/coir-team-coir.json",
+      "sha256": "badedc6c8013770cb30e0d6dba2b556e32ee193bd99326afbd3653f3d2792adc",
+      "bytes": 1876
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/dagger-container-use.json",
+      "sha256": "abaec4bd3ad564aecf88f2e5d902009f41b6da67dc90f00e4495812fdd83022b",
+      "bytes": 1884
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/edtechre-pybroker.json",
+      "sha256": "d227409e22239ec807e4e10fb988e0ba6b7eb14af818fe4ab190ebd6856058d9",
+      "bytes": 3008
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/eyuansu62-agent-retrieval-bench.json",
+      "sha256": "33418fba21133334f02bf41c0572ebd292fa5f5cf880ec8764eb6a33964bcead",
+      "bytes": 2022
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/garethgeorge-backrest.json",
+      "sha256": "b4d384ce35d65672cd3147ff50ff6d82ca16502b3d215a5f6da9beeb32ae6e7a",
+      "bytes": 2851
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/generalaction-emdash.json",
+      "sha256": "9ef80b3e23a35b49a4bccc3fe9b75c2c01fcd774d11bd75ac431e2925e6f9651",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/ggml-org-llama.cpp.json",
+      "sha256": "0d4fe83038fd90ee5e81160e62d28a97e9e811362813dfc0f30ff563d312ae74",
+      "bytes": 1375
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-google-gemma-4-26b-a4b-it.json",
+      "sha256": "c0a23cd83f250d49aaf2d657a544ac3000737fd7755abcc1715287f5c554e71b",
+      "bytes": 2009
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-ibm-granite-granite-embedding-311m-multilingual-r2.json",
+      "sha256": "965a0f49bf91f6587794d361f72a2ee6e81a360b262d0193674ccf0320cbb71f",
+      "bytes": 2131
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-kalm-embedding-kalm-reranker-v1-nano-r2.json",
+      "sha256": "1f2b07252539170f620870a010c4188d6f2b9c1ca424d7f8caf88f8c3b0b8e26",
+      "bytes": 2494
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-microsoft-harrier-oss-v1-0.6b.json",
+      "sha256": "8d13e431d90da064c01da56687f1e28331c4785baf9e93dbf2c584950eb07804",
+      "bytes": 2001
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-nvidia-nemotron-3-embed-1b-nvfp4.json",
+      "sha256": "098f8ef58c6e18081eacee6d9916c31c8591918c9e3be14d319d7326570d9437",
+      "bytes": 2022
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/hf-qwen-qwen3.6-35b-a3b.json",
+      "sha256": "2a6cf9fc8253f903a839527c22093b19d96fc478d1effa7f34ec5514c26eaa43",
+      "bytes": 1737
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/huggingface-skills.json",
+      "sha256": "3fce9932025804207677efc6e6bab2c133f2e2481e983e778283e17100a61858",
+      "bytes": 1678
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/jerbouma-financedatabase.json",
+      "sha256": "fb7274caa794fc5b861846e2ce7d4fb5a7687c6d7abc999b5439c277e7cb7b84",
+      "bytes": 2116
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/jerbouma-financetoolkit.json",
+      "sha256": "ebff5cbd3ccc46f162c55907dda4fd1069d8a4b5f71e3eca28b3a47e124866c6",
+      "bytes": 2111
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/johannesjo-parallel-code.json",
+      "sha256": "d7d482206545ada660a9e5ff5026a46de3f217fe43c71c54a77df014ee12c443",
+      "bytes": 1645
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/john-friedman-datamule-python.json",
+      "sha256": "c9ee62d817e26bf8577563e63f783efac7467330de1eb83aa50afe5d3b86e97f",
+      "bytes": 1718
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/kopia-kopia.json",
+      "sha256": "ac07d2c36922b994b4101e916979b86387f12ef59d25d1050582d921a713131e",
+      "bytes": 2264
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/loopx-project-loopx.json",
+      "sha256": "c1e5d6e1a1289eb9762c087b9e0605294812b9983261c95fd335788c1ef0f0e8",
+      "bytes": 1971
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/memorilabs-memori.json",
+      "sha256": "d69f20a0cc0453679ce69b8eb34210fd62746dbf539afaa89e7697b19c460a39",
+      "bytes": 1759
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/mhallsmoore-qstrader.json",
+      "sha256": "d2270253a832d54102c4b39c00d3ee7b4738c8690937a70a580df2513c014b7d",
+      "bytes": 1673
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/microsoft-skillopt.json",
+      "sha256": "3826653e352ef145d36febbe2d89afc6ea270216f3965b1e2f98218c388e83a2",
+      "bytes": 2008
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/msitarzewski-agency-agents.json",
+      "sha256": "fdf03d0573b77c81b544d5bdf23bddcbcdb087c12895e5bbfee1d82001f54c5f",
+      "bytes": 1887
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/nexting-ai-nexting.json",
+      "sha256": "40fecca8293f971a7f66e40b45cf692595a4d65e5c0c20be610d588ec08ff490",
+      "bytes": 2082
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/nolabs-ai-nono.json",
+      "sha256": "41ab389c6a53d3388b373182dc8b72dd562d099cc2fd3e924d95ef72c587f3c8",
+      "bytes": 1912
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/opensandbox-group-opensandbox.json",
+      "sha256": "64304303b4d888a7bd607e30c3c5b9ffdc50038e29f874dd9688227fed20bb44",
+      "bytes": 3503
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/plastic-labs-honcho.json",
+      "sha256": "9eb9983d8b1ad9a3492e5896b4d3cca741c3f0f2e5c881efae2d870654e6d204",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/pst-group-pysystemtrade.json",
+      "sha256": "cf6e3544e17de78207be2f69f6251f216b214c6a0ec205b157509eac7ed3139d",
+      "bytes": 1737
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/quantconnect-mcp-server.json",
+      "sha256": "6cb8e48df591e0c6e60c7c173f439bf837e341f79e3aba9e7a0aa111df91de3f",
+      "bytes": 1791
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/restatedev-restate.json",
+      "sha256": "d3d3ed98b5bf40cf94affb13826e22668b893cbb31f09868fad16f6d38720945",
+      "bytes": 1697
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/rohitg00-agentmemory.json",
+      "sha256": "b6e9c6858d8d94b27e9ffa63d9c64ff4b725d0a4be00e3efedc63930c3967d4a",
+      "bytes": 1709
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/shiyu-coder-kronos.json",
+      "sha256": "06ffc0c83514dbe17d897994776a3e67b47a1067df77599835466312d8d99f78",
+      "bytes": 1888
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/snyk-agent-scan.json",
+      "sha256": "82cd93c467cb6799763c178cd4721282ef0a702b7a9a5f4c26008c159efd0def",
+      "bytes": 2077
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/stefan-jansen-machine-learning-for-trading.json",
+      "sha256": "734c1f183099eda212ceef20ff660258fffe7653a98e54ea1de7fed51991575a",
+      "bytes": 1956
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/stefan-jansen-pyfolio-reloaded.json",
+      "sha256": "365a4cefcd6b09f5a9cd61287b288a0cebc60c9fbbcae3144c09a8d674835b65",
+      "bytes": 1788
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/storybloq-storybloq.json",
+      "sha256": "98d1f4969e3100eaf36b3c72cae637d3cb11afae41fd17d1d578ef900640d5ec",
+      "bytes": 1979
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/temporalio-sdk-python.json",
+      "sha256": "2d001125e063e210cea57d2ce72bf1abee3bec592b3460e778c680fe97256b98",
+      "bytes": 1655
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/tw93-mole.json",
+      "sha256": "e491a4ded660c992956ffa2d9147a7175695a593ac21e37807fcf6bbb9e788ea",
+      "bytes": 2693
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/tylerjforstrom-stock-data.json",
+      "sha256": "b30cca8700b9a024d92be7ea43cfcff89798f9dbb1ceb5e84a1fb7c1ffbdf959",
+      "bytes": 1830
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/untrivial-ai-agent-orchestrator.json",
+      "sha256": "899d155269fed6359f45e1918b4b428dcfb9dd5c31ad6b481c96a5f5bd81fdb9",
+      "bytes": 2049
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/zilliztech-claude-context.json",
+      "sha256": "febfec52a3be1e156a375860fd7a3b4296881fef1f4d6c34d4f3d7a9b42b9f9d",
+      "bytes": 1706
+    },
+    {
+      "path": "evidence/artifacts/source-review-20260923/zouuup-landrun.json",
+      "sha256": "6cedfb4eaa10ba3e1680ab769d9259782abcbf177496ca31ed3d9753f2657265",
+      "bytes": 2639
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -26550,8 +27203,8 @@
     },
     {
       "path": "evidence/receipts/catalog-freshness-20260923.json",
-      "sha256": "b952a45d650cffda3fe5eb0967d9adda29d2d420b00224a0852bb3540d5961a5",
-      "bytes": 1996
+      "sha256": "8598a451bb1b3415528153293c3418e823b40e0d25a4eae160c2d8494494fc50",
+      "bytes": 2090
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
@@ -27019,6 +27672,11 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-retrieval-20260920.json",
+      "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
+      "bytes": 2455
+    },
+    {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
       "sha256": "150c1d59848e227df6886863473838a032cd17b9e28303dedf8dcb2e4f1112d4",
       "bytes": 1013
@@ -27455,8 +28113,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e492c6f40ad527c6b1a2991996083e2a2362e55a4d50be83c2b7a0881720b7b6",
-      "bytes": 10505
+      "sha256": "90827450efd0a4ab2736e3c7d32cf5060d6504350f24d43a0572c5364bd2bc35",
+      "bytes": 11257
     },
     {
       "path": "observability/native-data/README.md",
@@ -27515,8 +28173,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "64a91a01eeaf500aa5eff8e51738e91d29faf60fd28e913cecc4eac9dd69f20b",
-      "bytes": 58202
+      "sha256": "e592060d0ab43d680eb2f9771cf2b89dd5a8d1b5809a50ec31603842704fe40e",
+      "bytes": 59537
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -27530,8 +28188,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
-      "bytes": 16440
+      "sha256": "8edc71e983a2d42ee50cc717530b5750bc5b80b2b621c9cd8feb1c31c59795f3",
+      "bytes": 16871
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -27765,8 +28423,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "bf515ac2b8cd6900809cfa16ffb4da9f09a495fd1e10ed30e273e37a4292e66d",
-      "bytes": 30901
+      "sha256": "3764227feeb48844f7f51052ea9bb5747f564354975835a9980b0f77944564ff",
+      "bytes": 40864
     },
     {
       "path": "tests/test_adoption_launchd.py",
@@ -27880,13 +28538,18 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
-      "bytes": 10546
+      "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
+      "bytes": 27591
     },
     {
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
+    },
+    {
+      "path": "tests/test_extreme_gainer_audit.py",
+      "sha256": "bfdf6e71700f259bdec3df2381328d07d0eb5c85622bf8a6d09a613de1cc75a4",
+      "bytes": 15815
     },
     {
       "path": "tests/test_financial_data.py",
@@ -27915,8 +28578,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "49138ec57925d5d94c64b92df08eeea2dfdec5cdf95229f9d91a08225399e77e",
-      "bytes": 31926
+      "sha256": "7ae277702e707230df21041df67d9fb212463bf8c560b3a018c617863d9a185f",
+      "bytes": 37816
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -27952,6 +28615,11 @@
       "path": "tests/test_ibkr_acceptance.py",
       "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
       "bytes": 15483
+    },
+    {
+      "path": "tests/test_ibkr_paper_orders.py",
+      "sha256": "787be818d3b4e5693597979da34fa09683697275de146520ccc438c3b897afc6",
+      "bytes": 67010
     },
     {
       "path": "tests/test_install_claude_profile.py",
@@ -28059,6 +28727,11 @@
       "bytes": 6602
     },
     {
+      "path": "tests/test_osv_lockfile_coverage.py",
+      "sha256": "102a785b580beb023f0d2c7ea7713058c074d613c74ae2453593d319f1aa85a7",
+      "bytes": 7346
+    },
+    {
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
@@ -28160,8 +28833,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "13928d7689e1796be5ef78c5d897700db0d4f2837fb171849253dc3374a2619b",
-      "bytes": 38080
+      "sha256": "7ecbde4156ce4484091e33cd934636755ed6a14b764aa6a3100dc5164d2d408b",
+      "bytes": 42344
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -28187,6 +28860,11 @@
       "path": "tests/test_wsl_restore.py",
       "sha256": "9df52e8b163627955662dadf5ca72ab19b1db6ab340a29522fb8b69faa928833",
       "bytes": 4442
+    },
+    {
+      "path": "tests/test_wsl_retrieval.py",
+      "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903",
+      "bytes": 12720
     },
     {
       "path": "tests/test_zizmor_negative_control.py",
@@ -28290,10 +28968,9 @@
     }
   ],
   "convergence_records": [
-    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
+    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
@@ -28306,6 +28983,8 @@
     "blueprints/convergence-practice/native-worker/experiment.json",
     "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
-    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json"
+    "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
   ]
 }

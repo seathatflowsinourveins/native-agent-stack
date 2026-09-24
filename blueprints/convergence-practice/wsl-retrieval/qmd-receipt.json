@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "mode": "qmd",
+  "started_utc": "2026-09-20T08:28:44.238682+00:00",
+  "platform": {
+    "system": "Linux",
+    "architecture": "x86_64",
+    "python": "3.12.3"
+  },
+  "checks": {
+    "node_binary_hash": true,
+    "node-version_exit": true,
+    "node_version": true,
+    "qmd_package_version": true,
+    "qmd_license_hash": true,
+    "qmd_entrypoint_hash": true,
+    "package_lock_hash": true,
+    "no_optional_llama_backends": true,
+    "qmd-version_exit": true,
+    "native_qmd_version": true,
+    "qmd-add-primary_exit": true,
+    "qmd-add-decoy_exit": true,
+    "qmd-positive-0_exit": true,
+    "qmd-positive-0_uri_scope": true,
+    "qmd-positive-0_paths": true,
+    "qmd-positive-0_body": true,
+    "qmd-positive-0_bound": true,
+    "qmd-positive-1_exit": true,
+    "qmd-positive-1_uri_scope": true,
+    "qmd-positive-1_paths": true,
+    "qmd-positive-1_body": true,
+    "qmd-positive-1_bound": true,
+    "qmd-positive-2_exit": true,
+    "qmd-positive-2_uri_scope": true,
+    "qmd-positive-2_paths": true,
+    "qmd-positive-2_body": true,
+    "qmd-positive-2_bound": true,
+    "qmd-positive-3_exit": true,
+    "qmd-positive-3_uri_scope": true,
+    "qmd-positive-3_paths": true,
+    "qmd-positive-3_body": true,
+    "qmd-positive-3_bound": true,
+    "qmd-positive-4_exit": true,
+    "qmd-positive-4_uri_scope": true,
+    "qmd-positive-4_paths": true,
+    "qmd-positive-4_body": true,
+    "qmd-positive-4_bound": true,
+    "qmd-negative-0_exit": true,
+    "qmd-negative-0_uri_scope": true,
+    "qmd-negative-0_paths": true,
+    "qmd-negative-1_exit": true,
+    "qmd-negative-1_uri_scope": true,
+    "qmd-negative-1_paths": true,
+    "qmd-bounded-get_exit": true,
+    "qmd_get_exact_bounded_line": true,
+    "qmd-reopen_exit": true,
+    "qmd-reopen_uri_scope": true,
+    "qmd-reopen_paths": true,
+    "qmd-reopen_body": true,
+    "qmd-reopen_bound": true,
+    "qmd-update_exit": true,
+    "qmd-updated_exit": true,
+    "qmd-updated_uri_scope": true,
+    "qmd-updated_paths": true,
+    "qmd-updated_body": true,
+    "qmd-updated_bound": true,
+    "qmd-old-marker_exit": true,
+    "qmd-old-marker_uri_scope": true,
+    "qmd-old-marker_paths": true,
+    "qmd-deleted_exit": true,
+    "qmd-deleted_uri_scope": true,
+    "qmd-deleted_paths": true,
+    "single_owned_database": true,
+    "qmd_database_integrity": true,
+    "qmd_active_scope_count": true,
+    "qmd_no_embedding_rows": true,
+    "qmd_no_model_files": true,
+    "qmd_entrypoint_and_lock_unchanged": true,
+    "frozen_inputs_unchanged": true,
+    "owned_commands_completed": true
+  },
+  "facts": [
+    {
+      "label": "node-version",
+      "exit_code": 0,
+      "stdout_bytes": 9,
+      "stdout_sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version_output": "v24.21.0"
+    },
+    {
+      "label": "qmd-version",
+      "exit_code": 0,
+      "stdout_bytes": 20,
+      "stdout_sha256": "f2fde0f2ce1957393ab2348fc31dae60a39e4684689ae9e95845a0ee5d8396ab",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version_output": "qmd 2.8.3 (facd35e)"
+    },
+    {
+      "label": "qmd-add-primary",
+      "exit_code": 0,
+      "stdout_bytes": 326,
+      "stdout_sha256": "7bdd2a55526343b6aa85e6336ed9eb74c51f3794e43d2488bd201478737eb5ef",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "qmd-add-decoy",
+      "exit_code": 0,
+      "stdout_bytes": 320,
+      "stdout_sha256": "3a178b5fc0fa235d209337060dbb8ac3fabdb5d5f97df52f443bc57553c60344",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "qmd-positive-0",
+      "exit_code": 0,
+      "stdout_bytes": 313,
+      "stdout_sha256": "cc9759016eb06cc9d36de187f5034771cdf775e7e972ee0ce504acab89f242ea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Cobaltcheckpoint",
+      "rows": [
+        {
+          "docid": "#01e6fe",
+          "score": 0,
+          "file": "qmd://wsl-primary/recovery.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Recovery contract",
+          "body": "# Recovery contract\nCobaltcheckpoint must execute exactly once after restart.\nThe receipt preserves the checkpoint hash.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-positive-1",
+      "exit_code": 0,
+      "stdout_bytes": 312,
+      "stdout_sha256": "5c59d6d043370d946b7bb4cba33a736f7e7f2f361fe2d34c02c75071915e0458",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Amberproject",
+      "rows": [
+        {
+          "docid": "#983ff5",
+          "score": 0.46,
+          "file": "qmd://wsl-primary/scope.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Scope boundary",
+          "body": "# Scope boundary\nAmberproject decisions belong only to the selected project.\nNo automatic transcript capture is permitted.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-positive-2",
+      "exit_code": 0,
+      "stdout_bytes": 304,
+      "stdout_sha256": "026399b0ecab4a88aac82ac55a5886b0d879b257dfebacd9811f41b04f05c302",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Willowunicode",
+      "rows": [
+        {
+          "docid": "#cb36cd",
+          "score": 0.45,
+          "file": "qmd://wsl-primary/notes/aéé.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Unicode note",
+          "body": "# Unicode note\nWillowunicode keeps café text and source provenance.\nThe five-byte directory example is aéé.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-positive-3",
+      "exit_code": 0,
+      "stdout_bytes": 316,
+      "stdout_sha256": "bfd128f9ea6c36c0c5b88ddc671f2192ffae7cd2a529139e9a7c7ae95b654dac",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "restart Cobaltcheckpoint",
+      "rows": [
+        {
+          "docid": "#01e6fe",
+          "score": 0.46,
+          "file": "qmd://wsl-primary/recovery.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Recovery contract",
+          "body": "# Recovery contract\nCobaltcheckpoint must execute exactly once after restart.\nThe receipt preserves the checkpoint hash.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-positive-4",
+      "exit_code": 0,
+      "stdout_bytes": 304,
+      "stdout_sha256": "407b0db66c4be5bb364fe56a1d19fcbfe4683f1b8c18efd141665a1e5804b928",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "café Willowunicode",
+      "rows": [
+        {
+          "docid": "#cb36cd",
+          "score": 0.62,
+          "file": "qmd://wsl-primary/notes/aéé.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Unicode note",
+          "body": "# Unicode note\nWillowunicode keeps café text and source provenance.\nThe five-byte directory example is aéé.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-negative-0",
+      "exit_code": 0,
+      "stdout_bytes": 3,
+      "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "__wsl_retrieval_absent_20260920__",
+      "rows": []
+    },
+    {
+      "label": "qmd-negative-1",
+      "exit_code": 0,
+      "stdout_bytes": 3,
+      "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Boundarydecoy",
+      "rows": []
+    },
+    {
+      "label": "qmd-bounded-get",
+      "exit_code": 0,
+      "stdout_bytes": 102,
+      "stdout_sha256": "24c3baa17784a03ea22d9e1229c9848c0bf937d3d41f683aac93f5c072ab36d0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": "qmd://wsl-primary/recovery.md  #01e6fe\n---\n\nCobaltcheckpoint must execute exactly once after restart.\n"
+    },
+    {
+      "label": "qmd-reopen",
+      "exit_code": 0,
+      "stdout_bytes": 313,
+      "stdout_sha256": "cc9759016eb06cc9d36de187f5034771cdf775e7e972ee0ce504acab89f242ea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Cobaltcheckpoint",
+      "rows": [
+        {
+          "docid": "#01e6fe",
+          "score": 0,
+          "file": "qmd://wsl-primary/recovery.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Recovery contract",
+          "body": "# Recovery contract\nCobaltcheckpoint must execute exactly once after restart.\nThe receipt preserves the checkpoint hash.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-update",
+      "exit_code": 0,
+      "stdout_bytes": 560,
+      "stdout_sha256": "dcdb78dcb08d621a9e82097ba52c46cb80ab666f37fe18ddf513c933dbfaeb2a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "qmd-updated",
+      "exit_code": 0,
+      "stdout_bytes": 304,
+      "stdout_sha256": "afbda08777ecc07efebe6ab291b20cf9979911612c583c5dc5a1c1a022d71a28",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Cedarreplacement",
+      "rows": [
+        {
+          "docid": "#70683f",
+          "score": 0.35,
+          "file": "qmd://wsl-primary/recovery.md?index=wsl-retrieval-fixture",
+          "line": 2,
+          "title": "Recovery contract",
+          "body": "# Recovery contract\nCedarreplacement records the updated recovery decision.\nThe old marker has been retired.\n"
+        }
+      ]
+    },
+    {
+      "label": "qmd-old-marker",
+      "exit_code": 0,
+      "stdout_bytes": 3,
+      "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Cobaltcheckpoint",
+      "rows": []
+    },
+    {
+      "label": "qmd-deleted",
+      "exit_code": 0,
+      "stdout_bytes": 3,
+      "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "query": "Amberproject",
+      "rows": []
+    }
+  ],
+  "frozen_inputs": {
+    "oracle.json": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c",
+    "package-lock.json": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+    "package.json": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+    "pins.json": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d",
+    "run.py": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2",
+    "seed/corpus/decoy/other.md": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136",
+    "seed/corpus/primary/notes/aéé.md": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
+    "seed/corpus/primary/recovery.md": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c",
+    "seed/corpus/primary/scope.md": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67",
+    "seed/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+  },
+  "global_or_client_changes": false,
+  "inference_invoked": false,
+  "whole_task_provider_usage": null,
+  "os_confinement_established": false,
+  "cleanup": {
+    "persistent_services_started": 0,
+    "timed_out_commands": 0
+  },
+  "database": {
+    "integrity": "ok",
+    "active_documents": 3,
+    "content_vectors_table": true,
+    "content_vector_rows": 0
+  },
+  "model_files_in_run": [],
+  "passed": true,
+  "finished_utc": "2026-09-20T08:28:46.519057+00:00",
+  "native_commands": 17,
+  "frozen_file_mapping": {},
+  "publication_note": "Only mapping to the retained executed runner filename was added; private historical receipt and frozen inputs remain unchanged."
+}

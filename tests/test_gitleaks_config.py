@@ -23,6 +23,7 @@ class).
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -50,6 +51,14 @@ GH_PAT_SHAPED_VALUE = "".join(_GH_PAT_SHAPE_PARTS)
 CURSOR = "QU1EfER8MTU5NTkwODgwMDAwMDAwMDAwMA=="
 
 GITLEAKS = shutil.which("gitleaks")
+
+
+class GitleaksPresenceTests(unittest.TestCase):
+    def test_gitleaks_is_on_path_when_the_ci_step_requires_it(self):
+        """The secret-scan job sets GITLEAKS_TESTS_REQUIRED and puts the pinned binary on PATH; without
+        it the allowlist tests below would silently skip there, as they do in the validate job."""
+        if os.environ.get("GITLEAKS_TESTS_REQUIRED"):
+            self.assertIsNotNone(GITLEAKS, "GITLEAKS_TESTS_REQUIRED is set but gitleaks is not on PATH")
 
 
 class _LockBusy(Exception):
@@ -228,6 +237,78 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "the same base64-shaped value under an unrelated 'api_key' field must be detected "
                 "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
+
+    def _manifest_fixture(self, target: Path, relative: str, extra: dict) -> None:
+        """A manifest-shaped file whose text names Sourcegraph, so the sourcegraph-access-token
+        rule's keyword is present and its 40-hex pattern is live for every value in the file."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        rows = [{"id": "a", "pin": HEX40}, {"id": "b", "pin": f"1.0.6 @ {HEX40}"},
+                {"evidence": ["https://sourcegraph.com/blog/announcing-scip"]}, extra]
+        path.write_text(json.dumps({"foundation": rows}, indent=1))
+
+    def test_d_manifest_pin_commit_ids_are_not_detected(self):
+        """The dated SOTA manifest's "pin" git commit ids (plain or "<version> @ <id>") are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260923.json", {})
+            findings = self._scan(target)
+            self.assertEqual([f for f in findings if f["RuleID"] == "sourcegraph-access-token"], [],
+                             "pin commit ids in the reviewed manifest must not be flagged")
+
+    def test_d2_other_fields_and_other_paths_stay_detected(self):
+        """Only "pin" lines of that exact file are exempt: the same 40-hex under another field in the
+        file, and the same pin lines in any other file, are still sourcegraph-access-token findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260923.json", {"token": HEX40})
+            self._manifest_fixture(target, "catalogs/sota-convergence/manifest-20260924.json", {})
+            findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
+            by_file = {}
+            for f in findings:
+                by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260923.json", [])), 1,
+                             f"the non-pin token line in the reviewed manifest must still be detected: {by_file}")
+            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
+                             f"pin lines outside the exact reviewed path must still be detected: {by_file}")
+
+    # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
+    # .gitleaks.toml entry pins by value.
+    REVIEWED_FINGERPRINTS = ["ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db", "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0", "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1", "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9"]
+
+    def _fingerprint_fixture(self, target: Path, relative: str, extra: dict, values=None) -> None:
+        """The shape of ai-memory's scheduled-learning report: 64-hex rejection fingerprints under "key"."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        rows = [{"key": value, "count": 10 - i} for i, value in enumerate(values or self.REVIEWED_FINGERPRINTS[:2])]
+        report = {"learning": {"report": {"aggregate": {"repeated_rejection_fingerprints": rows}, **extra}}}
+        path.write_text(json.dumps(report, indent=2))
+
+    def test_e_memory_rejection_fingerprints_are_not_detected(self):
+        """ai-memory's SHA-256 rejection fingerprints in the reviewed evidence file are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {})
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], "rejection fingerprints in the reviewed file must not be flagged")
+
+    def test_e2_other_fields_and_other_paths_stay_detected(self):
+        """Only the reviewed digests on whole "key" lines of that exact file are exempt: an unreviewed 64-hex
+        "key" value and an api_key in the same file, and the same lines in another file, are still findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            # The reviewed file: one exempt digest, one unreviewed 64-hex "key" value, and an api_key.
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {"api_key": HEX64},
+                                      values=[self.REVIEWED_FINGERPRINTS[0], HEX64[::-1]])
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260924.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "generic-api-key":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260923.json", [])), 2,
+                             f"the unreviewed key value and the api_key in the reviewed file must be detected: {by_file}")
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
+                             f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.

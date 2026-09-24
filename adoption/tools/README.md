@@ -2,12 +2,12 @@
 
 Two host-local launchers that keep a heavy maintenance job, and every process it
 spawns, inside its own native systemd scope with hard memory, task and runtime
-limits. They exist because an unbounded scan or build on a WSL2 host can exhaust
+limits, plus a CPU quota where the user manager delegates the cpu controller. They exist because an unbounded scan or build on a WSL2 host can exhaust
 the VM and take the whole session down; the scope kills the job instead.
 
 | Script | Role |
 | --- | --- |
-| `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied. Refuses to run at all when it cannot contain the job. |
+| `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied, and `CPUQuota` where cpu is delegated (see "CPU quota" below). Refuses to run at all when it cannot contain the job. |
 | `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
 
 ## Provenance
@@ -31,6 +31,17 @@ the VM and take the whole session down; the scope kills the job instead.
   `61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655`. Compare
   against *that* value when checking this repository's file, and against the
   `66db06f6…` value when checking a copy taken straight from the source host.
+- Re-synced 2026-09-24 for the CPU quota (see "CPU quota" below). The change
+  was made on the source host first and copied here. Before it, the host's
+  runner hashed `77c47d2d…`, identical to this repository's copy, so the host had
+  already received the 2026-09-22 divergence fixes described below.
+  - `ecosystem-bounded-run` is byte-for-byte identical to the host runner:
+    `cde3374b1a6146d89a768fbe99d80ef934c150e0bad1a50e53bc73d3bc3c9c0e`.
+  - `gitleaks-guarded` gained one line on both sides, `unset
+    ECOSYSTEM_JOB_CPU_QUOTA`, and still differs from its source on lines 5 and
+    6 only. The host source now hashes
+    `0a645ac84a6a2172526ca968bfb7c83616194d145054fab6c190bd57a56e3703`, and this repository's copy hashes
+    `7ead675d3a539b964e6d432427e5564cc9fa228e9196e715731d51c916a3acc9`.
 
 ### Exact lines changed in `gitleaks-guarded`
 
@@ -43,7 +54,10 @@ another host.
 | 5 | a literal absolute path to the pinned Gitleaks binary under one user's home | `gitleaks_native="${GITLEAKS_NATIVE:-${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/gitleaks-8.30.1/gitleaks}"` | Resolves through the same `ECO_INSTALL_ROOT` contract the bootstrap scripts use, with `GITLEAKS_NATIVE` as an explicit override. The pinned version string `gitleaks-8.30.1` is unchanged. |
 | 6 | a literal absolute path to `ecosystem-bounded-run` in one user's checkout | `gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"` | The guarded launcher finds its runner next to the path it was invoked with, so the pair stays correct wherever it is installed as long as the two files are installed together. `${BASH_SOURCE[0]}` is not symlink-resolved; see the install section. |
 
-Nothing else in `gitleaks-guarded` was touched. Every absolute `/usr/bin` tool path
+Nothing else in `gitleaks-guarded` differs from its source. Line 21, `unset
+ECOSYSTEM_JOB_CPU_QUOTA` (added on both sides on 2026-09-24), gives every scan
+the runner's default CPU quota, whatever job defaults the caller exported, in the
+same way the explicit memory, swap, task and time exports above it do. Every absolute `/usr/bin` tool path
 (`/usr/bin/systemd-run`, `/usr/bin/systemctl`, `/usr/bin/timeout`,
 `/usr/bin/flock`), every exit code (`64` usage, `75` lock held by another scan,
 `78` refusal to run uncontained) and every default limit (`MemoryHigh=4G`,
@@ -52,10 +66,9 @@ unchanged.
 
 ### Divergence in `ecosystem-bounded-run` (2026-09-22)
 
-Two cross-family review rounds found three gaps, and both are fixed in this repository's
-copy only. **The host original (in the Codex-owned `codex-ecosystem`
-checkout, not in this repository) has not been changed and should receive
-the same fix;** until it does, the two files are expected to differ.
+Two cross-family review rounds found three gaps, and fixed them in this repository's
+copy first. The host original has since received the same fixes: on 2026-09-23 its
+runner hashed `77c47d2d…`, identical to this copy before the CPU quota re-sync.
 
 | Gap in the source | Change here |
 | --- | --- |
@@ -67,6 +80,38 @@ handling (129/130/143 after a native scope stop) are unchanged. The marker
 directory is removed on every exit path.
 
 - The command lookup mirrors `exec`: a path must be an executable file, and a bare name must be an executable file in a `PATH` directory. A shell builtin with no file (for example `cd`) is refused with 78 before the start marker instead of failing with 127 after it (second cross-family review round, 2026-09-22).
+
+## CPU quota (2026-09-24)
+
+`ecosystem-bounded-run` adds `CPUQuota=` to the scope when the user manager
+delegates the cpu controller, that is, when `cpu` appears in
+`/sys/fs/cgroup<ControlGroup>/cgroup.controllers` for the manager's
+`systemctl --user show --property=ControlGroup` path. A controllers file that
+cannot be read means a wrong manager path and is refused with 78.
+
+- **Default:** (online CPUs − 2) × 100%, with a floor of 100%. On a 24-CPU host
+  that is `cpu.max` `2200000 100000`.
+- **Override:** `ECOSYSTEM_JOB_CPU_QUOTA`, a positive percentage of one CPU
+  (for example `200%`). Any other value is refused with 78.
+- **Checked from inside the scope,** like the memory and task limits. The
+  job's own `cpu.max` must equal the requested quota (N% is N ms of CPU per
+  100 ms period), or the runner exits 78 before the command runs.
+- **Without cpu delegation:** systemd's `user@.service` delegates cpu by
+  default only from v252; Ubuntu 22.04 ships `Delegate=pids memory`. There, the
+  default quota is skipped with one stderr note (`no CPU quota`), and the
+  memory, task and runtime limits still apply. An explicit
+  `ECOSYSTEM_JOB_CPU_QUOTA` is refused with 78, because it cannot be enforced.
+  Delegation can be added with a drop-in
+  `/etc/systemd/system/user@.service.d/delegate.conf` containing
+  `[Service]` / `Delegate=cpu memory pids`, then `systemctl daemon-reload` and
+  a new login. That drop-in has not been exercised by this repository's tests.
+- **What it does not do:** the quota is per job and leaves two CPUs free. It
+  does not throttle a scan that uses fewer cores. The measured Gitleaks peak of
+  about 8.4 cores (`docs/next-host-stages.md`) runs unthrottled on any host with
+  11 or more CPUs, and several concurrent jobs are not capped in aggregate. A
+  lower scanner quota or a slice-level aggregate cap needs a measured comparison
+  of scan duration against the 600 s bound, and of interactive CPU pressure,
+  first.
 
 ## Install on a new Linux/WSL2 host
 
@@ -123,6 +168,9 @@ These scripts are **Linux-only**, and only on a host that provides all of:
 - **cgroup v2** — `ecosystem-bounded-run` requires
   `/sys/fs/cgroup/cgroup.controllers` to exist. Without it the memory and task
   limits cannot be enforced.
+- **Optional: the cpu controller delegated to `user@.service`** (the systemd
+  default from v252). Without it, jobs still run under the memory, task and
+  runtime limits, with no CPU quota; see "CPU quota" above.
 - **A native `systemd --user` bus** at `/run/user/$UID/bus` — it must be a real
   socket, not a symlink, and both it and `/run/user/$UID` must be owned by the
   calling user. On WSL2 this means systemd is enabled for the distribution
@@ -140,7 +188,9 @@ scan begins.
 is no way to reproduce `MemoryMax`/`MemorySwapMax` containment for a transient
 scope. The "always run Gitleaks through the guarded launcher" rule is therefore
 scoped to Linux/WSL2 hosts; a macOS bootstrap must not pretend to satisfy it by
-installing an unbounded shim.
+installing an unbounded shim. The same holds for the CPU quota: a macOS host
+installs neither script, so it has no per-job CPU cap. This is a recorded
+limitation, not a gap this repository closes.
 
 ## What the tests establish
 
@@ -183,6 +233,33 @@ and prints which containment branch it took.
   command. Workload statuses 1, 78 and 127 must pass through unchanged, and a
   missing command must exit 78. Non-default, page-unaligned limits
   (`1000001K`, 64 tasks) must still run and show the page-rounded value.
+  `BoundedRunCpuQuotaTests` checks the CPU quota. The default and an explicit
+  `50%` must reach the job's own `cpu.max`; this needs cpu delegation and is
+  skipped without it. Stand-in launchers that drop `CPUQuota` or change it to
+  `37%` must each exit 78 without running the command. The dropped variant
+  runs in a fresh slice, so it always reaches the missing-`cpu.max` refusal,
+  and the altered one reaches the mismatch refusal. An unreadable controllers
+  file must also be refused with 78. A controllers file
+  without `cpu` must skip the default with the note and refuse an explicit
+  quota with 78, and a `cpuset`-only list counts as no delegation. Instrumented
+  CPU counts of 1, 2 and 3 must give the one-CPU floor (`100000 100000`) and 4
+  must give `200000 100000`. A manager query that stalls must be refused with
+  78 within the 5 s timeout. `0%`, `max`, `150`, `1000000%` and `-5%` must be
+  refused with 78. Checked by mutation on 2026-09-24, with each of these runner edits
+  failing at least one of these tests:
+  - removing the in-scope `cpu.max` check;
+  - tolerating a missing `cpu.max`;
+  - not refusing an explicit quota without delegation;
+  - dropping the `CPUQuota` property;
+  - changing the default to CPUs − 1;
+  - opening the quota regex;
+  - treating an unreadable controllers file as "no cpu";
+  - matching `cpuset` as `cpu`;
+  - lowering the small-host floor to `CPUs > 1`;
+  - removing the 5 s timeout on the manager query.
+  GitHub-hosted runners have no `systemd --user` manager, so there the
+  containment and CPU-quota tests take their skip or refusal branches. The
+  executed evidence for them comes from a host with a user manager.
   `LiveTaskQueryTests` stubs `systemctl` and requires that a failed query, or a
   missing count for a cgroup that still exists, is an error and never "no
   tasks". Checked by mutation on 2026-09-22: a stand-in runner that
@@ -230,7 +307,7 @@ same host. It was checked once by hand instead, on 2026-09-22 (bash 5.2.21): wit
 a sleeping stand-in for the native binary, a second `gitleaks-guarded dir .`
 launched while the first was still scanning exited **75** with `another scan
 holds the per-user lock`, and the first then exited 0. The lock file descriptor
-opened at line 21 survives the final `exec` on this bash (verified separately via
+opened at line 22 (line 21 before the 2026-09-24 re-sync) survives the final `exec` on this bash (verified separately via
 `/proc/self/fd`), which is what makes that guarantee hold. This is a one-host
 observation, not a suite assertion.
 

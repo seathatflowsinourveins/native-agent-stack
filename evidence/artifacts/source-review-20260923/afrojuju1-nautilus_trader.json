@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-afrojuju1-nautilus_trader",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/afrojuju1/nautilus_trader",
+ "reviewed_commit": "89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+ "readme_path": "README.md",
+ "license": "LGPL-3.0",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of the repository afrojuju1/nautilus_trader at commit 89e250e0ce5a30ad489aeabc1dc5f70705508d6f (license LGPL-3.0), read from README.md at that revision. Repository description: \"Production-grade Rust-native trading engine with deterministic event-driven architecture\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "NautilusTrader is an open-source, production-grade, Rust-native engine for multi-asset, multi-venue trading systems."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "The system spans research, deterministic simulation, and live execution within a single event-driven architecture, with Python serving as the control plane for strategy logic, configuration, and orchestration."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Fast: Rust core with the mimalloc allocator and asynchronous networking using tokio."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Reliable: Type- and thread-safety backed by Rust, with optional Redis-backed state persistence."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Portable: Runs on Linux, macOS, and Windows. Deploy using Docker."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Flexible: Modular adapters integrate any REST API or WebSocket feed."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Advanced: Time in force IOC, FOK, GTC, GTD, DAY, ATTHEOPEN, ATTHECLOSE, advanced order types and conditional triggers. Execution instructions post-only, reduce-only, and icebergs. Contingency orders including OCO, OUO, OTO."
+  },
+  {
+   "source": "README.md@89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+   "text": "Customizable: User-defined components, or assemble entire systems from scratch using the cache and message bus."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/afrojuju1/nautilus_trader/tree/89e250e0ce5a30ad489aeabc1dc5f70705508d6f",
+  "https://github.com/afrojuju1/nautilus_trader/blob/89e250e0ce5a30ad489aeabc1dc5f70705508d6f/README.md"
+ ]
+}

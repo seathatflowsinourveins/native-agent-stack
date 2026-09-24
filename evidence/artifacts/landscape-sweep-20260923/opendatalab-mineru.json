@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-opendatalab-mineru",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/opendatalab/MinerU",
+ "reviewed_commit": "9227669985a7876abe5d3181b1cda11a844e7322",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of opendatalab/MinerU at commit 9227669985a7876abe5d3181b1cda11a844e7322, read from README.md at that commit. Repository description: \"Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for your Agentic workflows.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9227669985a7876abe5d3181b1cda11a844e7322",
+   "text": "MinerU 4.0 brings document parsing, a local document library, and service tools into one workflow for document conversion, application integration, and agent reading."
+  },
+  {
+   "source": "README.md@9227669985a7876abe5d3181b1cda11a844e7322",
+   "text": "PDF and images support all four tiers. Office, OpenDocument, EPUB, OFD, HTML/MHTML, and CSV/TSV use local Flash native parsing. Plain text is read directly rather than parsed. Documents are not automatically uploaded to the official service; remote parsing requires explicit configuration."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/opendatalab/MinerU/tree/9227669985a7876abe5d3181b1cda11a844e7322",
+  "https://github.com/opendatalab/MinerU/blob/9227669985a7876abe5d3181b1cda11a844e7322/README.md"
+ ]
+}

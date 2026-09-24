@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-johannesjo-parallel-code",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/johannesjo/parallel-code",
+ "reviewed_commit": "68b56235bd66d6df71a1b6736d3cef317c1c7011",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of the repository johannesjo/parallel-code at commit 68b56235bd66d6df71a1b6736d3cef317c1c7011 (license MIT), read from README.md at that revision. Repository description: \"Run Claude Code, Codex, and Gemini side by side \\u2014 each in its own git worktree\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@68b56235bd66d6df71a1b6736d3cef317c1c7011",
+   "text": "Dispatch AI coding agents in parallel, each in its own worktree. Review the diffs, merge the wins, toss the rest."
+  },
+  {
+   "source": "README.md@68b56235bd66d6df71a1b6736d3cef317c1c7011",
+   "text": "When you're happy with the result, merge the branch back to main from the sidebar."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/johannesjo/parallel-code/tree/68b56235bd66d6df71a1b6736d3cef317c1c7011",
+  "https://github.com/johannesjo/parallel-code/blob/68b56235bd66d6df71a1b6736d3cef317c1c7011/README.md"
+ ]
+}

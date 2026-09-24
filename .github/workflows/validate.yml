@@ -261,6 +261,16 @@ jobs:
           printf '%s  %s\n' "$GITLEAKS_SHA256" "$RUNNER_TEMP/gitleaks/archive.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/gitleaks/archive.tar.gz" -C "$RUNNER_TEMP/gitleaks" gitleaks
           "$RUNNER_TEMP/gitleaks/gitleaks" version
+      - name: Run the gitleaks allowlist regression tests with the pinned binary
+        if: always()
+        env:
+          # tests/test_gitleaks_config.py fails instead of skipping when this is set and gitleaks is
+          # absent: the validate job has no gitleaks, so without this step the allowlist tests never
+          # ran in CI (Codex review of #155).
+          GITLEAKS_TESTS_REQUIRED: '1'
+        run: |
+          export PATH="$RUNNER_TEMP/gitleaks:$PATH"
+          python3 -m unittest tests.test_gitleaks_config -v
       - name: Scan git history for secrets
         if: always()
         run: |

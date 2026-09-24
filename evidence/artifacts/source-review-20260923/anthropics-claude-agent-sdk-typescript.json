@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-agent-sdk-typescript",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/anthropics/claude-agent-sdk-typescript",
+ "reviewed_commit": "fb04f66354f7d9fcf7bebb23f3336a491a37f195",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "agent-sdks"
+ ],
+ "claim": "Source and documentation review of the repository anthropics/claude-agent-sdk-typescript at commit fb04f66354f7d9fcf7bebb23f3336a491a37f195, read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@fb04f66354f7d9fcf7bebb23f3336a491a37f195",
+   "text": "The Claude Agent SDK enables you to programmatically build AI agents with Claude Code's capabilities. Create autonomous agents that can understand codebases, edit files, run commands, and execute complex workflows."
+  },
+  {
+   "source": "README.md@fb04f66354f7d9fcf7bebb23f3336a491a37f195",
+   "text": "The Claude Code SDK is now the Claude Agent SDK. Please check out the migration guide for details on breaking changes."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/anthropics/claude-agent-sdk-typescript/tree/fb04f66354f7d9fcf7bebb23f3336a491a37f195",
+  "https://github.com/anthropics/claude-agent-sdk-typescript/blob/fb04f66354f7d9fcf7bebb23f3336a491a37f195/README.md"
+ ]
+}

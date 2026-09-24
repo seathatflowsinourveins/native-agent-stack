@@ -184,16 +184,26 @@ Use [owned installation recipes](../adoption/lifecycle.md) for new prefixes and 
 
 For selected Python tools, use separate owned uv tool directories; the upstream package specifications are `uv tool install jcodemunch-mcp==1.108.319`, `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` and `uv tool install markitdown==0.1.7`. Apply the lifecycle guide's `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` guards before installation. Archive tools use upstream release assets and their published checksum, as in the [archive procedure](../recipes/README.md#official-release-archives). Preserve required, reviewed package postinstall behavior.
 
-The pinned native Context Mode plugin setup is:
+The native Context Mode plugin setup below is reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not a pin both clients enforce. Codex's `--ref` checks that commit out when it adds the marketplace. A Claude marketplace source takes a branch or tag and never a commit, and the former `@<commit>` form exited 1 on Claude Code 2.1.281 ([retained runs](../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json)). The Claude commands therefore take no ref and install the default-branch head, and the last command compares the installed `gitCommitSha` with the reviewed revision:
 
 ```sh
 codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json
 codex plugin add context-mode@context-mode --json
 codex features enable hooks
 codex features enable plugin_hooks
-claude plugin marketplace add mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b --scope user
+claude plugin marketplace add mksglu/context-mode --scope user
 claude plugin install context-mode@context-mode --scope user --json
+python3 - <<'EOF'
+import json, os, pathlib
+reviewed = "6f0cc6841c687e754059f36714a11233fda1a02b"  # recipes/README.md context-mode row
+config = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR") or pathlib.Path.home() / ".claude")
+registry = json.loads((config / "plugins/installed_plugins.json").read_text())
+found = [entry.get("gitCommitSha") for entry in registry.get("plugins", {}).get("context-mode@context-mode", [])]
+print("ok" if found and set(found) == {reviewed} else "MISMATCH", found or "not installed")
+EOF
 ```
+
+A `MISMATCH` means Claude runs a revision this catalog has not reviewed; [bootstrap step 4a](../adoption/bootstrap.md) checks all three plugins and says what to record.
 
 Install RTK awareness once with `rtk init --global --codex` in each intended Codex home; this writes instructions, not a Codex command-rewriting hook. Claude's supported setup is `rtk init --global --auto-patch --no-trust-filters`. Preserve other hooks/settings. In a fresh native Codex session inspect and trust the exact installed hook definitions through `/hooks`; project trust and hook trust are separate. Claude's `/context-mode:ctx-doctor` checks its own plugin integration. Full ai-memory routing/setup and Serena languages are in [the foundation guide](foundation-stack.md).
 

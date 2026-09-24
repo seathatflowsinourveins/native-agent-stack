@@ -1,0 +1,590 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "agent-lab .claude/workflows/child-usage.mjs",
+  "tool_commit": "549515ac6c7856284e3d0f75337ab48bfd073b06",
+  "tool_sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b",
+  "command": "node .claude/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_28d47bbc-1b5",
+  "exit_code": 1,
+  "raw_output_sha256": "e53984980701b3b744d60c8c91339710d36a273a10f55271e6569f320d975ad5",
+  "measured_at_utc": "2026-09-24T01:41:33Z",
+  "note": "Per-request provider usage from the retained subagent transcripts. A child counts only the assistant messages that already carry usage; for an incomplete run (status below) interrupted requests may be missing, so its totals are a lower bound. The raw output differs from this copy only in transcript_dir, which held a host path."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_28d47bbc-1b5",
+  "status": "incomplete",
+  "reason": "8 child(ren) incomplete",
+  "multi_model_children": [],
+  "children": [
+   {
+    "agent_id": "a65fb9cc9ff353f04",
+    "label": "discover:native-clients",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 16194,
+     "cache_read_input_tokens": 509287,
+     "cache_creation_input_tokens": 66102
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 16194,
+      "cache_read_input_tokens": 509287,
+      "cache_creation_input_tokens": 66102
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 46112,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a958da46558c3d8ca",
+    "label": "discover:instructions-skills",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 15947,
+     "cache_read_input_tokens": 824530,
+     "cache_creation_input_tokens": 59589
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 15947,
+      "cache_read_input_tokens": 824530,
+      "cache_creation_input_tokens": 59589
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afc5f12e051c265cc",
+    "label": "discover:workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 12506,
+     "cache_read_input_tokens": 567196,
+     "cache_creation_input_tokens": 46459
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 12506,
+      "cache_read_input_tokens": 567196,
+      "cache_creation_input_tokens": 46459
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46108,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a3941f51f26e217d3",
+    "label": "discover:isolation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 13160,
+     "cache_read_input_tokens": 446725,
+     "cache_creation_input_tokens": 40736
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 13160,
+      "cache_read_input_tokens": 446725,
+      "cache_creation_input_tokens": 40736
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46110,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "adb22ce8b7da4ce43",
+    "label": "discover:code-navigation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 13992,
+     "cache_read_input_tokens": 441080,
+     "cache_creation_input_tokens": 49949
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 13992,
+      "cache_read_input_tokens": 441080,
+      "cache_creation_input_tokens": 49949
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46114,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a4efb85e9cb483bd6",
+    "label": "discover:document-retrieval",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 5584,
+     "cache_read_input_tokens": 572713,
+     "cache_creation_input_tokens": 39662
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 5584,
+      "cache_read_input_tokens": 572713,
+      "cache_creation_input_tokens": 39662
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a86b8a8272d3f7464",
+    "label": "discover:semantic-rag",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 13547,
+     "cache_read_input_tokens": 663932,
+     "cache_creation_input_tokens": 46815
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 13547,
+      "cache_read_input_tokens": 663932,
+      "cache_creation_input_tokens": 46815
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aac8ee0a13ca3e0fd",
+    "label": "discover:durable-memory",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 18393,
+     "cache_read_input_tokens": 859227,
+     "cache_creation_input_tokens": 55451
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 18393,
+      "cache_read_input_tokens": 859227,
+      "cache_creation_input_tokens": 55451
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46114,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aaf0d7de368c609b7",
+    "label": "discover:web-research",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 11061,
+     "cache_read_input_tokens": 443281,
+     "cache_creation_input_tokens": 46769
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 11061,
+      "cache_read_input_tokens": 443281,
+      "cache_creation_input_tokens": 46769
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46110,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aae11f467b6c9c3f1",
+    "label": "discover:token-efficiency",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 10334,
+     "cache_read_input_tokens": 609144,
+     "cache_creation_input_tokens": 47553
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 10334,
+      "cache_read_input_tokens": 609144,
+      "cache_creation_input_tokens": 47553
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a4406a3894021a2a9",
+    "label": "discover:quality-evaluation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 8250,
+     "cache_read_input_tokens": 468040,
+     "cache_creation_input_tokens": 44160
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 8250,
+      "cache_read_input_tokens": 468040,
+      "cache_creation_input_tokens": 44160
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46118,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "acecacd708c062327",
+    "label": "discover:ci-supply-chain",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 7328,
+     "cache_read_input_tokens": 523389,
+     "cache_creation_input_tokens": 50971
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 7328,
+      "cache_read_input_tokens": 523389,
+      "cache_creation_input_tokens": 50971
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46120,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "ad76b060768d01fec",
+    "label": "discover:scheduling-supervision",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 5733,
+     "cache_read_input_tokens": 290152,
+     "cache_creation_input_tokens": 39636
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 5733,
+      "cache_read_input_tokens": 290152,
+      "cache_creation_input_tokens": 39636
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46120,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "ae1d9439c381448e1",
+    "label": "discover:hosting-services",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 6901,
+     "cache_read_input_tokens": 282119,
+     "cache_creation_input_tokens": 36209
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 6901,
+      "cache_read_input_tokens": 282119,
+      "cache_creation_input_tokens": 36209
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46114,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a93940dbe8c188c90",
+    "label": "discover:recovery-portability",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 4936,
+     "cache_read_input_tokens": 529555,
+     "cache_creation_input_tokens": 39207
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 4936,
+      "cache_read_input_tokens": 529555,
+      "cache_creation_input_tokens": 39207
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "a95530e783944f8f0",
+    "label": "discover:observation-inference",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 3728,
+     "cache_read_input_tokens": 179833,
+     "cache_creation_input_tokens": 41371
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 3728,
+      "cache_read_input_tokens": 179833,
+      "cache_creation_input_tokens": 41371
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46114,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   },
+   {
+    "agent_id": "ab6ebf6e8a4482c73",
+    "label": "discover:agent-sdks",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "high"
+    ],
+    "requests": 1,
+    "usage": {
+     "input_tokens": 2,
+     "output_tokens": 458,
+     "cache_read_input_tokens": 22944,
+     "cache_creation_input_tokens": 23170
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 2,
+      "output_tokens": 458,
+      "cache_read_input_tokens": 22944,
+      "cache_creation_input_tokens": 23170
+     }
+    },
+    "first_request_cache_read": 22944,
+    "first_request_prompt_tokens": 46116,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ]
+   }
+  ],
+  "by_resolved_model": {
+   "claude-sonnet-5": {
+    "children": 17,
+    "input_tokens": 302,
+    "output_tokens": 168052,
+    "cache_read_input_tokens": 8233147,
+    "cache_creation_input_tokens": 773809
+   }
+  }
+ }
+}

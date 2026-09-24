@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-temporalio-sdk-python",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/temporalio/sdk-python",
+ "reviewed_commit": "eb642b14947bd8bcdf8816cffb6a63869803f5c6",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of the repository temporalio/sdk-python at commit eb642b14947bd8bcdf8816cffb6a63869803f5c6 (license MIT), read from README.md at that revision. Repository description: \"Temporal Python SDK\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@eb642b14947bd8bcdf8816cffb6a63869803f5c6",
+   "text": "\ud83d\udce3 News: Integration between OpenAI Agents SDK and Temporal is now in public preview. Learn more."
+  },
+  {
+   "source": "README.md@eb642b14947bd8bcdf8816cffb6a63869803f5c6",
+   "text": "Temporal is a distributed, scalable, durable, and highly available orchestration engine used to execute asynchronous, long-running business logic in a scalable and resilient way."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/temporalio/sdk-python/tree/eb642b14947bd8bcdf8816cffb6a63869803f5c6",
+  "https://github.com/temporalio/sdk-python/blob/eb642b14947bd8bcdf8816cffb6a63869803f5c6/README.md"
+ ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "mode": "source",
+  "started_utc": "2026-09-20T08:27:41.743806+00:00",
+  "platform": {
+    "system": "Linux",
+    "architecture": "x86_64",
+    "python": "3.12.3"
+  },
+  "checks": {
+    "canonical_source_hash": true,
+    "frozen_source_hash": true,
+    "ripgrep_binary_hash": true,
+    "ripgrep-version_exit": true,
+    "ripgrep_version": true,
+    "ast-grep_binary_hash": true,
+    "ast-grep-version_exit": true,
+    "ast-grep_version": true,
+    "independent_literal_oracle": true,
+    "rg-positive_exit": true,
+    "rg_positive_exact_lines": true,
+    "rg_positive_exact_spans": true,
+    "rg_negative_exit_and_empty": true,
+    "independent_ast_oracle": true,
+    "ast-positive_exit": true,
+    "ast_exact_spans": true,
+    "ast_bounded_exact_source_text": true,
+    "ast_negative_empty": true,
+    "canonical_source_unchanged": true,
+    "source_binaries_unchanged": true,
+    "frozen_inputs_unchanged": true,
+    "owned_commands_completed": true
+  },
+  "facts": [
+    {
+      "label": "ripgrep-version",
+      "exit_code": 0,
+      "stdout_bytes": 160,
+      "stdout_sha256": "6be9d6a7c90a5db370a21178599013e052473462bb21656673a0c200f5bd014e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version_output": "ripgrep 15.2.0 (rev e89fff89ac)\n\nfeatures:+pcre2\nsimd(compile):+SSE2,-SSSE3,-AVX2\nsimd(runtime):+SSE2,+SSSE3,+AVX2\n\nPCRE2 10.45 is available (JIT is available)"
+    },
+    {
+      "label": "ast-grep-version",
+      "exit_code": 0,
+      "stdout_bytes": 16,
+      "stdout_sha256": "f78c1f163a09571a893a599de4067e8768968e0cdcbfa530cdebc1d98bba7b68",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version_output": "ast-grep 0.45.3"
+    },
+    {
+      "label": "rg-positive",
+      "exit_code": 0,
+      "stdout_bytes": 1047,
+      "stdout_sha256": "5385a210fc2df9566ed6b712129cadf7ee0b3f68fc20d8e747edac1dcf5373fa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": [
+        {
+          "path": "frozen/seed/planner.py",
+          "line": 22,
+          "line_text": "            raise ValueError(\n",
+          "spans": [
+            {
+              "start": 12,
+              "end": 28,
+              "text": "raise ValueError"
+            }
+          ]
+        },
+        {
+          "path": "frozen/seed/planner.py",
+          "line": 49,
+          "line_text": "        raise ValueError(\n",
+          "spans": [
+            {
+              "start": 8,
+              "end": 24,
+              "text": "raise ValueError"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "rg-negative",
+      "exit_code": 1,
+      "stdout_bytes": 261,
+      "stdout_sha256": "f4f4e367971d7ac248f8b049970e22029117795421ccf8d76336435a79ddb9cc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "match_count": 0
+    },
+    {
+      "label": "ast-positive",
+      "exit_code": 0,
+      "stdout_bytes": 1850,
+      "stdout_sha256": "a04665054fedb7a7c7f69adc7ba7b1f620e77e2b30d779050be0f3ce75cbede1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": [
+        {
+          "file": "frozen/seed/planner.py",
+          "text": "raise ValueError(\n                \"task {!r} requires undeclared prerequisite(s): {}\".format(\n                    task, \", \".join(repr(name) for name in sorted(unknown))\n                )\n            )",
+          "range": {
+            "byteOffset": {
+              "start": 815,
+              "end": 1016
+            },
+            "start": {
+              "line": 21,
+              "column": 12
+            },
+            "end": {
+              "line": 25,
+              "column": 13
+            }
+          }
+        },
+        {
+          "file": "frozen/seed/planner.py",
+          "text": "raise ValueError(\n            \"dependency cycle among: {}\".format(\n                \", \".join(repr(name) for name in blocked)\n            )\n        )",
+          "range": {
+            "byteOffset": {
+              "start": 1806,
+              "end": 1954
+            },
+            "start": {
+              "line": 48,
+              "column": 8
+            },
+            "end": {
+              "line": 52,
+              "column": 9
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "ast-negative",
+      "exit_code": 1,
+      "stdout_bytes": 3,
+      "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": []
+    }
+  ],
+  "frozen_inputs": {
+    "oracle.json": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c",
+    "package-lock.json": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+    "package.json": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+    "pins.json": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d",
+    "run.py": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0",
+    "seed/corpus/decoy/other.md": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136",
+    "seed/corpus/primary/notes/aéé.md": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
+    "seed/corpus/primary/recovery.md": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c",
+    "seed/corpus/primary/scope.md": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67",
+    "seed/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+  },
+  "global_or_client_changes": false,
+  "inference_invoked": false,
+  "whole_task_provider_usage": null,
+  "os_confinement_established": false,
+  "cleanup": {
+    "persistent_services_started": 0,
+    "timed_out_commands": 0
+  },
+  "passed": true,
+  "finished_utc": "2026-09-20T08:27:41.896903+00:00",
+  "native_commands": 6,
+  "frozen_file_mapping": {
+    "run.py": "run-initial.py.txt"
+  },
+  "publication_note": "Only mapping to the retained executed runner filename was added; private historical receipt and frozen inputs remain unchanged."
+}

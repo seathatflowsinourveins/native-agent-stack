@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-zouuup-landrun",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Zouuup/landrun",
+ "reviewed_commit": "811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of the repository Zouuup/landrun at commit 811cfff51ceaf3d9843708aa6d22e9b84ccac8b4 (license MIT), read from README.md at that revision. Repository description: \"Run any Linux process in a secure, unprivileged sandbox using Landlock. Think firejail, but lightweight, user-friendly, and baked into the kernel.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "A lightweight, secure sandbox for running Linux processes using Landlock. Think firejail, but with kernel-level security and minimal overhead."
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "Linux Landlock is a kernel-native security module that lets unprivileged processes sandbox themselves."
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83d\udd12 Kernel-level security using Landlock (up to ABI v9)"
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83d\udee1\ufe0f Fine-grained access control for directories and files"
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83d\udd04 Support for read and write paths"
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83c\udf10 TCP network access control (binding and connecting)"
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83d\udce1 IPC scoping for abstract UNIX sockets and signals (ABI v6+)"
+  },
+  {
+   "source": "README.md@811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+   "text": "\ud83d\udd0c Pathname UNIX domain socket connect/sendmsg control (ABI v9+)"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/Zouuup/landrun/tree/811cfff51ceaf3d9843708aa6d22e9b84ccac8b4",
+  "https://github.com/Zouuup/landrun/blob/811cfff51ceaf3d9843708aa6d22e9b84ccac8b4/README.md"
+ ]
+}

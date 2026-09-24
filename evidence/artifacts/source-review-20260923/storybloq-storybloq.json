@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-storybloq-storybloq",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Storybloq/storybloq",
+ "reviewed_commit": "a7bf556c55cb3a8935d91ea927e0dece23d356ee",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of the repository Storybloq/storybloq at commit a7bf556c55cb3a8935d91ea927e0dece23d356ee, read from README.md at that revision. Repository description: \"Project memory and workflows for Claude Code and Codex. Keep stories, plans, handovers, and review evidence in your repo. Resume across sessions and follow progress in the Mac app.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a7bf556c55cb3a8935d91ea927e0dece23d356ee",
+   "text": "Your project\u2019s memory. Your agents\u2019 workflow. Project memory and workflows for Claude Code and Codex. Keep stories, plans, handovers, and review evidence beside your code. Pick up work across sessions and follow progress in the optional Mac app."
+  },
+  {
+   "source": "README.md@a7bf556c55cb3a8935d91ea927e0dece23d356ee",
+   "text": "A new coding session may be missing the decisions and unfinished work from the last. Project instructions describe how to work; handovers, stories, and review records capture what happened and where to continue."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/Storybloq/storybloq/tree/a7bf556c55cb3a8935d91ea927e0dece23d356ee",
+  "https://github.com/Storybloq/storybloq/blob/a7bf556c55cb3a8935d91ea927e0dece23d356ee/README.md"
+ ]
+}

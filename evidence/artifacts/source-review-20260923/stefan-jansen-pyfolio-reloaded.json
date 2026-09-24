@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-stefan-jansen-pyfolio-reloaded",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/stefan-jansen/pyfolio-reloaded",
+ "reviewed_commit": "6b55da7fce365e325046bb080cb13ced1822de95",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "portfolio-risk"
+ ],
+ "claim": "Source and documentation review of the repository stefan-jansen/pyfolio-reloaded at commit 6b55da7fce365e325046bb080cb13ced1822de95 (license Apache-2.0), read from README.md at that revision. Repository description: \"Portfolio and risk analytics in Python\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@6b55da7fce365e325046bb080cb13ced1822de95",
+   "text": "pyfolio is a Python library for performance and risk analysis of financial portfolios that works well with the Zipline open source backtesting library."
+  },
+  {
+   "source": "README.md@6b55da7fce365e325046bb080cb13ced1822de95",
+   "text": "At the core of pyfolio are various tear sheets that combine various individual plots and summary statistics to provide a comprehensive view of the performance of a trading algorithm."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/stefan-jansen/pyfolio-reloaded/tree/6b55da7fce365e325046bb080cb13ced1822de95",
+  "https://github.com/stefan-jansen/pyfolio-reloaded/blob/6b55da7fce365e325046bb080cb13ced1822de95/README.md"
+ ]
+}
