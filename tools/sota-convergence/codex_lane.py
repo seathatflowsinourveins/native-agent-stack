@@ -276,6 +276,11 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
 # table ("invalid transport") when the loaded config does not define that server.
 # The file credential store is pinned (round 5, ISO-R5-4): a keyring or auto store from a system or managed layer
 # would save a blind child's rotated tokens apart from the native auth.json.
+# No shell_environment_policy override (round 6, ISO-R6-4): measured 2026-09-24 with codex-cli 0.155.1, the model's
+# shell in `codex exec` got the same variables under inherit="core", inherit="none", include_only=["PATH"] and no
+# override (a planted non-core SSL_CERT_DIR reached it every time), so it protects nothing here. Instead a blind child
+# never receives an API key: child_env forwards none, and codex_home_issue requires the native auth.json.
+# Overturn: a codex exec probe in which such an override removes a non-core variable from the model's shell.
 ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false",
                   "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
@@ -289,7 +294,12 @@ HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 # outside the repository; only its value, which the event does not show, says where (round-2 review).
 VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]\w*)/[^\s'\"|;&<>()`]*")
 # Only an expansion that transforms its value (${X%/*}, ${X:-/p}, ${X/a/b}, ${!X}) hides the path it builds; a plain
-# ${name} is caught by VARIABLE_PATH when used as a path (independent review of 52344da8).
+# ${name} is caught by VARIABLE_PATH when a path follows it, and by INHERITED_DIRECTORY when it is itself the
+# directory argument (``rg -l x ${TMPDIR}``, ``cp -r $SSL_CERT_DIR .``; round 6, REG6-3). A child's TMPDIR is a fresh,
+# empty directory of its run home, so it names no lane data either way.
+INHERITED_DIRECTORY = re.compile(r"\$\{?(?:TMPDIR|SSL_CERT_DIR|SSL_CERT_FILE|OLDPWD)\b\}?")
+CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
+COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
 PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
@@ -376,6 +386,11 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
             # (independent review of #145, BIND-R4-7).
             reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
+            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
+            # A blind child never needs its CODEX_HOME, and a command substitution builds a path the event does not
+            # show (round 6, ISO-R6-2).
+            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
+            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
             reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
@@ -428,40 +443,65 @@ def _overlap(first: Path, second: Path) -> bool:
     return any(_contains(a, b) or _contains(b, a) for a, b in spellings)
 
 
+def codex_home_issue(work_dir: Path, repo: Path = None):
+    """Why a run-scoped Codex home cannot be set up, or None; creates nothing, so a dry run and the lock run it first
+    (round 6, ISO-R6-5). Refused: a base that is, holds or sits inside the native Codex home (either spelling), a
+    base overlapping the work dir or ``repo``, and no native auth.json: a blind child never gets an API key, which
+    its shell would inherit (round 6, ISO-R6-4); `codex login --with-api-key` makes a native auth.json from one."""
+    base = codex_home_base()
+    native_home = native_codex_home()
+    if _overlap(base, native_home):
+        return (f"the run-scoped Codex homes' base {base} and the native Codex home {native_home} overlap; set "
+                f"{CODEX_HOME_BASE_ENV} to a directory apart from the native home")
+    for place in (Path(work_dir).resolve(), *([Path(repo).resolve()] if repo is not None else [])):
+        if _overlap(base, place):
+            return (f"the run-scoped Codex homes' base {base} overlaps {place}; set {CODEX_HOME_BASE_ENV} to a "
+                    "directory outside the work dir and the export")
+    native = native_auth_path()
+    if not native.is_file():
+        return (f"no native Codex credential at {native}; sign in natively with `codex login` (with an API key: "
+                "`codex login --with-api-key`); a blind child is never given an API key variable")
+    return None
+
+
+def codex_home_lock(work_dir: Path) -> Path:
+    """The lock both codex_lane and adjudicate codex hold for a work dir: one per work dir under the homes' base, so
+    neither sweeps or shares the other's credential link (review of 52344da8; round 6, ISO-R6-1)."""
+    return codex_home_base() / f"{codex_home_prefix(work_dir)}.lock"
+
+
+def sweep_stale_links(work_dir: Path) -> None:
+    """Remove the credential links an interrupted (SIGKILLed) earlier run of this work dir left in its homes; only
+    symlinks named auth.json are removed. The caller holds codex_home_lock (round 6, ISO-R6-1)."""
+    for home in codex_home_base().glob(f"{codex_home_prefix(work_dir)}-*"):
+        remove_codex_home_link(home)
+
+
 def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
     """Create a fresh run-scoped CODEX_HOME (mode 0700) under codex_home_base, holding only a symlink to the native
-    ``auth.json`` (never a copy) and the child's empty HOME. ``--ignore-user-config`` skips config.toml but not
-    ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools (measured 2026-09-24: a
-    child quoted its "# AGENTS.md instructions" block; with this home it answered "none"). A fresh directory per
-    run (tempfile.mkdtemp) means no leftover AGENTS.md or config is loaded and nothing is removed to make it; the
-    caller removes the credential link when the run ends (remove_codex_home_link). The child's sessions and logs
-    stay in the run home for inspection.
+    ``auth.json`` (never a copy), the child's empty HOME and an empty TMPDIR. ``--ignore-user-config`` skips
+    config.toml but not ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools
+    (measured 2026-09-24: a child quoted its "# AGENTS.md instructions" block; with this home it answered "none").
+    A fresh directory per run (tempfile.mkdtemp) means no leftover AGENTS.md or config is loaded and nothing is
+    removed to make it; the caller removes the credential link when the run ends (remove_codex_home_link). The
+    child's sessions and logs stay in the run home for inspection.
 
     The child's HOME is the empty ``<run home>/home`` (child_home): Codex also discovers user Agent Skills under
     ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child with this
     CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it listed only the
-    CLI's bundled skills).
+    CLI's bundled skills). Its TMPDIR is the empty ``<run home>/tmp``, not the caller's (round 6, REG6-3).
 
-    Raises CodexHomeRefused, creating nothing, when the base and the native Codex home are one directory or one
-    lies inside the other (either spelling), when the base lies inside the work dir or ``repo``, or when there is
-    neither a native auth.json nor CODEX_API_KEY/OPENAI_API_KEY (independent review of #145, rounds 4 and 5)."""
+    Raises CodexHomeRefused, creating nothing, for any codex_home_issue."""
+    issue = codex_home_issue(work_dir, repo)
+    if issue:
+        raise CodexHomeRefused(issue)
     base = codex_home_base()
-    native_home = native_codex_home()
-    if _overlap(base, native_home):
-        raise CodexHomeRefused(f"the run-scoped Codex homes' base {base} and the native Codex home {native_home} "
-                               f"overlap; set {CODEX_HOME_BASE_ENV} to a directory apart from the native home")
-    for place in (Path(work_dir).resolve(), *([Path(repo).resolve()] if repo is not None else [])):
-        if _overlap(base, place):
-            raise CodexHomeRefused(f"the run-scoped Codex homes' base {base} overlaps {place}; set "
-                                   f"{CODEX_HOME_BASE_ENV} to a directory outside the work dir and the export")
     native = native_auth_path()
-    if not native.is_file() and not (os.environ.get("CODEX_API_KEY") or os.environ.get("OPENAI_API_KEY")):
-        raise CodexHomeRefused(f"no native Codex credential at {native} and no CODEX_API_KEY or OPENAI_API_KEY; sign "
-                               "in natively with `codex login`")
     base.mkdir(parents=True, exist_ok=True, mode=0o700)
     home = Path(tempfile.mkdtemp(prefix=f"{codex_home_prefix(work_dir)}-", dir=base))
     home.chmod(0o700)
     child_home(home).mkdir(mode=0o700)
+    (home / "tmp").mkdir(mode=0o700)
     if native.is_file():
         (home / "auth.json").symlink_to(native)
     return home
@@ -505,21 +545,40 @@ def exclusive_run_lock(path: Path):
 
 # The environment a blind child gets (independent review of #145, round 5, ISO-R5-2): not the caller's, which
 # carries the coordinator's transcript pointer, cross-session messaging socket and token, and broker variables.
-CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
+CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
                        "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "ALL_PROXY", "https_proxy", "http_proxy", "no_proxy",
                        "all_proxy")
 # Extra variable-name prefixes a child keeps; empty in production (the test fixtures' fake codex reads its own).
 CHILD_ENV_EXTRA_PREFIXES = ()
 
 
+def redact_userinfo(value: str) -> str:
+    """A proxy URL's user:password@ as ***@ in printed output (round 6, ISO-R6-5)."""
+    return re.sub(r"(://)[^/@\s]+@", r"\1***@", value) if isinstance(value, str) else value
+
+
+@contextlib.contextmanager
+def terminate_on_signal():
+    """SIGTERM and SIGHUP raise SystemExit while held, so the caller's finally removes the credential link (round 6,
+    ISO-R6-1); a SIGKILLed run leaves it for the next run's sweep_stale_links."""
+    import signal
+    def stop(signum, _frame):
+        raise SystemExit(128 + signum)
+    previous = {signum: signal.signal(signum, stop) for signum in (signal.SIGTERM, signal.SIGHUP)}
+    try:
+        yield
+    finally:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
+
+
 def child_env(codex_home: Path) -> dict:
-    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME, and an API
-    key variable only when the run home holds no linked auth.json."""
+    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME and TMPDIR.
+    No API key variable: the child authenticates through the linked native auth.json (round 6, ISO-R6-4)."""
     env = {key: value for key, value in os.environ.items()
            if key in CHILD_ENV_ALLOWLIST or (CHILD_ENV_EXTRA_PREFIXES and key.startswith(CHILD_ENV_EXTRA_PREFIXES))}
-    env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home))})
-    if not (Path(codex_home) / "auth.json").exists():
-        env.update({key: os.environ[key] for key in ("CODEX_API_KEY", "OPENAI_API_KEY") if os.environ.get(key)})
+    env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home)),
+                "TMPDIR": str(Path(codex_home) / "tmp")})
     return env
 
 
@@ -827,6 +886,12 @@ def main(argv=None) -> int:
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
     blind = not args.allow_git_history
+    if blind:
+        # The home refusals create nothing, so they run before the dry run and the lock (round 6, ISO-R6-5).
+        issue = codex_home_issue(work_dir, repo)
+        if issue:
+            print(f"codex_lane: {issue}", file=sys.stderr)
+            return 2
     if args.dry_run:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
@@ -836,7 +901,7 @@ def main(argv=None) -> int:
             print(f"# a real run creates a fresh {run_home} (mkdtemp) and runs each child with only this environment",
                   file=sys.stderr)
         # Never an API key value on stdout: the printed environment omits the key variables.
-        env_prefix = ["env", "-i", *(f"{key}={value}" for key, value in child_env(run_home).items()
+        env_prefix = ["env", "-i", *(f"{key}={redact_userinfo(value)}" for key, value in child_env(run_home).items()
                                      if key not in ("CODEX_API_KEY", "OPENAI_API_KEY"))] if blind else []
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
@@ -853,10 +918,13 @@ def main(argv=None) -> int:
     with contextlib.ExitStack() as stack:
         if pending:
             try:
-                stack.enter_context(exclusive_run_lock(codex_dir / RUN_LOCK_NAME))
+                # One lock per work dir for both runners, under the homes' base (round 6, ISO-R6-1).
+                stack.enter_context(exclusive_run_lock(codex_home_lock(work_dir)))
             except RunLocked as error:
                 print(f"codex_lane: {error}", file=sys.stderr)
                 return 2
+            stack.enter_context(terminate_on_signal())
+            sweep_stale_links(work_dir)
         if pending and blind:
             # Blind children never load the user's global Codex instructions or user skills (isolated_codex_home),
             # set up only once every refusal has passed, the run holds its lock and something is to run (R4-REG-3).

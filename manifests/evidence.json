@@ -28203,8 +28203,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "d25425708c2d068cab1db8c434f3a409a00694725d3bbe374f3751d173ac3b44",
-      "bytes": 18593
+      "sha256": "060d56fb2beb546a4900c121ce0dc6fc4e69a7fdf34be6f423e9525619322059",
+      "bytes": 20638
     },
     {
       "path": "recipes/tavily.md",
@@ -28238,8 +28238,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "9095bdc06ef3d931b6afa888aa8b01692c43edf113b42e15f2ca7a55a89ee4d7",
-      "bytes": 98900
+      "sha256": "c38f87b8e57858cc34f082a476dd7276796f5f5c5fe48cfd13b1416982f97ae5",
+      "bytes": 99231
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -28888,8 +28888,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "982471c4a6c7e6163527d56a7e426a2159bbec7d880e90e1a3b877a0857c573a",
-      "bytes": 141529
+      "sha256": "59f1023043ee1799802fcd3cba8745f79ceabf5a38acc6267d2d0b4dc552f9f7",
+      "bytes": 148734
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

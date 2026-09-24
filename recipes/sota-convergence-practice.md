@@ -104,8 +104,10 @@ git worktree remove --force "$BLIND_DIR/checkout"
 # 3. Claude lane. $AL must be a clean agent-lab checkout at, or descending from, the commit
 #    examples/claude-native/workflows/vendored-lanes.json names (agentlab_commit, e070125 for the current workflow),
 #    with no uncommitted .claude/, CLAUDE.md or AGENTS.md changes; claude_lane.py refuses anything else. Install the
-#    vendored blind roles (blind-lane-reviewer, blind-adjudicator) user-level from this catalog first:
-python3 tools/adoption/install_claude_profile.py --only agents
+#    two vendored blind roles user-level from this catalog first, and only those two (install_claude_profile.py
+#    --only agents would replace all seven catalog agents, including user-level copies of the others):
+install -D -m 0644 adoption/agents/claude/blind-lane-reviewer.md ~/.claude/agents/blind-lane-reviewer.md
+install -D -m 0644 adoption/agents/claude/blind-adjudicator.md ~/.claude/agents/blind-adjudicator.md
 #    Args carry the launch identity {repo, repo_tree_sha256, agent_sha256} and lane-prompt.md,
 #    which the workflow echoes; run it headless from the export root with hooks disabled (every stage runs as
 #    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
@@ -159,37 +161,63 @@ python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR
   --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
   --packet-keys "$KEYS_DIR/packet-keys.json" --check
 
-# 7. Refresh the derived catalogs and narrative, then register the newly sealed files and rehash every listed
-#    file the wave rewrote (both ledgers, the handbook) -- after build_verdicts.py --write, or scripts/validate.py
-#    fails on their stale hashes (independent review of #145, round 4, OPS-2). A changed winner also needs
-#    scripts/component_matrix.py --write, the handbook's "Foundation selection by layer" table and any handbook
-#    display entry for a new component id (tests/test_handbook_summary.py checks them).
+# 7. Refresh the derived catalogs, register the newly sealed files and rehash only the listed files this wave
+#    changed, then run every check CI runs (.github/workflows/validate.yml). Start step 6 from a clean checkout,
+#    so the working tree's changes are exactly the wave's: a rehash of every listed file would also hide unrelated
+#    tampering from scripts/validate.py (independent review of #145, round 6, OPR6-2). A changed winner also needs
+#    the handbook's "Foundation selection by layer" table and any handbook display entry for a new component id
+#    (tests/test_handbook_summary.py checks them).
 python3 scripts/component_matrix.py --write
 python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
   --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
+python3 scripts/new_host_grand_list.py --write   # its check runs in CI (round 6, OPR6-1)
 python3 - <<'EOF'
-import hashlib, json, pathlib
+import hashlib, json, pathlib, subprocess
+status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], capture_output=True, text=True,
+                        check=True).stdout.splitlines()
+changed = {line[3:].split(" -> ")[-1].strip('"') for line in status}
 path = pathlib.Path("manifests/evidence.json"); doc = json.loads(path.read_text(encoding="utf-8"))
-listed = {entry["path"] for entry in doc["files"]}
-for entry in doc["files"]:  # every listed file the wave rewrote
-    file = pathlib.Path(entry["path"])
-    if file.is_file():
-        data = file.read_bytes(); entry["sha256"] = hashlib.sha256(data).hexdigest(); entry["bytes"] = len(data)
-for file in sorted(pathlib.Path("evidence/artifacts").rglob("*")):  # the newly sealed files
-    if file.is_file() and file.as_posix() not in listed:
-        data = file.read_bytes()
-        doc["files"].append({"path": file.as_posix(), "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+listed = {entry["path"]: entry for entry in doc["files"]}
+for relative in sorted(changed):
+    file = pathlib.Path(relative)
+    if not file.is_file():
+        continue
+    data = file.read_bytes()
+    if relative in listed:  # a listed file the wave rewrote (the ledgers, the handbook)
+        listed[relative].update(sha256=hashlib.sha256(data).hexdigest(), bytes=len(data))
+    elif relative.startswith("evidence/artifacts/"):  # a newly sealed file
+        doc["files"].append({"path": relative, "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
 path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 EOF
 python3 scripts/evidence_manifest.py --write
-#    The recorded winners are the next wave's incumbents: check the export against them before opening the PR
-#    (round 4, OPS-3). A role-label hit (exit 1) is fixed in blind_checkout.py (REMOVE_GLOBS or the role keys) and
-#    the export rebuilt; an evidence-record hit is reported and kept. tests/test_blind_checkout.py runs the same
-#    check on the committed tree in CI.
-python3 tools/sota-convergence/export_isolation_check.py "$BLIND_DIR/export" "$WORK_DIR/packets" . \
-  --packet-keys "$KEYS_DIR/packet-keys.json"
-python3 scripts/landscape.py --root .
+#    The recorded winners are the next wave's incumbents: check an export against them before opening the PR
+#    (round 4, OPS-3). Build it in new directories, never over this wave's packets or keys (lane_packets.py
+#    refuses an existing --out/packets or --keys-out; round 6, OPR6-3). A role-label hit (exit 1) is fixed in
+#    blind_checkout.py (REMOVE_GLOBS or the role keys) and re-checked the same way; an evidence-record hit and
+#    the prose exposure are reported and disclosed. tests/test_blind_checkout.py runs the same check in CI.
+CHECK_DIR=$(mktemp -d "$(dirname "$BLIND_DIR")/isolation-check.XXXXXX")
+python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$CHECK_DIR/work" \
+  --keys-out "$CHECK_DIR/keys/packet-keys.json"
+python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD --dest "$CHECK_DIR/hosts/blind/checkout" \
+  --export "$CHECK_DIR/hosts/blind/export" --allow-from-packets "$CHECK_DIR/work/packets"
+python3 tools/sota-convergence/export_isolation_check.py "$CHECK_DIR/hosts/blind/export" "$CHECK_DIR/work/packets" . \
+  --packet-keys "$CHECK_DIR/keys/packet-keys.json"
+git worktree remove --force "$CHECK_DIR/hosts/blind/checkout"
+#    Every check CI runs (validate.yml), in its order:
 python3 scripts/validate.py
+python3 scripts/host_receipts.py validate
+python3 scripts/validate_catalogs.py
+python3 scripts/validate_foundation.py --root . --json
+python3 scripts/landscape.py --root .
+python3 blueprints/blind-catalog-convergence/audit_reports.py --check
+python3 scripts/validate_convergence.py --all-recorded --root . --json
+python3 tools/sota-convergence/build_verdicts.py --check
+python3 scripts/component_matrix.py --check
+python3 scripts/new_host_grand_list.py --check
+python3 tools/sota-convergence/gap_crosswalk.py build --check
+python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 \
+  --owner gap-resolution --check
+python3 scripts/build_ecosystem.py --check
 python3 -m unittest
 ```
 

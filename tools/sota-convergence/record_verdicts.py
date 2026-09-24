@@ -1181,6 +1181,36 @@ def load_packet_keys(path) -> dict:
     return document
 
 
+def manifest_component_ids(manifest: dict) -> set:
+    """Every component id a sota manifest registers: its foundation components and trading entries."""
+    ids = set()
+    for catalog, field in (("foundation", "components"), ("trading", "entries")):
+        for layer in manifest.get(catalog) or []:
+            for item in (layer.get(field) or []) if isinstance(layer, dict) else []:
+                if isinstance(item, dict) and isinstance(item.get("id"), str):
+                    ids.add(item["id"])
+    return ids
+
+
+def packet_keys_manifest_issue(root: Path, packet_keys: dict):
+    """None when the packet-keys document names the manifest it was built from (path and sha256, unchanged under
+    --root) and every sealed component_id is registered there (independent review of #145, round 6, INT-R6-2)."""
+    manifest = packet_keys.get("manifest")
+    if not (isinstance(manifest, dict) and isinstance(manifest.get("path"), str)):
+        return "the packet-keys document names no manifest; rebuild it with lane_packets.py --keys-out"
+    path = safe_file(root, manifest["path"]) if ".." not in Path(manifest["path"]).parts else None
+    if path is None or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != manifest.get("sha256"):
+        return f"the packet-keys document's manifest {manifest['path']} is missing under --root or changed"
+    registered = manifest_component_ids(json.loads(path.read_text(encoding="utf-8")))
+    unknown = sorted({fields.get("component_id") for entry in (packet_keys.get("packets") or {}).values()
+                      if isinstance(entry, dict) for fields in (entry.get("candidates") or {}).values()
+                      if isinstance(fields, dict) and fields.get("component_id")
+                      and fields["component_id"] not in registered})
+    if unknown:
+        return f"sealed component ids {unknown[:5]} are not registered in {manifest['path']}"
+    return None
+
+
 def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, packet_keys, only,
                               work_dir: Path = None) -> str:
     """The wave's packet-keys document (<sealed_base>/packet-keys.json): the --packet-keys entry of every packet
@@ -1322,6 +1352,10 @@ def main(argv=None) -> int:
     lane_code = load_lane_code(root)
     failures = load_lane_failures(work_dir)
     packet_keys = load_packet_keys(args.packet_keys) if args.packet_keys else None
+    if packet_keys is not None and not grandfathered:
+        issue = packet_keys_manifest_issue(root, packet_keys)
+        if issue:
+            raise SystemExit(f"--packet-keys: {issue}")
     lane_root_trees = {}
     if not grandfathered:
         for lane_root in args.lane_repo_root:

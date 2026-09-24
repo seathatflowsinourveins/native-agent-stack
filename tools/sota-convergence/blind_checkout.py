@@ -132,6 +132,10 @@ CATALOGS_UNCONDITIONAL_KEYS = frozenset({"selection", "decision", "disposition",
 CATALOGS_NONEMPTY_KEYS = frozenset({
     "winners", "incumbents", "incumbent_decision_ids", "incumbent_decisions_path", "coordinator_disposition",
     "claude_final_disposition", "why_selected", "current_selection_record", "dual_lane_same_winner",
+    # A card's evidence_level (a selected candidate must carry a strong one) and installed_version (only installed,
+    # that is adopted, components have one) marked the winners in 7 and 3 layers (independent review of #145,
+    # round 6, B6-3); lane_packets.py withholds the same evidence_kind from blind packets.
+    "evidence_level", "installed_version",
 })
 
 # The original five keys, but under blueprints/ they are stripped only when the
@@ -387,6 +391,10 @@ def _is_evidence_object(value) -> bool:
 def _role_key(key, value=None) -> bool:
     if not isinstance(key, str):
         return False
+    if key == "role" and isinstance(value, str):
+        # A card's role that states the component's status ("Selected north-star engine ...") goes (round 6, B6-3).
+        from lane_packets import states_candidate_status
+        return states_candidate_status(value)
     if key in CATALOGS_NONEMPTY_KEYS or key in ROLE_LABEL_KEYS:
         # Named labels go whatever their value holds (review of 52344da8: the evidence-object exemption applies only
         # to keys matched by the ROLE_KEY pattern).
@@ -718,7 +726,6 @@ def build_allowlist(dest: Path, packets_dir: Path) -> dict:
     return {"files": files, "missing_refs": sorted(missing), "transitive_refs": sorted(transitive)}
 
 
-PROSE_SUFFIXES = (".md", ".markdown", ".txt", ".rst")
 LEDGER_EXPORTS = {"foundation": "catalogs/landscape/foundation.json", "us-equities": "catalogs/landscape/us-equities.json"}
 QUALITY_REVIEW_EXPORT = "catalogs/landscape/candidate-quality-review.json"
 
@@ -772,102 +779,10 @@ def align_exported_prose(export: Path, packets_dir: Path) -> int:
     return changed
 
 
-def redact_selection_prose(export: Path, packets_dir: Path) -> dict:
-    """Drop, from every exported prose file (outside fenced code), each sentence that uses a selection word and
-    names a candidate of any packet: "Serena is the selected navigation layer" states the current choice before a
-    lane reads the evidence (independent review of #145, round 4, F3: such a sentence reached 24 of the 30 scored
-    layers through a directly cited or one-level transitive file). The term set is the union over all packets, so
-    what is dropped does not depend on which candidate won. Returns {export-relative file: sentences dropped}."""
-    here = str(Path(__file__).resolve().parent)
-    if here not in sys.path:
-        sys.path.insert(0, here)
-    from lane_packets import candidate_matcher, states_choice
-    candidates = []
-    for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
-        candidates.extend(json.loads(packet_file.read_text(encoding="utf-8")).get("candidates") or [])
-    if not candidates:
-        return {}
-    matcher = candidate_matcher(candidates)
-
-    def choice(sentence):
-        return states_choice(sentence, matcher)
-
-    redacted = {}
-    for path in sorted(export.rglob("*")):
-        if path.is_symlink() or not path.is_file() or path.suffix.lower() not in PROSE_SUFFIXES \
-                or path.name in INSTRUCTION_FILE_NAMES:
-            continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        lines, dropped = _redact_blocks(text.split("\n"), choice)
-        if dropped:
-            path.write_text("\n".join(lines), encoding="utf-8")
-            redacted[path.relative_to(export).as_posix()] = dropped
-    return redacted
-
-
-# A Markdown line that starts its own block: a list item, heading, table row or quote.
-_BLOCK_START = re.compile(r"^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*|\|))")
-
-
-def _redact_blocks(lines: list, states_choice) -> tuple:
-    """(lines, sentences dropped): each prose block (a paragraph or list item with its wrapped continuation
-    lines) is read as one text, so a sentence wrapped over two lines is still one sentence, and a block that loses
-    a sentence is written back on one line. A table is one unit: when any row states the choice, the whole table
-    goes, so no single broken row marks the winner (review of 52344da8). Fenced code is kept as it is."""
-    out, dropped, fenced, block, table = [], 0, False, [], []
-
-    def flush_block():
-        nonlocal dropped
-        if not block:
-            return
-        match = _BLOCK_START.match(block[0])
-        prefix = match.group(1) if match else block[0][:len(block[0]) - len(block[0].lstrip())]
-        content = " ".join([block[0][len(prefix):].strip()] + [line.strip() for line in block[1:]])
-        sentences = re.split(r"(?<=[.!?;])\s+", content)
-        kept = [sentence for sentence in sentences if not states_choice(sentence)]
-        if len(kept) == len(sentences):
-            out.extend(block)
-        else:
-            dropped += len(sentences) - len(kept)
-            if kept:
-                out.append(prefix + " ".join(kept))
-        block.clear()
-
-    def flush_table():
-        nonlocal dropped
-        if not table:
-            return
-        rows = [row for row in table if not re.fullmatch(r"\s*\|?[\s:|-]*\|?\s*", row)]
-        if any(states_choice(row) for row in rows):
-            dropped += len(rows)
-        else:
-            out.extend(table)
-        table.clear()
-
-    for line in lines:
-        fence = line.lstrip().startswith("```")
-        if fenced or fence:
-            flush_block()
-            flush_table()
-            out.append(line)
-            if fence:
-                fenced = not fenced
-            continue
-        if line.lstrip().startswith("|"):
-            flush_block()
-            table.append(line)
-            continue
-        flush_table()
-        if not line.strip():
-            flush_block()
-            out.append(line)
-            continue
-        if _BLOCK_START.match(line) or not block:
-            flush_block()
-        block.append(line)
-    flush_block()
-    flush_table()
-    return out, dropped
+# Exported files are never rewritten beyond the label stripping above (independent review of #145, round 6, B6-4):
+# sentence redaction corrupted evidence (hash-bound files, listings, logs) and dropped incumbents' own negative
+# evidence. Prose that names a current choice is exported verbatim, and a wave discloses the layers it reaches
+# (export_isolation_check.prose_exposure); only the packets and catalog label fields are reduced.
 
 
 def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> dict:
@@ -957,7 +872,6 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
             if name not in replaced:
                 replaced.append(name)
     aligned = align_exported_prose(export, allow_from_packets) if allow_from_packets is not None else 0
-    redacted = redact_selection_prose(export, allow_from_packets) if allow_from_packets is not None else {}
     # A stripped (rewritten) file would otherwise carry a newer mtime than an untouched one.
     for directory, dirs, files in os.walk(export, topdown=False, followlinks=False):
         for name in files + dirs:
@@ -973,7 +887,6 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
     if allowlist is not None:
         result.update({"allowlisted_files": len(allowed_files), "missing_refs": allowlist["missing_refs"],
                        "transitive_refs": len(allowlist["transitive_refs"]),
-                       "redacted_prose_sentences": sum(redacted.values()), "redacted_prose_files": len(redacted),
                        "aligned_prose_entries": aligned})
     return result
 
@@ -1054,8 +967,7 @@ def main(argv=None) -> int:
                        "export_escaping_symlinks_removed": sanitized["removed_escaping_symlinks"] if sanitized else None,
                        "export_allowlisted_files": sanitized.get("allowlisted_files") if sanitized else None,
                        "export_missing_refs": sanitized.get("missing_refs") if sanitized else None,
-                       "export_transitive_refs": sanitized.get("transitive_refs") if sanitized else None,
-                       "export_redacted_prose_sentences": sanitized.get("redacted_prose_sentences") if sanitized else None},
+                       "export_transitive_refs": sanitized.get("transitive_refs") if sanitized else None},
                       sort_keys=True))
     return 0
 

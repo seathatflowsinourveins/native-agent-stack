@@ -813,7 +813,8 @@ class FourthRereviewOf145Tests(AdjudicateFixture):
         code, err, record = self.assemble()
         self.assertEqual(code, 1)
         self.assertIsNone(record)
-        self.assertIn("different provenance", err)
+        # Refused before the provenance comparison: the lane root changed after `inputs` (round 6, REG6-2).
+        self.assertIn("changed after `inputs`", err)
 
 
 class FifthRereviewOf145Tests(AdjudicateFixture):
@@ -1748,7 +1749,7 @@ class CallBindingRound4Tests(AdjudicateFixture):
     def test_a_second_run_on_the_same_work_dir_is_refused(self):
         # BIND-R4-5: two runs would recreate each other's Codex home and interleave events files.
         self.inputs()
-        lock = self.work / "adjudication-judgments" / "codex" / adjudicate.codex_lane.RUN_LOCK_NAME
+        lock = adjudicate.codex_lane.codex_home_lock(self.work)  # shared with codex_lane (round 6, ISO-R6-1)
         with adjudicate.codex_lane.exclusive_run_lock(lock):
             code, err = self.run_judges([(self.JUDGE, "gpt-6-astra", [0], None, None)])
         self.assertEqual(code, 2)
@@ -1833,8 +1834,13 @@ class ScrubRound5Tests(unittest.TestCase):
             "/home/example,private/result.json": "<outside-path>",
             # Codex review at a516c477: a final segment glued on without a later separator.
             "/home/example,private.json": "<outside-path>",
+            # Round 6, REG6-5: the whole glued chain is walked, past a kept repository file.
+            "see /home/example/x.json,docs/b.md,private.json now": "see <outside-path>,docs/b.md now",
             "C:\\Users\\example,private.json": "<outside-path>",
         }
+        # Round 6, REG6-1: an over-long glued segment is not a repository file, and nothing raises.
+        long_segment = "/home/example/a.json," + "x" * 300 + ".json"
+        self.assertEqual(adjudicate.scrub_text(long_segment, "/nonexistent", (str(root),)), "<outside-path>")
         for text, expected in cases.items():
             with self.subTest(text):
                 out = adjudicate.scrub_text(text, "/nonexistent", (str(root),))

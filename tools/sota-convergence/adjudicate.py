@@ -229,19 +229,31 @@ _GLUED = re.compile(r"<outside-path>([,;()'\"`|&])([^\s<>,;()'\"`|&]*)")
 
 def _names_repo_file(segment: str, repo_roots) -> bool:
     core = segment.rstrip(".:!?")
-    return bool(core) and ".." not in Path(core).parts and not core.startswith("/") and any(
-        (Path(root) / core).is_file() for root in repo_roots)
+    if not core or ".." in Path(core).parts or core.startswith("/"):
+        return False
+    # os.path.isfile returns False rather than raising on an over-long or odd name (round 6, REG6-1).
+    return any(os.path.isfile(os.path.join(str(root), core)) for root in repo_roots)
+
+
+_GLUED_CHAIN = re.compile(r"<outside-path>((?:[,;()'\"`|&][^\s<>,;()'\"`|&]*)+)")
+_GLUED_PIECE = re.compile(r"([,;()'\"`|&])([^\s<>,;()'\"`|&]*)")
 
 
 def absorb_glued(text: str, repo_roots=()) -> str:
-    def glued(match):
-        if not match.group(2) or _names_repo_file(match.group(2), repo_roots):
-            return match.group(0)
-        return OUTSIDE
-    previous = None
-    while previous != text:
-        previous, text = text, _GLUED.sub(glued, text)
-    return text
+    """Walk each chain of delimiter-glued segments after an outside path (round 6, REG6-5): a segment naming a file
+    under a lane root stays with its delimiter, any other non-empty one is absorbed, and an empty one (prose: a space
+    follows the delimiter) ends the chain unchanged."""
+    def chain(match):
+        kept, rest = [], match.group(1)
+        pieces = list(_GLUED_PIECE.finditer(rest))
+        for index, piece in enumerate(pieces):
+            delimiter, segment = piece.group(1), piece.group(2)
+            if not segment:
+                return OUTSIDE + "".join(kept) + rest[piece.start():]
+            if _names_repo_file(segment, repo_roots):
+                kept.append(delimiter + segment)
+        return OUTSIDE + "".join(kept)
+    return _GLUED_CHAIN.sub(chain, text)
 
 
 def _absorb_clause(match) -> str:
@@ -503,7 +515,9 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=(), packet_keys=None) -
                  "lane_returns_sha256": dict(return_sha256),
                  # The lane roots the hashes were relativized against; record_verdicts.py must get the same
                  # --lane-repo-root, and assemble rechecks with these.
-                 "lane_repo_roots": [str(root) for root in repo_roots]}
+                 "lane_repo_roots": [str(root) for root in repo_roots],
+                 # The trees the scrubbing read (round 6, REG6-2): assemble re-scrubs against the same files or refuses.
+                 "lane_root_trees": dict(root_trees)}
         if components["claude"] == components["codex"]:
             entry["agreement"] = "agree"
             index["layers"].append(entry)
@@ -856,12 +870,18 @@ def run_codex(args) -> int:
         return 2
     with contextlib.ExitStack() as stack:
         if pending:
+            issue = codex_lane.codex_home_issue(work_dir, repo)
+            if issue:
+                print(f"adjudicate: {issue}", file=sys.stderr)
+                return 2
             try:
-                # One Codex run per work dir (independent review of #145, BIND-R4-5).
-                stack.enter_context(codex_lane.exclusive_run_lock(out_dir / codex_lane.RUN_LOCK_NAME))
+                # One Codex run per work dir, shared with codex_lane (BIND-R4-5; round 6, ISO-R6-1).
+                stack.enter_context(codex_lane.exclusive_run_lock(codex_lane.codex_home_lock(work_dir)))
             except codex_lane.RunLocked as error:
                 print(f"adjudicate: {error}", file=sys.stderr)
                 return 2
+            stack.enter_context(codex_lane.terminate_on_signal())
+            codex_lane.sweep_stale_links(work_dir)
             # Codex judges never load the user's global Codex instructions or user skills
             # (codex_lane.isolated_codex_home), set up only when something is to run (R4-REG-3).
             try:
@@ -940,8 +960,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
         elif not provenance_unchanged(args.prompt, repo, run_provenance):
             # Checked after each call (independent review of #145, BIND-R4-4): the tree, code, prompt and schemas, so
-            # an interrupted run never leaves a judgment, or records a leak, the run end would void (review of
-            # 52344da8).
+            # an interrupted run never leaves a judgment of changed inputs, and a leak is recorded only by a call that
+            # passed its own checks (review of 52344da8).
             judge, refuter, leak, failure = None, None, None, TREE_CHANGED
         # This call's own audit, before its record is written (binding re-review N2): a flagged call is void even if
         # the run is interrupted before the end-of-run audit, and a resume never counts it.
@@ -954,9 +974,10 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         if flagged_calls:
             judge, refuter, leak, failure = None, None, None, AUDIT_FLAGGED
         if leak:
-            # Persisted now, once this call's own tree and audit checks passed (independent review of #145,
-            # BIND-R4-4): an interrupted run keeps its leaks with its judgments. A leak from a voided call is never
-            # persisted, so it cannot suppress later valid runs.
+            # Persisted now, once this call's own provenance and audit checks passed (independent review of #145,
+            # BIND-R4-4): an interrupted run keeps its leaks with its judgments. A call voided by its own checks never
+            # persists one. A later run-end void of the whole run keeps a leak its call already persisted: that call
+            # read an unchanged tree and code, so the leak it found stands (round 6, REG6-4).
             record_leaks(out_dir / LEAKS_NAME, index, [(name, order, input_path, {
                 **leak, "family": "openai", "input_sha256": judged_sha256, "inputs_sha256": both_sha256})])
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
@@ -1508,6 +1529,20 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         changed_returns = [lane for lane in FAMILIES
                            if indexed_returns.get(lane) != current_return_sha256(work_dir / lane / f"{name}.json",
                                                                                  entry.get("lane_repo_roots") or ())]
+        changed_roots = []
+        for root, digest in (entry.get("lane_root_trees") or {}).items():
+            try:
+                current = tree_sha256(Path(root))
+            except (OSError, ValueError):
+                current = None
+            if current != digest:
+                changed_roots.append(root)
+        if changed_roots:
+            # Scrubbing keeps glued repository files, so the position check must read the tree inputs read
+            # (round 6, REG6-2).
+            issues.append((name, f"the lane root {', '.join(changed_roots)} changed after `inputs`; rerun inputs"))
+            (out_dir / f"{name}.json").unlink(missing_ok=True)
+            continue
         if changed_returns:
             # A lane was rerun after `inputs` (Codex review of #145): the judges compared other returns.
             issues.append((name, f"the {', '.join(changed_returns)} lane return changed after `inputs`; rerun "
@@ -1624,7 +1659,17 @@ def main(argv=None) -> int:
         if refusal:
             print(refusal, file=sys.stderr)
             return 2
-        packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8")) if args.packet_keys else None
+        packet_keys = None
+        if args.packet_keys:
+            try:
+                packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as error:
+                print(f"adjudicate: --packet-keys {args.packet_keys}: {error}", file=sys.stderr)
+                return 2
+            if not (isinstance(packet_keys, dict) and isinstance(packet_keys.get("packets"), dict)):
+                # A checked load (round 6, INT-R6-3), as record_verdicts.load_packet_keys does.
+                print(f"adjudicate: --packet-keys {args.packet_keys} is not a packet-keys document", file=sys.stderr)
+                return 2
         index = build_inputs(args.work_dir, layer_set(args.layers), roots, packet_keys)
         for skipped in index["skipped"]:
             print(f"adjudicate: skipped {skipped['layer']}: {skipped['reason']}", file=sys.stderr)

@@ -249,6 +249,18 @@ class SealedKeysOutTests(LanePacketsFixture):
             restored += sum(1 for fields in entry["candidates"].values() if fields.get("component_id"))
         self.assertTrue(restored, "the fixture must match a manifest component")
 
+    def test_a_blind_build_never_overwrites_packets_or_keys(self):
+        # Round 6, OPR6-3: a re-check must not silently replace a wave's packets or keys.
+        keys_path = self.out.parent / "keys" / "packet-keys.json"
+        self.assertEqual(self.run_main("--withhold-labels", "--keys-out", str(keys_path))[0], 0)
+        code, err = self.run_main("--withhold-labels", "--keys-out", str(self.out.parent / "other.json"))
+        self.assertEqual(code, 2)
+        self.assertIn("already exists", err)
+        (self.out / "packets").rename(self.out.parent / "moved")
+        code, err = self.run_main("--withhold-labels", "--keys-out", str(keys_path))
+        self.assertEqual(code, 2)
+        self.assertIn("already exists", err)
+
     def test_keys_out_is_required_with_withhold_labels_and_outside_out(self):
         self.assertEqual(self.run_main("--withhold-labels")[0], 2)
         self.assertEqual(self.run_main("--keys-out", str(self.out.parent / "k.json"))[0], 2)
@@ -878,6 +890,13 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual(withheld_packet_keys(built), [])
         self.assertEqual(raw["candidates"][0]["evidence"]["stars"], 9, "the input is never mutated")
         self.assertEqual(withheld_packet_keys(packet), [])
+
+    def test_a_selection_word_leaves_a_candidate_name(self):
+        # Round 6, B6-6: "ECC selected skills" and a "(selected)" suffix name the winner.
+        packet = {"candidates": [{"key": "c1", "name": "ECC selected skills"}, {"key": "c2", "name": "Tool (selected)"},
+                                 {"key": "c3", "name": "Plain [default]"}, {"key": "c4", "name": "Other"}]}
+        built, _ = lane_packets.seal_candidate_fields(packet)
+        self.assertEqual([c["name"] for c in built["candidates"]], ["ECC skills", "Tool", "Plain", "Other"])
 
 
 class WithheldProseTests(unittest.TestCase):

@@ -951,12 +951,59 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         self.assertIn("codex login", err.getvalue())
         self.assertFalse((self.work_dir / "codex" / "foundation__native-clients.json").exists())
 
-    def test_an_api_key_reaches_a_child_only_without_a_linked_credential(self):
-        with mock.patch.dict(os.environ, {"CODEX_API_KEY": "k"}):
+    def test_an_api_key_never_reaches_a_child(self):
+        # Round 6, ISO-R6-4: the model's shell inherits the child's variables, so a blind child gets no key; an API key
+        # alone does not satisfy the credential check.
+        with mock.patch.dict(os.environ, {"CODEX_API_KEY": "k", "OPENAI_API_KEY": "o"}):
             home = codex_lane.isolated_codex_home(self.work_dir, self.repo)
-            self.assertNotIn("CODEX_API_KEY", codex_lane.child_env(home))
             (home / "auth.json").unlink()
-            self.assertEqual(codex_lane.child_env(home)["CODEX_API_KEY"], "k")
+            self.assertFalse({"CODEX_API_KEY", "OPENAI_API_KEY"} & set(codex_lane.child_env(home)))
+            (self.native_codex / "auth.json").unlink()
+            self.assertIn("codex login --with-api-key", codex_lane.codex_home_issue(self.work_dir, self.repo))
+
+    def test_round6_isolation_details(self):
+        # Round 6: a fresh TMPDIR (REG6-3), no API key forwarded (ISO-R6-4), stale links swept under the
+        # shared lock (ISO-R6-1), proxy credentials redacted in printed output (ISO-R6-5).
+        home = codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        env = codex_lane.child_env(home)
+        self.assertEqual(env["TMPDIR"], str(home / "tmp"))
+        self.assertEqual(list((home / "tmp").iterdir()), [])
+        (home / "auth.json").unlink()
+        with mock.patch.dict(os.environ, {"CODEX_API_KEY": "k", "OPENAI_API_KEY": "o"}):
+            env = codex_lane.child_env(home)
+        self.assertEqual((env.get("CODEX_API_KEY"), env.get("OPENAI_API_KEY")), (None, None))
+        stale = codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.assertTrue((stale / "auth.json").is_symlink())
+        codex_lane.sweep_stale_links(self.work_dir)
+        self.assertFalse((stale / "auth.json").is_symlink())
+        self.assertTrue((self.native_codex / "auth.json").is_file())
+        self.assertEqual(codex_lane.redact_userinfo("http://user:secret@proxy:3128"), "http://***@proxy:3128")
+        self.assertEqual(codex_lane.codex_home_lock(self.work_dir).parent, codex_lane.codex_home_base())
+
+    def test_a_dry_run_refuses_a_home_it_could_not_set_up(self):
+        # Round 6, ISO-R6-5: the refusals run before the dry run and create nothing.
+        (self.native_codex / "auth.json").unlink()
+        for key in ("CODEX_API_KEY", "OPENAI_API_KEY"):
+            os.environ.pop(key, None)
+        self.write_packet("foundation", "native-clients")
+        with contextlib.redirect_stderr(io.StringIO()) as err, contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_lane(["--dry-run"]), 2)
+        self.assertIn("codex login", err.getvalue())
+        self.assertFalse(codex_lane.codex_home_base().exists())
+
+    def test_the_codex_home_and_command_substitution_are_flagged(self):
+        # Round 6, ISO-R6-2.
+        events = self.work_dir / "home-events.jsonl"
+        events.write_text("".join(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n"
+            for command in ("ls $CODEX_HOME", "cat $(dirname x)/y", "cat `pwd`/y", "rg -l winner ${TMPDIR}",
+                            "cp -r $SSL_CERT_DIR .")), encoding="utf-8")
+        report = codex_lane.blind_audit(events, [str(self.repo)])
+        reasons = " ".join(reason for item in report["flagged_commands"] for reason in item["reasons"])
+        self.assertIn("names the Codex home", reasons)
+        self.assertEqual(reasons.count("command substitution"), 2)
+        self.assertEqual(reasons.count("inherited directory variable"), 2)  # REG6-3
+        self.assertEqual(len(report["flagged_commands"]), 5)
 
     def test_a_work_dir_inside_a_repository_is_refused(self):
         # Independent review of #145, round 4, OPS-6: the recipe's rule, enforced.

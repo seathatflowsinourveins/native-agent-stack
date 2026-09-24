@@ -179,11 +179,27 @@ class PacketWriter:
         self.keys[filename] = {"packet_sha256": digest, "candidates": sealed}
         return digest
 
+    # The --root a new-wave fixture records under: flush writes there a manifest registering every sealed
+    # component id, and the keys document names it by path and sha256, as lane_packets.py --keys-out does.
+    ROOT = None
+    MANIFEST = "catalogs/sota-convergence/manifest-fixture.json"
+
     def flush(self):
         (self.packets_dir / "SHA256SUMS").write_text("\n".join(self.sums.values()) + "\n", encoding="utf-8")
+        document = {"schema_version": 1, "packets": self.keys}
+        if PacketWriter.ROOT is not None:
+            ids = sorted({fields["component_id"] for entry in self.keys.values()
+                          for fields in entry["candidates"].values() if fields.get("component_id")})
+            manifest = PacketWriter.ROOT / self.MANIFEST
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            existing = json.loads(manifest.read_text(encoding="utf-8")) if manifest.is_file() else {"foundation": []}
+            known = {item["id"] for layer in existing["foundation"] for item in layer["components"]}
+            existing["foundation"].append({"layer": "fixture", "components": [{"id": i} for i in ids if i not in known]})
+            manifest.write_text(json.dumps(existing), encoding="utf-8")
+            document["manifest"] = {"path": self.MANIFEST,
+                                    "sha256": hashlib.sha256(manifest.read_bytes()).hexdigest()}
         self.keys_path.parent.mkdir(parents=True, exist_ok=True)
-        self.keys_path.write_text(json.dumps({"schema_version": 1, "packets": self.keys}, sort_keys=True, indent=1)
-                                  + "\n", encoding="utf-8")
+        self.keys_path.write_text(json.dumps(document, sort_keys=True, indent=1) + "\n", encoding="utf-8")
 
 
 def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dict):
@@ -261,6 +277,8 @@ class RecordVerdictsFixture(unittest.TestCase):
         self.addCleanup(work_temp.cleanup)
         self.work_dir = Path(work_temp.name).resolve()
         self.packets = PacketWriter(self.work_dir)
+        PacketWriter.ROOT = self.root
+        self.addCleanup(setattr, PacketWriter, "ROOT", None)
 
         manifest = {
             "schema_version": 1, "checked_at": "2026-09-22", "source_base": "a" * 40,
@@ -2416,9 +2434,24 @@ class SealedPacketKeysTests(NewWaveFixture):
         self.both_lanes("wave-same-layer")
         path = self.work_dir / "sealed-keys" / "packet-keys.json"
         keys = json.loads(path.read_text(encoding="utf-8"))
-        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["component_id"] = "other"
+        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["pin"] = "9.9"
         path.write_text(json.dumps(keys), encoding="utf-8")
         with self.assertRaisesRegex(SystemExit, "is not the sealed values the packet commits to"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    def test_sealed_ids_must_be_registered_in_the_named_manifest_and_unique(self):
+        # Round 6, INT-R6-2: the keys document is checked against the manifest it names.
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["component_id"] = "fabricated"
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "sealed component ids \\['fabricated'\\] are not registered"):
+            self.run_wave()
+        del keys["manifest"]
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "names no manifest"):
             self.run_wave()
         self.assertFalse(self.sealed_base().exists())
 

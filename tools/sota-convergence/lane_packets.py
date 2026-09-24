@@ -737,13 +737,29 @@ def states_choice(sentence: str, matcher: CandidateMatcher) -> bool:
                for s_start, s_end in selections for n_start, n_end in names)
 
 
+# A sentence of a candidate's own role or limitations that states its status: it opens with a selection adjective
+# ("Selected north-star engine ...", "Default ...") or says the candidate is, stays or remains the selected/default
+# one. A result marker or a repository path marks evidence, which stays (round 6, B6-5: the earlier rule, any
+# selection word, dropped real limitations such as a BLOCKED parity-gate record).
+STATUS_STATEMENT = re.compile(r"^\W*(?:the\s+)?(?:selected|default|chosen|retained|adopted|incumbent|preferred)\b|"
+                              r"\b(?:is|was|are|remains?|stays?|kept as|serves as|as)\s+(?:the\s+)?(?:current\s+)?"
+                              r"(?:selected|default|chosen|retained|adopted|incumbent|preferred)\b", re.I)
+RESULT_MARKER = re.compile(r"\b(?:PASS(?:ED)?|FAIL(?:ED)?|BLOCKED|exit(?: code)? \d+|\d+/\d+)\b|"
+                           r"(?<![\w.])[\w.-]+/[\w./-]+\.\w+")
+
+
+def states_candidate_status(sentence: str) -> bool:
+    return bool((CHOICE_PHRASE.search(sentence) or STATUS_STATEMENT.search(sentence))
+                and not RESULT_MARKER.search(sentence))
+
+
 def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = False) -> str:
     """``text`` without the sentences that state the choice, and with every other candidate name replaced by
     <candidate> (round 5, N1: redact the name rather than empty the sentence). A candidate's own role or
-    limitations (``about_candidate``) are about that candidate, so any selection word there states its status."""
+    limitations (``about_candidate``) also lose a sentence that states that candidate's status."""
     kept = []
     for sentence in re.split(r"(?<=[.!?;])\s+", text.strip()):
-        if not sentence or states_choice(sentence, matcher) or (about_candidate and SELECTION_WORD.search(sentence)):
+        if not sentence or states_choice(sentence, matcher) or (about_candidate and states_candidate_status(sentence)):
             continue
         kept.append(matcher.sub(CANDIDATE_PLACEHOLDER, sentence))
     return " ".join(kept)
@@ -862,6 +878,13 @@ def seal_candidate_fields(packet: dict) -> tuple:
     sealed = {}
     for candidate in packet.get("candidates") or []:
         sealed[candidate["key"]] = {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
+        # A selection word in a candidate's own name labels it (round 6, B6-6).
+        if isinstance(candidate.get("name"), str):
+            bare = re.sub(r"[(\[]\s*[)\]]", "", SELECTION_WORD.sub("", candidate["name"]))  # "Tool (selected)"
+            candidate["name"] = re.sub(r"\s{2,}", " ", bare).strip() or candidate["name"]
+    # The commitment covers the values as the document stores them (sanitized, as serialize and record_verdicts'
+    # sealed_text write them; round 6, INT-R6-1).
+    sealed = sanitize_value(sealed)
     # The packet commits to the sealed values (scripts/landscape.py sealed_candidates_sha256), so only this
     # build's document restores them and every return, bound to the packet's bytes, is bound to them too.
     packet[SEALED_COMMITMENT_KEY] = sealed_candidates_sha256(sealed)
@@ -1032,6 +1055,14 @@ def main(argv=None) -> int:
         if keys_out == out or out in keys_out.parents:
             print("lane_packets: --keys-out must be outside --out, where lanes read packets", file=sys.stderr)
             return 2
+    if args.withhold_labels:
+        # A blind build never overwrites a wave's packets or keys (independent review of #145, round 6, OPR6-3): a
+        # re-check goes to new directories.
+        for existing in (args.out / "packets", args.keys_out):
+            if existing is not None and existing.exists():
+                print(f"lane_packets: {existing} already exists; write a blind build to new directories",
+                      file=sys.stderr)
+                return 2
     sealed_keys, removed_refs = {}, {}
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
@@ -1046,7 +1077,13 @@ def main(argv=None) -> int:
     (out_dir / "SHA256SUMS").write_text(sha256sums(packets), encoding="utf-8")
     if args.keys_out is not None:
         args.keys_out.parent.mkdir(parents=True, exist_ok=True)
-        args.keys_out.write_text(serialize({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": sealed_keys}),
+        # The manifest the sealed component ids come from, by path and sha256: record_verdicts.py checks every
+        # sealed id against it (round 6, INT-R6-2).
+        manifest_relative = str(args.manifest) if args.manifest else SOTA_MANIFEST_PATH
+        manifest_bytes = (root / manifest_relative).read_bytes()
+        args.keys_out.write_text(serialize({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": sealed_keys,
+                                            "manifest": {"path": manifest_relative,
+                                                         "sha256": hashlib.sha256(manifest_bytes).hexdigest()}}),
                                  encoding="utf-8")
 
     unmatched_counts = {}

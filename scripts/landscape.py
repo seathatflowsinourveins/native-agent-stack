@@ -257,6 +257,10 @@ def packet_keys_issue(keys_doc, name, packet_sha256, packet):
     for key, fields in sealed.items():
         if not isinstance(fields, dict) or set(fields) - set(SEALED_CANDIDATE_FIELDS):
             return f"the packet-keys entry for {name} seals fields other than {list(SEALED_CANDIDATE_FIELDS)} for {key}"
+    ids = [fields.get("component_id") for fields in sealed.values() if fields.get("component_id")]
+    if len(ids) != len(set(ids)):
+        # Two candidates restored to one component would record a false same_winner (round 6, INT-R6-2).
+        return f"the packet-keys entry for {name} seals one component_id for two candidates"
     if packet.get(SEALED_COMMITMENT_KEY) != sealed_candidates_sha256(sealed):
         return (f"the packet-keys entry for {name} is not the sealed values the packet commits to "
                 f"({SEALED_COMMITMENT_KEY}); rebuild the document with lane_packets.py --keys-out for these packets")

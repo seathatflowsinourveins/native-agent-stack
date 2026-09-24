@@ -764,6 +764,15 @@ class RealExportIsolationTests(unittest.TestCase):
                                           {"schema_version": 1, "packets": sealed})
         self.assertGreaterEqual(len(report), 25)
         self.assertEqual(isolation.role_label_hits(report), [])
+        # Record fields of candidate lists (card evidence_level, installed_version) no longer mark the winners
+        # (round 6, B6-3).
+        records = isolation.record_field_hits(export, packets_dir, isolation.ledger_winners(ROOT),
+                                              {"schema_version": 1, "packets": sealed})
+        self.assertEqual(isolation.record_label_hits(records), [])
+        # Exported files are verbatim beyond label stripping (round 6, B6-4): a hash-bound listing keeps its bytes.
+        for relative in ("evidence/artifacts/usage-report.source.txt",):
+            if (export / relative).is_file():
+                self.assertEqual((export / relative).read_bytes(), (ROOT / relative).read_bytes(), relative)
         # Exercised checks survive role-key stripping (round 4, R4-REG-1).
         practice = json.loads((export / "catalogs/landscape/native-practice.json").read_text(encoding="utf-8"))
         self.assertIn("coordinator_owned_qualification", practice)
@@ -790,25 +799,74 @@ class RealExportIsolationTests(unittest.TestCase):
         self.assertEqual(fields, {"foundation::layer": ["pin", "registered_receipts"]})
         self.assertEqual(isolation.packet_role_label_hits(fields), [{"layer": "foundation::layer", "field": "pin"}])
 
-    def test_selection_sentences_naming_a_candidate_are_redacted_by_block(self):
-        # Round 4, F3: a sentence wrapped over two Markdown lines is one sentence; fenced commands are kept. Review of
-        # 52344da8: a table is one unit, so no single broken row marks the winner.
-        lane_packets = load_module("lane_packets_for_redaction", "lane_packets.py")
-        matcher = lane_packets.candidate_matcher([{"name": "Serena"}, {"name": "Nautilus"}, {"name": "LEAN"}])
+    def test_round6_checker_gaps_are_closed(self):
+        # Round 6, B6-6: camelCase and role words inside evidence records, and a field absent on exactly the winners.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        self.assertEqual(isolation._key_tokens("$.records[].selectedTools"), {"selected", "tools"})
+        self.assertEqual(isolation._key_tokens("$.x.selected-repos{keys}"), {"selected", "repos"})
+        for key in ("selectedTools", "selected_repos", "selection", "picked", "recommended", "default", "primary"):
+            hit = {"file": "evidence/run/receipt.json", "path": f"$.{key}", "mode": "names_alone"}
+            self.assertFalse(isolation.evidence_hit(hit), key)
+        self.assertTrue(isolation.evidence_hit({"file": "evidence/run/receipt.json", "path": "$.sources",
+                                                "mode": "names_alone"}))
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        candidates = [{"key": "c1", "repository": "https://github.com/acme/win", "adopted": True},
+                      {"key": "c2", "repository": "https://github.com/acme/other", "adopted": True, "role": "optional"},
+                      {"key": "c3", "repository": "https://github.com/acme/third", "adopted": True, "role": "optional"}]
+        (scratch / "foundation__layer.json").write_text(json.dumps({"candidates": candidates}), encoding="utf-8")
+        fields = isolation.packet_field_hits(scratch, {"foundation::layer": [("github.com/acme/win", "")]})
+        self.assertEqual(fields, {"foundation::layer": ["role"]})
 
-        def choice(sentence):
-            return lane_packets.states_choice(sentence, matcher)
+    def test_the_checker_refuses_bad_input_with_exit_2(self):
+        # Round 6, OPR6-5: a missing or malformed --packet-keys, or none for sealed packets, is a usage error (2),
+        # never the role-label exit (1).
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        packets.mkdir()
+        export.mkdir()
+        packet = {"candidates": [{"key": "c1", "repository": "https://github.com/acme/win", "adopted": True}],
+                  "sealed_candidates_sha256": "0" * 64}
+        (packets / "foundation__layer.json").write_text(json.dumps(packet), encoding="utf-8")
+        bad = {"missing": None, "text": "not json", "list": "[]", "string-entry": json.dumps(
+            {"schema_version": 1, "packets": {"foundation__layer.json": "x"}})}
+        for label, content in [("none", None)] + list(bad.items()):
+            argv = [str(export), str(packets), str(ROOT)]
+            if label != "none":
+                keys = scratch / f"{label}.json"
+                if content is not None:
+                    keys.write_text(content, encoding="utf-8")
+                argv += ["--packet-keys", str(keys)]
+            with contextlib.redirect_stderr(io.StringIO()) as err, contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(isolation.main(argv), 2, label)
+            self.assertIn("export_isolation_check:", err.getvalue(), label)
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(isolation.main([str(scratch / "absent"), str(packets)]), 2)
 
-        text = ("# Title\n\nSerena is the\nselected navigation layer. It indexes code.\n"
-                "- Nautilus stays the default engine. It runs replay.\n- Other item\n\n"
-                "| Candidate | Decision |\n| --- | --- |\n| LEAN | Conditional |\n| Nautilus | Selected |\n\n"
-                "| Tool | Use |\n| --- | --- |\n| Serena | symbols |\n"
-                "```\nserena --select x\n```\nPlain text.")
-        lines, dropped = blind_checkout._redact_blocks(text.split("\n"), choice)
-        self.assertEqual(dropped, 5)  # two sentences and the three rows of the table that goes
-        self.assertEqual("\n".join(lines), "# Title\n\nIt indexes code.\n- It runs replay.\n- Other item\n\n\n"
-                                            "| Tool | Use |\n| --- | --- |\n| Serena | symbols |\n"
-                                            "```\nserena --select x\n```\nPlain text.")
+    def test_a_categorical_card_field_on_exactly_the_winners_is_a_label(self):
+        # Round 6, B6-3: evidence_level native_proven only on the winners, installed_version only on them.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        packets.mkdir()
+        (packets / "us-equities__layer.json").write_text(json.dumps({"candidates": [
+            {"key": f"c{i}", "repository": f"https://github.com/acme/tool{i}", "adopted": True} for i in (1, 2, 3)]}),
+            encoding="utf-8")
+        cards = {"entries": [
+            {"id": "tool1", "repository": "https://github.com/acme/tool1", "evidence_level": "native_proven",
+             "installed_version": "1.0", "limitations": ["a"]},
+            {"id": "tool2", "repository": "https://github.com/acme/tool2", "evidence_level": "source_review",
+             "limitations": ["b"]},
+            {"id": "tool3", "repository": "https://github.com/acme/tool3", "evidence_level": "source_review",
+             "limitations": ["c"]}]}
+        (export / "catalogs").mkdir(parents=True)
+        (export / "catalogs" / "cards.json").write_text(json.dumps(cards), encoding="utf-8")
+        report = isolation.record_field_hits(export, packets, {"us-equities::layer": [("github.com/acme/tool1", "")]})
+        self.assertEqual({hit["field"] for hit in isolation.record_label_hits(report)},
+                         {"evidence_level", "installed_version"})
 
     def test_id_keyed_containers_are_matched_and_classified(self):
         # Round 4, F1 and F6: an id-keyed list or key set naming the winner alone outside an evidence record is a
