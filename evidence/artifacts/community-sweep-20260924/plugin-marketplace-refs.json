@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "id": "community-sweep-20260924-plugin-marketplace-refs",
+  "date": "2026-09-24",
+  "question": "A15 (docs/decisions/2026-09-24-community-sweep.md): does a Claude Code marketplace source accept a commit as its ref, what do the tag and ref-less forms install, does Codex's --ref accept the same commit, and what does adoption/bootstrap.md step 4a's gitCommitSha check report?",
+  "evidence_class": "Upstream native operation: the Claude Code 2.1.281 and codex-cli 0.155.1 CLIs run on this WSL2 host, each in its own empty scratch configuration directory, plus git and the step 4a check. No model was called, no session ran, and no plugin hook executed.",
+  "recorded_at_utc": "2026-09-24T04:23:16.503Z",
+  "isolation": "Each Claude run set CLAUDE_CONFIG_DIR to its own new directory under <SCRATCH>, and the Codex run set CODEX_HOME to a new directory. Every run used cwd <SCRATCH>/work and stdin /dev/null. The live files in live_config_before and live_config_after were hashed before the first run and after the last, and are unchanged. bootstrap-check-host only reads this host's plugin registry.",
+  "sanitization": [
+    "The scratch root, whose path contains a local session identifier, is replaced whole by <SCRATCH>, and the home directory by ~.",
+    "No other UUID-shaped identifier occurred, so the rule that would replace one with <uuid> made no change.",
+    "Otherwise, stdout, stderr, argv, exit codes and times are verbatim. The unsanitized record stays private on the measuring host."
+  ],
+  "findings": [
+    "Same repository, three ref forms: a commit ref (claude-add-commit-ref) exited 1 and wrote no marketplace; the tag ref v1.0.169 (claude-add-tag-ref) exited 0 and checked out the tag's commit 589d8214; no ref (claude-add-no-ref) exited 0, recorded no ref and checked out the default-branch head 5a92b7ca. Only the ref type differs between the failing and the working run.",
+    "The commit-ref run's final error is an SSH host-key failure, and it never printed the HTTPS clone line that both working runs print. Why the CLI chose that path for a commit ref is not established; the documented contract is that marketplace sources take a branch or tag, not a sha.",
+    "git itself does not accept a commit as clone --branch (git-clone-commit-as-branch, exit 128).",
+    "claude plugin install after the ref-less add (claude-install-no-ref) recorded gitCommitSha 5a92b7ca, not the reviewed 6f0cc684, in $CLAUDE_CONFIG_DIR/plugins/installed_plugins.json; this host's registry was unchanged.",
+    "bootstrap.md step 4a's check, as the page prints it, reported MISMATCH for that install and 'not installed' for the two absent plugins (bootstrap-check-scratch), and ok for all three plugins on this host's own registry (bootstrap-check-host).",
+    "codex plugin marketplace add with --ref 6f0cc684 (codex-add-commit-ref) exited 0, checked out 6f0cc684 and recorded ref = 6f0cc684 in config.toml, so Codex's --ref does hold the reviewed commit at add time."
+  ],
+  "limitations": [
+    "One run per form, on one host, on 2026-09-24; a later Claude Code release may change the commit-ref behavior.",
+    "The plugin was installed only into a scratch configuration. Its hooks and MCP server were not started, and the codex plugin itself was not added (codex plugin add was not run).",
+    "The claude-hud and codex-for-claude tag installs were not re-run here; their reviewed commits come from the tag objects (git ls-remote) and this host's registry.",
+    "The default-branch head (5a92b7ca) is the head at run time; a later install can land on a newer head, which is what step 4a's check detects."
+  ],
+  "live_config_before": {
+    "~/.claude/settings.json": "6a80f22287d616227e87888e5219863c00e08f0baa080c3232503c85262f0d04",
+    "~/.claude/plugins/installed_plugins.json": "d49b3e55d7f89f4b9e67a6476aa5b44a46c7363feaf03e45da2afdb0a28830a5",
+    "~/.claude/plugins/known_marketplaces.json": "8b20498b8867b8f42d96c50201dafd3b4322f48e9695171723fd0d9c590f007f",
+    "~/.codex/config.toml": "61840f0968cdca0039050e269ffe47b404c741b96ad815b611c0fffc0b7550d7"
+  },
+  "live_config_after": {
+    "~/.claude/settings.json": "6a80f22287d616227e87888e5219863c00e08f0baa080c3232503c85262f0d04",
+    "~/.claude/plugins/installed_plugins.json": "d49b3e55d7f89f4b9e67a6476aa5b44a46c7363feaf03e45da2afdb0a28830a5",
+    "~/.claude/plugins/known_marketplaces.json": "8b20498b8867b8f42d96c50201dafd3b4322f48e9695171723fd0d9c590f007f",
+    "~/.codex/config.toml": "61840f0968cdca0039050e269ffe47b404c741b96ad815b611c0fffc0b7550d7"
+  },
+  "bootstrap_check_source": "python3 - <<'EOF'\nimport json, os, pathlib\nreviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude\n    \"context-mode@context-mode\": \"6f0cc6841c687e754059f36714a11233fda1a02b\",\n    \"claude-hud@claude-hud\": \"ef5f1c8b167572ad1443c70629763ea8780af96b\",\n    \"codex@openai-codex\": \"db52e28f4d9ded852ab3942cea316258ae4ef346\",\n}\nconfig = pathlib.Path(os.environ.get(\"CLAUDE_CONFIG_DIR\") or pathlib.Path.home() / \".claude\")\nregistry = json.loads((config / \"plugins/installed_plugins.json\").read_text())\nfor key, sha in reviewed.items():\n    found = [entry.get(\"gitCommitSha\") for entry in registry.get(\"plugins\", {}).get(key, [])]\n    print(\"ok\" if found and set(found) == {sha} else \"MISMATCH\", key, found or \"not installed\")\nEOF\n",
+  "runs": [
+    {
+      "id": "claude-version",
+      "purpose": "Client version",
+      "argv": [
+        "claude",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {},
+      "started_at_utc": "2026-09-24T04:23:16.503Z",
+      "finished_at_utc": "2026-09-24T04:23:16.512Z",
+      "exit_code": 0,
+      "stdout": "2.1.281 (Claude Code)\n",
+      "stderr": ""
+    },
+    {
+      "id": "codex-version",
+      "purpose": "Client version",
+      "argv": [
+        "codex",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {},
+      "started_at_utc": "2026-09-24T04:23:16.512Z",
+      "finished_at_utc": "2026-09-24T04:23:16.520Z",
+      "exit_code": 0,
+      "stdout": "codex-cli 0.155.1\n",
+      "stderr": ""
+    },
+    {
+      "id": "git-version",
+      "purpose": "Git version",
+      "argv": [
+        "git",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {},
+      "started_at_utc": "2026-09-24T04:23:16.520Z",
+      "finished_at_utc": "2026-09-24T04:23:16.522Z",
+      "exit_code": 0,
+      "stdout": "git version 2.43.0\n",
+      "stderr": ""
+    },
+    {
+      "id": "claude-add-commit-ref",
+      "purpose": "The former recipe form: a commit as the marketplace ref",
+      "argv": [
+        "claude",
+        "plugin",
+        "marketplace",
+        "add",
+        "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b",
+        "--scope",
+        "user"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "<SCRATCH>/claude-commit-ref"
+      },
+      "started_at_utc": "2026-09-24T04:23:16.522Z",
+      "finished_at_utc": "2026-09-24T04:23:17.313Z",
+      "exit_code": 1,
+      "stdout": "Adding marketplace\u2026\n",
+      "stderr": "\u2718 Failed to add marketplace: Failed to clone marketplace repository: SSH host key is not in your known_hosts file. To add it, connect once manually (this will show the fingerprint for you to verify):\n  ssh -T git@github.com\n\nOr use an HTTPS URL instead (recommended for public repos).\n\nOriginal error: Cloning into '<SCRATCH>/claude-commit-ref/plugins/marketplaces/mksglu-context-mode..clone'...\nNo ED25519 host key is known for github.com and you have requested strict checking. \nHost key verification failed. \nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\n",
+      "observed": {
+        "known_marketplaces": "unreadable: FileNotFoundError",
+        "git_checkouts": []
+      }
+    },
+    {
+      "id": "claude-add-tag-ref",
+      "purpose": "Control on the same repository: a tag as the marketplace ref",
+      "argv": [
+        "claude",
+        "plugin",
+        "marketplace",
+        "add",
+        "mksglu/context-mode@v1.0.169",
+        "--scope",
+        "user"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "<SCRATCH>/claude-tag-ref"
+      },
+      "started_at_utc": "2026-09-24T04:23:17.313Z",
+      "finished_at_utc": "2026-09-24T04:23:19.259Z",
+      "exit_code": 0,
+      "stdout": "Adding marketplace\u2026SSH not configured, cloning via HTTPS: https://github.com/mksglu/context-mode.git\nRefreshing marketplace cache (timeout: 120s)\u2026\nCloning repository (timeout: 120s): https://github.com/mksglu/context-mode.git (ref: v1.0.169)\nClone complete, validating marketplace\u2026\nCleaning up old marketplace cache\u2026\n\u2714 Successfully added marketplace: context-mode (declared in user settings)\n",
+      "stderr": "",
+      "observed": {
+        "known_marketplaces": {
+          "context-mode": {
+            "source": {
+              "source": "github",
+              "repo": "mksglu/context-mode",
+              "ref": "v1.0.169"
+            },
+            "installLocation": "<SCRATCH>/claude-tag-ref/plugins/marketplaces/context-mode",
+            "lastUpdated": "2026-09-24T04:23:19.121Z"
+          }
+        },
+        "checkout_heads": {
+          "<SCRATCH>/claude-tag-ref/plugins/marketplaces/context-mode": "589d8214d56740a28b5f7bf63167743d586b0b40"
+        }
+      }
+    },
+    {
+      "id": "git-clone-commit-as-branch",
+      "purpose": "Git itself: a commit is not a clone --branch",
+      "argv": [
+        "git",
+        "clone",
+        "--depth",
+        "1",
+        "--branch",
+        "6f0cc6841c687e754059f36714a11233fda1a02b",
+        "https://github.com/mksglu/context-mode.git",
+        "<SCRATCH>/git-clone-commit"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {},
+      "started_at_utc": "2026-09-24T04:23:19.262Z",
+      "finished_at_utc": "2026-09-24T04:23:19.720Z",
+      "exit_code": 128,
+      "stdout": "",
+      "stderr": "Cloning into '<SCRATCH>/git-clone-commit'...\nwarning: Could not find remote branch 6f0cc6841c687e754059f36714a11233fda1a02b to clone.\nfatal: Remote branch 6f0cc6841c687e754059f36714a11233fda1a02b not found in upstream origin\n"
+    },
+    {
+      "id": "git-ls-remote",
+      "purpose": "Default-branch head and the v1.0.169 tag at run time",
+      "argv": [
+        "git",
+        "ls-remote",
+        "https://github.com/mksglu/context-mode.git",
+        "HEAD",
+        "refs/tags/v1.0.169^{}"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {},
+      "started_at_utc": "2026-09-24T04:23:19.720Z",
+      "finished_at_utc": "2026-09-24T04:23:20.224Z",
+      "exit_code": 0,
+      "stdout": "5a92b7caaf0086d04b87cc03a82505c891aa8254\tHEAD\n589d8214d56740a28b5f7bf63167743d586b0b40\trefs/tags/v1.0.169^{}\n",
+      "stderr": ""
+    },
+    {
+      "id": "claude-add-no-ref",
+      "purpose": "The corrected recipe form: no ref",
+      "argv": [
+        "claude",
+        "plugin",
+        "marketplace",
+        "add",
+        "mksglu/context-mode",
+        "--scope",
+        "user"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "<SCRATCH>/claude-no-ref"
+      },
+      "started_at_utc": "2026-09-24T04:23:20.224Z",
+      "finished_at_utc": "2026-09-24T04:23:21.764Z",
+      "exit_code": 0,
+      "stdout": "Adding marketplace\u2026SSH not configured, cloning via HTTPS: https://github.com/mksglu/context-mode.git\nRefreshing marketplace cache (timeout: 120s)\u2026\nCloning repository (timeout: 120s): https://github.com/mksglu/context-mode.git\nClone complete, validating marketplace\u2026\nCleaning up old marketplace cache\u2026\n\u2714 Successfully added marketplace: context-mode (declared in user settings)\n",
+      "stderr": "",
+      "observed": {
+        "known_marketplaces": {
+          "context-mode": {
+            "source": {
+              "source": "github",
+              "repo": "mksglu/context-mode"
+            },
+            "installLocation": "<SCRATCH>/claude-no-ref/plugins/marketplaces/context-mode",
+            "lastUpdated": "2026-09-24T04:23:21.636Z"
+          }
+        },
+        "settings_extraKnownMarketplaces": {
+          "context-mode": {
+            "source": {
+              "source": "github",
+              "repo": "mksglu/context-mode"
+            }
+          }
+        },
+        "checkout_heads": {
+          "<SCRATCH>/claude-no-ref/plugins/marketplaces/context-mode": "5a92b7caaf0086d04b87cc03a82505c891aa8254"
+        }
+      }
+    },
+    {
+      "id": "claude-install-no-ref",
+      "purpose": "Install the plugin from that marketplace",
+      "argv": [
+        "claude",
+        "plugin",
+        "install",
+        "context-mode@context-mode",
+        "--scope",
+        "user",
+        "--json"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "<SCRATCH>/claude-no-ref"
+      },
+      "started_at_utc": "2026-09-24T04:23:21.767Z",
+      "finished_at_utc": "2026-09-24T04:23:22.901Z",
+      "exit_code": 0,
+      "stdout": "{\"command\":\"install\",\"outcome\":\"ok\",\"plugin\":\"context-mode@context-mode\",\"pluginId\":\"context-mode@context-mode\",\"scope\":\"user\",\"message\":\"Successfully installed plugin: context-mode@context-mode (scope: user)\"}\n",
+      "stderr": "",
+      "observed": {
+        "registry_path": "<SCRATCH>/claude-no-ref/plugins/installed_plugins.json",
+        "registry_exists": true,
+        "home_registry_unchanged_so_far": true,
+        "context_mode_entries": [
+          {
+            "scope": "user",
+            "installPath": "<SCRATCH>/claude-no-ref/plugins/cache/context-mode/context-mode/1.0.169",
+            "version": "1.0.169",
+            "installedAt": "2026-09-24T04:23:22.101Z",
+            "lastUpdated": "2026-09-24T04:23:22.101Z",
+            "gitCommitSha": "5a92b7caaf0086d04b87cc03a82505c891aa8254"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bootstrap-check-scratch",
+      "purpose": "bootstrap.md step 4a check against the scratch install (CLAUDE_CONFIG_DIR set)",
+      "argv": [
+        "bash",
+        "-c",
+        "python3 - <<'EOF'\nimport json, os, pathlib\nreviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude\n    \"context-mode@context-mode\": \"6f0cc6841c687e754059f36714a11233fda1a02b\",\n    \"claude-hud@claude-hud\": \"ef5f1c8b167572ad1443c70629763ea8780af96b\",\n    \"codex@openai-codex\": \"db52e28f4d9ded852ab3942cea316258ae4ef346\",\n}\nconfig = pathlib.Path(os.environ.get(\"CLAUDE_CONFIG_DIR\") or pathlib.Path.home() / \".claude\")\nregistry = json.loads((config / \"plugins/installed_plugins.json\").read_text())\nfor key, sha in reviewed.items():\n    found = [entry.get(\"gitCommitSha\") for entry in registry.get(\"plugins\", {}).get(key, [])]\n    print(\"ok\" if found and set(found) == {sha} else \"MISMATCH\", key, found or \"not installed\")\nEOF\n"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "<SCRATCH>/claude-no-ref"
+      },
+      "started_at_utc": "2026-09-24T04:23:22.902Z",
+      "finished_at_utc": "2026-09-24T04:23:22.921Z",
+      "exit_code": 0,
+      "stdout": "MISMATCH context-mode@context-mode ['5a92b7caaf0086d04b87cc03a82505c891aa8254']\nMISMATCH claude-hud@claude-hud not installed\nMISMATCH codex@openai-codex not installed\n",
+      "stderr": ""
+    },
+    {
+      "id": "bootstrap-check-host",
+      "purpose": "The same check read-only against this host's registry",
+      "argv": [
+        "bash",
+        "-c",
+        "<bootstrap_check_source>"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CLAUDE_CONFIG_DIR": "(unset)"
+      },
+      "started_at_utc": "2026-09-24T04:23:22.921Z",
+      "finished_at_utc": "2026-09-24T04:23:22.940Z",
+      "exit_code": 0,
+      "stdout": "ok context-mode@context-mode ['6f0cc6841c687e754059f36714a11233fda1a02b']\nok claude-hud@claude-hud ['ef5f1c8b167572ad1443c70629763ea8780af96b']\nok codex@openai-codex ['db52e28f4d9ded852ab3942cea316258ae4ef346']\n",
+      "stderr": ""
+    },
+    {
+      "id": "codex-add-commit-ref",
+      "purpose": "Codex: the recipe's --ref form with the reviewed commit",
+      "argv": [
+        "codex",
+        "plugin",
+        "marketplace",
+        "add",
+        "mksglu/context-mode",
+        "--ref",
+        "6f0cc6841c687e754059f36714a11233fda1a02b",
+        "--json"
+      ],
+      "cwd": "<SCRATCH>/work",
+      "env_overrides": {
+        "CODEX_HOME": "<SCRATCH>/codex-home"
+      },
+      "started_at_utc": "2026-09-24T04:23:22.940Z",
+      "finished_at_utc": "2026-09-24T04:23:24.175Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"marketplaceName\": \"context-mode\",\n  \"installedRoot\": \"<SCRATCH>/codex-home/.tmp/marketplaces/context-mode\",\n  \"alreadyAdded\": false\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<SCRATCH>/codex-home\"))\n",
+      "observed": {
+        "checkout_heads": {
+          "<SCRATCH>/codex-home/.tmp/marketplaces/context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b"
+        },
+        "config_toml": "[marketplaces.context-mode]\nsource_type = \"git\"\nsource = \"https://github.com/mksglu/context-mode.git\"\nref = \"6f0cc6841c687e754059f36714a11233fda1a02b\"\n"
+      }
+    }
+  ]
+}

@@ -357,7 +357,7 @@
           "codex plugin add context-mode@context-mode --json",
           "codex features enable hooks",
           "codex features enable plugin_hooks",
-          "claude plugin marketplace add mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b --scope user",
+          "claude plugin marketplace add mksglu/context-mode --scope user",
           "claude plugin install context-mode@context-mode --scope user --json"
         ],
         "use": [
@@ -370,7 +370,7 @@
           "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_stats --args '{}' --output text --no-oauth"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "Native plugin source pinned to `6f0cc6841c687e754059f36714a11233fda1a02b`; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence.",
+        "install_note": "Native plugin source reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not a pin both clients enforce. Codex's `--ref` checks it out; a Claude marketplace source takes a branch or tag and never a commit, so the Claude commands install the default-branch head, and the installed `gitCommitSha` is then compared with the reviewed revision; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence.",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
       "returned_result_summary": "Foundation reporter at 15:50:45 UTC retained separate Context Mode event estimates: Desktop WSL 2,264,064, native Claude 57,856 and native Codex 79,616. They are not matched process-session deltas. 2026-09-20 14:55:58\u201359 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate. The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
