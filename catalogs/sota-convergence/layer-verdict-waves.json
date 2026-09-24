@@ -1,0 +1,14 @@
+{
+ "generated_by": "tools/sota-convergence/build_verdicts.py",
+ "schema_version": 1,
+ "scope": "One entry per layer-verdict wave document. Every wave older than the newest is frozen: build_verdicts.py --check verifies it byte for byte against this sha256 and against the ledger rows whose lanes.sealed_base names it, and --write refuses to rewrite it.",
+ "waves": [
+  {
+   "checked_at": "2026-09-22",
+   "manifest": "catalogs/sota-convergence/manifest-20260922.json",
+   "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+   "run_id": "20260922",
+   "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+  }
+ ]
+}

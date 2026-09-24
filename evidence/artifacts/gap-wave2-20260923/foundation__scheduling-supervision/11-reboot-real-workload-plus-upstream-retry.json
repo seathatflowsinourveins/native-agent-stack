@@ -1,0 +1,60 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-11",
+  "gap_index": 11,
+  "gap_text_sha256": "391bd13010b28e59316c98794f8b8a22bce39f7e7a26c84d57ea5aee083eba4f",
+  "preregistration": {
+    "written_at": "2026-09-22T22:42:40-04:00",
+    "expectation": "One driver invocation executes both oracles: (a) the unchanged upstream Dagu retry tests at v2.16.6 (source archive sha256 8f4b1095..., `go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd`, Go 1.27.0 downloaded into the isolated cache, GOTOOLCHAIN=local) and (b) a real project workflow (validate.py + build_ecosystem.py --check on a HEAD snapshot) carried through an orderly-restart analog: boot 1 is an unprivileged user+pid+mount namespace whose init runs `dagu start`; when finalize waits, init receives SIGTERM, forwards it, and the namespace is torn down; boot 2 is a fresh namespace whose boot service checks the changed boot token and runs `dagu retry --run-id <same> --step finalize`. The disposable QEMU guest reboot itself cannot run here (driver refuses non-hosted runners; no qemu-system/cloud-image-utils without sudo; user not in the kvm group; pushing to dispatch the hosted workflow is forbidden).",
+    "criteria": "Advanced iff both oracles pass in one run result: upstream tests exit 0 with 0 failures, and the real workflow shows aborted-by-shutdown -> retried succeeded under the same run id with checkpoint count 1 and outputs equal to a direct reference run. Cannot be settled here because the guest kernel reboot protocol is not reproduced; that remainder is named.",
+    "committed_before_running": "git commit 7802cab (preregistrations/11.json)"
+  },
+  "commands": [
+    "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run bash blueprints/gap-wave2-20260923/foundation__scheduling-supervision/upstream_setup.sh   # setup: downloads Go 1.27.0 (70,523,269 B, sha256 675c26c4...), Dagu source 58fed633 (sha256 8f4b1095...), and `go mod download` (module cache 2.1 GB) into the isolated cache",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_HIGH=8G ECOSYSTEM_JOB_MEMORY_MAX=10G ECOSYSTEM_JOB_TASKS_MAX=2048 $HOME/codex-ecosystem/bin/ecosystem-bounded-run python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/reboot_analog.py --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994",
+    "(inside, oracle a) env -i PATH=<go1.27.0>:/usr/bin:/bin HOME=<tmp> GOPATH=<cache> GOCACHE=<fresh> GOTOOLCHAIN=local GOSUMDB=sum.golang.org go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd   # in a fresh extraction of the pinned archive",
+    "(inside, oracle b) unshare --user --map-current-user --pid --fork --mount-proc python3 ns_init.py boot1 ...  # dagu start --run-id realboot-59dd2fcf40df9ebc realboot.yaml; SIGTERM to namespace init when finalize waits",
+    "(inside, oracle b) unshare --user --map-current-user --pid --fork --mount-proc python3 ns_init.py boot2 ...  # boot service: dagu retry --run-id realboot-59dd2fcf40df9ebc --step finalize realboot.yaml"
+  ],
+  "results": [
+    "both_oracles_passed=true in one result.json (started 02:53:14Z, completed 02:54:19Z) -- raw/11-reboot-analog-run/result.json",
+    "oracle a: exit_code 0, go version go1.27.0 linux/amd64, 3 top-level PASS + 12 subtest PASS (15 pass records, same as the accepted hosted run), 0 FAIL, 0 SKIP, final line 'ok  github.com/dagucloud/dagu/v2/internal/cmd 5.615s', source_unchanged=true over 3261 files; report raw/11-reboot-analog-run/upstream__reports__upstream-tests.txt",
+    "oracle b: running_before_shutdown, no_completed_effect_before_boot2, boot_identity_changed, boot1_processes_retired, boot2_retry_exit_zero, after_retry_succeeded_same_run_id, checkpoint_unchanged_count_one, validate_equals_reference, ecosystem_equals_reference all true; status_after_shutdown='aborted'",
+    "boot1 shutdown: pids_at_shutdown [2,20,21,22] all exited within 0.05 s after SIGTERM, pids_left_for_kernel_kill []; dagu start logged 'signal: terminated'. Native attempts: status 3 (aborted) triggerType 2 (manual start) then status 4 (succeeded) triggerType 5 (retry)",
+    "DISCLOSED FAILED ATTEMPT (raw/11-reboot-analog-attempt1-failed/): the first full run passed oracle a but boot2 refused with 'Boot identity did not change' because both namespaces reported pid:[4026532246] -- the kernel recycled the pid-namespace inode number. The identity check was changed to the random per-boot token plus boot1's completed shutdown record, and the whole driver (both oracles) was rerun."
+  ],
+  "outcome": "advanced",
+  "outcome_detail": "Both halves the gap names now exist together: a real project workflow (not the synthetic planner fixture) recovered across an orderly restart, and the unchanged upstream Dagu retry tests at v2.16.6 ran in the same invocation with both oracles in one result. Remaining: the restart is a user+pid+mount-namespace analog, not the disposable Ubuntu guest kernel reboot with a lingering systemd user timer that the service-reboot protocol specifies. Binding blocker: the protocol driver refuses to run anywhere except the declared disposable GitHub-hosted runner (blueprints/convergence-practice/service-reboot/run.py lines 149-150: `if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted': raise ValueError('Execution requires the declared disposable GitHub-hosted runner')`), and dispatching the hosted workflow would need a pushed branch, which this unit may not create. Why a local port of the protocol was not attempted (not a hard blocker): qemu-system-x86_64, qemu-img and cloud-localds are absent, and this user is not in the kvm group (/dev/kvm is root:kvm 0660). Rootless options exist and were not tried: fetch the packages with `apt-get download` and unpack them with `dpkg -x` into the cache, then boot the guest under QEMU TCG without /dev/kvm. Such a port would also have to change or bypass the driver's guard, so it would no longer be the unchanged protocol. (Fix round 3 corrected an earlier wording that called the qemu packages and the kvm group blockers needing sudo.)",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Namespace restart analog: same kernel, same filesystem, no systemd/linger, no boot-ID change; the boot service is the driver-launched boot2 namespace rather than a timer.",
+    "Upstream tests ran locally on WSL2 from a pre-populated module cache, not on a fresh hosted runner; test source and command are unchanged.",
+    "Single passing run after one disclosed failed attempt.",
+    "Executed helper revision: b7aec6b, not HEAD. Fix round 1 changed four of the six helpers in the g11 freeze inputs (codex_cancel_probe.py, dagu_common.py, real_scheduled_recovery.py, real_steps.py); see executed_helper_revision.",
+    "Unit-level isolation (fix round 2 cross-reference): this receipt's isolation statements cover this gap's own runs only. During fix round 1, between the fix-round preregistration and the F1/F2/F3 reruns, an unquoted heredoc started an unintended `dagu scheduler` (PATH dagu, default config) that wrote state into the default Dagu home $HOME/.local/share/dagu/data and bound :8090 on all interfaces for about 2 min 15 s, and an unintended `codex exec` that was killed while waiting for stdin. Fix round 2 verified that the running host `dagu server` (pid 366, the dagu-equities service) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities, a different store. See incidents/2026-09-22-fix-round-heredoc-substitution.json.",
+    "Helper change after execution (fix round 3): dagu_common.py was edited after this receipt's runs. codex_gate() now raises CodexGateTimeout instead of returning when 2 or more other `codex exec` processes still run at max_wait, and codex_exec_processes() also counts `codex <global options> exec` and the `e` alias. The executed revisions named in this receipt are unchanged and remain the ones that ran. Only one gated model call was made in the whole unit (fix-round F3, gap 2); it waited 0 s with 0 other processes counted by the old matcher, so the timeout path was not reached. Whether the broader matcher would have counted more processes at that time cannot be re-observed. Synthetic test: raw/fix3/codex-gate-test.txt."
+  ],
+  "raw_outputs": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-run/, evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-attempt1-failed/, evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-upstream-setup/",
+  "checked_at": "2026-09-22T22:54:30-04:00",
+  "executed_helper_revision": {
+    "revision": "b7aec6b",
+    "note": "Gap 11 ran the helpers as committed at b7aec6b (raw/executed-vs-committed-helpers.json compares the g11-run-1790131994/freeze.json inputs with git b7aec6b: identical, or identical after inverse home-path substitution). Fix round 1 later changed codex_cancel_probe.py, dagu_common.py, real_scheduled_recovery.py and real_steps.py (codex_gate, PRIVATE_CONFIG, listener sampling); ns_init.py and reboot_analog.py are unchanged. Gap 11 was not re-run, so reproduce it with `git checkout b7aec6b -- blueprints/gap-wave2-20260923/foundation__scheduling-supervision/` (or `git show b7aec6b:<path>`), not with HEAD's helpers.",
+    "hash_table": "raw/incident-1/fix-round-2-equities-store-and-helper-revisions.txt (section 'g11 freeze input helpers')"
+  },
+  "fix_round_2": {
+    "edited_at": "2026-09-23T08:50:58-04:00",
+    "changes": "Receipt text only; no check re-run. Added the unit-level isolation cross-reference; named b7aec6b as the executed helper revision."
+  },
+  "fix_round_3": {
+    "edited_at": "2026-09-23T10:18:07-04:00",
+    "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+    "review_findings_addressed": [
+      2,
+      4
+    ],
+    "changes": "Named the driver's hosted-runner guard as the binding blocker; restated the qemu/kvm points as the reason a local port was not attempted and named the rootless options. Added the helper-change limit. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/receipt-3-11-checks.txt (run.py:145-152 quote; qemu, kvm and group observations)",
+      "raw/fix3/codex-gate-test.txt"
+    ]
+  }
+}

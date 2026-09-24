@@ -1,0 +1,18 @@
+started=2026-09-23T14:21:01Z cgroup_of_caller=0::/init.scope cgroup_dir_owner=root:root
+mode=ns-root systemd_exit=1
+mode=nested-uid1000 systemd_exit=1
+stopped=2026-09-23T14:21:01Z
+--- failing syscalls (EACCES/EPERM) and exit, from strace -f:
+openat(AT_FDCWD, "/dev/console", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+openat(AT_FDCWD, "/dev/console", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+mknodat(AT_FDCWD, "$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-diag-1rSKDgI6/run/systemd/inaccessible/blk", S_IFBLK|000, makedev(0, 0)) = -1 EPERM (Operation not permitted)
+mkdirat(AT_FDCWD, "/run/user/0", 0755) = -1 EACCES (Permission denied)
+prlimit64(0, RLIMIT_MEMLOCK, {rlim_cur=6165964*1024, rlim_max=6165964*1024}, NULL) = -1 EPERM (Operation not permitted)
+openat(AT_FDCWD, "/sys/fs/cgroup/init.scope/cgroup.procs", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+exit_group(1)                     = ?
+openat(AT_FDCWD, "/dev/console", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+openat(AT_FDCWD, "/dev/console", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+mknodat(AT_FDCWD, "$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-diag-1rSKDgI6/run/systemd/inaccessible/blk", S_IFBLK|000, makedev(0, 0)) = -1 EPERM (Operation not permitted)
+prlimit64(0, RLIMIT_MEMLOCK, {rlim_cur=6165964*1024, rlim_max=6165964*1024}, NULL) = -1 EPERM (Operation not permitted)
+openat(AT_FDCWD, "/sys/fs/cgroup/init.scope/cgroup.procs", O_WRONLY|O_NOCTTY|O_CLOEXEC) = -1 EACCES (Permission denied)
+exit_group(1)                     = ?

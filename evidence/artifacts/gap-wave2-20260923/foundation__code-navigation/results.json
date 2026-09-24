@@ -1,0 +1,10 @@
+{
+  "0": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__code-navigation/0-matched-cross-candidate-benchmark.json"
+  },
+  "1": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__code-navigation/1-symbol-rename-delete-correctness.json"
+  }
+}

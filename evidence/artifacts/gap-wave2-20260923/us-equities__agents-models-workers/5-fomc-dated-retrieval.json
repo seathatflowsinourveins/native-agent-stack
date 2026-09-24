@@ -1,0 +1,113 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/5-fomc-dated-retrieval",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 5,
+ "gap_text": "Retrieval of dated financial sources is not established. The Qdrant/SocratiCode receipts record no financial-document corpus.",
+ "gap_text_sha256": "228d614b8d591fbfc131d11bbfeeb4f9367bf215f0590e8d5a359bea45c9838e",
+ "next_check": "Index a dated corpus of FOMC statements from federalreserve.gov into a disposable Qdrant collection and run dated queries with gold answers, recording recall and date correctness.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/5-fomc-dated-retrieval.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "Dense retrieval over FOMC statements (federalreserve.gov, 2023-2026) finds the right meeting for many dated queries, but pure semantic similarity will often return a neighbouring meeting because statements are nearly identical; a payload date filter derived from the query should raise date correctness to ~100%.",
+  "criteria": [
+   "Download the FOMC calendar page and every linked 2023-01..latest statement HTML (disclosed network download, small); record URLs, sha256 and fetched_at.",
+   "Generate queries mechanically from the corpus before any retrieval: for each statement, one dated query naming the meeting month and year and asking for the federal funds target range decided; gold = that statement's date and the target range regex-extracted from its text. Seal the query file (sha256) before indexing.",
+   "Index into a disposable Qdrant 1.19.1 collection on 127.0.0.1:27333 with payload {date,url}; embeddings from the same Nemotron-3-Embed-1B endpoint the adopted SocratiCode profile uses (read-only /v1/embeddings calls).",
+   "Report recall@1/@3/@5 of the gold document and top-1 date correctness for arm dense and arm dense+date-filter; report answer correctness (top-1 document's extracted target range equals gold).",
+   "No query rewriting after scores are seen."
+  ],
+  "late_amendment": {
+   "written_at": "2026-09-23T07:27:33Z",
+   "commit": "52bef05",
+   "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/5-fomc-dated-retrieval.ablation-late.json",
+   "label": "late preregistration: written AFTER the first run's results (both arms 30/30) were seen",
+   "expectation": "With the dateline and any explicit full dates (Month DD, YYYY) removed from the indexed text, the dense arm's top-1 date correctness drops well below 1.0 (neighbouring meetings with similar wording), while the dense+date_filter arm stays at 1.0 because the date lives in the payload.",
+   "criteria": [
+    "Same 30 sealed queries, same embedding endpoint, new collection g2amw_fomc_statements_nodate.",
+    "Remove every 'Month DD, YYYY' pattern and the 'For release at ... Share' header from the text before embedding; payload dates unchanged.",
+    "Report the same metrics for both arms; no further changes after seeing scores."
+   ]
+  }
+ },
+ "commands": [
+  "# main-round services (exact commands in raw/services-main-round.txt, exported fix round 2, not re-run): 07:18:45Z qdrant --config-path $GAPCACHE/qdrant.yaml --disable-telemetry (yaml: host 127.0.0.1, http 27333, grpc 27334, storage/snapshots under $GAPCACHE); 07:25:00Z HOME=$GAPCACHE/aim-home AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 AI_MEMORY_EMBEDDING_PROVIDER=none ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data init; 07:25:03Z sed -i on aim-data/config.toml: bind = 127.0.0.1:27374, embedding_provider = none; 07:25:07Z same env, setsid nohup ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data serve --transport http (log: bind=127.0.0.1:27374, providers llm disabled, embedding disabled); 07:39:45Z kill of both PIDs, ports 27333/27334/27374 verified free",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py <this unit's session transcript .jsonl> evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt  # fix round 2 export",
+  "curl -sS -A 'Mozilla/5.0 (research; gap-wave2)' https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm  # network download, 165,460 bytes, sha256 6ccbaf60...d748",
+  "curl each of 31 /newsevents/pressreleases/monetary20{23..26}MMDDa.htm links (1 s apart)  # network download, 2.6 MB total, all HTTP 200; per-file sha256 in fetch_log.tsv",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/build_corpus_and_queries.py $GAPCACHE/fomc $GAPCACHE/fomc/corpus.jsonl blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fomc_queries.json  # sealed sha256 395f7160... at 07:26:54Z, commit 6d508d8",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/index_and_eval.py $GAPCACHE/fomc/corpus.jsonl blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fomc_queries.json $GAPCACHE/out/gap5_fomc_eval.json",
+  "FOMC_ABLATE_DATES=1 python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/index_and_eval.py ...  # late-preregistered ablation, commit 52bef05"
+ ],
+ "results": {
+  "corpus": "31 federalreserve.gov pages 2023-02-01..2026-09-16 (30 FOMC statements + 1 framework-statement release as distractor), Qdrant collection g2amw_fomc_statements, 2048-dim Nemotron-3-Embed-1B, payload {date, date_int, url, target_range}",
+  "queries": "30 dated queries 'What target range for the federal funds rate did the FOMC set at its <Month> <YYYY> meeting?', gold = that statement's date and regex-extracted target range (8 distinct ranges)",
+  "dense": {
+   "recall@1": 1.0,
+   "recall@5": 1.0,
+   "mrr@5": 1.0,
+   "top1_date_correct": 1.0,
+   "top1_answer_correct": 1.0
+  },
+  "dense+date_filter": {
+   "recall@1": 1.0,
+   "recall@5": 1.0,
+   "mrr@5": 1.0,
+   "top1_date_correct": 1.0,
+   "top1_answer_correct": 1.0
+  },
+  "dateline_ablation (late): dense": {
+   "recall@1": 0.0667,
+   "recall@5": 0.1667,
+   "mrr@5": 0.0983,
+   "top1_date_correct": 0.0667,
+   "top1_answer_correct": 0.2333
+  },
+  "dateline_ablation (late): dense+date_filter": {
+   "recall@1": 1.0,
+   "top1_date_correct": 1.0,
+   "top1_answer_correct": 1.0
+  },
+  "reading": "Dense retrieval found the right meeting only because each statement carries its own dateline; with datelines removed it returned the wrong meeting 28/30 times (mostly 2026-01-28). Date correctness for dated financial sources therefore needs an as-of payload filter; with it, 30/30 in both conditions. The preregistered expectation (neighbouring-meeting confusion without a filter) was refuted for the as-published text and confirmed only after ablation."
+ },
+ "outcome": "settled",
+ "what_remains": null,
+ "evidence_class": "local_integration",
+ "limits": [
+  "One source type (FOMC statements), 30 templated queries; not a holdout of analyst questions or a broad financial RAG benchmark.",
+  "'Answer correctness' is a regex lookup of the retrieved document's target range, not a model-generated answer.",
+  "Queried through Qdrant directly with the adopted embedder, not through SocratiCode's code-oriented tools (SocratiCode exposes no date payload filter).",
+  "Network downloads from federalreserve.gov (about 2.8 MB total) are disclosed; raw HTML stays in the cache, hashes are committed.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/5-fomc-eval-dense-and-filter.json",
+   "sha256": "b951f9a1e92bd5a7c91adaa01448beed85911850b220c555c4bea6db4b46c450"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/5-fomc-eval-dateline-ablation.json",
+   "sha256": "448e6df904acb7281d2e39205092a6e291f485bbb850232c4190cece40b91cd3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt",
+   "sha256": "d1109be89f5b729b21737ae6a579d34abf0f9a9a0b4bc74e5c61833c221a03a1",
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/build_corpus_and_queries.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/index_and_eval.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fomc_queries.json",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fomc_queries.json.sha256",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/SEALED_AT.txt",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/corpus.jsonl.sha256",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fetch_log.tsv",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/statement_links.txt",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py"
+ ],
+ "checked_at": "2026-09-23"
+}

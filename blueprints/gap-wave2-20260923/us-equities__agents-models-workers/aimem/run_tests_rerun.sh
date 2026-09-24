@@ -1,0 +1,4 @@
+#!/bin/sh
+# runs inside: outer userns (root-mapped) + fresh netns; brings lo up, then drops to uid 1000 in a nested userns
+ip link set lo up || exit 90
+exec unshare --user --map-user=1000 --map-group=1000 env -i RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/rustup CARGO_HOME=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/cargo CARGO_TARGET_DIR=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/target HOME=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/testhome TMPDIR=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp PATH=$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/cargo/bin:/usr/bin:/bin AI_MEMORY_SERVER_URL=http://127.0.0.1:27375 LANG=C.UTF-8 sh -c 'ss -ltn; cd $HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0 && cargo test -p ai-memory-cli --test suite --locked --offline -j 12 --no-fail-fast'

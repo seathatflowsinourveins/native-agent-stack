@@ -1,0 +1,220 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/4-lean-oracle-alpaca-brokerage-model",
+  "gap_index": 4,
+  "gap_text_sha256": "4d9e0b7274baa32b1f95765448df6b809224841affd1ec638a317bdf4e7bdcc2",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "advanced: running the six frozen LEAN SPY oracle cases with SetBrokerageModel(BrokerageName.Alpaca, AccountType.Margin) added before AddEquity (all other lines unchanged) is expected to change behaviour because AlpacaBrokerageModel only accepts MarketOnOpen orders submitted between 19:00 and 09:28 New York, while the oracle submits at the 16:00 bar: entry orders are expected to be rejected as Invalid and the algorithm's lifecycle check to fail. The Alpaca adapter paper-endpoint initialization arm is broker contact and is deferred to peer:sota-workflow-resolution.",
+    "criteria": [
+      "settled only if both the Alpaca brokerage-model oracle run and an Alpaca adapter initialization against paper endpoints are executed and recorded",
+      "advanced if the brokerage-model arm runs offline for all six cases with per-case exit code, order statuses and rejection messages recorded",
+      "detection: per-case LEAN exit code, stderr, audit ledger order events (status Invalid plus message) and fill count; a zero-fill run with no rejection message would be reported as unexplained"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Run the LEAN SPY oracle with SetBrokerageModel(BrokerageName.Alpaca), initialize the Alpaca adapter against paper endpoints, and record the results.",
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/us-equities__backtesting-engine/lean_alpaca_brokerage_oracle.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --dotnet $HOME/.local/share/codex-ecosystem/tools/dotnet-equity10/dotnet --out $HOME/.cache/gap-wave2-20260923/backtesting-engine/lean-alpaca",
+    "(each LEAN compile/launch runs inside the existing execution-realism bwrap sandbox: --unshare-all, --cap-drop ALL, --clearenv, read-only engine/data/SDK; exact per-command argv, with $HOME substituted, is retained in raw/4-fix1-lean-report.json from the fix-round rerun; the first run's report did not record argv)"
+  ],
+  "results": {
+    "helper_exit_code": 0,
+    "wall_seconds": 36,
+    "variant_diff": "one inserted line after SetTimeZone: SetBrokerageModel(QuantConnect.Brokerages.BrokerageName.Alpaca, AccountType.Margin);",
+    "control_unchanged_algorithm": {
+      "one_zero": "exit 0, 2 fills, end equity 90734.08",
+      "one_stress": "exit 0, 2 fills, 90358.00",
+      "two_zero": "exit 0, 5 fills, 3 margin calls, 76310.34",
+      "two_stress": "exit 0, 5 fills, 3 margin calls, 75607.75",
+      "adaptive_stress": "exit 0, 3 fills, 95324.10",
+      "over_limit": "exit 0, 0 fills, 1 Invalid (insufficient buying power)",
+      "matches_retained_receipt": "all six end equities and the 381/390/202-byte stderr sizes equal the retained historical-simulation receipt"
+    },
+    "alpaca_brokerage_model": {
+      "one_zero|one_stress|two_zero|two_stress|adaptive_stress": "exit 1, 0 fills, entry MarketOnOpen order Invalid: 'BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.'; the algorithm then threw 'Expected a nonzero stress order.' at 2020-04-29 16:00 (native Status RuntimeError).",
+      "over_limit": "exit 0, 0 fills, 1 Invalid with the same insufficient-buying-power message as the control (buying-power validation precedes the brokerage-model check).",
+      "source_explanation": "AlpacaBrokerageModel at LEAN 985ef30 accepts MarketOnOpen only between 19:00 and 2 minutes before the regular open (09:28) New York; the oracle submits at the 16:00 bar. The rejection text prints the 19:00 start as '07:00' (12-hour format)."
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-lean-report.json",
+      "sha256": "67ed354e10c85efd8a90ec2102385d365e82d39d5b33b96f81d82e6714b80107"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-helper.stdout.txt",
+      "sha256": "a43690b16824f09b63e679d543ae9d8bfe92c82fd3bd946eb9ef9f04b728c745"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-helper.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-helper.exit.txt",
+      "sha256": "556be8a73b2b0e01434adf6f7fc8d918b9e88695d35857fb8e0dd08e2bf0fc7e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-helper.started_at.txt",
+      "sha256": "85fe659974d161cd5758d5279d3d5f74bec4740a1c503c20f54b7734d68a3487"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-report.json",
+      "sha256": "bfb153391da3075222138174e06832243e8f29ee2a2f648b5ddfabf9c7fcd571"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-helper.stdout.txt",
+      "sha256": "a43690b16824f09b63e679d543ae9d8bfe92c82fd3bd946eb9ef9f04b728c745"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-helper.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-helper.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-helper.started_at.txt",
+      "sha256": "07b74ec32a584e225b05bdc57d4f76af77ed78088501e1ec17dd266085f7d3d1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-lean-alpaca-adaptive_stress.stderr.first-run.txt",
+      "sha256": "f37c58e0f0b5f7ffa7b18d7ac3e7a03037b1fe33ff48067d399bc22abbd4756f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-alpaca-variant-HistoricalSimulationAlgorithm.cs",
+      "sha256": "b73742117b77031b32bcff993c58f69ff50ff6fddac033ad4cd05fbde055d95c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-compile.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-compile.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-one_zero.stdout.txt",
+      "sha256": "1dd079529f4b1a9a7f53d041cb0d3de35f366db9b268394e5a3c02d788958205"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-one_zero.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-one_stress.stdout.txt",
+      "sha256": "bf9ac1f98142ba2a9c6a40795e29f758435fca91b07fe4adaf7c1c4ceabe7146"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-one_stress.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-two_zero.stdout.txt",
+      "sha256": "72350cd4fafcf5500176e333a0a5043019d93d4ad3e3c09b6945e94163f7fe51"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-two_zero.stderr.txt",
+      "sha256": "f833366a2565d4d8e16f3609107448f71e1c4d9e39785c234e759ea9c0c39e0c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-two_stress.stdout.txt",
+      "sha256": "d8d94f9d58e87126ff57d976aac7b3e16dd5c1a8ab12ea9d752df9c71923ae5f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-two_stress.stderr.txt",
+      "sha256": "143306a8796926f7b6b6d8c2359fcfd3f566a8f3d9e02c79b8926bef1fc8c1f2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-adaptive_stress.stdout.txt",
+      "sha256": "fb287c836e1f52ea2370eee52f2b5462577f6ccdb1e1442b37ae1511ae1141c0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-adaptive_stress.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-over_limit.stdout.txt",
+      "sha256": "61796478d5537c38458568be79c5b9fbc0710c65892a116e68810ddfda982128"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-control-over_limit.stderr.txt",
+      "sha256": "e8f7d6afbdee952d77fdf71548dbabc94ea74cda226586b720c3d37d355ee386"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-compile.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-compile.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-one_zero.stdout.txt",
+      "sha256": "8b74c23e6be4252e86d0d5dddcae2785d3a7a36c746d4ce1630e54b38f3c0930"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-one_zero.stderr.txt",
+      "sha256": "1bdd8c6f62da3b8e83b313c8a859baa671b0b01a557c82fff8e603f65dafd5a7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-one_stress.stdout.txt",
+      "sha256": "0f84d079a8f3a460ffcbf09a9464efdf8ff10699477e2686c1fe2efd9c6aeff1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-one_stress.stderr.txt",
+      "sha256": "1112b78074536b497f75a34275e67a672661052ff406faf8063f08b923227875"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-two_zero.stdout.txt",
+      "sha256": "95c8867ec3b614495a325664919886383f6b11089f189ea76f9bb89077c979df"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-two_zero.stderr.txt",
+      "sha256": "41acb8ecaac47d3a2fa51d68c1c161a1a9a6946a61fd2bdb24b7416ffbdd207d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-two_stress.stdout.txt",
+      "sha256": "0cc29f0945ebb08ae09a8a8d0056185fc5f9f7ab426c4691962b0a55aa1ae042"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-two_stress.stderr.txt",
+      "sha256": "3343c8ab93e9579934493104ae60514bf17912cddc36aee17a3bed58240c2d64"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-adaptive_stress.stdout.txt",
+      "sha256": "50974efd1e8540498dfc8ecf436a694effb9030456a719f9fc44605f2dce47e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-adaptive_stress.stderr.txt",
+      "sha256": "75e0b21e2508aca7240da6a5936754467c3e1cde65597c741e9adb52db694904"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-over_limit.stdout.txt",
+      "sha256": "128eb9a720b687c80c610ccf8b4df2a4833f041326d407c5c18dcd648b89067f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-fix1-lean-alpaca-over_limit.stderr.txt",
+      "sha256": "95387594f9dce2018e5d089e774e2aff94c09f0ad445fbac33040eb0f01fdf5e"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "remaining": "(a) Alpaca adapter initialization against paper endpoints is broker contact: deferred, owner peer:sota-workflow-resolution. (b) The frozen oracle cannot run unchanged under the Alpaca brokerage model; a schedule that submits MOO inside 19:00-09:28 needs a newly preregistered plan. (c) The data remains bundled LEAN sample files, not an accepted vendor dataset.",
+  "limits": [
+    "Offline backtest only; no network, broker, adapter or credential.",
+    "The explicit per-security fee, slippage, fill and buying-power models set after AddEquity override the brokerage model's defaults, so only order-submission validation differs between the variants.",
+    "Preregistered expectation (MOO rejected at 16:00, lifecycle check fails) held for the five non-reject cases; over_limit was not predicted separately and is reported as observed.",
+    "Fix round 1 reran the helper with argv recording: identical exit codes, ledgers, analysis results and native states for all 12 launches. One log line differed: the Alpaca adaptive_stress stderr lacked the rejection log line in the rerun (1712 vs 1992 bytes; first-run file retained), while the order-event ledger still recorded the Invalid rejection. Per-case LEAN logs cited are from the rerun, with the machine hostname replaced by $HOSTNAME."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "fix_round_1": {
+    "preregistration_written_at": "2026-09-23T07:00:03Z",
+    "label": "fix-round 1 preregistration, written after the independent Codex review of c6c7f07/e951e32 and before any fix-round run; the original preregistration.json (2b93d4d) is unchanged",
+    "expectation": "Rerunning the LEAN helper with per-command argv recorded reproduces control and Alpaca-variant outcomes exactly (same exit codes, fills, Invalid messages, end equities).",
+    "criteria": [
+      "outcome stays advanced (adapter paper-endpoint arm deferred); any difference from the first run is reported"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix1.json (committed in 43a2f90 before the fix-round runs)"
+  }
+}

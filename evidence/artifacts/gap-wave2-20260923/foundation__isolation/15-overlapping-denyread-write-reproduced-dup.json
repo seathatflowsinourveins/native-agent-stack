@@ -1,0 +1,64 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-15",
+  "gap_index": 15,
+  "gap_text_sha256": "b64addfab857a9aa8377710e240d7669bb782567b2fad7987c238b80108b9af8",
+  "checked_at": "2026-09-23T01:03:12.569Z",
+  "outcome": "advanced",
+  "note": "Three configurations were tried (gap 3's denyRead+allowWrite, denyRead+denyWrite with a broad allowWrite, and denyRead+denyWrite with no allowWrite). None gave a direct denial for a write into a denyRead-covered directory; each returned write_exit=0 with the host unchanged. Direct `Read-only file system` denial appeared only when denyWrite covered a path not also covered by denyRead (gap 1). Three configurations do not show that no configuration can give a direct denial, so the question in the next_check is narrowed, not settled. Remaining: other combinations (nested paths, per-file entries) or a source reading of how srt builds the bwrap mounts for denyRead.",
+  "evidence_class": "local_integration",
+  "commands": [
+    "original#35 [2026-09-23T00:43:01.471Z]: SRT=$HOME/.local/share/codex-ecosystem/bin/srt\ncd $HOME/.cache/gap-wave2-20260923/isolation/fsfix\nmkdir -p overlap\necho \"preexisting\" > overlap/marker.txt\ncat > settings-overlap.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[\"overlap\"],\"denyWrite\":[]},\"network\":{\"allowedDomains\":[],\"deniedDomains\":[]}}\nEOF\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\nrun \"write inside denyRead region\" \"$SRT\" --settings settings-overlap.json -c \"echo written > overlap/newfile.txt; echo write_exit=\\$?\"\necho \"-- host state after (outside sandbox) --\"\nls -la overlap/\ncat overlap/marker.txt 2>&1\n[[ -f overlap/newfile.txt ]] && echo \"HOST: newfile.txt EXISTS\" || echo \"HOST: newfile.txt DOES NOT EXIST\"\nrun \"visibility inside a fresh sandbox invocation\" \"$SRT\" --settings settings-overlap.json -c \"ls -la overlap/ 2>&1; cat overlap/newfile.txt 2>&1\"",
+    "fix#15 [2026-09-23T01:03:05.681Z]: cd /tmp/gapfix && rm -rf overlap2 && mkdir overlap2 && cd overlap2\nmkdir overlap && echo marker > overlap/marker.txt\ncat > settings-overlap-denyboth.json <<'EOF'\n{\"network\":{\"allowedDomains\":[],\"deniedDomains\":[\"*\"]},\"filesystem\":{\"allowWrite\":[\".\"],\"denyWrite\":[\"overlap\"],\"denyRead\":[\"overlap\"],\"allowRead\":[\".\"]}}\nEOF\nsha256sum settings-overlap-denyboth.json\necho \"== write into denyRead+denyWrite overlap (no allowWrite exemption other than root) ==\"\nsrt --settings settings-overlap-denyboth.json -c \"echo written > overlap/newfile2.txt; echo write_exit=\\$?\"\nls -la overlap/\necho \"== fresh sandbox view ==\"\nsrt --settings settings-overlap-denyboth.json -c \"ls -la overlap/ 2>&1; cat overlap/marker.txt 2>&1\"",
+    "fix#16 [2026-09-23T01:03:12.138Z]: cd /tmp/gapfix/overlap2\ncat > settings-overlap-noallowwrite.json <<'EOF'\n{\"network\":{\"allowedDomains\":[],\"deniedDomains\":[\"*\"]},\"filesystem\":{\"allowWrite\":[],\"denyWrite\":[\"overlap\"],\"denyRead\":[\"overlap\"],\"allowRead\":[\".\"]}}\nEOF\nsha256sum settings-overlap-noallowwrite.json\necho \"== write into overlap, no allowWrite anywhere ==\"\nsrt --settings settings-overlap-noallowwrite.json -c \"echo written > overlap/newfile3.txt; echo write_exit=\\$?\" 2>&1\nls -la overlap/"
+  ],
+  "results": [
+    "Config (a) allowWrite=['.']+denyWrite=['overlap']+denyRead=['overlap']: write_exit=0 (from inside the sandbox); host-side overlap/ shows only the pre-existing marker.txt, newfile2.txt does not exist \u2014 same silent ephemeral-hide behavior as gap 3, even though denyWrite now also explicitly covers the path.",
+    "Config (b) allowWrite=[]+denyWrite=['overlap']+denyRead=['overlap'] (no allowWrite anywhere in the whole sandbox): write_exit=0 again; host-side newfile3.txt also does not exist \u2014 identical silent ephemeral-hide behavior even with no allowWrite grant at all.",
+    "settings-overlap-denyboth.json sha256: 8b9da77cebefa4daf21137fc7116973d6ff2304e7e0cd83947a1359f5fc85847.",
+    "settings-overlap-noallowwrite.json sha256: 9a0c72ed25689d24c4e4e76e54e8850392412aae2191ce844e642fd3123cc486.",
+    "No configuration tried (gap 3's original, plus these two) produced a direct denial (nonzero exit, 'Read-only file system'-style message) for a write into a denyRead-covered directory. Whenever filesystem.denyRead covers a directory, srt 0.0.77 appears to always mount an ephemeral overlay over it, silently absorbing writes (exit 0, host unchanged) regardless of denyWrite or allowWrite settings for that same path. Direct 'Read-only file system' denial (gap 1's receipt) only occurs when denyWrite applies WITHOUT denyRead covering the same path."
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T01:35:39.981Z",
+    "late": true,
+    "expectation": "Gap 15's next_check asks something gap 3 never tested: whether some filesystem configuration yields a direct denial (exit 1) for a write into a denyRead-covered directory, without the ephemeral-hide-and-report-exit-0 behavior gap 3 found. Testing denyWrite+denyRead together on the same directory, both with and without a broad allowWrite covering it, will show whether the ephemeral-hide behavior is specific to gap 3's exact config or general to any denyRead-covered write.",
+    "criteria": "Two additional configs are run against the same overlap directory: (a) allowWrite=['.'] + denyWrite=['overlap'] + denyRead=['overlap'] (broad allowWrite plus explicit denyWrite, unlike gap 3's denyWrite=[]), and (b) allowWrite=[] + denyWrite=['overlap'] + denyRead=['overlap'] (no allowWrite anywhere). Both are checked for exit code and host-side file existence after the write.",
+    "late_note": "Written at 2026-09-23T01:35:39.981Z by fix#61, after the evidence it covers was produced (2026-09-23T00:43:01.471Z to 2026-09-23T01:03:12.569Z). The previously recorded written_at '2026-09-23T01:45:00+00:00' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "limits": [
+    "Reproduced on Linux/bubblewrap only; the underlying mechanism (an overlay/tmpfs-style mount shadowing a denyRead directory) was inferred from behavior across three configurations, not confirmed by reading the bubblewrap invocation srt constructs.",
+    "Only allowWrite/denyWrite/denyRead combinations on a single directory were tried; nested or nesting-order edge cases (e.g. a denyRead subdirectory inside an allowRead-but-not-allowWrite parent) were not exercised.",
+    "settings-overlap-denyboth.json and settings-overlap-noallowwrite.json are retained as companion files alongside this receipt's directory for independent sha256 verification."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:43:01.471Z to 2026-09-23T01:03:12.569Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#35"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#15",
+        "fix#16"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Removed the note's claim that this \"settles\" the gap's question, which contradicted the advanced outcome.",
+      "Preregistration relabelled: written at fix#61 (01:35:39Z), after fix#15 and fix#16 ran (01:03:05Z-01:03:12Z), so late=true (was false).",
+      "Exact commands and raw_evidence added. Outcome kept advanced."
+    ]
+  }
+}

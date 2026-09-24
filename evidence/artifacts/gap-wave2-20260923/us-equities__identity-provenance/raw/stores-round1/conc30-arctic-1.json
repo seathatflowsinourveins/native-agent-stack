@@ -1,0 +1,30 @@
+{
+  "arm": "arctic",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "no_silent_loss": false,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 155,
+    "rows_lost_after_reported_success": 145,
+    "state": {
+      "readable": true,
+      "rows": 155,
+      "rows_including_seed": 160,
+      "versions": 32
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

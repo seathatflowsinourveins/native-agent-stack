@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "extreme_gainer_price_audit_deviations",
+  "recorded_at_utc": "2026-09-24T03:08:13Z",
+  "plan_sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+  "found_by": "independent review of PR #157 (evidence-reviewer), 2026-09-24",
+  "policy": "plan.json stays byte-identical, so the preregistered run's verdicts and its triggered overturn stand as recorded. Corrected rules run as compare --rules v2 on the same snapshot and are reported beside, never instead of, the preregistered result.",
+  "deviations": [
+    {
+      "id": "D1",
+      "what": "Which condition-6 closing print is the official close",
+      "plan_text": "the day's closing-auction record with condition 6 (closing print)",
+      "ambiguity": "Several exchanges can report a condition-6 print for the same symbol and day: 863 of 8,356 auction days in the snapshot have two or more, and 178 of those disagree on price. The plan did not say which exchange's print to take.",
+      "v1_implementation": "the first condition-6 print from any exchange, often a small NYSE Arca (P) print listed before the listing exchange's cross",
+      "v2_rule": "the condition-6 print on the listing exchange (the exchange of the day's condition-O opening records), taking the largest size when that exchange has several; else a condition-M print on the listing exchange; else the largest condition-6 print elsewhere (flagged closing_print_other_exchange); else the bar close",
+      "why_v2": "the plan's own M rule is keyed to the listing (opening) exchange, which shows that the intended official close is the listing exchange's",
+      "effect": "match/mismatch 535/137 (20.4%) under v1 becomes 589/84 (12.5%) under v2; the overturn triggers under both"
+    },
+    {
+      "id": "D2",
+      "what": "split_between tolerance",
+      "v1_implementation": "the relative change in the raw/split close ratio between the two dates must exceed 1e-6",
+      "v2_rule": "must exceed 1e-2",
+      "why_v2": "the provider's adjusted closes carry rounding noise of up to about 6e-4. 54 of the 57 v1 flags were noise; 3 were real splits (ELTX, QXO, UZX).",
+      "effect": "split_between rows go from 57 to 3; the gain changes by at most about 0.06% relative, so verdicts are essentially unchanged"
+    },
+    {
+      "id": "D3",
+      "what": "Symbol resolution order",
+      "plan_text": "Ticker_Used when present, else Ticker ... if that returns no event-date data: the alias-map Alias_Symbol",
+      "gap": "When Ticker_Used differs from Ticker and has no event-date data, the original Ticker was never tried (OCTO 2025-09-08 was queried only as ORBS). The v1 snapshot never used its alias fallback: each event was tried under one symbol, and none of the 5 no-data events had an alias entry.",
+      "v2_rule": "Ticker_Used, then Ticker if different, then the alias, fetched by audit.py supplement for events the snapshot has no event-date data for",
+      "effect": "1 event recovered (OCTO); no_source_data 5 becomes 4"
+    },
+    {
+      "id": "D4",
+      "what": "Verdict naming for Status OK rows without a computed gain",
+      "v1_implementation": "10 Status OK rows have a blank Computed_Gain_Pct; 7 of them were named recovered_* although the package did have prices",
+      "v2_rule": "those rows are package_uncomputed_match or package_uncomputed_mismatch",
+      "effect": "recovered rows go from 274 to 267 plus 7 package_uncomputed rows",
+      "detail": "The plan's question counts 271 rows without computed prices: 265 NO_DATA plus 6 EVENT_BAR_MISSING. v1's 274 recovered rows also include 7 Status OK rows whose Computed_Gain_Pct is blank."
+    },
+    {
+      "id": "D5",
+      "what": "plan.json frozen_at_utc is wrong",
+      "detail": "The field says 2026-09-24T03:05:00Z, a time typed ahead. The plan was committed and published at 02:51:57Z (4cb31878), before the fetch at 02:52:04Z; the git order is the evidence of preregistration. The field is left unedited because plan.json's sha256 binds the snapshot and the results.",
+      "effect": "none on results"
+    },
+    {
+      "id": "D6",
+      "what": "T+N forward returns on the market calendar",
+      "v1_implementation": "T+N counted the symbol's own bar dates, so a halted or suspended session shifted T+N later",
+      "v2_rule": "T+N is the N-th market session (sessions observed across all fetched windows); a session without a bar for the symbol is reported missing, not shifted",
+      "effect": "no change on this run: T+1 659/673, T+5 653/662, T+20 631/646 under both calendars"
+    },
+    {
+      "id": "D7",
+      "what": "Acquisition failures are not 'no data'",
+      "v2_rule": "an event without event-date data whose responses include an HTTP 400/404/422 error dict is fetch_error, not no_source_data",
+      "effect": "none on this run: 2,871 of 2,871 fetch responses and 3 of 3 supplement responses were HTTP 200"
+    },
+    {
+      "id": "D8",
+      "what": "Post-hoc price-leg comparison",
+      "v2_rule": "a package close counts as the same as Alpaca's when it is within a cent (or 0.5%) of the split-adjusted OR the raw bar close, because the package may carry raw prices",
+      "effect": "v2 post-hoc mismatch classes: closes_match_bar_not_official 67 (was 66), both_closes_differ 3 (was 4)"
+    },
+    {
+      "id": "D9",
+      "what": "Fetch and output hardening (no effect on recorded results)",
+      "detail": "pagination refuses a repeated or unbounded page_token; private outputs (snapshot, supplement, results, post-hoc) are created mode 0600 with no world-readable window; v1 output bytes are unchanged"
+    }
+  ]
+}

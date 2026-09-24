@@ -1,0 +1,56 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-18",
+  "gap_index": 18,
+  "gap_text_sha256": "5eca3a7eb6b3b14a94a48b40362772c985df81912cd3fbaa3b461248e0cb0cae",
+  "checked_at": "2026-09-23T00:46:08.073Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:45:28.726Z to 2026-09-23T00:46:08.073Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:45:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps.",
+    "expectation": "Rerunning the owned-worktrees lifecycle pass (create, list, dirty-removal-refusal, forced removal) in a disposable repository while recording `wt --version` will show it reporting 0.79.0, replacing the unversioned 2026-09-20 pass.",
+    "criteria": "Every lifecycle command in the rerun is preceded by or co-recorded with `wt --version` output in the same receipt."
+  },
+  "commands": [
+    "original#53 [2026-09-23T00:45:28.726Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\nrm -rf owned-repo\nmkdir owned-repo && cd owned-repo\ngit init -q\ngit config user.email test@example.com\ngit config user.name test\necho \"hello\" > file.txt\ngit add file.txt\ngit commit -qm init\n$WT --version\n$WT list 2>&1\necho \"== create ==\"\n$WT create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#55 [2026-09-23T00:45:35.040Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\necho \"== switch --create feat-a ==\"\n$WT -y switch --create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#56 [2026-09-23T00:45:42.268Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\nWORKTREE_DIR=../owned-repo.feat-a\necho \"dirty-uncommitted\" > \"$WORKTREE_DIR/dirty.txt\"\necho \"modified\" >> \"$WORKTREE_DIR/file.txt\"\nsha_dirty=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" | cut -d' ' -f1)\nsha_file=$(sha256sum \"$WORKTREE_DIR/file.txt\" | cut -d' ' -f1)\necho \"sha_dirty=$sha_dirty sha_file=$sha_file\"\necho \"== attempt remove dirty worktree ==\"\n$WT -y -C \"$WORKTREE_DIR\" remove 2>&1\necho \"exit=$?\"\nls -la \"$WORKTREE_DIR\" 2>&1\nsha_dirty2=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" 2>&1 | cut -d' ' -f1)\nsha_file2=$(sha256sum \"$WORKTREE_DIR/file.txt\" 2>&1 | cut -d' ' -f1)\necho \"post: sha_dirty2=$sha_dirty2 sha_file2=$sha_file2\"\n[[ \"$sha_dirty\" == \"$sha_dirty2\" && \"$sha_file\" == \"$sha_file2\" ]] && echo \"PRESERVED_BYTE_IDENTICAL=true\" || echo \"PRESERVED_BYTE_IDENTICAL=false\"",
+    "original#59 [2026-09-23T00:46:02.538Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\n$WT -y remove --force feat-a 2>&1 || $WT -y -C ../owned-repo.feat-a remove --force 2>&1\necho exit=$?\n$WT list 2>&1"
+  ],
+  "results": [
+    "`wt v0.79.0` recorded at the start of the session (original#53), before any lifecycle command.",
+    "`wt -y switch --create feat-a`: `\u2713 Created branch feat-a from master and worktree @ ...owned-repo.feat-a`, exit=0; `wt list` showed master and feat-a (original#55).",
+    "Dirty removal refused, exit=1 (original#56; see gap 7).",
+    "`wt -y remove --force feat-a`: `\u25ce Removing feat-a worktree (--force) & branch in background`, exit=0; `wt list` showed master only (original#59).",
+    "Comparison with the historical pass, made during reconciliation from the files on disk (no rerun): evidence/receipts/token-native-retained-functional-20260920.json check \"worktrunk-owned-lifecycle\": {\"created_worktrees\": 2, \"remaining_worktrees\": 1, \"remaining_branch\": \"main\", \"hooks_disabled\": true, \"disposable_repository_only\": true}. This rerun: 1 worktree created (historical 2), 1 remaining (same), branch master (historical main), hooks not configured and not asserted disabled. The fixtures differ, so identical behaviour on the same fixture is not established."
+  ],
+  "outcome": "advanced",
+  "note": "A lifecycle rerun at v0.79.0 with the version recorded exists and its operations succeeded, and it has now been compared with the historical pass. The comparison shows different fixtures (worktree count, default branch name, no hooks assertion). Remaining: rerun the historical fixture's exact steps at 0.79.0 and compare field by field. Outcome changed from covered_elsewhere to advanced, with its own evidence instead of a pointer to gap 6.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Hooks were not configured, and no remote was used in this repository.",
+    "Gaps 6, 7, 12 and 18 cite one continuous disposable repository session (original#53-#59 in $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo): repository init and `wt --version` (#53), `wt -y switch --create feat-a` (#55), dirty-removal refusal (#56), SIGKILL mid-write (#57), `wt -y step prune` (#58) and `wt -y remove --force feat-a` (#59). The earlier limit saying each gap used a fresh, independent repository was false and is removed."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:45:28.726Z to 2026-09-23T00:46:08.073Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#53",
+        "original#55",
+        "original#56",
+        "original#59"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 4: removed the circular pointer to gap 6; this receipt now carries its own versioned lifecycle evidence and the historical comparison the next_check asks for, computed from the files on disk.",
+      "Outcome changed covered_elsewhere -> advanced. Removed the false independent-repository limit. Timestamps corrected; exact commands and raw_evidence added."
+    ]
+  }
+}

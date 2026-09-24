@@ -1,0 +1,626 @@
+{
+  "id": "us-equities__storage-compute-10-four-store-latency-recovery-footprint",
+  "gap_index": 10,
+  "layer_id": "storage-compute",
+  "catalog": "us-equities",
+  "gap_text": "No retained comparison measures representative data volumes, concurrent writers/readers, latency, recovery or operational cost across storage candidates.",
+  "gap_text_sha256": "ae9b667cee362cb9b9b8b5518a70a40b0793f77b5c4be37b30e269fe3e48ee92",
+  "next_check": "Extend the same pinned DuckDB/QuestDB/ClickHouse/Iceberg benchmark with: a fixed-seed representative data volume, concurrent writer/reader latency percentiles, a kill-and-recover test per store, and disk/RAM footprint as the operational-cost proxy. Retain raw results.",
+  "preregistration": {
+    "gap_index": 10,
+    "written_at": "2026-09-23T05:15:15Z",
+    "expectation": "Same pinned four-store harness as gap 3, extended with: mixed phases (N writers plus N readers concurrently, N=1,4,8) reporting p50/p95/p99 writer-batch and reader-query latency; a kill-and-recover test per store (SIGKILL of the server for ClickHouse and QuestDB, of the writer process for DuckDB and pyiceberg, during acknowledged batch inserts) checking that every acknowledged batch survives and measuring time to ready; and on-disk footprint plus peak/idle RSS as operational-cost proxies. Expected: acknowledged rows survive SIGKILL in all four (process kill, not power loss); pyiceberg may leave orphan data files; ClickHouse and QuestDB server RSS far exceeds the embedded stores.",
+    "criteria": "settled if every store completes mixed percentiles, kill-and-recover and footprint with raw results retained. advanced if any store/arm is missing (named). Power-loss durability is out of scope and stays a stated limit either way.",
+    "note": "Written before the check's commands were run.",
+    "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/10.json",
+    "file_sha256": "9341d160a2417309dd5b07ef93bacb619597c2d63760c5a9f0466622f9adf81c",
+    "committed_in": "af80671 (before any check command ran)",
+    "fix_round": {
+      "gap_index": 10,
+      "written_at": "2026-09-23T05:52:16Z",
+      "round": 2,
+      "label": "fix-round (late relative to round 1, written before round 2)",
+      "expectation": "Round 2 kill test logs a start marker before and an ack marker after every batch (fsynced), kills only while the last marker is a start (writer inside an insert), and after recovery verifies per batch index: every acknowledged batch has exactly 10,000 rows, 10,000 distinct timestamps and the deterministic expected sum(volume); the in-flight batch is either absent or complete; no other batch index, torn batch or duplicate row appears. Recovery time is measured from restart/reopen to the first successful recovery count query. Expected: all four stores pass, with the in-flight batch absent or complete.",
+      "criteria": "settled if every store passes the per-batch verification with an in-flight batch proven at the kill instant (start marker before the kill time and no ack); advanced if the in-flight write cannot be shown for a store or any check fails.",
+      "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/10-fixround.json",
+      "file_sha256": "12aa0b8beff2d13ff46596f5e85d117ba55a8737b9577e097b003a32ae60c9cb",
+      "committed_in": "23c9902 (after round 1 and the Codex review, before any round-2 command ran)"
+    },
+    "fix_round_2": {
+      "gap_index": 10,
+      "written_at": "2026-09-23T06:08:19Z",
+      "round": 3,
+      "label": "second fix-round (late relative to rounds 1-2, written before round 3)",
+      "expectation": "The Codex re-review of 6155b51 showed the round-2 'S' marker is written before fsync, registration and the engine call, so an unmatched S does not prove an engine-level write was interrupted. Round 3 adds an 'I b t' marker written immediately before the engine call (insert/append) and kills only when the last marker is I, no ack exists for b, and at least 25% of the median insert duration of the acknowledged batches has elapsed since I. Proof of an interrupted engine write: I(b) < kill time, no A(b), and elapsed-in-engine at kill >= 0.25 x median (A-I) duration. Expected: all four stores pass per-batch verification with the in-flight batch absent or complete.",
+      "criteria": "settled if round 3 shows engine-level interruption by that criterion for all four stores and per-batch verification passes; advanced (naming the store) otherwise.",
+      "note": "Round 3 reruns the full bench for all four stores (third sample); rounds 1 and 2 stay retained.",
+      "file": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/10-fixround2.json",
+      "file_sha256": "246c4772b563e3eef2626f17fb6affdba551e811a89ab28e392a9813994f3416",
+      "committed_in": "1f234b9 (after the Codex re-review of 6155b51, before any round-3 command ran)"
+    }
+  },
+  "commands": [
+    "curl -fsSL -o questdb-10.0.1-rt-linux-x86-64.tar.gz https://github.com/questdb/questdb/releases/download/10.0.1/questdb-10.0.1-rt-linux-x86-64.tar.gz   # 98,016,278 bytes; sha256 38a736c253c3ac4c795aca1db35d6bf6f479e2788fcd88b9001693844682db86 equals the GitHub asset digest",
+    "curl -fsSL -o clickhouse-common-static-26.8.11.7-amd64.tgz https://github.com/ClickHouse/ClickHouse/releases/download/v26.8.11.7-lts/clickhouse-common-static-26.8.11.7-amd64.tgz && sha512sum -c clickhouse-common-static-26.8.11.7-amd64.tgz.sha512   # 235,732,763 bytes, 'OK'; both downloads inside ecosystem-bounded-run",
+    "uv venv --python ...python3.13 venv-bench && uv pip install --python venv-bench/bin/python duckdb==1.5.5 'pyiceberg[sql-sqlite,pyarrow]==0.12.0' pyarrow numpy pandas clickhouse-connect questdb 'psycopg[binary]' psutil",
+    "$HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py gen --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/duckdb.json   # round 1; default 256-task cgroup limit",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/questdb.json --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/iceberg.json   # round 1",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/duckdb.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/questdb.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r2/iceberg.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 2",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store duckdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-duckdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/duckdb.json   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store clickhouse --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-clickhouse --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/clickhouse.json --ch-bin $HOME/.cache/gap-wave2-20260923/storage-compute/clickhouse-26.8.11.7/clickhouse-common-static-26.8.11.7/usr/bin/clickhouse   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store questdb --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-questdb --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/questdb.json --qdb-home $HOME/.cache/gap-wave2-20260923/storage-compute/questdb-10.0.1/questdb-10.0.1-rt-linux-x86-64   # round 3",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_TASKS_MAX=4096 ECOSYSTEM_JOB_MEMORY_HIGH=12G ECOSYSTEM_JOB_MEMORY_MAX=14G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py run --store iceberg --data $HOME/.cache/gap-wave2-20260923/storage-compute/bench/data --work $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/w-iceberg --out $HOME/.cache/gap-wave2-20260923/storage-compute/bench/r3/iceberg.json   # round 3",
+    "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/bin/python blueprints/gap-wave2-20260923/us-equities__storage-compute/kill_verifier_control.py $HOME/.cache/gap-wave2-20260923/storage-compute/ctl/bench.duckdb 30   # on a copy of the round-2 DuckDB smoke database"
+  ],
+  "results": [
+    "Representative volume: 50000000 fixed-seed OHLCV rows (about 40M rows is 8,000 US symbols x 20 years of daily bars; this is the same order).",
+    "Round 3 full-row cross-store agreement on Q1-Q4: True; round 2: True.",
+    "duckdb (round 3): mixed M1/M4/M8 writer batch p50/p95/p99 s [[0.0066, 0.0074, 0.0109], [0.0116, 0.0457, 0.0512], [0.0233, 0.0559, 0.0727]], reader Q2 p50/p95/p99 s [[0.0019, 0.0037, 0.0072], [0.0025, 0.0067, 0.0093], [0.0068, 0.0121, 0.0137]], errors w/r [(0, 0), (0, 0), (0, 0)]; kill: SIGKILL writer_process while batch(es) [30] were inside the engine call for {\"30\": 0.0014} s (median acknowledged engine call 0.0054 s; engine_interrupted_proven True; acks after kill time []), 30 acknowledged batches -> acked batches failing per-batch verification [], in-flight state {\"30\": \"absent\"}, unexpected batch indices [], restart/reopen through first recovery query 0.0777 s (server ready None s); disk after load 1880895488 B, after recovery 2044146208 B; memory {\"server_after_load\": null, \"server_after_concurrency\": null, \"server_idle_before_load\": null, \"harness_maxrss_kB\": 3084548}",
+    "clickhouse (round 3): mixed M1/M4/M8 writer batch p50/p95/p99 s [[0.0602, 0.1503, 0.1845], [0.2104, 0.2186, 0.2197], [0.1915, 0.1988, 0.2004]], reader Q2 p50/p95/p99 s [[0.0047, 0.0057, 0.0063], [0.0049, 0.0058, 0.006], [0.0061, 0.0098, 0.0161]], errors w/r [(0, 0), (0, 0), (0, 0)]; kill: SIGKILL server_process_group while batch(es) [30] were inside the engine call for {\"30\": 0.0147} s (median acknowledged engine call 0.0577 s; engine_interrupted_proven True; acks after kill time []), 30 acknowledged batches -> acked batches failing per-batch verification [], in-flight state {\"30\": \"absent\"}, unexpected batch indices [], restart/reopen through first recovery query 0.3478 s (server ready 0.3235 s); disk after load 4741683342 B, after recovery 5969203319 B; memory {\"server_after_load\": {\"VmRSS_kB\": 1203448, \"VmHWM_kB\": 1396856}, \"server_after_concurrency\": {\"VmRSS_kB\": 779844, \"VmHWM_kB\": 1396856}, \"server_idle_before_load\": {\"VmRSS_kB\": 626156, \"VmHWM_kB\": 626156}, \"harness_maxrss_kB\": 161960}",
+    "questdb (round 3): mixed M1/M4/M8 writer batch p50/p95/p99 s [[0.0095, 0.0119, 0.013], [0.0085, 0.0177, 0.023], [0.013, 0.0339, 0.0612]], reader Q2 p50/p95/p99 s [[0.0013, 0.0016, 0.0351], [0.0017, 0.0073, 0.0862], [0.0087, 0.0407, 0.1791]], errors w/r [(0, 0), (0, 0), (0, 0)]; kill: SIGKILL server_process_group while batch(es) [30] were inside the engine call for {\"30\": 0.0015} s (median acknowledged engine call 0.0053 s; engine_interrupted_proven True; acks after kill time []), 30 acknowledged batches -> acked batches failing per-batch verification [], in-flight state {\"30\": \"absent\"}, unexpected batch indices [], restart/reopen through first recovery query 5.2847 s (server ready 2.2162 s); disk after load 4445281929 B, after recovery 5210612184 B; memory {\"server_after_load\": {\"VmRSS_kB\": 653132, \"VmHWM_kB\": 861780}, \"server_after_concurrency\": {\"VmRSS_kB\": 2696260, \"VmHWM_kB\": 2964948}, \"server_idle_before_load\": {\"VmRSS_kB\": 699824, \"VmHWM_kB\": 812100}, \"harness_maxrss_kB\": 618788}",
+    "iceberg (round 3): mixed M1/M4/M8 writer batch p50/p95/p99 s [[0.1178, 0.174, 0.1924], [0.1607, 2.0867, 4.5277], [0.4248, 4.8194, 6.0886]], reader Q2 p50/p95/p99 s [[0.2317, 0.267, 0.3578], [0.2824, 0.3189, 0.4155], [0.4777, 0.6299, 0.6607]], errors w/r [(0, 0), (0, 0), (0, 0)]; kill: SIGKILL writer_process while batch(es) [30] were inside the engine call for {\"30\": 0.0515} s (median acknowledged engine call 0.2045 s; engine_interrupted_proven True; acks after kill time []), 30 acknowledged batches -> acked batches failing per-batch verification [], in-flight state {\"30\": \"absent\"}, unexpected batch indices [], restart/reopen through first recovery query 0.4275 s (server ready None s); disk after load 1746525422 B, after recovery 2164014939 B; memory {\"server_after_load\": null, \"server_after_concurrency\": null, \"server_idle_before_load\": null, \"harness_maxrss_kB\": 2661620}",
+    "pyiceberg orphan data files (round 3): {\"data_files_on_disk\": 628, \"data_files_referenced_by_current_snapshot\": 570, \"orphan_data_files\": 58, \"snapshots\": 570} before the kill, equal to the 58 appends that raised CommitFailedException and were rewritten by the harness retry; 0 added by the kill.",
+    "Detection method: the writer fsyncs 'S b t' before client-side preparation, writes 'I b t' immediately before the engine call (DuckDB INSERT, clickhouse-connect insert_arrow, QuestDB Sender.flush, pyiceberg Table.append) and fsyncs 'A b t' after it returns; the kill fires only when the last marker is 'I' and at least 25% of the median acknowledged engine-call duration has elapsed, so the process was inside the engine call at the kill. After recovery every batch index of symbol KILL is checked for 10,000 rows, 10,000 distinct timestamps and the deterministic expected sum(volume). Control (raw/kill-verifier-control.json): deleting acknowledged batch 5 and duplicating batch 6 on a copy leaves the total at 300000 rows, so the round-1 aggregate check still passes (True), while the round-2 check flags batches [5, 6].",
+    "QuestDB's restart_or_reopen_through_first_query_s includes a fixed 3.0 s settle sleep after WAL visibility; server_ready_s + questdb_wal_visible_after_s = 2.274 s."
+  ],
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "store_summaries": {
+    "duckdb": {
+      "kill_recover": {
+        "killed": "writer_process",
+        "signal": "SIGKILL",
+        "kill_time_unix": 1790143912.999765,
+        "acked_batches": 30,
+        "acked_rows": 300000,
+        "inflight_batches_at_kill": [
+          30
+        ],
+        "inflight_proven": true,
+        "median_engine_call_s_acked": 0.005405902862548828,
+        "engine_call_elapsed_at_kill_s": {
+          "30": 0.0013608932495117188
+        },
+        "engine_interrupted_proven": true,
+        "acks_after_kill_time": [],
+        "inflight_state_after_recovery": {
+          "30": "absent"
+        },
+        "rows_after_recovery": 300000,
+        "acked_batches_failing_verification": [],
+        "all_acked_batches_exact": true,
+        "unexpected_batch_indices": [],
+        "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected",
+        "restart_or_reopen_through_first_query_s": 0.07772417900559958,
+        "server_ready_s": null,
+        "questdb_wal_visible_after_s": null,
+        "total_rows_after_recovery": 55500000
+      },
+      "footprint_bytes": {
+        "after_load": 1880895488,
+        "after_recovery": 2044146208
+      },
+      "memory": {
+        "server_after_load": null,
+        "server_after_concurrency": null,
+        "server_idle_before_load": null,
+        "harness_maxrss_kB": 3084548
+      },
+      "mixed_phases": {
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0066,
+            0.0074,
+            0.0109
+          ],
+          "read_p50_p95_p99_s": [
+            0.0019,
+            0.0037,
+            0.0072
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1381066
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.0116,
+            0.0457,
+            0.0512
+          ],
+          "read_p50_p95_p99_s": [
+            0.0025,
+            0.0067,
+            0.0093
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2162032
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.0233,
+            0.0559,
+            0.0727
+          ],
+          "read_p50_p95_p99_s": [
+            0.0068,
+            0.0121,
+            0.0137
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 2470976
+        }
+      }
+    },
+    "clickhouse": {
+      "kill_recover": {
+        "killed": "server_process_group",
+        "signal": "SIGKILL",
+        "kill_time_unix": 1790143954.2408166,
+        "acked_batches": 30,
+        "acked_rows": 300000,
+        "inflight_batches_at_kill": [
+          30
+        ],
+        "inflight_proven": true,
+        "median_engine_call_s_acked": 0.05766642093658447,
+        "engine_call_elapsed_at_kill_s": {
+          "30": 0.014696598052978516
+        },
+        "engine_interrupted_proven": true,
+        "acks_after_kill_time": [],
+        "inflight_state_after_recovery": {
+          "30": "absent"
+        },
+        "rows_after_recovery": 300000,
+        "acked_batches_failing_verification": [],
+        "all_acked_batches_exact": true,
+        "unexpected_batch_indices": [],
+        "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected",
+        "restart_or_reopen_through_first_query_s": 0.3478341719965101,
+        "server_ready_s": 0.32354438999755075,
+        "questdb_wal_visible_after_s": null,
+        "total_rows_after_recovery": 55500000
+      },
+      "footprint_bytes": {
+        "after_load": 4741683342,
+        "after_recovery": 5969203319
+      },
+      "memory": {
+        "server_after_load": {
+          "VmRSS_kB": 1203448,
+          "VmHWM_kB": 1396856
+        },
+        "server_after_concurrency": {
+          "VmRSS_kB": 779844,
+          "VmHWM_kB": 1396856
+        },
+        "server_idle_before_load": {
+          "VmRSS_kB": 626156,
+          "VmHWM_kB": 626156
+        },
+        "harness_maxrss_kB": 161960
+      },
+      "mixed_phases": {
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0602,
+            0.1503,
+            0.1845
+          ],
+          "read_p50_p95_p99_s": [
+            0.0047,
+            0.0057,
+            0.0063
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 98288
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.2104,
+            0.2186,
+            0.2197
+          ],
+          "read_p50_p95_p99_s": [
+            0.0049,
+            0.0058,
+            0.006
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 203162
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.1915,
+            0.1988,
+            0.2004
+          ],
+          "read_p50_p95_p99_s": [
+            0.0061,
+            0.0098,
+            0.0161
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 329832
+        }
+      }
+    },
+    "questdb": {
+      "kill_recover": {
+        "killed": "server_process_group",
+        "signal": "SIGKILL",
+        "kill_time_unix": 1790144021.6790786,
+        "acked_batches": 30,
+        "acked_rows": 300000,
+        "inflight_batches_at_kill": [
+          30
+        ],
+        "inflight_proven": true,
+        "median_engine_call_s_acked": 0.0052640438079833984,
+        "engine_call_elapsed_at_kill_s": {
+          "30": 0.001485586166381836
+        },
+        "engine_interrupted_proven": true,
+        "acks_after_kill_time": [],
+        "inflight_state_after_recovery": {
+          "30": "absent"
+        },
+        "rows_after_recovery": 300000,
+        "acked_batches_failing_verification": [],
+        "all_acked_batches_exact": true,
+        "unexpected_batch_indices": [],
+        "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected",
+        "restart_or_reopen_through_first_query_s": 5.284724807999737,
+        "server_ready_s": 2.216234130995872,
+        "questdb_wal_visible_after_s": 0.0574789839956793,
+        "total_rows_after_recovery": 55500000
+      },
+      "footprint_bytes": {
+        "after_load": 4445281929,
+        "after_recovery": 5210612184
+      },
+      "memory": {
+        "server_after_load": {
+          "VmRSS_kB": 653132,
+          "VmHWM_kB": 861780
+        },
+        "server_after_concurrency": {
+          "VmRSS_kB": 2696260,
+          "VmHWM_kB": 2964948
+        },
+        "server_idle_before_load": {
+          "VmRSS_kB": 699824,
+          "VmHWM_kB": 812100
+        },
+        "harness_maxrss_kB": 618788
+      },
+      "mixed_phases": {
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.0095,
+            0.0119,
+            0.013
+          ],
+          "read_p50_p95_p99_s": [
+            0.0013,
+            0.0016,
+            0.0351
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 359223
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.0085,
+            0.0177,
+            0.023
+          ],
+          "read_p50_p95_p99_s": [
+            0.0017,
+            0.0073,
+            0.0862
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1121329
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.013,
+            0.0339,
+            0.0612
+          ],
+          "read_p50_p95_p99_s": [
+            0.0087,
+            0.0407,
+            0.1791
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 1535948
+        }
+      }
+    },
+    "iceberg": {
+      "kill_recover": {
+        "killed": "writer_process",
+        "signal": "SIGKILL",
+        "kill_time_unix": 1790144135.6489387,
+        "acked_batches": 30,
+        "acked_rows": 300000,
+        "inflight_batches_at_kill": [
+          30
+        ],
+        "inflight_proven": true,
+        "median_engine_call_s_acked": 0.20454251766204834,
+        "engine_call_elapsed_at_kill_s": {
+          "30": 0.05147266387939453
+        },
+        "engine_interrupted_proven": true,
+        "acks_after_kill_time": [],
+        "inflight_state_after_recovery": {
+          "30": "absent"
+        },
+        "rows_after_recovery": 300000,
+        "acked_batches_failing_verification": [],
+        "all_acked_batches_exact": true,
+        "unexpected_batch_indices": [],
+        "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected",
+        "restart_or_reopen_through_first_query_s": 0.4274734130012803,
+        "server_ready_s": null,
+        "questdb_wal_visible_after_s": null,
+        "total_rows_after_recovery": 55500000,
+        "iceberg_files_before_kill": {
+          "data_files_on_disk": 628,
+          "data_files_referenced_by_current_snapshot": 570,
+          "orphan_data_files": 58,
+          "snapshots": 570
+        },
+        "iceberg_files_after_recovery": {
+          "data_files_on_disk": 658,
+          "data_files_referenced_by_current_snapshot": 600,
+          "orphan_data_files": 58,
+          "snapshots": 600
+        },
+        "orphan_data_files_added_by_kill": 0
+      },
+      "footprint_bytes": {
+        "after_load": 1746525422,
+        "after_recovery": 2164014939
+      },
+      "memory": {
+        "server_after_load": null,
+        "server_after_concurrency": null,
+        "server_idle_before_load": null,
+        "harness_maxrss_kB": 2661620
+      },
+      "mixed_phases": {
+        "M1": {
+          "write_p50_p95_p99_s": [
+            0.1178,
+            0.174,
+            0.1924
+          ],
+          "read_p50_p95_p99_s": [
+            0.2317,
+            0.267,
+            0.3578
+          ],
+          "write_batches_ok": 20,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 36970,
+          "pyiceberg_internal_commit_retries": 0,
+          "commit_failed_after_internal_retries_then_harness_retry": 0
+        },
+        "M4": {
+          "write_p50_p95_p99_s": [
+            0.1607,
+            2.0867,
+            4.5277
+          ],
+          "read_p50_p95_p99_s": [
+            0.2824,
+            0.3189,
+            0.4155
+          ],
+          "write_batches_ok": 80,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 63392,
+          "pyiceberg_internal_commit_retries": 62,
+          "commit_failed_after_internal_retries_then_harness_retry": 6
+        },
+        "M8": {
+          "write_p50_p95_p99_s": [
+            0.4248,
+            4.8194,
+            6.0886
+          ],
+          "read_p50_p95_p99_s": [
+            0.4777,
+            0.6299,
+            0.6607
+          ],
+          "write_batches_ok": 160,
+          "write_errors": 0,
+          "read_errors": 0,
+          "workers_lost": 0,
+          "rows_visible_ok": true,
+          "wall_rows_per_s": 54935,
+          "pyiceberg_internal_commit_retries": 355,
+          "commit_failed_after_internal_retries_then_harness_retry": 37
+        }
+      }
+    }
+  },
+  "limits": [
+    "Three runs per store (round 1 at a0f57fa, round 2 after the first review, round 3 after the second review) on a shared WSL2 host (24 CPUs) while other sessions ran heavy jobs; 1-minute load average at store start 19-34 / 9-13 / 4-5 in rounds 1/2/3. Absolute numbers are noisy (DuckDB bulk load 11730077 / 21371290 / 23104018 rows/s across rounds); no confidence intervals.",
+    "Python harness: ClickHouse via clickhouse-connect HTTP, QuestDB via ILP/HTTP (questdb 5.0.0 client) and /exec, pyiceberg scans materialised to Arrow with pyarrow compute. Client serialisation is inside every latency. Phase wall_rows_per_s includes spawn start-up for process-based clients (not for DuckDB threads); per-batch percentiles do not.",
+    "Load paths differ by store's native client: DuckDB read_parquet CTAS, ClickHouse one sequential Parquet HTTP insert per file, QuestDB ILP dataframe flushes of 100k rows, pyiceberg one append per 1M-row file. ClickHouse loaded far below the preregistered 'tens of millions rows/s' expectation with this single sequential client.",
+    "DuckDB concurrency is in-process threads (one cursor each) because a second process cannot open the file while a writer holds it (retained IOException, including for a read_only second process).",
+    "Retained failed attempt: the first round-1 ClickHouse run under the default 256-task cgroup limit lost its writer process ('std::system_error: Resource temporarily unavailable') and hung; it was stopped, its data deleted, and the store rerun with ECOSYSTEM_JOB_TASKS_MAX=4096 (raw/bench-clickhouse.attempt1-tasksmax256.stdout.txt). A dead-worker guard was added to the harness before the rerun.",
+    "Data are synthetic fixed-seed minute bars (seed 20260923, 500 symbols x 100,000 minutes = 50,000,000 rows, combined sha256 9ddbbf7b15caaa441170a093b799d7ac09d2e3c311bf163624bff52af7875e1f); the dataset itself stays in the private cache, only its manifest is committed.",
+    "Round 1 compared only aggregate query digests (Codex review finding); rounds 2 and 3 compare full canonical Q1-Q4 result rows (round 2 agreement: True). Round-1 kill checks were aggregate only; round 2 added per-batch verification; round 3 added the engine-call marker that proves an engine-level write was interrupted (second Codex review finding). Round 3 is primary.",
+    "Recovery is process kill (SIGKILL) only: unsynced data in the OS page cache survives it, so power loss, disk failure and fsync policy are not tested.",
+    "One kill per store per round; the in-flight batch was absent after recovery in every store, so the 'in-flight batch committed but unacknowledged' path was not observed.",
+    "Memory for embedded stores (DuckDB, pyiceberg) is the harness process ru_maxrss, which includes Python, pyarrow and the dataset reads; server stores report the server process VmRSS/VmHWM from /proc (ClickHouse run with CLICKHOUSE_WATCHDOG_ENABLE=0 so the sampled pid is the server). The preregistered expectation that server RSS 'far exceeds' embedded RSS did not hold.",
+    "Operational cost is proxied by disk bytes and RSS only; no CPU-hours, licence or hosting cost was measured."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-dataset-manifest.json",
+      "sha256": "450acfeb77fc441c023d21035e8710ae17a7e3d96509e62be80417683907012a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-duckdb.json",
+      "sha256": "46530242d57b25a1086d22cd81b63abb72c372c94a2447d365cfa6d9e19c3047"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-clickhouse.json",
+      "sha256": "f62e818c956b845e084cbee26e7b848f6c571cf37c47ea9d290e65eaa55dea9d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-questdb.json",
+      "sha256": "b00c24a83fc0805425bf1b029a7e960f393718d02e17dbbb427bc6631510371a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-iceberg.json",
+      "sha256": "b068aaad6bc83061747a61583cfc5f11ac785daefb56295212379e5d509570b5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-duckdb.stdout.txt",
+      "sha256": "2236ecf0bd99e10a274929450374fd9bda2a4a3e29d4a9fccafa3b715e833b52"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-clickhouse.stdout.txt",
+      "sha256": "57470ddd3b47f083a074e64684b3b63e61058ccc964ff6b03e904826394a1da7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-questdb.stdout.txt",
+      "sha256": "008e04338e1d844fad48812efe9521aaf875387b1d1030304ffced1805753fde"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r3-iceberg.stdout.txt",
+      "sha256": "fe7f1e124a76115ee6fcc06dc6e8c04cad067847299e8b34dbeda5ea36f50336"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-duckdb.json",
+      "sha256": "0d69cb47406d579bb6ebb473070d2046d985fb7df491fb8d4d8982170866af30"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-clickhouse.json",
+      "sha256": "1c1bd8138fdad29fec8094811cedf3fee9291e116c2eafbafa7e276a964028d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-questdb.json",
+      "sha256": "3a4277e35568bc29f85f47bd1cb8a1a1988fb283079ec0e674ee78f3e166d157"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-iceberg.json",
+      "sha256": "5a570c439fb4f3cb0dd58ba872e15d767d02d46caa84727ddef59e65c48245a6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-duckdb.stdout.txt",
+      "sha256": "023f30d06d0edc512d600654610539ef73abea07f6d899cc54b668ae9b55c3b7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-clickhouse.stdout.txt",
+      "sha256": "686a8e04ed1075cdeac4d3b1036a770dbc06a32dc0e5c1fe5ab91760f9cf92ac"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-questdb.stdout.txt",
+      "sha256": "6f88051436ca38fab4a40d476cfd6da250769c6c78b16b7dbbc705b0bd317370"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-r2-iceberg.stdout.txt",
+      "sha256": "95b9a53dc1b9c3b7de3aa68dd867b4a3d861f42cd3a5f62a0bc2dbb4067b4ae7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-duckdb.json",
+      "sha256": "1c0bd2df862af9b416fb226733cc912071fd19db1b331af935b877abad0c3df8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.json",
+      "sha256": "7da28d426717baad4a306fe8b2c63029269b4580da84b37883da412337ab9b6d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-questdb.json",
+      "sha256": "b2813d21ca9b64bb82698a26e636840c8de2531a4936dcf62a08d5178dcd5987"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-iceberg.json",
+      "sha256": "a89c82dddcf483e110042a75fd317016910ff043b92f9c15816c6f723b52a2e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-duckdb.stdout.txt",
+      "sha256": "a8b14a455383d1bca12b823730cc888fefb156bf5567a4494894860c5ef4e57e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.stdout.txt",
+      "sha256": "fa9165e0c4827113fd3d3eb7d9259bb01a312c1bad684f22eed191e3f3567061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-questdb.stdout.txt",
+      "sha256": "8d9b8ab18f8ca7085897e1409b8cbc1ea476f5a23d6aa6730a52b275c33e6fff"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-iceberg.stdout.txt",
+      "sha256": "224daa7dfbe776d0bc75184cff87a5a1a0fef42f9619317b4097ab64488b01ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/bench-clickhouse.attempt1-tasksmax256.stdout.txt",
+      "sha256": "7e29455cb638969f90aa0ca174a885f0f92b9380757fc938260a5eab468258ed"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/raw/kill-verifier-control.json",
+      "sha256": "a4ecf45fd14b210a9a0915d772e944e7dc43a7788f0253f0d2a94f96e842b26a"
+    }
+  ],
+  "checked_at": "2026-09-23T06:15:37.841836+00:00"
+}

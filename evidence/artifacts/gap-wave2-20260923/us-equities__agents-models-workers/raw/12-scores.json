@@ -1,0 +1,540 @@
+{
+ "summary": {
+  "queries": 32,
+  "gold_locations": 176,
+  "mrr@10": 0.7618,
+  "hit@1": 0.6562,
+  "mean_completeness@1": 0.242,
+  "hit@5": 0.9062,
+  "mean_completeness@5": 0.5778,
+  "hit@10": 0.9375,
+  "mean_completeness@10": 0.7621,
+  "fully_complete@10": 0.4375,
+  "micro_completeness@10": 0.6932,
+  "single_location_queries": 4,
+  "multi_location_queries": 28,
+  "mean_completeness@10_multi": 0.7282
+ },
+ "per_query": [
+  {
+   "id": "dupkey",
+   "gold_count": 5,
+   "returned": 10,
+   "first_gold_rank": 5,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 0.2,
+   "hit@10": 1,
+   "completeness@10": 0.6,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:167",
+    "scripts/validate_catalogs.py:156"
+   ]
+  },
+  {
+   "id": "sha256",
+   "gold_count": 10,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.1,
+   "hit@5": 1,
+   "completeness@5": 0.3,
+   "hit@10": 1,
+   "completeness@10": 0.5,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/build_ecosystem.py:703",
+    "scripts/landscape.py:118",
+    "scripts/landscape.py:417",
+    "scripts/validate.py:244",
+    "scripts/validate_convergence.py:231"
+   ]
+  },
+  {
+   "id": "subproc",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.25,
+   "hit@5": 1,
+   "completeness@5": 0.25,
+   "hit@10": 1,
+   "completeness@10": 0.75,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:134"
+   ]
+  },
+  {
+   "id": "envread",
+   "gold_count": 5,
+   "returned": 10,
+   "first_gold_rank": 2,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "urlparse",
+   "gold_count": 10,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.1,
+   "hit@5": 1,
+   "completeness@5": 0.4,
+   "hit@10": 1,
+   "completeness@10": 0.6,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:94",
+    "scripts/landscape.py:490",
+    "scripts/landscape.py:544",
+    "scripts/validate_catalogs.py:309"
+   ]
+  },
+  {
+   "id": "argparse",
+   "gold_count": 11,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.0909,
+   "hit@5": 1,
+   "completeness@5": 0.4545,
+   "hit@10": 1,
+   "completeness@10": 0.8182,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/validate.py:417",
+    "scripts/verify_nautilus_ci.py:126"
+   ]
+  },
+  {
+   "id": "recompile",
+   "gold_count": 18,
+   "returned": 10,
+   "first_gold_rank": 2,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 0.7778,
+   "hit@10": 1,
+   "completeness@10": 0.9444,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/verify_nautilus_ci.py:18"
+   ]
+  },
+  {
+   "id": "sysexit",
+   "gold_count": 10,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.1,
+   "hit@5": 1,
+   "completeness@5": 0.2,
+   "hit@10": 1,
+   "completeness@10": 0.5,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/build_ecosystem.py:732",
+    "scripts/catalog_decisions.py:283",
+    "scripts/native_token_ci.py:365",
+    "scripts/validate_catalogs.py:476",
+    "scripts/validate_convergence.py:275"
+   ]
+  },
+  {
+   "id": "filerel",
+   "gold_count": 9,
+   "returned": 10,
+   "first_gold_rank": null,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 0,
+   "completeness@5": 0.0,
+   "hit@10": 0,
+   "completeness@10": 0.0,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/build_ecosystem.py:709",
+    "scripts/catalog_decisions.py:248",
+    "scripts/landscape.py:590",
+    "scripts/native_token_ci.py:26",
+    "scripts/trading_gates.py:181",
+    "scripts/validate.py:418",
+    "scripts/validate_catalogs.py:463",
+    "scripts/validate_convergence.py:16",
+    "scripts/validate_foundation.py:26"
+   ]
+  },
+  {
+   "id": "writes",
+   "gold_count": 16,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.0625,
+   "hit@5": 1,
+   "completeness@5": 0.3125,
+   "hit@10": 1,
+   "completeness@10": 0.5625,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/native_token_ci.py:181",
+    "scripts/native_token_ci.py:218",
+    "scripts/native_token_ci.py:243",
+    "scripts/native_token_ci.py:257",
+    "scripts/native_token_ci.py:277",
+    "scripts/native_token_ci.py:278",
+    "scripts/native_token_ci.py:280"
+   ]
+  },
+  {
+   "id": "glob",
+   "gold_count": 2,
+   "returned": 10,
+   "first_gold_rank": null,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 0,
+   "completeness@5": 0.0,
+   "hit@10": 0,
+   "completeness@10": 0.0,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/native_token_ci.py:267",
+    "scripts/verify_nautilus_ci.py:140"
+   ]
+  },
+  {
+   "id": "htmlesc",
+   "gold_count": 1,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 1.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "tempdir",
+   "gold_count": 1,
+   "returned": 10,
+   "first_gold_rank": 7,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 0,
+   "completeness@5": 0.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "exccls",
+   "gold_count": 5,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.2,
+   "hit@5": 1,
+   "completeness@5": 0.2,
+   "hit@10": 1,
+   "completeness@10": 0.4,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:35",
+    "scripts/catalog_decisions.py:32",
+    "scripts/trading_gates.py:37"
+   ]
+  },
+  {
+   "id": "isodate",
+   "gold_count": 5,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.4,
+   "hit@5": 1,
+   "completeness@5": 0.6,
+   "hit@10": 1,
+   "completeness@10": 0.8,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/landscape.py:206"
+   ]
+  },
+  {
+   "id": "urlcheck",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.25,
+   "hit@5": 1,
+   "completeness@5": 0.75,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "require",
+   "gold_count": 8,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.125,
+   "hit@5": 1,
+   "completeness@5": 0.5,
+   "hit@10": 1,
+   "completeness@10": 0.875,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/validate_catalogs.py:46"
+   ]
+  },
+  {
+   "id": "canonical",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.25,
+   "hit@5": 1,
+   "completeness@5": 0.5,
+   "hit@10": 1,
+   "completeness@10": 0.75,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/catalog_decisions.py:139"
+   ]
+  },
+  {
+   "id": "gitrev",
+   "gold_count": 3,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.3333,
+   "hit@5": 1,
+   "completeness@5": 0.6667,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "digestdef",
+   "gold_count": 3,
+   "returned": 10,
+   "first_gold_rank": 2,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 0.6667,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "png",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.25,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "pdf",
+   "gold_count": 3,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 1.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "pointer",
+   "gold_count": 2,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.5,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "uniquejson",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 2,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 0.5,
+   "hit@10": 1,
+   "completeness@10": 0.75,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:44"
+   ]
+  },
+  {
+   "id": "loopback",
+   "gold_count": 2,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.5,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "dateregex",
+   "gold_count": 2,
+   "returned": 10,
+   "first_gold_rank": 5,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "hexregex",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 2,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 0.5,
+   "hit@10": 1,
+   "completeness@10": 0.5,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/landscape.py:453",
+    "scripts/landscape.py:497"
+   ]
+  },
+  {
+   "id": "archive",
+   "gold_count": 2,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.5,
+   "hit@5": 1,
+   "completeness@5": 0.5,
+   "hit@10": 1,
+   "completeness@10": 0.5,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/native_token_ci.py:20"
+   ]
+  },
+  {
+   "id": "printjson",
+   "gold_count": 13,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.2308,
+   "hit@5": 1,
+   "completeness@5": 0.4615,
+   "hit@10": 1,
+   "completeness@10": 0.5385,
+   "fully_complete@10": 0,
+   "missed_at_10": [
+    "scripts/adoption_status.py:209",
+    "scripts/landscape.py:594",
+    "scripts/native_token_ci.py:358",
+    "scripts/validate.py:425",
+    "scripts/validate_catalogs.py:470",
+    "scripts/validate_foundation.py:249"
+   ]
+  },
+  {
+   "id": "which",
+   "gold_count": 4,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 0.5,
+   "hit@5": 1,
+   "completeness@5": 0.75,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "csvread",
+   "gold_count": 1,
+   "returned": 10,
+   "first_gold_rank": 3,
+   "hit@1": 0,
+   "completeness@1": 0.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  },
+  {
+   "id": "render",
+   "gold_count": 1,
+   "returned": 10,
+   "first_gold_rank": 1,
+   "hit@1": 1,
+   "completeness@1": 1.0,
+   "hit@5": 1,
+   "completeness@5": 1.0,
+   "hit@10": 1,
+   "completeness@10": 1.0,
+   "fully_complete@10": 1,
+   "missed_at_10": []
+  }
+ ]
+}

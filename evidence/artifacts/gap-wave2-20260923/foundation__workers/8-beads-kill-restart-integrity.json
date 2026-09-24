@@ -1,0 +1,183 @@
+{
+  "id": "8-beads-kill-restart-integrity",
+  "gap_index": 8,
+  "gap_text_sha256": "e39496144b42093c7fd4c761ad7b3dc41510f711a8176372f932b4f624c9216d",
+  "preregistration": {
+    "written_at": "2026-09-23T00:47:23Z",
+    "expectation": "Killing `bd create` mid-write (before its ~0.5s embedded-dolt commit completes) and then issuing further bd commands against the same store will show either (a) a corrupted/inconsistent store, or (b) a clean rollback with no persisted partial issue and normal continued operation. Companion same-workspace concurrent review sessions are a separate, unaddressed part of this gap.",
+    "criteria": "Advanced (not settled) for the kill/restart portion if the store's post-kill state and subsequent operations are directly observed but the kill timing relative to actual write-start is only estimated and `bd doctor` checks used do not directly test store consistency; the companion-sessions portion needs two live model sessions and is out of scope for this check.",
+    "timing": "post_hoc: first written at 2026-09-23T00:47:23Z by the first-round receipt generator, after the trial (00:43:32Z-00:43:38Z). The generator hard-coded 00:55:00Z, which is later than both the write and the first commit (1a4448c, 00:50:10Z) and was not a real time. Criteria reworded in the fix round at 01:02:54Z."
+  },
+  "commands": [
+    {
+      "cmd": "$HOME/.local/share/codex-ecosystem/bin/wt --version 2>&1; echo ---; which cargo 2>&1; cargo --version 2>&1; echo ---BD---; $HOME/.local/share/codex-ecosystem/bin/bd --version 2>&1; echo ---CLAUDE---; which claude 2>&1; claude --version 2>&1; echo ---CODEX---; $HOME/.local/share/codex-ecosystem/bin/codex --version 2>&1",
+      "exit": 0,
+      "started_at": "2026-09-23T00:39:32.977Z",
+      "duration_s": 0.647,
+      "output_excerpt": "tool versions (wt, bd, codex); cargo absent",
+      "output_sha256": "0b60dc581971485669eef844308e3ab811fde2f3228873da9cde9ed53314e514",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_018pgQsFSxrq8nv11QmpPeXf",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "set -x\nSCRATCH=$HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nrm -rf \"$SCRATCH\"; mkdir -p \"$SCRATCH\"; cd \"$SCRATCH\"\ngit init -q .\ngit config user.email probe@example.com; git config user.name probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n$BD init -q 2>&1 | tail -5\necho \"--- generate graph plan with 300 issues ---\"\npython3 -c \"\nimport json\nnodes=[{'id':f'n{i}','title':f'issue {i}','type':'task'} for i in range(300)]\nedges=[]\nprint(json.dumps({'issues':nodes}))\n\" > plan.json\nwc -l plan.json\necho \"--- launch batch create in background ---\"\ntimeout 30 $BD create --graph plan.json --json > create_out.log 2>&1 &\nCPID=$!\nsleep 0.15\nkill -9 $CPID 2>/dev/null\nwait $CPID 2>/dev/null\necho \"exit_after_kill=$?\"\nls -la .beads/ 2>&1\necho \"--- count issues after kill ---\"\n$BD list --json 2>&1 | python3 -c \"import json,sys; d=json.load(sys.stdin); print('count_after_kill', len(d) if isinstance(d,list) else d)\" 2>&1\n",
+      "exit": 0,
+      "started_at": "2026-09-23T00:40:04.740Z",
+      "duration_s": 7.802,
+      "output_excerpt": "exploratory: `bd create --graph plan.json` (300 issues under key 'issues') SIGKILLed at 0.15 s; count_after_kill 0 -- the plan format was invalid ('plan has no nodes', seen next), so this kill did not interrupt a write",
+      "output_sha256": "af9d9805dab44cce3b458ba16169f50b603c97badb1097c657ad71045285ec01",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_011sDTQshikejSdg5hPNFHoD",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nps aux | grep -i \" bd \\| bd$\\|/bd \" | grep -v grep\necho \"---wait a bit then recheck---\"\nsleep 3\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n$BD list --json 2>&1 | head -c 300\necho\necho \"--- restart bd (new invocation) and verify db opens/list works ---\"\n$BD doctor 2>&1 | tail -30",
+      "exit": 0,
+      "started_at": "2026-09-23T00:40:19.780Z",
+      "duration_s": 4.672,
+      "output_excerpt": "`bd list` -> []; plain `bd doctor` is 'not yet supported in embedded mode' (only --check=artifacts|conventions|pollution)",
+      "output_sha256": "bc7108d81258e6722463742d4a844fcbf30f6edc5886262add44a7e077460c88",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01WcNinhfVYpC5G56t2LBjRt",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\npython3 -c \"\nimport json\nnodes=[{'id':f'm{i}','title':f'issue {i}','type':'task'} for i in range(3000)]\nprint(json.dumps({'issues':nodes}))\n\" > plan_big.json\ntime timeout 60 $BD create --graph plan_big.json --json > create_big.log 2>&1\necho exit=$?\ntail -c 300 create_big.log\n$BD list --json 2>&1 | python3 -c \"import json,sys; d=json.load(sys.stdin); print('count_after_full_run', len(d))\"",
+      "exit": 0,
+      "started_at": "2026-09-23T00:40:32.880Z",
+      "duration_s": 1.103,
+      "output_excerpt": "3000-issue graph plan rejected in 0.393 s: 'invalid graph plan: plan has no nodes'",
+      "output_sha256": "62cd0917ca4c0ab49d46bbbc9c24952550d20e5a910589045812dac7952d61f1",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01UXE8Xt6D9jhr7XhX5ASGg8",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\ncat create_out.log\necho ---\n$HOME/.local/share/codex-ecosystem/bin/bd create --graph --help 2>&1 | head -5\n$HOME/.local/share/codex-ecosystem/bin/bd create --help 2>&1 | grep -A2 graph",
+      "exit": 0,
+      "started_at": "2026-09-23T00:40:38.445Z",
+      "duration_s": 0.763,
+      "output_excerpt": "same schema error for the first plan",
+      "output_sha256": "9cf8e5532d324aee1ec32f44354eb017872a5494a148663318614ba81752499f",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01B7dkDQCyDwmsosk2TXiLXm",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "pkill -9 -f \"strings.*bd\" 2>/dev/null\ncd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\npython3 -c \"\nimport json\nnodes=[{'id':f'm{i}','title':f'issue {i}'} for i in range(3000)]\nprint(json.dumps({'nodes':nodes}))\n\" > plan_nodes.json\ntimeout 60 $BD create --graph plan_nodes.json --json > create_nodes.log 2>&1\necho exit=$?\ntail -c 400 create_nodes.log",
+      "exit": 1,
+      "started_at": "2026-09-23T00:42:51.540Z",
+      "duration_s": 0.13,
+      "output_excerpt": "exploratory graph plan with 'nodes' key: exit 1, no log produced",
+      "output_sha256": "809dc0fb4eff5fb89669ca2f74961308dc3ec53b01fb505d2ff5fc61484716f3",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01QECy4J5pxcu6hSVhSMsRYy",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\ncat create_nodes.log",
+      "exit": 1,
+      "started_at": "2026-09-23T00:42:54.408Z",
+      "duration_s": 0.1,
+      "output_excerpt": "create_nodes.log absent",
+      "output_sha256": "63ab5476c8bd3b47637198d390a95bc59e84a8e854f64d9e19783cdc73abd0b3",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01Hg2nVnn6adKPSi4tdaffd9",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe && pwd\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n(for i in $(seq 1 200); do $BD create \"loop-issue-$i\" --silent >/dev/null 2>>loop_err.log; done) &\nLOOPPID=$!\nsleep 0.4\nkill -9 $LOOPPID 2>/dev/null\npkill -9 -f \"bd create loop-issue\" 2>/dev/null\nsleep 0.3\necho \"killed loop pid=$LOOPPID\"\n$BD list --json 2>&1 | python3 -c \"import json,sys; d=json.load(sys.stdin); print('count_mid_kill', len(d))\"",
+      "exit": 1,
+      "started_at": "2026-09-23T00:43:01.342Z",
+      "duration_s": 0.561,
+      "output_excerpt": "exploratory loop of `bd create` killed after 0.4 s; exit 1, no count printed",
+      "output_sha256": "2a3fce2a17c8ae1529e20e35e5320815c5404f155ca0e69150f0a4ed85640836",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_012dWR5XiE4SEdbwMSd19rzz",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n( for i in $(seq 1 200); do $BD create \"loop-issue-$i\" --silent >/dev/null 2>>loop_err.log; done ) &\nLOOPPID=$!\nsleep 0.4\nkill -9 $LOOPPID 2>&1 || true\npkill -9 -f \"bd create loop-issue\" 2>&1 || true\nsleep 0.3\necho \"killed_loop_pid=$LOOPPID\"\n$BD list --json > list_out.json 2>list_err.log\necho \"bd_list_exit=$?\"\nwc -l list_out.json list_err.log 2>&1\npython3 -c \"import json; d=json.load(open('list_out.json')); print('count_mid_kill', len(d))\" 2>&1",
+      "exit": 1,
+      "started_at": "2026-09-23T00:43:13.317Z",
+      "duration_s": 0.556,
+      "output_excerpt": "exploratory loop killed after 0.4 s ('Killed'); exit 1",
+      "output_sha256": "1232781227f49a71dac502976713a416ec0912c205cd666cadca34148ec443b2",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01UDq8hHSVCX3Wc4i82vwEs3",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n( for i in $(seq 1 200); do $BD create \"loop-issue-$i\" --silent >/dev/null 2>>loop_err.log; done ) &\ndisown\nLOOPPID=$!\nsleep 0.4\nkill -9 $LOOPPID >/dev/null 2>&1\npkill -9 -f \"bd create loop-issue\" >/dev/null 2>&1\nsleep 0.3\ntrue",
+      "exit": 1,
+      "started_at": "2026-09-23T00:43:18.420Z",
+      "duration_s": 0.547,
+      "output_excerpt": "exploratory loop killed after 0.4 s; exit 1",
+      "output_sha256": "809dc0fb4eff5fb89669ca2f74961308dc3ec53b01fb505d2ff5fc61484716f3",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_011r3QsuY8H4RVnh3kFWzVZu",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n$BD list --json > list_out.json 2>list_err.log\necho bd_list_exit=$?\npython3 -c \"import json; d=json.load(open('list_out.json')); print('count_mid_kill', len(d))\"",
+      "exit": 0,
+      "started_at": "2026-09-23T00:43:19.217Z",
+      "duration_s": 0.705,
+      "output_excerpt": "`bd list` after the loop kills: bd_list_exit=0, count_mid_kill 0",
+      "output_sha256": "7b37a1fa3c9d72f8be64eb90963a05e8846070beb6cacc8069d7f72c4af6b12a",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01UT2KkQNv4tHPoPW2THCnYG",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\ncat loop_err.log | head -20\necho \"---single timed create---\"\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\ntime $BD create \"timing-test-1\" --silent 2>&1",
+      "exit": 0,
+      "started_at": "2026-09-23T00:43:24.032Z",
+      "duration_s": 0.716,
+      "output_excerpt": "unkilled `bd create timing-test-1`: real 0m0.550s (created bd-kill-probe-d48)",
+      "output_sha256": "b930ad084d4d36327f9bbb32a40abbb5c4ab34897fc6909f207b3278b74b3b38",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01M1ai4zdzQvb4WAb9U8A45p",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n$BD create \"kill-target-issue\" --id kill-target-issue --silent --json > kill_target.log 2>&1 &\ndisown\nKPID=$!\nsleep 0.2\nkill -9 $KPID >/dev/null 2>&1\nsleep 0.5\ntrue",
+      "exit": 0,
+      "started_at": "2026-09-23T00:43:32.655Z",
+      "duration_s": 0.972,
+      "output_excerpt": "`bd create kill-target-issue --id kill-target-issue` backgrounded, SIGKILL after 0.2 s; no output shown (kill_target.log was never read)",
+      "output_sha256": "cac1685585590361647e7a27b58a25a590f335bfcd0ab70fcdc0424e40c20843",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_019FNdt8mr1Xa9fWQ8iKzunU",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/bd-kill-probe\nBD=$HOME/.local/share/codex-ecosystem/bin/bd\n$BD show kill-target-issue --json 2>&1\necho \"---\"\n$BD list --json > list_after_kill.json 2>&1\npython3 -c \"import json; d=json.load(open('list_after_kill.json')); print('count_after_targeted_kill', len(d))\"\necho \"---doctor artifacts---\"\n$BD doctor --check=artifacts 2>&1 | tail -20\necho \"---doctor pollution---\"\n$BD doctor --check=pollution 2>&1 | tail -20\necho \"---restart: new bd invocation creates fine---\"\n$BD create \"post-kill-sanity\" --silent 2>&1\n$BD list --json 2>&1 | python3 -c \"import json,sys; d=json.load(sys.stdin); print('count_final', len(d))\"",
+      "exit": 0,
+      "started_at": "2026-09-23T00:43:35.086Z",
+      "duration_s": 2.893,
+      "output_excerpt": "`bd show kill-target-issue`: 'no issues found matching the provided IDs'; count_after_targeted_kill 1; 'No classic artifacts detected.'; 'No test pollution detected!'; post-kill `bd create` -> bd-kill-probe-ebg; count_final 2",
+      "output_sha256": "e33946f108ea44b6fae05564da8c5b1698ed55bed5c55152fe1bd8599dc3a2d5",
+      "raw_output": "raw/gap8-transcript-extract.json#toolu_01C1HfWEioa2aEpUfDafetqb",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Advanced, not settled. Kill/restart clause: in one targeted trial `bd create` was SIGKILLed 0.2 s into a call that took 0.55 s when not killed. The issue was absent afterwards, `bd list` counted only the earlier issue, and a new `bd create` on the same embedded-dolt store succeeded. Several earlier exploratory kills (0.4 s loop kills, a 0.15 s kill of a graph create) also left zero issues and a working store. The graph attempts used an invalid plan and wrote nothing. Limits: the kill timing is inferred from one unkilled baseline and was not tied to a write-in-progress signal. kill_target.log was never read. `bd doctor --check=artifacts|pollution` checks for leftover artifacts and test pollution, not store consistency, and plain `bd doctor` is unsupported in embedded mode. Companion clause ('run two companion review sessions in one workspace, interrupt one'): not attempted. Blocker: it needs two concurrent Claude Code sessions each driving the Codex companion. The unit rules defer multi-session Claude use while the shared Claude account is reserved, and limit the unit to at most one concurrent Codex call. A temp HOME, `unshare` or a loopback-only instance does not change either limit, because both are account and concurrency rules, not host state.",
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": "One targeted kill trial on a scratch single-writer store; no write-activity signal at the kill; no store-consistency checker available in embedded mode. Companion concurrent/interrupted-review clause blocked by the Claude-account reservation and the one-concurrent-Codex-call rule. Raw outputs: raw/gap8-transcript-extract.json.",
+  "checked_at": "2026-09-23T00:43:38Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): named blocker added for the companion clause; exploratory kills and the unread kill log disclosed; commands replaced by the exact transcript commands; timestamps corrected from the fictitious 00:55:00Z.",
+  "raw_evidence": [
+    {
+      "file": "raw/gap8-transcript-extract.json",
+      "sha256": "2fa5e907122d6e123cbafac4be1ab09e0da6a512d99adfc494a03b96c075a928",
+      "bytes": 16243,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)",
+      "published_support": "each command's cmd, exit, output_excerpt and output_sha256 in this receipt"
+    }
+  ]
+}

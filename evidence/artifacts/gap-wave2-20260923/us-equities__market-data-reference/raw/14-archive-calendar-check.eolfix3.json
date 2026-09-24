@@ -1,0 +1,690 @@
+{
+ "nyse_archive": {
+  "14-wayback-nyse-20160108005018.html": {
+   "comparison": {
+    "2016": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    }
+   },
+   "early_1pm": [
+    "2015-11-27",
+    "2015-12-24",
+    "2016-11-25"
+   ],
+   "listed_years": [
+    2015,
+    2016
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2015 and 2016.",
+   "self_test_injected_holiday_cell": {
+    "date": "2016-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "a4fa3e02b8d391a7052b1754dbd029273ac26ff6d9045c61252be34a9bdeb79c"
+  },
+  "14-wayback-nyse-20170301172132.html": {
+   "comparison": {
+    "2017": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2018": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2018-12-05"
+      ],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2018-12-05"
+      ],
+      "match": true
+     }
+    },
+    "2019": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    }
+   },
+   "early_1pm": [
+    "2017-07-03",
+    "2017-11-24",
+    "2018-07-03",
+    "2018-11-23",
+    "2018-12-24",
+    "2019-07-03",
+    "2019-11-29",
+    "2019-12-24"
+   ],
+   "listed_years": [
+    2017,
+    2018,
+    2019
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2017, 2018 and 2019.",
+   "self_test_injected_holiday_cell": {
+    "date": "2017-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "d0e150530e79f6e873861b8b09023c6a1061dafd0b93b4ad00ba26acb832891a"
+  },
+  "14-wayback-nyse-20181215174802.html": {
+   "comparison": {
+    "2018": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2018-12-05"
+      ],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2018-12-05"
+      ],
+      "match": true
+     }
+    },
+    "2019": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2020": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2021": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    }
+   },
+   "early_1pm": [
+    "2018-07-03",
+    "2018-11-23",
+    "2018-12-24",
+    "2019-07-03",
+    "2019-11-29",
+    "2019-12-24",
+    "2020-11-27",
+    "2020-12-24",
+    "2021-11-26"
+   ],
+   "listed_years": [
+    2018,
+    2019,
+    2020,
+    2021
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2018, 2019, 2020, and 2021.",
+   "self_test_injected_holiday_cell": {
+    "date": "2018-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "4a432da747fd5941a77e20b1ee14defcef23e39cf4ea419f2f0446e9d47dddc3"
+  },
+  "14-wayback-nyse-20210111130129.html": {
+   "comparison": {
+    "2021": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2022": {
+     "detection_floor_met": false,
+     "page_holiday_count": 8,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [
+       "2022-06-20"
+      ],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": false
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [
+       "2022-06-20"
+      ],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": false
+     }
+    },
+    "2023": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [
+       "2023-06-19"
+      ],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": false
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [
+       "2023-06-19"
+      ],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": false
+     }
+    }
+   },
+   "early_1pm": [
+    "2021-11-26",
+    "2022-11-25",
+    "2023-07-03",
+    "2023-11-24"
+   ],
+   "listed_years": [
+    2021,
+    2022,
+    2023
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2021, 2022, and 2023.",
+   "self_test_injected_holiday_cell": {
+    "date": "2021-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "4e50fc36bdb85a9d5a67cc17368975f75856e057ed2c9acf6e3837fdb4fd20b9"
+  },
+  "14-wayback-nyse-20220706011712.html": {
+   "comparison": {
+    "2022": {
+     "detection_floor_met": true,
+     "page_holiday_count": 9,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2023": {
+     "detection_floor_met": true,
+     "page_holiday_count": 10,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2024": {
+     "detection_floor_met": true,
+     "page_holiday_count": 10,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    }
+   },
+   "early_1pm": [
+    "2022-11-25",
+    "2023-07-03",
+    "2023-11-24",
+    "2024-07-03",
+    "2024-11-29",
+    "2024-12-24"
+   ],
+   "listed_years": [
+    2022,
+    2023,
+    2024
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2022, 2023, and 2024.",
+   "self_test_injected_holiday_cell": {
+    "date": "2022-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "c008ba82c32c774014884f7c6f56951ea07b70f2281d33cd625ef89ece2d55ea"
+  },
+  "14-wayback-nyse-20240111002222.html": {
+   "comparison": {
+    "2024": {
+     "detection_floor_met": true,
+     "page_holiday_count": 10,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    },
+    "2025": {
+     "detection_floor_met": true,
+     "page_holiday_count": 10,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2025-01-09"
+      ],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [
+       "2025-01-09"
+      ],
+      "match": true
+     }
+    },
+    "2026": {
+     "detection_floor_met": true,
+     "page_holiday_count": 10,
+     "pmc": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     },
+     "xcals": {
+      "early_only_library": [],
+      "early_only_page": [],
+      "holidays_only_library": [],
+      "holidays_only_page": [],
+      "library_adhoc_closures": [],
+      "match": true
+     }
+    }
+   },
+   "early_1pm": [
+    "2024-07-03",
+    "2024-11-29",
+    "2024-12-24",
+    "2025-07-03",
+    "2025-11-28",
+    "2025-12-24",
+    "2026-11-27",
+    "2026-12-24"
+   ],
+   "listed_years": [
+    2024,
+    2025,
+    2026
+   ],
+   "parsed": true,
+   "scope_statement": "All NYSE markets observe U.S. holidays as listed below for 2024, 2025, and 2026.",
+   "self_test_injected_holiday_cell": {
+    "date": "2024-03-08",
+    "reported_page_only": true
+   },
+   "sha256": "adbcdb88cf6336537c0853cacbdaa3d81b31270c74ad4d8b97903a9c1cd259a0"
+  }
+ },
+ "per_year": {
+  "2016": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20160108005018.html"
+   }
+  ],
+  "2017": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20170301172132.html"
+   }
+  ],
+  "2018": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20170301172132.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20181215174802.html"
+   }
+  ],
+  "2019": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20170301172132.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20181215174802.html"
+   }
+  ],
+  "2020": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20181215174802.html"
+   }
+  ],
+  "2021": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20181215174802.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20210111130129.html"
+   }
+  ],
+  "2022": [
+   {
+    "match_both": false,
+    "snapshot": "14-wayback-nyse-20210111130129.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20220706011712.html"
+   }
+  ],
+  "2023": [
+   {
+    "match_both": false,
+    "snapshot": "14-wayback-nyse-20210111130129.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20220706011712.html"
+   }
+  ],
+  "2024": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20220706011712.html"
+   },
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20240111002222.html"
+   }
+  ],
+  "2025": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20240111002222.html"
+   }
+  ],
+  "2026": [
+   {
+    "match_both": true,
+    "snapshot": "14-wayback-nyse-20240111002222.html"
+   }
+  ]
+ },
+ "per_year_latest_snapshot": {
+  "2016": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20160108005018.html"
+  },
+  "2017": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20170301172132.html"
+  },
+  "2018": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20181215174802.html"
+  },
+  "2019": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20181215174802.html"
+  },
+  "2020": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20181215174802.html"
+  },
+  "2021": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20210111130129.html"
+  },
+  "2022": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20220706011712.html"
+  },
+  "2023": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20220706011712.html"
+  },
+  "2024": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20240111002222.html"
+  },
+  "2025": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20240111002222.html"
+  },
+  "2026": {
+   "match_both": true,
+   "snapshot": "14-wayback-nyse-20240111002222.html"
+  }
+ },
+ "press": {
+  "adhoc_corroborated": {
+   "2018-12-05": true,
+   "2025-01-09": true
+  },
+  "negative_controls": {
+   "2018-12-03 (moment of silence, not a closure) not reported": true,
+   "2024-12-29 (date of death, not a closure) not reported": true
+  },
+  "pages": {
+   "14-wayback-ice-bush-20250108195503.txt": {
+    "closure_dates": [
+     "2018-12-05"
+    ],
+    "evidence": {
+     "2018-12-05": "Bush ruleDate) { $j(\".pr-headline\").css(\"display\", \"block\"); } Moment of Silence on Monday, December 3, 2018 NYSE Group Markets to close for Day of Mourning on Wednesday, December 5, 2018 On Monday, December 3, 2018, the NYSE w"
+    },
+    "sha256": "548127fe5b845554447b6836bea1542ff33a48beca0c36f76306df1f8a8a1e3e"
+   },
+   "14-wayback-ice-carter-20241230155348.txt": {
+    "closure_dates": [
+     "2025-01-09"
+    ],
+    "evidence": {
+     "2025-01-09": "he New York Stock Exchange, part of Intercontinental Exchange, Inc. (NYSE: ICE), a leading global provider of technology and data, announced today that it will close all NYSE Group equity and options markets on Thursday, January 9, 2025, in observance of the National Day of M"
+    },
+    "sha256": "c2c45bd4b63f17123283b01dba526333e19a96ad605e4760d349ced26d16e3a2"
+   }
+  },
+  "self_test": {
+   "injected_closure_reported": true,
+   "injected_open_not_reported": true
+  }
+ },
+ "range": [
+  2016,
+  2027
+ ],
+ "versions": {
+  "exchange_calendars": "4.13.2",
+  "pandas_market_calendars": "5.4.0"
+ }
+}

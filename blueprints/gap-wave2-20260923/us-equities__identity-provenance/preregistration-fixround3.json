@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "layer": "us-equities/identity-provenance",
+  "label": "fix-round 3 preregistration (after the independent Opus review of the fix-round-2 handoff, 2026-09-23)",
+  "written_at": "2026-09-23T13:20:19Z",
+  "written_at_note": "shell stamp taken immediately before writing this file; committed before any fix-round-3 check ran. This is a fix-round preregistration written after the original C0.3 result was seen; it is labelled as such and does not replace the original criterion, whose failure stays recorded.",
+  "review_findings_addressed": [
+    "major gap 0: C0.3 as written (full-tree sha256 list after `rm -rf` of every out and `dvc checkout` equals the pre-delete list) failed with git_restore_diff_exit=1, the original refutation rule makes the original run not_settled, and the settled outcome rested on an amendment written after the result",
+    "minor gap 4: fix-round-2 R4.1 named 'Iceberg: rows/5; ArcticDB: rows/5' as store-reported units, but the code used the Iceberg snapshot count and ArcticDB versions minus the seed, with no amendment recorded",
+    "minor gap 4: the 'highest retry attempt 3/4' limit rests on stderr truncated to its last 300 characters",
+    "minor gap 5: the C5.1 listing shows only an identical 8-character runId prefix for both runs, and the redacted published ndjson no longer satisfies the uuid format of the schema"
+  ],
+  "gaps": {
+    "0": {
+      "criteria": [
+        "G0.3a Fresh git+DVC 3.67.1 scratch repo with the same dvc.yaml and stage driver: `dvc repro` exits 0, dvc.lock and the DVC-written .gitignore files are committed, and a second `dvc repro` skips all six stages (re-observes C0.1/C0.2 in this run).",
+        "G0.3b As-written arm, kept as the detector: `rm -rf data out; dvc checkout`, then the full-tree sha256 list of data/ and out/ is diffed against the pre-delete list. Expected: the diff exits 1 and the only differing entries are data/.gitignore and out/.gitignore (dvc checkout does not restore git-tracked files). Any other differing entry fails G0.3.",
+        "G0.3c Corrected full-tree restore: `rm -rf data out; git checkout -- data/.gitignore out/.gitignore && dvc checkout`, then the full-tree sha256 list diff against the pre-delete list exits 0, and `dvc status` reports up to date.",
+        "G0.3d Outs-only delete: remove only the eight DVC outs declared in dvc.yaml (keeping the git-tracked .gitignore files), `dvc checkout`, then the full-tree diff exits 0 and `dvc status` reports up to date.",
+        "G0.3e Detector control: after G0.3d, overwrite one byte of data/ns_materialized/observations.parquet; the full-tree diff must exit 1 naming that file and `dvc status` must report a change. Then `dvc checkout --force` restores it and the full-tree diff exits 0 again.",
+        "Outcome rule for gap 0: the original run's C0.3 as written stays recorded as failed. Gap 0 is settled only if G0.3a-G0.3e all pass on this fresh run and the original C0.1, C0.2, C0.4, C0.5 and C0.6 results stand; if any G0.3 arm fails, gap 0 is not_settled with the observed failure."
+      ]
+    },
+    "4": {
+      "criteria": [
+        "H4.1 Record a late amendment: fix-round-2 R4.1's parenthetical 'Iceberg: rows/5; ArcticDB: rows/5' was not what the code measured. The cited stores-fix2 run used the Iceberg table's snapshot count and ArcticDB's version count minus the seed version, which are store-reported and independent of decoding (rows/5 would compare decoded batches with decoded rows/5, a tautology). No rerun: the amendment documents the measure that already ran.",
+        "H4.2 Supplementary Iceberg two-writer run, n=30 appends per writer, two repetitions, with each writer's complete stderr retained in its own file. Report the maximum 'retrying (k/4)' attempt, the retry-line count and any CommitFailedException from the complete stderr, plus rows lost after reported success. Detection method: the same regex is applied to a control string containing 'retrying (4/4)' and must return 4.",
+        "H4.3 The cited-run limit is reworded to state that only the last 300 characters of each writer's stderr were retained there, so its maximum retry attempt is unknown; the supplementary H4.2 figure is reported separately.",
+        "Outcome rule for gap 4: unchanged; H4.2 is supplementary and cannot change the gap-4 outcome unless it shows rows lost after reported success for Iceberg, which would make gap 4 advanced with that finding."
+      ]
+    },
+    "5": {
+      "criteria": [
+        "L5.1 From the original, unredacted openlineage-events.ndjson of the cited lineage-fix run (its sha256 must equal raw-index source_sha256), derive per event (job, eventType, full runId): START and COMPLETE of the materialize job share one runId, START and COMPLETE of the select job share one runId, and the two runIds differ. Detector control: a copy with the select COMPLETE runId replaced by the materialize runId must fail the check.",
+        "L5.2 Published redaction maps each UUID to a valid-format placeholder UUID (stable across all published files), so the published ndjson validates against the OpenLineage 2-0-2 RunEvent schema with jsonschema's FormatChecker. Validate the published file; detector control: a copy with runId 'uuid-redacted-01' must fail validation on format.",
+        "Outcome rule for gap 5: unchanged if L5.1 and L5.2 pass; if L5.1 fails, gap 5 is not_settled."
+      ]
+    }
+  }
+}

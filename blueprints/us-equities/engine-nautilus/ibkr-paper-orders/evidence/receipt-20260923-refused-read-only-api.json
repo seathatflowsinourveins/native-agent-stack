@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_paper_orders_nautilus_1_231",
+  "generated_at": "2026-09-23T16:45:02.518255+00:00",
+  "nautilus_trader_version": "1.231.0",
+  "ibapi_version": "10.45.1",
+  "plan_sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
+  "harness_sha256": "9f6c08f1835fe05c3848f318f7e9ca9162fb0580231ed79fb8f1b3a14a1d1b76",
+  "evidence_class": "native_paper",
+  "port": 4002,
+  "status": "incomplete",
+  "plan_bounds": {
+    "max_orders": 6,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_roundtrip_loss_usd": 5,
+    "commission_allowance_per_order_usd": 1.0,
+    "marketable_offset_usd": 0.05,
+    "resting_fraction_of_bid": 0.5,
+    "resting_price_floor_usd": 1.0,
+    "max_order_submit_rate": "100/00:00:01",
+    "time_in_force": "DAY",
+    "order_type": "LIMIT",
+    "min_submit_spacing_seconds": 1.5,
+    "max_cancel_attempts_per_order": 3,
+    "submit_rate_note": "Nautilus default risk-engine throttle (drops and denies submits beyond the rate); the run's own spacing is enforced by the harness before every order is created, so the throttle never binds."
+  },
+  "session_check": {
+    "fixed_window": "inside_window",
+    "liquid_hours_present": true,
+    "liquid_hours_parsed": true,
+    "with_liquid_hours": "inside_window"
+  },
+  "pre_check": {
+    "client": "ibapi",
+    "client_id": 92,
+    "port": 4002,
+    "status": "passed",
+    "observed": {
+      "account_count": 1,
+      "paper_accounts": true,
+      "server_time_epoch": 1790181901,
+      "positions": 0,
+      "spy_position": false,
+      "open_orders": 0,
+      "open_order_statuses": [],
+      "contract": {
+        "secType": "STK",
+        "currency": "USD",
+        "exchange": "SMART",
+        "primaryExchange": "ARCA",
+        "minTick": 0.01,
+        "timeZoneId": "US/Eastern"
+      },
+      "errors": [],
+      "info": [
+        {
+          "reqId": -1,
+          "code": 2104,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "reqId": -1,
+          "code": 2106,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "reqId": -1,
+          "code": 2158,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "server_minus_local_s": -1.587
+    },
+    "requests_completed": {
+      "accounts": true,
+      "time": true,
+      "positions": true,
+      "orders": true,
+      "contract": true
+    },
+    "time_zone_id": "US/Eastern"
+  },
+  "run": {
+    "run_prefix": "NTP-0923-164502-351ca1",
+    "cases": [
+      {
+        "id": "C1",
+        "name": "accept_resting",
+        "expect": "OrderAccepted",
+        "outcome": "incomplete",
+        "reason": "node_start_timeout",
+        "started_at": null,
+        "ended_at": "2026-09-23T16:46:03.357325+00:00",
+        "orders": [],
+        "events": []
+      },
+      {
+        "id": "C2",
+        "name": "cancel_resting",
+        "expect": "OrderCanceled",
+        "outcome": "not_run",
+        "reason": null,
+        "started_at": null,
+        "ended_at": null,
+        "orders": [],
+        "events": []
+      },
+      {
+        "id": "C3",
+        "name": "fill_buy",
+        "expect": "OrderFilled",
+        "outcome": "not_run",
+        "reason": null,
+        "started_at": null,
+        "ended_at": null,
+        "orders": [],
+        "events": []
+      },
+      {
+        "id": "C4",
+        "name": "flatten",
+        "expect": "OrderFilled+flat",
+        "outcome": "not_run",
+        "reason": null,
+        "started_at": null,
+        "ended_at": null,
+        "orders": [],
+        "events": []
+      }
+    ],
+    "fills": [],
+    "position": {
+      "opened": null,
+      "closed": null
+    },
+    "roundtrip": null,
+    "orders_created": 0,
+    "max_orders": 6,
+    "net_quantity_from_fills": "0",
+    "cleanup": {
+      "triggered": true,
+      "reason": "node_start_timeout",
+      "kind": "incomplete",
+      "started_at": "2026-09-23T16:46:03.357325+00:00",
+      "cancels_requested": 0,
+      "flatten_orders": 0,
+      "ended_at": null,
+      "end_reason": null,
+      "orders": [],
+      "events": []
+    },
+    "unconfirmed_events": [],
+    "duplicate_events": [],
+    "cancel_requests": [],
+    "node": {
+      "built": true,
+      "strategy_started": false,
+      "stop_requested_by": "node_start_timeout"
+    },
+    "notes": [
+      "node did not start the strategy within node_start_seconds"
+    ],
+    "errors": []
+  },
+  "flat_proof": {
+    "status": "passed",
+    "positions": 0,
+    "open_orders": 0,
+    "attempts": [
+      {
+        "client": "ibapi",
+        "client_id": 92,
+        "port": 4002,
+        "status": "passed",
+        "observed": {
+          "account_count": 1,
+          "paper_accounts": true,
+          "server_time_epoch": 1790181963,
+          "positions": 0,
+          "spy_position": false,
+          "open_orders": 0,
+          "open_order_statuses": [],
+          "contract": null,
+          "errors": [],
+          "info": [
+            {
+              "reqId": -1,
+              "code": 2104,
+              "text": "Market data farm connection is OK:usfarm"
+            },
+            {
+              "reqId": -1,
+              "code": 2106,
+              "text": "HMDS data farm connection is OK:ushmds"
+            },
+            {
+              "reqId": -1,
+              "code": 2158,
+              "text": "Sec-def data farm connection is OK:secdefil"
+            }
+          ],
+          "server_minus_local_s": -0.889
+        },
+        "requests_completed": {
+          "accounts": true,
+          "time": true,
+          "positions": true,
+          "orders": true,
+          "contract": false
+        }
+      }
+    ]
+  },
+  "elapsed_seconds": 61.546,
+  "exit_code": 1
+}

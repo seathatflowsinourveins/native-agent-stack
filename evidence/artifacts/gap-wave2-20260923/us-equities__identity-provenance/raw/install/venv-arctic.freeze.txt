@@ -1,0 +1,14 @@
+arcticdb==6.26.0
+attrs==26.1.0
+duckdb==1.5.5
+msgpack==1.2.2
+numpy==2.5.3
+packaging==26.3
+pandas==2.3.3
+protobuf==6.33.6
+pyarrow==25.0.1
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+pyyaml==6.0.3
+six==1.17.0
+tzdata==2026.4

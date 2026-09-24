@@ -1,0 +1,98 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/10",
+  "gap_index": 10,
+  "gap_text": "The September 22 Grype scan covers the 21-package Nautilus runtime and two declared adapter pins. It does not establish vulnerability coverage of the separate 36-package SDK inventoried on September 19, despite the broader wording in the supply-chain README.",
+  "gap_text_sha256": "6fea1d0a353da768ff82d808fcaad0d3e234a967a3ae5c4e7023ccd7fc6786ee",
+  "next_check": "Run grype on the 2026-09-19 equity-worker-sdk Syft SBOM, then correct the README wording to the target actually scanned.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "Same run as gap 0 (grype on the 2026-09-19 SDK SBOM) plus a README correction that names the 21-package Nautilus runtime as the 2026-09-22 target and cites the new SDK scan.",
+    "criteria": [
+      "settled if the grype run succeeds (as gap 0 criteria) and the README wording at the 2026-09-22 section is corrected in this branch",
+      "advanced if either part is missing"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh  # GRYPE_DB_CACHE_DIR=isolated cache, GRYPE_DB_AUTO_UPDATE=false",
+    "grype sbom:$HOME/codex-ecosystem/state/supply-chain-20260919/inventory/runtime.syft.json -o json",
+    "grype sbom:<same SBOM> -o cyclonedx-json",
+    "grype sbom:<same SBOM with requests changed to 2.19.0> -o json   # positive control 1",
+    "grype purl:<file: pkg:pypi/requests@2.19.0, pkg:pypi/urllib3@1.24.1> -o json   # positive control 2",
+    "git show ba3e7c2 -- blueprints/us-equities/supply-chain/README.md"
+  ],
+  "results": [
+    "SBOM sha256 6912fc526853724556519872207534d54bda90f9c22b48c9625b689c12b210fc (equals receipt.json raw_artifacts runtime.syft.json)",
+    "sdk-json exit=0; sdk-cdx exit=0; mutated exit=0; purls exit=0",
+    "sbom artifacts: 36 Counter({'python': 36}); sbom has openai ['3.16.2'], openai-codex ['0.154.0'], exchange-calendars ['4.13.2']",
+    "grype cdx components by type: Counter({'file': 87, 'library': 36})",
+    "sdk matches: 0 db built: 2026-09-23T06:31:39Z schema: v6.1.9",
+    "mutated matches: 5 (GHSA-9hjg-9r4m-mvj7, GHSA-9wx4-h78v-vm56, GHSA-gc5v-m9x4-r6x2, GHSA-j8r2-6x86-q33q, GHSA-x84v-xcm2-53pg)",
+    "positive matches: 17 on the same DB",
+    "README section 'Vulnerability scan - pinned NautilusTrader 2.0.0rc5 runtime ...' now reads: 'This scan targeted the NautilusTrader rc5 runtime, **not** the 36-package `equity-worker-sdk` inventoried above.' and a new section 'Vulnerability scan of the September 19 equity-worker-sdk SBOM, September 23, 2026' records the 36-package / 0-match result and controls (commit ba3e7c2)"
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Same limits as gap 0."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "SDK SBOM scanned (gap 0 evidence) and the README wording corrected to the target actually scanned.",
+  "raw_outputs": [
+    {
+      "path": "raw/grype-sdk/exits.log",
+      "sha256": "f35418988b3088553b876fdc8b8017f268a38d4b6834936d987730cf31b2ba1d"
+    },
+    {
+      "path": "raw/grype-sdk/db-status.json.txt",
+      "sha256": "fae3926e6c693ea058610629ad1beee3d8bcf4b095a4b0a49a45b6887643dd46"
+    },
+    {
+      "path": "raw/grype-sdk/sdk.grype.json",
+      "sha256": "2b8aaeda6b2d8f510faabcccb8b858a747b3876cee2e111dc3cba53b996b50fe"
+    },
+    {
+      "path": "raw/grype-sdk/sdk.grype.cdx.summary.json",
+      "sha256": "f1ca284ef6691c4e4f462269a46e9a9980a92e86e2c4a2edd02da6a47908cdc8"
+    },
+    {
+      "path": "raw/grype-sdk/mutated.grype.json",
+      "sha256": "5acec94c6ab91c6fb6e5dd010fce5108f1438e906e48c96f06c97a9bba471984"
+    },
+    {
+      "path": "raw/grype-sdk/positive.grype.json",
+      "sha256": "1d9099858532d60a12eff09ee7dbb2185a6dbd120e4fcbdd52c828d9abaa7840"
+    },
+    {
+      "path": "raw/grype-sdk/positive.purls",
+      "sha256": "390f2edfe0d05849e68cfb6e79e0403221f0b8c7566056cc785dd04ca4a19f0b"
+    },
+    {
+      "path": "raw/grype-sdk/sdk.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  }
+}

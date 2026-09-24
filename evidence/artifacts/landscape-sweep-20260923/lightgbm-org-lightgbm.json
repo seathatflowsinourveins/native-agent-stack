@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lightgbm-org-lightgbm",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/lightgbm-org/LightGBM",
+ "reviewed_commit": "9149cae965332053e82c8d85afe71374662a3185",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of lightgbm-org/LightGBM at commit 9149cae965332053e82c8d85afe71374662a3185 (license MIT), read from README.md at that commit. Repository description: \"A fast, distributed, high performance gradient boosting (GBT, GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9149cae965332053e82c8d85afe71374662a3185",
+   "text": "LightGBM is a gradient boosting framework that uses tree based learning algorithms. It is designed to be distributed and efficient with the following advantages:"
+  },
+  {
+   "source": "README.md@9149cae965332053e82c8d85afe71374662a3185",
+   "text": "What's more, distributed learning experiments show that LightGBM can achieve a linear speed-up by using multiple machines for training in specific settings."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/lightgbm-org/LightGBM/tree/9149cae965332053e82c8d85afe71374662a3185",
+  "https://github.com/lightgbm-org/LightGBM/blob/9149cae965332053e82c8d85afe71374662a3185/README.md"
+ ]
+}

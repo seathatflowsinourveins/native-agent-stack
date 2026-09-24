@@ -1,0 +1,59 @@
+{
+ "id": "foundation__quality-evaluation__gap5",
+ "gap_index": 5,
+ "gap_text_sha256": "8e4e39849fe35106a9ea6de76230a6bc0564d3d5d538aaf0e587c3922a357cb7",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "Twelve new cases (C9-C20) authored from retained repository sources, with labels frozen by sha256 before inference, extend the set to 20. One Codex call (read-only, ephemeral, stdin closed, --output-schema) and one bounded Claude call (--json-schema, no tools) each return a schema-valid verdict for all 20 cases, blind to labels and to TypeSafe output. TypeSafe on C9-C20 is not run: it needs an API credential the brief forbids reading. Expected outcome: advanced.",
+  "criteria": "both outputs validate against the schema; per-case table vs frozen labels; case authoring and labelling by the same agent disclosed; user hooks disabled for both CLIs and a process poller watches for ai-memory hook processes.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "fixround2_preregistration": {
+  "written_at": "2026-09-23T12:41:55Z",
+  "label": "fix-round-2 preregistration, written after the second independent review (Opus) and before any fix-round-2 command",
+  "expectation": "No rerun. The per-session hook attribution claim is withdrawn: real hook processes on this host are their own session leaders (pid == sid), so a hook spawned by the reviewed CLI would not share the call's setsid session. The detection method is restated on grounds the raw outputs already carry: both CLIs had hooks disabled by configuration, neither call produced tool activity (Claude --tools \"\"; codex-events.jsonl has no tool items), and every sampled hook process was a pre-tool-use/post-tool-use event, which a tool-less call cannot emit.",
+  "criteria": "receipt 5 results.hooks and README rewritten; the poller's limitation stated; parent-pid ancestry marked as not captured; outcome unchanged (advanced) because the TypeSafe arm remains deferred.",
+  "committed_in": "1fcd1fe (preregistrations-fixround2.json), before any fix-round-2 command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:45:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "python3 blueprints/gap-wave2-20260923/foundation__quality-evaluation/build_typesafe_extension.py evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension (frozen and committed in 1b85ad8 at 2026-09-23T02:53:30Z, before either model call)",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_review_call.sh codex $PWD/evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/review-out  -> codex exec --ignore-user-config --disable hooks --sandbox read-only --ephemeral --skip-git-repo-check -C <empty dir> -m gpt-6-astra -c model_reasoning_effort=\"medium\" --output-schema schema.json -o codex-last-message.json --json - < prompt.txt (timeout 900)",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_review_call.sh claude $PWD/evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/review-out  -> claude -p --model sonnet --effort medium --setting-sources project --strict-mcp-config --tools \"\" --no-session-persistence --output-format json --json-schema <schema.json> < prompt.txt (timeout 900)",
+  "pinned-venv/bin/python blueprints/gap-wave2-20260923/foundation__quality-evaluation/score_reviews.py evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/typesafe-extension .../review-out/codex-last-message.json .../review-out/claude-result.json .../review-out/agreement.json"
+ ],
+ "results": {
+  "case_set": "20 cases: C1-C8 unchanged from catalog-cases.json (sha256 7cc28c50...), C9-C20 new, sourced from verbatim line ranges of docs/promptfoo-upstream-retrieval.md and docs/native-skill-practice-20260921.md (cases.json, freeze-hashes.txt)",
+  "schema_validation": {
+   "codex": "valid",
+   "claude": "valid (structured_output)"
+  },
+  "agreement_with_frozen_labels": {
+   "codex": "20/20 (C1-C8 8/8, C9-C20 12/12)",
+   "claude": "17/20 (C1-C8 6/8, C9-C20 11/12)"
+  },
+  "codex_vs_claude": "17/20; Claude answered 'contradicted' where the source only fails to establish the claim, on C2, C4 and C20",
+  "C4": "frozen insufficient; Codex insufficient; Claude contradicted; TypeSafe (2026-09-21) contradicted",
+  "exit_and_timing": "codex exit 0, 24628 ms; claude exit 0, 9186 ms (*-timing.txt)",
+  "usage": {
+   "codex": "input 19896, cached 0, output 686, reasoning 44 (turn.completed)",
+   "claude": "resolved claude-sonnet-5; input 2, cache_creation 16064, output 1151; total_cost_usd 0.0758 is the CLI's list-price estimate on the subscription account, not a charge"
+  },
+  "hooks": "Fix-round-2 correction: the per-session attribution claim ('0 ai-memory hook processes in either call's session') is withdrawn. Every hook invocation the poller sampled is its own session leader: 6/6 distinct hook session ids in the Claude window and 7/7 in the Codex window belong to a process with pid == sid ({claude,codex}-hook-poller.txt), so a hook spawned by the reviewed CLI would also have opened a new session and been counted as another session; the zero was true by construction, and the setsid sensitivity probe did not test that case. The no-hook conclusion rests instead on: (1) configuration: Codex ran with --ignore-user-config --disable hooks, Claude with --setting-sources project from an empty directory; (2) tool activity: Claude ran with --tools \"\" and codex-events.jsonl holds only thread.started, turn.started, item.completed(agent_message) and turn.completed, so neither call made a tool call; (3) event type: every sampled hook process was --event pre-tool-use or post-tool-use (Claude window 3 + 17, Codex window 5 + 10), which a call without tool calls cannot emit, and no session-start, user-prompt-submit or stop hook appears in either window. Two post-tool-use samples in the Codex window carry --agent codex; the reviewed Codex call made no tool call, so they came from another Codex session. Parent-pid ancestry was not captured, so no sampled hook is attributed to or excluded from a call by ancestry.",
+  "blindness": "Not fully blind (reconciliation): prompt.txt lines 193-215 give, as the C15-C17 source excerpt, the sentence that the earlier native reviews 'corrected C4 to `insufficient`', and lines 217-239 (C18-C20) disclose TypeSafe's 7/8 aggregate. The same prompt asks for C4 at lines 86-96. Both reviewers' C4 verdicts are therefore contaminated, and the agreement counts on C4 are not independent agreement with the frozen label."
+ },
+ "outcome": "advanced",
+ "evidence_class": "native_proven",
+ "limits": "Deferred arm: TypeSafe was not run on C9-C20. Blocker: the TypeSafe API needs TYPESAFE_API_KEY, and this brief forbids credential reads and paid API use; owner: a session authorised to load that credential. The single Claude call is the brief's one allowed bounded call. It ran on Sonnet (resolved claude-sonnet-5), while the 2026-09-21 review ran on claude-fable-5-1, so the two Claude runs are different models. The C9-C20 labels were written by this agent before inference and were not independently reviewed. Twenty cases, one call per model and one run each still cannot support a ranking by quality, speed or cost. Label disclosure (reconciliation): the prompt was not blind on C4. The C15-C17 source excerpt states that the earlier native reviews corrected C4 to 'insufficient', and the C18-C20 excerpt gives TypeSafe's 7/8 aggregate. Codex's C4 'insufficient' (and so its 20/20) cannot count as independent agreement with the frozen label; Claude's C4 'contradicted' was given with the same disclosure in its input. The Claude arm cannot be rerun under the one-call limit and is recorded as contaminated on C4; the Codex arm could be rerun on a packet without C15-C20 or on C1-C8 alone, which this reconciliation (no new checks) did not do. Round-1 note: the round-1 Codex probe (codex exec --sandbox read-only --ephemeral with a positional prompt, without --ignore-user-config or --disable hooks) ran while $HOME/.codex/hooks.json registered ai-memory SessionStart, UserPromptSubmit and other hooks against the live store at 127.0.0.1:49374. Read-only determination: it did not reach session start. Its only stderr line is 'Reading additional input from stdin...', stdout is empty, and it was reaped by timeout 300. In the codex-cli 0.155.1 source (rust-v0.155.1 codex-rs/exec/src/lib.rs), that message is printed by read_prompt_from_stdin just before a blocking read_to_end on stdin, inside resolve_root_prompt (line 941), which runs before the in-process app-server client starts (line 973) and before thread/start. Hooks run inside that app server, so no ai-memory hook fired and nothing was written to the live store by this call (support/reconciliation/codex-round1-session-start.txt, codex-user-hooks-registration.txt). This rests on the installed version string matching the upstream tag; the live store itself was not queried, per the rules.",
+ "checked_at": "2026-09-23T02:55:07Z",
+ "artifacts": [
+  "support/typesafe-extension/{cases.json,labels-frozen.json,schema.json,prompt.txt,freeze-hashes.txt}",
+  "support/fixround/g5-g10-reviews/*",
+  "support/reconciliation/{codex-round1-session-start.txt,codex-user-hooks-registration.txt}",
+  "blueprints/gap-wave2-20260923/foundation__quality-evaluation/{build_typesafe_extension.py,run_review_call.sh,score_reviews.py}"
+ ]
+}

@@ -1,0 +1,243 @@
+{
+  "phase": "events2",
+  "pid": 55077,
+  "steps": [
+    {
+      "step": "fs/watch",
+      "ok": true,
+      "at": 1790173627.7928154,
+      "result_keys": [
+        "path"
+      ]
+    },
+    {
+      "step": "fs/writeFile",
+      "ok": true,
+      "at": 1790173627.7935176,
+      "result_keys": []
+    },
+    {
+      "step": "process/spawn",
+      "ok": true,
+      "at": 1790173629.801233,
+      "result_keys": []
+    },
+    {
+      "step": "command/exec",
+      "ok": true,
+      "at": 1790173631.8481965,
+      "result_keys": [
+        "exitCode",
+        "stderr",
+        "stdout"
+      ]
+    },
+    {
+      "step": "thread/settings/update",
+      "ok": true,
+      "at": 1790173632.8491051,
+      "result_keys": []
+    },
+    {
+      "step": "turn/start(untrusted)",
+      "ok": true,
+      "at": 1790173652.5566025,
+      "result_keys": [
+        "turn"
+      ]
+    },
+    {
+      "step": "thread/shellCommand",
+      "ok": true,
+      "at": 1790173652.5572486,
+      "result_keys": []
+    },
+    {
+      "step": "wait(shellCommand)",
+      "ok": true,
+      "at": 1790173652.5655086,
+      "result_keys": [
+        "turns"
+      ]
+    },
+    {
+      "step": "thread/compact/start",
+      "ok": true,
+      "at": 1790173652.5663915,
+      "result_keys": []
+    },
+    {
+      "step": "wait(compact)",
+      "ok": true,
+      "at": 1790173659.6062682,
+      "result_keys": [
+        "turns"
+      ]
+    },
+    {
+      "step": "thread/goal/set",
+      "ok": true,
+      "at": 1790173659.6100595,
+      "result_keys": [
+        "goal"
+      ]
+    },
+    {
+      "step": "wait(goal)",
+      "ok": true,
+      "at": 1790173667.6546183,
+      "result_keys": [
+        "turns"
+      ]
+    },
+    {
+      "step": "thread/goal/clear",
+      "ok": true,
+      "at": 1790173667.6560087,
+      "result_keys": [
+        "cleared"
+      ]
+    },
+    {
+      "step": "thread/queue/add",
+      "ok": true,
+      "at": 1790173669.6662521,
+      "result_keys": [
+        "queuedSubmission"
+      ]
+    },
+    {
+      "step": "wait(queue)",
+      "ok": true,
+      "at": 1790173672.6746485,
+      "result_keys": [
+        "turns"
+      ]
+    },
+    {
+      "step": "thread/rollback",
+      "ok": false,
+      "at": 1790173672.6751566,
+      "error": "InvalidRequestError: JSON-RPC error -32600: paginated threads do not support thread/rollback"
+    },
+    {
+      "step": "project/create",
+      "ok": false,
+      "at": 1790173673.6757543,
+      "error": "InvalidRequestError: JSON-RPC error -32600: Invalid request: invalid type: string \"$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events2\", expected struct ProjectRoot"
+    },
+    {
+      "step": "skills/extraRoots/set",
+      "ok": true,
+      "at": 1790173674.6770027,
+      "result_keys": []
+    },
+    {
+      "step": "thread/fork",
+      "ok": true,
+      "at": 1790173675.7572021,
+      "result_keys": [
+        "activePermissionProfile",
+        "approvalPolicy",
+        "approvalsReviewer",
+        "cwd",
+        "instructionSources",
+        "model",
+        "modelProvider",
+        "multiAgentMode",
+        "reasoningEffort",
+        "runtimeWorkspaceRoots",
+        "sandbox",
+        "serviceTier"
+      ]
+    },
+    {
+      "step": "turn/start(bad model)",
+      "ok": true,
+      "at": 1790173683.0730433,
+      "result_keys": [
+        "turn"
+      ]
+    },
+    {
+      "step": "thread/delete(fork)",
+      "ok": true,
+      "at": 1790173684.1066036,
+      "result_keys": []
+    },
+    {
+      "step": "thread/unsubscribe",
+      "ok": true,
+      "at": 1790173685.1072428,
+      "result_keys": [
+        "status"
+      ]
+    }
+  ],
+  "global_drain_end": "TransportClosedError",
+  "method_counts": {
+    "account/rateLimits/updated": 11,
+    "command/exec/outputDelta": 1,
+    "deprecationNotice": 16,
+    "error": 6,
+    "fs/changed": 2,
+    "item/agentMessage/delta": 389,
+    "item/completed": 12,
+    "item/started": 12,
+    "process/exited": 1,
+    "process/outputDelta": 1,
+    "remoteControl/status/changed": 1,
+    "serverRequest/resolved": 1,
+    "skills/changed": 1,
+    "thread/deleted": 1,
+    "thread/goal/cleared": 1,
+    "thread/goal/updated": 4,
+    "thread/queue/changed": 3,
+    "thread/settings/updated": 2,
+    "thread/started": 2,
+    "thread/status/changed": 16,
+    "thread/tokenUsage/updated": 12,
+    "turn/completed": 6,
+    "turn/started": 6,
+    "warning": 5
+  },
+  "untyped_methods": [],
+  "documented_types": 82,
+  "received_documented": [
+    "account/rateLimits/updated",
+    "command/exec/outputDelta",
+    "deprecationNotice",
+    "error",
+    "fs/changed",
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "process/exited",
+    "process/outputDelta",
+    "remoteControl/status/changed",
+    "serverRequest/resolved",
+    "skills/changed",
+    "thread/deleted",
+    "thread/goal/cleared",
+    "thread/goal/updated",
+    "thread/queue/changed",
+    "thread/settings/updated",
+    "thread/started",
+    "thread/status/changed",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/started",
+    "warning"
+  ],
+  "received_undocumented": [],
+  "tool_calls": [],
+  "other_server_requests": [
+    "item/commandExecution/requestApproval"
+  ],
+  "collector": "tap on openai_codex MessageRouter.route_notification (private attribute) plus a global drain",
+  "received_documented_count": 24,
+  "status": "ok",
+  "sdk": "openai-codex",
+  "started_at": 1790173627.6208794,
+  "finished_at": 1790173688.1391962
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-john-friedman-datamule-python",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/john-friedman/datamule-python",
+ "reviewed_commit": "20a2beafc689e086b123a39fbf175b621250a695",
+ "readme_path": "readme.md",
+ "license": "MIT",
+ "layers": [
+  "market-data-reference"
+ ],
+ "claim": "Source and documentation review of the repository john-friedman/datamule-python at commit 20a2beafc689e086b123a39fbf175b621250a695 (license MIT), read from readme.md at that revision. Repository description: \"A package to work with SEC data. Incorporates datamule endpoints.\".",
+ "documentation_excerpts": [
+  {
+   "source": "readme.md@20a2beafc689e086b123a39fbf175b621250a695",
+   "text": "A python package for working with SEC filings at scale. Developed by John Friedman."
+  },
+  {
+   "source": "readme.md@20a2beafc689e086b123a39fbf175b621250a695",
+   "text": "Most of this package is free and open source. But that can be slow. For convenience, datasets built using this package have been uploaded to the cloud. See Products."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/john-friedman/datamule-python/tree/20a2beafc689e086b123a39fbf175b621250a695",
+  "https://github.com/john-friedman/datamule-python/blob/20a2beafc689e086b123a39fbf175b621250a695/readme.md"
+ ]
+}

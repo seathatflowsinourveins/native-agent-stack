@@ -1,0 +1,44 @@
+{
+  "id": "gap-wave2-20260923-foundation-document-retrieval-5",
+  "gap_index": 5,
+  "gap_text_sha256": "854886c25be0c1d58ef68969365e8eccb9ac0a7f47f85e9a9c72c35fa7cba2ef",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "Running one fixture question through a native model client twice -- once blind (no retrieved excerpt, no filesystem access to the source) and once given the exact retrieved excerpt that a QMD lane would have surfaced -- will show the with-retrieval arm produces a factually correct, gold-matching answer while the blind arm hedges or is wrong, with per-arm provider token usage recorded. This is explicitly a single-question pilot, not the full fixture-set comparison the gap's next_check asks for, given the account and time-box constraints for this session.",
+    "criteria": "advanced (not settled) if the single-question pilot runs cleanly and both arms are graded and their usage recorded; not_settled if the calls fail or produce unusable output.",
+    "late": true,
+    "timestamp_note": "Actual write time unknown, so written_at is null. The first round recorded 2026-09-23T00:00:00Z, a round-number placeholder that was never a captured time. This preregistration was first committed in b78ed96 (2026-09-23T01:14:48Z, the only upper bound) together with its results, so it is late: it is not shown to precede the check. The fix round (f366da1) only labelled it late; this reconciliation round replaced the placeholder with null."
+  },
+  "commands": [
+    "Selected fixture question 'sec-availability' from blueprints/us-equities/retrieval-evaluation/fixture.json (question: 'Can a fact be used before we first observed the SEC snapshot containing it?'; expected_files: financial-data/README.md).",
+    "Gold excerpt taken directly from blueprints/us-equities/financial-data/README.md lines ~35-50 (Availability = max(acceptance_at, first_observed_at); 'Today's API payload cannot establish what this system knew years ago'; favors avoiding leakage over reconstructing earliest possible knowledge).",
+    "codex exec --sandbox read-only --skip-git-repo-check '<question, told to answer from general reasoning only, no repo access, cwd = empty isolated dir>'  # blind/no-retrieval arm",
+    "codex exec --sandbox read-only --skip-git-repo-check '<question + the exact retrieved excerpt pasted into the prompt>'  # with-retrieval-lane arm, cwd = same empty isolated dir",
+    "Both calls run sequentially (not concurrently), one bounded call each, using the Codex account per the session's Claude-account-reservation constraint."
+  ],
+  "results": [
+    "Blind arm answer (gpt-6-astra via codex-cli 0.155.1, reasoning effort ultra): 'Possibly, if the fact was already known from another source; the later-observed SEC snapshot alone cannot justify earlier knowledge. Whether the system permits that use depends on rules we have not been given.' Tokens used: 7,481. Graded: hedged/non-committal, does not match gold answer (gold is an unconditional 'No').",
+    "With-retrieval arm answer (same model/version, given only the excerpt text in-prompt, no other repo access): 'No. A fact cannot be used before the later of SEC acceptance and the first observation of both required snapshots, even if that individual fact was previously known.' Tokens used: 7,405. Graded: correct, matches gold ('No'; captures max(acceptance_at, first_observed_at) as 'the later of ... acceptance and ... observation').",
+    "Token usage was nearly identical between arms (7,481 vs 7,405) for this one question; this single data point does not establish a token-savings claim in either direction -- the two calls are dominated by fixed session/tool overhead rather than answer length."
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "This is a single-question pilot (n=1 of the 12-question fixture), not the full end-to-end comparison the gap's next_check specifies; it demonstrates the retrieval lane changes answer correctness for one question but is not statistically meaningful and must not be quoted as a general answer-quality or token-savings result.",
+    "The 'with-retrieval' arm was given a hand-picked gold excerpt directly in the prompt rather than routed through a live QMD search call feeding a real agent loop end-to-end; it isolates the effect of having the right context, not the full retrieval-pipeline behavior (which is separately, partially covered by gap_index 0's not_settled bench receipt and gap_index 2's freshness/recall receipt).",
+    "Used the Codex account (gpt-6-astra) rather than Claude, per this session's explicit constraint that the shared Claude account is reserved for another session's long-horizon comparison; the two calls were sequential and non-concurrent, respecting the at-most-1-concurrent-call bound.",
+    "No held-out oracle beyond a single hand-checked gold excerpt was used; grading was done by direct comparison to the source document, not an independent blind judge.",
+    "Time-boxed to two bounded exec calls; the remaining 11 fixture questions and any full provider-usage-per-arm aggregate were not run.",
+    "The task rule specified `codex exec --sandbox read-only --ephemeral`; the commands actually run used `--sandbox read-only --skip-git-repo-check` without `--ephemeral`, so session state was not guaranteed to be discarded. Correction: the exact prompt text of both calls is preserved in the retained Codex transcripts (raw/e2e-blind/arm-noretrieval.out and arm-withretrieval.out, the 'user' block), which also record model gpt-6-astra, codex-cli 0.155.1, sandbox read-only and reasoning effort ultra. Only the `codex exec` command lines in `commands` are paraphrase.",
+    "The blind arm was instructed to answer from general reasoning only with no repository access, which makes its failure on a project-specific policy question close to guaranteed; this pilot mainly shows that having the right excerpt in-context changes the answer, not a general result about a retrieval pipeline's marginal value over a competent blind agent that could otherwise search the repository itself.",
+    "Both transcripts show user-level Codex hooks firing (SessionStart, UserPromptSubmit, Stop). Whatever those hooks injected into context is not visible in the transcripts, so the blind arm may not have been fully blind, and the 'tokens used' totals include hook-injected context.",
+    "The only usage figure Codex printed is a single 'tokens used' total per call (7,481 and 7,405); no input/output/cached/reasoning split was recorded, so the next_check's 'full provider usage per arm' is not met."
+  ],
+  "checked_at": null,
+  "checked_at_note": "The first round's checked_at was an invented round-number placeholder and was removed. Surviving wall-clock evidence: retained raw outputs for this gap have file mtimes 2026-09-23T01:06:32Z to 2026-09-23T01:06:51Z UTC (see raw/raw-manifest.json); the no-retrieval transcript was written first. All steps precede the b78ed96 commit at 2026-09-23T01:14:48Z.",
+  "raw_outputs": [
+    "raw/e2e-blind/arm-noretrieval.out",
+    "raw/e2e-blind/arm-withretrieval.out"
+  ],
+  "raw_outputs_manifest": "raw/raw-manifest.json (source and committed sha256, host paths as $HOME, session UUIDs redacted; binary and third-party files hash-only)"
+}

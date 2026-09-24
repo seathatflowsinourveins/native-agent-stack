@@ -1,0 +1,83 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-6",
+  "gap_index": 6,
+  "gap_text_sha256": "76bab2844830fa2903dac9e7751a65d431c8626642fe5dce194a75708746f151",
+  "checked_at": "2026-09-23T01:04:06.717Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "expectation": "Rerunning the owned-worktrees lifecycle pass (create, list, dirty-removal-refusal, forced removal) in a disposable repository while recording `wt --version` will show it reporting 0.79.0, replacing the unversioned 2026-09-20 pass.",
+    "criteria": "Every lifecycle command in the rerun is preceded by or co-recorded with `wt --version` output in the same receipt.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:45:28.726Z to 2026-09-23T00:46:08.073Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:45:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#53 [2026-09-23T00:45:28.726Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\nrm -rf owned-repo\nmkdir owned-repo && cd owned-repo\ngit init -q\ngit config user.email test@example.com\ngit config user.name test\necho \"hello\" > file.txt\ngit add file.txt\ngit commit -qm init\n$WT --version\n$WT list 2>&1\necho \"== create ==\"\n$WT create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#55 [2026-09-23T00:45:35.040Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\necho \"== switch --create feat-a ==\"\n$WT -y switch --create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#56 [2026-09-23T00:45:42.268Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\nWORKTREE_DIR=../owned-repo.feat-a\necho \"dirty-uncommitted\" > \"$WORKTREE_DIR/dirty.txt\"\necho \"modified\" >> \"$WORKTREE_DIR/file.txt\"\nsha_dirty=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" | cut -d' ' -f1)\nsha_file=$(sha256sum \"$WORKTREE_DIR/file.txt\" | cut -d' ' -f1)\necho \"sha_dirty=$sha_dirty sha_file=$sha_file\"\necho \"== attempt remove dirty worktree ==\"\n$WT -y -C \"$WORKTREE_DIR\" remove 2>&1\necho \"exit=$?\"\nls -la \"$WORKTREE_DIR\" 2>&1\nsha_dirty2=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" 2>&1 | cut -d' ' -f1)\nsha_file2=$(sha256sum \"$WORKTREE_DIR/file.txt\" 2>&1 | cut -d' ' -f1)\necho \"post: sha_dirty2=$sha_dirty2 sha_file2=$sha_file2\"\n[[ \"$sha_dirty\" == \"$sha_dirty2\" && \"$sha_file\" == \"$sha_file2\" ]] && echo \"PRESERVED_BYTE_IDENTICAL=true\" || echo \"PRESERVED_BYTE_IDENTICAL=false\"",
+    "original#59 [2026-09-23T00:46:02.538Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\n$WT -y remove --force feat-a 2>&1 || $WT -y -C ../owned-repo.feat-a remove --force 2>&1\necho exit=$?\n$WT list 2>&1",
+    "fix#18 [2026-09-23T01:03:30.257Z]: set -e\ncd /tmp/gapfix && rm -rf wtlifecycle && mkdir wtlifecycle && cd wtlifecycle\n# bare remote\ngit init --bare remote.git -q\ngit clone remote.git main-repo -q\ncd main-repo\ngit config user.email test@example.com; git config user.name test\necho one > file.txt; git add file.txt; git commit -q -m init\ngit push -q origin HEAD:master 2>&1 || git push -q origin HEAD:main 2>&1\ngit branch -a\nwt --version\necho \"== create feature branch worktree ==\"\nwt -y switch --create feat-merge\nls -la ../main-repo.feat-merge 2>&1 || find .. -maxdepth 1 -type d",
+    "fix#22 [2026-09-23T01:03:54.268Z]: cd /tmp/gapfix/wtlifecycle/main-repo\necho \"== cd behavior via sourced integration (isolated HOME, subshell) ==\"\nHOME=/tmp/gapfix/isohome bash -c '\nsource /tmp/gapfix/isohome/.bashrc\ncd /tmp/gapfix/wtlifecycle/main-repo\nwt switch feat-merge\npwd\n'\necho \"=== merge ===\"\ncd /tmp/gapfix/wtlifecycle/main-repo.feat-merge 2>&1 || cd /tmp/gapfix/wtlifecycle/main-repo\npwd\necho second-commit >> file.txt\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge add -A\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge -c user.email=t@e.com -c user.name=t commit -q -m \"feat: add second line\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-merge merge 2>&1\necho \"exit=$?\"\ngit -C /tmp/gapfix/wtlifecycle/main-repo log --oneline -3\nwt list -C /tmp/gapfix/wtlifecycle/main-repo 2>&1",
+    "fix#23 [2026-09-23T01:04:00.655Z]: cd /tmp/gapfix/wtlifecycle/main-repo\nwt -y switch --create feat-unmerged 2>&1\necho scratch > /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged/scratch.txt\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged add -A\ngit -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged -c user.email=t@e.com -c user.name=t commit -q -m \"wip: unmerged change\"\necho \"== plain remove refuses unmerged ==\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged remove 2>&1; echo exit=$?\necho \"== force-delete unmerged branch ==\"\nwt -y -C /tmp/gapfix/wtlifecycle/main-repo.feat-unmerged remove -D 2>&1; echo exit=$?\nwt list -C /tmp/gapfix/wtlifecycle/main-repo 2>&1\ngit -C /tmp/gapfix/wtlifecycle/main-repo branch -a",
+    "fix#24 [2026-09-23T01:04:06.502Z]: cd /tmp/gapfix/wtlifecycle/main-repo\necho \"== force-delete the now-branch-only unmerged feat-unmerged ==\"\nwt -y remove -D feat-unmerged 2>&1; echo exit=$?\ngit branch -a"
+  ],
+  "results": [
+    "original#53: fresh `git init` repository with one commit; `wt v0.79.0`; `wt list` showed master only. `wt create feat-a` failed (`unrecognized subcommand 'create'`, exit=2).",
+    "original#55: `wt -y switch --create feat-a`: `\u2713 Created branch feat-a from master and worktree @ ~/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo.feat-a`, exit=0; `wt list` showed master and feat-a.",
+    "original#56: dirty removal refused (`\u2717 Cannot remove worktree: feat-a has uncommitted changes`, exit=1), files byte-identical (see gap 7).",
+    "original#59 (after the gap 12 crash and prune steps in the same repository): `wt -y remove --force feat-a`: `\u25ce Removing feat-a worktree (--force) & branch in background`, exit=0; `wt list` showed master only.",
+    "Supplementary 0.79.0 lifecycle in a second disposable repository (fix#18, #22-#24, detailed in gap 5): two worktrees created (feat-merge, feat-unmerged), feat-merge removed by `wt merge`, feat-unmerged removed by `wt remove` then its branch by `wt remove -D`; one worktree (master) remained.",
+    "Comparison with the historical pass, from the files on disk (no rerun): evidence/receipts/token-native-retained-functional-20260920.json check \"worktrunk-owned-lifecycle\": {\"created_worktrees\": 2, \"remaining_worktrees\": 1, \"remaining_branch\": \"main\", \"hooks_disabled\": true, \"disposable_repository_only\": true}. The owned-repo rerun created 1 worktree (historical 2), left 1 (same), on branch master (historical main); hooks were not configured, and no assertion like hooks_disabled was made. The supplementary repository created 2 and left 1 on master."
+  ],
+  "outcome": "advanced",
+  "note": "Worktree lifecycle operations were rerun with `wt --version` reporting v0.79.0 in the same session. The rerun is not the historical worktrunk-owned-lifecycle harness: its steps differ (one created worktree instead of two, default branch master instead of main, no hooks_disabled assertion). Remaining: rerun the retained harness that produced the 2026-09-20 pass, or its exact steps, at 0.79.0. The earlier reason for advanced (the interactive picker) belongs to gap 5, not this gap.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Gaps 6, 7, 12 and 18 cite one continuous disposable repository session (original#53-#59 in $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo): repository init and `wt --version` (#53), `wt -y switch --create feat-a` (#55), dirty-removal refusal (#56), SIGKILL mid-write (#57), `wt -y step prune` (#58) and `wt -y remove --force feat-a` (#59). The earlier limit saying each gap used a fresh, independent repository was false and is removed.",
+    "The historical harness script was not located or rerun; the comparison uses its recorded summary fields only."
+  ],
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T01:34:12.700Z",
+    "expectation": "Independent review found that merge, unmerged-branch deletion, the interactive picker, and shell integration were claimed as covered elsewhere but no receipt in this wave actually exercises them. Setting up a disposable repository with a local bare remote and running wt merge, wt remove -D on an unmerged branch, and wt config shell install/init in an isolated HOME will produce the missing live transcripts.",
+    "criteria": "A bare git remote is created and cloned; wt switch --create, a real commit, wt merge (squash+rebase+ff, automatic worktree/branch removal) all run against it; a second branch with an unmerged commit is created and wt remove (refuses to delete the branch) then wt remove -D (deletes it) are both run; wt config shell init/install are run against an isolated HOME (not the real user's ~/.bashrc), and a subshell sourcing the generated integration is used to confirm wt switch actually changes directory.",
+    "late": true,
+    "label": "fix-round preregistration, written after the fix-round commands it describes",
+    "late_note": "Written at 2026-09-23T01:34:12.700Z by fix#56; fix-round commands ran fix#4-fix#46 (01:01:10Z-01:27:09Z); cargo attempt 2 had finished by fix#54 (01:28:38Z). The previously recorded written_at '2026-09-23T01:30:00+00:00' was a placeholder, not the time this block was written, and it was not written before its sub-check ran."
+  },
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:45:28.726Z to 2026-09-23T01:04:06.717Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#53",
+        "original#55",
+        "original#56",
+        "original#59"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/fix-session-tool-calls.txt",
+      "sha256": "b1a1bce670082262521365455849b1618b460a9bbd53fdec5d6d0337523d8899",
+      "calls": [
+        "fix#18",
+        "fix#22",
+        "fix#23",
+        "fix#24"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 4: this receipt again contains its own versioned lifecycle pass (original#53, #55, #56, #59) instead of relying on gap 18, so the two receipts no longer cite each other.",
+      "Review finding 3: the merge and shell-integration steps moved to gap 5 with the recorded order; this receipt keeps only a short supplementary summary.",
+      "Added the comparison with the historical pass from the files on disk and restated why the outcome stays advanced (step differences, not the picker).",
+      "Review finding 7: removed the false claim that each gap used a fresh, independent repository. Timestamps corrected."
+    ]
+  }
+}

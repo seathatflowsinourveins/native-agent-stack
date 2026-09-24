@@ -1,0 +1,846 @@
+{
+  "summary": {
+    "native_methods": 82,
+    "sdk_registry": 82,
+    "native_equals_sdk_registry": true,
+    "native_only": [],
+    "sdk_only": [],
+    "samples_native_valid_both": 82,
+    "typed_minimal": 82,
+    "typed_maximal": 82,
+    "typed_both_among_native_valid": 82,
+    "untyped_among_native_valid": [],
+    "negative_controls": 80,
+    "negative_controls_untyped": 79,
+    "delivered": {
+      "turn": 59,
+      "login": 1,
+      "global": 104,
+      "not_delivered": 0
+    },
+    "sdk_more_lenient_than_native": [
+      "thread/project/updated"
+    ],
+    "not_native_valid": []
+  },
+  "methods": {
+    "account/login/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "login",
+      "negative_control_untyped": true
+    },
+    "account/rateLimits/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "account/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global"
+    },
+    "app/list/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "autoApprovalReview/strictReviewRequired": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "command/exec/outputDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "configWarning": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "deprecationNotice": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "error": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "externalAgentConfig/import/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "externalAgentConfig/import/progress": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "fs/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "fuzzyFileSearch/sessionCompleted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "fuzzyFileSearch/sessionUpdated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "guardianWarning": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "hook/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "hook/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/agentMessage/delta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/autoApprovalReview/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/autoApprovalReview/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/commandExecution/outputDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/commandExecution/terminalInteraction": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/fileChange/outputDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/fileChange/patchUpdated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/mcpToolCall/progress": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/plan/delta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/reasoning/summaryPartAdded": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/reasoning/summaryTextDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/reasoning/textDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "item/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "mcpServer/event/stream/notification": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "mcpServer/oauthLogin/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "mcpServer/startupStatus/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "model/rerouted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "model/safetyBuffering/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "model/verification": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "modelProvider/authRecoveryCompleted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "modelProvider/authRecoveryStarted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "process/exited": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "process/outputDelta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "project/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "remoteControl/status/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "serverRequest/resolved": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "skills/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global"
+    },
+    "thread/archived": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/attachment/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/closed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/compacted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "thread/deleted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/environment/connected": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/environment/disconnected": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/goal/cleared": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/goal/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "thread/name/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/project/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": false
+    },
+    "thread/queue/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/closed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/error": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/item/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/item/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/item/transcript/delta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/itemAdded": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/outputAudio/delta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/sdp": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/transcript/delta": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/realtime/transcript/done": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/reverted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/settings/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/status/changed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "thread/tokenUsage/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "thread/unarchived": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "turn/completed": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "turn/diff/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "turn/moderationMetadata": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "turn/plan/updated": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "turn/started": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "turn",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "turn",
+      "negative_control_untyped": true
+    },
+    "warning": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "windows/worldWritableWarning": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    },
+    "windowsSandbox/setupCompleted": {
+      "in_sdk_registry": true,
+      "minimal_native_valid": true,
+      "minimal_sdk_typed": true,
+      "minimal_delivered": "global",
+      "maximal_native_valid": true,
+      "maximal_sdk_typed": true,
+      "maximal_delivered": "global",
+      "negative_control_untyped": true
+    }
+  }
+}

@@ -1,0 +1,110 @@
+20260923 07:00:30.346 TRACE:: Using /run/control/one_stress/config.json as configuration file
+20260923 07:00:30.403 TRACE:: Composer(): Loading Assemblies from /engine
+20260923 07:00:30.478 TRACE:: Python for .NET Assembly: Python.Runtime, Version=2.0.66.0, Culture=neutral, PublicKeyToken=5000fea6cba702dd
+20260923 07:00:31.319 TRACE:: Engine.Main(): LEAN ALGORITHMIC TRADING ENGINE v2.5.0.0 Mode: DEBUG (64bit) Host: $HOSTNAME
+20260923 07:00:31.321 TRACE:: Engine.Main(): Started 07:00
+20260923 07:00:31.332 TRACE:: JobQueue.NextJob(): Selected /run/control/build/HistoricalSimulation.dll
+20260923 07:00:31.349 TRACE:: AlgorithmManager.CreateTokenBucket(): Initializing LeakyBucket: Capacity: 120 RefillAmount: 18 TimeInterval: 1440
+20260923 07:00:31.353 TRACE:: Engine.Run(): Resource limits '0' CPUs. 2147483647 MB RAM.
+20260923 07:00:31.353 TRACE:: TextSubscriptionDataSourceReader.SetCacheSize(): Setting cache size to 71582788 items
+20260923 07:00:31.714 TRACE:: Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly
+20260923 07:00:31.795 TRACE:: Loader.TryCreateILAlgorithm(): Loaded HistoricalSimulationAlgorithm
+20260923 07:00:31.797 TRACE:: LocalObjectStore.Initialize(): Storage Root: /run/control/one_stress/storage. StorageFileCount 10000. StorageLimit 10240MB. StoragePermissions Read=True Write=True Delete=True
+20260923 07:00:31.804 TRACE:: HistoryProviderManager.Initialize(): history providers [SubscriptionDataReaderHistoryProvider]
+20260923 07:00:31.806 TRACE:: BaseSetupHandler.Setup(LocalPlatform): UID: 0, PID: 0, Version: 2.5.0.0, Source: WebIDE
+20260923 07:00:31.868 TRACE:: WeightedWorkScheduler(): will use 24 workers and MaxWorkWeight is 400
+20260923 07:00:31.872 TRACE:: BaseSetupHandler.SetupCurrencyConversions():
+Account Type: Margin
+
+Symbol      Quantity    Conversion = Value in USD
+USD: $      100000.00 @       1.00 = $100000
+-------------------------------------------------
+CashBook Total Value:                $100000
+
+20260923 07:00:31.873 TRACE:: Total margin information: TotalMarginUsed: 0.00, MarginRemaining: 100000.00
+20260923 07:00:31.874 TRACE:: SetUp Backtesting: User: 0 ProjectId: 0 AlgoId: HistoricalSimulationAlgorithm
+20260923 07:00:31.874 TRACE:: Dates: Start: 12/02/2019 End: 04/30/2020 Cash: ¤100,000.00 MaximumRuntime: 100.00:00:00 MaxOrders: 2147483647
+20260923 07:00:31.876 TRACE:: BacktestingResultHandler(): Sample Period Set: 54.36
+20260923 07:00:31.876 TRACE:: JOB HANDLERS:
+         DataFeed:             QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed
+         Setup:                QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler
+         RealTime:             QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler
+         Results:              QuantConnect.Lean.Engine.Results.BacktestingResultHandler
+         Transactions:         QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler
+         Object Store:         QuantConnect.Lean.Engine.Storage.LocalObjectStore
+         History Provider:     QuantConnect.Lean.Engine.HistoricalData.HistoryProviderManager
+         Brokerage:            QuantConnect.Brokerages.Backtesting.BacktestingBrokerage
+         Data Provider:        QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider
+
+20260923 07:00:31.884 TRACE:: Event Name "Daily Sampling", scheduled to run.
+20260923 07:00:31.885 TRACE:: AlgorithmManager.Run(): Begin DataStream - Start: 12/02/2019 00:00:00 Stop: 04/30/2020 23:59:59 Time: 12/02/2019 00:00:00 Warmup: False
+20260923 07:00:31.927 TRACE:: Debug: 2019-12-02 00:00:00 Launching analysis for HistoricalSimulationAlgorithm with LEAN Engine v2.5.0.0
+20260923 07:00:32.003 TRACE:: UniverseSelection.AddPendingInternalDataFeeds(): Adding internal benchmark data feed SPY,#0,SPY,Hour,TradeBar,Trade,Adjusted,OpenInterest,Internal
+20260923 07:00:32.122 TRACE:: Synchronizer.GetEnumerator(): Exited thread.
+20260923 07:00:32.122 TRACE:: AlgorithmManager.Run(): Firing On End Of Algorithm...
+20260923 07:00:32.124 TRACE:: Engine.Run(): Exiting Algorithm Manager
+20260923 07:00:32.125 TRACE:: OrderRequestProcessingPool.Dispose(): completed
+20260923 07:00:32.125 TRACE:: StopSafely(): Waiting for 'Isolator Thread' thread to stop...
+20260923 07:00:32.126 TRACE:: FileSystemDataFeed.Exit(): Start. Setting cancellation token...
+20260923 07:00:32.127 TRACE:: FileSystemDataFeed.Exit(): Exit Finished.
+20260923 07:00:32.127 TRACE:: BacktestingResultHandler.Exit(): starting...
+20260923 07:00:32.127 TRACE:: BacktestingResultHandler.Exit(): Saving logs...
+20260923 07:00:32.127 TRACE:: Debug: 2020-04-30 16:00:00 Algorithm Id:(HistoricalSimulationAlgorithm) completed in 0.25 seconds at 6k data points per second. Processing total of 1,457 data points.
+20260923 07:00:32.127 TRACE:: Debug: 2020-04-30 16:00:00 Your log was successfully created and can be retrieved from: /run/control/one_stress/HistoricalSimulationAlgorithm-log.txt
+20260923 07:00:32.127 TRACE:: BacktestingResultHandler.Run(): Ending Thread...
+20260923 07:00:32.127 TRACE:: StopSafely(): Waiting for 'Result Thread' thread to stop...
+20260923 07:00:32.317 TRACE:: 
+STATISTICS:: Total Orders 2
+STATISTICS:: Average Win 0%
+STATISTICS:: Average Loss -10.07%
+STATISTICS:: Compounding Annual Return -21.784%
+STATISTICS:: Drawdown 34.000%
+STATISTICS:: Expectancy -1
+STATISTICS:: Start Equity 100000
+STATISTICS:: End Equity 90358.00
+STATISTICS:: Net Profit -9.642%
+STATISTICS:: Sharpe Ratio -0.294
+STATISTICS:: Sortino Ratio -0.276
+STATISTICS:: Probabilistic Sharpe Ratio 15.670%
+STATISTICS:: Loss Rate 100%
+STATISTICS:: Win Rate 0%
+STATISTICS:: Profit-Loss Ratio 0
+STATISTICS:: Alpha -0.07
+STATISTICS:: Beta 0.975
+STATISTICS:: Annual Standard Deviation 0.376
+STATISTICS:: Annual Variance 0.141
+STATISTICS:: Information Ratio -2.389
+STATISTICS:: Tracking Error 0.029
+STATISTICS:: Treynor Ratio -0.113
+STATISTICS:: Total Fees $2.00
+STATISTICS:: Estimated Strategy Capacity $130000000.00
+STATISTICS:: Lowest Capacity Asset SPY R735QTJ8XC9X
+STATISTICS:: Portfolio Turnover 1.30%
+STATISTICS:: Drawdown Recovery 14
+STATISTICS:: OrderListHash c8b6681fcb6446ce0d36ad7399c7679a
+20260923 07:00:32.317 TRACE:: BacktestingResultHandler.SendAnalysisResult(): Processed final packet
+20260923 07:00:32.317 TRACE:: Engine.Run(): Disconnecting from brokerage...
+20260923 07:00:32.317 TRACE:: Engine.Run(): Disposing of setup handler...
+20260923 07:00:32.317 TRACE:: Engine.Main(): Analysis Completed and Results Posted.
+20260923 07:00:32.317 TRACE:: DataMonitor.Exit(): start...
+20260923 07:00:32.317 TRACE:: StopSafely(): Waiting for '' thread to stop...
+20260923 07:00:32.318 TRACE:: DataMonitor.GenerateReport():
+DATA USAGE:: Total data requests 3
+DATA USAGE:: Succeeded data requests 3
+DATA USAGE:: Failed data requests 0
+DATA USAGE:: Failed data requests percentage 0%
+DATA USAGE:: Total universe data requests 0
+DATA USAGE:: Succeeded universe data requests 0
+DATA USAGE:: Failed universe data requests 0
+DATA USAGE:: Failed universe data requests percentage 0%
+20260923 07:00:32.320 TRACE:: DataMonitor.Exit(): end
+Engine.Main(): Analysis Complete.
+20260923 07:00:32.320 TRACE:: Engine.Main(): Packet removed from queue: HistoricalSimulationAlgorithm
+20260923 07:00:32.321 TRACE:: LeanEngineSystemHandlers.Dispose(): start...
+20260923 07:00:32.321 TRACE:: LeanEngineSystemHandlers.Dispose(): Disposed of system handlers.
+20260923 07:00:32.321 TRACE:: LeanEngineAlgorithmHandlers.Dispose(): start...
+20260923 07:00:32.322 TRACE:: LocalObjectStore.Dispose(): start...
+20260923 07:00:32.322 TRACE:: LocalObjectStore.Dispose(): end
+20260923 07:00:32.322 TRACE:: LeanEngineAlgorithmHandlers.Dispose(): Disposed of algorithm handlers.
+20260923 07:00:32.322 TRACE:: StopSafely(): Waiting for 'CpuPerformance' thread to stop...
+20260923 07:00:32.323 TRACE:: Program.Main(): Exiting Lean...

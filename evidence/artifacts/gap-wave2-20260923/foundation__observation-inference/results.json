@@ -1,0 +1,38 @@
+{
+  "layer": "foundation/observation-inference",
+  "generated_by": "blueprints/gap-wave2-20260923/foundation__observation-inference/make_results.py",
+  "results": {
+    "0": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/0-privacy-canary-script.json"
+    },
+    "1": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/1-usage-reconciliation-script.json"
+    },
+    "2": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/2-scheduled-unit-journal-persistence.json"
+    },
+    "3": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/3-task-attribution-isolated.json"
+    },
+    "4": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/4-sdk-spool-fill-outage-expiry.json"
+    },
+    "5": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/5-jaeger-codex-trace-by-id.json"
+    },
+    "6": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/6-alertmanager-ntfy-latency.json"
+    },
+    "8": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/8-llama-parallel-kill-recovery.json"
+    }
+  }
+}

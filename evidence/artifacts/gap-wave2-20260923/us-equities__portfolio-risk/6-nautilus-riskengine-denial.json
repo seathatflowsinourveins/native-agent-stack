@@ -1,0 +1,228 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-6-nautilus-riskengine-denial",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 6,
+  "gap_text": "No connection is shown between these libraries and the NautilusTrader destination's deterministic numeric risk or broker reconciliation. Optimization and risk estimates are not pre-trade enforcement.",
+  "gap_text_sha256": "1007dcb2c5aa06d2696e4134838ccb23990ef7d1f5efaa1dc367d3f9e2ed18ec",
+  "next_check": "Feed the skfolio target weights into a NautilusTrader 2.0.0rc5 backtest strategy with RiskEngine max-notional and max-order limits. Show that an order exceeding the limits is denied and that the positions reconcile.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "In a native NautilusTrader 2.0.0rc5 backtest, the skfolio reserved HRP target orders pass a RiskEngineConfig with max_notional_per_order of 45000 USD per instrument and max_order_submit_rate '4/00:00:01', while a deliberately oversized SPY order (about 60000 USD notional) is denied with an OrderDenied event whose reason names the notional limit, and a burst of extra orders at the same timestamp beyond the submit rate is denied. A control arm without limits fills the same oversized order. Final positions equal the sum of filled orders only.",
+    "criteria": "settled iff: (a) all within-limit target orders fill; (b) the oversized order produces OrderDenied mentioning notional, has no fill and leaves positions unchanged; (c) the control arm fills that same order (proving the probe can detect a missing denial); (d) at least one order beyond the submit rate is denied with a rate reason; (e) native positions and cash reconcile to an independent ledger of filled orders. If (d) is not observed, outcome is advanced with the rate clause named as remaining.",
+    "fix_round_addendum": {
+      "written_at": "2026-09-23T07:12:07Z",
+      "label": "fix-round preregistration, written after round-1 results and the review, before the fix-round reruns",
+      "text": "Fix round after independent Codex review: venue rejections now fail the probe, fills must match instrument and date, the full cash transition sequence must match, criteria a/c use actual fills, and mutation self-tests (wrong instrument, 1900 fill time, corrupted cash transition, injected rejection) must each be detected. Rerun into raw/6/nautilus-risk-run-fix1."
+    },
+    "fix_round_2_addendum": {
+      "written_at": "2026-09-23T07:22:02Z",
+      "label": "fix-round-2 preregistration, written after the round-2 review and before the fix-round-2 reruns",
+      "text": "Fix round 2 after the round-2 independent review: fill checks now compare the exact New York fill time (16:00 close bars; 09:30 open-print bars) instead of the date only, and a one-hour time-shift mutation must be detected. All Nautilus runners (portfolio, dividend-inclusive portfolio, RiskEngine probe, episodes) rerun into *-fix2 outputs; expected economic results identical to fix round 1."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_risk.py --weights evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/skfolio-fold-weights.json --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:22:12Z",
+      "fix_round_2": "fix round 2 (07:22Z, after the round-2 review): exact 16:00/09:30 New York fill times enforced and a one-hour time-shift mutation added; economic results identical to fix round 1; fix-round-1 outputs retained in git at 8bab001",
+      "fix_round": "after the independent review: rejections fail the probe, fills checked for instrument and date, full cash sequence compared, criteria a/c use actual fills, mutation self-tests added; round 1 (06:43:06Z, same criteria outcome) outputs retained in git at b482b86",
+      "development_attempts": "one earlier scratch run failed in the harness (fills report index not reset, KeyError client_order_id) after the engine had run; fixed with reset_index and rerun"
+    }
+  ],
+  "results": {
+    "criteria": {
+      "a_target_orders_filled_under_limits": true,
+      "b_oversized_denied_with_notional_reason": true,
+      "c_control_fills_oversized": true,
+      "d_burst_order_denied_by_rate": true,
+      "e_positions_and_cash_reconciled_both_arms": true
+    },
+    "limits": {
+      "max_notional_per_order_usd": "45000",
+      "max_order_submit_rate": "4/00:00:01"
+    },
+    "limits_arm_denied": [
+      {
+        "client_order_id": "O-20210105-210000-001-000-4",
+        "reason": "NOTIONAL_EXCEEDS_MAX_PER_ORDER: max=45000.00 USD, notional=59784.13 USD"
+      },
+      {
+        "client_order_id": "O-20210106-210000-001-000-9",
+        "reason": "RATE_LIMIT_EXCEEDED"
+      },
+      {
+        "client_order_id": "O-20210106-210000-001-000-10",
+        "reason": "RATE_LIMIT_EXCEEDED"
+      }
+    ],
+    "control_arm_denied": [],
+    "burst_filled": {
+      "limits": 4,
+      "control": 6
+    },
+    "reconciliation": {
+      "control": {
+        "account_rows": 14,
+        "cash_transitions_matched": 13,
+        "ending_cash_ledger": "1006586.37",
+        "ending_cash_native": "1006586.37",
+        "expected_fills": 13,
+        "fees_usd": "13",
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        },
+        "native_fills": 13
+      },
+      "limits": {
+        "account_rows": 11,
+        "cash_transitions_matched": 10,
+        "ending_cash_ledger": "1004967.66",
+        "ending_cash_native": "1004967.66",
+        "expected_fills": 10,
+        "fees_usd": "10",
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        },
+        "native_fills": 10
+      }
+    },
+    "mutation_self_tests_detected": {
+      "control": {
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "venue_rejection_injected": true,
+        "wrong_instrument_first_fill": true
+      },
+      "limits": {
+        "cash_corrupted_first_transition": true,
+        "fill_time_1900": true,
+        "fill_time_shifted_one_hour": true,
+        "venue_rejection_injected": true,
+        "wrong_instrument_first_fill": true
+      }
+    }
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Every preregistered criterion (a-e) passed, but the gap text also names broker reconciliation: positions reconcile against the simulated venue only. Broker-reported fill reconciliation needs the paper lane owned by peer session sota-workflow-resolution, so the outcome is advanced, not settled.",
+    "Submit-rate throttling is observed at backtest clock resolution (six orders at one timestamp); live-clock behaviour is not tested.",
+    "The known upstream test defect (bare matches! on denial variants) is unaffected; this run asserts the denial reason strings directly."
+  ],
+  "checked_at": "2026-09-23T07:22:12Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1.stderr.txt",
+      "sha256": "ab3bbabac25484edf68e8cff7d586e29b6e45649a12c9ff8d0f3788dd9968e4c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix1.stdout.txt",
+      "sha256": "32a3ed0add98ed888e00943b4555e843d456d7b0724e504a8ce8884a82418059"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/account.csv",
+      "sha256": "aad1ef5426dd2a8c2bc443117808b0141200ed87a31f841c7cc59a7bc6b85431"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/fills.csv",
+      "sha256": "e8e710cff67d15037eef6d634b2c45a856ef85dce093257417389dd8ea33b34a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/positions.csv",
+      "sha256": "583cb828c52fcd687621140a2fe37e05e845cbb70d1862e11678003d69313904"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/control/strategy-log.json",
+      "sha256": "575bc2aef685b6f56b8fa841041ed907f791d47cf58a1acf468b5a1e9821225c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/account.csv",
+      "sha256": "1cf6056f35d096a811c24b0e8a35d75cef35af4e0010522b42309d2d6aab645c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/fills.csv",
+      "sha256": "e3a2d67c974545f4bdf00b979a629ff684d85f3880d33a2a0eb943b19c48d6e2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/positions.csv",
+      "sha256": "531a206631949f74f4bc98c177113e3639d3b8c6fbc7a4f98c7676233d77a231"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/limits/strategy-log.json",
+      "sha256": "599520bda5eb397435dc12bc74b58d63ccd10bc0e0296fb3a9d1c0851e5de676"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2/summary.json",
+      "sha256": "733e346c88ff0cfbad1b8b6cd3eb7a59b2872c9d85ac7f7f5e51021c904989c5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2.stderr.txt",
+      "sha256": "ab3bbabac25484edf68e8cff7d586e29b6e45649a12c9ff8d0f3788dd9968e4c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run-fix2.stdout.txt",
+      "sha256": "32a3ed0add98ed888e00943b4555e843d456d7b0724e504a8ce8884a82418059"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run.stderr.txt",
+      "sha256": "ab3bbabac25484edf68e8cff7d586e29b6e45649a12c9ff8d0f3788dd9968e4c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/6/nautilus-risk-run.stdout.txt",
+      "sha256": "32a3ed0add98ed888e00943b4555e843d456d7b0724e504a8ce8884a82418059"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_risk.py",
+      "sha256": "e1c3be61ab961e3adca34500a7609d657657205cfd2d6aa922b72712a41fe1e9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "round-2: time-of-day shift passed the risk probe -> exact 16:00 fill time enforced; fix round 2 reran with the shift mutation detected",
+    "findings_and_resolution": "major: rejections could satisfy positive controls; intermediate cash and wrong-instrument/time fills escaped -> rejections fail, fill-based criteria, full cash sequence, instrument/date checks and mutation self-tests added; fix-round rerun passes",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

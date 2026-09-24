@@ -1,0 +1,9 @@
+Aborted - 2026-09-22T22:48:51-04:00
+
+dag: cancelprobe (5.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g1-cancel-1790131730/dagu-home/logs/cancelprobe/dag-run_20260923_024851Z_cancelprobe-ba0a1b8f27ff/dag-run_20260922.224851.174.cancelpr.log
+│
+└─provider_call [aborted]
+
+Result: Aborted
+

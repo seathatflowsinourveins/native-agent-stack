@@ -131,6 +131,14 @@ unattributed `FAIL`. The three modes were observed as:
 | `--lean-data` | 1 | identical verdict, rows re-derived and re-hashed |
 | neither | 1 | `FAIL`, 4 unattributed, 1 `SKIPPED`, `complete false` |
 
+All three modes were re-executed on 2026-09-23 after a fresh bwrap `run.py`
+replay: `--bars` (with that replay's own rows), `--lean-data` and neither
+reproduced this table exactly, the two complete modes writing a verdict
+byte-identical to the committed `verdict.json`, and a one-digit tampered
+`--bars` file was refused with `converted_rows_sha256_mismatch`. Exit codes,
+verdicts and outputs are retained in
+[`evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/`](../../../../evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/6-comparator-modes-and-review-count.json).
+
 The verdict vocabulary is:
 
 | Verdict | Meaning | Exit |
@@ -209,11 +217,12 @@ attempted here.
 ## Review findings carried (2026-09-22)
 
 An independent review of this harness confirmed 21 of 24 claims and recorded
-six non-blocking items. The review record is external evidence kept in the
-agent-lab working repository (task record
-`docs/tasks/2026-09-22-executed-comparisons.md`, "Parity final review"); it is
-not retained or hash-pinned in this repository, so the count is reported, not
-reproducible from this tree. The six items are restated below and can be
+six non-blocking items. The review record lives in the agent-lab task record
+`docs/tasks/2026-09-22-executed-comparisons.md` ("Parity final review", agent-lab
+commit `cf714105c3ec1921339343cd3dc949b0893b640e`); its verbatim excerpt is
+retained and hash-pinned in this repository at
+[`6-agent-lab-parity-final-review-excerpt.md`](../../../../evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-agent-lab-parity-final-review-excerpt.md)
+(sha256 recorded in `manifests/evidence.json`). The six items are restated below and can be
 checked against the files they name. None changes the BLOCKED verdict; they
 are carried into the next harness round:
 
@@ -229,5 +238,7 @@ are carried into the next harness round:
 4. `convert.py` drops a nonpositive derived distribution silently instead of
    refusing or recording it.
 5. The comparator mode table documents the `--bars` and no-evidence modes as
-   observed; the acceptance set exercises only the `--lean-data` mode.
+   observed; the original acceptance set exercised only the `--lean-data` mode.
+   Resolved 2026-09-23: all three modes were re-executed and retained (see the
+   note under the mode table).
 6. The review inventory miscounted the test classes (17, not 13).

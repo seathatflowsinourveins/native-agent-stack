@@ -1,0 +1,131 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/15-artifact-reduction-whole-task",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 15,
+ "gap_text": "Selected-artifact reductions and cache counters do not establish matched whole-task savings, including failures and retries.",
+ "gap_text_sha256": "9dedfc819c0f2757e4b6c6e0acc428a8cf7572194988ccb91a97493b4576f8e7",
+ "next_check": "Run the same task set with and without the artifact-reduction lane through native clients. Compare complete provider usage including failed attempts and retries, via child-usage.mjs.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/15-artifact-reduction-whole-task.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "Deferred for the Claude arm (child-usage.mjs measures Claude workflow children; the shared Claude account is reserved). A bounded Codex-only arm (same tasks with and without the Context Mode MCP) may be run if Codex capacity allows; it would give whole-task native usage including failed attempts for Codex only.",
+  "criteria": [
+   "If run: >=2 tasks x 2 arms, same prompts, same model, sequential, with every attempt's usage summed (including failed/retried turns).",
+   "Answer correctness checked against gold computed outside the model.",
+   "Outcome at most advanced because the child-usage.mjs Claude arm is not executed."
+  ]
+ },
+ "commands": [
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/gold.py $GAPCACHE/g15-snapshot  # gold outside any model, committed c7fb014 before runs",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/run_arm.sh t1|t2 with|without $GAPCACHE/runs/g15  # codex exec --sandbox read-only --ephemeral, hooks off; with: context-mode plugin MCP approve; without: plugins.\"context-mode@context-mode\".enabled=false"
+ ],
+ "results": {
+  "t1 (count 2,117 test defs in 93 files, top file)": {
+   "with_context_mode": {
+    "correct": "3/3",
+    "total_tokens": 91371,
+    "turns": 1,
+    "failed_tool_calls": 0,
+    "tools": [
+     "cat context-mode SKILL.md (16,358 chars)",
+     "cat RTK.md",
+     "ctx_execute"
+    ],
+    "wall_s": 29.41
+   },
+   "without": {
+    "correct": "3/3",
+    "total_tokens": 36224,
+    "turns": 1,
+    "failed_tool_calls": 0,
+    "tools": [
+     "one python3 aggregation command (112 chars output)"
+    ],
+    "wall_s": 15.04
+   }
+  },
+  "t2 (609 KB manifest: 99 receipt entries, 2,272,055 bytes)": {
+   "with_context_mode": {
+    "correct": "2/2",
+    "total_tokens": 62412,
+    "failed_tool_calls": 0,
+    "tools": [
+     "sed SKILL.md (10,471 chars)",
+     "ctx_execute"
+    ],
+    "wall_s": 16.62
+   },
+   "without": {
+    "correct": "2/2",
+    "total_tokens": 36315,
+    "failed_tool_calls": 0,
+    "tools": [
+     "one jq aggregation (53 chars output)"
+    ],
+    "wall_s": 18.86
+   }
+  },
+  "whole_task_totals_incl_failures": {
+   "with_context_mode": 153783,
+   "without": 72539,
+   "failed_or_retried_attempts": 0
+  },
+  "reading": "On these two Codex tasks the reduction lane cost about 2.1x the tokens of the plain arm with equal accuracy: the model loaded the Context Mode skill text and the MCP tool definitions, while the plain arm already aggregated large outputs in one small command. No net whole-task saving was observed for Codex on these tasks."
+ },
+ "outcome": "advanced",
+ "what_remains": "The Claude arm through native workflow children and child-usage.mjs (the shared Claude account is reserved for another session's long-horizon run, so a Claude fan-out is deferred); more tasks and repetitions (n=1 per cell); tasks where the plain arm must print large output.",
+ "evidence_class": "native_proven",
+ "limits": [
+  "Codex only, 2 tasks x 2 arms x 1 run; tasks are aggregations the model could script cheaply, which favours the plain arm.",
+  "Usage is the sum of turn.completed usage from codex exec --json (includes cached input); not a billing figure.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t1-with.summary.json",
+   "sha256": "47348f117bbf14e3fd46af763c2a0350cb29fb3b9453ba9bd0c269abd372b930"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t1-with.events.jsonl",
+   "sha256": "e91f94fae0483806cfa33992be3c24a3772f59a4c6079e42ec03e7611b0eae81"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t1-without.summary.json",
+   "sha256": "936f16a3fa194040370fae1ed741ab69ed41bcf3c61274b3eef69654951cb0b5"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t1-without.events.jsonl",
+   "sha256": "a6c237ec5947bf0f44fc97d1c66835ac9f7dee20548648836f5671308ed9255a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t2-with.summary.json",
+   "sha256": "b27da06aed911f515c241af2c97f7bb13b26c6e19aa51adf7a81006e1d2d3427"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t2-with.events.jsonl",
+   "sha256": "d980661d038e857b12c5e4bcb3ff152df2eb2b2f4758d34b87ca4528c605dfbf"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t2-without.summary.json",
+   "sha256": "226fd466e42664a1cdd7675b39b04cf68a8fd3d56077c096f070cb9c63f21508"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/15-t2-without.events.jsonl",
+   "sha256": "77c2aba4f3d1b38b5267877b44b52bab7220fed1aeb5c63c4cb4faf06ef492db"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/gold.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/gold.json",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/t1.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/t2.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/with-lane-note.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/without-lane-note.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/score.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/run_arm.sh"
+ ],
+ "checked_at": "2026-09-23"
+}

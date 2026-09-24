@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-code-action",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/anthropics/claude-code-action",
+ "reviewed_commit": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "git-github-automation"
+ ],
+ "claim": "Source and documentation review of anthropics/claude-code-action at commit 8cf3482550831fb35a4fc3fbf7ca139cf8028b4c (license MIT), read from README.md at that commit.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "A general-purpose Claude Code action for GitHub PRs and issues that can answer questions and implement code changes. This action intelligently detects when to activate based on your workflow context\u2014whether responding to @claude mentions, issue assignments, or executing automation tasks with explicit prompts. It supports multiple authentication methods including Anthropic direct API (API key or wo"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "See our Migration Guide for step-by-step instructions on updating your workflows to v1.0. The new version simplifies configuration while maintaining compatibility with most existing setups."
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\ud83c\udfaf Intelligent Mode Detection: Automatically selects the appropriate execution mode based on your workflow context\u2014no configuration needed"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\ud83e\udd16 Interactive Code Assistant: Claude can answer questions about code, architecture, and programming"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\ud83d\udd0d Code Review: Analyzes PR changes and suggests improvements"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\u2728 Code Implementation: Can implement simple fixes, refactoring, and even new features"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\ud83d\udcac PR/Issue Integration: Works seamlessly with GitHub comments and PR reviews"
+  },
+  {
+   "source": "README.md@8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+   "text": "\ud83d\udee0\ufe0f Flexible Tool Access: Access to GitHub APIs and file operations (additional tools can be enabled via configuration)"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/anthropics/claude-code-action/tree/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+  "https://github.com/anthropics/claude-code-action/blob/8cf3482550831fb35a4fc3fbf7ca139cf8028b4c/README.md"
+ ]
+}

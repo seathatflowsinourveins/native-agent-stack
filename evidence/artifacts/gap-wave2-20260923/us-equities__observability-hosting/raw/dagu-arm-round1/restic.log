@@ -1,0 +1,26 @@
+created restic repository e0f2ccf745 at $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/restic-repo
+
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is
+irrecoverably lost.
+no parent snapshot found, will read all files
+
+Files:          33 new,     0 changed,     0 unmodified
+Dirs:           53 new,     0 changed,     0 unmodified
+Added to the repository: 154.291 KiB (44.155 KiB stored)
+
+processed 33 files, 122.430 KiB in 0:00
+snapshot d19c39c7 saved
+using temporary cache in /tmp/restic-check-cache-2115408508
+create exclusive lock for repository
+load indexes
+check all packs
+check snapshots, trees and blobs
+[0:00] 100.00%  1 / 1 snapshots
+read all data
+[0:00] 100.00%  2 / 2 packs
+no errors were found
+restoring snapshot d19c39c7 of [$HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/dagu $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/data/prom $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/data/loki] at 2026-09-23 03:51:33.46995906 -0400 EDT by <user>@<host> to $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/restore
+Summary: Restored 86 files/dirs (122.430 KiB) in 0:00
+verifying files in $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/restore
+finished verifying 33 files in $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1/restore (took 1ms)

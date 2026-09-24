@@ -1,0 +1,35 @@
+{
+  "label": "fix-round-1 preregistration. Written after the independent Opus review of commit b7aec6b and after the original runs; it preregisters only the fix-round reruns below, not the original checks.",
+  "written_at": "2026-09-22T23:26:00-04:00",
+  "written_at_note": "Approximate to the minute; the file was written with the editor tool at about this time and committed before any rerun started (see the commit that adds it).",
+  "reruns": [
+    {
+      "id": "F1-dagu-sigkill-preregistered-protocol",
+      "gaps": [4, 6],
+      "command": "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery none --window 150 --work <new cache dir>",
+      "expectation": "The protocol preregistered in preregistrations/4.json: SIGKILL the Dagu executor tree mid-finalize, release, then 'dagu retry --step finalize' every 15 s for 150 s with NO scheduler. Expected: every retry refused ('already running'), history stays 'running', sigkill=false.",
+      "criteria": "Reported as Dagu's preregistered SIGKILL result whether it passes or fails. stop/retry/checkpoint_reuse are re-scored in the same run."
+    },
+    {
+      "id": "F2-dagu-sigkill-scheduler-variant-loopback-safe",
+      "gaps": [4, 6],
+      "command": "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery scheduler --window 270 --work <new cache dir>",
+      "expectation": "The post-hoc variant, labelled as a deviation from preregistrations/4.json: a Dagu scheduler started after the kill, with a private config setting scheduler port 0. Expected: the scheduler logs 'Health check server disabled', no TCP listener is owned by the scheduler tree at any sample, the zombie is confirmed after about 180 s, then a retry succeeds (sigkill=true under the 270 s window, false under the preregistered 150 s bound).",
+      "criteria": "Isolation holds iff the scheduler stderr contains 'Health check server disabled', contains no 'Starting health check server', and every 'ss -Hltnp' sample taken while the scheduler runs lists no socket owned by a scheduler-tree pid. The detection method is validated by a positive control: a loopback listener started by the same probe code must appear in the same ss parse."
+    },
+    {
+      "id": "F3-gap2-rerun-loopback-safe-with-codex-gate",
+      "gaps": [2],
+      "command": "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py --work <new cache dir>",
+      "expectation": "Same criteria (1)-(6) as preregistrations/2.json, with the private config setting scheduler port 0, scheduler listener sampling as in F2, and a Codex concurrency gate recorded before the one model call (count real codex exec processes other than the caller; wait while 2 or more run; record the count and the wait).",
+      "criteria": "Gap 2 stays settled iff all six original criteria pass AND the isolation criteria of F2 hold AND the gate record shows fewer than 2 other codex exec processes at call time. If the rerun fails any original criterion, gap 2 becomes advanced or not_settled with the observation. The original run's wildcard bind stays disclosed as a deviation in the superseded run."
+    }
+  ],
+  "non_rerun_changes": [
+    "Gap 4 outcome settled -> advanced: Restate (named in the gap text) was not ported; the missing Restate adapter is named as remaining work.",
+    "Gap 6: Prefect's SIGKILL comparison sentence is qualified (zombie-flow detection not configured); results reported both under the preregistered 150 s bound and the post-hoc 270 s window.",
+    "Gap 3: checked_at updated to the actual edit time with the late addition labelled.",
+    "Gap 1: wording corrected to local client-process termination plus no client-surfaced usage; no claim of server-side provider cancellation. The Codex concurrency check for the original gap 1 and gap 2 calls is recorded as not performed."
+  ],
+  "incident_before_this_file": "A first attempt to write this file (about 23:22:41-04:00) used an unquoted shell heredoc; the shell executed the backquoted command names in the text. See incidents/2026-09-22-fix-round-heredoc-substitution.json."
+}

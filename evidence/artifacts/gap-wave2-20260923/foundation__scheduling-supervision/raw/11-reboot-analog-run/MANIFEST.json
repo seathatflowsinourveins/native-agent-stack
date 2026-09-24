@@ -1,0 +1,287 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131994",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "boot1-identity.json",
+      "committed_as": "boot1-identity.json",
+      "raw_sha256": "794e13e9443273e29c109a293a48bde8280a96183493767b49cece99b8fd0c4c",
+      "committed_sha256": "794e13e9443273e29c109a293a48bde8280a96183493767b49cece99b8fd0c4c",
+      "bytes": 151
+    },
+    {
+      "source": "boot1-shutdown.json",
+      "committed_as": "boot1-shutdown.json",
+      "raw_sha256": "9d12a2c6b9374ddb5589327f32719d6f7bb093c069d3bf037bb76ff2f9e67d83",
+      "committed_sha256": "9d12a2c6b9374ddb5589327f32719d6f7bb093c069d3bf037bb76ff2f9e67d83",
+      "bytes": 211
+    },
+    {
+      "source": "boot2-identity.json",
+      "committed_as": "boot2-identity.json",
+      "raw_sha256": "67cea64319158428623c2e086ad66f276f355a2161541997fe36639a89681a57",
+      "committed_sha256": "67cea64319158428623c2e086ad66f276f355a2161541997fe36639a89681a57",
+      "bytes": 151
+    },
+    {
+      "source": "boot2-service.json",
+      "committed_as": "boot2-service.json",
+      "raw_sha256": "f89587e524952a033b491121ae6cbf1055e1e7df5aeb2cb1678d0c9dfd84b759",
+      "committed_sha256": "f89587e524952a033b491121ae6cbf1055e1e7df5aeb2cb1678d0c9dfd84b759",
+      "bytes": 48
+    },
+    {
+      "source": "checkpoint-started.json",
+      "committed_as": "checkpoint-started.json",
+      "raw_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "committed_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "source": "checkpoint.json",
+      "committed_as": "checkpoint.json",
+      "raw_sha256": "fb686fe10c11a471ef5eee1e8188054817864a62bb65be26a74ee1d0f0aa5465",
+      "committed_sha256": "fb686fe10c11a471ef5eee1e8188054817864a62bb65be26a74ee1d0f0aa5465",
+      "bytes": 295
+    },
+    {
+      "source": "completed.json",
+      "committed_as": "completed.json",
+      "raw_sha256": "590c8c0b70487eef94f9cb534fc4688cf673e950844af7b3f1f0d7c866f683d9",
+      "committed_sha256": "590c8c0b70487eef94f9cb534fc4688cf673e950844af7b3f1f0d7c866f683d9",
+      "bytes": 654
+    },
+    {
+      "source": "dagu-base.json",
+      "committed_as": "dagu-base.json",
+      "raw_sha256": "f8be7a4b3eed1e6539114cde6496551ed43f19e793ea0318b3b909f53974903c",
+      "committed_sha256": "6347eecdb1f9e2205048556285c33927ea138e3fb463f5846be4ce7805e1a670",
+      "bytes": 282
+    },
+    {
+      "source": "dagu-env.json",
+      "committed_as": "dagu-env.json",
+      "raw_sha256": "0cff3722aee93638921b5f0c98b2a7bd37198026d535e3cc01573a0e8e37a334",
+      "committed_sha256": "2a10c64f023c169b333554cddf6db713cf8dab60d4fc8de6125157dcdeefae8e",
+      "bytes": 571
+    },
+    {
+      "source": "finalize-ready.json",
+      "committed_as": "finalize-ready.json",
+      "raw_sha256": "28fffa000c2d5702b7897b5deaf420426b0995a2ce4b9119b85a483b31baa7cc",
+      "committed_sha256": "28fffa000c2d5702b7897b5deaf420426b0995a2ce4b9119b85a483b31baa7cc",
+      "bytes": 16
+    },
+    {
+      "source": "freeze.json",
+      "committed_as": "freeze.json",
+      "raw_sha256": "956d2c4003d3b300b02de3ad009729cc75890cfb7f32438fdb49f4168a024bba",
+      "committed_sha256": "956d2c4003d3b300b02de3ad009729cc75890cfb7f32438fdb49f4168a024bba",
+      "bytes": 669
+    },
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "4991742db160777014d5fa48a950020908adf4481d8c448c2c46768dc4b35b53",
+      "committed_sha256": "4991742db160777014d5fa48a950020908adf4481d8c448c2c46768dc4b35b53",
+      "bytes": 4164
+    },
+    {
+      "source": "retry-ready.json",
+      "committed_as": "retry-ready.json",
+      "raw_sha256": "9d8ef46edf7707755548c46d45256419b8ccb9ae75c2a2997db12df92e24a159",
+      "committed_sha256": "9d8ef46edf7707755548c46d45256419b8ccb9ae75c2a2997db12df92e24a159",
+      "bytes": 16
+    },
+    {
+      "source": "checkpoint-validate.log",
+      "committed_as": "checkpoint-validate.log",
+      "raw_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "committed_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "bytes": 161
+    },
+    {
+      "source": "final-ecosystem.log",
+      "committed_as": "final-ecosystem.log",
+      "raw_sha256": "c2d3b67e8f8ebe6e7aeb569be377237a1a5e0a8c14ddf68d0484066e9ea309f4",
+      "committed_sha256": "c2d3b67e8f8ebe6e7aeb569be377237a1a5e0a8c14ddf68d0484066e9ea309f4",
+      "bytes": 118
+    },
+    {
+      "source": "final-validate.log",
+      "committed_as": "final-validate.log",
+      "raw_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "committed_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "bytes": 161
+    },
+    {
+      "source": "reference-ecosystem.log",
+      "committed_as": "reference-ecosystem.log",
+      "raw_sha256": "c2d3b67e8f8ebe6e7aeb569be377237a1a5e0a8c14ddf68d0484066e9ea309f4",
+      "committed_sha256": "c2d3b67e8f8ebe6e7aeb569be377237a1a5e0a8c14ddf68d0484066e9ea309f4",
+      "bytes": 118
+    },
+    {
+      "source": "reference-validate.log",
+      "committed_as": "reference-validate.log",
+      "raw_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "committed_sha256": "b275f568a19865cbbe5b71ade63c2043f71fa07b90dfbe0775236423ccff624e",
+      "bytes": 161
+    },
+    {
+      "source": "realboot.yaml",
+      "committed_as": "realboot.yaml",
+      "raw_sha256": "58c1a8b17b2712e96f02fc0aec3056d01a3df630a9c026f735028b8c4e1656ab",
+      "committed_sha256": "903e40d874d7a00bdea2ac9a63999da26dfe0539355ecb8e7e44a1c8dfb76d4f",
+      "bytes": 697
+    },
+    {
+      "source": "native/boot1-ns.stderr",
+      "committed_as": "native__boot1-ns.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/boot1-ns.stdout",
+      "committed_as": "native__boot1-ns.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/boot1-start.stderr",
+      "committed_as": "native__boot1-start.stderr",
+      "raw_sha256": "9323eebce1babe2e382cb5432e0599af6f3cc38126a89226359ce4bf9830ab63",
+      "committed_sha256": "9323eebce1babe2e382cb5432e0599af6f3cc38126a89226359ce4bf9830ab63",
+      "bytes": 1360
+    },
+    {
+      "source": "native/boot1-start.stdout",
+      "committed_as": "native__boot1-start.stdout",
+      "raw_sha256": "5a4bd1fe3997b13667c7f77eb195e4f0ecda8d72ada561cde059c1310a1774f0",
+      "committed_sha256": "bf20594db67d0eb2924906307c0045cd7ffc1613641017982e1b1762ab552d01",
+      "bytes": 946
+    },
+    {
+      "source": "native/boot2-ns.stderr",
+      "committed_as": "native__boot2-ns.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/boot2-ns.stdout",
+      "committed_as": "native__boot2-ns.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/boot2-retry.stderr",
+      "committed_as": "native__boot2-retry.stderr",
+      "raw_sha256": "f2ef5a5648d18cb8c5918a45cadb2e0558919d9878a599c864575c2f6317ae8b",
+      "committed_sha256": "e2819b7d0820c7cabfba9471f4095af6c586e20ee8124772efb6a43c5a163275",
+      "bytes": 921
+    },
+    {
+      "source": "native/boot2-retry.stdout",
+      "committed_as": "native__boot2-retry.stdout",
+      "raw_sha256": "6dc5691d0e139ca55670ce839cbabf47498f79908a8faa92222d3d101eb5daa6",
+      "committed_sha256": "deb4cb75462cb11db0d308f4b577de58157afc87bc0833c567394052c13e670c",
+      "bytes": 907
+    },
+    {
+      "source": "native/history-after-boot2.stderr",
+      "committed_as": "native__history-after-boot2.stderr",
+      "raw_sha256": "6a4178b7efb2f175dd70cfefc835e1da879aa41186ff8b590895b0ea6e6d4726",
+      "committed_sha256": "6a4178b7efb2f175dd70cfefc835e1da879aa41186ff8b590895b0ea6e6d4726",
+      "bytes": 203
+    },
+    {
+      "source": "native/history-after-boot2.stdout",
+      "committed_as": "native__history-after-boot2.stdout",
+      "raw_sha256": "c1f1b7e3884daf13c28fc1dda6b52d3c8fb27a65e7509123d0e64671855e144d",
+      "committed_sha256": "c1f1b7e3884daf13c28fc1dda6b52d3c8fb27a65e7509123d0e64671855e144d",
+      "bytes": 247
+    },
+    {
+      "source": "native/history-after-shutdown.stderr",
+      "committed_as": "native__history-after-shutdown.stderr",
+      "raw_sha256": "270035c46a3b70caac2c8cc90f1a49b23c6fd205a58ca898bce47bbd6a50c4f8",
+      "committed_sha256": "270035c46a3b70caac2c8cc90f1a49b23c6fd205a58ca898bce47bbd6a50c4f8",
+      "bytes": 203
+    },
+    {
+      "source": "native/history-after-shutdown.stdout",
+      "committed_as": "native__history-after-shutdown.stdout",
+      "raw_sha256": "c3f457bda70e3f5023f2b94a9801d9d667d8a2830bdd0ce2d7059b82677c1751",
+      "committed_sha256": "c3f457bda70e3f5023f2b94a9801d9d667d8a2830bdd0ce2d7059b82677c1751",
+      "bytes": 245
+    },
+    {
+      "source": "native/history-before-shutdown.stderr",
+      "committed_as": "native__history-before-shutdown.stderr",
+      "raw_sha256": "15d81dc63de02ac371b31befd891ceea64af5ade31cefe0767a4e603f7f4bba4",
+      "committed_sha256": "15d81dc63de02ac371b31befd891ceea64af5ade31cefe0767a4e603f7f4bba4",
+      "bytes": 203
+    },
+    {
+      "source": "native/history-before-shutdown.stdout",
+      "committed_as": "native__history-before-shutdown.stdout",
+      "raw_sha256": "3f3260df34a3555bc6bb1d6bb23c803888de41ee7cc33f154e22d79ed5be0561",
+      "committed_sha256": "3f3260df34a3555bc6bb1d6bb23c803888de41ee7cc33f154e22d79ed5be0561",
+      "bytes": 198
+    },
+    {
+      "source": "native/validate.stderr",
+      "committed_as": "native__validate.stderr",
+      "raw_sha256": "b5be27ed40fc3df608c2adfdb4f1514231e46fef025cf8c6f6d89840a0318300",
+      "committed_sha256": "f1fbd3b65c8a1b368f2ae3abfa0a705ef5df2fd4270c623abdbd8b19896968fc",
+      "bytes": 517
+    },
+    {
+      "source": "native/validate.stdout",
+      "committed_as": "native__validate.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/version.stderr",
+      "committed_as": "native__version.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "native/version.stdout",
+      "committed_as": "native__version.stdout",
+      "raw_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "committed_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "bytes": 7
+    },
+    {
+      "source": "upstream/reports/upstream-tests.txt",
+      "committed_as": "upstream__reports__upstream-tests.txt",
+      "raw_sha256": "558ae56fa0ca59aa02341ab979708811b2144f22387d401510c515f654beb0a4",
+      "committed_sha256": "ee3ea000c525ee28036a08f33f714db8a5c13ed659718ce93b0b968348bfd8df",
+      "bytes": 97941
+    },
+    {
+      "source": "dagu-home/data/dag-runs/realboot/dag-runs/2026/09/23/dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc/a_20260923_025407_827Z_fe06cc/status.jsonl",
+      "committed_as": "dagu-home__data__dag-runs__realboot__dag-runs__2026__09__23__dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc__a_20260923_025407_827Z_fe06cc__status.jsonl",
+      "raw_sha256": "140a1dc5cfdabd19b7c24d72fa2f7e18b5be409d43eea082944637e59184e6ee",
+      "committed_sha256": "caca218f606cb4dc830a15ed2551791985b204267ac7af1e1c8dbd2ade7a6dae",
+      "bytes": 3373
+    },
+    {
+      "source": "dagu-home/data/dag-runs/realboot/dag-runs/2026/09/23/dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc/a_20260923_025413_138Z_524db0/status.jsonl",
+      "committed_as": "dagu-home__data__dag-runs__realboot__dag-runs__2026__09__23__dag-run_20260923_025407Z_realboot-59dd2fcf40df9ebc__a_20260923_025413_138Z_524db0__status.jsonl",
+      "raw_sha256": "05ea53014d6beec8e15b419eae801f22bf3016398f6a0cb190d0b805b284aa50",
+      "committed_sha256": "bcddfef967a5512f5a81ef7fce18a7c72a1642b028076a384730fec7d337faa7",
+      "bytes": 3262
+    }
+  ],
+  "uuid_placeholders": 15
+}

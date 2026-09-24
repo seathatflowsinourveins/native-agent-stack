@@ -1,0 +1,59 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-12",
+  "gap_index": 12,
+  "gap_text_sha256": "f7318eba45889fdcf7a6692b171758479edd21b6db54c29ba9a12792d576d8f2",
+  "checked_at": "2026-09-23T00:45:58.708Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:53:17.012Z",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:53:17.012Z by original#68 (Write of $SCRATCHPAD/write_receipts2.py; receipts written by original#69 at 00:53:20Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:45:28.726Z to 2026-09-23T00:45:58.708Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T02:05:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps.",
+    "expectation": "Killing a process mid-write inside an owned worktree, then running Worktrunk's closest cleanup primitive (`wt step prune`), will preserve the dirty/crash-leftover files and leave an unrelated (master) worktree untouched, since prune only removes worktrees merged into the default branch.",
+    "criteria": "File presence and worktree listing recorded before and after `wt step prune` on a repo containing one dirty, unmerged, crash-interrupted worktree plus the unrelated main worktree."
+  },
+  "commands": [
+    "original#53 [2026-09-23T00:45:28.726Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk\nrm -rf owned-repo\nmkdir owned-repo && cd owned-repo\ngit init -q\ngit config user.email test@example.com\ngit config user.name test\necho \"hello\" > file.txt\ngit add file.txt\ngit commit -qm init\n$WT --version\n$WT list 2>&1\necho \"== create ==\"\n$WT create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#55 [2026-09-23T00:45:35.040Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\necho \"== switch --create feat-a ==\"\n$WT -y switch --create feat-a 2>&1\necho \"exit=$?\"\n$WT list 2>&1",
+    "original#56 [2026-09-23T00:45:42.268Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\nWORKTREE_DIR=../owned-repo.feat-a\necho \"dirty-uncommitted\" > \"$WORKTREE_DIR/dirty.txt\"\necho \"modified\" >> \"$WORKTREE_DIR/file.txt\"\nsha_dirty=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" | cut -d' ' -f1)\nsha_file=$(sha256sum \"$WORKTREE_DIR/file.txt\" | cut -d' ' -f1)\necho \"sha_dirty=$sha_dirty sha_file=$sha_file\"\necho \"== attempt remove dirty worktree ==\"\n$WT -y -C \"$WORKTREE_DIR\" remove 2>&1\necho \"exit=$?\"\nls -la \"$WORKTREE_DIR\" 2>&1\nsha_dirty2=$(sha256sum \"$WORKTREE_DIR/dirty.txt\" 2>&1 | cut -d' ' -f1)\nsha_file2=$(sha256sum \"$WORKTREE_DIR/file.txt\" 2>&1 | cut -d' ' -f1)\necho \"post: sha_dirty2=$sha_dirty2 sha_file2=$sha_file2\"\n[[ \"$sha_dirty\" == \"$sha_dirty2\" && \"$sha_file\" == \"$sha_file2\" ]] && echo \"PRESERVED_BYTE_IDENTICAL=true\" || echo \"PRESERVED_BYTE_IDENTICAL=false\"",
+    "original#57 [2026-09-23T00:45:48.863Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\nWORKTREE_DIR=../owned-repo.feat-a\necho \"== simulate crash: start a process writing in the worktree, kill -9 mid-write ==\"\npython3 -c \"\nimport time, os\nwith open('$WORKTREE_DIR/crash-write.tmp', 'wb') as f:\n    for i in range(5):\n        f.write(b'X'*1024*1024)\n        f.flush(); os.fsync(f.fileno())\n        time.sleep(1)\n\" &\nCPID=$!\nsleep 2\nkill -9 $CPID\nsleep 1\nls -la \"$WORKTREE_DIR\"\necho \"== run wt list (should still show unrelated worktree master untouched) ==\"\n$WT list 2>&1\necho \"== run wt step or hook cleanup if available ==\"\n$WT step --help 2>&1 | head -20",
+    "original#58 [2026-09-23T00:45:58.017Z]: WT=$HOME/.local/share/codex-ecosystem/bin/wt\ncd $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo\n$WT -y step prune 2>&1\necho \"exit=$?\"\n$WT list 2>&1\nls -la ../owned-repo.feat-a 2>&1"
+  ],
+  "results": [
+    "Process killed with SIGKILL mid-write; crash-write.tmp left at 2097152 bytes (partial), plus the pre-existing dirty.txt and modified file.txt in the same worktree.",
+    "wt list before prune: shows master and feat-a ('!? -', +3, i.e. dirty/unmerged) as two worktrees.",
+    "`wt -y step prune`: `\u25cb No merged worktrees to remove`, exit=0. feat-a was not a prune candidate, so preservation here could not have failed; the probe cannot detect the failure it reports as absent.",
+    "wt list and ls -la after prune: identical \u2014 feat-a and all its dirty/crash files (crash-write.tmp, dirty.txt, modified file.txt) and the unrelated master worktree are all still present and unchanged."
+  ],
+  "outcome": "advanced",
+  "note": "This receipt holds the crash transcript itself (SIGKILL mid-write, 2,097,152-byte partial file, dirty files and master preserved after `wt step prune`). Because prune had nothing to remove, it does not show a cleanup that ran and still preserved dirty and unrelated state; gap 8's contrast fixture shows selective pruning, but without a crash. The first clause of the gap (worktrees do not isolate permissions, accounts, global configuration or shared services) was not tested. Outcome changed from covered_elsewhere to advanced.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Only `wt step prune` was tested.",
+    "Gaps 6, 7, 12 and 18 cite one continuous disposable repository session (original#53-#59 in $HOME/.cache/gap-wave2-20260923/isolation/worktrunk/owned-repo): repository init and `wt --version` (#53), `wt -y switch --create feat-a` (#55), dirty-removal refusal (#56), SIGKILL mid-write (#57), `wt -y step prune` (#58) and `wt -y remove --force feat-a` (#59). The earlier limit saying each gap used a fresh, independent repository was false and is removed.",
+    "No merged branch exists in this fixture; the earlier limit about a fast-forwarded merged branch was copied from gap 8 and is removed."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:45:28.726Z to 2026-09-23T00:45:58.708Z. The previous value '2026-09-23T00:53:20.715653+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#53",
+        "original#55",
+        "original#56",
+        "original#57",
+        "original#58"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Review finding 5: removed the limit copied from gap 8 (no merged branch exists here).",
+      "Outcome changed covered_elsewhere -> advanced: this receipt holds its own crash evidence, gap 8 is no longer settled, and the no-op prune cannot detect a preservation failure.",
+      "Removed the false independent-repository limit. Timestamps corrected; exact commands and raw_evidence added."
+    ]
+  }
+}

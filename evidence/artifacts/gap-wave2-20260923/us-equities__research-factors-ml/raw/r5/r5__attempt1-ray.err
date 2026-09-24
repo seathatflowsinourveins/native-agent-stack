@@ -1,0 +1,6 @@
+[2026-09-23 12:00:43,247 W 1317006 1317006] network_util.cc:330: Failed to determine local IP via external connectivity to: 8.8.8.8:53, [2001:4860:4860::8888]:53, falling back to hostname resolution
+2026-09-23 12:00:46,362	INFO worker.py:2024 -- Started a local Ray instance.
+INFO 2026-09-23 12:00:47,436 serve 1317006 -- Started Serve in namespace "serve".
+INFO 2026-09-23 12:00:47,453 serve 1317006 -- Connecting to existing Serve app in namespace "serve". New http_options/controller_options will not be applied.
+INFO 2026-09-23 12:00:48,571 serve 1317006 -- Application 'momentum' is ready at http://127.0.0.1:41547/momentum.
+INFO 2026-09-23 12:00:48,574 serve 1317006 -- Started <ray.serve._private.router.SharedRouterLongPollClient object at 0x7124684ab230>.

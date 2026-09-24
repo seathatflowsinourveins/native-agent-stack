@@ -1,0 +1,29 @@
+2026/09/23 03:34:10 INFO mlflow.store.db.utils: Creating initial MLflow database tables...
+2026/09/23 03:34:10 INFO mlflow.store.db.utils: Updating database tables
+2026/09/23 03:34:11 INFO mlflow.tracking.fluent: Experiment with name 'research-evaluation-chronological-controls' does not exist. Creating a new experiment.
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/mlflow_bind.py", line 42, in <module>
+    mlflow.log_input(dataset, context="input")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/tracking/fluent.py", line 1491, in log_input
+    MlflowClient().log_inputs(run_id=run_id, datasets=datasets, models=models)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/tracking/client.py", line 2768, in log_inputs
+    self._tracking_client.log_inputs(run_id, datasets, models)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/telemetry/track.py", line 24, in wrapper
+    return func(*args, **kwargs)
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/tracking/_tracking_service/client.py", line 615, in log_inputs
+    self.store.log_inputs(run_id=run_id, datasets=datasets, models=models)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/store/tracking/sqlalchemy_store.py", line 2357, in log_inputs
+    _validate_dataset_inputs(datasets)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/utils/validation.py", line 770, in _validate_dataset_inputs
+    _validate_dataset(dataset_input.dataset)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/utils/validation.py", line 791, in _validate_dataset
+    raise MlflowException(
+    ...<2 lines>...
+    )
+mlflow.exceptions.MlflowException: 'digest' exceeds the maximum length of 36 characters

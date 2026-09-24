@@ -1,0 +1,11 @@
+{
+ "written_at": "2026-09-23T16:21:52Z",
+ "label": "round-7 addendum, written after round 6 completed (16:18:29Z-16:20:42Z, all in-script assertions PASS) and after a post-hoc query of round 6's restored TSDB copy, before round 7 ran",
+ "round6_findings_prompting_this": [
+  "Loki held 311 MARK lines before kill -9 but 622 after the collector restart and in the restored store (311 distinct line bodies, 622 distinct timestamps): filelog with start_at: beginning and no storage extension re-read every step log after restart. The committed round-4 Dagu-arm raw outputs show the same doubling (2 -> 4). Round 6's assertion only checked that pre-kill timestamps were present, so it could not detect duplicates.",
+  "The count-connector series (delta -> delta_to_cumulative -> prometheusremotewrite) did not match the step log: paper_runtime_intents_total peaked at 16 before the kill against 20 intent lines, and after the restart the log-record series showed 100 against 311 re-read lines. The pre-kill history (1 -> 311 records) was retained in the restored TSDB. Neither the collector log nor the Prometheus log recorded errors (collector self-telemetry was off). The in-script check only asserted a nonzero value, so it could not detect the undercount."
+ ],
+ "changes": "Collector: a file_storage extension (directory in the scratch data dir) is attached to filelog so read offsets survive restart; the count connector feeds a loopback prometheus exporter (127.0.0.1:38889, which accumulates delta sums) scraped by Prometheus, replacing delta_to_cumulative + remote write for the count series only (span metrics unchanged). Assertions made exact: before kill, paper_runtime_log_records_total equals the MARK line count of the step log and paper_runtime_intents_total equals its intent-line count; after restart and from the restored store, max_over_time over 1h equals those values; Loki line count after restart and restored equals the pre-kill count (no duplicates).",
+ "expectation": "All round-6 assertions still PASS plus the exact count and no-duplicate assertions PASS.",
+ "criteria": "Any FAIL is reported as observed. If the exact counts still diverge, the metric-path finding stays open as a limit rather than being hidden."
+}

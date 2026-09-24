@@ -170,19 +170,38 @@ locally with `GH_TOKEN` set and no `--offline`, using
   enforced by the unit test.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
-  check. Off PRs, the same scan writes SARIF, uploaded by
-  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
-  (v4.38.1, annotated tag `c23de5a8…` dereferenced) with category
-  `osv-scanner`. Only that job holds `security-events: write`. CodeQL Action
-  v3 is deprecated in December 2026
+  check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
+  artifact; the separate `osv-sarif-upload` job (`needs: osv-scanner`,
+  `!cancelled()` so a findings failure still uploads) downloads it and uploads
+  it with `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1, annotated tag `c23de5a8…` dereferenced), category `osv-scanner`.
+  CodeQL Action v3 is deprecated in December 2026
   ([changelog](https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/)).
+- **Write scope (2026-09-23 split).** Until this change the `osv-scanner` job
+  itself held `security-events: write`, so the token that can dismiss the
+  CodeQL alerts gated by the `code_scanning` rule was present in the job that
+  runs the curl-installed OSV-Scanner binary on every event, PRs included
+  (job-level permissions apply whether or not the upload step runs). It was
+  never the only holder: `git show <c>:.github/workflows/security-scan.yml |
+  grep -c 'security-events: write'` returns 2 at `e4737e5`, `da000f8`,
+  `ad72b16`, `4e4aab0` and the squash merge `4970ba0` (`zizmor-online`, later
+  `zizmor-sarif-upload`, held it too). Now both scan jobs are `contents: read`,
+  and the two upload jobs hold the write scope and run no shell step or
+  installed tool (`tests/test_workflow_hardening.py`
+  `test_the_write_token_never_reaches_an_installed_tool`). The split adds no
+  scan: the job already ran `osv-scanner scan source` twice off PRs (the
+  table run for the exit status, then `--format sarif`).
 - **Alternatives.** Dependency review only (sees only a PR's changes). grype
-  over every lock (it needs SBOMs per ecosystem). A separate upload job, which
-  keeps `security-events: write` off the PR run but scans twice.
-- **Overturn.** OSV-Scanner fixes its version ordering, so resolved results
-  match a pip resolution of the same manifest (then drop `--no-resolve`). Or
-  30 days of PR runs produce only findings that another required check also
-  reports.
+  over every lock (it needs SBOMs per ecosystem). Keep the upload step inside
+  the scan job (rejected on 2026-09-23: it leaves the write-scoped token in the
+  job that runs the installed binary, which the zizmor split in section 4
+  already rejected for the same reason, and splitting costs no extra scan).
+- **Decision.** Scan in a read-only job; upload from a tool-free job.
+- **Overturn.** GitHub adds step-scoped permissions, so the upload step alone
+  can hold the write scope; or OSV-Scanner fixes its version ordering, so
+  resolved results match a pip resolution of the same manifest (then drop
+  `--no-resolve`); or 30 days of PR runs produce only findings that another
+  required check also reports.
 
 ## 4. `security-scan.yml`: zizmor online
 
@@ -210,22 +229,83 @@ locally with `GH_TOKEN` set and no `--offline`, using
   with `bash --noprofile --norc -eo pipefail -c 'set -uo pipefail; false; echo reached'`
   (prints nothing) and guarded by a test assertion that fails if the old line returns.
 - **Result.** 0 online findings on `168a3a8` and on this branch.
+- **Alternatives.** Give `zizmor-online` the write scope directly (rejected:
+  hands a pip-installed analyzer's token the power to dismiss CodeQL alerts,
+  see "Token split" above). Run zizmor online as a PR gate (rejected: online
+  audits need network egress and a token on every PR, and 0 findings on
+  `168a3a8` give no evidence yet that it would not be noisy). Drop online
+  zizmor and keep only `validate.yml`'s offline `regular` gate (rejected:
+  offline analysis covers no online-only audit class, such as impostor
+  commit, known-vulnerable action or ref-confusion checks that need the
+  GitHub API and an advisory database; zizmor's secrets audits, such as
+  `secrets-inherit`, `overprovisioned-secrets` and `unredacted-secrets`, are
+  static and already run offline in `validate.yml`).
+- **Decision.** Keep the two-job split: `zizmor-online` (`contents: read`,
+  push/schedule/dispatch only) produces the SARIF artifact, and
+  `zizmor-sarif-upload` (`security-events: write`, no shell step or
+  installed tool) uploads it, per the "Token split" evidence above.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.
 
 ## 5. Scorecard SARIF
 
-`scorecard.yml` keeps `publish_results: false` and the 5-day artifact. It now
-also uploads `results.sarif` through the same `upload-sarif` SHA. Only the
-`analysis` job has `security-events: write`. Scorecard v5.5.0 and
-scorecard-action v2.4.4 are the latest releases. **Overturn:** duplicate or
-noisy alerts that nobody triages for 30 days.
+- **Evidence.** `scorecard.yml`'s `analysis` job runs
+  `ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc` (v2.4.4,
+  the latest release; Scorecard itself is at v5.5.0) with `results_format:
+  sarif` and `publish_results: false`, then uploads `results.sarif` both as a
+  5-day workflow artifact and, in the same job, through
+  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1). The upload step and its job-scoped `security-events: write` were
+  added on `main` in commit `4970ba0` (PR #108). The layout matches the example
+  that `ossf/scorecard-action`'s README (pinned SHA
+  `2d1146689b8cda280b9bc96326124645441f03bc`, section "Workflow Example") links:
+  `ossf/scorecard` `.github/workflows/scorecard-analysis.yml` at
+  `d13ba3f3355b958d5d62edc47282a2e7ed9fa7c1`, where the action writes
+  `results_file: results.sarif` and the same job, holding `security-events:
+  write`, uploads it with `github/codeql-action/upload-sarif`. The README's
+  Inputs table (`results_file`, `results_format`) and its list of approved
+  steps say the same, and its private-repository snippet marks
+  `security-events: write` as "Required when publishing results (badge / API /
+  code scanning)". Observed upload: `gh api --paginate
+  "repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?ref=refs/heads/main&per_page=100"`
+  lists Scorecard analyses for commit `4970ba0`: `supply-chain/branch-protection`
+  (1 result, analysis 1823007546), `supply-chain/local` (5, 1823007605) and
+  `supply-chain/online-scm` (3, 1823007675), with `osv-scanner` (0, 1823007099)
+  and `zizmor` (0, 1823008464) on the same commit, read 2026-09-23. `analysis` is the only job in
+  the workflow and the only one with `security-events: write`
+  (`tests/test_workflow_hardening.py` `ScorecardTests`). Unlike the two
+  security-scan uploads, it is not split: `ossf/scorecard-action` itself takes
+  `repo_token` (default `github.token`) in that job, as its upstream layout
+  prescribes; a split would need the action to run in a read-only job, which
+  its README does not document. **Keep-but-compare:** measured comparison is a
+  dispatch run with the action in a `contents: read` job plus a separate upload
+  job; if it produces the same analyses, split it.
+- **Alternatives.** Set `publish_results: true` (rejected: publishes to the
+  public `api.scorecard.dev` dataset and badge, which this unit's scope
+  keeps off). Keep the artifact only, with no code-scanning upload (rejected:
+  findings would sit in a 5-day artifact nobody is required to open, instead
+  of surfacing next to CodeQL/OSV/zizmor alerts).
+- **Decision.** Keep `publish_results: false` and the 5-day artifact, and add
+  the code-scanning upload in the same job that already ran Scorecard so no
+  second run or separate job is needed.
+- **Overturn.** Duplicate or noisy alerts that nobody triages for 30 days.
 
 ## 6. Dependency review gate
 
 - **Evidence.** `warn-only: true` "overrid[es] `fail-on-severity`" (`action.yml`
   at `a1d282b3`). The graph has been on since the PR #78 correction. It passed
   on #97 and #98 (12-17 s).
+- **Alternatives.** Keep `warn-only: true` and report-only status (rejected:
+  the graph correction removed the only blocker to gating, and a report-only
+  advisory scan that nobody must act on does not close the gap). Gate at
+  `critical` instead of `high` (rejected: leaves high-severity advisories
+  with a fix available unblocked; #97 and #98 are the only measured samples
+  of the gate running at `high`, and both are Dependabot security-fix PRs
+  that passed in 12-17 s, so they show the gate's latency is low, not that
+  a `high` threshold would stay quiet on a PR introducing a new advisory).
+  Gate at `moderate` (rejected,
+  keep-but-compare: no measured 30-day run at `moderate` exists yet to show
+  its false-positive rate on this repository's dependency set).
 - **Decision.** `fail-on-severity: high`, `warn-only` removed, and
   `dependency-review` is a required check in the target ruleset.
 - **Overturn.** A high-severity block with no fix path that needs an
@@ -298,6 +378,14 @@ noisy alerts that nobody triages for 30 days.
   a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
+
+- **Stale lane text, recorded here only.** The lane-sourced Dependabot
+  alternative in `catalogs/landscape/foundation.json` (rendered into
+  `catalogs/sota-convergence/layer-verdicts-20260922.json` and the handbook's
+  generated verdict block) still says Dependabot owns only GitHub Actions
+  references. Since the 2026-09-23 fixture entry that is no longer exact. Sealed
+  lane outputs are not edited by hand; the next recorded lane run for that layer
+  replaces the text, and this bullet is the correction until then.
 
 ## 9. Tag-only immutable release
 
@@ -377,9 +465,14 @@ noisy alerts that nobody triages for 30 days.
   Request Alerts" checks passed on #97 and #98. It is not required.
   **Overturn:** remove it if its PR alerts add nothing beyond
   dependency-review across the next 10 PRs.
-- **harden-runner stays audit** on 18 of 22 ubuntu jobs; the other 4 are
-  hash-frozen exemptions. Block mode needs a per-job allow-list backed by
-  audit runs.
+- **harden-runner stays audit** on 21 of 25 ubuntu jobs (measured 2026-09-23
+  at HEAD, counting every job across `.github/workflows/*.yml` whose
+  `runs-on` is a literal `ubuntu-` label with `tests/test_workflow_hardening.py`'s
+  own job/first-step parser); the other 4 are hash-frozen exemptions
+  (`native-offhost-app-state.yml`'s `source` and `destination`,
+  `native-offhost-restore.yml`'s `synthetic-restore`, and
+  `native-token-e2e.yml`'s `native-token-tools`). Block mode needs a per-job
+  allow-list backed by audit runs.
 - **Renovate stays deferred.** No custom-manager gap is shown; Mend's hosted
   app is free, but it would duplicate Dependabot's ownership
   ([comparison](https://docs.renovatebot.com/bot-comparison/)).
@@ -487,3 +580,516 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 - **Related setting, owned elsewhere.** `can_approve_pull_request_reviews` was set to true by
   the bot-PR live test (#95, recorded in #110). It is not part of this change's target.
+
+## Blind comparison (2026-09-23)
+
+- **Why.** Two independent implementations of the same approved
+  GitHub-automation plan existed per repository (the merged one above and an
+  unmerged one built in parallel by a side agent of the same session). The
+  user asked for a blind comparison and to merge the winner.
+- **Protocol.** Preregistered before evaluation (`PREREGISTRATION.md`, with
+  Amendment 1 recorded after the first run and before re-judging: neutral
+  protocol ids after a repository-name leak, two harness defects fixed,
+  frozen per-command results added; metrics, thresholds and closure rule
+  unchanged). Arms had opaque labels; the key stayed sealed. Metrics:
+  `defect_weight` (10/3/1 per confirmed high/medium/low; confirmed = single-arm
+  reviewer claim not refuted by an independent source-reading refuter),
+  `battery_pass_rate` (identical fixed battery emulating the workflows with
+  fake scanners; the agent-lab hermetic check ran under bubblewrap with host
+  paths hidden), `requirements_met_rate` (shared requirement list), and
+  `own_suite_pass`. Closure by `tools/compare/closure.mjs`: the challenger
+  overturns only if better on defects AND not worse on the other three.
+- **Harness validation.** Positive controls reproduced known outcomes (the
+  pre-fix commit's findings-path report loss; the hermetic failure a hosted
+  run had shown).
+- **Results (run `wf_40347d59-2e8`, second pass).** Catalog `cmp-a`:
+  incumbent `defect_weight` 5, battery 1.0 (13/13), requirements 0.90, own
+  suite 1; challenger 10, 0.9231 (fails the analyzer-crash check), 0.8333,
+  1 -> closure "retain". agent-lab `cmp-b`: incumbent 10, 1.0 (8/8),
+  requirements 0.90, own suite 1; challenger 7, 1.0, 0.80, 1 -> closure
+  "retain" (challenger better on defects only). Publication gate passed for
+  both: 3 of 3 blind refuters did not refute, 0 leak votes, judge leak false.
+- **Outcome.** The merged implementation is the winner in both repositories,
+  so nothing is replaced; the winner's confirmed defects are fixed in this
+  change (the preregistered graft rule).
+- **Limitations.** The battery was authored by the coordinator, who had seen
+  earlier review findings on both arms; the challenger branches were built on
+  older bases; one incumbent acceptance-command result was dropped when the
+  packet was built (the battery file shows all 10 commands exit 0, so
+  `own_suite_pass` is unaffected); the completeness critic ran before closure
+  files existed.
+
+## verdict-review-gate (2026-09-23)
+
+- **Evidence.** The coordinator's audit found that a PR changing layer-verdict rows could merge
+  with 0 reviews. The live ruleset readback (`gh api .../rulesets/23739774`, 2026-09-23T15:16Z)
+  shows `required_approving_review_count: 0` and `require_code_owner_review: false`. The required
+  checks are `validate`, `token-report`, `secret-scan`, `dependency-review` and `osv-scanner`.
+  `gh api .../collaborators` returns 1 collaborator. Review of #122 (findings 1, 2, 4 and 6) showed
+  that CI compared the hashes of a new-wave row but not its agreement, its winners, its
+  single-lane authorization or earlier wave registry entries.
+- **Alternatives.**
+  - Required approvals: they block the only maintainer, who cannot approve their own PR.
+  - CODEOWNERS review: the existing `*` rule already names the only owner, so requesting a
+    review from the author adds nothing.
+  - Relying on `validate` alone: `scripts/landscape.py` checks what a row claims against its own
+    files. It does not compare the row with the base, and it does not recompute agreement or
+    winners from the sealed returns.
+- **Decision.** The new `verdict-review-gate` job in `validate.yml` runs
+  `scripts/verdict_review_gate.py` on every pull request, with no path filter, and on each push
+  to `main`. Any row that is added or changed outside the grandfathered 20260922 wave needs all
+  of the following:
+  - a registered wave document and a registered run manifest that lists the row;
+  - registered, hash-matching sealed returns from two distinct model families;
+  - an agreement that matches the one recomputed from the two sealed returns, and winners that
+    match the chosen lane's keys resolved through the sealed packet, with the candidate's
+    repository, recipe reference and pin and that lane's evidence class and `why_selected`. With no
+    sealed packet the row fails closed until finding 6 lands;
+  - published `alternatives`, `verdict_overturn_when` and `overturn_protocol` equal to what
+    `record_verdicts.py` derives from the sealed returns (`open_gaps` is re-checked with the row,
+    not re-derived);
+  - for a `disagree` row, an adjudication in which judges from both lane families agree in both
+    presentation orders with no refuting vote. A third-family judge is recorded but not required;
+  - for a `codex_absent` row, a `docs/decisions/` record that carries
+    `single-lane-authorization: <catalog>/<layer_id>`.
+
+  Every changed `platform_status` value must be the one `scripts/platform_status.py` derives.
+  Every base wave entry except the newest must be unchanged (the newest too once the PR registers
+  a newer wave; review of #135, M1). The rows always come from `build_verdicts.LEDGER_FILES`, and the head's landscape manifest must name exactly those files,
+  so a decoy ledger cannot be validated in place of the published one. The job runs the base
+  commit's copy of the gate against the PR checkout. A PR that changes verdict rows, waves or
+  sealed artifacts together with the gate's trust base (the gate, the modules it imports and
+  runs, the verdict tools, `validate.yml`) fails. `.github/main-ruleset.json` adds the
+  check. The coordinator applies the ruleset after merge, and until then the check reports but
+  does not block.
+- **Review of the gate (2026-09-23).** An independent review found a decoy-ledger bypass (the
+  manifest could point `scripts/landscape.py` at a copy while the published ledger changed), that
+  the gate ran the PR's own code, that a winner's repository and recipe reference and the published
+  alternatives were not tied to the sealed evidence, and that a base read error counted as an absent
+  file. All four are closed with a negative-control test each. It also noted that
+  `strict_required_status_checks_policy` stays `false` (a standing choice asserted by
+  `tests/test_workflow_hardening.py`): a squash merged after `main` gained or changed a wave is then
+  judged against the older base, and only the push-to-`main` run catches it, after the merge.
+- **Measured.** `tests/test_verdict_review_gate.py` has 61 synthetic-fixture tests (45 before the review). They cover the
+  negative controls (missing, stale or unregistered lane files, same-family lanes, adjudications
+  that are missing, one-order, one-family or refuted, a row missing from its run manifest, an
+  unregistered wave, a declared platform upgrade, edited winner fields, a relabelled agreement, mismatched packets,
+  swapped winners, missing packets, the single-lane path rules and a rewritten earlier wave) and
+  the positive controls. Two mutations of the real checkout both exit 1 and were then restored:
+  moving `foundation/workers` into an unsealed 20260923 wave, and deleting one of its sealed
+  20260922 lane files. After the review, further real-checkout mutations also exit 1: a decoy
+  landscape manifest with an unevidenced real-ledger edit, and a head that widens
+  `GRANDFATHERED_RUN_IDS` judged by the base's gate.
+- **Second review of the gate (2026-09-23).** A second independent review raised six findings.
+  All six are closed here, and finding 2 is closed as an accepted residual.
+  - **Finding 1 (row rollback or deletion, medium).** Every `(catalog, layer_id)` row at the
+    base must still exist at the head, and there is one row per layer. The head row's run id may
+    not be older than the base row's; the grandfathered 20260922 is the oldest. A run id may
+    change only to the newest registered wave, and the row then needs the full new-wave
+    evidence. A row may not move from a new wave to grandfathered content.
+  - **Finding 3 (generator format changes, low).** Rows, wave documents and the registry are
+    compared on parsed values, and a frozen document's registry sha256 must match its reformatted
+    bytes. A pure reformat therefore passes and is not a verdict change for the trust-base rule.
+    `build_verdicts.py --check` still runs on it.
+  - **Finding 4 (trust base, low).** `TRUST_PATHS` adds `scripts/validate.py` (imported through
+    `scripts/host_receipts.py`), `tools/sota-convergence/lane-provenance.json` and
+    `adoption/host-receipt.schema.json`. A test derives the transitive repository imports of the
+    gate and its validators, and the rule inputs they read, from the modules themselves.
+  - **Finding 5 (base selection, low).** On `pull_request` the base is the checked-out merge
+    commit's first parent. The payload `base.sha` must be an ancestor of it, and the job fails
+    closed when neither is available. On a push to `main` the base is `github.event.before`, and
+    the job fails closed on an empty or all-zero value.
+  - **Finding 6 (alignment with the tooling owner's #124, low).** A row's packet is resolved
+    through its run-manifest entry (`packet_sha256`, `retained_packets`, `packets_sha256sums`),
+    not an assumed file name. A sealed packet a changed row relies on may carry no withheld key at
+    any depth. `lanes.run_manifest_sha256`, `lanes.adjudication_sha256` (bound also to the run
+    manifest's `adjudication`) and `lanes.single_lane_decision_sha256` are required and must
+    match. The names are #124's module constants, and a test compares them with
+    `scripts/landscape.py` once #124 defines them there.
+- **Measured (second review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 92
+  synthetic-fixture tests (61 before), and `tests/test_workflow_hardening.py` has 7
+  `VerdictReviewGateTests`. The new negative controls cover a rollback to 20260922 content, a
+  deleted grandfathered or new-wave row, a downgrade to an older non-grandfathered wave, a move
+  to an unregistered wave or to a registered wave that is not the newest, two rows for one layer,
+  a stale frozen-document sha256, a missing or wrong `run_manifest_sha256`, `adjudication_sha256`
+  or `single_lane_decision_sha256`, a packet missing from the run manifest, a packet or
+  SHA256SUMS other than the run manifest's, and seven withheld-key packets. Positive controls
+  cover a pure reformat with its sha256 updated and a generator change together with its
+  regenerated documents. Real-checkout mutations were run in a scratch worktree with
+  `--base HEAD` and then restored:
+  - deleting `foundation/workers` exits 1;
+  - rolling it back from a committed 20260923 base to its 20260922 content exits 1;
+  - downgrading it from 20260924 to 20260923 exits 1;
+  - moving it to an unregistered 20260925 wave exits 1;
+  - reformatting both real ledgers exits 0, with `scripts/landscape.py` and
+    `build_verdicts.py --check` run and passing.
+
+  With #124's `scripts/landscape.py` and `tools/sota-convergence/` (origin
+  `claude/verdict-integrity-2-20260923` at 238c754) overlaid in a scratch worktree, the 92 tests
+  also pass, including the constant-name comparison. This is a local integration check of the
+  unmerged branch, not of its merged form.
+- **Third review of the gate (2026-09-23).** A third independent review raised one medium
+  and four low findings. All are closed except the second, which is recorded as documented scope.
+  - **Finding 1 (relabelled status, medium).** A recorded newest-wave row could be relabelled
+    `pending_lanes` or `no_selection` with its winners, alternatives and overturn text cleared,
+    and it passed, because nothing derived `verdict_status` from the sealed evidence. The gate
+    now derives the status `record_verdicts.py` writes (`recorded` for agreeing lanes, an
+    adjudicated disagreement or an authorized single lane, unless no indexed alternative remains;
+    `pending_lanes` otherwise) and fails a row with any other status. A new-wave row is never
+    `no_selection`. Negative controls: an agreeing row relabelled `pending_lanes` and relabelled
+    `no_selection`, an adjudicated disagreement relabelled `pending_lanes`, a single-lane row
+    relabelled `pending_lanes` with its decision hash dropped, an added `no_selection` row, and a
+    `recorded` row with no remaining alternative.
+  - **Finding 2 (free-form published fields, low).** `open_gaps` text and the wave document's
+    `title`, `group`, `overturn_when` and `checked_at` are not re-derived within the newest wave.
+    This is now stated in `docs/github-automation.md`; frozen waves are compared whole.
+  - **Finding 3 (fail-open git error, low).** A failing `git diff` or `git ls-files` while
+    listing changed paths raises a read error (exit 2) instead of counting as no change.
+  - **Finding 4 (duplicate JSON keys, low).** Every parse in the gate uses
+    `catalog_decisions.unique_json`; a duplicate key is not equivalent and a malformed ledger or
+    registry exits 2.
+  - **Finding 5 (empty name-alignment test, low).** #124's constant values at 238c754 are
+    pinned as literals and asserted unconditionally; the comparison with `scripts/landscape.py`
+    skips with a reason until #124 defines the names there.
+  - *Residual.* A `codex_absent` row relabelled `pending_lanes` with `lanes.single_lane_decision`
+    removed is what `record_verdicts.py` writes without `--allow-single-lane`, and the run manifest
+    does not record the decision, so it cannot be told apart and passes. It withdraws a
+    single-family verdict. It cannot add one only since the fourth review (G2): until then the
+    authorization was read from the head alone, so a PR could add it with the row it authorized.
+- **Fourth review of the gate (2026-09-23).** A fourth independent review raised two medium and
+  two low findings. All four are closed.
+  - **G1 (platform_status forgery, medium).** The gate compared a winner's repository, recipe
+    reference, evidence class, `why_selected` and packet pin, but not its `evidence_refs`, and not
+    its pin when the packet had none. `platform_status` was then derived from the head winner's own
+    refs and pin. A row could cite any registered `evidence/` file, or add a pin matching some host
+    receipt, and raise its status. Each winner apart from `platform_status` must now equal
+    `record_verdicts.build_winners` output (refs normalized against the head, the packet pin, else
+    the row's v1 candidate pin, else `unpinned`, and no other key). `platform_status` is derived
+    from the sealed refs and a sealed pin: the packet pin, else a pin the base's row candidates
+    already carry, else `unpinned`, which binds no receipt. A platform-only change is resolved the
+    same way.
+  - **G2 (same-PR single-lane authorization, medium).** The decision record named by
+    `lanes.single_lane_decision` must exist at the base with the same bytes (`git show
+    <base>:<path>`). An authorization added or edited in the PR that adds its row fails, and the
+    derived status is then `pending_lanes`.
+  - **G3 (hand-written read list, low).** The test that claimed to derive the rule inputs listed
+    three constants. It now records every file opened (a `sys.addaudithook`, in a subprocess)
+    while the gate judges a fixture that reaches the agreeing, adjudicated and single-lane paths,
+    and while `scripts/landscape.py` and `build_verdicts.py --check` check this checkout. Every
+    head-side read of the gate must be a `TRUST_PATHS` file or verdict data named in
+    `HEAD_DATA_BINDINGS` with what binds it. Every code, schema or tool-registry read of the
+    validators must be a `TRUST_PATHS` file. The derivation found two unbound rule inputs, both
+    now bound. The first is the canonical repository index (`sources.repository_index`), which
+    decides the derived alternatives and status: a changed row must derive the same alternatives
+    with the base's index. The second is `adoption/manifest.json#/platform_profiles`, read by
+    `host_receipts.platform_profile_map` to decide a receipt's platform identity. It is a
+    `RULE_INPUT_FIELDS` entry under the trust-base rule; the rest of that file stays data.
+  - **G4 (merge-commit premise, low).** On `pull_request` the job now requires HEAD to have
+    exactly two parents, the second equal to the payload's `pull_request.head.sha` (through
+    `env`), and fails closed otherwise. `tests/test_workflow_hardening.py` asserts the text and
+    executes the step's script against a scratch repository. The merge commit passes and calls
+    the gate with its first parent. Three cases exit 1 without calling it: the PR head checked
+    out, a merge commit of another head, and an empty payload head.
+  - *Round-three lows, re-checked.* Fail-open git errors: the base tree read now uses
+    `git ls-tree` and exits 2 when the listing fails, because `git cat-file -e` exits 128 both for
+    an absent path and for a broken repository. Duplicate JSON keys: every gate parse, including
+    the new base index and platform profiles reads, uses `unique_json`. The name-alignment test
+    still asserts #124's pinned literals unconditionally. The free-form published fields remain
+    the recorded residual: `open_gaps` text and the wave document's `title`, `group`,
+    `overturn_when` (the handbook fallback) and `checked_at` are layer metadata or recording
+    dates that no sealed lane return produces, so there is nothing to derive them from.
+- **Measured (fourth review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 127
+  synthetic-fixture tests (107 before), and `tests/test_workflow_hardening.py` has 9
+  `VerdictReviewGateTests` (7 before). Run against the pre-fix gate (09ff4e9), all nine new
+  negative controls fail and the four positive controls pass. The negative controls are forged
+  `evidence_refs`, a pin added where the packet has none (with and without a matching head
+  candidate), a pin changed to match an unrelated receipt, an extra winner key, an authorization
+  added or edited in the same PR, an index edit that withdraws a verdict, and a `platform_profiles`
+  change with a verdict change.
+
+  Real-checkout mutations ran in a scratch detached worktree of b76cd704, which was then
+  removed. It held a committed decision record and a constructed sealed 20260923 wave for four
+  real foundation layers, laid out as the gate requires (#124's retained packets). On it, the
+  gate's own rules (`evaluate`, validators off) pass all four rows. Mutations against that
+  base, gate's own rules:
+  - forged `evidence_refs` on `workers` (a registered `evidence/receipts/` file) with linux
+    `accepted`: fails on the refs and on the derived `conditional`. The pre-fix gate passes it;
+  - `token-efficiency`'s `rtk` pin set to 0.49.0 (the real `evidence/hosts` rtk receipt) with
+    linux `conditional`: fails on the pin and on the derived `not_established`. With a head
+    candidate `source_pin` added too, it fails on the status alone, derived at the sealed pin
+    `unpinned`. The pre-fix gate passes both;
+  - `quality-evaluation`'s `shellcheck` pin changed from the packet's 0.10.0 to the receipt's
+    0.11.0: fails on the pin and on the status. The pre-fix gate fails on the pin only;
+  - the single-lane record edited in the same comparison: fails (`differs from its base copy`).
+    The pre-fix gate passes it;
+  - the same wave judged against the commit before the record landed (authorization in the same
+    PR): fails (`is not at the base`). The pre-fix gate passes it;
+  - control, an `open_gaps` edit: passes.
+
+  The CLI runs with validators, and every one of these runs, the control included, exits 1. The
+  reason is that `scripts/landscape.py` and `build_verdicts.py --check` reject the constructed
+  wave itself: its placeholder wave document and its lane returns have no lane provenance. That
+  exit code is therefore not evidence for these findings. The evidence is the gate's own
+  violation list.
+- **Fifth review of the gate (2026-09-23).** A fifth independent review of the fourth-round
+  change raised one medium and three low findings. The medium and two lows are closed; the third
+  low is an accepted residual (below).
+  - **Sealed citation resolved at the head (medium, the rest of G1).** A sealed
+    `winner_evidence_refs` citation counts only if the cited file exists, and
+    `platform_status` accepts it when `manifests/evidence.json` registers it. Both were read at
+    the head. A citation to a file that did not exist when the row was recorded (so
+    `record_verdicts.py` dropped it) could be made to count by a PR that adds and registers the
+    file, copies it into the row's `evidence_refs` and raises linux to `accepted`. The row's
+    `evidence_refs` still follow `build_winners` at the head. But a changed `platform_status`
+    value may now rank no higher than what `platform_status()` derives from evidence refs that
+    are already at the base with the same bytes (`git ls-tree` blob id) and registered there with
+    that sha256. Negative controls: the citation's file added with the raise, the file added with
+    the row, the cited file rewritten in the same PR, and a base file the base does not register.
+    Positive: the cited file already at the base.
+  - **Same-PR host receipts (low).** Receipts are read from the head, so a receipt added in the
+    PR that raises a status supported it. The same base rule now applies to receipts: a raised
+    value is derived again from only the receipts at the base with the same bytes and registered
+    there. This follows the G2 principle: evidence that raises a status lands in its own earlier
+    PR. A lower or unchanged value is not held to the base. Negative control: the qualifying
+    receipt added with the raise. Positive: the receipt at the base.
+  - **`sota_components` (low).** `build_verdicts.py` publishes each row's `sota_components` from
+    the SOTA manifest the wave's registry entry names, and the newest wave's document may be
+    regenerated, so its manifest could be edited. The manifest every base registry entry names,
+    the newest included, must now keep its pointer and its parsed value. Negative controls: the
+    newest wave's manifest edited, its pointer moved, the grandfathered manifest edited.
+    Positive: a pure reformat. *Residual:* a wave registered for the first time in a PR brings
+    its manifest with it, and nothing binds that manifest to the sealed packets built from it.
+    Proposed fix for the tooling owner (`tools/sota-convergence/record_verdicts.py`, #124's run
+    manifest): record the SOTA manifest's path and sha256 in `run-manifest.json`, which the gate
+    would then compare with the registry entry.
+  - **Self-attested sealed files (low).** Recorded as the accepted residual below. The
+    overturn line and the `validate.yml` comment now describe a consistency check.
+  - *Round-three lows, re-checked again.* `merge_base()` falls back to the given base only when
+    `git merge-base` exits 1 with no output (no common history; comparing with the base tip then
+    reports more changes, not fewer). Any other failure exits 2 (`MergeBaseTests`). Duplicate
+    JSON keys: the new base-registry read uses `unique_json`. The free-form published fields
+    residual now also names `sota_components` of a newly registered wave, above. The
+    name-alignment test is unchanged: it asserts #124's pinned literals unconditionally, and the
+    comparison with `scripts/landscape.py` skips with its reason until #124 defines the names.
+- **Measured (fifth review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 139
+  synthetic-fixture tests (127 before). Three positive controls were rebased so their evidence or
+  receipt is at the base, since they had added it in the same comparison. Run against the pre-fix
+  gate (7eadf1e6), all nine new negative controls fail. They are five `platform_status` cases
+  (a late citation, evidence added with the row, rewritten, or unregistered at the base, and a
+  same-PR receipt), three SOTA manifest cases and the merge-base git failure. The positive
+  controls pass on both gates.
+
+  Real-checkout mutations ran in a scratch detached worktree of b316f3f9, which was then
+  removed. It held a committed decision record and the constructed sealed 20260923 wave for four
+  real foundation layers, whose `workers` claude return cites `evidence/scratch-new.json`, absent
+  when the row was recorded. Results of the gate's own rules (`evaluate`, validators off), new
+  gate against the 7eadf1e6 gate:
+  - the late citation's file added and registered, copied into `workers`' `evidence_refs`, with
+    linux `accepted`: the new gate fails, deriving `conditional`; the old gate passes it;
+  - the same with the file already at the base: passes on the new gate;
+  - a schema-valid `shellcheck` install receipt at the sealed pin 0.10.0 added with
+    `quality-evaluation` linux raised to `conditional`: the new gate fails, deriving
+    `not_established`; the old gate passes it. With the receipt at the base, the raise passes;
+  - `manifest-20260923.json` (registered by the wave) edited: the new gate fails; the old gate
+    passes it;
+  - G2 re-run: the single-lane record edited in the same comparison, and the wave judged against
+    the commit before the record landed, both fail on both gates;
+  - control, an `open_gaps` edit: passes on both.
+
+  As in the fourth round, the CLI exits 1 on every run, the control included. The cause is that
+  `scripts/landscape.py` and `build_verdicts.py --check` reject the constructed wave. Only the
+  gate's own violation list is evidence here.
+- **Sixth review (2026-09-23, coordinator-applied).**
+  - *Fixed, medium:* a pin change behind an unchanged declared status. The no-packet-pin fallback
+    now comes from the base row's candidates, so a candidates-only pin change fails the pin check
+    and has to land in its own PR. An unchanged platform value is now skipped only when the
+    winner's `pin`, `evidence_refs` and `evidence_class` are unchanged too; otherwise it is
+    re-derived.
+    - Negative controls: a candidates pin moved to 9.10 with a same-PR 9.10 receipt; changed
+      evidence_refs behind an unchanged status; a re-sealed pin 1.0 to 2.0 behind an unchanged
+      `accepted`.
+    - Each is mutation-checked: reverting either half of the fix makes its test fail.
+  - *Recorded, low: grandfathered rows.* A changed row of the grandfathered 20260922 wave gets no
+    row check of its own. Only `build_verdicts.py --check`'s frozen projection covers it. That wave
+    is superseded at the 20260923 re-record, which is when this residual ends.
+  - *Recorded, low: single-lane authorization scope.* An authorization line
+    `single-lane-authorization: <catalog>/<layer_id>` is not scoped to a wave. Once it is at the
+    base, it also authorizes a later wave's `codex_absent` row for that layer.
+    - Proposed fix for the tooling owner: include the run id in the line, as
+      `<catalog>/<layer_id>@<run-id>`, and have landscape.py and this gate require it.
+- **Review of #135 (2026-09-23, evidence-reviewer Opus/high; fixes in the same PR).**
+  - *Fixed, high (H1): a retargeted PR reused a stale green gate.* The `pull_request` trigger had
+    no `types`, so a base-branch change (the `edited` event) did not re-run the job, and the job
+    never checked the base branch. A PR from `f` to `t`, where `t` already held a rule-breaking
+    change and `f` only a harmless file, passed; `gh pr edit --base main` then kept that result.
+    The trigger now lists `[opened, synchronize, reopened, edited]`, and the job fails closed on a
+    `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed as `PR_BASE_REF` through the
+    step's `env`, never interpolated into `run:`) is not `main`. Push-to-`main` runs are unchanged.
+    Tests: the trigger lists `edited`; the executed step script fails for `develop`, `main-copy` and
+    an empty base ref and runs the gate for `main`. Reproduced live on GitHub below (round 2).
+    - Round 2 (low, defence in depth): the step only checked that the payload `base.sha` is an
+      ancestor of the merge commit's first parent, so a merge commit still built on a stacked
+      branch that contains `main`'s tip would have been judged against that branch. The first
+      parent must now also be an ancestor of `refs/remotes/origin/main` (fetched by
+      `actions/checkout` with `fetch-depth: 0`, whose pinned revision fetches
+      `+refs/heads/*:refs/remotes/origin/*`), or the job fails closed. Test: a merge of the PR
+      head into a stacked branch fails; the merge into `main` runs the gate.
+    - Live on GitHub (hosted runs, 2026-09-23, throwaway draft PR #143). The head was `b241106b`,
+      an empty commit on this branch at `b1bd5e26`. The PR was opened against the stacked
+      branch `claude/h1-live-stacked` (`b1bd5e26`, which contains `main`), then retargeted.
+      1. `opened` against the stacked base: the gate failed closed with "the pull request's
+         base branch is 'claude/h1-live-stacked', not main" (run 35907554093, job 107338919327).
+      2. `gh pr edit --base main`: an `edited` run fired, which confirms that a retarget emits the
+         `edited` type. It checked out `refs/pull/143/merge` at the **stale** merge commit
+         `ca990006` ("Merge b241106b into b1bd5e26"), still built on the old base, while its
+         payload already said `base.ref=main` and `base.sha=3956c924`. The payload base is an
+         ancestor of that first parent, so only the round-2 check stopped it: "the base
+         b1bd5e26… is not a commit on origin/main; failing closed" (run 35907626904, job
+         107339795307).
+         - Without that check the gate would have judged the retargeted PR against the stacked
+           branch. The H1 bypass would have stayed open through the `edited` run, as the round-2
+           reviewer predicted. The check is load-bearing, not only defence in depth.
+         - A re-run keeps the same `GITHUB_SHA`, so it cannot recover.
+      3. Close and reopen: the `reopened` run checked out the rebuilt merge commit `660d58d8`
+         ("Merge b241106b into 3956c924"), and the gate ran and passed (run 35908075608, job
+         107340867643).
+      - The error message now names this recovery: close and reopen, or push a commit.
+      - #143 was then closed and both branches were deleted.
+  - *Fixed, medium (M1): the base's newest wave was rewritable by a PR that registers a newer
+    wave.* Every wave document holds all rows, and once a wave is no longer current
+    `build_verdicts.py --check` checks only its own rows and its registry sha256. When the head
+    registers a wave newer than the base's newest, that newest (non-grandfathered) wave is now
+    frozen: its registry entry, sha256 included, is type-strictly unchanged and its document is
+    byte-identical. Negative controls: a row edited inside the base-newest document with its
+    registry sha256 updated and a newer wave registered fails; a pure reformat of it in that case
+    fails too; registering a newer wave without touching it passes.
+    - Round 2 (medium): the freeze covered only base waves, and only the current wave is
+      regenerated by `build_verdicts.py --check`, so a PR could register two new waves (a forged
+      `20260923` with its correct sha256 beside an honest `20260924`) or one backdated wave and
+      publish a document no check compares with the generator. A newly registered wave must now
+      be the only new run id, the head's newest, and newer than every base wave. Negative
+      controls: two new waves fail; a backdated new wave fails; one new current wave passes.
+    - Round 2 (builder note, closed by the coordinator): with no newer wave registered, the
+      base's newest wave was skipped entirely, so a change that only unregistered it passed the
+      gate. A fixture probe with stub validators confirmed this. Its rows would have stayed in
+      the ledgers with no registered document. The base's newest wave may still change, but
+      removing it now fails.
+      - Test: unregistering it fails.
+      - Mutation-checked.
+  - *Fixed, low (L4): the bootstrap fallback failed open.* The job runs the head's gate only when
+    the base lacks `scripts/verdict_review_gate.py` and `git diff --no-renames --name-status -z
+    <base>...HEAD` shows it added (`A`); any other base without the gate fails closed. Tests: an
+    adding PR bootstraps, a PR that does not add it fails, a base with the gate runs the base copy.
+  - *Fixed, low (L5): number and boolean values compared equal.* Frozen values (rows, wave
+    documents, the registry, rule-input fields and a winner's binding fields) now compare as their
+    canonical `json.dumps(..., sort_keys=True)` text, so `1`, `1.0` and `true` differ. Test: a frozen
+    wave document rewritten `1` to `1.0`, `true` to `1` or `1` to `true` fails.
+    - Round 2 (low, closed by the coordinator): the comparisons of a changed row with what the
+      sealed returns derive were still Python `==`, so a type-only rewrite passed them. These are
+      the winner fields, the published alternatives, `verdict_overturn_when` and
+      `overturn_protocol`. They now use the same helper.
+      - Hardening, not a closed bypass: the gate's own two-family check now applies
+        `judge_adjudication`'s integer rule to `refuting_votes`. `false` and `0.0` already failed
+        in `scripts/landscape.py`'s `judge_adjudication`, which the gate also calls.
+      - Tests (synthetic fixtures):
+        - a sealed `overturn_protocol` number rewritten `12` to `12.0` or `true` fails;
+        - a sealed alternative's `why_not_default` rewritten `1` to `1.0` or `true` fails;
+        - the sealed values pass;
+        - a judgment with `refuting_votes` `false` or `0.0` fails the gate's own check.
+      - Each test was mutation-checked.
+      - Not covered by a type-only test: the six winner fields. `scripts/landscape.py` requires
+        a text pin and an exact `(component_id, repository)` set.
+      - Residual, outside this PR's paths: the gate freezes wave documents, not ledger rows. A
+        changed row that names a grandfathered wave is reported and skipped. Only
+        `tools/sota-convergence/build_verdicts.py` `check_frozen_rows` compares such rows with
+        their frozen document, and it uses `!=` after `normalized()`. A type-only rewrite of a
+        number or boolean in a grandfathered row is therefore not caught by this gate. The
+        lane-return schema is all strings, so the exposure is small. The tooling owner
+        (agent-lab-17) was notified to make that comparison type-strict.
+  - *Hardening:* the changed-path listings use `git diff -z` and `git ls-files -z`, split on NUL. Test:
+    a tracked and an untracked path with a space, a newline and a non-ASCII character are listed as
+    themselves.
+  - *Recorded, low (L3): the self-edit residual.* Confirmed: every required check is defined by the
+    head, including the tests that pin the job and the gate, so a PR can edit the job and its pinning
+    test together. It stays the accepted residual below.
+  - Each new negative control was mutation-checked: reverting its fix makes its test fail.
+- **One withheld-key policy (2026-09-23, after #135 merged).**
+  - *Trigger.* The tooling owner (agent-lab-17) is adding `gap_receipts` and
+    `gap_receipts_note` to `scripts/landscape.py` `TOP_LEVEL_WITHHELD_KEYS` in blind-lanes round
+    2. By the tooling owner's count, those receipts are checks run against the previous winner,
+    and 111 of 249 quote gap text word for word.
+  - *Problem.* The gate kept its own copy of `withheld_packet_keys`, written before #124 merged.
+    It lacked the top-level `current_choice`, `decision` and `rationale` keys, the disposition
+    labels on candidate copies and a non-null `review_status`. It also deliberately left the
+    requirement-gated `archived`/`license` keys and the `withheld[]` policy-label check to
+    `scripts/landscape.py`, as its comment said.
+  - *Not a bypass in CI.* Every verdict-changing PR also runs `scripts/landscape.py` as a
+    validator, and the trust-base rule keeps that file at the base's copy.
+  - *Change.* The gate now imports the base's `scripts/landscape.withheld_packet_keys`, so its own
+    message reports exactly what the validator enforces, and a key the tooling owner adds applies
+    here with no gate change.
+  - *Tests (synthetic fixtures).* The fixture packet now lists the policy labels, as a
+    `--withhold-labels` packet does. Each of these fails: a top-level `decision`, `rationale` or
+    `current_choice`; a copy's `disposition` or non-null `review_status`; a `withheld[]` list
+    missing one label.
+  - *Mutation check (coordinator, local).* With `origin/main`'s gate restored, the identity
+    assertion fails. With that assertion also removed, all six subtests fail.
+  - *Independent review (evidence-reviewer, Opus/high): pass.*
+    - A synthetic comparison found no key or packet that the old copy flags and the landscape
+      policy does not: 1,721 keys and 97,781 packets.
+    - The import resolves to the base worktree's `landscape.py` in the job.
+    - The dropped constant pins are not a weakening. A landscape rules change lands as its own
+      trust-base PR.
+  - *Alternatives.* Keeping the copy and adding the two keys would leave the other five
+    differences and the drift. Relying on the validator alone would drop the gate's earlier,
+    specific message.
+  - *Overturn.* If the gate must judge packets under a different policy from the validator's, it
+    would need its own copy again, pinned by a test against `landscape.py`.
+- **Accepted residual: sealed lane returns are self-attested (fifth review, 2026-09-23).** The
+  gate checks consistency, not provenance. A sealed lane return must match the row's
+  `sealed_sha256` and be registered in the head's `manifests/evidence.json`, which the PR can
+  edit. Its model family is the one the return declares. `scripts/landscape.py` checks that its
+  provenance names a `workflow_path` and sha256 listed in `lane-provenance.json`, not that the
+  return came from that run. A PR that writes its own lane returns (a new wave, or a rewrite of
+  the newest wave with its registrations) and declares a `codex` family passes. The gate does
+  not show that a cross-family review happened.
+  - *Alternatives.* Lane returns produced and attested in CI (GitHub artifact attestations of
+    the lane run), signed returns verified against a key outside the repository, or a
+    base-registered list of lane-return hashes, so each wave's returns land in their own earlier
+    PR. None is adopted. The lanes run on local native clients, not in CI. A signing key would
+    have to live outside the repository and the single maintainer's own sessions. A base
+    hash list moves the same self-attestation one PR earlier.
+  - *Overturn.* The lane runs move into CI with attested outputs, or a second maintainer or
+    external reviewer can countersign a wave. Either makes the provenance checkable and would
+    replace this residual with a verification step.
+- **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
+  `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
+  `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
+  this check.
+  - *Alternatives, all rejected.* A `pull_request_target` or `workflow_run` job would take its
+    definition from the base, but the repository's strict zizmor gate (`--no-config --no-ignores`,
+    `tests/test_workflow_hardening.py`) rejects these dangerous triggers. A ruleset "require
+    workflows" rule is available only to organizations, and this is a personal repository.
+    Required code-owner review would block the single maintainer, who cannot approve their own PR.
+  - *Mitigations in place.* They narrow the residual but do not close it. First, the job
+    executes the base branch's copy of the gate script, and that copy imports the base's trusted
+    modules. A PR that leaves the job running therefore cannot change the rules that judge it.
+    Second, the trust-base rule fails a PR that changes gate-trust files (which include
+    `validate.yml`) together with verdict data, as long as the job still runs the base's gate. To
+    get past it, a PR has to rewrite the job's own step, a visible edit of a workflow file. That
+    was not the only path: until the review of #135 (H1, in the "Review of #135" entry above), retargeting a PR whose gate had
+    passed against another base branch reused that green run with no workflow edit at all. The
+    `edited` trigger type and the job's fail-closed check on a base branch other than `main` close
+    that path. The tests that pin the job's shape and the gate's rules
+    (`tests/test_workflow_hardening.py`, `tests/test_verdict_review_gate.py`) are defined by the
+    head too, so the PR that rewrites the step can rewrite them with it; the cost stays two visible
+    file edits (review of #135, L3).
+    Third, the push-to-`main` run re-checks after merge (asserted by
+    `tests/test_workflow_hardening.py`). It catches a merge judged against a stale base, but it
+    runs the merged commit's job, so it does not catch a PR that disabled that job.
+  - *Overturn.* The repository moves to an organization with required workflows, or GitHub offers
+    base-defined required checks for personal repositories.
+- **Overturn.** A merged PR whose changed verdict row is inconsistent with the sealed evidence
+  its wave registers, while this check was required (the gate checks consistency; the
+  self-attestation residual above bounds what that shows). The other trigger is a second maintainer joining, which would
+  make required approvals possible. The accepted residual above has its own overturn.

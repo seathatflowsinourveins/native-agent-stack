@@ -1,0 +1,1 @@
+{"case": "one_zero", "dividend_cash_usd": "428.64", "evidence_class": "HIST", "fills": 2, "native_end_cash_usd": "90078.96", "processed_bars": 725, "receipt": "/out/native/receipt.json", "reconciled_end_cash_usd": "90507.6000", "two_run_records_equal": true, "unsupported_mappings": ["distributions_and_cash", "market_on_open_proxy"]}

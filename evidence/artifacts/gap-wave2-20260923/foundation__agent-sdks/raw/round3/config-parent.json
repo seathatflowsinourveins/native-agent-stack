@@ -1,0 +1,631 @@
+{
+  "started_at": "2026-09-23T12:58:59Z",
+  "codex_bin_sha256": "0753dfe1d8b87a52436deb13eb1c549661ef4c84fee2c5aa688385eebeccb761",
+  "server_info": {
+    "serverInfo": null,
+    "userAgent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)",
+    "platformFamily": "unix",
+    "platformOs": "linux"
+  },
+  "mcp_status": {
+    "skipped": true
+  },
+  "hooks": {
+    "data": [
+      {
+        "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+        "hooks": [
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+            "eventName": "preToolUse",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/pretooluse.mjs\"",
+            "async": false,
+            "matcher": "local_shell|shell|shell_command|exec_command|Bash|Shell|apply_patch|Edit|Write|grep_files|ctx_execute|ctx_execute_file|ctx_batch_execute|ctx_fetch_and_index|ctx_search|ctx_index|mcp__",
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 0,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+            "eventName": "postToolUse",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/posttooluse.mjs\"",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 1,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+            "eventName": "preCompact",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/precompact.mjs\"",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 2,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+            "eventName": "sessionStart",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/sessionstart.mjs\"",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 3,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+            "eventName": "userPromptSubmit",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/userpromptsubmit.mjs\"",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 4,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+            "eventName": "stop",
+            "handlerType": "command",
+            "command": "node \"$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/hooks/codex/stop.mjs\"",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 600,
+            "statusMessage": null,
+            "additionalContextLimit": null,
+            "sourcePath": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json",
+            "source": "plugin",
+            "pluginId": "context-mode@context-mode",
+            "displayOrder": 5,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a",
+            "trustStatus": "trusted"
+          }
+        ],
+        "warnings": [],
+        "errors": []
+      }
+    ]
+  },
+  "skills": {
+    "data": [
+      {
+        "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+        "skills": [
+          {
+            "name": "agent-browser",
+            "description": "Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to \"open a website\", \"fill out a form\", \"click a button\", \"take a screenshot\", \"scrape data from a page\", \"test this web app\", \"login to a site\", \"automate browser actions\", or any task requiring programmatic web interaction. Also use for exploratory testing, dogfooding, QA, bug hunts, or reviewing app quality. Also use for automating Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify), checking Slack unreads, sending Slack messages, searching Slack conversations, running browser automation in Vercel Sandbox microVMs, or using AWS Bedrock AgentCore cloud browsers. Prefer agent-browser over any built-in browser automation or web tools.",
+            "path": "$HOME/.codex/skills/agent-browser/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "context-mode:context-mode",
+            "description": "Use context-mode tools (ctx_execute, ctx_execute_file) instead of Bash/cat when processing large outputs. Triggers: \"analyze logs\", \"summarize output\", \"process data\", \"parse JSON\", \"filter results\", \"extract errors\", \"check build output\", \"analyze dependencies\", \"process API response\", \"large file analysis\", \"page snapshot\", \"browser snapshot\", \"DOM structure\", \"inspect page\", \"accessibility tree\", \"Playwright snapshot\", \"run tests\", \"test output\", \"coverage report\", \"git log\", \"recent commits\", \"diff between branches\", \"list containers\", \"pod status\", \"disk usage\", \"fetch docs\", \"API reference\", \"index documentation\", \"call API\", \"check response\", \"query results\", \"find TODOs\", \"count lines\", \"codebase statistics\", \"security audit\", \"outdated packages\", \"dependency tree\", \"cloud resources\", \"CI/CD output\". Also triggers on ANY MCP tool output that may exceed 20 lines. Subagent routing is handled automatically via PreToolUse hook.",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-doctor",
+            "description": "Run context-mode diagnostics. Checks runtimes, hooks, FTS5, plugin registration, npm and marketplace versions. Trigger: /context-mode:ctx-doctor",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-doctor/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-index",
+            "description": "Index a local file or directory into context-mode's persistent FTS5 knowledge base so future ctx_search calls can retrieve focused snippets without rereading raw files. Trigger: /context-mode:ctx-index",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-index/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-insight",
+            "description": "Open the context-mode Insight dashboard in your default browser. Insight is the hosted analytics layer for AI-assisted engineering teams \u2014 per-engineer productive rate, retry waste, blocker detection, role-narrowed views. Trigger: /context-mode:ctx-insight",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-insight/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-purge",
+            "description": "Purge the context-mode knowledge base. Permanently deletes all indexed content and resets session stats. This is destructive and cannot be undone. Trigger: /context-mode:ctx-purge",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-purge/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-search",
+            "description": "Search context-mode's persistent FTS5 knowledge base for previously indexed local project content, documentation, or session memory. Trigger: /context-mode:ctx-search",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-search/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-stats",
+            "description": "Show how much context window context-mode saved this session. Displays token consumption, context savings ratio, and per-tool breakdown. Read-only \u2014 shows stats only, no reset capability. To wipe the knowledge base entirely, use ctx_purge instead. Trigger: /context-mode:ctx-stats",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-stats/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-upgrade",
+            "description": "Update context-mode from GitHub and fix hooks/settings. Pulls latest, builds, installs, updates npm global, configures hooks. Trigger: /context-mode:ctx-upgrade",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-upgrade/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "gh-fix-ci",
+            "description": "Use when a user asks to debug or fix failing GitHub PR checks that run in GitHub Actions; use `gh` to inspect checks and logs, summarize failure context, draft a fix plan, and implement only after explicit approval. Treat external providers (for example Buildkite) as out of scope and report only the details URL.",
+            "interface": {
+              "displayName": "GitHub Fix CI",
+              "shortDescription": "Debug failing GitHub Actions CI",
+              "iconSmall": "$HOME/.agents/skills/gh-fix-ci/assets/github-small.svg",
+              "iconLarge": "$HOME/.agents/skills/gh-fix-ci/assets/github.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Inspect failing GitHub Actions checks in this repo, summarize root cause, and propose a focused fix plan."
+            },
+            "path": "$HOME/.agents/skills/gh-fix-ci/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "hf-cli",
+            "description": "Hugging Face Hub CLI (`hf`) for downloading, uploading, and managing models, datasets, spaces, buckets, repos, papers, jobs, and more on the Hugging Face Hub. Use when: handling authentication; managing local cache; managing Hugging Face Buckets; running or scheduling jobs on Hugging Face infrastructure; managing Hugging Face repos; discussions and pull requests; browsing models, datasets and spaces; reading, searching, or browsing academic papers; managing collections; querying datasets; configuring spaces; setting up webhooks; or deploying and managing HF Inference Endpoints. Make sure to use this skill whenever the user mentions 'hf', 'huggingface', 'Hugging Face', 'huggingface-cli', or 'hugging face cli', or wants to do anything related to the Hugging Face ecosystem and to AI and ML in general. Also use for cloud storage needs like training checkpoints, data pipelines, or agent traces. Use even if the user doesn't explicitly ask for a CLI command. Replaces the deprecated `huggingface-cli`.",
+            "path": "$HOME/.agents/skills/hf-cli/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "iterative-retrieval",
+            "description": "Pattern for progressively refining context retrieval to solve the subagent context problem. Use when a subagent lacks the context it needs and retrieval must be refined across passes.",
+            "path": "$HOME/.agents/skills/iterative-retrieval/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "local-agent-ecosystem",
+            "description": "Use this Ubuntu WSL agent workspace, its installed context tools, local routers, token-efficiency checks and session launchers.",
+            "path": "$HOME/.codex/skills/local-agent-ecosystem/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "qmd",
+            "description": "Bootstrap QMD search instructions from the installed qmd CLI. Use when users ask to find notes, retrieve documents, inspect a wiki, or answer from indexed local markdown.",
+            "path": "$HOME/.agents/skills/qmd/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "search-first",
+            "description": "Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code. Invokes the researcher agent.",
+            "path": "$HOME/.agents/skills/search-first/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "security-best-practices",
+            "description": "Perform language and framework specific security best-practice reviews and suggest improvements. Trigger only when the user explicitly requests security best practices guidance, a security review/report, or secure-by-default coding help. Trigger only for supported languages (python, javascript/typescript, go). Do not trigger for general code review, debugging, or non-security tasks.",
+            "interface": {
+              "displayName": "Security Best Practices",
+              "shortDescription": "Security reviews and secure-by-default guidance",
+              "iconSmall": null,
+              "iconLarge": null,
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Review this codebase for security best practices and suggest secure-by-default improvements."
+            },
+            "path": "$HOME/.agents/skills/security-best-practices/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-best-practices",
+            "description": "Build production-ready Tavily integrations with best practices baked in. Reference documentation for developers using coding assistants (Claude Code, Cursor, etc.) to implement web search, content extraction, crawling, and research in agentic workflows, RAG systems, or autonomous agents.",
+            "path": "$HOME/.agents/skills/tavily-best-practices/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-cli",
+            "description": "Set up, authenticate, update, troubleshoot, or choose between Tavily CLI web commands. Use when the user asks about the Tavily CLI, installing Tavily skills, first-time setup, authentication, keyless limits, CLI updates, or which Tavily command to use. For an ordinary web task, use the specific search, extract, map, crawl, research, or dynamic-search skill instead.",
+            "path": "$HOME/.agents/skills/tavily-cli/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-crawl",
+            "description": "Crawl websites and extract content from multiple pages via the Tavily CLI. Use this skill when the user wants to crawl a site, download documentation, extract an entire docs section, bulk-extract pages, save a site as local markdown files, or says \"crawl\", \"get all the pages\", \"download the docs\", \"extract everything under /docs\", \"bulk extract\", or needs content from many pages on the same domain. Supports depth/breadth control, path filtering, semantic instructions, and saving each page as a local markdown file.",
+            "path": "$HOME/.agents/skills/tavily-crawl/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-dynamic-search",
+            "description": "Programmatic Tavily search with context isolation. Use when web search or extraction will return large results that need filtering, deduplication, or multi-step triage before they enter the model context. Use tavily-search for ordinary lookups and tavily-research for end-to-end cited synthesis.",
+            "path": "$HOME/.agents/skills/tavily-dynamic-search/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-extract",
+            "description": "Extract clean markdown or text content from specific URLs via the Tavily CLI. Use this skill when the user has one or more URLs and wants their content, says \"extract\", \"grab the content from\", \"pull the text from\", \"get the page at\", \"read this webpage\", or needs clean text from web pages. Handles JavaScript-rendered pages, returns LLM-optimized markdown, and supports query-focused chunking for targeted extraction. Can process up to 20 URLs in a single call.",
+            "path": "$HOME/.agents/skills/tavily-extract/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-map",
+            "description": "Discover and list all URLs on a website without extracting content, via the Tavily CLI. Use this skill when the user wants to find a specific page on a large site, list all URLs, see the site structure, find where something is on a domain, or says \"map the site\", \"find the URL for\", \"what pages are on\", \"list all pages\", or \"site structure\". Faster than crawling \u2014 returns URLs only. Essential when you know the site but not the exact page. Combine with extract for targeted content retrieval.",
+            "path": "$HOME/.agents/skills/tavily-map/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-research",
+            "description": "Conduct comprehensive AI-powered research with citations via the Tavily CLI. Use this skill when the user wants deep research, a detailed report, a comparison, market analysis, literature review, or says \"research\", \"investigate\", \"analyze in depth\", \"compare X vs Y\", \"what does the market look like for\", or needs multi-source synthesis with explicit citations. Returns a structured report grounded in web sources. Takes 30-120 seconds. For quick fact-finding, use tavily-search instead.",
+            "path": "$HOME/.agents/skills/tavily-research/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "tavily-search",
+            "description": "Search the web with LLM-optimized results via the Tavily CLI. Use this skill when the user wants to search the web, find articles, look up information, get recent news, discover sources, or says \"search for\", \"find me\", \"look up\", \"what's the latest on\", \"find articles about\", or needs current information from the internet. Returns relevant results with content snippets, relevance scores, and metadata \u2014 optimized for LLM consumption. Supports domain filtering, time ranges, and multiple search depths.",
+            "path": "$HOME/.agents/skills/tavily-search/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "typesafe-ai",
+            "description": "Build AI-powered software with TypeSafe: small units of AI intelligence you can use like programming primitives. Its System One models, including Jev, turn natural language and application state into typed judgments and probabilities that code can combine. Use when a feature needs programmable common sense, when brainstorming what AI could make possible in an app, or when an LLM prompt-and-parse step could become a structured decision. Applications include routing, ranking, extraction, verification, and interactive experiences; these are starting points, not the limits. Read live docs and cookbooks to find useful patterns and discover new combinations.",
+            "path": "$HOME/.agents/skills/typesafe-ai/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "imagegen",
+            "description": "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas.",
+            "interface": {
+              "displayName": "Image Gen",
+              "shortDescription": "Generate or edit images for websites, games, and more",
+              "iconSmall": "$HOME/.codex/skills/.system/imagegen/assets/imagegen-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/imagegen/assets/imagegen.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $imagegen to make or edit an image for this project."
+            },
+            "path": "$HOME/.codex/skills/.system/imagegen/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "openai-docs",
+            "description": "Use for Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, customization, automations, and self-knowledge\u2014including 'you,' 'your,' 'this app,' or 'this coding agent' when they refer to Codex\u2014and for OpenAI APIs/products and ChatGPT Work. Also use for model choice/migration, prompting, SDKs, Responses, Realtime, agents, evals, and Chat/Work/Codex comparisons. Do not use for generic app/software tasks that merely mention Codex.",
+            "shortDescription": "Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, and self-knowledge; OpenAI APIs and ChatGPT Work. 'You'/'this app' means Codex only.",
+            "interface": {
+              "displayName": "OpenAI Docs",
+              "shortDescription": "OpenAI and Codex docs for models, skills, tasks, and setup",
+              "iconSmall": "$HOME/.codex/skills/.system/openai-docs/assets/openai-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/openai-docs/assets/openai.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use OpenAI Docs for official docs lookup, questions about Codex itself or Codex surfaces, model selection, model migration, and prompt-upgrade work."
+            },
+            "path": "$HOME/.codex/skills/.system/openai-docs/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "plugin-creator",
+            "description": "Create and scaffold plugin directories for Codex with a required `.codex-plugin/plugin.json`, optional plugin folders/files, valid manifest defaults, and personal-marketplace entries by default. Use when Codex needs to create a new personal plugin, add optional plugin structure, generate or update marketplace entries for plugin ordering and availability metadata, or update an existing local plugin during development with the CLI-driven cachebuster and reinstall flow.",
+            "interface": {
+              "displayName": "Plugin Creator",
+              "shortDescription": "Scaffold plugins and marketplace entries",
+              "iconSmall": "$HOME/.codex/skills/.system/plugin-creator/assets/plugin-creator-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/plugin-creator/assets/plugin-creator.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $plugin-creator to scaffold a valid plugin in the personal marketplace, then validate it before handing it back."
+            },
+            "path": "$HOME/.codex/skills/.system/plugin-creator/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "review-agent",
+            "description": "Perform a read-only, defect-first review of a specified code change and return every actionable finding. Use when another agent delegates review of uncommitted changes, a base-branch diff, a commit, or custom review instructions.",
+            "interface": {
+              "displayName": "Review Agent",
+              "shortDescription": "Find actionable bugs in code changes",
+              "iconSmall": null,
+              "iconLarge": null,
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $review-agent to review the requested code changes and return actionable findings."
+            },
+            "path": "$HOME/.codex/skills/.system/review-agent/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "skill-creator",
+            "description": "Create or update a Codex skill with appropriately scoped instructions and any needed supporting resources.",
+            "shortDescription": "Create or update a skill",
+            "interface": {
+              "displayName": "Skill Creator",
+              "shortDescription": "Create or update a skill",
+              "iconSmall": "$HOME/.codex/skills/.system/skill-creator/assets/skill-creator-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/skill-creator/assets/skill-creator.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": null
+            },
+            "path": "$HOME/.codex/skills/.system/skill-creator/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "skill-installer",
+            "description": "Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos).",
+            "shortDescription": "Install curated skills from openai/skills or other repos",
+            "interface": {
+              "displayName": "Skill Installer",
+              "shortDescription": "Install curated skills from openai/skills or other repos",
+              "iconSmall": "$HOME/.codex/skills/.system/skill-installer/assets/skill-installer-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/skill-installer/assets/skill-installer.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": null
+            },
+            "path": "$HOME/.codex/skills/.system/skill-installer/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          }
+        ],
+        "errors": []
+      }
+    ]
+  },
+  "summary": {
+    "features": {
+      "hooks": true,
+      "plugin_hooks": true,
+      "apps": null
+    },
+    "plugins": {
+      "context-mode@context-mode": true
+    },
+    "mcp_servers_configured": [],
+    "mcp_status_names": [],
+    "hook_count": 6,
+    "skill_count": 31,
+    "otel": {
+      "exporter": {
+        "otlp-http": {
+          "endpoint": "http://127.0.0.1:14318/v1/logs",
+          "headers": {},
+          "protocol": "binary",
+          "tls": null
+        }
+      },
+      "metrics_exporter": {
+        "otlp-http": {
+          "endpoint": "http://127.0.0.1:14318/v1/metrics",
+          "headers": {},
+          "protocol": "binary",
+          "tls": null
+        }
+      }
+    },
+    "layer_sources": [
+      {
+        "type": "user",
+        "file": "$HOME/.codex/config.toml",
+        "profile": null
+      },
+      {
+        "type": "system",
+        "file": "/etc/codex/config.toml"
+      }
+    ],
+    "codex_home_instruction_files": [
+      "AGENTS.md",
+      "RTK.md"
+    ],
+    "config_top_level_keys": [
+      "agents",
+      "allow_login_shell",
+      "allow_symlinked_codex_home",
+      "analytics",
+      "approval_policy",
+      "approvals_reviewer",
+      "apps",
+      "apps_mcp_product_sku",
+      "audio",
+      "auto_review",
+      "background_terminal_max_timeout",
+      "browser_use",
+      "chatgpt_base_url",
+      "check_for_update_on_startup",
+      "cli_auth_credentials_store",
+      "compact_prompt",
+      "computer_use",
+      "default_permissions",
+      "desktop",
+      "developer_instructions",
+      "disable_paste_burst",
+      "experimental_compact_prompt_file",
+      "experimental_realtime_start_instructions",
+      "experimental_realtime_webrtc_call_base_url",
+      "experimental_realtime_ws_backend_prompt",
+      "experimental_realtime_ws_base_url",
+      "experimental_realtime_ws_model",
+      "experimental_realtime_ws_startup_context",
+      "experimental_thread_store",
+      "experimental_thread_store_endpoint",
+      "experimental_use_unified_exec_tool",
+      "features",
+      "feedback",
+      "file_opener",
+      "forced_chatgpt_workspace_id",
+      "forced_login_method",
+      "ghost_snapshot",
+      "goals",
+      "hide_agent_reasoning",
+      "history",
+      "hooks",
+      "include_apps_instructions",
+      "include_collaboration_mode_instructions",
+      "include_environment_context",
+      "include_permissions_instructions",
+      "instructions",
+      "js_repl_node_module_dirs",
+      "js_repl_node_path",
+      "log_dir",
+      "marketplaces",
+      "mcp_oauth_callback_port",
+      "mcp_oauth_callback_url",
+      "mcp_oauth_credentials_store",
+      "mcp_optional_startup_grace_ms",
+      "mcp_servers",
+      "memories",
+      "model",
+      "model_auto_compact_token_limit",
+      "model_auto_compact_token_limit_scope",
+      "model_catalog_json",
+      "model_context_window",
+      "model_instructions_file",
+      "model_provider",
+      "model_providers",
+      "model_reasoning_effort",
+      "model_reasoning_summary",
+      "model_verbosity",
+      "notice",
+      "notify",
+      "openai_base_url",
+      "orchestrator",
+      "oss_provider",
+      "otel",
+      "permissions",
+      "personality",
+      "plan_mode_reasoning_effort",
+      "plugins",
+      "profile",
+      "profiles",
+      "project_doc_fallback_filenames",
+      "project_doc_max_bytes",
+      "project_root_markers",
+      "projects",
+      "realtime",
+      "responses_api_metadata",
+      "review_model",
+      "sandbox_mode",
+      "sandbox_workspace_write",
+      "service_tier",
+      "shell_environment_policy",
+      "show_raw_agent_reasoning",
+      "skills",
+      "sqlite_home",
+      "suppress_unstable_features_warning",
+      "thread_unload_delay_secs",
+      "tool_output_token_limit",
+      "tool_suggest",
+      "tools",
+      "tui",
+      "web_search",
+      "windows"
+    ]
+  },
+  "config_read_error": null,
+  "finished_at": "2026-09-23T12:59:00Z"
+}

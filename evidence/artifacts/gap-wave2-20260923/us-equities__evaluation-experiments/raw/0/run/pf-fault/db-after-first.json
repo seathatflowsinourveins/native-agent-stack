@@ -1,0 +1,108 @@
+{
+ "tables": [
+  "__drizzle_migrations",
+  "blob_assets",
+  "blob_references",
+  "configs",
+  "datasets",
+  "eval_results",
+  "evals",
+  "evals_to_datasets",
+  "evals_to_prompts",
+  "evals_to_tags",
+  "model_audits",
+  "prompts",
+  "spans",
+  "tags",
+  "traces"
+ ],
+ "evals": [
+  {
+   "id": "eval-Sqm-2026-09-23T07:26:43",
+   "created_at": 1790148403422,
+   "is_redteam": 0
+  }
+ ],
+ "eval_results": [
+  {
+   "id": "<uuid-33>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 0,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-34>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 1,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 0
+  },
+  {
+   "id": "<uuid-35>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 2,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 2
+  },
+  {
+   "id": "<uuid-36>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 3,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 0
+  },
+  {
+   "id": "<uuid-37>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 4,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-38>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 5,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-39>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 6,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-40>",
+   "eval_id": "eval-Sqm-2026-09-23T07:26:43",
+   "test_idx": 7,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:26:43",
+   "updated_at": "2026-09-23 07:26:43",
+   "failure_reason": 0
+  }
+ ]
+}

@@ -1,0 +1,3 @@
+time=2026-09-22T23:05:04.891-04:00 level=INFO msg="Dag-run retry initiated" dag=recovery run-id=recovery-70b41190dc7dd523 step=finalize file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-run-1790132622/dagu/sigkill/dagu-home/logs/recovery/dag-run_20260923_030347Z_recovery-70b41190dc7dd523/dag-run_20260922.230347.115.recovery.log
+time=2026-09-22T23:05:04.892-04:00 level=ERROR msg="Failed to execute dag-run" dag=recovery run-id=recovery-70b41190dc7dd523 err="already running. dag-run ID=recovery-70b41190dc7dd523, socket=/tmp/@dagu_recovery_f834fd.sock"
+Error: failed to execute the dag-run recovery (dag-run ID: recovery-70b41190dc7dd523): already running. dag-run ID=recovery-70b41190dc7dd523, socket=/tmp/@dagu_recovery_f834fd.sock

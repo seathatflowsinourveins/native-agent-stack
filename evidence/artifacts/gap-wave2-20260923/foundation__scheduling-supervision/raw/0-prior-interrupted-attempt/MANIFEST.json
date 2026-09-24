@@ -1,0 +1,35 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "real_workflow.yaml",
+      "committed_as": "real_workflow.yaml",
+      "raw_sha256": "54859e0e6fff55df4b39a7dc4f510ae6b033691398d4c82fd62808320101733b",
+      "committed_sha256": "dc3a5c8ea259171737847821aab50d2507816468af5d3f227878d5a7732d5a04",
+      "bytes": 294
+    },
+    {
+      "source": "start.log",
+      "committed_as": "start.log",
+      "raw_sha256": "11a84c9a05e5996ebd3a84e5a0cd02a81d76ea6140bb7c1c061d3e2fab09ad8f",
+      "committed_sha256": "bfbc6defdf65001415c7507d2b030681f57e6fc83743426c17157f84a11fc6e1",
+      "bytes": 2388
+    },
+    {
+      "source": "retry.log",
+      "committed_as": "retry.log",
+      "raw_sha256": "42c5bd40f76274499a63576872f0196333a9f0826a91a5e36bb1898824b7f677",
+      "committed_sha256": "f62e16314d87f8ce9141c04d27e99f82765eff80ba3248498829f4d762ef4bdf",
+      "bytes": 2106
+    },
+    {
+      "source": "run_id.txt",
+      "committed_as": "run_id.txt",
+      "raw_sha256": "4e2cc0a996ca408188d9c95838dc1fed8b8af5f9be42b66712ce53f488206caa",
+      "committed_sha256": "4e2cc0a996ca408188d9c95838dc1fed8b8af5f9be42b66712ce53f488206caa",
+      "bytes": 18
+    }
+  ],
+  "uuid_placeholders": 0
+}

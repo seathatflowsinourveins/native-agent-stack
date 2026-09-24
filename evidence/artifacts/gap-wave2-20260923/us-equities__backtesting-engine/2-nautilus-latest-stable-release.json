@@ -1,0 +1,68 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/2-nautilus-latest-stable-release",
+  "gap_index": 2,
+  "gap_text_sha256": "c56fa1e680668f955ac229ce7d3deb63076496c185c43b4eaee443b2c236740f",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "settled: the exact gh command returns the latest non-prerelease releases; expected to show whether v1.231.0 is still the latest stable, retained as a dated raw receipt.",
+    "criteria": [
+      "settled if the exact next_check command exits 0 and its raw output is committed with sha256 and the checked_at time",
+      "not_settled if the command fails; the retained output is reported verbatim"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Run `gh release list --repo nautechsystems/nautilus_trader --exclude-pre-releases --limit 3` and retain the output as a dated receipt.",
+  "commands": [
+    "gh release list --repo nautechsystems/nautilus_trader --exclude-pre-releases --limit 3",
+    "gh release view v1.231.0 --repo nautechsystems/nautilus_trader --json tagName,name,isPrerelease,publishedAt,targetCommitish"
+  ],
+  "results": {
+    "exit_code": 0,
+    "gh_version": "gh version 2.101.0 (2026-09-15)",
+    "output": [
+      "NautilusTrader 1.231.0 Beta\tLatest\tv1.231.0\t2026-08-02T18:53:49Z",
+      "NautilusTrader 1.230.0 Beta\t\tv1.230.0\t2026-06-29T12:06:45Z",
+      "NautilusTrader 1.229.0 Beta\t\tv1.229.0\t2026-06-26T05:06:18Z"
+    ],
+    "release_view": {
+      "tagName": "v1.231.0",
+      "isPrerelease": false,
+      "publishedAt": "2026-08-02T18:53:49Z"
+    },
+    "conclusion": "v1.231.0 is the latest non-prerelease on 2026-09-23, matching the packet metadata; the selected 2.0.0rc5 (runtime-target.json line 29 prerelease true) remains a prerelease, now backed by this retained dated receipt."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-release-list.txt",
+      "sha256": "262a1e74838166c10c6a582fcf8447f2902759492efa7dc7da07799ee69e499b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-release-list.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-release-list.exit",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-release-list.checked_at",
+      "sha256": "3f8c37abd921925d9f10a21fbfe561b49ddf70fb8c898a168edf13ede5d07554"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-version.txt",
+      "sha256": "36505de29bab6d44fe29d02b8ee852cbc5f85145d3179399ce40fcf60933cdc5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/2-gh-release-view-v1.231.0.json",
+      "sha256": "fe1034bca881372c6b73e96d1a5794938a41fdd7f149b1b92030fac8b101ced7"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "remaining": null,
+  "limits": [
+    "A release listing is a point-in-time GitHub observation; a later stable 2.x release would supersede it.",
+    "Disclosed: a discovery call 'gh release list --limit 3' (without --exclude-pre-releases) ran at about 06:18Z before the preregistration; it showed rc5/rc4/rc3 as Pre-release and is not the cited evidence."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z"
+}

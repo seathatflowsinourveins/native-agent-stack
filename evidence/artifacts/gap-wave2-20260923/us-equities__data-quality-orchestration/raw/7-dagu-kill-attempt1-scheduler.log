@@ -1,0 +1,26 @@
+time=2026-09-23T01:22:35.526-04:00 level=INFO msg="Scheduler initialization" dir=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/dags log-format=text
+time=2026-09-23T01:22:35.527-04:00 level=INFO msg="Starting service registry" service=scheduler service-id=<hostname>-385294-1790140955 host=<hostname> port=18672 status=inactive
+time=2026-09-23T01:22:35.530-04:00 level=INFO msg="Registered with service registry as inactive" service-id=<hostname>-385294-1790140955 host=<hostname> port=18672
+time=2026-09-23T01:22:35.574-04:00 level=INFO msg="Waiting to acquire scheduler lock"
+time=2026-09-23T01:22:35.574-04:00 level=INFO msg="Starting health check server" service=scheduler port=18672
+time=2026-09-23T01:22:35.574-04:00 level=INFO msg="Acquired scheduler lock"
+time=2026-09-23T01:22:35.577-04:00 level=INFO msg="Updated scheduler status to active"
+time=2026-09-23T01:22:35.581-04:00 level=INFO msg="Loading DAGs" dir=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/dags
+time=2026-09-23T01:22:35.582-04:00 level=INFO msg="Loaded scheduler watermark" lastTick=0001-01-01T00:00:00.000Z dagCount=1
+time=2026-09-23T01:22:35.588-04:00 level=INFO msg="Scheduler started"
+time=2026-09-23T01:22:35.588-04:00 level=INFO msg="Started retry scanner" interval=30s retry_failure_window=24h0m0s
+2026/09/23 01:22:35 INFO DAG run notification monitor started
+2026/09/23 01:22:35 INFO DAG run notification monitor started
+time=2026-09-23T01:22:35.588-04:00 level=INFO msg="Started zombie detector" interval=45s
+2026/09/23 01:22:35 INFO Acquired notification lock; DAG run notifications are active lock_dir=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/data/notifications/monitor-state.json.lock
+2026/09/23 01:22:35 INFO Acquired notification lock; DAG run notifications are active lock_dir=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/data/incidents/monitor-state.json.lock
+time=2026-09-23T01:23:20.589-04:00 level=WARN msg="Proc entry appears stale, waiting for threshold" dag=g2k2166-kill run-id=g2k2166-kill-1 attempt-id=5b8e23 queue=g2k2166-kill stale_count=1 threshold=3
+time=2026-09-23T01:24:05.590-04:00 level=WARN msg="Proc entry appears stale, waiting for threshold" dag=g2k2166-kill run-id=g2k2166-kill-1 attempt-id=5b8e23 queue=g2k2166-kill stale_count=2 threshold=3
+time=2026-09-23T01:24:50.605-04:00 level=INFO msg="Confirmed zombie DAG run, updated to failed status" dag=g2k2166-kill run-id=g2k2166-kill-1 attempt-id=5b8e23 queue=g2k2166-kill stale_count=3
+time=2026-09-23T01:24:50.605-04:00 level=INFO msg="Removed stale proc file" dag=g2k2166-kill run-id=g2k2166-kill-1 attempt-id=5b8e23 queue=g2k2166-kill file=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/data/proc/g2k2166-kill/g2k2166-kill/proc_20260923_052043Z_67326b323136362d6b696c6c2d31_356238653233.proc
+2026/09/23 01:25:11 INFO DAG run notification monitor stopped
+2026/09/23 01:25:11 INFO DAG run notification monitor stopped
+time=2026-09-23T01:25:11.066-04:00 level=INFO msg="Stopping zombie detector"
+time=2026-09-23T01:25:11.069-04:00 level=INFO msg="Stopping health check server" service=scheduler
+time=2026-09-23T01:25:11.069-04:00 level=INFO msg="Stopping service registry" service=scheduler service-id=<hostname>-385294-1790140955 host=<hostname> port=18672
+time=2026-09-23T01:25:11.069-04:00 level=INFO msg="Scheduler stopped"

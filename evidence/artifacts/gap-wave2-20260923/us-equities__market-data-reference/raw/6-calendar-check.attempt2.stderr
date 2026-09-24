@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py", line 103, in <module>
+    _, xs28, xe28 = xsessions("XNYS", end=EXT_END)
+                    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py", line 19, in xsessions
+    s = cal.sessions_in_range(START, end)
+  File "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/lib/python3.13/site-packages/exchange_calendars/exchange_calendar.py", line 2218, in sessions_in_range
+    slc = self._get_sessions_slice(start, end, _parse)
+  File "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/lib/python3.13/site-packages/exchange_calendars/exchange_calendar.py", line 2195, in _get_sessions_slice
+    start, end = self._parse_start_end_dates(start, end, _parse)
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/lib/python3.13/site-packages/exchange_calendars/exchange_calendar.py", line 2191, in _parse_start_end_dates
+    return parse_date(start, "start", self), parse_date(end, "end", self)
+                                             ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "$HOME/.local/share/codex-ecosystem/tools/pandas-market-calendars-5.4.0/lib/python3.13/site-packages/exchange_calendars/calendar_helpers.py", line 389, in parse_date
+    raise errors.DateOutOfBounds(calendar, ts, param_name)
+exchange_calendars.errors.DateOutOfBounds: Parameter `end` receieved as '2028-12-31 00:00:00' although cannot be later than the last session of calendar 'XNYS' ('2028-12-29 00:00:00').

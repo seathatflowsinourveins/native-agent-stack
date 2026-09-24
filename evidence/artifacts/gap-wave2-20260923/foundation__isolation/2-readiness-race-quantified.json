@@ -1,0 +1,60 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-2",
+  "gap_index": 2,
+  "gap_text_sha256": "23b84096ee75967071ba9c0de377114778cb5f32141a2bc2bfbc7ed0b3184cd4",
+  "checked_at": "2026-09-23T00:43:41.764Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:52:08.551Z",
+    "expectation": "Running the HTTP fixture N times without connection-refused retries will show a consistently high (likely 100%) first-request failure rate under 0.0.77, since the in-sandbox socat listeners start in the background without a readiness wait; checking upstream issues/PRs will show whether this has been fixed.",
+    "criteria": "N>=8 runs with a fresh srt invocation each time, no --retry-connrefused, http_code and curl exit recorded per run; GitHub issue/PR search on anthropics/sandbox-runtime for a readiness fix.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:52:08.551Z by original#66 (Write of $SCRATCHPAD/write_receipts.py; receipts written by original#67 at 00:52:11Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:43:13.671Z to 2026-09-23T00:43:41.764Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:00:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#36 [2026-09-23T00:43:13.671Z]: mkdir -p $HOME/.cache/gap-wave2-20260923/isolation/racefix\ncd $HOME/.cache/gap-wave2-20260923/isolation/racefix\npython3 -c \"\nimport http.server\nclass H(http.server.BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200); self.end_headers(); self.wfile.write(b'ok')\n    def log_message(self,*a): pass\nsrv = http.server.HTTPServer(('127.0.0.1', 18191), H)\nsrv.serve_forever()\n\" &\necho SRV_PID=$!\nsleep 1\ncat > settings.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[]},\"network\":{\"allowedDomains\":[\"127.0.0.1:18191\"],\"deniedDomains\":[]}}\nEOF\nSRT=$HOME/.local/share/codex-ecosystem/bin/srt\nN=8\nfails=0\nresults=\"\"\nfor i in $(seq 1 $N); do\n  out=$(\"$SRT\" --settings settings.json -c \"curl -sS --max-time 5 --noproxy '' -o /dev/null -w '%{http_code}' http://127.0.0.1:18191/\" 2>&1)\n  code=$?\n  results=\"$results run$i:exit=$code:out=$out;\"\n  if [[ \"$out\" != \"200\" ]]; then fails=$((fails+1)); fi\ndone\necho \"N=$N fails=$fails\"\necho \"$results\"",
+    "original#37 [2026-09-23T00:43:20.153Z]: kill %1 2>/dev/null; wait 2>/dev/null\nss -tlnp 2>/dev/null | grep 18191 || echo clear",
+    "original#38 [2026-09-23T00:43:22.506Z]: kill -9 3911253 2>/dev/null; sleep 1; ss -tlnp 2>/dev/null | grep 18191 || echo clear",
+    "original#39 [2026-09-23T00:43:26.287Z]: timeout 15 npm view @anthropic-ai/sandbox-runtime versions --json 2>&1 | tail -20",
+    "original#40 [2026-09-23T00:43:32.181Z]: timeout 20 curl -sS \"https://api.github.com/search/issues?q=repo:anthropics/sandbox-runtime+readiness+in:title,body\" 2>&1 | python3 -c \"\nimport json,sys\ntry:\n    d=json.load(sys.stdin)\n    print('total_count', d.get('total_count'))\n    for it in d.get('items',[])[:5]:\n        print(it['number'], it['title'], it['state'])\nexcept Exception as e:\n    print('ERR', e)\n\"",
+    "original#41 [2026-09-23T00:43:36.642Z]: timeout 20 curl -sS \"https://api.github.com/search/issues?q=repo:anthropics/sandbox-runtime+socat+listener\" 2>&1 | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint('total_count', d.get('total_count'))\nfor it in d.get('items',[])[:8]:\n    print(it['number'], it['title'], it['state'])\n\"\necho ---\ntimeout 20 curl -sS \"https://api.github.com/search/issues?q=repo:anthropics/sandbox-runtime+connection+refused\" 2>&1 | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint('total_count', d.get('total_count'))\nfor it in d.get('items',[])[:8]:\n    print(it['number'], it['title'], it['state'])\n\"",
+    "original#42 [2026-09-23T00:43:41.309Z]: timeout 20 curl -sS \"https://api.github.com/repos/anthropics/sandbox-runtime/issues/257\" 2>&1 | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint(d.get('title'))\nprint(d.get('state'), d.get('closed_at'))\nprint((d.get('body') or '')[:1500])\nprint('pull_request' in d)\n\""
+  ],
+  "results": [
+    "8/8 runs (100%) failed on the first request without --retry-connrefused: 'curl: (7) Failed to connect to localhost port 3128 ... Couldn't connect to server', http_code=000, curl exit=7, every single time on this host.",
+    "0.0.77 is confirmed the latest published npm version, so this was also run against 'the latest upstream release' (same build).",
+    "GitHub pull request #257 (closed 2026-05-13T01:13:52Z, `pull_request` field present) replaced the host-side socat bridges with in-process net.Server listeners; its description says `The in-sandbox socat relays ... are unchanged and still required`. Searches for readiness, socat listener and connection refused (original#40, #41) found no open or closed item fixing the in-sandbox relay race."
+  ],
+  "outcome": "settled",
+  "note": "The failure rate is now quantified (100% over N=8 on this host) and the upstream-currency question is answered: 0.0.77 is latest, and the one closely-related closed fix (#257) explicitly excludes the in-sandbox listener race that causes this. The bounded connection-refused retry workaround remains necessary and is not superseded by any upstream fix.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "N=8 on one Linux/WSL host; rate could differ under different host load or OS.",
+    "GitHub search is keyword-based and could miss a differently-worded open issue; no maintainer confirmation was sought."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:43:13.671Z to 2026-09-23T00:43:41.764Z. The previous value '2026-09-23T00:52:11.952018+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#36",
+        "original#37",
+        "original#38",
+        "original#39",
+        "original#40",
+        "original#41",
+        "original#42"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "commands replaced with the exact loop that ran (original#36: N=8 fresh srt invocations, curl without --retry-connrefused); the earlier `for i in 1..8` pseudocode is gone.",
+      "Labelled #257 as a pull request, as the API response shows; preregistration timestamp corrected; raw_evidence added. Outcome kept settled: 8/8 first requests failed with exit 7, 0.0.77 was the latest release, and no upstream fix was found."
+    ]
+  }
+}

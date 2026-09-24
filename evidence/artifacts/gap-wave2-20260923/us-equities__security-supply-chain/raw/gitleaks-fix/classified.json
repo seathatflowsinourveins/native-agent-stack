@@ -1,0 +1,7001 @@
+{
+ "merge-control-default": {
+  "report": "merge-control-default",
+  "findings": 0,
+  "by_rule": {},
+  "by_shape": {},
+  "digest_shaped_and_in_other_tracked_files": 0,
+  "unclassified": [],
+  "unique_values": 0,
+  "rows": []
+ },
+ "merge-control-first-parent": {
+  "report": "merge-control-first-parent",
+  "findings": 1,
+  "by_rule": {
+   "github-pat": 1
+  },
+  "by_shape": {
+   "other(len=40)": 1
+  },
+  "digest_shaped_and_in_other_tracked_files": 0,
+  "unclassified": [
+   {
+    "rule": "github-pat",
+    "file": "resolution.txt",
+    "commit": "49d55751816b",
+    "line": 1,
+    "shape": "other(len=40)",
+    "other_tracked_files": null,
+    "other_tracked_examples": [],
+    "context": "<SECRET>"
+   }
+  ],
+  "unique_values": 1,
+  "rows": [
+   {
+    "rule": "github-pat",
+    "file": "resolution.txt",
+    "commit": "49d55751816b",
+    "line": 1,
+    "shape": "other(len=40)",
+    "other_tracked_files": null,
+    "other_tracked_examples": [],
+    "context": "<SECRET>"
+   }
+  ]
+ },
+ "oversized-control": {
+  "report": "oversized-control",
+  "findings": 23,
+  "by_rule": {
+   "generic-api-key": 2,
+   "sourcegraph-access-token": 20,
+   "github-pat": 1
+  },
+  "by_shape": {
+   "hex64": 2,
+   "hex40": 20,
+   "other(len=40)": 1
+  },
+  "digest_shaped_and_in_other_tracked_files": 22,
+  "unclassified": [
+   {
+    "rule": "github-pat",
+    "file": "planted.html",
+    "commit": "",
+    "line": 754,
+    "shape": "other(len=40)",
+    "other_tracked_files": 0,
+    "other_tracked_examples": [],
+    "context": "<SECRET>"
+   }
+  ],
+  "unique_values": 3,
+  "rows": [
+   {
+    "rule": "generic-api-key",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "unmodified.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "planted.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "github-pat",
+    "file": "planted.html",
+    "commit": "",
+    "line": 754,
+    "shape": "other(len=40)",
+    "other_tracked_files": 0,
+    "other_tracked_examples": [],
+    "context": "<SECRET>"
+   }
+  ]
+ },
+ "oversized-b00": {
+  "report": "oversized-b00",
+  "findings": 474,
+  "by_rule": {
+   "generic-api-key": 40,
+   "sourcegraph-access-token": 434
+  },
+  "by_shape": {
+   "hex64": 40,
+   "hex40": 434
+  },
+  "digest_shaped_and_in_other_tracked_files": 474,
+  "unclassified": [],
+  "unique_values": 2,
+  "rows": [
+   {
+    "rule": "generic-api-key",
+    "file": "4d8acc8f977249c7296333c9e3171cbab3c95d9b.html",
+    "commit": "",
+    "line": 122,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "4d44726f1a2125211acb1b4a31ec41d5bf531a09.html",
+    "commit": "",
+    "line": 122,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "276a17027296183bab767d5d8a070733e2ddae83.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "4f1ac87abbb25f6a366d3b1fce19a0af8eb79283.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "32599582ff317c2d1462578b17733a4027549525.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7ab0c0d16ee1f5311ecebe93227bea861028c95c.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d2ca03e012f164d146baf100eee2c3310ace9722.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "2838aefa4c421bc2582253cf8ad67a7da84b461a.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "42c657376bd22d3d75ae383843ef29dc242105a9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a892e10ac30a3a4549390f9e1da41a6d59700323.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a185c36d8a4a51e1b80850d8a6afc77b22cf284e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c6847aec5223b8d7481846e6741a3c69aa792f5b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "367cff03b0872f76017f37aff9e4031c421e4218.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "22ebd1061e58a9b5de99437d1a1c23e7490d2b0e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "08543059911ca52330aa258c1839dbedb392c9ae.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7c7e0015845255b12e8de38a3cb71653a5d70de7.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "356b914a3e204f45fa1cfa8fcf316ecd6f02c64f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c627cebdb0aab4b2abe3c1b735b7da5382b13ba1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d67b9e0566fedc5c5f4901fa8e30a32e9c3ddd4d.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "8d0eea62f617c7bbd97918b2c3bd2676748b0df8.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "830c48ed339751550c5169168a4f0c0be7146fe3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "525cb46fc7d47c994bedcf0784f8a32af69e8a65.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "c0ce209ba668a7215e0773f8f6f44b4fb3969f9b.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fe566f6ae61be249a395fd79770366b0e3ce7413.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "4185f6bd5224c845a2951b2e6d85bfa466c66dd9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "332bcf422833538ad3f4e8f83496afaccca91de3.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "9e5ee8eaa2bddf226959271e5b0a0afd9d906189.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3c593e23a6180c9905ee332ab81260eed4f31b41.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7e88735a41c1f7d35459c86c8a5d9ac833aef624.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "a131225d41ce45c257c1e455a55c115ea1a3f275.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "d5f1e62b4d7dd6894a4cd76b54a7ef39ec8d6ea1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "43164e4bcd4a555863232debc7baf6ccae3e6d5f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "7cfcfba679e40e36c1de8bad014fd863c9de3a80.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "3d2adb60282ec1f48e647bcdea35187012f30b8e.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "fef925c9479551eeb94970a66e06b08a012b071f.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "47e7f6b2223ca76b7241613a2073e4a672bfe777.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 6,
+    "other_tracked_examples": [
+     "catalogs/us-equities/architecture/trading-sources.json",
+     "catalogs/us-equities/architecture/trading.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "ea6b49c89be34c5ecbc21e0d2537a92cf8c739a1.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "5f4537a38b820747b895db5ebe5c063fd9626f16.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "6bb7be7feee9bc46556950eaf1a5b4084dc5d497.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 8,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/us-equities/architecture/trading-sources.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 21,
+    "other_tracked_examples": [
+     "blueprints/token-native-focus/saturation-audit.json",
+     "blueprints/us-equities/research-evaluation/README.md"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 7,
+    "other_tracked_examples": [
+     "catalogs/landscape/us-equities.json",
+     "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   },
+   {
+    "rule": "sourcegraph-access-token",
+    "file": "267ae06e5cbb4b59bdb46291ef9c40345fcad2c9.html",
+    "commit": "",
+    "line": 123,
+    "shape": "hex40",
+    "other_tracked_files": 1,
+    "other_tracked_examples": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "context": "<SECRET>\""
+   }
+  ]
+ },
+ "oversized-b01": {
+  "report": "oversized-b01",
+  "findings": 40,
+  "by_rule": {
+   "generic-api-key": 40
+  },
+  "by_shape": {
+   "hex64": 40
+  },
+  "digest_shaped_and_in_other_tracked_files": 40,
+  "unclassified": [],
+  "unique_values": 1,
+  "rows": [
+   {
+    "rule": "generic-api-key",
+    "file": "2045293a1ae5c1c627883bdd3d0fe97702d851f4.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "458c78662f7c9e75f7097f1de27311c3a59ca8f1.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a6972ac1ce2849cc2af5ff64d7433bb4033632c3.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "6d297acc1c443442f74ad7a2c6d361c79269de08.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "66b4822771267c4acb4d70381d5a7175d7530fcd.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "cc9571a6c3ca93f0ee75055fdef5af9f62b3fc2b.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "99a41020dfbb5b4dae771cc6bcb57dac22b63ca6.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "1defbb40e92c481d27ea33dda24d94857dbe28bd.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "aea7e3418f65bc8f97d1cc6c25d3361c0faaa17f.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "1862fddf04f11aeb747853ac993ac46bc3a4bbdc.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "9c6cc6a1c56cc0b3fb310d9d1f1d539a4e39001b.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "e71fea324fee9ae427e0184478816c434c5361f4.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "04af3d067e13999c28eeb8418b3f292bbb9b2efc.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "29692ed12d59a157fd5fb511a64763f46af3daeb.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "d067a66938a6726e5ef705f40f1255529043a640.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "6e29a1d75e13a93896b73f67a661dab6687b3dd4.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c4d43c9948c6ad8cf1125d4fdea6b48de03aaca4.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "91a79cdcb0275877263bedeecea5a62231c63283.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "9aa47d34a83e3980112857eda2e3c9afb54689bd.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "f0ddef3bd114081d38ccdb1ec0592426c80311e1.html",
+    "commit": "",
+    "line": 116,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "fe80aca8f60b081b800c4673119b668e6387e7df.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "5c3c5cad0354cf160e47dd17d3ff213de853ad8e.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "2c21dc961eb1c7ba96d8734502d433875c84212e.html",
+    "commit": "",
+    "line": 104,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a7d3ec578e0e9f8018bd0a4e57a4bbf24c2033bc.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7fcf388c2031aa95491159ad8b24c23dc900669e.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "fabe784e78e37b372b2c9f6e7191bd7643ed7380.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "67333b71c8fe7b4c0d318438522db296b731ae7b.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "9c99911ed0e8744f45adec3178c744e85aae7b2c.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "5bfe38d733b79d98149161460bcc0e6f52021826.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "7e151ba51331a51cc68ef7fc4734578d4efa3ef9.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "14d7618b715cac3460f657962a96300272044800.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "23be5150430e7e6c7a44683b711f2b11ec395c50.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "9d73ad518e7fb61af6b7c69f03cda09344662a8e.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "52bd41481c150a22d65eb5967b8baeabf64cdda2.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "5906582ad63c816174904a63e5301a6f86bd28ba.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "bf1392c3a9feab9e3601ee8c6b0ad066380362b1.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "0b73101a870fc49aec5e43f5bea9d3c4be5f1553.html",
+    "commit": "",
+    "line": 106,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "f2278a41a2ff74d179e3962f527c6c281b0923c6.html",
+    "commit": "",
+    "line": 116,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "045907c887afafa6fb50de2f26ef757b0a329314.html",
+    "commit": "",
+    "line": 105,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c0a630d711282c0d2917ed49dbd840489750cec9.html",
+    "commit": "",
+    "line": 106,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   }
+  ]
+ },
+ "oversized-b02": {
+  "report": "oversized-b02",
+  "findings": 7,
+  "by_rule": {
+   "generic-api-key": 7
+  },
+  "by_shape": {
+   "hex64": 7
+  },
+  "digest_shaped_and_in_other_tracked_files": 7,
+  "unclassified": [],
+  "unique_values": 1,
+  "rows": [
+   {
+    "rule": "generic-api-key",
+    "file": "278cc29b46e9d560f092499c18899de5fe9af2d5.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "cadb6067b4c5ec1e45bd55fbac1bfce6689daab0.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "a476f0684a6817d3582ce90f7266d39e4f9f4bcb.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "33827e8e2fbbe338439e7134510db30cf51a425c.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "c56e838be972c14baf0fd012a8c85328202f5219.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "6fa8cdf61f71e801184b58e8af38da0f85216ff4.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   },
+   {
+    "rule": "generic-api-key",
+    "file": "28afcb7e8aa23995c9446d8f34942edd939480f8.html",
+    "commit": "",
+    "line": 103,
+    "shape": "hex64",
+    "other_tracked_files": 3,
+    "other_tracked_examples": [
+     "blueprints/convergence-practice/offhost-app-state/upstream.json",
+     "docs/native-dashboards.md"
+    ],
+    "context": "openapi_sha256\":\"<SECRET>\""
+   }
+  ]
+ },
+ "oversized-b03": {
+  "report": "oversized-b03",
+  "findings": 0,
+  "by_rule": {},
+  "by_shape": {},
+  "digest_shaped_and_in_other_tracked_files": 0,
+  "unclassified": [],
+  "unique_values": 0,
+  "rows": []
+ },
+ "oversized-b04": {
+  "report": "oversized-b04",
+  "findings": 0,
+  "by_rule": {},
+  "by_shape": {},
+  "digest_shaped_and_in_other_tracked_files": 0,
+  "unclassified": [],
+  "unique_values": 0,
+  "rows": []
+ },
+ "merges-first-parent-2mb": {
+  "report": "merges-first-parent-2mb",
+  "findings": 0,
+  "by_rule": {},
+  "by_shape": {},
+  "digest_shaped_and_in_other_tracked_files": 0,
+  "unclassified": [],
+  "unique_values": 0,
+  "rows": []
+ }
+}

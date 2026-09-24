@@ -1,0 +1,133 @@
+{
+  "completed_at": "2026-09-23T02:55:45.572706+00:00",
+  "engines": {
+    "temporal": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": true,
+        "stop": true
+      },
+      "scenario_a": {
+        "after_retry_status": "COMPLETED",
+        "before_retry_status": "CANCELED",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": true
+        },
+        "completed_at": "2026-09-23T02:55:22.229189+00:00",
+        "completed_before_retry": false,
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "recovery-da295e219435",
+        "observed_owned_processes_remaining": 0,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 1,
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "same_native_run_id_note": "workflow id retained; reset creates a new run id under it",
+        "started_at": "2026-09-23T02:55:14.756895+00:00",
+        "temporal_reset": {
+          "checkpoint_activity_completed_event": 7,
+          "reset_event_id": 10
+        },
+        "temporal_run_ids": {
+          "after_reset": "<uuid-1>",
+          "before_reset": "<uuid-2>"
+        }
+      },
+      "scenario_b": {
+        "all_killed": false,
+        "cases": {
+          "sigkill": true
+        },
+        "completed_at": "2026-09-23T02:55:43.469448+00:00",
+        "final_status": "COMPLETED",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 2,
+        "native_run": "recovery-a9d786e6aded",
+        "operational_steps": [
+          "start a new worker process; the server retries the finalize activity after its 5 s heartbeat timeout"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T02:55:41.129399+00:00",
+            "verb": "start a new worker (no manual retry verb)"
+          },
+          {
+            "at": "2026-09-23T02:55:43.268118+00:00",
+            "status_after": "COMPLETED"
+          }
+        ],
+        "recovery_seconds": 2.7,
+        "started_at": "2026-09-23T02:55:22.229895+00:00",
+        "status_after_kill": "RUNNING",
+        "status_after_kill_2s": "RUNNING",
+        "window_seconds": 60
+      },
+      "setup": {
+        "install": "temporal CLI 1.9.1 release archive (sha256 09a0326a..., matches checksums.txt and the GitHub asset digest) + uv venv `temporalio==1.33.0`",
+        "long_running_processes": [
+          "temporal server start-dev (loopback, sqlite file under the work dir)",
+          "temporal_worker.py worker"
+        ],
+        "server_ready": true,
+        "server_ready_seconds": 1.2,
+        "version": "temporal version 1.9.1 (Server 1.32.0, UI 2.54.1)"
+      }
+    }
+  },
+  "inputs": {
+    "compare.py": "436f809e8f30a20d3b2ceeedbb63140c5a8252ae32e18a8171a9d2df80ee48b2",
+    "prefect_ctl.py": "68d19902bd4f8e3a1d8096f9eedd8ed72edda6bf9ba2e06773ab63a11feaf35e",
+    "prefect_flow.py": "7c49fb35afaa7f418a9c77cc99f2ee586af1f86031b4995c410165b2eaa379ac",
+    "temporal_worker.py": "7df916a18e743c42486aeb58682644637ea2d5a7ca153a7abffddb67a0ec3055"
+  },
+  "job_recovery_fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+  "leftover_processes_mentioning_work_dir": [
+    "2215465 timeout 900 python3 compare.py --engines temporal --window 60 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-t-1790132113",
+    "2215468 python3 compare.py --engines temporal --window 60 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-t-1790132113"
+  ],
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "started_at": "2026-09-23T02:55:13.542193+00:00"
+}

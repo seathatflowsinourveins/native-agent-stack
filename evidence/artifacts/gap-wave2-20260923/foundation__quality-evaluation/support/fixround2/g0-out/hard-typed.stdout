@@ -1,0 +1,236 @@
+Cache is disabled.
+Starting evaluation eval-msU-2026-09-23T12:47:59
+Running 30 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────[39m[90m┬────────────────────────────────────────[39m[90m┬────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m payload                                [39m[22m[90m│[39m[1m[34m label                                  [39m[22m[90m│[39m[1m[34m [Nemotron-3-Embed-1B, model-card       [39m[22m[90m│[39m
+[90m│[39m[1m[34m                                        [39m[22m[90m│[39m[1m[34m                                        [39m[22m[90m│[39m[1m[34m input_type query/document] {{payload}} [39m[22m[90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Vitamin C is needed    [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m for normal collagen formation, helping [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m maintain connective tissues such as    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m skin and gums. A prolonged severe      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m deficiency can cause scurvy, with      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m symptoms including bleeding gums and   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m poor wound healing, even when a...     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A migraine diary can   [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m record headache days, sleep patterns,  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m meals, medication use, and visual      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m symptoms. Reviewing these entries may  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m reveal recurring associations and help [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m a clinician assess treatment, although [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m an apparent trigger in...              [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Some vaccines contain  [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m an adjuvant, an ingredient that        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m enhances the immune response to the    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m antigen. Adjuvants can stimulate       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m innate immune pathways near the        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m injection site and help improve        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m responses, particularly when the       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m antigen alo...                         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["In the United States,  [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m copyright generally arises             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m automatically when an original work is [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m fixed in a tangible medium.            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Registration creates a public record   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and can provide important enforcement  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m advantages, including access to        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m certain ...                            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A move-in inventory    [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m records the condition of a rental      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m property before the tenant occupies    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m it. Dated photographs and written      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m descriptions can help establish what   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m was already present, while a signed    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m checklist gives both parties a sha...  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A fixed rate bond's    [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m coupon rate determines its scheduled   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m interest payment as a percentage of    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m face value. The coupon generally       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m remains unchanged throughout the       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m bond's life, while payment frequency   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and maturity are specified in the t... [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Inflation indexes      [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m track price changes across selected    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m baskets of goods and services. An      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m individual household's experience can  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m differ from the published inflation    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m rate because its spending weights,     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m housing situation, and consumption...  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Git reset can move the [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m current branch tip to an earlier       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m commit, with different modes           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m controlling the index and working      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m tree. A hard reset also replaces       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m tracked working files, so changes that [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m have not been saved elsewhere can be   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m los...                                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Use a LEFT JOIN with   [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m the customers table on the left and    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the orders table on the right. Each    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m customer appears even without a        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m matching order, and the order columns  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m are NULL for unmatched rows; multiple  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m orders can produce multiple ro...      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Cache-Control      [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m no-store directive instructs caches    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m not to store the relevant request or   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m response. It is different from merely  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m assigning a short freshness lifetime,  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and applications use it when retaining [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m a response in a cache wou...           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Earth's rotation       [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m produces the daily cycle of daylight   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and darkness as different locations    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m face toward or away from the Sun. Time [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m zones organize clocks around this      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m rotation, although political           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m boundaries mean that their shapes do   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m no...                                  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Stomata are pores in   [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m the leaf surface whose opening is      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m regulated by specialized guard cells.  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Their behavior influences carbon       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m dioxide entry and water vapor loss,    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m allowing plants to balance             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m photosynthesis with water conservation [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m as ...                                 [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Dendrochronology       [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m compares patterns of annual growth     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m rings in wood to construct dated       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sequences. Matching a timber's ring    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m pattern to a regional chronology can   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m identify the years when its rings      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m formed, provided the sample contains   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m en...                                  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The decree on the      [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m Rosetta Stone dates to 196 BCE and     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m concerns the reign of Ptolemy V.       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Issued by a gathering of priests, it   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m describes royal benefits and           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m establishes honors for the king within [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the religious and political traditions [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m o...                                   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Movable type allowed   [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m printers to assemble individual        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m characters into a page, print many     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m copies, and then redistribute the      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m characters for another page. Reusing   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the same pieces reduced the need to    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m carve an entirely new printing         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m surfa...                               [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Berlin Wall was    [90m│[39m 1                                      [90m│[39m [PASS] pred=1                          [90m│[39m
+[90m│[39m constructed in 1961 under the          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m authority of East Germany, separating  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m East Berlin from the city's western    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m sectors. It became a major symbol of   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the Cold War and restricted movement   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m until the border opening of Novem...   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["The Andes extend along [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m the western side of South America and  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m contain a wide range of climates and   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m ecosystems. Elevation strongly         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m influences temperature, while latitude [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and regional rainfall patterns help    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m distinguish tropical highla...         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Mountain temperatures  [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m generally decrease with increasing     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m elevation within the troposphere,      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m though the rate varies with            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m atmospheric conditions. This elevation [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m effect helps explain why high peaks    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m may support snow and alpine            [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m vegetatio...                           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["An oil and vinegar     [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m vinaigrette commonly separates after   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m standing because its droplets merge    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m without enough stabilizing material.   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m Shaking the container briefly          [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m disperses the oil again for serving,   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m while its fluid texture makes it co... [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Kneading helps         [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m hydrated wheat proteins form and       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m organize a gluten network throughout   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the dough. This elastic, extensible    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m network stretches around gas bubbles   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m produced during fermentation, allowing [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the dough to expand while retainin...  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Rinsing white rice     [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m removes some of the loose starch       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m clinging to the outside of the grains. [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m With less surface starch released into [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the cooking water, fewer sticky starch [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m deposits form between grains, although [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m rice variety and cookin...             [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Eastward travel        [90m│[39m 0                                      [90m│[39m [PASS] pred=0                          [90m│[39m
+[90m│[39m usually requires the body clock to     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m advance, making sleep and waking occur [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m earlier than the body expects. Many    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m people's internal circadian period is  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m slightly longer than twenty-four       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m hours, making a delay toward later...  [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A codeshare flight is  [90m│[39m 3                                      [90m│[39m [PASS] pred=3                          [90m│[39m
+[90m│[39m marketed under one airline's flight    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m number but operated by another         [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m airline. Travelers should check the    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m operating carrier because it           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m determines practical details such as   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m the aircraft, onboard service, and     [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m often...                               [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["Players change ends    [90m│[39m 2                                      [90m│[39m [PASS] pred=2                          [90m│[39m
+[90m│[39m after every six points during a        [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m standard tennis tiebreak. This differs [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m from the usual odd-game changeovers in [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m a set and helps distribute exposure to [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m environmental conditions such as sun   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m and wind as the tiebreak ...           [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m├────────────────────────────────────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────────────────────────────────┤[39m
+[90m│[39m {"candidates":["A freestyle flutter    [90m│[39m 1                                      [90m│[39m [PASS] pred=1                          [90m│[39m
+[90m│[39m kick uses alternating leg movements    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m that originate mainly from the hips,   [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m with relatively relaxed knees and      [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m ankles. Large knee-driven kicks can    [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m increase resistance, so swimmers often [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m│[39m practice a narrower motion th...       [90m│[39m                                        [90m│[39m                                        [90m│[39m
+[90m└────────────────────────────────────────[39m[90m┴────────────────────────────────────────[39m[90m┴────────────────────────────────────────┘[39m
+... 5 more rows not shown ...
+
+✓ Eval complete (ID: eval-msU-2026-09-23T12:47:59)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+Total Tokens: 6,702
+  Provider: 6,702 (6,702 prompt)
+
+Results:
+  ✓ 30 passed (100%)
+  0 failed (0%)
+  0 errors (0%)
+Duration: 3s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0/hard/typed-results.json

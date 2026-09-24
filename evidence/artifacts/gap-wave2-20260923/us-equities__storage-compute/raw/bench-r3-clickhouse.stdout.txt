@@ -1,0 +1,97 @@
+Unexpected Http Driver Exception
+Process SpawnProcess-53:
+Traceback (most recent call last):
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connectionpool.py", line 540, in _make_request
+    response = conn.getresponse()
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connection.py", line 638, in getresponse
+    httplib_response = super().getresponse()
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1478, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 343, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 312, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+                             " response")
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/clickhouse_connect/driver/_backend/http_sync.py", line 332, in request
+    response: HTTPResponse = cast(HTTPResponse, cast(PoolManager, self.http).request(method, url, **kwargs))
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/_request_methods.py", line 143, in request
+    return self.request_encode_body(
+           ~~~~~~~~~~~~~~~~~~~~~~~~^
+        method, url, fields=fields, headers=headers, **urlopen_kw
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/_request_methods.py", line 278, in request_encode_body
+    return self.urlopen(method, url, **extra_kw)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/poolmanager.py", line 459, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/util/retry.py", line 510, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/util/util.py", line 38, in reraise
+    raise value.with_traceback(tb)
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connectionpool.py", line 540, in _make_request
+    response = conn.getresponse()
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/urllib3/connection.py", line 638, in getresponse
+    httplib_response = super().getresponse()
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1478, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 343, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/http/client.py", line 312, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+                             " response")
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 313, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py", line 696, in kill_writer
+    conn["client"].insert_arrow("bars", tbl)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/clickhouse_connect/driver/client.py", line 1191, in insert_arrow
+    return self.raw_insert(full_table, column_names, insert_block, settings, "Arrow", transport_settings=transport_settings)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/clickhouse_connect/driver/_backendclient.py", line 122, in raw_insert
+    summary = self._backend.execute_raw_insert(
+        table, column_names, insert_block, fmt if fmt else self._write_format, compression, runtime, transport_settings
+    )
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/clickhouse_connect/driver/_backend/http_sync.py", line 214, in execute_raw_insert
+    response = self.request(plan.body, plan.params, plan.headers, server_wait=False)
+  File "$HOME/.cache/gap-wave2-20260923/storage-compute/venv-bench/lib/python3.13/site-packages/clickhouse_connect/driver/_backend/http_sync.py", line 357, in request
+    raise OperationalError(f"Error {ex} executing HTTP request attempt {attempts} ({self.url})") from ex
+clickhouse_connect.driver.exceptions.OperationalError: Error ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')) executing HTTP request attempt 1 (http://127.0.0.1:18123)
+{"store": "clickhouse", "error": "", "load": {"seconds": 14.105176992001361, "rows_per_s": 3544797.7737786314, "row_count": 50000000, "row_count_ok": true}, "queries": {"Q1": 0.0013758100030827336, "Q2": 0.004920236002362799, "Q3": 0.0825381059985375, "Q4": 0.014265204998082481}, "kill": {"killed": "server_process_group", "signal": "SIGKILL", "kill_time_unix": 1790143954.2408166, "acked_batches": 30, "acked_rows": 300000, "inflight_batches_at_kill": [30], "inflight_proven": true, "median_engine_call_s_acked": 0.05766642093658447, "engine_call_elapsed_at_kill_s": {"30": 0.014696598052978516}, "engine_interrupted_proven": true, "acks_after_kill_time": [], "inflight_state_after_recovery": {"30": "absent"}, "rows_after_recovery": 300000, "acked_batches_failing_verification": [], "all_acked_batches_exact": true, "unexpected_batch_indices": [], "per_batch_checks": "rows == 10000, distinct ts == 10000, sum(volume) == deterministic expected", "restart_or_reopen_through_first_query_s": 0.3478341719965101, "server_ready_s": 0.32354438999755075, "questdb_wal_visible_after_s": null, "total_rows_after_recovery": 55500000}}

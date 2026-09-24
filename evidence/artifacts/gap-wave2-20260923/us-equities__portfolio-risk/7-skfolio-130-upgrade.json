@@ -1,0 +1,61 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-7-skfolio-130-upgrade",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 7,
+  "gap_text": "The packet pins skfolio at 1.2.9 (behind upstream v1.3.0), and the packet's cited README is tagged v1.2.8. The newer release is not natively accepted.",
+  "gap_text_sha256": "9ad05a84ed14a949d6b2ea396e615957116efbdb1f2092600ace3300a8aefb2a",
+  "next_check": "Install skfolio==1.3.0 with hashes in a new Python 3.13.15 venv, re-run the WalkForward acceptance and the optimizer run on the frozen plan.json, diff the outputs against 1.2.9, then update the cited README tag.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "Stale-pin upgrades are assigned to the SOTA refresh wave; its merged receipt evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json (PR #87) re-ran the WalkForward optimizer acceptance on skfolio 1.3.0 against the frozen inputs. No check is run here.",
+    "criteria": "covered_elsewhere iff the cited receipt exists on origin/main and covers the 1.3.0 install and WalkForward/optimizer rerun; clauses it leaves (hash-locked install, README tag update) are named in limits."
+  },
+  "commands": [
+    {
+      "cmd": "git log origin/main -1 -- evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json; git show origin/main:evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json | sha256sum",
+      "exit": 0,
+      "output": "raw/7/citation-check.txt"
+    }
+  ],
+  "results": {
+    "covered_by": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json (merged in #87, commit 43bb931 on origin/main)",
+    "cited_result": "skfolio 1.3.0 WalkForward optimizer acceptance rerun on the frozen inputs: verdict qualified, development Sharpe 0.778/0.846 and reserved weights reproduced to the 1.2.9 receipt's 3-decimal precision",
+    "this_unit_observation": "gap 2 found the WalkForward source file byte-identical between v1.2.9 (c99fcf71) and v1.3.0"
+  },
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "limits": [
+    "The cited 1.3.0 install was an unlocked live PyPI resolve, not a --require-hashes install, and the research-evaluation README tag was not updated; both clauses remain with the SOTA refresh lane.",
+    "No check was run by this unit for this gap."
+  ],
+  "checked_at": "2026-09-23T06:51:21Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/7/citation-check.txt",
+      "sha256": "0b2f80dc4f5616d50374f250b2ccd78e49cb877201b2c2141d28677a03cec6e6"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "no finding for this gap",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

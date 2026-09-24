@@ -1,0 +1,1478 @@
+[
+  {
+    "acknowledgements": [
+      {
+        "ex_dates": [
+          "2016-03-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-06-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-09-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-12-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-03-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-06-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-09-15"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-12-15"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-03-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-06-15"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-09-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-12-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-03-15"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-06-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-09-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-12-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-03-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-06-19"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-09-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-12-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2021-03-19"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "emissions": [
+      {
+        "amount": "4361.70",
+        "currency": "USD",
+        "eligible_quantity": 4154,
+        "ex_date": "2016-03-18",
+        "ex_instant_ns": 1458273600000000000,
+        "factor_row_date": "2016-03-17",
+        "on_time": true,
+        "per_share": "1.05",
+        "positions_seen": 2,
+        "ts_now_ns": 1458273600000000000
+      },
+      {
+        "amount": "5420.52",
+        "currency": "USD",
+        "eligible_quantity": 5019,
+        "ex_date": "2016-06-17",
+        "ex_instant_ns": 1466136000000000000,
+        "factor_row_date": "2016-06-16",
+        "on_time": true,
+        "per_share": "1.08",
+        "positions_seen": 2,
+        "ts_now_ns": 1466136000000000000
+      },
+      {
+        "amount": "5630.94",
+        "currency": "USD",
+        "eligible_quantity": 5166,
+        "ex_date": "2016-09-16",
+        "ex_instant_ns": 1473998400000000000,
+        "factor_row_date": "2016-09-15",
+        "on_time": true,
+        "per_share": "1.09",
+        "positions_seen": 1,
+        "ts_now_ns": 1473998400000000000
+      },
+      {
+        "amount": "6906.69",
+        "currency": "USD",
+        "eligible_quantity": 5193,
+        "ex_date": "2016-12-16",
+        "ex_instant_ns": 1481864400000000000,
+        "factor_row_date": "2016-12-15",
+        "on_time": true,
+        "per_share": "1.33",
+        "positions_seen": 1,
+        "ts_now_ns": 1481864400000000000
+      },
+      {
+        "amount": "5428.80",
+        "currency": "USD",
+        "eligible_quantity": 5220,
+        "ex_date": "2017-03-17",
+        "ex_instant_ns": 1489723200000000000,
+        "factor_row_date": "2017-03-16",
+        "on_time": true,
+        "per_share": "1.04",
+        "positions_seen": 1,
+        "ts_now_ns": 1489723200000000000
+      },
+      {
+        "amount": "6184.38",
+        "currency": "USD",
+        "eligible_quantity": 5241,
+        "ex_date": "2017-06-16",
+        "ex_instant_ns": 1497585600000000000,
+        "factor_row_date": "2017-06-15",
+        "on_time": true,
+        "per_share": "1.18",
+        "positions_seen": 1,
+        "ts_now_ns": 1497585600000000000
+      },
+      {
+        "amount": "6474.72",
+        "currency": "USD",
+        "eligible_quantity": 5264,
+        "ex_date": "2017-09-15",
+        "ex_instant_ns": 1505448000000000000,
+        "factor_row_date": "2017-09-14",
+        "on_time": true,
+        "per_share": "1.23",
+        "positions_seen": 1,
+        "ts_now_ns": 1505448000000000000
+      },
+      {
+        "amount": "7190.32",
+        "currency": "USD",
+        "eligible_quantity": 5287,
+        "ex_date": "2017-12-15",
+        "ex_instant_ns": 1513314000000000000,
+        "factor_row_date": "2017-12-14",
+        "on_time": true,
+        "per_share": "1.36",
+        "positions_seen": 1,
+        "ts_now_ns": 1513314000000000000
+      },
+      {
+        "amount": "5838.80",
+        "currency": "USD",
+        "eligible_quantity": 5308,
+        "ex_date": "2018-03-16",
+        "ex_instant_ns": 1521172800000000000,
+        "factor_row_date": "2018-03-15",
+        "on_time": true,
+        "per_share": "1.10",
+        "positions_seen": 1,
+        "ts_now_ns": 1521172800000000000
+      },
+      {
+        "amount": "6432.50",
+        "currency": "USD",
+        "eligible_quantity": 5146,
+        "ex_date": "2018-06-15",
+        "ex_instant_ns": 1529035200000000000,
+        "factor_row_date": "2018-06-14",
+        "on_time": true,
+        "per_share": "1.25",
+        "positions_seen": 2,
+        "ts_now_ns": 1529035200000000000
+      },
+      {
+        "amount": "5462.31",
+        "currency": "USD",
+        "eligible_quantity": 4107,
+        "ex_date": "2018-09-21",
+        "ex_instant_ns": 1537502400000000000,
+        "factor_row_date": "2018-09-20",
+        "on_time": true,
+        "per_share": "1.33",
+        "positions_seen": 2,
+        "ts_now_ns": 1537502400000000000
+      },
+      {
+        "amount": "5302.08",
+        "currency": "USD",
+        "eligible_quantity": 3682,
+        "ex_date": "2018-12-21",
+        "ex_instant_ns": 1545368400000000000,
+        "factor_row_date": "2018-12-20",
+        "on_time": true,
+        "per_share": "1.44",
+        "positions_seen": 2,
+        "ts_now_ns": 1545368400000000000
+      },
+      {
+        "amount": "4854.81",
+        "currency": "USD",
+        "eligible_quantity": 3947,
+        "ex_date": "2019-03-15",
+        "ex_instant_ns": 1552622400000000000,
+        "factor_row_date": "2019-03-14",
+        "on_time": true,
+        "per_share": "1.23",
+        "positions_seen": 2,
+        "ts_now_ns": 1552622400000000000
+      },
+      {
+        "amount": "7573.28",
+        "currency": "USD",
+        "eligible_quantity": 5296,
+        "ex_date": "2019-06-21",
+        "ex_instant_ns": 1561089600000000000,
+        "factor_row_date": "2019-06-20",
+        "on_time": true,
+        "per_share": "1.43",
+        "positions_seen": 1,
+        "ts_now_ns": 1561089600000000000
+      },
+      {
+        "amount": "7340.22",
+        "currency": "USD",
+        "eligible_quantity": 5319,
+        "ex_date": "2019-09-20",
+        "ex_instant_ns": 1568952000000000000,
+        "factor_row_date": "2019-09-19",
+        "on_time": true,
+        "per_share": "1.38",
+        "positions_seen": 1,
+        "ts_now_ns": 1568952000000000000
+      },
+      {
+        "amount": "8390.08",
+        "currency": "USD",
+        "eligible_quantity": 5344,
+        "ex_date": "2019-12-20",
+        "ex_instant_ns": 1576818000000000000,
+        "factor_row_date": "2019-12-19",
+        "on_time": true,
+        "per_share": "1.57",
+        "positions_seen": 1,
+        "ts_now_ns": 1576818000000000000
+      },
+      {
+        "amount": "7564.65",
+        "currency": "USD",
+        "eligible_quantity": 5365,
+        "ex_date": "2020-03-20",
+        "ex_instant_ns": 1584676800000000000,
+        "factor_row_date": "2020-03-19",
+        "on_time": true,
+        "per_share": "1.41",
+        "positions_seen": 1,
+        "ts_now_ns": 1584676800000000000
+      },
+      {
+        "amount": "7399.37",
+        "currency": "USD",
+        "eligible_quantity": 5401,
+        "ex_date": "2020-06-19",
+        "ex_instant_ns": 1592539200000000000,
+        "factor_row_date": "2020-06-18",
+        "on_time": true,
+        "per_share": "1.37",
+        "positions_seen": 1,
+        "ts_now_ns": 1592539200000000000
+      },
+      {
+        "amount": "4953.98",
+        "currency": "USD",
+        "eligible_quantity": 3697,
+        "ex_date": "2020-09-18",
+        "ex_instant_ns": 1600401600000000000,
+        "factor_row_date": "2020-09-17",
+        "on_time": true,
+        "per_share": "1.34",
+        "positions_seen": 2,
+        "ts_now_ns": 1600401600000000000
+      },
+      {
+        "amount": "8048.52",
+        "currency": "USD",
+        "eligible_quantity": 5094,
+        "ex_date": "2020-12-18",
+        "ex_instant_ns": 1608267600000000000,
+        "factor_row_date": "2020-12-17",
+        "on_time": true,
+        "per_share": "1.58",
+        "positions_seen": 2,
+        "ts_now_ns": 1608267600000000000
+      },
+      {
+        "amount": "6730.24",
+        "currency": "USD",
+        "eligible_quantity": 5258,
+        "ex_date": "2021-03-19",
+        "ex_instant_ns": 1616126400000000000,
+        "factor_row_date": "2021-03-18",
+        "on_time": true,
+        "per_share": "1.28",
+        "positions_seen": 2,
+        "ts_now_ns": 1616126400000000000
+      }
+    ],
+    "errors": [],
+    "instrument": "SPY.SIM",
+    "process_calls": 3276
+  },
+  {
+    "acknowledgements": [
+      {
+        "ex_dates": [
+          "2016-03-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-06-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-09-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-12-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-03-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-06-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-09-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-12-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-03-19"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-06-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-09-24"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-12-24"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-03-18"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-06-24"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-09-23"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-12-23"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-03-23"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-06-22"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-09-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-12-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2021-03-22"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "emissions": [
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-03-18",
+        "ex_instant_ns": 1458273600000000000,
+        "factor_row_date": "2016-03-17",
+        "on_time": true,
+        "per_share": "0.32",
+        "positions_seen": 2,
+        "ts_now_ns": 1458273600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-06-17",
+        "ex_instant_ns": 1466136000000000000,
+        "factor_row_date": "2016-06-16",
+        "on_time": true,
+        "per_share": "0.29",
+        "positions_seen": 2,
+        "ts_now_ns": 1466136000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-09-16",
+        "ex_instant_ns": 1473998400000000000,
+        "factor_row_date": "2016-09-15",
+        "on_time": true,
+        "per_share": "0.29",
+        "positions_seen": 1,
+        "ts_now_ns": 1473998400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-12-16",
+        "ex_instant_ns": 1481864400000000000,
+        "factor_row_date": "2016-12-15",
+        "on_time": true,
+        "per_share": "0.35",
+        "positions_seen": 1,
+        "ts_now_ns": 1481864400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-03-17",
+        "ex_instant_ns": 1489723200000000000,
+        "factor_row_date": "2017-03-16",
+        "on_time": true,
+        "per_share": "0.27",
+        "positions_seen": 1,
+        "ts_now_ns": 1489723200000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-06-16",
+        "ex_instant_ns": 1497585600000000000,
+        "factor_row_date": "2017-06-15",
+        "on_time": true,
+        "per_share": "0.38",
+        "positions_seen": 1,
+        "ts_now_ns": 1497585600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-09-18",
+        "ex_instant_ns": 1505707200000000000,
+        "factor_row_date": "2017-09-15",
+        "on_time": true,
+        "per_share": "0.32",
+        "positions_seen": 1,
+        "ts_now_ns": 1505707200000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-12-18",
+        "ex_instant_ns": 1513573200000000000,
+        "factor_row_date": "2017-12-15",
+        "on_time": true,
+        "per_share": "0.33",
+        "positions_seen": 1,
+        "ts_now_ns": 1513573200000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2018-03-19",
+        "ex_instant_ns": 1521432000000000000,
+        "factor_row_date": "2018-03-16",
+        "on_time": true,
+        "per_share": "0.28",
+        "positions_seen": 1,
+        "ts_now_ns": 1521432000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2018-06-18",
+        "ex_instant_ns": 1529294400000000000,
+        "factor_row_date": "2018-06-15",
+        "on_time": true,
+        "per_share": "0.38",
+        "positions_seen": 2,
+        "ts_now_ns": 1529294400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2018-09-24",
+        "ex_instant_ns": 1537761600000000000,
+        "factor_row_date": "2018-09-21",
+        "on_time": true,
+        "per_share": "0.33",
+        "positions_seen": 2,
+        "ts_now_ns": 1537761600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2018-12-24",
+        "ex_instant_ns": 1545627600000000000,
+        "factor_row_date": "2018-12-21",
+        "on_time": true,
+        "per_share": "0.42",
+        "positions_seen": 2,
+        "ts_now_ns": 1545627600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-03-18",
+        "ex_instant_ns": 1552881600000000000,
+        "factor_row_date": "2019-03-15",
+        "on_time": true,
+        "per_share": "0.32",
+        "positions_seen": 2,
+        "ts_now_ns": 1552881600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-06-24",
+        "ex_instant_ns": 1561348800000000000,
+        "factor_row_date": "2019-06-21",
+        "on_time": true,
+        "per_share": "0.42",
+        "positions_seen": 1,
+        "ts_now_ns": 1561348800000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-09-23",
+        "ex_instant_ns": 1569211200000000000,
+        "factor_row_date": "2019-09-20",
+        "on_time": true,
+        "per_share": "0.38",
+        "positions_seen": 1,
+        "ts_now_ns": 1569211200000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-12-23",
+        "ex_instant_ns": 1577077200000000000,
+        "factor_row_date": "2019-12-20",
+        "on_time": true,
+        "per_share": "0.46",
+        "positions_seen": 1,
+        "ts_now_ns": 1577077200000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-03-23",
+        "ex_instant_ns": 1584936000000000000,
+        "factor_row_date": "2020-03-20",
+        "on_time": true,
+        "per_share": "0.38",
+        "positions_seen": 1,
+        "ts_now_ns": 1584936000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-06-22",
+        "ex_instant_ns": 1592798400000000000,
+        "factor_row_date": "2020-06-19",
+        "on_time": true,
+        "per_share": "0.42",
+        "positions_seen": 1,
+        "ts_now_ns": 1592798400000000000
+      },
+      {
+        "amount": "827.19",
+        "currency": "USD",
+        "eligible_quantity": 2121,
+        "ex_date": "2020-09-21",
+        "ex_instant_ns": 1600660800000000000,
+        "factor_row_date": "2020-09-18",
+        "on_time": true,
+        "per_share": "0.39",
+        "positions_seen": 2,
+        "ts_now_ns": 1600660800000000000
+      },
+      {
+        "amount": "264.88",
+        "currency": "USD",
+        "eligible_quantity": 473,
+        "ex_date": "2020-12-21",
+        "ex_instant_ns": 1608526800000000000,
+        "factor_row_date": "2020-12-18",
+        "on_time": true,
+        "per_share": "0.56",
+        "positions_seen": 2,
+        "ts_now_ns": 1608526800000000000
+      },
+      {
+        "amount": "117.39",
+        "currency": "USD",
+        "eligible_quantity": 301,
+        "ex_date": "2021-03-22",
+        "ex_instant_ns": 1616385600000000000,
+        "factor_row_date": "2021-03-19",
+        "on_time": true,
+        "per_share": "0.39",
+        "positions_seen": 2,
+        "ts_now_ns": 1616385600000000000
+      }
+    ],
+    "errors": [],
+    "instrument": "QQQ.SIM",
+    "process_calls": 3276
+  },
+  {
+    "acknowledgements": [
+      {
+        "ex_dates": [
+          "2016-03-23"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-07-06"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-09-26"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2016-12-22"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-03-24"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-07-06"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-09-26"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2017-12-21"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-03-22"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-07-03"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-09-26"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2018-12-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-03-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-06-17"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-09-24"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2019-12-16"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-03-25"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-06-15"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-09-23"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-12-14"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2021-03-25"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "emissions": [
+      {
+        "amount": "590.04",
+        "currency": "USD",
+        "eligible_quantity": 1788,
+        "ex_date": "2016-03-23",
+        "ex_instant_ns": 1458705600000000000,
+        "factor_row_date": "2016-03-22",
+        "on_time": true,
+        "per_share": "0.33",
+        "positions_seen": 2,
+        "ts_now_ns": 1458705600000000000
+      },
+      {
+        "amount": "139.23",
+        "currency": "USD",
+        "eligible_quantity": 221,
+        "ex_date": "2016-07-06",
+        "ex_instant_ns": 1467777600000000000,
+        "factor_row_date": "2016-07-05",
+        "on_time": true,
+        "per_share": "0.63",
+        "positions_seen": 2,
+        "ts_now_ns": 1467777600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-09-26",
+        "ex_instant_ns": 1474862400000000000,
+        "factor_row_date": "2016-09-23",
+        "on_time": true,
+        "per_share": "0.35",
+        "positions_seen": 1,
+        "ts_now_ns": 1474862400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2016-12-22",
+        "ex_instant_ns": 1482382800000000000,
+        "factor_row_date": "2016-12-21",
+        "on_time": true,
+        "per_share": "0.57",
+        "positions_seen": 1,
+        "ts_now_ns": 1482382800000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-03-24",
+        "ex_instant_ns": 1490328000000000000,
+        "factor_row_date": "2017-03-23",
+        "on_time": true,
+        "per_share": "0.39",
+        "positions_seen": 1,
+        "ts_now_ns": 1490328000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-07-06",
+        "ex_instant_ns": 1499313600000000000,
+        "factor_row_date": "2017-07-05",
+        "on_time": true,
+        "per_share": "0.61",
+        "positions_seen": 1,
+        "ts_now_ns": 1499313600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-09-26",
+        "ex_instant_ns": 1506398400000000000,
+        "factor_row_date": "2017-09-25",
+        "on_time": true,
+        "per_share": "0.35",
+        "positions_seen": 1,
+        "ts_now_ns": 1506398400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2017-12-21",
+        "ex_instant_ns": 1513832400000000000,
+        "factor_row_date": "2017-12-20",
+        "on_time": true,
+        "per_share": "0.58",
+        "positions_seen": 1,
+        "ts_now_ns": 1513832400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2018-03-22",
+        "ex_instant_ns": 1521691200000000000,
+        "factor_row_date": "2018-03-21",
+        "on_time": true,
+        "per_share": "0.37",
+        "positions_seen": 1,
+        "ts_now_ns": 1521691200000000000
+      },
+      {
+        "amount": "192.60",
+        "currency": "USD",
+        "eligible_quantity": 321,
+        "ex_date": "2018-07-03",
+        "ex_instant_ns": 1530590400000000000,
+        "factor_row_date": "2018-07-02",
+        "on_time": true,
+        "per_share": "0.60",
+        "positions_seen": 2,
+        "ts_now_ns": 1530590400000000000
+      },
+      {
+        "amount": "961.40",
+        "currency": "USD",
+        "eligible_quantity": 2090,
+        "ex_date": "2018-09-26",
+        "ex_instant_ns": 1537934400000000000,
+        "factor_row_date": "2018-09-25",
+        "on_time": true,
+        "per_share": "0.46",
+        "positions_seen": 2,
+        "ts_now_ns": 1537934400000000000
+      },
+      {
+        "amount": "1357.36",
+        "currency": "USD",
+        "eligible_quantity": 2888,
+        "ex_date": "2018-12-17",
+        "ex_instant_ns": 1545022800000000000,
+        "factor_row_date": "2018-12-14",
+        "on_time": true,
+        "per_share": "0.47",
+        "positions_seen": 2,
+        "ts_now_ns": 1545022800000000000
+      },
+      {
+        "amount": "1009.42",
+        "currency": "USD",
+        "eligible_quantity": 2462,
+        "ex_date": "2019-03-20",
+        "ex_instant_ns": 1553054400000000000,
+        "factor_row_date": "2019-03-19",
+        "on_time": true,
+        "per_share": "0.41",
+        "positions_seen": 2,
+        "ts_now_ns": 1553054400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-06-17",
+        "ex_instant_ns": 1560744000000000000,
+        "factor_row_date": "2019-06-14",
+        "on_time": true,
+        "per_share": "0.53",
+        "positions_seen": 1,
+        "ts_now_ns": 1560744000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-09-24",
+        "ex_instant_ns": 1569297600000000000,
+        "factor_row_date": "2019-09-23",
+        "on_time": true,
+        "per_share": "0.54",
+        "positions_seen": 1,
+        "ts_now_ns": 1569297600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-12-16",
+        "ex_instant_ns": 1576472400000000000,
+        "factor_row_date": "2019-12-13",
+        "on_time": true,
+        "per_share": "0.60",
+        "positions_seen": 1,
+        "ts_now_ns": 1576472400000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-03-25",
+        "ex_instant_ns": 1585108800000000000,
+        "factor_row_date": "2020-03-24",
+        "on_time": true,
+        "per_share": "0.42",
+        "positions_seen": 1,
+        "ts_now_ns": 1585108800000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-06-15",
+        "ex_instant_ns": 1592193600000000000,
+        "factor_row_date": "2020-06-12",
+        "on_time": true,
+        "per_share": "0.47",
+        "positions_seen": 1,
+        "ts_now_ns": 1592193600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-09-23",
+        "ex_instant_ns": 1600833600000000000,
+        "factor_row_date": "2020-09-22",
+        "on_time": true,
+        "per_share": "0.57",
+        "positions_seen": 2,
+        "ts_now_ns": 1600833600000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2020-12-14",
+        "ex_instant_ns": 1607922000000000000,
+        "factor_row_date": "2020-12-11",
+        "on_time": true,
+        "per_share": "0.59",
+        "positions_seen": 2,
+        "ts_now_ns": 1607922000000000000
+      },
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2021-03-25",
+        "ex_instant_ns": 1616644800000000000,
+        "factor_row_date": "2021-03-24",
+        "on_time": true,
+        "per_share": "0.40",
+        "positions_seen": 2,
+        "ts_now_ns": 1616644800000000000
+      }
+    ],
+    "errors": [],
+    "instrument": "IWM.SIM",
+    "process_calls": 3276
+  }
+]

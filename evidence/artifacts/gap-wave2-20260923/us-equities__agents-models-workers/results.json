@@ -1,0 +1,46 @@
+{
+ "0": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/0-worker-backend-head-to-head.json"
+ },
+ "2": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/2-mcp-allowlist-order-block.json"
+ },
+ "4": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/4-socraticode-holdout-recall.json"
+ },
+ "5": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/5-fomc-dated-retrieval.json"
+ },
+ "6": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/6-ai-memory-pin-and-features.json"
+ },
+ "7": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/7-winner-readiness-today.json"
+ },
+ "9": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/9-composed-sdk-worker-restart-handoff.json"
+ },
+ "11": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/11-twelve-query-per-lane.json"
+ },
+ "12": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/12-exhaustive-source-recovery.json"
+ },
+ "15": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/15-artifact-reduction-whole-task.json"
+ },
+ "16": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/16-non-adopted-candidate-comparison.json"
+ }
+}

@@ -1,0 +1,15 @@
+outer_started=2026-09-23T14:43:19Z root=$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-oTUsxAgH host_uid=1000 cgroup=0::/user.slice/user-1000.slice/user@1000.service/app.slice/ecosystem-job-1000-259026-20102.scope
+2026-09-23T14:43:19.432Z inner pid=1 uid_in_ns=0
+2026-09-23T14:43:19.435Z live runtime dir hidden: 0 entries visible
+2026-09-23T14:43:19.437Z /dev/console bound to manager.log
+2026-09-23T14:43:19.441Z inner2 pid=1 uid_in_ns=1000 cgroup=0::/user.slice/user-1000.slice/user@1000.service/app.slice/ecosystem-job-1000-259026-20102.scope
+2026-09-23T14:43:19.656Z manager pid=21 state=running
+Created symlink <root>/<private-home>/.config/systemd/user/timers.target.wants/ecosystem-native-data.timer → <root>/<private-home>/.config/systemd/user/ecosystem-native-data.timer.
+2026-09-23T14:43:19.750Z after enable+start: NextElapseUSecMonotonic=23h 46min 11.811339s LastTriggerUSec= ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:46:19.726Z PHASE enable-start: NOT fired within 180 s
+2026-09-23T14:46:19.749Z after phase enable-start: NextElapseUSecMonotonic=infinity LastTriggerUSec= ActiveState=failed UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:46:19.836Z daemon-reload issued; NextElapseUSecMonotonic=infinity LastTriggerUSec= ActiveState=failed UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive 
+Terminated
+unshare: sigprocmask unblock failed: Invalid argument
+inner_exit=1 outer_stopped=2026-09-23T14:46:40Z
+no leftover processes

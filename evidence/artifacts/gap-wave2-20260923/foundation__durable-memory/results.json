@@ -1,0 +1,13 @@
+{
+  "0": {"outcome": "deferred", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/0-no-benchmark-run.json"},
+  "1": {"outcome": "not_settled", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/1-auto-improve-not-rerun.json"},
+  "2": {"outcome": "not_settled", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/2-restore-reindex-source-review.json"},
+  "5": {"outcome": "covered_elsewhere", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/5-stale-pin-covered-elsewhere.json"},
+  "6": {"outcome": "deferred", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/6-token-savings-deferred.json"},
+  "8": {"outcome": "not_settled", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/8-autonomous-learning-not-rerun.json"},
+  "9": {"outcome": "deferred", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/9-matched-comparison-not-run.json"},
+  "11": {"outcome": "not_settled", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/11-ttl-forget-sweep-live-store-incident.json"},
+  "12": {"outcome": "not_settled", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/12-live-client-rebind-deferred.json"},
+  "13": {"outcome": "covered_elsewhere", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/13-stale-pin-covered-elsewhere.json"},
+  "14": {"outcome": "advanced", "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/14-network-bytes-not-measured.json"}
+}

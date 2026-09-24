@@ -1,0 +1,6 @@
+[2026-09-23T08:04:53Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0
+[2026-09-23T08:05:18Z] stack pids prom=2026587 loki=2026588 otel=2031993 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T08:05:18Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 
+[2026-09-23T08:05:18Z] dagu start
+[2026-09-23T08:05:19Z] dagu start exit=1
+[2026-09-23T08:05:19Z] dagu status exit=0

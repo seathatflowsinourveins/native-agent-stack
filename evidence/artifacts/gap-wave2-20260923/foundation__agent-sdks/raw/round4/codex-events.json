@@ -1,0 +1,112 @@
+{
+  "phase": "events",
+  "pid": 30330,
+  "steps": [
+    {
+      "step": "thread/name/set",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "thread/compact/start",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "thread/archive",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "thread/unarchive",
+      "ok": true,
+      "keys": [
+        "thread"
+      ]
+    },
+    {
+      "step": "fuzzyFileSearch/sessionStart",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "fuzzyFileSearch/sessionUpdate",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "fuzzyFileSearch/sessionStop",
+      "ok": true,
+      "keys": []
+    },
+    {
+      "step": "command/exec",
+      "ok": false,
+      "error": "InvalidRequestError: JSON-RPC error -32600: command/exec tty or streaming requires a client-supplied processId"
+    },
+    {
+      "step": "thread/unsubscribe",
+      "ok": true,
+      "keys": [
+        "status"
+      ]
+    }
+  ],
+  "global_drain_end": "TransportClosedError",
+  "method_counts": {
+    "account/rateLimits/updated": 9,
+    "fuzzyFileSearch/sessionCompleted": 1,
+    "fuzzyFileSearch/sessionUpdated": 2,
+    "item/agentMessage/delta": 185,
+    "item/completed": 7,
+    "item/started": 7,
+    "remoteControl/status/changed": 1,
+    "thread/archived": 1,
+    "thread/name/updated": 1,
+    "thread/started": 1,
+    "thread/status/changed": 6,
+    "thread/tokenUsage/updated": 6,
+    "thread/unarchived": 1,
+    "turn/completed": 1,
+    "turn/started": 1,
+    "warning": 2
+  },
+  "untyped_methods": [],
+  "documented_types": 82,
+  "received_documented": [
+    "account/rateLimits/updated",
+    "fuzzyFileSearch/sessionCompleted",
+    "fuzzyFileSearch/sessionUpdated",
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "remoteControl/status/changed",
+    "thread/archived",
+    "thread/name/updated",
+    "thread/started",
+    "thread/status/changed",
+    "thread/tokenUsage/updated",
+    "thread/unarchived",
+    "turn/completed",
+    "turn/started",
+    "warning"
+  ],
+  "received_undocumented": [],
+  "tool_calls": [
+    {
+      "at": 1790173513.2952633,
+      "tool": "vault_lookup",
+      "arguments": {
+        "key": "alpha"
+      },
+      "answered": true
+    }
+  ],
+  "other_server_requests": [],
+  "notes_txt_created": true,
+  "received_documented_count": 16,
+  "status": "ok",
+  "sdk": "openai-codex",
+  "started_at": 1790173481.50889,
+  "finished_at": 1790173536.929353
+}

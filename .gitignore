@@ -15,6 +15,7 @@ node_modules/
 *.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
+!adoption/hosts/macos-example.json
 
 # Generated public explorer (scripts/build_ecosystem.py --write); rebuilt
 # locally or downloaded from the publish-catalog.yml release artifact/

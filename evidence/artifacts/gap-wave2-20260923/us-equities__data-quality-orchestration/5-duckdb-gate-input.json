@@ -1,0 +1,318 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-5-duckdb-gate-input",
+  "gap_index": 5,
+  "gap_text_sha256": "0882dce713a9ba389c7f8804ff553365cae24b045b31ebeb45444aeef129cb5e",
+  "gap_text": "pandera: the duckdb:// input path is source-only because the duckdb package is not in the pinned gate install (blueprints/us-equities/data/README.md).",
+  "next_check": "Create a new prefix from the gate lock plus a pinned duckdb, write the good and bad fixtures to a DuckDB file, and run promotion_gate.py with duckdb:// inputs. The results should match good-gate-result.json and bad-gate-result.json. Then add duckdb to the pinned gate install.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "A fresh venv synced from requirements.lock plus duckdb==1.5.5 runs promotion_gate.py on duckdb://<file>#snapshot inputs built from good.csv and bad.csv. Expected: the pandas-registered table reproduces good-gate-result.json and bad-gate-result.json (same status, row_count and per-check status). A DuckDB-native read_csv auto-typed table (DATE/TIMESTAMP/BIGINT) may differ; that difference is a finding to record, not hidden. Then duckdb is added to requirements.in and the lock regenerated with the old lock as constraints so no other pin moves.",
+    "criteria": "settled iff: the pandas-registered duckdb inputs match both fixtures on status, row_count and every named check's status; the regenerated lock differs from the old one only by the added duckdb entry; a fresh venv syncs from the new lock with --require-hashes; and the unit suite passes with PROMOTION_GATE_PYTHON pointed at that venv and REQUIRE_PROMOTION_GATE_VENV=1, including a new duckdb-path test. Any auto-typed mismatch is reported. Detection: the comparison is per-check and would report any differing check."
+  },
+  "commands": [
+    "$UV venv -q --python /usr/bin/python3 $C/gate-oldlock && $UV pip sync -q --python $C/gate-oldlock/bin/python3 --require-hashes $R/blueprints/us-equities/data/requirements.lock && $UV pip install -q --python $C/gate-oldlock/bin/python3 duckdb==1.5.5",
+    "$C/gate-oldlock/bin/python3 $H/duckdb_gate_check.py --repo $R --work $C/duckdb-oldlock-work --out $C/raw/5-duckdb-oldlock.json",
+    "printf 'duckdb==1.5.5\\n' >> blueprints/us-equities/data/requirements.in",
+    "$UV pip compile --python /usr/bin/python3 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-header blueprints/us-equities/data/requirements.in -o $C/requirements.lock.new2   (an earlier attempt with -c <old lock> was discarded because it wrote the constraint path into the via comments)",
+    "diff $C/requirements.lock.old $C/requirements.lock.new2 > 5-lock.diff; cp requirements.lock.new2 blueprints/us-equities/data/requirements.lock",
+    "$UV venv -q --python /usr/bin/python3 $C/gate-newlock && $UV pip sync --python $C/gate-newlock/bin/python3 --require-hashes $R/blueprints/us-equities/data/requirements.lock",
+    "$C/gate-newlock/bin/python3 $H/duckdb_gate_check.py --repo $R --work $C/duckdb-newlock-work --out $C/raw/5-duckdb-newlock.json",
+    "PROMOTION_GATE_PYTHON=$C/gate-newlock/bin/python3 REQUIRE_PROMOTION_GATE_VENV=1 rtk proxy python3 -m unittest tests.test_promotion_gate -v",
+    "REQUIRE_PROMOTION_GATE_VENV=1 PROMOTION_GATE_PYTHON=$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3 rtk proxy python3 -m unittest tests.test_promotion_gate.DuckdbInputRuns   (detection control: a venv without duckdb)",
+    "rtk proxy python3 -m unittest tests.test_promotion_gate.DuckdbInputRuns -v   (local default: skip)",
+    "fix round 2: { date; sha256sum requirements.lock; $UV --version; $UV venv --python /usr/bin/python3 $C/gate-fr2; $UV pip sync --python $C/gate-fr2/bin/python3 --require-hashes blueprints/us-equities/data/requirements.lock; python -c 'print versions'; duckdb_gate_check.py --work $C/duckdb-fr2-work --out $C/raw/5-duckdb-fr2.json; PROMOTION_GATE_PYTHON=$C/gate-fr2/bin/python3 REQUIRE_PROMOTION_GATE_VENV=1 rtk proxy python3 -m unittest tests.test_promotion_gate; detection control; local default; date } > 5-fr2-fresh-sync-and-checks.txt"
+  ],
+  "results": {
+    "lock_plus_duckdb_venv": {
+      "versions": "duckdb 1.5.5, pandera 0.33.1, pandas 3.0.6 (CPython 3.12.3)",
+      "all_pandas_match": true,
+      "all_native_match": true,
+      "cases": {
+        "pandas:good": {
+          "status": "pass",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 0
+        },
+        "pandas:bad": {
+          "status": "fail",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:null-price-cell": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:empty-snapshot": {
+          "status": "fail",
+          "row_count": 0,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:fractional-negative-volume": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:good": {
+          "status": "pass",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 0
+        },
+        "native:bad": {
+          "status": "fail",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:null-price-cell": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:empty-snapshot": {
+          "status": "fail",
+          "row_count": 0,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:fractional-negative-volume": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        }
+      }
+    },
+    "new_lock_venv": {
+      "all_pandas_match": true,
+      "all_native_match": true,
+      "cases": {
+        "pandas:good": {
+          "status": "pass",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 0
+        },
+        "pandas:bad": {
+          "status": "fail",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:null-price-cell": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:empty-snapshot": {
+          "status": "fail",
+          "row_count": 0,
+          "match": true,
+          "gate_exit": 1
+        },
+        "pandas:fractional-negative-volume": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:good": {
+          "status": "pass",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 0
+        },
+        "native:bad": {
+          "status": "fail",
+          "row_count": 4,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:null-price-cell": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:empty-snapshot": {
+          "status": "fail",
+          "row_count": 0,
+          "match": true,
+          "gate_exit": 1
+        },
+        "native:fractional-negative-volume": {
+          "status": "fail",
+          "row_count": 2,
+          "match": true,
+          "gate_exit": 1
+        }
+      }
+    },
+    "duckdb_column_types_good_fixture": {
+      "pandas": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "VARCHAR"
+      },
+      "native": {
+        "symbol": "VARCHAR",
+        "session": "DATE",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "TIMESTAMP WITH TIME ZONE"
+      }
+    },
+    "lock_diff": "single hunk \"4a5,41\": only the duckdb==1.5.5 entry with its 35 wheel/sdist hashes and \"# via -r blueprints/us-equities/data/requirements.in\" was added; the pin list differs only by \"> duckdb==1.5.5\"",
+    "unittest_new_lock": "Ran 25 tests in 13.328s  OK  (includes DuckdbInputRuns.test_duckdb_inputs_match_the_retained_csv_results over 5 fixtures)",
+    "unittest_detection_control": "AssertionError: gate venv cannot import duckdb although requirements.lock pins it ... FAILED (failures=1)",
+    "unittest_local_default": "Ran 1 test ... OK (skipped=1)",
+    "files_changed": [
+      "blueprints/us-equities/data/requirements.in",
+      "blueprints/us-equities/data/requirements.lock",
+      "blueprints/us-equities/data/README.md",
+      "blueprints/us-equities/data/promotion_gate.py (docstring/comment only)",
+      "tests/test_promotion_gate.py (new DuckdbInputRuns class)"
+    ],
+    "fix_round_2": "started 2026-09-23T05:41:10Z; lock sha256 5a5ade33a4290d1f... (the same lock bytes are committed at 980cb35 and 1c7fe43; the capture labelled it \"HEAD df355a4\", a pre-rewrite commit that is not on this branch); uv 0.12.17; \"Resolved 21 packages in 84ms / Installed 21 packages in 76ms\" with --require-hashes, sync exit 0; \"python 3.12.3 duckdb 1.5.5 pandera 0.33.1 pandas 3.0.6 pyarrow 25.0.1 exchange_calendars 4.13.2\"; {\"all_pandas_match\": true, \"all_native_match\": true} with all 10 cases \"match\"; \"Ran 25 tests in 15.991s OK\"; detection control \"FAILED (failures=1)\"; local default \"OK (skipped=1)\"; finished 2026-09-23T05:41:42Z.",
+    "chronology": "Round-1 outputs 05:17:10Z-05:18:11Z (raw/0-first-round-mtimes.txt), after the 05:16:19Z preregistration."
+  },
+  "outcome": "settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Fixtures are the synthetic CSV snapshots; DuckDB tables were built from them in two ways (pandas-registered and DuckDB read_csv auto-typed), both matching. A production DuckDB snapshot with other column types is untested.",
+    "The comparison covers status, row_count and each named check status; input_sha256 necessarily differs (it hashes the DuckDB file) and the test asserts it equals that file's hash.",
+    "Venvs were built with /usr/bin/python3 3.12.3 (the CI runner interpreter family); the README's original 3.13.15 resolution was not repeated.",
+    "The shared local gate venv ($HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv) was not modified and still lacks duckdb, so DuckdbInputRuns skips there unless REQUIRE_PROMOTION_GATE_VENV=1; CI provisions from the new lock and will run it.",
+    "docs/github-automation.md still describes \"20 locked packages\" from its dated measurement; the lock now has 21. That dated measurement was not rewritten.",
+    "Network: uv downloaded the locked wheels and duckdb 1.5.5 from PyPI into the uv cache."
+  ],
+  "checked_at": "2026-09-23T05:41:42Z",
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "R": "worktree root (claude/g2-data-quality-orchestration-20260923)",
+    "H": "R/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration",
+    "UV": "$HOME/.local/share/codex-ecosystem/tools/uv-0.12.17/uv (uv 0.12.17, the CI-pinned version)"
+  },
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-fr2-fresh-sync-and-checks.txt",
+      "original_sha256": "b29c0aaed7cad43efe0fda9ce759facd669107bc11105a70c500cb59a952a2ea",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-fr2-fresh-sync-and-checks.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "4177669954a98968414a5e8587e873c72420388068082c518bacd834a7fb7a6a",
+      "bytes": 1830,
+      "note": "Line 2 of the captured output reads '(HEAD df355a4)'. df355a4 was dropped by the branch rewrite and is not an ancestor of the branch (git merge-base --is-ancestor rc=1). The captured bytes are kept unedited; the lock sha256 5a5ade33... it records equals blueprints/us-equities/data/requirements.lock at 980cb35 and 1c7fe43 (git show <c>:... | sha256sum, checked 2026-09-23T05:56Z)."
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-fr2.json",
+      "original_sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-duckdb-fr2.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "bytes": 18390
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-lock.diff",
+      "original_sha256": "019dc91883417c12c61c6f330391db927c7b6ef6cee9df6150d2bd1c09578ae1",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-lock.diff",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "019dc91883417c12c61c6f330391db927c7b6ef6cee9df6150d2bd1c09578ae1",
+      "bytes": 3127
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-oldlock.json",
+      "original_sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-duckdb-oldlock.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "bytes": 18390
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-newlock.json",
+      "original_sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-duckdb-newlock.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807",
+      "bytes": 18390
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-newlock-r1.txt",
+      "original_sha256": "74bc9bc17c1a333c16ce7812317ac9f150786482c16d3d3fc0904f5dcc9e1e91",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-unittest-newlock.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "74bc9bc17c1a333c16ce7812317ac9f150786482c16d3d3fc0904f5dcc9e1e91",
+      "bytes": 612
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-detection-no-duckdb-r1.txt",
+      "original_sha256": "8b73cc554e52784e2ca2f1726f3c4e5b8c29ba8d831c9dc944461ee87b5f7cc4",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-unittest-detection-no-duckdb.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "8b73cc554e52784e2ca2f1726f3c4e5b8c29ba8d831c9dc944461ee87b5f7cc4",
+      "bytes": 196
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-local-skip-r1.txt",
+      "original_sha256": "5bd74cb12b26ddf9a3db4304bfd81a151a444446270ffc6d6a5d694b9b649a8e",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/5-unittest-local-skip.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5bd74cb12b26ddf9a3db4304bfd81a151a444446270ffc6d6a5d694b9b649a8e",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "original_sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "bytes": 923
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    }
+  ],
+  "fixround2_preregistration": {
+    "written_at": "2026-09-23T05:40:45Z",
+    "label": "fix round 2, written after the independent review and before the reruns",
+    "reason": "Independent Codex review (codex exec --sandbox read-only --ephemeral, 2026-09-23) found: base64 Temporal payloads still carried the host home path; *.jsonl raw files were gitignored and so not committed; several provenance claims (checksum verification, archive size, modal version, fresh --require-hashes sync, installed versions) had no retained raw output; raw outputs lacked capture timestamps; and the Temporal harness hardcoded the second-worker launch delay as 3 s.",
+    "expectation": "In a new venv synced with --require-hashes from the committed lock (output retained), print installed versions and UTC timestamps, rerun duckdb_gate_check.py and the unit tests. Expect the same all-match result and 25 tests OK.",
+    "criteria": "Settled stays only if the fresh sync succeeds with hashes required, duckdb 1.5.5 is installed, every case matches, and the tests pass; otherwise the outcome is downgraded."
+  },
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Finding 4: no install output established the fresh --require-hashes sync or the versions; finding 6: no capture timestamps. Resolved: fix-round-2 fresh venv sync with retained output, printed versions and UTC timestamps; all results reproduced.",
+    "second_review_fix_round_4": "Independent Opus review finding 1: the 'HEAD df355a4' label cited a commit dropped by the branch rewrite. Resolved: the result now cites the lock bytes at 980cb35/1c7fe43 (sha256 re-checked) and the raw artifact carries a note; captured bytes unchanged. No rerun needed: the lock bytes are identical."
+  }
+}

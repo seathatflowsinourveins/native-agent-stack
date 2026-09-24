@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 import hashlib
 import importlib.metadata
+import importlib.util
 import inspect
 import json
 import os
@@ -22,6 +23,10 @@ from zoneinfo import ZoneInfo
 HERE = Path(__file__).resolve().parent
 MAX_BODY = 8 * 1024 * 1024
 UTC = timezone.utc
+
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", HERE.parents[2] / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 
 
 def sha(raw):
@@ -49,10 +54,10 @@ def strict_json(raw):
 
 
 def safe_path(path):
-    path = Path(path).absolute()
-    if ".." in path.parts or any(p.is_symlink() for p in [path, *path.parents]):
-        raise ValueError("symlink_or_parent_traversal_refused")
-    return path
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    return _path_safety.refuse_untrusted_symlinks(path, "symlink_or_parent_traversal_refused")
 
 
 def read(path):

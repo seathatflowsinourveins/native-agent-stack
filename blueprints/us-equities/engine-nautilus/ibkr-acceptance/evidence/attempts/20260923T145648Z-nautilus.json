@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "nautilus_trader.adapters.interactive_brokers.HistoricalInteractiveBrokersClient",
+  "host": "127.0.0.1",
+  "port": 4002,
+  "client_id": 76,
+  "generated_at": "2026-09-23T14:56:48.428218+00:00",
+  "paper_check": {
+    "ibapi_receipt": {
+      "sha256": "1856e3c2af1c97553cc6fe08ef135729ffe3ca97f1e0a15882f7547a8f55c720",
+      "generated_at": "2026-09-23T14:56:46.222588+00:00"
+    }
+  },
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "observed": {
+    "nautilus_trader": "2.0.0rc5",
+    "instrument": {
+      "id": "SPY.ARCA",
+      "class": "Equity",
+      "price_increment": "0.01",
+      "conId": 756733,
+      "primaryExchange": "ARCA",
+      "currency": "USD",
+      "elapsed_s": 0.02
+    },
+    "bars": [
+      {
+        "spec": "1-DAY-LAST",
+        "end": "2026-09-22T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 5,
+        "first": "SPY.ARCA-1-DAY-LAST-EXTERNAL,759.50,761.67,749.60,754.05,37772236,1789603199999999999",
+        "last": "SPY.ARCA-1-DAY-LAST-EXTERNAL,774.04,775.14,772.57,773.38,20070509,1790121599999999999",
+        "elapsed_s": 0.316
+      },
+      {
+        "spec": "5-MINUTE-LAST",
+        "end": "2026-09-22T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 390,
+        "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,759.50,759.71,759.14,759.21,725714,1789565700000000000",
+        "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,774.36,774.36,773.29,773.44,1620113,1790107200000000000",
+        "elapsed_s": 0.145
+      }
+    ]
+  },
+  "exit_code": 0
+}

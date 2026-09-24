@@ -1,0 +1,59 @@
+{
+ "note": "Fix-round preregistrations. The original round's written_at values were reconstructed after the runs (raw-output mtimes precede them); they are superseded by these and set to null in the receipts. Each written_at below is the real write time; this file is committed before any fix-round command runs.",
+ "gaps": {
+  "0": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "Rerunning the frozen 30-case held-out set with a provider that prints only its prediction (no label) and an assertion that reads the label from the test's own vars reproduces 26/30 (deterministic embeddings); a constant-prediction control provider scores near chance, proving the assertion can fail.",
+   "criteria": "sha256 of cases.json recorded before the run; provider output contains no label; assertion compares to vars.label; 30 per-case gradingResults retained; control run pass count <= 12/30; generator script retained under blueprints/."
+  },
+  "1": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "The whole upstream examples/todomvc suite at tag v1.63.0 (all spec directories, chromium project) passes against demo.playwright.dev/todomvc.",
+   "criteria": "exit code captured to a file; pass/fail counts from the list reporter retained; any failure reported as-is."
+  },
+  "2": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "For each of Promptfoo, Playwright and ShellCheck: original exit 0, mutant exit non-zero, restored exit 0. The Playwright mutation is applied to the application (a local TLS mirror of the TodoMVC app served on loopback, with Chromium host-resolver-rules mapping demo.playwright.dev to it), with the upstream spec files byte-identical across all three runs.",
+   "criteria": "nine exit codes captured to files by the helper script; all three provider/script versions retained; spec sha256 unchanged; the local server access log shows the tests loaded the app from the mirror (detection that the network app was not used)."
+  },
+  "3": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "shellcheck exits 1 with SC2086 on the warning fixture and 0 on a clean fixture; difft --exit-code exits 1 on a changed file with the changed token in stdout, and 0 with no changed token on identical files.",
+   "criteria": "exit codes captured to files; a content assertion (grep of the changed token) run and its exit captured for both difft cases."
+  },
+  "4": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "In a fresh prefix with inspect-ai==0.3.268 and mlflow==3.16.1 pinned at install, the same frozen cases.json (sha256 checked) run through promptfoo and inspect gives identical per-case predictions (30/30 agreement) and 26/30 for both; runtime is recorded for both; token usage is recorded for both from the endpoint's billed_units, from each harness's own usage fields, and from vLLM prompt_tokens_total snapshots.",
+   "criteria": "pinned install command; per-case agreement table; wall-clock runtime per harness; harness-reported token fields quoted (including zero/empty); vLLM metric deltas with a quiet control interval; Inspect log retained as JSON."
+  },
+  "5": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "Twelve new cases (C9-C20) authored from retained repository sources, with labels frozen by sha256 before inference, extend the set to 20. One Codex call (read-only, ephemeral, stdin closed, --output-schema) and one bounded Claude call (--json-schema, no tools) each return a schema-valid verdict for all 20 cases, blind to labels and to TypeSafe output. TypeSafe on C9-C20 is not run: it needs an API credential the brief forbids reading. Expected outcome: advanced.",
+   "criteria": "both outputs validate against the schema; per-case table vs frozen labels; case authoring and labelling by the same agent disclosed; user hooks disabled for both CLIs and a process poller watches for ai-memory hook processes."
+  },
+  "7": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "Rerunning the upstream four-query retrieval assertion (examples/promptfoo-nemotron-upstream with NVIDIA's pinned model-card script) with -o results.json gives 4/4 and zero token/cost placeholders; vLLM prompt_tokens_total rises by about 336 over the run. The independently authored 30-case run with a provider that returns the endpoint's billed_units as promptfoo tokenUsage makes promptfoo report non-zero token usage matching the metric delta. Cost has no price source for the local endpoint, so expected outcome: advanced.",
+   "criteria": "results.json tokenUsage/cost quoted for both runs; metric snapshots before/after each run and for a quiet control interval of similar length."
+  },
+  "9": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "A probe shows the resident vLLM on 8231 serves only the embedding model (/v1/chat/completions 404). A temporary loopback vLLM serving the local Qwen2.5-7B-Instruct-AWQ model lets an unmodified upstream Inspect example (examples/ from the inspect_ai repo at the tag matching 0.3.268) run against local vLLM from a fresh pinned prefix, logged to a temporary loopback MLflow server; run IDs, exit codes and FINISHED status retrieved by REST; both servers stopped and verified down. CI failure repair and security finding quality stay untested, so expected outcome: advanced.",
+   "criteria": "exit codes in files; MLflow runs/get JSON retained; Inspect log retained as JSON; post-stop connection-refused checks retained."
+  },
+  "10": {
+   "written_at": "2026-09-23T02:42:37Z",
+   "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+   "expectation": "Using the Codex and Claude outputs of gap 5 restricted to the identical eight TypeSafe cases C1-C8, agreement with the TypeSafe verdicts and with the frozen source-review labels is computed per model, including C4. Expected: settled if both arms return schema-valid verdicts for all eight.",
+   "criteria": "agreement counts per model vs TypeSafe and vs frozen labels; C4 verdicts listed; schema validation output retained."
+  }
+ }
+}

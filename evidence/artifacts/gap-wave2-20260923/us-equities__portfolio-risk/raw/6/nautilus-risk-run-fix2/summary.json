@@ -1,0 +1,144 @@
+{
+  "arms": {
+    "control": {
+      "burst_denied": [],
+      "burst_filled": 6,
+      "denied": [],
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "cash transitions differ: native 13 rows, ledger 13",
+        "fill_time_1900": "fill mismatch O-20210104-210000-001-000-1",
+        "fill_time_shifted_one_hour": "fill mismatch O-20210104-210000-001-000-1",
+        "venue_rejection_injected": "venue rejections are not expected in this probe: [{'client_order_id': 'X', 'reason': 'injected'}]",
+        "wrong_instrument_first_fill": "fill mismatch O-20210104-210000-001-000-1"
+      },
+      "oversized_denied_reason": null,
+      "oversized_filled": true,
+      "oversized_order": {
+        "asset": "SPY",
+        "client_order_id": "O-20210105-210000-001-000-4",
+        "date": "2021-01-05",
+        "notional": "59784.1300",
+        "qty": 161,
+        "side": "BUY",
+        "tag": "oversized"
+      },
+      "reconciliation": {
+        "account_rows": 14,
+        "cash_transitions_matched": 13,
+        "ending_cash_ledger": "1006586.37",
+        "ending_cash_native": "1006586.37",
+        "expected_fills": 13,
+        "fees_usd": "13",
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        },
+        "native_fills": 13
+      },
+      "rejected": [],
+      "report_sha256": {
+        "account": "aad1ef5426dd2a8c2bc443117808b0141200ed87a31f841c7cc59a7bc6b85431",
+        "fills": "99365f1dbb425caa05b7c3815b993b451cead46887a5776c8c117578fb8936d5",
+        "positions": "92a5b2a89a474ca968e2047ea34ad291a3d77fc237bd471453d60b7422f20b1d"
+      },
+      "submitted": 13,
+      "target_order_notionals": [
+        "30978.3600",
+        "27219.2800",
+        "41215.5000"
+      ],
+      "target_orders_denied": [],
+      "target_orders_filled": 3,
+      "target_orders_submitted": 3
+    },
+    "limits": {
+      "burst_denied": [
+        "RATE_LIMIT_EXCEEDED",
+        "RATE_LIMIT_EXCEEDED"
+      ],
+      "burst_filled": 4,
+      "denied": [
+        {
+          "client_order_id": "O-20210105-210000-001-000-4",
+          "reason": "NOTIONAL_EXCEEDS_MAX_PER_ORDER: max=45000.00 USD, notional=59784.13 USD"
+        },
+        {
+          "client_order_id": "O-20210106-210000-001-000-9",
+          "reason": "RATE_LIMIT_EXCEEDED"
+        },
+        {
+          "client_order_id": "O-20210106-210000-001-000-10",
+          "reason": "RATE_LIMIT_EXCEEDED"
+        }
+      ],
+      "mutation_self_tests": {
+        "cash_corrupted_first_transition": "cash transitions differ: native 10 rows, ledger 10",
+        "fill_time_1900": "fill mismatch O-20210104-210000-001-000-1",
+        "fill_time_shifted_one_hour": "fill mismatch O-20210104-210000-001-000-1",
+        "venue_rejection_injected": "venue rejections are not expected in this probe: [{'client_order_id': 'X', 'reason': 'injected'}]",
+        "wrong_instrument_first_fill": "fill mismatch O-20210104-210000-001-000-1"
+      },
+      "oversized_denied_reason": "NOTIONAL_EXCEEDS_MAX_PER_ORDER: max=45000.00 USD, notional=59784.13 USD",
+      "oversized_filled": false,
+      "oversized_order": {
+        "asset": "SPY",
+        "client_order_id": "O-20210105-210000-001-000-4",
+        "date": "2021-01-05",
+        "notional": "59784.1300",
+        "qty": 161,
+        "side": "BUY",
+        "tag": "oversized"
+      },
+      "reconciliation": {
+        "account_rows": 11,
+        "cash_transitions_matched": 10,
+        "ending_cash_ledger": "1004967.66",
+        "ending_cash_native": "1004967.66",
+        "expected_fills": 10,
+        "fees_usd": "10",
+        "final_shares": {
+          "IWM": 0,
+          "QQQ": 0,
+          "SPY": 0
+        },
+        "native_fills": 10
+      },
+      "rejected": [],
+      "report_sha256": {
+        "account": "1cf6056f35d096a811c24b0e8a35d75cef35af4e0010522b42309d2d6aab645c",
+        "fills": "d09ceece5cfd61f70534dcd8e1ab3567d41c6a9c62aff7897d0fbb4621db57f0",
+        "positions": "96f9ad8ffcf2f63673dff894efa453076c971eca7cf5bf69a3e1fece827a7356"
+      },
+      "submitted": 13,
+      "target_order_notionals": [
+        "30978.3600",
+        "27219.2800",
+        "41215.5000"
+      ],
+      "target_orders_denied": [],
+      "target_orders_filled": 3,
+      "target_orders_submitted": 3
+    }
+  },
+  "criteria": {
+    "a_target_orders_filled_under_limits": true,
+    "b_oversized_denied_with_notional_reason": true,
+    "c_control_fills_oversized": true,
+    "d_burst_order_denied_by_rate": true,
+    "e_positions_and_cash_reconciled_both_arms": true
+  },
+  "engine": "2.0.0rc5",
+  "hrp_reserved_weights": {
+    "IWM": 0.4138079135185544,
+    "QQQ": 0.2751279843514368,
+    "SPY": 0.3110641021300088
+  },
+  "inputs_unchanged": true,
+  "limits": {
+    "max_notional_per_order_usd": "45000",
+    "max_order_submit_rate": "4/00:00:01"
+  },
+  "runner_sha256": "e1c3be61ab961e3adca34500a7609d657657205cfd2d6aa922b72712a41fe1e9",
+  "weights_sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765"
+}

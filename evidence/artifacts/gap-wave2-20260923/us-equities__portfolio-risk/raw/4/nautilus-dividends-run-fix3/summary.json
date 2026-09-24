@@ -1,0 +1,111 @@
+{
+  "capital_usd": "1000000",
+  "distribution_events": {
+    "IWM": 21,
+    "QQQ": 21,
+    "SPY": 21
+  },
+  "engine": "2.0.0rc5",
+  "fee_per_order_usd": "1",
+  "inputs_unchanged": true,
+  "invest_fraction": "0.99",
+  "mutation_self_tests": {
+    "hrp_variance": {
+      "all_decisions_removed": "decision mismatch",
+      "cash_corrupted_first_transition": "account transitions differ: native 129 rows, ledger 129",
+      "decision_equity_off_by_one_cent": "decision mismatch",
+      "dividend_account_row_removed": "account transitions differ: native 128 rows, ledger 129",
+      "dividend_account_transition_off_by_one_cent": "account transitions differ: native 129 rows, ledger 129",
+      "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+      "emission_ex_date_shifted_one_day": "distribution emissions differ from ledger credits",
+      "emission_removed": "distribution emissions differ from ledger credits",
+      "fill_time_1900": "fill mismatch",
+      "fill_time_shifted_one_hour": "fill mismatch",
+      "module_error_injected": "distribution module errors: [[\"injected\"], [], []]",
+      "wrong_instrument_first_fill": "fill mismatch"
+    },
+    "meanrisk_min_variance": {
+      "all_decisions_removed": "decision mismatch",
+      "cash_corrupted_first_transition": "account transitions differ: native 97 rows, ledger 97",
+      "decision_equity_off_by_one_cent": "decision mismatch",
+      "dividend_account_row_removed": "account transitions differ: native 96 rows, ledger 97",
+      "dividend_account_transition_off_by_one_cent": "account transitions differ: native 97 rows, ledger 97",
+      "emission_amount_off_by_one_cent": "distribution emissions differ from ledger credits",
+      "emission_ex_date_shifted_one_day": "distribution emissions differ from ledger credits",
+      "emission_removed": "distribution emissions differ from ledger credits",
+      "fill_time_1900": "fill mismatch",
+      "fill_time_shifted_one_hour": "fill mismatch",
+      "module_error_injected": "distribution module errors: [[\"injected\"], [], []]",
+      "wrong_instrument_first_fill": "fill mismatch"
+    }
+  },
+  "optimizers": {
+    "hrp_variance": {
+      "account_transitions_matched": 129,
+      "decisions_matched": 22,
+      "distribution_credits": 63,
+      "dividend_cash_usd": "111669.90",
+      "ending_cash_ledger": "2451556.98",
+      "ending_cash_native": "2451556.98",
+      "fees_usd": "66",
+      "fills_matched": 66,
+      "final_shares": {
+        "IWM": 0,
+        "QQQ": 0,
+        "SPY": 0
+      },
+      "native_total_return": "1.45155698",
+      "nonzero_distribution_credits": 63,
+      "open_orders": 0,
+      "open_positions": 0,
+      "report_sha256": {
+        "account": "01b2607947228effdddedce1b660659794db4cfe3e9420bd2943c05090199d7b",
+        "fills": "8e38f2b38d1c23fde02bc23de7959c3ddcf61dd017c7a082193e7cb871833bff",
+        "positions": "60a23d9c1f04e52900aa8d5cac69031359498add290fd3737b180518ce26b70b"
+      },
+      "total_pnl_usd": "1451556.98"
+    },
+    "meanrisk_min_variance": {
+      "account_transitions_matched": 97,
+      "decisions_matched": 22,
+      "distribution_credits": 63,
+      "dividend_cash_usd": "138948.42",
+      "ending_cash_ledger": "2207656.15",
+      "ending_cash_native": "2207656.15",
+      "fees_usd": "34",
+      "fills_matched": 34,
+      "final_shares": {
+        "IWM": 0,
+        "QQQ": 0,
+        "SPY": 0
+      },
+      "native_total_return": "1.20765615",
+      "nonzero_distribution_credits": 30,
+      "open_orders": 0,
+      "open_positions": 0,
+      "report_sha256": {
+        "account": "ff6b2a5544e28a17e753568f42d2e67120fc3523c6bbd3de8d1abd9302367c6f",
+        "fills": "7ff6fc82372d349d6f37f677ae64668ab10b9e4a88d964be7045c7f02e3d6b6f",
+        "positions": "fbbc976fb6e6d595905f7396600c6cab8bc3cb08be7180aeb828e9ce3fddca91"
+      },
+      "total_pnl_usd": "1207656.15"
+    }
+  },
+  "runner_sha256": "d5a1f14ce891925ba0cee61cee8b082c6635057a4bcbc1ba992e895b188423b0",
+  "self_test": {
+    "hrp_variance": {
+      "detected": "fill mismatch",
+      "perturbation": "ledger fee +0.01 USD"
+    },
+    "meanrisk_min_variance": {
+      "detected": "fill mismatch",
+      "perturbation": "ledger fee +0.01 USD"
+    }
+  },
+  "vendored_distribution_module": {
+    "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/vendored/distribution_module.py",
+    "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "source": "origin/main 51d66001205dfe7722555d69b0a3f29d09a2164e blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py"
+  },
+  "weights_sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765"
+}

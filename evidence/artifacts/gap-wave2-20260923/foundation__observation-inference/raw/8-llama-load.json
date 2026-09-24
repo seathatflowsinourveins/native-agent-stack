@@ -1,0 +1,381 @@
+{
+  "started_at": "2026-09-23T03:18:07.587573+00:00",
+  "profile": {
+    "parallel": 4,
+    "ctx": 8192,
+    "max_tokens": 32
+  },
+  "fixtures": [
+    "fib",
+    "planner-repair",
+    "primes",
+    "summary"
+  ],
+  "gpu_before": {
+    "free_mib": 19060,
+    "used_mib": 5078,
+    "total_mib": 24463
+  },
+  "command": [
+    "$HOME/.cache/gap-wave2-20260923/observation-inference/llama-b11057/runtime/llama-b11057/llama-server",
+    "--model",
+    "$HOME/.cache/gap-wave2-20260923/observation-inference/llama-b11057/dl/Qwen3.8-27B-Q4_K_M.gguf",
+    "--alias",
+    "local-qwen38-frozen",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "59818",
+    "--ctx-size",
+    "8192",
+    "--parallel",
+    "4",
+    "--n-gpu-layers",
+    "32",
+    "--batch-size",
+    "128",
+    "--ubatch-size",
+    "128",
+    "--threads",
+    "8",
+    "--n-predict",
+    "1536",
+    "--fit",
+    "off",
+    "--no-webui",
+    "--no-agent",
+    "--jinja",
+    "--perf"
+  ],
+  "cold_start_healthy_s": 14.118,
+  "phase1_concurrent": {
+    "requests": 12,
+    "ok": 12,
+    "failed": 0,
+    "success_rate": 1.0,
+    "wall_s": 130.483,
+    "latency_ok_s": [
+      22.617,
+      31.147,
+      59.442,
+      60.103,
+      66.117,
+      70.378,
+      94.779,
+      98.729,
+      103.912,
+      106.77,
+      118.458,
+      119.795
+    ],
+    "completion_tokens_ok": 333,
+    "errors": [],
+    "rows": [
+      {
+        "fixture": "planner-repair",
+        "ok": true,
+        "http": 200,
+        "latency_s": 106.77,
+        "completion_tokens": 32,
+        "prompt_tokens": 791,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "fib",
+        "ok": true,
+        "http": 200,
+        "latency_s": 66.117,
+        "completion_tokens": 32,
+        "prompt_tokens": 31,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "primes",
+        "ok": true,
+        "http": 200,
+        "latency_s": 22.617,
+        "completion_tokens": 15,
+        "prompt_tokens": 22,
+        "finish_reason": "stop"
+      },
+      {
+        "fixture": "summary",
+        "ok": true,
+        "http": 200,
+        "latency_s": 70.378,
+        "completion_tokens": 32,
+        "prompt_tokens": 28,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "planner-repair",
+        "ok": true,
+        "http": 200,
+        "latency_s": 119.795,
+        "completion_tokens": 32,
+        "prompt_tokens": 791,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "fib",
+        "ok": true,
+        "http": 200,
+        "latency_s": 98.729,
+        "completion_tokens": 32,
+        "prompt_tokens": 31,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "primes",
+        "ok": true,
+        "http": 200,
+        "latency_s": 31.147,
+        "completion_tokens": 15,
+        "prompt_tokens": 22,
+        "finish_reason": "stop"
+      },
+      {
+        "fixture": "summary",
+        "ok": true,
+        "http": 200,
+        "latency_s": 118.458,
+        "completion_tokens": 32,
+        "prompt_tokens": 28,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "planner-repair",
+        "ok": true,
+        "http": 200,
+        "latency_s": 103.912,
+        "completion_tokens": 32,
+        "prompt_tokens": 791,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "fib",
+        "ok": true,
+        "http": 200,
+        "latency_s": 94.779,
+        "completion_tokens": 32,
+        "prompt_tokens": 31,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "primes",
+        "ok": true,
+        "http": 200,
+        "latency_s": 59.442,
+        "completion_tokens": 15,
+        "prompt_tokens": 22,
+        "finish_reason": "stop"
+      },
+      {
+        "fixture": "summary",
+        "ok": true,
+        "http": 200,
+        "latency_s": 60.103,
+        "completion_tokens": 32,
+        "prompt_tokens": 28,
+        "finish_reason": "length"
+      }
+    ]
+  },
+  "phase2_kill_midload": {
+    "requests": 8,
+    "ok": 0,
+    "failed": 8,
+    "success_rate": 0.0,
+    "wall_s": 8.518,
+    "latency_ok_s": [],
+    "completion_tokens_ok": 0,
+    "errors": [
+      "RemoteDisconnected"
+    ],
+    "rows": [
+      {
+        "fixture": "planner-repair",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.416
+      },
+      {
+        "fixture": "fib",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.417
+      },
+      {
+        "fixture": "primes",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.416
+      },
+      {
+        "fixture": "summary",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.416
+      },
+      {
+        "fixture": "planner-repair",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.415
+      },
+      {
+        "fixture": "fib",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.415
+      },
+      {
+        "fixture": "primes",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.414
+      },
+      {
+        "fixture": "summary",
+        "ok": false,
+        "error": "RemoteDisconnected",
+        "detail": "Remote end closed connection without response",
+        "latency_s": 8.414
+      }
+    ],
+    "kill": {
+      "at_s": 8.003,
+      "done_before_kill": 0,
+      "exit": -9
+    }
+  },
+  "restart_healthy_after_start_s": 5.264,
+  "restart_first_request": {
+    "fixture": "primes",
+    "ok": true,
+    "http": 200,
+    "latency_s": 4.923,
+    "completion_tokens": 15,
+    "prompt_tokens": 22,
+    "finish_reason": "stop"
+  },
+  "recovery_kill_to_first_success_s": 10.702,
+  "phase3_after_restart": {
+    "requests": 8,
+    "ok": 8,
+    "failed": 0,
+    "success_rate": 1.0,
+    "wall_s": 57.67,
+    "latency_ok_s": [
+      9.005,
+      12.101,
+      20.722,
+      20.723,
+      49.087,
+      49.792,
+      56.225,
+      57.669
+    ],
+    "completion_tokens_ok": 222,
+    "errors": [],
+    "rows": [
+      {
+        "fixture": "planner-repair",
+        "ok": true,
+        "http": 200,
+        "latency_s": 57.669,
+        "completion_tokens": 32,
+        "prompt_tokens": 791,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "fib",
+        "ok": true,
+        "http": 200,
+        "latency_s": 20.723,
+        "completion_tokens": 32,
+        "prompt_tokens": 31,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "primes",
+        "ok": true,
+        "http": 200,
+        "latency_s": 9.005,
+        "completion_tokens": 15,
+        "prompt_tokens": 22,
+        "finish_reason": "stop"
+      },
+      {
+        "fixture": "summary",
+        "ok": true,
+        "http": 200,
+        "latency_s": 20.722,
+        "completion_tokens": 32,
+        "prompt_tokens": 28,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "planner-repair",
+        "ok": true,
+        "http": 200,
+        "latency_s": 56.225,
+        "completion_tokens": 32,
+        "prompt_tokens": 791,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "fib",
+        "ok": true,
+        "http": 200,
+        "latency_s": 49.087,
+        "completion_tokens": 32,
+        "prompt_tokens": 31,
+        "finish_reason": "length"
+      },
+      {
+        "fixture": "primes",
+        "ok": true,
+        "http": 200,
+        "latency_s": 12.101,
+        "completion_tokens": 15,
+        "prompt_tokens": 22,
+        "finish_reason": "stop"
+      },
+      {
+        "fixture": "summary",
+        "ok": true,
+        "http": 200,
+        "latency_s": 49.792,
+        "completion_tokens": 32,
+        "prompt_tokens": 28,
+        "finish_reason": "length"
+      }
+    ]
+  },
+  "server_exit_final": 0,
+  "gpu_after": {
+    "free_mib": 19104,
+    "used_mib": 5034,
+    "total_mib": 24463
+  },
+  "gpu_min_free_mib": 9135,
+  "gpu_max_used_mib": 15003,
+  "memory_guard_events": [],
+  "stopped_at": "2026-09-23T03:21:49.984392+00:00",
+  "server_log_signals": {
+    "offloaded": 0,
+    "CUDA0": 0,
+    "error": 0,
+    "slot launch_slot_": 25,
+    "all slots are idle": 0
+  },
+  "server_log_offload_lines": []
+}

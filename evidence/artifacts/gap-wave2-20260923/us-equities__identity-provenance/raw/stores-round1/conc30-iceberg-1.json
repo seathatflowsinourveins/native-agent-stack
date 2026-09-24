@@ -1,0 +1,29 @@
+{
+  "arm": "iceberg",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "no_silent_loss": true,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 300,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "readable": true,
+      "rows": 300,
+      "snapshots": 60
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": "Commit failed due to a concurrent update, retrying (1/4) in 108 ms\nCommit failed due to a concurrent update, retrying (2/4) in 202 ms\nCommit failed due to a concurrent update, retrying (3/4) in 414 ms\n"
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Layer-verdict lane return v1",
-  "description": "One lane's (claude or codex) judgment of one catalog layer's packet, produced by tools/sota-convergence/lane_packets.py and consumed by (a later unit's) record_verdicts.py. Fully inlined (no $ref/$defs) and additionalProperties: false everywhere so this file is directly usable as a codex --output-schema file. evidence_class/disposition enum values are the sorted WINNER_EVIDENCE_CLASSES/DISPOSITIONS sets from scripts/landscape.py, duplicated here literally because a static schema file cannot import them at runtime; tests/test_lane_packets.py asserts the two stay in sync.",
+  "description": "One lane's (claude or codex) judgment of one catalog layer's packet, produced by tools/sota-convergence/lane_packets.py and consumed by (a later unit's) record_verdicts.py. Fully inlined (no $ref/$defs) and additionalProperties: false everywhere so this file is directly usable as a codex --output-schema file. evidence_class/disposition enum values are the sorted WINNER_EVIDENCE_CLASSES/DISPOSITIONS sets from scripts/landscape.py, duplicated here literally because a static schema file cannot import them at runtime; tests/test_lane_packets.py asserts the two stay in sync. model.family and provenance are runner-owned (record_verdicts.py requires them outside the grandfathered 2026-09-22 wave: family anthropic for the claude lane and openai for the codex lane; provenance {workflow_path, workflow_sha256, agentlab_commit} for claude and {codex_lane_py_sha256, prompt_sha256} for codex); codex_lane.py writes both itself and drops them from the strict copy it passes to codex exec. refutation is the Claude lane's refutation summary (layer-verdict-lane.js, copied by claude_lane.py); record_verdicts.py requires a new-wave Claude return to carry it with status unrefuted and both lens votes on the sealed round unrefuted, and codex_lane.py drops it from the strict copy.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,8 @@
       "required": ["name", "effort"],
       "properties": {
         "name": {"type": "string", "minLength": 1},
-        "effort": {"type": "string", "minLength": 1}
+        "effort": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "enum": ["anthropic", "openai"]}
       }
     },
     "winner_keys": {
@@ -92,6 +93,42 @@
     },
     "open_gaps": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "sources_read": {"type": "array", "items": {"type": "string", "minLength": 1}},
-    "limits": {"type": "array", "items": {"type": "string", "minLength": 1}}
+    "limits": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "refutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "final_source", "proposal_status", "revision_status", "votes"],
+      "properties": {
+        "status": {"type": "string", "enum": ["refuted", "unknown", "unrefuted"]},
+        "final_source": {"type": ["string", "null"], "enum": ["proposal", "revision", null]},
+        "proposal_status": {"type": ["string", "null"], "enum": ["refuted", "unknown", "unrefuted", null]},
+        "revision_status": {"type": ["string", "null"], "enum": ["refuted", "unknown", "unrefuted", null]},
+        "votes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["lens", "round", "refuted", "reason"],
+            "properties": {
+              "lens": {"type": "string", "enum": ["challenger", "evidence"]},
+              "round": {"type": "string", "enum": ["proposal", "revision"]},
+              "refuted": {"type": ["boolean", "null"]},
+              "reason": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workflow_path": {"type": "string", "pattern": "\\.js$"},
+        "workflow_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "agentlab_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "codex_lane_py_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "prompt_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
   }
 }

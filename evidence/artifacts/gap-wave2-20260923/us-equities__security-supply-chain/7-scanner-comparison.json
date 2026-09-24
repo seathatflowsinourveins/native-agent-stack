@@ -1,0 +1,148 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/7",
+  "gap_index": 7,
+  "gap_text": "No measured comparison exists between the winners and any alternative scanner or SBOM tool. The winners rest on native execution only.",
+  "gap_text_sha256": "6293d574babf87bad429e4d5dc7d12a9a00208bb2ea31afb39c77b4bc2c1e797",
+  "next_check": "On the same Nautilus runtime venv, compare package counts and matches from syft against trivy (or cdxgen) and from grype against osv-scanner (or pip-audit).",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "Trivy and Syft agree on most of the 21 Python packages in the Nautilus venv; osv-scanner (or pip-audit) and Grype both report 0 vulnerabilities for the venv, and both detect the known-vulnerable positive control.",
+    "criteria": [
+      "settled if all four arms run on the same venv: syft vs trivy package counts (with set difference) and grype vs osv-scanner/pip-audit matches, plus a positive control that each vulnerability scanner detects",
+      "advanced if one arm cannot run here (record blocker)"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh install   # trivy 0.74.0 (asset digest, checksum list, cosign bundle), osv-scanner 2.6.0 (asset digest, SHA256SUMS), pip-audit 2.10.1 via uv into an isolated venv",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh scan",
+    "syft scan dir:<nautilus rc5 site-packages> -o syft-json -o cyclonedx-json",
+    "ecosystem-bounded-run trivy rootfs --scanners vuln --list-all-pkgs --cache-dir <isolated> <same site-packages>",
+    "grype sbom:<syft json>; osv-scanner scan source -L <syft cdx json>; pip-audit --path <same site-packages> --format json",
+    "positive controls: trivy fs <dir with requirements.txt requests==2.19.0 urllib3==1.24.1>; osv-scanner -L that requirements.txt; pip-audit -r that file --no-deps --disable-pip; grype purl: control from gap 0"
+  ],
+  "results": [
+    "trivy-asset-digest exit=0; trivy-checksum-list exit=0; trivy-cosign-verify exit=0 'Verified OK'; osv-asset-digest exit=0; osv-checksum-list exit=0; pip-audit-install exit=0 (first venv attempt exit=1: host python lacks ensurepip; retried with uv)",
+    "trivy DB downloaded from mirror.gcr.io/aquasec/trivy-db:2 (116.44 MiB), UpdatedAt 2026-09-23T12:53:55Z",
+    "syft 21 python packages; trivy 21 python-pkg packages; raw (name, version) difference: syft-only [pydantic-core 2.46.5, typing-extensions 4.16.0], trivy-only [pydantic_core 2.46.5, typing_extensions 4.16.0]; after PEP 503 name normalization (lowercase, [-_.]+ -> '-'): syft-only [], trivy-only [], both 21 (raw/compare/inventory-diff.json, computed by inventory_diff.py from the committed raw files)",
+    "grype-venv exit=0: 0 matches; trivy-rootfs exit=0: 0 vulnerabilities; osv-venv exit=0: stderr 'found 21 packages', osv.json '\"results\": []'; pip-audit-venv-scan exit=0: stderr 'No known vulnerabilities found', pip-audit.json 21 dependencies, 0 vulns",
+    "positive controls: grype 17 GHSA ids; trivy 17 CVE ids; osv-scanner exit=1 34 ids (17 GHSA + PYSEC aliases, 17 groups); pip-audit exit=1 'Found 34 known vulnerabilities in 2 packages'; all 17 grype GHSA ids appear in osv-scanner's 17 alias groups"
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Agreement on a zero-finding target has little discriminating power; the positive control shows detection, not equal recall on real-world findings.",
+    "Different databases and times: Grype DB 2026-09-23T06:31:39Z, Trivy DB 2026-09-23T12:53:55Z, osv-scanner and pip-audit query live APIs at 16:42Z.",
+    "One venv (21 Python packages); no OS, binary or container comparison.",
+    "Network downloads: trivy archive 50.4 MB, trivy DB 116.44 MiB, osv-scanner 57.5 MB, pip-audit and dependencies from PyPI."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "Same Nautilus rc5 venv: Syft and Trivy inventories identical after PEP 503 name normalization (21/21; raw names differ only in '-' vs '_' for pydantic-core and typing-extensions); Grype, osv-scanner and pip-audit (plus Trivy) all report 0 vulnerabilities; every scanner detects the positive control (17 advisories, 34 ids with PYSEC aliases).",
+  "raw_outputs": [
+    {
+      "path": "raw/compare/exits.log",
+      "sha256": "6f96c33a00b19f07a33b3bac4c2744e61edc092df7f66df82e2010e47afaa11e"
+    },
+    {
+      "path": "raw/compare/versions.txt",
+      "sha256": "af96475a6dd76a58e91c028dab242b9010520a1265a335b3a1477e4a19bd166b"
+    },
+    {
+      "path": "raw/compare/syft.summary.json",
+      "sha256": "075bc97ed32a9053e53bc1fc46f7cac79ffe86b9f448658c0119259bac1c5ef0"
+    },
+    {
+      "path": "raw/compare/trivy.json",
+      "sha256": "8b378860ee10ba0a35a6d1d1d02362c4ce965ac3455c058a727894248692feb7"
+    },
+    {
+      "path": "raw/compare/trivy.stderr.txt",
+      "sha256": "ae27da4dd94fdae13148aa062393b59872e17846db3785e368ab0bc7fc003901"
+    },
+    {
+      "path": "raw/compare/trivy-positive.json",
+      "sha256": "92c47d977853d8ee957ba9c4488d15338d803a085ac56ad8cfe76e05a089ac47"
+    },
+    {
+      "path": "raw/compare/grype.json",
+      "sha256": "a843cae2b7ecdebdb6495631ca28ff5afba500290286fad5522dbf74176a1458"
+    },
+    {
+      "path": "raw/compare/osv.stderr.filtered.txt",
+      "sha256": "a9be82f2a762f82d014de6b504698a60c71ce3994e37021a61c8dfc9b950f237"
+    },
+    {
+      "path": "raw/compare/osv-positive.json",
+      "sha256": "9daa0f88577f12fb12f519938c97614b7714849e059fbac8855124da0908b067"
+    },
+    {
+      "path": "raw/compare/pip-audit.json",
+      "sha256": "ac2c9886943455736e6c905de8b2b5fa0adc0d410fd2aefd24f4fb47bb9f9b24"
+    },
+    {
+      "path": "raw/compare/pip-audit-positive.json",
+      "sha256": "7eeeaa70ba8c93a3ea9b466428894fc1497ff090639b08f065cc5dac592a581d"
+    },
+    {
+      "path": "raw/compare/positive/requirements.txt.fixture",
+      "sha256": "4230baa82e2249a967fe4fac6fce1b6c642b590d53030e0d72e328b4619da535"
+    },
+    {
+      "path": "raw/compare/trivy-cosign.stderr",
+      "sha256": "80a53f76c7ed6969dade3b6ee47cdb753162db7c00be625448999d08bae77ed8"
+    },
+    {
+      "path": "raw/compare/osv.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+    },
+    {
+      "path": "raw/compare/pip-audit.stderr",
+      "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    {
+      "path": "raw/compare/pip-audit-positive.stderr",
+      "sha256": "0a259496ae48f6f5a53cb6cf7c514604b29c3b878112190b095d659ff0c81b1c"
+    },
+    {
+      "path": "raw/compare/scan.driver.log",
+      "sha256": "c89b242e520b9c10c464ee0d096b263c6029c41447892ab75e18b90292cb21cc"
+    },
+    {
+      "path": "raw/compare/inventory-diff.json",
+      "sha256": "f21566f275eb3ab2cd11534988a7ec33815f6d4eda70efcfc3280ba327ab7a1a"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  },
+  "fix_round_preregistration": {
+    "written_at": "2026-09-23T16:56:53Z",
+    "label": "fix round after independent Opus review; written before the fix-round checks ran",
+    "expectation": "Committing the osv-scanner venv output (osv.json) shows results [] for the 21-package SBOM; the quoted 'No known vulnerabilities found' is expected to come from pip-audit's stderr, not osv-scanner, and is re-attributed. A committed helper recomputes the Syft vs Trivy inventory difference from the committed raw files, both raw and after PEP 503 name normalization.",
+    "criteria": [
+      "osv arm: committed osv.json has an empty results array and osv-venv exit=0 in exits.log",
+      "inventory arm: the normalized (PEP 503: lowercase, runs of [-_.] to '-') symmetric difference is empty; the raw difference is reported as found",
+      "if the normalized difference is non-empty the receipt changes from settled to advanced"
+    ]
+  }
+}

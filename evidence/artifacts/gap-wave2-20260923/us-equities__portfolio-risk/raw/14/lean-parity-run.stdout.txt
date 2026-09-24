@@ -1,0 +1,1 @@
+{"out": "$HOME/.cache/gap-wave2-20260923/portfolio-risk/lean-parity-attempt1", "commands": 7, "inputs_unchanged": true}

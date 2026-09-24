@@ -1,0 +1,25 @@
+All cited hashes match. Recorded preregistrations precede their runs; gap 2 is labelled late. No committed secret, expanded host path, or live-service mutation was apparent; gap 2 explicitly reads live journal/unit state.
+
+1. **Medium — `preregistrations.json`, all receipts:** The scoped files omit the original `next_check` texts. Complete arm-by-arm closure cannot be verified. **Fix:** retain each original `next_check` alongside its executed/unexecuted arms.
+
+2. **Medium — receipt 0, [privacy_canary.py:174]($HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py:174):** Positive controls need appear in only *one* backend, although preregistration requires every applicable backend. Removing backend detections still passes the predicate. **Fix:** enforce an explicit field-to-backend expectation matrix. The retained run’s quoted results match.
+
+3. **Medium — receipt 1, [reconcile_usage.py:197]($HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/reconcile_usage.py:197):** The script exits successfully when model-usage totals match even if native-result usage mismatches; attribution failure also does not affect exit status. A synthetic evaluation reproduced exit 0. **Fix:** require the preregistered result-usage equality and enforce attribution criteria when qualifying receipt 3. Current recorded values do match.
+
+4. **Medium — `2-scheduled-unit-journal-persistence.json`, result 6:** The quoted 09:30 timeout, signal codes, and `TimeoutStartSec=90` are absent from cited raw evidence. Both retained timeout timestamps are approximately **09:36:31 EDT**. **Fix:** retain sanitized supporting journal entries or remove/correct the unsupported quotation.
+
+5. **Medium — receipt 2, [journal_timer.py:107]($HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/journal_timer.py:107):** Any later service completion counts as recovery after a reload/start. A run already executing before reload—or one started manually—can satisfy this without a subsequent timer firing. **Fix:** distinguish “completion observed afterward” from timer firing; correlate invocation starts and timer triggers before claiming timer recovery.
+
+6. **High — `3-task-attribution-isolated.json`, `results.json`, `README.md`:** “Settled” conflicts with the explicitly unexecuted preregistered live-export absence check. Arrival at the isolated collector cannot exclude simultaneous export elsewhere. **Fix:** mark **advanced**, naming the missing isolation check; complete a probe with demonstrated detection capability before settlement.
+
+7. **Medium — `README.md:31`, `reconcile_usage.py` isolation description:** “Plugins … were not loaded” conflicts with raw `plugin_loaded: 2`. This does not establish live-store access, but invalidates that isolation assurance. **Fix:** identify the loaded plugins using sanitized evidence and correct or substantiate the claim.
+
+8. **Medium — `4-sdk-spool-fill-outage-expiry.json`:** Preregistration requires Loki to be down during part of the collector outage. The scripts run these outages sequentially, and this missing combined-outage arm is not named among remaining work. **Fix:** retain **advanced** and explicitly list—or execute—the overlapping-outage check.
+
+9. **Low — receipt 4, [spool_followup.py:90]($HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/spool_followup.py:90):** The quoted 0.38/0.39 seconds starts before the expiry function’s Loki query, not at deletion. **Fix:** label it elapsed time from expiry invocation, or timestamp unlink completion to measure release after deletion.
+
+10. **Receipt 5 — no finding.** Quoted results match; **advanced** appropriately preserves deployment/privacy gaps and the ten-trace sampling limit.
+
+11. **Low — receipt 6, [alert_latency.py:103]($HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/alert_latency.py:103):** Resolved latency starts *after* the POST response, unlike firing latency measured before sending. **Fix:** timestamp before the resolved POST, or relabel existing measurements as response-to-notification latency. Firing measurements remain supported.
+
+12. **Receipt 8 — no finding.** Quoted measurements match raw results; **advanced** correctly retains portability, repeated-trial, and quality limitations.

@@ -23,8 +23,10 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import time
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,6 +44,19 @@ RESULTS = {"pass", "fail", "partial", "not_runnable"}
 EVIDENCE_CLASSES = {"native_proven", "local_integration", "synthetic"}
 REVIEW_KINDS = {"self", "independent_session", "codex_lane", "human"}
 REVIEW_VERDICTS = {"agree", "disagree", "needs_changes"}
+QUALIFIED_MODEL_REQUIRED = ["model_id", "revision", "runtime", "runtime_version", "bars", "result"]
+QUALIFIED_MODEL_RESULTS = {"pass", "fail"}
+
+# Identity of whoever records or reviews a receipt, stored only as a domain-separated sha256
+# (a fixed public prefix, not a secret salt: a guessable --identity can be recovered by
+# dictionary, so use a random per-session token). A Claude Code session exports
+# CLAUDE_CODE_SESSION_ID (observed in Claude Code 2.1.280) and is always identified by it; a
+# Codex session, a human or CI has no such variable and must pass --identity. There is no
+# default: an absent identity fails closed rather than making every such recorder the same
+# identity.
+IDENTITY_ENV = "CLAUDE_CODE_SESSION_ID"
+IDENTITY_DOMAIN = "host-receipt-identity-v1:"
+DISSENT_VERDICTS = {"disagree", "needs_changes"}
 
 HOST_ID_PATTERN = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -62,6 +77,10 @@ COMMAND_REQUIRED = ["cmd", "exit", "duration_s", "output_sha256", "output_excerp
 REVIEW_REQUIRED = ["kind", "ref", "verdict", "at_utc"]
 
 DEFAULT_TIMEOUT_S = 120
+# How far ahead of the validating machine's clock an observation or review may be dated
+# (clock skew between hosts). A later date would sort as the "latest" receipt or review and
+# could not be superseded, so validate refuses it.
+FUTURE_SKEW_S = 15 * 60
 MAX_EXCERPT_CHARS = 400
 
 
@@ -84,7 +103,78 @@ def load_json(root: Path, relative: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
 
 
+def identity_digest(value: str) -> str:
+    return hashlib.sha256((IDENTITY_DOMAIN + value).encode("utf-8")).hexdigest()
+
+
+class IdentityError(ValueError):
+    """An identity that cannot be used; the message says why."""
+
+
+def normalize_identity(value: str) -> str:
+    """NFKC, case-folded, whitespace-collapsed, so 'Alice' and ' alice ' are one identity."""
+    return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
+
+
+def resolve_identity(explicit: str | None) -> str | None:
+    """Digest of $CLAUDE_CODE_SESSION_ID when set (a Claude Code session cannot choose another
+    identity), else of the normalized --identity, else None (callers fail closed)."""
+    session = os.environ.get(IDENTITY_ENV, "").strip()
+    chosen = normalize_identity(explicit or "")
+    if session:
+        if chosen:
+            raise IdentityError(
+                f"--identity is for sessions without ${IDENTITY_ENV}; this Claude Code session is identified "
+                "by its session id, so a review from it cannot pose as another reviewer")
+        return identity_digest(session)
+    return identity_digest(chosen) if chosen else None
+
+
+def normalize_pin(value) -> str | None:
+    """Comparable form of a pin or recorded version: lower-cased, whitespace collapsed, and a
+    leading 'v' dropped from each token that continues with a digit ('v1.52.0' -> '1.52.0').
+    ``None`` when the text has no digit (for example 'unpinned'): such a value cannot bind."""
+    if not isinstance(value, str):
+        return None
+    tokens = [token[1:] if re.fullmatch(r"v[0-9].*", token) else token for token in value.lower().split()]
+    text = " ".join(tokens)
+    return text if re.search(r"[0-9]", text) else None
+
+
+HEX_PREFIX_MIN = 7
+FULL_COMMIT_LENGTHS = {40, 64}
+
+
+def pin_matches(recorded, pin) -> bool:
+    """True when a recorded component version is ``pin``: equal after ``normalize_pin``, or
+    an abbreviation (at least 7 hex characters) of a full 40- or 64-character commit id. A
+    value without a digit ('unpinned') never binds."""
+    left, right = normalize_pin(recorded), normalize_pin(pin)
+    if not left or not right:
+        return False
+    if left == right:
+        return True
+    shorter, longer = sorted((left, right), key=len)
+    hexy = re.compile(r"[0-9a-f]+")
+    return (len(longer) in FULL_COMMIT_LENGTHS and len(shorter) >= HEX_PREFIX_MIN
+            and hexy.fullmatch(longer) is not None and hexy.fullmatch(shorter) is not None
+            and longer.startswith(shorter))
+
+
+def identity_record(digest: str, model: str | None) -> dict:
+    record = {"identity_sha256": digest}
+    if model and model.strip():
+        record["model"] = model.strip()
+    return record
+
+
+def require_git() -> None:
+    if shutil.which("git") is None:
+        raise InvalidHostReceipt("git is not on PATH; install git (Homebrew: brew install git) and rerun")
+
+
 def git_head(root: Path) -> str:
+    require_git()
     result = subprocess.run(
         ["git", "--no-optional-locks", "-C", str(root), "rev-parse", "HEAD"],
         capture_output=True, text=True, timeout=5, check=False,
@@ -284,6 +374,35 @@ def landscape_component_ids(root: Path) -> set[str]:
     return ids
 
 
+def winner_pins(root: Path, component_id: str) -> set[str]:
+    """Every landscape winner pin recorded for ``component_id`` (one per selecting layer)."""
+    pins: set[str] = set()
+    landscape_dir = root / "catalogs" / "landscape"
+    for path in sorted(landscape_dir.glob("*.json")) if landscape_dir.is_dir() else []:
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError):
+            continue
+        for layer in document.get("layers", []) if isinstance(document, dict) else []:
+            for winner in (layer.get("winners") or []) if isinstance(layer, dict) else []:
+                if isinstance(winner, dict) and winner.get("component_id") == component_id \
+                        and isinstance(winner.get("pin"), str) and winner["pin"].strip():
+                    pins.add(winner["pin"].strip())
+    return pins
+
+
+def catalog_component_version(root: Path, component_id: str) -> str | None:
+    """The version a receipt binds to by default: the landscape winner pin when every layer
+    that selects the component agrees on it (the pin scripts/platform_status.py binds to),
+    else the manifests/stack.json version."""
+    pins = winner_pins(root, component_id)
+    if len(pins) == 1:
+        return pins.pop()
+    if pins:
+        return None
+    return stack_component_version(root, component_id)
+
+
 def platform_ids(root: Path) -> set[str]:
     try:
         manifest = load_json(root, "adoption/manifest.json")
@@ -413,6 +532,74 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(f"error: --platform-id {args.platform_id!r} is not a known adoption/manifest.json platform_profiles id")
         return 2
 
+    try:
+        recorder = resolve_identity(args.identity)
+    except IdentityError as error:
+        print(f"error: {error}")
+        return 2
+    if recorder is None:
+        print(f"error: no recorder identity: pass --identity NAME (only a Claude Code session exports "
+              f"{IDENTITY_ENV}; a Codex session, a human or CI must name itself)")
+        return 2
+    component_version = args.component_version or catalog_component_version(root, args.component_id)
+    if normalize_pin(component_version) is None:
+        print(f"error: no usable version for component {args.component_id!r} ({component_version!r}: its landscape "
+              "pins disagree, it has none, or it has no digit such as 'unpinned'); pass --component-version with "
+              "the version this host ran")
+        return 2
+    pins = winner_pins(root, args.component_id)
+    if pins and not any(pin_matches(component_version, pin) for pin in pins) and not args.allow_unbound_version:
+        print(f"error: version {component_version!r} matches no current winner pin of {args.component_id!r} "
+              f"({', '.join(sorted(pins))}), so the receipt would never count toward a status; pass the pin as "
+              "written, or --allow-unbound-version to record it anyway")
+        return 2
+
+    qualified_models: list[dict] = []
+    for raw in args.qualified_model:
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError as error:
+            print(f"error: --qualified-model is not valid JSON ({error})")
+            return 2
+        if not isinstance(parsed, dict):
+            print("error: --qualified-model must be a JSON object")
+            return 2
+        qualified_models.append(parsed)
+    if args.qualified_models_file:
+        models_path = Path(args.qualified_models_file)
+        if not models_path.is_absolute():
+            models_path = root / models_path
+        try:
+            payload = json.loads(models_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"error: --qualified-models-file could not be read as JSON ({error})")
+            return 2
+        if not isinstance(payload, list):
+            print("error: --qualified-models-file must contain a JSON array")
+            return 2
+        for entry in payload:
+            if not isinstance(entry, dict):
+                print("error: --qualified-models-file entries must be JSON objects")
+                return 2
+            qualified_models.append(entry)
+    if qualified_models:
+        # Full schema validation (every constraint: required keys, type, enum, maxLength, ...)
+        # against the qualified_models[] item subschema, before anything below runs a single
+        # command. A hand-rolled subset check here previously let a too-long `bars` (or any
+        # other constraint this list did not name) through to run the commands and fail only
+        # afterward at the pre-write validate_receipt_shape() call; validating up front with
+        # the same schema-driven validator used everywhere else in this module means no
+        # constraint can be missed twice, and nothing executes for a malformed entry.
+        qualified_model_schema = (load_receipt_schema(root).get("properties", {})
+                                  .get("qualified_models", {}).get("items", {}))
+        for index, entry in enumerate(qualified_models):
+            entry_errors: list[str] = []
+            validate_against_schema(entry, qualified_model_schema, f"qualified_models[{index}]", entry_errors)
+            if entry_errors:
+                print("error: --qualified-model entry would not validate (checked before running any command): "
+                      + "; ".join(entry_errors))
+                return 2
+
     commands_to_run: list[str] = []
     if args.from_stack_commands:
         stack_commands = stack_component_string_commands(root, args.component_id)
@@ -452,10 +639,8 @@ def cmd_record(args: argparse.Namespace) -> int:
         f"On host {host_id} ({args.platform_id}), {len(command_records)} command(s) were run for "
         f"component {args.component_id!r} at stage {args.stage!r}; overall result {result}."
     )
-    tool_versions = {}
-    declared_version = stack_component_version(root, args.component_id)
-    if declared_version:
-        tool_versions[args.component_id] = declared_version
+    tool_versions = {args.component_id: component_version}
+    recorded_by = identity_record(recorder, args.model)
 
     receipt = {
         "schema_version": 1,
@@ -469,6 +654,7 @@ def cmd_record(args: argparse.Namespace) -> int:
             "second_physical_machine": bool(args.second_physical_machine),
         },
         "catalog_revision": catalog_revision,
+        "recorded_by": recorded_by,
         "component_id": args.component_id,
         "stage": args.stage,
         "commands": command_records,
@@ -479,9 +665,12 @@ def cmd_record(args: argparse.Namespace) -> int:
         "limitations": limitations,
         "evidence_class": args.evidence_class,
         "reviews": [
-            {"kind": "self", "ref": "scripts/host_receipts.py record", "verdict": "agree", "at_utc": observed_at},
+            {"kind": "self", "ref": "scripts/host_receipts.py record", "verdict": "agree", "at_utc": observed_at,
+             "reviewer": dict(recorded_by)},
         ],
     }
+    if qualified_models:
+        receipt["qualified_models"] = qualified_models
     if args.hardware_profile_ref:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
 
@@ -490,6 +679,14 @@ def cmd_record(args: argparse.Namespace) -> int:
         target = safe_file(root, relative_path)
     except InvalidDecisionIndex as error:
         print(f"error: cannot record a receipt at {relative_path!r}: {error}")
+        return 2
+
+    # Check the receipt against the schema before writing anything (for example an overlong
+    # --model), so a failed check never leaves a receipt that validate would reject.
+    shape_errors: list[str] = []
+    validate_receipt_shape(root, receipt, relative_path, shape_errors)
+    if shape_errors:
+        print("error: the receipt would not validate: " + "; ".join(shape_errors))
         return 2
 
     # Validate (and register) before/around the final write, rolling back the file on any
@@ -546,9 +743,39 @@ def cmd_review(args: argparse.Namespace) -> int:
     if args.verdict not in REVIEW_VERDICTS:
         print(f"error: --verdict must be one of {sorted(REVIEW_VERDICTS)}")
         return 2
+    try:
+        reviewer = resolve_identity(args.identity)
+    except IdentityError as error:
+        print(f"error: {error}")
+        return 2
+    if reviewer is None:
+        print(f"error: no reviewer identity: pass --identity NAME (only a Claude Code session exports {IDENTITY_ENV})")
+        return 2
+    recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") if isinstance(receipt.get("recorded_by"), dict) else None
+    if args.kind != "self":
+        if recorder is None:
+            print("error: this receipt has no recorded_by identity, so an independent review cannot be checked "
+                  "against its recorder; re-record it with the current scripts/host_receipts.py record")
+            return 2
+        if reviewer == recorder:
+            print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review must "
+                  "come from a different session, lane or person")
+            return 2
+    now = utc_now()
+    observed_at = receipt.get("observed_at_utc")
+    if isinstance(observed_at, str) and now < observed_at:
+        print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a review "
+              "dated before the observation is refused by validate, so fix the clock and rerun")
+        return 2
     receipt.setdefault("reviews", []).append({
-        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": utc_now(),
+        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
+        "reviewer": identity_record(reviewer, args.model),
     })
+    shape_errors: list[str] = []
+    validate_receipt_shape(root, receipt, relative_path, shape_errors)
+    if shape_errors:
+        print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
+        return 2
     path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     register_file(root, relative_path)
     print(relative_path)
@@ -647,6 +874,36 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
             if exit_code != expected:
                 errors.append(f"{label}.commands[{index}]: result is 'pass' but exit {exit_code!r} != expected {expected!r}")
 
+    recorded_by = receipt.get("recorded_by") if isinstance(receipt.get("recorded_by"), dict) else {}
+    recorder = recorded_by.get("identity_sha256")
+    observed_at = receipt.get("observed_at_utc")
+    reviews = receipt.get("reviews") if isinstance(receipt.get("reviews"), list) else []
+    for index, review in enumerate(reviews):
+        if not isinstance(review, dict) or review.get("kind") == "self":
+            continue
+        reviewer = review.get("reviewer") if isinstance(review.get("reviewer"), dict) else {}
+        where = f"{label}.reviews[{index}]"
+        if recorder is None:
+            errors.append(f"{where}: a {review.get('kind')!r} review needs the receipt's recorded_by identity to "
+                          "check independence; re-record the receipt with the current recorder")
+        elif not reviewer.get("identity_sha256"):
+            errors.append(f"{where}: a {review.get('kind')!r} review must carry reviewer.identity_sha256")
+        elif reviewer.get("identity_sha256") == recorder:
+            errors.append(f"{where}: a {review.get('kind')!r} review comes from the recorder's own identity")
+        at_utc = review.get("at_utc")
+        if isinstance(at_utc, str) and isinstance(observed_at, str) and at_utc < observed_at:
+            errors.append(f"{where}: review at_utc {at_utc} precedes observed_at_utc {observed_at}")
+
+    latest_allowed = datetime.fromtimestamp(time.time() + FUTURE_SKEW_S, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    dated = [("observed_at_utc", observed_at)] + [
+        (f"reviews[{index}].at_utc", review.get("at_utc")) for index, review in enumerate(reviews)
+        if isinstance(review, dict)]
+    for field, value in dated:
+        if isinstance(value, str) and ISO_UTC_PATTERN.fullmatch(value) and value > latest_allowed:
+            errors.append(f"{label}.{field}: {value} is later than this machine's clock allows "
+                          f"({latest_allowed}, {FUTURE_SKEW_S // 60} minutes of skew); a future date would stay "
+                          "the latest receipt or review")
+
     catalog_revision = receipt.get("catalog_revision")
     if isinstance(catalog_revision, str) and SHA_PATTERN.fullmatch(catalog_revision):
         try:
@@ -726,6 +983,50 @@ def cmd_validate(args: argparse.Namespace) -> int:
 # ------------------------------------------------------------------------ summary
 
 
+def review_state(receipt: dict) -> str:
+    """``agree``, ``dissent`` or ``none`` over the receipt's independent reviews.
+
+    A review is well formed when it is not ``self``, carries a reviewer identity that differs
+    from ``recorded_by``, and has a valid ``at_utc`` not older than the observation. Only
+    each well-formed reviewer's latest review counts, so a reviewer may withdraw their own
+    dissent. Any standing ``disagree`` or ``needs_changes`` vetoes, however many reviewers
+    agree, and so does a dissent in a review that is not well formed, which nobody can
+    withdraw. A non-self ``agree`` that is not well formed keeps the state from being
+    ``agree``. Without ``recorded_by`` no review can be checked for independence."""
+    recorded_by = receipt.get("recorded_by") if isinstance(receipt.get("recorded_by"), dict) else {}
+    recorder = recorded_by.get("identity_sha256")
+    observed_at = receipt.get("observed_at_utc") if isinstance(receipt.get("observed_at_utc"), str) else ""
+    latest: dict[str, tuple[str, int, str]] = {}
+    malformed_dissent = malformed_other = False
+    reviews = receipt.get("reviews") if isinstance(receipt.get("reviews"), list) else []
+    for position, review in enumerate(reviews):
+        if not isinstance(review, dict):
+            malformed_other = True
+            continue
+        if review.get("kind") == "self":
+            continue
+        reviewer = review.get("reviewer") if isinstance(review.get("reviewer"), dict) else {}
+        identity = reviewer.get("identity_sha256")
+        at_utc = review.get("at_utc") if isinstance(review.get("at_utc"), str) else ""
+        well_formed = bool(recorder and identity and identity != recorder
+                           and ISO_UTC_PATTERN.fullmatch(at_utc) and at_utc >= observed_at)
+        if not well_formed:
+            if review.get("verdict") in DISSENT_VERDICTS:
+                malformed_dissent = True
+            else:
+                malformed_other = True
+            continue
+        key = (at_utc, position, review.get("verdict"))
+        if identity not in latest or key[:2] > latest[identity][:2]:
+            latest[identity] = key
+    verdicts = {entry[2] for entry in latest.values()}
+    if malformed_dissent or verdicts & DISSENT_VERDICTS:
+        return "dissent"
+    if malformed_other or not recorder:
+        return "none"
+    return "agree" if "agree" in verdicts else "none"
+
+
 def build_summary(root: Path) -> dict:
     """Aggregate every recorded host receipt by component x platform.
 
@@ -738,10 +1039,14 @@ def build_summary(root: Path) -> dict:
     ``platform_id`` (when ``adoption/manifest.json`` records one), and passes
     ``validate_receipt_shape`` (a fabricated or malformed receipt cannot enter
     this stricter list even though it may still appear in the looser
-    per-stage pass/fail counts above). Callers needing that stricter
-    combination (for example ``scripts/component_matrix.py``'s
-    macOS-acceptance flip rule) can check that list directly instead of
-    re-deriving it from raw receipts. This function does not re-run the full
+    per-stage pass/fail counts above). "Independently reviewed" is
+    ``review_state(receipt) == "agree"``. Each per-receipt entry also carries the receipt's
+    own ``qualified_models`` (empty unless the receipt both declares some and is shape-valid),
+    for callers such as ``scripts/component_matrix.py`` to surface per platform; this never
+    feeds review or e2e-state computation. Those counts ignore pins; the
+    per-receipt ``receipts`` entries carry what ``scripts/platform_status.py``
+    needs to bind a receipt to a winner's current pin, and that module is the
+    one rule for platform status and the macOS flip. This function does not re-run the full
     cross-reference checks (catalog_revision presence, evidence.json
     registration, id/path coherence): CI runs ``host_receipts.py validate``
     as a separate, earlier gate for that.
@@ -766,7 +1071,8 @@ def build_summary(root: Path) -> dict:
         platform_bucket = component_bucket["platforms"].setdefault(
             platform_id, {
                 "stages": {}, "latest_observed_at_utc": None, "independently_reviewed_passes": 0,
-                "independently_reviewed_native_proven_pass_stages": set(),
+                "independently_reviewed_fails": 0, "dissented": 0,
+                "independently_reviewed_native_proven_pass_stages": set(), "receipts": [],
             },
         )
         stage_counts = platform_bucket["stages"].setdefault(
@@ -778,22 +1084,42 @@ def build_summary(root: Path) -> dict:
             current_latest = platform_bucket["latest_observed_at_utc"]
             if current_latest is None or observed_at > current_latest:
                 platform_bucket["latest_observed_at_utc"] = observed_at
-        reviews = receipt.get("reviews") if isinstance(receipt.get("reviews"), list) else []
-        independently_reviewed = any(
-            isinstance(review, dict) and review.get("kind") != "self" and review.get("verdict") == "agree"
-            for review in reviews
+        state = review_state(receipt)
+        independently_reviewed = state == "agree"
+        second_physical_machine = host.get("second_physical_machine") is True
+        expected_profile = platform_profiles.get(platform_id)
+        platform_identity_ok = expected_profile is None or (
+            host.get("os") == expected_profile.get("os")
+            and host.get("architecture") == expected_profile.get("architecture")
         )
+        relative = path.relative_to(root).as_posix()
+        shape_errors: list[str] = []
+        validate_receipt_shape(root, receipt, relative, shape_errors)
+        tool_versions = receipt.get("tool_versions") if isinstance(receipt.get("tool_versions"), dict) else {}
+        component_version = tool_versions.get(component_id)
+        qualified_models = [entry for entry in (receipt.get("qualified_models") or [])
+                            if isinstance(entry, dict)] if not shape_errors else []
+        platform_bucket["receipts"].append({
+            "path": relative,
+            "host_id": host.get("host_id") if isinstance(host.get("host_id"), str) else None,
+            "stage": stage,
+            "result": result,
+            "evidence_class": evidence_class,
+            "component_version": component_version if isinstance(component_version, str) else None,
+            "observed_at_utc": observed_at if isinstance(observed_at, str) else None,
+            "review_state": state,
+            "second_physical_machine": second_physical_machine,
+            "platform_identity_ok": platform_identity_ok,
+            "shape_ok": not shape_errors,
+            "qualified_models": qualified_models,
+        })
+        if state == "dissent":
+            platform_bucket["dissented"] += 1
+        if result == "fail" and independently_reviewed:
+            platform_bucket["independently_reviewed_fails"] += 1
         if result == "pass" and independently_reviewed:
             platform_bucket["independently_reviewed_passes"] += 1
             if evidence_class == "native_proven" and isinstance(stage, str):
-                second_physical_machine = host.get("second_physical_machine") is True
-                expected_profile = platform_profiles.get(platform_id)
-                platform_identity_ok = expected_profile is None or (
-                    host.get("os") == expected_profile.get("os")
-                    and host.get("architecture") == expected_profile.get("architecture")
-                )
-                shape_errors: list[str] = []
-                validate_receipt_shape(root, receipt, path.relative_to(root).as_posix(), shape_errors)
                 if second_physical_machine and platform_identity_ok and not shape_errors:
                     platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
 
@@ -802,14 +1128,34 @@ def build_summary(root: Path) -> dict:
             platform_bucket["independently_reviewed_native_proven_pass_stages"] = sorted(
                 platform_bucket["independently_reviewed_native_proven_pass_stages"]
             )
+            platform_bucket["receipts"].sort(key=lambda entry: entry["path"])
 
     return {"generated_at_utc": utc_now(), "components": components}
 
 
+def receipt_age_days(observed_at: str | None, now: datetime) -> int | None:
+    if not isinstance(observed_at, str) or not ISO_UTC_PATTERN.fullmatch(observed_at):
+        return None
+    observed = datetime.strptime(observed_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return (now - observed).days
+
+
 def cmd_summary(args: argparse.Namespace) -> int:
+    """Summaries carry the receipt age and an ``old`` flag past --max-age-days. Age is only
+    reported here, never in the generated matrix, so ``component_matrix.py --check`` stays
+    deterministic; the pin binding in scripts/platform_status.py is what retires a receipt."""
     root = repo_root(args.root)
     summary = build_summary(root)
     components = summary["components"]
+    now = datetime.now(timezone.utc)
+    for component_bucket in components.values():
+        for bucket in component_bucket["platforms"].values():
+            age = receipt_age_days(bucket["latest_observed_at_utc"], now)
+            bucket["latest_age_days"] = age
+            bucket["old"] = age is not None and age > args.max_age_days
+            for entry in bucket["receipts"]:
+                entry["age_days"] = receipt_age_days(entry["observed_at_utc"], now)
+    summary["max_age_days"] = args.max_age_days
     if args.json:
         print(json.dumps(summary, indent=2, sort_keys=True))
     else:
@@ -820,8 +1166,11 @@ def cmd_summary(args: argparse.Namespace) -> int:
                     f"{stage}={counts}" for stage, counts in sorted(bucket["stages"].items())
                 )
                 print(f"{component_id} @ {platform_id}: {stage_text} "
-                      f"(latest={bucket['latest_observed_at_utc']}, "
-                      f"independently_reviewed_passes={bucket['independently_reviewed_passes']})")
+                      f"(latest={bucket['latest_observed_at_utc']}, age_days={bucket['latest_age_days']}"
+                      f"{', OLD' if bucket['old'] else ''}, "
+                      f"independently_reviewed_passes={bucket['independently_reviewed_passes']}, "
+                      f"independently_reviewed_fails={bucket['independently_reviewed_fails']}, "
+                      f"dissented={bucket['dissented']})")
     return 0
 
 
@@ -852,6 +1201,18 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--os", default=None)
     record_parser.add_argument("--architecture", default=None)
     record_parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S)
+    record_parser.add_argument("--identity", default=None,
+                               help=f"Recorder identity (stored hashed); defaults to ${IDENTITY_ENV}, else required")
+    record_parser.add_argument("--model", default=None, help="Model or runtime that ran the recording (optional)")
+    record_parser.add_argument("--component-version", default=None,
+                               help="Version this host ran; defaults to the landscape pin or the stack version")
+    record_parser.add_argument("--allow-unbound-version", action="store_true",
+                               help="Record a --component-version that matches no current winner pin (never counts)")
+    record_parser.add_argument("--qualified-model", action="append", default=[],
+                               help='JSON object {model_id, revision, runtime, runtime_version, bars, result}; '
+                                    'repeatable. Local model weights qualified on this host\'s runtime.')
+    record_parser.add_argument("--qualified-models-file", default=None,
+                               help="Path to a JSON array of qualified-model objects, merged after --qualified-model")
     record_parser.set_defaults(func=cmd_record)
 
     review_parser = subparsers.add_parser("review", help="Append an independent review to an existing receipt")
@@ -860,11 +1221,16 @@ def build_parser() -> argparse.ArgumentParser:
     review_parser.add_argument("--kind", required=True, choices=sorted(REVIEW_KINDS))
     review_parser.add_argument("--ref", required=True)
     review_parser.add_argument("--verdict", required=True, choices=sorted(REVIEW_VERDICTS))
+    review_parser.add_argument("--identity", default=None,
+                               help=f"Reviewer identity (stored hashed); defaults to ${IDENTITY_ENV}, else required")
+    review_parser.add_argument("--model", default=None, help="Model or runtime of the reviewer (optional)")
     review_parser.set_defaults(func=cmd_review)
 
     summary_parser = subparsers.add_parser("summary", help="Summarize recorded host receipts")
     summary_parser.add_argument("--root", type=Path, default=None)
     summary_parser.add_argument("--json", action="store_true")
+    summary_parser.add_argument("--max-age-days", type=int, default=180,
+                                help="Flag platforms whose latest receipt is older than this (report only)")
     summary_parser.set_defaults(func=cmd_summary)
 
     return parser
@@ -873,7 +1239,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except InvalidHostReceipt as error:
+        print(f"error: {error}")
+        return 2
 
 
 if __name__ == "__main__":

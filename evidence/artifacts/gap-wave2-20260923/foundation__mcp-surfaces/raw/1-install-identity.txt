@@ -1,0 +1,51 @@
+measured_at=2026-09-23T04:52:39Z
+mcporter-0.13.13 0.13.13 https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA==
+mcporter-0.14.0 0.14.0 https://registry.npmjs.org/mcporter/-/mcporter-0.14.0.tgz sha512-R60nKyUcW65WawhVjoESC0HeNibsf+1iqpX0wHPX9P60AFX/DYCBlhS7pDYcuWzeGYqYfZG2Xf5jWWkM74d/+A==
+host-installed 0.13.13 https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA==
+wong2-mcp-cli 2.0.0 https://registry.npmjs.org/@wong2/mcp-cli/-/mcp-cli-2.0.0.tgz sha512-h+WAEO1dqUDv6gOQTKRGdJMWyQC2fHPGsZ5u+cpv9cfmUUkl6f0awTDk1drhYfSjBYg6SgO9AV+Wq5nRCiCLTw==
+--- diff -rq dist (excluding .map)
+Files mcporter-0.13.13/node_modules/mcporter/dist/chrome-devtools-compat.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/chrome-devtools-compat.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/chrome-devtools-compat.js and mcporter-0.14.0/node_modules/mcporter/dist/chrome-devtools-compat.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/chrome-devtools-relay-handoff.js and mcporter-0.14.0/node_modules/mcporter/dist/chrome-devtools-relay-handoff.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/adhoc-server.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/adhoc-server.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/config/add.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/config/add.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/config/add.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/config/add.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/config/help.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/config/help.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/config/render.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/config/render.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/emit-ts-command.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/emit-ts-command.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/emit-ts-command.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/emit-ts-command.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/emit-ts-templates.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/emit-ts-templates.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/emit-ts-templates.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/emit-ts-templates.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/generate/definition.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/generate/definition.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/generate/flags.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/generate/flags.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/generate/flags.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/generate/flags.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/generate/template-data.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/generate/template-data.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/generate-cli-runner.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/generate-cli-runner.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/list-command.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/list-command.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/list-signature.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli/list-signature.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/list-signature.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/list-signature.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli/output-utils.js and mcporter-0.14.0/node_modules/mcporter/dist/cli/output-utils.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/cli-metadata.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/cli-metadata.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/config/imports/paths.js and mcporter-0.14.0/node_modules/mcporter/dist/config/imports/paths.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/config-normalize.js and mcporter-0.14.0/node_modules/mcporter/dist/config-normalize.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/config-schema.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/config-schema.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/config-schema.js and mcporter-0.14.0/node_modules/mcporter/dist/config-schema.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/daemon/process-retirement.js and mcporter-0.14.0/node_modules/mcporter/dist/daemon/process-retirement.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/definition-fields.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/definition-fields.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/definition-fields.js and mcporter-0.14.0/node_modules/mcporter/dist/definition-fields.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/fs-json.js and mcporter-0.14.0/node_modules/mcporter/dist/fs-json.js differ
+Only in mcporter-0.14.0/node_modules/mcporter/dist: oauth-redirect-uri.d.ts
+Only in mcporter-0.14.0/node_modules/mcporter/dist: oauth-redirect-uri.js
+Files mcporter-0.13.13/node_modules/mcporter/dist/oauth.js and mcporter-0.14.0/node_modules/mcporter/dist/oauth.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/connection-cache.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/runtime/connection-cache.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/connection-cache.js and mcporter-0.14.0/node_modules/mcporter/dist/runtime/connection-cache.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/node-http-fetch.js and mcporter-0.14.0/node_modules/mcporter/dist/runtime/node-http-fetch.js differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/record-transport.d.ts and mcporter-0.14.0/node_modules/mcporter/dist/runtime/record-transport.d.ts differ
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/record-transport.js and mcporter-0.14.0/node_modules/mcporter/dist/runtime/record-transport.js differ
+Only in mcporter-0.14.0/node_modules/mcporter/dist/runtime: schema-validator.d.ts
+Only in mcporter-0.14.0/node_modules/mcporter/dist/runtime: schema-validator.js
+Files mcporter-0.13.13/node_modules/mcporter/dist/runtime/transport.js and mcporter-0.14.0/node_modules/mcporter/dist/runtime/transport.js differ
+--- cmp daemon/client.js
+identical
+074c05716fbc6d1da0f404810f14cf4e513680f615e52ad3559286b7ebc08865  mcporter-0.13.13/node_modules/mcporter/dist/daemon/client.js
+074c05716fbc6d1da0f404810f14cf4e513680f615e52ad3559286b7ebc08865  mcporter-0.14.0/node_modules/mcporter/dist/daemon/client.js

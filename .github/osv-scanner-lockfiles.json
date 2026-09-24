@@ -20,6 +20,9 @@
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
     },
     {
@@ -122,6 +125,10 @@
     {
       "path": "tools/mlx-smoke/requirements.lock.txt",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
@@ -132,6 +139,14 @@
     {
       "path": "blueprints/convergence-practice/application-delivery/pyproject.toml",
       "lockfile": "blueprints/convergence-practice/application-delivery/uv.lock"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "lockfile": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",
+      "lockfile": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock"
     }
   ],
   "excluded": [
@@ -139,6 +154,21 @@
       "path": "blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt",
       "reason": "Deliberately vulnerable positive-control fixture (urllib3==1.26.4, CVE-2021-33503 / GHSA-q2q7-5pp4-w6pg) for gap ci-supply-chain[13]: tests/test_grype_known_cve_fixture.py asserts grype detects it. Nothing installs it, so scanning it would fail osv-scanner permanently on a known, intended advisory; its 9 Dependabot alerts were dismissed as not_used and Dependabot PR #105 was closed (2026-09-23).",
       "evidence": "tests/test_grype_known_cve_fixture.py"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/repo-git__dvc.lock",
+      "reason": "Gap-wave-2 captured evidence fixture for layer us-equities__identity-provenance (catalog PR: gap-wave2 agent-lab-17): the dependency list a gap check installed into an isolated cache prefix, or a copy of a probe repository's lock, retained so the receipt is reproducible. Nothing in the catalog installs it, and scanning it would report advisories for a probe environment rather than for a shipped dependency.",
+      "evidence": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/repo-git__dvc.lock",
+      "reason": "Gap-wave-2 captured evidence fixture for layer us-equities__identity-provenance (catalog PR: gap-wave2 agent-lab-17): the dependency list a gap check installed into an isolated cache prefix, or a copy of a probe repository's lock, retained so the receipt is reproducible. Nothing in the catalog installs it, and scanning it would report advisories for a probe environment rather than for a shipped dependency.",
+      "evidence": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/repo-identity__dvc.lock",
+      "reason": "Gap-wave-2 captured evidence fixture for layer us-equities__identity-provenance (catalog PR: gap-wave2 agent-lab-17): the dependency list a gap check installed into an isolated cache prefix, or a copy of a probe repository's lock, retained so the receipt is reproducible. Nothing in the catalog installs it, and scanning it would report advisories for a probe environment rather than for a shipped dependency.",
+      "evidence": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/2-dvc-executes-selection-quarantine.json"
     }
   ]
 }

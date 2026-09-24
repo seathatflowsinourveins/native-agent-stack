@@ -1,0 +1,9 @@
+{
+  "gap_index": 0,
+  "written_at": "2026-09-23T05:52:16Z",
+  "round": 2,
+  "label": "fix-round (late relative to round 1, written before round 2)",
+  "expectation": "Same round-2 rerun as gap 4 (retained ingest receipts, precision check).",
+  "criteria": "advanced stands if round 2 reproduces round 1.",
+  "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran."
+}

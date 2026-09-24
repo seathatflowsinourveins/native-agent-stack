@@ -1,0 +1,393 @@
+{
+  "dagu_version": "2.16.6",
+  "scenario": "kill",
+  "tag": "g2k2166",
+  "result": {
+    "step1_started_before_kill": false,
+    "kill": {
+      "t": 17.0,
+      "signal": "SIGKILL to the dagu start process group",
+      "reaped": true
+    },
+    "immediately_after_kill": {
+      "status": "running",
+      "ps": "DAG           RUN_ID          ATTEMPT  STARTED               GROUP         FRESH\ng2k2166-kill  g2k2166-kill-1  5b8e23   2026-09-23T05:20:43Z  g2k2166-kill  yes\n"
+    },
+    "manual_retries_without_scheduler": [
+      {
+        "seconds_after_kill": 35.0,
+        "retry_exit": 1,
+        "retry_stderr_tail": " dag=g2k2166-kill run-id=g2k2166-kill-1 err=\"already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\n",
+        "retry_stdout_tail": "Failed - 2026-09-23 01:21:35\n\ndag: g2k2166-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+        "status_after": "running"
+      },
+      {
+        "seconds_after_kill": 95.0,
+        "retry_exit": 1,
+        "retry_stderr_tail": " dag=g2k2166-kill run-id=g2k2166-kill-1 err=\"already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\n",
+        "retry_stdout_tail": "Failed - 2026-09-23 01:22:35\n\ndag: g2k2166-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+        "status_after": "running"
+      }
+    ],
+    "scheduler_phase": {
+      "scheduler_started_seconds_after_kill": 95.0,
+      "polls": [
+        {
+          "seconds_after_kill": 95.1,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 110.1,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 125.1,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 140.2,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 155.2,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 170.3,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 185.3,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 200.3,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 215.4,
+          "status": "running"
+        },
+        {
+          "seconds_after_kill": 230.4,
+          "status": "failed"
+        }
+      ],
+      "status_when_poll_ended": "failed",
+      "retry_after_scheduler": {
+        "seconds_after_kill": 250.5,
+        "exit": 1,
+        "stderr_tail": "sion denied\\nsh: 1: cannot create /step1.finished: Permission denied\\n\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): exit status 2\nrecent stderr (tail):\nsh: 1: cannot create /step1.started: Permission denied\nsh: 1: cannot create /step1.finished: Permission denied\n\n",
+        "status_after": "failed"
+      }
+    },
+    "final_status": "failed",
+    "markers": {},
+    "telemetry": {
+      "endpoint": "/api/v1/metrics",
+      "http": 200,
+      "dagu_metric_lines": [
+        "dagu_cache_entries_total{cache=\"dag_definition\"} 0",
+        "dagu_cache_entries_total{cache=\"dag_run_status\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"1\"} 0",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"5\"} 0",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"15\"} 0",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"30\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"60\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"120\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"300\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"600\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"1800\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"3600\"} 1",
+        "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166-kill\",le=\"+Inf\"} 1",
+        "dagu_dag_run_duration_seconds_sum{dag=\"g2k2166-kill\"} 20",
+        "dagu_dag_run_duration_seconds_count{dag=\"g2k2166-kill\"} 1",
+        "dagu_dag_runs_currently_running 0",
+        "dagu_dag_runs_currently_running_by_dag{dag=\"g2k2166-kill\"} 0",
+        "dagu_dag_runs_queued_total 0",
+        "dagu_dag_runs_total{status=\"failed\"} 1",
+        "dagu_dag_runs_total_by_dag{dag=\"g2k2166-kill\",status=\"failed\"} 1",
+        "dagu_info{go_version=\"go1.27.0\",version=\"2.16.6\"} 1",
+        "dagu_sse_topics_per_session_bucket{le=\"1\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"2\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"4\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"8\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"12\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"16\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"20\"} 0",
+        "dagu_sse_topics_per_session_bucket{le=\"+Inf\"} 0"
+      ]
+    }
+  },
+  "command_log": [
+    {
+      "t": 0.0,
+      "spawn": "dagu start --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home --run-id g2k2166-kill-1 $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/dags/g2k2166-kill.yaml",
+      "pid": 351797
+    },
+    {
+      "t": 17.1,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "17s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 17.1,
+      "cmd": "dagu ps --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home",
+      "exit": 0,
+      "stdout_tail": "DAG           RUN_ID          ATTEMPT  STARTED               GROUP         FRESH\ng2k2166-kill  g2k2166-kill-1  5b8e23   2026-09-23T05:20:43Z  g2k2166-kill  yes\n",
+      "stderr_tail": ""
+    },
+    {
+      "t": 52.0,
+      "cmd": "dagu retry --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home --run-id g2k2166-kill-1 g2k2166-kill",
+      "exit": 1,
+      "stdout_tail": "Failed - 2026-09-23 01:21:35\n\ndag: g2k2166-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+      "stderr_tail": "166-kill run-id=g2k2166-kill-1 file=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/logs/g2k2166-kill/dag-run_20260923_052043Z_g2k2166-kill-1/dag-run_20260923.012043.528.g2k2166-.log\ntime=2026-09-23T01:21:35.490-04:00 level=ERROR msg=\"Failed to execute dag-run\" dag=g2k2166-kill run-id=g2k2166-kill-1 err=\"already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\n"
+    },
+    {
+      "t": 52.1,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "52s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 112.0,
+      "cmd": "dagu retry --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home --run-id g2k2166-kill-1 g2k2166-kill",
+      "exit": 1,
+      "stdout_tail": "Failed - 2026-09-23 01:22:35\n\ndag: g2k2166-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+      "stderr_tail": "166-kill run-id=g2k2166-kill-1 file=$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/logs/g2k2166-kill/dag-run_20260923_052043Z_g2k2166-kill-1/dag-run_20260923.012043.528.g2k2166-.log\ntime=2026-09-23T01:22:35.460-04:00 level=ERROR msg=\"Failed to execute dag-run\" dag=g2k2166-kill run-id=g2k2166-kill-1 err=\"already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): already running. dag-run ID=g2k2166-kill-1, socket=/tmp/@dagu_g2k2166-kill_34ad99.sock\n"
+    },
+    {
+      "t": 112.0,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "1m52s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 112.0,
+      "spawn": "dagu scheduler --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home",
+      "pid": 385294
+    },
+    {
+      "t": 112.1,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "1m52s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 127.1,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "2m7s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 142.1,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "2m22s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 157.2,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "2m37s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 172.2,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "2m52s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 187.3,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "3m7s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 202.3,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "3m22s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 217.3,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "3m37s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 232.4,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "running",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": null,
+          "duration": "3m52s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 247.4,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:20:43-04:00",
+          "finishedAt": "2026-09-23T01:24:50-04:00",
+          "duration": "4m7s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 267.5,
+      "cmd": "dagu retry --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home --run-id g2k2166-kill-1 g2k2166-kill",
+      "exit": 1,
+      "stdout_tail": "_g2k2166-kill-1/dag-run_20260923.012043.528.g2k2166-.log\n\u2502\n\u251c\u2500step1 (20.0s) [failed]\n\u2502 \u251c\u2500sh -c 'date +%s > \"$MARKS/step1.started\"; sleep 20; date +%s >\n\u2502 \u2502   \"$MARKS/step1.finished\"'\n\u2502 \u2502\n\u2502 \u251c\u2500stderr: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home/logs/g2k2166-kill/dag-run_20260923_052043Z_g2k2166-kill-1/run_20260923_052450Z_f0f584/step1.20260923.012450.933.g2k2166-.err\n\u2502 \u2502   sh: 1: cannot create /step1.started: Permission denied\n\u2502 \u2502   sh: 1: cannot create /step1.finished: Permission denied\n\u2502 \u2502\n\u2502 \u2514\u2500error: exit status 2\n\u2502 \n\u2514\u2500step2 [aborted]\n\nResult: Failed\n\n",
+      "stderr_tail": "f0f584 status=failed started-at=2026-09-23T01:24:50-04:00 finished-at=2026-09-23T01:25:10-04:00\ntime=2026-09-23T01:25:10.973-04:00 level=ERROR msg=\"Failed to execute dag-run\" dag=g2k2166-kill run-id=g2k2166-kill-1 err=\"exit status 2\\nrecent stderr (tail):\\nsh: 1: cannot create /step1.started: Permission denied\\nsh: 1: cannot create /step1.finished: Permission denied\\n\"\nError: failed to execute the dag-run g2k2166-kill (dag-run ID: g2k2166-kill-1): exit status 2\nrecent stderr (tail):\nsh: 1: cannot create /step1.started: Permission denied\nsh: 1: cannot create /step1.finished: Permission denied\n\n"
+    },
+    {
+      "t": 267.6,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:24:50-04:00",
+          "finishedAt": "2026-09-23T01:25:10-04:00",
+          "duration": "20s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 267.7,
+      "cmd": "dagu history --format json g2k2166-kill",
+      "exit": 0,
+      "rows": [
+        {
+          "dagRunId": "g2k2166-kill-1",
+          "status": "failed",
+          "startedAt": "2026-09-23T01:24:50-04:00",
+          "finishedAt": "2026-09-23T01:25:10-04:00",
+          "duration": "20s"
+        }
+      ],
+      "stderr_tail": ""
+    },
+    {
+      "t": 267.7,
+      "spawn": "dagu server --dagu-home $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-kill-2166/dagu-home",
+      "pid": 448912
+    }
+  ],
+  "elapsed_s": 268.8
+}

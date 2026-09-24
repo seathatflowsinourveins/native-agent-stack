@@ -1,0 +1,130 @@
+[
+ {
+  "name": "ai-memory",
+  "enabled": true,
+  "disabled_reason": null,
+  "transport": {
+   "type": "streamable_http",
+   "url": "http://127.0.0.1:49374/mcp",
+   "bearer_token_env_var": null,
+   "http_headers": null,
+   "env_http_headers": null,
+   "http_headers_helper": null
+  },
+  "startup_timeout_sec": null,
+  "tool_timeout_sec": null,
+  "auth_status": "unknown"
+ },
+ {
+  "name": "context-mode",
+  "enabled": true,
+  "disabled_reason": null,
+  "transport": {
+   "type": "stdio",
+   "command": "/bin/sh",
+   "args": [
+    "-c",
+    "CONTEXT_MODE_PROJECT_DIR=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)\"; export CONTEXT_MODE_PROJECT_DIR; exec $HOME/.local/share/codex-ecosystem/bin/context-mode",
+    "context-mode"
+   ],
+   "env": {
+    "PATH": "<redacted>",
+    "CONTEXT_MODE_PLATFORM": "<redacted>",
+    "RTK_TELEMETRY_DISABLED": "<redacted>"
+   },
+   "env_vars": [],
+   "cwd": null
+  },
+  "startup_timeout_sec": 60.0,
+  "tool_timeout_sec": null,
+  "auth_status": "unsupported"
+ },
+ {
+  "name": "jcodemunch",
+  "enabled": true,
+  "disabled_reason": null,
+  "transport": {
+   "type": "stdio",
+   "command": "$HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp",
+   "args": [],
+   "env": {
+    "PATH": "<redacted>",
+    "RTK_TELEMETRY_DISABLED": "<redacted>",
+    "CODE_INDEX_PATH": "<redacted>",
+    "JCODEMUNCH_SHARE_SAVINGS": "<redacted>"
+   },
+   "env_vars": [],
+   "cwd": null
+  },
+  "startup_timeout_sec": 60.0,
+  "tool_timeout_sec": null,
+  "auth_status": "unsupported"
+ },
+ {
+  "name": "serena",
+  "enabled": true,
+  "disabled_reason": null,
+  "transport": {
+   "type": "stdio",
+   "command": "$HOME/.local/share/codex-ecosystem/bin/serena-context",
+   "args": [
+    "start-mcp-server",
+    "--transport",
+    "stdio",
+    "--project-from-cwd",
+    "--context",
+    "codex",
+    "--enable-web-dashboard",
+    "true",
+    "--open-web-dashboard",
+    "false",
+    "--enable-gui-log-window",
+    "false"
+   ],
+   "env": {
+    "RTK_TELEMETRY_DISABLED": "<redacted>",
+    "PATH": "<redacted>"
+   },
+   "env_vars": [],
+   "cwd": null
+  },
+  "startup_timeout_sec": 60.0,
+  "tool_timeout_sec": null,
+  "auth_status": "unsupported"
+ },
+ {
+  "name": "socraticode",
+  "enabled": true,
+  "disabled_reason": null,
+  "transport": {
+   "type": "stdio",
+   "command": "$HOME/.local/share/codex-ecosystem/bin/node",
+   "args": [
+    "$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+   ],
+   "env": {
+    "RTK_TELEMETRY_DISABLED": "<redacted>",
+    "QDRANT_URL": "<redacted>",
+    "QDRANT_MODE": "<redacted>",
+    "RESPECT_GITIGNORE": "<redacted>",
+    "SOCRATICODE_WATCHER": "<redacted>",
+    "LMSTUDIO_URL": "<redacted>",
+    "EMBEDDING_QUERY_PREFIX": "<redacted>",
+    "EMBEDDING_PROVIDER": "<redacted>",
+    "EMBEDDING_CONTEXT_LENGTH": "<redacted>",
+    "EMBEDDING_DIMENSIONS": "<redacted>",
+    "INCLUDE_DOT_FILES": "<redacted>",
+    "PATH": "<redacted>",
+    "EMBEDDING_DOCUMENT_INCLUDE_PATH": "<redacted>",
+    "EMBEDDING_DOCUMENT_PREFIX": "<redacted>",
+    "EMBEDDING_MODEL": "<redacted>",
+    "SEARCH_DEFAULT_LIMIT": "<redacted>"
+   },
+   "env_vars": [],
+   "cwd": null
+  },
+  "startup_timeout_sec": 120.0,
+  "tool_timeout_sec": null,
+  "auth_status": "unsupported"
+ }
+]

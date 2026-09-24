@@ -1,0 +1,173 @@
+{
+  "mode": "tool-turn",
+  "limits_before": {
+    "at": 1790133900.401277,
+    "windows": {
+      "primary": {
+        "usedPercent": 12,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ordinaryUsageAllowed": true
+  },
+  "thread_path_name": "rollout-2026-09-22T23-25-00-redacted-id:87837ad6c1744972.jsonl",
+  "limits_after": {
+    "at": 1790133914.6212888,
+    "windows": {
+      "primary": {
+        "usedPercent": 12,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ordinaryUsageAllowed": true
+  },
+  "method_counts": {
+    "turn/started": 1,
+    "item/started": 6,
+    "item/completed": 6,
+    "item/agentMessage/delta": 11,
+    "thread/tokenUsage/updated": 2,
+    "turn/completed": 1
+  },
+  "untyped_methods": [],
+  "documented_notification_types": 82,
+  "received_types_documented": [
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/started"
+  ],
+  "received_types_undocumented": [],
+  "documented_types_not_received": 76,
+  "item_types": [
+    "agentMessage",
+    "dynamicToolCall",
+    "reasoning",
+    "userMessage"
+  ],
+  "tool_items": [
+    {
+      "server": null,
+      "tool": "vault_lookup",
+      "namespace": null,
+      "status": "completed",
+      "success": true
+    }
+  ],
+  "last_token_usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 19712,
+      "inputTokens": 20170,
+      "outputTokens": 26,
+      "reasoningOutputTokens": 17,
+      "totalTokens": 20196
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 19712,
+      "inputTokens": 40083,
+      "outputTokens": 253,
+      "reasoningOutputTokens": 205,
+      "totalTokens": 40336
+    }
+  },
+  "turn_completed": {
+    "at": 1790133914.3220036,
+    "method": "turn/completed",
+    "typed": true,
+    "turn_status": "completed",
+    "turn_error": null
+  },
+  "tool_host_calls": [
+    {
+      "at": 1790133910.4826727,
+      "tool": "vault_lookup",
+      "arguments": {
+        "key": "alpha"
+      },
+      "call_id_present": true,
+      "answered": true
+    }
+  ],
+  "other_server_requests": [],
+  "tool_round_trip": true,
+  "host_mcp_tool_items": [],
+  "rollout": {
+    "rollout_found": true,
+    "rollout_name": "rollout-2026-09-22T23-25-00-redacted-id:87837ad6c1744972.jsonl",
+    "entries": [
+      {
+        "timestamp": "2026-09-23T03:25:00.569Z",
+        "event": "task_started",
+        "reason": null
+      },
+      {
+        "timestamp": "2026-09-23T03:25:10.557Z",
+        "total": {
+          "input_tokens": 19913,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 227,
+          "reasoning_output_tokens": 188,
+          "total_tokens": 20140
+        },
+        "last": {
+          "input_tokens": 19913,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 227,
+          "reasoning_output_tokens": 188,
+          "total_tokens": 20140
+        }
+      },
+      {
+        "timestamp": "2026-09-23T03:25:14.315Z",
+        "total": {
+          "input_tokens": 40083,
+          "cached_input_tokens": 19712,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 253,
+          "reasoning_output_tokens": 205,
+          "total_tokens": 40336
+        },
+        "last": {
+          "input_tokens": 20170,
+          "cached_input_tokens": 19712,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 26,
+          "reasoning_output_tokens": 17,
+          "total_tokens": 20196
+        }
+      },
+      {
+        "timestamp": "2026-09-23T03:25:14.320Z",
+        "event": "task_complete",
+        "reason": null
+      }
+    ]
+  },
+  "status": "ok",
+  "isolation_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "sdk": "openai-codex",
+  "started_at": 1790133899.3716028,
+  "finished_at": 1790133914.640147,
+  "python_env_keys": [
+    "HOME",
+    "LC_CTYPE",
+    "PATH"
+  ]
+}

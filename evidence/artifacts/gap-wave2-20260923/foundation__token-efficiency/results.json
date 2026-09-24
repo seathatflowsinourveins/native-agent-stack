@@ -1,0 +1,26 @@
+{
+  "0": {
+    "outcome": "deferred",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/0-native-task-onoff-baseline.json"
+  },
+  "1": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/1-headroom-interception-doctor.json"
+  },
+  "2": {
+    "outcome": "advanced",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/2-rtk-lite-preview-rerun.json"
+  },
+  "3": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/3-ccusage-attempt-child-coverage.json"
+  },
+  "4": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/4-context-mode-paired-causality.json"
+  },
+  "5": {
+    "outcome": "not_settled",
+    "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__token-efficiency/5-headroom-pin-stale-requalify.json"
+  }
+}

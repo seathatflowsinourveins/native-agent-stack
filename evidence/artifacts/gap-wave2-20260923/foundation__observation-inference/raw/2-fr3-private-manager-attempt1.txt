@@ -1,0 +1,6 @@
+outer_started=2026-09-23T14:19:04Z root=$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-WVuZQG7C host_uid=1000 cgroup=0::/init.scope
+2026-09-23T14:19:04.167Z inner pid=1 uid_in_ns=0
+2026-09-23T14:19:04.171Z live runtime dir hidden: 0 entries visible
+2026-09-23T14:19:04.381Z BLOCKER: private manager exited early (see manager.log)
+2026-09-23T14:19:04.382Z manager exit=1
+inner_exit=4 outer_stopped=2026-09-23T14:19:04Z

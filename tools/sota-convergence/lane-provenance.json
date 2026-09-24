@@ -1,0 +1,74 @@
+{
+ "claude": [
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": ".claude/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "5cbf6becbc9cc5d15a070afebab322df895242b76f62a85a1aa620960984dd4a"
+  },
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "5cbf6becbc9cc5d15a070afebab322df895242b76f62a85a1aa620960984dd4a"
+  },
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": ".claude/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "2eb9c10d40db7dd058376d03c973c55433b30d6e0d86f72e563da6627d8e7fbb"
+  },
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "2eb9c10d40db7dd058376d03c973c55433b30d6e0d86f72e563da6627d8e7fbb"
+  },
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": ".claude/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "0d66c9a11ad017c1fa84678f010e72fd7492e9902829f9a9185516695a4a3a72"
+  },
+  {
+   "registered_at": "2026-09-23",
+   "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
+   "workflow_sha256": "0d66c9a11ad017c1fa84678f010e72fd7492e9902829f9a9185516695a4a3a72"
+  }
+ ],
+ "codex": [
+  {
+   "codex_lane_py_sha256": "132fa7185dd4c1b3988531843d300bcfafaa09c011302228931c35f792e31650",
+   "prompt_sha256": "1434fdc4b049e06aceb9ae6c34c35954d64cc22311bdce983f72337159e26abf",
+   "registered_at": "2026-09-23"
+  },
+  {
+   "codex_lane_py_sha256": "e6804a4939cd6c5d4d3526afd7cf6fee24b955f15ef5f213e4c1f559efbb1772",
+   "prompt_sha256": "1434fdc4b049e06aceb9ae6c34c35954d64cc22311bdce983f72337159e26abf",
+   "registered_at": "2026-09-23"
+  },
+  {
+   "codex_lane_py_sha256": "bd9962d76a0d83d711f13ded866d2b156971a2d49a4cb703ccfc33971dbe43e9",
+   "prompt_sha256": "1434fdc4b049e06aceb9ae6c34c35954d64cc22311bdce983f72337159e26abf",
+   "registered_at": "2026-09-23"
+  },
+  {
+   "codex_lane_py_sha256": "4d67783bce70b623d748cd9b9661002e2f34f3a997dc9e4c7af4c4b52abb08f4",
+   "prompt_sha256": "1434fdc4b049e06aceb9ae6c34c35954d64cc22311bdce983f72337159e26abf",
+   "registered_at": "2026-09-23"
+  },
+  {
+   "codex_lane_py_sha256": "97047bc0f3aef0c3ebcc100a216a50669bef2c69d080f99389f1b017c57cbe28",
+   "prompt_sha256": "1434fdc4b049e06aceb9ae6c34c35954d64cc22311bdce983f72337159e26abf",
+   "registered_at": "2026-09-23"
+  },
+  {
+   "codex_lane_py_sha256": "66efcd2fa8c5ce96fae56eef4154f9328ea00ceb988b285ac0ecdfa2dc08f64c",
+   "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
+   "registered_at": "2026-09-23"
+  }
+ ],
+ "schema_version": 1,
+ "scope": "Append-only registry of the lane code a layer-verdict return outside the grandfathered 2026-09-22 wave may name in its provenance (2026-09-23 verdict-integrity review). tools/sota-convergence/record_verdicts.py accepts a Claude return only when its (workflow_path, workflow_sha256) is listed here and equals the current examples/claude-native/workflows/SHA256SUMS entry of the listed vendored_path, and a Codex return only when its (codex_lane_py_sha256, prompt_sha256) is listed here and equals this checkout's codex_lane.py and lane-prompt.md; scripts/landscape.py re-checks every sealed new-wave return against this list in CI. Append an entry (never edit or remove one) when codex_lane.py, lane-prompt.md or the vendored workflow changes; tests/test_verdict_lane_vendoring.py fails until the current bytes are listed."
+}

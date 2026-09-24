@@ -1,0 +1,4 @@
+# 3694 lines 'Neither CPE nor PURL found for package: <CycloneDX file component>' removed (file components, not packages); full stderr {'cache_path': '$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/compare/osv.stderr', 'bytes': 2542179, 'sha256': 'c4c35303219f864e4a024d3b95e6cb831aeb6afd0e2b3cc80572409b65915252', 'committed': False}
+Starting filesystem walk for root: /
+Scanned $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/compare/syft.cdx.json file and found 21 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 22.404703ms elapsed, 22.404803ms wall time

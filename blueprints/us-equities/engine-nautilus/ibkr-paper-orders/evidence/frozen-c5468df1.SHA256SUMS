@@ -1,0 +1,7 @@
+d64a08b42d0e43feb2f571ae5d1097f7411e767ca39762aa96fef37ccb26666d  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md
+8bf9a89cf74e49bb5f06ca617a1ff40f324de19e84e1544fd9138c1bb52c3533  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS
+e813c655d664966a6910926d284887815d933ac81d0552d2c985aadbdb5d43dc  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json
+cb6ece766ca5eb26f1022e9bc7e2fb566277a2e10f1a3ae101de2d2ac5d1fb5f  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-refused-read-only-api.json
+4500c917e11e3d756f181432bbd297614acbfe5014d2a7e9d0c4332f87af1a51  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/plan-post.json
+9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/plan.json
+676a375a472a016096b56abdf95d9ba32b9fb821aee27a027b6d34094271a8e6  ./blueprints/us-equities/engine-nautilus/ibkr-paper-orders/run.py

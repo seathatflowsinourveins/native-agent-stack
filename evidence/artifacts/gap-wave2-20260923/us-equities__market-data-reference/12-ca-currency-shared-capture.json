@@ -1,0 +1,51 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/12-ca-currency-shared-capture",
+ "gap_index": 12,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "The dividend's missing currency prevents complete cash-unit reconciliation despite matching numeric values.",
+ "gap_text_sha256": "f7545570ad0b47bf9f73f1b50570ac1eef7d90b9c969929219471ed6e18f1541",
+ "next_check": "Use the raw Alpaca corporate-actions capture described for gap 1, and record the currency-field result or a documented USD assumption.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Same evidence as gap 1 (shared capture).",
+  "criteria": "Same as gap 1; outcome mirrors gap 1.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "none"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "Same evidence as gap 1 (receipt 1-ca-currency-field.json); no separate command."
+ ],
+ "results": [
+  "Same result as gap 1: currency is an optional REST property whose empty value can mean USD, N/A or unknown; the retained capture has no currency key; alpaca-py 0.44.0 does not model it."
+ ],
+ "detection_method": "See gap 1 (key-scan positive control).",
+ "outcome": "advanced",
+ "evidence_class": "source_review",
+ "limits": [
+  "Fresh credentialed capture deferred to sota-workflow-resolution; catalog USD-assumption text drafted in the layer README, not written to the frozen catalog ledger. Cash-unit reconciliation stays incomplete until one of those lands."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json",
+   "sha256": "d0a6eade4eaf0365d4d69fce09dc3d6c9846f3d6de389743aaf6f932e319b96c"
+  }
+ ],
+ "checked_at": "2026-09-23T04:24:19Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

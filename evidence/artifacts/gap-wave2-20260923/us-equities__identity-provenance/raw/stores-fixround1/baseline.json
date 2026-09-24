@@ -1,0 +1,256 @@
+{
+  "arm": "baseline",
+  "concurrent_writers": {
+    "appends_each": 10,
+    "content": {
+      "batches": 20,
+      "content_ok": true,
+      "decoded_rows": 100,
+      "problems": []
+    },
+    "detector_controls": {
+      "corrupted_row_flagged": true,
+      "dropped_row_flagged": true,
+      "foreign_row_flagged": true
+    },
+    "no_silent_loss": true,
+    "reported_successful_appends": 20,
+    "rows_expected_from_reported_successes": 100,
+    "rows_found": 100,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "committed_versions": 20,
+      "content": {
+        "batches": 20,
+        "content_ok": true,
+        "decoded_rows": 100,
+        "problems": []
+      },
+      "detector_controls": {
+        "corrupted_row_flagged": true,
+        "dropped_row_flagged": true,
+        "foreign_row_flagged": true
+      },
+      "incomplete_dirs_without_manifest": 0,
+      "manifest_present_but_invalid": [],
+      "readable": true,
+      "rows": 100
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  },
+  "correction_retention": {
+    "mechanism": "separate immutable snapshot directory per version",
+    "v1_row_ids": [
+      "future-member",
+      "original"
+    ],
+    "v1_rows_equal": true
+  },
+  "elapsed_s": 8.89,
+  "fixture_rows": {
+    "observations": [
+      "aeeacfe8f0cfa22b73c71a6b2b7349f05c3bfd031c2ef8f8bbe98784c7ac9ebe",
+      5
+    ],
+    "universe": [
+      "37cb0502779e72b2c0ff66e7dd64932d0b75a43873cde1d46e83a229e67a11c9",
+      2
+    ]
+  },
+  "latency_ms": {
+    "read_median": 29.998,
+    "unit_of_work": "materialize two tables + manifest / verify + read two tables",
+    "write_median": 38.549,
+    "write_samples": 5
+  },
+  "lineage": {
+    "classification_note": "version_id is the content digest materialize returns; the caller must hold it because the store does not persist it. input_dataset_name is the provenance prose from the source file. The source.json content hash is recorded natively in the manifest.",
+    "commit_timestamp": "2026-09-23T05:32:15.328871Z",
+    "field_classification": {
+      "commit_timestamp": "native",
+      "input_dataset_name": "caller_annotation",
+      "operation": "absent",
+      "parent_version": "absent",
+      "per_file_content_hash": "native",
+      "version_id": "native"
+    },
+    "input_dataset_name": "Entirely synthetic events and membership; symbols are illust",
+    "native_count": 3,
+    "operation": null,
+    "parent_version": null,
+    "per_file_content_hash": [
+      "observations.parquet",
+      "source.json",
+      "universe.parquet"
+    ],
+    "version_id": "snapshot_sha256 (content digest, caller-held)"
+  },
+  "python": "3.13.15",
+  "recovery_after_sigkill": {
+    "all_recovered": true,
+    "detection_method": "after SIGKILL, reopen the store in a fresh process handle and decode every stored row; pass only if it reads, the decoded rows are whole identical copies of the 5-row fixture batch (content_check), the corrupted/foreign/dropped-row controls are flagged, and the committed count is the writer's last recorded count or one more (a commit that finished before its progress line was written)",
+    "trials": [
+      {
+        "committed_units": 5,
+        "progress_recorded_commits": 5,
+        "state": {
+          "committed_versions": 5,
+          "content": {
+            "batches": 5,
+            "content_ok": true,
+            "decoded_rows": 25,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "incomplete_dirs_without_manifest": 1,
+          "manifest_present_but_invalid": [],
+          "readable": true,
+          "rows": 25
+        },
+        "trial": 0,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 6,
+        "progress_recorded_commits": 6,
+        "state": {
+          "committed_versions": 6,
+          "content": {
+            "batches": 6,
+            "content_ok": true,
+            "decoded_rows": 30,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "incomplete_dirs_without_manifest": 1,
+          "manifest_present_but_invalid": [],
+          "readable": true,
+          "rows": 30
+        },
+        "trial": 1,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 9,
+        "progress_recorded_commits": 9,
+        "state": {
+          "committed_versions": 9,
+          "content": {
+            "batches": 9,
+            "content_ok": true,
+            "decoded_rows": 45,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "incomplete_dirs_without_manifest": 1,
+          "manifest_present_but_invalid": [],
+          "readable": true,
+          "rows": 45
+        },
+        "trial": 2,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 4,
+        "progress_recorded_commits": 4,
+        "state": {
+          "committed_versions": 4,
+          "content": {
+            "batches": 4,
+            "content_ok": true,
+            "decoded_rows": 20,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "incomplete_dirs_without_manifest": 1,
+          "manifest_present_but_invalid": [],
+          "readable": true,
+          "rows": 20
+        },
+        "trial": 3,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      },
+      {
+        "committed_units": 4,
+        "progress_recorded_commits": 4,
+        "state": {
+          "committed_versions": 4,
+          "content": {
+            "batches": 4,
+            "content_ok": true,
+            "decoded_rows": 20,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "incomplete_dirs_without_manifest": 1,
+          "manifest_present_but_invalid": [],
+          "readable": true,
+          "rows": 20
+        },
+        "trial": 4,
+        "whole_units_and_consistent_with_progress": true,
+        "writer_errors": []
+      }
+    ]
+  },
+  "restore": {
+    "observations": true,
+    "universe": true
+  },
+  "restore_after_delete": {
+    "mechanism": "re-materialize from git-tracked fixture",
+    "old_snapshot_sha256_still_verifies": "refused: snapshot_manifest_hash_mismatch",
+    "per_file_equal": {
+      "observations.parquet": true,
+      "snapshot.json": false,
+      "source.json": true,
+      "universe.parquet": true
+    }
+  },
+  "started_utc": "2026-09-23T05:32:14Z",
+  "storage_bytes": {
+    "du_sb": 12524,
+    "file_sum": 12524
+  },
+  "versions": {
+    "duckdb": "1.5.5",
+    "dvc": "3.67.1",
+    "pandas": "3.0.6"
+  }
+}

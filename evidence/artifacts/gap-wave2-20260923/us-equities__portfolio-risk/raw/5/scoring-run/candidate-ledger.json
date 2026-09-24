@@ -1,0 +1,6872 @@
+[
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-09-27",
+    "entry": "2011-09-28",
+    "exit": "2011-10-05",
+    "gross_price_label": "-0.0635006296096420219463932362",
+    "net_proxy": "-0.0655006296096420219463932362",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-09-27",
+    "entry": "2011-09-28",
+    "exit": "2011-10-05",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-09-27",
+    "entry": "2011-09-28",
+    "exit": "2011-10-05",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-09-27",
+    "entry": "2011-09-28",
+    "exit": "2011-10-05",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-09-27",
+    "entry": "2011-09-28",
+    "exit": "2011-10-05",
+    "gross_price_label": "-0.05054739225419919225560699120",
+    "net_proxy": "-0.05254739225419919225560699120",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-04",
+    "entry": "2011-10-05",
+    "exit": "2011-10-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-04",
+    "entry": "2011-10-05",
+    "exit": "2011-10-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-04",
+    "entry": "2011-10-05",
+    "exit": "2011-10-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-04",
+    "entry": "2011-10-05",
+    "exit": "2011-10-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-10-04",
+    "entry": "2011-10-05",
+    "exit": "2011-10-12",
+    "gross_price_label": "0.07810338100935645411057133533",
+    "net_proxy": "0.07610338100935645411057133533",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-10-11",
+    "entry": "2011-10-12",
+    "exit": "2011-10-19",
+    "gross_price_label": "0.014245515300738656348927190",
+    "net_proxy": "0.012245515300738656348927190",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-11",
+    "entry": "2011-10-12",
+    "exit": "2011-10-19",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-11",
+    "entry": "2011-10-12",
+    "exit": "2011-10-19",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-11",
+    "entry": "2011-10-12",
+    "exit": "2011-10-19",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-10-11",
+    "entry": "2011-10-12",
+    "exit": "2011-10-19",
+    "gross_price_label": "0.01524416375119583065829614133",
+    "net_proxy": "0.01324416375119583065829614133",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-10-18",
+    "entry": "2011-10-19",
+    "exit": "2011-10-26",
+    "gross_price_label": "-0.0001734003814808392578463673",
+    "net_proxy": "-0.0021734003814808392578463673",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-18",
+    "entry": "2011-10-19",
+    "exit": "2011-10-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-18",
+    "entry": "2011-10-19",
+    "exit": "2011-10-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-18",
+    "entry": "2011-10-19",
+    "exit": "2011-10-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-10-18",
+    "entry": "2011-10-19",
+    "exit": "2011-10-26",
+    "gross_price_label": "0.01493517801704850210130551590",
+    "net_proxy": "0.01293517801704850210130551590",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-10-25",
+    "entry": "2011-10-26",
+    "exit": "2011-11-02",
+    "gross_price_label": "-0.0002754062241806664830625172",
+    "net_proxy": "-0.0022754062241806664830625172",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-25",
+    "entry": "2011-10-26",
+    "exit": "2011-11-02",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-25",
+    "entry": "2011-10-26",
+    "exit": "2011-11-02",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-10-25",
+    "entry": "2011-10-26",
+    "exit": "2011-11-02",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-10-25",
+    "entry": "2011-10-26",
+    "exit": "2011-11-02",
+    "gross_price_label": "-0.004993726350820361915144292833",
+    "net_proxy": "-0.006993726350820361915144292833",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-01",
+    "entry": "2011-11-02",
+    "exit": "2011-11-09",
+    "gross_price_label": "0.009641873278236914600550964",
+    "net_proxy": "0.007641873278236914600550964",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-01",
+    "entry": "2011-11-02",
+    "exit": "2011-11-09",
+    "gross_price_label": "0.012449587936173943538488515",
+    "net_proxy": "0.010449587936173943538488515",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-01",
+    "entry": "2011-11-02",
+    "exit": "2011-11-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-01",
+    "entry": "2011-11-02",
+    "exit": "2011-11-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-11-01",
+    "entry": "2011-11-02",
+    "exit": "2011-11-09",
+    "gross_price_label": "0.01013531970520185423061083500",
+    "net_proxy": "0.008135319705201854230610835000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-08",
+    "entry": "2011-11-09",
+    "exit": "2011-11-16",
+    "gross_price_label": "0.000954979536152796725784447",
+    "net_proxy": "-0.001045020463847203274215553",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-08",
+    "entry": "2011-11-09",
+    "exit": "2011-11-16",
+    "gross_price_label": "-0.0005195704883962590924835469",
+    "net_proxy": "-0.0025195704883962590924835469",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-08",
+    "entry": "2011-11-09",
+    "exit": "2011-11-16",
+    "gross_price_label": "-0.0005195704883962590924835469",
+    "net_proxy": "-0.0025195704883962590924835469",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-08",
+    "entry": "2011-11-09",
+    "exit": "2011-11-16",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-11-08",
+    "entry": "2011-11-09",
+    "exit": "2011-11-16",
+    "gross_price_label": "-0.0001217224557540919708173473333",
+    "net_proxy": "-0.002121722455754091970817347333",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-15",
+    "entry": "2011-11-16",
+    "exit": "2011-11-23",
+    "gross_price_label": "-0.0603789014583617282267956931",
+    "net_proxy": "-0.0623789014583617282267956931",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-15",
+    "entry": "2011-11-16",
+    "exit": "2011-11-23",
+    "gross_price_label": "-0.0623808698665742505631606307",
+    "net_proxy": "-0.0643808698665742505631606307",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-15",
+    "entry": "2011-11-16",
+    "exit": "2011-11-23",
+    "gross_price_label": "-0.0623808698665742505631606307",
+    "net_proxy": "-0.0643808698665742505631606307",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-15",
+    "entry": "2011-11-16",
+    "exit": "2011-11-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-11-15",
+    "entry": "2011-11-16",
+    "exit": "2011-11-23",
+    "gross_price_label": "-0.05892061816378297549014354826",
+    "net_proxy": "-0.06092061816378297549014354826",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-22",
+    "entry": "2011-11-23",
+    "exit": "2011-12-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-22",
+    "entry": "2011-11-23",
+    "exit": "2011-12-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-22",
+    "entry": "2011-11-23",
+    "exit": "2011-12-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-22",
+    "entry": "2011-11-23",
+    "exit": "2011-12-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-11-22",
+    "entry": "2011-11-23",
+    "exit": "2011-12-01",
+    "gross_price_label": "0.05512485406448554927025373833",
+    "net_proxy": "0.05312485406448554927025373833",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-30",
+    "entry": "2011-12-01",
+    "exit": "2011-12-08",
+    "gross_price_label": "0.005851136209008028303170499",
+    "net_proxy": "0.003851136209008028303170499",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-30",
+    "entry": "2011-12-01",
+    "exit": "2011-12-08",
+    "gross_price_label": "0.005851136209008028303170499",
+    "net_proxy": "0.003851136209008028303170499",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2011-11-30",
+    "entry": "2011-12-01",
+    "exit": "2011-12-08",
+    "gross_price_label": "0.005853139411138701667257893",
+    "net_proxy": "0.003853139411138701667257893",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-11-30",
+    "entry": "2011-12-01",
+    "exit": "2011-12-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-11-30",
+    "entry": "2011-12-01",
+    "exit": "2011-12-08",
+    "gross_price_label": "0.006651391833334185654273087000",
+    "net_proxy": "0.004651391833334185654273087000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-07",
+    "entry": "2011-12-08",
+    "exit": "2011-12-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-07",
+    "entry": "2011-12-08",
+    "exit": "2011-12-15",
+    "gross_price_label": "-0.0251623376623376623376623377",
+    "net_proxy": "-0.0271623376623376623376623377",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-07",
+    "entry": "2011-12-08",
+    "exit": "2011-12-15",
+    "gross_price_label": "-0.0238053253394463057661788044",
+    "net_proxy": "-0.0258053253394463057661788044",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-07",
+    "entry": "2011-12-08",
+    "exit": "2011-12-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-12-07",
+    "entry": "2011-12-08",
+    "exit": "2011-12-15",
+    "gross_price_label": "-0.02363110215725178981281517573",
+    "net_proxy": "-0.02563110215725178981281517573",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-14",
+    "entry": "2011-12-15",
+    "exit": "2011-12-22",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-14",
+    "entry": "2011-12-15",
+    "exit": "2011-12-22",
+    "gross_price_label": "0.029558701082431307243963364",
+    "net_proxy": "0.027558701082431307243963364",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-14",
+    "entry": "2011-12-15",
+    "exit": "2011-12-22",
+    "gross_price_label": "-0.0019869942196531791907514451",
+    "net_proxy": "-0.0039869942196531791907514451",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-14",
+    "entry": "2011-12-15",
+    "exit": "2011-12-22",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-12-14",
+    "entry": "2011-12-15",
+    "exit": "2011-12-22",
+    "gross_price_label": "0.01330579529170793568851919930",
+    "net_proxy": "0.01130579529170793568851919930",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-21",
+    "entry": "2011-12-22",
+    "exit": "2011-12-30",
+    "gross_price_label": "-0.0009435233859010648335355169",
+    "net_proxy": "-0.0029435233859010648335355169",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-21",
+    "entry": "2011-12-22",
+    "exit": "2011-12-30",
+    "gross_price_label": "-0.0009435233859010648335355169",
+    "net_proxy": "-0.0029435233859010648335355169",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-21",
+    "entry": "2011-12-22",
+    "exit": "2011-12-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-21",
+    "entry": "2011-12-22",
+    "exit": "2011-12-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-12-21",
+    "entry": "2011-12-22",
+    "exit": "2011-12-30",
+    "gross_price_label": "0.007036463303122227280834110700",
+    "net_proxy": "0.005036463303122227280834110700",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-29",
+    "entry": "2011-12-30",
+    "exit": "2012-01-09",
+    "gross_price_label": "0.016271132629573775696483848",
+    "net_proxy": "0.014271132629573775696483848",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2011-12-29",
+    "entry": "2011-12-30",
+    "exit": "2012-01-09",
+    "gross_price_label": "0.014031300593631948192120885",
+    "net_proxy": "0.012031300593631948192120885",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-29",
+    "entry": "2011-12-30",
+    "exit": "2012-01-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2011-12-29",
+    "entry": "2011-12-30",
+    "exit": "2012-01-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2011-12-29",
+    "entry": "2011-12-30",
+    "exit": "2012-01-09",
+    "gross_price_label": "0.02257023413985146347864892566",
+    "net_proxy": "0.02057023413985146347864892566",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-06",
+    "entry": "2012-01-09",
+    "exit": "2012-01-17",
+    "gross_price_label": "0.012594893029675638371290545",
+    "net_proxy": "0.010594893029675638371290545",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-06",
+    "entry": "2012-01-09",
+    "exit": "2012-01-17",
+    "gross_price_label": "0.025944651410324640766365088",
+    "net_proxy": "0.023944651410324640766365088",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-06",
+    "entry": "2012-01-09",
+    "exit": "2012-01-17",
+    "gross_price_label": "0.012594893029675638371290545",
+    "net_proxy": "0.010594893029675638371290545",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-01-06",
+    "entry": "2012-01-09",
+    "exit": "2012-01-17",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-01-06",
+    "entry": "2012-01-09",
+    "exit": "2012-01-17",
+    "gross_price_label": "0.01820942223809652124540619400",
+    "net_proxy": "0.01620942223809652124540619400",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-13",
+    "entry": "2012-01-17",
+    "exit": "2012-01-24",
+    "gross_price_label": "0.007521722215017507456879782",
+    "net_proxy": "0.005521722215017507456879782",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-13",
+    "entry": "2012-01-17",
+    "exit": "2012-01-24",
+    "gross_price_label": "0.007521722215017507456879782",
+    "net_proxy": "0.005521722215017507456879782",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.000",
+    "decision": "2012-01-13",
+    "entry": "2012-01-17",
+    "exit": "2012-01-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-01-13",
+    "entry": "2012-01-17",
+    "exit": "2012-01-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-01-13",
+    "entry": "2012-01-17",
+    "exit": "2012-01-24",
+    "gross_price_label": "0.008937903163977214812893887333",
+    "net_proxy": "0.006937903163977214812893887333",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-23",
+    "entry": "2012-01-24",
+    "exit": "2012-01-31",
+    "gross_price_label": "0.020665322580645161290322581",
+    "net_proxy": "0.018665322580645161290322581",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-23",
+    "entry": "2012-01-24",
+    "exit": "2012-01-31",
+    "gross_price_label": "0.024971038743725061140429914",
+    "net_proxy": "0.022971038743725061140429914",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-23",
+    "entry": "2012-01-24",
+    "exit": "2012-01-31",
+    "gross_price_label": "0.020665322580645161290322581",
+    "net_proxy": "0.018665322580645161290322581",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-01-23",
+    "entry": "2012-01-24",
+    "exit": "2012-01-31",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-01-23",
+    "entry": "2012-01-24",
+    "exit": "2012-01-31",
+    "gross_price_label": "0.01839837620857967930276950300",
+    "net_proxy": "0.01639837620857967930276950300",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-30",
+    "entry": "2012-01-31",
+    "exit": "2012-02-07",
+    "gross_price_label": "0.019753086419753086419753086",
+    "net_proxy": "0.017753086419753086419753086",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-30",
+    "entry": "2012-01-31",
+    "exit": "2012-02-07",
+    "gross_price_label": "0.037799824186864247143036544",
+    "net_proxy": "0.035799824186864247143036544",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-01-30",
+    "entry": "2012-01-31",
+    "exit": "2012-02-07",
+    "gross_price_label": "0.037799824186864247143036544",
+    "net_proxy": "0.035799824186864247143036544",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-01-30",
+    "entry": "2012-01-31",
+    "exit": "2012-02-07",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-01-30",
+    "entry": "2012-01-31",
+    "exit": "2012-02-07",
+    "gross_price_label": "0.02468852006838766948684413201",
+    "net_proxy": "0.02268852006838766948684413201",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-06",
+    "entry": "2012-02-07",
+    "exit": "2012-02-14",
+    "gross_price_label": "-0.0091965150048402710551790900",
+    "net_proxy": "-0.0111965150048402710551790900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-06",
+    "entry": "2012-02-07",
+    "exit": "2012-02-14",
+    "gross_price_label": "-0.0091965150048402710551790900",
+    "net_proxy": "-0.0111965150048402710551790900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-06",
+    "entry": "2012-02-07",
+    "exit": "2012-02-14",
+    "gross_price_label": "-0.0091965150048402710551790900",
+    "net_proxy": "-0.0111965150048402710551790900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-02-06",
+    "entry": "2012-02-07",
+    "exit": "2012-02-14",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-02-06",
+    "entry": "2012-02-07",
+    "exit": "2012-02-14",
+    "gross_price_label": "0.004062196416168572035252222667",
+    "net_proxy": "0.002062196416168572035252222667",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-13",
+    "entry": "2012-02-14",
+    "exit": "2012-02-22",
+    "gross_price_label": "0.009378477189635987919249722",
+    "net_proxy": "0.007378477189635987919249722",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-13",
+    "entry": "2012-02-14",
+    "exit": "2012-02-22",
+    "gross_price_label": "0.000977039570102589154860772",
+    "net_proxy": "-0.001022960429897410845139228",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-13",
+    "entry": "2012-02-14",
+    "exit": "2012-02-22",
+    "gross_price_label": "0.000977039570102589154860772",
+    "net_proxy": "-0.001022960429897410845139228",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-02-13",
+    "entry": "2012-02-14",
+    "exit": "2012-02-22",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-02-13",
+    "entry": "2012-02-14",
+    "exit": "2012-02-22",
+    "gross_price_label": "0.006439714565022373309712264000",
+    "net_proxy": "0.004439714565022373309712264000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-21",
+    "entry": "2012-02-22",
+    "exit": "2012-02-29",
+    "gross_price_label": "0.019685039370078740157480315",
+    "net_proxy": "0.017685039370078740157480315",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-21",
+    "entry": "2012-02-22",
+    "exit": "2012-02-29",
+    "gross_price_label": "0.007076622742801366520253782",
+    "net_proxy": "0.005076622742801366520253782",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-21",
+    "entry": "2012-02-22",
+    "exit": "2012-02-29",
+    "gross_price_label": "0.019685039370078740157480315",
+    "net_proxy": "0.017685039370078740157480315",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-02-21",
+    "entry": "2012-02-22",
+    "exit": "2012-02-29",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-02-21",
+    "entry": "2012-02-22",
+    "exit": "2012-02-29",
+    "gross_price_label": "0.01266504742969718680740916300",
+    "net_proxy": "0.01066504742969718680740916300",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-28",
+    "entry": "2012-02-29",
+    "exit": "2012-03-07",
+    "gross_price_label": "-0.0135907335907335907335907336",
+    "net_proxy": "-0.0155907335907335907335907336",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-28",
+    "entry": "2012-02-29",
+    "exit": "2012-03-07",
+    "gross_price_label": "-0.0135907335907335907335907336",
+    "net_proxy": "-0.0155907335907335907335907336",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-02-28",
+    "entry": "2012-02-29",
+    "exit": "2012-03-07",
+    "gross_price_label": "-0.0135907335907335907335907336",
+    "net_proxy": "-0.0155907335907335907335907336",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-02-28",
+    "entry": "2012-02-29",
+    "exit": "2012-03-07",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-02-28",
+    "entry": "2012-02-29",
+    "exit": "2012-03-07",
+    "gross_price_label": "-0.02557095285766445619925767266",
+    "net_proxy": "-0.02757095285766445619925767266",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-06",
+    "entry": "2012-03-07",
+    "exit": "2012-03-14",
+    "gross_price_label": "0.038515735086895255988727102",
+    "net_proxy": "0.036515735086895255988727102",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-06",
+    "entry": "2012-03-07",
+    "exit": "2012-03-14",
+    "gross_price_label": "0.038515735086895255988727102",
+    "net_proxy": "0.036515735086895255988727102",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-06",
+    "entry": "2012-03-07",
+    "exit": "2012-03-14",
+    "gross_price_label": "0.038515735086895255988727102",
+    "net_proxy": "0.036515735086895255988727102",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-03-06",
+    "entry": "2012-03-07",
+    "exit": "2012-03-14",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-03-06",
+    "entry": "2012-03-07",
+    "exit": "2012-03-14",
+    "gross_price_label": "0.04226498454739338112629814900",
+    "net_proxy": "0.04026498454739338112629814900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-13",
+    "entry": "2012-03-14",
+    "exit": "2012-03-21",
+    "gross_price_label": "0.011910146238504447459671340",
+    "net_proxy": "0.009910146238504447459671340",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-13",
+    "entry": "2012-03-14",
+    "exit": "2012-03-21",
+    "gross_price_label": "0.011910146238504447459671340",
+    "net_proxy": "0.009910146238504447459671340",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-13",
+    "entry": "2012-03-14",
+    "exit": "2012-03-21",
+    "gross_price_label": "0.002289984331686151621067856",
+    "net_proxy": "0.000289984331686151621067856",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-03-13",
+    "entry": "2012-03-14",
+    "exit": "2012-03-21",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-03-13",
+    "entry": "2012-03-14",
+    "exit": "2012-03-21",
+    "gross_price_label": "0.005661484231614186271719233667",
+    "net_proxy": "0.003661484231614186271719233667",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-20",
+    "entry": "2012-03-21",
+    "exit": "2012-03-28",
+    "gross_price_label": "0.016835518474374255065554231",
+    "net_proxy": "0.014835518474374255065554231",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-20",
+    "entry": "2012-03-21",
+    "exit": "2012-03-28",
+    "gross_price_label": "0.016835518474374255065554231",
+    "net_proxy": "0.014835518474374255065554231",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-20",
+    "entry": "2012-03-21",
+    "exit": "2012-03-28",
+    "gross_price_label": "0.007455507455507455507455507",
+    "net_proxy": "0.005455507455507455507455507",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-03-20",
+    "entry": "2012-03-21",
+    "exit": "2012-03-28",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-03-20",
+    "entry": "2012-03-21",
+    "exit": "2012-03-28",
+    "gross_price_label": "0.009592096212708683532879937000",
+    "net_proxy": "0.007592096212708683532879937000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-27",
+    "entry": "2012-03-28",
+    "exit": "2012-04-04",
+    "gross_price_label": "-0.0077655677655677655677655678",
+    "net_proxy": "-0.0097655677655677655677655678",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-27",
+    "entry": "2012-03-28",
+    "exit": "2012-04-04",
+    "gross_price_label": "-0.0077655677655677655677655678",
+    "net_proxy": "-0.0097655677655677655677655678",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-03-27",
+    "entry": "2012-03-28",
+    "exit": "2012-04-04",
+    "gross_price_label": "-0.0077655677655677655677655678",
+    "net_proxy": "-0.0097655677655677655677655678",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-03-27",
+    "entry": "2012-03-28",
+    "exit": "2012-04-04",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-03-27",
+    "entry": "2012-03-28",
+    "exit": "2012-04-04",
+    "gross_price_label": "-0.01033222014028797811460777513",
+    "net_proxy": "-0.01233222014028797811460777513",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-03",
+    "entry": "2012-04-04",
+    "exit": "2012-04-12",
+    "gross_price_label": "-0.0171293561724748966331955109",
+    "net_proxy": "-0.0191293561724748966331955109",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-03",
+    "entry": "2012-04-04",
+    "exit": "2012-04-12",
+    "gross_price_label": "-0.0171293561724748966331955109",
+    "net_proxy": "-0.0191293561724748966331955109",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-03",
+    "entry": "2012-04-04",
+    "exit": "2012-04-12",
+    "gross_price_label": "-0.0171293561724748966331955109",
+    "net_proxy": "-0.0191293561724748966331955109",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-03",
+    "entry": "2012-04-04",
+    "exit": "2012-04-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-04-03",
+    "entry": "2012-04-04",
+    "exit": "2012-04-12",
+    "gross_price_label": "-0.02434963871082243055857171746",
+    "net_proxy": "-0.02634963871082243055857171746",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-11",
+    "entry": "2012-04-12",
+    "exit": "2012-04-19",
+    "gross_price_label": "-0.0028545673076923076923076923",
+    "net_proxy": "-0.0048545673076923076923076923",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-11",
+    "entry": "2012-04-12",
+    "exit": "2012-04-19",
+    "gross_price_label": "-0.0028545673076923076923076923",
+    "net_proxy": "-0.0048545673076923076923076923",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-11",
+    "entry": "2012-04-12",
+    "exit": "2012-04-19",
+    "gross_price_label": "-0.0028545673076923076923076923",
+    "net_proxy": "-0.0048545673076923076923076923",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-11",
+    "entry": "2012-04-12",
+    "exit": "2012-04-19",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-04-11",
+    "entry": "2012-04-12",
+    "exit": "2012-04-19",
+    "gross_price_label": "0.005764011777159522858108570900",
+    "net_proxy": "0.003764011777159522858108570900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-18",
+    "entry": "2012-04-19",
+    "exit": "2012-04-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-18",
+    "entry": "2012-04-19",
+    "exit": "2012-04-26",
+    "gross_price_label": "0.001054693385565767666114208",
+    "net_proxy": "-0.000945306614434232333885792",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-18",
+    "entry": "2012-04-19",
+    "exit": "2012-04-26",
+    "gross_price_label": "0.001054693385565767666114208",
+    "net_proxy": "-0.000945306614434232333885792",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-18",
+    "entry": "2012-04-19",
+    "exit": "2012-04-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-04-18",
+    "entry": "2012-04-19",
+    "exit": "2012-04-26",
+    "gross_price_label": "0.003670476764704801920917933000",
+    "net_proxy": "0.001670476764704801920917933000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-25",
+    "entry": "2012-04-26",
+    "exit": "2012-05-03",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-25",
+    "entry": "2012-04-26",
+    "exit": "2012-05-03",
+    "gross_price_label": "0.009933774834437086092715232",
+    "net_proxy": "0.007933774834437086092715232",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-04-25",
+    "entry": "2012-04-26",
+    "exit": "2012-05-03",
+    "gross_price_label": "0.009933774834437086092715232",
+    "net_proxy": "0.007933774834437086092715232",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-04-25",
+    "entry": "2012-04-26",
+    "exit": "2012-05-03",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-04-25",
+    "entry": "2012-04-26",
+    "exit": "2012-05-03",
+    "gross_price_label": "0.009975804145216653575007030333",
+    "net_proxy": "0.007975804145216653575007030333",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-02",
+    "entry": "2012-05-03",
+    "exit": "2012-05-10",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-02",
+    "entry": "2012-05-03",
+    "exit": "2012-05-10",
+    "gross_price_label": "-0.0371087928464977645305514158",
+    "net_proxy": "-0.0391087928464977645305514158",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-02",
+    "entry": "2012-05-03",
+    "exit": "2012-05-10",
+    "gross_price_label": "-0.0371087928464977645305514158",
+    "net_proxy": "-0.0391087928464977645305514158",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-02",
+    "entry": "2012-05-03",
+    "exit": "2012-05-10",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-05-02",
+    "entry": "2012-05-03",
+    "exit": "2012-05-10",
+    "gross_price_label": "-0.03050315659953163097514237240",
+    "net_proxy": "-0.03250315659953163097514237240",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-09",
+    "entry": "2012-05-10",
+    "exit": "2012-05-17",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-09",
+    "entry": "2012-05-10",
+    "exit": "2012-05-17",
+    "gross_price_label": "-0.0255378424392508899551153072",
+    "net_proxy": "-0.0275378424392508899551153072",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-09",
+    "entry": "2012-05-10",
+    "exit": "2012-05-17",
+    "gross_price_label": "-0.0255378424392508899551153072",
+    "net_proxy": "-0.0275378424392508899551153072",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-09",
+    "entry": "2012-05-10",
+    "exit": "2012-05-17",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-05-09",
+    "entry": "2012-05-10",
+    "exit": "2012-05-17",
+    "gross_price_label": "-0.02693446181011533763772857354",
+    "net_proxy": "-0.02893446181011533763772857354",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-16",
+    "entry": "2012-05-17",
+    "exit": "2012-05-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-16",
+    "entry": "2012-05-17",
+    "exit": "2012-05-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-16",
+    "entry": "2012-05-17",
+    "exit": "2012-05-24",
+    "gross_price_label": "-0.0049237611181702668360864041",
+    "net_proxy": "-0.0069237611181702668360864041",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-16",
+    "entry": "2012-05-17",
+    "exit": "2012-05-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-05-16",
+    "entry": "2012-05-17",
+    "exit": "2012-05-24",
+    "gross_price_label": "-0.005535048162765119605161006433",
+    "net_proxy": "-0.007535048162765119605161006433",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-23",
+    "entry": "2012-05-24",
+    "exit": "2012-06-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-23",
+    "entry": "2012-05-24",
+    "exit": "2012-06-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-23",
+    "entry": "2012-05-24",
+    "exit": "2012-06-01",
+    "gross_price_label": "-0.0272944932162809257781324820",
+    "net_proxy": "-0.0292944932162809257781324820",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-23",
+    "entry": "2012-05-24",
+    "exit": "2012-06-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-05-23",
+    "entry": "2012-05-24",
+    "exit": "2012-06-01",
+    "gross_price_label": "-0.02618477942030653482015468390",
+    "net_proxy": "-0.02818477942030653482015468390",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-31",
+    "entry": "2012-06-01",
+    "exit": "2012-06-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-31",
+    "entry": "2012-06-01",
+    "exit": "2012-06-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-05-31",
+    "entry": "2012-06-01",
+    "exit": "2012-06-08",
+    "gross_price_label": "0.020183787331801772234985231",
+    "net_proxy": "0.018183787331801772234985231",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-05-31",
+    "entry": "2012-06-01",
+    "exit": "2012-06-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-05-31",
+    "entry": "2012-06-01",
+    "exit": "2012-06-08",
+    "gross_price_label": "0.01939844035559752887528531900",
+    "net_proxy": "0.01739844035559752887528531900",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-07",
+    "entry": "2012-06-08",
+    "exit": "2012-06-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-07",
+    "entry": "2012-06-08",
+    "exit": "2012-06-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-07",
+    "entry": "2012-06-08",
+    "exit": "2012-06-15",
+    "gross_price_label": "0.003538684252855074794917163",
+    "net_proxy": "0.001538684252855074794917163",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-07",
+    "entry": "2012-06-08",
+    "exit": "2012-06-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-06-07",
+    "entry": "2012-06-08",
+    "exit": "2012-06-15",
+    "gross_price_label": "0.007280757430880810218191317000",
+    "net_proxy": "0.005280757430880810218191317000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-14",
+    "entry": "2012-06-15",
+    "exit": "2012-06-22",
+    "gross_price_label": "-0.0017997750281214848143982002",
+    "net_proxy": "-0.0037997750281214848143982002",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-14",
+    "entry": "2012-06-15",
+    "exit": "2012-06-22",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-14",
+    "entry": "2012-06-15",
+    "exit": "2012-06-22",
+    "gross_price_label": "0.008174386920980926430517711",
+    "net_proxy": "0.006174386920980926430517711",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-14",
+    "entry": "2012-06-15",
+    "exit": "2012-06-22",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-06-14",
+    "entry": "2012-06-15",
+    "exit": "2012-06-22",
+    "gross_price_label": "0.005486582047674387109324272600",
+    "net_proxy": "0.003486582047674387109324272600",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-21",
+    "entry": "2012-06-22",
+    "exit": "2012-06-29",
+    "gross_price_label": "0.024247925311203319502074689",
+    "net_proxy": "0.022247925311203319502074689",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-21",
+    "entry": "2012-06-22",
+    "exit": "2012-06-29",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-21",
+    "entry": "2012-06-22",
+    "exit": "2012-06-29",
+    "gross_price_label": "0.007949125596184419713831479",
+    "net_proxy": "0.005949125596184419713831479",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-21",
+    "entry": "2012-06-22",
+    "exit": "2012-06-29",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-06-21",
+    "entry": "2012-06-22",
+    "exit": "2012-06-29",
+    "gross_price_label": "0.01606628464248211245593686933",
+    "net_proxy": "0.01406628464248211245593686933",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-28",
+    "entry": "2012-06-29",
+    "exit": "2012-07-09",
+    "gross_price_label": "0.018736548930244334725914673",
+    "net_proxy": "0.016736548930244334725914673",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-28",
+    "entry": "2012-06-29",
+    "exit": "2012-07-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-06-28",
+    "entry": "2012-06-29",
+    "exit": "2012-07-09",
+    "gross_price_label": "0.010252365930599369085173502",
+    "net_proxy": "0.008252365930599369085173502",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-06-28",
+    "entry": "2012-06-29",
+    "exit": "2012-07-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-06-28",
+    "entry": "2012-06-29",
+    "exit": "2012-07-09",
+    "gross_price_label": "0.01008197980326457286653742667",
+    "net_proxy": "0.008081979803264572866537426670",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-06",
+    "entry": "2012-07-09",
+    "exit": "2012-07-16",
+    "gross_price_label": "-0.0106872126258232881819311545",
+    "net_proxy": "-0.0126872126258232881819311545",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-06",
+    "entry": "2012-07-09",
+    "exit": "2012-07-16",
+    "gross_price_label": "-0.0106872126258232881819311545",
+    "net_proxy": "-0.0126872126258232881819311545",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-06",
+    "entry": "2012-07-09",
+    "exit": "2012-07-16",
+    "gross_price_label": "-0.0126463700234192037470725995",
+    "net_proxy": "-0.0146463700234192037470725995",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-06",
+    "entry": "2012-07-09",
+    "exit": "2012-07-16",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-07-06",
+    "entry": "2012-07-09",
+    "exit": "2012-07-16",
+    "gross_price_label": "-0.007753244286571464028029437333",
+    "net_proxy": "-0.009753244286571464028029437333",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-13",
+    "entry": "2012-07-16",
+    "exit": "2012-07-23",
+    "gross_price_label": "-0.0262529832935560859188544153",
+    "net_proxy": "-0.0282529832935560859188544153",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-13",
+    "entry": "2012-07-16",
+    "exit": "2012-07-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-13",
+    "entry": "2012-07-16",
+    "exit": "2012-07-23",
+    "gross_price_label": "-0.0039531941808981657179000633",
+    "net_proxy": "-0.0059531941808981657179000633",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-13",
+    "entry": "2012-07-16",
+    "exit": "2012-07-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-07-13",
+    "entry": "2012-07-16",
+    "exit": "2012-07-23",
+    "gross_price_label": "-0.01245635935999260265999431766",
+    "net_proxy": "-0.01445635935999260265999431766",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-20",
+    "entry": "2012-07-23",
+    "exit": "2012-07-30",
+    "gross_price_label": "0.025541795665634674922600619",
+    "net_proxy": "0.023541795665634674922600619",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-20",
+    "entry": "2012-07-23",
+    "exit": "2012-07-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-20",
+    "entry": "2012-07-23",
+    "exit": "2012-07-30",
+    "gross_price_label": "0.032386093030639784092713129",
+    "net_proxy": "0.030386093030639784092713129",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-20",
+    "entry": "2012-07-23",
+    "exit": "2012-07-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-07-20",
+    "entry": "2012-07-23",
+    "exit": "2012-07-30",
+    "gross_price_label": "0.02952375018027544567896103500",
+    "net_proxy": "0.02752375018027544567896103500",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-27",
+    "entry": "2012-07-30",
+    "exit": "2012-08-06",
+    "gross_price_label": "0.008154723244569531644656130",
+    "net_proxy": "0.006154723244569531644656130",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-27",
+    "entry": "2012-07-30",
+    "exit": "2012-08-06",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-07-27",
+    "entry": "2012-07-30",
+    "exit": "2012-08-06",
+    "gross_price_label": "0.013993541442411194833153929",
+    "net_proxy": "0.011993541442411194833153929",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-07-27",
+    "entry": "2012-07-30",
+    "exit": "2012-08-06",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-07-27",
+    "entry": "2012-07-30",
+    "exit": "2012-08-06",
+    "gross_price_label": "0.004280029528783931886733332034",
+    "net_proxy": "0.002280029528783931886733332034",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-03",
+    "entry": "2012-08-06",
+    "exit": "2012-08-13",
+    "gross_price_label": "0.006442376521116678596993558",
+    "net_proxy": "0.004442376521116678596993558",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-03",
+    "entry": "2012-08-06",
+    "exit": "2012-08-13",
+    "gross_price_label": "0.006442376521116678596993558",
+    "net_proxy": "0.004442376521116678596993558",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-03",
+    "entry": "2012-08-06",
+    "exit": "2012-08-13",
+    "gross_price_label": "0.013648771610555050045495905",
+    "net_proxy": "0.011648771610555050045495905",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-08-03",
+    "entry": "2012-08-06",
+    "exit": "2012-08-13",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-08-03",
+    "entry": "2012-08-06",
+    "exit": "2012-08-13",
+    "gross_price_label": "0.01126789752349105022804498933",
+    "net_proxy": "0.009267897523491050228044989330",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-10",
+    "entry": "2012-08-13",
+    "exit": "2012-08-20",
+    "gross_price_label": "0.021394374625972471573907840",
+    "net_proxy": "0.019394374625972471573907840",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-10",
+    "entry": "2012-08-13",
+    "exit": "2012-08-20",
+    "gross_price_label": "0.021394374625972471573907840",
+    "net_proxy": "0.019394374625972471573907840",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-10",
+    "entry": "2012-08-13",
+    "exit": "2012-08-20",
+    "gross_price_label": "0.021394374625972471573907840",
+    "net_proxy": "0.019394374625972471573907840",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-08-10",
+    "entry": "2012-08-13",
+    "exit": "2012-08-20",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-08-10",
+    "entry": "2012-08-13",
+    "exit": "2012-08-20",
+    "gross_price_label": "0.01790580443548763255359666567",
+    "net_proxy": "0.01590580443548763255359666567",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-17",
+    "entry": "2012-08-20",
+    "exit": "2012-08-27",
+    "gross_price_label": "0.004540793906547531858795957",
+    "net_proxy": "0.002540793906547531858795957",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-17",
+    "entry": "2012-08-20",
+    "exit": "2012-08-27",
+    "gross_price_label": "0.004540793906547531858795957",
+    "net_proxy": "0.002540793906547531858795957",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-17",
+    "entry": "2012-08-20",
+    "exit": "2012-08-27",
+    "gross_price_label": "0.004540793906547531858795957",
+    "net_proxy": "0.002540793906547531858795957",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-08-17",
+    "entry": "2012-08-20",
+    "exit": "2012-08-27",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-08-17",
+    "entry": "2012-08-20",
+    "exit": "2012-08-27",
+    "gross_price_label": "-0.0002965070229344897966432470337",
+    "net_proxy": "-0.002296507022934489796643247034",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-24",
+    "entry": "2012-08-27",
+    "exit": "2012-09-04",
+    "gross_price_label": "-0.0080198308544765237678623505",
+    "net_proxy": "-0.0100198308544765237678623505",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-24",
+    "entry": "2012-08-27",
+    "exit": "2012-09-04",
+    "gross_price_label": "-0.0080198308544765237678623505",
+    "net_proxy": "-0.0100198308544765237678623505",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-24",
+    "entry": "2012-08-27",
+    "exit": "2012-09-04",
+    "gross_price_label": "-0.0080198308544765237678623505",
+    "net_proxy": "-0.0100198308544765237678623505",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-08-24",
+    "entry": "2012-08-27",
+    "exit": "2012-09-04",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-08-24",
+    "entry": "2012-08-27",
+    "exit": "2012-09-04",
+    "gross_price_label": "-0.003960565001515960245651856933",
+    "net_proxy": "-0.005960565001515960245651856933",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-31",
+    "entry": "2012-09-04",
+    "exit": "2012-09-11",
+    "gross_price_label": "0.007643686608849037189475232",
+    "net_proxy": "0.005643686608849037189475232",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-31",
+    "entry": "2012-09-04",
+    "exit": "2012-09-11",
+    "gross_price_label": "0.007643686608849037189475232",
+    "net_proxy": "0.005643686608849037189475232",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-08-31",
+    "entry": "2012-09-04",
+    "exit": "2012-09-11",
+    "gross_price_label": "0.007643686608849037189475232",
+    "net_proxy": "0.005643686608849037189475232",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-08-31",
+    "entry": "2012-09-04",
+    "exit": "2012-09-11",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-08-31",
+    "entry": "2012-09-04",
+    "exit": "2012-09-11",
+    "gross_price_label": "0.01870565123524489144481638700",
+    "net_proxy": "0.01670565123524489144481638700",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-10",
+    "entry": "2012-09-11",
+    "exit": "2012-09-18",
+    "gross_price_label": "0.022177178967449624418743293",
+    "net_proxy": "0.020177178967449624418743293",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-10",
+    "entry": "2012-09-11",
+    "exit": "2012-09-18",
+    "gross_price_label": "0.022177178967449624418743293",
+    "net_proxy": "0.020177178967449624418743293",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-10",
+    "entry": "2012-09-11",
+    "exit": "2012-09-18",
+    "gross_price_label": "0.020190767945415303209635870",
+    "net_proxy": "0.018190767945415303209635870",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-09-10",
+    "entry": "2012-09-11",
+    "exit": "2012-09-18",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-09-10",
+    "entry": "2012-09-11",
+    "exit": "2012-09-18",
+    "gross_price_label": "0.02131934238209040014065349666",
+    "net_proxy": "0.01931934238209040014065349666",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-17",
+    "entry": "2012-09-18",
+    "exit": "2012-09-25",
+    "gross_price_label": "-0.0031494226058555931412574361",
+    "net_proxy": "-0.0051494226058555931412574361",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-17",
+    "entry": "2012-09-18",
+    "exit": "2012-09-25",
+    "gross_price_label": "-0.0031494226058555931412574361",
+    "net_proxy": "-0.0051494226058555931412574361",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-09-17",
+    "entry": "2012-09-18",
+    "exit": "2012-09-25",
+    "gross_price_label": "-0.0038899883982802156554971678",
+    "net_proxy": "-0.0058899883982802156554971678",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-09-17",
+    "entry": "2012-09-18",
+    "exit": "2012-09-25",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "train",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-09-17",
+    "entry": "2012-09-18",
+    "exit": "2012-09-25",
+    "gross_price_label": "-0.002870055464894239088184706134",
+    "net_proxy": "-0.004870055464894239088184706134",
+    "phase": "train",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-01",
+    "entry": "2012-10-02",
+    "exit": "2012-10-09",
+    "gross_price_label": "-0.0065343946774385172864441012",
+    "net_proxy": "-0.0085343946774385172864441012",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-01",
+    "entry": "2012-10-02",
+    "exit": "2012-10-09",
+    "gross_price_label": "-0.0091609713537879889486694780",
+    "net_proxy": "-0.0111609713537879889486694780",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-01",
+    "entry": "2012-10-02",
+    "exit": "2012-10-09",
+    "gross_price_label": "-0.0065343946774385172864441012",
+    "net_proxy": "-0.0085343946774385172864441012",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-01",
+    "entry": "2012-10-02",
+    "exit": "2012-10-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-10-01",
+    "entry": "2012-10-02",
+    "exit": "2012-10-09",
+    "gross_price_label": "-0.003805517685587119285640574399",
+    "net_proxy": "-0.005805517685587119285640574399",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-08",
+    "entry": "2012-10-09",
+    "exit": "2012-10-16",
+    "gross_price_label": "-0.0052226498075865860362836723",
+    "net_proxy": "-0.0072226498075865860362836723",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-08",
+    "entry": "2012-10-09",
+    "exit": "2012-10-16",
+    "gross_price_label": "-0.0127678309363076019958908130",
+    "net_proxy": "-0.0147678309363076019958908130",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-08",
+    "entry": "2012-10-09",
+    "exit": "2012-10-16",
+    "gross_price_label": "-0.0052226498075865860362836723",
+    "net_proxy": "-0.0072226498075865860362836723",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-08",
+    "entry": "2012-10-09",
+    "exit": "2012-10-16",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-10-08",
+    "entry": "2012-10-09",
+    "exit": "2012-10-16",
+    "gross_price_label": "-0.008109559115859172459740215499",
+    "net_proxy": "-0.01010955911585917245974021550",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-15",
+    "entry": "2012-10-16",
+    "exit": "2012-10-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-15",
+    "entry": "2012-10-16",
+    "exit": "2012-10-23",
+    "gross_price_label": "-0.0198949986184028737220226582",
+    "net_proxy": "-0.0218949986184028737220226582",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-15",
+    "entry": "2012-10-16",
+    "exit": "2012-10-23",
+    "gross_price_label": "-0.0198949986184028737220226582",
+    "net_proxy": "-0.0218949986184028737220226582",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-15",
+    "entry": "2012-10-16",
+    "exit": "2012-10-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-10-15",
+    "entry": "2012-10-16",
+    "exit": "2012-10-23",
+    "gross_price_label": "-0.02328412071774106543547496266",
+    "net_proxy": "-0.02528412071774106543547496266",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-22",
+    "entry": "2012-10-23",
+    "exit": "2012-11-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-22",
+    "entry": "2012-10-23",
+    "exit": "2012-11-01",
+    "gross_price_label": "-0.0015506061460389061178460671",
+    "net_proxy": "-0.0035506061460389061178460671",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-22",
+    "entry": "2012-10-23",
+    "exit": "2012-11-01",
+    "gross_price_label": "-0.0015506061460389061178460671",
+    "net_proxy": "-0.0035506061460389061178460671",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-22",
+    "entry": "2012-10-23",
+    "exit": "2012-11-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-10-22",
+    "entry": "2012-10-23",
+    "exit": "2012-11-01",
+    "gross_price_label": "0.001829743872262111078352349933",
+    "net_proxy": "-0.000170256127737888921647650067",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-31",
+    "entry": "2012-11-01",
+    "exit": "2012-11-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-31",
+    "entry": "2012-11-01",
+    "exit": "2012-11-08",
+    "gross_price_label": "-0.0207646268474410651032124099",
+    "net_proxy": "-0.0227646268474410651032124099",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-10-31",
+    "entry": "2012-11-01",
+    "exit": "2012-11-08",
+    "gross_price_label": "-0.0136947621064520683326274178",
+    "net_proxy": "-0.0156947621064520683326274178",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-10-31",
+    "entry": "2012-11-01",
+    "exit": "2012-11-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-10-31",
+    "entry": "2012-11-01",
+    "exit": "2012-11-08",
+    "gross_price_label": "-0.01663742177696070584132237424",
+    "net_proxy": "-0.01863742177696070584132237424",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-07",
+    "entry": "2012-11-08",
+    "exit": "2012-11-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-07",
+    "entry": "2012-11-08",
+    "exit": "2012-11-15",
+    "gross_price_label": "-0.0384183609829113134588998378",
+    "net_proxy": "-0.0404183609829113134588998378",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-07",
+    "entry": "2012-11-08",
+    "exit": "2012-11-15",
+    "gross_price_label": "-0.0269825365015745777268823361",
+    "net_proxy": "-0.0289825365015745777268823361",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-07",
+    "entry": "2012-11-08",
+    "exit": "2012-11-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-11-07",
+    "entry": "2012-11-08",
+    "exit": "2012-11-15",
+    "gross_price_label": "-0.03252290988410601967265000203",
+    "net_proxy": "-0.03452290988410601967265000203",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-14",
+    "entry": "2012-11-15",
+    "exit": "2012-11-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-14",
+    "entry": "2012-11-15",
+    "exit": "2012-11-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-14",
+    "entry": "2012-11-15",
+    "exit": "2012-11-23",
+    "gross_price_label": "0.030820154468554615667524825",
+    "net_proxy": "0.028820154468554615667524825",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-14",
+    "entry": "2012-11-15",
+    "exit": "2012-11-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-11-14",
+    "entry": "2012-11-15",
+    "exit": "2012-11-23",
+    "gross_price_label": "0.03318155303168551077575189201",
+    "net_proxy": "0.03118155303168551077575189201",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-21",
+    "entry": "2012-11-23",
+    "exit": "2012-11-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-21",
+    "entry": "2012-11-23",
+    "exit": "2012-11-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-21",
+    "entry": "2012-11-23",
+    "exit": "2012-11-30",
+    "gross_price_label": "0.014485514485514485514485514",
+    "net_proxy": "0.012485514485514485514485514",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-21",
+    "entry": "2012-11-23",
+    "exit": "2012-11-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-11-21",
+    "entry": "2012-11-23",
+    "exit": "2012-11-30",
+    "gross_price_label": "0.02368803740256740594890767434",
+    "net_proxy": "0.02168803740256740594890767434",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-29",
+    "entry": "2012-11-30",
+    "exit": "2012-12-07",
+    "gross_price_label": "-0.0045495905368516833484986351",
+    "net_proxy": "-0.0065495905368516833484986351",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-29",
+    "entry": "2012-11-30",
+    "exit": "2012-12-07",
+    "gross_price_label": "0.001821051353648172878475173",
+    "net_proxy": "-0.000178948646351827121524827",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-11-29",
+    "entry": "2012-11-30",
+    "exit": "2012-12-07",
+    "gross_price_label": "0.001821051353648172878475173",
+    "net_proxy": "-0.000178948646351827121524827",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-11-29",
+    "entry": "2012-11-30",
+    "exit": "2012-12-07",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-11-29",
+    "entry": "2012-11-30",
+    "exit": "2012-12-07",
+    "gross_price_label": "-0.0000888992419311225610729773666",
+    "net_proxy": "-0.002088899241931122561072977367",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-06",
+    "entry": "2012-12-07",
+    "exit": "2012-12-14",
+    "gross_price_label": "-0.0037566650508967523024721280",
+    "net_proxy": "-0.0057566650508967523024721280",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-06",
+    "entry": "2012-12-07",
+    "exit": "2012-12-14",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-06",
+    "entry": "2012-12-07",
+    "exit": "2012-12-14",
+    "gross_price_label": "-0.0037566650508967523024721280",
+    "net_proxy": "-0.0057566650508967523024721280",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-06",
+    "entry": "2012-12-07",
+    "exit": "2012-12-14",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-12-06",
+    "entry": "2012-12-07",
+    "exit": "2012-12-14",
+    "gross_price_label": "-0.005630209636073463176450035733",
+    "net_proxy": "-0.007630209636073463176450035733",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-13",
+    "entry": "2012-12-14",
+    "exit": "2012-12-21",
+    "gross_price_label": "0.012528889429509791996107529",
+    "net_proxy": "0.010528889429509791996107529",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-13",
+    "entry": "2012-12-14",
+    "exit": "2012-12-21",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-13",
+    "entry": "2012-12-14",
+    "exit": "2012-12-21",
+    "gross_price_label": "-0.0008431703204047217537942664",
+    "net_proxy": "-0.0028431703204047217537942664",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-13",
+    "entry": "2012-12-14",
+    "exit": "2012-12-21",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-12-13",
+    "entry": "2012-12-14",
+    "exit": "2012-12-21",
+    "gross_price_label": "0.003946624523958922494316126199",
+    "net_proxy": "0.001946624523958922494316126199",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-20",
+    "entry": "2012-12-21",
+    "exit": "2012-12-31",
+    "gross_price_label": "-0.0068476693897164824603555983",
+    "net_proxy": "-0.0088476693897164824603555983",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-20",
+    "entry": "2012-12-21",
+    "exit": "2012-12-31",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-20",
+    "entry": "2012-12-21",
+    "exit": "2012-12-31",
+    "gross_price_label": "-0.0068476693897164824603555983",
+    "net_proxy": "-0.0088476693897164824603555983",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-20",
+    "entry": "2012-12-21",
+    "exit": "2012-12-31",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-12-20",
+    "entry": "2012-12-21",
+    "exit": "2012-12-31",
+    "gross_price_label": "-0.01410706221889693451607017750",
+    "net_proxy": "-0.01610706221889693451607017750",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-28",
+    "entry": "2012-12-31",
+    "exit": "2013-01-08",
+    "gross_price_label": "0.050683440183863553888956090",
+    "net_proxy": "0.048683440183863553888956090",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-28",
+    "entry": "2012-12-31",
+    "exit": "2013-01-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2012-12-28",
+    "entry": "2012-12-31",
+    "exit": "2013-01-08",
+    "gross_price_label": "0.042943028914972802748353851",
+    "net_proxy": "0.040943028914972802748353851",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2012-12-28",
+    "entry": "2012-12-31",
+    "exit": "2013-01-08",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2012-12-28",
+    "entry": "2012-12-31",
+    "exit": "2013-01-08",
+    "gross_price_label": "0.04653870321920611249601327033",
+    "net_proxy": "0.04453870321920611249601327033",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-07",
+    "entry": "2013-01-08",
+    "exit": "2013-01-15",
+    "gross_price_label": "-0.0003453833755468570112825236",
+    "net_proxy": "-0.0023453833755468570112825236",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-07",
+    "entry": "2013-01-08",
+    "exit": "2013-01-15",
+    "gross_price_label": "-0.0003453833755468570112825236",
+    "net_proxy": "-0.0023453833755468570112825236",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-07",
+    "entry": "2013-01-08",
+    "exit": "2013-01-15",
+    "gross_price_label": "-0.0003453833755468570112825236",
+    "net_proxy": "-0.0023453833755468570112825236",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-01-07",
+    "entry": "2013-01-08",
+    "exit": "2013-01-15",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-01-07",
+    "entry": "2013-01-08",
+    "exit": "2013-01-15",
+    "gross_price_label": "0.001138722636601318795240175600",
+    "net_proxy": "-0.000861277363398681204759824400",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-14",
+    "entry": "2013-01-15",
+    "exit": "2013-01-23",
+    "gross_price_label": "0.027640216515029367730047219",
+    "net_proxy": "0.025640216515029367730047219",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-14",
+    "entry": "2013-01-15",
+    "exit": "2013-01-23",
+    "gross_price_label": "0.027640216515029367730047219",
+    "net_proxy": "0.025640216515029367730047219",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-14",
+    "entry": "2013-01-15",
+    "exit": "2013-01-23",
+    "gross_price_label": "0.027640216515029367730047219",
+    "net_proxy": "0.025640216515029367730047219",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-01-14",
+    "entry": "2013-01-15",
+    "exit": "2013-01-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-01-14",
+    "entry": "2013-01-15",
+    "exit": "2013-01-23",
+    "gross_price_label": "0.02031434320339479989865579700",
+    "net_proxy": "0.01831434320339479989865579700",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-22",
+    "entry": "2013-01-23",
+    "exit": "2013-01-30",
+    "gross_price_label": "0.008181105009525944189174045",
+    "net_proxy": "0.006181105009525944189174045",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-22",
+    "entry": "2013-01-23",
+    "exit": "2013-01-30",
+    "gross_price_label": "0.008181105009525944189174045",
+    "net_proxy": "0.006181105009525944189174045",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-22",
+    "entry": "2013-01-23",
+    "exit": "2013-01-30",
+    "gross_price_label": "0.008181105009525944189174045",
+    "net_proxy": "0.006181105009525944189174045",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-01-22",
+    "entry": "2013-01-23",
+    "exit": "2013-01-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-01-22",
+    "entry": "2013-01-23",
+    "exit": "2013-01-30",
+    "gross_price_label": "0.004743257958916028648195710534",
+    "net_proxy": "0.002743257958916028648195710534",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-29",
+    "entry": "2013-01-30",
+    "exit": "2013-02-06",
+    "gross_price_label": "-0.0034459759893285904846598488",
+    "net_proxy": "-0.0054459759893285904846598488",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-29",
+    "entry": "2013-01-30",
+    "exit": "2013-02-06",
+    "gross_price_label": "-0.0034459759893285904846598488",
+    "net_proxy": "-0.0054459759893285904846598488",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-01-29",
+    "entry": "2013-01-30",
+    "exit": "2013-02-06",
+    "gross_price_label": "-0.0034459759893285904846598488",
+    "net_proxy": "-0.0054459759893285904846598488",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-01-29",
+    "entry": "2013-01-30",
+    "exit": "2013-02-06",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-01-29",
+    "entry": "2013-01-30",
+    "exit": "2013-02-06",
+    "gross_price_label": "-0.001590241349342548580100524033",
+    "net_proxy": "-0.003590241349342548580100524033",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-05",
+    "entry": "2013-02-06",
+    "exit": "2013-02-13",
+    "gross_price_label": "0.017401003904071388733965421",
+    "net_proxy": "0.015401003904071388733965421",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-05",
+    "entry": "2013-02-06",
+    "exit": "2013-02-13",
+    "gross_price_label": "0.017401003904071388733965421",
+    "net_proxy": "0.015401003904071388733965421",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-05",
+    "entry": "2013-02-06",
+    "exit": "2013-02-13",
+    "gross_price_label": "0.017401003904071388733965421",
+    "net_proxy": "0.015401003904071388733965421",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-02-05",
+    "entry": "2013-02-06",
+    "exit": "2013-02-13",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-02-05",
+    "entry": "2013-02-06",
+    "exit": "2013-02-13",
+    "gross_price_label": "0.01318469006946801714599311733",
+    "net_proxy": "0.01118469006946801714599311733",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-12",
+    "entry": "2013-02-13",
+    "exit": "2013-02-21",
+    "gross_price_label": "-0.0051529437561670869422212477",
+    "net_proxy": "-0.0071529437561670869422212477",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-12",
+    "entry": "2013-02-13",
+    "exit": "2013-02-21",
+    "gross_price_label": "-0.0051529437561670869422212477",
+    "net_proxy": "-0.0071529437561670869422212477",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-12",
+    "entry": "2013-02-13",
+    "exit": "2013-02-21",
+    "gross_price_label": "-0.0051529437561670869422212477",
+    "net_proxy": "-0.0071529437561670869422212477",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-02-12",
+    "entry": "2013-02-13",
+    "exit": "2013-02-21",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-02-12",
+    "entry": "2013-02-13",
+    "exit": "2013-02-21",
+    "gross_price_label": "-0.009683082915037979684236888834",
+    "net_proxy": "-0.01168308291503797968423688883",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-20",
+    "entry": "2013-02-21",
+    "exit": "2013-02-28",
+    "gross_price_label": "-0.0051796341194621996914260525",
+    "net_proxy": "-0.0071796341194621996914260525",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-20",
+    "entry": "2013-02-21",
+    "exit": "2013-02-28",
+    "gross_price_label": "-0.0051796341194621996914260525",
+    "net_proxy": "-0.0071796341194621996914260525",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-20",
+    "entry": "2013-02-21",
+    "exit": "2013-02-28",
+    "gross_price_label": "-0.0051796341194621996914260525",
+    "net_proxy": "-0.0071796341194621996914260525",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-02-20",
+    "entry": "2013-02-21",
+    "exit": "2013-02-28",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-02-20",
+    "entry": "2013-02-21",
+    "exit": "2013-02-28",
+    "gross_price_label": "0.001959825602020415211343938834",
+    "net_proxy": "-0.000040174397979584788656061166",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-27",
+    "entry": "2013-02-28",
+    "exit": "2013-03-07",
+    "gross_price_label": "0.018568512543622835319681306",
+    "net_proxy": "0.016568512543622835319681306",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-27",
+    "entry": "2013-02-28",
+    "exit": "2013-03-07",
+    "gross_price_label": "0.024592888002658690594882021",
+    "net_proxy": "0.022592888002658690594882021",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-02-27",
+    "entry": "2013-02-28",
+    "exit": "2013-03-07",
+    "gross_price_label": "0.024592888002658690594882021",
+    "net_proxy": "0.022592888002658690594882021",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-02-27",
+    "entry": "2013-02-28",
+    "exit": "2013-03-07",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-02-27",
+    "entry": "2013-02-28",
+    "exit": "2013-03-07",
+    "gross_price_label": "0.02102901703463411458614316600",
+    "net_proxy": "0.01902901703463411458614316600",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-06",
+    "entry": "2013-03-07",
+    "exit": "2013-03-14",
+    "gross_price_label": "0.016866688290626013623094389",
+    "net_proxy": "0.014866688290626013623094389",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-06",
+    "entry": "2013-03-07",
+    "exit": "2013-03-14",
+    "gross_price_label": "0.016866688290626013623094389",
+    "net_proxy": "0.014866688290626013623094389",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-06",
+    "entry": "2013-03-07",
+    "exit": "2013-03-14",
+    "gross_price_label": "0.016866688290626013623094389",
+    "net_proxy": "0.014866688290626013623094389",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-03-06",
+    "entry": "2013-03-07",
+    "exit": "2013-03-14",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-03-06",
+    "entry": "2013-03-07",
+    "exit": "2013-03-14",
+    "gross_price_label": "0.01047382467996004772520867700",
+    "net_proxy": "0.008473824679960047725208677000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-13",
+    "entry": "2013-03-14",
+    "exit": "2013-03-21",
+    "gross_price_label": "0",
+    "net_proxy": "-0.002",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-13",
+    "entry": "2013-03-14",
+    "exit": "2013-03-21",
+    "gross_price_label": "0",
+    "net_proxy": "-0.002",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-13",
+    "entry": "2013-03-14",
+    "exit": "2013-03-21",
+    "gross_price_label": "0",
+    "net_proxy": "-0.002",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-03-13",
+    "entry": "2013-03-14",
+    "exit": "2013-03-21",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-03-13",
+    "entry": "2013-03-14",
+    "exit": "2013-03-21",
+    "gross_price_label": "-0.007065051020214636108363206100",
+    "net_proxy": "-0.009065051020214636108363206100",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-20",
+    "entry": "2013-03-21",
+    "exit": "2013-03-28",
+    "gross_price_label": "0.002551834130781499202551834",
+    "net_proxy": "0.000551834130781499202551834",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-20",
+    "entry": "2013-03-21",
+    "exit": "2013-03-28",
+    "gross_price_label": "0.002551834130781499202551834",
+    "net_proxy": "0.000551834130781499202551834",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-20",
+    "entry": "2013-03-21",
+    "exit": "2013-03-28",
+    "gross_price_label": "0.002551834130781499202551834",
+    "net_proxy": "0.000551834130781499202551834",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-03-20",
+    "entry": "2013-03-21",
+    "exit": "2013-03-28",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-03-20",
+    "entry": "2013-03-21",
+    "exit": "2013-03-28",
+    "gross_price_label": "0.007261505765081067443181138666",
+    "net_proxy": "0.005261505765081067443181138666",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-27",
+    "entry": "2013-03-28",
+    "exit": "2013-04-05",
+    "gross_price_label": "-0.0401951426450312864566762117",
+    "net_proxy": "-0.0421951426450312864566762117",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-27",
+    "entry": "2013-03-28",
+    "exit": "2013-04-05",
+    "gross_price_label": "-0.0401951426450312864566762117",
+    "net_proxy": "-0.0421951426450312864566762117",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-03-27",
+    "entry": "2013-03-28",
+    "exit": "2013-04-05",
+    "gross_price_label": "-0.0401951426450312864566762117",
+    "net_proxy": "-0.0421951426450312864566762117",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-03-27",
+    "entry": "2013-03-28",
+    "exit": "2013-04-05",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-03-27",
+    "entry": "2013-03-28",
+    "exit": "2013-04-05",
+    "gross_price_label": "-0.02501376661419874187742955450",
+    "net_proxy": "-0.02701376661419874187742955450",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-04",
+    "entry": "2013-04-05",
+    "exit": "2013-04-12",
+    "gross_price_label": "0.030718275100662423691388492",
+    "net_proxy": "0.028718275100662423691388492",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-04",
+    "entry": "2013-04-05",
+    "exit": "2013-04-12",
+    "gross_price_label": "0.030718275100662423691388492",
+    "net_proxy": "0.028718275100662423691388492",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-04",
+    "entry": "2013-04-05",
+    "exit": "2013-04-12",
+    "gross_price_label": "0.035248618784530386740331492",
+    "net_proxy": "0.033248618784530386740331492",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-04-04",
+    "entry": "2013-04-05",
+    "exit": "2013-04-12",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-04-04",
+    "entry": "2013-04-05",
+    "exit": "2013-04-12",
+    "gross_price_label": "0.03421366148561116447699253134",
+    "net_proxy": "0.03221366148561116447699253134",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-11",
+    "entry": "2013-04-12",
+    "exit": "2013-04-19",
+    "gross_price_label": "-0.0269044168609413395501228656",
+    "net_proxy": "-0.0289044168609413395501228656",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-11",
+    "entry": "2013-04-12",
+    "exit": "2013-04-19",
+    "gross_price_label": "-0.0269044168609413395501228656",
+    "net_proxy": "-0.0289044168609413395501228656",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-11",
+    "entry": "2013-04-12",
+    "exit": "2013-04-19",
+    "gross_price_label": "-0.0402390863485964350517664639",
+    "net_proxy": "-0.0422390863485964350517664639",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-04-11",
+    "entry": "2013-04-12",
+    "exit": "2013-04-19",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-04-11",
+    "entry": "2013-04-12",
+    "exit": "2013-04-19",
+    "gross_price_label": "-0.03441210443086950932256236506",
+    "net_proxy": "-0.03641210443086950932256236506",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2013-04-18",
+    "entry": "2013-04-19",
+    "exit": "2013-04-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-18",
+    "entry": "2013-04-19",
+    "exit": "2013-04-26",
+    "gross_price_label": "0.025252525252525252525252525",
+    "net_proxy": "0.023252525252525252525252525",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-18",
+    "entry": "2013-04-19",
+    "exit": "2013-04-26",
+    "gross_price_label": "0.035475978647686832740213523",
+    "net_proxy": "0.033475978647686832740213523",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-04-18",
+    "entry": "2013-04-19",
+    "exit": "2013-04-26",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-04-18",
+    "entry": "2013-04-19",
+    "exit": "2013-04-26",
+    "gross_price_label": "0.03173367168144761435545252600",
+    "net_proxy": "0.02973367168144761435545252600",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-25",
+    "entry": "2013-04-26",
+    "exit": "2013-05-03",
+    "gross_price_label": "0.017620310723758999621068587",
+    "net_proxy": "0.015620310723758999621068587",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-25",
+    "entry": "2013-04-26",
+    "exit": "2013-05-03",
+    "gross_price_label": "0.017620310723758999621068587",
+    "net_proxy": "0.015620310723758999621068587",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-04-25",
+    "entry": "2013-04-26",
+    "exit": "2013-05-03",
+    "gross_price_label": "0.014928579099989260015035979",
+    "net_proxy": "0.012928579099989260015035979",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-04-25",
+    "entry": "2013-04-26",
+    "exit": "2013-05-03",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-04-25",
+    "entry": "2013-04-26",
+    "exit": "2013-05-03",
+    "gross_price_label": "0.02210118600751390326470171367",
+    "net_proxy": "0.02010118600751390326470171367",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-02",
+    "entry": "2013-05-03",
+    "exit": "2013-05-10",
+    "gross_price_label": "0.010976795887175211893844657",
+    "net_proxy": "0.008976795887175211893844657",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-02",
+    "entry": "2013-05-03",
+    "exit": "2013-05-10",
+    "gross_price_label": "0.011791720970644820952026314",
+    "net_proxy": "0.009791720970644820952026314",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "SPY": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-02",
+    "entry": "2013-05-03",
+    "exit": "2013-05-10",
+    "gross_price_label": "0.017566137566137566137566138",
+    "net_proxy": "0.015566137566137566137566138",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-05-02",
+    "entry": "2013-05-03",
+    "exit": "2013-05-10",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-05-02",
+    "entry": "2013-05-03",
+    "exit": "2013-05-10",
+    "gross_price_label": "0.01344488480798586632781236967",
+    "net_proxy": "0.01144488480798586632781236967",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-09",
+    "entry": "2013-05-10",
+    "exit": "2013-05-17",
+    "gross_price_label": "0.016630016492578339747113799",
+    "net_proxy": "0.014630016492578339747113799",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-09",
+    "entry": "2013-05-10",
+    "exit": "2013-05-17",
+    "gross_price_label": "0.016630016492578339747113799",
+    "net_proxy": "0.014630016492578339747113799",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-09",
+    "entry": "2013-05-10",
+    "exit": "2013-05-17",
+    "gross_price_label": "0.023086522462562396006655574",
+    "net_proxy": "0.021086522462562396006655574",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-05-09",
+    "entry": "2013-05-10",
+    "exit": "2013-05-17",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-05-09",
+    "entry": "2013-05-10",
+    "exit": "2013-05-17",
+    "gross_price_label": "0.01925000990790364585237281667",
+    "net_proxy": "0.01725000990790364585237281667",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-16",
+    "entry": "2013-05-17",
+    "exit": "2013-05-24",
+    "gross_price_label": "-0.0136541841287008246586453968",
+    "net_proxy": "-0.0156541841287008246586453968",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-16",
+    "entry": "2013-05-17",
+    "exit": "2013-05-24",
+    "gross_price_label": "-0.0136541841287008246586453968",
+    "net_proxy": "-0.0156541841287008246586453968",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-16",
+    "entry": "2013-05-17",
+    "exit": "2013-05-24",
+    "gross_price_label": "-0.0113844277292132547265704411",
+    "net_proxy": "-0.0133844277292132547265704411",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-05-16",
+    "entry": "2013-05-17",
+    "exit": "2013-05-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-05-16",
+    "entry": "2013-05-17",
+    "exit": "2013-05-24",
+    "gross_price_label": "-0.01133871263894679712310311627",
+    "net_proxy": "-0.01333871263894679712310311627",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-23",
+    "entry": "2013-05-24",
+    "exit": "2013-06-03",
+    "gross_price_label": "0.004111842105263157894736842",
+    "net_proxy": "0.002111842105263157894736842",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-23",
+    "entry": "2013-05-24",
+    "exit": "2013-06-03",
+    "gross_price_label": "0.004111842105263157894736842",
+    "net_proxy": "0.002111842105263157894736842",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-23",
+    "entry": "2013-05-24",
+    "exit": "2013-06-03",
+    "gross_price_label": "0.009459181575159366646103228",
+    "net_proxy": "0.007459181575159366646103228",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-05-23",
+    "entry": "2013-05-24",
+    "exit": "2013-06-03",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-05-23",
+    "entry": "2013-05-24",
+    "exit": "2013-06-03",
+    "gross_price_label": "0.003307721252747845404663940332",
+    "net_proxy": "0.001307721252747845404663940332",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-31",
+    "entry": "2013-06-03",
+    "exit": "2013-06-10",
+    "gross_price_label": "0.004888979425544917498472194",
+    "net_proxy": "0.002888979425544917498472194",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-31",
+    "entry": "2013-06-03",
+    "exit": "2013-06-10",
+    "gross_price_label": "0.003685503685503685503685504",
+    "net_proxy": "0.001685503685503685503685504",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-05-31",
+    "entry": "2013-06-03",
+    "exit": "2013-06-10",
+    "gross_price_label": "0.004888979425544917498472194",
+    "net_proxy": "0.002888979425544917498472194",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-05-31",
+    "entry": "2013-06-03",
+    "exit": "2013-06-10",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-05-31",
+    "entry": "2013-06-03",
+    "exit": "2013-06-10",
+    "gross_price_label": "0.005746453283375325563407378333",
+    "net_proxy": "0.003746453283375325563407378333",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-07",
+    "entry": "2013-06-10",
+    "exit": "2013-06-17",
+    "gross_price_label": "-0.0010135819987837016014595581",
+    "net_proxy": "-0.0030135819987837016014595581",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-07",
+    "entry": "2013-06-10",
+    "exit": "2013-06-17",
+    "gross_price_label": "-0.0092479260165918672650618795",
+    "net_proxy": "-0.0112479260165918672650618795",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-07",
+    "entry": "2013-06-10",
+    "exit": "2013-06-17",
+    "gross_price_label": "-0.0010135819987837016014595581",
+    "net_proxy": "-0.0030135819987837016014595581",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-07",
+    "entry": "2013-06-10",
+    "exit": "2013-06-17",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-06-07",
+    "entry": "2013-06-10",
+    "exit": "2013-06-17",
+    "gross_price_label": "-0.005437038263645052497753566499",
+    "net_proxy": "-0.007437038263645052497753566499",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-14",
+    "entry": "2013-06-17",
+    "exit": "2013-06-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-14",
+    "entry": "2013-06-17",
+    "exit": "2013-06-24",
+    "gross_price_label": "-0.0411805078929306794783802334",
+    "net_proxy": "-0.0431805078929306794783802334",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-14",
+    "entry": "2013-06-17",
+    "exit": "2013-06-24",
+    "gross_price_label": "-0.0369318181818181818181818182",
+    "net_proxy": "-0.0389318181818181818181818182",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-14",
+    "entry": "2013-06-17",
+    "exit": "2013-06-24",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-06-14",
+    "entry": "2013-06-17",
+    "exit": "2013-06-24",
+    "gross_price_label": "-0.04001593664857220107734864087",
+    "net_proxy": "-0.04201593664857220107734864087",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-21",
+    "entry": "2013-06-24",
+    "exit": "2013-07-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-21",
+    "entry": "2013-06-24",
+    "exit": "2013-07-01",
+    "gross_price_label": "0.027201145311381531853972799",
+    "net_proxy": "0.025201145311381531853972799",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-21",
+    "entry": "2013-06-24",
+    "exit": "2013-07-01",
+    "gross_price_label": "0.028866413822166034555415086",
+    "net_proxy": "0.026866413822166034555415086",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-21",
+    "entry": "2013-06-24",
+    "exit": "2013-07-01",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-06-21",
+    "entry": "2013-06-24",
+    "exit": "2013-07-01",
+    "gross_price_label": "0.02688434551640455377358860500",
+    "net_proxy": "0.02488434551640455377358860500",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-28",
+    "entry": "2013-07-01",
+    "exit": "2013-07-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-28",
+    "entry": "2013-07-01",
+    "exit": "2013-07-09",
+    "gross_price_label": "0.031333196805242678681138644",
+    "net_proxy": "0.029333196805242678681138644",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-06-28",
+    "entry": "2013-07-01",
+    "exit": "2013-07-09",
+    "gross_price_label": "0.031333196805242678681138644",
+    "net_proxy": "0.029333196805242678681138644",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-06-28",
+    "entry": "2013-07-01",
+    "exit": "2013-07-09",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-06-28",
+    "entry": "2013-07-01",
+    "exit": "2013-07-09",
+    "gross_price_label": "0.02389363432029188786080540933",
+    "net_proxy": "0.02189363432029188786080540933",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-08",
+    "entry": "2013-07-09",
+    "exit": "2013-07-16",
+    "gross_price_label": "0.028891977760127084988085782",
+    "net_proxy": "0.026891977760127084988085782",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-08",
+    "entry": "2013-07-09",
+    "exit": "2013-07-16",
+    "gross_price_label": "0.028891977760127084988085782",
+    "net_proxy": "0.026891977760127084988085782",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-08",
+    "entry": "2013-07-09",
+    "exit": "2013-07-16",
+    "gross_price_label": "0.028891977760127084988085782",
+    "net_proxy": "0.026891977760127084988085782",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-07-08",
+    "entry": "2013-07-09",
+    "exit": "2013-07-16",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-07-08",
+    "entry": "2013-07-09",
+    "exit": "2013-07-16",
+    "gross_price_label": "0.02779607834357900221536540667",
+    "net_proxy": "0.02579607834357900221536540667",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-15",
+    "entry": "2013-07-16",
+    "exit": "2013-07-23",
+    "gross_price_label": "0.012158641320081057608800540",
+    "net_proxy": "0.010158641320081057608800540",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-15",
+    "entry": "2013-07-16",
+    "exit": "2013-07-23",
+    "gross_price_label": "0.012158641320081057608800540",
+    "net_proxy": "0.010158641320081057608800540",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-15",
+    "entry": "2013-07-16",
+    "exit": "2013-07-23",
+    "gross_price_label": "0.012158641320081057608800540",
+    "net_proxy": "0.010158641320081057608800540",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-07-15",
+    "entry": "2013-07-16",
+    "exit": "2013-07-23",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-07-15",
+    "entry": "2013-07-16",
+    "exit": "2013-07-23",
+    "gross_price_label": "0.004544206487485471466341110834",
+    "net_proxy": "0.002544206487485471466341110834",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-22",
+    "entry": "2013-07-23",
+    "exit": "2013-07-30",
+    "gross_price_label": "-0.0110592048813042234722089808",
+    "net_proxy": "-0.0130592048813042234722089808",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-22",
+    "entry": "2013-07-23",
+    "exit": "2013-07-30",
+    "gross_price_label": "-0.0110592048813042234722089808",
+    "net_proxy": "-0.0130592048813042234722089808",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-22",
+    "entry": "2013-07-23",
+    "exit": "2013-07-30",
+    "gross_price_label": "-0.0110592048813042234722089808",
+    "net_proxy": "-0.0130592048813042234722089808",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-07-22",
+    "entry": "2013-07-23",
+    "exit": "2013-07-30",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-07-22",
+    "entry": "2013-07-23",
+    "exit": "2013-07-30",
+    "gross_price_label": "-0.002496780516965527667175827967",
+    "net_proxy": "-0.004496780516965527667175827967",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-29",
+    "entry": "2013-07-30",
+    "exit": "2013-08-06",
+    "gross_price_label": "0.014171406536199749349272149",
+    "net_proxy": "0.012171406536199749349272149",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-29",
+    "entry": "2013-07-30",
+    "exit": "2013-08-06",
+    "gross_price_label": "0.014171406536199749349272149",
+    "net_proxy": "0.012171406536199749349272149",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-07-29",
+    "entry": "2013-07-30",
+    "exit": "2013-08-06",
+    "gross_price_label": "0.014171406536199749349272149",
+    "net_proxy": "0.012171406536199749349272149",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-07-29",
+    "entry": "2013-07-30",
+    "exit": "2013-08-06",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-07-29",
+    "entry": "2013-07-30",
+    "exit": "2013-08-06",
+    "gross_price_label": "0.01338232658886337058577965800",
+    "net_proxy": "0.01138232658886337058577965800",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-05",
+    "entry": "2013-08-06",
+    "exit": "2013-08-13",
+    "gross_price_label": "-0.0020798128168464838164565189",
+    "net_proxy": "-0.0040798128168464838164565189",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-05",
+    "entry": "2013-08-06",
+    "exit": "2013-08-13",
+    "gross_price_label": "-0.0049429657794676806083650190",
+    "net_proxy": "-0.0069429657794676806083650190",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-05",
+    "entry": "2013-08-06",
+    "exit": "2013-08-13",
+    "gross_price_label": "-0.0049429657794676806083650190",
+    "net_proxy": "-0.0069429657794676806083650190",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-08-05",
+    "entry": "2013-08-06",
+    "exit": "2013-08-13",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-08-05",
+    "entry": "2013-08-06",
+    "exit": "2013-08-13",
+    "gross_price_label": "-0.004180384536996897906391336467",
+    "net_proxy": "-0.006180384536996897906391336467",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-12",
+    "entry": "2013-08-13",
+    "exit": "2013-08-20",
+    "gross_price_label": "-0.0166731796274586426989709522",
+    "net_proxy": "-0.0186731796274586426989709522",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-12",
+    "entry": "2013-08-13",
+    "exit": "2013-08-20",
+    "gross_price_label": "-0.0374474589224302636606801681",
+    "net_proxy": "-0.0394474589224302636606801681",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-12",
+    "entry": "2013-08-13",
+    "exit": "2013-08-20",
+    "gross_price_label": "-0.0374474589224302636606801681",
+    "net_proxy": "-0.0394474589224302636606801681",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-08-12",
+    "entry": "2013-08-13",
+    "exit": "2013-08-20",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-08-12",
+    "entry": "2013-08-13",
+    "exit": "2013-08-20",
+    "gross_price_label": "-0.02663918963075793139969480476",
+    "net_proxy": "-0.02863918963075793139969480476",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-19",
+    "entry": "2013-08-20",
+    "exit": "2013-08-27",
+    "gross_price_label": "0.004106504172738111008080540",
+    "net_proxy": "0.002106504172738111008080540",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-19",
+    "entry": "2013-08-20",
+    "exit": "2013-08-27",
+    "gross_price_label": "0.011214767764986105597459309",
+    "net_proxy": "0.009214767764986105597459309",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-19",
+    "entry": "2013-08-20",
+    "exit": "2013-08-27",
+    "gross_price_label": "0.004106504172738111008080540",
+    "net_proxy": "0.002106504172738111008080540",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-08-19",
+    "entry": "2013-08-20",
+    "exit": "2013-08-27",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-08-19",
+    "entry": "2013-08-20",
+    "exit": "2013-08-27",
+    "gross_price_label": "0.003693206301647432722156055033",
+    "net_proxy": "0.001693206301647432722156055033",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-26",
+    "entry": "2013-08-27",
+    "exit": "2013-09-04",
+    "gross_price_label": "0.004749340369393139841688654",
+    "net_proxy": "0.002749340369393139841688654",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-26",
+    "entry": "2013-08-27",
+    "exit": "2013-09-04",
+    "gross_price_label": "-0.0072627343213269211895181078",
+    "net_proxy": "-0.0092627343213269211895181078",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-08-26",
+    "entry": "2013-08-27",
+    "exit": "2013-09-04",
+    "gross_price_label": "0.004749340369393139841688654",
+    "net_proxy": "0.002749340369393139841688654",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-08-26",
+    "entry": "2013-08-27",
+    "exit": "2013-09-04",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-08-26",
+    "entry": "2013-08-27",
+    "exit": "2013-09-04",
+    "gross_price_label": "-0.0005741009515837609056751946003",
+    "net_proxy": "-0.002574100951583760905675194600",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.000",
+    "decision": "2013-09-03",
+    "entry": "2013-09-04",
+    "exit": "2013-09-11",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-03",
+    "entry": "2013-09-04",
+    "exit": "2013-09-11",
+    "gross_price_label": "0.020089285714285714285714286",
+    "net_proxy": "0.018089285714285714285714286",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-03",
+    "entry": "2013-09-04",
+    "exit": "2013-09-11",
+    "gross_price_label": "0.020089285714285714285714286",
+    "net_proxy": "0.018089285714285714285714286",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-09-03",
+    "entry": "2013-09-04",
+    "exit": "2013-09-11",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-09-03",
+    "entry": "2013-09-04",
+    "exit": "2013-09-11",
+    "gross_price_label": "0.02723747757681951249070566267",
+    "net_proxy": "0.02523747757681951249070566267",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-10",
+    "entry": "2013-09-11",
+    "exit": "2013-09-18",
+    "gross_price_label": "0.010297335564422705624919552",
+    "net_proxy": "0.008297335564422705624919552",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-10",
+    "entry": "2013-09-11",
+    "exit": "2013-09-18",
+    "gross_price_label": "0.010297335564422705624919552",
+    "net_proxy": "0.008297335564422705624919552",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-10",
+    "entry": "2013-09-11",
+    "exit": "2013-09-18",
+    "gross_price_label": "0.010297335564422705624919552",
+    "net_proxy": "0.008297335564422705624919552",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-09-10",
+    "entry": "2013-09-11",
+    "exit": "2013-09-18",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-09-10",
+    "entry": "2013-09-11",
+    "exit": "2013-09-18",
+    "gross_price_label": "0.01197367000196300931729130367",
+    "net_proxy": "0.009973670001963009317291303670",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-17",
+    "entry": "2013-09-18",
+    "exit": "2013-09-25",
+    "gross_price_label": "0.006506364922206506364922207",
+    "net_proxy": "0.004506364922206506364922207",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-17",
+    "entry": "2013-09-18",
+    "exit": "2013-09-25",
+    "gross_price_label": "0.005096190597528347560198751",
+    "net_proxy": "0.003096190597528347560198751",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "cost_proxy": "0.002",
+    "decision": "2013-09-17",
+    "entry": "2013-09-18",
+    "exit": "2013-09-25",
+    "gross_price_label": "0.005096190597528347560198751",
+    "net_proxy": "0.003096190597528347560198751",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "cost_proxy": "0.000",
+    "decision": "2013-09-17",
+    "entry": "2013-09-18",
+    "exit": "2013-09-25",
+    "gross_price_label": "0",
+    "net_proxy": "0.000",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "cost_proxy": "0.002000000000000000000000000000",
+    "decision": "2013-09-17",
+    "entry": "2013-09-18",
+    "exit": "2013-09-25",
+    "gross_price_label": "0.001215981199838310767148096532",
+    "net_proxy": "-0.000784018800161689232851903468",
+    "phase": "reserved",
+    "status": "observed",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  },
+  {
+    "candidate": "momentum20",
+    "decision": "2013-09-24",
+    "phase": "reserved",
+    "reason": "exit beyond evaluation boundary",
+    "status": "censored",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "momentum60",
+    "decision": "2013-09-24",
+    "phase": "reserved",
+    "reason": "exit beyond evaluation boundary",
+    "status": "censored",
+    "weights": {
+      "QQQ": "1"
+    }
+  },
+  {
+    "candidate": "momentum120",
+    "decision": "2013-09-24",
+    "phase": "reserved",
+    "reason": "exit beyond evaluation boundary",
+    "status": "censored",
+    "weights": {
+      "IWM": "1"
+    }
+  },
+  {
+    "candidate": "cash",
+    "decision": "2013-09-24",
+    "phase": "reserved",
+    "reason": "exit beyond evaluation boundary",
+    "status": "censored",
+    "weights": {}
+  },
+  {
+    "candidate": "equalweight",
+    "decision": "2013-09-24",
+    "phase": "reserved",
+    "reason": "exit beyond evaluation boundary",
+    "status": "censored",
+    "weights": {
+      "IWM": "0.3333333333333333333333333333",
+      "QQQ": "0.3333333333333333333333333333",
+      "SPY": "0.3333333333333333333333333334"
+    }
+  }
+]

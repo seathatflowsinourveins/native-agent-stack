@@ -1,0 +1,1752 @@
+{
+ "id": "us-equities__observability-hosting-0-executed-comparison-dagu-arm",
+ "gap_index": 0,
+ "layer_id": "observability-hosting",
+ "catalog": "us-equities",
+ "gap_text_sha256": "ef9876f6df1b08c4523d9edbd058ef1d2c6ab554ecf2663432eaf5e1b407d9a6",
+ "gap_crosswalk": "main 92bb279, crosswalk PR #85",
+ "preregistration": {
+  "written_at": "2026-09-23T07:41:33Z",
+  "expectation": "The dispatch directs this gap to covered_elsewhere via the executed observability-hosting comparison merged in #87 (evidence/artifacts/sota-refresh-20260923/obs-compare/). Expected: the cited receipt is on origin/main unchanged from 43bb931, runs both contested candidate sets (c14 common; c5 prometheus, c6 loki; c8 restic, c3 sandbox-runtime) natively, and covers log/metric retention and query, snapshot restore fidelity and sandbox isolation; expected NOT covered: a Dagu workload and paper-runtime telemetry (synthetic trading-shaped OTLP emitter instead), and the landscape row still pending_lanes (re-judgement is a ledger change this unit may not make).",
+  "criteria": {
+   "covered_elsewhere": "cited files present on origin/main with sha256 identical to 43bb931, all five contested candidates have an executed native_proven per-component verdict, and the retention/query, restore-fidelity and sandbox-isolation clauses each have an executed result in the receipt",
+   "residual_reporting": "any next_check clause with no detected coverage (probe: case-insensitive term search over the full receipt JSON and README, with a positive control on a term known present, 'restic', and the absent-term result reported verbatim) is listed as a residual with its owner, not claimed",
+   "not_settled": "cited evidence missing, altered, or lacking an executed result for one of the five candidates"
+  },
+  "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0.json",
+  "rounds": [
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-dagu-arm.json",
+    "written_at": "2026-09-23T07:49:21Z",
+    "label": "second-round preregistration, written after the independent Codex review of commit 508ec00 found covered_elsewhere overclaimed the unexecuted Dagu arm; written before any Dagu-arm command ran",
+    "expectation": "Dagu spans arrive (span-metric series with the DAG's service.name queryable in Prometheus), Dagu step log lines are queryable in Loki, both survive kill -9 + restart, restic check/restore pass and the restored DAGU_HOME is byte-identical (dagu idle) and dagu history/status reads the run as succeeded, and the srt-wrapped step's egress is denied (srt debug line 'No matching config rule, denying: example.com:443').",
+    "criteria": {
+     "advanced": "every sub-check above passes; outcome stays advanced because the paper-runtime telemetry and live order-journal backup arm (peer sota-workflow-resolution) and the ledger re-judgement (coordinator) remain",
+     "partial": "any sub-check fails or cannot run: record it verbatim, keep advanced for what passed",
+     "detection": "Prometheus/Loki queries return series/streams filtered by labels unique to this run (service_name=dagu-obsgap-20260923, run marker string); a missing series returns an empty result array, which the script records as a failure. srt denial is detected from its own debug line, not from curl failure alone.",
+     "timebox": "stop at 20 minutes and record not_settled for the unfinished sub-checks"
+    }
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-dagu-arm-round2.json",
+    "written_at": "2026-09-23T07:52:09Z",
+    "label": "round-2 addendum, written after round 1 (07:50:08-07:51:43Z) and before round 2 ran",
+    "deviation": "Round 1: Dagu 2.16.6 did not export traces; dagu-start.log: 'traces export: exporter export timeout: rpc error: code = Unavailable desc = invalid target address http://127.0.0.1:34318/v1/traces, error info: address http://127.0.0.1:34318/v1/traces:443: too many colons in address' -- the HTTP-with-path endpoint form that `dagu schema dag` documents was handed to the gRPC exporter. Round 2 changes only the DAG otel block: endpoint 127.0.0.1:34317 (collector OTLP gRPC) and insecure: true. Everything else unchanged.",
+    "expectation": "Round 2: span-metric series for service_name=dagu-obsgap-20260923 appear in Prometheus before kill -9 and are still present after restart; the other sub-checks repeat round 1's passes (Loki marker lines retained across kill -9, restic check/restore clean, restored DAGU_HOME byte-identical and readable by dagu history, srt denial line present).",
+    "addition": {
+     "written_at": "2026-09-23T07:52:24Z",
+     "text": "Added before round 2 ran: start Prometheus and Loki from the restic-restored data dirs on separate loopback ports (39091, 33110) and expect the same span-metric series and marker log lines (restored-store query parity)."
+    }
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-dagu-arm-round3.json",
+    "written_at": "2026-09-23T08:04:37Z",
+    "label": "round-3 preregistration, written after the second independent Codex review (of commit 09c77d0) and before round 3 ran",
+    "deviation": "Review finding: rounds 1 and 2 configured Loki with ports only, so Loki's HTTP (33100/33110) and gRPC (33101/33111) listeners bound all interfaces, contradicting the 'loopback only' claim. Round 3 binds Loki's http_listen_address and grpc_listen_address to 127.0.0.1, records every listening socket owned by the run's processes (ss -ltnp) as a probe that can detect a non-loopback bind, asserts query results in-script (PASS/FAIL lines: 4 span names before kill, after restart and from the restored TSDB; the pre-kill Loki marker timestamps present after restart and in the restored store), and records a process count for the scratch path after stop (pgrep -f).",
+    "expectation": "Every listener of the run's processes is on 127.0.0.1; all PASS lines; zero processes left for the scratch path; same substantive results as round 2."
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-dagu-arm-round4.json",
+    "written_at": "2026-09-23T08:15:25Z",
+    "label": "round-4 addendum, written after round 3 was stopped (08:15:12Z) and before round 4 ran",
+    "deviation": "Round 3 (started 08:04:53Z) confirmed all run listeners on 127.0.0.1 ('listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090') but its first Loki query_range hung for ~10 minutes: Loki's query frontend advertised the host interface address while its gRPC listener was bound to loopback (loki.log: 'frontend=<lan-ip>:33101 msg=\"error notifying frontend about finished query\" ... dial tcp <lan-ip>:33101: connect: connection refused'). Round 3 was stopped manually and is recorded as aborted. Round 4 adds only `frontend: {address: 127.0.0.1}` to the Loki config.",
+    "expectation": "Same as round 3: all listeners loopback, all PASS lines, zero processes left, round-2 results reproduced.",
+    "label_note": "Label says 'before round 4 ran'; it was written by the same command that then started round 4, within the same second (08:15:25Z). Ordering within that second is not independently evidenced."
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-paper-sim-arm.json",
+    "written_at": "2026-09-23T16:13:23Z",
+    "label": "round-5 preregistration (paper-runtime simulated-port arm), written after rounds 1-4 and before any round-5 command ran; dispatched as a continuation of this unit",
+    "commit_before_run": "bb110db committed 16:15:07Z; round 5's first steps.txt line 16:15:11Z",
+    "disclosure": "A 5-second unsandboxed dry run of paper_sim_workload.py (no stack, no Dagu, no srt) ran about 16:12:45Z, before this preregistration, only to check that the driver imports and runs; its outputs are in raw/paper-sim-dry/ (status passed, 16 native fills). The round-5 preregistration was written after it."
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-paper-sim-arm-round6.json",
+    "written_at": "2026-09-23T16:17:50Z",
+    "label": "round-6 addendum, written after round 5 failed (run 16:15:21Z-16:17:30Z) and before round 6 ran",
+    "commit_before_run": "7d3236e committed 16:18:01Z; round 6's first steps.txt line 16:18:07Z",
+    "time_note": "This addendum's quoted start time for the previous round (16:15:21Z or 16:18:29Z) is an approximate stack-ready time. The first steps.txt lines are 16:15:11Z and 16:18:07Z. The committed addendum is left unedited."
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-paper-sim-arm-round7.json",
+    "written_at": "2026-09-23T16:21:52Z",
+    "label": "round-7 addendum, written after round 6 completed (16:18:29Z-16:20:42Z, all in-script assertions PASS) and after a post-hoc query of round 6's restored TSDB copy, before round 7 ran",
+    "commit_before_run": "7352bf4 committed 16:22:16Z; round 7's first steps.txt line 16:22:16Z (same second. The commit and the run were chained with && in one shell command, so the commit completed first; this is not independently evidenced beyond that ordering)",
+    "time_note": "This addendum's quoted start time for the previous round (16:15:21Z or 16:18:29Z) is an approximate stack-ready time. The first steps.txt lines are 16:15:11Z and 16:18:07Z. The committed addendum is left unedited."
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-paper-sim-arm-round8.json",
+    "written_at": "2026-09-23T16:25:19Z",
+    "label": "round-8 addendum, written after round 7 (16:22:36Z-16:24:51Z) and before round 8 ran",
+    "commit_before_run": "9c58d9f committed 16:25:45Z; round 8's first steps.txt line 16:25:46Z"
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__observability-hosting/preregistration-0-paper-sim-arm-recheck.json",
+    "written_at": "2026-09-23T16:38:46Z",
+    "label": "fix-round preregistration, written after the independent Codex review of 58b2ba0..49278fa and before the recheck ran; no new workload",
+    "commit_before_run": "Not committed separately before the recheck. The file was written at 16:38:46Z, and the recheck first ran after it in the same session. That ordering is evidenced only by written_at and the command sequence. The recheck reads committed raw files and runs no workload."
+   }
+  ],
+  "note": "Round A (source review of #87) preregistered 07:41:33Z, run 07:41:53Z (first run failed on a wrong ledger key and was rerun). The Dagu arm was added after an independent Codex review of commit 508ec00 found that recording covered_elsewhere overclaimed the unexecuted Dagu arm; its preregistration (07:49:21Z) precedes round 1 (07:50:08Z), and the round-2 addendum (07:52:09Z, addition 2026-09-23T07:52:24Z, written by the same shell command immediately before round 2 started, in the same second) precede round 2 (started 07:52:24Z). Timestamps are self-recorded from the host clock when each file was written. Rounds 3 and 4 followed a second independent Codex review (of commit 09c77d0): round-3 preregistration 08:04:37Z precedes round 3 (08:04:53Z); the round-4 addendum and round 4's first log line share the second 08:15:25Z (written by the same shell command immediately before the run), so strict order is not established by the evidence; the addendum changes only Loki's frontend.address. The round-2 restore-query addition and round-2 start share the second 07:52:24Z, so their strict order is not established by the evidence; round 4 re-runs that check under a preregistration that clearly precedes it."
+ },
+ "commands": [
+  "git merge-base --is-ancestor 43bb931 origin/main",
+  "python3 blueprints/gap-wave2-20260923/us-equities__observability-hosting/verify_cited_comparison.py origin/main > evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/0-verify_cited_comparison.origin-main.json",
+  "timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-1   # round 1, default OTEL_EP=http://127.0.0.1:34318/v1/traces",
+  "OTEL_EP=127.0.0.1:34317 OTEL_INSECURE=true timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-2   # round 2",
+  "OTEL_EP=127.0.0.1:34317 OTEL_INSECURE=true timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-3   # round 3 (Loki listen addresses 127.0.0.1, listener probe, assertions); hung, stopped manually",
+  "OTEL_EP=127.0.0.1:34317 OTEL_INSECURE=true timeout 540 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4   # round 4 = committed script",
+  "ps -eo pid,args | grep -E 'prometheus|loki-linux|otelcol-contrib' | grep gap-wave2 | grep -v grep | wc -l; ss -ltn | grep -c -E ':(34317|34318|39090|39091|33100|33101|33110|33111) '   # post-run cleanup check",
+  "$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python -m unittest tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation   # sanity: pinned runtime env runs the simulated-port path (OK, 1 test)",
+  "$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_sim_workload.py --journal <dry>/journal.db --result <dry>/result.json --mark dry --seconds 5   # pre-preregistration dry run",
+  "timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5   # round 5, script at bb110db",
+  "timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-6   # round 6, script at 7d3236e",
+  "prometheus --storage.tsdb.path=<paper-arm-6>/check/prom-posthoc (copy of the restic-restored TSDB) --web.listen-address=127.0.0.1:39092; curl /api/v1/query_range query={__name__=~\"paper_runtime_.*\"} step=1   # post-hoc, not preregistered",
+  "timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7   # round 7, script at 7352bf4",
+  "timeout 1200 bash blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8   # round 8 = committed script (9c58d9f)",
+  "prometheus --storage.tsdb.path=<paper-arm-8>/check/prom-posthoc (copy of the round-8 TSDB) --web.listen-address=127.0.0.1:39092; curl /api/v1/query query={__name__=~\"otelcol_.*\",job=\"otelcol-self\"}[1h] and {__name__=~\"paper_runtime_.*\"}[1h]   # post-hoc, not preregistered",
+  "python3 blueprints/gap-wave2-20260923/us-equities__observability-hosting/collect_paper_raw.py   # sanitized copies into raw/paper-arm-round{5..8}/ and raw/paper-sim-dry/",
+  "python3 blueprints/gap-wave2-20260923/us-equities__observability-hosting/recheck_paper_arm.py 5 6 8 > evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/recheck-paper-arm.txt   # fix round after the Codex review; committed raw files only"
+ ],
+ "components": {
+  "dagu": "2.16.6",
+  "otelcol-contrib": "0.161.0 (spanmetrics connector, filelog receiver, prometheusremotewrite, otlphttp->Loki)",
+  "prometheus": "3.14.0",
+  "loki": "3.7.8",
+  "restic": "0.19.1",
+  "sandbox-runtime": "package 0.0.77 at $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77 (its `srt --version` prints 1.0.0)",
+  "nautilus-trader (paper runtime)": "2.0.0rc5 with alpaca-py 0.44.0 in the existing pinned env $HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (used read-only; alpaca never called: SimulatedPort only)",
+  "paper runtime code": "blueprints/us-equities/adaptive-paper runner.run_native + native_strategy.AdaptiveStrategy + safety.Ledger (SQLite WAL journal) + simulation.SimulatedPort, at this worktree's base",
+  "otelcol-contrib (paper arm)": "0.161.0: filelog (+ file_storage offsets from round 7), count connector, delta_to_cumulative (rounds 6 and 8), prometheus exporter (round 7 only), self-telemetry pull reader (round 8)"
+ },
+ "source_ref": {
+  "origin_main": "4d2721b0af8ea50c51a05767535352c9f5fe1085",
+  "merge_commit_87": "43bb931",
+  "worktree_base": "41d39b3 (does not contain #87; cited evidence read from origin/main via git show)"
+ },
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/0-verify_cited_comparison.origin-main.json",
+   "sha256": "a437db625a3a3d36fdbbbfba2fa11166a25261a4647b8e7279af7ccf177297de",
+   "bytes": 3419
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/dagu-history-restored.log",
+   "sha256": "dcff96428b27159a1e70e6678f122e1bfad56130122163bb03c3bdf966d4ba56",
+   "bytes": 384
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/dagu-start.log",
+   "sha256": "ebc37252189b2613d2161d9f8dffe5eed8c7db21303c52b386c8ba51d93d0a6d",
+   "bytes": 12973
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/dagu-status-restored.log",
+   "sha256": "3a303e307d5881a3b24f78b36249806b9fd290703144a2f103dc77947ddf8438",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/dagu-status.log",
+   "sha256": "7e24bdcb548d2766fbfc974de014630cece679ec97fb9a5d5d1626001d39be5a",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/loki-after-restart.json",
+   "sha256": "ad22c1bd0a6780339421946c72d087d2e7b394e7124e98b1bc383c619cbf7a6a",
+   "bytes": 4692
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/loki-before-kill.json",
+   "sha256": "295985e321d4316e8a9ee26d913e783580db7aa124f519bc7d125e1d16e579d9",
+   "bytes": 4520
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+   "sha256": "3e695bbcb921e26c2ccee590e2472f20defad380728ed5198fa8f551b17a8c7b",
+   "bytes": 569
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/otelcol.yml",
+   "sha256": "cddaec7439997423e80bacadcb079d666a4a505810b2098cea59f218e64477e5",
+   "bytes": 1110
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/prom-after-restart.json",
+   "sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+   "bytes": 63
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/prom-before-kill.json",
+   "sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+   "bytes": 63
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/restic.log",
+   "sha256": "3230185403061a356bdda906edc2377fd3c3fec7e91ab68488c127ee05b8b3c5",
+   "bytes": 1449
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/sandboxed-worker.err",
+   "sha256": "453ebd1cb2972987b23a40d2e6347c33bdedf9e9d25d91095372e0f842325188",
+   "bytes": 6504
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/steps.txt",
+   "sha256": "dfdfd17202a313820f47bb4b8e14e9b85073f391a845fde979555e6f49b36d6d",
+   "bytes": 2926
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/dagu-history-restored.log",
+   "sha256": "697bd5cb754979140c796d7f02a80f4d61312dcb8bbca8d2eaa2a7b9bbbbe846",
+   "bytes": 384
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/dagu-start.log",
+   "sha256": "3746b1b33b609271706b703b8a906bbc25a915e3aef81dd9e2e841daaf972a4c",
+   "bytes": 12734
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/dagu-status-restored.log",
+   "sha256": "fd8321389ba9e82a06df9b7743f479267f24f12b5cd64e03dc58df5c18d952be",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/dagu-status.log",
+   "sha256": "9d5d3df93e39b943c64ebde449b94f155142f7dc00d979d7518f7c9e93028084",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/loki-after-restart.json",
+   "sha256": "1aaa337fcd6e12ae3ffc2e19e114f2d11e743559ff72c0ce1e9c18b56d6ce37a",
+   "bytes": 4691
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/loki-before-kill.json",
+   "sha256": "6a5322a1a799c066d9e5ee40115dbacf8134e8abfe1c477a8e3a28aeb6295aac",
+   "bytes": 4521
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/loki-restored.json",
+   "sha256": "5f0b3fb52067e9f9620fb71654ba189fde64f3e428c176588a90d84ab948403d",
+   "bytes": 4692
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+   "sha256": "65015d8726703a456df90a55aff4a0bd187e69099dc908866c59ec2c75badba9",
+   "bytes": 569
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/otelcol.yml",
+   "sha256": "f020e595cf9e46b22dbd978b4533d4b008171739e79bfc68ab353de8d304171a",
+   "bytes": 1110
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/prom-after-restart.json",
+   "sha256": "d79a388d57f7a52562ce62cb1894b2d68f2ff9087444fb9417f262d5d9ebab64",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/prom-before-kill.json",
+   "sha256": "b5bdb1354773a0af7d498e33cfb21845ddc975682b110a9f8b9914513f979ee6",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/prom-restored.json",
+   "sha256": "b02ca901da68b76aa163bd6dd456a6a4917879eb5f61dab279f8306dda2343ca",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/restic.log",
+   "sha256": "32ca8fda463448f4d7ea3a0e5d3770f95ae6ea17c6ab84f0303a9c2919ed931d",
+   "bytes": 1450
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/sandboxed-worker.err",
+   "sha256": "c460ca36524bdad32b7092a6b0996e5a61bc88c6e08591e383b8db3c7c1bd507",
+   "bytes": 6504
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/steps.txt",
+   "sha256": "c853c6e49ff78ed9f0dcf8c39d746ff61a25f00d4f453f66457b05cb45ca567d",
+   "bytes": 3942
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round3/loki-frontend-errors-excerpt.log",
+   "sha256": "8bdadba50cf6f8afffbaa5d56ed83c26f8dc1d112b588dae00b2026c3dfec7e5",
+   "bytes": 1810
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round3/loki.yml",
+   "sha256": "030a602edca0cfd0c5a5819bfd105af228a553b426eac77fe29df0544e26bd02",
+   "bytes": 740
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round3/prom-before-kill.json",
+   "sha256": "e1ebf0a79618e80998cd732b0e7dc2f420697f4438a79cff07d31cf1afbdecfe",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round3/steps.txt",
+   "sha256": "5c6984de774c002ea5e265560f93fff991554787103fdfe61c32c96c8db7ae6d",
+   "bytes": 687
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/dagu-history-restored.log",
+   "sha256": "717833b516d6c43889257c9189df5bff597a3f7e6c5b4cfd33a5ec1eba78d28e",
+   "bytes": 384
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/dagu-start.log",
+   "sha256": "ea83b2cb8e6e26e79be8ce5cd38ba97254425833e5a5f1e3506630f2b5261d90",
+   "bytes": 12734
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/dagu-status-restored.log",
+   "sha256": "0a1c34d63809058170a60111432d516da28a9e75b902f92ab1bea3d09f4d8f00",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/dagu-status.log",
+   "sha256": "7d579a3bd989e568b6c7e3977a51c2b4361477950fe096f197f5427df6de56bc",
+   "bytes": 9222
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/loki-after-restart.json",
+   "sha256": "6ff6543c1bfbd0fb8e2df3d268f98656e565a36ea9c323fbbcc907ecf73030cc",
+   "bytes": 4691
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/loki-before-kill.json",
+   "sha256": "6348440ce0633378d5d9e9fcadf38fcc9f6948e46be328f5e0d849b9f877c95c",
+   "bytes": 4521
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/loki-restored.json",
+   "sha256": "549d4add1ffde128420db2c49c3020a9ec7a43613a685c479d430ac1aaddb3be",
+   "bytes": 4691
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/loki-restored.yml",
+   "sha256": "3d48c8cf05b4488d618e820cd1e714d8365d3773ad309b417f10a6b3ba80a05c",
+   "bytes": 987
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/loki.yml",
+   "sha256": "955f48f61df1d32e5a370cc86a71b12129460a61ab396f7d4d189c3a5fb97bae",
+   "bytes": 771
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+   "sha256": "2b059091aacc87390a042748e68133107d8bb33bbdba12d8e7fceaf52e75f1a6",
+   "bytes": 569
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/otelcol.yml",
+   "sha256": "5b0f69ca43d8a5b847ede8b4b15d032ae75718da934433b3c3d2cd1e2e098c1b",
+   "bytes": 1110
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/post-run-process-check.txt",
+   "sha256": "3ea133bb93e7268c1177a469163e9db6e46b874f4ad3174b1453088d9ce880f7",
+   "bytes": 218
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/prom-after-restart.json",
+   "sha256": "4c64a52dda80471cdeae70e43f8602339b130440ced707fd4399c0984f34d0d7",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/prom-before-kill.json",
+   "sha256": "732c011a2c2db7f2dde67887b86c83481adaf92f45a26088a4550323566c6c9a",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/prom-restored.json",
+   "sha256": "1f6d4cd0f04888772644954e73e55d6d7e6f786cc782574feefaa138680d268f",
+   "bytes": 353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/restic.log",
+   "sha256": "3f9c3724898a0d3d8994e46652720d9acff80a53f8e7dd4282d10e4655c29639",
+   "bytes": 1450
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/sandboxed-worker.err",
+   "sha256": "020003e8c02c2429941ba1f90233273700a3e168cd1419f414eab2f1f8679b3c",
+   "bytes": 6504
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/steps.txt",
+   "sha256": "3cd5ec99658719de52b7b4d6db6a85adcecb0c929e102dafc44acf9f0dad1098",
+   "bytes": 4822
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/hot_step.sh",
+   "sha256": "7293206f97a04b73d6845f3a12e08cf3f7cf1816ffeb23c4b95fde8eae345202",
+   "bytes": 457
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/loki-restored.yml",
+   "sha256": "64c0c448745e6bed000294744baa53d7e472c125a76aee2e224bcfe62210efa3",
+   "bytes": 993
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/loki.yml",
+   "sha256": "6dda0d0e263e6578412d16b4c691d65762582086007b2539af5314215d303171",
+   "bytes": 774
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/otelcol.yml",
+   "sha256": "d4f90b676cdb025101c313e07b6ea6241fa5c5a16a45f08bd299f5f3260775c5",
+   "bytes": 1609
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/paper_step.sh",
+   "sha256": "a8065f46b585c4ee81c4ce3893d53b74a67ca18d3e3e52c78a43f38f59a687bc",
+   "bytes": 780
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/probes.sh",
+   "sha256": "c2d113946033c11aee59fd541ebd0029849b587b75348025a57dc20ba3b6cc52",
+   "bytes": 365
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/prometheus.yml",
+   "sha256": "2b595fe582f753a89cd5dbfe24d6402eed5f49f733de5f4b5e7b983aca17d60e",
+   "bytes": 30
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/cfg/srt.json",
+   "sha256": "3c2c5759cf835bc39baddf4610646a715f664f5357143d623e8e6a12493a5d09",
+   "bytes": 287
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+   "sha256": "ac4bba1ebfad77f3ec907a12ef28a19b54ce17db349cd39d48be8d63f5c5de6b",
+   "bytes": 519
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu-step-logs/hot-backup.20260923.121536.421.034TtO4p.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu-step-logs/hot-backup.20260923.121536.421.034TtO4p.out",
+   "sha256": "cc47a6872b43f44bd29a37af0b24814207b8968042197b74e78feff3b260cd31",
+   "bytes": 548
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu-step-logs/paper-runtime.20260923.121536.421.034TtO4p.err",
+   "sha256": "a74a257a6f27068a2ea216901bbd3bbfff3dd056bb4c79d7bb36c0cdb7e9a7a8",
+   "bytes": 903
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu-step-logs/paper-runtime.20260923.121536.421.034TtO4p.out",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/dagu-start.log",
+   "sha256": "7e2c2c964aa722f5aa5a8f829271dd054bb37f6a14e5cc8312dba1a77dcd0a85",
+   "bytes": 6236
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/dagu-status-restored.log",
+   "sha256": "3bc32692e06534872f27649f0195cb601f404ed4e7e25c0aef2f21e249298bc5",
+   "bytes": 3143
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/dagu-status.log",
+   "sha256": "8fb0c11c576bf651f8ef1bf70df871da02a12e8ad0c53f0ed19b2b16cb63fac6",
+   "bytes": 3143
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/diff-work.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/journal-check.json",
+   "sha256": "e87fca2165003ad9d3de59d9bd4f3736e45fdf1891d445111fa3a4558c0ef537",
+   "bytes": 130
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/loki-after-restart.json",
+   "sha256": "8d8125af4cc5a9a9725448b9b565e3d7ba8423219c292a88ad5bfcc7111082fb",
+   "bytes": 3614
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/loki-before-kill.json",
+   "sha256": "6cd5a0de37d04e58d388b0b582282cddedb6fb59642e990963e0836422a972de",
+   "bytes": 3615
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/loki-restored.json",
+   "sha256": "3ce5f36b1a6a5a5ffcf321e9579960f431f92f4fd3b3877e58af1350f52070dd",
+   "bytes": 3615
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/loki-restored.log",
+   "sha256": "792e8f6b65fd4823dfb8fc9e7b86f9cf627c4e4f9552e62ee88053386a90b2ab",
+   "bytes": 22858
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/loki.log",
+   "sha256": "4d0886255d4e8904e397287f21ef7b3bb95ff4c85ec089ec3b37b9fd3f97b44c",
+   "bytes": 40862
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/otelcol.log",
+   "sha256": "5cae63a9efb9cbafaade238eef6f3828088c7c8dad49c4f1143947b9428c6113",
+   "bytes": 16023
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-count-after-restart.json",
+   "sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+   "bytes": 63
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-count-before-kill.json",
+   "sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+   "bytes": 63
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-count-restored.json",
+   "sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+   "bytes": 63
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-restored.log",
+   "sha256": "ade812f48fa2df3b25d0264e1a6d961a937d323491db5c0aea2307d201de015b",
+   "bytes": 6605
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-spans-after-restart.json",
+   "sha256": "39ca13b9fdab115bd2013115f0fd32c8a445aba00537dcc4c93482d67010d54c",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-spans-before-kill.json",
+   "sha256": "ece2c22beb9a15f059791bc18c6aad34229ab0c813bf1f873ff3b11500ca81da",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom-spans-restored.json",
+   "sha256": "5e1b105feec7f0ac62c99430cafa8c0cd1c00638d4c6c01d7df1ed3ede422182",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/prom.log",
+   "sha256": "b42e8f6137d2a1db428be77abbd1dec2e5309ced896899ee28f51ed379b3a745",
+   "bytes": 10007
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/restic-hot.log",
+   "sha256": "bea82aefaf5b115fc11ad39752d11f6436c2644260432d94ede94dc2923a9a86",
+   "bytes": 825
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/restic.log",
+   "sha256": "d2756ccfd1e281dbe179f30eb6c83730a932cc9527204fc098c774d04b49296d",
+   "bytes": 1592
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/logs/steps.txt",
+   "sha256": "2c5096b6006594348bc7e4e4b09428daba9ef4d4ae114c07b4e366f4b4b7302d",
+   "bytes": 4547
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/console.txt",
+   "sha256": "1dbd64cdfa12e0e2ede001a8fcdfb40a3e0a66660583dae50734234814d4de65",
+   "bytes": 4652
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/hot_step.sh",
+   "sha256": "15beef9273e0e4acb0d48cf9347edcb45211f6973e0b7da0ca2472867acac376",
+   "bytes": 457
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/loki-restored.yml",
+   "sha256": "8b0e9b2d79b00c4732ea92e1f9341bc26dff143c56e5eb80c7d5aa0db0e58359",
+   "bytes": 993
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/loki.yml",
+   "sha256": "bda7ea81bc5ed73ccb6c9c72c7b75f5b83af55e6edd0eb641b54a2d08195422e",
+   "bytes": 774
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/otelcol.yml",
+   "sha256": "9f68b288f5016e8132dde550714c9f6ef14cfce667017108e9da699a6c320085",
+   "bytes": 1609
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/paper_step.sh",
+   "sha256": "388c2a3277d4d2e5438309a8072fd4456d4c5d7526e4ea11aca325ed506efb70",
+   "bytes": 868
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/probes.sh",
+   "sha256": "c2d113946033c11aee59fd541ebd0029849b587b75348025a57dc20ba3b6cc52",
+   "bytes": 365
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/prometheus.yml",
+   "sha256": "2b595fe582f753a89cd5dbfe24d6402eed5f49f733de5f4b5e7b983aca17d60e",
+   "bytes": 30
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/cfg/srt.json",
+   "sha256": "22d959757d1c64256d6676f565f76388f721e892dd7d6aff9bc80f81e608f841",
+   "bytes": 287
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+   "sha256": "8996c6a14b298a0f410bf8c000b0f94d3ec290c1a2a4b66a41d2dc49ed960d42",
+   "bytes": 519
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu-step-logs/hot-backup.20260923.121832.370.034TtSXS.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu-step-logs/hot-backup.20260923.121832.370.034TtSXS.out",
+   "sha256": "c1504a29f1800acc7cf9fcc10f020a24d0f2c10fd6103fb102bdf29f4caf696e",
+   "bytes": 555
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu-step-logs/paper-runtime.20260923.121832.370.034TtSXS.err",
+   "sha256": "f7d1bdf5da7ba20b55480f9b2eab0dca6ca534246508a1d58520fb4ece673880",
+   "bytes": 6235
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu-step-logs/paper-runtime.20260923.121832.370.034TtSXS.out",
+   "sha256": "8c0c0f9d39247711700d8a4a22dd229a00ca620ae5b6b6e2c4a1d12b74a50ff6",
+   "bytes": 84416
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/dagu-start.log",
+   "sha256": "83a487c1f9ac1edef1a790473d2b47bd9c6e65b3c4e931c489272638db270997",
+   "bytes": 23778
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/dagu-status-restored.log",
+   "sha256": "49e4c1460967be883161fbe7c18ea76527478d659f4e2722325f3019d37c3b15",
+   "bytes": 22792
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/dagu-status.log",
+   "sha256": "ac905327b59a78e968b214e3e76e2c4a98a3d850532ee7def4414143af3cf66b",
+   "bytes": 22792
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/diff-work.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/journal-check.json",
+   "sha256": "38a5f935cf84354e60de64d902e113d0803c1c417ba6b51b13c23c5befd74eea",
+   "bytes": 254
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/loki-after-restart.json",
+   "sha256": "5c72c7b939c392e87cb3a47858001cd346306894892fdbe55204d2987d026a6c",
+   "bytes": 209589
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/loki-before-kill.json",
+   "sha256": "ccea37b36162019c7a80e5099e9d11f462eb2c00b23f4b44b91147dec054771f",
+   "bytes": 106802
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/loki-restored.json",
+   "sha256": "ab7aca0dd30ada6ff65e5777163436628161bb8f70f13b9ea8b8b242d37f87de",
+   "bytes": 209590
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/loki-restored.log",
+   "sha256": "f6c2704ca281c7d6de87b32bc3320e3e8d58123fa8c9c0271b27b3fa40be2b1c",
+   "bytes": 22889
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/loki.log",
+   "sha256": "a9e502929f365118ecaebe017647ed488a68b7c660da7bc74e9f03446f34b05e",
+   "bytes": 41340
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/otelcol.log",
+   "sha256": "2f619050e9cd694490e5112e54b4b2341e5f4c4efafc173db10ca8f2c7357445",
+   "bytes": 17113
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/pgrep.txt",
+   "sha256": "2caa9f01f1cbc2d7befa6fadfebb6213dfdd72dc4fbc27f2e088896092d20077",
+   "bytes": 24
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/procs-left.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-count-after-restart.json",
+   "sha256": "65bf8e203497c234d9b488053cb24bcd9d6c27989df443b0d8af1d60dc62efdb",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-count-before-kill.json",
+   "sha256": "fe050a3bdd651e07d245e2f506793fbe1d5500aa555d1e9f4b43dd2d4b3bb640",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-count-restored.json",
+   "sha256": "ed1034a1d2feeb214763b476be380a282b28ccb3964bc3b3020f2950d17e7512",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-posthoc-count-range.json",
+   "sha256": "ed4f23dcd7b2b2e23fe6001b3b705170687dd94f43374952cb842d55f787033f",
+   "bytes": 6353
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-posthoc.log",
+   "sha256": "5080b76861d6ffb6579dd5f114c4a565dc2816dad114e90e27a69f7767dcba1e",
+   "bytes": 6429
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-restored.log",
+   "sha256": "a29a38f0530fb81bc1c884d7e212b26aeda6aa3e2301696e090619f38adca9e2",
+   "bytes": 6601
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-spans-after-restart.json",
+   "sha256": "7d3b10d30a4867bce9ff79bc006ac96a9695661993d43e951f1eada48437b32e",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-spans-before-kill.json",
+   "sha256": "5a457c4f12474a366db125c080f35cfce032322a37e219d2da403df7aba2b4b2",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom-spans-restored.json",
+   "sha256": "f545f281cc19b41af7be7188fe39adc332cb4cb4d5a767f3159c75a0fbfc57fa",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/prom.log",
+   "sha256": "faf1aea2b051244846bc432ed312500938369bf1afc97fac96b8690e21b65109",
+   "bytes": 10002
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/restic-hot.log",
+   "sha256": "c63042654b55472cc012f13d480861916e183a22454c456923e4707a2a872810",
+   "bytes": 766
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/restic.log",
+   "sha256": "3b6bf122c18cf8a552971ee049f648bd884cf85a5cfbeb46ad8402d6fc95c816",
+   "bytes": 1528
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/logs/steps.txt",
+   "sha256": "7dd9bef703ca5bd442364d8da2f404c004886da02e5f609653b9e7c725c2ba1f",
+   "bytes": 7003
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/work/result.json",
+   "sha256": "7dd55878c6af9e3f74d7eac95e61997000548b2c52daeb127713f859686698c3",
+   "bytes": 68618
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/console.txt",
+   "sha256": "4b43600ed1daf352bd420ec70465a176d0db5651390259deb84260c18343e634",
+   "bytes": 7232
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/hot_step.sh",
+   "sha256": "e9cc066e2fb33af0c3d04bbf023454f3b9545424f549408fcc2d11d9d7ba1125",
+   "bytes": 457
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/loki-restored.yml",
+   "sha256": "80410f463252aab1c57f13610c85504c78774971473aa1acb59c865b480fef0f",
+   "bytes": 993
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/loki.yml",
+   "sha256": "e6afe31ccac5d73fc9eec3f73b135ecc6dd71baa740c0a72254706f4e5c0da73",
+   "bytes": 774
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/otelcol.yml",
+   "sha256": "883609270664f35c34c1a68e84034a6d109ae61f37354fe58ec68973fc4c6133",
+   "bytes": 1788
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/paper_step.sh",
+   "sha256": "2d045efdead1fb9655a44d82a3ad7252e56f959a3bf5694ac2a06c3480dbb5b3",
+   "bytes": 868
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/probes.sh",
+   "sha256": "c2d113946033c11aee59fd541ebd0029849b587b75348025a57dc20ba3b6cc52",
+   "bytes": 365
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/prometheus.yml",
+   "sha256": "65e2854335ed859cdff2a3a8b9378faa2cc5f32ccfead1c2570d29f635c8dd20",
+   "bytes": 127
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/cfg/srt.json",
+   "sha256": "beaa30165408113edfe91a62d79a509adebc9a3f9348a4fb0ed891c2b9f9cfd8",
+   "bytes": 287
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+   "sha256": "f561f49d3d75134d7a327356c9571a9a24bb13bd5e0726d39fb29a675ed6c530",
+   "bytes": 519
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu-step-logs/hot-backup.20260923.122242.064.034TtYs2.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu-step-logs/hot-backup.20260923.122242.064.034TtYs2.out",
+   "sha256": "5df8e1e78ad3b4e1d3f6d404d0fe8aa1808b85541a1a0687426f32d24f0b6594",
+   "bytes": 555
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu-step-logs/paper-runtime.20260923.122242.064.034TtYs2.err",
+   "sha256": "a97ca67258f33b24a472f9000d475b181e8030602e441ba0a45a0ba1908c79bd",
+   "bytes": 6235
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu-step-logs/paper-runtime.20260923.122242.064.034TtYs2.out",
+   "sha256": "9c0a77ccbd88754b71025a63786ef6d9d7b061cb89c7213852f2897269225a8e",
+   "bytes": 84745
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/dagu-start.log",
+   "sha256": "391fc114f517028ea0cabce87f8ef150c4d950bd75a7459221599064c7fd6fbd",
+   "bytes": 23745
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/dagu-status-restored.log",
+   "sha256": "0eacded7efaea85eda5bac8222d27562fc7e435cb94f3994ead85b40a947fa8d",
+   "bytes": 22759
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/dagu-status.log",
+   "sha256": "6b091acf63557b185e33e7cbceb6cfa28bdfe25dcaca453c74f2ed61347009d3",
+   "bytes": 22759
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/diff-work.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/journal-check.json",
+   "sha256": "38a5f935cf84354e60de64d902e113d0803c1c417ba6b51b13c23c5befd74eea",
+   "bytes": 254
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/loki-after-restart.json",
+   "sha256": "a882ee91d06c207915394f77f6fd37c736bba879b42cddd15d9485e9be2cf0a7",
+   "bytes": 107221
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/loki-before-kill.json",
+   "sha256": "2662333aca7d066501f7629e64340761e52eb44903916cdbc2b37b67a6f6f00c",
+   "bytes": 107220
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/loki-restored.json",
+   "sha256": "e544bce5efa28bc84851373829aacfde52c0b754206e2cb532507bbc9569d57b",
+   "bytes": 107221
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/loki-restored.log",
+   "sha256": "4de9a8c508f0c1f30672c54ac0b3655202a3c19a0293c0b635b08412f089534f",
+   "bytes": 22904
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/loki.log",
+   "sha256": "8a583fe0980ab18a3e2fec1b668c3049951816fa687e211bfa87fd17a5e6de1d",
+   "bytes": 41159
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/otelcol.log",
+   "sha256": "f5de42fc5f8952535877961b0db6a55db6d8cec4bac2cffbfbc0007cfc6cb87f",
+   "bytes": 16964
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/pgrep.txt",
+   "sha256": "8792b96519dcfdab2179b95a1663abe1921ecd0c1e3a0bd6b6ba37ffd2c89ae4",
+   "bytes": 24
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/procs-left.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-count-after-restart.json",
+   "sha256": "4c444a0ab1d6affbc547542c260dbc30b9f54174dfc24ff38c42a0a1f3fdf3b1",
+   "bytes": 618
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-count-before-kill.json",
+   "sha256": "04e6123047f30612b0982f883047a82a9ae3a501c74cd558569d62e22870a639",
+   "bytes": 618
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-count-restored.json",
+   "sha256": "4cb5f982786a0e95fe2054b50e907e410d35ead73e36a84a01563b2aca3e2b96",
+   "bytes": 618
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-countmax-after-restart.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-countmax-before-kill.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-countmax-restored.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-restored.log",
+   "sha256": "2408c3b2bf4c7163ddf9ee213c20640f134967a3d0b13f091ffb87ede6959fbb",
+   "bytes": 6602
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-spans-after-restart.json",
+   "sha256": "6a52c060b36e2ff1a633018a53b2da7437f5d96c361da340d5869c137d9d3b79",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-spans-before-kill.json",
+   "sha256": "42b75b9804c8b7d2abcea91a279d98ae7719598ef8c0365981bf4754bf89717b",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom-spans-restored.json",
+   "sha256": "f16b2ba505c32b11e2a75cd0a61b7db62a826e0b0034ca2f1df6a00f8774b001",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/prom.log",
+   "sha256": "16ed904d7bc3e57f9440d0d4c4ef94dde6553df71b4d97f15e703575ce505eaf",
+   "bytes": 10027
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/restic-hot.log",
+   "sha256": "025ad011dd3dfa1ad45817705ce699865e8498f9fdb33c07dbdceb5bf7573fd9",
+   "bytes": 767
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/restic.log",
+   "sha256": "9c573c0a7d05bc0af49dfa62321e811b33a12d3bf5512ca0d4072fcf66aabf26",
+   "bytes": 1528
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/logs/steps.txt",
+   "sha256": "5c722f137379a5a0221ba115f5645d5c2adcd85a3a96f61a149cf89d472d0548",
+   "bytes": 6758
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/work/result.json",
+   "sha256": "3edeee1f2ff0e1873b3391cdfbcea840bb09d39934cf0381731805a3648ff8a1",
+   "bytes": 68966
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/console.txt",
+   "sha256": "eed971e31eb8ac02dec4ca096eb46b012b95112e6600793a240969bda3e87401",
+   "bytes": 7117
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/hot_step.sh",
+   "sha256": "10fba77a3bf478542ad35f35c35e33d27d36800864a6c056b751edb732035366",
+   "bytes": 457
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/loki-restored.yml",
+   "sha256": "4d7b5b18f72b5875ea62e0b6c1a9b7eddf9f923362f842ab36216f5f65d6d1cf",
+   "bytes": 993
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/loki.yml",
+   "sha256": "74aa0155b8eafc9bd48c6d3e164b1ba74ec35758b1468ed8b3f4d0bf8cbbf6a2",
+   "bytes": 774
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/otelcol.yml",
+   "sha256": "50f9237b7db063f96ab1717a172f2902b8d64f20c52b224c19b2aaacdd0144c2",
+   "bytes": 1873
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/paper_step.sh",
+   "sha256": "4db367961386ac086a9363f636f5e17c29f333839b9bb3a85939b642c3bb3512",
+   "bytes": 868
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/probes.sh",
+   "sha256": "c2d113946033c11aee59fd541ebd0029849b587b75348025a57dc20ba3b6cc52",
+   "bytes": 365
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/prometheus.yml",
+   "sha256": "f02adb3974c56eca77b9d7f17b69ef7ce7faa4219a5c608b163192d4eafcf663",
+   "bytes": 126
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/cfg/srt.json",
+   "sha256": "a5136f7e749198323a97911454f654d8f1c6ed73ee75549f8213031c3300e7cf",
+   "bytes": 287
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+   "sha256": "b2c7489747a6c713c461ac4556d1411102033e442538b1417a1bed5402e5f466",
+   "bytes": 519
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu-step-logs/hot-backup.20260923.122612.160.034TteCF.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu-step-logs/hot-backup.20260923.122612.160.034TteCF.out",
+   "sha256": "5c12b39c53d63c180cbf2e1396d7069fc639f246070c8b4c16892d216e80999e",
+   "bytes": 555
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu-step-logs/paper-runtime.20260923.122612.161.034TteCF.err",
+   "sha256": "aeab856da6868e33346be15a5123bff52c8a189abb029c5ee2143cb1f0ab3a92",
+   "bytes": 6235
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu-step-logs/paper-runtime.20260923.122612.161.034TteCF.out",
+   "sha256": "3958452e3cf569f810fc41da4f0a68c2bd00dff9befba236d0ac7f7b393b8d99",
+   "bytes": 80293
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/dagu-start.log",
+   "sha256": "f87e9cf9a05f61352e46ddf17a808bc790d8bbbd7f98c03ae116f2d83e5ae18c",
+   "bytes": 23774
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/dagu-status-restored.log",
+   "sha256": "738ebe87a33218e8a401443e6ce203289a831fd62aace3eb949fa700ed86a3aa",
+   "bytes": 22788
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/dagu-status.log",
+   "sha256": "dbd137e5d90f2f886e24adc25ed077fa84d54f72a1eafc45cd6ff7549ec77f3f",
+   "bytes": 22788
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/diff-dagu.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/diff-work.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/journal-check.json",
+   "sha256": "3ce714ab805a6e9c57b9e388fd100274aa07e6a78f8e5b1340f2def01664c790",
+   "bytes": 254
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-after-restart.json",
+   "sha256": "f546934592010a0de5f3debcf94da1b82ed4f8d3c834735cf1689b952447bda3",
+   "bytes": 101875
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-before-kill.json",
+   "sha256": "38304d2126ecf8187c359a3920c4655044325d08ef04034f939491d5c1c102e7",
+   "bytes": 101876
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-countovertime-after-restart.json",
+   "sha256": "83b36bbce698182212738744e6f1ee563962e1eb4fbdddb21e7882a7883da352",
+   "bytes": 3689
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-countovertime-before-kill.json",
+   "sha256": "cc4610977c415f6cf4443a4d7b4ba6c0bb2eda891c0e757376af3e9e6364efae",
+   "bytes": 3679
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-countovertime-restored.json",
+   "sha256": "eaa74e5ee41d148684315afce3c1acfeaf8f62336d12e35edf12598b169ed2c3",
+   "bytes": 3689
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-restored.json",
+   "sha256": "48b9af89fd30788d9d8c4737fcf40355d92bedd2645ec9f56a87a8a8d947be65",
+   "bytes": 101875
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki-restored.log",
+   "sha256": "d349f9e25cb9b8e3af26aa4386aadd3c40f28c2ddddd71ef27ba10fbe86f8dda",
+   "bytes": 27584
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/loki.log",
+   "sha256": "0fb1c19a229760d9259b8a91cd4d1adb5b0e6ed8a749d35f8a32ade4d9f62f9a",
+   "bytes": 50724
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/otelcol.log",
+   "sha256": "771cb8671f677cab7affdc2a8d3a4ea9a25445b0765571f5d6dcfc6f4e3bebcf",
+   "bytes": 16534
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/pgrep.txt",
+   "sha256": "40b0663a9f23695faaf0a5d6db6eb48e39b0b5308421ab6324edf9d8f61ca97d",
+   "bytes": 24
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/procs-left.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-count-after-restart.json",
+   "sha256": "f72aa60adffed2e3736930cb85f1cc47dbcc4e37578453bdc9bf8c0aa0cb40c2",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-count-before-kill.json",
+   "sha256": "deb422ba61592985eefc3bb69c8dfeb636591ed91ae029283143be25b7f65402",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-count-restored.json",
+   "sha256": "1e2a46fc05affe03e32aeb46cadf5f51f256bc334461de1593bcc9c2456e7979",
+   "bytes": 501
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-intents-after-restart.json",
+   "sha256": "e82fffec7f61fabb24b98c7d3613f33a10a8eede90b66d81f0bb093446f46cc8",
+   "bytes": 238
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-intents-before-kill.json",
+   "sha256": "a63b6179491ac6dbc613d8ec7f71574c215a88be505af9da0fb081fe3ac6dee6",
+   "bytes": 238
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-intents-restored.json",
+   "sha256": "282efb206b4c975e7b0d35ec92b56cde7b50bf36214c59c802b2016a550fc610",
+   "bytes": 238
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-records-after-restart.json",
+   "sha256": "3308687bb4758ffae24be54845f6ab9733e96a146ffb6d3849af3d586d1157c0",
+   "bytes": 239
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-records-before-kill.json",
+   "sha256": "3e424b853eb1a1e14d918911048e18a32b97bde11c1aff6bc72b82a18cde49b3",
+   "bytes": 239
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-countmax-records-restored.json",
+   "sha256": "e996eb47491f36ef912f62e568fad6b28fe3ec16a1e696e0c70d05bdfbc3416b",
+   "bytes": 239
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-otelself-after-restart.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-otelself-before-kill.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-otelself-restored.json",
+   "sha256": "441875c4b1cee8a31bf7ac28158606f156a098dd9b4da4581b91d6202c66e7b8",
+   "bytes": 105
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-posthoc-count-range.json",
+   "sha256": "e1b995d4c7bddcd6bc04b5e67eca0556879a350a519be5984695b634d6804e62",
+   "bytes": 1230
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-posthoc-otelself-range.json",
+   "sha256": "67b019ad61241f96ad0eaa57964dbe1c9e1c8195d1a828b9e876b01befa63ff4",
+   "bytes": 130500
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-posthoc.log",
+   "sha256": "9245238fd702c26a001ac9e8b2e22b832e563000ea323a29be1dd36bd2f73fd2",
+   "bytes": 6286
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-restored.log",
+   "sha256": "91f5a9b5cae10736a6003d90322d4c2ce995dc9fe184db05b4c3781334694ae7",
+   "bytes": 6597
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-spans-after-restart.json",
+   "sha256": "64933c5641a1b7a350dac8abc309c3a9d73604a0e754268e1fdf6ddb473e1f21",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-spans-before-kill.json",
+   "sha256": "757373d9ba7fbd7140ce2fcef8d6e6cf6b6c640af140168dceb6bb3753ad138e",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom-spans-restored.json",
+   "sha256": "cb869100c49980d5dc48a6a8bbfc4b3ff23374c49eef15de02fba76e10faef97",
+   "bytes": 285
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/prom.log",
+   "sha256": "454e32da397b83e74527d1def4fbc293de76f8bd3a60f6c5bc867f3ccf407f02",
+   "bytes": 10011
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/restic-hot.log",
+   "sha256": "aad3e54fe4243f67aa43180e5206625379319ea0f87c3dc2fb2c89fb767c7f2f",
+   "bytes": 767
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/restic.log",
+   "sha256": "ca9fd4ac3213e70090e944510583faf09bee316e4794c21df12d582c619c4899",
+   "bytes": 1528
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/logs/steps.txt",
+   "sha256": "4bb5f12e2eee292d17e048f6235a6e5bb5395707ce12711bec8b50ad10265747",
+   "bytes": 10392
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/work/result.json",
+   "sha256": "e7aaf95d2e50a80800060d51447c68a0d092bb056ed9f4c54cc09de16a4e3043",
+   "bytes": 64553
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/console.txt",
+   "sha256": "0d4b6ff23b48631bb43357518c226263d79b826710d50c0d724822bce58a26d7",
+   "bytes": 10621
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-sim-dry/out.log",
+   "sha256": "28f9547fcff87193c4cc93c112459ab8a42063b7c62a6c32c7e708240fa75a7b",
+   "bytes": 19969
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-sim-dry/err.log",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-sim-dry/result.json",
+   "sha256": "ea84246bdee9161b5e185d80aa193b8d4e05d607711e2d789e91755c5d4c2b18",
+   "bytes": 20399
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/recheck-paper-arm.txt",
+   "sha256": "815e89e993807483daf924bae22d019f5873fa3a35f30fc9f362b41dab176a92",
+   "bytes": 4091
+  }
+ ],
+ "results": {
+  "A_cited_comparison_87": {
+   "cited_evidence_on_main_unchanged": true,
+   "cited_receipt_sha256": "3baa597c122ed91bf95f4c16d00a01f7f048119e439ae024972b595511b0a1bf",
+   "candidates": [
+    {
+     "key": "c14",
+     "name": "opentelemetry-collector-contrib",
+     "in_claude_set": true,
+     "in_codex_set": true,
+     "verdict": "qualified",
+     "evidence_class": "native_proven",
+     "works_under_requirement": true
+    },
+    {
+     "key": "c5",
+     "name": "prometheus",
+     "in_claude_set": true,
+     "in_codex_set": false,
+     "verdict": "qualified",
+     "evidence_class": "native_proven",
+     "works_under_requirement": true
+    },
+    {
+     "key": "c6",
+     "name": "loki",
+     "in_claude_set": true,
+     "in_codex_set": false,
+     "verdict": "qualified",
+     "evidence_class": "native_proven",
+     "works_under_requirement": true
+    },
+    {
+     "key": "c8",
+     "name": "restic",
+     "in_claude_set": false,
+     "in_codex_set": true,
+     "verdict": "qualified",
+     "evidence_class": "native_proven",
+     "works_under_requirement": true
+    },
+    {
+     "key": "c3",
+     "name": "sandbox-runtime",
+     "in_claude_set": false,
+     "in_codex_set": true,
+     "verdict": "not_comparable",
+     "evidence_class": "native_proven",
+     "works_under_requirement": true
+    }
+   ],
+   "clause_covered": {
+    "positive_control_restic": true,
+    "both_candidate_sets": true,
+    "log_metric_retention": true,
+    "log_metric_query": true,
+    "snapshot_restore_fidelity": true,
+    "sandbox_isolation": true,
+    "dagu_workload": false,
+    "paper_runtime_telemetry": false
+   },
+   "quoted_excerpts": [
+    "obs-compare README: \"Steps 1-4 passed for opentelemetry-collector-contrib, Prometheus, Loki and Restic -- each is directly, natively demonstrated to work for this requirement.\"",
+    "logs-fixround/egress-default-retry.log: \"[SandboxDebug] No matching config rule, denying: example.com:443\" / \"curl: (56) CONNECT tunnel failed, response 403\""
+   ]
+  },
+  "B_dagu_arm_round1": {
+   "outcome": "trace export failed; logs, retention, restic and srt passed",
+   "quoted": [
+    "dagu-start.log: \"traces export: exporter export timeout: rpc error: code = Unavailable desc = invalid target address http://127.0.0.1:34318/v1/traces, error info: address http://127.0.0.1:34318/v1/traces:443: too many colons in address\"",
+    "steps.txt: \"before-kill prom={\\\"status\\\":\\\"success\\\",\\\"data\\\":{\\\"resultType\\\":\\\"vector\\\",\\\"result\\\":[]}}\"",
+    "steps.txt: \"before-kill loki_lines=2\" / \"after-restart loki_lines=4\" / \"check exit=0\" / \"restore exit=0\" / \"diff -rq dagu exit=0 lines=0\""
+   ],
+   "finding": "Dagu 2.16.6 hands the documented HTTP form of otel.endpoint (`http://host:4318/v1/traces`, per `dagu schema dag` otelConfig.endpoint description) to its gRPC exporter; the host:port gRPC form works (round 2)."
+  },
+  "B_dagu_arm_round2": {
+   "dagu_run": "dagu status: Partially Succeeded (fill-log, risk-check succeeded; sandboxed-worker failed by design: srt denied egress, continue_on failure)",
+   "prometheus_span_metrics_before_kill": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "prometheus_span_metrics_after_kill9_restart": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "prometheus_span_metrics_from_restic_restored_tsdb": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "loki_marker_line_timestamps_before_kill": [
+    "1790149970224946766",
+    "1790149970425472595"
+   ],
+   "loki_after_kill9_restart": [
+    "1790149970224946766",
+    "1790149970425472595",
+    "1790150005805317461",
+    "1790150005805341661"
+   ],
+   "loki_from_restic_restored_store": [
+    "1790149970224946766",
+    "1790149970425472595",
+    "1790150005805317461",
+    "1790150005805341661"
+   ],
+   "loki_note": "The two pre-kill lines are present unchanged after kill -9 + restart; the two extra lines are the filelog receiver re-reading the same step files from the beginning after restart (no file_storage checkpoint configured), i.e. duplicates, not loss.",
+   "restic": "backup of DAGU_HOME + Prometheus TSDB + Loki store taken hot (all three telemetry processes running): 'Files: 32 new'; check --read-data: 'no errors were found'; restore --verify: 'finished verifying 32 files'; diff -rq of DAGU_HOME vs restored: exit 0, 0 lines (Dagu idle); `dagu history` on the restored DAGU_HOME lists run 034Th35jEcCshESVT83lDU as 'Partially Succeeded' (dagu-history-restored.log).",
+   "srt_step": "sandboxed-worker.err: \"[SandboxDebug] No matching config rule, denying: example.com:443\" / \"curl: (56) CONNECT tunnel failed, response 403\"; stdout \"HTTPSTATUS:000 EXIT:56\"",
+   "cleanup": "steps.txt: 'listeners left: 0' (TCP listener count only; it cannot detect a surviving process without a listener). The earlier claim of a pgrep check had no committed output and is withdrawn; round 4 adds a committed process check.",
+   "network_binding_disclosure": "Rounds 1 and 2 configured Loki with ports only (server.http_listen_address/grpc_listen_address empty), so Loki's HTTP and gRPC listeners (33100/33101, restored instance 33110/33111 in round 2) bound all interfaces for the run's duration (~1.5 min each); Prometheus and otelcol were bound to 127.0.0.1. Found by the second Codex review; fixed in rounds 3-4."
+  },
+  "B_dagu_arm_round3": {
+   "outcome": "aborted (hung at the first Loki query; stopped manually after ~10 minutes)",
+   "quoted": [
+    "steps.txt: \"listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090\"",
+    "loki-frontend-errors-excerpt.log: \"frontend=<lan-ip>:33101 msg=\\\"error notifying frontend about finished query\\\" ... dial tcp <lan-ip>:33101: connect: connection refused\""
+   ],
+   "finding": "Binding Loki 3.7.8's gRPC listener to 127.0.0.1 without also setting frontend.address makes the query frontend advertise the host interface IP, and queries hang. Setting frontend: {address: 127.0.0.1} fixes it (round 4)."
+  },
+  "B_dagu_arm_round4": {
+   "dagu_run": "034Thc6IKCSPVoUbG9DzaV, status Partially Succeeded (fill-log, risk-check succeeded; sandboxed-worker failed by design after srt denied egress; continue_on failure)",
+   "listeners": [
+    "initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090",
+    "after-restart: same five, all 127.0.0.1",
+    "restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091"
+   ],
+   "listener_probe_method": "ss -ltnpH filtered by the run's PIDs, printing each local address; a wildcard bind would print 0.0.0.0/*/[::] (rounds 1-2 Loki config would have)",
+   "assertions": [
+    "PASS prom span names before-kill ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']",
+    "PASS prom span names after-restart ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']",
+    "PASS prom span names restored ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']",
+    "PASS loki marker lines before kill 2",
+    "PASS loki pre-kill timestamps present after-restart 4",
+    "PASS loki pre-kill timestamps present restored 4"
+   ],
+   "prometheus_span_metrics_before_kill": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "prometheus_span_metrics_after_kill9_restart": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "prometheus_span_metrics_from_restic_restored_tsdb": [
+    "DAG: obsgap",
+    "Step: fill-log",
+    "Step: risk-check",
+    "Step: sandboxed-worker"
+   ],
+   "loki_marker_line_timestamps_before_kill": [
+    "1790151350930401363",
+    "1790151350930436763"
+   ],
+   "loki_after_kill9_restart": [
+    "1790151350930401363",
+    "1790151350930436763",
+    "1790151386325961816",
+    "1790151386325962116"
+   ],
+   "loki_from_restic_restored_store": [
+    "1790151350930401363",
+    "1790151350930436763",
+    "1790151386325961816",
+    "1790151386325962116"
+   ],
+   "loki_note": "The two pre-kill lines are present unchanged after kill -9 + restart and in the restored store; the two extra lines are the filelog receiver re-reading the same step files from the beginning after restart (no file_storage checkpoint), i.e. duplicates, not loss.",
+   "restic": "hot backup of DAGU_HOME + Prometheus TSDB + Loki store while the stack ran: backup exit 0, check --read-data exit 0 ('no errors were found'), restore --verify exit 0, diff -rq DAGU_HOME vs restored exit 0 with 0 lines, `dagu history` on the restored DAGU_HOME lists 034Thc6IKCSPVoUbG9DzaV 'Partially Succeeded'.",
+   "srt_step": "sandboxed-worker.err: \"[SandboxDebug] No matching config rule, denying: example.com:443\" / \"curl: (56) CONNECT tunnel failed, response 403\"",
+   "cleanup": "In-script 'processes left for scratch path: 4' is not a valid probe: pgrep -f on the scratch path can also match the invoking shells whose command lines contain the path. That these four were wrapper shells is an inference, not committed evidence. The committed post-run check (post-run-process-check.txt, 08:17:45Z) matched 0 prometheus/loki/otelcol processes whose arguments contain the gap-wave2 path, and 0 run listeners. Positive control: during the round-3 hang, a `pgrep -af dagu-arm-3` listing in this session showed the three service processes. That listing was observed in the session and not committed."
+  },
+  "C_paper_sim_arm_round5": {
+   "status": "failed (setup)",
+   "observed": [
+    "[2026-09-23T16:15:52Z] dagu start exit=1",
+    "FAIL paper runtime passed flat with fills None",
+    "FAIL paper step rc 0",
+    "FAIL sandboxed egress denied",
+    "FAIL sandboxed write outside allowWrite denied",
+    "FAIL sandboxed decoy read denied",
+    "PASS unsandboxed controls succeed",
+    "PASS hot backup during the run",
+    "PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom paper log-record count before-kill {}",
+    "PASS prom span names after-restart ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom paper log-record count after-restart {}",
+    "PASS prom span names restored ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom paper log-record count restored {}",
+    "FAIL loki MARK lines before kill vs step-log MARK lines 0 0",
+    "FAIL loki pre-kill timestamps present after-restart 0",
+    "FAIL loki pre-kill timestamps present restored 0",
+    "PASS backup exit=0",
+    "PASS check exit=0",
+    "PASS restore exit=0",
+    "PASS hot check exit=0",
+    "PASS hot restore exit=0",
+    "PASS diff -rq work exit=0",
+    "PASS diff -rq dagu exit=0",
+    "FAIL cold-restored journal integrity and counts {'error': \"OperationalError('no such table: intents')\"}",
+    "FAIL hot-snapshot journal integrity {'error': \"OperationalError('no such table: intents')\"}"
+   ],
+   "cause": "srt: 'HTTP bridge process exited with code 1' / 'Error: Failed to create bridge sockets after 5 attempts'. The global TMPDIR put srt's bridge socket at about 110 bytes, over the 108-byte sun_path limit, so the workload never started. Also, the leftover-process probe counted 3 = the invoking wrapper, timeout and script (their command lines carry the scratch path), not stack processes."
+  },
+  "C_paper_sim_arm_round6": {
+   "status": "all in-script assertions PASS; two defects found post hoc",
+   "listeners": [
+    "[2026-09-23T16:18:32Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 ",
+    "[2026-09-23T16:19:41Z] listeners after-restart: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 ",
+    "[2026-09-23T16:20:18Z] listeners restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091 ",
+    "[2026-09-23T16:20:42Z] listeners left: 0"
+   ],
+   "workload": "[2026-09-23T16:19:15Z] step output: {\"mark\": \"obsgap-paper-161806\", \"kind\": \"paper_sim_end\", \"at\": 1790180343.2347684, \"status\": \"passed\", \"flat\": true, \"native_fill_events\": 20, \"journal_counts\": {\"intents\": 20, \"requests\": 22, \"events\": 41, \"positions\": 2, \"marks\": 6, \"trials\": 0}} PAPER_RC=0 PROBE egress HTTPSTATUS:000 EXIT:56 PROBE egress curl_rc=56 PROBE write_outside rc=2 PROBE read_decoy rc",
+   "controls": [
+    "CONTROL egress HTTPSTATUS:200 EXIT:0",
+    "[2026-09-23T16:19:15Z] CONTROL write_outside rc=0",
+    "[2026-09-23T16:19:15Z] CONTROL read_decoy rc=0"
+   ],
+   "assertions": [
+    "PASS paper runtime passed flat with fills {'mark': 'obsgap-paper-161806', 'kind': 'paper_sim_end', 'at': 1790180343.2347684, 'status': 'passed', 'flat': True, 'native_fill_events': 20, 'journal_counts': {'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "PASS paper step rc 0",
+    "PASS sandboxed egress denied",
+    "PASS sandboxed write outside allowWrite denied",
+    "PASS sandboxed decoy read denied",
+    "PASS unsandboxed controls succeed",
+    "PASS hot backup during the run",
+    "PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "PASS prom paper log-record count before-kill {'paper_runtime_log_records_total': 311.0, 'paper_runtime_intents_total': 16.0}",
+    "PASS prom span names after-restart ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "PASS prom paper log-record count after-restart {'paper_runtime_log_records_total': 100.0, 'paper_runtime_intents_total': 20.0}",
+    "PASS prom span names restored ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "PASS prom paper log-record count restored {'paper_runtime_log_records_total': 100.0, 'paper_runtime_intents_total': 20.0}",
+    "PASS loki MARK lines before kill vs step-log MARK lines 311 311",
+    "PASS loki pre-kill timestamps present after-restart 622",
+    "PASS loki pre-kill timestamps present restored 622",
+    "PASS backup exit=0",
+    "PASS check exit=0",
+    "PASS restore exit=0",
+    "PASS hot check exit=0",
+    "PASS hot restore exit=0",
+    "PASS diff -rq work exit=0",
+    "PASS diff -rq dagu exit=0",
+    "PASS cold-restored journal integrity and counts {'integrity': 'ok', 'counts': {'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "PASS hot-snapshot journal integrity {'integrity': 'ok', 'counts': {'intents': 20, 'requests': 21, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}"
+   ],
+   "left": [
+    "[2026-09-23T16:20:42Z] processes left for scratch path (excluding this script's ancestors 1543439 1543438 1543435 1252910 1252901 1252899 1252897 2 1 ): 0",
+    "[2026-09-23T16:20:42Z] listeners left: 0"
+   ],
+   "defects": [
+    "Loki 311 lines before kill, 622 after restart and in the restored store (311 distinct bodies): filelog re-read without an offset store. Round 4 of the Dagu arm shows the same doubling (2 -> 4).",
+    "Count-connector series via delta_to_cumulative + remote write: intents peaked at 16 against 20 intent lines; after restart the records series read 100 against 311 re-read lines. The post-hoc query of the restored TSDB copy shows the pre-kill records history 1 -> 311 retained (raw/paper-arm-round6/logs/prom-posthoc-count-range.json)."
+   ],
+   "posthoc_label": "The post-hoc query was not preregistered. It ran on a copy of the restored TSDB on 127.0.0.1:39092, which was stopped afterwards."
+  },
+  "C_paper_sim_arm_round7": {
+   "status": "partial: count path FAIL, checker aborted",
+   "assertions": [
+    "PASS paper runtime passed flat with fills {'mark': 'obsgap-paper-162216', 'kind': 'paper_sim_end', 'at': 1790180592.9548845, 'status': 'passed', 'flat': True, 'native_fill_events': 20, 'journal_counts': {'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "PASS paper step rc 0",
+    "PASS sandboxed egress denied",
+    "PASS sandboxed write outside allowWrite denied",
+    "PASS sandboxed decoy read denied",
+    "PASS unsandboxed controls succeed",
+    "PASS hot backup during the run",
+    "PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom exact counts before kill (records, intents) {'paper_runtime_intents_total': 2.0, 'paper_runtime_log_records_total': 2.0} 312 20"
+   ],
+   "other_exits": [
+    "[2026-09-23T16:23:13Z] dagu start exit=0",
+    "[2026-09-23T16:23:13Z] dagu status exit=0",
+    "[2026-09-23T16:24:01Z] backup exit=0",
+    "[2026-09-23T16:24:02Z] check exit=0",
+    "[2026-09-23T16:24:03Z] restore exit=0",
+    "[2026-09-23T16:24:04Z] hot check exit=0",
+    "[2026-09-23T16:24:04Z] hot restore exit=0",
+    "[2026-09-23T16:24:04Z] diff -rq work exit=0 lines=0",
+    "[2026-09-23T16:24:04Z] diff -rq dagu exit=0 lines=0",
+    "[2026-09-23T16:24:04Z] dagu status on restored home exit=0",
+    "[2026-09-23T16:24:51Z] processes left for scratch path (excluding this script's ancestors 1654392 1654391 1654372 1252910 1252901 1252899 1252897 2 1 ): 0",
+    "[2026-09-23T16:24:51Z] listeners left: 0"
+   ],
+   "observed": "The loopback prometheus exporter showed 2 and 2 against 312 records and 20 intents; it did not accumulate the count connector's deltas. The unnamed max_over_time query errored ('vector cannot contain metrics with the same labelset') and the checker raised after the first count FAIL, so the Loki, restic and journal assertions did not print (exits in steps.txt were 0)."
+  },
+  "C_paper_sim_arm_round8": {
+   "status": "all assertions PASS except the count-connector series (off by 2 of 300 records; intents exact)",
+   "listeners": [
+    "[2026-09-23T16:26:11Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:38888 127.0.0.1:39090 ",
+    "[2026-09-23T16:27:21Z] listeners after-restart: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:38888 127.0.0.1:39090 ",
+    "[2026-09-23T16:27:59Z] listeners restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091 ",
+    "[2026-09-23T16:28:23Z] listeners left: 0"
+   ],
+   "workload": "[2026-09-23T16:26:55Z] step output: [SandboxDebug] No matching config rule, denying: example.com:443 HOT_BACKUP_OK {\"mark\": \"obsgap-paper-162545\", \"kind\": \"paper_sim_end\", \"at\": 1790180803.4371452, \"status\": \"passed\", \"flat\": true, \"native_fill_events\": 16, \"journal_counts\": {\"intents\": 16, \"requests\": 18, \"events\": 33, \"positions\": 2, \"marks\": 6, \"trials\": 0}} PAPER_RC=0 PROBE egress HTTPSTATUS:0",
+   "controls": [
+    "CONTROL egress HTTPSTATUS:200 EXIT:0",
+    "[2026-09-23T16:26:55Z] CONTROL write_outside rc=0",
+    "[2026-09-23T16:26:55Z] CONTROL read_decoy rc=0"
+   ],
+   "assertions": [
+    "PASS paper runtime passed flat with fills {'mark': 'obsgap-paper-162545', 'kind': 'paper_sim_end', 'at': 1790180803.4371452, 'status': 'passed', 'flat': True, 'native_fill_events': 16, 'journal_counts': {'intents': 16, 'requests': 18, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "PASS paper step rc 0",
+    "PASS sandboxed egress denied",
+    "PASS sandboxed write outside allowWrite denied",
+    "PASS sandboxed decoy read denied",
+    "PASS unsandboxed controls succeed",
+    "PASS hot backup during the run",
+    "PASS prom span names before-kill ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom exact counts before kill (records, intents) {'paper_runtime_log_records_total': 298.0, 'paper_runtime_intents_total': 16.0} 300 16",
+    "FAIL prom max_over_time counts equal step log (records, intents) before-kill [298.0] [16.0] 300 16",
+    "PASS logql count_over_time equals step log before-kill [300.0] 300",
+    "PASS prom span names after-restart ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom max_over_time counts equal step log (records, intents) after-restart [298.0] [16.0] 300 16",
+    "PASS logql count_over_time equals step log after-restart [300.0] 300",
+    "PASS prom span names restored ['DAG: obsgap-paper', 'Step: hot-backup', 'Step: paper-runtime']",
+    "FAIL prom max_over_time counts equal step log (records, intents) restored [298.0] [16.0] 300 16",
+    "PASS logql count_over_time equals step log restored [300.0] 300",
+    "PASS loki MARK lines before kill vs step-log MARK lines 300 300",
+    "PASS loki pre-kill timestamps present after-restart 300",
+    "PASS loki no duplicate re-ingest after-restart 300 300",
+    "PASS loki pre-kill timestamps present restored 300",
+    "PASS loki no duplicate re-ingest restored 300 300",
+    "PASS backup exit=0",
+    "PASS check exit=0",
+    "PASS restore exit=0",
+    "PASS hot check exit=0",
+    "PASS hot restore exit=0",
+    "PASS diff -rq work exit=0",
+    "PASS diff -rq dagu exit=0",
+    "PASS cold-restored journal integrity and counts {'integrity': 'ok', 'counts': {'intents': 16, 'requests': 18, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "PASS hot-snapshot journal integrity {'integrity': 'ok', 'counts': {'intents': 16, 'requests': 17, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}}"
+   ],
+   "left": [
+    "[2026-09-23T16:28:23Z] processes left for scratch path (excluding this script's ancestors 1748359 1748358 1748338 1252910 1252901 1252899 1252897 2 1 ): 0",
+    "[2026-09-23T16:28:23Z] listeners left: 0"
+   ],
+   "self_telemetry_posthoc": "From a copy of the round-8 TSDB: otelcol_receiver_accepted_log_records{filelog}=371, refused=0, failed=0; otelcol_exporter_sent_log_records{otlphttp/loki}=371; otelcol_exporter_sent_metric_points{prometheusremotewrite}=106 with no send_failed series; otelcol_deltatocumulative_datapoints=66 with no error label. paper_runtime_log_records_total's last sample is 298 at 16:26:44Z (1790180804); the step log's final MARK lines were written about 16:26:43.4Z. The drop is not recorded by collector self-telemetry. The root cause is not isolated (candidates: a final delta that landed on the same sample timestamp, or Prometheus-side rejection, which is not visible because Prometheus did not scrape itself). raw/paper-arm-round8/logs/prom-posthoc-otelself-range.json, prom-posthoc-count-range.json",
+   "self_telemetry_in_script_note": "The in-script self-telemetry query (max_over_time over a name regex) errored with the same 'vector cannot contain metrics with the same labelset' mistake as round 7. raw/paper-arm-round8/logs/prom-otelself-*.json hold the error responses. The post-hoc range-vector query below replaced it."
+  },
+  "C_recheck_fix_round": {
+   "why": "The independent Codex review of 58b2ba0..49278fa found no high-severity issues but three medium checker weaknesses in paper_arm.sh. (1) 'check exit=0' and 'restore exit=0' substring-matched the hot-repository lines. (2) The Loki checks compared timestamps and counts, not bodies, and the span checks compared names, not values. (3) 'hot backup during the run' did not test overlap; round 5 printed PASS for it with no workload. It also found one low issue: the in-script self-telemetry query errors. The same review confirmed that all 234 raw hashes and every quoted PASS/FAIL line match, and that the preregistration chronology holds.",
+   "method": "recheck_paper_arm.py applies exact operation-specific line matches, Loki (timestamp, body) and body-multiset comparison against the step log, span values per name across stages, and hot-snapshot time strictly inside [paper_sim_start.at, paper_sim_end.at] from restic-hot.log. It reads committed raw files only.",
+   "detection": "Rounds 5 and 6 are natural negative controls. Round 5 (no workload) FAILs the Loki body and hot-overlap checks. Round 6 FAILs the body multiset after restart and on restore (622 vs 311 duplicates). Check (a) requires the record to follow the timestamp bracket directly, so '[t] hot check exit=0' cannot satisfy 'check exit=0'.",
+   "round8": [
+    "PASS exact line: backup exit=0",
+    "PASS exact line: check exit=0",
+    "PASS exact line: restore exit=0",
+    "PASS exact line: hot check exit=0",
+    "PASS exact line: hot restore exit=0",
+    "PASS exact line: diff -rq work exit=0 lines=0",
+    "PASS exact line: diff -rq dagu exit=0 lines=0",
+    "PASS loki body multiset equals step-log MARK lines before-kill 300 300",
+    "PASS loki body multiset equals step-log MARK lines after-restart 300 300",
+    "PASS loki pre-kill (ts, body) pairs all present after-restart",
+    "PASS loki body multiset equals step-log MARK lines restored 300 300",
+    "PASS loki pre-kill (ts, body) pairs all present restored",
+    "PASS span series before kill {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS span values equal to pre-kill after-restart {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS span values equal to pre-kill restored {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS hot snapshot time inside workload window 1790180772.7387433 1790180786.638537 1790180803.4371452",
+    "PASS hot journal integrity {'integrity': 'ok', 'counts': {'intents': 16, 'requests': 17, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "INFO hot vs cold journal counts: hot={'intents': 16, 'requests': 17, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0} cold={'intents': 16, 'requests': 18, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}"
+   ],
+   "round6": [
+    "PASS exact line: backup exit=0",
+    "PASS exact line: check exit=0",
+    "PASS exact line: restore exit=0",
+    "PASS exact line: hot check exit=0",
+    "PASS exact line: hot restore exit=0",
+    "PASS exact line: diff -rq work exit=0 lines=0",
+    "PASS exact line: diff -rq dagu exit=0 lines=0",
+    "PASS loki body multiset equals step-log MARK lines before-kill 311 311",
+    "FAIL loki body multiset equals step-log MARK lines after-restart 622 311",
+    "PASS loki pre-kill (ts, body) pairs all present after-restart",
+    "FAIL loki body multiset equals step-log MARK lines restored 622 311",
+    "PASS loki pre-kill (ts, body) pairs all present restored",
+    "PASS span series before kill {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS span values equal to pre-kill after-restart {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS span values equal to pre-kill restored {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}",
+    "PASS hot snapshot time inside workload window 1790180312.6988344 1790180327.248257 1790180343.2347684",
+    "PASS hot journal integrity {'integrity': 'ok', 'counts': {'intents': 20, 'requests': 21, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}",
+    "INFO hot vs cold journal counts: hot={'intents': 20, 'requests': 21, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0} cold={'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}"
+   ],
+   "round5": [
+    "PASS exact line: backup exit=0",
+    "PASS exact line: check exit=0",
+    "PASS exact line: restore exit=0",
+    "PASS exact line: hot check exit=0",
+    "PASS exact line: hot restore exit=0",
+    "PASS exact line: diff -rq work exit=0 lines=0",
+    "PASS exact line: diff -rq dagu exit=0 lines=0",
+    "FAIL loki body multiset equals step-log MARK lines before-kill 0 0",
+    "FAIL loki body multiset equals step-log MARK lines after-restart 0 0",
+    "FAIL loki pre-kill (ts, body) pairs all present after-restart",
+    "FAIL loki body multiset equals step-log MARK lines restored 0 0",
+    "FAIL loki pre-kill (ts, body) pairs all present restored",
+    "PASS span series before kill {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}",
+    "PASS span values equal to pre-kill after-restart {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}",
+    "PASS span values equal to pre-kill restored {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}",
+    "FAIL hot snapshot time inside workload window None 1790180151.317571 None",
+    "FAIL hot journal integrity {'error': \"OperationalError('no such table: intents')\"}",
+    "INFO hot vs cold journal counts: hot=None cold=None"
+   ],
+   "summary": "{\"5\": {\"pass\": 10, \"fail\": 7}, \"6\": {\"pass\": 15, \"fail\": 2}, \"8\": {\"pass\": 17, \"fail\": 0}}",
+   "reading": "Round 8 passes all 17 strengthened checks. The hot snapshot was taken at 1790180786.64, inside the workload window [1790180772.74, 1790180803.44]. Its journal passes integrity_check and holds a mid-run state (requests 17 against 18 in the cold copy). The in-script lines in C_paper_sim_arm_round6/8 stay as recorded. Where they are weaker, these results supersede them.",
+   "not_fixed_in_script": "paper_arm.sh is left as round 8 ran it (commit 9c58d9f), so its weak checks and the broken self-telemetry query remain in the committed script. The recheck script is the verdict-bearing checker for rounds 6 and 8."
+  }
+ },
+ "comparison_reading": "On the same Dagu workload (round 4; round 2 agrees) both contested sets' components worked in their roles: c14 collector ingested Dagu's native spans and step logs; c5 Prometheus and c6 Loki (Claude set) stored and served them, kept pre-kill data across kill -9 and served it again from a restic-restored copy; c8 restic (Codex set) produced a clean hot snapshot of the Dagu run history and both stores with a byte-identical Dagu history restore; c3 sandbox-runtime (Codex set) denied a Dagu step's egress by default. The two sets cover different scope terms (telemetry storage/query vs backup and worker confinement) rather than competing for one role; this receipt records the executed results and does not re-judge the ledger row. Paper-runtime arm (round 8, synthetic broker port): the same five components carried the adaptive-paper runtime's own native path (NautilusTrader node, 16 native fills, flat, SQLite WAL journal) as a sandboxed Dagu step. Loki (Claude set) stored all 300 runtime lines exactly across kill -9 and restic restore once filelog offsets were persisted (file_storage). Without that, rounds 4 and 6 re-ingested every line after a collector restart. LogQL count_over_time matched the step log at every stage. Prometheus (Claude set) retained and served Dagu span metrics and the log-derived counters across kill and restore, but the count-connector counter undercounted by 2 of 300 in round 8, and in round 6 it undercounted intents (16 of 20) after passing through delta_to_cumulative; round 7's alternative exporter path was worse. restic (Codex set) took a hot snapshot of the live WAL journal mid-run (integrity ok) and a cold backup whose restore was byte-identical, with journal table counts equal to the runtime's own counts. srt (Codex set) ran the runtime with egress, out-of-scope writes and a decoy read all denied, while the unsandboxed controls succeeded. The two sets still cover different scope terms. The one role-level weakness found is on the metrics side of the Claude set: log-derived counters through the collector. It does not affect span metrics or Loki queries.",
+ "outcome": "advanced",
+ "remaining": [
+  "Real paper-account telemetry and backup of a broker-session order journal. Not run here or in #87. The real runner (runner.py main, scheduled_trial.sh) loads Alpaca paper credentials and calls the broker, and both are prohibited for this unit. The executed substitute is the same runtime's native path against the repository's synthetic SimulatedPort (rounds 5-8). Owner: peer session sota-workflow-resolution.",
+  "Ledger re-judgement: catalogs/landscape/us-equities.json row observability-hosting is still pending_lanes on origin/main. Applying #87 and this receipt is a ledger change reserved to the coordinator.",
+  "Count-connector counter accuracy: log-derived Prometheus counters undercounted (round 8: 298 of 300; round 6: 16 of 20 intents), and collector self-telemetry recorded no drop. The root cause is not isolated. A fix candidate is a Prometheus self-scrape plus a longer flush window, or deriving the counters in Loki (the LogQL count_over_time was exact).",
+  "Scale and durability depth: one run per round (30 s, 6 symbols, at most 20 fills), one kill -9 with nothing in flight, local restic repositories only, srt default-style settings on one runtime step, and no trace backend (traces only as span metrics)."
+ ],
+ "evidence_class": "native_proven",
+ "evidence_class_note": "Dagu arm: native upstream binaries executed on this host with every run listener on 127.0.0.1 in rounds 3-4 (Loki listened on all interfaces in rounds 1-2, disclosed); a trading-shaped but synthetic DAG; no broker or paper account. Part A is source review of #87's native_proven receipt. Part C (paper arm, rounds 5-8) is local_integration: native upstream binaries and the project's own runtime path, but a synthetic broker port, so it is not paper-account evidence.",
+ "limits": [
+  "The DAG's steps echo trading-shaped marker lines; it is not the project's real Dagu research/paper DAG, so volume and cardinality are toy-sized.",
+  "Clause probe over #87 is a term search; detection shown by the positive control ('restic' = 75 hits) and by 'dagu' = 0 which this unit then closed by execution.",
+  "Scratch data (configs, stores, restic repositories) retained at $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-{1,2,3,4} as the raw-output recovery path; sanitized copies of the cited outputs are committed under raw/.",
+  "Sanitization of committed raw copies: host home replaced by $HOME, host name by <host>, and the run's temporary HOME directory (named 'home' inside each scratch dir) by <temp-home>; the unsanitized originals remain in the scratch dirs; for part C also user@host (restic) by <user>@<host> and UUIDs (collector service.instance.id) by <uuid> (collect_paper_raw.py).",
+  "After round 2, dagu_arm.sh changed as follows: the two absolute tool-directory paths were made $HOME-relative (captured before HOME is replaced), before round 3. For round 3, Loki listen addresses, the listener probe, in-script assertions and the process count were added. For round 4, Loki frontend.address was added. The committed script is the one round 4 ran.",
+  "Rounds 1-3 remain in the record as observed (round 1 trace-export failure, round 2 wildcard Loki bind, round 3 hang); round 4 is the result the committed script reproduces.",
+  "Criteria detection: rounds 1-2 printed query results for manual reading; in-script PASS/FAIL assertions exist only from round 3 onward (round 4 is the first completed round with them).",
+  "Paper arm: the broker side is repository fixture simulation.SimulatedPort. By its own docstring it models no queue priority, impact, fees or disconnect fills. Telemetry volume is about 300 lines per run.",
+  "Paper arm telemetry is the runtime's event sink (controller.events) streamed to stdout as JSON lines by the driver paper_sim_workload.py. The runtime has no OTLP exporter, and Nautilus stdout logging is ERROR-only in build_node.",
+  "Paper arm used the existing pinned env adaptive-paper-20260921 read-only instead of a fresh venv under the gap-wave2 cache. Its versions are printed in each round's steps.txt.",
+  "Network: each of rounds 6-8 made one unsandboxed HTTPS GET to example.com as the egress control (status 200). No other network calls; no downloads.",
+  "Rounds 5-8 scratch data remains under $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-{5,6,7,8} (recovery path). Post-hoc Prometheus instances on 127.0.0.1:39092 were started on copies and stopped (0 listeners afterwards).",
+  "Rounds 6-8's in-script PASS lines are the detection method: sandbox probes print exit codes, and unsandboxed controls must succeed. Round 6's retention check could not detect duplicates; round 8's exact-count checks could.",
+  "paper_arm.sh's in-script checker has the weaknesses listed in results.C_recheck_fix_round (substring exit matches, name-only span checks, timestamp-only Loki checks, no hot-overlap test, broken self-telemetry query). The verdict for rounds 6 and 8 rests on recheck_paper_arm.py over the committed raw files.",
+  "Telemetry-store restore is checked by query parity (span values, Loki bodies and pairs, count maxima) only. It is not a sample-by-sample comparison of the full TSDB or Loki chunk history. The byte-identical diff covers the work dir and DAGU_HOME only."
+ ],
+ "checked_at": "2026-09-23T16:39:30Z",
+ "evidence_class_by_part": {
+  "A_cited_comparison_87": "source_review",
+  "B_dagu_arm": "native_proven",
+  "C_paper_sim_arm": "local_integration (native upstream binaries and the project's runtime code with a synthetic broker port; no broker or paper account)"
+ }
+}

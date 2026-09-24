@@ -1,0 +1,29 @@
+[09/23/26 03:27:14] WARNING  Control server failed to start (eval server.py:1862
+                             will run without control surface):                 
+                             AF_UNIX path too long                              
+Running 1 tasks...
+---------------------------------------------------------                       
+catalog_cases (8 samples): mockllm/model                                        
+max_connections: 1, retry_on_error: 1, max_samples: 1, delay: 1.5, dataset:     
+(samples)                                                                       
+---------------------------------------------------------                       
+                                                                                
+generate     | Steps:   3/8  37% | Samples:   3/  8 | accuracy: 0.33 | mockllm:  0/ 1 | HTTP retries: 0
+generate     | Steps:   4/8  50% | Samples:   3/  8 | accuracy: 0.33 | mockllm:  0/ 1 | HTTP retries: 0
+
+---------------------------------------------------------                       
+catalog_cases (8 samples): mockllm/model                                        
+max_connections: 1, retry_on_error: 1, max_samples: 1, delay: 1.5, dataset:     
+(samples)                                                                       
+                                                                                
+total time:                    0:00:06                                          
+mockllm/model                  0 tokens [I: 0, O: 0]                            
+Task interrupted (3 of 8 total samples logged before interruption). Resume task 
+with:                                                                           
+                                                                                
+inspect eval-retry                                                              
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-int/l…
+Log:                                                                            
+../../../../../../.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in…
+---------------------------------------------------------                       
+                                                                                

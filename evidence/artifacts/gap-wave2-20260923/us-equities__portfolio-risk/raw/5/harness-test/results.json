@@ -1,0 +1,143 @@
+{
+  "auxiliary": {
+    "IWM": {
+      "covering_factor_rows": 12,
+      "covering_map_rows": 1,
+      "price_factor_values": 12,
+      "split_factors": [
+        "1"
+      ]
+    },
+    "QQQ": {
+      "covering_factor_rows": 11,
+      "covering_map_rows": 1,
+      "price_factor_values": 11,
+      "split_factors": [
+        "1"
+      ]
+    },
+    "SPY": {
+      "covering_factor_rows": 11,
+      "covering_map_rows": 1,
+      "price_factor_values": 11,
+      "split_factors": [
+        "1"
+      ]
+    }
+  },
+  "consequence": "No tuning, promotion, rerun or alpha claim regardless of p-values.",
+  "freeze_sha256": "2569434c1ecfd69682887c112c23b10d47bf53b0eb6cefcf71f1e768463caf13",
+  "inputs_unchanged": true,
+  "kind": "extended-reserved-raw-price-label-study",
+  "ledger_sha256": "4fb460a1d691f154002a3df59f4f4a36ce931710007339cdd2874d732ccbf582",
+  "no_pnl_or_execution_claim": true,
+  "plan_sha256": "546c334a9b653c9c4812421cbd35b86bed3225145f54ce739f9e576219a431b9",
+  "primary_test": {
+    "alpha": 0.05,
+    "mean_difference": -0.00030480715024576,
+    "n_pairs": 49,
+    "pvalue": 0.8318143189054369,
+    "reject_null_at_alpha": false,
+    "selected": "momentum20",
+    "t": -0.2135347391688166,
+    "test": "two-sided one-sample t-test on paired net_proxy(selected) - net_proxy(equalweight)"
+  },
+  "reserved_candidates": {
+    "cash": {
+      "censored_episodes": 2,
+      "invested_episodes": 0,
+      "mean_net_cost_proxy_label": "0.000",
+      "mean_raw_price_label": "0",
+      "observed_episodes": 49
+    },
+    "equalweight": {
+      "censored_episodes": 2,
+      "invested_episodes": 49,
+      "mean_net_cost_proxy_label": "0.001407888608837241519244418087",
+      "mean_raw_price_label": "0.003407888608837241519244418086",
+      "observed_episodes": 49
+    },
+    "momentum120": {
+      "censored_episodes": 2,
+      "invested_episodes": 49,
+      "mean_net_cost_proxy_label": "0.0001251761474976673683186924469",
+      "mean_raw_price_label": "0.002125176147497667368318692447",
+      "observed_episodes": 49
+    },
+    "momentum20": {
+      "censored_episodes": 2,
+      "invested_episodes": 44,
+      "mean_net_cost_proxy_label": "0.001103081458591481727974391469",
+      "mean_raw_price_label": "0.002898999825938420503484595551",
+      "observed_episodes": 49
+    },
+    "momentum60": {
+      "censored_episodes": 2,
+      "invested_episodes": 48,
+      "mean_net_cost_proxy_label": "0.001237907340124245756316705504",
+      "mean_raw_price_label": "0.003197091013593633511418746320",
+      "observed_episodes": 49
+    }
+  },
+  "secondary_per_candidate_vs_zero": {
+    "equalweight": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0014078886088372416,
+      "n": 49,
+      "pvalue": 0.411163212238023,
+      "t": 0.8290798744396477
+    },
+    "momentum120": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.00012517614749766727,
+      "n": 49,
+      "pvalue": 0.9530982088096112,
+      "t": 0.05912475968079267
+    },
+    "momentum20": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0011030814585914815,
+      "n": 49,
+      "pvalue": 0.5297197892529206,
+      "t": 0.6330281649767755
+    },
+    "momentum60": {
+      "holm_pvalue": 1.0,
+      "mean_net_proxy": 0.0012379073401242457,
+      "n": 49,
+      "pvalue": 0.531750170286393,
+      "t": 0.6298954253523933
+    }
+  },
+  "secondary_wilcoxon": {
+    "pvalue": 0.5341490024178306,
+    "statistic": 549.0
+  },
+  "selection": {
+    "chosen": "momentum20",
+    "evaluation_cutoff": "2016-10-03",
+    "id": "reserved-extended",
+    "latest_training_exit": "2016-09-27",
+    "plan_sha256": "546c334a9b653c9c4812421cbd35b86bed3225145f54ce739f9e576219a431b9",
+    "scores": {
+      "cash": "0.000",
+      "momentum120": "-0.001173976104047344275042851856",
+      "momentum20": "0.000871393957984013769445840332",
+      "momentum60": "-0.000484252242515038275406309798"
+    },
+    "test_first": "2016-10-03",
+    "test_last": "2017-09-29",
+    "test_sessions": 251,
+    "train_first": "2015-09-24",
+    "train_last": "2016-09-22",
+    "train_sessions": 252,
+    "training_episode_count": 50
+  },
+  "selection_sha256": "54a10756e1804871aae8565fa1d1452a50ac09c036516287fba4f5ccfc6848f6",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "skfolio": "1.2.9"
+  }
+}

@@ -1,0 +1,24 @@
+{
+ "command": [
+  "python3",
+  "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/wong2_pty_list.py",
+  "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/wong2-interactive-list.json"
+ ],
+ "started_at": "2026-09-23T05:00:08Z",
+ "ended_at": "2026-09-23T05:01:41Z",
+ "exit": 0,
+ "namespace": "unshare -rnm --fork --kill-child; lo up; tmpfs over $HOME/.mcporter",
+ "shared_daemon_outside_before": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "shared_daemon_outside_after": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "shared_daemon_unchanged": true
+}

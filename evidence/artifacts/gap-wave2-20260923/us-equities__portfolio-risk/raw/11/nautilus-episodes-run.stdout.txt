@@ -1,0 +1,37 @@
+{
+ "momentum20": {
+  "episodes": 260,
+  "gross": "0.00262581",
+  "proxy": "0.00104120",
+  "fixed": "0.00260875",
+  "per_share": "0.00252632"
+ },
+ "momentum60": {
+  "episodes": 260,
+  "gross": "0.00266515",
+  "proxy": "0.00103438",
+  "fixed": "0.00264744",
+  "per_share": "0.00256440"
+ },
+ "momentum120": {
+  "episodes": 260,
+  "gross": "0.00366941",
+  "proxy": "0.00192325",
+  "fixed": "0.00364985",
+  "per_share": "0.00356522"
+ },
+ "cash": {
+  "episodes": 260,
+  "gross": "0",
+  "proxy": "0.000",
+  "fixed": "n/a",
+  "per_share": "n/a"
+ },
+ "equalweight": {
+  "episodes": 260,
+  "gross": "0.00379155",
+  "proxy": "0.00179155",
+  "fixed": "0.00372251",
+  "per_share": "0.00367006"
+ }
+}

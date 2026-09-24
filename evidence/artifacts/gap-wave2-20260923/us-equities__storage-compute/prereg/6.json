@@ -1,0 +1,7 @@
+{
+  "gap_index": 6,
+  "written_at": "2026-09-23T05:15:15Z",
+  "expectation": "covered_elsewhere: adoption/paired/receipt.json (native-paired-adoption-20260919) already records the Dagu research-pair workflow succeeded with workflow astra_then_claude, gpt-6-astra and claude-opus-5, both reports validated, usage for both. Expect the four report/packet hashes in the receipt to equal the committed files and the Claude prompt to bind the Astra report hash. No new model call is needed.",
+  "criteria": "covered_elsewhere if the receipt's report and packet hashes match committed files and status fields show both roles completed in one research-pair run; otherwise run one Codex astra stage and one bounded Claude review call.",
+  "note": "Written before the check's commands were run. For gap 6 an exploratory sha256 of the four adoption/paired files was run minutes earlier while locating evidence; the verification is rerun by script after this file."
+}

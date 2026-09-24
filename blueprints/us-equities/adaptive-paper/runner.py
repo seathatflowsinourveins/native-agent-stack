@@ -497,6 +497,33 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
             raise SafetyError("promotion_gate_mismatch")
 
 
+def intraday_buying_power(account):
+    """(value, field) for the account's intraday buying power, or None.
+
+    Alpaca's responses dropped ``daytrading_buying_power``, ``pattern_day_trader`` and
+    ``daytrade_count`` on 2026-07-06 (alpaca-py 0.44.0 models), after FINRA's intraday
+    margin rule ended the PDT designation; buying power is now computed in real time
+    (docs.alpaca.markets/us/docs/the-intraday-margin-rule, 2026-07-07). A read-only
+    paper account read on 2026-09-23 showed, at multiplier 4,
+    ``buying_power == 4 * (equity - maintenance_margin)`` on current equity (not the
+    prior-close formula the older schema page still gives). The legacy field is
+    preferred when a broker still reports it; otherwise ``buying_power`` is used,
+    bounded by ``multiplier * (equity - maintenance_margin)`` whenever those fields are
+    present, so a stale or prior-close figure can never admit more than current equity
+    supports."""
+    field = "daytrading_buying_power" if account.get("daytrading_buying_power") is not None else "buying_power"
+    if account.get(field) is None or any(account.get(k) is None for k in ("multiplier", "equity")):
+        return None
+    if account.get("maintenance_margin") is None and field == "buying_power":
+        return None  # the current-schema figure is only trusted with its equity bound: fail closed
+    value = Decimal(str(account[field]))
+    margin = Decimal(str(account.get("maintenance_margin") or 0))
+    bound = Decimal(str(account["multiplier"])) * max(Decimal(str(account["equity"])) - margin, Decimal(0))
+    if bound < value:
+        return str(bound), "multiplier*(equity-maintenance_margin)"
+    return str(value), field
+
+
 def _check_margin_entitlement(account, config, lev, session_policy):
     """G-e: only called (from validate_preflight, below) when
     ``config.get("_leverage_policy")`` is set -- i.e. `account` was fetched
@@ -506,14 +533,16 @@ def _check_margin_entitlement(account, config, lev, session_policy):
     non-leverage path (validate_preflight never calls this function then).
     """
     need = lev.max_leverage
-    if any(key not in account for key in ("multiplier", "daytrading_buying_power", "regt_buying_power")):
+    if any(key not in account for key in ("multiplier", "regt_buying_power")) or intraday_buying_power(account) is None:
         raise SafetyError("account_margin_fields_missing")
+    # Tolerated legacy signal: Alpaca no longer sends pattern_day_trader (2026-07-06), but
+    # a broker that still flags an account PDT under the old rule is refused below 25,000.
     if account.get("pattern_day_trader") is True and Decimal(account["equity"]) < 25000:
         raise SafetyError("account_restricted")
     mult = Decimal(account["multiplier"])
     if not mult.is_finite() or mult < need:
         raise SafetyError("account_multiplier_below_requested_leverage")
-    if Decimal(account["daytrading_buying_power"]) < Decimal(config["max_gross_exposure_usd"]):
+    if Decimal(intraday_buying_power(account)[0]) < Decimal(config["max_gross_exposure_usd"]):
         raise SafetyError("account_daytrading_buying_power_insufficient")
     if session_policy["overnight_holds"]:
         overnight_cap = Decimal(config["capital_usd"]) * lev.overnight_max_leverage
@@ -548,7 +577,7 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     if (account.get("status") != "ACTIVE" or account.get("currency") != "USD" or any(account.get(k) is not False for k in
             ("trading_blocked", "account_blocked", "trade_suspended_by_user"))
             or (not allow_existing and (Decimal(account["cash"]) < Decimal(config["capital_usd"])
-            or Decimal(account["equity"]) < 25000))):
+            or Decimal(account["equity"]) < PROJECT_EQUITY_FLOOR_USD))):
         raise SafetyError("account_not_ready")
     # G-e: margin-entitlement preflight, only under a validated leverage
     # policy (config["_leverage_policy"], set by load_config). Runs after
@@ -660,6 +689,25 @@ def held_resume_matches_ledger(ledger, observation):
     known = {i.client_id for i in ledger.intents()}
     if any(order.get("client_order_id") not in known for order in observation["orders"]):
         raise SafetyError("held_resume_external_order")
+
+
+class LiveEventLog(list):
+    """The controller's event list that also appends each event to a JSON-lines file as
+    it happens (``--live-dir``), for a live view of decisions and intents. Observation
+    only: a write failure is counted and never interrupts trading."""
+
+    def __init__(self, path):
+        super().__init__()
+        self.path, self.write_errors = Path(path), 0
+        self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+
+    def append(self, event):
+        super().append(event)
+        try:
+            with self.path.open("a") as f:
+                f.write(json.dumps({"at": time.time(), **event}, default=str, sort_keys=True) + "\n")
+        except (OSError, TypeError, ValueError):
+            self.write_errors += 1
 
 
 class Controller:
@@ -847,7 +895,16 @@ _INITIAL_LEVERAGE_ACHIEVEMENT_STATE = {"peak_achieved_leverage": Decimal("0"), "
                                        "seconds_above_next_lower_rung_ceiling": 0.0}
 
 
-async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
+# A deliberate project capital floor for a fresh paper start. It began as the PDT day-trading
+# minimum; FINRA's intraday margin rule removed that minimum (Reg T margin needs 2,000), and the
+# floor is kept on purpose as a conservative project limit, not as a broker rule (2026-09-23).
+PROJECT_EQUITY_FLOOR_USD = 25000
+
+RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
+
+
+async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
+                     log_directory=None):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
@@ -881,7 +938,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 for a in assets]
     session_policy = validate_session_policy(config)
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
-                         max_order_submit_rate="180/00:01:00", session_policy=session_policy)
+                         max_order_submit_rate="180/00:01:00", session_policy=session_policy,
+                         log_directory=log_directory)
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -970,12 +1028,17 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 if str(exc) != "held_position_mark_stale":
                     controller.stop = True
                     force_exit = True
-            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= 30
+            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= RECONCILE_EVERY_SECONDS
                     and not controller.ledger.unresolved() and not strategy.pending):
                 strategy.enabled = False
                 snapshot = await port.snapshot()
                 reconcile(controller.ledger, snapshot, baseline_cash)
-                if health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
+                # Re-read health after the snapshot await: a gap that arose meanwhile must
+                # stop the run, never be thawed by this periodic acknowledgement.
+                health = getattr(port, "health", {})
+                if any("stale" not in str(reason) for reason in health.get("reasons", [])):
+                    controller.stop = True
+                elif health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
                     port.mark_reconciled()
                 last_reconciliation = time.monotonic()
             # Boundary receipts (D6): independent of the 30s reconciliation
@@ -1062,7 +1125,10 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         await port.stop()
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
+    port_health = getattr(port, "health", {})
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
+              "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
+                                 "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}},
               "native_fill_events": strategy.native_fills, "native_rejections": strategy.native_rejections,
               "policy_selections": strategy.policy.counts, "accounting": state,
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
@@ -1322,6 +1388,10 @@ def main():
                          help="the exact bars/universe input file the promotion "
                               "gate validated (its hash must match --gate-result's "
                               "input_sha256); required for `paper`")
+    parser.add_argument("--live-dir", type=Path, default=None,
+                         help="optional directory for a live record of this run: events.jsonl "
+                              "(decisions and intents as they happen) and NautilusTrader's own "
+                              "JSON log under nautilus/; observation only")
     args = parser.parse_args()
     LAST_OUTPUT = args.output
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
@@ -1362,7 +1432,8 @@ def main():
             if leverage_policy is not None:
                 summary["margin"] = {
                     "multiplier": str(config["_account_multiplier"]),
-                    "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+                    "intraday_buying_power": intraday_buying_power(observation["account"])[0],
+                    "intraday_buying_power_field": intraday_buying_power(observation["account"])[1],
                     "regt_buying_power": observation["account"]["regt_buying_power"],
                     "requested_max_leverage": str(leverage_policy.max_leverage),
                     "policy_version": leverage_policy.version}
@@ -1410,7 +1481,8 @@ def main():
     if leverage_policy is not None and config.get("_account_multiplier") is not None:
         summary["margin"] = {
             "multiplier": str(config["_account_multiplier"]),
-            "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+            "intraday_buying_power": intraday_buying_power(observation["account"])[0],
+            "intraday_buying_power_field": intraday_buying_power(observation["account"])[1],
             "regt_buying_power": observation["account"]["regt_buying_power"],
             "requested_max_leverage": str(leverage_policy.max_leverage),
             "policy_version": leverage_policy.version}
@@ -1454,6 +1526,14 @@ def main():
                 if controller_market_open:
                     controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
+            if args.live_dir is not None:
+                controller.events = LiveEventLog(args.live_dir / "events.jsonl")
+                # Binds this run's live record to its own ledger and kill switch for
+                # live_manifest.py (local state; the manifest never displays these paths).
+                import safety as _safety
+                (args.live_dir / "run.json").write_text(json.dumps(
+                    {"trial": args.trial, "ledger": str(state_dir / "ledger.sqlite3"),
+                     "stop_file": str(_safety.DEFAULT_STOP)}) + "\n")
             if args.command == "recover":
                 metadata = previous_metadata
                 if metadata["config_sha256"] != summary["config_sha256"]:
@@ -1506,10 +1586,17 @@ def main():
                 controller.port = fresh_port()
                 try:
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
-                                               config, metadata["baseline_cash"], account_fingerprint=fingerprint)
+                                               config, metadata["baseline_cash"], account_fingerprint=fingerprint,
+                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus")
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}
+                    port_health = getattr(controller.port, "health", {})
+                    outcome["dropped_quotes"] = {
+                        "by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
+                        "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}}
+                if isinstance(controller.events, LiveEventLog):
+                    outcome["live_event_write_errors"] = controller.events.write_errors
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
                     # This CLI invocation cannot yet tell whether it is the

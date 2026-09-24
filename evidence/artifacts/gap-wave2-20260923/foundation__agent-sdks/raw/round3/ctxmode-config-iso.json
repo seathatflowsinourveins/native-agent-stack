@@ -1,0 +1,837 @@
+{
+  "started_at": "2026-09-23T12:59:02Z",
+  "codex_bin_sha256": "0753dfe1d8b87a52436deb13eb1c549661ef4c84fee2c5aa688385eebeccb761",
+  "server_info": {
+    "serverInfo": null,
+    "userAgent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)",
+    "platformFamily": "unix",
+    "platformOs": "linux"
+  },
+  "mcp_status": {
+    "data": [
+      {
+        "name": "context-mode",
+        "runtimeStatus": null,
+        "pluginId": "context-mode@context-mode",
+        "serverInfo": {
+          "name": "context-mode",
+          "title": null,
+          "version": "1.0.169",
+          "description": null,
+          "icons": null,
+          "websiteUrl": null
+        },
+        "tools": {
+          "ctx_batch_execute": {
+            "name": "ctx_batch_execute",
+            "title": "Batch Execute & Search",
+            "description": "Run multiple commands in ONE call. Every command's output is auto-indexed into the knowledge base; if you also pass `queries`, the matching sections come back in the same round trip so a follow-up search call is not needed.\n\nConcurrency parallelizes the FETCH phase (run-the-commands). The DERIVATION phase \u2014 turning raw output into an answer \u2014 still belongs in code: add a processing command that consumes the indexed output and prints only the answer, so the raw bytes never enter your conversation (Think-in-Code, same principle as the sandbox tool).\n\nWHEN:\n  - You have 3+ related commands you would otherwise run sequentially (multi-issue lookups, git log + git diff + git blame, multi-file reads, multi-region cloud queries)\n  - You want to gather AND query in one round trip \u2014 pass `queries` so the matching sections come back inline\n  - You want to parallelize I/O-bound work \u2014 pass `concurrency` 2-8 (network calls, gh CLI, cloud APIs, multi-repo git reads)\n  - The combined output is large enough that piping it through ctx_search later would itself be expensive \u2014 let auto-index + inline queries do both in one shot\n\nWHEN NOT:\n  - Single command with no follow-up query \u2014 run it in the sandbox tool directly\n  - CPU-bound or stateful commands \u2014 keep concurrency at 1 (npm test, build, lint, port-binding servers, lock-file holders, anything that races on the same resource)\n\nRETURNS:\n  Auto-indexed section list per command label, plus top matches per query (when `queries` is passed). Raw output is NOT echoed in full \u2014 only the matched windows. Concurrency>1 switches each command to its own per-command timeout (no shared budget); concurrency=1 preserves the legacy shared-budget cascading-skip-on-timeout path. Use 4-8 for I/O-bound batches; keep at 1 for CPU work or shared-state commands; lower the value when target hosts enforce per-IP rate limits.\n\nEXAMPLE: ctx_batch_execute(\n  commands: [\n    {label: \"issue 1\", command: \"gh issue view 1\"},\n    {label: \"issue 2\", command: \"gh issue view 2\"},\n    {label: \"summarize\", command: \"echo done\"}\n  ],\n  queries: [\"root cause\", \"proposed fix\"],\n  concurrency: 2\n). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "commands": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "description": "Section header for this command's output (e.g., 'README', 'Package.json', 'Source Tree')"
+                      },
+                      "command": {
+                        "type": "string",
+                        "description": "Shell command to execute"
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "command"
+                    ]
+                  },
+                  "minItems": 1,
+                  "description": "Commands to execute as a batch. Output is labeled with the section header. Default order is sequential; pass concurrency>1 to run in parallel (output stays in input order)."
+                },
+                "queries": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "description": "Search queries to extract information from indexed output. Use 5-8 comprehensive queries. Each returns top 5 matching sections with full content. This is your ONLY chance \u2014 put ALL your questions here. No follow-up calls needed."
+                },
+                "timeout": {
+                  "type": "number",
+                  "description": "Max execution time in ms. When omitted, no server-side timer fires \u2014 the MCP host's RPC timeout governs. With concurrency=1, the value (when set) is a shared budget across commands; with concurrency>1, it is applied per-command."
+                },
+                "concurrency": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8,
+                  "default": 1,
+                  "description": "Max commands to run in parallel (1-8, default: 1). Use 4-8 for I/O-bound batches (network, gh, curl, multi-repo git reads). Keep at 1 for CPU-bound (npm test, build, lint) or stateful commands (ports, locks). >1 switches to per-command timeouts (no shared budget) and individual `(timed out)` blocks instead of cascading skip."
+                },
+                "cwd": {
+                  "type": "string",
+                  "description": "Optional working directory for all shell commands in this batch."
+                },
+                "query_scope": {
+                  "type": "string",
+                  "enum": [
+                    "batch",
+                    "global"
+                  ],
+                  "default": "batch",
+                  "description": "Scope for `queries` (default: `batch`). `batch` searches ONLY the chunks produced by this batch's commands \u2014 useful when you want answers about the just-fetched output. `global` searches the entire persistent index (same scope as ctx_search) \u2014 useful when you want the batch commands to enrich context and the queries to also surface related prior knowledge in one round trip."
+                }
+              },
+              "required": [
+                "commands",
+                "queries"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": true
+            }
+          },
+          "ctx_execute_file": {
+            "name": "ctx_execute_file",
+            "title": "Run code over a file (executes code, reads the given path)",
+            "description": "Read a file into a sandboxed FILE_CONTENT variable and run code over it. Only what you console.log() enters your conversation \u2014 the file bytes stay in the sandbox.\n\nThink-in-Code applied to file-level analysis: Reading the whole file means every byte enters your conversation memory and costs reasoning capacity for the rest of the session. Running code over it here lets you keep the raw bytes out and only the derived answer in. Same principle as ctx_execute, scoped to one named file via the FILE_CONTENT variable.\n\nWHEN:\n  - You want to KNOW SOMETHING ABOUT a file (line count, matches of a pattern, parsed structure, statistical aggregate) without needing to SEE all of it\n  - The file is structured (CSV, JSON, log, code) and a code-level derivation is cheaper than reading verbatim\n  - The file is large enough that reading the full content would burn meaningful conversation memory you need for the actual work\n  - The derivation may itself produce a large output you want recall-by-topic on later \u2014 pass an `intent` string; outputs over ~5KB are auto-indexed and only matching sections come back, retrievable via ctx_search\n\nWHEN NOT:\n  - You intend to EDIT the file \u2014 use Read so the subsequent Edit can match the exact text\n  - You only need one specific line and you know its offset \u2014 Read with offset/limit is the simplest path\n  - The file is small AND you will consume all of it for understanding/editing \u2014 Read directly\n\nRETURNS:\n  Only what your code prints. The FILE_CONTENT variable holds the raw bytes inside the sandbox; nothing else leaves. When `intent` is set and output exceeds the auto-index threshold, the response carries searchable section titles + previews instead of the raw stdout.\n\nEXAMPLE: ctx_execute_file(path: \"huge.log\", language: \"javascript\", code: \"const errs = FILE_CONTENT.split('\\\\n').filter(l => /ERROR|FATAL/.test(l)); console.log(`${errs.length} error lines`); console.log(errs.slice(-5).join('\\\\n'))\")\nEXAMPLE: ctx_execute_file(path: \"data.csv\", language: \"javascript\", code: \"const rows = FILE_CONTENT.split('\\\\n'); console.log(`rows: ${rows.length - 1}, header: ${rows[0]}`)\"). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Absolute file path or relative to project root"
+                },
+                "language": {
+                  "type": "string",
+                  "enum": [
+                    "javascript",
+                    "typescript",
+                    "python",
+                    "shell",
+                    "ruby",
+                    "go",
+                    "rust",
+                    "php",
+                    "perl",
+                    "r",
+                    "elixir",
+                    "csharp"
+                  ],
+                  "description": "Runtime language"
+                },
+                "code": {
+                  "type": "string",
+                  "description": "Code to process FILE_CONTENT (file_content in Elixir). Print summary via console.log/print/echo/IO.puts/Console.WriteLine."
+                },
+                "timeout": {
+                  "type": "number",
+                  "description": "Max execution time in ms. When omitted, no server-side timer fires \u2014 the MCP host's RPC timeout governs."
+                },
+                "intent": {
+                  "type": "string",
+                  "description": "What you're looking for in the output. When provided and output is large (>5KB), returns only matching sections via BM25 search instead of truncated output."
+                }
+              },
+              "required": [
+                "path",
+                "language",
+                "code"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": true
+            }
+          },
+          "ctx_purge": {
+            "name": "ctx_purge",
+            "title": "Purge Knowledge Base",
+            "description": "DESTRUCTIVE: permanently delete indexed content. Cannot be undone. Requires confirm:true and exactly one scope.\n\nWHEN:\n  - User explicitly asks to clear a specific session ('purge this session', 'wipe this conversation')\n  - User explicitly asks to reset the whole project ('reset everything', 'wipe the knowledge base')\n\nWHEN NOT:\n  - User says 'reset', 'clear', or 'wipe' without naming a scope -> ask which scope before calling\n  - User wants to free memory or improve performance -> recommend ctx_stats first, do not purge\n\nSCOPES (pass exactly one):\n  - Per-session: ctx_purge(confirm: true, sessionId: \"<uuid>\") deletes that session's events (auto-captured decisions, errors, plans, user prompts, rejected approaches, etc.) and per-session FTS5 chunks; sibling sessions and stats file are preserved.\n  - Per-project: ctx_purge(confirm: true, scope: \"project\") wipes FTS5 knowledge base, every session DB row, events markdown, and resets the stats file. Use ctx_stats first to preview category counts before purging.\n\nCONTRACT:\n  - confirm:true is required; confirm:false returns 'purge cancelled'.\n  - sessionId and scope:'project' together return 'ambiguous - pick one'.\n  - scope:'session' without sessionId throws (sessionId required).\n  - Bare {confirm:true} is deprecated: maps to scope:'project' with a stderr warning; will hard-error in a future major.\n\nRETURNS:\n  A summary of removed rows + the resolved scope.\n\nEXAMPLE: ctx_purge(confirm: true, sessionId: \"7c8a-1234-5678-9abc-def012345678\")\nEXAMPLE: ctx_purge(confirm: true, scope: \"project\"). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "confirm": {
+                  "type": "boolean",
+                  "description": "MUST be true. Destructive operation; false returns 'purge cancelled'."
+                },
+                "sessionId": {
+                  "type": "string",
+                  "description": "UUID of a single session. Pairs with confirm:true to wipe only that session's events + per-session FTS5 chunks. Sibling sessions and the stats file are preserved. MUST NOT be combined with scope:'project'."
+                },
+                "scope": {
+                  "type": "string",
+                  "enum": [
+                    "session",
+                    "project"
+                  ],
+                  "description": "Explicit scope selector. 'session' REQUIRES sessionId. 'project' wipes the entire project (FTS5 + every session + stats). Omit only for the deprecated bare-{confirm:true} back-compat path."
+                }
+              },
+              "required": [
+                "confirm"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          },
+          "ctx_stats": {
+            "name": "ctx_stats",
+            "title": "Session Statistics",
+            "description": "Returns context consumption statistics for the current session. Shows total bytes returned to context, breakdown by tool, call counts, estimated token usage, and context savings ratio. This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          },
+          "ctx_upgrade": {
+            "name": "ctx_upgrade",
+            "title": "Upgrade Plugin",
+            "description": "Upgrade context-mode to the latest version. Returns a shell command to execute. You MUST run the returned command using your shell tool (Bash, shell_execute, run_in_terminal, etc.) and display the output as a checklist. Tell the user to restart their session after upgrade. This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          },
+          "ctx_insight": {
+            "name": "ctx_insight",
+            "title": "Open Insight Dashboard",
+            "description": "Opens the context-mode Insight dashboard (https://context-mode.com/insight) in your default browser \u2014 a dashboard launcher for the hosted analytics layer, not a Q&A engine. Insight surfaces per-engineer productive rate, retry waste, blocker detection, and role-narrowed views for CTO, EM, IC, CISO, FinOps, and DevOps. For natural-language queries over your indexed content, use ctx_search. This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": true
+            }
+          },
+          "ctx_index": {
+            "name": "ctx_index",
+            "title": "Index Content",
+            "description": "Store content in a searchable knowledge base (BM25 over FTS5). Splits markdown by headings, keeps code blocks intact, and persists the raw chunks. The full content stays in storage \u2014 retrieve any section on-demand via ctx_search; nothing is summarized or truncated.\n\nWHEN:\n  - Documentation from Context7, Skills, or MCP tools (API docs, framework guides, code examples)\n  - API references (endpoint details, parameter specs, response schemas)\n  - MCP tools/list output (exact tool signatures and descriptions)\n  - Skill prompts and instructions that are too large to keep verbatim in conversation\n  - README files, migration guides, changelog entries\n  - Any content with code examples you may need to reference precisely later\n\nWHEN NOT:\n  - Log files, test output, CSV, or build output \u2014 use ctx_execute_file, which processes in-sandbox without persisting bytes\n  - Single-use ephemeral content you will not query later \u2014 keep it inline if it fits, or ctx_execute_file it\n\nRETURNS:\n  Indexing metadata: chunk counts (total, code-bearing), source label, and the exact ctx_search call shape to query the indexed content. Raw content is NOT echoed back \u2014 it lives in storage, retrievable via ctx_search(source: \"<label>\"). When `path` is provided, a content hash is stored so ctx_search results auto-flag staleness on future calls.\n\nEXAMPLE: ctx_index(content: \"# React useEffect\\n\\nThe Effect Hook lets you ...\", source: \"react-useeffect-docs\")\nEXAMPLE: ctx_index(path: \"/path/to/large-spec.md\", source: \"openapi-v2-spec\"). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "Raw text/markdown to index. Provide this OR path, not both."
+                },
+                "path": {
+                  "type": "string",
+                  "description": "File OR directory path to read and index (content never enters context). Provide this OR content. Directory paths trigger a bounded recursive walk (#687)."
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Label for the indexed content (e.g., 'Context7: React useEffect', 'Skill: frontend-design')"
+                },
+                "include": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Directory-only: glob patterns to include (default: all matching extensions)."
+                },
+                "exclude": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Directory-only: glob patterns to exclude. Merged with defaults (node_modules, .git, dist, build, .next, coverage, .venv, __pycache__, .DS_Store)."
+                },
+                "maxDepth": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Directory-only: max recursion depth from root (default: 5)."
+                },
+                "maxFiles": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Directory-only: hard cap on files indexed (default: 200) \u2014 FTS5 blow-up guard."
+                },
+                "extensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Directory-only: allowed file extensions (default: .md .mdx .txt .json .yaml .yml .ts .tsx .js .jsx .py .rs .go .sh)."
+                },
+                "respectGitignore": {
+                  "type": "boolean",
+                  "description": "Directory-only: apply nearest .gitignore (default: true)."
+                },
+                "followSymlinks": {
+                  "type": "boolean",
+                  "description": "Directory-only: follow directory symlinks (default: false \u2014 cycle hazard + escape risk)."
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": false
+            }
+          },
+          "ctx_doctor": {
+            "name": "ctx_doctor",
+            "title": "Run Diagnostics",
+            "description": "Diagnose context-mode installation. Runs all checks server-side and returns a plain-text status report with [OK]/[FAIL]/[WARN] prefixes (renderer-safe across MCP clients). No CLI execution needed. This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          },
+          "ctx_execute": {
+            "name": "ctx_execute",
+            "title": "Run code in a sandbox (executes the supplied code)",
+            "description": "Run code in a sandboxed subprocess. Languages: javascript, shell, python, perl.\n\nThink-in-Code \u2014 the core philosophy: the bytes your code processes never enter your conversation memory; only what you console.log() does. Reading a 700 KB log directly means 700 KB of your remaining reasoning capacity gets spent on raw bytes. Running code over that same log in this sandbox and printing a 3 KB summary leaves you with 697 KB of capacity for the actual work.\n\nConcrete shape \u2014 analyze 47 source files without reading any of them:\n  ctx_execute(language: \"javascript\", code: `\n    const fs = require('fs');\n    const files = fs.readdirSync('src').filter(f => f.endsWith('.ts'));\n    files.forEach(f => {\n      const lines = fs.readFileSync('src/'+f,'utf8').split('\\\\n').length;\n      console.log(f + ': ' + lines + ' lines');\n    });\n  `)\n  // 47 files analyzed, 15,314 LoC summarized \u2014 output ~3.6 KB instead of 47 Read() calls = ~700 KB.\n\nWHEN:\n  - You intend to derive an answer FROM data (filter, count, aggregate, parse, compare, transform) \u2014 do the derivation in code and print only the answer\n  - Output shape or size cannot be predicted before execution (recursive finds, repo-wide greps, list endpoints, query results, log scans)\n  - You would otherwise read raw output and then mentally compute \u2014 that compute belongs here, in code, where its inputs stay out of your conversation\n  - You need to keep a long-running process alive (dev server, watcher, daemon) \u2014 pass `background: true` to detach on timeout instead of killing the process\n  - The output may legitimately be large but you only want recall-by-topic later \u2014 pass an `intent` string; outputs over ~5KB are auto-indexed into the knowledge base and only the section titles + previews come back, retrievable via ctx_search\n\nWHEN NOT:\n  - Single observational command whose entire short output you intend to consume verbatim (whoami, pwd, git status on a clean tree) \u2014 Bash is simpler\n  - File mutations (Edit/Write) or navigation (cd/ls) \u2014 Bash is the right surface\n  - You already know the output is one short fixed line and you want to read it as-is\n\nRETURNS:\n  Only what your code prints. Wrap risky calls in try/catch \u2014 uncaught errors go to stderr and may leak more than intended. When `intent` is set and output exceeds the auto-index threshold, the response carries searchable section titles + previews instead of the raw stdout; use ctx_search(queries: [...]) to drill into specific sections.\n\nEXAMPLE: ctx_execute(language: \"javascript\", code: \"const out = require('child_process').execSync('npm test', {encoding:'utf8', stdio:['ignore','pipe','pipe']}); console.log(out.split('\\\\n').filter(l => /(FAIL|\u2717|\u00d7|Error:|Tests +.*(failed|passed))/i.test(l)).slice(0, 60).join('\\\\n'))\")\nEXAMPLE: ctx_execute(language: \"javascript\", code: \"const out = require('child_process').execSync('gh issue list --json number,title --limit 100', {encoding:'utf8'}); const hooks = JSON.parse(out).filter(i => /hook|routing/i.test(i.title)); console.log(`${hooks.length} hook-related issues`)\"). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "language": {
+                  "type": "string",
+                  "enum": [
+                    "javascript",
+                    "typescript",
+                    "python",
+                    "shell",
+                    "ruby",
+                    "go",
+                    "rust",
+                    "php",
+                    "perl",
+                    "r",
+                    "elixir",
+                    "csharp"
+                  ],
+                  "description": "Runtime language"
+                },
+                "code": {
+                  "type": "string",
+                  "description": "Source code to execute. Use console.log (JS/TS), print (Python/Ruby/Perl/R), echo (Shell), echo (PHP), fmt.Println (Go), IO.puts (Elixir), or Console.WriteLine (C#) to output a summary to context."
+                },
+                "timeout": {
+                  "type": "number",
+                  "description": "Max execution time in ms. When omitted, no server-side timer fires \u2014 the MCP host's RPC timeout governs (which is the right layer for this policy). Pass an explicit value for long-running builds (Gradle/Maven/SBT)."
+                },
+                "background": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Keep process running after timeout (for servers/daemons). Returns partial output without killing the process. IMPORTANT: Do NOT add setTimeout/self-close timers in background scripts \u2014 the process must stay alive until the timeout detaches it. For server+fetch patterns, prefer putting both server and fetch in ONE ctx_execute call instead of using background."
+                },
+                "cwd": {
+                  "type": "string",
+                  "description": "Optional working directory for shell commands. Non-shell languages still execute from their sandbox temp directory."
+                },
+                "intent": {
+                  "type": "string",
+                  "description": "What you're looking for in the output. When provided and output is large (>5KB), indexes output into knowledge base and returns section titles + previews \u2014 not full content. Use ctx_search(queries: [...]) to retrieve specific sections. Example: 'failing tests', 'HTTP 500 errors'.\n\nTIP: Use specific technical terms, not just concepts. Check 'Searchable terms' in the response for available vocabulary."
+                }
+              },
+              "required": [
+                "language",
+                "code"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": true
+            }
+          },
+          "ctx_fetch_and_index": {
+            "name": "ctx_fetch_and_index",
+            "title": "Fetch & Index URL(s)",
+            "description": "Fetches URL content, converts HTML to markdown (JSON is chunked by key paths, plain text indexed directly), persists it in a searchable knowledge base, and returns a small preview window per source. The raw page bytes never enter your conversation \u2014 they live in storage and you retrieve any section on-demand via ctx_search.\n\nCaching: every fetch is cached on disk and reused for repeat calls within the TTL window. The default TTL is 24 hours; override per-call with the `ttl` parameter (milliseconds, `ttl: 0` bypasses cache like `force: true`). Stored content older than 14 days is cleaned up on startup.\n\nWHEN:\n  - You need web content (docs, changelogs, API references, spec pages) and the raw page bytes should NOT enter your conversation\n  - Multi-URL research (library evaluation, migration scans, doc comparisons): pass the `requests` array and a `concurrency` value 2-8 for parallel I/O\n  - You want repeat lookups against the same URL to be cheap (TTL cache hits return only a hint, no re-fetch)\n  - You want a long-lived cache window (override `ttl` upward for stable specs) or a guaranteed-fresh fetch (`ttl: 0` or `force: true`)\n\nWHEN NOT:\n  - You already have the content locally \u2014 store it via the inline index tool\n  - The page is SPA-rendered (JavaScript-required to materialize content) \u2014 this is a plain HTTP fetch, no headless browser\n\nRETURNS:\n  Per-source preview windows extracted around indexable headings plus indexing metadata (chunk counts, source labels, cache state). Raw content is NOT echoed back \u2014 retrieve any section on-demand via ctx_search(source: \"<label>\"). Concurrency parallelizes the fetch phase up to your chosen value (capped by the host's logical CPU count); the FTS5 write phase always runs serially because SQLite is a single-writer store. Net latency = max(fetch latency across the pool) + sum(per-source index write time). Cache hits skip both phases and return a small freshness hint instead of re-fetching. Use 4-8 for stable I/O-bound batches; lower the value when the target host enforces a per-IP rate limit you cannot raise.\n\nEXAMPLE: ctx_fetch_and_index(\n  requests: [{url: \"https://react.dev/...\", source: \"react\"}, {url: \"https://vuejs.org/...\", source: \"vue\"}],\n  concurrency: 5\n). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Single URL to fetch and index (legacy single-shape)"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Label for the indexed content when using single `url` (e.g., 'React useEffect docs', 'Supabase Auth API'). For batch, put source in each requests entry."
+                },
+                "requests": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "URL to fetch"
+                      },
+                      "source": {
+                        "type": "string",
+                        "description": "Label for this URL's indexed content"
+                      }
+                    },
+                    "required": [
+                      "url"
+                    ]
+                  },
+                  "minItems": 1,
+                  "description": "Batch shape: array of {url, source?} entries. Use with concurrency>1 for parallel fetch. Each request indexed under its own source label. Output preserves input order."
+                },
+                "concurrency": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8,
+                  "default": 1,
+                  "description": "Max URLs to fetch in parallel (1-8, default: 1). Use 4-8 for I/O-bound multi-URL batches (library docs, changelogs, pricing pages). Capped by os.cpus().length on small machines (response notes when capped). Indexing is always serial regardless \u2014 only fetches race."
+                },
+                "force": {
+                  "type": "boolean",
+                  "description": "Skip cache and re-fetch even if content was recently indexed"
+                },
+                "ttl": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Override the cache freshness window for this call, in milliseconds. `ttl: 0` bypasses the cache like `force: true`; omit to use the default 24h TTL."
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": false,
+              "idempotentHint": false,
+              "openWorldHint": true
+            }
+          },
+          "ctx_search": {
+            "name": "ctx_search",
+            "title": "Search Indexed Content",
+            "description": "Search a unified knowledge base with a multi-strategy ranking pipeline. Two parallel matchers run on every query: a Porter-stemming matcher (\"caching\" finds \"cached\", \"caches\", \"cach\") and a trigram-substring matcher (\"useEff\" finds \"useEffect\"). Their ranked lists are merged via Reciprocal Rank Fusion, so a document that ranks well in both surfaces above one that wins only on a single strategy. Multi-term queries get an additional proximity-rerank pass that boosts passages where the query terms appear close together. Typos are corrected via Levenshtein distance and re-searched. Result snippets are window-extracted around the matched terms, not blindly truncated.\n\nThe knowledge base is unified: queries reach indexed content you stored (ctx_index, ctx_fetch_and_index, ctx_batch_execute output) AND auto-captured session memory written by hooks (decisions, errors, blockers, plans, user prompts, rejected approaches, tool failures, compaction guides \u2014 26 event categories). File-backed sources carry a content hash and auto-flag staleness when the source file changes.\n\nWHEN:\n  - You want to recall something that exists in storage (recently indexed content, prior session events, auto-memory) instead of re-reading raw sources\n  - You have multiple related questions about the same body of knowledge \u2014 batch every question into one call (the ranking pipeline runs per-query but the round-trip cost is paid once)\n  - You want to scope the query to one labelled source (pass `source` \u2014 partial match is fine)\n  - You want a chronological view across current session + prior sessions + persistent auto-memory (pass `sort: \"timeline\"` \u2014 the default `relevance` mode only ranks within the current session)\n  - You want to filter ranked results by content shape (pass `contentType: \"code\"` to surface implementation snippets or `contentType: \"prose\"` to surface explanations)\n\nWHEN NOT:\n  - The data you want to query has never been stored in the knowledge base AND no session memory has accumulated around it \u2014 capture first (run a gather-and-index call), then come back here to query\n  - You have one ad-hoc question against data that is not in the knowledge base \u2014 answer it inline by running code in the sandbox tool; one round-trip instead of capture-then-query\n\nRETURNS:\n  Per-query ranked sections with window-extracted snippets. Use 2-4 specific technical terms per query. Common session-memory source labels: `decision` (user corrections / preferences), `error` and `error-resolution` (past failures + their fixes), `blocker`, `plan`, `user-prompt`, `rejected-approach`, `compaction` (post-compact session guide). See ctx_stats for live category counts. Each response carries a throttle counter (call #N/M in the rolling time window); results taper toward the soft cap and calls block after the hard cap. Tune via CONTEXT_MODE_SEARCH_WINDOW_MS, CONTEXT_MODE_SEARCH_MAX_RESULTS_AFTER, CONTEXT_MODE_SEARCH_BLOCK_AFTER.\n\nEXAMPLE: ctx_search(queries: [\"root cause\", \"proposed fix\", \"test coverage\"], source: \"issue-#683\")\nEXAMPLE: ctx_search(queries: [\"what did we decide about caching\"], source: \"decision\", sort: \"timeline\")\nEXAMPLE: ctx_search(queries: [\"useEffect cleanup pattern\"], source: \"react-docs\", contentType: \"code\", limit: 5)\nEXAMPLE: ctx_search(queries: [\"last user prompt\", \"active skills\", \"open blockers\"], sort: \"timeline\"). This tool is part of plugin `context-mode`.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "queries": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Array of search queries. Batch ALL questions in one call."
+                },
+                "limit": {
+                  "type": "number",
+                  "default": 3,
+                  "description": "Results per query (default: 3)"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Filter to a specific indexed source (partial match)."
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "code",
+                    "prose"
+                  ],
+                  "description": "Filter results by content type: 'code' or 'prose'."
+                },
+                "sort": {
+                  "type": "string",
+                  "enum": [
+                    "relevance",
+                    "timeline"
+                  ],
+                  "default": "relevance",
+                  "description": "Sort mode. 'relevance' (default): BM25 ranked, current session only. 'timeline': chronological across current session, prior sessions, and auto-memory."
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          }
+        },
+        "toolsError": null,
+        "resources": [],
+        "resourceTemplates": [],
+        "authStatus": "unsupported"
+      }
+    ],
+    "nextCursor": null
+  },
+  "hooks": {
+    "data": [
+      {
+        "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/ctxmode/ws",
+        "hooks": [],
+        "warnings": [],
+        "errors": []
+      }
+    ]
+  },
+  "skills": {
+    "data": [
+      {
+        "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/ctxmode/ws",
+        "skills": [
+          {
+            "name": "context-mode:context-mode",
+            "description": "Use context-mode tools (ctx_execute, ctx_execute_file) instead of Bash/cat when processing large outputs. Triggers: \"analyze logs\", \"summarize output\", \"process data\", \"parse JSON\", \"filter results\", \"extract errors\", \"check build output\", \"analyze dependencies\", \"process API response\", \"large file analysis\", \"page snapshot\", \"browser snapshot\", \"DOM structure\", \"inspect page\", \"accessibility tree\", \"Playwright snapshot\", \"run tests\", \"test output\", \"coverage report\", \"git log\", \"recent commits\", \"diff between branches\", \"list containers\", \"pod status\", \"disk usage\", \"fetch docs\", \"API reference\", \"index documentation\", \"call API\", \"check response\", \"query results\", \"find TODOs\", \"count lines\", \"codebase statistics\", \"security audit\", \"outdated packages\", \"dependency tree\", \"cloud resources\", \"CI/CD output\". Also triggers on ANY MCP tool output that may exceed 20 lines. Subagent routing is handled automatically via PreToolUse hook.",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-doctor",
+            "description": "Run context-mode diagnostics. Checks runtimes, hooks, FTS5, plugin registration, npm and marketplace versions. Trigger: /context-mode:ctx-doctor",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-doctor/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-index",
+            "description": "Index a local file or directory into context-mode's persistent FTS5 knowledge base so future ctx_search calls can retrieve focused snippets without rereading raw files. Trigger: /context-mode:ctx-index",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-index/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-insight",
+            "description": "Open the context-mode Insight dashboard in your default browser. Insight is the hosted analytics layer for AI-assisted engineering teams \u2014 per-engineer productive rate, retry waste, blocker detection, role-narrowed views. Trigger: /context-mode:ctx-insight",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-insight/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-purge",
+            "description": "Purge the context-mode knowledge base. Permanently deletes all indexed content and resets session stats. This is destructive and cannot be undone. Trigger: /context-mode:ctx-purge",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-purge/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-search",
+            "description": "Search context-mode's persistent FTS5 knowledge base for previously indexed local project content, documentation, or session memory. Trigger: /context-mode:ctx-search",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-search/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-stats",
+            "description": "Show how much context window context-mode saved this session. Displays token consumption, context savings ratio, and per-tool breakdown. Read-only \u2014 shows stats only, no reset capability. To wipe the knowledge base entirely, use ctx_purge instead. Trigger: /context-mode:ctx-stats",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-stats/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "context-mode:ctx-upgrade",
+            "description": "Update context-mode from GitHub and fix hooks/settings. Pulls latest, builds, installs, updates npm global, configures hooks. Trigger: /context-mode:ctx-upgrade",
+            "path": "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/ctx-upgrade/SKILL.md",
+            "scope": "user",
+            "enabled": true,
+            "pluginId": "context-mode@context-mode"
+          },
+          {
+            "name": "imagegen",
+            "description": "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas.",
+            "interface": {
+              "displayName": "Image Gen",
+              "shortDescription": "Generate or edit images for websites, games, and more",
+              "iconSmall": "$HOME/.codex/skills/.system/imagegen/assets/imagegen-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/imagegen/assets/imagegen.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $imagegen to make or edit an image for this project."
+            },
+            "path": "$HOME/.codex/skills/.system/imagegen/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "openai-docs",
+            "description": "Use for Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, customization, automations, and self-knowledge\u2014including 'you,' 'your,' 'this app,' or 'this coding agent' when they refer to Codex\u2014and for OpenAI APIs/products and ChatGPT Work. Also use for model choice/migration, prompting, SDKs, Responses, Realtime, agents, evals, and Chat/Work/Codex comparisons. Do not use for generic app/software tasks that merely mention Codex.",
+            "shortDescription": "Codex models/pricing, scheduled tasks, skills, settings, setup, troubleshooting, and self-knowledge; OpenAI APIs and ChatGPT Work. 'You'/'this app' means Codex only.",
+            "interface": {
+              "displayName": "OpenAI Docs",
+              "shortDescription": "OpenAI and Codex docs for models, skills, tasks, and setup",
+              "iconSmall": "$HOME/.codex/skills/.system/openai-docs/assets/openai-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/openai-docs/assets/openai.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use OpenAI Docs for official docs lookup, questions about Codex itself or Codex surfaces, model selection, model migration, and prompt-upgrade work."
+            },
+            "path": "$HOME/.codex/skills/.system/openai-docs/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "plugin-creator",
+            "description": "Create and scaffold plugin directories for Codex with a required `.codex-plugin/plugin.json`, optional plugin folders/files, valid manifest defaults, and personal-marketplace entries by default. Use when Codex needs to create a new personal plugin, add optional plugin structure, generate or update marketplace entries for plugin ordering and availability metadata, or update an existing local plugin during development with the CLI-driven cachebuster and reinstall flow.",
+            "interface": {
+              "displayName": "Plugin Creator",
+              "shortDescription": "Scaffold plugins and marketplace entries",
+              "iconSmall": "$HOME/.codex/skills/.system/plugin-creator/assets/plugin-creator-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/plugin-creator/assets/plugin-creator.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $plugin-creator to scaffold a valid plugin in the personal marketplace, then validate it before handing it back."
+            },
+            "path": "$HOME/.codex/skills/.system/plugin-creator/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "review-agent",
+            "description": "Perform a read-only, defect-first review of a specified code change and return every actionable finding. Use when another agent delegates review of uncommitted changes, a base-branch diff, a commit, or custom review instructions.",
+            "interface": {
+              "displayName": "Review Agent",
+              "shortDescription": "Find actionable bugs in code changes",
+              "iconSmall": null,
+              "iconLarge": null,
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": "Use $review-agent to review the requested code changes and return actionable findings."
+            },
+            "path": "$HOME/.codex/skills/.system/review-agent/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "skill-creator",
+            "description": "Create or update a Codex skill with appropriately scoped instructions and any needed supporting resources.",
+            "shortDescription": "Create or update a skill",
+            "interface": {
+              "displayName": "Skill Creator",
+              "shortDescription": "Create or update a skill",
+              "iconSmall": "$HOME/.codex/skills/.system/skill-creator/assets/skill-creator-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/skill-creator/assets/skill-creator.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": null
+            },
+            "path": "$HOME/.codex/skills/.system/skill-creator/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          },
+          {
+            "name": "skill-installer",
+            "description": "Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos).",
+            "shortDescription": "Install curated skills from openai/skills or other repos",
+            "interface": {
+              "displayName": "Skill Installer",
+              "shortDescription": "Install curated skills from openai/skills or other repos",
+              "iconSmall": "$HOME/.codex/skills/.system/skill-installer/assets/skill-installer-small.svg",
+              "iconLarge": "$HOME/.codex/skills/.system/skill-installer/assets/skill-installer.png",
+              "iconSmallUrl": null,
+              "iconLargeUrl": null,
+              "brandColor": null,
+              "defaultPrompt": null
+            },
+            "path": "$HOME/.codex/skills/.system/skill-installer/SKILL.md",
+            "scope": "system",
+            "enabled": true,
+            "pluginId": null
+          }
+        ],
+        "errors": []
+      }
+    ]
+  },
+  "summary": {
+    "features": {
+      "hooks": false,
+      "plugin_hooks": false,
+      "apps": false
+    },
+    "plugins": {
+      "context-mode@context-mode": true
+    },
+    "mcp_servers_configured": [],
+    "mcp_status_names": [
+      "context-mode"
+    ],
+    "hook_count": 0,
+    "skill_count": 14,
+    "otel": {
+      "exporter": "none",
+      "metrics_exporter": "none"
+    },
+    "layer_sources": [
+      {
+        "type": "user",
+        "file": "$HOME/.codex/config.toml",
+        "profile": null
+      },
+      {
+        "type": "system",
+        "file": "/etc/codex/config.toml"
+      }
+    ],
+    "codex_home_instruction_files": [],
+    "config_top_level_keys": [
+      "agents",
+      "allow_login_shell",
+      "allow_symlinked_codex_home",
+      "analytics",
+      "approval_policy",
+      "approvals_reviewer",
+      "apps",
+      "apps_mcp_product_sku",
+      "audio",
+      "auto_review",
+      "background_terminal_max_timeout",
+      "browser_use",
+      "chatgpt_base_url",
+      "check_for_update_on_startup",
+      "cli_auth_credentials_store",
+      "compact_prompt",
+      "computer_use",
+      "default_permissions",
+      "desktop",
+      "developer_instructions",
+      "disable_paste_burst",
+      "experimental_compact_prompt_file",
+      "experimental_realtime_start_instructions",
+      "experimental_realtime_webrtc_call_base_url",
+      "experimental_realtime_ws_backend_prompt",
+      "experimental_realtime_ws_base_url",
+      "experimental_realtime_ws_model",
+      "experimental_realtime_ws_startup_context",
+      "experimental_thread_store",
+      "experimental_thread_store_endpoint",
+      "experimental_use_unified_exec_tool",
+      "features",
+      "feedback",
+      "file_opener",
+      "forced_chatgpt_workspace_id",
+      "forced_login_method",
+      "ghost_snapshot",
+      "goals",
+      "hide_agent_reasoning",
+      "history",
+      "hooks",
+      "include_apps_instructions",
+      "include_collaboration_mode_instructions",
+      "include_environment_context",
+      "include_permissions_instructions",
+      "instructions",
+      "js_repl_node_module_dirs",
+      "js_repl_node_path",
+      "log_dir",
+      "marketplaces",
+      "mcp_oauth_callback_port",
+      "mcp_oauth_callback_url",
+      "mcp_oauth_credentials_store",
+      "mcp_optional_startup_grace_ms",
+      "mcp_servers",
+      "memories",
+      "model",
+      "model_auto_compact_token_limit",
+      "model_auto_compact_token_limit_scope",
+      "model_catalog_json",
+      "model_context_window",
+      "model_instructions_file",
+      "model_provider",
+      "model_providers",
+      "model_reasoning_effort",
+      "model_reasoning_summary",
+      "model_verbosity",
+      "notice",
+      "notify",
+      "openai_base_url",
+      "orchestrator",
+      "oss_provider",
+      "otel",
+      "permissions",
+      "personality",
+      "plan_mode_reasoning_effort",
+      "plugins",
+      "profile",
+      "profiles",
+      "project_doc_fallback_filenames",
+      "project_doc_max_bytes",
+      "project_root_markers",
+      "projects",
+      "realtime",
+      "responses_api_metadata",
+      "review_model",
+      "sandbox_mode",
+      "sandbox_workspace_write",
+      "service_tier",
+      "shell_environment_policy",
+      "show_raw_agent_reasoning",
+      "skills",
+      "sqlite_home",
+      "suppress_unstable_features_warning",
+      "thread_unload_delay_secs",
+      "tool_output_token_limit",
+      "tool_suggest",
+      "tools",
+      "tui",
+      "web_search",
+      "windows"
+    ]
+  },
+  "config_read_error": null,
+  "finished_at": "2026-09-23T12:59:03Z"
+}

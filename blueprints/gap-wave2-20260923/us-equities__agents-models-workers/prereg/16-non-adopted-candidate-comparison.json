@@ -1,0 +1,13 @@
+{
+ "gap_index": 16,
+ "slug": "non-adopted-candidate-comparison",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "LoopX 1.1.0 (non-adopted candidate in this packet) can run one governed Turn through its built-in codex-cli adapter on the same preregistered fact-extraction task used for gap 0, with an independent validator; it should reach the same facts as codex-native-sdk with extra control-plane overhead.",
+ "criteria": [
+  "Install LoopX 1.1.0 only into a venv under this unit's cache with a temporary HOME (no skills installed into the real ~/.codex or ~/.claude).",
+  "Same input files, same gold, same scoring script as gap 0; validator = the scoring script over the artifact.",
+  "Record committed/repair status, facts correct, blocks, and whatever native usage the adapter exposes (unavailable usage is reported as unavailable).",
+  "If LoopX cannot run headless here, record the exact blocker and outcome deferred/not_settled."
+ ]
+}

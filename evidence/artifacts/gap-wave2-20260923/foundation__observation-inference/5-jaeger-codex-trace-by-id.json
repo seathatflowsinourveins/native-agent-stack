@@ -1,0 +1,98 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-5",
+  "gap_index": 5,
+  "gap_text_sha256": "b7b6223b0fe93cfbd55f89d01e583d5d04372722e52bd78304e6de9ca2747c15",
+  "gap_text": "Traces are disabled and no trace database is deployed, so the pipeline answers no trace questions (agents-operations.json line 882).",
+  "next_check": "Deploy a pinned local Jaeger or Tempo, enable OTLP trace export for one native client session, and query that session's trace by ID.",
+  "arms": [
+    {
+      "arm": "deploy a pinned local Jaeger or Tempo",
+      "status": "executed (temporary)",
+      "detail": "Jaeger 2.21.0, checksum-verified, loopback, in-memory; stopped afterwards"
+    },
+    {
+      "arm": "enable OTLP trace export for one native client session",
+      "status": "executed",
+      "detail": "one ephemeral codex exec with only trace_exporter enabled"
+    },
+    {
+      "arm": "query that session's trace by ID",
+      "status": "executed",
+      "detail": "v3 and legacy query APIs; session-linked traces identified by the codex thread id"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "Jaeger 2.21.0 (checksum-verified, loopback, in-memory storage) will accept OTLP traces from one ephemeral codex exec session configured with a trace_exporter override, and the Jaeger query API will return that trace by its ID.",
+    "criteria": "Pass = at least one trace with service codex_exec (or the native service name) found via /api/v3/traces or /api/traces search, then fetched again by trace ID with span count > 0. Record which spans/attributes exist and whether content leaks. Live pipeline stays trace-disabled (not changed).",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)"
+  },
+  "commands": [
+    "curl -fsSL https://github.com/jaegertracing/jaeger/releases/download/v2.21.0/jaeger-2.21.0-linux-amd64.tar.gz (+ .sha256sum.txt) into $HOME/.cache/gap-wave2-20260923/observation-inference/jaeger-2.21.0/dl; sha256 compared with the GitHub release digest; inner binaries checked with sha256sum -c (raw/5-jaeger-install.txt)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/trace_codex.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-trace-codex.json",
+    "child (inside the script): codex exec --ephemeral --sandbox read-only --skip-git-repo-check --ignore-user-config --disable hooks --json -C <tmp cwd> -c model=\"gpt-6-astra\" -c model_reasoning_effort=\"low\" -c otel.environment=\"gap-wave2\" -c otel.exporter=\"none\" -c otel.metrics_exporter=\"none\" -c otel.log_user_prompt=false -c otel.trace_exporter={otlp-http={endpoint=\"<jaeger otlp http>/v1/traces\",protocol=\"binary\"}} Reply with exactly the two characters OK and nothing else. Do not run any command."
+  ],
+  "results": [
+    "codex_exit_code=0, codex_usage={\"input_tokens\": 16986, \"cached_input_tokens\": 11520, \"cache_write_input_tokens\": 0, \"output_tokens\": 5, \"reasoning_output_tokens\": 0}, codex_thread_id=<codex-thread-id>",
+    "Jaeger services after the run: ['codex_exec']; search found 681 spans in 17 traces",
+    "GET /api/v3/traces/239356db2d0567727f3f4f8c61c5b333 -> 200, spans=2; GET /api/traces/239356db2d0567727f3f4f8c61c5b333 -> 200, spans=2; contains_codex_thread_id=False",
+    "GET /api/v3/traces/33adc7e3da1b3ecb6b8561b94b177d87 -> 200, spans=198; GET /api/traces/33adc7e3da1b3ecb6b8561b94b177d87 -> 200, spans=198; contains_codex_thread_id=False",
+    "GET /api/v3/traces/34c92129e93d03f7f02ccdba355508b0 -> 200, spans=1; GET /api/traces/34c92129e93d03f7f02ccdba355508b0 -> 200, spans=1; contains_codex_thread_id=True",
+    "GET /api/v3/traces/3df66994852bad1b85b4bd22432f8c1c -> 200, spans=4; GET /api/traces/3df66994852bad1b85b4bd22432f8c1c -> 200, spans=4; contains_codex_thread_id=True",
+    "GET /api/v3/traces/4a64e006dc91dc417995844f60624efa -> 200, spans=2; GET /api/traces/4a64e006dc91dc417995844f60624efa -> 200, spans=2; contains_codex_thread_id=True",
+    "GET /api/v3/traces/4f8cdac35da0cba74b9164fce950afde -> 200, spans=4; GET /api/traces/4f8cdac35da0cba74b9164fce950afde -> 200, spans=4; contains_codex_thread_id=False",
+    "GET /api/v3/traces/76146a2e1bf217a6447a68a2be50f9b3 -> 200, spans=1; GET /api/traces/76146a2e1bf217a6447a68a2be50f9b3 -> 200, spans=1; contains_codex_thread_id=False",
+    "GET /api/v3/traces/844703bed776b005c5205245c16d28e5 -> 200, spans=1; GET /api/traces/844703bed776b005c5205245c16d28e5 -> 200, spans=1; contains_codex_thread_id=False",
+    "GET /api/v3/traces/878fcc2fb6e44df41a69903c415bf84f -> 200, spans=183; GET /api/traces/878fcc2fb6e44df41a69903c415bf84f -> 200, spans=183; contains_codex_thread_id=True",
+    "GET /api/v3/traces/8d4e69d7aea5184f7805d1002d3f8236 -> 200, spans=1; GET /api/traces/8d4e69d7aea5184f7805d1002d3f8236 -> 200, spans=1; contains_codex_thread_id=False",
+    "session-linked traces (attribute carrying the codex thread id): [{'trace_id': '34c92129e93d03f7f02ccdba355508b0', 'spans': 1, 'root': ['codex.exec'], 'attr': ['thread.id']}, {'trace_id': '3df66994852bad1b85b4bd22432f8c1c', 'spans': 4, 'root': ['session_loop'], 'attr': ['thread_id']}, {'trace_id': '4a64e006dc91dc417995844f60624efa', 'spans': 2, 'root': ['thread/unsubscribe'], 'attr': ['key']}, {'trace_id': '878fcc2fb6e44df41a69903c415bf84f', 'spans': 183, 'root': ['turn/start'], 'attr': ['key']}]",
+    "prompt_text_in_traces=False, home_path_in_traces=True (the turn/start trace carries a 'cwd' attribute)"
+  ],
+  "outcome": "advanced",
+  "note": "A checksum-verified Jaeger 2.21.0 on loopback received OTLP traces from one ephemeral codex exec session; that session's traces were fetched by ID through both query APIs (for example the 183-span turn/start trace and the codex.exec root span carrying thread.id). Remaining: the live pipeline still has traces disabled and no trace database; adopting one needs a retention decision and a privacy review (these traces carry the working-directory path and thread IDs and bypass the collector privacy processors), and Claude trace export was not tested.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Temporary in-memory Jaeger, stopped after the check; nothing was deployed into the live pipeline.",
+    "One ephemeral codex exec (gpt-6-astra, low effort, read-only sandbox, --ignore-user-config, hooks disabled); log and metric export were disabled for this run.",
+    "Only the first 10 of the found trace IDs were fetched by ID.",
+    "Publication redaction: the Codex thread UUID is replaced by <codex-thread-id> in committed files (repository validator rule for local session identifiers); the match was computed on the unredacted private output."
+  ],
+  "checked_at": "2026-09-23T02:58:55.215061+00:00",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-trace-codex.json",
+      "sha256": "1759b1b0aa6cb39f0e22f1a0a0c44abacbba9e71ee9403c3d978b4e40c52a923"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-trace-codex.stdout.txt",
+      "sha256": "1750e7c6f954df87cee37da30c17c6d0046780f8a7c89c1709e40781716eb551"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-trace-codex.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-trace-codex-by-id-summary.json",
+      "sha256": "47329cc9a159901abcfdfd375e976a7f4117828554e6629a011bf1ccd8b5f1af"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/5-jaeger-install.txt",
+      "sha256": "fd81a5fc0940214a6a9c31ae087fcb7360e8f74c969cd9052e217885ff98cd50"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/trace_codex.py",
+      "sha256": "9f70fb98d20c8efa0bb5a6069ab75612a3dd8bd729e0e55c034a94b318218d36"
+    }
+  ]
+}

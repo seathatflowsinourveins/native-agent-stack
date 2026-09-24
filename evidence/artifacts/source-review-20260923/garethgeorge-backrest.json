@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-garethgeorge-backrest",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/garethgeorge/backrest",
+ "reviewed_commit": "148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "observability-hosting"
+ ],
+ "claim": "Source and documentation review of the repository garethgeorge/backrest at commit 148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635 (license GPL-3.0), read from README.md at that revision. Repository description: \"Backrest is a web UI and orchestrator for restic backup.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Backrest is a web-accessible backup solution built on top of restic. Backrest provides a WebUI which wraps the restic CLI and makes it easy to create repos, browse snapshots, and restore files. Additionally, Backrest can run in the background and take an opinionated approach to scheduling snapshots and orchestrating repo health operations."
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "By building on restic, Backrest leverages its mature, fast, reliable, and secure backup capabilities while adding an intuitive interface."
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Web Interface: Access locally or remotely (perfect for NAS deployments)"
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Cron-scheduled backups and maintenance (e.g. prune, check, forget, etc)"
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Browse and restore files from snapshots"
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Configurable notifications (Discord, Slack, Shoutrrr, Gotify, Healthchecks)"
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Pre/post backup command hooks to execute shell scripts"
+  },
+  {
+   "source": "README.md@148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+   "text": "Supports all restic storage backends (S3, B2, Azure, GCS, local, SFTP, and all rclone remotes)"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/garethgeorge/backrest/tree/148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635",
+  "https://github.com/garethgeorge/backrest/blob/148ba12c12a7a4fef6d3c6c8e675ca2c5e7d3635/README.md"
+ ]
+}

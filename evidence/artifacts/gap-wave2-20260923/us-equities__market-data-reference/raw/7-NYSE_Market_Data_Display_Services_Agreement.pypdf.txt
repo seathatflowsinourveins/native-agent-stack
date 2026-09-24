@@ -1,0 +1,261 @@
+ 
+ 
+Last Update: March 4, 2013 
+EXHIBIT B 
+ 
+ 
+ 
+ 
+AGREEMENT FOR 
+ 
+MARKET DATA DISPLAY SERVICES 
+ 
+(Usage-Based Services/Nonprofessional Subscriber Status) 
+ 
+(Electronic Version) 
+ 
+ 
+_______________________________[NAME OF VENDOR/BROKER DEALER] ("Vendor") 
+agrees to make "Market Data" available to y ou pursuant to the terms and conditions set forth in 
+this agreement. By executing this Agreement in the space indicated below, you ("Subscriber") 
+agree to comply with those terms and conditions. Section 1 sets forth terms and conditions of 
+general applicability. Section 2 applies insofar as Subscriber receives and uses Market Data made 
+available pursuant to this Agreement as a Nonprofessional Subscriber. 
+ 
+ 
+ 
+SECTION 1: TERMS AND CONDITIONS OF GENERAL APPLICABILITY 
+ 
+1. MARKET DATA DEFINITION – For all purposes of this Agreement, "Market 
+Data" means (a) last sale information and quotation information relating to securities that are 
+admitted to dealings on the New York Stock Exchange ("NYSE"), (b) such bond and other equity 
+last sale and quotation information, a nd such index and other market information, as United 
+States-registered national securities exchanges and national securities associations (each, an 
+"Authorizing SRO") may make available and as the NYSE may from time to time designate as 
+"Market Data"; and (c) all information that derives from any such information. 
+ 
+2. PROPRIETARY NATURE OF DATA – Subscriber understands and 
+acknowledges that each Authorizing SRO and Other Data Disseminator has a proprietary interest 
+in the Market Data that originates on or derives from it or its market(s). 
+ 
+3. ENFORCEMENT – Subscriber understands and acknowledges that (a) the 
+Authorizing SROs are third -party beneficiaries under this Agreement and (b) the Authorizing 
+SROs or their authorized representative(s) may enforce this  Agreement, by legal proceedings or 
+otherwise, against Subscriber or any person that obtains Market Data that is made available 
+pursuant to this Agreement other than as this Agreement contemplates. Subscriber shall pay the 
+reasonable attorney's fees that a ny Authorizing SRO incurs in enforcing this Agreement against 
+Subscriber. 
+ 
+4. DATA NOT GUARANTEED – Subscriber understands that no Authorizing 
+SRO, no other entity whose information is made available over the Authorizing SROs' facilities 
+(an "Other Data Di sseminator") and no information processor that assists any Authorizing SRO 
+or Other Data Disseminator in making Market Data available (collectively, the "Disseminating 
+ 
+ 
+Last Update: March 4, 2013 
+Parties") guarantees the timeliness, sequence, accuracy or completeness of Market Data o r of 
+other market information or messages disseminated by any Disseminating Party. Neither 
+Subscriber nor any other person shall hold any Disseminating Party liable in any way for (a) any 
+inaccuracy, error or delay in, or omission of, (i) any such data, in formation or message or (ii) the 
+transmission or delivery of any such data, information or message, or (b) any loss or damage 
+arising from or occasioned by (i) any such inaccuracy, error, delay or omission, (ii) non -
+performance or (iii) interruption in any  such data, information or message, due either to any 
+negligent act or omission by any Disseminating Party, to any "force majeure" (e.g., flood, 
+extraordinary weather conditions, earthquake or other act of God, fire, war, insurrection, riot, 
+labor dispute,  accident, action of government, communications or power failure, equipment or 
+software malfunction) or to any other cause beyond the reasonable control of any Disseminating 
+Party. 
+ 
+5. PERMITTED USE – Subscriber shall not furnish Market Data to any other 
+person or entity.  If Subscriber receives Market Data other than as a Nonprofessional Subscriber, 
+it shall use Market Data only for its individual use in its business. 
+ 
+6. DISSEMINATION DISCONTINUANCE OR MODIFICATION – 
+Subscriber understands and acknowledge s that, at any time, the Authorizing SROs may 
+discontinue disseminating any category of Market Data, may change or eliminate any 
+transmission method and may change transmission speeds or other signal characteristics. The 
+Authorizing SROs shall not be liabl e for any resulting liability, loss or damages that may arise 
+therefrom. 
+ 
+ 
+7. DURATION; SURVIVAL – This Agreement remains in effect for so long as 
+Subscriber has the ability to receive Market Data as contemplated by this Agreement. In addition, 
+Vendor may terminate this Agreement at any time, whether at the direction of the Authorizing 
+SROs or otherwise. Paragraphs 2, 3 and 4, and the first two sentences of Paragraph 8, survive any 
+termination of this Agreement. 
+ 
+ 
+8. MISCELLANEOUS – The laws of the State of  New York shall govern this 
+Agreement and it shall be interpreted in accordance with those laws. This Agreement is subject to 
+the Securities Exchange Act of 1934, the rules promulgated under that act, and the joint -industry 
+plans entered into pursuant to t hat act. This writing contains the entire agreement between the 
+parties in respect of its subject matter. Subscriber may not assign all or any part of this Agreement 
+to any other person. The person executing this Agreement below represents and warrants tha t he 
+or she has legal capacity to contract and, if that person is executing this Agreement on behalf of a 
+proprietorship or a business, partnership or other organization, represents and warrants that he or 
+she has actual authority to bind the organization. 
+ 
+ 
+ 
+Last Update: March 4, 2013 
+ACCEPTED AND AGREED:  I, the "Subscriber" to which the preceding terms 
+and conditions refer, acknowledge that I have read the preceding terms and conditions of this 
+Section 1, that I understand them and that I hereby manifest my assent to, and my agreement to 
+comply with, those terms and conditions by "clicking" on the following box: 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SECTION 2: NONPROFESSIONAL SUBSCRIBER 
+ 
+9.            NONPROFESSIONAL SUBSCRIBER DEFINITION -"Nonprofessional 
+Subscriber" means any natural person who receives mark et data solely for his/her personal, non -
+business use and who is not a “Securities Professional.”   A “Securities Professional” includes an 
+individual who, if working in the United States, is: 
+ 
+(a) registered or qualified with the Securities and Exchange Commis sion (the 
+"SEC"), the Commodities Futures Trading Commission, any state securities 
+agency, any securities exchange or association, or any commodities or futures 
+contract market or association. 
+ 
+(b) engaged as an "investment advisor" as that term is defined in Section 202 (a) (11) 
+of the Investment Advisor's Act of 1940 (whether or not registered or qualified 
+under that Act), or  
+ 
+(c) employed by a bank or other organization exempt from registration under Federal 
+and/or state securities laws to perform functions tha t would require him or her to 
+be so registered or qualified if he or she were to perform such functions for an 
+organization not so exempt. 
+ 
+A person who works outside of the United States will be considered a “Securities Professional” if 
+he or she performs  the same functions as someone who would be considered a “Securities 
+Professional” in the United States.   
+ 
+Subscriber may not receive Market Data as a “Nonprofessional Subscriber” unless the vendor 
+providing that data to Subscriber first determines that t he individual falls within Paragraph 9’s 
+definition of “Nonprofessional Subscriber.”   
+ 
+ 
+10. PERMITTED RECEIPT  - Subscriber may not receive Market Data from 
+Vendor, and Vendor may not provide Market Data to Subscriber, on a “Nonprofessional 
+Subscriber” bas is unless Vendor first properly determines that Subscriber qualifies as a 
+“Nonprofessional Subscriber” as defined in Paragraph 9 and Subscriber in fact qualifies as a 
+“Nonprofessional Subscriber.” 
+ 
+ 
+ 
+Last Update: March 4, 2013 
+ 
+11. PERMITTED USE – If Subscriber is a Nonprofessional Su bscriber, he or she 
+shall receive Market Data solely for his or her personal, non-business use. 
+ 
+ 
+ 12. PERSONAL AND EMPLOYMENT DATA – As a prerequisite to qualifying 
+as a "Nonprofessional Subscriber", Subscriber shall provide the following information: 
+ 
+ 
+Subscriber's name and address: 
+ 
+ 
+ 
+Subscriber's occupations (list all occupations – including homemaker, student, retiree, 
+etc.): 
+ 
+ 
+ 
+Name(s) and address(es) of Subscriber's employer(s): 
+ 
+ 
+ 
+Subscriber's title(s) and/or position(s): 
+ 
+ 
+ 
+Subscriber's employment functions (description): 
+ 
+ 
+ 
+In order to facilitate a decision as to whether Subscriber qualifies as a "Nonprofessional 
+Subscriber," Subscriber shall answer the following questions:  
+ 
+A. Do you use Market Data solely for your personal, non-business use? 
+☐Yes  ☐No   
+ 
+B. Do you receive Market Data for your business or any other entity? 
+☐Yes  ☐No   
+ 
+C. Are you currently registered or qualified with the SEC or the CFTC?  
+☐Yes  ☐No   
+ 
+D. Are you currently registered or qualified with any securities agency, any securities exchange, 
+association or regulatory body, or any commodities or futures contract market, association or 
+regulatory body, in the United States or elsewhere? 
+☐Yes  ☐No   
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Last Update: March 4, 2013 
+E. Whether you are located within or outside of the United States, do you perform any functions 
+that are similar to those that require an individual to register or qualify with the SEC, the 
+CFTC, any other securities agency or regulatory body, any securities exchange or association, 
+or any commodities or futures contract market, association or regulatory body? 
+☐Yes  ☐No   
+ 
+F. Are you engaged to provide investment advice to any individual or entity? 
+☐Yes  ☐No   
+ 
+G. Are you engaged as an asset manager?  
+☐Yes  ☐No   
+ 
+H. Do you use the capital of any other individual or entity in the conduct of your trading?  
+☐Yes  ☐No   
+ 
+I. Do you conduct trading for the benefit of a corporation, partnership, or other entity? 
+☐Yes  ☐No   
+ 
+J. Have you entered into any agreement to share the profit of your trading activities or receive 
+compensation for your trading activities?  
+☐Yes  ☐No   
+ 
+K. Are you receiving office space, and equipment or other benefits in exchange for your trading 
+or work as a financial consultant to any person, firm or business entity? 
+☐Yes  ☐No   
+ 
+Subscriber shall notify Vendor promptly in writing of any change in his or her circumstances that 
+may cause him or her to cease to qualify as a Nonprofessional Subscriber or that may change his 
+or her response to any of the preceding questions. 
+ 
+ 
+13. CERTIFICATION – By executing this Agreement, Subscriber hereby certifies that he 
+or she falls within Paragraph 9's definition of "Nonprofessional Subscriber" and that the personal 
+and employment information that he or she has included in Paragraph 12 is truthful and accurate. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Last Update: March 4, 2013 
+ACCEPTED AND AGREED:  I, the "Subscriber" to which the preceding terms 
+and conditions refer, acknowledge that I have read the preceding terms and conditions of this 
+Section 2, that I understand them and that I hereby manifest my assent to, and my agreement to 
+comply with, those terms and conditions by "clicking" on the following box: 
+ 
+ 
+ 
+ 
+ 
+ 

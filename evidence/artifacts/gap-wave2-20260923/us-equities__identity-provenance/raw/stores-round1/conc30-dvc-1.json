@@ -1,0 +1,43 @@
+{
+  "arm": "dvc",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "no_silent_loss": true,
+    "reported_successful_appends": 60,
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 300,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "detail": {
+        "a": {
+          "batches": 30,
+          "checkout_exit": 0,
+          "stderr": ""
+        },
+        "b": {
+          "batches": 30,
+          "checkout_exit": 0,
+          "stderr": ""
+        }
+      },
+      "git_commits": 60,
+      "readable": true,
+      "rows": 300,
+      "status_after_exit": 0,
+      "status_exit": 0
+    },
+    "stderr_tail": {
+      "a": "",
+      "b": ""
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/7-one-zero-distributions-fill-rule-peer",
+  "gap_index": 7,
+  "gap_text_sha256": "a2d912c233c144a38fa69201959cbac0fd2ce68f53903c032ab6ed99faf8423b",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "covered_elsewhere: one_zero parity, distribution posting and fill-price alignment belong to the spy-lean-parity and dividend-sim-module gates owned by peer:sota-workflow-resolution.",
+    "criteria": [
+      "covered_elsewhere if both gates name that owner at base 41d39b3"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Post the SPY distributions in the Nautilus replay, align the fill-price rule with LEAN, rerun one_zero parity, and report the ending-cash delta against the -655.12 USD baseline.",
+  "commands": [
+    "python3 -c \"read catalogs/us-equities/gates-20260922.json gates spy-lean-parity, dividend-sim-module\""
+  ],
+  "results": {
+    "spy-lean-parity": "owner peer:sota-workflow-resolution, status blocked",
+    "dividend-sim-module": "owner peer:sota-workflow-resolution, status not_established; closes market_on_open_proxy and distributions_and_cash",
+    "incidental_observation": "The 2026-09-23 fresh replay in gap 6 reproduced native_end_cash 90078.96 and dividend_cash 428.64 unchanged."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-run.stdout.txt",
+      "sha256": "3ea170eb851c00394d7b61502c1e2fc0b55e84bc36f1055d4970ad691f88eac2"
+    }
+  ],
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "remaining": "Owned by peer:sota-workflow-resolution: post distributions, align the fill-price rule, rerun one_zero and report the delta against -655.12 USD.",
+  "limits": [
+    "No fill rule, distribution posting or manifest change was attempted here (peer-owned; the manifest forbids an invented balancing cash entry)."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "covered_by": {
+    "owner": "peer:sota-workflow-resolution",
+    "gate_file": "catalogs/us-equities/gates-20260922.json",
+    "rule": "SPY/LEAN parity and the dividend sim module are covered_elsewhere under the peer's preregistration (unit brief)."
+  }
+}

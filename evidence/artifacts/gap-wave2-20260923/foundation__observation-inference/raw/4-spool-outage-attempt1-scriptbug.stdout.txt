@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/spool_outage.py", line 211, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "$HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/spool_outage.py", line 153, in main
+    ev = events_ids(stack)
+         ^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-observation-inference/blueprints/gap-wave2-20260923/foundation__observation-inference/spool_outage.py", line 73, in events_ids
+    at = {x['key']: list(x['value'].values())[0] for x in lr.get('attributes', [])}
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

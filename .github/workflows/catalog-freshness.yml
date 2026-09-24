@@ -34,6 +34,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history (as in validate.yml and the propose job below): the project test
+          # suite this job runs includes tests/test_release_pin_contents.py, which requires
+          # the pinned release commit and tag to resolve in a CI clone. A depth-1 clone of a
+          # main that has moved past the release commit fails those tests (run 35931645459).
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:

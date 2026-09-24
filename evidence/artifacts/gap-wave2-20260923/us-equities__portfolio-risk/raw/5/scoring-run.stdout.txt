@@ -1,0 +1,85 @@
+{
+ "selected": "momentum20",
+ "reserved_candidates": {
+  "momentum20": {
+   "observed_episodes": 49,
+   "censored_episodes": 1,
+   "invested_episodes": 38,
+   "mean_raw_price_label": "0.003421123484186133510158929314",
+   "mean_net_cost_proxy_label": "0.001870103076022868204036480335"
+  },
+  "momentum60": {
+   "observed_episodes": 49,
+   "censored_episodes": 1,
+   "invested_episodes": 43,
+   "mean_raw_price_label": "0.001239654190559452298392534239",
+   "mean_net_cost_proxy_label": "-0.0005154478502568742322197106592"
+  },
+  "momentum120": {
+   "observed_episodes": 49,
+   "censored_episodes": 1,
+   "invested_episodes": 49,
+   "mean_raw_price_label": "0.004184748958235042508286118880",
+   "mean_net_cost_proxy_label": "0.002184748958235042508286118880"
+  },
+  "cash": {
+   "observed_episodes": 49,
+   "censored_episodes": 1,
+   "invested_episodes": 0,
+   "mean_raw_price_label": "0",
+   "mean_net_cost_proxy_label": "0.000"
+  },
+  "equalweight": {
+   "observed_episodes": 49,
+   "censored_episodes": 1,
+   "invested_episodes": 49,
+   "mean_raw_price_label": "0.003817883142223400032523087182",
+   "mean_net_cost_proxy_label": "0.001817883142223400032523087186"
+  }
+ },
+ "primary_test": {
+  "test": "two-sided one-sample t-test on paired net_proxy(selected) - net_proxy(equalweight)",
+  "selected": "momentum20",
+  "n_pairs": 49,
+  "mean_difference": 5.221993379946801e-05,
+  "t": 0.02651516343730066,
+  "pvalue": 0.9789563709880422,
+  "alpha": 0.05,
+  "reject_null_at_alpha": false
+ },
+ "secondary_wilcoxon": {
+  "statistic": 560.0,
+  "pvalue": 0.6079896611658668
+ },
+ "per_candidate": {
+  "momentum20": {
+   "n": 49,
+   "mean_net_proxy": 0.0018701030760228683,
+   "t": 0.9061750778148573,
+   "pvalue": 0.3693697274290137,
+   "holm_pvalue": 1.0
+  },
+  "momentum60": {
+   "n": 49,
+   "mean_net_proxy": -0.0005154478502568742,
+   "t": -0.19532042485244172,
+   "pvalue": 0.845966569242816,
+   "holm_pvalue": 1.0
+  },
+  "momentum120": {
+   "n": 49,
+   "mean_net_proxy": 0.0021847489582350428,
+   "t": 0.7642607807334552,
+   "pvalue": 0.44845271533138004,
+   "holm_pvalue": 1.0
+  },
+  "equalweight": {
+   "n": 49,
+   "mean_net_proxy": 0.0018178831422234001,
+   "t": 0.6680510969710225,
+   "pvalue": 0.5073007066496829,
+   "holm_pvalue": 1.0
+  }
+ },
+ "inputs_unchanged": true
+}

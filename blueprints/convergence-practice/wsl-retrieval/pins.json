@@ -1,0 +1,35 @@
+{
+  "base_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+  "ripgrep": {
+    "version": "15.2.0",
+    "binary_sha256": "e62198eb19b136b88c330af83647b5a962cb99b6b1f066758568f12de1974849",
+    "source_commit": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+    "license": "MIT OR Unlicense",
+    "archive_url": "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+    "archive_sha256": "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c"
+  },
+  "ast-grep": {
+    "version": "0.45.3",
+    "binary_sha256": "7a5ab30160186184c0bf8bffc87da4af25123c183964cd98c11b0b354137db0a",
+    "source_commit": "979c143639e3588c31f563091e69398683ed34f0",
+    "license": "MIT",
+    "archive_url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-x86_64-unknown-linux-gnu.zip",
+    "archive_sha256": "f8ac830881339d1edee6b2652f54798c0f4da5a827f2db38a08ee31117783ce8"
+  },
+  "qmd": {
+    "version": "2.8.3",
+    "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+    "license": "MIT",
+    "license_sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+    "archive_url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
+    "archive_sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+    "package_integrity": "sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==",
+    "entrypoint_sha256": "b7162aa4da31d602c687f2c3dd2d7fcae753def25066d4b07dc262d790f4ea23",
+    "node_engine": ">=22",
+    "reviewed_lexical_path": "dist/cli/qmd.js search() calls searchFTS without LLM session; source SHA0dd4fd702adb83f27a69e59725478524ee48d00580ab6e9848dcde933000d99a"
+  },
+  "node": {
+    "version": "24.21.0",
+    "binary_sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  }
+}

@@ -9,6 +9,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -62,6 +63,16 @@ def _init_support_tree(root: Path) -> str:
     _git(root, "-c", "user.email=test@example.com", "-c", "user.name=Test",
          "commit", "-q", "-m", "init")
     return _git(root, "rev-parse", "HEAD").stdout.strip()
+
+
+def _run_cli(argv: list[str], identity: str | None = "test-recorder") -> int:
+    """Run the CLI with no inherited $CLAUDE_CODE_SESSION_ID (CI has none) and, for record and
+    review, an explicit --identity unless the test passes identity=None or its own."""
+    if identity is not None and argv and argv[0] in ("record", "review") and "--identity" not in argv:
+        argv = [*argv, "--identity", identity]
+    environment = {key: value for key, value in os.environ.items() if key != hr.IDENTITY_ENV}
+    with mock.patch.dict(os.environ, environment, clear=True):
+        return hr.main(argv)
 
 
 def _register(root: Path, relative_path: str) -> None:
@@ -439,8 +450,7 @@ class DefaultOsNormalizationTests(unittest.TestCase):
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     def _run(self, argv: list[str]) -> int:
-        args = hr.build_parser().parse_args(argv)
-        return args.func(args)
+        return _run_cli(argv)
 
     def test_default_os_normalizes_darwin_to_macos(self):
         with mock.patch("platform.system", return_value="Darwin"):
@@ -489,8 +499,7 @@ class RecorderRoundTripTests(unittest.TestCase):
         _init_support_tree(self.root)
 
     def _run(self, argv: list[str]) -> int:
-        args = hr.build_parser().parse_args(argv)
-        return args.func(args)
+        return _run_cli(argv)
 
     def test_record_writes_a_valid_registered_receipt(self):
         buffer = io.StringIO()
@@ -499,6 +508,10 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # host.os/architecture are auto-detected unless overridden; pin them to
+                # match the linux-wsl2-x86_64 platform_id so this test's later
+                # cmd_validate() cross-check is consistent on every host OS/arch.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -543,6 +556,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "vendor/tool",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -583,6 +599,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "candidate:cli-cli",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -666,6 +685,9 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "record", "--root", str(self.root),
                 "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64",
+                # See test_record_writes_a_valid_registered_receipt: pin host.os/
+                # architecture so cmd_validate()'s cross-check is host-independent.
+                "--os", "linux", "--architecture", "x86_64",
                 "--component-id", "widget",
                 "--stage", "use",
                 "--evidence-class", "synthetic",
@@ -681,12 +703,15 @@ class RecorderRoundTripTests(unittest.TestCase):
                 "--kind", "independent_session",
                 "--ref", "test-suite",
                 "--verdict", "agree",
+                "--identity", "test-reviewer",
             ])
         self.assertEqual(review_exit, 0, review_buffer.getvalue())
 
         receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
         kinds = [review["kind"] for review in receipt["reviews"]]
         self.assertEqual(kinds, ["self", "independent_session"])
+        self.assertEqual(receipt["reviews"][1]["reviewer"]["identity_sha256"], hr.identity_digest("test-reviewer"))
+        self.assertEqual(hr.review_state(receipt), "agree")
 
         evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
         registered = {entry["path"]: entry for entry in evidence["files"]}[relative_path]
@@ -712,11 +737,304 @@ class RecorderRoundTripTests(unittest.TestCase):
             ])
         summary_buffer = io.StringIO()
         with contextlib.redirect_stdout(summary_buffer):
-            summary_exit = hr.cmd_summary(argparse.Namespace(root=self.root, json=True))
+            summary_exit = hr.cmd_summary(argparse.Namespace(root=self.root, json=True, max_age_days=180))
         self.assertEqual(summary_exit, 0)
         summary = json.loads(summary_buffer.getvalue())
-        stage_counts = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"]["stages"]["use"]
-        self.assertEqual(stage_counts["pass"], 1)
+        bucket = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"]
+        self.assertEqual(bucket["stages"]["use"]["pass"], 1)
+        self.assertIsInstance(bucket["latest_age_days"], int)
+        self.assertFalse(bucket["old"])
+        self.assertEqual(bucket["receipts"][0]["component_version"], "1.0.0")
+
+    def test_record_fails_closed_without_an_identity(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ], identity=None)
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertIn("--identity", buffer.getvalue())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101").exists())
+
+    def test_record_hashes_the_claude_session_id_and_never_stores_it(self):
+        # Built at run time: a literal UUID would trip the repository's own privacy scan.
+        session_id = "-".join(("1" * 8, "2" * 4, "3" * 4, "4" * 4, "5" * 12))
+        buffer = io.StringIO()
+        with mock.patch.dict(os.environ, {hr.IDENTITY_ENV: session_id}), contextlib.redirect_stdout(buffer):
+            exit_code = hr.main([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--model", "claude-opus-5-5",
+            ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        text = (self.root / buffer.getvalue().strip()).read_text(encoding="utf-8")
+        self.assertNotIn(session_id, text)
+        receipt = json.loads(text)
+        self.assertEqual(receipt["recorded_by"], {"identity_sha256": hr.identity_digest(session_id),
+                                                  "model": "claude-opus-5-5"})
+        self.assertEqual(receipt["tool_versions"], {"widget": "1.0.0"})
+
+    def test_record_needs_a_component_version_when_the_catalog_has_none(self):
+        buffer = io.StringIO()
+        argv = ["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "unlisted-tool", "--stage", "use",
+                "--evidence-class", "synthetic", "--cmd", "echo hi"]
+        with contextlib.redirect_stdout(buffer):
+            self.assertEqual(self._run(argv), 2, buffer.getvalue())
+        self.assertIn("--component-version", buffer.getvalue())
+
+    def test_record_binds_a_landscape_only_winner_to_its_pin(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "landscape-tool", "pin": "v2.0.0"}]},
+            {"winners": [{"component_id": "landscape-tool", "pin": "v2.0.0"}]},
+        ]}), encoding="utf-8")
+        self.assertEqual(hr.catalog_component_version(self.root, "landscape-tool"), "v2.0.0")
+        (self.root / "catalogs" / "landscape" / "us-equities.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "landscape-tool", "pin": "v3.0.0"}]},
+        ]}), encoding="utf-8")
+        self.assertIsNone(hr.catalog_component_version(self.root, "landscape-tool"))
+
+    def _record_then_review(self, *, reviewer: str | None, kind: str = "independent_session") -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        relative_path = buffer.getvalue().strip()
+        review_buffer = io.StringIO()
+        argv = ["review", "--root", str(self.root), "--receipt", relative_path, "--kind", kind,
+                "--ref", "test", "--verdict", "agree"]
+        with contextlib.redirect_stdout(review_buffer):
+            exit_code = _run_cli(argv, identity=reviewer)
+        return exit_code, review_buffer.getvalue()
+
+    def test_a_claude_session_cannot_pose_as_another_identity(self):
+        # Review of #117 finding 3: with the session id set, --identity is refused.
+        buffer = io.StringIO()
+        with mock.patch.dict(os.environ, {hr.IDENTITY_ENV: "session-a"}), contextlib.redirect_stdout(buffer):
+            exit_code = hr.main([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--identity", "someone-else",
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertIn("--identity is for sessions without", buffer.getvalue())
+
+    def test_identity_is_normalized(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(hr.resolve_identity("Alice"), hr.resolve_identity("  alice "))
+            self.assertEqual(hr.resolve_identity("\uff21lice"), hr.resolve_identity("alice"))  # NFKC fullwidth A
+            self.assertIsNone(hr.resolve_identity("   "))
+
+    def test_record_refuses_a_version_without_a_digit(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "unpinned",
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+
+    def test_default_version_prefers_the_landscape_pin_over_the_stack_version(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "widget", "pin": "v1.0.0"}]}]}), encoding="utf-8")
+        self.assertEqual(hr.catalog_component_version(self.root, "widget"), "v1.0.0")
+
+    def test_review_refuses_when_the_clock_is_behind_the_observation(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        relative_path = buffer.getvalue().strip()
+        review_buffer = io.StringIO()
+        with mock.patch.object(hr, "utc_now", return_value="2000-01-01T00:00:00Z"), \
+                contextlib.redirect_stdout(review_buffer):
+            exit_code = _run_cli(["review", "--root", str(self.root), "--receipt", relative_path,
+                                  "--kind", "independent_session", "--ref", "t", "--verdict", "disagree"],
+                                 identity="test-reviewer")
+        self.assertEqual(exit_code, 2, review_buffer.getvalue())
+        self.assertIn("clock", review_buffer.getvalue())
+        receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["reviews"]), 1)
+
+    def test_record_refuses_a_version_that_matches_no_winner_pin(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "widget", "pin": "2.0.0rc5 (tag v2.0.0rc5)"}]}]}), encoding="utf-8")
+        argv = ["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "2.0.0rc5"]
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self.assertEqual(self._run(argv), 2, buffer.getvalue())
+        self.assertIn("--allow-unbound-version", buffer.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0)
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)"])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+
+    def test_overlong_model_is_refused_before_anything_is_written(self):
+        # Codex review of #117: a --model over the schema's 100 characters used to write a receipt
+        # that validate then rejected.
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--model", "m" * 101,
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101").exists())
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        self.assertEqual(evidence["files"], [])
+
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        relative_path = out.getvalue().strip()
+        before = (self.root / relative_path).read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()) as review_out:
+            exit_code = _run_cli(["review", "--root", str(self.root), "--receipt", relative_path, "--kind",
+                                  "independent_session", "--ref", "t", "--verdict", "agree", "--model", "m" * 101],
+                                 identity="test-reviewer")
+        self.assertEqual(exit_code, 2, review_out.getvalue())
+        self.assertEqual((self.root / relative_path).read_bytes(), before)
+
+    def test_validate_refuses_future_dated_observations_and_reviews(self):
+        # Codex review of #117: a future date would stay the "latest" receipt or review.
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        path = self.root / out.getvalue().strip()
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["reviews"].append({"kind": "independent_session", "ref": "t", "verdict": "agree",
+                                   "at_utc": "2099-01-01T00:00:00Z",
+                                   "reviewer": {"identity_sha256": hr.identity_digest("x")}})
+        errors: list[str] = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors,
+                                             set(), set(), set(), {})
+        self.assertTrue(any("reviews[1].at_utc: 2099-01-01T00:00:00Z is later" in e for e in errors), errors)
+        receipt["observed_at_utc"] = "2099-01-01T00:00:00Z"
+        errors = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors,
+                                             set(), set(), set(), {})
+        self.assertTrue(any("observed_at_utc: 2099-01-01T00:00:00Z is later" in e for e in errors), errors)
+
+    def test_review_from_the_recorders_identity_is_refused(self):
+        exit_code, output = self._record_then_review(reviewer="test-recorder")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("recorder's own identity", output)
+
+    def test_review_fails_closed_without_an_identity(self):
+        exit_code, output = self._record_then_review(reviewer=None)
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("--identity", output)
+
+    def test_missing_git_is_a_clear_error_not_a_traceback(self):
+        buffer = io.StringIO()
+        with mock.patch.object(hr.shutil, "which", return_value=None), contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertIn("git is not on PATH", buffer.getvalue())
+
+
+class ReviewIndependenceTests(unittest.TestCase):
+    """validate and review_state treat a review as independent only when its reviewer identity
+    differs from recorded_by, it is not older than the observation, and no reviewer's latest
+    verdict dissents (the audit's simulated same-session 'independent_session' review)."""
+
+    RECORDER = hr.identity_digest("recorder")
+    OTHER = hr.identity_digest("other")
+    THIRD = hr.identity_digest("third")
+
+    def _receipt(self, reviews: list[dict], *, recorded_by: bool = True) -> dict:
+        receipt = {"observed_at_utc": "2026-01-01T00:00:00Z", "reviews": [
+            {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-01-01T00:00:00Z"}, *reviews]}
+        if recorded_by:
+            receipt["recorded_by"] = {"identity_sha256": self.RECORDER}
+        return receipt
+
+    @staticmethod
+    def _review(identity: str | None, verdict: str = "agree", at_utc: str = "2026-01-01T01:00:00Z") -> dict:
+        review = {"kind": "independent_session", "ref": "r", "verdict": verdict, "at_utc": at_utc}
+        if identity is not None:
+            review["reviewer"] = {"identity_sha256": identity}
+        return review
+
+    def test_same_identity_review_is_not_independent(self):
+        self.assertEqual(hr.review_state(self._receipt([self._review(self.RECORDER)])), "none")
+
+    def test_distinct_identity_agree_is_independent(self):
+        self.assertEqual(hr.review_state(self._receipt([self._review(self.OTHER)])), "agree")
+
+    def test_any_standing_dissent_vetoes(self):
+        receipt = self._receipt([self._review(self.OTHER), self._review(self.THIRD, "needs_changes")])
+        self.assertEqual(hr.review_state(receipt), "dissent")
+
+    def test_a_reviewer_can_withdraw_a_dissent_with_a_newer_review(self):
+        receipt = self._receipt([
+            self._review(self.OTHER, "disagree", "2026-01-01T01:00:00Z"),
+            self._review(self.OTHER, "agree", "2026-01-01T02:00:00Z"),
+        ])
+        self.assertEqual(hr.review_state(receipt), "agree")
+
+    def test_review_dated_before_the_observation_does_not_count(self):
+        receipt = self._receipt([self._review(self.OTHER, at_utc="2025-12-31T23:00:00Z")])
+        self.assertEqual(hr.review_state(receipt), "none")
+
+    def test_a_malformed_dissent_still_vetoes_and_cannot_be_withdrawn(self):
+        # Review of #117 finding 4.
+        for dissent in (self._review(None, "disagree"), self._review(self.RECORDER, "needs_changes"),
+                        self._review(self.OTHER, "disagree", "2025-12-31T23:00:00Z")):
+            receipt = self._receipt([self._review(self.THIRD), dissent,
+                                     self._review(self.OTHER, "agree", "2026-01-01T05:00:00Z")])
+            self.assertEqual(hr.review_state(receipt), "dissent", dissent)
+
+    def test_a_malformed_agree_keeps_the_state_from_agree(self):
+        receipt = self._receipt([self._review(self.OTHER), self._review(None)])
+        self.assertEqual(hr.review_state(receipt), "none")
+
+    def test_a_dissent_without_recorded_by_still_vetoes(self):
+        receipt = self._receipt([self._review(self.OTHER, "disagree")], recorded_by=False)
+        self.assertEqual(hr.review_state(receipt), "dissent")
+
+    def test_receipt_without_recorded_by_has_no_independent_review(self):
+        self.assertEqual(hr.review_state(self._receipt([self._review(self.OTHER)], recorded_by=False)), "none")
+
+    def test_validate_rejects_same_identity_missing_reviewer_and_early_reviews(self):
+        errors: list[str] = []
+        receipt = self._receipt([self._review(self.RECORDER), self._review(None),
+                                 self._review(self.OTHER, at_utc="2025-12-31T23:00:00Z")])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_support_tree(root)
+            path = root / "evidence" / "hosts" / "h-20260101" / "x.json"
+            path.parent.mkdir(parents=True)
+            path.write_text("{}", encoding="utf-8")
+            hr.validate_receipt_cross_references(root, "h-20260101", path, receipt, errors, set(), set(), set(), {})
+        joined = "\n".join(errors)
+        self.assertIn("recorder's own identity", joined)
+        self.assertIn("must carry reviewer.identity_sha256", joined)
+        self.assertIn("precedes observed_at_utc", joined)
 
 
 class FlipRuleGatingTests(unittest.TestCase):
@@ -744,6 +1062,7 @@ class FlipRuleGatingTests(unittest.TestCase):
                 "architecture": architecture, "second_physical_machine": second_physical_machine,
             },
             "catalog_revision": self.commit,
+            "recorded_by": {"identity_sha256": hr.identity_digest("recorder")},
             "component_id": "widget",
             "stage": "use",
             "commands": [{
@@ -759,7 +1078,7 @@ class FlipRuleGatingTests(unittest.TestCase):
             "reviews": [
                 {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-01-01T00:00:00Z"},
                 {"kind": "independent_session", "ref": independent_review_ref, "verdict": "agree",
-                 "at_utc": "2026-01-01T01:00:00Z"},
+                 "at_utc": "2026-01-01T01:00:00Z", "reviewer": {"identity_sha256": hr.identity_digest("reviewer")}},
             ],
         }
         host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
@@ -863,6 +1182,161 @@ class RegisterFileSortTests(unittest.TestCase):
             (self.root / relative).write_text("{}", encoding="utf-8")
             hr.register_file(self.root, relative)
         self.assertEqual(self._paths(), sorted(self._paths()))
+
+
+class QualifiedModelSchemaSyncTests(unittest.TestCase):
+    """adoption/host-receipt.schema.json qualified_models[] item required keys and result
+    enum must match the code's constants, the same way SchemaSyncTests covers the top-level
+    fields."""
+
+    def setUp(self):
+        self.schema = _load_schema()
+
+    def test_qualified_model_required_matches(self):
+        self.assertEqual(
+            set(self.schema["properties"]["qualified_models"]["items"]["required"]),
+            set(hr.QUALIFIED_MODEL_REQUIRED))
+
+    def test_qualified_model_result_enum_matches(self):
+        self.assertEqual(
+            set(self.schema["properties"]["qualified_models"]["items"]["properties"]["result"]["enum"]),
+            hr.QUALIFIED_MODEL_RESULTS)
+
+    def test_qualified_models_is_not_in_top_level_required(self):
+        # Optional field: a receipt with no local model qualification is still valid.
+        self.assertNotIn("qualified_models", self.schema["required"])
+
+
+class QualifiedModelRecordTests(unittest.TestCase):
+    """scripts/host_receipts.py record --qualified-model / --qualified-models-file."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _record(self, extra_argv: list[str]) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                # host.os/architecture are auto-detected unless overridden; pin them
+                # to match linux-wsl2-x86_64 so test_qualified_model_flag_is_recorded_
+                # and_validates' cmd_validate() cross-check is host-independent (see
+                # test_record_writes_a_valid_registered_receipt for the same fix).
+                "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--from-stack-commands",
+                *extra_argv,
+            ])
+        return exit_code, buffer.getvalue()
+
+    def test_qualified_model_flag_is_recorded_and_validates(self):
+        qm = json.dumps({
+            "model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+            "runtime_version": "0.9.0", "bars": "20/20 tool calls, 4/5 tasks", "result": "pass",
+        })
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["qualified_models"], [json.loads(qm)])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_repeated_qualified_model_flags_accumulate(self):
+        qm1 = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+                          "bars": "bars", "result": "pass"})
+        qm2 = json.dumps({"model_id": "b", "revision": "r2", "runtime": "mlx-lm", "runtime_version": "2",
+                          "bars": "bars", "result": "fail"})
+        exit_code, output = self._record(["--qualified-model", qm1, "--qualified-model", qm2])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["qualified_models"]), 2)
+
+    def test_qualified_models_file_is_merged(self):
+        models_file = self.root / "models.json"
+        models_file.write_text(json.dumps([
+            {"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+             "bars": "bars", "result": "pass"},
+        ]), encoding="utf-8")
+        exit_code, output = self._record(["--qualified-models-file", str(models_file)])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["qualified_models"]), 1)
+
+    def test_no_qualified_model_flag_omits_the_key(self):
+        exit_code, output = self._record([])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertNotIn("qualified_models", receipt)
+
+    def test_malformed_qualified_model_json_is_rejected(self):
+        exit_code, output = self._record(["--qualified-model", "{not json"])
+        self.assertEqual(exit_code, 2, output)
+
+    def test_qualified_model_missing_required_key_is_rejected(self):
+        qm = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm"})  # no runtime_version/bars/result
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 2, output)
+
+    def test_qualified_model_bad_result_is_rejected(self):
+        qm = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+                         "bars": "bars", "result": "maybe"})
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 2, output)
+
+    def _record_without_from_stack_commands(self, extra_argv: list[str], marker: Path) -> tuple[int, str]:
+        """Like _record, but with an explicit --cmd (that would touch ``marker`` if it ran)
+        instead of --from-stack-commands, so a test can assert nothing executed."""
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "widget",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--cmd", f"touch {marker}",
+                *extra_argv,
+            ])
+        return exit_code, buffer.getvalue()
+
+    def test_overlong_bars_is_rejected_before_any_command_runs(self):
+        # Every schema constraint (not just required keys and the result enum) must be
+        # checked up front: an over-length `bars` (schema maxLength 400) previously slipped
+        # past the CLI's own ad hoc check, ran the qualification command(s), and failed only
+        # at the pre-write validate_receipt_shape() call.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "x" * 401, "result": "pass",
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("checked before running any command", output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
+    def test_result_as_a_list_is_rejected_without_crashing(self):
+        # `entry.get("result") not in {"pass", "fail"}` raises TypeError: unhashable type on
+        # a non-hashable value like a list; the schema-driven validator's equality-based enum
+        # check must reject this cleanly (exit 2, no traceback) and run nothing.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "bars", "result": [],
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
 
 
 if __name__ == "__main__":

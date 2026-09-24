@@ -1,0 +1,36 @@
+outer_started=2026-09-23T14:47:14Z root=$HOME/.cache/gap-wave2-20260923/observation-inference/private-systemd-Z7psrViD host_uid=1000 cgroup=0::/user.slice/user-1000.slice/user@1000.service/app.slice/ecosystem-job-1000-325468-28895.scope
+2026-09-23T14:47:14.697Z inner pid=1 uid_in_ns=0
+2026-09-23T14:47:14.701Z live runtime dir hidden: 0 entries visible
+2026-09-23T14:47:14.703Z /dev/console bound to manager.log
+2026-09-23T14:47:14.708Z inner2 pid=1 uid_in_ns=1000 cgroup=0::/user.slice/user-1000.slice/user@1000.service/app.slice/ecosystem-job-1000-325468-28895.scope
+2026-09-23T14:47:14.932Z manager pid=25 state=running
+Created symlink <root>/<private-home>/.config/systemd/user/timers.target.wants/ecosystem-native-data.timer → <root>/<private-home>/.config/systemd/user/ecosystem-native-data.timer.
+2026-09-23T14:47:15.015Z after enable+start: NextElapseUSecMonotonic=23h 50min 7.084125s LastTriggerUSec= Result=success ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:48:03.203Z PHASE enable-start: fired after 48 s (marker lines 1)
+2026-09-23T14:48:03.221Z after phase enable-start: NextElapseUSecMonotonic=23h 52min 10.416684s LastTriggerUSec=Wed 2026-09-23 10:48:03 EDT Result=success ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=1 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:48:03.297Z daemon-reload issued; NextElapseUSecMonotonic=23h 52min 10.416684s LastTriggerUSec=Wed 2026-09-23 10:48:03 EDT Result=success ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=1 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:50:13.263Z PHASE daemon-reload: fired after 130 s (marker lines 2)
+2026-09-23T14:50:13.293Z after phase daemon-reload: NextElapseUSecMonotonic=23h 54min 20.436218s LastTriggerUSec=Wed 2026-09-23 10:50:13 EDT Result=success ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=1 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:50:43.145Z manager did not exit on SIGTERM within 30 s; SIGKILL sent
+blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh: line 117:    25 Killed                  /usr/lib/systemd/systemd --user --log-target=console --log-level=info < /dev/null >> "$ROOT/manager.stderr" 2>&1
+2026-09-23T14:50:43.212Z manager stop exit=137
+2026-09-23T14:50:44.436Z manager pid=948 state=running
+2026-09-23T14:50:44.458Z after manager restart: NextElapseUSecMonotonic=23h 53min 36.578070s LastTriggerUSec= Result=success ActiveState=active UnitFileState=enabled | service: Result=success NRestarts=0 ExecMainCode=0 ExecMainStatus=0 ActiveState=inactive 
+2026-09-23T14:51:33.622Z PHASE manager-restart: fired after 49 s (marker lines 3)
+2026-09-23T14:51:33.624Z marker: 2026-09-23T14:48:03Z 2026-09-23T14:50:13Z 2026-09-23T14:51:33Z 
+NEXT                            LEFT LAST                           PASSED UNIT                        ACTIVATES
+Wed 2026-09-23 10:53:33 EDT 1min 59s Wed 2026-09-23 10:51:33 EDT 601ms ago ecosystem-native-data.timer ecosystem-native-data.service
+
+1 timers listed.
+○ ecosystem-native-data.service - private stand-in for ecosystem-native-data.service
+     Loaded: loaded (<root>/<private-home>/.config/systemd/user/ecosystem-native-data.service; static)
+     Active: inactive (dead) since Wed 2026-09-23 10:51:33 EDT; 596ms ago
+TriggeredBy: ● ecosystem-native-data.timer
+    Process: 1170 ExecStart=/bin/sh -c date -u +%Y-%m-%dT%H:%M:%SZ >> <root>/marker.txt (code=exited, status=0/SUCCESS)
+   Main PID: 1170 (code=exited, status=0/SUCCESS)
+        CPU: 1ms
+2026-09-23T14:52:03.345Z manager did not exit on SIGTERM within 30 s; SIGKILL sent
+blueprints/gap-wave2-20260923/foundation__observation-inference/private_user_manager.sh: line 117:   948 Killed                  /usr/lib/systemd/systemd --user --log-target=console --log-level=info < /dev/null >> "$ROOT/manager.stderr" 2>&1
+2026-09-23T14:52:03.384Z manager stop exit=137
+inner_exit=0 outer_stopped=2026-09-23T14:52:03Z
+no leftover processes

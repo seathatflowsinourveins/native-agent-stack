@@ -1,0 +1,1 @@
+ARGV: exec -c features.hooks=false -c features.plugin_hooks=false --ephemeral --skip-git-repo-check --sandbox read-only -C $HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g16-loopx/workspace --output-schema /tmp/loopx-turn-codex-v1ked2te/result-schema.json --output-last-message /tmp/loopx-turn-codex-v1ked2te/last-message.json --json --model gpt-6-astra -

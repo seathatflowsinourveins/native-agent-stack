@@ -1,0 +1,34 @@
+{
+ "mode": "passthrough",
+ "status": "leak",
+ "leak_count": 58,
+ "negative_count": 37,
+ "arrival": {
+  "prom": true,
+  "loki_otlp": true,
+  "loki_sdk": true
+ },
+ "positive_controls_found_in": {
+  "logs.resource.ecosystem.task.id(allowlisted)": [
+   "collector_file_events",
+   "loki_query_range"
+  ],
+  "logs.attr.tool_name(allowlisted)": [
+   "collector_file_events",
+   "loki_query_range"
+  ],
+  "metrics.name(boundary)": [
+   "collector_prometheus_exporter",
+   "prometheus_federate",
+   "prometheus_metadata"
+  ],
+  "metrics.attr.model(allowlisted)": [
+   "collector_prometheus_exporter",
+   "prometheus_federate"
+  ],
+  "sdk.configured_model(allowlisted-as-model)": [
+   "collector_file_events",
+   "loki_query_range"
+  ]
+ }
+}

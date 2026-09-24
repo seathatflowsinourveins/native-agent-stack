@@ -1,0 +1,37 @@
+receivers:
+  otlp:
+    protocols: {grpc: {endpoint: 127.0.0.1:34317}, http: {endpoint: 127.0.0.1:34318}}
+  filelog:
+    include: ["$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/dagu/logs/**/*.out", "$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/dagu/logs/**/*.err"]
+    start_at: beginning
+    include_file_path: true
+    storage: file_storage
+extensions:
+  file_storage: {directory: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-8/data/otelcol-storage}
+connectors:
+  spanmetrics: {metrics_flush_interval: 2s}
+  count:
+    logs:
+      paper.runtime.log.records:
+        description: runtime log lines of the paper-sim step
+        conditions: ['IsMatch(body, "obsgap-paper-162545")']
+      paper.runtime.intents:
+        description: runtime intent events
+        conditions: ['IsMatch(body, "obsgap-paper-162545") and IsMatch(body, "type.: .intent")']
+exporters:
+  prometheusremotewrite: {endpoint: "http://127.0.0.1:39090/api/v1/write"}
+  otlphttp/loki: {logs_endpoint: "http://127.0.0.1:33100/otlp/v1/logs", tls: {insecure: true}}
+  debug: {verbosity: basic}
+processors:
+  batch: {timeout: 1s}
+  delta_to_cumulative: {}
+  resource/paperlogs:
+    attributes: [{key: service.name, value: paper-obsgap-20260923, action: upsert}]
+service:
+  extensions: [file_storage]
+  telemetry: {metrics: {level: detailed, readers: [{pull: {exporter: {prometheus: {host: 127.0.0.1, port: 38888}}}}]}}
+  pipelines:
+    traces: {receivers: [otlp], processors: [batch], exporters: [spanmetrics, debug]}
+    metrics: {receivers: [otlp, spanmetrics], processors: [batch], exporters: [prometheusremotewrite]}
+    metrics/count: {receivers: [count], processors: [delta_to_cumulative, batch], exporters: [prometheusremotewrite]}
+    logs: {receivers: [filelog], processors: [resource/paperlogs, batch], exporters: [otlphttp/loki, count]}

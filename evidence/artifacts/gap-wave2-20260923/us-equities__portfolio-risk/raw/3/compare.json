@@ -1,0 +1,375 @@
+{
+  "counts": {
+    "match": 29,
+    "mismatch": 9,
+    "not_regenerated": 4
+  },
+  "semantic": {
+    "retained_frozen_utc_substituted": "2026-09-19T22:55:35.365101+00:00",
+    "reconstructed_freeze_sha256": "8cefddb1be8c6dc0384856d97ba54705e017e43630c912ef1e160e495dfe8fed",
+    "reconstructed_freeze_equals_retained": true,
+    "reconstructed_results_sha256": "79d146d0a9506ecea3124ce084bcce701b33427d78fd4bba417deb4c6cd91c49",
+    "reconstructed_results_equals_retained": true,
+    "results_equal_public_receipt_results": {
+      "assets": true,
+      "auxiliary": true,
+      "development_folds": true,
+      "inputs_unchanged": true,
+      "kind": true,
+      "ledger_records": true,
+      "ledger_sha256": true,
+      "no_pnl_or_execution_claim": true,
+      "plan_sha256": true,
+      "reserved": true,
+      "session_counts": true,
+      "versions": true
+    },
+    "results_ledger_records": 6605,
+    "results_inputs_unchanged": true
+  },
+  "rows": [
+    {
+      "artifact": "run-1.stderr.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "regenerated_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "regenerated_bytes": 0,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1.stdout.txt",
+      "retained_sha256": "524801ce4afdaef5de44d68525cbbb206a86e67d76385fe4342f4033e514a62b",
+      "retained_bytes": 1353,
+      "regenerated_sha256": "524801ce4afdaef5de44d68525cbbb206a86e67d76385fe4342f4033e514a62b",
+      "regenerated_bytes": 1353,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/candidate-ledger.json",
+      "retained_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+      "retained_bytes": 2536508,
+      "regenerated_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+      "regenerated_bytes": 2536508,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-1.selection.json",
+      "retained_sha256": "f2fe53d5aaaceaecd0a6b0b738cfb7b4628cc0c23ec43a9d6e3550385ee26923",
+      "retained_bytes": 615,
+      "regenerated_sha256": "f2fe53d5aaaceaecd0a6b0b738cfb7b4628cc0c23ec43a9d6e3550385ee26923",
+      "regenerated_bytes": 615,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-10.selection.json",
+      "retained_sha256": "ad077a9704ce51eb73566eed750345ee41f9bd28818837992f7a89540fbdc734",
+      "retained_bytes": 621,
+      "regenerated_sha256": "ad077a9704ce51eb73566eed750345ee41f9bd28818837992f7a89540fbdc734",
+      "regenerated_bytes": 621,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-11.selection.json",
+      "retained_sha256": "49ef82009925ce18836489222eb719424dd45b4c0e24e3f620239870380259e1",
+      "retained_bytes": 622,
+      "regenerated_sha256": "49ef82009925ce18836489222eb719424dd45b4c0e24e3f620239870380259e1",
+      "regenerated_bytes": 622,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-12.selection.json",
+      "retained_sha256": "8c1ae0b4002ca3f992597e26148ae4a4890a2d7cdfe031d1e70aead543d1c64f",
+      "retained_bytes": 620,
+      "regenerated_sha256": "8c1ae0b4002ca3f992597e26148ae4a4890a2d7cdfe031d1e70aead543d1c64f",
+      "regenerated_bytes": 620,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-13.selection.json",
+      "retained_sha256": "e418690b33c6ff01098f37fa90ab18970f732226b104a67f309b5d85b6b1f287",
+      "retained_bytes": 616,
+      "regenerated_sha256": "e418690b33c6ff01098f37fa90ab18970f732226b104a67f309b5d85b6b1f287",
+      "regenerated_bytes": 616,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-14.selection.json",
+      "retained_sha256": "d444ba303a2c3a3b497e4e7593cdb34a3761579da1fbb20f1afbcb3df6ca30d3",
+      "retained_bytes": 624,
+      "regenerated_sha256": "d444ba303a2c3a3b497e4e7593cdb34a3761579da1fbb20f1afbcb3df6ca30d3",
+      "regenerated_bytes": 624,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-15.selection.json",
+      "retained_sha256": "63c8c0adb217032f9ba442b12bebfaa1353fa214ef908cee28c17333d91e1258",
+      "retained_bytes": 615,
+      "regenerated_sha256": "63c8c0adb217032f9ba442b12bebfaa1353fa214ef908cee28c17333d91e1258",
+      "regenerated_bytes": 615,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-16.selection.json",
+      "retained_sha256": "728e27c32f5a2e5e5c85070445f0746f3c84b74cb9119150164e876f6d4440ee",
+      "retained_bytes": 616,
+      "regenerated_sha256": "728e27c32f5a2e5e5c85070445f0746f3c84b74cb9119150164e876f6d4440ee",
+      "regenerated_bytes": 616,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-17.selection.json",
+      "retained_sha256": "460908c76ce232255dad6653dfe2bacb6ee1d77bb7084e9568849034a0c7a48e",
+      "retained_bytes": 620,
+      "regenerated_sha256": "460908c76ce232255dad6653dfe2bacb6ee1d77bb7084e9568849034a0c7a48e",
+      "regenerated_bytes": 620,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-18.selection.json",
+      "retained_sha256": "c0bf777becb5a8ac33bec6c36ac08e7568667bbdb473c03e11aeaa5ce51ca4ee",
+      "retained_bytes": 616,
+      "regenerated_sha256": "c0bf777becb5a8ac33bec6c36ac08e7568667bbdb473c03e11aeaa5ce51ca4ee",
+      "regenerated_bytes": 616,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-19.selection.json",
+      "retained_sha256": "a09bdff38ac6aaa88448f1e252437af7273063f7bc8b8de87581bb8f0a1ddf8b",
+      "retained_bytes": 620,
+      "regenerated_sha256": "a09bdff38ac6aaa88448f1e252437af7273063f7bc8b8de87581bb8f0a1ddf8b",
+      "regenerated_bytes": 620,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-2.selection.json",
+      "retained_sha256": "83dd49d44cdfda69ad7c200bb6f7028a9566242baeac32d7980fc7c2a6f5f0a8",
+      "retained_bytes": 614,
+      "regenerated_sha256": "83dd49d44cdfda69ad7c200bb6f7028a9566242baeac32d7980fc7c2a6f5f0a8",
+      "regenerated_bytes": 614,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-20.selection.json",
+      "retained_sha256": "6f00ade9fbc616cc0eb5430ebb4307650725f73166f35dd3b2062fc363393220",
+      "retained_bytes": 617,
+      "regenerated_sha256": "6f00ade9fbc616cc0eb5430ebb4307650725f73166f35dd3b2062fc363393220",
+      "regenerated_bytes": 617,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-3.selection.json",
+      "retained_sha256": "2b450c795b1bd1e5f76453923355d724a6573fc423e1448c35cd66aaf7bb577d",
+      "retained_bytes": 615,
+      "regenerated_sha256": "2b450c795b1bd1e5f76453923355d724a6573fc423e1448c35cd66aaf7bb577d",
+      "regenerated_bytes": 615,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-4.selection.json",
+      "retained_sha256": "8664efef859eb7deb2e0210f4d283c1396740438f21615517fbe668e77b979e8",
+      "retained_bytes": 622,
+      "regenerated_sha256": "8664efef859eb7deb2e0210f4d283c1396740438f21615517fbe668e77b979e8",
+      "regenerated_bytes": 622,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-5.selection.json",
+      "retained_sha256": "61712ac9dcdb72fe452cb64b5d3f0ce4ed7a83286de2718eaf2a76f778d31ef0",
+      "retained_bytes": 619,
+      "regenerated_sha256": "61712ac9dcdb72fe452cb64b5d3f0ce4ed7a83286de2718eaf2a76f778d31ef0",
+      "regenerated_bytes": 619,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-6.selection.json",
+      "retained_sha256": "7dff682665670ee0f10a3723f55d08a3ec3dca20dfa76309574641eaa583da36",
+      "retained_bytes": 622,
+      "regenerated_sha256": "7dff682665670ee0f10a3723f55d08a3ec3dca20dfa76309574641eaa583da36",
+      "regenerated_bytes": 622,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-7.selection.json",
+      "retained_sha256": "ba3e35563ef001fccec34df18517067e1189aa9ee79a346cb171fe33ab8f72f4",
+      "retained_bytes": 618,
+      "regenerated_sha256": "ba3e35563ef001fccec34df18517067e1189aa9ee79a346cb171fe33ab8f72f4",
+      "regenerated_bytes": 618,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-8.selection.json",
+      "retained_sha256": "f310bf598c0b117d19eeae263ae1cc220ce53160b04e2304466ac10eed04910a",
+      "retained_bytes": 617,
+      "regenerated_sha256": "f310bf598c0b117d19eeae263ae1cc220ce53160b04e2304466ac10eed04910a",
+      "regenerated_bytes": 617,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/development-9.selection.json",
+      "retained_sha256": "f1ad609019950172385224d8d0d8d974e4a22abc44b3a976ff0c965709300d47",
+      "retained_bytes": 618,
+      "regenerated_sha256": "f1ad609019950172385224d8d0d8d974e4a22abc44b3a976ff0c965709300d47",
+      "regenerated_bytes": 618,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/freeze.json",
+      "retained_sha256": "8cefddb1be8c6dc0384856d97ba54705e017e43630c912ef1e160e495dfe8fed",
+      "retained_bytes": 6413,
+      "regenerated_sha256": "7eef3be01cf065af046c190d0091eca503ddde7a5a8168cadb33d6d48b681dfe",
+      "regenerated_bytes": 6413,
+      "status": "mismatch",
+      "normalized_fields_removed": [
+        "frozen_utc"
+      ],
+      "reconstructed_equals_retained": true
+    },
+    {
+      "artifact": "run-1/reserved-2021q1.selection.json",
+      "retained_sha256": "7c78902a3c8014a62ce6e0eb71093b3ca5c850cb6b9418029873df602adc19fc",
+      "retained_bytes": 620,
+      "regenerated_sha256": "7c78902a3c8014a62ce6e0eb71093b3ca5c850cb6b9418029873df602adc19fc",
+      "regenerated_bytes": 620,
+      "status": "match"
+    },
+    {
+      "artifact": "run-1/results.json",
+      "retained_sha256": "79d146d0a9506ecea3124ce084bcce701b33427d78fd4bba417deb4c6cd91c49",
+      "retained_bytes": 52052,
+      "regenerated_sha256": "1e217c9c636a97929696a92aaff1b5061db0d4831328d6cf1cf5553f4914eb7c",
+      "regenerated_bytes": 52052,
+      "status": "mismatch",
+      "normalized_fields_removed": [
+        "freeze_sha256"
+      ],
+      "reconstructed_equals_retained": true
+    },
+    {
+      "artifact": "setup/api.stderr.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "status": "not_regenerated"
+    },
+    {
+      "artifact": "setup/api.stdout.txt",
+      "retained_sha256": "89f1f4421856fe9ae95307786f306fb2bb3eddb83e119008c2bcd050d1bd46a3",
+      "retained_bytes": 421,
+      "status": "not_regenerated"
+    },
+    {
+      "artifact": "setup/check.stderr.txt",
+      "retained_sha256": "58fb6d7725b46ccfd7f3907c8c72150a94c7409a918b98318f0b9d68fcf9c68a",
+      "retained_bytes": 184,
+      "regenerated_sha256": "47502948c921cba95009afd207cc30ed001c26fbd18d1a43552a0e8d115b0247",
+      "regenerated_bytes": 171,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv\nChecked 19 packages in 0.52ms\nAll installed packages are compatible\n"
+    },
+    {
+      "artifact": "setup/check.stdout.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "regenerated_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "regenerated_bytes": 0,
+      "status": "match"
+    },
+    {
+      "artifact": "setup/compile-final.stderr.txt",
+      "retained_sha256": "a9e0510c1dad5d20f80dbe71aa818f4239bbe58e93feadb6ec7400bee6646146",
+      "retained_bytes": 28,
+      "regenerated_sha256": "f0e6f40f164a08ad9c2d8be383f7ecd9a16142bdf20574debfbe9ad155dd3a10",
+      "regenerated_bytes": 29,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Resolved 19 packages in 19ms\n"
+    },
+    {
+      "artifact": "setup/compile-final.stdout.txt",
+      "retained_sha256": "bb82ec0446011a74f5d1ee47ef3b02b62e56151d8a2937f6b7554d30fd7bcc27",
+      "retained_bytes": 39492,
+      "regenerated_sha256": "bb82ec0446011a74f5d1ee47ef3b02b62e56151d8a2937f6b7554d30fd7bcc27",
+      "regenerated_bytes": 39492,
+      "status": "match"
+    },
+    {
+      "artifact": "setup/compile.stderr.txt",
+      "retained_sha256": "a805af9d10e1982945defa5677bb6122e6e140dc45e8b629c0e04253749c6852",
+      "retained_bytes": 30,
+      "regenerated_sha256": "e5cfd39c8c20ab3f089057dde3044dd796126fe8812946075811e8d1aacc459b",
+      "regenerated_bytes": 30,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Resolved 20 packages in 130ms\n"
+    },
+    {
+      "artifact": "setup/compile.stdout.txt",
+      "retained_sha256": "028f1db07a3480021e3de9f1e65ff4f03ddc08e05362f8f8066defcb4a508ade",
+      "retained_bytes": 42877,
+      "regenerated_sha256": "d43ac6ff2f84accfc25293c0c3eb03ce0a0467168e2e10b3da91f17e1a685291",
+      "regenerated_bytes": 42649,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "cffi==2.1.1 \\\n    --hash=sha256:046bfc24911b37851ee1b51aab8bffe713d89c68c6a057b09484ce9fd5f69b4e \\\n    --hash=sha256:06c72bb76605a4b0cd0aad6930b69d4baf7dd5d806cfc409b824191099700e66 \\\n    --hash=sha256:0beceaabe56af686895136a2de78db54ecd8e4046b236b8fd6d6cb61389e9bf2 \\\n    --hash=sha256:154852545011f779917b11c78db2358d095da62a9a172b78ad0a583ee5adc0d0 \\\n    --hash=sha256:194cffa889098ced9976c3fc6340"
+    },
+    {
+      "artifact": "setup/freeze.stderr.txt",
+      "retained_sha256": "4e534252a4f7388c88adac94307ee16fb848df70b0aeb2d179648a8d874c7d44",
+      "retained_bytes": 116,
+      "regenerated_sha256": "2a4284951fa951d16d43788e885d58ed6d7942397f1650f4596518923290e82c",
+      "regenerated_bytes": 103,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv\n"
+    },
+    {
+      "artifact": "setup/freeze.stdout.txt",
+      "retained_sha256": "ac8e8d95c94e10a81ec1735bbd134d6c1a2028e4a185ab704d8155f0329731a8",
+      "retained_bytes": 319,
+      "regenerated_sha256": "ac8e8d95c94e10a81ec1735bbd134d6c1a2028e4a185ab704d8155f0329731a8",
+      "regenerated_bytes": 319,
+      "status": "match"
+    },
+    {
+      "artifact": "setup/sync-final.stderr.txt",
+      "retained_sha256": "f20e5dcb26bd1dbd957cad32fbaaaf8080d8604432f227eb63a2eac133699391",
+      "retained_bytes": 190,
+      "regenerated_sha256": "7f09de623cd636b408ff7e2fb788e871946b91d81031d055066cce1bbf7374e2",
+      "regenerated_bytes": 538,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv\nResolved 19 packages in 6ms\nInstalled 19 packages in 122ms\n + cffi==2.1.1\n + clarabel==0.11.1\n + cloudpickle==3.1.2\n + cvxpy-base==1.9.3\n + joblib==1.6.0\n + narwhals==2.26.0\n + numpy==2.5.3\n + packaging==26.3\n + pandas==3.0.6\n + plotly==7.1.0\n + pycparser==3.0\n + python-dateutil==2.9.0.post0\n + qdldl=="
+    },
+    {
+      "artifact": "setup/sync-final.stdout.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "regenerated_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "regenerated_bytes": 0,
+      "status": "match"
+    },
+    {
+      "artifact": "setup/sync.stderr.txt",
+      "retained_sha256": "0e662f260a7c6fc5cb00606db4b429d396eeed8dec49ac2c4862957421102876",
+      "retained_bytes": 1009,
+      "status": "not_regenerated"
+    },
+    {
+      "artifact": "setup/sync.stdout.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "status": "not_regenerated"
+    },
+    {
+      "artifact": "setup/venv.stderr.txt",
+      "retained_sha256": "a42af4d1558c3bb69f1269435e8b077a926b6d2bdb57b31dac129cfff5c014a5",
+      "retained_bytes": 344,
+      "regenerated_sha256": "c0f3ab38f1b36023b7e5bc393b2b2bea2f0293208216b0964c3456821dfc9897",
+      "regenerated_bytes": 334,
+      "status": "mismatch",
+      "regenerated_text_excerpt": "Using CPython 3.13.15 interpreter at: $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13\nCreating virtual environment at: $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv\nActivate with: source $HOME/.cache/gap-wave2-20260923/portfolio-risk/g3-wave/venv/bin/activate\n"
+    },
+    {
+      "artifact": "setup/venv.stdout.txt",
+      "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "retained_bytes": 0,
+      "regenerated_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "regenerated_bytes": 0,
+      "status": "match"
+    }
+  ]
+}

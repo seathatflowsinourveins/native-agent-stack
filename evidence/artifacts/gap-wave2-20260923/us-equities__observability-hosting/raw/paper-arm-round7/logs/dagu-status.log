@@ -1,0 +1,359 @@
+time=2026-09-23T12:23:13.117-04:00 level=WARN msg="No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account."
+Succeeded - 2026-09-23T12:22:42-04:00
+
+dag: obsgap-paper (31.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/logs/obsgap-paper/dag-run_20260923_162242Z_034TtYs2POkFW6gydpIMl0/dag-run_20260923.122242.036.034TtYs2.log
+│
+├─paper-runtime (31.0s) [succeeded]
+│ ├─$HOME/.local/share/codex-ecosystem/bin/srt -d -s
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   7/cfg/srt.json -c "sh
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   7/cfg/paper_step.sh"
+│ │
+│ ├─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/logs/obsgap-paper/dag-run_20260923_162242Z_034TtYs2POkFW6gydpIMl0/run_20260923_162242Z_5fb233/paper-runtime.20260923.122242.064.034TtYs2.out
+│ │   ... (269 more lines)
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.4166107, "event": {"type": "decision", "timestamp":
+│ │   1790180588.4137495, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.521097, "event": {"type": "decision", "timestamp":
+│ │   1790180588.517653, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.6244974, "event": {"type": "decision", "timestamp":
+│ │   1790180588.6223035, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.7280624, "event": {"type": "decision", "timestamp":
+│ │   1790180588.725323, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.8319592, "event": {"type": "decision", "timestamp":
+│ │   1790180588.8290493, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180588.9352078, "event": {"type": "decision", "timestamp":
+│ │   1790180588.9328854, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.0390284, "event": {"type": "decision", "timestamp":
+│ │   1790180589.0362372, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.141703, "event": {"type": "decision", "timestamp":
+│ │   1790180589.1395087, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.2442088, "event": {"type": "decision", "timestamp":
+│ │   1790180589.2419298, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.347484, "event": {"type": "decision", "timestamp":
+│ │   1790180589.3445911, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.4504435, "event": {"type": "decision", "timestamp":
+│ │   1790180589.4481785, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.5539095, "event": {"type": "decision", "timestamp":
+│ │   1790180589.5516133, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.6574383, "event": {"type": "decision", "timestamp":
+│ │   1790180589.655042, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.7610283, "event": {"type": "decision", "timestamp":
+│ │   1790180589.7578683, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.865174, "event": {"type": "decision", "timestamp":
+│ │   1790180589.861635, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180589.9687371, "event": {"type": "decision", "timestamp":
+│ │   1790180589.9664094, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.0729163, "event": {"type": "decision", "timestamp":
+│ │   1790180590.07008, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.177196, "event": {"type": "decision", "timestamp":
+│ │   1790180590.1740634, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.2812674, "event": {"type": "decision", "timestamp":
+│ │   1790180590.2776945, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.3845525, "event": {"type": "decision", "timestamp":
+│ │   1790180590.381733, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.4881992, "event": {"type": "decision", "timestamp":
+│ │   1790180590.4854388, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.5915236, "event": {"type": "decision", "timestamp":
+│ │   1790180590.5886526, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.695371, "event": {"type": "decision", "timestamp":
+│ │   1790180590.692972, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.7997124, "event": {"type": "decision", "timestamp":
+│ │   1790180590.797521, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180590.9040084, "event": {"type": "decision", "timestamp":
+│ │   1790180590.901662, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.0072708, "event": {"type": "decision", "timestamp":
+│ │   1790180591.0050805, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.1094663, "event": {"type": "decision", "timestamp":
+│ │   1790180591.107472, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.2131379, "event": {"type": "decision", "timestamp":
+│ │   1790180591.210086, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.316355, "event": {"type": "decision", "timestamp":
+│ │   1790180591.3135562, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.419761, "event": {"type": "decision", "timestamp":
+│ │   1790180591.4173143, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.5229983, "event": {"type": "decision", "timestamp":
+│ │   1790180591.5199256, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.626482, "event": {"type": "decision", "timestamp":
+│ │   1790180591.623983, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.7301571, "event": {"type": "decision", "timestamp":
+│ │   1790180591.7272933, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.8338404, "event": {"type": "decision", "timestamp":
+│ │   1790180591.8307812, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180591.9369524, "event": {"type": "decision", "timestamp":
+│ │   1790180591.934665, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.0409381, "event": {"type": "decision", "timestamp":
+│ │   1790180592.037377, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.1448305, "event": {"type": "decision", "timestamp":
+│ │   1790180592.1413229, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.2487733, "event": {"type": "decision", "timestamp":
+│ │   1790180592.245813, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.3524885, "event": {"type": "decision", "timestamp":
+│ │   1790180592.34934, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.456129, "event": {"type": "decision", "timestamp":
+│ │   1790180592.4533207, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.5591938, "event": {"type": "decision", "timestamp":
+│ │   1790180592.5568225, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "runtime_event", "at":
+│ │   1790180592.6623108, "event": {"type": "decision", "timestamp":
+│ │   1790180592.6601872, "regime": "range", "targets": {}, "exits": {},
+│ │   "effective_leverage": 0.0, "signals": [], "gap_bps": {}}}
+│ │   {"mark": "obsgap-paper-162216", "kind": "paper_sim_end", "at":
+│ │   1790180592.9548845, "status": "passed", "flat": true,
+│ │   "native_fill_events": 20, "journal_counts": {"intents": 20,
+│ │   "requests": 22, "events": 41, "positions": 2, "marks": 6, "trials":
+│ │   0}}
+│ │   PAPER_RC=0
+│ │   PROBE egress HTTPSTATUS:000 EXIT:56
+│ │   PROBE egress curl_rc=56
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   7/cfg/probes.sh: 3: cannot create
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   7/outside/probe-write.txt: Read-only file system
+│ │   PROBE write_outside rc=2
+│ │   cat:
+│ │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-
+│ │   7/decoy/decoy.txt: No such file or directory
+│ │   PROBE read_decoy rc=1
+│ └─stderr: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/logs/obsgap-paper/dag-run_20260923_162242Z_034TtYs2POkFW6gydpIMl0/run_20260923_162242Z_5fb233/paper-runtime.20260923.122242.064.034TtYs2.err
+│     ... (3 more lines)
+│     [SandboxDebug] mux: HTTP backend listening on
+│     /tmp/srt-mux-1662820-0.sock
+│     [SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:57974
+│     [SandboxDebug] Starting HTTP bridge: socat
+│     UNIX-LISTEN:/tmp/claude-http-21e7ace9a3d8d6f8.sock,fork,reuseaddr
+│     TCP:localhost:57974,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+│     [SandboxDebug] Linux bridges ready after 3 attempts
+│     [SandboxDebug] Network infrastructure initialized
+│     [SandboxDebug] Command string mode (-c): sh
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     cfg/paper_step.sh
+│     [SandboxDebug] {
+│     "allowedHosts": []
+│     }
+│     [SandboxDebug] [Sandbox Linux] Applying seccomp filter for Unix socket
+│     blocking
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/stdout ->
+│     /dev/stdout
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stdout
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/stderr ->
+│     /dev/stderr
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stderr
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/null ->
+│     /dev/null
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/null
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/tty ->
+│     /dev/tty
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/tty
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/dtracehelper
+│     -> /dev/dtracehelper
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/dtracehelper
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /dev/autofs_nowait
+│     -> /dev/autofs_nowait
+│     [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/autofs_nowait
+│     [SandboxDebug] [Sandbox Linux] Processing write path: /tmp/claude ->
+│     /tmp/claude
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+│     /tmp/claude
+│     [SandboxDebug] [Sandbox Linux] Processing write path:
+│     /private/tmp/claude -> /private/tmp/claude
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+│     /private/tmp/claude
+│     [SandboxDebug] [Sandbox Linux] Processing write path:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.npm/_logs ->
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.npm/_logs
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.npm/_logs
+│     [SandboxDebug] [Sandbox Linux] Processing write path:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.claude/debug ->
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.claude/debug
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     home/.claude/debug
+│     [SandboxDebug] [Sandbox Linux] Processing write path:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     work ->
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     work
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.git
+│     config
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.git
+│     modules
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.bas
+│     hrc
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.bas
+│     h_profile
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.zsh
+│     rc
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.zpr
+│     ofile
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.pro
+│     file
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.rip
+│     greprc
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.mcp
+│     .json
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.vsc
+│     ode
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.ide
+│     a
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.cla
+│     ude/commands
+│     [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+│     within allowed paths:
+│     $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+│     dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.cla
+│     ude/agents
+│     [SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network,
+│     filesystem, seccomp(unix-block) restrictions)
+│     [SandboxDebug] No matching config rule, denying: example.com:443
+│     [SandboxDebug] Connection blocked to example.com:443
+│     curl: (56) CONNECT tunnel failed, response 403
+│     [SandboxDebug] Sent SIGTERM to HTTP bridge process
+│     [SandboxDebug] Sent SIGTERM to SOCKS bridge process
+│ 
+└─hot-backup (15.0s) [succeeded]
+  ├─sh
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/
+  │   cfg/hot_step.sh
+  │
+  └─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/logs/obsgap-paper/dag-run_20260923_162242Z_034TtYs2POkFW6gydpIMl0/run_20260923_162242Z_5fb233/hot-backup.20260923.122242.064.034TtYs2.out
+      created restic repository e1ac8b34a5 at
+      $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/re
+      stic-hot
+      Please note that knowledge of your password is required to access
+      the repository. Losing your password means that your data is
+      irrecoverably lost.
+      no parent snapshot found, will read all files
+      Files:           3 new,     0 changed,     0 unmodified
+      Dirs:            7 new,     0 changed,     0 unmodified
+      Added to the repository: 1.709 MiB (24.675 KiB stored)
+      processed 3 files, 1.705 MiB in 0:00
+      snapshot 5c71d91d saved
+      HOT_BACKUP_OK
+
+Result: Succeeded

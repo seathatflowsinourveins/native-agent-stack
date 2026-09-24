@@ -1,0 +1,28 @@
+# DVC 3.67.1 pipeline for gap-wave-2 identity-provenance gaps 0 and 2 (replay.py and temporal_snapshot.py arms). Copied into a fresh scratch
+# git+DVC repo by run_dvc_arm.sh; `code/` holds copies of blueprints/us-equities/<adapter> and
+# `stages/stage.py` is this directory's stage driver. Synthetic fixtures only.
+stages:
+  ns_materialize:
+    cmd: mkdir -p data && python code/nanosecond-replay/replay.py materialize --source code/nanosecond-replay/fixture.json --output data/ns_materialized > data/ns_materialize.json
+    deps: [code/nanosecond-replay/replay.py, code/nanosecond-replay/fixture.json, code/point-in-time/temporal_snapshot.py, code/financial-data/sec_data.py]
+    outs: [data/ns_materialized, data/ns_materialize.json]
+  ns_select:
+    cmd: python stages/stage.py ns-select --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_select.json
+    deps: [stages/stage.py, code/nanosecond-replay/select.sql, data/ns_materialized, data/ns_materialize.json]
+    outs: [out/ns_select.json]
+  ns_quarantine:
+    cmd: python stages/stage.py ns-quarantine --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_quarantine.json
+    deps: [stages/stage.py, data/ns_materialized, data/ns_materialize.json]
+    outs: [out/ns_quarantine.json]
+  pit_snapshot:
+    cmd: mkdir -p data && python code/point-in-time/temporal_snapshot.py snapshot --source code/point-in-time/fixture.json --output data/pit_snapshot > data/pit_snapshot.json
+    deps: [code/point-in-time/temporal_snapshot.py, code/point-in-time/fixture.json, code/financial-data/sec_data.py]
+    outs: [data/pit_snapshot, data/pit_snapshot.json]
+  pit_select:
+    cmd: python stages/stage.py pit-select --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_select.json
+    deps: [stages/stage.py, code/point-in-time/select.sql, data/pit_snapshot, data/pit_snapshot.json]
+    outs: [out/pit_select.json]
+  pit_quarantine:
+    cmd: python stages/stage.py pit-quarantine --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_quarantine.json
+    deps: [stages/stage.py, data/pit_snapshot, data/pit_snapshot.json]
+    outs: [out/pit_quarantine.json]

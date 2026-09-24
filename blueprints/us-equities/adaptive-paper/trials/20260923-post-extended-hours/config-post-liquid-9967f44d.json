@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "mode": "adaptive_paper",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "feed": "sip",
+  "regular_session_only": false,
+  "duration_seconds": 300,
+  "cleanup_seconds": 120,
+  "max_api_requests_per_minute": 200,
+  "max_submit_requests_per_minute": 180,
+  "strategy_scope": [
+    "trend_momentum",
+    "range_breakout",
+    "mean_reversion",
+    "relative_strength",
+    "defensive_cash"
+  ],
+  "symbols": [
+    "QQQ",
+    "META",
+    "SPY",
+    "NVDA"
+  ],
+  "benchmarks": [
+    "QQQ"
+  ],
+  "capital_usd": "10000",
+  "max_gross_exposure_usd": "5000",
+  "max_order_notional_usd": "1000",
+  "max_order_quantity": 1,
+  "max_held_symbols": 4,
+  "max_outstanding_orders": 20,
+  "max_gross_loss_usd": "25",
+  "max_drawdown_usd": "25",
+  "max_leverage": "1",
+  "quote_max_age_seconds": 3,
+  "max_spread_bps": "15",
+  "warmup_samples": 32,
+  "warmup_seconds": 30,
+  "minimum_edge_bps": 4,
+  "min_entry_close_seconds": 300,
+  "order_timeout_seconds": 10,
+  "min_hold_seconds": 5,
+  "max_hold_seconds": 90,
+  "stop_bps": 25,
+  "take_profit_bps": 40,
+  "trailing_bps": 15,
+  "catalyst_orders_enabled": false,
+  "extended_hours_enabled": true,
+  "notes": "2026-09-23 after-hours paper E2E of the extended-hours session path (user: paper is never gated). Same numeric limits as config-sip.json 77244c39 (1 share, 1x, loss/drawdown 25 USD, quote age 3 s, spread 15 bps). Universe and regime basket narrowed to after-hours-liquid names from SIP samples at 18:5x ET (QQQ and META fresh 8/8 at 3 s; SPY 3/8, NVDA 3/8; IWM and DIA 2/8), because RiskLimits caps quote age at 3 s. A mechanics E2E, not a strategy evaluation; its own state root because the durable ledger refuses config changes.",
+  "sessions": {
+    "extended_hours": true,
+    "overnight_holds": false,
+    "overnight_gross_multiple": "1.0"
+  }
+}

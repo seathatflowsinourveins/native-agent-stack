@@ -1,0 +1,12 @@
+20260923 07:00:43.068 ERROR:: Extensions.SetRuntimeError(): Extensions.SetRuntimeError(): RuntimeError at 04/29/2020 20:00:00 UTC. Context: OnData System.InvalidOperationException: Expected a nonzero stress order.
+   at HistoricalSimulationAlgorithm.Submit(String reason, Decimal target)
+   at HistoricalSimulationAlgorithm.OnData(Slice data)
+   at QuantConnect.Lean.Engine.AlgorithmManager.Run(AlgorithmNodePacket job, IAlgorithm algorithm, ISynchronizer synchronizer, ITransactionHandler transactions, IResultHandler results, IRealTimeHandler realtime, ILeanManager leanManager, CancellationTokenSource cancellationTokenSource, PerformanceTrackingTool performanceTrackingTool) in $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Engine/AlgorithmManager.cs:line 585
+20260923 07:00:43.073 ERROR:: 2019-12-31 16:00:00 BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00– 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.
+20260923 07:00:43.080 ERROR:: 2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585
+ System.Exception: Expected a nonzero stress order. in AlgorithmManager.cs:line 585
+ ---> QuantConnect.Exceptions.SystemExceptionInterpreter+SanitizedException: Expected a nonzero stress order.
+   at HistoricalSimulationAlgorithm.Submit(String reason, Decimal target)
+   at HistoricalSimulationAlgorithm.OnData(Slice data)
+   at QuantConnect.Lean.Engine.AlgorithmManager.Run(AlgorithmNodePacket job, IAlgorithm algorithm, ISynchronizer synchronizer, ITransactionHandler transactions, IResultHandler results, IRealTimeHandler realtime, ILeanManager leanManager, CancellationTokenSource cancellationTokenSource, PerformanceTrackingTool performanceTrackingTool) in $HOME/.local/share/codex-ecosystem/tools/lean-985ef30/Engine/AlgorithmManager.cs:line 585
+   --- End of inner exception stack trace ---

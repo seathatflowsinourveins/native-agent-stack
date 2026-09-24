@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-21",
+  "updated_at": "2026-09-23",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
     "baseline_meaning": "Parent accepted publication before this adoption addition; local revision is always git rev-parse HEAD. This commit predates adoption/ and tools/adoption/ entirely and must never be the checkout target for a new machine (see release_tag/release_commit below, and adoption/bootstrap.md step 0; Codex cross-family review finding, codex-review-72).",
-    "release_tag": "v2026.09.23",
-    "release_commit": "4970ba0f9c961f5bfaf765544d14e5527601028d",
+    "release_tag": "v2026.09.23.1",
+    "release_commit": "40828dfea7bca910032e93b966bbdfdd729f9f44",
     "release_meaning": "The attested release tag adoption/bootstrap.md step 0 checks out on a new machine (or a later tag): published with SLSA build provenance by .github/workflows/publish-catalog.yml, and contains both adoption/ and tools/adoption/ (unlike baseline_commit above)."
   },
   "supported_platforms": [
@@ -38,8 +38,9 @@
         "workflow": ".github/workflows/adoption-bootstrap.yml",
         "job": "bootstrap-macos",
         "status": "green_on_hosted_runner",
-        "run_id": "35753801691",
-        "receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+        "run_id": "35875188590",
+        "receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json",
+        "previous_receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
       },
       "evidence_ref": null
     }

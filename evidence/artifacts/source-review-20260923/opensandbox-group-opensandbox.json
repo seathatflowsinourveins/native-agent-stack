@@ -1,0 +1,52 @@
+{
+ "schema_version": 1,
+ "id": "source-review-opensandbox-group-opensandbox",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/opensandbox-group/OpenSandbox",
+ "reviewed_commit": "2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of the repository opensandbox-group/OpenSandbox at commit 2dd6e027bc3ee5b4f906c162d611ce9aa684aab7 (license Apache-2.0), read from README.md at that revision. Repository description: \"Secure, Fast, and Extensible Sandbox runtime for AI agents.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "OpenSandbox is a general-purpose sandbox platform for AI applications. It gives Coding Agents, GUI Agents, Agent Evaluation, AI Code Execution, and RL Training workloads a secure, scalable place to run \u2014 with the same API from a laptop to a large cluster."
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "OpenSandbox release images are published under the same component name in three official registries:"
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "\ud83e\udde9 SDKs, CLI, and MCP: Native SDKs for Python, Java/Kotlin, TypeScript, C#/.NET, and Go, plus the osb CLI and an MCP server \u2014 one API surface for sandbox creation, command execution, and file operations. See SDKs, CLI, and MCP."
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "\ud83d\udcdc Open Protocol: Sandbox lifecycle and execution APIs are defined as public OpenAPI contracts, so custom runtimes can plug in without changing client code. See API specs."
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "\u26a1 Hybrid Deployment: Mix long-running, Kubernetes-native container workloads with short-lived microVM sandboxes in one cluster. Pre-warmed, Firecracker-backed pools give constant-time admission and ~80ms startup; FastSandbox pause/resume checkpoints state to the artifact store and releases all compute, resuming on any host. See Fast Sandbox."
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "\ud83d\udea6 Network Policy and Credential Vault: Unified ingress gateway with multiple routing strategies, per-sandbox egress controls, and secure credential injection that keeps real secrets away from sandbox workloads. See Ingress Gateway, egress controls, and Credential Vault."
+  },
+  {
+   "source": "README.md@2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+   "text": "\ud83c\udff0 Strong Isolation: Run workloads under gVisor, Kata Containers, or Firecracker microVMs for strong isolation from the host. See the Secure Container Runtime Guide."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/opensandbox-group/OpenSandbox/tree/2dd6e027bc3ee5b4f906c162d611ce9aa684aab7",
+  "https://github.com/opensandbox-group/OpenSandbox/blob/2dd6e027bc3ee5b4f906c162d611ce9aa684aab7/README.md"
+ ]
+}

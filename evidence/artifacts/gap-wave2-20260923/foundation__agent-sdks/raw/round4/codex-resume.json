@@ -1,0 +1,73 @@
+{
+  "phase": "resume",
+  "pid": 4154742,
+  "resumed_same_thread": true,
+  "method_counts": {
+    "turn/started": 1,
+    "item/started": 2,
+    "item/completed": 2,
+    "item/agentMessage/delta": 12,
+    "thread/tokenUsage/updated": 1,
+    "turn/completed": 1
+  },
+  "untyped_methods": [],
+  "documented_notification_types": 82,
+  "received_types_documented": [
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/started"
+  ],
+  "received_types_undocumented": [],
+  "documented_types_not_received": 76,
+  "item_types": [
+    "agentMessage",
+    "userMessage"
+  ],
+  "tool_items": [],
+  "last_token_usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 10784,
+      "inputTokens": 10874,
+      "outputTokens": 13,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 10887
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 32160,
+      "inputTokens": 32281,
+      "outputTokens": 46,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 32327
+    }
+  },
+  "turn_completed": {
+    "at": 1790173299.5897665,
+    "method": "turn/completed",
+    "typed": true,
+    "turn_status": "completed",
+    "turn_error": null
+  },
+  "final_answer": "vx-498e98ddd5b0",
+  "provider_delta": {
+    "vllm:prompt_tokens_total": 10874.0,
+    "vllm:generation_tokens_total": 13.0,
+    "finished_by_reason": {
+      "stop": 1.0
+    },
+    "seconds": 0.893
+  },
+  "tool_calls_in_resume": [],
+  "answer_contains_turn1_value": true,
+  "answer_contains_decoy": false,
+  "resume_recall": true,
+  "status": "ok",
+  "sdk": "openai-codex",
+  "started_at": 1790173298.4331238,
+  "finished_at": 1790173299.6350198
+}

@@ -1,0 +1,36 @@
+{
+ "id": "foundation__quality-evaluation__gap7",
+ "gap_index": 7,
+ "gap_text_sha256": "fc7fe6c4b31f9b5f01b04c4ceac761d7899b517bab4c9f70715400c2880fc64d",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "Rerunning the upstream four-query retrieval assertion (examples/promptfoo-nemotron-upstream with NVIDIA's pinned model-card script) with -o results.json gives 4/4 and zero token/cost placeholders; vLLM prompt_tokens_total rises by about 336 over the run. The independently authored 30-case run with a provider that returns the endpoint's billed_units as promptfoo tokenUsage makes promptfoo report non-zero token usage matching the metric delta. Cost has no price source for the local endpoint, so expected outcome: advanced.",
+  "criteria": "results.json tokenUsage/cost quoted for both runs; metric snapshots before/after each run and for a quiet control interval of similar length.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T01:58:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "curl https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/resolve/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md; extract the first python block under 'Recommended Retrieval Endpoint'; substitute only the endpoint URL",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g0_g4_g7.sh $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g047 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g047-out $HOME/.cache/gap-wave2-20260923/quality-evaluation/promptfoo-heldout/cases.json $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/upstream4 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/pinned-venv  (gap-7 step: promptfoo eval -c examples/promptfoo-nemotron-upstream/promptfooconfig.yaml --no-cache -j 1 -o results.json, python = pinned venv with numpy 2.5.3 / requests 2.34.2)"
+ ],
+ "results": {
+  "upstream_example_hashes": "original 09df5e6a..., executed c4b48632..., both equal to the 2026-09-21 qualification.json values",
+  "upstream_four_query_rerun": "exit 0; ✓ 1 passed (100%), 'All assertions passed' (upstream4.stdout, g7-upstream4/results.json)",
+  "upstream_tokenUsage_cost": "promptfoo tokenUsage total 0, numRequests 1; cost 0 (zero placeholders: the exec provider reports no usage)",
+  "upstream_measured_tokens": "vllm:prompt_tokens_total +336 and request_success_total{stop} +8 over the run window (vllm-metrics.txt), consistent with 8 texts; quiet control windows +0",
+  "independent_queries": "the 30 held-out queries (gap 0) were written independently of NVIDIA's four rows; with the Python provider returning the endpoint's billed_units, promptfoo itself reports tokenUsage total 2040 over 30 requests, equal to the +2040 metric delta",
+  "cost": "cost 0 in both results.json files: a placeholder, because no price exists for the local endpoint"
+ },
+ "outcome": "advanced",
+ "evidence_class": "local_integration",
+ "limits": "Token usage is now recorded both by promptfoo (independent queries) and by the endpoint meter (upstream four-query run). The four-query assertion's own promptfoo counters remain zero placeholders, because the upstream script prints only a matrix and was not modified. Cost remains unreported: promptfoo's cost field is a 0 placeholder, and no per-token price or energy measurement exists for the local vLLM endpoint. This is the remaining arm, so the outcome is advanced. The metric deltas are model-scoped counters; quiet control windows showed no background traffic, but they are not exclusive per-evaluation billing.",
+ "checked_at": "2026-09-23T02:48:49Z",
+ "artifacts": [
+  "support/fixround/g7-upstream4/*",
+  "support/fixround/g0-g4-g7/{upstream4.stdout,upstream4.exit,upstream4.wall_ms,vllm-metrics.txt,pf-heldout-results.json}"
+ ]
+}

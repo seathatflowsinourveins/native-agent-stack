@@ -1,0 +1,66 @@
+{
+  "id": "1-auto-improve-deferred",
+  "gap_index": 1,
+  "gap_text_sha256": "8e90cca0bbaf058a6b8009c5c9d9257bdb2b15e3f48c5d9c526302243a408dbd",
+  "preregistration": {
+    "written_at": "2026-09-23T01:31:12Z",
+    "late": true,
+    "late_reason": "Written by the fix round at 01:31:12Z, after its commands ran; the first-pass text (01:16:49Z) was also written after its checks.",
+    "expectation": "Rerunning `ai-memory auto-improve` and grading its proposed edits requires an LLM provider configured via AI_MEMORY_LLM_PROVIDER; a disposable-serve-on-an-alternate-port instance (validated safe in gap 14's receipt) removes the isolation risk, but does not remove the LLM-provider requirement.",
+    "criteria": "Settled only by an independent reviewer grading auto-improve's proposed edits against source sessions on a disposable copy, using a configured LLM provider.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "cat docs/memory-landscape-maintenance.md (lines around 135-137) via grep",
+      "exit": 0,
+      "output_excerpt": "Line 135: '`ai-memory auto-improve --workspace agent-lab --project agent-lab --session-id SESSION_ID --json` | One real completed Codex session reviewed: no validated proposals; one rejected for insufficient durable evidence.' (Corrected in this fix round: the earlier version of this receipt paraphrased this as 'scheduler admission produced no learned edits', which is not the actual quoted text.)"
+    },
+    {
+      "cmd": "env | grep -i AI_MEMORY_LLM || echo \"AI_MEMORY_LLM_PROVIDER not set in worker env\"; ai-memory --help 2>&1 | grep -i \"auto-improve\\|llm\" | head -5; ai-memory auto-improve --help 2>&1 | head -20",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap1-env-and-help.txt",
+      "output_excerpt": "AI_MEMORY_LLM_PROVIDER not set in worker env\n  llm-test              Smoke-test an LLM provider by sending one prompt\n  ...\n  auto-improve          Run auto-improvement for one completed session\n  pending-writes        Review, approve, or reject staged auto-improvement proposals\nUsage: ai-memory auto-improve [OPTIONS] --session-id <SESSION_ID>",
+      "note": "Corrected on reconciliation: the previous entry recorded `ai-memory serve --help | grep -i llm`, which was not the command run, and quoted two serve log lines as its output.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "(no separate command) serve.log tail printed by the gap-14 probe, fix-round transcript Bash call [12]",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap14-netns-probe.txt",
+      "output_excerpt": "INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only\nINFO ai_memory_cli::commands::serve: auto-improve scheduler enabled but no LLM provider is configured; job not started",
+      "note": "These two lines are in the raw gap-14 run (disposable serve inside unshare -rn); the same wording also appears in the older memory-lifecycle-probe-20260921/ai-server-1.log.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ai-memory status (first-pass transcript Bash call [14], which reached the LIVE service; recorded here only for its provider line)",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "output_excerpt": "providers:\n    llm:       codex/gpt-5.6-luna ok (last call: 2026-09-23T01:08:59.334925017Z)\n    embedding: local/all-MiniLM-L6-v2 (384d) ok",
+      "note": "Shows the host's live ai-memory service does have an LLM provider (native Codex) configured, contradicting the previous blocker text.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Not executed. The previous deferral named the blocker 'no LLM provider is configured on this host and configuring one needs credentials/paid API'. The raw output on disk contradicts it: the live service's status reports `llm: codex/gpt-5.6-luna ok`, a native Codex provider, and the assignment allowed Codex-account calls (at most one concurrent). Only the worker's own shell lacked AI_MEMORY_LLM_PROVIDER. A disposable serve with the codex provider, inside unshare -rn plus a loopback-only instance (as used for gap 14) was not attempted, and no reviewer graded any proposal. The only open question that could be a real blocker, whether copying the live store into a disposable dir counts as touching it, was never raised or decided. Outcome: not_settled (weak deferral).",
+  "outcome": "not_settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "No auto-improve run and no graded proposal; evidence_class stays source_review.",
+    "Remaining: copy (or synthesize) completed sessions into a disposable data dir served on its own loopback port with AI_MEMORY_SERVER_URL exported, run `ai-memory auto-improve` with the native codex provider, and have an independent reviewer grade each proposal against its source sessions.",
+    "Coordinator decision needed only on whether a read-only copy of the live store is allowed; a synthetic-session variant needs no live-store access."
+  ],
+  "checked_at": "2026-09-23T01:23:35Z",
+  "checked_at_note": "Time of the env/help command (fix-round transcript Bash call [14]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "deferred -> not_settled: the named blocker is contradicted by the live status provider line.",
+      "commands[1] replaced with the command actually run and its real output; the serve log lines are now attributed to the gap-14 raw output.",
+      "Real timestamps."
+    ]
+  }
+}

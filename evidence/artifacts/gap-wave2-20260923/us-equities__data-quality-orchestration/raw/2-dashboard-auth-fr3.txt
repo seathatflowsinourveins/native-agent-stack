@@ -1,0 +1,22 @@
+probe started 2026-09-23T05:48:51Z
+binary: 2.16.6
+control=none mode_configured=none served=[authMode: "none"]
+  anonymous GET /api/v1/dags -> 200
+  anonymous WWW-Authenticate: []
+  basic(correct) GET /api/v1/dags -> 200
+  basic(wrong) GET /api/v1/dags -> 200
+  stopped: port answers 000
+control=basic mode_configured=basic served=[authMode: "basic"]
+  anonymous GET /api/v1/dags -> 401
+  anonymous WWW-Authenticate: [Www-Authenticate: Basic realm="restricted"]
+  basic(correct) GET /api/v1/dags -> 200
+  basic(wrong) GET /api/v1/dags -> 401
+  stopped: port answers 000
+live service: ExecMainStartTimestamp=Tue 2026-09-22 10:52:37 EDT ActiveState=active SubState=running 
+live served=[authMode: "none"]
+live anonymous GET /api/v1/dags -> 200
+live anonymous WWW-Authenticate: []
+live dummy-basic GET /api/v1/dags -> 200
+live anonymous GET / -> 200
+live service after probe: ExecMainStartTimestamp=Tue 2026-09-22 10:52:37 EDT ActiveState=active 
+probe finished 2026-09-23T05:48:53Z

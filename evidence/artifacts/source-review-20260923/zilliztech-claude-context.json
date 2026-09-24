@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-zilliztech-claude-context",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/zilliztech/claude-context",
+ "reviewed_commit": "6fc318b4e3ce58e2898b00a9c3538ead9e24dee5",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the repository zilliztech/claude-context at commit 6fc318b4e3ce58e2898b00a9c3538ead9e24dee5 (license MIT), read from README.md at that revision. Repository description: \"Code search MCP for Claude Code. Make entire codebase the context for any coding agent.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@6fc318b4e3ce58e2898b00a9c3538ead9e24dee5",
+   "text": "Claude Context is an MCP plugin that adds semantic code search to Claude Code and other AI coding agents, giving them deep context from your entire codebase."
+  },
+  {
+   "source": "README.md@6fc318b4e3ce58e2898b00a9c3538ead9e24dee5",
+   "text": "No multi-round discovery needed. It brings results straight into the Claude's context."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/zilliztech/claude-context/tree/6fc318b4e3ce58e2898b00a9c3538ead9e24dee5",
+  "https://github.com/zilliztech/claude-context/blob/6fc318b4e3ce58e2898b00a9c3538ead9e24dee5/README.md"
+ ]
+}

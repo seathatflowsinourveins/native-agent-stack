@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-pst-group-pysystemtrade",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/pst-group/pysystemtrade",
+ "reviewed_commit": "8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of the repository pst-group/pysystemtrade at commit 8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7 (license GPL-3.0), read from README.md at that revision. Repository description: \"Systematic Trading in python\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7",
+   "text": "Systematic futures trading in python, using the systems developed by Rob Carver"
+  },
+  {
+   "source": "README.md@8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7",
+   "text": "pysystemtrade is the open source version of Rob Carver's own backtesting and trading engine that implements systems according to the framework outlined in his book \"Systematic Trading\", which is further developed on his blog and in his other books."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/pst-group/pysystemtrade/tree/8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7",
+  "https://github.com/pst-group/pysystemtrade/blob/8958c49c38b1e4a8c07f0e4375d5e9cb68a087f7/README.md"
+ ]
+}

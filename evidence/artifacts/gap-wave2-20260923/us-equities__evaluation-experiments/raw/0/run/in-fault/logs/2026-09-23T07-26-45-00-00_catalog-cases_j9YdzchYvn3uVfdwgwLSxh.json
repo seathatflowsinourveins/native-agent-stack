@@ -1,0 +1,4085 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "dcodpuSDgkRKg9pKrTf7zX",
+    "run_id": "3cA42Fxind3XPPCohGneaS",
+    "created": "2026-09-23T07:26:45+00:00",
+    "task": "catalog_cases",
+    "task_id": "j9YdzchYvn3uVfdwgwLSxh",
+    "task_version": 0,
+    "task_file": "catalog_task.py",
+    "task_display_name": "catalog_cases",
+    "task_registry_name": "catalog_cases",
+    "task_attribs": {},
+    "task_args": {
+      "delay": 0.0,
+      "fail_once_case": "C3",
+      "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault/markers"
+    },
+    "task_args_passed": {
+      "fail_once_case": "C3",
+      "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault/markers"
+    },
+    "dataset": {
+      "samples": 8,
+      "sample_ids": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "shuffled": false
+    },
+    "model": "mockllm/model",
+    "model_generate_config": {},
+    "model_args": {
+      "custom_outputs": null
+    },
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "retry_on_error": 1,
+      "score_on_error": false,
+      "max_samples": 1,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "revision": {
+      "type": "git",
+      "origin": "https://github.com/seathatflowsinourveins/native-agent-stack.git",
+      "commit": "11d1e6c",
+      "dirty": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.266"
+    },
+    "scorers": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "fault_and_delay",
+        "params": {
+          "delay": 0.0,
+          "fail_once_case": "C3",
+          "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault/markers"
+        },
+        "params_passed": {
+          "delay": 0.0,
+          "fail_once_case": "C3",
+          "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault/markers"
+        }
+      },
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_connections": 1
+    }
+  },
+  "results": {
+    "total_samples": 8,
+    "completed_samples": 8,
+    "scores": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "scorer": "promptfoo_equivalent_assertions",
+        "scored_samples": 8,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "accuracy": {
+            "name": "accuracy",
+            "value": 0.375,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "promptfoo_equivalent_assertions",
+      "score": "promptfoo_equivalent_assertions",
+      "metric": "accuracy"
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-23T07:26:45+00:00",
+    "completed_at": "2026-09-23T07:26:45+00:00",
+    "model_usage": {
+      "mockllm/model": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "C1",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "WYpDqoF4i4kMWc5tVRSSwu",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "Y7LV7uuMbYLqUvFhn5K3JK",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "Y7LV7uuMbYLqUvFhn5K3JK",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02331687200057786
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+          "expected": "supported"
+        },
+        "description": "C1 manual-hook-supported"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "VL3dx98An642mAnovAgdhR",
+          "span_id": "HUDWboCnYudZFCT8CKPuSz",
+          "timestamp": "2026-09-23T07:26:45.393803+00:00",
+          "working_start": 59332.754427627,
+          "event": "span_begin",
+          "id": "HUDWboCnYudZFCT8CKPuSz",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "AzFuGUfeETUM6Y9oyvJdY7",
+          "span_id": "HUDWboCnYudZFCT8CKPuSz",
+          "timestamp": "2026-09-23T07:26:45.394292+00:00",
+          "working_start": 59332.754916526,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "target": "supported",
+            "id": "C1",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "WYpDqoF4i4kMWc5tVRSSwu",
+                "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          }
+        },
+        {
+          "uuid": "FTQru4xdJv9dFxUwkbDqhx",
+          "span_id": "HUDWboCnYudZFCT8CKPuSz",
+          "timestamp": "2026-09-23T07:26:45.394703+00:00",
+          "working_start": 59332.755330526,
+          "event": "span_end",
+          "id": "HUDWboCnYudZFCT8CKPuSz"
+        },
+        {
+          "uuid": "K5EukYHsw8TBGLgFVyTY6S",
+          "span_id": "35Sxd58nDkUXaJunuQTsUE",
+          "timestamp": "2026-09-23T07:26:45.395133+00:00",
+          "working_start": 0.0002703000063775107,
+          "event": "span_begin",
+          "id": "35Sxd58nDkUXaJunuQTsUE",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "DMdEYJWE29eF2ow4BhvXC6",
+          "span_id": "U6w9kqiHbmnUMaRaDoovCZ",
+          "timestamp": "2026-09-23T07:26:45.395369+00:00",
+          "working_start": 0.000505900003190618,
+          "event": "span_begin",
+          "id": "U6w9kqiHbmnUMaRaDoovCZ",
+          "parent_id": "35Sxd58nDkUXaJunuQTsUE",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "iVCHq38Ho7eik6miEq74hc",
+          "span_id": "U6w9kqiHbmnUMaRaDoovCZ",
+          "timestamp": "2026-09-23T07:26:45.395643+00:00",
+          "working_start": 0.0007806000066921115,
+          "event": "span_end",
+          "id": "U6w9kqiHbmnUMaRaDoovCZ"
+        },
+        {
+          "uuid": "Vip82xc4tqRqp6gKr32NRz",
+          "span_id": "Uesc4rjQKGY8qhHCekPyu6",
+          "timestamp": "2026-09-23T07:26:45.395741+00:00",
+          "working_start": 0.0008772990040597506,
+          "event": "span_begin",
+          "id": "Uesc4rjQKGY8qhHCekPyu6",
+          "parent_id": "35Sxd58nDkUXaJunuQTsUE",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "QCXKcHrHhsGAJaVN9x2vnU",
+          "span_id": "Uesc4rjQKGY8qhHCekPyu6",
+          "timestamp": "2026-09-23T07:26:45.395899+00:00",
+          "working_start": 0.0010358990039094351,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "Y7LV7uuMbYLqUvFhn5K3JK",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02331687200057786
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.492495+00:00",
+          "working_time": 0.02331687200057786
+        },
+        {
+          "uuid": "MPpQexSbP4u6r2HZoyuRod",
+          "span_id": "Uesc4rjQKGY8qhHCekPyu6",
+          "timestamp": "2026-09-23T07:26:45.493077+00:00",
+          "working_start": 0.025156470001093112,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02331687200057786
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "Y7LV7uuMbYLqUvFhn5K3JK",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "Y7LV7uuMbYLqUvFhn5K3JK",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "5bXdFSoeHSZUPD6dwQ4DBQ",
+          "span_id": "Uesc4rjQKGY8qhHCekPyu6",
+          "timestamp": "2026-09-23T07:26:45.493324+00:00",
+          "working_start": 0.025402370003575925,
+          "event": "span_end",
+          "id": "Uesc4rjQKGY8qhHCekPyu6"
+        },
+        {
+          "uuid": "DaYtLDsVTJYy9LSp4JQyJ2",
+          "span_id": "35Sxd58nDkUXaJunuQTsUE",
+          "timestamp": "2026-09-23T07:26:45.493432+00:00",
+          "working_start": 0.025510269006190356,
+          "event": "span_end",
+          "id": "35Sxd58nDkUXaJunuQTsUE"
+        },
+        {
+          "uuid": "VFRSeuKpDYScgrfWLSfBJj",
+          "span_id": "EQFJGpmyNuxMRnFrbvFQmK",
+          "timestamp": "2026-09-23T07:26:45.493754+00:00",
+          "working_start": 0.025831969003775157,
+          "event": "span_begin",
+          "id": "EQFJGpmyNuxMRnFrbvFQmK",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "9cBBYnAa2ZpEvZxMHGZWt4",
+          "span_id": "BaHHzmraTx3ZiqD32jrJ4F",
+          "timestamp": "2026-09-23T07:26:45.493842+00:00",
+          "working_start": 0.025920169005985372,
+          "event": "span_begin",
+          "id": "BaHHzmraTx3ZiqD32jrJ4F",
+          "parent_id": "EQFJGpmyNuxMRnFrbvFQmK",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "BNcrCzjfWgw59xuymfXcD5",
+          "span_id": "BaHHzmraTx3ZiqD32jrJ4F",
+          "timestamp": "2026-09-23T07:26:45.519570+00:00",
+          "working_start": 0.05165533800027333,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "Fy3HMxJCNKZ4JVrPKSNJxU",
+          "span_id": "BaHHzmraTx3ZiqD32jrJ4F",
+          "timestamp": "2026-09-23T07:26:45.520031+00:00",
+          "working_start": 0.05211113800032763,
+          "event": "span_end",
+          "id": "BaHHzmraTx3ZiqD32jrJ4F"
+        },
+        {
+          "uuid": "WF62RJfvWUaTqdewXAZnd6",
+          "span_id": "EQFJGpmyNuxMRnFrbvFQmK",
+          "timestamp": "2026-09-23T07:26:45.520166+00:00",
+          "working_start": 0.052244436999899335,
+          "event": "span_end",
+          "id": "EQFJGpmyNuxMRnFrbvFQmK"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.394865+00:00",
+      "completed_at": "2026-09-23T07:26:45.520439+00:00",
+      "total_time": 0.126,
+      "working_time": 0.052,
+      "uuid": "G4qV9B5NFP6rFM3uzcayy7",
+      "error_retries": [],
+      "attachments": {
+        "c48837c6b5cd04d96e990059063801b9": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "WYpDqoF4i4kMWc5tVRSSwu",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "WYpDqoF4i4kMWc5tVRSSwu",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C2",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "g8H9pdGe4S2VAsd5VHrC8f",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "hSbu2fakZrsFwMYUwjTtZE",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "hSbu2fakZrsFwMYUwjTtZE",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.022716472994943615
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Automatic compaction preserves every fact.",
+          "expected": "insufficient"
+        },
+        "description": "C2 untested-not-failed"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "9St3adNMbeFSUmJkAfwNVz",
+          "span_id": "YvEwNYLo4GdtCe6G3HF7pM",
+          "timestamp": "2026-09-23T07:26:45.522431+00:00",
+          "working_start": 59332.883055373,
+          "event": "span_begin",
+          "id": "YvEwNYLo4GdtCe6G3HF7pM",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "SyQ3BKuuajSMtjNSR9P3a2",
+          "span_id": "YvEwNYLo4GdtCe6G3HF7pM",
+          "timestamp": "2026-09-23T07:26:45.522722+00:00",
+          "working_start": 59332.883346372,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "target": "insufficient",
+            "id": "C2",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "g8H9pdGe4S2VAsd5VHrC8f",
+                "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          }
+        },
+        {
+          "uuid": "cyGKecA97a2ntz4zQPc5Wg",
+          "span_id": "YvEwNYLo4GdtCe6G3HF7pM",
+          "timestamp": "2026-09-23T07:26:45.522927+00:00",
+          "working_start": 59332.883551272,
+          "event": "span_end",
+          "id": "YvEwNYLo4GdtCe6G3HF7pM"
+        },
+        {
+          "uuid": "CgCQNGPyr95PeTKr8YYRzs",
+          "span_id": "X8XCkvUSPqCteMtkVogrUR",
+          "timestamp": "2026-09-23T07:26:45.523232+00:00",
+          "working_start": 0.00021890000061830506,
+          "event": "span_begin",
+          "id": "X8XCkvUSPqCteMtkVogrUR",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "DXrHbzhwfw6v5ApEeVUaQx",
+          "span_id": "LgVV8pbdVL8dYwQoVd3L7B",
+          "timestamp": "2026-09-23T07:26:45.523331+00:00",
+          "working_start": 0.0003180999992764555,
+          "event": "span_begin",
+          "id": "LgVV8pbdVL8dYwQoVd3L7B",
+          "parent_id": "X8XCkvUSPqCteMtkVogrUR",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "iSug3nUc5vLoGBkLYAzG49",
+          "span_id": "LgVV8pbdVL8dYwQoVd3L7B",
+          "timestamp": "2026-09-23T07:26:45.523501+00:00",
+          "working_start": 0.0004879990010522306,
+          "event": "span_end",
+          "id": "LgVV8pbdVL8dYwQoVd3L7B"
+        },
+        {
+          "uuid": "VujMTXPVndBoobaXd4KCWF",
+          "span_id": "Q3MuWTA2rTEPSdQsPCgCqu",
+          "timestamp": "2026-09-23T07:26:45.523584+00:00",
+          "working_start": 0.0005709990000468679,
+          "event": "span_begin",
+          "id": "Q3MuWTA2rTEPSdQsPCgCqu",
+          "parent_id": "X8XCkvUSPqCteMtkVogrUR",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "ET8pWpG2KK7tVtdA3hC86J",
+          "span_id": "Q3MuWTA2rTEPSdQsPCgCqu",
+          "timestamp": "2026-09-23T07:26:45.523732+00:00",
+          "working_start": 0.0007190989999799058,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "hSbu2fakZrsFwMYUwjTtZE",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.022716472994943615
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.547926+00:00",
+          "working_time": 0.022716472994943615
+        },
+        {
+          "uuid": "NwoUgKjtyJmtWQEzgziZjv",
+          "span_id": "Q3MuWTA2rTEPSdQsPCgCqu",
+          "timestamp": "2026-09-23T07:26:45.548278+00:00",
+          "working_start": 0.02394217198889237,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.022716472994943615
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "hSbu2fakZrsFwMYUwjTtZE",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "hSbu2fakZrsFwMYUwjTtZE",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "NYKCSSXa7XAQUmFtgZ4fJS",
+          "span_id": "Q3MuWTA2rTEPSdQsPCgCqu",
+          "timestamp": "2026-09-23T07:26:45.548498+00:00",
+          "working_start": 0.024162370988051407,
+          "event": "span_end",
+          "id": "Q3MuWTA2rTEPSdQsPCgCqu"
+        },
+        {
+          "uuid": "aT2os3PubjuVNqUy6iUBiw",
+          "span_id": "X8XCkvUSPqCteMtkVogrUR",
+          "timestamp": "2026-09-23T07:26:45.548790+00:00",
+          "working_start": 0.02445877098944038,
+          "event": "span_end",
+          "id": "X8XCkvUSPqCteMtkVogrUR"
+        },
+        {
+          "uuid": "XhgjGYoh6jRFWjRgHRXGkB",
+          "span_id": "XHWafUgXTv8jhuhZoWTrJQ",
+          "timestamp": "2026-09-23T07:26:45.549128+00:00",
+          "working_start": 0.024792270989564713,
+          "event": "span_begin",
+          "id": "XHWafUgXTv8jhuhZoWTrJQ",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "3ry93fPWvkL4BJRdqiZDem",
+          "span_id": "2uAUJCqmCtUdG3dUfSwysq",
+          "timestamp": "2026-09-23T07:26:45.549223+00:00",
+          "working_start": 0.024887270985345822,
+          "event": "span_begin",
+          "id": "2uAUJCqmCtUdG3dUfSwysq",
+          "parent_id": "XHWafUgXTv8jhuhZoWTrJQ",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "JonM4oKSHmoS9tWUMR7ADZ",
+          "span_id": "2uAUJCqmCtUdG3dUfSwysq",
+          "timestamp": "2026-09-23T07:26:45.571460+00:00",
+          "working_start": 0.04712874398683198,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "S3Jeam4AxeVu7MueaKJmnH",
+          "span_id": "2uAUJCqmCtUdG3dUfSwysq",
+          "timestamp": "2026-09-23T07:26:45.571814+00:00",
+          "working_start": 0.04747854398738127,
+          "event": "span_end",
+          "id": "2uAUJCqmCtUdG3dUfSwysq"
+        },
+        {
+          "uuid": "Npm3SDp6mqwCBw8nfjceUd",
+          "span_id": "XHWafUgXTv8jhuhZoWTrJQ",
+          "timestamp": "2026-09-23T07:26:45.571944+00:00",
+          "working_start": 0.04760754298331449,
+          "event": "span_end",
+          "id": "XHWafUgXTv8jhuhZoWTrJQ"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.523015+00:00",
+      "completed_at": "2026-09-23T07:26:45.572232+00:00",
+      "total_time": 0.049,
+      "working_time": 0.048,
+      "uuid": "SRKAsrqnoaR8zKScKTWNEV",
+      "error_retries": [],
+      "attachments": {
+        "729e21f4d46bc208559897b9a14ce1ab": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "g8H9pdGe4S2VAsd5VHrC8f",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "g8H9pdGe4S2VAsd5VHrC8f",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C3",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "MxTgHUM4y4D5aVaVE4Zz6e",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "ijnUaP9TkpnojSg4aag7KV",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "ijnUaP9TkpnojSg4aag7KV",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.025232370004232507
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "Independent verification accepted both repairs in this small repair comparison.",
+          "expected": "supported"
+        },
+        "description": "C3 bounded-writing-acceptance"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "GkUdXfiJ2kaELKNFXsDWNx",
+          "span_id": "kdFDMHzrTpCzy6LdwtUUwS",
+          "timestamp": "2026-09-23T07:26:45.902503+00:00",
+          "working_start": 0.3283971070050029,
+          "event": "span_begin",
+          "id": "kdFDMHzrTpCzy6LdwtUUwS",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "NuNL6rLJ5jYtZN66aDifiq",
+          "span_id": "kdFDMHzrTpCzy6LdwtUUwS",
+          "timestamp": "2026-09-23T07:26:45.902755+00:00",
+          "working_start": 0.3286484060008661,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "target": "supported",
+            "id": "C3",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "MxTgHUM4y4D5aVaVE4Zz6e",
+                "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          }
+        },
+        {
+          "uuid": "CvpZ6fL2xub56RiXegHGDn",
+          "span_id": "kdFDMHzrTpCzy6LdwtUUwS",
+          "timestamp": "2026-09-23T07:26:45.902891+00:00",
+          "working_start": 0.32878470600553555,
+          "event": "span_end",
+          "id": "kdFDMHzrTpCzy6LdwtUUwS"
+        },
+        {
+          "uuid": "YtB4NjkCH3eGYmx7Fzc4LS",
+          "span_id": "iG4sjoXautvQAKozAzkBJv",
+          "timestamp": "2026-09-23T07:26:45.903182+00:00",
+          "working_start": 0.00021050000214017928,
+          "event": "span_begin",
+          "id": "iG4sjoXautvQAKozAzkBJv",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "m7PmdKcvgTzuuznE643Vix",
+          "span_id": "YHV8cTm4Z2JVwkydCiBpKu",
+          "timestamp": "2026-09-23T07:26:45.903273+00:00",
+          "working_start": 0.00030139999580569565,
+          "event": "span_begin",
+          "id": "YHV8cTm4Z2JVwkydCiBpKu",
+          "parent_id": "iG4sjoXautvQAKozAzkBJv",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "eiZ7f2MBq28jfBTqkkpQGX",
+          "span_id": "YHV8cTm4Z2JVwkydCiBpKu",
+          "timestamp": "2026-09-23T07:26:45.903505+00:00",
+          "working_start": 0.0005341989963199012,
+          "event": "span_end",
+          "id": "YHV8cTm4Z2JVwkydCiBpKu"
+        },
+        {
+          "uuid": "GrAhhEVmmawM42mLHGv7bq",
+          "span_id": "DTtkstdmUeNQzk5SM24mSY",
+          "timestamp": "2026-09-23T07:26:45.903595+00:00",
+          "working_start": 0.0006233989988686517,
+          "event": "span_begin",
+          "id": "DTtkstdmUeNQzk5SM24mSY",
+          "parent_id": "iG4sjoXautvQAKozAzkBJv",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "BEtniQNpayjHgHoVNaCy5y",
+          "span_id": "DTtkstdmUeNQzk5SM24mSY",
+          "timestamp": "2026-09-23T07:26:45.903741+00:00",
+          "working_start": 0.0007702989969402552,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "ijnUaP9TkpnojSg4aag7KV",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.025232370004232507
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.930360+00:00",
+          "working_time": 0.025232370004232507
+        },
+        {
+          "uuid": "BQtjuYaMisAmLihnAHFnST",
+          "span_id": "DTtkstdmUeNQzk5SM24mSY",
+          "timestamp": "2026-09-23T07:26:45.930689+00:00",
+          "working_start": 0.026463469002919737,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.025232370004232507
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "ijnUaP9TkpnojSg4aag7KV",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "ijnUaP9TkpnojSg4aag7KV",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "kPitEU5GDvHPHF796sV9bE",
+          "span_id": "DTtkstdmUeNQzk5SM24mSY",
+          "timestamp": "2026-09-23T07:26:45.930819+00:00",
+          "working_start": 0.0265930690075038,
+          "event": "span_end",
+          "id": "DTtkstdmUeNQzk5SM24mSY"
+        },
+        {
+          "uuid": "aQ6XWudabT4MiMqbNRXLHJ",
+          "span_id": "iG4sjoXautvQAKozAzkBJv",
+          "timestamp": "2026-09-23T07:26:45.930920+00:00",
+          "working_start": 0.026693668005464133,
+          "event": "span_end",
+          "id": "iG4sjoXautvQAKozAzkBJv"
+        },
+        {
+          "uuid": "SM3cjETjo2bKuy2a2UkMvU",
+          "span_id": "HCiB5828acxxBwBkuWGQYH",
+          "timestamp": "2026-09-23T07:26:45.931271+00:00",
+          "working_start": 0.027046668001275975,
+          "event": "span_begin",
+          "id": "HCiB5828acxxBwBkuWGQYH",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "gvB9MomAQZ7AbXLUWkTR3c",
+          "span_id": "EazQLb9T6WwcBPnitgqCFs",
+          "timestamp": "2026-09-23T07:26:45.931491+00:00",
+          "working_start": 0.02726576800341718,
+          "event": "span_begin",
+          "id": "EazQLb9T6WwcBPnitgqCFs",
+          "parent_id": "HCiB5828acxxBwBkuWGQYH",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "kDWiaA2JgkfBTPWP2egwFP",
+          "span_id": "EazQLb9T6WwcBPnitgqCFs",
+          "timestamp": "2026-09-23T07:26:45.956342+00:00",
+          "working_start": 0.0521206380071817,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "S3kpyXVhbRSzcDHF6Af2MU",
+          "span_id": "EazQLb9T6WwcBPnitgqCFs",
+          "timestamp": "2026-09-23T07:26:45.956752+00:00",
+          "working_start": 0.05252633800409967,
+          "event": "span_end",
+          "id": "EazQLb9T6WwcBPnitgqCFs"
+        },
+        {
+          "uuid": "b8jxsPgu6PHS4bbJEhwfxB",
+          "span_id": "HCiB5828acxxBwBkuWGQYH",
+          "timestamp": "2026-09-23T07:26:45.956891+00:00",
+          "working_start": 0.052665437004179694,
+          "event": "span_end",
+          "id": "HCiB5828acxxBwBkuWGQYH"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.902972+00:00",
+      "completed_at": "2026-09-23T07:26:45.957117+00:00",
+      "total_time": 0.054,
+      "working_time": 0.053,
+      "uuid": "mQ92Fc6q3CWhQXNLQ7x2yu",
+      "error_retries": [
+        {
+          "message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+          "traceback": "  + Exception Group Traceback (most recent call last):\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n  |     async with anyio.create_task_group() as tg:\n  |                ~~~~~~~~~~~~~~~~~~~~~~~^^\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 847, in __aexit__\n  |     raise BaseExceptionGroup(\n  |         \"unhandled errors in a TaskGroup\", self._exceptions\n  |     ) from None\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    |     raise inner_exception(ex)\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    |     retval = await self._coro\n    |              ^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    |     state = await plan(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    |     state = await solver(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    |     raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\n    | RuntimeError: injected transient failure for C3 (first attempt)\n    +------------------------------------\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    raise inner_exception(ex)\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    retval = await self._coro\n             ^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    state = await plan(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    state = await solver(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\nRuntimeError: injected transient failure for C3 (first attempt)\n",
+          "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:847 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 844 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# added to self._exceptions so it's ok to break \u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 845 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# chaining and avoid adding a \"During handling o\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 846 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# for each nesting level.\u001b[0m                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 847 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m BaseExceptionGroup(                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mExceptionGroup: \u001b[0munhandled errors in a TaskGroup \u001b[1m(\u001b[0m\u001b[1;36m1\u001b[0m sub-exception\u001b[1m)\u001b[0m\n\n\u001b[35m┌─\u001b[0m\u001b[35m────────────────────────────\u001b[0m\u001b[35m Sub-exception #1 \u001b[0m\u001b[35m─────────────────────────────\u001b[0m\u001b[35m─┐\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m┌─\u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m─┐\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m _task_run_sample_attempt                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m run                                                                     \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in       \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m __call__                                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m20260923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.p\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[1my\u001b[0m:80 in solve                                                           \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                               \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                            \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure f\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                              \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m└─────────────────────────────────────────────────────────────────────────┘\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m             \u001b[35m│\u001b[0m\n\u001b[35m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\n\u001b[3mDuring handling of the above exception, another exception occurred:\u001b[0m\n\n\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro          \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in run        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in __call__      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-2026\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m0923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.py\u001b[0m:80 in  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m solve                                                                       \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed-onc\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                                   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                                \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure for \u001b[0m\u001b[1;4;33m{\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                                  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                      \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m\n",
+          "events": []
+        }
+      ],
+      "attachments": {
+        "d1d67a6ad6e81f9acf119f87035f8968": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "MxTgHUM4y4D5aVaVE4Zz6e",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "MxTgHUM4y4D5aVaVE4Zz6e",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C4",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "6vW3Ldd63MrbZSQf9cmjGJ",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "Av8AsijjjXgoRyzPpamWmT",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "Av8AsijjjXgoRyzPpamWmT",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02384737199463416
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+          "expected": "insufficient"
+        },
+        "description": "C4 universal-worker-ranking"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "HV56o9G7vM3ABU5o784jCo",
+          "span_id": "PPkj3npZgo2MWvX52T2tjk",
+          "timestamp": "2026-09-23T07:26:45.636283+00:00",
+          "working_start": 59332.996908236,
+          "event": "span_begin",
+          "id": "PPkj3npZgo2MWvX52T2tjk",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "fGh6N5vGeBNpuJtb6kdXsN",
+          "span_id": "PPkj3npZgo2MWvX52T2tjk",
+          "timestamp": "2026-09-23T07:26:45.636662+00:00",
+          "working_start": 59332.997286436,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "target": "insufficient",
+            "id": "C4",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "6vW3Ldd63MrbZSQf9cmjGJ",
+                "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          }
+        },
+        {
+          "uuid": "adFEiN2xiic2ArJYFKejyV",
+          "span_id": "PPkj3npZgo2MWvX52T2tjk",
+          "timestamp": "2026-09-23T07:26:45.636853+00:00",
+          "working_start": 59332.997476636,
+          "event": "span_end",
+          "id": "PPkj3npZgo2MWvX52T2tjk"
+        },
+        {
+          "uuid": "JnJJFs76fZDZ8f2vcFPyK9",
+          "span_id": "etfFu62kdjYZuBxtqtL9UG",
+          "timestamp": "2026-09-23T07:26:45.637120+00:00",
+          "working_start": 0.00019489899568725377,
+          "event": "span_begin",
+          "id": "etfFu62kdjYZuBxtqtL9UG",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "gCwW7fakNaQDdGZ2Tq5cVz",
+          "span_id": "SRW8LXfTLuyZGPy6XK7xue",
+          "timestamp": "2026-09-23T07:26:45.637209+00:00",
+          "working_start": 0.0002838989967131056,
+          "event": "span_begin",
+          "id": "SRW8LXfTLuyZGPy6XK7xue",
+          "parent_id": "etfFu62kdjYZuBxtqtL9UG",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "2uRypiG8X9rUpK6GEacRkT",
+          "span_id": "SRW8LXfTLuyZGPy6XK7xue",
+          "timestamp": "2026-09-23T07:26:45.637337+00:00",
+          "working_start": 0.0004114990006200969,
+          "event": "span_end",
+          "id": "SRW8LXfTLuyZGPy6XK7xue"
+        },
+        {
+          "uuid": "5xmosg7cLQkvdiUG98RRJx",
+          "span_id": "b4RUtYqj75Po3PKfeyLNy8",
+          "timestamp": "2026-09-23T07:26:45.637412+00:00",
+          "working_start": 0.00048679899919079617,
+          "event": "span_begin",
+          "id": "b4RUtYqj75Po3PKfeyLNy8",
+          "parent_id": "etfFu62kdjYZuBxtqtL9UG",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "QVvn3rw3vi2pMRnUJhJiTb",
+          "span_id": "b4RUtYqj75Po3PKfeyLNy8",
+          "timestamp": "2026-09-23T07:26:45.637553+00:00",
+          "working_start": 0.0006273990002227947,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "Av8AsijjjXgoRyzPpamWmT",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02384737199463416
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.662821+00:00",
+          "working_time": 0.02384737199463416
+        },
+        {
+          "uuid": "djzrhQVKkvnbGcCpW9rSuh",
+          "span_id": "b4RUtYqj75Po3PKfeyLNy8",
+          "timestamp": "2026-09-23T07:26:45.663168+00:00",
+          "working_start": 0.024950169994554017,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02384737199463416
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "Av8AsijjjXgoRyzPpamWmT",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "Av8AsijjjXgoRyzPpamWmT",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "EdSqPtfsZP2BsCooKssn6N",
+          "span_id": "b4RUtYqj75Po3PKfeyLNy8",
+          "timestamp": "2026-09-23T07:26:45.663309+00:00",
+          "working_start": 0.025089969996770378,
+          "event": "span_end",
+          "id": "b4RUtYqj75Po3PKfeyLNy8"
+        },
+        {
+          "uuid": "neVDp4zHM7TSwwYtqmRqpc",
+          "span_id": "etfFu62kdjYZuBxtqtL9UG",
+          "timestamp": "2026-09-23T07:26:45.663446+00:00",
+          "working_start": 0.02522756999678677,
+          "event": "span_end",
+          "id": "etfFu62kdjYZuBxtqtL9UG"
+        },
+        {
+          "uuid": "PmBBTgTzYg3pxZDTFcrfpY",
+          "span_id": "TMYLZF2x879PUYYUckmf3D",
+          "timestamp": "2026-09-23T07:26:45.663749+00:00",
+          "working_start": 0.025530568993417546,
+          "event": "span_begin",
+          "id": "TMYLZF2x879PUYYUckmf3D",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "h6vCqufTWChGGG6gUGdYt3",
+          "span_id": "hFk94tPWk8mkZdLgsbvMMK",
+          "timestamp": "2026-09-23T07:26:45.663839+00:00",
+          "working_start": 0.025620168991736136,
+          "event": "span_begin",
+          "id": "hFk94tPWk8mkZdLgsbvMMK",
+          "parent_id": "TMYLZF2x879PUYYUckmf3D",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "J2ydVvzSe8A9Y4kL2kDboR",
+          "span_id": "hFk94tPWk8mkZdLgsbvMMK",
+          "timestamp": "2026-09-23T07:26:45.687473+00:00",
+          "working_start": 0.04926034099480603,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "LbSV63Foyk9zpY2d9jvZzn",
+          "span_id": "hFk94tPWk8mkZdLgsbvMMK",
+          "timestamp": "2026-09-23T07:26:45.687821+00:00",
+          "working_start": 0.04960324099374702,
+          "event": "span_end",
+          "id": "hFk94tPWk8mkZdLgsbvMMK"
+        },
+        {
+          "uuid": "RqcmB5dW4nBWhkyRjYxgTQ",
+          "span_id": "TMYLZF2x879PUYYUckmf3D",
+          "timestamp": "2026-09-23T07:26:45.687959+00:00",
+          "working_start": 0.049740039990865625,
+          "event": "span_end",
+          "id": "TMYLZF2x879PUYYUckmf3D"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.636927+00:00",
+      "completed_at": "2026-09-23T07:26:45.688173+00:00",
+      "total_time": 0.051,
+      "working_time": 0.05,
+      "uuid": "FAi94wEC6w5wKjaf6hAUJP",
+      "error_retries": [],
+      "attachments": {
+        "944c03f42c0508dd3fd2271585127dc1": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "6vW3Ldd63MrbZSQf9cmjGJ",
+            "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "6vW3Ldd63MrbZSQf9cmjGJ",
+            "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C5",
+      "epoch": 1,
+      "input": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+      "target": "contradicted",
+      "messages": [
+        {
+          "id": "Y3C8aRC5ibTVqegi9C6gxx",
+          "content": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "T3M5HkQ64wCXyeCaNnR8GN",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "T3M5HkQ64wCXyeCaNnR8GN",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.023817571003746707
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+          "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+          "expected": "contradicted"
+        },
+        "description": "C5 latency-direction"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "Lp9b8k3eXh8FtiwzzdHQSU",
+          "span_id": "9HxprewApUCJ7q7uwAjcSk",
+          "timestamp": "2026-09-23T07:26:45.689453+00:00",
+          "working_start": 59333.050076873,
+          "event": "span_begin",
+          "id": "9HxprewApUCJ7q7uwAjcSk",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "2oJmztpGYuEtHVNhYiWzR4",
+          "span_id": "9HxprewApUCJ7q7uwAjcSk",
+          "timestamp": "2026-09-23T07:26:45.689711+00:00",
+          "working_start": 59333.050335372,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "target": "contradicted",
+            "id": "C5",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+                "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+                "expected": "contradicted"
+              },
+              "description": "C5 latency-direction"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "Y3C8aRC5ibTVqegi9C6gxx",
+                "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://b2f5e430785617cb61d4ecd122c0a18c",
+                "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+                "expected": "contradicted"
+              },
+              "description": "C5 latency-direction"
+            }
+          }
+        },
+        {
+          "uuid": "V5jgjn92SfdLDwZvDME5Qn",
+          "span_id": "9HxprewApUCJ7q7uwAjcSk",
+          "timestamp": "2026-09-23T07:26:45.689853+00:00",
+          "working_start": 59333.050477072,
+          "event": "span_end",
+          "id": "9HxprewApUCJ7q7uwAjcSk"
+        },
+        {
+          "uuid": "ikQ39jY9WiLEGCFWuRSF9s",
+          "span_id": "cFJXyMYJ2SZ3ABuozQ2s7d",
+          "timestamp": "2026-09-23T07:26:45.690127+00:00",
+          "working_start": 0.00020930000027874485,
+          "event": "span_begin",
+          "id": "cFJXyMYJ2SZ3ABuozQ2s7d",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "h4zqXbgiXeEfjWsRBTamcv",
+          "span_id": "ELRADQnajzMhxvj9smsJNd",
+          "timestamp": "2026-09-23T07:26:45.690211+00:00",
+          "working_start": 0.0002930999980890192,
+          "event": "span_begin",
+          "id": "ELRADQnajzMhxvj9smsJNd",
+          "parent_id": "cFJXyMYJ2SZ3ABuozQ2s7d",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "TDoduwswvs4wCkiqsybKNK",
+          "span_id": "ELRADQnajzMhxvj9smsJNd",
+          "timestamp": "2026-09-23T07:26:45.690347+00:00",
+          "working_start": 0.000428999999712687,
+          "event": "span_end",
+          "id": "ELRADQnajzMhxvj9smsJNd"
+        },
+        {
+          "uuid": "fGq8gKuZXd4pCSViKJUVFv",
+          "span_id": "CsnuYUhdPNEJL5ysumu6Wp",
+          "timestamp": "2026-09-23T07:26:45.690427+00:00",
+          "working_start": 0.000508999997691717,
+          "event": "span_begin",
+          "id": "CsnuYUhdPNEJL5ysumu6Wp",
+          "parent_id": "cFJXyMYJ2SZ3ABuozQ2s7d",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "Syu7vzXfYWxwzA9osanP5X",
+          "span_id": "CsnuYUhdPNEJL5ysumu6Wp",
+          "timestamp": "2026-09-23T07:26:45.690570+00:00",
+          "working_start": 0.0006516990033560432,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "T3M5HkQ64wCXyeCaNnR8GN",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.023817571003746707
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.715735+00:00",
+          "working_time": 0.023817571003746707
+        },
+        {
+          "uuid": "mziLm5QGu7cymU6YXWiPeN",
+          "span_id": "CsnuYUhdPNEJL5ysumu6Wp",
+          "timestamp": "2026-09-23T07:26:45.716074+00:00",
+          "working_start": 0.0249387700096122,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.023817571003746707
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "T3M5HkQ64wCXyeCaNnR8GN",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "T3M5HkQ64wCXyeCaNnR8GN",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "bdrrZ5CL2RphF6pHrXcete",
+          "span_id": "CsnuYUhdPNEJL5ysumu6Wp",
+          "timestamp": "2026-09-23T07:26:45.716217+00:00",
+          "working_start": 0.02508077001402853,
+          "event": "span_end",
+          "id": "CsnuYUhdPNEJL5ysumu6Wp"
+        },
+        {
+          "uuid": "7Dbyg7SabzLGzE46XQ8vv5",
+          "span_id": "cFJXyMYJ2SZ3ABuozQ2s7d",
+          "timestamp": "2026-09-23T07:26:45.716479+00:00",
+          "working_start": 0.02534896901488537,
+          "event": "span_end",
+          "id": "cFJXyMYJ2SZ3ABuozQ2s7d"
+        },
+        {
+          "uuid": "K7dDK3xo5ei4qiAXBy4vdw",
+          "span_id": "FzNvKPqkYTJMhgVAqM3UVu",
+          "timestamp": "2026-09-23T07:26:45.717060+00:00",
+          "working_start": 0.025924569010385312,
+          "event": "span_begin",
+          "id": "FzNvKPqkYTJMhgVAqM3UVu",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "ab3AspXtZJzBUZXiAUy65u",
+          "span_id": "nLc6aeQPofuctUALhQHcqp",
+          "timestamp": "2026-09-23T07:26:45.717162+00:00",
+          "working_start": 0.02602586801367579,
+          "event": "span_begin",
+          "id": "nLc6aeQPofuctUALhQHcqp",
+          "parent_id": "FzNvKPqkYTJMhgVAqM3UVu",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "S48ojnJFKGebUTDcczSS8s",
+          "span_id": "nLc6aeQPofuctUALhQHcqp",
+          "timestamp": "2026-09-23T07:26:45.740066+00:00",
+          "working_start": 0.048935441016510595,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "contradicted",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "mfw5ZJ286VmwBaK62x2tby",
+          "span_id": "nLc6aeQPofuctUALhQHcqp",
+          "timestamp": "2026-09-23T07:26:45.740440+00:00",
+          "working_start": 0.049305841013847385,
+          "event": "span_end",
+          "id": "nLc6aeQPofuctUALhQHcqp"
+        },
+        {
+          "uuid": "4QNXaGfHRdvzd8vPNDivPD",
+          "span_id": "FzNvKPqkYTJMhgVAqM3UVu",
+          "timestamp": "2026-09-23T07:26:45.740590+00:00",
+          "working_start": 0.04945404001045972,
+          "event": "span_end",
+          "id": "FzNvKPqkYTJMhgVAqM3UVu"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.689919+00:00",
+      "completed_at": "2026-09-23T07:26:45.740811+00:00",
+      "total_time": 0.051,
+      "working_time": 0.05,
+      "uuid": "XyPvBiNqPZgizPdAdcnuZm",
+      "error_retries": [],
+      "attachments": {
+        "c176dae42df2ff4d10d677ddd693f387": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+        "b2f5e430785617cb61d4ecd122c0a18c": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "Y3C8aRC5ibTVqegi9C6gxx",
+            "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "Y3C8aRC5ibTVqegi9C6gxx",
+            "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C6",
+      "epoch": 1,
+      "input": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "JiLRcY8Hnp3nftUTjVxU2E",
+          "content": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "nmpdgW8hPbcMrb4UudEXwg",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "nmpdgW8hPbcMrb4UudEXwg",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02387327099859249
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": false,
+              "disposition": "reject_evidence",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T12:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": false,
+          "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+          "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.",
+          "expected": "supported"
+        },
+        "description": "C6 bounded-retrieval-choice"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "LXadvGqain7fmNjCTvsHgk",
+          "span_id": "ineYg4ahrREtHgekNwWZeL",
+          "timestamp": "2026-09-23T07:26:45.742083+00:00",
+          "working_start": 59333.10270691,
+          "event": "span_begin",
+          "id": "ineYg4ahrREtHgekNwWZeL",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "a3DCVhr9L7ifjMacFuMnqH",
+          "span_id": "ineYg4ahrREtHgekNwWZeL",
+          "timestamp": "2026-09-23T07:26:45.742356+00:00",
+          "working_start": 59333.102980309,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "target": "supported",
+            "id": "C6",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T12:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": false,
+                "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+                "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.",
+                "expected": "supported"
+              },
+              "description": "C6 bounded-retrieval-choice"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "JiLRcY8Hnp3nftUTjVxU2E",
+                "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T12:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": false,
+                "source": "attachment://b2f5e430785617cb61d4ecd122c0a18c",
+                "claim": "attachment://a32a17942bb77d95442b0dda673069f5",
+                "expected": "supported"
+              },
+              "description": "C6 bounded-retrieval-choice"
+            }
+          }
+        },
+        {
+          "uuid": "FvtAjF2qVyWzDL8JgiZHR9",
+          "span_id": "ineYg4ahrREtHgekNwWZeL",
+          "timestamp": "2026-09-23T07:26:45.742726+00:00",
+          "working_start": 59333.103351409,
+          "event": "span_end",
+          "id": "ineYg4ahrREtHgekNwWZeL"
+        },
+        {
+          "uuid": "aVUqDKkkhamBurcGNKRT7H",
+          "span_id": "XTjKAhTCMmrfpipYAREio8",
+          "timestamp": "2026-09-23T07:26:45.743133+00:00",
+          "working_start": 0.00024829900212353095,
+          "event": "span_begin",
+          "id": "XTjKAhTCMmrfpipYAREio8",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "BZhbGVBh62ZygS5dPBT6sD",
+          "span_id": "ne8TpskhT2GrZbsP7umiZQ",
+          "timestamp": "2026-09-23T07:26:45.743234+00:00",
+          "working_start": 0.00034909899841295555,
+          "event": "span_begin",
+          "id": "ne8TpskhT2GrZbsP7umiZQ",
+          "parent_id": "XTjKAhTCMmrfpipYAREio8",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "Mr4GKjUiZboWP6rMR9rXN5",
+          "span_id": "ne8TpskhT2GrZbsP7umiZQ",
+          "timestamp": "2026-09-23T07:26:45.743383+00:00",
+          "working_start": 0.0005390989972511306,
+          "event": "span_end",
+          "id": "ne8TpskhT2GrZbsP7umiZQ"
+        },
+        {
+          "uuid": "Rn2ZBLK7dTPAGhZ3QVRbAt",
+          "span_id": "VtTjWDCQ5J3ZRYZitEV4vx",
+          "timestamp": "2026-09-23T07:26:45.743539+00:00",
+          "working_start": 0.0006542990013258532,
+          "event": "span_begin",
+          "id": "VtTjWDCQ5J3ZRYZitEV4vx",
+          "parent_id": "XTjKAhTCMmrfpipYAREio8",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "LXnky9wTx6ShVGvheHkN7m",
+          "span_id": "VtTjWDCQ5J3ZRYZitEV4vx",
+          "timestamp": "2026-09-23T07:26:45.743702+00:00",
+          "working_start": 0.0008170989967766218,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "nmpdgW8hPbcMrb4UudEXwg",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02387327099859249
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.769117+00:00",
+          "working_time": 0.02387327099859249
+        },
+        {
+          "uuid": "7Q8PudmhLRFawNP3XWtr83",
+          "span_id": "VtTjWDCQ5J3ZRYZitEV4vx",
+          "timestamp": "2026-09-23T07:26:45.769449+00:00",
+          "working_start": 0.025163470003462862,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02387327099859249
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "nmpdgW8hPbcMrb4UudEXwg",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "nmpdgW8hPbcMrb4UudEXwg",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "LmzYehSEs5QvvMPLkqUwox",
+          "span_id": "VtTjWDCQ5J3ZRYZitEV4vx",
+          "timestamp": "2026-09-23T07:26:45.769618+00:00",
+          "working_start": 0.025332570003229193,
+          "event": "span_end",
+          "id": "VtTjWDCQ5J3ZRYZitEV4vx"
+        },
+        {
+          "uuid": "4kkC9fhT3jizEQzrUcZvuk",
+          "span_id": "XTjKAhTCMmrfpipYAREio8",
+          "timestamp": "2026-09-23T07:26:45.769753+00:00",
+          "working_start": 0.025467569001193624,
+          "event": "span_end",
+          "id": "XTjKAhTCMmrfpipYAREio8"
+        },
+        {
+          "uuid": "8XQQCK9YSzooHREDYtZVai",
+          "span_id": "9eoxqPM8AxcLjzMR5c3DAv",
+          "timestamp": "2026-09-23T07:26:45.770046+00:00",
+          "working_start": 0.025760568998521194,
+          "event": "span_begin",
+          "id": "9eoxqPM8AxcLjzMR5c3DAv",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "KW2oahGqHEvSwvtwTgLXMw",
+          "span_id": "DvJBaMu5aMFAQcpcs3xq8d",
+          "timestamp": "2026-09-23T07:26:45.770130+00:00",
+          "working_start": 0.025844469004368875,
+          "event": "span_begin",
+          "id": "DvJBaMu5aMFAQcpcs3xq8d",
+          "parent_id": "9eoxqPM8AxcLjzMR5c3DAv",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "TJZBH8hcTCKvHDuqBbkjGd",
+          "span_id": "DvJBaMu5aMFAQcpcs3xq8d",
+          "timestamp": "2026-09-23T07:26:45.795604+00:00",
+          "working_start": 0.051323938998393714,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": false,
+                "disposition": "reject_evidence",
+                "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "gTyaAsLGeCqfYqk4Y7MrMg",
+          "span_id": "DvJBaMu5aMFAQcpcs3xq8d",
+          "timestamp": "2026-09-23T07:26:45.795990+00:00",
+          "working_start": 0.05170633800298674,
+          "event": "span_end",
+          "id": "DvJBaMu5aMFAQcpcs3xq8d"
+        },
+        {
+          "uuid": "AuFS4DChWnxaVd998rQKA3",
+          "span_id": "9eoxqPM8AxcLjzMR5c3DAv",
+          "timestamp": "2026-09-23T07:26:45.796138+00:00",
+          "working_start": 0.05185233800148126,
+          "event": "span_end",
+          "id": "9eoxqPM8AxcLjzMR5c3DAv"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.742886+00:00",
+      "completed_at": "2026-09-23T07:26:45.796353+00:00",
+      "total_time": 0.053,
+      "working_time": 0.052,
+      "uuid": "WBpkH2TK8SSWHKygJfnDdj",
+      "error_retries": [],
+      "attachments": {
+        "b389e5ef0d467e2342cdec9e3795e47d": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+        "b2f5e430785617cb61d4ecd122c0a18c": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+        "a32a17942bb77d95442b0dda673069f5": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "JiLRcY8Hnp3nftUTjVxU2E",
+            "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "JiLRcY8Hnp3nftUTjVxU2E",
+            "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C7",
+      "epoch": 1,
+      "input": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}",
+      "target": "contradicted",
+      "messages": [
+        {
+          "id": "GJXREXXyXbkNhxY7dRXhQ2",
+          "content": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "4hEMm5HmKx2ArnTC7KzaQJ",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "4hEMm5HmKx2ArnTC7KzaQJ",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.022494272998301312
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "Typed output guarantees the interface, not truth.",
+          "claim": "A typed output guarantees that the model judgment is true.",
+          "expected": "contradicted"
+        },
+        "description": "C7 typed-is-not-true"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "TFz3E22nQGBnsZmcPke3iG",
+          "span_id": "nbkxM8Qua86HGPR65RiUYi",
+          "timestamp": "2026-09-23T07:26:45.797630+00:00",
+          "working_start": 59333.158254243,
+          "event": "span_begin",
+          "id": "nbkxM8Qua86HGPR65RiUYi",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "U7vgtfEWWcNVzZLCAUpEfQ",
+          "span_id": "nbkxM8Qua86HGPR65RiUYi",
+          "timestamp": "2026-09-23T07:26:45.797926+00:00",
+          "working_start": 59333.158550543,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "target": "contradicted",
+            "id": "C7",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "A typed output guarantees that the model judgment is true.",
+                "expected": "contradicted"
+              },
+              "description": "C7 typed-is-not-true"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "GJXREXXyXbkNhxY7dRXhQ2",
+                "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "A typed output guarantees that the model judgment is true.",
+                "expected": "contradicted"
+              },
+              "description": "C7 typed-is-not-true"
+            }
+          }
+        },
+        {
+          "uuid": "NiTCCiAmNwC73WNFMFsofQ",
+          "span_id": "nbkxM8Qua86HGPR65RiUYi",
+          "timestamp": "2026-09-23T07:26:45.798069+00:00",
+          "working_start": 59333.158692843,
+          "event": "span_end",
+          "id": "nbkxM8Qua86HGPR65RiUYi"
+        },
+        {
+          "uuid": "7JjmrxqctuV5mmatCPhoYo",
+          "span_id": "agAm66m356PEV25cW8mfgf",
+          "timestamp": "2026-09-23T07:26:45.798348+00:00",
+          "working_start": 0.00020440000662347302,
+          "event": "span_begin",
+          "id": "agAm66m356PEV25cW8mfgf",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "Kwo3VttCAp2stNULcK3azq",
+          "span_id": "TLMrJYXrYhMnifjw24drJx",
+          "timestamp": "2026-09-23T07:26:45.798439+00:00",
+          "working_start": 0.00029550000181188807,
+          "event": "span_begin",
+          "id": "TLMrJYXrYhMnifjw24drJx",
+          "parent_id": "agAm66m356PEV25cW8mfgf",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "jNnTn8g99Z2CKmCnXdjRBv",
+          "span_id": "TLMrJYXrYhMnifjw24drJx",
+          "timestamp": "2026-09-23T07:26:45.798606+00:00",
+          "working_start": 0.0004620000036084093,
+          "event": "span_end",
+          "id": "TLMrJYXrYhMnifjw24drJx"
+        },
+        {
+          "uuid": "U7bK9XRH6NRHuyxEvCG3HC",
+          "span_id": "Rnjt5ALdpf39ufAzv9Z496",
+          "timestamp": "2026-09-23T07:26:45.798685+00:00",
+          "working_start": 0.0005412000027718022,
+          "event": "span_begin",
+          "id": "Rnjt5ALdpf39ufAzv9Z496",
+          "parent_id": "agAm66m356PEV25cW8mfgf",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "FcCRQKrnDwWveWPhph8D6f",
+          "span_id": "Rnjt5ALdpf39ufAzv9Z496",
+          "timestamp": "2026-09-23T07:26:45.798825+00:00",
+          "working_start": 0.000680800003465265,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "4hEMm5HmKx2ArnTC7KzaQJ",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.022494272998301312
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.822993+00:00",
+          "working_time": 0.022494272998301312
+        },
+        {
+          "uuid": "EyHkmotsV9uewdKs5aFP8y",
+          "span_id": "Rnjt5ALdpf39ufAzv9Z496",
+          "timestamp": "2026-09-23T07:26:45.823320+00:00",
+          "working_start": 0.023630572002730332,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.022494272998301312
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "4hEMm5HmKx2ArnTC7KzaQJ",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "4hEMm5HmKx2ArnTC7KzaQJ",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "kDL4ym8sbW65qRASDtyrJU",
+          "span_id": "Rnjt5ALdpf39ufAzv9Z496",
+          "timestamp": "2026-09-23T07:26:45.823643+00:00",
+          "working_start": 0.023953772004460916,
+          "event": "span_end",
+          "id": "Rnjt5ALdpf39ufAzv9Z496"
+        },
+        {
+          "uuid": "DWGEaSJ5qPXmGPDJsvsVN8",
+          "span_id": "agAm66m356PEV25cW8mfgf",
+          "timestamp": "2026-09-23T07:26:45.823771+00:00",
+          "working_start": 0.02408117200684501,
+          "event": "span_end",
+          "id": "agAm66m356PEV25cW8mfgf"
+        },
+        {
+          "uuid": "XLxByQC3BqXxLgtJE6Xnpp",
+          "span_id": "TcdG57JRdnVJu7sEP77Xj9",
+          "timestamp": "2026-09-23T07:26:45.824071+00:00",
+          "working_start": 0.024381771007028874,
+          "event": "span_begin",
+          "id": "TcdG57JRdnVJu7sEP77Xj9",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "YzNcGhyXXgwrNEzZVzy5AJ",
+          "span_id": "8YbtmWiY8UW6JuP5obaVuP",
+          "timestamp": "2026-09-23T07:26:45.824159+00:00",
+          "working_start": 0.02446967100695474,
+          "event": "span_begin",
+          "id": "8YbtmWiY8UW6JuP5obaVuP",
+          "parent_id": "TcdG57JRdnVJu7sEP77Xj9",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "RvYjcnpiuY8bDvTERDrGML",
+          "span_id": "8YbtmWiY8UW6JuP5obaVuP",
+          "timestamp": "2026-09-23T07:26:45.848102+00:00",
+          "working_start": 0.048417543002869934,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "contradicted",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "L6bKvGTqQ9zpk6K9p6USMA",
+          "span_id": "8YbtmWiY8UW6JuP5obaVuP",
+          "timestamp": "2026-09-23T07:26:45.848451+00:00",
+          "working_start": 0.048762542006443255,
+          "event": "span_end",
+          "id": "8YbtmWiY8UW6JuP5obaVuP"
+        },
+        {
+          "uuid": "TjJRnAf2eNVnBDmBRe5L5f",
+          "span_id": "TcdG57JRdnVJu7sEP77Xj9",
+          "timestamp": "2026-09-23T07:26:45.848589+00:00",
+          "working_start": 0.04889924200688256,
+          "event": "span_end",
+          "id": "TcdG57JRdnVJu7sEP77Xj9"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.798145+00:00",
+      "completed_at": "2026-09-23T07:26:45.848801+00:00",
+      "total_time": 0.051,
+      "working_time": 0.049,
+      "uuid": "2BUZAW27GjRFkJxf3Sbceq",
+      "error_retries": [],
+      "attachments": {
+        "1f3c4f44eea1b539b453291cfab96e49": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "GJXREXXyXbkNhxY7dRXhQ2",
+            "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "GJXREXXyXbkNhxY7dRXhQ2",
+            "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C8",
+      "epoch": 1,
+      "input": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "S8aNYBnjqrNcigh8BxMXUe",
+          "content": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "mqCpaWr7NwsikDYJvkXT3t",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "mqCpaWr7NwsikDYJvkXT3t",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.0229474730003858
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "Typed output guarantees the interface, not truth.",
+          "claim": "Jev is qualified as a profitable trading signal across all markets.",
+          "expected": "insufficient"
+        },
+        "description": "C8 missing-domain-qualification"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "GRiYH5mSZMPeujQiEc7Vtt",
+          "span_id": "h7WrDF8YAJBBtecUGpXgRA",
+          "timestamp": "2026-09-23T07:26:45.850055+00:00",
+          "working_start": 59333.21067888,
+          "event": "span_begin",
+          "id": "h7WrDF8YAJBBtecUGpXgRA",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "jz2bPUVNEiCMbFAtjc2BbJ",
+          "span_id": "h7WrDF8YAJBBtecUGpXgRA",
+          "timestamp": "2026-09-23T07:26:45.850289+00:00",
+          "working_start": 59333.21091348,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "target": "insufficient",
+            "id": "C8",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "Jev is qualified as a profitable trading signal across all markets.",
+                "expected": "insufficient"
+              },
+              "description": "C8 missing-domain-qualification"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "S8aNYBnjqrNcigh8BxMXUe",
+                "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "Jev is qualified as a profitable trading signal across all markets.",
+                "expected": "insufficient"
+              },
+              "description": "C8 missing-domain-qualification"
+            }
+          }
+        },
+        {
+          "uuid": "P4Hfms64Kru6HEDX3z73Ya",
+          "span_id": "h7WrDF8YAJBBtecUGpXgRA",
+          "timestamp": "2026-09-23T07:26:45.850428+00:00",
+          "working_start": 59333.21105168,
+          "event": "span_end",
+          "id": "h7WrDF8YAJBBtecUGpXgRA"
+        },
+        {
+          "uuid": "Gda85bucaZXSJ7kdXHEZii",
+          "span_id": "ieu8zHQ7UftJSvUXoZ8oKF",
+          "timestamp": "2026-09-23T07:26:45.850713+00:00",
+          "working_start": 0.0002210000020568259,
+          "event": "span_begin",
+          "id": "ieu8zHQ7UftJSvUXoZ8oKF",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "YBsSnSyPDHaqaJSrExZ3XQ",
+          "span_id": "XMrjjSKbUypuwidCK8HFAS",
+          "timestamp": "2026-09-23T07:26:45.850802+00:00",
+          "working_start": 0.0003106989970547147,
+          "event": "span_begin",
+          "id": "XMrjjSKbUypuwidCK8HFAS",
+          "parent_id": "ieu8zHQ7UftJSvUXoZ8oKF",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "itQGKG7MWpdP6tKEdxYALE",
+          "span_id": "XMrjjSKbUypuwidCK8HFAS",
+          "timestamp": "2026-09-23T07:26:45.850934+00:00",
+          "working_start": 0.00044259899732423946,
+          "event": "span_end",
+          "id": "XMrjjSKbUypuwidCK8HFAS"
+        },
+        {
+          "uuid": "U2TETASea5FQ3UtLNsXot6",
+          "span_id": "VzqWrUiuQ3L2GwosAKow5C",
+          "timestamp": "2026-09-23T07:26:45.851008+00:00",
+          "working_start": 0.0005163989990251139,
+          "event": "span_begin",
+          "id": "VzqWrUiuQ3L2GwosAKow5C",
+          "parent_id": "ieu8zHQ7UftJSvUXoZ8oKF",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "ZqMZVCnijXn2gwXLFyNP9Z",
+          "span_id": "VzqWrUiuQ3L2GwosAKow5C",
+          "timestamp": "2026-09-23T07:26:45.851145+00:00",
+          "working_start": 0.0006529989987029694,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "mqCpaWr7NwsikDYJvkXT3t",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.0229474730003858
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:45.875527+00:00",
+          "working_time": 0.0229474730003858
+        },
+        {
+          "uuid": "mU5mkMHbmYKkVToVvQ7xMY",
+          "span_id": "VzqWrUiuQ3L2GwosAKow5C",
+          "timestamp": "2026-09-23T07:26:45.875859+00:00",
+          "working_start": 0.024065171004622243,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.0229474730003858
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "mqCpaWr7NwsikDYJvkXT3t",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "mqCpaWr7NwsikDYJvkXT3t",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "WmnWCS4SpAFRZLwGWyKa3k",
+          "span_id": "VzqWrUiuQ3L2GwosAKow5C",
+          "timestamp": "2026-09-23T07:26:45.875992+00:00",
+          "working_start": 0.024198071005230304,
+          "event": "span_end",
+          "id": "VzqWrUiuQ3L2GwosAKow5C"
+        },
+        {
+          "uuid": "NpJdV93USbX6Ui5RjgREbe",
+          "span_id": "ieu8zHQ7UftJSvUXoZ8oKF",
+          "timestamp": "2026-09-23T07:26:45.876090+00:00",
+          "working_start": 0.024295171002449933,
+          "event": "span_end",
+          "id": "ieu8zHQ7UftJSvUXoZ8oKF"
+        },
+        {
+          "uuid": "GJHMUJoU4LiD9aKAkjoVrP",
+          "span_id": "KH7PH6RrdvWP57BTRfEP6V",
+          "timestamp": "2026-09-23T07:26:45.876551+00:00",
+          "working_start": 0.024761471002420876,
+          "event": "span_begin",
+          "id": "KH7PH6RrdvWP57BTRfEP6V",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "78iE8iv4YDBTbtwyUEuPKw",
+          "span_id": "Xit4cRrqRJhcMi7VN6iVd2",
+          "timestamp": "2026-09-23T07:26:45.876771+00:00",
+          "working_start": 0.024976870008686092,
+          "event": "span_begin",
+          "id": "Xit4cRrqRJhcMi7VN6iVd2",
+          "parent_id": "KH7PH6RrdvWP57BTRfEP6V",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "QqyYgKrpH7Z4rwLBoh57Ve",
+          "span_id": "Xit4cRrqRJhcMi7VN6iVd2",
+          "timestamp": "2026-09-23T07:26:45.900543+00:00",
+          "working_start": 0.04875424200872658,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "FY2XoZCTr3MV2g2LZjYsUz",
+          "span_id": "Xit4cRrqRJhcMi7VN6iVd2",
+          "timestamp": "2026-09-23T07:26:45.900885+00:00",
+          "working_start": 0.049091041008068714,
+          "event": "span_end",
+          "id": "Xit4cRrqRJhcMi7VN6iVd2"
+        },
+        {
+          "uuid": "H8KpqpVU7ygvn4D7bxdwrx",
+          "span_id": "KH7PH6RrdvWP57BTRfEP6V",
+          "timestamp": "2026-09-23T07:26:45.901015+00:00",
+          "working_start": 0.04922084100689972,
+          "event": "span_end",
+          "id": "KH7PH6RrdvWP57BTRfEP6V"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:45.850493+00:00",
+      "completed_at": "2026-09-23T07:26:45.901230+00:00",
+      "total_time": 0.051,
+      "working_time": 0.049,
+      "uuid": "4cBVUkhsJg2VjRBWXjcKxr",
+      "error_retries": [],
+      "attachments": {
+        "dc62aa148cd6fa6e681df6f25e6322e6": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "S8aNYBnjqrNcigh8BxMXUe",
+            "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "S8aNYBnjqrNcigh8BxMXUe",
+            "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "promptfoo_equivalent_assertions",
+      "samples": [
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C1"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C2"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C3"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C4"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C5"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": false,
+              "disposition": "reject_evidence",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C6"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C7"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C8"
+        }
+      ]
+    }
+  ]
+}

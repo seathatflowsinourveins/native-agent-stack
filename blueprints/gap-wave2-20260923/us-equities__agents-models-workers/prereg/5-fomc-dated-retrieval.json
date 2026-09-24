@@ -1,0 +1,14 @@
+{
+ "gap_index": 5,
+ "slug": "fomc-dated-retrieval",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "Dense retrieval over FOMC statements (federalreserve.gov, 2023-2026) finds the right meeting for many dated queries, but pure semantic similarity will often return a neighbouring meeting because statements are nearly identical; a payload date filter derived from the query should raise date correctness to ~100%.",
+ "criteria": [
+  "Download the FOMC calendar page and every linked 2023-01..latest statement HTML (disclosed network download, small); record URLs, sha256 and fetched_at.",
+  "Generate queries mechanically from the corpus before any retrieval: for each statement, one dated query naming the meeting month and year and asking for the federal funds target range decided; gold = that statement's date and the target range regex-extracted from its text. Seal the query file (sha256) before indexing.",
+  "Index into a disposable Qdrant 1.19.1 collection on 127.0.0.1:27333 with payload {date,url}; embeddings from the same Nemotron-3-Embed-1B endpoint the adopted SocratiCode profile uses (read-only /v1/embeddings calls).",
+  "Report recall@1/@3/@5 of the gold document and top-1 date correctness for arm dense and arm dense+date-filter; report answer correctness (top-1 document's extracted target range equals gold).",
+  "No query rewriting after scores are seen."
+ ]
+}

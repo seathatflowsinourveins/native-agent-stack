@@ -1,0 +1,86 @@
+{
+ "results": [
+  {
+   "arm": "RAW",
+   "path": "development",
+   "episodes": 249,
+   "traded_episodes": 138,
+   "fills": 276,
+   "fees_usd": "27073.48",
+   "ending_cash_usd": "87359.71",
+   "net_pnl_usd": "-12640.29",
+   "dividends_entitled_usd": "2542.51",
+   "max_daily_volume_participation": "0.0000812",
+   "strategy_decision_check": {
+    "checked": 249,
+    "mismatches": 0
+   },
+   "reconciled": true,
+   "problems": []
+  },
+  {
+   "arm": "ADJ",
+   "path": "development",
+   "episodes": 249,
+   "traded_episodes": 138,
+   "fills": 276,
+   "fees_usd": "27407.36",
+   "ending_cash_usd": "89651.9250",
+   "net_pnl_usd": "-10348.0750",
+   "dividends_entitled_usd": "2652.43",
+   "max_daily_volume_participation": "0.0000844",
+   "strategy_decision_check": {
+    "checked": 249,
+    "adjusted_price_choice_differs_from_frozen_raw": 6
+   },
+   "reconciled": false,
+   "problems": [
+    "cash sequence mismatch",
+    "final cash 89651.82 != independent 89651.9250",
+    "realized pnl -10348.11 != cash delta -10348.0750"
+   ]
+  },
+  {
+   "arm": "RAW",
+   "path": "reserved",
+   "episodes": 11,
+   "traded_episodes": 10,
+   "fills": 20,
+   "fees_usd": "2079.93",
+   "ending_cash_usd": "100808.61",
+   "net_pnl_usd": "808.61",
+   "dividends_entitled_usd": "0",
+   "max_daily_volume_participation": "0.0000267",
+   "strategy_decision_check": {
+    "checked": 11,
+    "mismatches": 0
+   },
+   "reconciled": true,
+   "problems": []
+  },
+  {
+   "arm": "ADJ",
+   "path": "reserved",
+   "episodes": 11,
+   "traded_episodes": 10,
+   "fills": 20,
+   "fees_usd": "2080.04",
+   "ending_cash_usd": "100814.9167",
+   "net_pnl_usd": "814.9167",
+   "dividends_entitled_usd": "0",
+   "max_daily_volume_participation": "0.0000267",
+   "strategy_decision_check": {
+    "checked": 11,
+    "adjusted_price_choice_differs_from_frozen_raw": 0
+   },
+   "reconciled": false,
+   "problems": [
+    "cash sequence mismatch",
+    "final cash 100814.92 != independent 100814.9167",
+    "realized pnl 814.91 != cash delta 814.9167"
+   ]
+  }
+ ],
+ "inputs_unchanged": true,
+ "summary_sha256": "d8272a08f8578330d02a11685d95fbc57872eeb42da07607edba868a6d1a0729"
+}

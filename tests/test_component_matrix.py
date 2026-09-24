@@ -14,6 +14,7 @@ import unittest
 from pathlib import Path
 
 from scripts import component_matrix as cm
+from scripts import host_receipts as hr
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -69,7 +70,9 @@ def _init_root(root: Path, layers: list[dict], *, catalog_file="foundation.json"
 
 def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
              evidence_class="native_proven", reviewed=True, second_physical_machine=True,
-             os_value: str | None = None, architecture: str | None = None) -> dict:
+             os_value: str | None = None, architecture: str | None = None, version="1.0.0",
+             reviewer="reviewer-session", review_verdict="agree", observed_at="2026-09-22T01:00:00Z",
+             qualified_models: list | None = None) -> dict:
     """A fully schema-shape-valid receipt (host_receipts.validate_receipt_shape must pass
     it with no errors): scripts/host_receipts.py's build_summary only lets a
     result=pass/native_proven/independently-reviewed receipt into
@@ -79,11 +82,12 @@ def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
         os_value = "macos" if platform_id == "macos-arm64" else "linux"
     if architecture is None:
         architecture = "arm64" if platform_id == "macos-arm64" else "x86_64"
-    reviews = [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-09-22T00:00:00Z"}]
+    recorder = {"identity_sha256": hr.identity_digest("recorder-session")}
+    reviews = [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": observed_at, "reviewer": recorder}]
     if reviewed:
         reviews.append({
-            "kind": "independent_session", "ref": "test-suite", "verdict": "agree",
-            "at_utc": "2026-09-22T01:00:00Z",
+            "kind": "independent_session", "ref": "test-suite", "verdict": review_verdict,
+            "at_utc": observed_at, "reviewer": {"identity_sha256": hr.identity_digest(reviewer)},
         })
     return {
         "schema_version": 1,
@@ -94,6 +98,7 @@ def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
             "architecture": architecture, "second_physical_machine": second_physical_machine,
         },
         "catalog_revision": "0" * 40,
+        "recorded_by": recorder,
         "component_id": component_id,
         "stage": stage,
         "commands": [{
@@ -101,13 +106,14 @@ def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
             "output_sha256": "98ea6e4f216f2fb4b69fff9b3a44842c38686ca685f3f55dc48c5d3fb1107be4",
             "output_excerpt": "hi",
         }],
-        "tool_versions": {},
-        "observed_at_utc": "2026-09-22T01:00:00Z",
+        "tool_versions": {component_id: version},
+        "observed_at_utc": observed_at,
         "result": result,
         "claim": "test claim",
         "limitations": ["test limitation"],
         "evidence_class": evidence_class,
         "reviews": reviews,
+        **({"qualified_models": qualified_models} if qualified_models else {}),
     }
 
 
@@ -195,7 +201,7 @@ class FlipRuleTests(unittest.TestCase):
 
             document, flip_violations = cm.build_document(root)
             self.assertEqual(len(flip_violations), 1)
-            self.assertIn("macos-arm64=accepted", flip_violations[0])
+            self.assertIn("platform_status.macos-arm64 declares 'accepted'", flip_violations[0])
 
             buffer = io.StringIO()
             with contextlib.redirect_stdout(buffer):
@@ -286,6 +292,53 @@ class FlipRuleTests(unittest.TestCase):
             self.assertEqual(len(flip_violations), 1)
             winner_row = document["rows"][0]["winners"][0]
             self.assertEqual(winner_row["platforms"]["macos-arm64"]["e2e_state"], "accepted")
+
+    def test_receipt_for_an_old_pin_does_not_satisfy_flip_rule(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner(macos="accepted", pin="1.1.0")])])
+            _write_receipt(root, _receipt("widget", "macos-arm64", version="1.0.0"))
+            _document, flip_violations = cm.build_document(root)
+            self.assertEqual(len(flip_violations), 1)
+            self.assertIn("pin '1.1.0'", flip_violations[0])
+
+    def test_same_identity_review_does_not_satisfy_flip_rule(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner(macos="accepted")])])
+            _write_receipt(root, _receipt("widget", "macos-arm64", reviewer="recorder-session"))
+            _document, flip_violations = cm.build_document(root)
+            self.assertEqual(len(flip_violations), 1)
+
+    def test_dissenting_review_vetoes_and_is_shown(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner(macos="conditional")])])
+            _write_receipt(root, _receipt("widget", "macos-arm64", review_verdict="needs_changes"))
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(len(flip_violations), 1)
+            macos = document["rows"][0]["winners"][0]["platforms"]["macos-arm64"]
+            self.assertEqual(macos["derived_status"], "not_established")
+            self.assertEqual(macos["host_receipts"]["dissented"], 1)
+            self.assertIn("dissented 1", cm.render_markdown(document))
+
+    def test_conditional_macos_is_allowed_with_an_unreviewed_pin_bound_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner(macos="conditional")])])
+            _write_receipt(root, _receipt("widget", "macos-arm64", reviewed=False))
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(flip_violations, [])
+            self.assertEqual(document["rows"][0]["winners"][0]["platforms"]["macos-arm64"]["derived_status"],
+                             "conditional")
+
+    def test_markdown_shows_pass_and_fail_counts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner()])])
+            _write_receipt(root, _receipt("widget", "linux-wsl2-x86_64", stage="use", result="fail", reviewed=False))
+            document, _ = cm.build_document(root)
+            self.assertIn("widget (accepted [0/1/0/0] / untested [0/0/0/0])", cm.render_markdown(document))
 
     def test_non_accepted_macos_status_never_flips(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -383,6 +436,57 @@ class AlternativeAndDecisionJoinTests(unittest.TestCase):
             _init_root(root, [_layer()])
             document, _flip = cm.build_document(root)
             self.assertIsNone(document["rows"][0]["open_executable_now_gaps"])
+
+
+class QualifiedModelsSurfacingTests(unittest.TestCase):
+    """scripts/host_receipts.py record --qualified-model entries must surface per platform
+    on the runtime component's winner row, and never affect the flip rule."""
+
+    def test_qualified_model_surfaces_on_the_winner_platform(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm", linux="conditional", macos="untested")])
+            _init_root(root, [layer])
+            qm = [{"model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+                  "runtime_version": "0.9.0", "bars": "20/20 tool calls, 4/5 tasks", "result": "pass"}]
+            _write_receipt(root, _receipt("vllm", "linux-wsl2-x86_64", qualified_models=qm))
+
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(flip_violations, [])
+            winner = document["rows"][0]["winners"][0]
+            linux_qm = winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"]
+            self.assertEqual(len(linux_qm), 1)
+            self.assertEqual(linux_qm[0]["model_id"], "Qwen/Qwen3-8B-AWQ")
+            self.assertEqual(linux_qm[0]["runtime"], "vllm")
+            self.assertEqual(linux_qm[0]["result"], "pass")
+            self.assertIn("host_id", linux_qm[0])
+            self.assertIn("receipt_path", linux_qm[0])
+            # Never on the platform it was not recorded for.
+            self.assertEqual(winner["platforms"]["macos-arm64"]["qualified_models"], [])
+
+    def test_no_qualified_models_yields_empty_list_not_missing_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm")])
+            _init_root(root, [layer])
+            _write_receipt(root, _receipt("vllm", "linux-wsl2-x86_64"))
+            document, _flip = cm.build_document(root)
+            winner = document["rows"][0]["winners"][0]
+            self.assertEqual(winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"], [])
+
+    def test_shape_invalid_receipt_never_surfaces_a_qualified_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm")])
+            _init_root(root, [layer])
+            qm = [{"model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+                  "runtime_version": "0.9.0", "bars": "bars", "result": "pass"}]
+            receipt = _receipt("vllm", "linux-wsl2-x86_64", qualified_models=qm)
+            receipt["result"] = "not-a-known-result"  # shape-invalid: fails the schema's result enum
+            _write_receipt(root, receipt)
+            document, _flip = cm.build_document(root)
+            winner = document["rows"][0]["winners"][0]
+            self.assertEqual(winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"], [])
 
 
 if __name__ == "__main__":

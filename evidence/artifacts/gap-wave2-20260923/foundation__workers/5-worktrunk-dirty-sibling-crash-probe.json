@@ -1,0 +1,264 @@
+{
+  "id": "5-worktrunk-dirty-sibling-crash-probe",
+  "gap_index": 5,
+  "gap_text_sha256": "9208ab4743360e0ca213ec59ec3cf72761ad0366c36653dcb451a1272a1dfc9b",
+  "preregistration": {
+    "written_at": "2026-09-23T01:02:29Z",
+    "expectation": "An exact, scripted (not narrative) loop of `wt remove crash-target -y --force --foreground` (note: `--foreground` is required -- without it `wt remove` backgrounds the actual removal and detaches, so SIGKILLing the foreground `wt` PID observed by a caller does not necessarily interrupt the removal itself) SIGKILLed at fixed millisecond delays, with a genuinely dirty sibling worktree present throughout, will either reproduce a torn `.git/worktrees` state or show only clean before/after states across every trial. Separately, installing a Rust toolchain into the unit's own cache prefix and running `cargo test` against the pinned worktrunk v0.79.0 tag is an allowed bounded/heavy job (per this unit's own isolation rules, which route heavy jobs through `ecosystem-bounded-run` rather than forbidding them) and should actually be attempted within the 20-minute time-box, not skipped for lack of `cargo` on PATH.",
+    "criteria": "Advanced (not settled) if trials show no torn state was reproduced within reachable timing resolution but the sibling stayed intact every time. Not_settled if the toolchain/build attempt does not complete within the time-box; settled only if `cargo test` actually runs to completion.",
+    "timing": "post_hoc fix-round preregistration: written at 2026-09-23T01:02:29Z, after the probe (00:54:48Z) and the cargo attempt (00:55:10Z-00:57:47Z) it describes. The receipt previously showed 01:20:00Z, which is later than the fix-round commit (01:08:43Z) and was not a real time. The probe script itself (raw/probe.py) was written at 00:54:46Z, before its run at 00:54:48Z."
+  },
+  "commands": [
+    {
+      "cmd": "mkdir -p $HOME/.cache/gap-wave2-20260923/workers/fix5 && cd $HOME/.cache/gap-wave2-20260923/workers/fix5 && rm -rf wt-repo && git init -q wt-repo && cd wt-repo && git commit -q --allow-empty -m init && wt -C . switch --create sibling-dirty --no-cd --format=json -y >/dev/null 2>&1; echo dirty >> sibling-dirty/README.md 2>/dev/null || (mkdir -p sibling-dirty && echo dirty > sibling-dirty/README.md); ls; git worktree list",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:33.208Z",
+      "duration_s": 0.314,
+      "output_excerpt": "scratch repo fix5/wt-repo and sibling worktree wt-repo.sibling-dirty created (first write to sibling-dirty/README.md used a wrong relative path; see next call)",
+      "output_sha256": "63c50489c273bb50ee383ad46e9b51655bf4fa2b28a27208d470a13fcea77336",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01BE6rmPbqQ5hbR9APSUZekN",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/fix5 && echo dirty >> wt-repo.sibling-dirty/README.md 2>/dev/null || echo dirty > wt-repo.sibling-dirty/README.md\ncd wt-repo && git -C ../wt-repo.sibling-dirty status --porcelain; git worktree list",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:36.784Z",
+      "duration_s": 0.269,
+      "output_excerpt": "sibling dirtied: `git status --porcelain` -> '?? README.md'; worktree list: wt-repo [master], wt-repo.sibling-dirty [sibling-dirty]",
+      "output_sha256": "5c39784a1b1fb8d54e8fa5c0a6cfe64aaa404b422515dbbc89798fc96da61eb8",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_0166eR5MRKCQsza9pBS7nonR",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/fix5 && python3 probe.py 2>&1 | tee probe-output.json",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:48.996Z",
+      "duration_s": 0.634,
+      "output_excerpt": "10 trials; 1-12 ms: target_state target_present, 3 worktrees listed; 20-90 ms: target_removed, 2 listed; killed_process_group true in all 10; sibling_intact true in all 10",
+      "output_sha256": "af209be7dfa60b07dfe250eebc0fe3a9720bbfaa0124810a73708e615eda1d97",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01SrLNXgSnALV2iWziRXuZQ7",
+      "note": "the live stdout (tee'd to fix5/probe-output.json) had sha256 1aa7a1c22daa0c8bdd48df27415632472c8743be0628e72ea4ba3cd042c62960 before host-path sanitization; the committed raw/probe-output.json is that output with the home directory replaced by $HOME (sha256 437e855fbbb11df1328a399ac9eb5114c1ab5481bac3d1c3053e03f3bcc67111). Both hashes were recomputed from the transcript text in the reconciliation pass.",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/fix5 && sha256sum probe.py probe-output.json && which cargo; echo \"cargo_exit=$?\"\nrm -rf wt-repo wt-repo.sibling-dirty wt-repo.crash-target 2>/dev/null; echo cleaned",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:54.499Z",
+      "duration_s": 0.248,
+      "output_excerpt": "probe.py 57ea19c60ff306b6d2634011817eb6a8b344111c1e937b8e6c74087165e79e07, probe-output.json 1aa7a1c22daa0c8bdd48df27415632472c8743be0628e72ea4ba3cd042c62960 (pre-sanitization); `which cargo` exit 1; fix5 scratch repos removed ('cleaned')",
+      "output_sha256": "5d4f6756fc7b58b88a199e60a0cb0dd2636e9bb8c9e5eb30c17619d612f96359",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01KxQUU3xLgTvfBkLxHAxNLF",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ls -la $HOME/codex-ecosystem/bin/ecosystem-bounded-run 2>&1; cat $HOME/codex-ecosystem/bin/ecosystem-bounded-run 2>&1 | head -30",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:58.647Z",
+      "duration_s": 0.357,
+      "output_excerpt": "the unit read ecosystem-bounded-run (default limits MemoryHigh 4G, MemoryMax 6G, 600 s, 256 tasks) but did not use it for the install or the build",
+      "output_sha256": "9af571aa60d572f0c2a529ba69b8f09c91cc9e537095199547357a2f41d0bb9c",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_018XFJurPw1KkZhKtCUXvVpi",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "timeout 8 curl -sI https://sh.rustup.rs 2>&1 | head -5; echo \"curl_exit=$?\"; timeout 8 curl -sI https://crates.io 2>&1 | head -5; echo \"curl2_exit=$?\"",
+      "exit": 0,
+      "started_at": "2026-09-23T00:55:04.371Z",
+      "duration_s": 0.546,
+      "output_excerpt": "sh.rustup.rs HTTP/2 200 (29915-byte installer script); crates.io HTTP/2 403 to a HEAD request",
+      "output_sha256": "63315959b9e9c52c0387224c8828141e405d4344704e27544cf48d867a3ad88d",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_017EnK3eEtERJCKjrxc5M5CD",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "export CARGO_HOME=$HOME/.cache/gap-wave2-20260923/workers/cargo-home\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/workers/rustup-home\nmkdir -p \"$CARGO_HOME\" \"$RUSTUP_HOME\"\ntimeout 480 bash -c 'curl --proto \"=https\" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal --default-toolchain stable' 2>&1 | tail -30\necho \"install_exit=$?\"",
+      "exit": 0,
+      "started_at": "2026-09-23T00:55:10.962Z",
+      "duration_s": 14.08,
+      "output_excerpt": "rustup-init completed: 'Cargo's bin directory ($HOME/.cache/gap-wave2-20260923/workers/cargo-home/bin)'; install_exit=0",
+      "output_sha256": "f4f0af14645a74a203c84aaacd4ae5068a699c3d12864fb2e6d9f895a717b9b1",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_015FnGV6WnJu7w9fRJKJojxM",
+      "note": "CARGO_HOME/RUSTUP_HOME were exported before the pipeline, so the installer ran with them; the earlier receipt showed a different, non-equivalent one-line form. Not run through ecosystem-bounded-run. Network download: rustup-init script and the stable minimal toolchain (size not recorded).",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "export CARGO_HOME=$HOME/.cache/gap-wave2-20260923/workers/cargo-home\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/workers/rustup-home\nexport PATH=\"$CARGO_HOME/bin:$PATH\"\ncargo --version\ncd $HOME/.cache/gap-wave2-20260923/workers\ntimeout 60 git clone --depth 1 --branch v0.79.0 https://github.com/worktrunk/worktrunk.git wt-src 2>&1 | tail -20 || echo \"clone_v79_failed\"\nls wt-src 2>&1 | head -5",
+      "exit": 0,
+      "started_at": "2026-09-23T00:55:29.076Z",
+      "duration_s": 0.717,
+      "output_excerpt": "'cargo 1.98.1 (797e8a9bc 2026-08-05)'; clone of github.com/worktrunk/worktrunk failed ('Repository not found')",
+      "output_sha256": "e95b5ca3df429bf5106ac796c035c4c39ac584eb231a5ef2d7d6b022634fdc5a",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01PkJRVTr9TUWcrrcfvwu1CM",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "wt --help 2>&1 | grep -i -A2 \"repo\\|source\\|homepage\\|github\" | head -20\ngrep -rn \"worktrunk\" $HOME/code/agent-lab/docs/*.md 2>/dev/null | grep -i github | head -5\ngrep -rln \"github.com.*worktrunk\\|worktrunk.*github\" $HOME/code/nas-wt-g2-workers/docs 2>/dev/null | head -5",
+      "exit": 0,
+      "started_at": "2026-09-23T00:55:34.387Z",
+      "duration_s": 0.273,
+      "output_excerpt": "`wt --help` names 'GitHub: https://github.com/max-sixty/worktrunk'",
+      "output_sha256": "7f9055c6d9cad42c18a5d26e9b2f87797d08c3f12b1f536299006ee7e9dda4a1",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01KHXtsox6oea3adBSfg23kT",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers\ntimeout 90 git clone --depth 1 --branch v0.79.0 https://github.com/max-sixty/worktrunk.git wt-src 2>&1 | tail -20",
+      "exit": 0,
+      "started_at": "2026-09-23T00:55:36.968Z",
+      "duration_s": 1.357,
+      "output_excerpt": "cloned v0.79.0, detached at 5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "output_sha256": "fe69f6c8186a419458f5e764486cce4a62824ecd1db098276787d467c36fa109",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_015RExJ6k6TgKuSRrokwabQ8",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "export CARGO_HOME=$HOME/.cache/gap-wave2-20260923/workers/cargo-home\nexport RUSTUP_HOME=$HOME/.cache/gap-wave2-20260923/workers/rustup-home\nexport PATH=\"$CARGO_HOME/bin:$PATH\"\ncd $HOME/.cache/gap-wave2-20260923/workers/wt-src\ntimeout 900 cargo test --release 2>&1 | tail -80\necho \"TEST_EXIT=$?\"",
+      "exit": 1,
+      "started_at": "2026-09-23T00:55:41.795Z",
+      "duration_s": 111.97,
+      "output_excerpt": "'cargo test: 1 errors, 0 warnings (374 crates)'; 'error: could not write output to .../wt-src/target/release/deps/skim-...rcgu.o: No such file or directory'; 'TEST_EXIT=0' is tail's status; `pwd` then failed (getcwd: cannot access parent directories)",
+      "output_sha256": "7aeb7c5cf4c5b071df8333a586ebc19a9fd6df1d428476f67b76d894ab8312d6",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_015KEtZMM8ADHPfvi2gLrcLp",
+      "note": "Not run through $HOME/codex-ecosystem/bin/ecosystem-bounded-run, which the unit rules required for heavy jobs; the build was only bounded by `timeout 900`. RTK-condensed in the transcript; full output recovered from the RTK store: raw/gap5-cargo-test-rtk-recall-b8772aefe188.txt (rustup auto-installed toolchain 1.97.0, '5 components', from worktrunk's rust-toolchain pin; 429 'Downloaded' crate lines from crates.io; 374 'Compiling' lines).",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "df -h $HOME/.cache 2>&1; ls -la $HOME/.cache/gap-wave2-20260923/workers/wt-src 2>&1 | head; cd $HOME/.cache/gap-wave2-20260923/workers/wt-src 2>&1 && pwd",
+      "exit": 1,
+      "started_at": "2026-09-23T00:57:37.402Z",
+      "duration_s": 0.177,
+      "output_excerpt": "'$HOME/.cache/gap-wave2-20260923/workers/wt-src': No such file or directory; disk 14% used (824G free)",
+      "output_sha256": "6045a3f018ca899e2635dc7b36ea033b7c0f7a265f40a8dd4b910c08b9cd3fc3",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_019fgMU1pPn5uPvhexaAbGQu",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ls -la $HOME/.cache/gap-wave2-20260923/workers/ 2>&1",
+      "exit": 2,
+      "started_at": "2026-09-23T00:57:41.824Z",
+      "duration_s": 0.09,
+      "output_excerpt": "'$HOME/.cache/gap-wave2-20260923/workers/': No such file or directory",
+      "output_sha256": "6859c237522a969c167f8c7d54b25d200314260fa9d458a8b1d5f6329e7ab914",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01Hh7PVa8cnCuhnyTwGsgoDT",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ls -la $HOME/.cache/gap-wave2-20260923/ 2>&1; ls -la $HOME/.cache/ 2>&1 | head -20",
+      "exit": 0,
+      "started_at": "2026-09-23T00:57:47.161Z",
+      "duration_s": 0.192,
+      "output_excerpt": "'$HOME/.cache/gap-wave2-20260923/': No such file or directory (the whole shared wave prefix, not only this unit's directory)",
+      "output_sha256": "4b6552f27fb9d015e5496af8467f400873255ed2ee96e1e071c9d361e184846c",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_016B18VbUbg6Tx5w9yTBhJwy",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "rm -rf $HOME/.cache/gap-wave2-20260923\ndf -h / | tail -1",
+      "exit": 0,
+      "started_at": "2026-09-23T00:56:57.790Z",
+      "duration_s": 1.241,
+      "output_excerpt": "foundation/isolation unit (same workflow run, its own worktree) ran `rm -rf $HOME/.cache/gap-wave2-20260923` at 00:56:57.790Z (result 00:56:59.031Z), inside this unit's cargo window (00:55:41.795Z-00:57:33.765Z)",
+      "output_sha256": "d83f51c133cc41ae980b2d76ba7c426c59bfb37efd781707d02c0f6596d9613e",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_019YSNRYhpjP5pXvLimhP5VZ",
+      "note": "source ISO in raw/gap5-transcript-extract.json. This is the deletion the earlier receipt attributed to an unidentified external process.",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cat $HOME/.cache/gap-wave2-20260923/workers/fix5/probe.py | sha256sum\ncat $HOME/.cache/gap-wave2-20260923/workers/fix5/probe-output.json | sha256sum",
+      "exit": 0,
+      "started_at": "2026-09-23T01:01:07.447Z",
+      "duration_s": 0.108,
+      "output_excerpt": "fix5/probe.py and fix5/probe-output.json: No such file or directory (deleted with the prefix)",
+      "output_sha256": "46e250e9d567aafbfdb9a1db4bee466f655111c66b3f4161b2f5ad3dfada6d5b",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01SXSpQUQTXUE9TVttATQMXx",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "sha256sum $HOME/code/nas-wt-g2-workers/evidence/artifacts/gap-wave2-20260923/foundation__workers/raw/probe.py",
+      "exit": 0,
+      "started_at": "2026-09-23T01:01:27.471Z",
+      "duration_s": 0.094,
+      "output_excerpt": "raw/probe.py rewritten from the transcript: sha256 57ea19c6... (equal to the live file's hash above)",
+      "output_sha256": "8df1cff983a07a5226a797aa79803fb839bcc23b16a452b5ad861508e3b04fc9",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01YW7PDRXcKHpraNN3WdHNne",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "sha256sum $HOME/code/nas-wt-g2-workers/evidence/artifacts/gap-wave2-20260923/foundation__workers/raw/probe-output.json",
+      "exit": 0,
+      "started_at": "2026-09-23T01:01:46.731Z",
+      "duration_s": 0.101,
+      "output_excerpt": "raw/probe-output.json rewritten from the transcript: sha256 1aa7a1c2... (equal to the live file's hash above)",
+      "output_sha256": "2efc0c3c965fa52d207acfdd749a7acc6c84ab11d2666a08d5a8726ef5b0cfc5",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01D3MnuNzXi2X9pPXenSyHtw",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/code/nas-wt-g2-workers/evidence/artifacts/gap-wave2-20260923/foundation__workers/raw\nsed -i 's#$HOME#$HOME#g' probe.py probe-output.json\nsha256sum probe.py probe-output.json\ngrep -c '\\$HOME' probe.py probe-output.json",
+      "exit": 0,
+      "started_at": "2026-09-23T01:07:35.039Z",
+      "duration_s": 0.246,
+      "output_excerpt": "home directory replaced by $HOME in raw/probe.py and raw/probe-output.json (now 2f542eb2... and 437e855f...)",
+      "output_sha256": "098afe642cd4533dd0478a23ce00108a6d6767c2f71833cccd0cb3335c337945",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01HVVYJ9s5ea43yxXcWVHX14",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ls -la $HOME/.cache/gap-wave2-20260923/ 2>&1; ls -la $HOME/.cache/gap-wave2-20260923/workers/ 2>&1; pgrep -af \"wt remove\\|cargo\\|codex exec\" 2>&1",
+      "exit": 1,
+      "started_at": "2026-09-23T01:08:47.448Z",
+      "duration_s": 0.097,
+      "output_excerpt": "post-commit look at the prefix (01:08:47Z)",
+      "output_sha256": "0da52b2adf16a61431a5dfd58ee8672e2636f21fcc5bf8b9befdb1806821a6b8",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01EUJp9Kjy6aSUEVavT61GzR",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ls -la $HOME/.cache/gap-wave2-20260923/workers/fix1/ 2>&1\nrm -rf $HOME/.cache/gap-wave2-20260923/workers/fix1\nls -la $HOME/.cache/gap-wave2-20260923/workers/ 2>&1",
+      "exit": 0,
+      "started_at": "2026-09-23T01:08:50.889Z",
+      "duration_s": 0.184,
+      "output_excerpt": "`rm -rf $HOME/.cache/gap-wave2-20260923/workers/fix1` at 01:08:50Z -- this unit's own cleanup; it explains the empty workers/ directory with mtime 2026-09-23T01:08:50Z that the review saw (workers/ was recreated by `mkdir -p .../workers/fix1` at 00:58:23Z)",
+      "output_sha256": "dc2195f4e4f0113fa26e2cfda15aee0849c7c3ee3a6b6b15ba4d79e0091090ca",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01FT5jeoZKAdp9fJf9WvjDB1",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Advanced, not settled; one clause narrowed, two clauses open. (1) Dirty-sibling safety, the narrowed clause: an exact script (raw/probe.py) SIGKILLed the process group of `wt remove crash-target -y --force --foreground` at 10 delays (1-90 ms) with a dirty sibling worktree present. The sibling's `git status --porcelain` stayed '?? README.md' after every trial. Detection method: that status comparison fails if the sibling directory, its README.md, its .git file or its .git/worktrees admin entry is removed (git then errors and prints nothing). It can therefore detect deletion of the dirty sibling. It cannot detect subtler changes such as a moved branch ref or edited admin files. (2) Torn/partial state of the killed target: not measured. The probe classified the target only by `os.path.isdir` of its directory and by the paths in `git worktree list --porcelain`. It never read .git/worktrees/<name>, prunable/locked flags, the target directory's contents or whether the crash-target branch still existed, and it recreated the target only when the directory was absent. A partially deleted target or a stale admin entry would have gone unrecorded and carried into the next trial. The earlier statements 'no torn state reproduced' and 'this rerun closes that hole' overstated the measurement. What the data show is only that the target directory was present at 1-12 ms and absent at 20-90 ms. `killed_process_group: true` means killpg() returned without error; before wait() reaps the child that also happens for an already-exited zombie, so it does not show that a kill interrupted removal. (3) Worktrunk Rust suite: not completed by this unit. The toolchain install (00:55:10Z, 14 s) and v0.79.0 clone succeeded. `cargo test --release` compiled until the prefix was deleted and failed with 'could not write output ... No such file or directory'. The deletion was not by an unidentified external process. The foundation/isolation unit of the same workflow run executed `rm -rf $HOME/.cache/gap-wave2-20260923` at 00:56:57.790Z, inside this build's window, and removed every unit's scratch tree. This unit's own deletions were fix5 subdirectories at 00:54:54Z and fix1 at 01:08:50Z. The build also broke the unit rules: it ran without ecosystem-bounded-run and downloaded toolchains and crates. Covered elsewhere, not verified by this unit: that same isolation unit reports its own worktrunk v0.79.0 `cargo test --locked` run under ecosystem-bounded-run on branch claude/g2-isolation-20260923 (evidence/artifacts/gap-wave2-20260923/foundation__isolation/5-worktrunk-0-79-0-cargo-test.json at 9874beb). That run awaits the coordinator's review and integration.",
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": "Remaining for this gap: a probe that records .git/worktrees/<name>, `git worktree list --porcelain` prunable/locked lines, the target's file list and the branch ref after each kill and resets the target every trial (the next_check's 'until partial .git/worktrees state is observed'); a completed Rust suite, which is claimed only by the isolation unit's unintegrated receipt. The cargo build here ran outside ecosystem-bounded-run and downloaded rustup-init, the stable minimal toolchain, toolchain 1.97.0 (5 components) and crates.io dependencies. The shared-prefix deletion shows that per-unit directories under one shared scratch prefix did not isolate concurrent units. 10 trials, WSL2 scheduling, Python-level timing. Privacy sweep 2026-09-23: the transcript extract(s) are retained host-local and not published; the published support is each command's cmd, exit, output_excerpt and output_sha256.",
+  "checked_at": "2026-09-23T00:57:47Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): cargo installer and test commands replaced by the exact transcript commands (installer exported CARGO_HOME/RUSTUP_HOME; nothing went to ~/.rustup or ~/.cargo, both absent); missing ecosystem-bounded-run and the downloads disclosed; deletion attributed to the isolation unit's rm -rf with transcript evidence; torn-state detection limits and the uninformative killed_process_group stated; conflicting probe-output hashes explained (pre/post sanitization); timestamps corrected.",
+  "raw_evidence": [
+    {
+      "file": "raw/gap5-transcript-extract.json",
+      "sha256": "7d36a67a2cd3c8d3135a6797ad66149710c940c2be181f26aacb6d62d9d15764",
+      "bytes": 29761,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)",
+      "published_support": "each command's cmd, exit, output_excerpt and output_sha256 in this receipt"
+    }
+  ]
+}

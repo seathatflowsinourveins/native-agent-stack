@@ -1,0 +1,149 @@
+{
+ "source": "$HOME/codex-ecosystem/state/upstream-native-20260920/combined-functional-summary.json (host-local, private; excerpted read-only)",
+ "operations": {
+  "fresh-static-graph": {
+   "id": "fresh-static-graph",
+   "components": [
+    "codebase-memory-mcp",
+    "mcporter"
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "codebase-memory.search_graph",
+    "--args",
+    "{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":10}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/.codex/worktrees/token-coverage-refresh-20260920/agent-lab",
+   "started_at_utc": "2026-09-20T03:57:40.480Z",
+   "elapsed_ms": 4112,
+   "exit_code": 0,
+   "purpose": "Native indexed function lookup",
+   "checks": [
+    {
+     "name": "expected process exit",
+     "passed": true
+    },
+    {
+     "name": "collect node returned",
+     "passed": true
+    }
+   ],
+   "stdout_preview": "{\n  \"qn_rule\": \"qn = qn_prefix == \\\"\\\" ? name : qn_prefix + \\\".\\\" + name\",\n  \"cols\": [\n    \"name\",\n    \"label\",\n    \"lines\",\n    \"in\",\n    \"out\"\n  ],\n  \"groups\": [\n    {\n      \"qn_prefix\": \"agent-lab.tools.ecosystem.linux-usage-report\",\n      \"file\": \"tools/ecosystem/linux-usage-report.cjs\",\n      \"rows\": [\n        [\n          \"collect\",\n          \"Function\",\n          \"91-127\",\n          1,\n          5\n        ]\n      ]\n    }\n  ],\n  \"total\": 1,\n  \"returned\": 1,\n  \"count\": 1,\n  \"has_more\": false,\n  \"truncated\": false\n}\n",
+   "source_operation_id": "static-graph",
+   "stdout_sha256": "d1742e725e1d72e248cbee88f44bb7cb870a1d5b0623c69b44481996411d4dc6"
+  },
+  "fresh-static-callees": {
+   "id": "fresh-static-callees",
+   "components": [
+    "codebase-memory-mcp",
+    "mcporter"
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "codebase-memory.trace_path",
+    "--args",
+    "{\"project\":\"agent-lab\",\"function_name\":\"agent-lab.tools.ecosystem.linux-usage-report.collect\",\"direction\":\"outbound\",\"depth\":1,\"format\":\"json\",\"limit\":20}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/.codex/worktrees/token-coverage-refresh-20260920/agent-lab",
+   "started_at_utc": "2026-09-20T03:57:44.595Z",
+   "elapsed_ms": 3935,
+   "exit_code": 0,
+   "purpose": "Native outbound static dependencies",
+   "checks": [
+    {
+     "name": "expected process exit",
+     "passed": true
+    }
+   ],
+   "stdout_preview": "{\n  \"function\": \"agent-lab.tools.ecosystem.linux-usage-report.collect\",\n  \"direction\": \"outbound\",\n  \"callees_total\": 4,\n  \"callees_total_relation\": \"eq\",\n  \"callees\": {\n    \"qn_rule\": \"qn = qn_prefix == \\\"\\\" ? name : qn_prefix + \\\".\\\" + name\",\n    \"cols\": [\n      \"name\",\n      \"hop\"\n    ],\n    \"groups\": [\n      {\n        \"qn_prefix\": \"agent-lab.tools.ecosystem.linux-usage-report\",\n        \"rows\": [\n          [\n            \"installation\",\n            1\n          ],\n          [\n            \"sourcesFor\",\n            1\n          ],\n          [\n            \"runParser\",\n            1\n          ],\n          [\n            \"overlaps\",\n            1\n          ]\n        ]\n      }\n    ]\n  }\n}\n",
+   "source_operation_id": "static-callees",
+   "stdout_sha256": "f79ec5d9f95b65dbed2a9bed9f8332ff0ef21a26e9bffa37d43793742d1a5915"
+  },
+  "fresh-memory-status": {
+   "id": "fresh-memory-status",
+   "components": [
+    "ai-memory",
+    "mcporter"
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "ai-memory.memory_status",
+    "--args",
+    "{\"workspace\":\"agent-lab\",\"project\":\"agent-lab\"}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/.codex/worktrees/token-coverage-refresh-20260920/agent-lab",
+   "started_at_utc": "2026-09-20T03:57:49.611Z",
+   "elapsed_ms": 314,
+   "exit_code": 0,
+   "purpose": "Read-only status of the explicitly configured project memory; no transcript archival or model use",
+   "checks": [
+    {
+     "name": "expected process exit",
+     "passed": true
+    },
+    {
+     "name": "structured status",
+     "passed": true
+    }
+   ],
+   "stdout_preview": "{\n  \"counts\": {\n    \"pages_latest\": 27,\n    \"pages_all\": 86,\n    \"sessions\": 37,\n    \"observations\": 17731\n  }\n}\n",
+   "source_operation_id": "memory-status",
+   "stdout_sha256": "6505145e741a8a1ff6624a4b303eb8cc41ec5eb0735ec708d55632e80a234bbd"
+  },
+  "fresh-socraticode-status": {
+   "id": "fresh-socraticode-status",
+   "components": [
+    "socraticode",
+    "mcporter"
+   ],
+   "argv": [
+    "$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "--config",
+    "$HOME/codex-ecosystem/config/mcporter.json",
+    "call",
+    "socraticode.codebase_status",
+    "--args",
+    "{\"projectPath\":\"$HOME/code/agent-lab\"}",
+    "--output",
+    "json",
+    "--no-oauth"
+   ],
+   "cwd": "$HOME/.codex/worktrees/token-coverage-refresh-20260920/agent-lab",
+   "started_at_utc": "2026-09-20T04:00:22.661Z",
+   "elapsed_ms": 720,
+   "exit_code": 0,
+   "purpose": "Read existing semantic index status only; no embedding search or indexing requested",
+   "checks": [
+    {
+     "name": "expected process exit",
+     "passed": true
+    },
+    {
+     "name": "structured native status",
+     "passed": true
+    }
+   ],
+   "stdout_preview": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Project: $HOME/code/agent-lab\\nCollection: codebase_72cfa87c5abf\\nStatus: green\\nIndexed chunks: 176\\n\\n⚠ Incremental update in progress\\n  Phase: checking for changes\\n  Progress: 0/0 files\\n  Elapsed: 0s\\n\\nFile watcher: active (watched by another process)\\n\\nCode graph: 26 files, 3 edges\\n  Last built: 1261s ago\"\n    }\n  ]\n}\n",
+   "source_operation_id": "socraticode-status",
+   "stdout_sha256": "dd4336e5f33aa269ced3b6f07eb0cca225e3e53ead4845a18989f32bfc10a942"
+  }
+ }
+}

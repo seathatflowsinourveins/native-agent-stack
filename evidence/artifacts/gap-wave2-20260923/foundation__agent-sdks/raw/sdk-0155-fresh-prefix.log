@@ -1,0 +1,39 @@
+# 2026-09-23T04:22:45Z fresh prefix 2 (uv cache reused; the first prefix downloaded openai-codex-cli-bin 123.9 MiB, output not retained)
+Using CPython 3.13.15 interpreter at: $HOME/.local/share/codex-ecosystem/bin/python3.13
+Creating virtual environment at: $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b
+Activate with: source $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b/bin/activate
+Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b
+Resolved 8 packages in 90ms
+Installed 8 packages in 6ms
+ + annotated-types==0.8.0
+ + openai-codex==0.155.1
+ + openai-codex-cli-bin==0.155.1
+ + packaging==26.3
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+# install exit 0
+# freeze prefix 2
+Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b
+annotated-types==0.8.0
+openai-codex==0.155.1
+openai-codex-cli-bin==0.155.1
+packaging==26.3
+pydantic==2.13.5
+pydantic-core==2.46.5
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+# freeze prefix 1 (used for the model turns)
+Using Python 3.13.15 environment at: $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551
+annotated-types==0.8.0
+openai-codex==0.155.1
+openai-codex-cli-bin==0.155.1
+packaging==26.3
+pydantic==2.13.5
+pydantic-core==2.46.5
+typing-extensions==4.16.0
+typing-inspection==0.4.4
+# native
+codex-cli 0.155.1
+$HOME/.local/share/codex-ecosystem/tools/codex-package-0.155.1/bin/codex

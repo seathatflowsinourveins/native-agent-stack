@@ -1,0 +1,3 @@
+{"inputs": {"worker-receipt.json": "blueprints/us-equities/workers/receipt.json", "acp-research-receipt.json": "blueprints/us-equities/deerflow/research-receipt.json"},
+ "gold": {"sdk_run_duration_ms": 58410, "sdk_run_total_tokens": 135311, "sdk_blocked_file_extraction_tasks": 2,
+          "acp_native_turn_duration_ms": 31027, "acp_cumulative_total_tokens": 42345, "acp_sandbox_policy_type": "workspaceWrite"}}

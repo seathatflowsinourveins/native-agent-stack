@@ -1,0 +1,57 @@
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Applying the download-date S&P 500 membership throughout history excludes former constituents and includes current constituents before their historical admission."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Default average ranks can admit more than ten stocks when scores tie at the cutoff, so dividing every selected position by ten can create unintended leverage."
+  },
+  {
+    "line": 34,
+    "category": "data_quality",
+    "explanation": "Leaving missing-price handling to pandas' version-dependent pct_change default can forward-fill gaps into artificial zero returns, and the feature calculation has the same issue."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights calculated using today's closing prices receive today's close-to-close returns, crediting the strategy with returns earned before its selection information was available."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "Daily portfolio rebalancing incurs no commissions, bid-ask spread, slippage, or market impact in the reported returns."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "The default skip-NA summation silently ignores missing asset returns and converts entirely missing rows to zero, potentially concealing unavailable valuations and delisting losses."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffling stacked stock-date observations trains models on future dates and on other securities from validation dates, so the accuracy does not represent prospective prediction."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "The folds do not purge overlapping 20-session label intervals, allowing training outcomes to incorporate price movements occurring within validation outcome windows."
+  },
+  {
+    "line": 68,
+    "category": "data_quality",
+    "explanation": "Silently excluding universe members absent from the price file conditions the tested universe on data availability and hides coverage-related selection bias."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the highest historical Sharpe across four lookbacks without accounting for the parameter search produces an optimistically selected performance estimate."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The purported out-of-sample backtest reuses exactly the price history used to select the winning lookback, leaving no independent validation period."
+  }
+]

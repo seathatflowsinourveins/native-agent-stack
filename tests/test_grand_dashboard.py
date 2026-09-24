@@ -219,7 +219,11 @@ class GrandDashboardTests(unittest.TestCase):
             with patch.object(installer.subprocess, 'run'):
                 installer.install(ROOT, root/'config', root/'units', root/'data', binary, root)
             service = (root/'units/ecosystem-research-progress.service').read_text()
-            self.assertIn(f'--dagu-bin {binary} --dagu-home {root}', service)
+            # install() resolves dagu_bin/dagu_home (install.py's `optional=[Path(p).resolve() ...]`)
+            # before writing them into the unit file, so a system-level symlink ancestor of the
+            # temp root (macOS's /tmp -> /private/tmp, /var -> /private/var, ...) legitimately
+            # changes the written path; compare against the same resolved form.
+            self.assertIn(f'--dagu-bin {binary.resolve()} --dagu-home {root.resolve()}', service)
             with self.assertRaises(ValueError):installer.install(ROOT, root/'c', root/'u', root/'d', binary, None)
 
 

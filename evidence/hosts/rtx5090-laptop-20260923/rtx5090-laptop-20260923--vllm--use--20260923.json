@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "rtx5090-laptop-20260923--vllm--use--20260923",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "rtx5090-laptop-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false,
+    "hardware_profile_ref": "this-host-20260923"
+  },
+  "catalog_revision": "95f8cb7205e66b168c2859a8a257d9a47ea0c69a",
+  "recorded_by": {
+    "identity_sha256": "c6d2169be7bc461f94a4854c4553f55e81135065807b47705699bf53b349eea2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "vllm",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import urllib.request as u;print(u.urlopen(\\\"http://127.0.0.1:8231/health\\\",timeout=5).status)\"",
+      "exit": 0,
+      "duration_s": 0.052,
+      "output_sha256": "c11e3f4837efde2441e23a7b9da02131f53bf59fddeb7147c4ab81afe400460f",
+      "output_excerpt": "200\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,urllib.request as u;r=u.Request(\\\"http://127.0.0.1:8231/v1/embeddings\\\",data=json.dumps({\\\"model\\\":\\\"nvidia/Nemotron-3-Embed-1B-BF16\\\",\\\"input\\\":[\\\"query: where is the workstation WSL memory decision\\\"]}).encode(),headers={\\\"Content-Type\\\":\\\"application/json\\\"});d=json.load(u.urlopen(r,timeout=30));print(\\\"dims\\\",len(d[\\\"data\\\"][0][\\\"embedding\\\"]))\"",
+      "exit": 0,
+      "duration_s": 0.139,
+      "output_sha256": "cddf85cf8593c8e84757d3689d8910975e89fc4759a4621fffa27de2973c51ff",
+      "output_excerpt": "dims 2048\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,urllib.request as u;print(json.load(u.urlopen(\\\"http://127.0.0.1:8231/v1/models\\\",timeout=5))[\\\"data\\\"][0][\\\"max_model_len\\\"])\"",
+      "exit": 0,
+      "duration_s": 0.058,
+      "output_sha256": "131e490ede5d344e5a8539d4a5335ccc70db7eacb397b876cffc72578b1331bf",
+      "output_excerpt": "8192\n"
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.25.0"
+  },
+  "observed_at_utc": "2026-09-23T17:14:16Z",
+  "result": "pass",
+  "claim": "The resident vLLM 0.25.0 service serves nvidia/Nemotron-3-Embed-1B-BF16 (2048 dimensions, max-model-len 8192) as the one local embedder for SocratiCode code search and ai-memory durable memory; the listed local models passed their preregistered bars on this host.",
+  "limitations": [
+    "Qualifications ran once per arm on one host; the qualified_models bars summarise the linked evidence artifacts.",
+    "Qwen3-8B-AWQ ran on vllm 0.29.0 in a temporary server and is not resident; its weights were deleted after qualification."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-23T17:14:16Z",
+      "reviewer": {
+        "identity_sha256": "c6d2169be7bc461f94a4854c4553f55e81135065807b47705699bf53b349eea2",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm",
+      "runtime_version": "0.25.0",
+      "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",
+      "result": "pass"
+    },
+    {
+      "model_id": "Qwen/Qwen3-8B-AWQ",
+      "revision": "4da05a8e",
+      "runtime": "vllm",
+      "runtime_version": "0.29.0",
+      "bars": "local worker for mini-swe-agent/pydantic-ai, hermes tool-call parser, thinking off: 20/20 valid tool calls (bar 19) and 4/5 exact-content tasks (bar 4), one run, exactly at the task bar; evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+      "result": "pass"
+    }
+  ]
+}

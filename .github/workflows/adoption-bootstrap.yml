@@ -10,11 +10,48 @@ on:
     branches: [main]
     paths:
       - 'adoption/**'
+      - 'tools/adoption/**'
+      - 'tests/test_adoption_*.py'
+      - 'scripts/validate.py'
+      - 'scripts/validate_catalogs.py'
+      - 'scripts/validate_foundation.py'
+      - 'scripts/landscape.py'
+      - 'scripts/build_ecosystem.py'
+      - 'scripts/adoption_status.py'
+      # Round 3j (Codex P2 thread 6): every input validate-macos's
+      # recording-tooling gate and recording smoke actually consume, not
+      # only adoption/** and tools/adoption/**.
+      - 'evidence/artifacts/macos-embed-reference-20260923/**'
+      - 'scripts/host_receipts.py'
+      - 'scripts/component_matrix.py'
+      - 'scripts/new_host_grand_list.py'
+      - 'tools/sota-convergence/build_verdicts.py'
+      - 'scripts/platform_status.py'
+      - 'scripts/validate_convergence.py'
+      - 'scripts/release_due.py'
+      - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   pull_request:
     paths:
       - 'adoption/**'
+      - 'tools/adoption/**'
+      - 'tests/test_adoption_*.py'
+      - 'scripts/validate.py'
+      - 'scripts/validate_catalogs.py'
+      - 'scripts/validate_foundation.py'
+      - 'scripts/landscape.py'
+      - 'scripts/build_ecosystem.py'
+      - 'scripts/adoption_status.py'
+      - 'evidence/artifacts/macos-embed-reference-20260923/**'
+      - 'scripts/host_receipts.py'
+      - 'scripts/component_matrix.py'
+      - 'scripts/new_host_grand_list.py'
+      - 'tools/sota-convergence/build_verdicts.py'
+      - 'scripts/platform_status.py'
+      - 'scripts/validate_convergence.py'
+      - 'scripts/release_due.py'
+      - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   schedule:
@@ -86,11 +123,26 @@ jobs:
   # native client. A green run here never flips adoption/manifest.json's
   # macos-arm64 platform profile out of drafted_not_accepted, and never flips
   # scripts/adoption_status.py's platform.supported, which stays false because
-  # supported_platforms pins linux/x86_64 only.
+  # supported_platforms pins linux/x86_64 only. Round 3h added the embedding
+  # acceptance check (tools/adoption/embed_acceptance.py against a live
+  # llama-embed launchd agent): this is HOSTED-RUNNER EVIDENCE ONLY -- a
+  # GitHub-hosted macOS Apple Silicon runner is CPU-only, not a real Mac
+  # workstation with Metal actually engaged, so a green run here establishes
+  # the endpoint, the model and the request/response shape, never the Metal
+  # backend a real Mac would use; see "Record which backend llama-server's
+  # own log reports" below and adoption/platforms/macos-arm64.md.
   bootstrap-macos:
     runs-on: macos-15
     timeout-minutes: 30
     steps:
+      # step-security/harden-runner's pinned version supports macOS runners
+      # in audit mode (its README: "GitHub-hosted runners (Windows, macOS):
+      # Audit mode only", read at this exact pinned commit 2026-09-23), which
+      # is the only mode this project ever uses.
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out the event commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -110,6 +162,39 @@ jobs:
             exit 1
           fi
           sw_vers | tee sw_vers.txt
+      # Round 3i (Codex Medium, cache-ordering finding): the cache key is
+      # DERIVED from the pin's own sha256 (read here, once, into a step
+      # output), never a literal hardcoded hash string, so a changed pin --
+      # a different sha256 -- always misses the cache and downloads fresh,
+      # rather than silently restoring a stale cached file under a reused
+      # key. Read before restoring the cache, and before the bootstrap step
+      # that verifies it, so both can reference the exact same value.
+      - name: Read the pinned embedding model's sha256
+        id: embed-model-pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256="$(jq -r '.models[0].sha256' adoption/pins-macos-arm64.json)"
+          if [ -z "$sha256" ] || [ "$sha256" = "null" ]; then
+            echo "adoption/pins-macos-arm64.json's models[0].sha256 is missing or null." >&2
+            exit 1
+          fi
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+      # Restored BEFORE the bootstrap step below, not after (round 3i,
+      # Codex Medium): a cache restore that ran AFTER bootstrap's own
+      # checksum verification could silently overwrite the just-verified
+      # model with stale cached bytes, with nothing left to re-check them.
+      # Restoring first means bootstrap's own install_embed_model always
+      # has the last word: fetch() (adoption/bootstrap-macos.sh) checks
+      # the destination's existing checksum before ever trusting it, and
+      # transparently re-downloads and re-verifies on any mismatch --
+      # exactly the same path a genuine cache miss takes, so a restored
+      # cache is never treated any differently from a fresh download.
+      - name: Restore the cached pinned embedding model
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
+          key: macos-embed-model-${{ steps.embed-model-pin.outputs.sha256 }}
       - name: Run the macOS bootstrap into a disposable prefix
         shell: bash
         run: |
@@ -184,13 +269,131 @@ jobs:
           # gh is installed by the bootstrap into $ECO_INSTALL_ROOT/bin, which is first on PATH here,
           # installed-versions.txt stays the authoritative pinned-version record.
           gh --version
+      - name: Render and lint the launchd plists (drafted; not a workstation launchd run)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          bash adoption/launchd/launchd-agents.sh render
+          bash adoption/launchd/launchd-agents.sh lint
+      # Round 3h (2026-09-23 readiness audit): the llama-embed launchd
+      # agent's template ran with no model argument at all, so nothing had
+      # ever proven the endpoint serves the pinned model correctly. The
+      # model itself is downloaded, verified and (round 3i) cached earlier
+      # in this job, well before this step -- see "Restore the cached
+      # pinned embedding model" and "Run the macOS bootstrap into a
+      # disposable prefix" above, and that step's own comment for why the
+      # cache restore must run BEFORE bootstrap's own checksum
+      # verification, never after.
+      - name: Bootstrap the llama-embed launchd agent, run the embedding acceptance check, then boot it out
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          # The bootstrap step above already downloaded and sha256-verified
+          # the model into this exact path via install_embed_model; the
+          # cache step above may also have restored it there already
+          # (fetch() is idempotent: it checks an existing destination's own
+          # checksum before ever downloading again), so this is never a
+          # second, redundant fetch either way.
+          bash adoption/launchd/launchd-agents.sh install --label com.native-stack.llama-embed
+          healthy=0
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8232/health >/dev/null 2>&1; then
+              healthy=1
+              break
+            fi
+            sleep 1
+          done
+          acceptance_exit=0
+          if [ "$healthy" -eq 1 ]; then
+            python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 \
+              evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json \
+              > "$RUNNER_TEMP/embed-acceptance-result.json" || acceptance_exit=$?
+            cat "$RUNNER_TEMP/embed-acceptance-result.json"
+          else
+            echo "llama-embed launchd agent never answered http://127.0.0.1:8232/ within 30s." >&2
+            acceptance_exit=1
+          fi
+          cp "$ECO_INSTALL_ROOT/state/logs/com.native-stack.llama-embed.err.log" \
+            "$RUNNER_TEMP/llama-embed-startup.log" 2>/dev/null || true
+          bash adoption/launchd/launchd-agents.sh remove --label com.native-stack.llama-embed
+          exit "$acceptance_exit"
+      - name: Record which backend llama-server's own log reports
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          log="$RUNNER_TEMP/llama-embed-startup.log"
+          if [ ! -f "$log" ]; then
+            echo "No llama-embed startup log was captured (the agent likely never started); nothing to report."
+            exit 0
+          fi
+          # This runner is CPU-only (no discrete GPU, and GitHub's macOS
+          # Apple Silicon runners do not expose Metal to a sandboxed
+          # process the way a real Mac workstation does); a real Mac run is
+          # what would show Metal actually engaging. Best-effort only --
+          # never fails the job on its own, and never asserts a specific
+          # backend: llama.cpp's own startup log wording is not a stable
+          # API this project should assume without checking (see the
+          # launchctl(1) caveat in adoption/platforms/macos-arm64.md's
+          # untested-boundary note for the same reasoning applied there).
+          if grep -qi 'metal' "$log"; then
+            echo "Backend reported in the startup log: Metal (see the uploaded llama-embed-startup.log for the exact line)."
+          elif grep -qi -E 'cpu|blas' "$log"; then
+            echo "Backend reported in the startup log: CPU (see the uploaded llama-embed-startup.log for the exact line)."
+          else
+            echo "Backend not identified from a fixed keyword search; inspect the uploaded llama-embed-startup.log directly."
+          fi
+      - name: Bootstrap the qdrant launchd agent, health-check it, then boot it out
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          # qdrant is a pinned, always-selected component of
+          # macos-arm64-foundation (adoption/manifest.json, not editable from
+          # here), so it must exist after a successful bootstrap above; its
+          # absence here is a real failure to surface, not a reason to skip
+          # quietly (qdrant is not itself in required_commands, so this
+          # assertion is what actually catches its absence).
+          if [ ! -x "$ECO_INSTALL_ROOT/bin/qdrant" ]; then
+            echo "qdrant binary absent at $ECO_INSTALL_ROOT/bin/qdrant after a bootstrap that selects it; failing." >&2
+            exit 1
+          fi
+          # Round 3j (Codex P2 thread 4): the bootstrap step above already
+          # provisioned $ECO_INSTALL_ROOT/config/qdrant.yaml via
+          # provision_qdrant_config (adoption/bootstrap-macos.sh) -- storage
+          # under state/qdrant, loopback, port 16333 -- so this step no
+          # longer writes its own disposable config; it uses that one,
+          # unmodified, exactly the config a real install would use.
+          if [ ! -f "$ECO_INSTALL_ROOT/config/qdrant.yaml" ]; then
+            echo "$ECO_INSTALL_ROOT/config/qdrant.yaml absent after a bootstrap that provisions it; failing." >&2
+            exit 1
+          fi
+          bash adoption/launchd/launchd-agents.sh install --label com.native-stack.qdrant
+          healthy=0
+          for _ in $(seq 1 15); do
+            if curl --fail --silent --show-error http://127.0.0.1:16333/ >"$RUNNER_TEMP/qdrant-health.json"; then
+              healthy=1
+              break
+            fi
+            sleep 1
+          done
+          bash adoption/launchd/launchd-agents.sh remove --label com.native-stack.qdrant
+          if [ "$healthy" -ne 1 ]; then
+            echo "qdrant launchd agent never answered http://127.0.0.1:16333/ within 15s." >&2
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/qdrant-health.json"
+          echo "qdrant launchd agent answered http://127.0.0.1:16333/ (bootstrapped, health-checked, then booted out)."
       - name: Collect the artifact payload
         if: always()
         shell: bash
         run: |
           set -uo pipefail
           mkdir -p macos-status
-          for file in status.json sw_vers.txt "$RUNNER_TEMP/eco/installed-versions.txt"; do
+          for file in status.json sw_vers.txt "$RUNNER_TEMP/eco/installed-versions.txt" "$RUNNER_TEMP/qdrant-health.json" \
+                      "$RUNNER_TEMP/embed-acceptance-result.json" "$RUNNER_TEMP/llama-embed-startup.log"; do
             if [ -f "$file" ]; then
               cp "$file" macos-status/
             else
@@ -206,5 +409,219 @@ jobs:
           path: macos-status
           # warn, not error: a failed bootstrap must stay visible as that
           # step's failure instead of being masked by a missing-artifact error.
+          if-no-files-found: warn
+          retention-days: 30
+
+  # Evidence class: native operation on a GitHub-hosted macOS arm64 runner,
+  # exercising the brew_formulae loop this change added to
+  # adoption/bootstrap-macos.sh WITHOUT --skip-system-packages, so it is the
+  # only job that actually invokes `brew install` for the six floating
+  # formulae (jq, python@3.13, ripgrep, coreutils, restic, shellcheck). Like
+  # bootstrap-macos above, this never flips adoption/manifest.json's
+  # macos-arm64 platform profile out of drafted_not_accepted and signs into
+  # no native client.
+  bootstrap-macos-brew:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No actions/setup-python here on purpose: this job exists to exercise
+      # the real brew_formulae loop (including python@3.13), and a
+      # setup-python-provided interpreter could shadow python3.13 on PATH,
+      # making the assertion below pass without ever checking Homebrew's own
+      # install. GitHub's macos-15 image ships a system Python already,
+      # which is all the script itself (bash + jq, no Python) needs.
+      - name: Run the macOS bootstrap without --skip-system-packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation
+      - name: Assert every brew-installed formula is actually present
+        shell: bash
+        run: |
+          set -euo pipefail
+          # python@3.13 is keg-only (it does not become the default python3),
+          # and which exact opt-prefix subpath carries its own python3.13
+          # binary is not asserted identically by every source consulted for
+          # this check, so every plausible brew --prefix candidate is tried
+          # explicitly, never a bare `python3.13` resolved from PATH alone.
+          python313=""
+          for candidate in \
+            "$(brew --prefix)/bin/python3.13" \
+            "$(brew --prefix python@3.13 2>/dev/null || true)/bin/python3.13" \
+            "$(brew --prefix python@3.13 2>/dev/null || true)/libexec/bin/python3.13"; do
+            if [ -x "$candidate" ]; then
+              python313="$candidate"
+              break
+            fi
+          done
+          if [ -z "$python313" ]; then
+            echo "python3.13 not found via any brew --prefix candidate; brew list --versions python@3.13:" >&2
+            brew list --versions python@3.13 >&2 || true
+            exit 1
+          fi
+          "$python313" --version
+          rg --version
+          restic version
+          shellcheck --version
+          gsha256sum --version
+
+  # Evidence class: local integration on a GitHub-hosted macOS arm64 runner.
+  # Runs this repository's own read-only validators and its adoption test
+  # modules on Darwin/arm64, since every other job here exercises the
+  # bootstrap script but never the repository's own Python tooling on macOS.
+  # No account sign-in, no live provider call.
+  validate-macos:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, as in validate.yml: host_receipts.py validate resolves each
+          # receipt's catalog_revision, which a depth-1 clone does not contain.
+          fetch-depth: 0
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Validate manifests and evidence integrity
+        run: python3 scripts/validate.py
+      - name: Validate catalog evidence and coverage joins
+        run: python3 scripts/validate_catalogs.py
+      - name: Validate general foundation capability claims
+        run: python3 scripts/validate_foundation.py --root . --json
+      - name: Validate landscape choices and alternative evidence
+        run: python3 scripts/landscape.py --root .
+      - name: Check offline ecosystem explorer rebuild
+        run: python3 scripts/build_ecosystem.py --check
+      # Round 3i (2026-09-23 peer-update-audit gap, adoption_macos, medium):
+      # the catalog's own recording and verdict scripts had never actually
+      # run on macOS CI, or against macOS's own system Python, at all --
+      # every prior gating job for them (validate.yml, catalog-freshness.yml)
+      # runs on ubuntu-24.04 only. See "Recording and verdict scripts" in
+      # adoption/platforms/macos-arm64.md.
+      - name: Validate host receipts
+        run: python3 scripts/host_receipts.py validate
+      - name: Check the component matrix
+        run: python3 scripts/component_matrix.py --check
+      - name: Check the new-host grand list
+        run: python3 scripts/new_host_grand_list.py --check
+      - name: Check the layer-verdicts join
+        run: python3 tools/sota-convergence/build_verdicts.py --check
+      - name: Validate declared convergence evidence
+        run: python3 scripts/validate_convergence.py --all-recorded --root . --json
+      - name: Report any new-machine paths main documents but the pinned release lacks
+        # Report only (no --strict): this never fails the job. It surfaces
+        # release-pin drift; cutting and re-pinning a release is a separate,
+        # deliberate maintainer action, not something this smoke performs.
+        run: python3 scripts/release_due.py
+      # Installs this profile so the recording smoke below has a real,
+      # already-pinned component (codex) to record a receipt for -- the same
+      # bootstrap step the bootstrap-macos job runs, reused here rather than
+      # duplicated with different logic.
+      - name: Run the macOS bootstrap into a disposable prefix (recording-script smoke)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages
+      # Round 3i, minimum-Python-version test (declared in adoption/
+      # bootstrap.md and adoption/platforms/macos-arm64.md's "Recording and
+      # verdict scripts": Python 3.9 or newer): runs the SAME recording smoke
+      # first against the manifest-pinned Python line (already set up above),
+      # then again against the runner's own system /usr/bin/python3 if -- and
+      # only if -- it meets that floor, skipping with a message otherwise.
+      # Every write happens inside a THROWAWAY copy of the checkout
+      # ($RUNNER_TEMP/rec, recreated fresh for each interpreter), never the
+      # real one, so nothing from this step is ever committed.
+      - name: 'Recording smoke: record a real receipt in a throwaway checkout copy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$RUNNER_TEMP/eco/bin:$PATH"
+          min_version="3.9"
+          rec_dir="$RUNNER_TEMP/rec"
+
+          run_smoke() {
+            local python_bin="$1" label="$2"
+            rm -rf "$rec_dir"
+            mkdir -p "$rec_dir"
+            cp -R "$GITHUB_WORKSPACE/." "$rec_dir/"
+            echo "-- recording smoke with $label ($("$python_bin" --version 2>&1)) --"
+            (
+              cd "$rec_dir"
+              "$python_bin" scripts/host_receipts.py record \
+                --host-id ci-macos15-smoke-20260923 \
+                --platform-id macos-arm64 \
+                --component-id codex \
+                --stage install \
+                --evidence-class native_proven \
+                --identity "ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${label}" \
+                --from-stack-commands
+              "$python_bin" scripts/host_receipts.py validate
+              "$python_bin" scripts/component_matrix.py --write
+              "$python_bin" scripts/component_matrix.py --check
+              "$python_bin" scripts/new_host_grand_list.py --write
+              "$python_bin" scripts/new_host_grand_list.py --check
+            )
+            rm -rf "$rec_dir"
+          }
+
+          run_smoke python3 "the manifest-pinned Python line (actions/setup-python)"
+
+          system_python3="/usr/bin/python3"
+          if [ -x "$system_python3" ]; then
+            system_version="$("$system_python3" -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
+            meets_min="$("$system_python3" -c "import sys; minimum = tuple(int(part) for part in '$min_version'.split('.')); print(1 if sys.version_info[:2] >= minimum else 0)")"
+            if [ "$meets_min" = "1" ]; then
+              run_smoke "$system_python3" "the runner's own system /usr/bin/python3 ($system_version)"
+            else
+              echo "System /usr/bin/python3 ($system_version) is below the declared minimum ($min_version) for scripts/host_receipts.py and friends; skipping the system-Python recording smoke."
+            fi
+          else
+            echo "No /usr/bin/python3 present on this runner; skipping the system-Python recording smoke."
+          fi
+      - name: Gate on the adoption test modules
+        run: >-
+          python3 -m unittest
+          tests.test_adoption_bootstrap_macos tests.test_adoption_launchd
+          tests.test_adoption_contract tests.test_adoption_status
+          tests.test_render_config tests.test_workflow_hardening
+          tests.test_workflow_security_coverage
+      - name: Run the full test suite (gating on macOS)
+        id: full_suite
+        shell: bash
+        run: |
+          # Gating since PR #126: the full suite passed on macos-15 (run
+          # 35898879109: 3156 tests OK, skipped=435) once the path-safety and
+          # platform-specific fixes landed. The log is still uploaded below.
+          set +e
+          python3 -m unittest -v >full-suite-macos.log 2>&1
+          code=$?
+          set -e
+          echo "Full python3 -m unittest exit code on macOS: $code"
+          tail -n 5 full-suite-macos.log
+          exit "$code"
+      - name: Upload the full test suite result
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: adoption-bootstrap-full-suite-macos-${{ github.run_id }}-${{ github.run_attempt }}
+          path: full-suite-macos.log
           if-no-files-found: warn
           retention-days: 30

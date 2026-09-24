@@ -1,0 +1,857 @@
++ date -u +%FT%TZ
+2026-09-23T05:05:41Z
++ command -v python dvc
+$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/python
+$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/dvc
++ python --version
+Python 3.13.15
++ dvc --version
+3.67.1
++ git --version
+git version 2.43.0
++ python -c 'import duckdb, pandas; print("duckdb", duckdb.__version__, "pandas", pandas.__version__)'
+duckdb 1.5.5 pandas 3.0.6
++ R=$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git
++ mkdir -p $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/code $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/stages
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/code/nanosecond-replay
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/point-in-time $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/code/point-in-time
++ for d in nanosecond-replay point-in-time financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/financial-data $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/code/financial-data
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/stages/stage.py
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc.yaml $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git/dvc.yaml
++ cd $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-git
++ git init -q
++ git config user.email gap-wave2@local
++ git config user.name gap-wave2
++ dvc init -q
++ dvc config core.analytics false
++ dvc config core.check_update false
++ dvc config core.site_cache_dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/dvc-site-cache
++ git add -A
++ git commit -q -m 'code, stage driver and dvc.yaml'
++ : ==== git native dvc add arm: materialize outside the pipeline, dvc add, delete, checkout, select
++ mkdir -p tracked
++ python code/nanosecond-replay/replay.py materialize --source code/nanosecond-replay/fixture.json --output tracked/ns_added
++ echo add_materialize_exit=0
+add_materialize_exit=0
++ dvc add tracked/ns_added
+
+To track the changes with git, run:
+
+	git add tracked/.gitignore tracked/ns_added.dvc
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
++ echo dvc_add_exit=0
+dvc_add_exit=0
++ git add tracked/ns_added.dvc tracked/.gitignore
++ git commit -q -m 'dvc add tracked/ns_added'
++ find tracked/ns_added -type f
++ sort
++ xargs sha256sum
++ chmod -R u+w tracked/ns_added
++ rm -rf tracked/ns_added
++ dvc checkout tracked/ns_added.dvc
+A       tracked/ns_added/
++ echo add_checkout_exit=0
+add_checkout_exit=0
++ find tracked/ns_added -type f
++ sort
++ xargs sha256sum
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/add-pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/add-post-checkout.sha256
++ echo add_restore_diff_exit=0
+add_restore_diff_exit=0
++ python stages/stage.py ns-select --code code --materialized tracked/ns_added --manifest $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/add-materialize.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/add-restored-ns_select.json
++ echo add_restored_ns_select_exit=0
+add_restored_ns_select_exit=0
++ dvc_cycle git
++ local L=git
++ : ==== git C0.1/C2.1 dvc repro
++ dvc repro
+Running stage 'ns_materialize':
+> mkdir -p data && python code/nanosecond-replay/replay.py materialize --source code/nanosecond-replay/fixture.json --output data/ns_materialized > data/ns_materialize.json
+Generating lock file 'dvc.lock'
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_select':
+> python stages/stage.py ns-select --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_quarantine':
+> python stages/stage.py ns-quarantine --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_quarantine.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_snapshot':
+> mkdir -p data && python code/point-in-time/temporal_snapshot.py snapshot --source code/point-in-time/fixture.json --output data/pit_snapshot > data/pit_snapshot.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_select':
+> python stages/stage.py pit-select --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_quarantine':
+> python stages/stage.py pit-quarantine --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_quarantine.json
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add data/.gitignore dvc.lock out/.gitignore
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.
++ echo git_repro1_exit=0
+git_repro1_exit=0
++ cat dvc.lock
+schema: '2.0'
+stages:
+  ns_materialize:
+    cmd: mkdir -p data && python code/nanosecond-replay/replay.py materialize 
+      --source code/nanosecond-replay/fixture.json --output data/ns_materialized
+      > data/ns_materialize.json
+    deps:
+    - path: code/financial-data/sec_data.py
+      hash: md5
+      md5: d576dad5f31cef3a80d8f303578045b7
+      size: 27151
+    - path: code/nanosecond-replay/fixture.json
+      hash: md5
+      md5: ccac29b2f379d156db7953daa84343ad
+      size: 2522
+    - path: code/nanosecond-replay/replay.py
+      hash: md5
+      md5: 43f04eca44d52e610c49ac404d78b01a
+      size: 10184
+    - path: code/point-in-time/temporal_snapshot.py
+      hash: md5
+      md5: 18163b8efee92eb2e8f400aa510baf71
+      size: 11998
+    outs:
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: 1d1d14572d2323fcd479699d2cf82b2c
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 5146ccdae2a58772979262fe63ecf710.dir
+      size: 7302
+      nfiles: 4
+  ns_select:
+    cmd: python stages/stage.py ns-select --code code --materialized 
+      data/ns_materialized --manifest data/ns_materialize.json --out 
+      out/ns_select.json
+    deps:
+    - path: code/nanosecond-replay/select.sql
+      hash: md5
+      md5: 6c89578efae9b006f1bd2d5944e8c5eb
+      size: 1008
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: 1d1d14572d2323fcd479699d2cf82b2c
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 5146ccdae2a58772979262fe63ecf710.dir
+      size: 7302
+      nfiles: 4
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/ns_select.json
+      hash: md5
+      md5: f3b825d0c5be0472820998038bc38f11
+      size: 8496
+  ns_quarantine:
+    cmd: python stages/stage.py ns-quarantine --code code --materialized 
+      data/ns_materialized --manifest data/ns_materialize.json --out 
+      out/ns_quarantine.json
+    deps:
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: 1d1d14572d2323fcd479699d2cf82b2c
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 5146ccdae2a58772979262fe63ecf710.dir
+      size: 7302
+      nfiles: 4
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/ns_quarantine.json
+      hash: md5
+      md5: d156cbad4bce8909b39d566e454fe1de
+      size: 2044
+  pit_snapshot:
+    cmd: mkdir -p data && python code/point-in-time/temporal_snapshot.py 
+      snapshot --source code/point-in-time/fixture.json --output 
+      data/pit_snapshot > data/pit_snapshot.json
+    deps:
+    - path: code/financial-data/sec_data.py
+      hash: md5
+      md5: d576dad5f31cef3a80d8f303578045b7
+      size: 27151
+    - path: code/point-in-time/fixture.json
+      hash: md5
+      md5: 05fa1cae50700a96f0b0e7c921b93464
+      size: 6716
+    - path: code/point-in-time/temporal_snapshot.py
+      hash: md5
+      md5: 18163b8efee92eb2e8f400aa510baf71
+      size: 11998
+    outs:
+    - path: data/pit_snapshot
+      hash: md5
+      md5: cfff33dd3b72cc010e4c5b49fb53b29b.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: 9b0506d218fdce050393f621027a09b9
+      size: 322
+  pit_select:
+    cmd: python stages/stage.py pit-select --code code --materialized 
+      data/pit_snapshot --manifest data/pit_snapshot.json --out 
+      out/pit_select.json
+    deps:
+    - path: code/point-in-time/select.sql
+      hash: md5
+      md5: 6e636212ad42632d1f6fb2129bda7396
+      size: 1332
+    - path: data/pit_snapshot
+      hash: md5
+      md5: cfff33dd3b72cc010e4c5b49fb53b29b.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: 9b0506d218fdce050393f621027a09b9
+      size: 322
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/pit_select.json
+      hash: md5
+      md5: 4df622cf163e83c7332b64e234b1f77b
+      size: 15230
+  pit_quarantine:
+    cmd: python stages/stage.py pit-quarantine --code code --materialized 
+      data/pit_snapshot --manifest data/pit_snapshot.json --out 
+      out/pit_quarantine.json
+    deps:
+    - path: data/pit_snapshot
+      hash: md5
+      md5: cfff33dd3b72cc010e4c5b49fb53b29b.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: 9b0506d218fdce050393f621027a09b9
+      size: 322
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/pit_quarantine.json
+      hash: md5
+      md5: 912caf114dacc6bdf17a14e7a4a3efe2
+      size: 1302
++ '[' -d .git ']'
++ git add -A
++ git commit -q -m 'dvc.lock after first repro'
++ git status --short
++ : ==== git C0.2 cache-aware second repro and status
++ dvc repro
+Stage 'ns_materialize' didn't change, skipping
+Stage 'ns_select' didn't change, skipping
+Stage 'ns_quarantine' didn't change, skipping
+Stage 'pit_snapshot' didn't change, skipping
+Stage 'pit_select' didn't change, skipping
+Stage 'pit_quarantine' didn't change, skipping
+Data and pipelines are up to date.
++ echo git_repro2_exit=0
+git_repro2_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo git_status_exit=0
+git_status_exit=0
++ dvc dag
+            +----------------+               
+            | ns_materialize |               
+            +----------------+               
+             **            **                
+           **                **              
+         **                    **            
++-----------+             +---------------+  
+| ns_select |             | ns_quarantine |  
++-----------+             +---------------+  
+              +--------------+                 
+              | pit_snapshot |                 
+              +--------------+                 
+              ***           ***                
+            **                 **              
+          **                     **            
++------------+              +----------------+ 
+| pit_select |              | pit_quarantine | 
++------------+              +----------------+ 
++----------------------+ 
+| tracked/ns_added.dvc | 
++----------------------+ 
++ : ==== git C0.3 delete every out, dvc checkout, compare sha256 lists
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+16
++ cp -a out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/git-repro-out
++ chmod -R u+w data
++ rm -rf data out
++ dvc status
+ns_materialize:
+	changed outs:
+		deleted:            data/ns_materialized
+		deleted:            data/ns_materialize.json
+ns_select:
+	changed deps:
+		deleted:            data/ns_materialized
+		deleted:            data/ns_materialize.json
+	changed outs:
+		deleted:            out/ns_select.json
+ns_quarantine:
+	changed deps:
+		deleted:            data/ns_materialized
+		deleted:            data/ns_materialize.json
+	changed outs:
+		deleted:            out/ns_quarantine.json
+pit_snapshot:
+	changed outs:
+		deleted:            data/pit_snapshot
+		deleted:            data/pit_snapshot.json
+pit_select:
+	changed deps:
+		deleted:            data/pit_snapshot
+		deleted:            data/pit_snapshot.json
+	changed outs:
+		deleted:            out/pit_select.json
+pit_quarantine:
+	changed deps:
+		deleted:            data/pit_snapshot
+		deleted:            data/pit_snapshot.json
+	changed outs:
+		deleted:            out/pit_quarantine.json
++ echo git_status_after_delete_exit=0
+git_status_after_delete_exit=0
++ dvc checkout
+A       data/ns_materialized/
+A       data/pit_snapshot/
+A       data/ns_materialize.json
+A       data/pit_snapshot.json
+A       out/ns_quarantine.json
+A       out/ns_select.json
+A       out/pit_quarantine.json
+A       out/pit_select.json
++ echo git_checkout_exit=0
+git_checkout_exit=0
++ find data out -type f
++ sort
++ xargs sha256sum
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/git-pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/git-post-checkout.sha256
+1d0
+< 71701562b963f283a25b2ab12ba2e6ca26a65acdeeb898434b6b240806050b88  data/.gitignore
+12d10
+< 0dd351f92574166a1b410905304bc4a8bdb032586269719c640c1da3af2f372c  out/.gitignore
++ echo git_restore_diff_exit=1
+git_restore_diff_exit=1
++ dvc status
+Data and pipelines are up to date.
++ echo git_status_after_checkout_exit=0
+git_status_after_checkout_exit=0
++ : ==== git C0.4/C0.5/C2.2 rerun select and quarantine directly on the DVC-restored data
++ mkdir -p $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun
++ python stages/stage.py ns-select --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/ns_select.json
++ echo restored_ns_select_exit=0
+restored_ns_select_exit=0
++ python stages/stage.py ns-quarantine --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/ns_quarantine.json
++ echo restored_ns_quarantine_exit=0
+restored_ns_quarantine_exit=0
++ python stages/stage.py pit-select --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/pit_select.json
++ echo restored_pit_select_exit=0
+restored_pit_select_exit=0
++ python stages/stage.py pit-quarantine --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/pit_quarantine.json
++ echo restored_pit_quarantine_exit=0
+restored_pit_quarantine_exit=0
+++ printf 0%.0s 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
++ python code/nanosecond-replay/replay.py select --snapshot data/ns_materialized --snapshot-sha256 0000000000000000000000000000000000000000000000000000000000000000 --cutoff 2025-02-01T21:00:00.000000100Z --universe-id fixture-universe --feed fixture-feed
+{"status": "rejected", "reason": "snapshot_manifest_hash_mismatch"}
++ echo restored_wrong_digest_cli_exit=2
+restored_wrong_digest_cli_exit=2
++ cp -a data/ns_materialize.json data/pit_snapshot.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/
++ cp data/ns_materialized/snapshot.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/first-ns-snapshot.json
++ cp data/pit_snapshot/snapshot.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/first-pit-snapshot.json
++ : ==== git C0.6 forced regeneration
++ dvc repro --force
+Running stage 'ns_materialize':
+> mkdir -p data && python code/nanosecond-replay/replay.py materialize --source code/nanosecond-replay/fixture.json --output data/ns_materialized > data/ns_materialize.json
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_select':
+> python stages/stage.py ns-select --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'ns_quarantine':
+> python stages/stage.py ns-quarantine --code code --materialized data/ns_materialized --manifest data/ns_materialize.json --out out/ns_quarantine.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_snapshot':
+> mkdir -p data && python code/point-in-time/temporal_snapshot.py snapshot --source code/point-in-time/fixture.json --output data/pit_snapshot > data/pit_snapshot.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_select':
+> python stages/stage.py pit-select --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_select.json
+Updating lock file 'dvc.lock'
+
+Running stage 'pit_quarantine':
+> python stages/stage.py pit-quarantine --code code --materialized data/pit_snapshot --manifest data/pit_snapshot.json --out out/pit_quarantine.json
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add data/.gitignore out/.gitignore dvc.lock
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.
++ echo git_repro_force_exit=0
+git_repro_force_exit=0
++ find data out -type f
++ sort
++ xargs sha256sum
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/git-pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/git-post-force.sha256
+2c2
+< b244dfbea1eaf85fc9473a1118c9833d4e311c8ff599b7c08b9c080cd75d2d29  data/ns_materialize.json
+---
+> 23f3930e27b7aa2e356abfb627137f3edc85f12e06ba0581572ff5394de43a3a  data/ns_materialize.json
+4c4
+< 3b9dbed12f028aa9093264cc66e2123f3eb470aa7e805c70ca84ed0eefd2ed92  data/ns_materialized/snapshot.json
+---
+> d25c2955fe454eb10428fee0128193b9e1ddedb705e03b90bb778bcbac7fde0e  data/ns_materialized/snapshot.json
+7c7
+< 284d12665b8b426021823361ccddd895f40bf122f43601e9fcbbabd5206c8c2f  data/pit_snapshot.json
+---
+> 1107ee3269714d5c459d5e8add4c7d8be0e9a9491bf18f9bd4a45caab38fffcc  data/pit_snapshot.json
+9c9
+< cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413  data/pit_snapshot/snapshot.json
+---
+> 4ed69dd49a48dad6eb06489c933c53324894a6d9b00c1a34f25934da07d4a0fb  data/pit_snapshot/snapshot.json
+14c14
+< 17cca797a5ae5b1ebbb6a94f8f3f56d34a02e71fe86342f2543d8fe7d6e81e67  out/ns_select.json
+---
+> 967048a757cba197d5ee79358af19c5e151a14859cc9d80cd47324b8382147ce  out/ns_select.json
+16c16
+< 9cc0e4e85c463367355747f24d5fcc44bf98ca4538981779a36dc5d5b146a95d  out/pit_select.json
+---
+> 2dc7f2f26260225615f66c30f1a130e370c35ec3a2a4313432ee40311cda82f7  out/pit_select.json
++ echo git_force_diff_exit=1
+git_force_diff_exit=1
++ cp data/ns_materialized/snapshot.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/forced-ns-snapshot.json
++ cp data/pit_snapshot/snapshot.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/forced-pit-snapshot.json
++ git diff --stat dvc.lock
+ dvc.lock | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
++ RI=$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity
++ mkdir -p $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/code $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/stages
++ for d in security-identity alpaca-historical financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/security-identity $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/code/security-identity
++ for d in security-identity alpaca-historical financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/alpaca-historical $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/code/alpaca-historical
++ for d in security-identity alpaca-historical financial-data
++ cp -a $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/financial-data $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/code/financial-data
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/stages/stage.py
++ cp $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc-identity.yaml $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity/dvc.yaml
++ cd $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/repo-identity
++ dvc init -q --no-scm
++ dvc config core.analytics false
++ dvc config core.check_update false
++ dvc config core.site_cache_dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/dvc-site-cache
++ dvc_cycle identity
++ local L=identity
++ : ==== identity C0.1/C2.1 dvc repro
++ dvc repro
+Running stage 'id_capture':
+> mkdir -p data && python stages/stage.py id-capture --code code --out-dir data/id_capture --out data/id_capture.json
+Generating lock file 'dvc.lock'
+Updating lock file 'dvc.lock'
+
+Running stage 'id_quality':
+> python stages/stage.py id-quality --code code --capture data/id_capture --capture-json data/id_capture.json --out-dir data/id_quality --out data/id_quality.json
+Updating lock file 'dvc.lock'
+
+Running stage 'id_ledger':
+> python stages/stage.py id-ledger --code code --quality data/id_quality --quality-json data/id_quality.json --out-dir data/id_ledger --out data/id_ledger.json
+Updating lock file 'dvc.lock'
+
+Running stage 'id_select':
+> python stages/stage.py id-select --code code --ledger data/id_ledger --ledger-json data/id_ledger.json --out out/id_select.json
+Updating lock file 'dvc.lock'
+Use `dvc push` to send your updates to remote storage.
++ echo identity_repro1_exit=0
+identity_repro1_exit=0
++ cat dvc.lock
+schema: '2.0'
+stages:
+  id_capture:
+    cmd: mkdir -p data && python stages/stage.py id-capture --code code 
+      --out-dir data/id_capture --out data/id_capture.json
+    deps:
+    - path: code/alpaca-historical/collect.py
+      hash: md5
+      md5: 1532e2c385b7429691841f117bdeb60a
+      size: 25735
+    - path: code/security-identity/plan.json
+      hash: md5
+      md5: 06665971dd05da3693347831b46b4616
+      size: 1627
+    - path: code/security-identity/probe.py
+      hash: md5
+      md5: bca1a26413803d2576786fb549ca970b
+      size: 19108
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_capture
+      hash: md5
+      md5: 366f131f8fa978bfa48324a40a2b463a.dir
+      size: 71068
+      nfiles: 19
+    - path: data/id_capture.json
+      hash: md5
+      md5: bfc15b3d0f35b44c289b947f7a90884b
+      size: 2196
+  id_quality:
+    cmd: python stages/stage.py id-quality --code code --capture data/id_capture
+      --capture-json data/id_capture.json --out-dir data/id_quality --out 
+      data/id_quality.json
+    deps:
+    - path: code/security-identity/quality.py
+      hash: md5
+      md5: 60afa4c33afc60d6e52bc02a2ebd7028
+      size: 18496
+    - path: data/id_capture
+      hash: md5
+      md5: 366f131f8fa978bfa48324a40a2b463a.dir
+      size: 71068
+      nfiles: 19
+    - path: data/id_capture.json
+      hash: md5
+      md5: bfc15b3d0f35b44c289b947f7a90884b
+      size: 2196
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_quality
+      hash: md5
+      md5: f137a3a095f05357403a26fc5123a16d.dir
+      size: 158111
+      nfiles: 25
+    - path: data/id_quality.json
+      hash: md5
+      md5: 48e09903e486602ba533b9069da6c1f9
+      size: 324
+  id_ledger:
+    cmd: python stages/stage.py id-ledger --code code --quality data/id_quality 
+      --quality-json data/id_quality.json --out-dir data/id_ledger --out 
+      data/id_ledger.json
+    deps:
+    - path: code/security-identity/ledger.py
+      hash: md5
+      md5: b757bf85baf7da07afa92604b3487420
+      size: 14979
+    - path: code/security-identity/select.sql
+      hash: md5
+      md5: db7722f7e747703d85679a24d024591b
+      size: 377
+    - path: data/id_quality
+      hash: md5
+      md5: f137a3a095f05357403a26fc5123a16d.dir
+      size: 158111
+      nfiles: 25
+    - path: data/id_quality.json
+      hash: md5
+      md5: 48e09903e486602ba533b9069da6c1f9
+      size: 324
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: data/id_ledger
+      hash: md5
+      md5: be3cc8f07cd4a492b98fa4972e5431a3.dir
+      size: 257051
+      nfiles: 34
+    - path: data/id_ledger.json
+      hash: md5
+      md5: 833fc4cba4f139479e88fad0beec109f
+      size: 4067
+  id_select:
+    cmd: python stages/stage.py id-select --code code --ledger data/id_ledger 
+      --ledger-json data/id_ledger.json --out out/id_select.json
+    deps:
+    - path: data/id_ledger
+      hash: md5
+      md5: be3cc8f07cd4a492b98fa4972e5431a3.dir
+      size: 257051
+      nfiles: 34
+    - path: data/id_ledger.json
+      hash: md5
+      md5: 833fc4cba4f139479e88fad0beec109f
+      size: 4067
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/id_select.json
+      hash: md5
+      md5: da58ea1844cbd064b35209ceeaadf58b
+      size: 3888
++ '[' -d .git ']'
++ : ==== identity C0.2 cache-aware second repro and status
++ dvc repro
+Stage 'id_capture' didn't change, skipping
+Stage 'id_quality' didn't change, skipping
+Stage 'id_ledger' didn't change, skipping
+Stage 'id_select' didn't change, skipping
+Data and pipelines are up to date.
++ echo identity_repro2_exit=0
+identity_repro2_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo identity_status_exit=0
+identity_status_exit=0
++ dvc dag
++------------+ 
+| id_capture | 
++------------+ 
+       *       
+       *       
+       *       
++------------+ 
+| id_quality | 
++------------+ 
+       *       
+       *       
+       *       
++-----------+  
+| id_ledger |  
++-----------+  
+       *       
+       *       
+       *       
++-----------+  
+| id_select |  
++-----------+  
++ : ==== identity C0.3 delete every out, dvc checkout, compare sha256 lists
++ find data out -type f
++ sort
++ xargs sha256sum
++ wc -l
+82
++ cp -a out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/identity-repro-out
++ chmod -R u+w data
++ rm -rf data out
++ dvc status
+id_capture:
+	changed outs:
+		deleted:            data/id_capture
+		deleted:            data/id_capture.json
+id_quality:
+	changed deps:
+		deleted:            data/id_capture
+		deleted:            data/id_capture.json
+	changed outs:
+		deleted:            data/id_quality
+		deleted:            data/id_quality.json
+id_ledger:
+	changed deps:
+		deleted:            data/id_quality
+		deleted:            data/id_quality.json
+	changed outs:
+		deleted:            data/id_ledger
+		deleted:            data/id_ledger.json
+id_select:
+	changed deps:
+		deleted:            data/id_ledger
+		deleted:            data/id_ledger.json
+	changed outs:
+		deleted:            out/id_select.json
++ echo identity_status_after_delete_exit=0
+identity_status_after_delete_exit=0
++ dvc checkout
+A       data/id_capture/
+A       data/id_ledger/
+A       data/id_quality/
+A       data/id_capture.json
+A       data/id_ledger.json
+A       data/id_quality.json
+A       out/id_select.json
++ echo identity_checkout_exit=0
+identity_checkout_exit=0
++ find data out -type f
++ sort
++ xargs sha256sum
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/identity-pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/identity-post-checkout.sha256
++ echo identity_restore_diff_exit=0
+identity_restore_diff_exit=0
++ dvc status
+Data and pipelines are up to date.
++ echo identity_status_after_checkout_exit=0
+identity_status_after_checkout_exit=0
++ python stages/stage.py id-select --code code --ledger data/id_ledger --ledger-json data/id_ledger.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/id_select.json
++ echo restored_id_select_exit=0
+restored_id_select_exit=0
++ cp -a data/id_ledger.json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/restored-rerun/
++ dvc repro --force
+Running stage 'id_capture':
+> mkdir -p data && python stages/stage.py id-capture --code code --out-dir data/id_capture --out data/id_capture.json
+Updating lock file 'dvc.lock'
+
+Running stage 'id_quality':
+> python stages/stage.py id-quality --code code --capture data/id_capture --capture-json data/id_capture.json --out-dir data/id_quality --out data/id_quality.json
+Updating lock file 'dvc.lock'
+
+Running stage 'id_ledger':
+> python stages/stage.py id-ledger --code code --quality data/id_quality --quality-json data/id_quality.json --out-dir data/id_ledger --out data/id_ledger.json
+Updating lock file 'dvc.lock'
+
+Running stage 'id_select':
+> python stages/stage.py id-select --code code --ledger data/id_ledger --ledger-json data/id_ledger.json --out out/id_select.json
+Updating lock file 'dvc.lock'
+Use `dvc push` to send your updates to remote storage.
++ echo identity_repro_force_exit=0
+identity_repro_force_exit=0
++ find data out -type f
++ sort
++ xargs sha256sum
++ diff $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/identity-pre-delete.sha256 $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/identity-post-force.sha256
+1c1
+< 555514c6d9d580d9482a097e1053a2093e12fc9222235bf6524730496729806f  data/id_capture.json
+---
+> 3775a05b3147eef1ebec91e12d0fb896e61d30c5492259f3d0f3abc247480561  data/id_capture.json
+9c9
+< 3b51333ccb0a4d3aa13aea6c4563f52b005830a6cd788f1ffa2b32813ab8ae05  data/id_capture/freeze.json
+---
+> 7e8d47207e13505810083e72e4e7ecfa107c75bfd66f6324175e6af61ffb0d00  data/id_capture/freeze.json
+20,23c20,23
+< 09ab18a98775549fa9a1db7f28b917e6c946f401b8d1c5cb4c2e8b3913deccec  data/id_capture/receipt.json
+< c6ac4fc1915aba417554ba8b39b35106f2acfa6c8d9946738ef591fc722caa96  data/id_ledger.json
+< 49fa8753f03a9e9b4daf655646a82c5cd959507da3c51f3cad189b41e46f600c  data/id_ledger/assets.parquet
+< 0b3d8bfd53a2c992246b6ec0abd1c68aef348e9da8291e62201a8328420a456b  data/id_ledger/bars.parquet
+---
+> a7ea3b6b3ad7d156541c4cf6126ace08b65d4f8d88e92b522655b48cac4adef4  data/id_capture/receipt.json
+> 4755d6d933a65426a2eac1ce5eb9f6e80226f2788cf2cc5e34d9f965987c83cd  data/id_ledger.json
+> 04a0ac4be4df66828bbf135ad0aa78eda3f152f70d7c9f91debc6f7e4a1c9237  data/id_ledger/assets.parquet
+> bca76a41c1de4ff3379d6ea0377ff7a8849a5d2213d42da0522f78580bd3fe02  data/id_ledger/bars.parquet
+25c25
+< 7e7a11f8f466ac678a1616a525c89b9b889fb388c3e3b32180d81b705c808bff  data/id_ledger/eligibility.json
+---
+> 3b822a1c76ac945f6fe2350d6d99997a27188d89a1056856180f66a5f03de5da  data/id_ledger/eligibility.json
+27c27
+< 93dbc5312fdd80e8f3ac5181f2a46fc22576967549a066e0f24b809e2616ae02  data/id_ledger/manifest.json
+---
+> 467043ee37e61dab3885581acc3a22d2ca8357c367c6fbed3e695cf487483a30  data/id_ledger/manifest.json
+32c32
+< a98aa794768347b5a525a7e71eb2af826b020f73f5d4aaa63fbd61f7b4c70222  data/id_ledger/source/freeze.json
+---
+> 0cb0c81bd9113a0df4f08a0fd8bfe9b4ec10447e5e7f355981c0c3e4afb79229  data/id_ledger/source/freeze.json
+40c40
+< 3b51333ccb0a4d3aa13aea6c4563f52b005830a6cd788f1ffa2b32813ab8ae05  data/id_ledger/source/original/freeze.json
+---
+> 7e8d47207e13505810083e72e4e7ecfa107c75bfd66f6324175e6af61ffb0d00  data/id_ledger/source/original/freeze.json
+51c51
+< 09ab18a98775549fa9a1db7f28b917e6c946f401b8d1c5cb4c2e8b3913deccec  data/id_ledger/source/original/receipt.json
+---
+> a7ea3b6b3ad7d156541c4cf6126ace08b65d4f8d88e92b522655b48cac4adef4  data/id_ledger/source/original/receipt.json
+55,56c55,56
+< 3224825b050e1a189c8ab643d77a95ed399a19d91bb5fe1ea745394fffe92a66  data/id_ledger/source/receipt.json
+< 7c62d7990778675baa6e03ce356d138a40bfb307c9544c394270b5a018714a9f  data/id_quality.json
+---
+> de35698643db6712b6c81f9fa2a05b166a8f1a7cbe88772ccbe759473c4afb4e  data/id_ledger/source/receipt.json
+> 830f7ab40e1069cf5c68c780fe9d97c87064ff83ef40c6964b09c94a05f7fe5f  data/id_quality.json
+58c58
+< a98aa794768347b5a525a7e71eb2af826b020f73f5d4aaa63fbd61f7b4c70222  data/id_quality/freeze.json
+---
+> 0cb0c81bd9113a0df4f08a0fd8bfe9b4ec10447e5e7f355981c0c3e4afb79229  data/id_quality/freeze.json
+66c66
+< 3b51333ccb0a4d3aa13aea6c4563f52b005830a6cd788f1ffa2b32813ab8ae05  data/id_quality/original/freeze.json
+---
+> 7e8d47207e13505810083e72e4e7ecfa107c75bfd66f6324175e6af61ffb0d00  data/id_quality/original/freeze.json
+77c77
+< 09ab18a98775549fa9a1db7f28b917e6c946f401b8d1c5cb4c2e8b3913deccec  data/id_quality/original/receipt.json
+---
+> a7ea3b6b3ad7d156541c4cf6126ace08b65d4f8d88e92b522655b48cac4adef4  data/id_quality/original/receipt.json
+81,82c81,82
+< 3224825b050e1a189c8ab643d77a95ed399a19d91bb5fe1ea745394fffe92a66  data/id_quality/receipt.json
+< 5718833a644a769e6169958448dbaa1b064d104690dce97c5e22380f607345e9  out/id_select.json
+---
+> de35698643db6712b6c81f9fa2a05b166a8f1a7cbe88772ccbe759473c4afb4e  data/id_quality/receipt.json
+> 9f55acc7c8868bd18073cde0f65e8318dd3ab6a7193fac8dc8367f4d6ff87571  out/id_select.json
++ echo identity_force_diff_exit=1
+identity_force_diff_exit=1
++ : ==== project-local arm
++ L=$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local
++ mkdir -p $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local
++ CODE=$HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities
++ S=$HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/replay.py materialize --source $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/nanosecond-replay/fixture.json --output $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_materialized
++ echo local_ns_materialize_exit=0
+local_ns_materialize_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py ns-select --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --materialized $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_materialized --manifest $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_materialize.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_select.json
++ echo local_ns_select_exit=0
+local_ns_select_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py ns-quarantine --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --materialized $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_materialized --manifest $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_materialize.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/ns_quarantine.json
++ echo local_ns_quarantine_exit=0
+local_ns_quarantine_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/point-in-time/temporal_snapshot.py snapshot --source $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities/point-in-time/fixture.json --output $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_snapshot
++ echo local_pit_snapshot_exit=0
+local_pit_snapshot_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py pit-select --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --materialized $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_snapshot --manifest $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_snapshot.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_select.json
++ echo local_pit_select_exit=0
+local_pit_select_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py pit-quarantine --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --materialized $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_snapshot --manifest $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_snapshot.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/pit_quarantine.json
++ echo local_pit_quarantine_exit=0
+local_pit_quarantine_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py id-capture --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --out-dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_capture --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_capture.json
++ echo local_id_capture_exit=0
+local_id_capture_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py id-quality --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --capture $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_capture --capture-json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_capture.json --out-dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_quality --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_quality.json
++ echo local_id_quality_exit=0
+local_id_quality_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py id-ledger --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --quality $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_quality --quality-json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_quality.json --out-dir $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_ledger --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_ledger.json
++ echo local_id_ledger_exit=0
+local_id_ledger_exit=0
++ python $HOME/code/nas-wt-g2-identity-provenance/blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py id-select --code $HOME/code/nas-wt-g2-identity-provenance/blueprints/us-equities --ledger $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_ledger --ledger-json $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_ledger.json --out $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local/id_select.json
++ echo local_id_select_exit=0
+local_id_select_exit=0
++ cd $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z/local
++ find ns_materialized pit_snapshot id_capture id_quality id_ledger -type f
++ sort
++ xargs sha256sum
++ date -u +%FT%TZ
+2026-09-23T05:06:36Z

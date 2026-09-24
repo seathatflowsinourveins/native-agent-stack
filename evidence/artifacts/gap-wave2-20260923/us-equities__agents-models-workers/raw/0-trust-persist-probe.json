@@ -1,0 +1,41 @@
+{
+ "started_at": "2026-09-23T16:17:33Z",
+ "codex_version": "codex-cli 0.155.1",
+ "arms": [
+  {
+   "arm": "T0-control",
+   "override_sent": false,
+   "config_toml_existed_before": false,
+   "thread_start_ok": true,
+   "thread_start_error": null,
+   "config_toml_after": null,
+   "config_toml_after_sha256": null,
+   "stdout_first_lines": [
+    "{\"id\":0,\"result\":{\"userAgent\":\"trust-probe/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (trust-probe; 0)\",\"codexHome\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T0-control-kzaez75t/codex-home\",\"platformFamily\":\"unix\",\"platformOs\":\"linux\"}}",
+    "{\"method\":\"remoteControl/status/changed\",\"params\":{\"status\":\"disabled\",\"serverName\":\"<host>\",\"installationId\":\"<id-1>\",\"environmentId\":null},\"emittedAtMs\":1790180254087}",
+    "{\"id\":1,\"result\":{\"thread\":{\"id\":\"<id-2>\",\"environments\":[{\"environmentId\":\"local\",\"cwd\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T0-control-kzaez75t/ws\",\"runtimeWorkspaceRoots\":[\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T0-control-kzaez75t/ws\"]}],\"extra\":null,\"sessionId\":\"01a0cf0e-e18c-7380-a3da-4531573df25"
+   ],
+   "stderr_tail": "\u001b[2m2026-09-23T16:17:34.211037Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n",
+   "exit_code": 0,
+   "ws": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T0-control-kzaez75t/ws"
+  },
+  {
+   "arm": "T1-override",
+   "override_sent": true,
+   "config_toml_existed_before": false,
+   "thread_start_ok": true,
+   "thread_start_error": null,
+   "config_toml_after": null,
+   "config_toml_after_sha256": null,
+   "stdout_first_lines": [
+    "{\"id\":0,\"result\":{\"userAgent\":\"trust-probe/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (trust-probe; 0)\",\"codexHome\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T1-override-k88b8d_0/codex-home\",\"platformFamily\":\"unix\",\"platformOs\":\"linux\"}}",
+    "{\"method\":\"remoteControl/status/changed\",\"params\":{\"status\":\"disabled\",\"serverName\":\"<host>\",\"installationId\":\"<id-3>\",\"environmentId\":null},\"emittedAtMs\":1790180256303}",
+    "{\"id\":1,\"result\":{\"thread\":{\"id\":\"<id-4>\",\"environments\":[{\"environmentId\":\"local\",\"cwd\":\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T1-override-k88b8d_0/ws\",\"runtimeWorkspaceRoots\":[\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T1-override-k88b8d_0/ws\"]}],\"extra\":null,\"sessionId\":\"01a0cf0e-ea35-7240-8b54-40ff96406"
+   ],
+   "stderr_tail": "\u001b[2m2026-09-23T16:17:36.429743Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n",
+   "exit_code": 0,
+   "ws": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/trustprobe/T1-override-k88b8d_0/ws"
+  }
+ ],
+ "finished_at": "2026-09-23T16:17:38Z"
+}

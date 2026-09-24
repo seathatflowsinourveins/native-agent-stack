@@ -1,0 +1,13 @@
+{
+ "gap_index": 9,
+ "slug": "composed-sdk-worker-restart-handoff",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "One codex-native-sdk worker configured with an isolated ai-memory MCP and a disposable-Qdrant SocratiCode MCP can run a bounded two-step task, be killed after step 1, and a fresh worker can recover progress from an ai-memory handoff and finish step 2. Recovered state is exactly what was written to ai-memory; in-process thread state is lost (ephemeral thread).",
+ "criteria": [
+  "Run 1: worker searches SocratiCode for step-1 facts and writes a handoff/page to isolated ai-memory, then the process group is SIGKILLed.",
+  "Run 2: new worker process reads the handoff via ai-memory MCP, completes step 2 using SocratiCode, returns final JSON.",
+  "Record: which facts were recovered, whether any SocratiCode index had to be rebuilt, tool calls per run, usage per run, and whether the handoff content matched.",
+  "Detection: the kill is verified by process exit status/signal; the handoff is verified by reading the isolated store after the kill."
+ ]
+}

@@ -1,0 +1,43 @@
+{
+  "folds": 20,
+  "ledger_records": 6605,
+  "reserved_selection": "momentum20",
+  "reserved_candidates": {
+    "momentum20": {
+      "observed_episodes": 11,
+      "censored_episodes": 1,
+      "invested_episodes": 10,
+      "mean_raw_price_label": "0.003002253484797453652757773582",
+      "mean_net_cost_proxy_label": "0.001184071666615635470939591764"
+    },
+    "momentum60": {
+      "observed_episodes": 11,
+      "censored_episodes": 1,
+      "invested_episodes": 11,
+      "mean_raw_price_label": "0.006403128517506842397527919636",
+      "mean_net_cost_proxy_label": "0.004403128517506842397527919636"
+    },
+    "momentum120": {
+      "observed_episodes": 11,
+      "censored_episodes": 1,
+      "invested_episodes": 11,
+      "mean_raw_price_label": "0.006403128517506842397527919636",
+      "mean_net_cost_proxy_label": "0.004403128517506842397527919636"
+    },
+    "cash": {
+      "observed_episodes": 11,
+      "censored_episodes": 1,
+      "invested_episodes": 0,
+      "mean_raw_price_label": "0",
+      "mean_net_cost_proxy_label": "0.000"
+    },
+    "equalweight": {
+      "observed_episodes": 11,
+      "censored_episodes": 1,
+      "invested_episodes": 11,
+      "mean_raw_price_label": "0.003622928696130345656850000132",
+      "mean_net_cost_proxy_label": "0.001622928696130345656850000132"
+    }
+  },
+  "inputs_unchanged": true
+}

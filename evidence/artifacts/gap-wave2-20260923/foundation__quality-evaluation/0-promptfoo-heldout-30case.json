@@ -1,0 +1,64 @@
+{
+ "id": "foundation__quality-evaluation__gap0",
+ "gap_index": 0,
+ "gap_text_sha256": "fd1214a556c7ac7c312a4d9a2b0f8726174614405958b26d933ee0d08bf56f66",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "Rerunning the frozen 30-case held-out set with a provider that prints only its prediction (no label) and an assertion that reads the label from the test's own vars reproduces 26/30 (deterministic embeddings); a constant-prediction control provider scores near chance, proving the assertion can fail.",
+  "criteria": "sha256 of cases.json recorded before the run; provider output contains no label; assertion compares to vars.label; 30 per-case gradingResults retained; control run pass count <= 12/30; generator script retained under blueprints/.",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "fixround2_preregistration": {
+  "written_at": "2026-09-23T12:41:55Z",
+  "label": "fix-round-2 preregistration, written after the second independent review (Opus) and before any fix-round-2 command",
+  "expectation": "(a) The model card's call (separate requests; queries with input_type 'query', candidates with input_type 'document', as in the retained upstream-example.py) on the frozen 30-case easy set scores at least 28/30 through promptfoo; if the round-1 failures (case-07/09/13/24) persist, the harness-setup explanation is rejected and reported. (b) A new 30-case hard-negative set (query, one correct passage, three same-topic distractors that share vocabulary but do not answer) is authored by one Codex call (read-only, ephemeral, user config and hooks disabled, --output-schema), not by this agent, and frozen by sha256 and committed before any embedding call. (c) promptfoo eval on the hard set runs two models: Nemotron-3-Embed-1B (model-card input_type call) and BAAI/bge-small-en-v1.5 (fastembed, pinned version, model-card query instruction); each retains 30 per-case gradingResults. Both models are expected to score lower on the hard set than Nemotron on the easy set. A constant pred=0 control on the hard set passes exactly the label-0 cases. A diagnostic untyped Nemotron run on the hard set is also recorded.",
+  "criteria": "settled only if arms (a), (b) and (c) all execute with per-case scores retained, the hard set is frozen and committed before any model call on it, the case author is not this agent, and the control passes only label-0 cases. The shared predict() used by gap 4 is left unchanged; the typed call is a separate function. If any arm fails to run, the outcome is advanced with the remaining arm named. Label correctness of the Codex-authored set is reviewed by this agent only for schema and duplicate checks, not re-labelled; that limit is disclosed.",
+  "committed_in": "1fcd1fe (preregistrations-fixround2.json), before any fix-round-2 command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T01:40:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_codex_author.sh $PWD/evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround2/hardneg-author $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/author-out  (one codex exec: --ignore-user-config --disable hooks --sandbox read-only --ephemeral --skip-git-repo-check -C <empty dir> -m gpt-6-astra -c model_reasoning_effort=\"medium\" --output-schema schema.json --json - < prompt.txt)",
+  "freeze: the author's cases array written unchanged to evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround2/hardneg-cases.json (sha256 be64ae45...), committed in 2557b2f before any embedding call on it",
+  "UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/uv-cache uv venv -p python3.12 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/fe-venv && uv pip install -p $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/fe-venv/bin/python fastembed==0.8.1; TextEmbedding('BAAI/bge-small-en-v1.5', cache_dir=$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/fe-models) (downloads Qdrant/bge-small-en-v1.5-onnx-Q, 65 MB)",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g0_fixround2.sh $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0-out evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround/g0-g4-g7/cases.json evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround2/hardneg-cases.json $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/fe-venv $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/fe-models",
+  "python3 blueprints/gap-wave2-20260923/foundation__quality-evaluation/margins_fixround2.py evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround/g0-g4-g7/cases.json evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/support/fixround2/hardneg-cases.json > $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g0-out/margins-typed.jsonl  (post-hoc diagnostic, not preregistered)"
+ ],
+ "results": {
+  "call_form": "Nemotron now uses the pinned model card's call (upstream-example.py): the query in one /v2/embed request with input_type 'query', the four candidates in a second request with input_type 'document', embedding_types ['float'], truncate 'END' (heldout_common.predict_typed). The round-1/fix-round-1 predict() sent query and candidates in one request without input_type; it is kept unchanged for gap 4.",
+  "easy_set": {
+   "cases_sha256": "124e29b041af1ced01c2b8af4c5f15600cf86e78f13c19676079f2a792b0e9e6 (g0-out/easy-cases.sha256)",
+   "nemotron_typed": "✓ 30 passed (100%), exit 0 (easy-typed.stdout); tokenUsage total 2432 over 60 requests",
+   "bge_small": "✓ 30 passed (100%), exit 0 (easy-bge.stdout)",
+   "fix_round_1_untyped": "26/30 with failures case-07/09/13/24 (support/fixround/g0-g4-g7/pf-heldout.stdout): all four pass with the model-card call, so those failures came from the harness call, as the review said"
+  },
+  "hard_set": {
+   "author": "one Codex call (gpt-6-astra, medium effort), exit 0, 241106 ms; usage input 17348, output 7664, reasoning 365 (author-out/codex-author-timing.txt, codex-author-events.jsonl: thread.started, turn.started, item.completed agent_message, turn.completed; no tool items)",
+   "cases_sha256": "be64ae45405313961624b102cba7b7a25cee97061ef3a251293d59c70a068576 (hardneg-freeze.txt; g0-out/hard-cases.sha256 identical)",
+   "shape": "30 cases, 30 distinct queries, each with one answer passage and three same-topic distractors (for example H22: jet lag after eastward travel; distractors on time-zone arithmetic, long-flight fatigue and jet-lag symptoms)",
+   "nemotron_typed": "✓ 30 passed (100%), exit 0 (hard-typed.stdout); tokenUsage total 6702 over 60 requests",
+   "bge_small": "✓ 28 passed (93.33%) ✗ 2 failed, exit 100 (hard-bge.stdout); failures case-21 (H22 jet lag, predicted the jet-lag-symptoms distractor) and case-23 (H24 tennis tiebreak serving order, predicted the tiebreak-scoring distractor)",
+   "nemotron_untyped_diagnostic": "✓ 13 passed (43.33%) ✗ 17 failed, exit 100 (hard-untyped.stdout); tokenUsage total 6299 over 30 requests",
+   "control": "constant pred=0: ✓ 6 passed (20.00%) ✗ 24 failed, exactly the 6 label-0 cases (hard-control.stdout, hard-generator.stdout 'label==0 count: 6')"
+  },
+  "per_case_scores": "every run's -o results JSON with 30 gradingResults is retained (g0-out/{easy,hard}-*-results.json)",
+  "margin_diagnostic": "post-hoc, not preregistered: Nemotron typed cosine margin between the answer and the best distractor, median 0.5667 (min 0.3373) on the easy set vs 0.2272 (min 0.0674) on the hard set (g0-out/margins-typed.jsonl)",
+  "preregistered_expectation_check": "arms (a), (b) and (c) all ran and every settled criterion holds. One stated expectation failed: Nemotron did not score lower on the hard set (30/30 on both); bge-small did (30 -> 28)."
+ },
+ "outcome": "settled",
+ "evidence_class": "local_integration",
+ "limits": "The hard set was written by one Codex call, not by a human or a published benchmark. This agent checked only schema, counts and distinct queries, and read the two bge-failure cases (their labels are correct on inspection); the other labels were not re-reviewed. Nemotron reaches the ceiling on both sets, so the hard set cannot separate it from a stronger model; the 30 vs 28 difference against bge-small is two cases on one deterministic run, not a ranking with confidence. bge-small ran through fastembed 0.8.1, which serves Qdrant's quantised ONNX export (model_optimized.onnx sha256 51f1bd0a..., setup/bge-model-files.sha256), not the original FP32 weights. The fix-round-1 26/30 (and the gap-4 harness comparison built on it) used a call without input_type that drops Nemotron to 13/30 on the hard set; it measured the harness call, not model quality. Round-1 note: the round-1 assertion read the label from the provider's own output; that design was replaced in fix round 1 and is superseded (commit b37df23).",
+ "checked_at": "2026-09-23T12:49:30Z",
+ "artifacts": [
+  "support/fixround2/hardneg-author/{prompt.txt,schema.json}",
+  "support/fixround2/author-out/*",
+  "support/fixround2/{hardneg-cases.json,hardneg-freeze.txt}",
+  "support/fixround2/g0-out/*",
+  "support/fixround2/setup/{fe-install.log,bge-model-files.sha256,g0.started}",
+  "support/fixround/g0-g4-g7/{cases.json,pf-heldout.stdout,pf-heldout-results.json}",
+  "blueprints/gap-wave2-20260923/foundation__quality-evaluation/{run_codex_author.sh,run_g0_fixround2.sh,gen_fixround2_configs.py,heldout_common.py,pf_provider.py,pf_provider_typed.py,pf_provider_bge.py,pf_control_provider.py,margins_fixround2.py}"
+ ]
+}

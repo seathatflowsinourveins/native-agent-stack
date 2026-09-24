@@ -1,0 +1,20 @@
+[
+ {
+  "task": "task1_open_read_title",
+  "success": true,
+  "ms": 18,
+  "detail": "Local browser command check"
+ },
+ {
+  "task": "task2_fill_click_read_status",
+  "success": true,
+  "ms": 68,
+  "detail": "Hello, Gap Wave 2!"
+ },
+ {
+  "task": "task3_nonexistent_selector",
+  "success": false,
+  "ms": 2001,
+  "detail": "TimeoutError: page.click: Timeout 2000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#does-not-exist')\u001b[22m\n"
+ }
+]

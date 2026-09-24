@@ -1,0 +1,104 @@
+## seam probe
+{
+ "alpaca_py": "0.44.0.post12.dev0+232179c",
+ "clients": {
+  "CorporateActionsClient": {
+   "_retry_after_ctor_retry_attempts_0": null,
+   "_session_is_requests_Session": true,
+   "ctor_accepts_retry_attempts": false,
+   "default__retry": 3,
+   "get_signature": "(path: str, data: Union[dict, str, NoneType] = None, **kwargs) -> Union[dict, List[dict], Any]",
+   "has__retry": true
+  },
+  "StockHistoricalDataClient": {
+   "_retry_after_ctor_retry_attempts_0": null,
+   "_session_is_requests_Session": true,
+   "ctor_accepts_retry_attempts": false,
+   "default__retry": 3,
+   "get_signature": "(path: str, data: Union[dict, str, NoneType] = None, **kwargs) -> Union[dict, List[dict], Any]",
+   "has__retry": true
+  }
+ },
+ "requests": "2.34.2",
+ "rest_py_sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5"
+}
+## unchanged suite
+test_symlink_parent_and_unexpected_payload_are_refused (tests.test_alpaca_historical.AlpacaHistoricalTests.test_symlink_parent_and_unexpected_payload_are_refused) ... ok
+test_timestamp_parser_preserves_nanosecond_and_rejects_extra_precision (tests.test_alpaca_historical.AlpacaHistoricalTests.test_timestamp_parser_preserves_nanosecond_and_rejects_extra_precision) ... ok
+
+======================================================================
+ERROR: test_interrupted_stream_is_closed_and_prefix_cannot_be_accepted (tests.test_alpaca_historical.AlpacaHistoricalTests.test_interrupted_stream_is_closed_and_prefix_cannot_be_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-market-data-reference/tests/test_alpaca_historical.py", line 312, in test_interrupted_stream_is_closed_and_prefix_cannot_be_accepted
+    self.m.native_identity()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/us-equities/alpaca-historical/collect.py", line 326, in native_identity
+    raise ValueError("alpaca_sdk_version_mismatch")
+ValueError: alpaca_sdk_version_mismatch
+
+======================================================================
+ERROR: test_native_get_retains_exact_bytes_and_disables_redirect_retry (tests.test_alpaca_historical.AlpacaHistoricalTests.test_native_get_retains_exact_bytes_and_disables_redirect_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-market-data-reference/tests/test_alpaca_historical.py", line 238, in test_native_get_retains_exact_bytes_and_disables_redirect_retry
+    self.m.native_identity()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/us-equities/alpaca-historical/collect.py", line 326, in native_identity
+    raise ValueError("alpaca_sdk_version_mismatch")
+ValueError: alpaca_sdk_version_mismatch
+
+======================================================================
+ERROR: test_native_hook_bounds_oversized_body_and_marks_incomplete (tests.test_alpaca_historical.AlpacaHistoricalTests.test_native_hook_bounds_oversized_body_and_marks_incomplete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-market-data-reference/tests/test_alpaca_historical.py", line 294, in test_native_hook_bounds_oversized_body_and_marks_incomplete
+    self.m.native_identity()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/us-equities/alpaca-historical/collect.py", line 326, in native_identity
+    raise ValueError("alpaca_sdk_version_mismatch")
+ValueError: alpaca_sdk_version_mismatch
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.510s
+
+FAILED (errors=3)
+unchanged_exit=1
+## pin-lifted copy (pin -> 0.44.0.post12.dev0+232179c); lines changed:
+<     if plan["alpaca_py_version"] != "0.44.0":
+>     if plan["alpaca_py_version"] != "0.44.0.post12.dev0+232179c":
+<     if version != "0.44.0":
+>     if version != "0.44.0.post12.dev0+232179c":
+<   "alpaca_py_version": "0.44.0",
+>   "alpaca_py_version": "0.44.0.post12.dev0+232179c",
+test_action_identity_and_process_bounds_are_checked (tests.test_alpaca_historical.AlpacaHistoricalTests.test_action_identity_and_process_bounds_are_checked) ... ok
+test_action_refusal_is_retained_and_does_not_erase_valid_bars (tests.test_alpaca_historical.AlpacaHistoricalTests.test_action_refusal_is_retained_and_does_not_erase_valid_bars) ... ok
+test_actions_keep_process_event_observation_distinct (tests.test_alpaca_historical.AlpacaHistoricalTests.test_actions_keep_process_event_observation_distinct) ... ok
+test_actual_prepared_request_cannot_change_feed_or_action_quality (tests.test_alpaca_historical.AlpacaHistoricalTests.test_actual_prepared_request_cannot_change_feed_or_action_quality) ... ok
+test_bounded_sample_accepts_25_synthetic_sessions (tests.test_alpaca_historical.AlpacaHistoricalTests.test_bounded_sample_accepts_25_synthetic_sessions) ... ok
+test_duplicate_json_keys_are_not_silently_replaced (tests.test_alpaca_historical.AlpacaHistoricalTests.test_duplicate_json_keys_are_not_silently_replaced) ... ok
+test_exact_decimal_text_is_not_rounded_via_sdk_float (tests.test_alpaca_historical.AlpacaHistoricalTests.test_exact_decimal_text_is_not_rounded_via_sdk_float) ... ok
+test_inclusive_wire_end_and_half_open_local_rejection (tests.test_alpaca_historical.AlpacaHistoricalTests.test_inclusive_wire_end_and_half_open_local_rejection) ... ok
+test_incomplete_actions_are_retained_as_unqualified (tests.test_alpaca_historical.AlpacaHistoricalTests.test_incomplete_actions_are_retained_as_unqualified) ... ok
+test_incomplete_token_chain_and_missing_terminal_fail (tests.test_alpaca_historical.AlpacaHistoricalTests.test_incomplete_token_chain_and_missing_terminal_fail) ... ok
+test_interrupted_stream_is_closed_and_prefix_cannot_be_accepted (tests.test_alpaca_historical.AlpacaHistoricalTests.test_interrupted_stream_is_closed_and_prefix_cannot_be_accepted) ... $HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-master/lib/python3.13/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+ok
+test_invalid_observation_order_duplicate_actions_and_lower_bound (tests.test_alpaca_historical.AlpacaHistoricalTests.test_invalid_observation_order_duplicate_actions_and_lower_bound) ... ok
+test_malformed_nonfinite_ohlcv_and_daily_timestamp_are_rejected (tests.test_alpaca_historical.AlpacaHistoricalTests.test_malformed_nonfinite_ohlcv_and_daily_timestamp_are_rejected) ... ok
+test_native_get_retains_exact_bytes_and_disables_redirect_retry (tests.test_alpaca_historical.AlpacaHistoricalTests.test_native_get_retains_exact_bytes_and_disables_redirect_retry) ... ok
+test_native_hook_bounds_oversized_body_and_marks_incomplete (tests.test_alpaca_historical.AlpacaHistoricalTests.test_native_hook_bounds_oversized_body_and_marks_incomplete) ... ok
+test_page_cap_preserves_failure_and_stops_requests (tests.test_alpaca_historical.AlpacaHistoricalTests.test_page_cap_preserves_failure_and_stops_requests) ... ok
+test_page_chain_and_complete_session_set (tests.test_alpaca_historical.AlpacaHistoricalTests.test_page_chain_and_complete_session_set) ... ok
+test_reforged_assessment_and_metadata_are_checked_against_raw (tests.test_alpaca_historical.AlpacaHistoricalTests.test_reforged_assessment_and_metadata_are_checked_against_raw) ... ok
+test_repeated_tokens_wrong_requests_and_duplicate_rows_fail (tests.test_alpaca_historical.AlpacaHistoricalTests.test_repeated_tokens_wrong_requests_and_duplicate_rows_fail) ... ok
+test_saved_receipt_raw_tamper_external_anchor_and_overwrite (tests.test_alpaca_historical.AlpacaHistoricalTests.test_saved_receipt_raw_tamper_external_anchor_and_overwrite) ... ok
+test_short_complete_query_does_not_claim_session_coverage (tests.test_alpaca_historical.AlpacaHistoricalTests.test_short_complete_query_does_not_claim_session_coverage) ... ok
+test_symlink_parent_and_unexpected_payload_are_refused (tests.test_alpaca_historical.AlpacaHistoricalTests.test_symlink_parent_and_unexpected_payload_are_refused) ... ok
+test_timestamp_parser_preserves_nanosecond_and_rejects_extra_precision (tests.test_alpaca_historical.AlpacaHistoricalTests.test_timestamp_parser_preserves_nanosecond_and_rejects_extra_precision) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.539s
+
+OK
+pin_lifted_exit=0

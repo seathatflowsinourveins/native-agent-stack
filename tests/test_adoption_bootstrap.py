@@ -6,10 +6,14 @@ behavior are exercised via `bash -c`, using a stub HOME and no real download.
 """
 
 import json
+import os
 from pathlib import Path
+import platform
 import re
 import subprocess
+import sys
 import tempfile
+import shlex
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,10 +22,19 @@ SCRIPT_PATH = ROOT / "adoption/bootstrap-linux.sh"
 MANIFEST_PATH = ROOT / "adoption/manifest.json"
 WORKFLOW_PATH = ROOT / ".github/workflows/adoption-bootstrap.yml"
 PUBLISH_WORKFLOW_PATH = ROOT / ".github/workflows/publish-catalog.yml"
+
+# bootstrap-linux.sh refuses to run at all off Linux x86_64 (its own guard,
+# "This verified asset set targets x86_64 Linux, not Windows/Git Bash or ARM.");
+# tests that exercise behaviour past that guard only make sense on that platform.
+# adoption/bootstrap-macos.sh is the separate, already-covered macOS path.
+LINUX_X86_64_ONLY = unittest.skipUnless(
+    sys.platform.startswith("linux") and platform.machine() == "x86_64",
+    "bootstrap-linux.sh targets Linux x86_64 only",
+)
 GITHUB_AUTOMATION_DOC_PATH = ROOT / "docs/github-automation.md"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
-VALID_KINDS = {"tarball", "npm", "pip", "uv-tool"}
+VALID_KINDS = {"tarball", "npm", "pip", "uv-tool", "native"}
 
 
 def load_pins() -> dict:
@@ -124,6 +137,7 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("--profile", result.stderr)
 
+    @LINUX_X86_64_ONLY
     def test_unknown_profile_exits_nonzero(self):
         result = subprocess.run(
             ["bash", str(SCRIPT_PATH), "--profile", "not-a-real-profile", "--skip-system-packages"],
@@ -134,6 +148,7 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Unknown or empty profile", result.stderr)
 
+    @LINUX_X86_64_ONLY
     def test_null_hash_pin_is_refused_before_any_download(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -224,6 +239,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
             env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)},
         )
 
+    @LINUX_X86_64_ONLY
     def test_unpinned_component_exits_3_before_installing_anything(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -243,6 +259,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
                 "no tool files should have been installed before the refusal",
             )
 
+    @LINUX_X86_64_ONLY
     def test_allow_unpinned_covering_every_gap_proceeds_and_is_logged(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -261,6 +278,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
                 "no pin exists for any selected component, so nothing should install",
             )
 
+    @LINUX_X86_64_ONLY
     def test_partial_allow_unpinned_still_fails_closed_on_the_rest(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -282,6 +300,7 @@ class InstallRootCanonicalHomeTests(unittest.TestCase):
     ("$HOME/.", a symlink to HOME, "$HOME/../<home>") must be refused before
     bin/, tools/ or downloads/ are created in HOME (cross-family review P2)."""
 
+    @LINUX_X86_64_ONLY
     def test_install_root_that_resolves_to_home_is_refused(self):
         import os
         with tempfile.TemporaryDirectory() as tmp:
@@ -321,6 +340,7 @@ class SystemPackagesBeforePrerequisiteCheckTests(unittest.TestCase):
             "the apt-get install step must run before the curl/git/tar/jq presence check",
         )
 
+    @LINUX_X86_64_ONLY
     def test_skip_system_packages_with_missing_tool_lists_it_and_exits_4(self):
         # Exercise the real check logic (not just source order) by prepending a
         # stub PATH directory that shadows `jq` with nothing, so the presence
@@ -415,7 +435,10 @@ class AdoptionWorkflowPythonVersionTests(unittest.TestCase):
         # run. Assert a Python 3.13 setup step precedes the status step.
         text = WORKFLOW_PATH.read_text()
         setup_index = text.index("actions/setup-python@")
-        status_index = text.index("scripts/adoption_status.py")
+        # The literal invocation, not a bare path-filter list entry or a
+        # comment mentioning the script by name -- both of which can sit
+        # earlier in the file than the first job's own setup-python step.
+        status_index = text.index("python3 scripts/adoption_status.py")
         self.assertLess(setup_index, status_index)
         setup_step = text[setup_index:status_index]
         self.assertIn("python-version: '3.13'", setup_step)
@@ -440,6 +463,62 @@ class WorkflowReferenceTests(unittest.TestCase):
     def test_workflow_targets_foundation_cpu_profile(self):
         text = WORKFLOW_PATH.read_text()
         self.assertIn("foundation-cpu", text)
+
+
+class InstallNativeLauncherTests(unittest.TestCase):
+    """Runs each script's own install_native with a stub fetch and a stub native
+    installer that, like `claude install`, links ~/.local/bin/claude into
+    ~/.local/share/claude/versions."""
+
+    STUB_INSTALLER = (
+        "#!/usr/bin/env bash\n"
+        "mkdir -p \"$HOME/.local/share/claude/versions\" \"$HOME/.local/bin\"\n"
+        "printf 'REAL-BINARY\\n' > \"$HOME/.local/share/claude/versions/$2\"\n"
+        "ln -sfn \"$HOME/.local/share/claude/versions/$2\" \"$HOME/.local/bin/claude\"\n"
+    )
+
+    def run_install_native(self, script: Path, home: Path, bin_dir: Path):
+        text = script.read_text()
+        match = re.search(r"(?ms)^install_native\(\) \{.*?^\}$", text)
+        self.assertIsNotNone(match, f"install_native not found in {script}")
+        stub = home / "stub-installer"
+        stub.write_text(self.STUB_INSTALLER)
+        harness = (
+            f"set -euo pipefail\ncache_dir={shlex.quote(str(home / 'cache'))}\n"
+            f"bin_dir={shlex.quote(str(bin_dir))}\nmkdir -p \"$cache_dir\" \"$bin_dir\"\n"
+            f"fetch() {{ cp {shlex.quote(str(stub))} \"$3\"; }}\n"
+            + match.group(0)
+            + "\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 claude\n"
+        )
+        env = dict(os.environ, HOME=str(home))
+        return subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
+
+    def test_launcher_goes_to_bin_dir_and_leaves_the_native_binary_intact(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                bin_dir = home / "eco" / "bin"
+                bin_dir.mkdir(parents=True)
+                # A stale symlink at the launcher path must be replaced, not written through.
+                (home / ".local/share/claude/versions").mkdir(parents=True)
+                (home / ".local/share/claude/versions/old").write_text("OLD-BINARY\n")
+                (bin_dir / "claude").symlink_to(home / ".local/share/claude/versions/old")
+                result = self.run_install_native(script, home, bin_dir)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                launcher = bin_dir / "claude"
+                self.assertFalse(launcher.is_symlink())
+                self.assertIn('exec "$HOME/.local/bin/claude"', launcher.read_text())
+                self.assertEqual((home / ".local/share/claude/versions/old").read_text(), "OLD-BINARY\n")
+                self.assertEqual((home / ".local/bin/claude").read_text(), "REAL-BINARY\n")
+
+    def test_no_launcher_when_bin_dir_is_the_native_bin_dir(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                result = self.run_install_native(script, home, home / ".local" / "bin")
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertTrue((home / ".local/bin/claude").is_symlink())
+                self.assertEqual((home / ".local/bin/claude").read_text(), "REAL-BINARY\n")
 
 
 if __name__ == "__main__":

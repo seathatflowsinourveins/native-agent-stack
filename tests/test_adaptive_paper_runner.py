@@ -44,6 +44,23 @@ import safety as safety_module
 from runner import credentials, validate_preflight as validate_preflight_always
 from safety import SafetyError as SafetyErrorAlways
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    extra = (native_strategy_module,) if NATIVE else ()
+    _HERMETIC_TOKEN = patch_default_stop(*extra)
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class IntegratedRunner(unittest.TestCase):
@@ -111,6 +128,60 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(len(ledger.unresolved()), 0)
             self.assertEqual(port.started, 1)
             self.assertEqual(port.stopped, 1)
+            ledger.close()
+
+    def test_run_output_records_dropped_quote_counts_from_the_transport(self):
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            port.health.update(dropped_quotes={"crossed": 2, "one_sided": 1}, dropped_quotes_by_symbol={"SPY": 3})
+            controller.port = port
+            result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                            "fixture", config, "100000"))
+            self.assertEqual(result["dropped_quotes"], {"by_reason": {"crossed": 2, "one_sided": 1},
+                                                        "by_symbol": {"SPY": 3}})
+            ledger.close()
+
+    def test_gap_arising_during_the_periodic_snapshot_stops_instead_of_thawing(self):
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=3, cleanup_seconds=2, order_timeout_seconds=1)
+
+        class GapDuringSnapshot(SimulatedPort):
+            marks = snapshots = 0
+
+            async def snapshot(self):
+                snap = await super().snapshot()
+                GapDuringSnapshot.snapshots += 1
+                if GapDuringSnapshot.snapshots == 2:  # the first periodic one; the first is the startup snapshot
+                    self.health["reasons"] = ["orders_disconnected"]  # arrives while the snapshot awaits
+                return snap
+
+            def mark_reconciled(self):
+                GapDuringSnapshot.marks += 1
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = GapDuringSnapshot(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            port.health.update(fresh_quotes=True, reasons=[])
+            controller.port = port
+            with patch.object(runner_module, "RECONCILE_EVERY_SECONDS", 0.2):
+                asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                       "fixture", config, "100000"))
+            self.assertGreaterEqual(GapDuringSnapshot.snapshots, 2)  # the periodic branch ran
+            self.assertEqual(GapDuringSnapshot.marks, 0)
+            self.assertTrue(controller.stop)
             ledger.close()
 
     def test_default_policy_run_native_never_calls_session_at_and_survives_2028(self):
@@ -2025,6 +2096,55 @@ class LeverageMarginEntitlementTests(unittest.TestCase):
             runner_module._check_margin_entitlement(
                 self.account(pattern_day_trader=True, equity="10000"), self.config(),
                 self.leverage_policy("4"), {"overnight_holds": False})
+
+    def current_schema_account(self, **overrides):
+        # Alpaca's GetAccount schema after FINRA's intraday margin rule: no
+        # daytrading_buying_power, pattern_day_trader or daytrade_count.
+        account = {"multiplier": "4", "buying_power": "40000", "regt_buying_power": "20000", "equity": "10000",
+                   "maintenance_margin": "0"}
+        account.update(overrides)
+        return account
+
+    def test_current_alpaca_schema_uses_buying_power(self):
+        mult = runner_module._check_margin_entitlement(self.current_schema_account(), self.config(),
+                                                        self.leverage_policy("4"), {"overnight_holds": False})
+        self.assertEqual(mult, Decimal("4"))
+        self.assertEqual(runner_module.intraday_buying_power(self.current_schema_account()), ("40000", "buying_power"))
+        self.assertEqual(runner_module.intraday_buying_power(self.account()), ("40000", "daytrading_buying_power"))
+
+    def test_current_alpaca_schema_insufficient_buying_power_refused(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(self.current_schema_account(buying_power="100"), self.config(),
+                                                     self.leverage_policy("4"), {"overnight_holds": False})
+
+    def test_buying_power_is_bounded_by_current_equity(self):
+        # A stale or prior-close buying_power can never admit more than current equity supports.
+        account = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="5000")
+        self.assertEqual(runner_module.intraday_buying_power(account),
+                         ("20000", "multiplier*(equity-maintenance_margin)"))
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+        consistent = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="0")
+        self.assertEqual(runner_module.intraday_buying_power(consistent), ("40000", "buying_power"))
+
+    def test_bound_is_required_and_applies_to_the_legacy_field_too(self):
+        no_margin = self.current_schema_account()
+        del no_margin["maintenance_margin"]
+        self.assertIsNone(runner_module.intraday_buying_power(no_margin))
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_margin_fields_missing"):
+            runner_module._check_margin_entitlement(no_margin, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+        stale_legacy = self.account(daytrading_buying_power="80000", equity="10000")
+        self.assertEqual(runner_module.intraday_buying_power(stale_legacy),
+                         ("40000", "multiplier*(equity-maintenance_margin)"))
+
+    def test_no_intraday_buying_power_field_is_missing(self):
+        account = self.current_schema_account()
+        del account["buying_power"]
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_margin_fields_missing"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
 
     def test_sufficient_account_returns_multiplier(self):
         mult = runner_module._check_margin_entitlement(self.account(), self.config(),

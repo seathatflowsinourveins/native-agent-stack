@@ -1,0 +1,124 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/6-sdk-0155-requalification",
+  "gap_index": 6,
+  "gap_text_sha256": "cee1cbb739311f874ae53c7d9dd2c958c23f64ac91c911915b43c51e70104640",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "openai-codex 0.155.1 installs in a fresh prefix and native_worker.py runs against native codex-cli 0.155.1 with matching versions.",
+    "criteria": [
+      "fresh venv install of openai-codex==0.155.1 recorded",
+      "inspect + run receipts record SDK 0.155.1 and native 0.155.1",
+      "settled if a completed run receipt with matching versions exists"
+    ],
+    "fix_round": {
+      "written_at": "2026-09-23T04:22:00Z",
+      "label": "fix-round preregistration, written after the Codex cross-family review (review findings 3-6); not back-dated",
+      "expectation": "A second fresh prefix installs openai-codex==0.155.1 with its log retained; native_worker.py inspect against native 0.155.1 completes with no model call.",
+      "criteria": [
+        "retained install log lists openai-codex 0.155.1 and openai-codex-cli-bin 0.155.1",
+        "inspect receipt status discovery_complete with sdk_version 0.155.1",
+        "settled if both hold alongside the already-retained completed turn receipts"
+      ]
+    },
+    "fix_round_2": {
+      "written_at": "2026-09-23T04:38:21Z",
+      "label": "fix-round-2 preregistration, written after the independent Opus review and before the two new worker turns; not back-dated",
+      "note": "runs_with_matching_versions cites worker-tool-t2.json instead of the stale-revision worker-resume-t2.json"
+    }
+  },
+  "commands": [
+    "$HOME/codex-ecosystem/bin/ecosystem-bounded-run bash -c \"uv venv --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551 && UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/uv-cache uv pip install --python $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python --default-index https://pypi.org/simple 'openai-codex==0.155.1'\"",
+    "$HOME/codex-ecosystem/bin/ecosystem-bounded-run bash -c \"uv venv --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b && UV_CACHE_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/uv-cache uv pip install --python $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b/bin/python --default-index https://pypi.org/simple 'openai-codex==0.155.1'\"  # fix round, log retained",
+    "uv pip freeze --python $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551{,-b}/bin/python; codex --version",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 120 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551-b/bin/python blueprints/us-equities/workers/native_worker.py inspect --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-inspect-fresh.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1-root.json --turn-deadline-seconds 300 --context-mode-start $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/run_worker_tool.py $HOME/.cache/gap-wave2-20260923/agent-sdks $HOME/.cache/gap-wave2-20260923/agent-sdks/runs"
+  ],
+  "results": {
+    "fresh_prefix_install_log_excerpt": [
+      "# 2026-09-23T04:22:45Z fresh prefix 2 (uv cache reused; the first prefix downloaded openai-codex-cli-bin 123.9 MiB, output not retained)",
+      " + openai-codex==0.155.1",
+      " + openai-codex-cli-bin==0.155.1",
+      "# install exit 0",
+      "openai-codex==0.155.1",
+      "openai-codex-cli-bin==0.155.1",
+      "openai-codex==0.155.1",
+      "openai-codex-cli-bin==0.155.1",
+      "codex-cli 0.155.1"
+    ],
+    "fresh_prefix_inspect": {
+      "status": "discovery_complete",
+      "sdk_version": "0.155.1",
+      "model_inference_submitted": false
+    },
+    "runs_with_matching_versions": {
+      "c4-t1-root.json": {
+        "sdk_version": "0.155.1",
+        "native_runtime": {
+          "server_info": {
+            "name": "codex_python_sdk",
+            "version": "0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+          },
+          "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+        },
+        "status": "completed"
+      },
+      "c4-t3.json": {
+        "sdk_version": "0.155.1",
+        "native_runtime": {
+          "server_info": {
+            "name": "codex_python_sdk",
+            "version": "0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+          },
+          "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+        },
+        "status": "completed"
+      },
+      "worker-tool-t2.json": {
+        "sdk_version": "0.155.1",
+        "native_runtime": {
+          "server_info": null,
+          "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+        },
+        "status": "completed"
+      }
+    },
+    "native_binary": "--codex-bin $HOME/.local/share/codex-ecosystem/bin/codex -> tools/codex-package-0.155.1/bin/codex (ELF), codex-cli 0.155.1",
+    "receipt_json_update": "blueprints/us-equities/workers/receipt.json gains version_requalification_20260923 (historical 0.154.0 fields unchanged)"
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/c4-t1-root.json",
+      "sha256": "8e307a51dd64f176ac320c67d8dfd3bb66fcb3ad35e38f8dfd312f519c6ebaa0"
+    },
+    {
+      "path": "raw/c4-t3.json",
+      "sha256": "49dc7513e5025475e2fc790a6de22bcecd534fce0e0ab55e05848ef4cc9857a5"
+    },
+    {
+      "path": "raw/worker-tool-t2.json",
+      "sha256": "32032cf7dce311d0cdd454878e940005cb266cd176f4b045c9671d3530df1663"
+    },
+    {
+      "path": "raw/c4-inspect.json",
+      "sha256": "34dd13430e3c2d0d5860bec7a423d95765521df62e83947c3129a42c5dc1db8f"
+    },
+    {
+      "path": "raw/sdk-0155-fresh-prefix.log",
+      "sha256": "9b628bb65c33640b7925ae2d0e6f3842f666ce81dbfccbe41d600c6c7d0fb2b0"
+    },
+    {
+      "path": "raw/c4-inspect-fresh.json",
+      "sha256": "1dc34e2c86faf5e1187a20df9a31809be0230cbf80a62b20cc24f1ef602f6b4e"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "note": "Fix round 2: worker-tool-t2.json (committed native_worker.py) replaces worker-resume-t2.json, which came from an uncommitted intermediate revision.",
+  "rechecked_at": "2026-09-23T04:38:53Z",
+  "limits": [
+    "The adoption lock and requirements.txt still pin openai-codex 0.154.0; changing pins is the stale-pin upgrade covered by evidence/artifacts/sota-refresh-20260923/ (#87).",
+    "Fresh prefix = new venv on the same WSL host, not a second machine. The first prefix's install output (which downloaded openai-codex-cli-bin, 123.9 MiB as printed by uv) was not retained; the fix-round second prefix reused the uv cache, and both freezes are identical."
+  ],
+  "checked_at": "2026-09-23T04:23:16Z"
+}

@@ -1,0 +1,169 @@
+{
+  "mode": "privacy",
+  "run": "8ef62a7d",
+  "started_at": "2026-09-23T03:30:53Z",
+  "otlp_post_status": {
+    "logs": 200,
+    "metrics": 200
+  },
+  "arrival": {
+    "prom": true,
+    "loki_otlp": true,
+    "loki_sdk": true
+  },
+  "negative_fields": [
+    "logs.attr.api_key",
+    "logs.attr.error.message",
+    "logs.attr.prompt",
+    "logs.attr.tool_input",
+    "logs.attr.user.account_uuid",
+    "logs.attr.user.email",
+    "logs.body",
+    "logs.event_name",
+    "logs.resource.host.name",
+    "logs.resource.process.command_line",
+    "logs.resource.schema_url",
+    "logs.resource.user.email",
+    "logs.scope.attr",
+    "logs.scope.name",
+    "logs.scope.schema_url",
+    "logs.scope.version",
+    "logs.severity_text",
+    "metrics.attr.prompt",
+    "metrics.attr.session.id",
+    "metrics.attr.user.account_uuid",
+    "metrics.attr.user.email",
+    "metrics.description",
+    "metrics.exemplar.attr",
+    "metrics.metadata",
+    "metrics.resource.host.name",
+    "metrics.resource.organization.id",
+    "metrics.resource.schema_url",
+    "metrics.resource.user.email",
+    "metrics.scope.attr",
+    "metrics.scope.name",
+    "metrics.scope.schema_url",
+    "metrics.scope.version",
+    "sdk.cwd",
+    "sdk.error",
+    "sdk.final_response",
+    "sdk.items.text",
+    "sdk.prompt"
+  ],
+  "negative_count": 37,
+  "backends_searched": {
+    "collector_prometheus_exporter": {
+      "bytes": 509
+    },
+    "prometheus_federate": {
+      "bytes": 1023
+    },
+    "prometheus_metadata": {
+      "bytes": 202
+    },
+    "loki_query_range": {
+      "bytes": 4399
+    },
+    "loki_labels_and_values": {
+      "bytes": 123
+    },
+    "collector_file_events": {
+      "bytes": 1503
+    }
+  },
+  "leaks": [],
+  "leak_count": 0,
+  "positive_controls_found_in": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ]
+  },
+  "canaries": {
+    "logs.resource.user.email": "CNRYa1419aaaf66cd298",
+    "logs.resource.host.name": "CNRYee15641e4f3aa3cc",
+    "logs.resource.process.command_line": "CNRY24051002b1bab76c",
+    "logs.resource.ecosystem.task.id(allowlisted)": "CNRYbd404a1a9077fbc3",
+    "logs.attr.prompt": "CNRYc2dd0c71cca5258f",
+    "logs.attr.tool_input": "CNRY2c402eacfdd07f8a",
+    "logs.attr.user.account_uuid": "CNRY5ee766ce849ef759",
+    "logs.attr.api_key": "<withheld synthetic canary: see README publication redaction>",
+    "logs.attr.user.email": "CNRY5cd1b8eefcf0239a",
+    "logs.attr.error.message": "CNRY2a2c14a7070a6911",
+    "logs.attr.tool_name(allowlisted)": "CNRY730a057c232f7dac",
+    "logs.resource.schema_url": "CNRYed848b6dbdb304e3",
+    "logs.scope.name": "CNRY7cef4f9606d06be5",
+    "logs.scope.version": "CNRY5a63b5bc7f7dfcf7",
+    "logs.scope.attr": "CNRY448da02d1a3e48cc",
+    "logs.scope.schema_url": "CNRY32c2131210d5008f",
+    "logs.severity_text": "CNRYfb15a2f6095c83b3",
+    "logs.event_name": "CNRY90223d76044d449c",
+    "logs.body": "CNRYa65286c93773a5bf",
+    "metrics.name(boundary)": "CNRY345100d8991f3b8a",
+    "metrics.resource.user.email": "CNRY4a082dcad3f41466",
+    "metrics.resource.host.name": "CNRY24e351fd3587ecef",
+    "metrics.resource.organization.id": "CNRY69d9219b32ecf75f",
+    "metrics.attr.user.email": "CNRY237cc3131f500e59",
+    "metrics.attr.session.id": "CNRY3e463a6484dabf1a",
+    "metrics.attr.prompt": "CNRY62b7cd0911fad8b0",
+    "metrics.attr.user.account_uuid": "CNRY9f3dcbe7ba89968f",
+    "metrics.attr.model(allowlisted)": "CNRYb054670933b27d05",
+    "metrics.resource.schema_url": "CNRY119bb11648066869",
+    "metrics.scope.name": "CNRY8cd92f05dc230e58",
+    "metrics.scope.version": "CNRY837241e8b8928815",
+    "metrics.scope.attr": "CNRY79a3ce2709c97bca",
+    "metrics.scope.schema_url": "CNRYd577d2ce44c83999",
+    "metrics.description": "CNRY997b5f11d8cd438d",
+    "metrics.metadata": "CNRY193e1581fd63fe6b",
+    "metrics.exemplar.attr": "CNRY93d646eb559567e6",
+    "sdk.configured_model(allowlisted-as-model)": "CNRY2e75a47feb2e199b",
+    "sdk.final_response": "CNRYe80cd797675efd8a",
+    "sdk.items.text": "CNRY7d4cc04ae8f67a78",
+    "sdk.error": "CNRY3b747e7b232c9e39",
+    "sdk.prompt": "CNRY9bc14d0720949059",
+    "sdk.cwd": "CNRYdebdae04cc326fb9"
+  },
+  "positive_control_expected_backends": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ]
+  },
+  "positive_control_missing": {},
+  "status": "passed",
+  "stopped_at": "2026-09-23T03:31:33Z"
+}

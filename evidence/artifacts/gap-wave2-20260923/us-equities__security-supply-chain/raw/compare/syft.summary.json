@@ -1,0 +1,131 @@
+{
+ "source_file": {
+  "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/compare/syft.json",
+  "bytes": 2334868,
+  "sha256": "9e647b38a0b6b38ed784771289600306c436feef50c1c35c3ea0147aed620b44",
+  "committed": false
+ },
+ "syft_version": "1.52.0",
+ "source_name": "$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/lib/python3.12/site-packages",
+ "packages": 21,
+ "by_type": {
+  "python": 21
+ },
+ "by_cataloger": {
+  "python-installed-package-cataloger": 21
+ },
+ "executable_files": 74,
+ "executable_formats": {
+  "elf": 74
+ },
+ "so_files_with_elf_metadata": 74,
+ "so_files_related_to_a_package": 74,
+ "binary_identified_packages": [],
+ "package_list": [
+  [
+   "python",
+   "alpaca-py",
+   "0.44.0"
+  ],
+  [
+   "python",
+   "annotated-types",
+   "0.8.0"
+  ],
+  [
+   "python",
+   "certifi",
+   "2026.7.22"
+  ],
+  [
+   "python",
+   "charset-normalizer",
+   "3.5.1"
+  ],
+  [
+   "python",
+   "duckdb",
+   "1.5.5"
+  ],
+  [
+   "python",
+   "idna",
+   "3.20"
+  ],
+  [
+   "python",
+   "msgpack",
+   "1.2.2"
+  ],
+  [
+   "python",
+   "nautilus-trader",
+   "2.0.0rc5"
+  ],
+  [
+   "python",
+   "numpy",
+   "2.5.3"
+  ],
+  [
+   "python",
+   "pandas",
+   "3.0.6"
+  ],
+  [
+   "python",
+   "pydantic",
+   "2.13.5"
+  ],
+  [
+   "python",
+   "pydantic-core",
+   "2.46.5"
+  ],
+  [
+   "python",
+   "python-dateutil",
+   "2.9.0.post0"
+  ],
+  [
+   "python",
+   "pytz",
+   "2026.3.post1"
+  ],
+  [
+   "python",
+   "requests",
+   "2.34.2"
+  ],
+  [
+   "python",
+   "six",
+   "1.17.0"
+  ],
+  [
+   "python",
+   "sseclient-py",
+   "1.9.0"
+  ],
+  [
+   "python",
+   "typing-extensions",
+   "4.16.0"
+  ],
+  [
+   "python",
+   "typing-inspection",
+   "0.4.4"
+  ],
+  [
+   "python",
+   "urllib3",
+   "2.8.0"
+  ],
+  [
+   "python",
+   "websockets",
+   "17.1"
+  ]
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-stefan-jansen-machine-learning-for-trading",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/stefan-jansen/machine-learning-for-trading",
+ "reviewed_commit": "2d6e8f95eeccaee66906245606471f570b5807e5",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of the repository stefan-jansen/machine-learning-for-trading at commit 2d6e8f95eeccaee66906245606471f570b5807e5 (license MIT), read from README.md at that revision. Repository description: \"Code for Machine Learning for Trading, 3rd edition \\u2014 from data sourcing to live execution.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2d6e8f95eeccaee66906245606471f570b5807e5",
+   "text": "Build, test, and deploy ML-driven trading strategies \u2014 from data sourcing to live execution."
+  },
+  {
+   "source": "README.md@2d6e8f95eeccaee66906245606471f570b5807e5",
+   "text": "This repository hosts the code for Machine Learning for Trading, 3rd Edition by Stefan Jansen \u2014 a ground-up rebuild, organized around one end-to-end workflow: how you define a research idea and develop it iteratively into a strategy you can actually run, and keep running, in a live market."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/stefan-jansen/machine-learning-for-trading/tree/2d6e8f95eeccaee66906245606471f570b5807e5",
+  "https://github.com/stefan-jansen/machine-learning-for-trading/blob/2d6e8f95eeccaee66906245606471f570b5807e5/README.md"
+ ]
+}

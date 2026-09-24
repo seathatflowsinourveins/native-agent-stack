@@ -1,0 +1,9 @@
+{
+  "model_inference_submitted": false,
+  "startup_status": [],
+  "global_methods": [
+    "remoteControl/status/changed",
+    "thread/started"
+  ],
+  "mcp_status_after_thread_start": []
+}

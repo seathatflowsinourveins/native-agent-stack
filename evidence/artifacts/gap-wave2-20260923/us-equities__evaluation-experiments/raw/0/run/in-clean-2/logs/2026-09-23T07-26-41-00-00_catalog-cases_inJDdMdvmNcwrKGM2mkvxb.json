@@ -1,0 +1,4075 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "ZNsgG9jok2WZ27C7nRZwPf",
+    "run_id": "eaAjRextWHN3V4YDTQoon9",
+    "created": "2026-09-23T07:26:41+00:00",
+    "task": "catalog_cases",
+    "task_id": "inJDdMdvmNcwrKGM2mkvxb",
+    "task_version": 0,
+    "task_file": "catalog_task.py",
+    "task_display_name": "catalog_cases",
+    "task_registry_name": "catalog_cases",
+    "task_attribs": {},
+    "task_args": {
+      "delay": 0.0,
+      "fail_once_case": "",
+      "marker_dir": ""
+    },
+    "task_args_passed": {},
+    "dataset": {
+      "samples": 8,
+      "sample_ids": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "shuffled": false
+    },
+    "model": "mockllm/model",
+    "model_generate_config": {},
+    "model_args": {
+      "custom_outputs": null
+    },
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "retry_on_error": 1,
+      "score_on_error": false,
+      "max_samples": 1,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "revision": {
+      "type": "git",
+      "origin": "https://github.com/seathatflowsinourveins/native-agent-stack.git",
+      "commit": "11d1e6c",
+      "dirty": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.266"
+    },
+    "scorers": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "fault_and_delay",
+        "params": {
+          "delay": 0.0,
+          "fail_once_case": "",
+          "marker_dir": ""
+        },
+        "params_passed": {
+          "delay": 0.0,
+          "fail_once_case": "",
+          "marker_dir": ""
+        }
+      },
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_connections": 1
+    }
+  },
+  "results": {
+    "total_samples": 8,
+    "completed_samples": 8,
+    "scores": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "scorer": "promptfoo_equivalent_assertions",
+        "scored_samples": 8,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "accuracy": {
+            "name": "accuracy",
+            "value": 0.375,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "promptfoo_equivalent_assertions",
+      "score": "promptfoo_equivalent_assertions",
+      "metric": "accuracy"
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-23T07:26:41+00:00",
+    "completed_at": "2026-09-23T07:26:42+00:00",
+    "model_usage": {
+      "mockllm/model": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "C1",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "BJt6RMu2gXnGP9Cz5KR9Wy",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "fZZ2Sqhm99CDZY7RzQpDvc",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "fZZ2Sqhm99CDZY7RzQpDvc",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.022878228999616113
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+          "expected": "supported"
+        },
+        "description": "C1 manual-hook-supported"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "dfZ7Gp6mGGp5dtnyF8bLDp",
+          "span_id": "kK8cUXKnEPcHK8T65oRVFi",
+          "timestamp": "2026-09-23T07:26:41.725274+00:00",
+          "working_start": 59329.085899245,
+          "event": "span_begin",
+          "id": "kK8cUXKnEPcHK8T65oRVFi",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "LwwxzgqRCQCFJMQTq66AWZ",
+          "span_id": "kK8cUXKnEPcHK8T65oRVFi",
+          "timestamp": "2026-09-23T07:26:41.725798+00:00",
+          "working_start": 59329.086422948,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "target": "supported",
+            "id": "C1",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "BJt6RMu2gXnGP9Cz5KR9Wy",
+                "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          }
+        },
+        {
+          "uuid": "23e7noSuKQoT2sVykQjW95",
+          "span_id": "kK8cUXKnEPcHK8T65oRVFi",
+          "timestamp": "2026-09-23T07:26:41.726177+00:00",
+          "working_start": 59329.08680275,
+          "event": "span_end",
+          "id": "kK8cUXKnEPcHK8T65oRVFi"
+        },
+        {
+          "uuid": "EJoYBo4pvvDT99X5rbciqU",
+          "span_id": "WfeFCAyo3tSGdkJ8eZMffU",
+          "timestamp": "2026-09-23T07:26:41.727224+00:00",
+          "working_start": 0.0009157060048892163,
+          "event": "span_begin",
+          "id": "WfeFCAyo3tSGdkJ8eZMffU",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "N2GGcH9mBawkG6vLkPHvno",
+          "span_id": "8bLuU52U99CpoPHTFEcDT2",
+          "timestamp": "2026-09-23T07:26:41.727546+00:00",
+          "working_start": 0.0012379070030874573,
+          "event": "span_begin",
+          "id": "8bLuU52U99CpoPHTFEcDT2",
+          "parent_id": "WfeFCAyo3tSGdkJ8eZMffU",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "3hANGFMFEQuF3uVgLyMU5i",
+          "span_id": "8bLuU52U99CpoPHTFEcDT2",
+          "timestamp": "2026-09-23T07:26:41.727828+00:00",
+          "working_start": 0.0015196090025710873,
+          "event": "span_end",
+          "id": "8bLuU52U99CpoPHTFEcDT2"
+        },
+        {
+          "uuid": "6qDJoJs6DBzMoPBu9CSdDd",
+          "span_id": "ZemHipLkjvwiXzj97VwtDq",
+          "timestamp": "2026-09-23T07:26:41.727932+00:00",
+          "working_start": 0.001622809999389574,
+          "event": "span_begin",
+          "id": "ZemHipLkjvwiXzj97VwtDq",
+          "parent_id": "WfeFCAyo3tSGdkJ8eZMffU",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "gskj6kdGBVZuHucBXSKaHb",
+          "span_id": "ZemHipLkjvwiXzj97VwtDq",
+          "timestamp": "2026-09-23T07:26:41.728123+00:00",
+          "working_start": 0.0018149110037484206,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "fZZ2Sqhm99CDZY7RzQpDvc",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.022878228999616113
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:41.825493+00:00",
+          "working_time": 0.022878228999616113
+        },
+        {
+          "uuid": "c6Ym3vnmQHzHG6iyxsANFx",
+          "span_id": "ZemHipLkjvwiXzj97VwtDq",
+          "timestamp": "2026-09-23T07:26:41.826122+00:00",
+          "working_start": 0.025544644995534327,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.022878228999616113
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "fZZ2Sqhm99CDZY7RzQpDvc",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "fZZ2Sqhm99CDZY7RzQpDvc",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "a3mrwyzPursnuEXUon4K6r",
+          "span_id": "ZemHipLkjvwiXzj97VwtDq",
+          "timestamp": "2026-09-23T07:26:41.826379+00:00",
+          "working_start": 0.025801245996262878,
+          "event": "span_end",
+          "id": "ZemHipLkjvwiXzj97VwtDq"
+        },
+        {
+          "uuid": "EKrLfsYogo5cTLZ4DzDuXS",
+          "span_id": "WfeFCAyo3tSGdkJ8eZMffU",
+          "timestamp": "2026-09-23T07:26:41.826491+00:00",
+          "working_start": 0.025912746998074,
+          "event": "span_end",
+          "id": "WfeFCAyo3tSGdkJ8eZMffU"
+        },
+        {
+          "uuid": "KsXFxhHW7rAHbBAbhKZiKd",
+          "span_id": "VAKehC9FjicpANU2BvKNS5",
+          "timestamp": "2026-09-23T07:26:41.826829+00:00",
+          "working_start": 0.026251148992741946,
+          "event": "span_begin",
+          "id": "VAKehC9FjicpANU2BvKNS5",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "mUDUDFZFQ7F9ZTPtC88U3o",
+          "span_id": "WhWzLwm8iwQWsEaAVtZgQJ",
+          "timestamp": "2026-09-23T07:26:41.826945+00:00",
+          "working_start": 0.026366948994109407,
+          "event": "span_begin",
+          "id": "WhWzLwm8iwQWsEaAVtZgQJ",
+          "parent_id": "VAKehC9FjicpANU2BvKNS5",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "9ANF3Vp9cgX2pce9G338w3",
+          "span_id": "WhWzLwm8iwQWsEaAVtZgQJ",
+          "timestamp": "2026-09-23T07:26:41.851926+00:00",
+          "working_start": 0.051352289992792066,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "jt2s7V9WaRZFSvgSDn5aqS",
+          "span_id": "WhWzLwm8iwQWsEaAVtZgQJ",
+          "timestamp": "2026-09-23T07:26:41.852356+00:00",
+          "working_start": 0.05177869299950544,
+          "event": "span_end",
+          "id": "WhWzLwm8iwQWsEaAVtZgQJ"
+        },
+        {
+          "uuid": "NDevxFLLkHAHBnH9N6e7aQ",
+          "span_id": "VAKehC9FjicpANU2BvKNS5",
+          "timestamp": "2026-09-23T07:26:41.852477+00:00",
+          "working_start": 0.05189879299723543,
+          "event": "span_end",
+          "id": "VAKehC9FjicpANU2BvKNS5"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:41.726311+00:00",
+      "completed_at": "2026-09-23T07:26:41.852756+00:00",
+      "total_time": 0.126,
+      "working_time": 0.052,
+      "uuid": "BPRXzs6aZCTMa4a9GR7AhE",
+      "error_retries": [],
+      "attachments": {
+        "c48837c6b5cd04d96e990059063801b9": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "BJt6RMu2gXnGP9Cz5KR9Wy",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "BJt6RMu2gXnGP9Cz5KR9Wy",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C2",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "7PY5ZUaQqfsqBnyDpkwsir",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "N9ycmXat32kva9i6VgSRzQ",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "N9ycmXat32kva9i6VgSRzQ",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.024161036002624314
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Automatic compaction preserves every fact.",
+          "expected": "insufficient"
+        },
+        "description": "C2 untested-not-failed"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "SWya7CXdHpuH2syRswNTAR",
+          "span_id": "mwG3BorpAAS8SwHejRgAYw",
+          "timestamp": "2026-09-23T07:26:41.854382+00:00",
+          "working_start": 59329.215005973,
+          "event": "span_begin",
+          "id": "mwG3BorpAAS8SwHejRgAYw",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "M2LrX7oJgnvDjwyXBe3YpT",
+          "span_id": "mwG3BorpAAS8SwHejRgAYw",
+          "timestamp": "2026-09-23T07:26:41.854646+00:00",
+          "working_start": 59329.215270674,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "target": "insufficient",
+            "id": "C2",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "7PY5ZUaQqfsqBnyDpkwsir",
+                "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          }
+        },
+        {
+          "uuid": "E79N9k8qDhwmxVaiSFhniK",
+          "span_id": "mwG3BorpAAS8SwHejRgAYw",
+          "timestamp": "2026-09-23T07:26:41.854820+00:00",
+          "working_start": 59329.215444375,
+          "event": "span_end",
+          "id": "mwG3BorpAAS8SwHejRgAYw"
+        },
+        {
+          "uuid": "gZfWkzPN6x8BFTGQb7HMv3",
+          "span_id": "TqgkeNPHHdmtsR8qbwzjx7",
+          "timestamp": "2026-09-23T07:26:41.855096+00:00",
+          "working_start": 0.00020410100114531815,
+          "event": "span_begin",
+          "id": "TqgkeNPHHdmtsR8qbwzjx7",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "hsSNFJHZUA7R4XThvUcM5c",
+          "span_id": "fCUaRhaJ2HctFHiLvyBAPV",
+          "timestamp": "2026-09-23T07:26:41.855185+00:00",
+          "working_start": 0.0002932009956566617,
+          "event": "span_begin",
+          "id": "fCUaRhaJ2HctFHiLvyBAPV",
+          "parent_id": "TqgkeNPHHdmtsR8qbwzjx7",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "JfH8zAJjACamX6jqHBGSbk",
+          "span_id": "fCUaRhaJ2HctFHiLvyBAPV",
+          "timestamp": "2026-09-23T07:26:41.855316+00:00",
+          "working_start": 0.0004240019989083521,
+          "event": "span_end",
+          "id": "fCUaRhaJ2HctFHiLvyBAPV"
+        },
+        {
+          "uuid": "HYh9oV8ZrNZ4D9K5UMhxRL",
+          "span_id": "Xpf35Ea4bkVdfBF4HjrCpS",
+          "timestamp": "2026-09-23T07:26:41.855400+00:00",
+          "working_start": 0.000508202996570617,
+          "event": "span_begin",
+          "id": "Xpf35Ea4bkVdfBF4HjrCpS",
+          "parent_id": "TqgkeNPHHdmtsR8qbwzjx7",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "EA6q5SQQUctQzxSCAB7ATa",
+          "span_id": "Xpf35Ea4bkVdfBF4HjrCpS",
+          "timestamp": "2026-09-23T07:26:41.855661+00:00",
+          "working_start": 0.0007715039973845705,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "N9ycmXat32kva9i6VgSRzQ",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.024161036002624314
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:41.881351+00:00",
+          "working_time": 0.024161036002624314
+        },
+        {
+          "uuid": "Tqz7EuFktMgmo7669jZyxM",
+          "span_id": "Xpf35Ea4bkVdfBF4HjrCpS",
+          "timestamp": "2026-09-23T07:26:41.881709+00:00",
+          "working_start": 0.025463141995714977,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.024161036002624314
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "N9ycmXat32kva9i6VgSRzQ",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "N9ycmXat32kva9i6VgSRzQ",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "Vqjzai2WZbWf2cGjDh5gqB",
+          "span_id": "Xpf35Ea4bkVdfBF4HjrCpS",
+          "timestamp": "2026-09-23T07:26:41.881836+00:00",
+          "working_start": 0.02558924299228238,
+          "event": "span_end",
+          "id": "Xpf35Ea4bkVdfBF4HjrCpS"
+        },
+        {
+          "uuid": "ULQ6gUFFTyoGvzHVUwPmrq",
+          "span_id": "TqgkeNPHHdmtsR8qbwzjx7",
+          "timestamp": "2026-09-23T07:26:41.881942+00:00",
+          "working_start": 0.02569544299331028,
+          "event": "span_end",
+          "id": "TqgkeNPHHdmtsR8qbwzjx7"
+        },
+        {
+          "uuid": "6i4vFksxPUVLZAn6iqiJH4",
+          "span_id": "8AVh2rJ5kffZhzKq2rUecm",
+          "timestamp": "2026-09-23T07:26:41.882266+00:00",
+          "working_start": 0.026019444994744845,
+          "event": "span_begin",
+          "id": "8AVh2rJ5kffZhzKq2rUecm",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "EtRU9jpp5FAoRqg9B2Yiqp",
+          "span_id": "PtvQ22yDyYw2wXsKAWKKUh",
+          "timestamp": "2026-09-23T07:26:41.882358+00:00",
+          "working_start": 0.026111645995115396,
+          "event": "span_begin",
+          "id": "PtvQ22yDyYw2wXsKAWKKUh",
+          "parent_id": "8AVh2rJ5kffZhzKq2rUecm",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "6JoEB5rxo2tUBA4uKFZc9p",
+          "span_id": "PtvQ22yDyYw2wXsKAWKKUh",
+          "timestamp": "2026-09-23T07:26:41.906321+00:00",
+          "working_start": 0.050079980996088125,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "XF6skXNtsGRotQHxuPgL6B",
+          "span_id": "PtvQ22yDyYw2wXsKAWKKUh",
+          "timestamp": "2026-09-23T07:26:41.906666+00:00",
+          "working_start": 0.0504203829987091,
+          "event": "span_end",
+          "id": "PtvQ22yDyYw2wXsKAWKKUh"
+        },
+        {
+          "uuid": "jUsMdzbLW4LuveGom7Qm6q",
+          "span_id": "8AVh2rJ5kffZhzKq2rUecm",
+          "timestamp": "2026-09-23T07:26:41.906782+00:00",
+          "working_start": 0.05053538399806712,
+          "event": "span_end",
+          "id": "8AVh2rJ5kffZhzKq2rUecm"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:41.854894+00:00",
+      "completed_at": "2026-09-23T07:26:41.907030+00:00",
+      "total_time": 0.052,
+      "working_time": 0.051,
+      "uuid": "kfs9nEbn37jJ9chZcrMzVL",
+      "error_retries": [],
+      "attachments": {
+        "729e21f4d46bc208559897b9a14ce1ab": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "7PY5ZUaQqfsqBnyDpkwsir",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "7PY5ZUaQqfsqBnyDpkwsir",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C3",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "WNF994mJyQCB7oBKww7mYb",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "SdsdpVKRDwyAeUaAVrEJth",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "SdsdpVKRDwyAeUaAVrEJth",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.021729122003307566
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "Independent verification accepted both repairs in this small repair comparison.",
+          "expected": "supported"
+        },
+        "description": "C3 bounded-writing-acceptance"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "32Ha9N87q3web5cfFbYu7N",
+          "span_id": "iE4jhHsfCsHg7nGYBCBXwG",
+          "timestamp": "2026-09-23T07:26:41.908406+00:00",
+          "working_start": 59329.269030278,
+          "event": "span_begin",
+          "id": "iE4jhHsfCsHg7nGYBCBXwG",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "kfuSWKZBRaNykqodCk9pna",
+          "span_id": "iE4jhHsfCsHg7nGYBCBXwG",
+          "timestamp": "2026-09-23T07:26:41.908660+00:00",
+          "working_start": 59329.269284479,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "target": "supported",
+            "id": "C3",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "WNF994mJyQCB7oBKww7mYb",
+                "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          }
+        },
+        {
+          "uuid": "VfFHabr97KLZr2PN94YwMC",
+          "span_id": "iE4jhHsfCsHg7nGYBCBXwG",
+          "timestamp": "2026-09-23T07:26:41.908820+00:00",
+          "working_start": 59329.26944388,
+          "event": "span_end",
+          "id": "iE4jhHsfCsHg7nGYBCBXwG"
+        },
+        {
+          "uuid": "QzLS4yLHtDtAPsGx2euXUe",
+          "span_id": "BfwZiu8Mpbgba4Ru8eMSQx",
+          "timestamp": "2026-09-23T07:26:41.909103+00:00",
+          "working_start": 0.00021640199702233076,
+          "event": "span_begin",
+          "id": "BfwZiu8Mpbgba4Ru8eMSQx",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "4YmuBc5XEw8mqNMUheiXnr",
+          "span_id": "5q3PQpcMmy4kwip7Hnf94B",
+          "timestamp": "2026-09-23T07:26:41.909195+00:00",
+          "working_start": 0.0003085019998252392,
+          "event": "span_begin",
+          "id": "5q3PQpcMmy4kwip7Hnf94B",
+          "parent_id": "BfwZiu8Mpbgba4Ru8eMSQx",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "jQ9pqqRuCmc852aDbsQaHs",
+          "span_id": "5q3PQpcMmy4kwip7Hnf94B",
+          "timestamp": "2026-09-23T07:26:41.909324+00:00",
+          "working_start": 0.0004376029974082485,
+          "event": "span_end",
+          "id": "5q3PQpcMmy4kwip7Hnf94B"
+        },
+        {
+          "uuid": "QhamjEiYZZLi5MyrosCAye",
+          "span_id": "PppMKPrP4ZuiYZstwhnJtc",
+          "timestamp": "2026-09-23T07:26:41.909419+00:00",
+          "working_start": 0.0005325029997038655,
+          "event": "span_begin",
+          "id": "PppMKPrP4ZuiYZstwhnJtc",
+          "parent_id": "BfwZiu8Mpbgba4Ru8eMSQx",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "5YzMyxe3xEM6DpKnWsJ8Hr",
+          "span_id": "PppMKPrP4ZuiYZstwhnJtc",
+          "timestamp": "2026-09-23T07:26:41.909568+00:00",
+          "working_start": 0.0006816039967816323,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "SdsdpVKRDwyAeUaAVrEJth",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.021729122003307566
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:41.932665+00:00",
+          "working_time": 0.021729122003307566
+        },
+        {
+          "uuid": "LtUbjmgdyBCq7YQ2zMPikM",
+          "span_id": "PppMKPrP4ZuiYZstwhnJtc",
+          "timestamp": "2026-09-23T07:26:41.932994+00:00",
+          "working_start": 0.022876528004417196,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.021729122003307566
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "SdsdpVKRDwyAeUaAVrEJth",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "SdsdpVKRDwyAeUaAVrEJth",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "mfzR2iNLt2HBUK7Hm9Ldtk",
+          "span_id": "PppMKPrP4ZuiYZstwhnJtc",
+          "timestamp": "2026-09-23T07:26:41.933135+00:00",
+          "working_start": 0.0230164290042012,
+          "event": "span_end",
+          "id": "PppMKPrP4ZuiYZstwhnJtc"
+        },
+        {
+          "uuid": "Amk5KPYnegPinmPMyx6WM4",
+          "span_id": "BfwZiu8Mpbgba4Ru8eMSQx",
+          "timestamp": "2026-09-23T07:26:41.933237+00:00",
+          "working_start": 0.023118329998396803,
+          "event": "span_end",
+          "id": "BfwZiu8Mpbgba4Ru8eMSQx"
+        },
+        {
+          "uuid": "P6Ntf4gWFjbxEpFQk7uWvU",
+          "span_id": "Qq4VwRfLDWM3V843rCfTpP",
+          "timestamp": "2026-09-23T07:26:41.933532+00:00",
+          "working_start": 0.02341443100158358,
+          "event": "span_begin",
+          "id": "Qq4VwRfLDWM3V843rCfTpP",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "4vRw3GRKFsnUm53mUKq56z",
+          "span_id": "H6ioMfCHnsu4vRtinfZeJb",
+          "timestamp": "2026-09-23T07:26:41.933624+00:00",
+          "working_start": 0.023505832003138494,
+          "event": "span_begin",
+          "id": "H6ioMfCHnsu4vRtinfZeJb",
+          "parent_id": "Qq4VwRfLDWM3V843rCfTpP",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "AgsqjmGeDk2kcpwdY8xS4w",
+          "span_id": "H6ioMfCHnsu4vRtinfZeJb",
+          "timestamp": "2026-09-23T07:26:41.958694+00:00",
+          "working_start": 0.04858097300166264,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "Vkia8Xeumr9S3bAudJJ7Sf",
+          "span_id": "H6ioMfCHnsu4vRtinfZeJb",
+          "timestamp": "2026-09-23T07:26:41.959034+00:00",
+          "working_start": 0.04891637500259094,
+          "event": "span_end",
+          "id": "H6ioMfCHnsu4vRtinfZeJb"
+        },
+        {
+          "uuid": "BTzx4pQPQiKQqXavY3SoVa",
+          "span_id": "Qq4VwRfLDWM3V843rCfTpP",
+          "timestamp": "2026-09-23T07:26:41.959167+00:00",
+          "working_start": 0.04904887600423535,
+          "event": "span_end",
+          "id": "Qq4VwRfLDWM3V843rCfTpP"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:41.908888+00:00",
+      "completed_at": "2026-09-23T07:26:41.959434+00:00",
+      "total_time": 0.05,
+      "working_time": 0.049,
+      "uuid": "jUV2BepsjizeN2RjHW9knJ",
+      "error_retries": [],
+      "attachments": {
+        "d1d67a6ad6e81f9acf119f87035f8968": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "WNF994mJyQCB7oBKww7mYb",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "WNF994mJyQCB7oBKww7mYb",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C4",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "RuDnKt7z2y3CgCRewe8n3h",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "LPjZz49vsbmQfvdA7fVpb2",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "LPjZz49vsbmQfvdA7fVpb2",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02515214199956972
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+          "expected": "insufficient"
+        },
+        "description": "C4 universal-worker-ranking"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "QHEuQTDdjzQDoRMDZXiVnB",
+          "span_id": "BfmWJryCekxCgWADxJygw8",
+          "timestamp": "2026-09-23T07:26:41.960772+00:00",
+          "working_start": 59329.321396273,
+          "event": "span_begin",
+          "id": "BfmWJryCekxCgWADxJygw8",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "hMxVnK3ZkJHEhqw22anBjs",
+          "span_id": "BfmWJryCekxCgWADxJygw8",
+          "timestamp": "2026-09-23T07:26:41.961016+00:00",
+          "working_start": 59329.321639974,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "target": "insufficient",
+            "id": "C4",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "RuDnKt7z2y3CgCRewe8n3h",
+                "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          }
+        },
+        {
+          "uuid": "NHrH84NJBKjvWtieGEVKWo",
+          "span_id": "BfmWJryCekxCgWADxJygw8",
+          "timestamp": "2026-09-23T07:26:41.961160+00:00",
+          "working_start": 59329.321784075,
+          "event": "span_end",
+          "id": "BfmWJryCekxCgWADxJygw8"
+        },
+        {
+          "uuid": "GGm8RXNuJQuichY4ZNeGkZ",
+          "span_id": "mzbEptHsH2LUW3jLLbiRNM",
+          "timestamp": "2026-09-23T07:26:41.961430+00:00",
+          "working_start": 0.00020780100021511316,
+          "event": "span_begin",
+          "id": "mzbEptHsH2LUW3jLLbiRNM",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "N4vt2CajssTbTKACkh82VG",
+          "span_id": "HipaXNr52KpWvmEBQFBnJW",
+          "timestamp": "2026-09-23T07:26:41.961516+00:00",
+          "working_start": 0.0002938010002253577,
+          "event": "span_begin",
+          "id": "HipaXNr52KpWvmEBQFBnJW",
+          "parent_id": "mzbEptHsH2LUW3jLLbiRNM",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "DiGT2HdTJzu5mrdgSt8FMD",
+          "span_id": "HipaXNr52KpWvmEBQFBnJW",
+          "timestamp": "2026-09-23T07:26:41.961636+00:00",
+          "working_start": 0.00041310200322186574,
+          "event": "span_end",
+          "id": "HipaXNr52KpWvmEBQFBnJW"
+        },
+        {
+          "uuid": "GEh8yQiMQFuLYrAt4bwPcb",
+          "span_id": "K4bdE68t9B2Vuo9gr5gYeL",
+          "timestamp": "2026-09-23T07:26:41.961710+00:00",
+          "working_start": 0.0004876020029769279,
+          "event": "span_begin",
+          "id": "K4bdE68t9B2Vuo9gr5gYeL",
+          "parent_id": "mzbEptHsH2LUW3jLLbiRNM",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "fPCMm6vN82jnjrhvUUQ5c3",
+          "span_id": "K4bdE68t9B2Vuo9gr5gYeL",
+          "timestamp": "2026-09-23T07:26:41.961852+00:00",
+          "working_start": 0.0006295030034380034,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "LPjZz49vsbmQfvdA7fVpb2",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02515214199956972
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:41.988323+00:00",
+          "working_time": 0.02515214199956972
+        },
+        {
+          "uuid": "8gfnMtHX9Ed43cL8Q9e7At",
+          "span_id": "K4bdE68t9B2Vuo9gr5gYeL",
+          "timestamp": "2026-09-23T07:26:41.988633+00:00",
+          "working_start": 0.026224647008348256,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02515214199956972
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "LPjZz49vsbmQfvdA7fVpb2",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "LPjZz49vsbmQfvdA7fVpb2",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "h7EkPXvtanTUmuh54vMoNy",
+          "span_id": "K4bdE68t9B2Vuo9gr5gYeL",
+          "timestamp": "2026-09-23T07:26:41.988767+00:00",
+          "working_start": 0.026358448012615554,
+          "event": "span_end",
+          "id": "K4bdE68t9B2Vuo9gr5gYeL"
+        },
+        {
+          "uuid": "4CwAusHCei7vw2pWxSNvg4",
+          "span_id": "mzbEptHsH2LUW3jLLbiRNM",
+          "timestamp": "2026-09-23T07:26:41.988868+00:00",
+          "working_start": 0.026458449006895535,
+          "event": "span_end",
+          "id": "mzbEptHsH2LUW3jLLbiRNM"
+        },
+        {
+          "uuid": "WPWYhT5iUnNVFXW8p9buky",
+          "span_id": "3gmXwLz6kZ3tLVtGNtLb2s",
+          "timestamp": "2026-09-23T07:26:41.989242+00:00",
+          "working_start": 0.026834151009097695,
+          "event": "span_begin",
+          "id": "3gmXwLz6kZ3tLVtGNtLb2s",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "4Y9hc67jDFcztBcieiKnSg",
+          "span_id": "HfyuKBCcPkvmiEwLMykRS2",
+          "timestamp": "2026-09-23T07:26:41.989397+00:00",
+          "working_start": 0.02698865201091394,
+          "event": "span_begin",
+          "id": "HfyuKBCcPkvmiEwLMykRS2",
+          "parent_id": "3gmXwLz6kZ3tLVtGNtLb2s",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "fq7tXWQn8787NorhY4pNML",
+          "span_id": "HfyuKBCcPkvmiEwLMykRS2",
+          "timestamp": "2026-09-23T07:26:42.012419+00:00",
+          "working_start": 0.05001478201302234,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "gAXz9TATpGLbZUiA2BpmZv",
+          "span_id": "HfyuKBCcPkvmiEwLMykRS2",
+          "timestamp": "2026-09-23T07:26:42.012760+00:00",
+          "working_start": 0.05035178401158191,
+          "event": "span_end",
+          "id": "HfyuKBCcPkvmiEwLMykRS2"
+        },
+        {
+          "uuid": "2gMNWV582ArKZqyMGBUBiJ",
+          "span_id": "3gmXwLz6kZ3tLVtGNtLb2s",
+          "timestamp": "2026-09-23T07:26:42.012892+00:00",
+          "working_start": 0.05048338500637328,
+          "event": "span_end",
+          "id": "3gmXwLz6kZ3tLVtGNtLb2s"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:41.961224+00:00",
+      "completed_at": "2026-09-23T07:26:42.013108+00:00",
+      "total_time": 0.052,
+      "working_time": 0.051,
+      "uuid": "3NYiao3DP7m5hdootNL8p7",
+      "error_retries": [],
+      "attachments": {
+        "944c03f42c0508dd3fd2271585127dc1": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "RuDnKt7z2y3CgCRewe8n3h",
+            "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "RuDnKt7z2y3CgCRewe8n3h",
+            "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C5",
+      "epoch": 1,
+      "input": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+      "target": "contradicted",
+      "messages": [
+        {
+          "id": "93AAchCY59MK8qfpGHzJAj",
+          "content": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "4TNUCnGVDQ3nEjE2pv2HpK",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "4TNUCnGVDQ3nEjE2pv2HpK",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.024087338002573233
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+          "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+          "expected": "contradicted"
+        },
+        "description": "C5 latency-direction"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "QEDpwytLQ4rWPEfutCDkUL",
+          "span_id": "fbvan8bpwELydZXfRaw5tp",
+          "timestamp": "2026-09-23T07:26:42.014370+00:00",
+          "working_start": 59329.374993676,
+          "event": "span_begin",
+          "id": "fbvan8bpwELydZXfRaw5tp",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "UZ5Ruq6h2mXuLgDABmH9HE",
+          "span_id": "fbvan8bpwELydZXfRaw5tp",
+          "timestamp": "2026-09-23T07:26:42.014619+00:00",
+          "working_start": 59329.375243278,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "target": "contradicted",
+            "id": "C5",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+                "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+                "expected": "contradicted"
+              },
+              "description": "C5 latency-direction"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "93AAchCY59MK8qfpGHzJAj",
+                "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://b2f5e430785617cb61d4ecd122c0a18c",
+                "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+                "expected": "contradicted"
+              },
+              "description": "C5 latency-direction"
+            }
+          }
+        },
+        {
+          "uuid": "hnnGM7dJPstVxfAWDUrqMj",
+          "span_id": "fbvan8bpwELydZXfRaw5tp",
+          "timestamp": "2026-09-23T07:26:42.014762+00:00",
+          "working_start": 59329.375386278,
+          "event": "span_end",
+          "id": "fbvan8bpwELydZXfRaw5tp"
+        },
+        {
+          "uuid": "MZjPFGP9ALgmrX6p8vwpDY",
+          "span_id": "ZJknWrMQukR6qKXjyWWNDw",
+          "timestamp": "2026-09-23T07:26:42.015035+00:00",
+          "working_start": 0.00020970100013073534,
+          "event": "span_begin",
+          "id": "ZJknWrMQukR6qKXjyWWNDw",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "RZhkUHLce6zD9FnfXQbn4e",
+          "span_id": "Pough5qdjqqgnD2myDRTpf",
+          "timestamp": "2026-09-23T07:26:42.015128+00:00",
+          "working_start": 0.0003032019958482124,
+          "event": "span_begin",
+          "id": "Pough5qdjqqgnD2myDRTpf",
+          "parent_id": "ZJknWrMQukR6qKXjyWWNDw",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "T3uWi7nNFHpNN9HwfoaqPR",
+          "span_id": "Pough5qdjqqgnD2myDRTpf",
+          "timestamp": "2026-09-23T07:26:42.015253+00:00",
+          "working_start": 0.00042840199603233486,
+          "event": "span_end",
+          "id": "Pough5qdjqqgnD2myDRTpf"
+        },
+        {
+          "uuid": "9quDywCt7sDDB7W5SRQtV3",
+          "span_id": "gXYhdpEXZcSxWwRHPxQiUi",
+          "timestamp": "2026-09-23T07:26:42.015330+00:00",
+          "working_start": 0.0005046029982622713,
+          "event": "span_begin",
+          "id": "gXYhdpEXZcSxWwRHPxQiUi",
+          "parent_id": "ZJknWrMQukR6qKXjyWWNDw",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "BCFC6zyVztkocVvJqwyus3",
+          "span_id": "gXYhdpEXZcSxWwRHPxQiUi",
+          "timestamp": "2026-09-23T07:26:42.015520+00:00",
+          "working_start": 0.0006952039984753355,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "4TNUCnGVDQ3nEjE2pv2HpK",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.024087338002573233
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:42.040980+00:00",
+          "working_time": 0.024087338002573233
+        },
+        {
+          "uuid": "QQ6ezzzNKnMuGpJMwSzkst",
+          "span_id": "gXYhdpEXZcSxWwRHPxQiUi",
+          "timestamp": "2026-09-23T07:26:42.041308+00:00",
+          "working_start": 0.02525024500209838,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.024087338002573233
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "4TNUCnGVDQ3nEjE2pv2HpK",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "4TNUCnGVDQ3nEjE2pv2HpK",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "7PxYc6CeHnXktoAP94L76y",
+          "span_id": "gXYhdpEXZcSxWwRHPxQiUi",
+          "timestamp": "2026-09-23T07:26:42.041446+00:00",
+          "working_start": 0.025387246001628228,
+          "event": "span_end",
+          "id": "gXYhdpEXZcSxWwRHPxQiUi"
+        },
+        {
+          "uuid": "MQxKsttXu8AqgSbRxeq2JG",
+          "span_id": "ZJknWrMQukR6qKXjyWWNDw",
+          "timestamp": "2026-09-23T07:26:42.041551+00:00",
+          "working_start": 0.025492546003079042,
+          "event": "span_end",
+          "id": "ZJknWrMQukR6qKXjyWWNDw"
+        },
+        {
+          "uuid": "4y4xdEizakpQBU2f9i9aAe",
+          "span_id": "TnNah9QcLcTKE8uSZErxVt",
+          "timestamp": "2026-09-23T07:26:42.041855+00:00",
+          "working_start": 0.0257962480027345,
+          "event": "span_begin",
+          "id": "TnNah9QcLcTKE8uSZErxVt",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "mjJcii4UUjGNoDr2rLGf8H",
+          "span_id": "R6etGVwumRbWfZqZicuGJf",
+          "timestamp": "2026-09-23T07:26:42.041946+00:00",
+          "working_start": 0.025887149000482168,
+          "event": "span_begin",
+          "id": "R6etGVwumRbWfZqZicuGJf",
+          "parent_id": "TnNah9QcLcTKE8uSZErxVt",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "BfFCs8yb2TYm9jXH4avCNr",
+          "span_id": "R6etGVwumRbWfZqZicuGJf",
+          "timestamp": "2026-09-23T07:26:42.067269+00:00",
+          "working_start": 0.051215293002314866,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "contradicted",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "4VeKkPExHSHyogJAPgid6K",
+          "span_id": "R6etGVwumRbWfZqZicuGJf",
+          "timestamp": "2026-09-23T07:26:42.067673+00:00",
+          "working_start": 0.05161549600597937,
+          "event": "span_end",
+          "id": "R6etGVwumRbWfZqZicuGJf"
+        },
+        {
+          "uuid": "ciBPBVYo2hJkaBrbA84Fei",
+          "span_id": "TnNah9QcLcTKE8uSZErxVt",
+          "timestamp": "2026-09-23T07:26:42.067807+00:00",
+          "working_start": 0.05174809600430308,
+          "event": "span_end",
+          "id": "TnNah9QcLcTKE8uSZErxVt"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:42.014826+00:00",
+      "completed_at": "2026-09-23T07:26:42.068021+00:00",
+      "total_time": 0.053,
+      "working_time": 0.052,
+      "uuid": "US78yqcbRhore8sW4bbNKE",
+      "error_retries": [],
+      "attachments": {
+        "c176dae42df2ff4d10d677ddd693f387": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"Hybrid retrieval had lower average latency than BM25 in this diagnostic.\"}",
+        "b2f5e430785617cb61d4ecd122c0a18c": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "93AAchCY59MK8qfpGHzJAj",
+            "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "93AAchCY59MK8qfpGHzJAj",
+            "content": "attachment://c176dae42df2ff4d10d677ddd693f387",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C6",
+      "epoch": 1,
+      "input": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "L8qEStzMLrAopLMTcDf44A",
+          "content": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "L8biAcCgXAbt68HaAFKAvq",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "L8biAcCgXAbt68HaAFKAvq",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.023333633005677257
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": false,
+              "disposition": "reject_evidence",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T12:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": false,
+          "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+          "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.",
+          "expected": "supported"
+        },
+        "description": "C6 bounded-retrieval-choice"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "dnP2AQrfqAHFtbevtDyjdF",
+          "span_id": "PTAZLvhuUE78XF4D9bBDeV",
+          "timestamp": "2026-09-23T07:26:42.069404+00:00",
+          "working_start": 59329.430028491,
+          "event": "span_begin",
+          "id": "PTAZLvhuUE78XF4D9bBDeV",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "PEDBNZztnFYeQoq9TNJd3Q",
+          "span_id": "PTAZLvhuUE78XF4D9bBDeV",
+          "timestamp": "2026-09-23T07:26:42.069644+00:00",
+          "working_start": 59329.430267892,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "target": "supported",
+            "id": "C6",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T12:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": false,
+                "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+                "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.",
+                "expected": "supported"
+              },
+              "description": "C6 bounded-retrieval-choice"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "L8qEStzMLrAopLMTcDf44A",
+                "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T12:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": false,
+                "source": "attachment://b2f5e430785617cb61d4ecd122c0a18c",
+                "claim": "attachment://a32a17942bb77d95442b0dda673069f5",
+                "expected": "supported"
+              },
+              "description": "C6 bounded-retrieval-choice"
+            }
+          }
+        },
+        {
+          "uuid": "4f3tiew6zC3eXNWorDAEwC",
+          "span_id": "PTAZLvhuUE78XF4D9bBDeV",
+          "timestamp": "2026-09-23T07:26:42.069792+00:00",
+          "working_start": 59329.430416593,
+          "event": "span_end",
+          "id": "PTAZLvhuUE78XF4D9bBDeV"
+        },
+        {
+          "uuid": "YFxTakDSxUL3t2HVEAMCeR",
+          "span_id": "JYVUHGzm4opBk6QYoFMowc",
+          "timestamp": "2026-09-23T07:26:42.070062+00:00",
+          "working_start": 0.00020810100249946117,
+          "event": "span_begin",
+          "id": "JYVUHGzm4opBk6QYoFMowc",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "k9TrAokinCFtZUehqQWiRe",
+          "span_id": "7hHeqcd3sa2EYCydZMfbo9",
+          "timestamp": "2026-09-23T07:26:42.070149+00:00",
+          "working_start": 0.0002947020038845949,
+          "event": "span_begin",
+          "id": "7hHeqcd3sa2EYCydZMfbo9",
+          "parent_id": "JYVUHGzm4opBk6QYoFMowc",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "YB7dwf2JWZqb9kmuUuxJXG",
+          "span_id": "7hHeqcd3sa2EYCydZMfbo9",
+          "timestamp": "2026-09-23T07:26:42.070277+00:00",
+          "working_start": 0.0004231020066072233,
+          "event": "span_end",
+          "id": "7hHeqcd3sa2EYCydZMfbo9"
+        },
+        {
+          "uuid": "RHds4szUR3nPyR3h6qsX8h",
+          "span_id": "2LiymDL6jWQescjsniwJvk",
+          "timestamp": "2026-09-23T07:26:42.070354+00:00",
+          "working_start": 0.0004997030046069995,
+          "event": "span_begin",
+          "id": "2LiymDL6jWQescjsniwJvk",
+          "parent_id": "JYVUHGzm4opBk6QYoFMowc",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "jXn5c5LhkEf4q8JwH2DVzc",
+          "span_id": "2LiymDL6jWQescjsniwJvk",
+          "timestamp": "2026-09-23T07:26:42.070498+00:00",
+          "working_start": 0.0006437040065065958,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "L8biAcCgXAbt68HaAFKAvq",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.023333633005677257
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:42.095174+00:00",
+          "working_time": 0.023333633005677257
+        },
+        {
+          "uuid": "N9vUdT55rsUabW4XP5t3rx",
+          "span_id": "2LiymDL6jWQescjsniwJvk",
+          "timestamp": "2026-09-23T07:26:42.095563+00:00",
+          "working_start": 0.024499340004695114,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.023333633005677257
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "L8biAcCgXAbt68HaAFKAvq",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "L8biAcCgXAbt68HaAFKAvq",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "fG3QpYsjdd3NHSdurJpvmh",
+          "span_id": "2LiymDL6jWQescjsniwJvk",
+          "timestamp": "2026-09-23T07:26:42.095715+00:00",
+          "working_start": 0.02465054101048736,
+          "event": "span_end",
+          "id": "2LiymDL6jWQescjsniwJvk"
+        },
+        {
+          "uuid": "ZRcn49yrgpacso77DDCYW9",
+          "span_id": "JYVUHGzm4opBk6QYoFMowc",
+          "timestamp": "2026-09-23T07:26:42.095820+00:00",
+          "working_start": 0.024755441008892376,
+          "event": "span_end",
+          "id": "JYVUHGzm4opBk6QYoFMowc"
+        },
+        {
+          "uuid": "ATky7axfGNewL5WRcGUSHL",
+          "span_id": "aMgHkunAHsY4GbhFtxcgtJ",
+          "timestamp": "2026-09-23T07:26:42.096120+00:00",
+          "working_start": 0.02505584300524788,
+          "event": "span_begin",
+          "id": "aMgHkunAHsY4GbhFtxcgtJ",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "E8WensDMHgqbpRrvybg8Ks",
+          "span_id": "9koSF2pdvwW5YggNMs9nBx",
+          "timestamp": "2026-09-23T07:26:42.096214+00:00",
+          "working_start": 0.025149244007479865,
+          "event": "span_begin",
+          "id": "9koSF2pdvwW5YggNMs9nBx",
+          "parent_id": "aMgHkunAHsY4GbhFtxcgtJ",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "afjhvWvcPhEgec44jK5NEW",
+          "span_id": "9koSF2pdvwW5YggNMs9nBx",
+          "timestamp": "2026-09-23T07:26:42.120535+00:00",
+          "working_start": 0.0494755830077338,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": false,
+                "disposition": "reject_evidence",
+                "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "KrS2oyyHZ8bj2oJ4XDCPAc",
+          "span_id": "9koSF2pdvwW5YggNMs9nBx",
+          "timestamp": "2026-09-23T07:26:42.120892+00:00",
+          "working_start": 0.04982868500519544,
+          "event": "span_end",
+          "id": "9koSF2pdvwW5YggNMs9nBx"
+        },
+        {
+          "uuid": "4bzU3Yc4SsL5xWhDf5rDf6",
+          "span_id": "aMgHkunAHsY4GbhFtxcgtJ",
+          "timestamp": "2026-09-23T07:26:42.121041+00:00",
+          "working_start": 0.04997678500512848,
+          "event": "span_end",
+          "id": "aMgHkunAHsY4GbhFtxcgtJ"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:42.069855+00:00",
+      "completed_at": "2026-09-23T07:26:42.121272+00:00",
+      "total_time": 0.051,
+      "working_time": 0.05,
+      "uuid": "FYquY8KcxWn8gjnB2UHxwa",
+      "error_retries": [],
+      "attachments": {
+        "b389e5ef0d467e2342cdec9e3795e47d": "{\"source\": \"BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\\nthis to a reason to keep the present default pending a representative repeated\\ncomparison.\", \"claim\": \"The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.\"}",
+        "b2f5e430785617cb61d4ecd122c0a18c": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+        "a32a17942bb77d95442b0dda673069f5": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "L8qEStzMLrAopLMTcDf44A",
+            "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "L8qEStzMLrAopLMTcDf44A",
+            "content": "attachment://b389e5ef0d467e2342cdec9e3795e47d",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C7",
+      "epoch": 1,
+      "input": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}",
+      "target": "contradicted",
+      "messages": [
+        {
+          "id": "FNp3RyVos6bEMzaBaF7GY3",
+          "content": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "izPomeSJkXHLeWWMit2Z4h",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "izPomeSJkXHLeWWMit2Z4h",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02260242900229059
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "Typed output guarantees the interface, not truth.",
+          "claim": "A typed output guarantees that the model judgment is true.",
+          "expected": "contradicted"
+        },
+        "description": "C7 typed-is-not-true"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "A7oSmuLGKQvnicxL28WzBE",
+          "span_id": "eQhBo7iJD84cwLcwsF7ijr",
+          "timestamp": "2026-09-23T07:26:42.122596+00:00",
+          "working_start": 59329.483220394,
+          "event": "span_begin",
+          "id": "eQhBo7iJD84cwLcwsF7ijr",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "fBvczwp7CoSfUMNPZzcizb",
+          "span_id": "eQhBo7iJD84cwLcwsF7ijr",
+          "timestamp": "2026-09-23T07:26:42.122844+00:00",
+          "working_start": 59329.483468396,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "target": "contradicted",
+            "id": "C7",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "A typed output guarantees that the model judgment is true.",
+                "expected": "contradicted"
+              },
+              "description": "C7 typed-is-not-true"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "FNp3RyVos6bEMzaBaF7GY3",
+                "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "A typed output guarantees that the model judgment is true.",
+                "expected": "contradicted"
+              },
+              "description": "C7 typed-is-not-true"
+            }
+          }
+        },
+        {
+          "uuid": "ikzhrgzXzDm6AHseTiyJqS",
+          "span_id": "eQhBo7iJD84cwLcwsF7ijr",
+          "timestamp": "2026-09-23T07:26:42.122980+00:00",
+          "working_start": 59329.483603796,
+          "event": "span_end",
+          "id": "eQhBo7iJD84cwLcwsF7ijr"
+        },
+        {
+          "uuid": "3oSZyuMhw93QesWktD9G4P",
+          "span_id": "iBYDNhYAScH7XU9qLqVkfx",
+          "timestamp": "2026-09-23T07:26:42.123240+00:00",
+          "working_start": 0.0001995009952224791,
+          "event": "span_begin",
+          "id": "iBYDNhYAScH7XU9qLqVkfx",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "2vuhQENyG4G8LWKWz2ywPg",
+          "span_id": "Lc4rVmgWBs6rtfxvYGsxCx",
+          "timestamp": "2026-09-23T07:26:42.123327+00:00",
+          "working_start": 0.00028720100090140477,
+          "event": "span_begin",
+          "id": "Lc4rVmgWBs6rtfxvYGsxCx",
+          "parent_id": "iBYDNhYAScH7XU9qLqVkfx",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "kAyZKhpvMQGJXTKkT6XWyL",
+          "span_id": "Lc4rVmgWBs6rtfxvYGsxCx",
+          "timestamp": "2026-09-23T07:26:42.123496+00:00",
+          "working_start": 0.0004564019982353784,
+          "event": "span_end",
+          "id": "Lc4rVmgWBs6rtfxvYGsxCx"
+        },
+        {
+          "uuid": "8mSeRQ2o77XcYcUNNkySci",
+          "span_id": "byi4gp5BQMifCFJmKn6QfF",
+          "timestamp": "2026-09-23T07:26:42.123580+00:00",
+          "working_start": 0.0005397029963205568,
+          "event": "span_begin",
+          "id": "byi4gp5BQMifCFJmKn6QfF",
+          "parent_id": "iBYDNhYAScH7XU9qLqVkfx",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "dwa3Af5VcGmjBGgU5CwyCt",
+          "span_id": "byi4gp5BQMifCFJmKn6QfF",
+          "timestamp": "2026-09-23T07:26:42.123721+00:00",
+          "working_start": 0.0006811040002503432,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "izPomeSJkXHLeWWMit2Z4h",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02260242900229059
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:42.147738+00:00",
+          "working_time": 0.02260242900229059
+        },
+        {
+          "uuid": "Qj5it3Gs7iA5bsqHSoDQjE",
+          "span_id": "byi4gp5BQMifCFJmKn6QfF",
+          "timestamp": "2026-09-23T07:26:42.148065+00:00",
+          "working_start": 0.023747735991491936,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02260242900229059
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "izPomeSJkXHLeWWMit2Z4h",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "izPomeSJkXHLeWWMit2Z4h",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "8YmoZCYr3EYbxNtvyZbQhv",
+          "span_id": "byi4gp5BQMifCFJmKn6QfF",
+          "timestamp": "2026-09-23T07:26:42.148200+00:00",
+          "working_start": 0.02388213599624578,
+          "event": "span_end",
+          "id": "byi4gp5BQMifCFJmKn6QfF"
+        },
+        {
+          "uuid": "bveRDwk2aAC2k6ei98im89",
+          "span_id": "iBYDNhYAScH7XU9qLqVkfx",
+          "timestamp": "2026-09-23T07:26:42.148302+00:00",
+          "working_start": 0.023983636994671542,
+          "event": "span_end",
+          "id": "iBYDNhYAScH7XU9qLqVkfx"
+        },
+        {
+          "uuid": "oUNRhPYEdQ6BLdubsJx6Qz",
+          "span_id": "Gc6rUGpyRi5Kfw6dPeU9uE",
+          "timestamp": "2026-09-23T07:26:42.148602+00:00",
+          "working_start": 0.024283738996018656,
+          "event": "span_begin",
+          "id": "Gc6rUGpyRi5Kfw6dPeU9uE",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "MLB84crE6Z7ZeENciMRGv9",
+          "span_id": "kakbvf7MbEeGW25zYDKuuT",
+          "timestamp": "2026-09-23T07:26:42.148706+00:00",
+          "working_start": 0.024387638994085137,
+          "event": "span_begin",
+          "id": "kakbvf7MbEeGW25zYDKuuT",
+          "parent_id": "Gc6rUGpyRi5Kfw6dPeU9uE",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "9ujTN3Q4SVSvJN9n6XbyXW",
+          "span_id": "kakbvf7MbEeGW25zYDKuuT",
+          "timestamp": "2026-09-23T07:26:42.172283+00:00",
+          "working_start": 0.0479699739953503,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "contradicted",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "bNPf3YTbCvuYYLtMzW3F2A",
+          "span_id": "kakbvf7MbEeGW25zYDKuuT",
+          "timestamp": "2026-09-23T07:26:42.172612+00:00",
+          "working_start": 0.048294475993316155,
+          "event": "span_end",
+          "id": "kakbvf7MbEeGW25zYDKuuT"
+        },
+        {
+          "uuid": "ksKcJwYmgsoTkiN62F47vm",
+          "span_id": "Gc6rUGpyRi5Kfw6dPeU9uE",
+          "timestamp": "2026-09-23T07:26:42.172736+00:00",
+          "working_start": 0.048418176993436646,
+          "event": "span_end",
+          "id": "Gc6rUGpyRi5Kfw6dPeU9uE"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:42.123041+00:00",
+      "completed_at": "2026-09-23T07:26:42.172968+00:00",
+      "total_time": 0.05,
+      "working_time": 0.049,
+      "uuid": "8kj3r3dDQV9cpkj4oE5gRR",
+      "error_retries": [],
+      "attachments": {
+        "1f3c4f44eea1b539b453291cfab96e49": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"A typed output guarantees that the model judgment is true.\"}"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "FNp3RyVos6bEMzaBaF7GY3",
+            "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "FNp3RyVos6bEMzaBaF7GY3",
+            "content": "attachment://1f3c4f44eea1b539b453291cfab96e49",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C8",
+      "epoch": 1,
+      "input": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "kFt2XXu7nHn5txSVbJWc29",
+          "content": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "7Fry5rnAxuuN2SFGc7Qsg7",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "7Fry5rnAxuuN2SFGc7Qsg7",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02202842599945143
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "Typed output guarantees the interface, not truth.",
+          "claim": "Jev is qualified as a profitable trading signal across all markets.",
+          "expected": "insufficient"
+        },
+        "description": "C8 missing-domain-qualification"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "8D4eadJWUPLf5N8mYgDXMz",
+          "span_id": "ZckpDh8Wd3PmUB3D9yv5P4",
+          "timestamp": "2026-09-23T07:26:42.174237+00:00",
+          "working_start": 59329.534861489,
+          "event": "span_begin",
+          "id": "ZckpDh8Wd3PmUB3D9yv5P4",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "GkTGYgU5xiNHikLFCDqJAw",
+          "span_id": "ZckpDh8Wd3PmUB3D9yv5P4",
+          "timestamp": "2026-09-23T07:26:42.174491+00:00",
+          "working_start": 59329.535115391,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "target": "insufficient",
+            "id": "C8",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "Jev is qualified as a profitable trading signal across all markets.",
+                "expected": "insufficient"
+              },
+              "description": "C8 missing-domain-qualification"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "kFt2XXu7nHn5txSVbJWc29",
+                "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "Typed output guarantees the interface, not truth.",
+                "claim": "Jev is qualified as a profitable trading signal across all markets.",
+                "expected": "insufficient"
+              },
+              "description": "C8 missing-domain-qualification"
+            }
+          }
+        },
+        {
+          "uuid": "RKHR7m5RF4HakRgxgR7zTW",
+          "span_id": "ZckpDh8Wd3PmUB3D9yv5P4",
+          "timestamp": "2026-09-23T07:26:42.174633+00:00",
+          "working_start": 59329.535257391,
+          "event": "span_end",
+          "id": "ZckpDh8Wd3PmUB3D9yv5P4"
+        },
+        {
+          "uuid": "aDALZhJLHzgYtjUGkvyoAE",
+          "span_id": "dQdMgb3TEbdz29bwuPhc3M",
+          "timestamp": "2026-09-23T07:26:42.174902+00:00",
+          "working_start": 0.00020380099886097014,
+          "event": "span_begin",
+          "id": "dQdMgb3TEbdz29bwuPhc3M",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "f5MBevkrofsektZNpTA4hT",
+          "span_id": "RmZ79XshiECeNf2fU5WXyt",
+          "timestamp": "2026-09-23T07:26:42.174991+00:00",
+          "working_start": 0.00029230099607957527,
+          "event": "span_begin",
+          "id": "RmZ79XshiECeNf2fU5WXyt",
+          "parent_id": "dQdMgb3TEbdz29bwuPhc3M",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "KihtVe5mEuHudJEYVSuLtm",
+          "span_id": "RmZ79XshiECeNf2fU5WXyt",
+          "timestamp": "2026-09-23T07:26:42.175116+00:00",
+          "working_start": 0.0004175020003458485,
+          "event": "span_end",
+          "id": "RmZ79XshiECeNf2fU5WXyt"
+        },
+        {
+          "uuid": "egFPUeLA8nwnNtYfjmkKRq",
+          "span_id": "nLmqpTtsPUHNjLdxYBakV8",
+          "timestamp": "2026-09-23T07:26:42.175218+00:00",
+          "working_start": 0.000519902998348698,
+          "event": "span_begin",
+          "id": "nLmqpTtsPUHNjLdxYBakV8",
+          "parent_id": "dQdMgb3TEbdz29bwuPhc3M",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "GxEbS6wv5bQ7iFkPV8fP4W",
+          "span_id": "nLmqpTtsPUHNjLdxYBakV8",
+          "timestamp": "2026-09-23T07:26:42.175373+00:00",
+          "working_start": 0.0006745040009263903,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "7Fry5rnAxuuN2SFGc7Qsg7",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02202842599945143
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:42.198774+00:00",
+          "working_time": 0.02202842599945143
+        },
+        {
+          "uuid": "CKhJcxZ5qKmwrVzFVTD2n4",
+          "span_id": "nLmqpTtsPUHNjLdxYBakV8",
+          "timestamp": "2026-09-23T07:26:42.199089+00:00",
+          "working_start": 0.023192332999315113,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02202842599945143
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "7Fry5rnAxuuN2SFGc7Qsg7",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "7Fry5rnAxuuN2SFGc7Qsg7",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "Rm8N7UsGzi9BCxfHhrYDVa",
+          "span_id": "nLmqpTtsPUHNjLdxYBakV8",
+          "timestamp": "2026-09-23T07:26:42.199221+00:00",
+          "working_start": 0.023323433997575194,
+          "event": "span_end",
+          "id": "nLmqpTtsPUHNjLdxYBakV8"
+        },
+        {
+          "uuid": "JdwL972Mc4vLyyW5cmrqLc",
+          "span_id": "dQdMgb3TEbdz29bwuPhc3M",
+          "timestamp": "2026-09-23T07:26:42.199322+00:00",
+          "working_start": 0.023424833998433314,
+          "event": "span_end",
+          "id": "dQdMgb3TEbdz29bwuPhc3M"
+        },
+        {
+          "uuid": "3VhQvLhanMVAkxK7pBSMpw",
+          "span_id": "5BLbBzLSvd8tubsw5JD2S3",
+          "timestamp": "2026-09-23T07:26:42.199682+00:00",
+          "working_start": 0.023784535995218903,
+          "event": "span_begin",
+          "id": "5BLbBzLSvd8tubsw5JD2S3",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "WBTXfEjyNqXxEuvRYzsdkG",
+          "span_id": "c92UXpiV9bvAVjPGphVFkc",
+          "timestamp": "2026-09-23T07:26:42.199791+00:00",
+          "working_start": 0.023893236997537315,
+          "event": "span_begin",
+          "id": "c92UXpiV9bvAVjPGphVFkc",
+          "parent_id": "5BLbBzLSvd8tubsw5JD2S3",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "92tZv8qtSTTm9UVx7SWfmL",
+          "span_id": "c92UXpiV9bvAVjPGphVFkc",
+          "timestamp": "2026-09-23T07:26:42.222812+00:00",
+          "working_start": 0.04691966899554245,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "FRECkHwfE3xu66XTS5FidU",
+          "span_id": "c92UXpiV9bvAVjPGphVFkc",
+          "timestamp": "2026-09-23T07:26:42.223150+00:00",
+          "working_start": 0.04725386999780312,
+          "event": "span_end",
+          "id": "c92UXpiV9bvAVjPGphVFkc"
+        },
+        {
+          "uuid": "epyMjk7LCdVYKCRjos6Ytn",
+          "span_id": "5BLbBzLSvd8tubsw5JD2S3",
+          "timestamp": "2026-09-23T07:26:42.223279+00:00",
+          "working_start": 0.0473817709935247,
+          "event": "span_end",
+          "id": "5BLbBzLSvd8tubsw5JD2S3"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:42.174700+00:00",
+      "completed_at": "2026-09-23T07:26:42.223532+00:00",
+      "total_time": 0.049,
+      "working_time": 0.048,
+      "uuid": "EJYg54NnXRspgsLJqXXQWe",
+      "error_retries": [],
+      "attachments": {
+        "dc62aa148cd6fa6e681df6f25e6322e6": "{\"source\": \"Typed output guarantees the interface, not truth.\", \"claim\": \"Jev is qualified as a profitable trading signal across all markets.\"}"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "kFt2XXu7nHn5txSVbJWc29",
+            "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "kFt2XXu7nHn5txSVbJWc29",
+            "content": "attachment://dc62aa148cd6fa6e681df6f25e6322e6",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "promptfoo_equivalent_assertions",
+      "samples": [
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C1"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C2"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C3"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C4"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C5"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": false,
+              "disposition": "reject_evidence",
+              "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C6"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C7"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C8"
+        }
+      ]
+    }
+  ]
+}

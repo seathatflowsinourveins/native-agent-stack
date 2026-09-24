@@ -1,0 +1,68 @@
+2026/09/23 03:28:49 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+Registry store URI not provided. Using backend store URI.
+2026/09/23 03:28:50 INFO mlflow.store.db.utils: Creating initial MLflow database tables...
+2026/09/23 03:28:50 INFO mlflow.store.db.utils: Updating database tables
+[MLflow] Security middleware enabled with default settings (localhost-only). To allow connections from other hosts, use --host 0.0.0.0 and configure --allowed-hosts and --cors-allowed-origins.
+2026/09/23 03:28:51 INFO:     Uvicorn running on http://127.0.0.1:60402 (Press CTRL+C to quit)
+2026/09/23 03:28:51 INFO:     Started parent process [1558555]
+2026/09/23 03:28:52 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:52 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:52 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:52 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:52 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/server/fastapi_app.py:23: StarletteDeprecationWarning: starlette.middleware.wsgi is deprecated and will be removed in a future release. Please refer to https://github.com/abersheeran/a2wsgi as a replacement.
+  from starlette.middleware.wsgi import WSGIResponder, build_environ
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/server/fastapi_app.py:23: StarletteDeprecationWarning: starlette.middleware.wsgi is deprecated and will be removed in a future release. Please refer to https://github.com/abersheeran/a2wsgi as a replacement.
+  from starlette.middleware.wsgi import WSGIResponder, build_environ
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/server/fastapi_app.py:23: StarletteDeprecationWarning: starlette.middleware.wsgi is deprecated and will be removed in a future release. Please refer to https://github.com/abersheeran/a2wsgi as a replacement.
+  from starlette.middleware.wsgi import WSGIResponder, build_environ
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/server/fastapi_app.py:23: StarletteDeprecationWarning: starlette.middleware.wsgi is deprecated and will be removed in a future release. Please refer to https://github.com/abersheeran/a2wsgi as a replacement.
+  from starlette.middleware.wsgi import WSGIResponder, build_environ
+2026/09/23 03:28:53 INFO:     Started server process [1558567]
+2026/09/23 03:28:53 INFO:     Waiting for application startup.
+2026/09/23 03:28:53 INFO:     Started server process [1558565]
+2026/09/23 03:28:53 INFO:     Waiting for application startup.
+2026/09/23 03:28:53 INFO:     Started server process [1558566]
+2026/09/23 03:28:53 INFO:     Waiting for application startup.
+2026/09/23 03:28:53 INFO:     Application startup complete.
+2026/09/23 03:28:53 INFO:     Application startup complete.
+2026/09/23 03:28:53 INFO:     Application startup complete.
+2026/09/23 03:28:53 INFO:     Started server process [1558568]
+2026/09/23 03:28:53 INFO:     Waiting for application startup.
+2026/09/23 03:28:53 INFO:     Application startup complete.
+2026/09/23 03:28:53 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:53 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:53 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:53 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:54 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:54 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:54 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mlflow/lib/python3.13/site-packages/mlflow/assistant/skills/instrumenting-with-mlflow-tracing/SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.
+2026/09/23 03:28:54 INFO:     127.0.0.1:59469 - "GET /health HTTP/1.1" 200 OK
+2026/09/23 03:28:54 INFO:     127.0.0.1:59475 - "POST /api/2.0/mlflow/experiments/search HTTP/1.1" 200 OK
+2026/09/23 03:28:54 INFO:     Received SIGTERM, exiting.
+2026/09/23 03:28:54 INFO:     Received SIGTERM, exiting.
+2026/09/23 03:28:54 INFO:     Terminated child process [1558565]
+2026/09/23 03:28:54 INFO:     Terminated child process [1558566]
+2026/09/23 03:28:54 INFO:     Terminated child process [1558567]
+2026/09/23 03:28:54 INFO:     Terminated child process [1558568]
+2026/09/23 03:28:54 INFO:     Waiting for child process [1558565]
+2026/09/23 03:28:54 INFO:     Shutting down
+2026/09/23 03:28:54 INFO:     Shutting down
+2026/09/23 03:28:54 INFO:     Shutting down
+2026/09/23 03:28:54 INFO:     Shutting down
+2026/09/23 03:28:54 INFO:     Waiting for application shutdown.
+2026/09/23 03:28:54 INFO:     Application shutdown complete.
+2026/09/23 03:28:54 INFO:     Finished server process [1558568]
+2026/09/23 03:28:54 INFO:     Waiting for application shutdown.
+2026/09/23 03:28:54 INFO:     Waiting for application shutdown.
+2026/09/23 03:28:54 INFO:     Application shutdown complete.
+2026/09/23 03:28:54 INFO:     Finished server process [1558566]
+2026/09/23 03:28:54 INFO:     Application shutdown complete.
+2026/09/23 03:28:54 INFO:     Finished server process [1558565]
+2026/09/23 03:28:54 INFO:     Waiting for application shutdown.
+2026/09/23 03:28:54 INFO:     Application shutdown complete.
+2026/09/23 03:28:54 INFO:     Finished server process [1558567]
+2026/09/23 03:28:54 INFO:     Waiting for child process [1558566]
+2026/09/23 03:28:54 INFO:     Waiting for child process [1558567]
+2026/09/23 03:28:54 INFO:     Waiting for child process [1558568]
+2026/09/23 03:28:54 INFO:     Stopping parent process [1558555]

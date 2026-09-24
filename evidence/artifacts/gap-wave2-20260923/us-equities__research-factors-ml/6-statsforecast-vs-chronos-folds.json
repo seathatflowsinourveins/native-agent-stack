@@ -1,0 +1,150 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-6-statsforecast-vs-chronos-folds",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 6,
+  "gap_text_sha256": "33eac3c44e6ecbd7fc3422661d822a5f8c1d4204b955e264bd494c9c0eed9c7c",
+  "gap_text": "No measured comparison between any two candidates in this layer exists. The winner set reflects evidence strength, not a demonstrated performance ranking.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.6",
+    "expectation": "Matched forecast comparison (fcmp) on the same frozen series and the 20 skfolio WalkForward development folds: origins are episode decision sessions t (global stride-5 anchor) inside each test fold with t+5 inside the segment; context is the 252 sessions ending at t; target r = ln(close[t+5]/close[t]) per asset.",
+    "criteria": [
+      "Arms: naive (r_hat=0), statsforecast 2.1.1 AutoARIMA on log close, statsmodels 0.15.0 ARIMA(1,1,1) on log close, chronos-bolt-small (HF amazon/chronos-bolt-small at 772f3d25d38aec6d914c8949dab4462e2d46f5d8, chronos-forecasting 2.3.2, CPU) median at step 5, Kronos-small (gap 7/14).",
+      "Preregistered primary metric: per-fold MAE of r_hat vs r across all origins and assets in the fold; secondary: per-fold RMSE and MAE ratio to naive.",
+      "Interval: 95% percentile bootstrap over the 20 development folds (10,000 resamples, seed 20260923) of the mean per-fold MAE difference; a model is called better only if the interval excludes zero.",
+      "Reserved 2021Q1 fold reported separately and not used for any choice.",
+      "Settled for gap 6 if statsforecast and chronos both run on every fold and per-fold metrics are retained."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:48:47Z",
+        "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+        "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+        "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+        "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+      },
+      {
+        "written_at": "2026-09-23T07:08:30Z",
+        "label": "fix round 3 (gaps 1 and 5, plus merge metadata), written after an independent Codex review of commit 5516759",
+        "trigger": "The review found: (a) the Z-check arm raised the wrapper's 'incomplete training label' check (the one evaluate.main performs), not evaluate.choose's overlap detector, and the preregistered 'same assertion on P6' was only run in report mode; (b) the ARIMA residual Ljung-Box used model_df=0; (c) the merged forecast metadata recorded the merge CLI's kronos_device default ('cpu').",
+        "change": "(a) Add two arms to evaluate_purge.py and rerun into a new output dir: Z-choose (purge 0, full-segment training panel so overlapping labels are observed, unmodified evaluate.choose) is expected to raise 'training label overlap with evaluation decision'; P6-assert (plan purge 6, embargo 0, no censoring, the P6E5 fold-boundary assertion enforced) is expected to raise AssertionError on the first fold whose evaluation labels cross the fold end. Existing arms are unchanged and must reproduce their earlier results. (b) Add a statsmodels_lb_df2 arm: the same ARIMA(1,1,1) residuals with acorr_ljungbox(model_df=2); report both values. (c) The merge records per-model execution metadata from the source results files; rerun the merge into a new dir, and the metrics must be identical.",
+        "criteria": [
+          "Z-choose raises the overlap ValueError; P6-assert raises AssertionError; Z-check, Z-leaky, P6 and P6E5 outputs are unchanged.",
+          "statsmodels_lb_df2 exits 0; both p-values are reported.",
+          "The merged metrics equal the earlier merge."
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env HF_HOME=$HOME/.cache/gap-wave2-20260923/research-factors-ml/hf CUDA_VISIBLE_DEVICES= $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/fcmp.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --kronos-src $HOME/.cache/gap-wave2-20260923/research-factors-ml/src/kronos --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp   # attempt 1, all arms on CPU; stopped at the 1200 s limit during the Kronos stage, no results",
+    "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env HF_HOME=$HOME/.cache/gap-wave2-20260923/research-factors-ml/hf HF_HUB_OFFLINE=1 CUDA_VISIBLE_DEVICES= OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/fcmp.py --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --kronos-src $HOME/.cache/gap-wave2-20260923/research-factors-ml/src/kronos --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-A --models naive,statsforecast_autoarima,statsmodels_arima111,chronos_bolt_small --sf-jobs 4   # exit 0, 43 s",
+    "(same env, GPU visible) $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/fcmp.py ... --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-B --models kronos_small --kronos-device cuda:0   # exit 0, 119 s",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/fcmp.py ... --out $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-merged --models none --merge $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-A/forecasts.json $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-B/forecasts.json   # exit 0",
+    "(fix round 3) same merge into $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-merged-r2 with per-source execution metadata   # exit 0; per_fold, pairwise and forecasts_sha256 identical to run-fcmp-merged"
+  ],
+  "results": {
+    "design": "20 skfolio WalkForward development folds (11-13 origins each, 250 in total) plus reserved 2021Q1 (11 origins); 783 origin-by-asset forecasts over 261 decision origins; target 5-session log return; primary metric per-fold MAE.",
+    "dev_mean_fold_mae": {
+      "naive": 0.018682,
+      "statsforecast_autoarima": 0.019455,
+      "statsmodels_arima111": 0.01863,
+      "chronos_bolt_small": 0.018623,
+      "kronos_small": 0.043356
+    },
+    "reserved_mae": {
+      "naive": 0.02057,
+      "statsforecast_autoarima": 0.023407,
+      "statsmodels_arima111": 0.021075,
+      "chronos_bolt_small": 0.022224,
+      "kronos_small": 0.122386
+    },
+    "chronos_vs_statsforecast": "mean per-fold MAE diff -0.000832, 95% bootstrap CI [-0.001787, 0.0000076], chronos better in 14/20 folds: no difference resolved (interval touches zero).",
+    "chronos_vs_naive": "-0.0000586, CI [-0.000660, 0.000583], 13/20: no difference resolved.",
+    "statsforecast_vs_naive": "+0.000773, CI [-0.0000094, 0.001929], better in 9/20: no difference resolved.",
+    "per_fold_table": "raw/fcmp/run-fcmp-merged-r2__results.json per_fold (identical to run-fcmp-merged)",
+    "merge_metadata_note": "run-fcmp-merged__results.json records kronos_device 'cpu' (the merge CLI default); the r2 merge records the per-source metadata (part A cpu without Kronos, part B cuda:0)."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "The merge step fails if the origin keys or targets of the two forecast files differ; the bootstrap reports a resolved difference whenever the interval excludes zero, as it does for Kronos (receipt 7), so a no-difference result is not a blind spot.",
+  "remaining": "The comparison now exists and was run as specified, but it shows no resolved difference between the two adopted candidates (c5, c12), so it does not turn the winner set into a performance ranking. Mapping this result into the layer verdict belongs to the ledger owner.",
+  "limits": [
+    "One target (5-session log return), one context length (252), three ETFs, 20 folds; the bootstrap resamples folds, which are serially dependent.",
+    "chronos ran on CPU in float32, and statsforecast used n_jobs=4 in attempt 2. Attempt 1 was stopped at 1200 s during Kronos and is retained as a stopped attempt."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/fcmp/run-fcmp-merged-r2__results.json",
+      "committed_sha256": "d49339dd07c09cb2367cd8f61a4c8904713399419d9fbea1d0a093365e43975c",
+      "original_sha256": "6c6c030a0d636932dcef280526921c724a14499ef90a910bd92b3d694c7f43df",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-merge-r2.stdout",
+      "committed_sha256": "28b404be9f258cbc48c56d72410b99ca059828de16ef53538561b8d8a8a94064",
+      "original_sha256": "28b404be9f258cbc48c56d72410b99ca059828de16ef53538561b8d8a8a94064",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-merged__results.json",
+      "committed_sha256": "9901047b022c68f4a6b54b507d664eaa65338137fb361ef46a669faaba6bd766",
+      "original_sha256": "7cffea0cb9a686348c6d8d6c39d05a7398ec5bafc7dc5f1051f13c3e0bf8630c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-merged__forecasts.json",
+      "committed_sha256": "8829d98c059f377713882ea56cec4b27c0ff5bd0e0b96087c95ca741edeb9d14",
+      "original_sha256": "8829d98c059f377713882ea56cec4b27c0ff5bd0e0b96087c95ca741edeb9d14",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-A__results.json",
+      "committed_sha256": "f440fbc34856668feb08d58173af30263411c704c2f71f314ee9eb3c5ef6d1bb",
+      "original_sha256": "f440fbc34856668feb08d58173af30263411c704c2f71f314ee9eb3c5ef6d1bb",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-A__forecasts.json",
+      "committed_sha256": "090bb77816ce7f3f33a208ef0f2351d631cdf138fdcbbc09e8ba2d809743edbb",
+      "original_sha256": "090bb77816ce7f3f33a208ef0f2351d631cdf138fdcbbc09e8ba2d809743edbb",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-A.stdout",
+      "committed_sha256": "22407e8c7fd486205e076fa113b93623076d6f9968238d91a04b538bab3854d1",
+      "original_sha256": "22407e8c7fd486205e076fa113b93623076d6f9968238d91a04b538bab3854d1",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-A.stderr",
+      "committed_sha256": "b77e739b35b2d0c90b1c03b8e0fa90954eced947e6b0ff9f1f2cfa075d7f1f4a",
+      "original_sha256": "b77e739b35b2d0c90b1c03b8e0fa90954eced947e6b0ff9f1f2cfa075d7f1f4a",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-merge.stdout",
+      "committed_sha256": "e2c3039f74d8ae835eb90d5ad44d3f59d5ac0fa76824350db68fc6112ffbebb2",
+      "original_sha256": "e2c3039f74d8ae835eb90d5ad44d3f59d5ac0fa76824350db68fc6112ffbebb2",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-attempt1.stderr",
+      "committed_sha256": "93a174a6b6ce283094ee1342d5004460de9267a77eaf4ac0bc14c68662c693e9",
+      "original_sha256": "6b1de30382987db58ff26b7aac16242a948fa7d7b3cfbc95656c18dc68763622",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/logs__fcmp-attempt1.stdout",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

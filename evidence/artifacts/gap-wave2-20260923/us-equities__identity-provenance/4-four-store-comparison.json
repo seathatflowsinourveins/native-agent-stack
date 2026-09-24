@@ -1,0 +1,1141 @@
+{
+  "id": "identity-provenance-g4-four-store-comparison",
+  "gap_index": 4,
+  "gap_text_sha256": "7be4d03166e2b941e492032d27cfa8bcb84b410ef8a45cb269e6e0b2f10a1dcc",
+  "gap_text": "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores.",
+  "preregistration": {
+    "written_at": "2026-09-23T04:57:25Z",
+    "written_at_note": "written_at is approximate (between the 04:57:11Z shell stamp and the 04:57:40Z first commit). Written and committed before any gap-wave-2 check for this layer ran. Each receipt copies its entry verbatim.",
+    "committed_in": "7078d05 (Preregister gap-wave-2 checks for us-equities identity-provenance), before any check ran",
+    "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration.json",
+    "expectation": "On the materialized nanosecond-replay fixture (5 observations, 2 universe rows), PyIceberg 0.12.0 (SQLite catalog, local warehouse) and ArcticDB 6.26.0 (LMDB) both restore canonical rows exactly, retain the pre-correction version by time travel, record a version history, recover a readable last-committed version after SIGKILL of a writer, and handle two concurrent writers (Iceberg: optimistic commit conflict or serialised retry; ArcticDB: last-writer-wins version race on one symbol). DVC and the baseline arms are measured on the same metrics. Absolute numbers are for this tiny fixture only.",
+    "criteria": [
+      "C4.1 Restore fidelity: canonical row-content sha256 (rows sorted by row_id, JSON-canonical) read back equals the materialized parquet content for every arm; per-file sha256 recorded where the arm keeps files (DVC, baseline).",
+      "C4.2 Correction retention: write v1 (rows without correction rows), then v2 (all rows); reading v1 by version/snapshot id returns exactly the v1 rows.",
+      "C4.3 Lineage completeness: count which of {version id, parent version, commit timestamp, operation, per-file content hash, input dataset name} each arm records natively.",
+      "C4.4 Recovery: SIGKILL a writer process mid-loop of appends; reopen and verify the latest committed version reads without error and its row count equals a whole number of completed appends.",
+      "C4.5 Concurrency: two processes append simultaneously N times each; record final row count vs expected, errors/conflicts raised.",
+      "C4.6 Storage bytes (du -sb of the arm's store) and latency (median of 5 write and 5 read wall times).",
+      "Outcome rule: settled only if every metric is measured for all four arms (baseline, DVC, PyIceberg, ArcticDB); a metric an arm lacks by design is recorded as not_supported rather than skipped."
+    ],
+    "amendments_after_preregistration": [
+      {
+        "at": "2026-09-23T05:12Z (approx.)",
+        "late": true,
+        "change": "Attempt 1: the DVC arm failed on an empty git commit, now committed with --allow-empty. ArcticDB could not append to an empty seeded frame (E_INCOMPATIBLE_INDEX), so the symbol is seeded with one 5-row batch that is subtracted from row counts. Log kept: raw/stores-round1/attempt1-run.log."
+      },
+      {
+        "at": "2026-09-23T05:14Z (approx.)",
+        "late": true,
+        "change": "Recovery trials were raised from 3 to 5. After attempt 2 showed ArcticDB losing rows, a repeatability check was added: 30 appends per writer, 2 repetitions per arm. Attempt 2 log kept: raw/stores-round1/attempt2-run.log."
+      },
+      {
+        "at": "2026-09-23T05:30:25Z",
+        "late": true,
+        "change": "Fix round, preregistered in preregistration-fixround.json (commit 3ce38e9) after the Codex review. Round 1 counted baseline rows as committed_versions*5 without decoding, so its rows % 5 check could not fail. The fix round decodes every stored row in every arm and checks that each row is an identical copy of the fixture batch. Detector controls (corrupted, foreign and dropped rows) must be flagged. The fix round also records du -sb next to the file-length sum and classifies lineage fields as native, caller_annotation or absent. Round-1 raw outputs are kept in raw/stores-round1/."
+      },
+      {
+        "at": "2026-09-23T13:20:19Z",
+        "late": true,
+        "change": "Fix round 3 (preregistration-fixround3.json H4.1, commit 9f84cc9), recorded after the independent Opus review: fix-round-2 R4.1's parenthetical 'Iceberg: rows/5; ArcticDB: rows/5' is not what the cited stores-fix2 code measured. The code used the Iceberg table's snapshot count and ArcticDB's version count minus the seed version (store_arms.py recovery(): store_units), both store-reported and independent of decoding. rows/5 would have compared decoded batches with decoded rows/5, a tautology. No rerun: this amendment documents the measure that ran."
+      },
+      {
+        "at": "2026-09-23T13:20:19Z",
+        "late": true,
+        "change": "Fix round 3 (H4.2/H4.3): the cited runs kept only the last 300 characters of each writer's stderr, so their maximum Iceberg retry attempt is unknown. store_arms.py concurrency() now also writes each writer's complete stderr to its own file and parses every 'retrying (k/N)' line (added after the cited run; stderr_tail is unchanged). A supplementary Iceberg n=30 x2 run with complete stderr is published in raw/stores-fixround3/."
+      },
+      {
+        "at": "2026-09-23T15:16:17Z",
+        "late": true,
+        "change": "Fix round 4 (preregistration-fixround4.json H4.5, commit aa85595) after the Codex review of fix round 3: retry_summary counts CommitFailedException in stderr only, and writers catch exceptions into their progress files, so that count alone cannot detect a caught commit failure. The receipt now reports writer_error_counts (read from the progress files) beside it. No rerun: both fields are read from the retained raw/stores-fixround3 outputs."
+      },
+      {
+        "at": "2026-09-23T15:30:35Z",
+        "late": true,
+        "change": "Fix round 5 (no preregistration; documentation corrections after the independent Opus review of fix round 4, no rerun): the H4.5 block now carries its preregistered source_review label, and two limits were added or aligned: this is not the verdict_overturn_when comparison (different fixture; validate_source rejection not run in any store arm), and the list of unmeasured candidates now matches the handoff (lakeFS, QuestDB, ClickHouse; delta-rs is not a layer candidate)."
+      },
+      {
+        "at": "2026-09-23T05:44:56Z",
+        "late": true,
+        "change": "Fix round 2, preregistered in preregistration-fixround2.json (commit 260398f) after the Codex re-review found that the recovery predicate accepted whole-batch loss or an empty decode. The predicate now requires decoded whole batches to equal the store-reported committed units, and whole-batch-loss and empty-result controls must fail it. The cited gap-4 run is stores-fix2. Fix-round-1 raw outputs are kept in raw/stores-fixround1/."
+      }
+    ],
+    "fix_round": {
+      "label": "fix-round preregistration (written after the first results and after the Codex read-only review of 2026-09-23T05:23-05:29Z)",
+      "written_at": "2026-09-23T05:30:25Z",
+      "written_at_note": "approximate: between the 05:30:19Z shell stamp and the 05:30:35Z commit",
+      "committed_in": "3ce38e9 (Preregister the identity-provenance fix round after Codex review), before the fix-round reruns",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround.json",
+      "review_findings_addressed": [
+        "P1 gap 4: baseline recovery and concurrency derived rows as committed_versions*5 without decoding Parquet, so rows % 5 could not fail",
+        "P1 gap 5: check_events accepted missing or renamed dataset bindings",
+        "P1 gap 5: original C5.2 says every event's output carries version facets; the materialize START output carries none",
+        "P2 gap 4: lineage counts treated caller-supplied text (DVC commit subject, baseline provenance prose) as native fields",
+        "P2 gap 4: storage measured as a Python file-length sum, not the preregistered du -sb, and outcome text called totals medians",
+        "P2 gap 0: outcome text said every criterion passed although the literal C0.3 full-tree diff exited 1",
+        "P2 gap 5: the OpenLineage event file was published as .jsonl, which .gitignore excludes"
+      ],
+      "criteria": [
+        "F4.1 Every arm's recovery and concurrency inspection decodes the stored rows (baseline: Parquet bytes of every hash-verified snapshot; DVC: Parquet files after checkout of the committed .dvc; Iceberg: scan; ArcticDB: read). Content check: every row_id occurs the same number of times, and every occurrence equals the fixture row. Row count = decoded rows, not a derived product.",
+        "F4.2 Detector control per arm: inject one foreign or corrupted row into a copy of the decoded rows and confirm the content check fails, so the check can see a wrong batch.",
+        "F4.3 Storage: record both `du -sb` (apparent size, preregistered) and the regular-file byte sum, labelled as totals.",
+        "F4.4 Lineage: classify each of the six fields per arm as native, caller_annotation or absent. Count native fields only.",
+        "Outcome rule: settled if F4.1-F4.3 pass for all four arms and the remaining preregistered metrics stand; otherwise advanced."
+      ]
+    },
+    "fix_round_2": {
+      "label": "fix-round 2 preregistration (after the Codex re-review of 2026-09-23T05:37-05:44Z)",
+      "written_at": "2026-09-23T05:44:56Z",
+      "written_at_note": "approximate: the shell stamp was 05:44:57Z at write time and the commit is 05:44:57Z; written before the gap-4 rerun",
+      "committed_in": "260398f (Preregister identity-provenance fix round 2 (recovery predicate)), before the fix-round-2 rerun",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround2.json",
+      "review_findings_addressed": [
+        "P2 gap 4: the recovery predicate used committed_versions for the baseline and accepted whole-batch loss or empty decoded rows (content_check passes on empty input)",
+        "P3 gap 4: the attempt-1 log citation pointed to raw/stores/ instead of raw/stores-round1/"
+      ],
+      "criteria": [
+        "R4.1 Recovery passes only if decoded whole batches (content_check.batches, minus the seed batch for ArcticDB) equal the committed units the store reports (baseline: hash-verified manifests; DVC: batch files in the committed .dvc; Iceberg: rows/5; ArcticDB: rows/5), and that count is the writer's last recorded count or one more.",
+        "R4.2 When at least one commit is recorded, empty decoded rows fail.",
+        "R4.3 New detector controls, each of which must be flagged: whole-batch loss (one batch removed while the committed count is unchanged) and an empty result.",
+        "Outcome rule: unchanged from the fix round; settled only if R4.1-R4.3 pass for all four arms on a fresh rerun."
+      ]
+    },
+    "fix_round_3": {
+      "label": "fix-round 3 preregistration (after the independent Opus review of the fix-round-2 handoff, 2026-09-23)",
+      "written_at": "2026-09-23T13:20:19Z",
+      "written_at_note": "shell stamp taken immediately before writing this file; committed before any fix-round-3 check ran. This is a fix-round preregistration written after the original C0.3 result was seen; it is labelled as such and does not replace the original criterion, whose failure stays recorded.",
+      "committed_in": "9f84cc9 (Preregister identity-provenance fix round 3 ...), before any fix-round-3 check ran",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json",
+      "review_findings_addressed": [
+        "major gap 0: C0.3 as written (full-tree sha256 list after `rm -rf` of every out and `dvc checkout` equals the pre-delete list) failed with git_restore_diff_exit=1, the original refutation rule makes the original run not_settled, and the settled outcome rested on an amendment written after the result",
+        "minor gap 4: fix-round-2 R4.1 named 'Iceberg: rows/5; ArcticDB: rows/5' as store-reported units, but the code used the Iceberg snapshot count and ArcticDB versions minus the seed, with no amendment recorded",
+        "minor gap 4: the 'highest retry attempt 3/4' limit rests on stderr truncated to its last 300 characters",
+        "minor gap 5: the C5.1 listing shows only an identical 8-character runId prefix for both runs, and the redacted published ndjson no longer satisfies the uuid format of the schema"
+      ],
+      "criteria": [
+        "H4.1 Record a late amendment: fix-round-2 R4.1's parenthetical 'Iceberg: rows/5; ArcticDB: rows/5' was not what the code measured. The cited stores-fix2 run used the Iceberg table's snapshot count and ArcticDB's version count minus the seed version, which are store-reported and independent of decoding (rows/5 would compare decoded batches with decoded rows/5, a tautology). No rerun: the amendment documents the measure that already ran.",
+        "H4.2 Supplementary Iceberg two-writer run, n=30 appends per writer, two repetitions, with each writer's complete stderr retained in its own file. Report the maximum 'retrying (k/4)' attempt, the retry-line count and any CommitFailedException from the complete stderr, plus rows lost after reported success. Detection method: the same regex is applied to a control string containing 'retrying (4/4)' and must return 4.",
+        "H4.3 The cited-run limit is reworded to state that only the last 300 characters of each writer's stderr were retained there, so its maximum retry attempt is unknown; the supplementary H4.2 figure is reported separately.",
+        "Outcome rule for gap 4: unchanged; H4.2 is supplementary and cannot change the gap-4 outcome unless it shows rows lost after reported success for Iceberg, which would make gap 4 advanced with that finding."
+      ]
+    },
+    "fix_round_4": {
+      "label": "fix-round 4 preregistration (after a Codex read-only review of fix round 3, 2026-09-23T15:05-15:15Z)",
+      "written_at": "2026-09-23T15:16:17Z",
+      "written_at_note": "shell stamp taken immediately before writing this file; committed before the fix-round-4 verifier ran. Written after the review, which agreed with all four outcomes (gap 0 settled, 2 advanced, 4 settled, 5 settled).",
+      "committed_in": "aa85595 (Preregister identity-provenance fix round 4 ...), before the fix-round-4 verifier ran",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround4.json",
+      "review_findings_addressed": [
+        "P2 verify_lineage_fixround3.py:57 `for o, p in zip(orig, pub)` assumes publication preserves events and identities; in-memory probes passed after removing the published select COMPLETE event or collapsing every published runId",
+        "P3 store_arms.py:678 retry_summary counts CommitFailedException in stderr only, while writers catch exceptions into their progress files"
+      ],
+      "criteria": [
+        "H4.5 From the retained raw/stores-fixround3/conc30-iceberg-{1,2}.json, record writer_error_counts (progress-file errors, which include caught commit failures) next to commit_failed_exception_lines. No rerun: this is a reading of retained output, labelled source_review within the local_integration receipt.",
+        "Outcome rule: any nonzero writer_error_counts in the supplement drops the 'no CommitFailedException' limit wording to the measured counts; the gap 4 outcome depends on decoded rows, not on this field."
+      ]
+    }
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_store_arms.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/stores-fix2-20260923T054530Z   (fix round 2, cited)",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_store_arms.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/stores-fix-20260923T053213Z   (fix round 1, superseded)",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_store_arms.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/stores-20260923T051425Z   (round 1, superseded)",
+    "(inside) <venv>/bin/python store_arms.py {baseline,dvc,iceberg,arctic} --fixture <replay.py materialized fixture> --work <dir> --out <arm>.json",
+    "(inside) <venv>/bin/python store_arms.py <arm> ... --only-concurrency 30   (x2 per arm)",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_iceberg_retry_fixround3.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/iceberg-retry-fix3-20260923T132130Z   (fix round 3, H4.2 supplement: Iceberg n=30 x2, complete stderr)"
+  ],
+  "results": {
+    "per_arm": {
+      "baseline": {
+        "restore_fidelity_rows": {
+          "observations": true,
+          "universe": true
+        },
+        "restore_after_delete": {
+          "mechanism": "re-materialize from git-tracked fixture",
+          "old_snapshot_sha256_still_verifies": "refused: snapshot_manifest_hash_mismatch",
+          "per_file_equal": {
+            "observations.parquet": true,
+            "snapshot.json": false,
+            "source.json": true,
+            "universe.parquet": true
+          }
+        },
+        "correction_retention": {
+          "mechanism": "separate immutable snapshot directory per version",
+          "v1_row_ids": [
+            "future-member",
+            "original"
+          ],
+          "v1_rows_equal": true
+        },
+        "lineage_field_classification": {
+          "commit_timestamp": "native",
+          "input_dataset_name": "caller_annotation",
+          "operation": "absent",
+          "parent_version": "absent",
+          "per_file_content_hash": "native",
+          "version_id": "native"
+        },
+        "lineage_native_count": 3,
+        "lineage_detail": {
+          "classification_note": "version_id is the content digest materialize returns; the caller must hold it because the store does not persist it. input_dataset_name is the provenance prose from the source file. The source.json content hash is recorded natively in the manifest.",
+          "commit_timestamp": "2026-09-23T05:45:30.922851Z",
+          "field_classification": {
+            "commit_timestamp": "native",
+            "input_dataset_name": "caller_annotation",
+            "operation": "absent",
+            "parent_version": "absent",
+            "per_file_content_hash": "native",
+            "version_id": "native"
+          },
+          "input_dataset_name": "Entirely synthetic events and membership; symbols are illust",
+          "native_count": 3,
+          "operation": null,
+          "parent_version": null,
+          "per_file_content_hash": [
+            "observations.parquet",
+            "source.json",
+            "universe.parquet"
+          ],
+          "version_id": "snapshot_sha256 (content digest, caller-held)"
+        },
+        "recovery_after_sigkill": {
+          "all_recovered": true,
+          "trials": [
+            {
+              "progress_recorded_commits": 8,
+              "decoded_rows": 40,
+              "decoded_batches": 8,
+              "store_reported_units": 8,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 7,
+              "decoded_rows": 35,
+              "decoded_batches": 7,
+              "store_reported_units": 7,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 12,
+              "decoded_rows": 60,
+              "decoded_batches": 12,
+              "store_reported_units": 12,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 7,
+              "decoded_rows": 35,
+              "decoded_batches": 7,
+              "store_reported_units": 7,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 8,
+              "decoded_rows": 40,
+              "decoded_batches": 8,
+              "store_reported_units": 8,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            }
+          ]
+        },
+        "concurrency_n10": {
+          "reported_successful_appends": 20,
+          "rows_expected_from_reported_successes": 100,
+          "rows_found": 100,
+          "rows_lost_after_reported_success": 0,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content": {
+            "batches": 20,
+            "content_ok": true,
+            "decoded_rows": 100,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "no_silent_loss": true
+        },
+        "concurrency_n30_repeats": [
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          },
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          }
+        ],
+        "concurrency_stderr": {
+          "a": "",
+          "b": ""
+        },
+        "storage_bytes_totals": {
+          "du_sb": 12524,
+          "file_sum": 12524
+        },
+        "latency_ms": {
+          "read_median": 23.491,
+          "unit_of_work": "materialize two tables + manifest / verify + read two tables",
+          "write_median": 25.725,
+          "write_samples": 5
+        },
+        "versions": {
+          "duckdb": "1.5.5",
+          "dvc": "3.67.1",
+          "pandas": "3.0.6"
+        }
+      },
+      "dvc": {
+        "restore_fidelity_rows": {
+          "observations": true,
+          "universe": true
+        },
+        "restore_after_delete": {
+          "mechanism": "dvc checkout from local cache",
+          "per_file_equal": {
+            "observations.parquet": true,
+            "universe.parquet": true
+          }
+        },
+        "correction_retention": {
+          "mechanism": "git checkout <v1 commit> -- snap.dvc && dvc checkout",
+          "v1_row_ids": [
+            "future-member",
+            "original"
+          ],
+          "v1_rows_equal": true
+        },
+        "lineage_field_classification": {
+          "commit_timestamp": "native",
+          "input_dataset_name": "absent",
+          "operation": "caller_annotation",
+          "parent_version": "native",
+          "per_file_content_hash": "native",
+          "version_id": "native"
+        },
+        "lineage_native_count": 4,
+        "lineage_detail": {
+          "classification_note": "dvc add mode: operation is the caller commit subject. In pipeline mode dvc.lock natively records the stage cmd and dep paths (see gap-0 run).",
+          "commit_timestamp": "2026-09-23T01:45:38-04:00",
+          "field_classification": {
+            "commit_timestamp": "native",
+            "input_dataset_name": "absent",
+            "operation": "caller_annotation",
+            "parent_version": "native",
+            "per_file_content_hash": "native",
+            "version_id": "native"
+          },
+          "input_dataset_name": null,
+          "native_count": 4,
+          "note": "input dataset names appear only for pipeline stages (dvc.lock deps), not for dvc add; see gap 0/2 run dvc.lock",
+          "operation": "v2",
+          "parent_version": "436c973c6f508f68e2939adf487a9d80e618444c",
+          "per_file_content_hash": "md5 of the directory manifest in snap.dvc: 6c0c0e7ae3bac776360620fa0943beb9.dir",
+          "version_id": "68d08211aec0d0949d83810be27f55d839954c0d"
+        },
+        "recovery_after_sigkill": {
+          "all_recovered": true,
+          "trials": [
+            {
+              "progress_recorded_commits": 3,
+              "decoded_rows": 15,
+              "decoded_batches": 3,
+              "store_reported_units": 3,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 3,
+              "decoded_rows": 15,
+              "decoded_batches": 3,
+              "store_reported_units": 3,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 3,
+              "decoded_rows": 15,
+              "decoded_batches": 3,
+              "store_reported_units": 3,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 3,
+              "decoded_rows": 15,
+              "decoded_batches": 3,
+              "store_reported_units": 3,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 3,
+              "decoded_rows": 15,
+              "decoded_batches": 3,
+              "store_reported_units": 3,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            }
+          ]
+        },
+        "concurrency_n10": {
+          "reported_successful_appends": 20,
+          "rows_expected_from_reported_successes": 100,
+          "rows_found": 100,
+          "rows_lost_after_reported_success": 0,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content": {
+            "batches": 20,
+            "content_ok": true,
+            "decoded_rows": 100,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "no_silent_loss": true
+        },
+        "concurrency_n30_repeats": [
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          },
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          }
+        ],
+        "concurrency_stderr": {
+          "a": "",
+          "b": ""
+        },
+        "storage_bytes_totals": {
+          "du_sb_dvc_cache": 6363,
+          "du_sb_excluding_git": 10887,
+          "du_sb_git_dir": 28963,
+          "file_sum_dvc_cache": 6363,
+          "file_sum_git_dir": 28963,
+          "file_sum_workspace_plus_cache": 10887
+        },
+        "latency_ms": {
+          "read_median": 368.618,
+          "unit_of_work": "write parquet + dvc add + git commit (CLI subprocesses) / delete + dvc checkout + read",
+          "write_median": 503.802,
+          "write_samples": 5
+        },
+        "versions": {
+          "duckdb": "1.5.5",
+          "dvc": "3.67.1",
+          "pandas": "3.0.6"
+        }
+      },
+      "iceberg": {
+        "restore_fidelity_rows": {
+          "observations": true,
+          "universe": true
+        },
+        "restore_after_delete": {
+          "mechanism": "row store; the fixture parquet files are rewritten into Iceberg data files, so source per-file sha256 is not preserved",
+          "per_file_equal": "not_supported"
+        },
+        "correction_retention": {
+          "mechanism": "scan(snapshot_id=<v1 snapshot>) time travel",
+          "v1_row_ids": [
+            "future-member",
+            "original"
+          ],
+          "v1_rows_equal": true
+        },
+        "lineage_field_classification": {
+          "commit_timestamp": "native",
+          "input_dataset_name": "absent",
+          "operation": "native",
+          "parent_version": "native",
+          "per_file_content_hash": "absent",
+          "version_id": "native"
+        },
+        "lineage_native_count": 4,
+        "lineage_detail": {
+          "commit_timestamp": 1790142383405,
+          "data_file_fields": [
+            "file_path",
+            "file_size_in_bytes",
+            "record_count"
+          ],
+          "data_files_recorded": 2,
+          "field_classification": {
+            "commit_timestamp": "native",
+            "input_dataset_name": "absent",
+            "operation": "native",
+            "parent_version": "native",
+            "per_file_content_hash": "absent",
+            "version_id": "native"
+          },
+          "history_entries": 2,
+          "input_dataset_name": null,
+          "native_count": 4,
+          "note": "manifests record data file path, size, record count and column stats; no content hash",
+          "operation": "Operation.APPEND",
+          "parent_version": 3994176784649661689,
+          "per_file_content_hash": null,
+          "version_id": 1030165178560499060
+        },
+        "recovery_after_sigkill": {
+          "all_recovered": true,
+          "trials": [
+            {
+              "progress_recorded_commits": 6,
+              "decoded_rows": 30,
+              "decoded_batches": 6,
+              "store_reported_units": 6,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 6,
+              "decoded_rows": 30,
+              "decoded_batches": 6,
+              "store_reported_units": 6,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 11,
+              "decoded_rows": 55,
+              "decoded_batches": 11,
+              "store_reported_units": 11,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 5,
+              "decoded_rows": 25,
+              "decoded_batches": 5,
+              "store_reported_units": 5,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 6,
+              "decoded_rows": 30,
+              "decoded_batches": 6,
+              "store_reported_units": 6,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            }
+          ]
+        },
+        "concurrency_n10": {
+          "reported_successful_appends": 20,
+          "rows_expected_from_reported_successes": 100,
+          "rows_found": 100,
+          "rows_lost_after_reported_success": 0,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content": {
+            "batches": 20,
+            "content_ok": true,
+            "decoded_rows": 100,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "no_silent_loss": true
+        },
+        "concurrency_n30_repeats": [
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          },
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 300,
+            "rows_lost_after_reported_success": 0,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": true,
+            "content_ok": true
+          }
+        ],
+        "concurrency_stderr": {
+          "a": "Commit failed due to a concurrent update, retrying (1/4) in 110 ms\nCommit failed due to a concurrent update, retrying (1/4) in 109 ms\nCommit failed due to a concurrent update, retrying (2/4) in 204 ms\n",
+          "b": "Commit failed due to a concurrent update, retrying (1/4) in 108 ms\n"
+        },
+        "storage_bytes_totals": {
+          "du_sb": 64841,
+          "file_sum": 64841
+        },
+        "latency_ms": {
+          "read_median": 17.352,
+          "unit_of_work": "new SQLite catalog + create/append two tables / fresh catalog + scan two tables",
+          "write_median": 149.399,
+          "write_samples": 5
+        },
+        "versions": {
+          "duckdb": "1.5.5",
+          "pandas": "3.0.6",
+          "pyarrow": "25.0.1",
+          "pyiceberg": "0.12.0"
+        }
+      },
+      "arctic": {
+        "restore_fidelity_rows": {
+          "observations": true,
+          "universe": true
+        },
+        "restore_after_delete": {
+          "mechanism": "row store; parquet files are converted to ArcticDB segments, so source per-file sha256 is not preserved",
+          "per_file_equal": "not_supported"
+        },
+        "correction_retention": {
+          "mechanism": "read(as_of=<v1 version>)",
+          "v1_row_ids": [
+            "future-member",
+            "original"
+          ],
+          "v1_rows_equal": true
+        },
+        "lineage_field_classification": {
+          "commit_timestamp": "native",
+          "input_dataset_name": "caller_annotation",
+          "operation": "absent",
+          "parent_version": "absent",
+          "per_file_content_hash": "absent",
+          "version_id": "native"
+        },
+        "lineage_native_count": 2,
+        "lineage_detail": {
+          "commit_timestamp": "2026-09-23 05:46:35.563871070+00:00",
+          "field_classification": {
+            "commit_timestamp": "native",
+            "input_dataset_name": "caller_annotation",
+            "operation": "absent",
+            "parent_version": "absent",
+            "per_file_content_hash": "absent",
+            "version_id": "native"
+          },
+          "input_dataset_name": "user metadata only: {'input_dataset': 'nanosecond-replay/fixture.json', 'part': 'v1'}",
+          "native_count": 2,
+          "note": "version numbers are monotonic per symbol; no parent pointer, operation type or content hash is recorded; metadata is caller-supplied",
+          "operation": null,
+          "parent_version": null,
+          "per_file_content_hash": null,
+          "version_id": 1,
+          "versions_listed": 2
+        },
+        "recovery_after_sigkill": {
+          "all_recovered": true,
+          "trials": [
+            {
+              "progress_recorded_commits": 6,
+              "decoded_rows": 30,
+              "decoded_batches": 6,
+              "store_reported_units": 6,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 6,
+              "decoded_rows": 35,
+              "decoded_batches": 7,
+              "store_reported_units": 7,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 17,
+              "decoded_rows": 90,
+              "decoded_batches": 18,
+              "store_reported_units": 18,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 15,
+              "decoded_rows": 75,
+              "decoded_batches": 15,
+              "store_reported_units": 15,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            },
+            {
+              "progress_recorded_commits": 26,
+              "decoded_rows": 130,
+              "decoded_batches": 26,
+              "store_reported_units": 26,
+              "content_ok": true,
+              "content_controls_flagged": true,
+              "recovery_controls": {
+                "empty_result_flagged": true,
+                "whole_batch_loss_flagged": true
+              },
+              "passed": true
+            }
+          ]
+        },
+        "concurrency_n10": {
+          "reported_successful_appends": 20,
+          "rows_expected_from_reported_successes": 100,
+          "rows_found": 50,
+          "rows_lost_after_reported_success": 50,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content": {
+            "batches": 11,
+            "content_ok": true,
+            "decoded_rows": 55,
+            "problems": []
+          },
+          "detector_controls": {
+            "corrupted_row_flagged": true,
+            "dropped_row_flagged": true,
+            "foreign_row_flagged": true
+          },
+          "no_silent_loss": false
+        },
+        "concurrency_n30_repeats": [
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 170,
+            "rows_lost_after_reported_success": 130,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": false,
+            "content_ok": true
+          },
+          {
+            "reported_successful_appends": 60,
+            "rows_found": 150,
+            "rows_lost_after_reported_success": 150,
+            "writer_error_counts": {
+              "a": 0,
+              "b": 0
+            },
+            "no_silent_loss": false,
+            "content_ok": true
+          }
+        ],
+        "concurrency_stderr": {
+          "a": "",
+          "b": ""
+        },
+        "storage_bytes_totals": {
+          "du_sb": 225536,
+          "file_sum": 225536
+        },
+        "latency_ms": {
+          "read_median": 11.087,
+          "unit_of_work": "new LMDB library + write two symbols / fresh handle + read two symbols",
+          "write_median": 94.994,
+          "write_samples": 5
+        },
+        "versions": {
+          "arcticdb": "6.26.0",
+          "duckdb": "1.5.5",
+          "pandas": "2.3.3",
+          "pyarrow": "25.0.1"
+        }
+      }
+    },
+    "H4.2_iceberg_n30_complete_stderr_supplement": {
+      "runs": [
+        {
+          "rows_lost_after_reported_success": 0,
+          "reported_successful_appends": 60,
+          "rows_found": 300,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content_ok": true,
+          "retry_summary_full_stderr": {
+            "attempt_histogram": {
+              "1": 2,
+              "2": 2,
+              "3": 1
+            },
+            "commit_failed_exception_lines": 0,
+            "detector_control_parses_4_of_4": true,
+            "max_attempt": 3,
+            "retry_lines": 5,
+            "stderr_bytes": {
+              "a": 134,
+              "b": 201
+            }
+          }
+        },
+        {
+          "rows_lost_after_reported_success": 0,
+          "reported_successful_appends": 60,
+          "rows_found": 300,
+          "writer_error_counts": {
+            "a": 0,
+            "b": 0
+          },
+          "content_ok": true,
+          "retry_summary_full_stderr": {
+            "attempt_histogram": {
+              "1": 2,
+              "2": 1,
+              "3": 1
+            },
+            "commit_failed_exception_lines": 0,
+            "detector_control_parses_4_of_4": true,
+            "max_attempt": 3,
+            "retry_lines": 4,
+            "stderr_bytes": {
+              "a": 201,
+              "b": 67
+            }
+          }
+        }
+      ],
+      "max_retry_attempt": 3,
+      "detection_method": "regex 'retrying \\((\\d+)/(\\d+)\\)' over each writer's complete stderr file; the same regex parses a control string containing 'retrying (4/4)' as 4 (detector_control_parses_4_of_4)"
+    },
+    "H4.5_writer_error_counts_fixround3_supplement": {
+      "evidence_class": "source_review",
+      "evidence_class_note": "a reading of the retained raw/stores-fixround3/conc30-iceberg-{1,2}.json outputs, no rerun (preregistration-fixround4.json H4.5); the receipt as a whole is local_integration",
+      "runs": [
+        {
+          "a": 0,
+          "b": 0
+        },
+        {
+          "a": 0,
+          "b": 0
+        }
+      ],
+      "detection_method": "each writer records caught exceptions in its progress file; store_arms.py counts them per writer (writer_error_counts). commit_failed_exception_lines scans stderr only and cannot see a caught exception."
+    },
+    "cited_run_retry_max_in_retained_300_char_tails": 3,
+    "quoted_excerpts": {
+      "iceberg_stderr": "Commit failed due to a concurrent update, retrying (1/4) in 110 ms\nCommit failed due to a concurrent update, retrying (1/4) in 109 ms\nCommit failed due to a concurrent update, retrying (2/4) in 204 ms",
+      "arctic_docstring": "arcticdb/version_store/library.py:891-892 (installed 6.26.0): 'concurrent writers to a single symbol are not supported other than for primitives that explicitly state support for single-symbol concurrent writes'; :1386 'Note that `append` is not designed for multiple concurrent writers over a single symbol.'"
+    }
+  },
+  "outcome": "settled",
+  "outcome_reason": "Fix round 2 ran, with every metric group in the gap text measured for the four store arms of the overturn_protocol on one materialized nanosecond-replay fixture (not the overturn_protocol's point-in-time fixture; see limits): baseline hash-manifest, DVC 3.67.1, PyIceberg 0.12.0 and ArcticDB 6.26.0. By-design gaps are recorded as not_supported. Every arm restores canonical rows exactly. Only the baseline and DVC keep per-file sha256. After deletion, DVC checkout restores the tracked files byte-identically; the gap-0 run shows this for snapshot.json too, so the old digest still verifies. Baseline re-materialization reproduces the three data files, but snapshot.json changes (ingested_at) and the old digest is refused (snapshot_manifest_hash_mismatch). Every arm retains the pre-correction version. Native lineage fields out of six (caller annotations excluded): DVC add mode 4, Iceberg 4, baseline 3, ArcticDB 2. After SIGKILL, every arm reopened in 5/5 trials. The decoded rows were whole identical copies of the fixture batch, and decoded whole batches equaled the store-reported committed units, which matched the writer's last recorded commit or one more. Every corrupted, foreign, dropped-row, whole-batch-loss and empty-result control was flagged. With two concurrent writers, baseline, DVC and Iceberg (after its automatic commit retries) lost 0, 0 and 0 rows at n=10 and [0, 0], [0, 0] and [0, 0] at n=30. ArcticDB on LMDB silently lost whole appends that both writers reported as successful: 50 of 100 rows at n=10 and [130, 150] of 300 at n=30. Earlier rounds gave 50 and [140, 145] (fix round 1) and 45 and [145, 150] (round 1). The surviving rows are intact copies, and the loss matches its documented single-writer-per-symbol limit. Storage totals (du -sb and file-length sum) and latency medians are recorded per arm.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "A 5-row observation and 2-row universe fixture. Storage bytes and latency describe fixed overheads at this size, not throughput or scaling.",
+    "Latency units differ by arm: DVC is timed through CLI subprocesses (process start-up included), the others in-process. See each arm's unit_of_work.",
+    "ArcticDB runs with pandas 2.3.3, as arcticdb 6.26.0 requires; the other arms use pandas 3.0.6. DuckDB 1.5.5 does canonicalization in every arm.",
+    "Iceberg and ArcticDB rewrite the fixture into their own storage formats, so per-file sha256 of source.json and the parquet files is not preserved (not_supported by design). Restore fidelity for them is canonical row-content equality.",
+    "Recovery kill points are random (seeded) after at least 3 commits. They are not guaranteed to land inside a commit's critical section.",
+    "PyIceberg retried conflicting commits automatically. The cited runs kept only the last 300 characters of each writer's stderr, so their maximum retry attempt is unknown; the retained tails show up to 3/4 (fix round 1's tails showed 4/4 once, and that append still committed). The fix-round-3 supplementary Iceberg n=30 x2 run kept complete stderr: maximum attempt 3/4, 0 CommitFailedException lines in stderr, writer errors in the progress files [{'a': 0, 'b': 0}, {'a': 0, 'b': 0}], rows lost [0, 0]. Heavier contention could exhaust the 4-retry budget and surface CommitFailedException to the caller.",
+    "Storage totals are measured after the v1+v2 writes and before the latency loop. At this size du -sb (apparent size) equals the regular-file byte sum.",
+    "ArcticDB's supported parallel-write path (stage + finalize_staged_data) was not tested. S3/remote backends were not tested for any arm.",
+    "The lakeFS, QuestDB and ClickHouse layer candidates are not overturn_protocol arms and were not measured. delta-rs (Delta Lake), named as unmeasured in an earlier handoff of this unit, is not a candidate of this layer and was not measured either.",
+    "This is not the comparison named in the layer's verdict_overturn_when. That comparison uses the overturn_protocol fixture_paths (blueprints/us-equities/point-in-time/fixture.json with the invariants in tests/test_point_in_time.py and tests/test_security_identity.py); this one used the materialized nanosecond-replay fixture (blueprints/us-equities/nanosecond-replay/fixture.json via replay.py materialize), as preregistered and as the gap's next_check names ('the materialized fixture'). overturn_protocol metric part (2), validate_source rejection of the availability-unknown or inconsistent mutations, was not run in any store arm (store_arms.py has no validate_source call), and the fifth arm (an OpenLineage event over the winning arm) is covered only by gap 5's separate replay run. The gap text's metric list is measured; a verdict change still needs the verdict_overturn_when comparison."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/run.log",
+      "sha256": "bf96d7b13b8bded6caf98d89c94f9f730281187405e17e7e010ff107942c67ba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/baseline.json",
+      "sha256": "9de17cd745fc4d5436e27c8fd199c3bf12e39e43fc699b91f21d2a2060db9eea"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/dvc.json",
+      "sha256": "d39bcd1365f9744ae198643b8ef236585f795f59765a2ba76ce3861c7ac19d6a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/iceberg.json",
+      "sha256": "0a803c826b1158579b901b0ed13d12fe78cf0aecefb386ddd58ec95f8dbed2b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/arctic.json",
+      "sha256": "84bb2f9d26c699bf6828c52928675da53a457c344820beb0cf52728a0d85d4df"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-baseline-1.json",
+      "sha256": "3bf6bb93011ab3b6e62334e464f48cd2412343bbad6ab1c5f71be8f19038e7b3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-baseline-2.json",
+      "sha256": "3bf6bb93011ab3b6e62334e464f48cd2412343bbad6ab1c5f71be8f19038e7b3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-dvc-1.json",
+      "sha256": "b39572a7afd994ba6548aef9dd44de3444ea8344dda74d654f5b6c74913e153d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-dvc-2.json",
+      "sha256": "b39572a7afd994ba6548aef9dd44de3444ea8344dda74d654f5b6c74913e153d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-iceberg-1.json",
+      "sha256": "fb62184ae80cb1105d2377d2b8695e08b250ba1a2bc773a773f8b87f0cd57804"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-iceberg-2.json",
+      "sha256": "a6444b00c08babefe32e1419eee97a079fa20bd396777a5c9b65b08913990d9b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-arctic-1.json",
+      "sha256": "13ffa8814d4bf68d53fac01bc49f3ae07c41fc0d768d49cbc2e89544802ecf61"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores/conc30-arctic-2.json",
+      "sha256": "85544514e91e3e9a2592c7a67a86ca9db50287d46df27b4520a0f334d7822581"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround1/run.log",
+      "sha256": "43f7384e4db6932e33091cd9a2e8e2a79950f2c0aa7a4e0fe98cbd9bc92bb519"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround1/baseline.json",
+      "sha256": "329c7d0b15513d22ded1e18dad1fe895fbc8bde8b62be8bf0349462d02c532ca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround1/dvc.json",
+      "sha256": "4ee05aa9f3154eab2923440dc8d6b4e1cbf27c1194d8c3e1a657678d7695cca1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround1/iceberg.json",
+      "sha256": "fee45886f463fe4b595616a42277fc4088110fd95e2ee3500fc6d05a20fabc3b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround1/arctic.json",
+      "sha256": "ea8d820be03c7bc27c0cb1b1ff7d4c93a37038b1ee1f3360fc259c9115c79638"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/run.log",
+      "sha256": "9ce37bdbd96e21aa08366e6dfbaf5b1a4460feae948330b07585ce2149c9f5de"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/attempt1-run.log",
+      "sha256": "caa6f826fb155cf2dba9caada7b08a407577984150e7f0fa1f394b4ab0a0701a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/attempt2-run.log",
+      "sha256": "c67652767e2ee1f602df89b4fd2fdbc9fb7976c13d852fa8b89d4bc098e67e7b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/baseline.json",
+      "sha256": "6bda23d5690eb3885c31dfed4c9f74c2b8b952cbd8ac4c64345370de4796ed6e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/dvc.json",
+      "sha256": "f6219527f3b76c0320ce496d94b2bb778ae5bbe205706879a29c4e4807659867"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/iceberg.json",
+      "sha256": "22e8f4c6ba9dbd182e69196dcd5144a0cd2b8c96b9444c539a5db053a3280fd5"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-round1/arctic.json",
+      "sha256": "469b379903b643fd32bb5dc002fe8df59584cf51075ce8ef857ab27b689b4c0f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/venv-core.freeze.txt",
+      "sha256": "6e5c1bff1b0f3136f1f08d1b974a567427e67e74667f253772546f0cf85600a2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/venv-iceberg.freeze.txt",
+      "sha256": "cb36600e18bf2c938823c9098d11470a19448031226bb2ca68425eda494816ad"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/venv-arctic.freeze.txt",
+      "sha256": "b7f8d2e1c34b54e0aeb6f51dbaf7929c3b9fe6205b778e479bac00184c97a1db"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/run.log",
+      "sha256": "ed4dcb6bb9eea30eb758d2cc723a16fe276d610bf40923ae2ac1d2a4b8406542"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-1.json",
+      "sha256": "41c599220737dd6b14e9ac17485c8b75d2c86bd64cdf49fb2017418c3de53274"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-2.json",
+      "sha256": "0dfec7c485540714e2fa7006ac6fd46fe422aab95d5251749f56cc52567b4332"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-1__conc-a.stderr",
+      "sha256": "3fab45d9324761885ca99c2bebe6637d0fadb2ae3cd820c96f9bd8e3aa5e4075"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-1__conc-b.stderr",
+      "sha256": "455ad7c72950e8cd7b27def6b1a487d657e80268fd597ceb567c6eaf077f4bd8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-2__conc-a.stderr",
+      "sha256": "a4363b63153ad4c8f0b79db8a9787bb4285a451aaa36e39f5032eff63e3d9a31"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/stores-fixround3/conc30-iceberg-2__conc-b.stderr",
+      "sha256": "a8438b617f279a4be384a500b0424cd0a063b311848ece15996755f2d46eb38b"
+    }
+  ],
+  "helpers": [
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_store_arms.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/store_arms.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_iceberg_retry_fixround3.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround4.json"
+  ],
+  "checked_at": "2026-09-23T15:17:32Z",
+  "layer": "us-equities/identity-provenance",
+  "crosswalk": "main 92bb279, crosswalk PR #85"
+}

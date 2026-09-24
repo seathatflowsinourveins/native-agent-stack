@@ -1,0 +1,359 @@
+{
+  "phase": "session",
+  "pid": 4145230,
+  "effective_provider": {
+    "model": "qwen3-4b",
+    "model_provider": "localvllm",
+    "providers": {
+      "localvllm": {
+        "name": "local vLLM (loopback)",
+        "base_url": "http://127.0.0.1:28431/v1",
+        "wire_api": "responses"
+      }
+    }
+  },
+  "account": {
+    "account": null,
+    "requiresOpenaiAuth": false
+  },
+  "turn1": {
+    "method_counts": {
+      "turn/started": 1,
+      "item/started": 3,
+      "item/completed": 3,
+      "thread/tokenUsage/updated": 2,
+      "item/agentMessage/delta": 12,
+      "turn/completed": 1
+    },
+    "untyped_methods": [],
+    "documented_notification_types": 82,
+    "received_types_documented": [
+      "item/agentMessage/delta",
+      "item/completed",
+      "item/started",
+      "thread/tokenUsage/updated",
+      "turn/completed",
+      "turn/started"
+    ],
+    "received_types_undocumented": [],
+    "documented_types_not_received": 76,
+    "item_types": [
+      "agentMessage",
+      "dynamicToolCall",
+      "userMessage"
+    ],
+    "tool_items": [
+      {
+        "server": null,
+        "tool": "vault_lookup",
+        "namespace": null,
+        "status": "completed",
+        "success": true
+      }
+    ],
+    "last_token_usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10704,
+        "inputTokens": 10726,
+        "outputTokens": 13,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 10739
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 21376,
+        "inputTokens": 21407,
+        "outputTokens": 33,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 21440
+      }
+    },
+    "turn_completed": {
+      "at": 1790173264.9203913,
+      "method": "turn/completed",
+      "typed": true,
+      "turn_status": "completed",
+      "turn_error": null
+    },
+    "final_answer": "vx-498e98ddd5b0",
+    "tool_host_calls": [
+      {
+        "at": 1790173264.4372602,
+        "tool": "vault_lookup",
+        "arguments": {
+          "key": "alpha"
+        },
+        "answered": true
+      }
+    ],
+    "provider_delta": {
+      "vllm:prompt_tokens_total": 21407.0,
+      "vllm:generation_tokens_total": 33.0,
+      "finished_by_reason": {
+        "stop": 2.0
+      },
+      "seconds": 1.389
+    },
+    "answer_contains_value": true,
+    "tool_round_trip": true
+  },
+  "turn2_interrupt": {
+    "streaming_observed_before_interrupt": true,
+    "interrupt_requested_at": 1790173269.0755324,
+    "interrupt_response": {},
+    "method_counts": {
+      "turn/started": 1,
+      "item/started": 2,
+      "item/completed": 1,
+      "item/agentMessage/delta": 127,
+      "thread/tokenUsage/updated": 1,
+      "turn/completed": 1
+    },
+    "untyped_methods": [],
+    "documented_notification_types": 82,
+    "received_types_documented": [
+      "item/agentMessage/delta",
+      "item/completed",
+      "item/started",
+      "thread/tokenUsage/updated",
+      "turn/completed",
+      "turn/started"
+    ],
+    "received_types_undocumented": [],
+    "documented_types_not_received": 76,
+    "item_types": [
+      "agentMessage",
+      "userMessage"
+    ],
+    "tool_items": [],
+    "last_token_usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 10704,
+        "inputTokens": 10726,
+        "outputTokens": 13,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 10739
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 21376,
+        "inputTokens": 21407,
+        "outputTokens": 33,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 21440
+      }
+    },
+    "turn_completed": {
+      "at": 1790173269.0867732,
+      "method": "turn/completed",
+      "typed": true,
+      "turn_status": "interrupted",
+      "turn_error": null
+    },
+    "samples": {
+      "before": {
+        "at": 1790173264.935417,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 53635.0,
+        "vllm:generation_tokens_total": 480.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 5.0,
+          "length": 2.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "at_interrupt": {
+        "at": 1790173269.0750754,
+        "vllm:num_requests_running": 1.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 64430.0,
+        "vllm:generation_tokens_total": 607.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 5.0,
+          "length": 2.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "after_completed_1s": {
+        "at": 1790173269.091957,
+        "vllm:num_requests_running": 1.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 64430.0,
+        "vllm:generation_tokens_total": 607.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 5.0,
+          "length": 2.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle1": {
+        "at": 1790173279.1156018,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 64430.0,
+        "vllm:generation_tokens_total": 607.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 5.0,
+          "length": 2.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      },
+      "settle2": {
+        "at": 1790173289.133833,
+        "vllm:num_requests_running": 0.0,
+        "vllm:num_requests_waiting": 0.0,
+        "vllm:prompt_tokens_total": 64430.0,
+        "vllm:generation_tokens_total": 607.0,
+        "vllm:request_success_total_by_reason": {
+          "stop": 5.0,
+          "length": 2.0,
+          "abort": 0.0,
+          "error": 0.0,
+          "repetition": 0.0
+        }
+      }
+    },
+    "provider_delta_before_to_interrupt": {
+      "vllm:prompt_tokens_total": 10795.0,
+      "vllm:generation_tokens_total": 127.0,
+      "finished_by_reason": {},
+      "seconds": 4.14
+    },
+    "provider_delta_before_to_settle1": {
+      "vllm:prompt_tokens_total": 10795.0,
+      "vllm:generation_tokens_total": 127.0,
+      "finished_by_reason": {},
+      "seconds": 14.18
+    },
+    "provider_delta_settle1_to_settle2": {
+      "vllm:prompt_tokens_total": 0.0,
+      "vllm:generation_tokens_total": 0.0,
+      "finished_by_reason": {},
+      "seconds": 10.018
+    },
+    "running_at_settle1": 0.0,
+    "consumption_stopped": true,
+    "sdk_token_usage_notifications": [
+      {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 10704,
+          "inputTokens": 10726,
+          "outputTokens": 13,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 10739
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 21376,
+          "inputTokens": 21407,
+          "outputTokens": 33,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 21440
+        }
+      }
+    ],
+    "rollout": {
+      "rollout_found": true,
+      "rollout_name": "rollout-2026-09-23T10-21-03-redacted-id:9c37bf170279d20d.jsonl",
+      "entries": [
+        {
+          "timestamp": "2026-09-23T14:21:03.544Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:21:04.444Z",
+          "total": {
+            "input_tokens": 10681,
+            "cached_input_tokens": 10672,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10701
+          },
+          "last": {
+            "input_tokens": 10681,
+            "cached_input_tokens": 10672,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10701
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:21:04.913Z",
+          "total": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "last": {
+            "input_tokens": 10726,
+            "cached_input_tokens": 10704,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 13,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10739
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:21:04.918Z",
+          "event": "task_complete",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:21:04.940Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T14:21:09.076Z",
+          "total": {
+            "input_tokens": 21407,
+            "cached_input_tokens": 21376,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 33,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 21440
+          },
+          "last": {
+            "input_tokens": 10726,
+            "cached_input_tokens": 10704,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 13,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 10739
+          }
+        },
+        {
+          "timestamp": "2026-09-23T14:21:09.084Z",
+          "event": "turn_aborted",
+          "reason": "interrupted"
+        }
+      ]
+    }
+  },
+  "thread_id_private_in_state": true,
+  "status": "ok",
+  "sdk": "openai-codex",
+  "started_at": 1790173263.2817776,
+  "finished_at": 1790173289.17805
+}

@@ -1,0 +1,16 @@
+# Codex read-only review 3 (codex exec --sandbox read-only --ephemeral); prompt then final message
+## prompt
+Independent read-only reviewer. Repository: current directory, commit d8ad36a. Scope: evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/ and blueprints/gap-wave2-20260923/us-equities__storage-compute/.
+Your previous review of 6155b51 left two items: (3) the kill test's unmatched 'S' marker did not prove an engine-level write was interrupted, so gap 10 should stay advanced; (P2) raw/paired-receipt-negative-controls-r2.jsonl was gitignored and missing from the commit.
+Check whether round 3 (commits 1f234b9 and d8ad36a; prereg/10-fixround2.json; bench.py kill_writer/kill_and_recover; raw/bench-r3-*.json kill_recover fields) resolves (3) under the preregistered criterion, and whether the paired control file is now committed and hash-matches receipt 6. Report any remaining problem that would change an outcome (0 advanced, 3 settled, 4 settled, 6 covered_elsewhere, 10 settled). Verify every raw file cited by the five receipts is tracked by git (git ls-files) and its sha256 matches. At most 20 lines.
+## final message
+No remaining outcome-changing findings at `d8ad36a`.
+
+- **(3) resolved under the [preregistered criterion]($HOME/code/nas-wt-g2-storage-compute/evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/prereg/10-fixround2.json:6).** `I` now precedes each write API after preparation. Elapsed/median ratios are DuckDB **0.251742**, ClickHouse **0.254855**, QuestDB **0.282214**, Iceberg **0.251648**—all ≥0.25. Each records no late acknowledgements, all 30 acknowledged batches passing verification, batch 30 absent, and no unexpected batches.
+- **P2 resolved:** controls were committed as `raw/paired-receipt-negative-controls-r2.json` in `1f234b9`; receipt 6 references that replacement. SHA-256 matches: `ebc57fa43b5213019e8e4a97fe5ae0933c94d8d6ab0cd86d4feb2e819ae6d2af`.
+- **Artifact audit passed:** all **90 references / 48 unique raw files** appear in `git ls-files` and commit `d8ad36a`; working-file and committed-blob SHA-256 values match every receipt.
+- Round-2/3 full Q1–Q4 comparisons and required concurrency phases also pass.
+
+Outcomes stand: **0 advanced; 3 settled; 4 settled; 6 covered_elsewhere; 10 settled.**
+
+Read-only source/artifact review; no benchmark rerun.

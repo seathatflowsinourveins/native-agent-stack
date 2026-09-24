@@ -60,6 +60,12 @@ from build_manifest import assert_no_leak, github_repo_slug, sanitize_value  # n
 # DISPOSITIONS/WINNER_EVIDENCE_CLASSES are reused (not reimplemented) from
 # scripts/landscape.py, the single owner of these enums.
 from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E402
+# The withheld-key policy is shared with scripts/landscape.py, which re-checks every packet a new
+# wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
+from scripts.landscape import (  # noqa: E402
+    COPY_WITHHELD_FIELDS, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS, is_withheld_packet_key,
+    requirement_names, withhold_policy_labels,
+)
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
 
 LEDGER_FILES = {
@@ -79,6 +85,7 @@ def default_sota_manifest_path(run_id: str) -> str:
 SOTA_MANIFEST_PATH = default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
 ADOPTION_MANIFEST_PATH = "adoption/manifest.json"
 FOUNDATION_DECISIONS_PATH = "catalogs/foundation/decisions.json"
+EVIDENCE_MANIFEST_PATH = "manifests/evidence.json"
 PACKET_SCHEMA_VERSION = 1
 DEFAULT_SEED = "20260922"
 DEFAULT_CHECKED_AT = "2026-09-22"
@@ -97,8 +104,8 @@ TRADING_CARD_FILES = (
 CARD_DECISION_ADOPTED = {"default", "conditional"}
 # Manifest review labels are not carried in manifest mode: every label value, including
 # not_individually_reviewed and unmaintained_signal, correlates with the withheld card
-# decision (measured over the 112 2026-09-22 trading entries). pin_behind_upstream stays
-# as its own boolean field and the upstream metadata stays.
+# decision (measured over the 112 2026-09-22 trading entries). Outside --withhold-labels,
+# pin_behind_upstream stays as its own boolean field and the upstream metadata stays.
 LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
                           "group; judge fit against the layer title and layer_scope_terms.")
 MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
@@ -107,6 +114,69 @@ MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
 # default occur only on selected candidates; decision review_status accepted_within_scope on 105
 # selected against 6 others). Evidence prose (evidence_scope, limitations, next_gap) stays.
 WITHHELD_DECISION_FIELDS = ("selection", "review_status")
+# --withhold-labels also strips popularity and recency signals (2026-09-23 peer audit: the upstream
+# record was copied verbatim, so every judge saw GitHub stars and push/release dates, which rank
+# candidates by attention rather than by the retained evidence). The explicit keys are the ones
+# build_manifest.upstream_record() and the GitHub API emit; any other key naming a count of stars,
+# forks, watchers or downloads, or a timestamp (``*_at``), is stripped the same way.
+# The latest upstream release is withheld entirely (re-review 2026-09-23): a date-based tag such as
+# inspect_ai's "release/2025-11-28" carries a release date. Withholding it always is the stricter
+# of the two options considered (the other stripped it only when date-shaped) and no packet
+# requirement names releases, versions or maintenance. prerelease describes that same release, and
+# pin_behind_upstream is derived by comparing the pin with it, so both go with it.
+# newcomer marks a candidate as recently discovered, a recency signal of the same kind (final
+# verification, 2026-09-23), so it is withheld with them. The candidate-only note (a newcomer's
+# demonstrated_gap or a keep-but-compare entry's overturn comparison) exists only on non-adopted
+# candidates, so it hints at their status too and is withheld as well (review of #122, finding 9).
+COPY_RELEASE_FIELDS = COPY_WITHHELD_FIELDS
+_POPULARITY_TOKENS = POPULARITY_TOKENS
+# archived/license are kept only when the packet's requirement text names them (a requirement about
+# licensing or maintenance status makes them evidence rather than a popularity proxy):
+# scripts/landscape.py REQUIREMENT_GATED_FIELDS and requirement_names.
+# The review of the #122 fix round made the strip recursive, sharing scripts/landscape.py
+# is_withheld_packet_key with the CI check: a withheld key is removed at any depth of a copy (for
+# example upstream.latest_flag, whose tag-listing fallback can be date-shaped such as
+# "release/2025-11-28", or a nested evidence.stars), not only on the copy and its upstream record.
+# The packet copies of upstream metadata: each candidate's and each unclaimed sota component's.
+UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
+
+
+def withhold_popularity(packet: dict) -> dict:
+    """Strip popularity and recency fields, the latest upstream release and what is derived from it
+    (and archived/license unless the requirement names them) at any depth of every candidate and
+    sota-component copy in a built packet, and list each stripped field in ``withheld``. The
+    canonical fields are always listed, so a reader can tell the packet was built under this policy
+    even when no copy carried upstream metadata."""
+    requirement = packet.get("requirement")
+    kept_gated = {field for field in REQUIREMENT_GATED_FIELDS if requirement_names(field, requirement)}
+    labels = set(withhold_policy_labels(requirement))
+
+    def strip(value, label):
+        # Rebuild rather than delete in place: build_candidate and the unclaimed list share the loaded
+        # manifest's upstream record across packets, so an earlier packet must not remove a field a
+        # later packet's requirement keeps.
+        if isinstance(value, dict):
+            kept = {}
+            for key, item in value.items():
+                if is_withheld_packet_key(key, kept_gated):
+                    labels.add(f"{label}.{key}")
+                else:
+                    kept[key] = strip(item, f"{label}.{key}")
+            return kept
+        if isinstance(value, list):
+            return [strip(item, label) for item in value]
+        return value
+
+    for collection in UPSTREAM_COPIES:
+        if isinstance(packet.get(collection), list):
+            packet[collection] = [strip(item, f"{collection}[]") if isinstance(item, dict) else item
+                                  for item in packet[collection]]
+    withheld = list(packet.get("withheld", []))
+    for label in sorted(labels):
+        if label not in withheld:
+            withheld.append(label)
+    packet["withheld"] = withheld
+    return packet
 
 
 RULE_ITEM_RE = re.compile(r"\n(?=\d+\.\s)")
@@ -356,6 +426,34 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     return packet
 
 
+def registered_receipts_by_component(root: Path) -> dict:
+    """component_id -> [{id, kind, path}] from manifests/evidence.json ``receipts`` (the registered receipt
+    list that scripts/platform_status.py and component_matrix.py read), sorted by path. A packet otherwise
+    carries only the ledger's evidence_refs, so a lane cannot see, cite or judge a registered native receipt
+    the ledger row never named (2026-09-23 re-record)."""
+    index: dict = {}
+    for receipt in load_json(root / EVIDENCE_MANIFEST_PATH).get("receipts") or []:
+        entry = {"id": receipt["id"], "kind": receipt["kind"], "path": receipt["path"]}
+        for component_id in receipt.get("component_ids") or []:
+            index.setdefault(component_id, []).append(entry)
+    return {component_id: sorted(entries, key=lambda item: item["path"]) for component_id, entries in index.items()}
+
+
+REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists, for each candidate and component, the receipts "
+                            "manifests/evidence.json registers for its component id. They are evidence to open "
+                            "and judge like evidence_refs: a receipt's kind and content, not its presence, "
+                            "decide the evidence class.")
+
+
+def attach_registered_receipts(packet: dict, index: dict) -> dict:
+    for item in packet.get("candidates") or []:
+        item["registered_receipts"] = list(index.get(item.get("component_id"), []))
+    for item in packet.get("sota_components_not_in_candidates") or []:
+        item["registered_receipts"] = list(index.get(item.get("id"), []))
+    packet["registered_receipts_note"] = REGISTERED_RECEIPTS_NOTE
+    return packet
+
+
 def serialize(document: dict) -> str:
     sanitized = sanitize_value(document)
     text = json.dumps(sanitized, indent=1, sort_keys=True)
@@ -388,7 +486,7 @@ def withhold_labels(packet: dict) -> dict:
 
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
-                      manifest: str = None) -> dict:
+                      manifest: str = None, registered_receipts: bool = False) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
@@ -403,6 +501,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     manifest_mode = trading_candidates == "manifest"
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
+    receipts_index = registered_receipts_by_component(root) if registered_receipts else None
 
     packets = {}
     for catalog in catalogs:
@@ -423,9 +522,14 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 else None,
             )
             if withhold and layer_candidates is None:
-                # Manifest-mode trading packets already carry no labels; leaving them untouched
-                # keeps their bytes (and every lane return sealed against them) unchanged.
+                # Manifest-mode trading packets already carry no decision labels.
                 packet = withhold_labels(packet)
+            if withhold:
+                # Every packet, manifest-mode trading packets included, loses popularity and
+                # recency signals; the default (no --withhold-labels) build is unchanged.
+                packet = withhold_popularity(packet)
+            if receipts_index is not None:
+                packet = attach_registered_receipts(packet, receipts_index)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -451,9 +555,17 @@ def parse_args(argv=None):
                              "so packets and verdicts agree on the pins.")
     parser.add_argument("--withhold-labels", action="store_true",
                         help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
-                             "selection and review_status) from every ledger-built packet; manifest-built trading "
-                             "packets (--trading-candidates manifest) carry none and stay byte-identical. Off by "
+                             "selection and review_status) from every ledger-built packet, and popularity/recency "
+                             "fields (stars, forks, watchers, pushed_at, released_at, any *_at; archived and "
+                             "license unless the requirement names them; always upstream.latest, upstream.prerelease, "
+                             "upstream.latest_flag, pin_behind_upstream, the newcomer flag, the candidate-only note "
+                             "and any key naming a release) at any depth of every candidate and component copy "
+                             "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
+    parser.add_argument("--registered-receipts", action="store_true",
+                        help="Attach to every candidate and component its receipts registered in "
+                             "manifests/evidence.json (id, kind, path), so a lane can open and cite them. Off "
+                             "by default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -468,7 +580,8 @@ def main(argv=None) -> int:
 
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
-                                manifest=str(args.manifest) if args.manifest else None)
+                                manifest=str(args.manifest) if args.manifest else None,
+                                registered_receipts=args.registered_receipts)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,127 @@
+{
+ "id": "gap2-session-recovery-and-site-compat",
+ "gap_index": 2,
+ "gap_text_sha256": "278ff6a72163207b61be059d1418a285f602d0b539648469d0a1d6ff2e1cd1d3",
+ "preregistration": {
+  "written_at": "2026-09-23T01:45:00Z",
+  "expectation": "Killing agent-browser's background daemon mid-session will either resume the prior page or start fresh; a 5-site public sample (reduced from the 'about 10' in the next_check, time-boxed) will mostly succeed for both tools; Playwright, being process-per-invocation with no daemon, has no equivalent daemon-kill scenario.",
+  "criteria": "Record daemon PID before/after SIGKILL, whether 'get title' after relaunch reflects the pre-kill page, whether owned Chrome processes are cleaned up, and per-site pass/fail/latency for agent-browser and Playwright on 5 public sites.",
+  "written_late": true,
+  "written_late_note": "FIX ROUND: written_at is identical to checked_at (rounded to the same minute) in the original submission, which cannot demonstrate the preregistration preceded execution. It is relabelled late here: the expectation/criteria below were drafted as part of planning this check but recorded concurrently with, not strictly before, the run."
+ },
+ "commands": [
+  "agent-browser --namespace gapwave2test open http://127.0.0.1:8317/greeting.html",
+  "agent-browser --namespace gapwave2test session info --json  (record pid)",
+  "kill -9 <daemon pid>",
+  "agent-browser --namespace gapwave2test get title  (post-kill)",
+  "agent-browser --namespace gapwave2test session info --json  (post-kill, new pid)",
+  "ps aux | grep renderer  (orphaned Chrome check)",
+  "agent-browser --namespace gapwave2sites open <url> for 5 public sites",
+  "node pw_sites.mjs  (Playwright chromium.launch, same 5 sites)",
+  "FIX ROUND: node pw_kill_test.mjs & then kill -9 <node pid> mid-task (during a 15s wait), then ps -p <pid> and a chrome-process count, then a fresh rerun of node pw_kill_test.mjs"
+ ],
+ "results": {
+  "daemon_kill_recovery": {
+   "pre_kill_pid": 1245883,
+   "post_kill_action": "next CLI call auto-relaunched a new daemon (pid 1247118) rather than erroring",
+   "post_kill_get_title": "empty string (no page loaded; prior navigation state was NOT restored -- session info showed restoreStatus: 'not_configured')",
+   "orphaned_chrome_processes": "8 renderer/utility/zygote processes survived the daemon SIGKILL and had to be pkilled manually; they were not auto-reaped by the relaunch",
+   "note": "The tool's own help text documents 'Owned Chrome processes close with their daemon, even if it is killed' -- this was NOT observed; the old Chrome tree was orphaned, not closed, until manually killed.",
+   "raw_evidence_caveat": "FIX ROUND: no raw log/output file for this daemon-kill sequence (the PIDs, the 8-orphan count, or restoreStatus) was retained in the repo or in ~/.cache/gap-wave2-20260923/web-research/ -- only ab_sites_results.json and the pw_sites_*/pw_kill_* files exist there. This block is reported as originally observed and remembered, not as a re-verifiable artifact; treat the specific numbers (pid 1245883/1247118, 8 processes) as unverified by this fix round, though the qualitative claim (relaunch does not restore state; some Chrome processes survive the daemon kill) is corroborated in spirit by the new playwright_kill_recovery_control block below, run on a comparable (but architecturally different) tool during this fix round with a retained raw log.",
+   "scope_of_manual_pkill": "Not recorded in the original run; unknown how broad the 'pkilled manually' cleanup was (this namespace only vs. all agent-browser/Chrome processes on the host)."
+  },
+  "playwright_kill_recovery_control": {
+   "purpose": "FIX ROUND: the review noted the original receipt skipped a Playwright kill-and-recover half as having 'no analog'. Playwright's architecture (process-per-invocation, no daemon) really has no daemon to kill, but a comparable control -- SIGKILL the node process mid-task and observe cleanup/rerun -- was possible and is run here.",
+   "script": "scripts/pw_kill_test.mjs (opens the loopback fixture, fills #name, then waits 15s before clicking -- SIGKILL sent during the wait)",
+   "pre_kill_ready_line": "READY_FOR_KILL pid=1381784 elapsed_ms=288 (raw/pw_kill_prekill_stderr.log)",
+   "post_kill_process_check": "`ps -p <killed pid>` returned no matching process immediately after `kill -9`; a `ps aux | grep chrom` count taken right after the kill was 0 -- no orphaned Chrome child processes survived this SIGKILL (raw/pw_kill_ps_after_kill.log)",
+   "rerun_result": "A fresh `node pw_kill_test.mjs` invocation immediately after completed normally end-to-end: `{\"finished\":true,\"status\":\"Hello, Kill Test!\"}` (raw/pw_kill_rerun_stdout.log) -- as expected for a stateless, process-per-invocation tool, the rerun has no prior state to recover and simply redoes the whole task.",
+   "caveat": "pw_kill_test.mjs itself does not call browser.close() at the end, so on the (non-killed) rerun the node process and its Chromium tree kept running after printing output until manually pkilled a few seconds later -- an artifact of this test script omitting cleanup, not a finding about Playwright's kill/recovery behavior. This is unrelated to the mid-task-kill result above, which measured process state immediately after the SIGKILL, not after a clean run."
+  },
+  "site_sample_agent_browser": [
+   {
+    "url": "https://example.com",
+    "success": true,
+    "ms": 441,
+    "stdout": "\u2713 Example Domain\n  https://example.com/",
+    "stderr": "[agent-browser] launched browser"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Special:Random",
+    "success": true,
+    "ms": 1332,
+    "stdout": "\u2713 Scott Porter (rugby league) - Wikipedia\n  https://en.wikipedia.org/wiki/Scott_Porter_(rugby_league)",
+    "stderr": ""
+   },
+   {
+    "url": "https://www.iana.org/domains/reserved",
+    "success": true,
+    "ms": 296,
+    "stdout": "\u2713 IANA-managed Reserved Domains\n  https://www.iana.org/domains/reserved",
+    "stderr": ""
+   },
+   {
+    "url": "https://playwright.dev",
+    "success": true,
+    "ms": 246,
+    "stdout": "\u2713 Playwright\n  https://playwright.dev/",
+    "stderr": ""
+   },
+   {
+    "url": "https://httpstat.us/200",
+    "success": true,
+    "ms": 10421,
+    "stdout": "\u2713 404 Not Found\n  https://httpstat.us/200",
+    "stderr": "",
+    "counted_as_indeterminate_fix_round": "The tool reported success:true (its request completed, exit 0), but the page it fetched read '404 Not Found' despite requesting /200. This is very likely httpstat.us-side behavior (that service is known to be flaky/decommission-adjacent), not evidence about agent-browser itself. FIX ROUND: do not count this row toward a 'passed' tally for either tool -- see site_sample_tally_fix_round below."
+   }
+  ],
+  "site_sample_playwright": [
+   {
+    "url": "https://example.com",
+    "success": true,
+    "ms": 131,
+    "title": "Example Domain"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Special:Random",
+    "success": true,
+    "ms": 691,
+    "title": "Slovakia men's national ball hockey team - Wikipedia"
+   },
+   {
+    "url": "https://www.iana.org/domains/reserved",
+    "success": true,
+    "ms": 300,
+    "title": "IANA-managed Reserved Domains"
+   },
+   {
+    "url": "https://playwright.dev",
+    "success": true,
+    "ms": 273,
+    "title": "Playwright"
+   },
+   {
+    "url": "https://httpstat.us/200",
+    "success": true,
+    "ms": 13386,
+    "title": "404 Not Found",
+    "counted_as_indeterminate_fix_round": "Same httpstat.us behavior as the agent-browser row; not counted toward a pass tally for either tool. See site_sample_tally_fix_round."
+   }
+  ],
+  "site_sample_tally_fix_round": "FIX ROUND correction: the README/outcome_detail originally read '5/5 pass each'. Of the 5 sites, https://httpstat.us/200 returned a page titled '404 Not Found' for both tools despite the URL asking for a 200 -- almost certainly httpstat.us-side flakiness, not a tool defect, but it is not a clean pass either. Corrected tally: 4/5 clear passes plus 1/5 indeterminate (site-side anomaly) for each tool. Separately, the Wikipedia row (https://en.wikipedia.org/wiki/Special:Random) is not a fixed, repeatable sample: by design it redirects to a different random article on every request, so agent-browser landed on 'Scott Porter (rugby league)' and Playwright landed on 'Slovakia men's national ball hockey team' -- two different pages, not the same page loaded twice. Both tools still successfully loaded *a* Wikipedia article, which is the property actually being tested (arbitrary-site compatibility), so this does not change the tally, but the two runs are not comparable page-for-page."
+ },
+ "outcome": "advanced",
+ "outcome_detail": "Narrows but does not fully settle the gap; corrected during the fix round from an overstated 5/5-pass tally. Crash-recovery: the agent-browser daemon auto-relaunches on next command but does NOT restore prior page/session state by default (restore is 'not_configured'), and the original run reported that killing the daemon orphaned owned Chrome child processes rather than closing them as documented -- however no raw log for that specific sequence was retained (see raw_evidence_caveat), so treat the exact PIDs/count as unverified-but-plausible. A new, retained-log control on Playwright (SIGKILL mid-task, not a daemon-kill since Playwright has none) shows a cleaner result: 0 orphaned Chrome processes immediately after the kill, and a stateless fresh rerun completes normally -- a real architectural contrast (agent-browser's persistent daemon has cleanup edge cases; Playwright's process-per-invocation model has none to have) even though the two are not the same kind of kill test. Site compatibility: agent-browser and Playwright each cleanly passed 4 of 5 sites (example.com, a Wikipedia article, iana.org, playwright.dev); the 5th, httpstat.us/200, returned an anomalous '404 Not Found' page for both tools and is counted as indeterminate, not a pass, for either. The Wikipedia:Random URL is not a fixed sample (each tool landed on a different random article), which is expected of that URL and does not undermine the compatibility result, but is noted for reproducibility.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Time-boxed to 5 public sites, not the ~10 in next_check; this is a reduced, not full, compatibility sample.",
+  "The tally is 4/5 clear passes + 1/5 indeterminate per tool, not 5/5; see site_sample_tally_fix_round.",
+  "en.wikipedia.org/wiki/Special:Random is not a fixed/repeatable URL (each request lands on a different article); the two tools were not tested against the same page.",
+  "The original agent-browser daemon-kill numbers (PIDs, 8 orphaned processes, restoreStatus) have no retained raw log in the repo or the cache dir; they are reported as originally observed, not re-verified in this fix round. A retained-log Playwright SIGKILL control was added instead (playwright_kill_recovery_control) as the closest thing to a like-for-like kill test, since Playwright has no daemon to kill.",
+  "The scope of the original 'pkilled manually' Chrome cleanup (this namespace only vs. host-wide) was not recorded.",
+  "Did not test the file-protocol rejection mentioned in the original gap text; loopback HTTP was used throughout.",
+  "Reproducibility: scripts/pw_sites.mjs and scripts/pw_kill_test.mjs are committed; raw/ab_sites_results.json, raw/pw_sites_results.json, raw/pw_kill_prekill_stderr.log, raw/pw_kill_ps_after_kill.log and raw/pw_kill_rerun_stdout.log are the retained raw outputs for this receipt."
+ ],
+ "checked_at": "2026-09-23T01:45:00Z"
+}

@@ -1,0 +1,144 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/7-data-licensing-clauses",
+ "gap_index": 7,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "No receipt I read establishes licensing or redistribution rights for the acquired data.",
+ "gap_text_sha256": "7b72e77cdeef45acbb5e1806600b218f94ad97e2c73332690682db5e5d96a097",
+ "next_check": "Fetch Alpaca's market-data and customer agreement terms and the SEC EDGAR access and reuse statements. Record the storage and redistribution clauses that apply to the acquired data in a dated receipt.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Alpaca's customer agreement / market data terms contain a non-redistribution or personal-use clause for market data; SEC states sec.gov information is public and may be copied/redistributed, subject to fair-access (rate limit, User-Agent) rules.",
+  "criteria": "settled if dated fetches of both parties' primary documents are retained (sha256) and the storage and redistribution clauses are quoted; advanced if either party's clause cannot be located in a primary document.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": {
+  "written_at": "2026-09-23T04:58:07Z",
+  "label": "fix-round-2 preregistration, written after the independent Opus review of fe8b66e and before the round-2 fetches and reruns",
+  "expectation": "QuantConnect/LEAN publish terms for the bundled sample data (LEAN repository license and QuantConnect data terms). The gap likely stays advanced because account-plan terms need account access.",
+  "criteria": "Quote the governing clause for LEAN repository Data/ (license file and any data-specific notice) and QuantConnect's terms on data redistribution, with exact anchors. settled only if every acquired data source used by this layer (Alpaca, SEC, LEAN) has a quoted storage/redistribution clause AND account-plan terms are read; otherwise advanced.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round2.json",
+  "committed_in": "5f248b6"
+ },
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": {
+  "written_at": "2026-09-23T13:25:21Z",
+  "label": "round-3 integrity-fix preregistration, written after git reported CRLF normalization on commit 78be820 and before any file was rewritten",
+  "finding": "five published raw HTML files have CRLF line endings in the worktree while .gitattributes (* text=auto eol=lf) stores LF; the manifest and receipts hash the CRLF bytes, so a fresh checkout mismatches. Two are round-2 files already committed (6-nasdaqtrader-holiday-calendar.html, 7-quantconnect-terms.html); three are round-3 NYSE snapshots.",
+  "expectation": "Normalizing the five worktree files to LF makes their sha256 equal the committed blob hash; venue_pages_check.py (gap 6), lean_rights.py if it reads the QuantConnect page (gap 7) and archive_calendar_check.py (gaps 6/14) produce the same results on the LF copies.",
+  "criteria": "For each file: worktree sha256 == git blob sha256 after the change. Check outputs compared with the committed outputs (sha256 fields excluded); any difference is reported. REDACTIONS.json records the normalization.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration-fix-round3.json",
+  "committed_in": "1240cb9"
+ },
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "major: settled although LEAN data rights and account-plan terms were uncovered - LEAN repository license and QuantConnect terms added; outcome changed settled -> advanced (account-plan terms and vendor terms remain)"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "curl -sSL https://alpaca.markets/disclosures   # 200",
+  "curl -sSL https://files.alpaca.markets/disclosures/library/{AcctAppMarginAndCustAgmt,TermsAndConditions,NYSE+Market+Data+Display+Services+Agreement,NASDAQ+OMX+Global+Subscriber+Agreement}.pdf   # all 200",
+  "curl -sSL -A '<project-URL UA>' https://www.sec.gov/about/privacy-information   # 403 'Request Rate Threshold Exceeded' (live sec.gov blocked for this host)",
+  "curl http://web.archive.org/web/20260919152816id_/https://www.sec.gov/about/privacy-information ; .../20260821173111id_/https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+  "$HOME/.cache/gap-wave2-20260923/market-data-reference/pdf/bin/python (pypdf 6.19.0) PDF->text; python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/license_clauses.py $HOME/.cache/gap-wave2-20260923/market-data-reference/docs > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-license-clauses.json   # missing_anchors []",
+  "# fix round 2 (after the Opus review): LEAN/QuantConnect bundled data used by compare_multi.py (lean-daily, lean-probe sources)",
+  "curl -sSL -A 'Mozilla/5.0 (X11; Linux x86_64) research-check' https://www.quantconnect.com/terms/   # 200, 79948 bytes; https://www.quantconnect.com/terms/data/ redirected to /login (not readable without an account)",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/publish_raw.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw 7-quantconnect-terms.html; cp $HOME/.local/share/codex-ecosystem/tools/lean-985ef30-remediation/{LICENSE,Data/equity/readme.md} evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/lean_rights.py $HOME/.local/share/codex-ecosystem/tools/lean-985ef30-remediation evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.json   # exit 0, missing_anchors []",
+  "# round-3 EOL integrity fix (eol_fix preregistration 13:25:21Z, committed in 1240cb9): git stores these raw HTML files with LF (.gitattributes '* text=auto eol=lf') but the worktree copies were CRLF, so recorded hashes did not match a fresh checkout",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/eol_normalize.py evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw 6-nasdaqtrader-holiday-calendar.html 7-quantconnect-terms.html 14-wayback-nyse-20160108005018.html 14-wayback-nyse-20170301172132.html 14-wayback-nyse-20181215174802.html   # worktree sha256 now equals the git blob sha256 for all five",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/lean_rights.py $HOME/.local/share/codex-ecosystem/tools/lean-985ef30-remediation evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.eolfix3.json   # exit 0; identical to 7-lean-rights.fix2.json except the QuantConnect page sha256; stderr empty"
+ ],
+ "results": [
+  "Alpaca Customer Agreement V26.2026.07 s.30 'Use of Market Data': 'AlpacaDB, Inc. provides market data to non-professional Alpaca customers ... I agree not to reproduce, distribute, sell or commercially exploit the market data in any manner without written consent from Alpaca.'; it incorporates the NASDAQ OMX Global Subscriber Agreement and the Agreement for Market Data Display Services 'if I am provided access to such data'",
+  "Alpaca Terms and Conditions: 'Content is provided exclusively for personal and noncommercial access and use. No part of the Service or Content may be copied, reproduced, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted or distributed in any way (including \"mirroring\") to any other computer, server, web site or other medium for publication or distribution or for any commercial enterprise, without Alpaca's express prior written consent.'",
+  "NYSE Market Data Display Services Agreement s.5: 'Subscriber shall not furnish Market Data to any other person or entity.'; Nonprofessional Subscriber = natural person receiving market data 'solely for his/her personal, non-business use'",
+  "NASDAQ Global Subscriber Agreement: non-professional 'Information is licensed only for personal use'; 'Subscriber shall take reasonable security precautions to prevent unauthorized Persons from gaining access to the Information.'",
+  "SEC (archived 2026-09-19): 'Information presented on sec.gov is considered public information and may be copied or further distributed by users of the web site without the SEC's permission. Please consider appropriate citation to the SEC as the source.'; fair access: no more than 10 requests per second; EDGAR (archived 2026-08-21): 'Anyone can access and download this information for free'; declare a User-Agent",
+  "Storage: no Alpaca/NYSE/Nasdaq document found here contains a clause permitting or forbidding private local retention of historical market data; the operative limits are personal/non-commercial use, no furnishing/redistribution, and security against unauthorized access. Scan of store/retain/archive/cache/mirroring terms retained per document.",
+  "Fix round 2, LEAN bundled data: the files this layer used (Data/equity/usa/daily/{aapl,ibm,spy}.zip at LEAN 985ef30, 2026-09-18) are tracked in the LEAN git repository, whose only license is Apache-2.0 ('Copyright 2014 QuantConnect Corporation'): '2. Grant of Copyright License ... to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work'; '4. Redistribution. You may reproduce and distribute copies of the Work ... provided that You meet the following conditions: (a) You must give any other recipients ... a copy of this License'. No data-specific license, notice or terms file exists under Data/ and no Data readme mentions a license or redistribution (both lists empty).",
+  "Fix round 2: Data/equity/readme.md: 'QuantConnect hosts US Equity Data (market 'USA') provided by AlgoSeek ... (trade and quote data from post-2007) and QuantQuote (trade data from pre-2007)' - the upstream vendors' own terms for the bundled sample were not found.",
+  "Fix round 2: QuantConnect site Terms (quantconnect.com/terms) govern the Site, not the GitHub repository: '2.1 License. ... limited license to use and access the Site solely for your own personal use'; '2.2 Certain Restrictions ... you shall not license, sell, rent, lease, transfer, assign, distribute, host, or otherwise commercially exploit the Site ... or any content displayed on the Site'; '(xv) modify, distribute, redistribute or translate underlying works based on the Site'. The QuantConnect data-agreement URL requires login."
+ ],
+ "detection_method": "Each clause is located by an exact anchor phrase; license_clauses.py and lean_rights.py exit 1 and list missing anchors if any is absent (missing_anchors = [] for both); lean_rights.py's self-test confirms a made-up anchor is reported missing.",
+ "outcome": "advanced",
+ "evidence_class": "source_review",
+ "limits": [
+  "Outcome advanced, not settled: (1) the account-specific Alpaca market-data plan and subscriber status (Basic/Algo Trader Plus, professional vs non-professional) that govern the data actually acquired were not read; that needs account access, owner sota-workflow-resolution. (2) For the LEAN sample data, only the repository license (Apache-2.0, no data carve-out) and QuantConnect's site terms were found; the AlgoSeek/QuantQuote vendor terms and QuantConnect's login-gated data agreement were not read.",
+  "Not legal advice or a legal interpretation; clauses are quoted, not construed. Whether QuantConnect's Apache-2.0 grant validly covers vendor-sourced sample data is not assessed.",
+  "Live sec.gov returned 403 'Request Rate Threshold Exceeded' for this host, so SEC statements come from Internet Archive snapshots dated 2026-09-19 and 2026-08-21.",
+  "Consequence for the repository: raw Alpaca payloads must stay private (already the practice); SEC-derived data may be republished with citation."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-license-clauses.json",
+   "sha256": "3dbcb58b445d957966d673dbdc028c545a7cca00d8a48b1d852bf57a65dc83e1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-AcctAppMarginAndCustAgmt.pypdf.txt",
+   "sha256": "91e9dcaaf34843c834c006269c83d25507d34fe66559021ded7a5448432bd32a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-TermsAndConditions.pypdf.txt",
+   "sha256": "bacb70eb1d5455f1117e0659955a6ade77e5581243312604d3b303ef683a489f"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NYSE_Market_Data_Display_Services_Agreement.pypdf.txt",
+   "sha256": "cdf7da75bd5e7404611440b2bd4296bac45e59fb07ac84d2152eb582fbeb4f1f"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NASDAQ_OMX_Global_Subscriber_Agreement.pypdf.txt",
+   "sha256": "2a03882e63c8e95fb3cd256d8639023b740e3df55fc9de1a1bb2b71a7b5c6742"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-privacy-information-wb20260919.html",
+   "sha256": "a8897135a1f720fa60bb019e1e0407b947a42cab6a82002ddcc57b54fa49628d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-accessing-edgar-data-wb20260821.html",
+   "sha256": "c3380a32963b9e68d6edcbfd82c659ad8cbe60e08a419024f074e88e904576cc"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-live-403-response.html",
+   "sha256": "26537ebfdae04ffbdba670f71b52334efac5f5e7f347b337d64fb34d8c536034"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+   "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.json",
+   "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-LICENSE.txt",
+   "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-Data-equity-readme.md",
+   "sha256": "3752faae1328d3db99d4e2ea2e3525886b979724d74d6c228d7036d193be444a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html",
+   "sha256": "b0061581c86f8e9d8eb0750aa1802c432188a5f94bf4015fb5e393f3f15f50db"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.eolfix3.json",
+   "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+  }
+ ],
+ "checked_at": "2026-09-23T13:25:49Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

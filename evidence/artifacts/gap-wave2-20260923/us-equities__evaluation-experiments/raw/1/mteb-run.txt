@@ -1,0 +1,25 @@
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mteb/lib/python3.13/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 8844.39it/s]
+The task 'STSBenchmark' is superseded by 'STSBenchmark.v2'. We recommend using the newer version of the task unless you are running a specific benchmark. See `get_task('STSBenchmark.v2').metadata.description` to get a description of the task and changes.
+$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-mteb/lib/python3.13/site-packages/mteb/evaluate.py:169: UserWarning: The task 'STSBenchmark' is superseded by 'STSBenchmark.v2'. We recommend using the newer version of the task unless you are running a specific benchmark. See `get_task('STSBenchmark.v2').metadata.description` to get a description of the task and changes.
+  task.check_if_dataset_is_superseded()
+Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 5749 examples [00:00, 653895.59 examples/s]
+Generating validation split: 0 examples [00:00, ? examples/s]Generating validation split: 1500 examples [00:00, 392774.13 examples/s]
+Generating test split: 0 examples [00:00, ? examples/s]Generating test split: 1379 examples [00:00, 478091.02 examples/s]
+{
+ "mteb": "2.21.0",
+ "torch": "2.14.0+cpu",
+ "cuda_available": false,
+ "task": "STSBenchmark",
+ "task_dataset": {
+  "path": "mteb/stsbenchmark-sts",
+  "revision": "b0fddb56ed78048fa8b90373c8a3cfc37b684831"
+ },
+ "model": "sentence-transformers/all-MiniLM-L6-v2",
+ "model_revision": "8b3219a92973c328a8e22fadcfa821b5dc75636a",
+ "split": "test",
+ "main_score": 0.8203246731235654,
+ "cosine_spearman": 0.8203246731235654,
+ "evaluation_seconds": 43.86
+}

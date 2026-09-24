@@ -1,0 +1,122 @@
+{
+  "aborted_row": {
+    "dagRunId": "034TZWE79HwVYFpT1qdPpE",
+    "duration": "6s",
+    "finishedAt": "2026-09-22T22:46:06-04:00",
+    "name": "realmaint",
+    "startedAt": "2026-09-22T22:46:00-04:00",
+    "status": "aborted",
+    "workerId": "local"
+  },
+  "checkpoint": {
+    "execution_count": 1,
+    "validate": {
+      "exit": 0,
+      "stdout_first_line": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}",
+      "stdout_first_line_sha256": "941352217aafbe965f2cb9ec5498d6b763d818f9ee6ef61310dde86bfd8e9632"
+    }
+  },
+  "checks": {
+    "after_retry_status_succeeded": true,
+    "before_retry_status_aborted": true,
+    "checkpoint_execution_count_one": true,
+    "checkpoint_unchanged": true,
+    "ecosystem_equals_reference": true,
+    "model_call_claim_single": true,
+    "model_usage_present": true,
+    "model_verdict_pass": true,
+    "owned_processes_retired_after_stop": true,
+    "retry_finalizer_exited": true,
+    "same_native_run_id": true,
+    "scheduler_created_run": true,
+    "single_run_in_history": true,
+    "validate_equals_reference": true
+  },
+  "command_exit_codes": {
+    "history-aborted": 0,
+    "history-all": 0,
+    "history-running": 0,
+    "history-succeeded": 0,
+    "retry": 0,
+    "stop": 0,
+    "validate": 0,
+    "version": 0
+  },
+  "completed": {
+    "checkpoint_sha256": "fb686fe10c11a471ef5eee1e8188054817864a62bb65be26a74ee1d0f0aa5465",
+    "ecosystem": {
+      "exit": 0,
+      "stdout_first_line": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+      "stdout_first_line_sha256": "3febda0044c60c8138359a09bbf80daafc6c9f9b36b8a72bd0b332feb55beff7"
+    },
+    "validate": {
+      "exit": 0,
+      "stdout_first_line": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}",
+      "stdout_first_line_sha256": "941352217aafbe965f2cb9ec5498d6b763d818f9ee6ef61310dde86bfd8e9632"
+    }
+  },
+  "dagu_version": "2.16.6",
+  "frozen": {
+    "cron": "46 22 * * *",
+    "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "frozen_at_utc": "2026-09-23T02:44:47.413747+00:00",
+    "inputs": {
+      "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "dagu_common.py": "1ce91e2b253a36611e08f4de5897b889df671aaf4d0735c3111d357c56610d7d",
+      "real_scheduled_recovery.py": "286aa14a6fed3717002103cceb674413a40d3e7b29de208dc8a966b629fb27e1",
+      "real_steps.py": "fe8787054a719222b1a6aeb3570f6cadd665a06e0ba84fdb0c4dd4bd385bc7a7",
+      "realmaint.yaml": "31744887b4083df28e2d01379c7211ca08c1258b25bb161baddd0634505d58e7"
+    },
+    "planned_fire_local": "2026-09-22T22:46:00-04:00",
+    "python_version": "3.12.3",
+    "reference": {
+      "ecosystem": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+      "validate": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}"
+    },
+    "snapshot": {
+      "archive_sha256": "25dd92d1ebef69c44ebbd396485778ff47a4d5c9418c7bb9368289478d4340aa",
+      "commit": "41d39b3"
+    }
+  },
+  "history_rows_total": 1,
+  "owned_processes_remaining_after_scheduler_stop": 0,
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "run_id": "034TZWE79HwVYFpT1qdPpE",
+  "running_row": {
+    "dagRunId": "034TZWE79HwVYFpT1qdPpE",
+    "duration": "6s",
+    "name": "realmaint",
+    "startedAt": "2026-09-22T22:46:00-04:00",
+    "status": "running",
+    "workerId": "local"
+  },
+  "scheduler_stopped": true,
+  "status": "passed",
+  "succeeded_row": {
+    "dagRunId": "034TZWE79HwVYFpT1qdPpE",
+    "duration": "8s",
+    "finishedAt": "2026-09-22T22:46:14-04:00",
+    "name": "realmaint",
+    "startedAt": "2026-09-22T22:46:06-04:00",
+    "status": "succeeded",
+    "workerId": "local"
+  },
+  "timeline_utc": [
+    [
+      "scheduler_started",
+      "2026-09-23T02:44:47.650589+00:00"
+    ],
+    [
+      "finalize_ready",
+      "2026-09-23T02:46:06.529088+00:00"
+    ],
+    [
+      "stop_issued",
+      "2026-09-23T02:46:06.659843+00:00"
+    ],
+    [
+      "retry_returned",
+      "2026-09-23T02:46:14.370850+00:00"
+    ]
+  ]
+}

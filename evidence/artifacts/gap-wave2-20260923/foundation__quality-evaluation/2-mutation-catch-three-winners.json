@@ -1,0 +1,55 @@
+{
+ "id": "foundation__quality-evaluation__gap2",
+ "gap_index": 2,
+ "gap_text_sha256": "88b1e6ed7c563000f16960909a05b34c83d382e69cb8e05d632dbb3b226b53f4",
+ "preregistration": {
+  "written_at": "2026-09-23T02:42:37Z",
+  "label": "fix-round preregistration, written after the independent review and before any fix-round rerun",
+  "expectation": "For each of Promptfoo, Playwright and ShellCheck: original exit 0, mutant exit non-zero, restored exit 0. The Playwright mutation is applied to the application (a local TLS mirror of the TodoMVC app served on loopback, with Chromium host-resolver-rules mapping demo.playwright.dev to it), with the upstream spec files byte-identical across all three runs.",
+  "criteria": "nine exit codes captured to files by the helper script; all three provider/script versions retained; spec sha256 unchanged; the local server access log shows the tests loaded the app from the mirror (detection that the network app was not used).",
+  "committed_in": "ebf6ac1 (preregistrations-fixround.json), before any fix-round command"
+ },
+ "fixround2_preregistration": {
+  "written_at": "2026-09-23T12:41:55Z",
+  "label": "fix-round-2 preregistration, written after the second independent review (Opus) and before any fix-round-2 command",
+  "expectation": "Rerun the mutation check on the project's own winner fixtures, copied into a temp work dir (repository files unchanged): (1) Promptfoo: examples/promptfoo-nemotron-upstream/promptfooconfig.yaml with its assertion target upstream-example.py (the executed copy, sha256 c4b48632...), mutant swaps DOCUMENTS[2] and DOCUMENTS[3] so two queries lose their paired document; expected exits 0 / 100 / 0. (2) ShellCheck: the manifest command 'shellcheck fixtures/example.sh' on a copy of fixtures/example.sh; mutant replaces the quoted literal argument with an unquoted $1; expected exits 0 / 1 / 0 with SC2086. (3) Playwright: the project's application fixture blueprints/convergence-practice/application-delivery (frozen browser/ledger.spec.ts, unchanged) set up in an owned prefix (PostgreSQL 18.6 source build via the Makefile's recipe, pnpm 12.4.2 via corepack, uv sync, next build) and run inside a private network namespace (unshare, own loopback; 127.0.0.1:18080 on the host is held by a running ntfy service) with the Playwright 1.63 Chromium build as the executable; mutant changes the app so an update no longer records a revision; expected exits 0 / 1 / 0 with spec sha256 unchanged.",
+  "criteria": "nine exit codes captured to files; all fixture versions retained with sha256; repository fixture files unchanged (git diff empty); settled only if all three arms run on the project fixtures. If the application arm cannot be set up within 20 minutes of setup wall time, the outcome is advanced with the exact blocker, and the TodoMVC substitute run is kept as supporting evidence.",
+  "committed_in": "1fcd1fe (preregistrations-fixround2.json), before any fix-round-2 command"
+ },
+ "original_round_preregistration": {
+  "written_at": null,
+  "note": "Round 1 recorded written_at 2026-09-23T02:15:00Z, a value reconstructed after its runs (raw-output mtimes and eval ids precede it). It is labelled late and superseded; the round-1 artifacts are at commit b37df23."
+ },
+ "commands": [
+  "application prefix $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/app: copy of blueprints/convergence-practice/application-delivery at this branch plus wsl-application/playwright.config.ts; flex 2.6.4-8.2build1, m4 1.4.19-4build1 and bison 3.8.2+dfsg-1ubuntu0.24.04.1 .deb files downloaded from archive.ubuntu.com, sha256-checked against wsl-application/ubuntu-packages.json and extracted with dpkg-deb -x into a task sysroot; corepack enable --install-directory <prefix>/bin pnpm (COREPACK_HOME in the prefix; pnpm 12.4.2); make setup; ecosystem-bounded-run make postgres-install (attempt 1 failed: 'configure: error: bison not found'; attempt 2 exit 0); ecosystem-bounded-run taskset -c 0-3 pnpm build (attempt 1 failed: tokio 'OS can't spawn worker thread' under the default 256-task cap; attempt 2 with ECOSYSTEM_JOB_TASKS_MAX=1024 exit 0)",
+  "bash blueprints/gap-wave2-20260923/foundation__quality-evaluation/run_g2_fixround2.sh $PWD $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2 $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2-out $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/pinned-venv $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/app $HOME/.cache/gap-wave2-20260923/web-research/ms-playwright/chromium-1243/chrome-linux64/chrome  (inner namespace script: run_g2_app_inner.sh)"
+ ],
+ "results": {
+  "exit_codes": {
+   "promptfoo (examples/promptfoo-nemotron-upstream)": "original 0 / mutant 100 / restored 0",
+   "shellcheck (shellcheck fixtures/example.sh)": "original 0 / mutant 1 / restored 0",
+   "playwright (application-delivery, frozen browser/ledger.spec.ts)": "original 0 / mutant 1 / restored 0"
+  },
+  "exit_code_files": "g2-out/{pf-upstream,sh,app}-{original,mutant,restored}.exit",
+  "promptfoo_mutation": "upstream-example.py (the fixture's assertion target, executed copy sha256 c4b48632...) with DOCUMENTS[2] and DOCUMENTS[3] swapped (pf-upstream-mutation.diff; mutant sha256 28c29b96...); promptfooconfig.yaml sha256 07c64ff5... unchanged in all phases (pf-upstream-phase.sha256)",
+  "promptfoo_mutant_failure": "'2/4 NVIDIA published queries ranked the paired document first; winners=[[0],[1],[3],[2]]' (pf-upstream-results-mutant.json); original and restored 'All assertions passed'",
+  "shellcheck_mutation": "fixtures/example.sh line 3 'printf \"%s\\n\" \"native stack fixture\"' -> 'printf \"%s\\n\" $1' (sh-mutation.diff)",
+  "shellcheck_mutant_failure": "In fixtures/example.sh line 3: printf \"%s\\n\" $1 ... SC2086 (info): Double quote to prevent globbing and word splitting. (sh-mutant.stdout)",
+  "app_mutation": "backend/app.py update_run no longer inserts the run_events history row (app-mutation.diff); original sha256 0dbd2f60... equals the repository file",
+  "app_mutant_failure": "Error: expect(locator).toContainText(expected) failed ... Expected substring: \"Revision 2 · 2 recorded changes\" Received string: \"...Revision 2 · 1 recorded changes...\" ... 1 failed (app-mutant.stdout)",
+  "app_original_restored": "1 passed (4.5s) and 1 passed (2.4s) (app-original.stdout, app-restored.stdout)",
+  "oracle_unchanged": "browser/ledger.spec.ts 1cd010ba..., playwright.config.ts d36c6391... and wsl-application/playwright.config.ts 24a34681... identical in all three phases and equal to the repository files (app-phase.sha256)",
+  "isolation": "host 127.0.0.1:18080 was held by a running ntfy service (app-host-ports-before.txt), so PostgreSQL, the API, Next and Chromium ran in a new user+network namespace whose only interface was lo (app-ns-interfaces.txt), with the caller's uid mapped back to 1000 so PostgreSQL did not run as root. Namespace listeners after pg_ctl stop: none (app-ns-listeners-after.txt); host listeners on 15432/18081 after: 0 (app-host-ports-after.txt)",
+  "fix_round_1_substitutes": "the fix-round-1 run on minimal Promptfoo/shell fixtures and on a loopback mirror of the TodoMVC demo app (support/fixround/g1-g2-g3/g2-*) is kept as supporting evidence; it is superseded as the gap-2 evidence"
+ },
+ "outcome": "settled",
+ "evidence_class": "local_integration",
+ "limits": "One mutation per tool shows that each winner catches an injected regression in its project fixture; it does not measure mutation-detection rates. Chromium was the Playwright 1.63 chromium-1243 build from a browser cache another unit created this wave, not the Linux Chrome for Testing 153 build of the WSL qualification. The Ubuntu InRelease signature step of the WSL recipe was not repeated; each .deb was checked against the sha256 recorded in the committed ubuntu-packages.json. The application was copied from this branch rather than cloned fresh at cabbe2c; app/, backend/ and browser/ are unchanged between them, and the Makefile and serve.py differ only by the recorded portability fixes. The Promptfoo fixture directory holds only promptfooconfig.yaml; its assertion target is NVIDIA's model-card script, used here as the executed copy retained by gap 7. Detection: each mutant has a recorded diff (diff exit 1); the oracle hashes are identical in every phase; the original-phase pass needed the 'Run ledger' heading, which the host's ntfy on :18080 cannot serve, and the namespace had no route to host listeners.",
+ "checked_at": "2026-09-23T12:50:46Z",
+ "artifacts": [
+  "support/fixround2/g2-out/*",
+  "support/fixround2/setup/{app-setup.log,app-setup.started,debs-urls-sha256.txt,debs-verify.log,pg-install1-bison-missing.log,pg-install2.tail.log,app-build1-tasks-limit.log,app-build2.log,g2.started}",
+  "support/fixround/g1-g2-g3/g2-*",
+  "blueprints/gap-wave2-20260923/foundation__quality-evaluation/{run_g2_fixround2.sh,run_g2_app_inner.sh}"
+ ]
+}

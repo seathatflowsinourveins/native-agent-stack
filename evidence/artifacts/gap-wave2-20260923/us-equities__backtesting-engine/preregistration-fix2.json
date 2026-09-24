@@ -1,0 +1,19 @@
+{
+  "written_at": "2026-09-23T07:09:27Z",
+  "label": "fix-round 2 preregistration, written after the Codex re-review of faebb70 and before the fix-round-2 rerun",
+  "review_finding": "ca_window_replay.py compared fill instants at whole-second precision; a +1 ms shift passed",
+  "gaps": {
+    "1": {
+      "expectation": "With exact nanosecond instant comparison, the rerun reproduces the same fills, cash 96852.10 and all 13 checks true; the synthetic probe additionally fails fill_BUY_at_bar_instant for a +1 ms fill shift.",
+      "criteria": [
+        "outcome stays advanced; any new failing check is reported verbatim"
+      ]
+    },
+    "8": {
+      "expectation": "Same as gap 1.",
+      "criteria": [
+        "outcome stays advanced"
+      ]
+    }
+  }
+}

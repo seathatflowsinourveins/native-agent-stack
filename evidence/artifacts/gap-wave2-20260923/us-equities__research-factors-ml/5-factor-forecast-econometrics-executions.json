@@ -1,0 +1,550 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-5-factor-forecast-econometrics-executions",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 5,
+  "gap_text_sha256": "cb253e9ae7a83153b5e4dd9ad3d9acfe7636e0454c2dd19d9a7feb91fe4af07d",
+  "gap_text": "None of the factor IC, forecasting, feature-extraction, online-learning, econometrics, volatility or RAG candidates (c2, c3, c4, c5, c6, c9, c10, c12, c14, c15, c17, c18, c20, c21, c24) has a retained execution. Untested is not failed.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.5",
+    "expectation": "A fresh uv venv with pinned alphalens-reloaded 0.4.6, statsmodels 0.15.0, arch 8.0.0 and statsforecast 2.1.1 runs each library on the frozen SPY/QQQ/IWM data; chronos 2.3.2 (chronos-bolt-small) runs in the forecast comparison. Optional extra arms if pinned wheels install cleanly: sktime 1.1.0, tsfresh 0.21.2, river 0.26.1, arcticdb 6.26.0.",
+    "criteria": [
+      "alphalens: momentum20/60/120 factor IC for 1- and 5-session forward returns over development sessions; exit 0; output hashed.",
+      "statsmodels: ARIMA(1,1,1) on SPY log close (last 252 development sessions) with a 5-step forecast plus Ljung-Box; exit 0; hashed.",
+      "arch: GARCH(1,1) on SPY daily percent log returns 2015-2020 with a 5-step variance forecast; exit 0; hashed.",
+      "statsforecast: AutoARIMA(season_length=1) on log close of all three assets, h=5; exit 0; hashed.",
+      "Outcome: advanced unless all 15 listed candidates execute; list the remaining candidates by id."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:48:47Z",
+        "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+        "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+        "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+        "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+      },
+      {
+        "written_at": "2026-09-23T07:08:30Z",
+        "label": "fix round 3 (gaps 1 and 5, plus merge metadata), written after an independent Codex review of commit 5516759",
+        "trigger": "The review found: (a) the Z-check arm raised the wrapper's 'incomplete training label' check (the one evaluate.main performs), not evaluate.choose's overlap detector, and the preregistered 'same assertion on P6' was only run in report mode; (b) the ARIMA residual Ljung-Box used model_df=0; (c) the merged forecast metadata recorded the merge CLI's kronos_device default ('cpu').",
+        "change": "(a) Add two arms to evaluate_purge.py and rerun into a new output dir: Z-choose (purge 0, full-segment training panel so overlapping labels are observed, unmodified evaluate.choose) is expected to raise 'training label overlap with evaluation decision'; P6-assert (plan purge 6, embargo 0, no censoring, the P6E5 fold-boundary assertion enforced) is expected to raise AssertionError on the first fold whose evaluation labels cross the fold end. Existing arms are unchanged and must reproduce their earlier results. (b) Add a statsmodels_lb_df2 arm: the same ARIMA(1,1,1) residuals with acorr_ljungbox(model_df=2); report both values. (c) The merge records per-model execution metadata from the source results files; rerun the merge into a new dir, and the metrics must be identical.",
+        "criteria": [
+          "Z-choose raises the overlap ValueError; P6-assert raises AssertionError; Z-check, Z-leaky, P6 and P6E5 outputs are unchanged.",
+          "statsmodels_lb_df2 exits 0; both p-values are reported.",
+          "The merged metrics equal the earlier merge."
+        ]
+      },
+      {
+        "written_at": "2026-09-23T15:36:22Z",
+        "label": "fix round 4 (gap 5 only), written before any fix-round-4 command ran, on a re-dispatch of this unit",
+        "trigger": "Gap 5 remained advanced with six listed candidates unexecuted: c9 haystack, c14 docling, c17 ray-serve, c18 timesfm, c21 sentence-transformers, c24 Qlib. Each installs on this host without credentials, so the preregistered 'all 15 execute' criterion is reachable.",
+        "change": "Add six arms in a new script extra_arms.py, each in its own uv venv under $CACHE, bounded to 20 minutes through ecosystem-bounded-run. All arms read one export of the frozen data (export step: the existing venv runs fcmp.load_ohlcv, which cross-checks evaluate.load_panel after evaluate.verify_inputs, and writes frozen_ohlcv.json with its sha256); each arm refuses to run if the export sha256 differs. Pins: haystack-ai==3.1.1; docling==2.129.0; ray[serve]==2.58.0; timesfm from source tag v3.0.0 with the [torch] extra and google/timesfm-2.5-200m-pytorch@1d952420fba87f3c6dee4f240de0f1a0fbc790e3 (925 MB download, disclosed); sentence-transformers==6.1.0 with sentence-transformers/all-MiniLM-L6-v2@1110a243fdf4706b3f48f1d95db1a4f5529b4d41; pyqlib==0.9.7 on CPython 3.11 (no 3.13 wheel) with scripts/dump_bin.py fetched from the v0.9.7 tag. HF downloads go to the isolated HF_HOME $CACHE/hf. Ray binds 127.0.0.1 only, uses a temp dir under $CACHE, and is shut down; the absence of leftover raylet/gcs_server processes is checked with pgrep afterwards.",
+        "criteria": [
+          "Documents (c9, c21): one text document per (asset, calendar month) for 2015-01..2020-12 (216 documents) stating asset, month, monthly close-to-close return in percent and last close.",
+          "c9 haystack: an InMemoryDocumentStore + InMemoryBM25Retriever Pipeline; for all 216 keyed queries '<ASSET> <YYYY-MM>' the top-1 document's meta (asset, month) equals the query key (pass: 216/216). Negative control: query 'SPY 1999-01' has no matching document, so its top-1 meta must differ from the key (the check can fail). Exit 0.",
+          "c14 docling: HTML and CSV files of SPY 2020 month-end closes (12 rows, 3 columns) converted with DocumentConverter; every extracted table cell equals the source cell string (pass: 36/36 data cells plus header per format). Negative control: the same comparison against a copy with one perturbed cell reports exactly 1 mismatch. PDF/OCR paths are out of scope and listed as a limit.",
+          "c17 ray-serve: a Serve deployment computes the evaluate.py momentum20 decision (highest positive close[t]/close[t-20]-1, ties alphabetical, else cash) for 40 development decision dates; responses through a DeploymentHandle and through one loopback HTTP request equal the in-process computation (pass: 40/40 and HTTP equal). Negative control: a deliberately wrong lookback (19) disagrees on at least one of the 40 dates, or the control is reported as unable to detect. Ray and Serve are shut down and no ray processes remain.",
+          "c18 timesfm: TimesFM 2.5 point forecast of close at step 5 from the 252-session raw-close context for every (fold, asset, decision) key of run-fcmp-merged-r2/forecasts.json (sha256 8829d98c...); predicted r = ln(forecast) - ln(close[t]); keys and targets identical; all forecasts finite. Report per-fold MAE, dev mean and the fcmp paired fold bootstrap (seed 20260923, 10000 draws) against naive and chronos_bolt_small. The comparison is reported, not pass/fail; no superiority claim is preregistered.",
+          "c21 sentence-transformers: encode the 216 documents and the 216 keyed queries; embedding dimension 384; two encodes of the documents agree within 1e-5 max abs; report top-1 key accuracy by cosine similarity (measured, not pass/fail) next to the c9 BM25 accuracy.",
+          "c24 Qlib: dump the export to Qlib binary format with the tag's dump_bin.py, qlib.init(provider_uri=<temp>, region='us'), and read $close and the expression $close/Ref($close,20)-1 via D.features for SPY, QQQ and IWM over 2015-01-02..2020-12-31; every value equals the pandas computation from the export within 1e-5 relative (float32 storage). Negative control: comparing against a one-session-shifted pandas series reports mismatches.",
+          "Outcome: gap 5 is settled only if all six arms meet their pass criteria (so all 15 listed candidates have a retained execution); otherwise advanced, listing what failed. The executions remain run-on-frozen-data evidence, not accuracy or alpha acceptance."
+        ]
+      },
+      {
+        "written_at": "2026-09-23T15:59:30Z",
+        "label": "fix round 5 (gap 5 only), written after an independent Codex review of commits 4d82f63..332b0e2 and before any fix-round-5 command ran",
+        "trigger": "The review found: (1) the Qlib arm added atol=1e-6 for the momentum expression, so it did not apply the preregistered 1e-5 relative tolerance; (2) the haystack absent-key control cannot fail, TimesFM and MiniLM had no injected negative control, and the Ray expected decisions came from the same helper the deployment used; (3) the Ray cleanup observation (pgrep count 0) and (4) the TimesFM weight size, sha256 and LFS match were not retained as raw files; (5) the Ray attempt-2 listener start time was misquoted.",
+        "change": "Rerun into new r5 outputs (r4 outputs stay as they are). (1) Qlib reports mismatches under the preregistered rtol=1e-5 with atol=0 as the criterion of record, and the atol=1e-6 count as a labelled deviation. (2) haystack adds a permuted-meta control (each document's meta rotated by one within the store); its keyed top-1 hits must fall to at most 5 of 216. TimesFM adds an offset-key control (decision index t+1 instead of t) that must make the key/target check fail. MiniLM adds a perturbed-text control (last-close digits changed) whose embeddings must differ by more than 1e-5 from the originals. Ray compares served responses with evaluate.weights(panel, t, 'momentum20') decisions computed in the plan venv with Decimal arithmetic and written, with a sha256, to expected_momentum20.json; the served rule must match 40/40, and the lookback-19 control stays. (3) The Ray run is followed by a retained pgrep count of raylet/gcs_server processes. (4) Retain stat size and sha256 of the TimesFM and MiniLM weight files and the Hugging Face tree API's LFS oid for each. (5) Correct the quoted time from the retained log. The ray run again uses the loopback-only network namespace; docling and the fcmp arms are not rerun.",
+        "criteria": [
+          "c24 passes only with 0 mismatches under rtol=1e-5, atol=0; otherwise c24 is recorded as failing its preregistered criterion, with the atol variant reported as a deviation.",
+          "c9 permuted-meta control hits <= 5/216; the main criterion is unchanged (216/216).",
+          "c18 offset-key control makes keys_and_targets_identical false; the main run reproduces the r4 forecasts_sha256.",
+          "c21 perturbed-text control max abs embedding difference > 1e-5; the repeat-encode check is unchanged.",
+          "c17 served decisions equal the evaluate.weights decisions on 40/40 dates; leftover ray process count 0 is retained.",
+          "Gap 5 outcome rule unchanged from fix round 4."
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "uv venv --python $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13 $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv",
+    "ECOSYSTEM_JOB_SECONDS=900 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python -r $HOME/.cache/gap-wave2-20260923/research-factors-ml/requirements.in   # skfolio==1.2.9 statsmodels==0.15.0 arch==8.0.0 statsforecast==2.1.1 chronos-forecasting==2.3.2 torch==2.13.0 einops huggingface_hub safetensors tqdm; exit 0 (third attempt: pandas==3.0.6 and alphalens were dropped because alphalens-reloaded 0.4.6 and statsforecast 2.1.1 require pandas<3; resolved pandas 2.3.3)",
+    "uv venv ... $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-al && uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-al/bin/python alphalens-reloaded==0.4.6   # exit 0; pandas 2.3.3, statsmodels 0.15.0",
+    "uv venv ... $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-extra && uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-extra/bin/python sktime==1.1.0 tsfresh==0.21.2 river==0.26.1 arcticdb==6.26.0   # exit 0",
+    "uv venv ... $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-lock && uv pip sync --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-lock/bin/python --offline --require-hashes blueprints/us-equities/research-evaluation/requirements.lock   # exit 0",
+    "uv venv --python <cpython-3.13.15> $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-{haystack,st,ray,docling,timesfm}; uv venv --python <cpython-3.11.16> $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-qlib",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-haystack/bin/python haystack-ai==3.1.1   # exit 0",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-st/bin/python sentence-transformers==6.1.0 torch==2.13.0   # exit 0",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/bin/python 'ray[serve]==2.58.0'   # exit 0",
+    "uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/bin/python jinja2   # exit 0; added after ray attempt 1 (see results.c17_ray_serve)",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-qlib/bin/python pyqlib==0.9.7 fire loguru   # exit 0 (resolved pandas 3.0.6, numpy 2.4.6)",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-docling/bin/python docling==2.129.0 torch==2.13.0   # exit 0",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run uv pip install --python $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-timesfm/bin/python 'timesfm[torch] @ git+https://github.com/google-research/timesfm@v3.0.0' torch==2.13.0   # exit 0; tag v3.0.0 resolved to 331c6d33cb1ac2611de3056d0ac7164aab6301eb",
+    "curl -sL -o $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/dump_bin.py https://raw.githubusercontent.com/microsoft/qlib/v0.9.7/scripts/dump_bin.py   # sha256 b8f34c57ce1ef4b1772f3909735e66058f21b25bd7ab8a5f16318822401fe53f",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm export --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --export $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/frozen_ohlcv.json   # exit 0, export sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-haystack/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm haystack --export $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/frozen_ohlcv.json --export-sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7   # exit 0",
+    "HF_HOME=$HOME/.cache/gap-wave2-20260923/research-factors-ml/hf ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-st/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm st --device cpu --export ... --export-sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7   # exit 0",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-qlib/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm qlib --tmp $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/qlib-tmp --export ... --export-sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7   # exit 0",
+    "RAY_USAGE_STATS_ENABLED=0 ECOSYSTEM_JOB_TASKS_MAX=2048 ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm ray --tmp /tmp/claude-1000/r4ray ...   # attempt 1: exit 1, ModuleNotFoundError: No module named 'jinja2' at 'from ray import serve' (before ray.init)",
+    "(same, after installing jinja2)   # attempt 2: exit 0, passed, but Ray's node_ip_address was the host LAN address, not loopback (preregistration deviation)",
+    "RAY_USAGE_STATS_ENABLED=0 ECOSYSTEM_JOB_TASKS_MAX=2048 ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run unshare -rn sh -c 'ip link set lo up && ip -brief addr > $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/ray-netns.txt && exec $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm ray --tmp /tmp/claude-1000/r4ray3 ...'   # attempt 3 (result of record): exit 0 inside a loopback-only network namespace",
+    "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=8G ECOSYSTEM_JOB_MEMORY_HIGH=6G $HOME/codex-ecosystem/bin/ecosystem-bounded-run unshare -rn sh -c 'ip link set lo up && exec $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-docling/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm docling --tmp $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/docling-tmp ...'   # exit 0 with no network access",
+    "HF_HOME=$HOME/.cache/gap-wave2-20260923/research-factors-ml/hf ECOSYSTEM_JOB_MEMORY_MAX=12G ECOSYSTEM_JOB_MEMORY_HIGH=10G ... ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-timesfm/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm timesfm --fcmp-forecasts $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-fcmp-merged-r2/forecasts.json --export ... --export-sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7   # exit 0, 100 s including the weight download",
+    "cd $HOME/.cache/gap-wave2-20260923/research-factors-ml && $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-haystack/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/haystack_diag.py blueprints/gap-wave2-20260923/us-equities__research-factors-ml > r4/haystack-diag.json   # post-hoc diagnostic, not preregistered",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py --arm expected --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --export $HOME/.cache/gap-wave2-20260923/research-factors-ml/r4/frozen_ohlcv.json --export-sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7 --expected $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5/expected_momentum20.json   # fix round 5, exit 0, sha256 230a15612e49d154d9eaaf4ec72c0a9a562c485bd810e8a51c130c3190a8e079",
+    "(fix round 5) same haystack, st (HF_HUB_OFFLINE=1) and qlib (--tmp $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5/qlib-tmp) commands with outputs in $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5   # each exit 0",
+    "(fix round 5) same unshare -rn ray command with --expected $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5/expected_momentum20.json --expected-sha256 230a1561...   # attempt 1 exit 0 (its pgrep -f cleanup probe self-matched); attempt 2 adds in-run pgrep -x counts, exit 0, result of record",
+    "(fix round 5) HF_HUB_OFFLINE=1 same timesfm command, outputs in $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5   # exit 0",
+    "stat -L -c %s / sha256sum on the snapshot files and curl -s https://huggingface.co/api/models/<id>/tree/<revision> for both models > $HOME/.cache/gap-wave2-20260923/research-factors-ml/r5/weights.txt",
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/libs_run.py --arm {statsmodels|arch|statsforecast} --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30   # each exit 0",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-al/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/libs_run.py --arm alphalens --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30   # exit 0",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-extra/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/libs_run.py --arm {sktime|tsfresh|river} --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30   # each exit 0",
+    "OPENBLAS_NUM_THREADS=1 $HOME/.cache/gap-wave2-20260923/research-factors-ml/venv/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/libs_run.py --arm statsmodels_lb_df2 --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30   # fix round 3, exit 0",
+    "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-extra/bin/python blueprints/gap-wave2-20260923/us-equities__research-factors-ml/libs_run.py --arm arcticdb --lean-source $HOME/.local/share/codex-ecosystem/tools/lean-985ef30 --tmp $HOME/.cache/gap-wave2-20260923/research-factors-ml/arctic-tmp   # exit 0",
+    "chronos-bolt-small: see receipt 6 (fcmp part A)"
+  ],
+  "results": {
+    "c20_statsmodels": "ARIMA(1,1,1) on SPY log close (last 252 development sessions): ar.L1 -0.554985, ma.L1 0.262383, AIC -1242.8696, 5-step forecast 5.92264..5.923058 vs last 5.923935; residual Ljung-Box p lag5 0.0624, lag10 0.0 with model_df=0. Fix round 3 with model_df=2 (AR1+MA1): lag5 p=0.014798, lag10 p<1e-6, so residual autocorrelation is rejected at 5% at lag 5 as well. sha256 17c335da... and libs__statsmodels_lb_df2.json",
+    "c15_arch": "GARCH(1,1) on 1511 SPY daily % log returns: omega 0.038823, alpha 0.242925, beta 0.735408, convergence_flag 0, 5-step variance 0.311237..0.435446. sha256 1444824e...",
+    "c12_statsforecast": "AutoARIMA on 252 log closes, h=5: SPY 5.922154.., QQQ 5.747813.., IWM 5.28083... sha256 1dac4866...",
+    "c4_alphalens": "Spearman IC over 1506 sessions x 3 ETFs: momentum20 1D 0.0428 / 5D 0.0183; momentum60 0.0501 / 0.0820; momentum120 0.0551 / 0.1019 (IC std about 0.73-0.76). sha256 473ee5d3...",
+    "c3_sktime": "ThetaForecaster(sp=1) SPY 5-step log close 5.923831..5.925659. sha256 345da5ac...",
+    "c6_tsfresh": "MinimalFCParameters on 252 values per ETF: 251 daily log returns plus one leading zero placeholder from fillna(0) (10 features each). sha256 209d69d1...",
+    "c10_river": "Progressive StandardScaler|LinearRegression on 5 lagged SPY returns: MAE 0.77118635 vs zero-forecast MAE 0.00686633 over 1757 steps. The online model diverged in this untuned configuration; recorded as observed, not tuned after the fact. sha256 70256539...",
+    "c2_arcticdb": "LMDB write/read of the 1824x3 close panel: DataFrame.equals False but values, index and columns equal and pandas assert_frame_equal passed (diagnostic file). sha256 605d691b...",
+    "c5_chronos": "chronos-bolt-small produced all 783 origin-by-asset forecasts across 261 decision origins (receipt 6).",
+    "fix_round_4_export": "frozen_ohlcv.json: 1824 sessions 2014-01-02..2021-03-31 for SPY/QQQ/IWM, sha256 f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7; every arm checked this hash before running.",
+    "c9_haystack": "haystack-ai 3.1.1, 216 documents, InMemoryBM25Retriever top_k=1: 182/216 keyed queries return the matching (asset, month) document. PRECONDITION FAILED: the preregistered pass criterion was 216/216. The absent-key query 'SPY 1999-01' returned 'SPY 2019-01'; that control cannot fail (no document carries the key) and is not counted as detection evidence. Fix round 5 permuted-meta control (each document labelled with the next document's key): 2/216 keyed hits (criterion <= 5), so the keyed check detects wrong labels; the main result reproduced at 182/216. Post-hoc diagnostic (not preregistered): the default BM25 tokenizer (?u)\\b\\w+\\b splits '2015-10' into '2015' and '10' and also tokenizes the numbers in each text ('-6.10%' gives '10'), so number fragments in other documents outscore the true document; this is a document-design weakness of the test, reported as observed and not rescored.",
+    "c14_docling": "docling 2.129.0 converted an HTML and a CSV table of SPY 2020 month-end closes (13x3 including the header) with DocumentConverter inside a network namespace with no external interface: 0 cell mismatches in both formats; the perturbed-copy negative control reports exactly 1 mismatch in each. Passed.",
+    "c17_ray_serve": "ray 2.58.0 Serve deployment on the momentum20 rule: 40/40 DeploymentHandle responses equal the in-process computation; in fix round 5 they also equal 40/40 decisions from evaluate.weights(panel, t, 'momentum20') computed with Decimal arithmetic in the plan venv (expected_momentum20.json, sha256 230a1561...), an implementation independent of the deployment's helper; one loopback HTTP request (2015-12-22) returned 'cash' = expected; the lookback-19 negative control disagrees on 4/40 dates, so the comparison can detect a wrong rule. Picks: IWM 14, QQQ 16, SPY 3, cash 7. Cleanup (fix round 5, retained in raw/r5/r5__ray-pgrep.txt): pgrep -x raylet and pgrep -x gcs_server counted 1 and 1 inside the run before shutdown (positive control, in r5__ray.json) and 0 and 0 five seconds after exit. A first fix-round-5 cleanup probe used pgrep -f with the pattern in the calling shell's own command line and counted 2 before and after (self-matches); it is retained as r5__attempt1-ray-pgrep.txt and not used. Passed (attempt 3 in fix round 4, rerun in fix round 5). Attempt 1 failed at import: ray[serve]==2.58.0 metadata does not require jinja2 but ray/serve/_private/haproxy.py imports it. Attempt 2 passed functionally but Ray's node_ip_address was <lan-ip> (the host LAN address); its GcsServer started listening at 11:39:44.583 local time (15:39:44Z) per the retained log, and their bind address and shutdown time were not logged (the job had exited before the 11:40:36 evidence copy), so the preregistered loopback-only condition was not met; attempt 3 ran in an unprivileged network namespace containing only lo, where node_ip_address was 127.0.1.1.",
+    "c18_timesfm": "timesfm 3.0.0 (source tag v3.0.0, 331c6d33) with google/timesfm-2.5-200m-pytorch@1d952420 on cuda:0: 783/783 forecasts finite, keys and targets identical to run-fcmp-merged-r2. Dev mean fold MAE: timesfm 0.018658, naive 0.018682, chronos-bolt-small 0.018623; reserved MAE 0.021511 / 0.020570 / 0.022224. Paired fold bootstrap: timesfm vs naive -0.0000233, 95% CI [-0.000382, 0.000334], better in 12/20 folds; timesfm vs chronos +0.0000354, CI [-0.000653, 0.000727], 9/20. No difference resolved. Fix round 5 rerun (HF_HUB_OFFLINE=1) reproduced forecasts_sha256 fab9e681...; its offset-key control (decision index t+1) fails the key/target check, as required. Weight file: 925,181,104 bytes, sha256 2f776efe..., equal to the Hugging Face tree API LFS oid at the pinned revision (raw/r5/r5__weights.txt). Passed (execution criterion; the comparison was reported, not scored).",
+    "c21_sentence_transformers": "sentence-transformers 6.1.0 with all-MiniLM-L6-v2@1110a243 on CPU: dimension 384, repeat-encode max abs diff 0.0; keyed top-1 accuracy by cosine 29/216 (0.134) vs BM25 182/216 on the same documents and queries. Fix round 5 perturbed-text control: max abs embedding difference 0.0231 (> 1e-5), so the drift check can detect a change. model.safetensors 90,868,376 bytes, sha256 53aa5117..., equal to the LFS oid. Passed (the accuracy was a measured report, not a criterion).",
+    "c24_qlib": "pyqlib 0.9.7 on CPython 3.11.16, data dumped with the v0.9.7 scripts/dump_bin.py: D.features for IWM/QQQ/SPY returned 4533 rows; 9066 values ($close and $close/Ref($close,20)-1) were compared with the pandas computation. FAILED ITS PREREGISTERED CRITERION: the criterion was rtol 1e-5 with no absolute tolerance, and fix round 5 counts 294 mismatches under it. The fix-round-4 script had added atol=1e-6 for the momentum expression, an unpreregistered deviation found by review; under that deviation all 9066 values agree, so every one of the 294 differences is within 1e-6 absolute. The one-session-shift negative control reports 9048 mismatches under both rules.",
+    "fix_round_4_tally": "After fix round 5, four of six arms met their preregistered pass criteria (c14, c17, c18, c21). c9 executed but failed its 216/216 retrieval criterion (182/216). c24 executed but failed its rtol-only equality criterion (294 of 9066 values; all within 1e-6 absolute). All 15 listed candidates now have a retained execution on the frozen data."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "Fix-round-4/5 arms, each with a control that must register a failure (the fix-round-5 controls were added after review found the absent-key haystack query could not fail, TimesFM and MiniLM had no injected control, and Ray's expected values shared the deployment's helper): BM25 keyed top-1 plus a permuted-meta store (2/216 hits); docling cells vs the source strings plus a one-cell perturbed copy (exactly 1 mismatch); Serve responses vs evaluate.weights Decimal decisions plus a lookback-19 rule (4/40 disagreements); Qlib values vs pandas plus a one-session shift (9048 mismatches); TimesFM keys/targets vs the sha256-pinned fcmp file plus an offset-key control (fails); MiniLM repeat-encode drift plus a perturbed-text control (0.0231). Ray cleanup uses pgrep -x with an in-run positive control (1 raylet, 1 gcs_server). Ray loopback was checked from Ray's own session logs (node_ip_address), which is how attempt 2's LAN binding was found. Earlier arms: each fails with a nonzero exit if the library import, pinned version or fit raises; stderr files are retained, all empty. evaluate.verify_inputs checks the plan input hashes before each arm.",
+  "remaining": "All 15 listed candidates now have a retained execution on the frozen data (c2, c3, c4, c5, c6, c10, c12, c15, c20 in rounds 1-3; c9, c14, c17, c18, c21, c24 in fix round 4). Outcome stays advanced under the preregistered rule: the c9 haystack arm failed its 216/216 keyed-retrieval criterion (182/216), and the c24 Qlib arm failed its rtol-only equality criterion (294 of 9066 values; all within 1e-6 absolute). A redesigned retrieval test (for example a tokenizer or document text without numeric fragments) and a Qlib tolerance suited to float32 storage would each need their own preregistration. These executions show only that each library runs on the frozen data; they are not accuracy, RAG-quality or alpha acceptance.",
+  "limits": [
+    "pandas resolved to 2.3.3 in these venvs (alphalens-reloaded 0.4.6 and statsforecast 2.1.1 require pandas<3), not the plan's lock at 3.0.6.",
+    "sktime is at pin 1.1.0 while PyPI latest is 1.2.0.",
+    "Network downloads: PyPI packages not already in the shared uv cache (uv reported 'Prepared 10', 'Prepared 20' and 'Prepared 9' packages for the three installs; torch 2.13.0 came from the cache); Hugging Face snapshots amazon/chronos-bolt-small@772f3d25, NeoQuasar/Kronos-small@901c26c1 and NeoQuasar/Kronos-Tokenizer-base@0e011738 into an isolated HF_HOME ($HOME/.cache/gap-wave2-20260923/research-factors-ml/hf, 292 MB total, each file under 200 MB); git clones of shiyu-coder/Kronos@67b630e6 (26 MB) and tradermonty/claude-trading-skills@bc551564 (102 MB). No credentials were read.",
+    "Fix round 4 downloads: PyPI wheels not already in the shared uv cache (uv 'Prepared' 5, 13, 85, 22 and 1 packages for haystack, ray, qlib, docling and timesfm; its large-file lines list 446 MiB; pyqlib 0.9.7 pulls mlflow and jupyter components); jinja2 and markupsafe; the timesfm v3.0.0 git source; google/timesfm-2.5-200m-pytorch model.safetensors (925,181,104 bytes, sha256 2f776efe... equal to the Hugging Face LFS oid) and all-MiniLM-L6-v2 into the isolated HF_HOME $CACHE/hf; qlib v0.9.7 scripts/dump_bin.py. No credentials were read.",
+    "Deviations from the fix-round-4 preregistration: jinja2 was added to the ray venv after attempt 1; Ray temp dirs were /tmp/claude-1000/r4ray and r4ray3 (short socket paths), not under $CACHE, and were removed after the bind evidence was copied; attempt 2 ran Ray with the host LAN address as node_ip_address (under a minute; exact duration not logged) before the network-namespace rerun; TimesFM ran on the GPU, while chronos in receipt 6 ran on the CPU.",
+    "Fix round 5 reran haystack, sentence-transformers, Qlib, Ray (twice; the first cleanup probe self-matched) and TimesFM into $CACHE/r5; docling was not rerun.",
+    "Qlib resolved pandas 3.0.6 (no pandas<3 constraint in pyqlib 0.9.7); only $close and one expression were checked, not Alpha158, a model or qrun, and the US region was set without a reviewed calendar or benchmark.",
+    "docling was tested on HTML and CSV tables only; PDF layout and OCR models were not downloaded or run.",
+    "The TimesFM comparison uses the fcmp folds and bootstrap (serially dependent folds, one target, 20 folds)."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/libs/libs__statsmodels.json",
+      "committed_sha256": "17c335dac4630fd5dad763b31e999ca0f25cad015f8b7199db2f6f3b5d127ff1",
+      "original_sha256": "17c335dac4630fd5dad763b31e999ca0f25cad015f8b7199db2f6f3b5d127ff1",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__statsmodels_lb_df2.json",
+      "committed_sha256": "213b0a47ba12ffd9b6f66edb887dc346a6c4147678fa8cc0edf7daa63192807c",
+      "original_sha256": "213b0a47ba12ffd9b6f66edb887dc346a6c4147678fa8cc0edf7daa63192807c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__arch.json",
+      "committed_sha256": "1444824e116aff607de556c716f3b794095e37da58d07f31c511a855f12047ed",
+      "original_sha256": "1444824e116aff607de556c716f3b794095e37da58d07f31c511a855f12047ed",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__statsforecast.json",
+      "committed_sha256": "1dac4866d6e3297990190700ab225abb38e52362144ce12dbf083233902294c3",
+      "original_sha256": "1dac4866d6e3297990190700ab225abb38e52362144ce12dbf083233902294c3",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__alphalens.json.txt",
+      "committed_sha256": "473ee5d379ab7265a5e4e3c40854ff562a581d935121da9727ab6481e6691b6d",
+      "original_sha256": "473ee5d379ab7265a5e4e3c40854ff562a581d935121da9727ab6481e6691b6d",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__sktime.json",
+      "committed_sha256": "345da5ac72e508c0f552e17236961d35b1a24cfc269017d65eb195aee4026d82",
+      "original_sha256": "345da5ac72e508c0f552e17236961d35b1a24cfc269017d65eb195aee4026d82",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__tsfresh.json",
+      "committed_sha256": "209d69d169d909071619c80c707173973934b720b0ab2d0971296736a09031bf",
+      "original_sha256": "209d69d169d909071619c80c707173973934b720b0ab2d0971296736a09031bf",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__river.json",
+      "committed_sha256": "70256539a0ee09987b757c03f241a20a7f19e0d183f8662b79ede3d6becfcaef",
+      "original_sha256": "70256539a0ee09987b757c03f241a20a7f19e0d183f8662b79ede3d6becfcaef",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__arcticdb.json",
+      "committed_sha256": "605d691bc7a4154d7ec2af3ee69c3575fd8672ee5e98446b9ca1fd60d82f43e3",
+      "original_sha256": "605d691bc7a4154d7ec2af3ee69c3575fd8672ee5e98446b9ca1fd60d82f43e3",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/libs/libs__arcticdb-diagnostic.txt",
+      "committed_sha256": "8d6725cead8c0aadf5e3e2dd453330b394f63d92754b76d5a4a7629f65f28340",
+      "original_sha256": "8d6725cead8c0aadf5e3e2dd453330b394f63d92754b76d5a4a7629f65f28340",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/logs__install.log",
+      "committed_sha256": "ca9ecbd09d768a06e94fa67691cc9a40f52822ed9b29312c8d0466cbe93355c3",
+      "original_sha256": "ca9ecbd09d768a06e94fa67691cc9a40f52822ed9b29312c8d0466cbe93355c3",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/logs__install-al.log",
+      "committed_sha256": "90a6565fcf2cbe1c98117f7c0ed908285d13f79a7aa6deabb78a469ef1547991",
+      "original_sha256": "90a6565fcf2cbe1c98117f7c0ed908285d13f79a7aa6deabb78a469ef1547991",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/logs__install-extra.log",
+      "committed_sha256": "8854c1a98f185e4045d1ff8b211f28675b1e5bfaa219af5a5e4514f40ac239de",
+      "original_sha256": "8854c1a98f185e4045d1ff8b211f28675b1e5bfaa219af5a5e4514f40ac239de",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/requirements.in.captured",
+      "committed_sha256": "2a05d271ccddd274d84ad6651e06ca03d9a16f3e57339e629863941accc43ec4",
+      "original_sha256": "2a05d271ccddd274d84ad6651e06ca03d9a16f3e57339e629863941accc43ec4",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/requirements-alphalens.in.captured",
+      "committed_sha256": "fd0185005e106d5b0afa6a97ad054bda4f94a1834a471f568e0b6f38c33c85ce",
+      "original_sha256": "fd0185005e106d5b0afa6a97ad054bda4f94a1834a471f568e0b6f38c33c85ce",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/install/requirements-extra.in.captured",
+      "committed_sha256": "2ee86aec0b4588575c63c4d0e3eba15bea42c1353c2d00d0938a4bcebd687fe9",
+      "original_sha256": "2ee86aec0b4588575c63c4d0e3eba15bea42c1353c2d00d0938a4bcebd687fe9",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__frozen_ohlcv.json",
+      "committed_sha256": "f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7",
+      "original_sha256": "f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__r4-export.json",
+      "committed_sha256": "089ea96655929fcbeb96cfaea6b1bd67ab4e2ad5588cb85511007608c07ab423",
+      "original_sha256": "089ea96655929fcbeb96cfaea6b1bd67ab4e2ad5588cb85511007608c07ab423",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__haystack.json",
+      "committed_sha256": "d7e727bc9a0f6e5d733fc35c11396f9bd767de1b951d0b54c50d45387d0f6826",
+      "original_sha256": "d7e727bc9a0f6e5d733fc35c11396f9bd767de1b951d0b54c50d45387d0f6826",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__haystack.err",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__haystack-diag.json",
+      "committed_sha256": "cb9b29a6c756fed86d1b5225f3d4998820700607d6220fbda0ce2efc80bd6f5c",
+      "original_sha256": "cb9b29a6c756fed86d1b5225f3d4998820700607d6220fbda0ce2efc80bd6f5c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__docling.json",
+      "committed_sha256": "ed6996a09c7995ca8d0d247e19240ad3e08454ce7c4f6f07e9af3d658bc1b705",
+      "original_sha256": "ed6996a09c7995ca8d0d247e19240ad3e08454ce7c4f6f07e9af3d658bc1b705",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__docling.err",
+      "committed_sha256": "db95da2846507610c66d09876d68cdc1289671908c12f4950cc1bc546b9adddb",
+      "original_sha256": "db95da2846507610c66d09876d68cdc1289671908c12f4950cc1bc546b9adddb",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt1.json.txt",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt1.err",
+      "committed_sha256": "b4c2e2a96b107f7d7fa734f7a62bf96fcde96e751fd4d9bffaaf2ffd1804e0f9",
+      "original_sha256": "a1c1143f360b19a3a0ff336b12fb8a0de009c6ed1b758d661437419ef1b452a6",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt2.json.txt",
+      "committed_sha256": "3fde36f74d0c98d5e3238e57177161e142bf76c482b3c3d2676ed4f369e49127",
+      "original_sha256": "3fde36f74d0c98d5e3238e57177161e142bf76c482b3c3d2676ed4f369e49127",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt2.err",
+      "committed_sha256": "8219669393b5e980f55bcc5dcd895b05c7f2593ea7c586c240d5d59248541f68",
+      "original_sha256": "8219669393b5e980f55bcc5dcd895b05c7f2593ea7c586c240d5d59248541f68",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt2-binds.txt",
+      "committed_sha256": "7616dfd19783424b8a6736dcb0fc4424e98b1c49ef4a57a71fdcafff40779790",
+      "original_sha256": "928b0c7c8caedfcfaa0c559d2f187b1f0a1f4131f7acf29b2ea7d14005280cc6",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray.json.txt",
+      "committed_sha256": "afe1fe38b8e946bc31ee5a5342baa2f96f003b1faacf991c7689302ac6258eef",
+      "original_sha256": "afe1fe38b8e946bc31ee5a5342baa2f96f003b1faacf991c7689302ac6258eef",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray.err",
+      "committed_sha256": "bba580b511915613c775234a94b07a5d7a968eb3635f592226e776c37b3dd593",
+      "original_sha256": "bba580b511915613c775234a94b07a5d7a968eb3635f592226e776c37b3dd593",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-netns.txt",
+      "committed_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "original_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__ray-attempt3-binds.txt",
+      "committed_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "original_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__timesfm.json",
+      "committed_sha256": "b1c523a3d053594fea50289281b83d32731819ca3f43e4d094ace872af7ce704",
+      "original_sha256": "b1c523a3d053594fea50289281b83d32731819ca3f43e4d094ace872af7ce704",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__timesfm.err",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__st.json",
+      "committed_sha256": "338aa913aba3d55eda1000e608401ba45b3e0b0e707845cabf428bb0b56ff549",
+      "original_sha256": "338aa913aba3d55eda1000e608401ba45b3e0b0e707845cabf428bb0b56ff549",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__st.err",
+      "committed_sha256": "93071495ed88c11d35d6a801c8866b88e4d3a963d685c311b206212c2101a4eb",
+      "original_sha256": "93071495ed88c11d35d6a801c8866b88e4d3a963d685c311b206212c2101a4eb",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__qlib.json",
+      "committed_sha256": "80e171bd7ac4117ea2621cad7bff4a1410320ed5f4fa785fc222913f7191351e",
+      "original_sha256": "80e171bd7ac4117ea2621cad7bff4a1410320ed5f4fa785fc222913f7191351e",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/r4__qlib.err",
+      "committed_sha256": "f0f8cf700beff77607255f6c2ecb764c6c664edc38095a9843c0368a500de3be",
+      "original_sha256": "7551f95676c41835decc14ba48da16f035e1864f3425266bdcdffec50e9ec0cb",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-haystack.log",
+      "committed_sha256": "801db937dbfff1995a1d4864853702842f82c708f2fad3e29309b2977d0a7ad0",
+      "original_sha256": "801db937dbfff1995a1d4864853702842f82c708f2fad3e29309b2977d0a7ad0",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-st.log",
+      "committed_sha256": "c7061312bf5d0e377065393b5bbe75cd24ec4b6ff47dc424ee61db0b1a41e425",
+      "original_sha256": "c7061312bf5d0e377065393b5bbe75cd24ec4b6ff47dc424ee61db0b1a41e425",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-ray.log",
+      "committed_sha256": "2aa92baeffef169728d9bc228fb9e55e2c3d9067bddab7122ee2efe411c466df",
+      "original_sha256": "2aa92baeffef169728d9bc228fb9e55e2c3d9067bddab7122ee2efe411c466df",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-ray-jinja2.log",
+      "committed_sha256": "421bc0510c811e3c0ae37d3a75e4bbe8049718da09cdb2ea0e3e3d6eb025cad0",
+      "original_sha256": "421bc0510c811e3c0ae37d3a75e4bbe8049718da09cdb2ea0e3e3d6eb025cad0",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-qlib.log",
+      "committed_sha256": "258eb3f56bf05bee06ed9b60539b0b7c10494489d035c6e041fc835b110ba434",
+      "original_sha256": "258eb3f56bf05bee06ed9b60539b0b7c10494489d035c6e041fc835b110ba434",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-docling.log",
+      "committed_sha256": "63273ee65a7f59952bf9472e2280ada44ee635bdc07de8b60d0781c6c9eeef43",
+      "original_sha256": "63273ee65a7f59952bf9472e2280ada44ee635bdc07de8b60d0781c6c9eeef43",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r4/logs__install-r4-timesfm.log",
+      "committed_sha256": "e0904b8b44d795c64db9cc60b59ec8f7826a260616fb4f2260a725c281a31401",
+      "original_sha256": "e0904b8b44d795c64db9cc60b59ec8f7826a260616fb4f2260a725c281a31401",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__expected.json",
+      "committed_sha256": "c89df8c1f36ce49df4b84d9de925704433537585f4767a62f39b9d3942065a4c",
+      "original_sha256": "c89df8c1f36ce49df4b84d9de925704433537585f4767a62f39b9d3942065a4c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__expected.err",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__expected_momentum20.json",
+      "committed_sha256": "230a15612e49d154d9eaaf4ec72c0a9a562c485bd810e8a51c130c3190a8e079",
+      "original_sha256": "230a15612e49d154d9eaaf4ec72c0a9a562c485bd810e8a51c130c3190a8e079",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__haystack.json",
+      "committed_sha256": "a5d2a852c77e1238895483155fa16640d6b05ce38e71b82f7d86b145831b2c1a",
+      "original_sha256": "a5d2a852c77e1238895483155fa16640d6b05ce38e71b82f7d86b145831b2c1a",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__haystack.err",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__st.json",
+      "committed_sha256": "b80966347fb4df71fbd5d0deab9b4747d961d9df5a6f5719fe27c177e57b0c2f",
+      "original_sha256": "b80966347fb4df71fbd5d0deab9b4747d961d9df5a6f5719fe27c177e57b0c2f",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__st.err",
+      "committed_sha256": "0fa4f2f7060e813d98c48be90bec97a5b7cdd0747af15dbc0413ed233e8d7779",
+      "original_sha256": "0fa4f2f7060e813d98c48be90bec97a5b7cdd0747af15dbc0413ed233e8d7779",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__qlib.json",
+      "committed_sha256": "91fb88eceea183c0aa5688fb13ef8ab311e46f3f43246fadb311b2dc05db126e",
+      "original_sha256": "91fb88eceea183c0aa5688fb13ef8ab311e46f3f43246fadb311b2dc05db126e",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__qlib.err",
+      "committed_sha256": "dadb2bc33f8162c83822965c4e9c0f76ea60ff75589f613c18601d4ceba35c11",
+      "original_sha256": "bead55d6275c58292caeb7e03a4ebbc514a3b4697f6c46ea2744d4e5317f0815",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__attempt1-ray.json.txt",
+      "committed_sha256": "09b489e1dda11f31138493443c03c68ef270b3f26b05a914711e7f506075c473",
+      "original_sha256": "09b489e1dda11f31138493443c03c68ef270b3f26b05a914711e7f506075c473",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__attempt1-ray.err",
+      "committed_sha256": "1ebbfb190bd9621fed5ec3a2a5a220898e29b2902429f08996d5cbb70fe35231",
+      "original_sha256": "1ebbfb190bd9621fed5ec3a2a5a220898e29b2902429f08996d5cbb70fe35231",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__attempt1-ray-pgrep.txt",
+      "committed_sha256": "d67da4e826b8161f11f28570e9a04ce92421c25ede8c0041126043d8505571f3",
+      "original_sha256": "d67da4e826b8161f11f28570e9a04ce92421c25ede8c0041126043d8505571f3",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__attempt1-ray-binds.txt",
+      "committed_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "original_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__attempt1-ray-netns.txt",
+      "committed_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "original_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__ray.json.txt",
+      "committed_sha256": "37a78ba24297962c42972db7a04db33491122d0797cc18339eaa9c642df5098c",
+      "original_sha256": "37a78ba24297962c42972db7a04db33491122d0797cc18339eaa9c642df5098c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__ray.err",
+      "committed_sha256": "a454da3491a40aa76c403b8bb7a10ab23d961fe8c347928a9ceb9ae07ef0c6de",
+      "original_sha256": "a454da3491a40aa76c403b8bb7a10ab23d961fe8c347928a9ceb9ae07ef0c6de",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__ray-pgrep.txt",
+      "committed_sha256": "50b0eb0b579b203079c9f49572d60f7ef20e2aa7ee688a6baa063b5e3316c708",
+      "original_sha256": "50b0eb0b579b203079c9f49572d60f7ef20e2aa7ee688a6baa063b5e3316c708",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__ray-binds.txt",
+      "committed_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "original_sha256": "c18fdcc669528782baf3acef5954a59065c3378d8123777acf34cc06314c0efc",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__ray-netns.txt",
+      "committed_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "original_sha256": "f97bfb6dd64aa8eb168dccad2aa4ae938ecdb0da61f6bb9e9d5c963b3f667850",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__timesfm.json",
+      "committed_sha256": "dad25ddb17504261133360e53f88c81cb9166817cac87859d57148fe546c7d09",
+      "original_sha256": "dad25ddb17504261133360e53f88c81cb9166817cac87859d57148fe546c7d09",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__timesfm.err",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/r5/r5__weights.txt",
+      "committed_sha256": "d470d834aec3b9ab8aef87421fe88efeb5320f61a480105b4dc3ddfa9b4cf4b8",
+      "original_sha256": "d470d834aec3b9ab8aef87421fe88efeb5320f61a480105b4dc3ddfa9b4cf4b8",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T16:03:25Z",
+  "checked_at_note": "time of the last fix-round-5 observation, the Hugging Face tree API retrieval recorded in $CACHE/r5/weights.txt. Fix round 4 was preregistered at 15:36:22Z (commit 4d82f63) and fix round 5 at 15:59:30Z (commit 8ac240d); fix-round-4 outputs were written 15:37:54Z-15:45:24Z by extra_arms.py as committed in 332b0e2 (sha256 d8fcad4ebf4a780c5b4598fec62907a2267ac297b91cd1fc0e8d19e2d2fc62fa).",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

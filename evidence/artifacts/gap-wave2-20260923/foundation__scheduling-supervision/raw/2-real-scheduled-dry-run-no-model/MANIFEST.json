@@ -1,0 +1,14 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-dry-1790131479",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "f080e154c06cbb1c727ba1f23bd1dd7ad0fcfb1202087315f7a4c8cb302ad845",
+      "committed_sha256": "f080e154c06cbb1c727ba1f23bd1dd7ad0fcfb1202087315f7a4c8cb302ad845",
+      "bytes": 4300
+    }
+  ],
+  "uuid_placeholders": 0
+}

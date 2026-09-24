@@ -1,0 +1,12 @@
+{
+ "source_file": {
+  "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/grype-sdk/sdk.grype.cdx.json",
+  "bytes": 229361,
+  "sha256": "24d98bfd042434da139a78f50aa9c2dfaae1a982e54b15e8aa6aff5ee2f849b9",
+  "committed": false
+ },
+ "component_types": {
+  "library": 36,
+  "file": 87
+ }
+}

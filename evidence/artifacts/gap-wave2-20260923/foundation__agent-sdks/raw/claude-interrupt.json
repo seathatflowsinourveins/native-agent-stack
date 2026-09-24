@@ -1,0 +1,231 @@
+{
+  "mode": "claude-interrupt",
+  "model_requested": "haiku",
+  "query_submitted_at": 1790134166.3272977,
+  "session_id": "redacted-id:22f3ca86d8ec873d",
+  "streaming_observed_before_interrupt": true,
+  "interrupt_requested_at": 1790134169.7332683,
+  "result": {
+    "subtype": "error_during_execution",
+    "is_error": true,
+    "num_turns": 2,
+    "session_id": "redacted-id:22f3ca86d8ec873d",
+    "stop_reason": null,
+    "terminal_reason": "aborted_streaming",
+    "usage": {
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard"
+    },
+    "model_usage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 921,
+        "outputTokens": 17,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.001006,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "total_cost_usd": 0.001006,
+    "duration_ms": 2904,
+    "errors": [
+      "[ede_diagnostic] result_type=user last_content_type=n/a stop_reason=null"
+    ]
+  },
+  "result_at": 1790134169.7903168,
+  "event_type_counts": {
+    "SystemMessage:init": 1,
+    "SystemMessage:status": 1,
+    "RateLimitEvent": 1,
+    "StreamEvent:message_start": 1,
+    "StreamEvent:content_block_start": 2,
+    "SystemMessage:thinking_tokens": 2,
+    "StreamEvent:content_block_delta": 68,
+    "AssistantMessage": 2,
+    "StreamEvent:content_block_stop": 1,
+    "UserMessage": 1,
+    "ResultMessage": 1
+  },
+  "init": {
+    "model": "claude-haiku-4-5-20251001",
+    "tools": [
+      "mcp__claude_ai_Claude_Docs__batch",
+      "mcp__claude_ai_Claude_Docs__create",
+      "mcp__claude_ai_Claude_Docs__delete",
+      "mcp__claude_ai_Claude_Docs__export",
+      "mcp__claude_ai_Claude_Docs__guide",
+      "mcp__claude_ai_Claude_Docs__query",
+      "mcp__claude_ai_Claude_Docs__read",
+      "mcp__claude_ai_Claude_Docs__update"
+    ],
+    "mcp_servers": [
+      {
+        "name": "claude.ai Claude Docs",
+        "status": "connected",
+        "source": "claudeai"
+      }
+    ],
+    "permissionMode": "default",
+    "claude_code_version": "2.1.280",
+    "apiKeySource": "none"
+  },
+  "stream_usage_events": [
+    {
+      "at": 1790134167.3543577,
+      "type": "StreamEvent",
+      "event": "message_start",
+      "usage": {
+        "input_tokens": 3346,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 4,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "at": 1790134168.0496337,
+      "type": "AssistantMessage",
+      "stop": null,
+      "usage": {
+        "input_tokens": 3346,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 4,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    },
+    {
+      "at": 1790134169.7831817,
+      "type": "AssistantMessage",
+      "stop": null,
+      "usage": {
+        "input_tokens": 3346,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 4,
+        "service_tier": "standard",
+        "inference_geo": "not_available"
+      }
+    }
+  ],
+  "events_after_interrupt": 3,
+  "session_log_after_settle": {
+    "session_jsonl_found": true,
+    "session_jsonl_name": "redacted-id:22f3ca86d8ec873d.jsonl",
+    "entries": [
+      {
+        "timestamp": "2026-09-23T03:29:28.047Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      {
+        "timestamp": "2026-09-23T03:29:29.736Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      {
+        "timestamp": "2026-09-23T03:29:29.780Z",
+        "event": "user_mentions_interrupt"
+      }
+    ],
+    "final_usage_per_message": [
+      {
+        "timestamp": "2026-09-23T03:29:29.736Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      }
+    ]
+  },
+  "session_log_after_second_settle": {
+    "session_jsonl_found": true,
+    "session_jsonl_name": "redacted-id:22f3ca86d8ec873d.jsonl",
+    "entries": [
+      {
+        "timestamp": "2026-09-23T03:29:28.047Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      {
+        "timestamp": "2026-09-23T03:29:29.736Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      {
+        "timestamp": "2026-09-23T03:29:29.780Z",
+        "event": "user_mentions_interrupt"
+      }
+    ],
+    "final_usage_per_message": [
+      {
+        "timestamp": "2026-09-23T03:29:29.736Z",
+        "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+        "stop_reason": null,
+        "input_tokens": 3346,
+        "output_tokens": 4,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      }
+    ]
+  },
+  "status": "ok",
+  "sdk": "claude-agent-sdk",
+  "started_at": 1790134165.7565727,
+  "finished_at": 1790134200.212315
+}

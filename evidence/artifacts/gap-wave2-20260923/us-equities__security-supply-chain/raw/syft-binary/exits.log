@@ -1,0 +1,12 @@
+venv-syft exit=0 seconds=8
+venv-grype exit=0 seconds=2
+root-syft exit=0 seconds=608
+root-grype exit=0 seconds=20
+interp-syft exit=0 seconds=2
+interp-grype exit=0 seconds=1
+ibgw-jars-syft exit=0 seconds=2
+ibgw-jars-grype exit=0 seconds=0
+ibgw-jre-syft exit=0 seconds=2
+ibgw-jre-grype exit=0 seconds=1
+ibkr-venv-syft exit=0 seconds=0
+ibkr-venv-grype exit=0 seconds=1

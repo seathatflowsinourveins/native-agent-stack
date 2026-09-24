@@ -1,0 +1,537 @@
+{
+ "adhoc_closures": {
+  "2018-12-05": {
+   "pmc_BATS_closed": true,
+   "pmc_IEX_closed": false,
+   "pmc_NASDAQ_closed": true,
+   "pmc_NYSE_closed": true,
+   "why": "National Day of Mourning, George H. W. Bush",
+   "xcals_ARCX_closed": true,
+   "xcals_XASE_closed": true,
+   "xcals_XNAS_closed": true,
+   "xcals_XNYS_closed": true
+  },
+  "2025-01-09": {
+   "pmc_BATS_closed": true,
+   "pmc_IEX_closed": false,
+   "pmc_NASDAQ_closed": true,
+   "pmc_NYSE_closed": true,
+   "why": "National Day of Mourning, Jimmy Carter",
+   "xcals_ARCX_closed": true,
+   "xcals_XASE_closed": true,
+   "xcals_XNAS_closed": true,
+   "xcals_XNYS_closed": true
+  }
+ },
+ "future_extension_for_nyse_page": "2028-12-31",
+ "nyse_page": {
+  "arca_hours_text": [
+   "Early Trading Session: 4:00 a.m. to 9:30 a.m. ET",
+   "Late Trading Session: 4:00 p.m. to 8:00 p.m. ET"
+  ],
+  "early_closes_1pm": [
+   "2026-11-27",
+   "2026-12-24",
+   "2027-11-26",
+   "2028-07-03",
+   "2028-11-24"
+  ],
+  "holidays": [
+   "2026-01-01",
+   "2026-01-19",
+   "2026-02-16",
+   "2026-04-03",
+   "2026-05-25",
+   "2026-06-19",
+   "2026-07-03",
+   "2026-09-07",
+   "2026-11-26",
+   "2026-12-25",
+   "2027-01-01",
+   "2027-01-18",
+   "2027-02-15",
+   "2027-03-26",
+   "2027-05-31",
+   "2027-06-18",
+   "2027-07-05",
+   "2027-09-06",
+   "2027-11-25",
+   "2027-12-24",
+   "2028-01-17",
+   "2028-02-21",
+   "2028-04-14",
+   "2028-05-29",
+   "2028-06-19",
+   "2028-07-04",
+   "2028-09-04",
+   "2028-11-23",
+   "2028-12-25"
+  ],
+  "table_rows": {
+   "Christmas Day": [
+    "Friday, December 25****",
+    "Friday, December 24 (Christmas Day observed)",
+    "Monday, December 25"
+   ],
+   "Good Friday": [
+    "Friday, April 3",
+    "Friday, March 26",
+    "Friday, April 14"
+   ],
+   "Independence Day": [
+    "Friday, July 3 (Independence Day observed) ",
+    "Monday, July 5 (Independence Day observed) ",
+    "Tuesday, July 4**"
+   ],
+   "Juneteenth National Independence Day": [
+    "Friday, June 19",
+    "Friday, June 18 (Juneteenth National Independence Day observed)",
+    "Monday, June 19"
+   ],
+   "Labor Day": [
+    "Monday, September 7",
+    "Monday, September 6",
+    "Monday, September 4"
+   ],
+   "Martin Luther King, Jr. Day": [
+    "Monday, January 19",
+    "Monday, January 18",
+    "Monday, January 17"
+   ],
+   "Memorial Day": [
+    "Monday, May 25",
+    "Monday, May 31",
+    "Monday, May 29"
+   ],
+   "New Year\u2019s Day": [
+    "Thursday, January 1",
+    "Friday, January 1",
+    "\u2014*"
+   ],
+   "Thanksgiving Day": [
+    "Thursday, November 26***",
+    "Thursday, November 25***",
+    "Thursday, November 23*** "
+   ],
+   "Washington's Birthday": [
+    "Monday, February 16",
+    "Monday, February 15",
+    "Monday, February 21"
+   ]
+  },
+  "vs_pmc_NYSE": {
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_not_1300": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "vs_xcals_XNYS": {
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_not_1300": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "years": [
+   2026,
+   2027,
+   2028
+  ]
+ },
+ "pmc_calendar_objects": {
+  "BATS": "NYSEExchangeCalendar",
+  "IEX": "IEXExchangeCalendar",
+  "NASDAQ": "NYSEExchangeCalendar",
+  "NYSE": "NYSEExchangeCalendar"
+ },
+ "pmc_extended_hours": {
+  "NASDAQ": {
+   "boundary_combinations_ET": {
+    "04:00|09:30|13:00|17:00": 24,
+    "04:00|09:30|16:00|20:00": 2992
+   },
+   "columns": [
+    "pre",
+    "market_open",
+    "market_close",
+    "post"
+   ],
+   "early_close_day_sample": [
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    },
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    },
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    }
+   ],
+   "sessions": 3016
+  },
+  "NYSE": {
+   "boundary_combinations_ET": {
+    "04:00|09:30|13:00|17:00": 24,
+    "04:00|09:30|16:00|20:00": 2992
+   },
+   "columns": [
+    "pre",
+    "market_open",
+    "market_close",
+    "post"
+   ],
+   "early_close_day_sample": [
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    },
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    },
+    {
+     "market_close": "13:00",
+     "market_open": "09:30",
+     "post": "17:00",
+     "pre": "04:00"
+    }
+   ],
+   "sessions": 3016
+  }
+ },
+ "positive_controls_present": {
+  "2018-12-04": true,
+  "2018-12-06": true,
+  "2025-01-08": true,
+  "2025-01-10": true
+ },
+ "range": [
+  "2016-01-01",
+  "2027-12-31"
+ ],
+ "self_test_detected": true,
+ "self_test_injected_time_disagreements": [
+  [
+   "2020-01-02",
+   [
+    "09:30",
+    "16:00"
+   ],
+   [
+    "10:00",
+    "16:00"
+   ]
+  ],
+  [
+   "2020-01-03",
+   [
+    "09:30",
+    "16:00"
+   ],
+   [
+    "09:30",
+    "14:00"
+   ]
+  ]
+ ],
+ "venue_pairs": {
+  "ARCX~NYSE": {
+   "early_close_disagreements": [],
+   "only_pmc": [],
+   "only_xcals": [],
+   "open_close_time_disagreements": [],
+   "pmc_early_closes": 24,
+   "pmc_sessions": 3016,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  },
+  "XASE~NYSE": {
+   "early_close_disagreements": [],
+   "only_pmc": [],
+   "only_xcals": [],
+   "open_close_time_disagreements": [],
+   "pmc_early_closes": 24,
+   "pmc_sessions": 3016,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  },
+  "XNAS~NASDAQ": {
+   "early_close_disagreements": [],
+   "only_pmc": [],
+   "only_xcals": [],
+   "open_close_time_disagreements": [],
+   "pmc_early_closes": 24,
+   "pmc_sessions": 3016,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  },
+  "XNYS~BATS": {
+   "early_close_disagreements": [],
+   "only_pmc": [],
+   "only_xcals": [],
+   "open_close_time_disagreements": [],
+   "pmc_early_closes": 24,
+   "pmc_sessions": 3016,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  },
+  "XNYS~IEX": {
+   "early_close_disagreements": [
+    [
+     "2017-07-03",
+     "13:00"
+    ],
+    [
+     "2018-07-03",
+     "13:00"
+    ],
+    [
+     "2018-12-24",
+     "13:00"
+    ],
+    [
+     "2019-07-03",
+     "13:00"
+    ],
+    [
+     "2019-12-24",
+     "13:00"
+    ],
+    [
+     "2020-12-24",
+     "13:00"
+    ],
+    [
+     "2023-07-03",
+     "13:00"
+    ],
+    [
+     "2024-07-03",
+     "13:00"
+    ],
+    [
+     "2024-12-24",
+     "13:00"
+    ],
+    [
+     "2025-07-03",
+     "13:00"
+    ],
+    [
+     "2025-12-24",
+     "13:00"
+    ],
+    [
+     "2026-12-24",
+     "13:00"
+    ]
+   ],
+   "only_pmc": [
+    "2016-01-01",
+    "2016-09-05",
+    "2017-01-02",
+    "2017-09-04",
+    "2018-01-01",
+    "2018-09-03",
+    "2018-12-05",
+    "2019-01-01",
+    "2019-09-02",
+    "2020-01-01",
+    "2020-09-07",
+    "2021-01-01",
+    "2021-09-06",
+    "2022-09-05",
+    "2023-01-02",
+    "2023-09-04",
+    "2024-01-01",
+    "2024-09-02",
+    "2025-01-01",
+    "2025-01-09",
+    "2025-09-01",
+    "2026-01-01",
+    "2026-09-07",
+    "2027-01-01",
+    "2027-09-06"
+   ],
+   "only_xcals": [],
+   "open_close_time_disagreements": [
+    [
+     "2017-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2018-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2018-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2019-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2019-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2020-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2023-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2024-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2024-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2025-07-03",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2025-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ],
+    [
+     "2026-12-24",
+     [
+      "09:30",
+      "13:00"
+     ],
+     [
+      "09:30",
+      "16:00"
+     ]
+    ]
+   ],
+   "pmc_early_closes": 12,
+   "pmc_sessions": 3041,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  },
+  "XNYS~NYSE": {
+   "early_close_disagreements": [],
+   "only_pmc": [],
+   "only_xcals": [],
+   "open_close_time_disagreements": [],
+   "pmc_early_closes": 24,
+   "pmc_sessions": 3016,
+   "xcals_early_closes": 24,
+   "xcals_sessions": 3016
+  }
+ },
+ "versions": {
+  "exchange_calendars": "4.13.2",
+  "pandas": "3.0.6",
+  "pandas_market_calendars": "5.4.0"
+ },
+ "xcals_calendar_objects": {
+  "ARCX": "XNYSExchangeCalendar",
+  "XASE": "XNYSExchangeCalendar",
+  "XNAS": "XNYSExchangeCalendar",
+  "XNYS": "XNYSExchangeCalendar"
+ },
+ "xcals_has_extended_hours_attrs": {
+  "break_starts": true,
+  "post_closes": false,
+  "pre_opens": false
+ }
+}

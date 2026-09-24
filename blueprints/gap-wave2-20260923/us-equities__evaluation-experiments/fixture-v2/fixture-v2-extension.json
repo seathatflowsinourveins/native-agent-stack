@@ -1,0 +1,120 @@
+{
+ "schema_version": 1,
+ "fixture_id": "public-convergence-questions-2026-09-23-v2-extension",
+ "created_at": "2026-09-23T07:37:10Z",
+ "extends": {
+  "path": "blueprints/convergence-practice/local-fixture/fixture.json",
+  "sha256": "aea5e9616fb19eb1d2fd58ecfadf88ff087d7d2e79b4a70bc9f88207af9d0402",
+  "queries_unchanged": 24
+ },
+ "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+ "added_expected_abstention_count": 8,
+ "v2_totals": {
+  "queries": 32,
+  "answerable": 20,
+  "expected_abstention": 12
+ },
+ "limitations": [
+  "Same single source-aware author class as v1; not an external held-out or real-user set.",
+  "Unanswerability is an authoring judgment backed by rg term scans; a semantic answer could still exist in paraphrase."
+ ],
+ "queries": [
+  {
+   "id": "abstain-25",
+   "category": "deployment",
+   "query": "Which Kubernetes Helm chart version deploys the memory service in production?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [],
+   "relevance_rationale": "No Kubernetes or Helm deployment is described in the 15 frozen documents (rg: 0 files for kubernetes/helm).",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-26",
+   "category": "broker",
+   "query": "What IBKR paper account number and gateway port did the worker supervision exercise connect to?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/worker-supervision/README.md"
+   ],
+   "relevance_rationale": "The worker supervision document covers local process supervision; no account number or gateway port is recorded (rg: 0 files for 'account number'/'gateway port').",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-27",
+   "category": "research_metrics",
+   "query": "What Sharpe ratio did the momentum20 rule achieve over the 2015 to 2020 development folds?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/research-evaluation/README.md"
+   ],
+   "relevance_rationale": "The research-evaluation README states its label means are not portfolio P&L, annualized returns or Sharpe; no Sharpe value exists.",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-28",
+   "category": "restore",
+   "query": "How many gigabytes of GPU memory did the Qdrant restore consume on the Windows host?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/state-recovery/qdrant/README.md"
+   ],
+   "relevance_rationale": "The Qdrant recovery document records collection/point verification, not GPU memory consumption (rg: 0 files for gigabyte/'GPU memory').",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-29",
+   "category": "alerting",
+   "query": "Which Slack channel receives an alert when a research worker exceeds its cgroup memory limit?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/worker-supervision/README.md",
+    "adoption/README.md"
+   ],
+   "relevance_rationale": "No Slack channel is named anywhere in the corpus (rg: 0 files for slack); adoption lists Alertmanager/ntfy only as components.",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-30",
+   "category": "data_cost",
+   "query": "What monthly subscription price was paid for the market data used in the authenticated AAPL check?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/authenticated-data/README.md",
+    "blueprints/us-equities/data-readiness/README.md"
+   ],
+   "relevance_rationale": "No monthly price is recorded (rg: 0 files for monthly); data-readiness says a subscription is not intrinsically required for that historical request.",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-31",
+   "category": "trading",
+   "query": "List the ticker symbols the catalyst strategy bought in live trading last week.",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/acceptance-wave/research-protocol.md"
+   ],
+   "relevance_rationale": "No live trading or purchases are recorded (rg: 0 files for 'live trading'/bought/'last week').",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  },
+  {
+   "id": "abstain-32",
+   "category": "recovery",
+   "query": "What recovery time objective in minutes was agreed for off-host disaster recovery of the memory store?",
+   "expected_abstention": true,
+   "expected_files": [],
+   "boundary_files": [
+    "blueprints/us-equities/state-recovery/README.md",
+    "blueprints/us-equities/state-recovery/memory/README.md"
+   ],
+   "relevance_rationale": "The state-recovery documents say an approved off-host destination is still required before this becomes a disaster-recovery design; no RTO is agreed (rg: 0 files for 'recovery time objective').",
+   "authoring": "Authored 2026-09-23 by the gap-wave-2 unit after reading the frozen corpus paths and rg term scans, before any ranking in this wave."
+  }
+ ]
+}

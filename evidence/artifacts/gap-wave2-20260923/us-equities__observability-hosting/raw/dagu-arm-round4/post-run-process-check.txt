@@ -1,0 +1,4 @@
+$ date -u; ps -eo pid,args | grep -E 'prometheus|loki-linux|otelcol-contrib' | grep gap-wave2 | grep -v grep | wc -l; ss -ltn | grep -c -E ':(34317|34318|39090|39091|33100|33101|33110|33111) '
+2026-09-23T08:17:45Z
+0
+0

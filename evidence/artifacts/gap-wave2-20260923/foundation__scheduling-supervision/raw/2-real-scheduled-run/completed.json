@@ -1,0 +1,13 @@
+{
+  "checkpoint_sha256": "0f192a2b27cf5739e24cc244745bb257fc2a119e0fe5d01597620022d30c369e",
+  "ecosystem": {
+    "exit": 0,
+    "stdout_first_line": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+    "stdout_first_line_sha256": "3febda0044c60c8138359a09bbf80daafc6c9f9b36b8a72bd0b332feb55beff7"
+  },
+  "validate": {
+    "exit": 0,
+    "stdout_first_line": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}",
+    "stdout_first_line_sha256": "941352217aafbe965f2cb9ec5498d6b763d818f9ee6ef61310dde86bfd8e9632"
+  }
+}

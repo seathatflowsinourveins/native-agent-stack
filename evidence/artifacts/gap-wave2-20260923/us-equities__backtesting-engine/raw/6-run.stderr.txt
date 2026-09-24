@@ -1,0 +1,8 @@
+/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py:204: Pandas4Warning: The default 'epoch' date format is deprecated and will be removed in a future version, please use 'iso' date format instead.
+  raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}
+/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py:204: Pandas4Warning: The default 'epoch' date format is deprecated and will be removed in a future version, please use 'iso' date format instead.
+  raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}
+/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py:204: Pandas4Warning: The default 'epoch' date format is deprecated and will be removed in a future version, please use 'iso' date format instead.
+  raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}
+/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py:204: Pandas4Warning: The default 'epoch' date format is deprecated and will be removed in a future version, please use 'iso' date format instead.
+  raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}

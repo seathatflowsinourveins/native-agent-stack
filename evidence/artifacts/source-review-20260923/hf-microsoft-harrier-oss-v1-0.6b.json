@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hf-microsoft-harrier-oss-v1-0.6b",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+ "reviewed_commit": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+ "readme_path": "README.md",
+ "license": "mit",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the model repository microsoft/harrier-oss-v1-0.6b at sha f9b9dc8d367d443f2479d27aa5d8d2850c0774ee (license mit), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+   "text": "harrier-oss-v1 is a family of multilingual text embedding models developed by Microsoft. The models use decoder-only architectures with last-token pooling and L2 normalization to produce dense text embeddings. They can be applied to a wide range of tasks, including but not limited to retrieval, clustering, semantic similarity, classification, bitext mining, and reranking."
+  },
+  {
+   "source": "README.md@f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+   "text": "All models are trained with contrastive learning objectives on a large-scale mixture of multilingual datasets covering diverse tasks. The 270m and 0.6b variants are additionally trained with knowledge distillation from larger embedding models."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://huggingface.co/microsoft/harrier-oss-v1-0.6b/tree/f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+  "https://huggingface.co/microsoft/harrier-oss-v1-0.6b/blob/f9b9dc8d367d443f2479d27aa5d8d2850c0774ee/README.md"
+ ]
+}

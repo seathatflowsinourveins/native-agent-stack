@@ -1,0 +1,1 @@
+20260923 07:00:53.442 ERROR:: 2019-12-31 16:00:00 Order Error: ids: [1], Insufficient buying power to complete orders (Value:[391703.62]), Reason: Id: 1, Initial Margin: 195852.81, Free Margin: 100000.

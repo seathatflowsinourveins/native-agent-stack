@@ -1,0 +1,11 @@
+[
+  {
+    "name": "research-pair",
+    "dagRunId": "portable-adoption-model-pair-20260919",
+    "status": "succeeded",
+    "startedAt": "2026-09-19T15:41:23-04:00",
+    "finishedAt": "2026-09-19T15:41:50-04:00",
+    "duration": "27s",
+    "workerId": "local"
+  }
+]

@@ -1,0 +1,134 @@
+{
+  "mode": "run",
+  "model_inference_submitted": true,
+  "usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 17536,
+      "inputTokens": 18056,
+      "outputTokens": 27,
+      "reasoningOutputTokens": 18,
+      "totalTokens": 18083
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 17536,
+      "inputTokens": 35753,
+      "outputTokens": 355,
+      "reasoningOutputTokens": 298,
+      "totalTokens": 36108
+    }
+  },
+  "usage_status": "reported",
+  "sdk_version": "0.155.1",
+  "sandbox": "read-only",
+  "approval_mode": "deny_all",
+  "config_overrides": [
+    "features.hooks=false",
+    "features.plugin_hooks=false",
+    "features.apps=false",
+    "otel.exporter=\"none\"",
+    "otel.metrics_exporter=\"none\"",
+    "analytics.enabled=false",
+    "plugins={\"context-mode@context-mode\"={enabled=false}}"
+  ],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 18,
+        "resetsAt": 1790719654,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_runtime": {
+    "server_info": null,
+    "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+  },
+  "dynamic_tool": {
+    "name": "vault_lookup",
+    "registered": true,
+    "calls": [
+      {
+        "tool": "vault_lookup",
+        "key": "alpha",
+        "answered": true
+      }
+    ],
+    "declined_server_requests": []
+  },
+  "thread_mode": "persistent",
+  "thread_id": "redacted-id:92d6ac9147cf5fb6",
+  "configured_model": "gpt-6-astra",
+  "configured_provider": "openai",
+  "status": "completed",
+  "final_response": "STORED",
+  "duration_ms": 18391,
+  "items": [
+    {
+      "clientId": null,
+      "content": [
+        {
+          "text": "Call the vault_lookup tool with key \"alpha\". Remember the exact value it returns for later in this conversation. Run no shell commands. Reply with only the word STORED.\n",
+          "text_elements": [],
+          "type": "text"
+        }
+      ],
+      "id": "redacted-id:642c2b66ec3b757d",
+      "type": "userMessage"
+    },
+    {
+      "content": [],
+      "id": "rs_01339f24c730002c016ab357cb48e487d18b5e906caed6e308",
+      "summary": [],
+      "type": "reasoning"
+    },
+    {
+      "delivery": null,
+      "id": "msg_01339f24c730002c016ab357d3c54887d181763596ff6a9e8b",
+      "memoryCitation": null,
+      "phase": "commentary",
+      "questions": null,
+      "text": "I\u2019ll retrieve the value and remember it for this conversation.\n",
+      "type": "agentMessage"
+    },
+    {
+      "arguments": {
+        "key": "alpha"
+      },
+      "contentItems": [
+        {
+          "text": "vw-59debe49327d",
+          "type": "inputText"
+        }
+      ],
+      "durationMs": 1,
+      "id": "exec-redacted-id:8fba2d8e1e5cfbcb",
+      "namespace": null,
+      "status": "completed",
+      "success": true,
+      "tool": "vault_lookup",
+      "type": "dynamicToolCall"
+    },
+    {
+      "content": [],
+      "id": "rs_01339f24c730002c016ab357d836d087d1b591dbd86fd93891",
+      "summary": [],
+      "type": "reasoning"
+    },
+    {
+      "delivery": null,
+      "id": "msg_01339f24c730002c016ab357d8ce0087d189743e60eba5f1b5",
+      "memoryCitation": null,
+      "phase": "final_answer",
+      "questions": null,
+      "text": "STORED",
+      "type": "agentMessage"
+    }
+  ]
+}

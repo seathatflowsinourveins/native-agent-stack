@@ -1,0 +1,16 @@
+name: obsgap
+otel:
+  enabled: true
+  endpoint: 127.0.0.1:34317
+  insecure: true
+  resource: {service.name: dagu-obsgap-20260923}
+steps:
+  - name: fill-log
+    command: echo "order-filled receipt_id=obsgap-075224 symbol=SPY qty=1 mode=simulation"
+  - name: risk-check
+    command: echo "risk-check passed receipt_id=obsgap-075224"
+    depends: [fill-log]
+  - name: sandboxed-worker
+    command: srt -d -c 'sleep 1; curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com'
+    depends: [risk-check]
+    continue_on: {failure: true}

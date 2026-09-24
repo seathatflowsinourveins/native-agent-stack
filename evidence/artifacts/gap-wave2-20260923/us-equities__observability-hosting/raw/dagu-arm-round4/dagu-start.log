@@ -1,0 +1,174 @@
+time=2026-09-23T04:15:50.738-04:00 level=INFO msg="Executing root dag-run" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV params=""
+time=2026-09-23T04:15:50.756-04:00 level=INFO msg="DAG run started" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV worker-id=local trace-id=0eeb93b728cccc58ceb95d3dd697904d span-id=6fde7b6fdfa8544a trace-flags=01 attempt-id=c76444 params=[]
+time=2026-09-23T04:15:50.757-04:00 level=INFO msg="Step started" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV worker-id=local trace-id=0eeb93b728cccc58ceb95d3dd697904d span-id=6fde7b6fdfa8544a trace-flags=01 attempt-id=c76444 step=fill-log
+time=2026-09-23T04:15:50.763-04:00 level=INFO msg="Step started" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV worker-id=local trace-id=0eeb93b728cccc58ceb95d3dd697904d span-id=6fde7b6fdfa8544a trace-flags=01 attempt-id=c76444 step=risk-check
+time=2026-09-23T04:15:50.771-04:00 level=INFO msg="Step started" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV worker-id=local trace-id=0eeb93b728cccc58ceb95d3dd697904d span-id=6fde7b6fdfa8544a trace-flags=01 attempt-id=c76444 step=sandboxed-worker
+time=2026-09-23T04:15:52.025-04:00 level=INFO msg="DAG run finished" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV worker-id=local trace-id=0eeb93b728cccc58ceb95d3dd697904d span-id=6fde7b6fdfa8544a trace-flags=01 attempt-id=c76444 status=partially_succeeded started-at=2026-09-23T04:15:50-04:00 finished-at=2026-09-23T04:15:52-04:00
+time=2026-09-23T04:15:52.035-04:00 level=ERROR msg="Failed to execute dag-run" dag=obsgap run-id=034Thc6IKCSPVoUbG9DzaV err="exit status 56\nrecent stderr (tail):\n not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.idea\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/commands\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/agents\n[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)\n[SandboxDebug] No matching config rule, denying: example.com:443\n[SandboxDebug] Connection blocked to example.com:443\ncurl: (56) CONNECT tunnel failed, response 403\n[SandboxDebug] Sent SIGTERM to HTTP bridge process\n[SandboxDebug] Sent SIGTERM to SOCKS bridge process\n"
+Partially Succeeded - 2026-09-23T04:15:50-04:00
+
+dag: obsgap (2.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/logs/obsgap/dag-run_20260923_081550Z_034Thc6IKCSPVoUbG9DzaV/dag-run_20260923.041550.741.034Thc6I.log
+│
+├─fill-log (0s) [succeeded]
+│ ├─echo "order-filled receipt_id=obsgap-081525 symbol=SPY qty=1
+│ │   mode=simulation"
+│ │
+│ └─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/logs/obsgap/dag-run_20260923_081550Z_034Thc6IKCSPVoUbG9DzaV/run_20260923_081550Z_c76444/fill-log.20260923.041550.758.034Thc6I.out
+│     order-filled receipt_id=obsgap-081525 symbol=SPY qty=1 mode=simulation
+│ 
+├─risk-check (0s) [succeeded]
+│ ├─echo "risk-check passed receipt_id=obsgap-081525"
+│ │
+│ └─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/logs/obsgap/dag-run_20260923_081550Z_034Thc6IKCSPVoUbG9DzaV/run_20260923_081550Z_c76444/risk-check.20260923.041550.764.034Thc6I.out
+│     risk-check passed receipt_id=obsgap-081525
+│ 
+└─sandboxed-worker (2.0s) [failed]
+  ├─srt -d -c 'sleep 1; curl -sS -m 8 -o /dev/null -w
+  │   "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com'
+  │
+  ├─stdout: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/logs/obsgap/dag-run_20260923_081550Z_034Thc6IKCSPVoUbG9DzaV/run_20260923_081550Z_c76444/sandboxed-worker.20260923.041550.772.034Thc6I.out
+  │   HTTPSTATUS:000 EXIT:56
+  ├─stderr: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/logs/obsgap/dag-run_20260923_081550Z_034Thc6IKCSPVoUbG9DzaV/run_20260923_081550Z_c76444/sandboxed-worker.20260923.041550.772.034Thc6I.err
+  │   ... (3 more lines)
+  │   [SandboxDebug] [SeccompFilter] Found apply-seccomp binary:
+  │   $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/li
+  │   b/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-se
+  │   ccomp (x64)
+  │   [SandboxDebug] mux: HTTP backend listening on
+  │   /tmp/srt-mux-2154604-0.sock
+  │   [SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:56974
+  │   [SandboxDebug] Starting HTTP bridge: socat
+  │   UNIX-LISTEN:/tmp/claude-http-6f434385d38c996d.sock,fork,reuseaddr
+  │   TCP:localhost:56974,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+  │   [SandboxDebug] Linux bridges ready after 3 attempts
+  │   [SandboxDebug] Network infrastructure initialized
+  │   [SandboxDebug] Command string mode (-c): sleep 1; curl -sS -m 8 -o
+  │   /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n"
+  │   https://example.com
+  │   [SandboxDebug] {
+  │   "allowedHosts": []
+  │   }
+  │   [SandboxDebug] [Sandbox Linux] Applying seccomp filter for Unix socket
+  │   blocking
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/stdout ->
+  │   /dev/stdout
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stdout
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/stderr ->
+  │   /dev/stderr
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stderr
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/null ->
+  │   /dev/null
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/null
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/tty ->
+  │   /dev/tty
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/tty
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/dtracehelper
+  │   -> /dev/dtracehelper
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/dtracehelper
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /dev/autofs_nowait
+  │   -> /dev/autofs_nowait
+  │   [SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/autofs_nowait
+  │   [SandboxDebug] [Sandbox Linux] Processing write path: /tmp/claude ->
+  │   /tmp/claude
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+  │   /tmp/claude
+  │   [SandboxDebug] [Sandbox Linux] Processing write path:
+  │   /private/tmp/claude -> /private/tmp/claude
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+  │   /private/tmp/claude
+  │   [SandboxDebug] [Sandbox Linux] Processing write path:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.npm/_logs ->
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.npm/_logs
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.npm/_logs
+  │   [SandboxDebug] [Sandbox Linux] Processing write path:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.claude/debug ->
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.claude/debug
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent write path:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/h
+  │   ome/.claude/debug
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.gitconfig
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.gitmodules
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.bashrc
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.bash_profi
+  │   le
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.zshrc
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.zprofile
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.profile
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.ripgreprc
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.mcp.json
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.vscode
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.idea
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/com
+  │   mands
+  │   [SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not
+  │   within allowed paths:
+  │   $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/d
+  │   agu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/age
+  │   nts
+  │   [SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network,
+  │   filesystem, seccomp(unix-block) restrictions)
+  │   [SandboxDebug] No matching config rule, denying: example.com:443
+  │   [SandboxDebug] Connection blocked to example.com:443
+  │   curl: (56) CONNECT tunnel failed, response 403
+  │   [SandboxDebug] Sent SIGTERM to HTTP bridge process
+  │   [SandboxDebug] Sent SIGTERM to SOCKS bridge process
+  │
+  └─error: exit status 56
+
+Result: Partially Succeeded
+
+Error: failed to execute the dag-run obsgap (dag-run ID: 034Thc6IKCSPVoUbG9DzaV): exit status 56
+recent stderr (tail):
+ not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.idea
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/commands
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/agents
+[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)
+[SandboxDebug] No matching config rule, denying: example.com:443
+[SandboxDebug] Connection blocked to example.com:443
+curl: (56) CONNECT tunnel failed, response 403
+[SandboxDebug] Sent SIGTERM to HTTP bridge process
+[SandboxDebug] Sent SIGTERM to SOCKS bridge process
+

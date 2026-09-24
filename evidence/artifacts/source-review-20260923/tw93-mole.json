@@ -1,0 +1,52 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tw93-mole",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/tw93/Mole",
+ "reviewed_commit": "a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+ "readme_path": "README.md",
+ "license": "GPL-3.0",
+ "layers": [
+  "hosting-services"
+ ],
+ "claim": "Source and documentation review of the repository tw93/Mole at commit a7fa8dd60f61afdfd81540fc0bf73cc483b98a53 (license GPL-3.0), read from README.md at that revision. Repository description: \"\\ud83d\\udc39 Clean, uninstall, analyze, optimize, and monitor your Mac. Free open-source CLI, plus a native Mac app.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Mole \ud83d\udc39 Clean, uninstall, analyze, optimize, and monitor your Mac. Free open-source CLI, plus a native Mac app."
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Mole can remove files, so it validates paths, protects shared and system-owned locations, and asks for confirmation when an action needs it. When Mole cannot prove an item is safe to change, it skips or refuses it."
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "All-in-one CLI toolkit: Combines CleanMyMac, AppCleaner, DaisyDisk, and iStat Menus style workflows in a single terminal binary"
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Deep cleaning: Removes caches, logs, leftovers, and orphaned app data to reclaim gigabytes of space"
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Smart uninstaller: Removes apps plus launch agents, preferences, and hidden remnants"
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Disk insights: Visualizes usage, finds large files, rebuilds caches, and refreshes system services"
+  },
+  {
+   "source": "README.md@a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+   "text": "Live monitoring: Shows real-time CPU, GPU, memory, disk, and network stats"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/tw93/Mole/tree/a7fa8dd60f61afdfd81540fc0bf73cc483b98a53",
+  "https://github.com/tw93/Mole/blob/a7fa8dd60f61afdfd81540fc0bf73cc483b98a53/README.md"
+ ]
+}

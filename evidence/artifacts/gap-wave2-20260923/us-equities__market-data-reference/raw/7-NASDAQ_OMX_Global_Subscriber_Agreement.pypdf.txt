@@ -1,0 +1,661 @@
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1 Page | 1 
+  
+ 
+ 
+ 
+ 
+Subscribers to the Information must sign The NASDAQ OMX Group, Inc. (“NASDAQ OMX”) Subscriber 
+Agreement (“Agreement”) or its equivalent in order to receive the Information (Refer to definition in Section 
+12). While all terms are important, NASDAQ OMX asks that you pay particular attention to the following 
+conditions. For additional information, refer to the sections referenced at the end of each condition. 
+Restrictions on uses and transfers:  The subscriber (“Subscriber”) may not provide access to information 
+described herein (“Information”) or transfer this Agreement to others. The Information is only for use as 
+described by the Non -Professional or Professional Subscri ber (for U.S. Information) and Business or Private 
+(for non-US. Information) definitions. [Section 12] 
+Most types of damages are excluded and remaining damages are limited:  NASDAQ OMX is not liable 
+for trading losses, lost profits or incidental, consequential or other indirect damages, even if the Information is 
+untimely or incorrect. Other damages (if any) are strictly limited (in contract, tort or otherwise) to a capped 
+amount. [Section 6 and Section 7] 
+No implied or statutory warranties or duties:  All warranties and duties (if any) are eliminated. There are 
+no express warranties, except for a Limited Warranty regarding efforts only. Stock quotes might not be 
+current and/or accurate. [Section 7] 
+Subscriber provides an indemnity: Subscriber indemnifies NASDAQ OMX and holds NASDAQ OMX harmless 
+for any Claims or Losses (as described in Section 9) resul ting from Subscriber’s breach of the Agreement, 
+from Subscriber’s infringement of a third -party’s intellectual property rights or from any third -party lawsuit 
+related to Subscriber’s use or receipt of Information. [Section 9] 
+Notices; Notification of Changes. All notices and other communications (except for invoices) required to be 
+given in writing under this Agreement shall be directed to the signatories or, in the alternative, to the 
+individuals identified in subse ctions (a) and (b) below. Notices shall be deemed to have been duly given (i) 
+upon actual receipt (or date of first refusal) by the parties, or (ii) upon constructive receipt (or date of first 
+refusal) if sent by certified mail, return receipt requested, or any other delivery method that actually obtains a 
+signed delivery receipt, to the following addresses or to such other address as any party hereto shall hereafter 
+specify by prior written notice to the other party or parties below, or (iii) upon posting the notice or other 
+communication on the NASDAQTrader website or a successor site.  If an email address is provided, NASDAQ 
+OMX may, in lieu of the above, give notice to or communicate with Subscriber  by email addressed to the 
+persons identified in subsecti on (a) or to such other email address or persons as Subscriber  shall hereafter 
+specify by prior written notice.  By providing an email address, Subscriber  agrees that any receipt received by 
+NASDAQ OMX from Subscriber’s service provider or internet computer  server indicating that the email was 
+received shall be deemed proof that Subscriber  received the message. If Subscriber cannot see or printout all 
+or any portion of the message, Subscriber agrees that it is Subscriber’s responsibility to contact NASDAQ OMX 
+at (301) 978–5307.  
+(a) If to Subscriber: 
+Name:                          
+Title:                           
+Address:                        
+                                                            
+Telephone #:                     
+Fax #:                          
+Email:                          
+ 
+With, in the event of notices of dispute or default, a 
+required copy to:                            
+                              
+ 
+ 
+(b) If to  NASDAQ OMX:     
+NASDAQ OMX Global Data Products 
+805 King Farm Boulevard 
+Rockville, MD 20850 
+Phone: +1 301 978 5307 or +45 33 93 33 66 
+DataOps@nasdaqomx.com  
+ 
+With, in the event of notices of default or 
+dispute, a required copy to:  
+ 
+The NASDAQ OMX Group, Inc.  
+Office of General Counsel, Attn: Contracts Group 
+805 King Farm Boulevard 
+Rockville, MD 20850 
+NASDAQ OMX Global Subscriber Agreement 
+Summary  
+
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 2 
+  
+Governing Law; Construction: Everything relating to this Agreement is governed by the laws as detailed in 
+per Appendix 1. For Information received, this Agreement shall be deemed to have been made in the 
+jurisdiction of the applicable NASDAQ OMX Market as detailed in Appendix 1. [Appendix 1] 
+No oral amendments and only NASDAQ OMX may amend:  The Agreement may not be altered orally and 
+may only be altered by NASDAQ OMX pursuant to an agreement procedure which includes notice to either the 
+Subscriber or the Distributor. Failure to terminate the Agreement before, or use of Information thereafter , an 
+amendment will be the Subscriber’s consent (or confirmation of earlier consent) to the amendment. [ Section 
+10 and Section 11] 
+Distributors can impact Subscriber’s rights but not NASDAQ OMX’s rights: A Distributor does not have 
+the authority to change the Agreement. Distributors are obligated to provide notice of NASDAQ OMX changes 
+to the Subscriber. However, if they do not, NASDAQ OMX’s notice to the Distributor is still effectiv e, as to 
+Subscriber including notice of cancellation. [Summary and Section 12]. 
+Requirements of Self -Regulatory Organization; Actions To Be Taken In Fulfillment of Statutory 
+Obligations. Subscriber acknowledges that NASDAQ OMX may be under certain restrictions when offering the 
+Information, as detailed in Appendix 1. [Section 1] 
+Please review the following terms and conditions of the NASDAQ OMX Global Subscriber 
+Agreement before you complete the  Signature Section:  You must be 18 years of age and must 
+designate yourself as either a Non -Professional or Professional and Business or Private Subscriber 
+in the following  section, based on the definitions provided in Section 12 . To qualify as Non -
+Professional or Private Subscriber, you must meet all the terms set forth in Section 12 . By 
+completing this section, I agree to the terms and conditions set forth in this NASDAQ OMX Global 
+Subscriber Agreement.  
+ 
+ Individual Subscriber – Complete Section A. Subscriber Firm or Organization–Complete Section B. 
+ 
+US Subscriber Status: 
+Professional 
+Non-Professional 
+ 
+ 
+Non-US Subscriber Status: 
+Business 
+Private  
+ 
+ 
+US Subscriber Status: 
+Professional 
+ 
+ 
+Non-US Subscriber Status: 
+Business 
+ 
+A. Individual Subscriber Information: 
+ 
+_____________________________________                         
+        (PRINT NAME OF INDIVIDUAL SUBSCRIBER) 
+ 
+By:______________________________________     
+                (SUBSCRIBER SIGNATURE) 
+ 
+Date: ________________________, 20________ 
+ 
+ 
+B. Subscriber Firm Information: 
+ 
+_____________________________________                         
+              (PRINT NAME OF SUBSCRIBER FIRM) 
+ 
+By:______________________________________     
+                (SUBSCRIBER SIGNATURE) 
+Name of  
+Signatory:________________________________ 
+ (PRINT NAME OF PERSON SIGNING on BEHALF of SUBSCRIBER FIRM)  
+ 
+Title:_____________________________________ 
+                 AUTHORIZED OFFICER 
+ 
+Date: ________________________, 20_______ 
+_ 
+ 
+Distributor Information (for Distributor/Vendor/Data Provider Use Only) 
+ 
+Distributor: _____________________________ 
+                         (PRINT NAME OF DISTRIBUTOR FIRM) 
+        
+By:________________________________________ Signatory:__________________________________ 
+      (PRINT NAME OF PERSON SIGNING on BEHALF of DISTRIBUTOR)             (SIGNATURE OF PERSON SIGNING ON BEHALF OF DISTRIBUTOR) 
+ 
+Title:_____________________________________  Date: ______________________, 20________ 
+             AUTHORIZED OFFICER                      
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 3 
+  
+ 
+ 
+ 
+ 
+ 
+The Distributor and its agents may not m odify or waive any term of this Agreement.   
+Any attempt to modify this Agreement, except by NASDAQ OMX, is void. 
+ 
+1. USE OF DATA.  Subscriber may not sell, lease, furnish or otherwise permit or provide access to the 
+Information to any other Person or to any other office or place. Subscriber will not engage in the operation of 
+any illegal business use or permit anyone else to use the I nformation, or any part thereof, for any illegal 
+purpose or violate any NASDAQ OMX or Securities and Exchange Commission (“SEC”) Rule or any Financial 
+Services Authority Rule (“FSA”) or other applicable law, rule or regulation. Subscriber may not present t he 
+Information rendered in any unfair, misleading or discriminatory format. Subscriber shall take reasonable 
+security precautions to prevent unauthorized Persons from gaining access to the Information.  
+a. Non-Professional or Private Subscriber — For Non-Professional or Private Subscriber, the 
+Information is licensed only for personal use.  By representing to Distributor that Subscriber is a Non -
+Professional or Private Subscriber, or by continuing to receive the Information at a Non-Professional or 
+Private Subscriber rate, Subscriber is affirming to Distributor and to NASDAQ OMX that Subscriber 
+meets the definition of Non -Professional or Business Subscriber as set forth in Section 12 of this 
+Agreement. A Non -Professional or Private Subscriber shall comply promptly with any reasonable 
+request from NASDAQ OMX for information regarding the Non -Professional Subscriber’s receipt, 
+processing, display and redistribution of the Information. 
+b. Professional or Business Subscriber — For Professional or Business Subscriber, the Information 
+is licensed for the internal business use and/or personal use of the Professional or Business 
+Subscriber. Professional or Business Subscribers may, on a non -continuous basis, furnish limited 
+amounts of the Information to customers in written advertisements, correspondence or other 
+literature or during voice telephonic conversations not entailing computerized voice, automated 
+information inquiry systems or similar technologies. Upon request, Professio nal or Business 
+Subscribers shall make its premises available to NASDAQ OMX for physical inspection of Distributor's 
+Service and of Professional or Business Subscriber's use of the Information (including review of any 
+records regarding use of or access to the Information and the number and locations of all devices that 
+receive Information), all at reasonable times, upon reasonable notice, to ensure compliance with this 
+Agreement.  
+2. PROPRIETARY DATA. NASDAQ OMX grants to Subscriber a nonexclusive, non -transferable license during 
+the term of the Agreement to receive and use the Information transmitted to it by Distributor and thereafter, 
+to use such Information as permitted under the terms of this Agreement and/or  the NASDAQ OMX 
+Requirements. Subscriber acknowledges and agrees that NASDAQ OMX has proprietary rights to the 
+Information that originates on or derives from markets regulated or operated by NASDAQ OMX, and 
+compilation or other rights  to Information gathered from other sources. Subscriber further acknowledges and 
+agrees that NASDAQ  OMX 's third -party information providers have exclusive proprietary rights to their 
+respective Information. In the event of any misappropriation or misuse by Subscriber or anyone  who accesses 
+the Information through Subscriber, NASDAQ OMX or its third-party information providers shall have the right 
+to obtain injunctive relief for its respective materials. Subscriber will attribute source as appropriate under all 
+the circumstances.  
+3. PAYMENT. Subscriber shall assume full and complete responsibility for the payment of any taxes, charges 
+or assessments imposed on Subscriber or NASDAQ  OMX (except for federal, state or local income taxes, if 
+any, imposed on NASDAQ  OMX) by any foreign or domestic national, state, provincial or local governmental 
+bodies, or subdivisions thereof, and any penalties or interest relating to the provision of the Information to 
+Subscriber. Interest shall be due from the date of the invoice to the time that the amount(s) that are due 
+have been paid. To the extent permitted by applicable law, Subscriber acknowledges and agrees that the 
+termination of the Distributor's Service for failure to make payments shall not be considered an improper 
+limitation of access by NASDAQ OMX. For Professional or Business Subscribers, if any payment is due directly 
+to NASDAQ OMX under this Agreement, payment in full is due NASDAQ OMX in immediately available funds, in 
+the currency specified by NASDAQ OMX by a check to NASDAQ OMX, by electronic funds transfer to an 
+NASDAQ OMX Global Subscriber Agreement 
+Terms and Conditions 
+
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 4 
+  
+institution of NASDAQ OMX’s choosing or by any other form of payment as specified by NASDAQ OMX in 
+Appendix 1, within fifteen (15) days of the date of an invoice, whether or not use is made of, or access is  
+made to, the Information.  
+4. SYSTEM. Subscriber acknowledges that NASDAQ  OMX, in its sole discretion, may from time -to-time make 
+modifications to its system or the Information. Such modifications may require corresponding changes to be 
+made in Distributor's Service. Changes or the failure to make timely changes by Distributor or Subscriber may 
+sever or affect Subscriber's access to or use of the Information. NASDAQ OMX shall not be responsible for 
+such effects. NASDAQ OMX does not endorse or approve any equipment, Distributor or Distributor's Service.  
+5. EXCLUSIVE REMEDY. NASDAQ OMX shall endeavor to offer the Information as promptly and accurately as 
+is reasonably practicable. In the event that the Information is not available as a result of failure by NASDAQ 
+OMX to perform its obligations under this Agreement, NASDAQ OMX will endeavor to correct any such failure. 
+If the Information is not available, is delayed, is interrupted, is incomplete, is not accurate or is otherwise 
+materially affected for a continuous period of four (4) hours or more during the time that NASDAQ OMX 
+regularly transmits the Information due to the fault of NASDAQ OMX (except for a reason permitted in this 
+Agreement or in NASDAQ OMX’s agreement with the Distributor), Subscriber’s or any other Person’s exclusive 
+remedy against NASDAQ OMX shall be:  
+a. If Subscriber or any other P erson continues to receive the Information or any other data and/or 
+information offered by NASDAQ  OMX, a prorated month’s credit of any monies due, if any, for the 
+affected Information directly to  NASDAQ OMX from Subscriber  or, if applicable , from said other 
+Person, for the period at issue; or 
+b. If Subscriber or any other Person no longer receives  either the Information or any other data 
+and/or information offered by NASDAQ  OMX, a prorated month’s refund of any monies due for the 
+affected In formation dir ectly to NASDAQ OMX from Subscriber  or, if applicable, from said other 
+Person, for the period at issue. 
+Such credit or refund shall, if applicable, be requested in writing to NASDAQ  OMX with all pertinent details. 
+Beyond the warranties stated in this section, there are no other warranties of any kind — express, implied, 
+statutory (including without limitation, timeliness, truthfulness, sequence, completeness, accuracy, freedom 
+from interruption), implied warranties arising from trade usage, cou rse of dealing , course of performance or 
+the implied warranties of merchantability or fitness for a particular use or purpose.  
+6. LIMITATION OF LIABILITY.  
+a. Except as may otherwise be set forth herein, NASDAQ OMX shall not be liable to Subscriber, its 
+Distributor or any other Person for indirect, special, punitive, consequential or incidental loss or 
+damage (including, but not limited to, trading losses, loss of anticipated profits, loss by reason of 
+shutdown in operation or increased expenses of operat ion, cost of cover or other indirect loss or 
+damage) of any nature arising from any cause whatsoever, even if NASDAQ OMX has been advised of 
+the possibility of such damages. 
+b. NASDAQ OMX shall not be liable to Subscriber or any other Person for any unavailability, 
+interruption, delay, incompleteness or inaccuracy of the Information that lasts less than four (4) 
+continuous hours during the time that NASDAQ OMX regularly transmits the Inform ation or if the 
+Information is materially affected for less than four (4) continuous hours during the time that NASDAQ 
+OMX regularly transmits the Information.  
+c. If NASDAQ OMX is for any reason held liable to Subscriber or to any other Person, whether in  tort 
+or in contract, the liability of NASDAQ OMX within a single year of the Agreement (one year from the 
+effective data of the Agreement) is limited to an amount of Subscriber’s damages that are actually 
+incurred by Subscriber in reasonable reliance (com bined with the total of all claims or losses of 
+Subscriber’s Distributor and any other Person clai ming through, on behalf of or as  harmed by 
+Subscriber) and which amount does not exceed the lesser of: 
+i. For Subscriber or any other person that continues to receive the Information or any other 
+data and/or Information offered by NASDAQ  OMX, a prorated month’s credit of any monies 
+due directly to NASDAQ OMX from Subscriber or, if applicable, from any other P erson, for the 
+Information at issue during the period  at issue, or if Subscriber or any other Person no longer 
+receives either the Information or any other data and/or information offered by NASDAQ OMX, 
+a refund of any monies due directly to NASDAQ  OMX from Subscriber or,  if applicable, from 
+any other Person, for the Information at issue during the period at issue; or  
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 5 
+  
+ii. $500. 
+d. This section shall not relieve N ASDAQ OMX, Subscriber or any other P erson from liability for 
+damages that result from their own gross negligence or willful tortious misconduct or from personal 
+injury or wrongful death claims. 
+e. Subscriber and NASDAQ OMX understand and agree that the terms of this section reflect a 
+reasonable allocation of risk and limitation of liability.  
+7. DISCLAIMERS OF WARRANTIES.  NASDAQ OMX and its third -party information providers make no 
+warranties of any kind — express, implied or statutory (including without limitation, timeliness, truthfulness, 
+sequence, completeness, accuracy, freedom from interruption), any implied warranties arising from tr ade 
+usage, course of dealing, course of performance or the implied warranties of merchantability or fitness for a 
+particular use or purpose or noninfringement.  
+8. THIRD-PARTY INFORMATION PROVIDERS’ LIMITATION OF LIABILITY.  NASDAQ OMX’s third-party 
+information providers shall have no liability for any damages for the accuracy of or for delays or omissions in 
+any of the Information provided by them, whether direct or indirect, lost profits, special or consequential 
+damages of the Subscriber or any other Person seeking relief through Subscriber, even if the third -party 
+information providers have been advised of the possibility of such damages. In no event will the liability of the 
+third-party information providers or their affiliates to Subscr iber or any other Person seeking relief through 
+Subscriber pursuant to any cause of action, whether in contract, tort or otherwise, exceed the fee paid by 
+Subscriber or any other Person seeking relief through Subscriber, as applicable.  
+9. CLAIMS AND LOSSES. Subscriber will indemnify NASDAQ OMX and hold NASDAQ OMX and its employees, 
+officers, directors and other agents harmless from any and all Claims or Losses imposed on, incurred by or 
+asserted as a result of or relating to: (a) any noncompliance by Subsc riber with the terms and conditions 
+hereof; (b) any third -party actions related to Subscriber's receipt and use of the Information, whether 
+authorized or unauthorized under the Agreement.  Each party warrants and represents and will indemnify and 
+hold harmless (and in every case, NASDAQ OMX shall be permitted to solely defend and settle) another party 
+(including NASDAQ  OMX) and their officers, directors, employees and other agents, against any Claims or 
+Losses arising from, involving or relating to a claim o f infringement or other violation of an intellectual 
+property right by the indemnifying party, its actions or omissions, equipment or other property. This right is 
+conditioned on the indemnified party giving prompt written notice to the indemnifying party (as does not 
+prejudice the defense) of the Claims or Losses and providing cooperation in the defense of the Claims or 
+Losses (without waiver of attorney -client, work-product or other legal privilege, or disclosure of information 
+legally required to be kept confidential). 
+10. TERMINATION. Subscriber acknowledges that NASDAQ  OMX, when required to do so in fulfillment of 
+statutory obligations, may by notice to Distributor unilaterally limit or terminate the right of any or all Persons 
+to receive or use the Information and that Distributor will immediately comply with any such notice and will 
+terminate or limit the furnishing of the Information and confirm such compliance by notice to NASDAQ OMX. 
+Any affected P erson will have avai lable to it such procedural protections as are provided by the Act and 
+applicable rules thereunder. In addition to terminations permitted under the Distributor's agreement, this 
+Agreement may be terminated by Subscriber with thirty (30) days written notice  to Distributor and by 
+NASDAQ OMX with thirty (30) days written notice either to Distributor or Subscriber. NASDAQ OMX may also 
+alter any term of this Agreement with ninety (90) days written notice either to Distributor or Subscriber, and 
+any use after such date is deemed acceptance of the new terms.  In the event of Subscriber breach, discovery 
+of the untruth of any representation of Subscriber,  or where directed by the SEC in its regulatory authority, 
+NASDAQ OMX may terminate this Agreement with not less t han three (3) days written notice to Subscriber 
+provided either by NASDAQ OMX or Distributor. 
+11. AMENDMENTS/AGREEMENT. Except as otherwise provided herein, no provision of this Agreement may 
+be amended, modified or waived. No failure on the part of NASDAQ OMX or Subscriber to exercise, no delay in 
+exercising and no course of dealing with respect to any right, power or privilege under this Agreement shall 
+operate as a waiver thereof, nor shall any single or partial exercise of any such right, power or privilege 
+preclude any other or further exercise thereof or the exercise of any other right, power or privilege under this 
+Agreement. If any of the provisions of this Agreement or application thereof to any individual, entity or  
+circumstance is held invalid or unenforceable, the remainder of this Agreement, or the application of such 
+terms or provisions to individuals, entities or circumstances other than those as to which they are held invalid 
+or unenforceable, shall not be affe cted thereby and each such term and provision of this Agreement shall be 
+valid and enforceable to the fullest extent permitted by law. In the event of any conflict between the terms of 
+this Agreement and of the Distributor's agreement, the terms of this Ag reement shall prevail as between 
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 6 
+  
+NASDAQ OMX and Subscriber.  
+12. DEFINITIONS.  
+Act shall mean the Securities Exchange Act of 1934, applicable only to Information disseminated from a 
+NASDAQ OMX Market in the United States. 
+Affiliate shall mean any individual, corporation, company, partnership, limited partnership, limited liability 
+company, trust, association or other entity that, directly or indirectly through one or more intermediaries, 
+controls, is controlled by, or is under common control with such party. 
+Claims or Losses  — Any and all liabilities, obligations, losses, damages, penalties, claims, actions, suits, 
+costs, judgments, settlements and expenses of whatever nature, whether incurred by or issued against an 
+indemnified party or a third party, including, without limitation, (a) indirect, special, punitive, consequential or 
+incidental loss or damage, (including, but not limited to, trading losses, loss of anticipated profits, loss by 
+reason of shutdown in operation or increased expenses of operation or other indirect loss or damage), and (b) 
+administrative costs, investigatory costs, litigation costs  and auditors' and attorneys' fees and disbursements 
+(including in-house personnel).  
+Distributor shall mean Distributor and its Affiliates as ide ntified in writing to NASDAQ OMX.  For purposes of 
+this agreement, “Distributor” shall mean “Vendor”. 
+Distributor's Service — The service from a distributor, including the data processing equipment, software 
+and communications facilities related thereto, for receiving, processing, transmitting, using and disseminating 
+the Information to or by Subscriber.  
+FSA shall mean a Financial Services Authority in Sweden, the United Kingdom, or other jurisdiction other than 
+the United States. 
+Information shall mean certain market data and other data disseminated that has been collected, validated, 
+processed, and recorded by the System or o ther sources made available for transmission to and receipt from 
+either a Distributor or from NASDAQ OMX relating to: a) eligible securities or other financial instruments, 
+markets, products, vehicles, indicators, or devices; b) activities of a NASDAQ OMX Company; c) other 
+information and data from a NASDAQ OMX Company. Information also includes any element of Information as 
+used or processed in such a way that the Information can be identified, recalculated or re-engineered from the 
+processed Information or that the processed Information can be used as a substitute for Information. 
+NASDAQ OMX shall collectively mean The NASDAQ OMX Group, Inc., a Delaware limited liability company 
+and its subsidiaries and Affiliates (collectively “NASDAQ OMX”).  
+NASDAQ OMX Markets shall mean the regulated securities and options exchange subsidiaries of NASDAQ 
+OMX and other regulated market subsidiaries of NASDAQ OMX, including, but not limited to , The NASDAQ 
+Stock Market (“NASDAQ”), the OMX Nordic Exchange (“OMX”), NASDAQ O MX BX (“BX”), NASDAQ OMX PHLX 
+(“PHLX”), the Philadelphia Board of Trade (“PBOT”), and NASDAQ OMX Europe. The NASDAQ OMX Markets are 
+each a “NASDAQ OMX Market.” 
+NASDAQ OMX Requirements — All (i) rules, regulations, interpretations, decisions, opinions, orde rs and 
+other requirements of the SEC or an FSA , as may be applicable based upon the NASDAQ OMX Market from 
+which the Information is received  ; (ii) the rules and regulations, disciplinary decision and rule interpretations 
+applicable to NASDAQ OMX Markets ( iii) the NASDAQ OMX Markets' decisions, policies, interpretations, 
+operating procedures, specifications, requirements, and other documentation that is regulatory or technical in 
+nature (including, but not limited to, user guides) published on the NASDAQTra der website located at  
+www.NASDAQTrader.com or another website accessible by and made known to Distributor; and (iv) all 
+other applicable laws, statutes, rules, regulations, orders, decisions, interpretations, opinions, and other 
+requirements, whether promulgated by the United States, England, Swed en or any other applicable 
+jurisdiction (including in the area of intellectual property); and (v) the successors, as they may exist at the 
+time, of the components of the NASDAQ OMX Requirements. 
+NASDAQ Trader shall mean the website located at www.NASDAQTrader.com or its successor site(s). 
+Or — Includes the word "and".  
+Person — Any natural person, proprietorship, corporation, partnership or other entity whatsoever.  
+ 
+NASDAQ OMX Global Subscriber Agreement Summary - Version 2013.1  Page | 7 
+  
+Subscriber — When it appears alone, t he word "Subscriber" encompasses all Non -Professional, Private, 
+Professional and Business Subscribers. All subscribers are deemed Professional or Business unless they are 
+qualified as Non-Professional or Private Subscriber.  
+U.S. Information 
+Non-
+Professional 
+Subscriber  
+ 
+Any natural person who is NOT:  
+(a) registered or qualified in any capacity with the SEC, the Commodities Futures Trading 
+Commission, any state securities agency, any securities exchange or association or any 
+commodities or futures contract market or association;  
+(b) engaged as an "investment advisor" as that term is defined in Section 202(a)(11) of 
+the Investment Advisors Act of 1940  (whether or not registered or qualified under 
+that Act); or  
+(c) employed by a bank or other organization exempt from registration under federal or 
+state securities laws to perform functions that would require registration or qualification if 
+such functions were performed for an organization not so exempt.  
+Professional  
+Subscriber  
+ 
+All other persons who do not meet the definition of Non-Professional Subscriber.  
+ 
+Non-U.S. Information 
+Private 
+Subscriber  
+A natural person for the purpose of managing the Subscriber’s own personal investments 
+and not for any business purpose, nor for the purpose of giving any form of advice to any 
+other person. A Private Use Subscriber may not:  
+(a) contract for, receive or use Information for the purpose of Private Use on behalf of any 
+other person or any corporation, partnership, limited liability company, trust, association 
+or other form of entity,  
+(b) contract for, receive or use Information for the purpose of Private Use in any Service 
+that is paid for by another person or any corporation, partnership, limited liability 
+company, trust, association or other form of entity.  
+A Private Use Subscriber shall, notwithstanding the above:  
+(c) be permitted to contract for, receive  or use Information on behalf of or paid for by 
+another natural person (person B) provided that (1) its for the purpose of managing 
+person B’s own personal investments and not for any business purpose, and (2) person B 
+have filed a power of attorney or equivalent documentation accordingly with Licensee,  
+(d) be permitted to contract for, receive or use Information for Private Use on behalf of 
+and/or paid for by a legal entity or other form of non -natural Person in which the Private 
+Use Subscriber has full (100%) ownership and exercises full (100%) control,  
+(e) Section (c) and (d) may not be combined.  
+ 
+Business 
+Subscriber 
+ 
+All other persons who do not meet the definition of Private Subscriber.  
+ 
+ “System” shall mean any system NASDAQ OMX has developed for the creation and/or dissemination of 
+Information. 
+ 
+NASDAQ OMX Global Subscriber Agreement Appendix Version 2013.1     Page | 1 
+  
+ 
+ 
+ 
+ 
+ 
+1. INFORMATION. NASDAQ OMX offers Information that has been collected, validated, processed, and 
+recorded by the System or other sources.  For data offered from other sources, the governing laws shall apply 
+as identified below.  
+ 
+Legal Entity and Principal 
+Place of Business 
+Entity 
+Type 
+Funds Governing Laws 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be amicably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY, and shall be conducted in the English 
+language, which shall also be the language of the 
+documents. 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be amicably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY, and shall be conducted in the English 
+language, which shall also be the language of the 
+documents. 
+Finnish 
+company Euros 
+This Agreement shall be governed by and construed in 
+accordance with the laws of Finland. Any dispute that cannot 
+be amicably settled that arises out of this Agreement shall 
+be referred to arbitration and shall be conducted in 
+accordance with the rules for expedited arbitrations of the 
+Arbitration Institute of the Stockholm Chamber of 
+Commerce. All such proceedings shall be held in Stockholm, 
+and shall be conducted in the English language, which shall 
+also be the language of the documents. 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be amicably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY, and shall be conducted in the English 
+language, which shall also be the language of the 
+documents. 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be amicably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY, and shall be conducted in the English 
+language, which shall also be the language of the 
+documents. 
+NASDAQ OMX Global Subscriber Agreement 
+Appendix 1 
+
+ 
+NASDAQ OMX Global Subscriber Agreement Appendix Version 2013.1     Page | 2 
+  
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be am icably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY , and shall be conducted i n the English 
+language, which shall also be the language of the 
+documents. 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be am icably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY , and shall be conducted i n the English 
+language, which shall also be the language of the 
+documents. 
+Norwegian 
+Company Euros 
+This Agreement shall be governed by and construed in 
+accordance with the laws of Norway. Any dispute that 
+cannot be amicably settled that arises out of this Agreement 
+shall be referred to arbitration and shall be conducted in 
+accordance with the Norwegian Arbitration Act 2004. Unless 
+the parties agree otherwise such proceedings shall b e held 
+in Oslo, and shall be conducted in the English language, 
+which shall also be the language of the documents. The 
+proceedings as well as the verdict shall be confidential 
+between the parties, except for information which a party is 
+required to disclose by virtue of law or governmental order. 
+British 
+Company 
+British 
+Pounds 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by English law, without reference to 
+principles of conflicts of laws thereof.  Any dispute that 
+cannot be amicably settled that arises out of this Agreement 
+shall be referred to arbitration and shall be conducted 
+pursuant to the Rules of Arbitration of the London Court of 
+International Arbitration from time to time in force. All such 
+proceedings shall be held in London, and shall be conducted 
+in the English language, which shall also be the language of 
+the documents. 
+British 
+Company 
+British 
+Pounds 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by English law, without reference to 
+principles of conflicts of laws thereof.  Any dispute that 
+cannot be amicably settled that arises out of this Agreement 
+shall be referred to arbitration and shall be conducted 
+pursuant to the Rules of Arbitration of the London Court of 
+International Arbitration from time to time in force. All such 
+proceedings shall be held in London, and shall be conducted 
+in the English language, which shall also be the language of 
+the documents. 
+Delaware 
+Corporation 
+US 
+Dollars 
+This Agreement shall be construed and enforced in 
+accordance with, and the validity and performance hereof 
+shall be governed by, the laws of the State of New York, 
+without reference to principles of conflicts of laws thereof.  
+Any dispute that cannot be amicably settled that arises out 
+of this Agreement shall be referred to arbitration and shall 
+be conducted in accordance with the rules of the American 
+Arbitration Association. All such proceedings shall be held in 
+New York City, NY, and shall be conducted in the English 
+language, which shall also be the language of the 
+documents. 
+ 
+NASDAQ OMX Global Subscriber Agreement Appendix Version 2013.1     Page | 3 
+  
+2. REQUIREMENTS OF SELF-REGULATORY ORGANIZATION; ACTIONS TO BE TAKEN IN 
+FULFILLMENT OF STATUTORY OBLIGATIONS.  
+(a) Subscriber acknowledges that in the United States: (i) several of the NASDAQ OMX Markets are registered 
+with the SEC as national securities exchanges pursuant to Section 6 of the Act, and FINRA is registered with 
+the SEC as a national securities association pursuant to 15A of the Act; (ii) FINRA and NASDAQ O MX have a 
+statutory obligation to protect investors and the public interest, and to ensure that quotation information 
+supplied to investors and the public is fair and informative, and not discriminatory, fictitious or misleading; 
+(iii) Section 19(g)(1) of the Act mandates that FINRA and NASDAQ OMX comply with the NASDAQ OMX 
+Requirements; (iv) NASDAQ OMX has jurisdiction to enforce compliance with certain of the NASDAQ OMX 
+Requirements; (v) FINRA has jurisdiction to enforce compliance with certain of the NAS DAQ OMX 
+Requirements; and (vi) NASDAQ OMX is obligated to offer terms that are not unreasonably discriminatory 
+between Subscribers, subject to applicable NASDAQ OMX Requirements.  Accordingly, Subscriber agrees that 
+NASDAQ OMX, when required to do so in ful fillment of its statutory obligations, may, temporarily or 
+permanently, unilaterally condition, modify or terminate the right of any or all individuals or entities to receive 
+or use the Information.  NASDAQ OMX shall undertake reasonable efforts to notify Subscriber of any such 
+condition, modification or termination, and Subscriber shall promptly comply with any such notice within such 
+period of time as may be determined in good faith by NASDAQ OMX to be necessary, consistent with its 
+statutory obligations.  Any Person that receives such a notice shall have available to it such procedural 
+protections as are provided to it by the Act and the applicable rules thereunder. 
+ 
+(b) Subscriber acknowledges that, in Europe, NASDAQ OMX is obligated to offer terms that are not 
+unreasonably discriminatory between Subscribers, subject to applicable NASDAQ OMX Requirements. NASDAQ 
+OMX when required to do so in fulfillment of the its statutory obligations, may, temporarily or permanently, 
+unilaterally condition, modify or terminate the right of any and all individuals or entities to receive or use the 
+Information. NASDAQ OMX shall notify the Subscriber of any such condition, modification or termination, and 
+the Subscriber shall promptly comply with any such notice within such period of time as may be determined in 
+good faith by NASDAQ OMX to be necessary, consistent with its statutory obligations. If the Subscriber 
+receives such notice, it will have available to it all procedural protections pr ovided to it by statute and any 
+applicable regulatory rules.  
+ 
+(c) If Subscriber is a member of a NASDAQ OMX Market, then Subscriber expressly acknowledges and agrees 
+that (i) this Agreement does not limit or reduce in any way Subscriber’s obligations and responsibilities as a 
+member of any applicable NASDAQ OMX Market; (ii) this Agreement does not in any way alter the procedures 
+or standards generally applicable to disciplinary or other actions taken by NASDAQ OMX to enforce compliance 
+with, or impose sanc tions for violations of, the NASDAQ OMX Requirements; and (iii) the nonpayment of 
+amounts due under this Agreement could result in the suspension or cancellation of Subscriber's membership 
+in a NASDAQ OMX Market in accordance with the NASDAQ OMX Requirements. 

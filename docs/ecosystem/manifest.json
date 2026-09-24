@@ -3,7 +3,7 @@
   "landscape_manifest": "catalogs/landscape/manifest.json",
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "source_revision": "35cf9e35913f91d838b16dc518109ef2f8747e01",
   "publication_ref": "main",
   "layers": [
     {
@@ -722,6 +722,13 @@
       "status": "Isolated WSL acceptance",
       "body": "Official Linux ai-memory2.3.2 passed65 synthetic native checks across exact scope, Unicode/reserved paths, restart, upstream HTTP backup and native restore; four owned processes exited0. Isolated fresh synthetic store and39 MCP tool calls; not production activation, native-client integration or prior-version migration.",
       "path": "blueprints/convergence-practice/wsl-memory-maintenance/README.md"
+    },
+    {
+      "id": "wsl-retrieval-20260920",
+      "title": "Incomplete historical WSL retrieval reference",
+      "status": "Native acceptance incomplete",
+      "body": "Retained source and QMD fixture receipts lack command argv/cwd; raw logs could not be recovered. Historical npm --ignore-scripts is not the supported fresh-install recipe. Selected facts and the failed attempt remain inspectable, but do not qualify native E2E or adoption. Future runs must retain invocation provenance and use supported QMD installation controls.",
+      "path": "blueprints/convergence-practice/wsl-retrieval/README.md"
     }
   ],
   "annotations": [

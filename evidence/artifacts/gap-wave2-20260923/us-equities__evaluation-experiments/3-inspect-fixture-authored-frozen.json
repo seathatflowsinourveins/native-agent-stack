@@ -1,0 +1,82 @@
+{
+ "id": "gap-wave2-20260923/us-equities__evaluation-experiments/3-inspect-fixture-authored-frozen",
+ "gap_index": 3,
+ "gap_text_sha256": "d44f22cda08a594c3e94090832c936bccba8ecd2874a153337c3700ef07e9001",
+ "next_check": "Author an inspect-ai mock-model task over catalog-cases.json with the deterministic scorer, commit it with a hash, and run `inspect eval` once to confirm it executes.",
+ "preregistration": {
+  "written_at": "2026-09-23T07:18:31Z",
+  "expectation": "An inspect-ai mock-model task over catalog-cases.json is authored under blueprints/, committed with sha256 hashes before its first scored run, and one `inspect eval` run exits 0 with 8 scored samples and zero provider calls.",
+  "criteria": [
+   "Task source files committed and hashed in a freeze record before the first scored run (commit order is the proof).",
+   "The scorer calls the unmodified blueprints/native-skill-practice/gate.cjs through node and evaluates the same three assertions as promptfooconfig.yaml.",
+   "The model is local and deterministic (no network): the same exact-text containment transform as the promptfoo echo provider.",
+   "`inspect eval` exits 0 with 8 samples scored in the retained JSON log."
+  ],
+  "file": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/prereg/3-inspect-fixture-authored-frozen.json",
+  "committed_in": "20fbeb6 (2026-09-23T07:18:35Z), before any check ran"
+ },
+ "commands": [
+  "git commit 11d1e6c (inspect-arm/catalog_task.py, bridge.cjs, freeze.json) at 2026-09-23T07:21:37Z, before the first scored run",
+  "cd blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm && HOME=<run>/home unshare -rn $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/bin/inspect eval catalog_task.py --max-samples 1 --max-connections 1 --retry-on-error 1 --log-format json --log-dir <run>/logs"
+ ],
+ "results": {
+  "freeze": {
+   "kind": "inspect_arm_freeze",
+   "frozen_at": "2026-09-23T07:21:37Z",
+   "before": "first scored inspect eval run (compile/syntax checks only before this freeze)",
+   "inspect_ai": "0.3.266",
+   "model": "mockllm/model with custom_outputs callable (exact-text-baseline-v1 transform evaluated by node)",
+   "files": {
+    "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py": "b667435ddfe809fc804b0cfd1a7bb5ff3f680e52c6ba343711522c650194ca7b",
+    "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/bridge.cjs": "05c3aead62ebe8058f06859cc3ec96c9fa97b553fa0e67b7d56c7d1fcdebcc1b",
+    "blueprints/native-skill-practice/catalog-cases.json": "7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40",
+    "blueprints/native-skill-practice/promptfooconfig.yaml": "fab8b7e8d9493c61ce58c89333f30b8af63659410d4b609a2daa8e67944f18cb",
+    "blueprints/native-skill-practice/gate.cjs": "e7e94404b06e67b389ea1bb8348457f5fe67f25d4bc7b7286e1f37f733c2ffcc"
+   }
+  },
+  "retained_run_timeline_attempt4": [
+   "2026-09-23T07:26:39.833Z in-clean-1 exit=0"
+  ],
+  "in_clean_1": {
+   "status": "success",
+   "samples": 8,
+   "accuracy_label_matches": 3,
+   "model_usage": {
+    "mockllm/model": {
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "total_tokens": 0
+    }
+   }
+  },
+  "first_scored_run": "The first scored inspect run was attempt 2 at 07:23:39Z, after the 07:21:37Z freeze commit.",
+  "superseded_attempts": [
+   "attempt 1 (07:22:15Z): inspect rejected the absolute task path (NotImplementedError: Non-relative patterns are unsupported); no inspect sample was scored; runner fixed to cd into the task directory (frozen task files unchanged).",
+   "attempt 2 (07:23:36Z): all clean and fault runs scored; the background inspect run ignored SIGINT (inherited SIG_IGN) and ran to completion, and eval-retry rejected --log-format; runner fixed.",
+   "attempt 3 (07:24:56Z): all checks passed, but the promptfoo fault first-run and retry stdout shared one file; runner fixed to capture them separately and snapshot the DB before and after the retry.",
+   "attempt 4 (07:26:37Z): retained run; all results in this receipt come from it."
+  ]
+ },
+ "outcome": "settled",
+ "outcome_note": "The inspect-ai mock-model task over catalog-cases.json was authored, hash-frozen and committed before its first scored run, and inspect eval ran it to 8 scored samples with exit 0.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "The fixture is under blueprints/gap-wave2-20260923/, not under blueprints/native-skill-practice/; integration into that folder is left to the coordinator.",
+  "Raw outputs of superseded attempts 1-3 were deleted when run_two_arm.sh was rerun into the same directory; they are described from the observed output, not retained."
+ ],
+ "raw_outputs": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-clean-1/logs/2026-09-23T07-26-38-00-00_catalog-cases_dvpzjs6ojajkGw3tzkejww.json",
+   "sha256": "79fc9e111b1b6fa0221cb25e7fe8cbb46db91b06b3b22ee980d17007d4a6e100"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/in-clean-1/stdout.txt",
+   "sha256": "02eaf76ac8f4da77ad0bbdb3c945a1ec43ba0be4f5080f2654a6c6f86e60da35"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/0/run/timeline.txt",
+   "sha256": "d7a347b7fcacb31e4bf36df5a128045f885bea270687143b489d62bfb0cb322d"
+  }
+ ],
+ "checked_at": "2026-09-23T13:51:51Z"
+}

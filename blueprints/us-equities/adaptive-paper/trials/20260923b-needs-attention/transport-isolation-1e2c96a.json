@@ -1,0 +1,42 @@
+{
+  "kind": "transport_isolation_check",
+  "feed": "sip",
+  "symbols": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA"
+  ],
+  "window_seconds": 25,
+  "transport_sha256": "fe10f01bfe05880da08625fb5280a26ca51d05cf2262687fb0cde1caa32af8c5",
+  "quotes_received": 8914,
+  "health_changes": [
+    {
+      "t": 0.19,
+      "reasons": [],
+      "ready": true
+    }
+  ],
+  "restart_log_records": [
+    {
+      "seconds_after_stop_called": 0.016,
+      "logger": "alpaca.trading.stream",
+      "message": "trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)"
+    },
+    {
+      "seconds_after_stop_called": 0.018,
+      "logger": "alpaca.data.live.websocket",
+      "message": "data websocket error, restarting connection: sent 1000 (OK); no close frame received"
+    },
+    {
+      "seconds_after_stop_called": 0.018,
+      "logger": "alpaca.data.live.websocket",
+      "message": "data stream stopped"
+    },
+    {
+      "seconds_after_stop_called": 0.027,
+      "logger": "alpaca.trading.stream",
+      "message": "Trading stream stopped"
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+ "kind": "river_progressive_validation_report",
+ "river": "0.26.1",
+ "input": {
+  "path": "Data/equity/usa/daily/spy.zip",
+  "sha256": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+  "hash_verified_before_parse": true,
+  "sessions": 1824,
+  "first": "2014-01-02",
+  "last": "2021-03-31"
+ },
+ "stream": {
+  "samples": 1798,
+  "positive_labels": 1103,
+  "features": [
+   "ret1",
+   "ret5",
+   "ret20"
+  ],
+  "label": "open[t+6]/open[t+1]-1 > 0",
+  "moment": "session date t",
+  "step": 250
+ },
+ "runs": [
+  {
+   "model": "logistic",
+   "delay": "label_at - date (t+6 open)",
+   "final": {
+    "Accuracy": 0.5917686318131257,
+    "LogLoss": 0.6806130025132363
+   },
+   "labels_learned": 1798,
+   "causality_violations": 0,
+   "checkpoints": [
+    {
+     "step": 250,
+     "Accuracy": 0.504,
+     "LogLoss": 0.7010155820982847
+    },
+    {
+     "step": 500,
+     "Accuracy": 0.5,
+     "LogLoss": 0.702390190172622
+    },
+    {
+     "step": 750,
+     "Accuracy": 0.5413333333333333,
+     "LogLoss": 0.6941397870772561
+    },
+    {
+     "step": 1000,
+     "Accuracy": 0.578,
+     "LogLoss": 0.6802720430365842
+    },
+    {
+     "step": 1250,
+     "Accuracy": 0.5704,
+     "LogLoss": 0.6880699833422165
+    },
+    {
+     "step": 1500,
+     "Accuracy": 0.5906666666666667,
+     "LogLoss": 0.6800089762599228
+    },
+    {
+     "step": 1750,
+     "Accuracy": 0.5925714285714285,
+     "LogLoss": 0.680389107925066
+    },
+    {
+     "step": 1798,
+     "Accuracy": 0.5917686318131257,
+     "LogLoss": 0.6806130025132363
+    }
+   ]
+  },
+  {
+   "model": "logistic",
+   "delay": "None (immediate standard online validation)",
+   "final": {
+    "Accuracy": 0.6095661846496107,
+    "LogLoss": 0.6704837777246395
+   },
+   "labels_learned": 1798,
+   "causality_violations": 1797,
+   "checkpoints": [
+    {
+     "step": 250,
+     "Accuracy": 0.584,
+     "LogLoss": 0.6896234008472297
+    },
+    {
+     "step": 500,
+     "Accuracy": 0.548,
+     "LogLoss": 0.6922111521404927
+    },
+    {
+     "step": 750,
+     "Accuracy": 0.5733333333333334,
+     "LogLoss": 0.6857429723273973
+    },
+    {
+     "step": 1000,
+     "Accuracy": 0.602,
+     "LogLoss": 0.6729897900801185
+    },
+    {
+     "step": 1250,
+     "Accuracy": 0.5904,
+     "LogLoss": 0.6798910239640059
+    },
+    {
+     "step": 1500,
+     "Accuracy": 0.6073333333333333,
+     "LogLoss": 0.6720061532048961
+    },
+    {
+     "step": 1750,
+     "Accuracy": 0.6108571428571429,
+     "LogLoss": 0.6700706330831835
+    },
+    {
+     "step": 1798,
+     "Accuracy": 0.6095661846496107,
+     "LogLoss": 0.6704837777246395
+    }
+   ]
+  },
+  {
+   "model": "prior",
+   "delay": "label_at - date (t+6 open)",
+   "final": {
+    "Accuracy": 0.6121651785714286,
+    "LogLoss": 0.7637073307596162
+   },
+   "labels_learned": 1798,
+   "causality_violations": 0,
+   "checkpoints": [
+    {
+     "step": 250,
+     "Accuracy": 0.5901639344262295,
+     "LogLoss": 1.3677618731267465
+    },
+    {
+     "step": 500,
+     "Accuracy": 0.5587044534412956,
+     "LogLoss": 1.0309450887203113
+    },
+    {
+     "step": 750,
+     "Accuracy": 0.581989247311828,
+     "LogLoss": 0.9089728409964434
+    },
+    {
+     "step": 1000,
+     "Accuracy": 0.6086519114688129,
+     "LogLoss": 0.8412217296974329
+    },
+    {
+     "step": 1250,
+     "Accuracy": 0.594855305466238,
+     "LogLoss": 0.8128481626273608
+    },
+    {
+     "step": 1500,
+     "Accuracy": 0.6117804551539491,
+     "LogLoss": 0.7828013435824059
+    },
+    {
+     "step": 1750,
+     "Accuracy": 0.6135321100917431,
+     "LogLoss": 0.765696764299441
+    },
+    {
+     "step": 1798,
+     "Accuracy": 0.6121651785714286,
+     "LogLoss": 0.7637073307596162
+    }
+   ]
+  }
+ ],
+ "probe_detection": "CausalityProbe counts labels whose label_at is later than the next question's date; the immediate run is the positive control."
+}

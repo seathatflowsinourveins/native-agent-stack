@@ -1,0 +1,3 @@
+.runtime/postgresql/18.6/bin/pg_ctl -D .runtime/native-pgdata -l .runtime/postgres.log -w start
+waiting for server to start.... done
+server started

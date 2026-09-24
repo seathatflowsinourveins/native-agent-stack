@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-edtechre-pybroker",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/edtechre/pybroker",
+ "reviewed_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "backtesting-engine"
+ ],
+ "claim": "Source and documentation review of the repository edtechre/pybroker at commit 95e00fecb1006490601aca7e2e8de609f032e12d, read from README.md at that revision. Repository description: \"Algorithmic Trading in Python with Machine Learning\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Are you looking to enhance your trading strategies with the power of Python and machine learning? PyBroker is a Python framework designed for developing algorithmic trading strategies, with a focus on strategies that use machine learning. With PyBroker, you can easily create and fine-tune trading rules, build powerful models, and gain valuable insights into your strategy\u2019s performance."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "PyBroker provides you with the tools to build, test, and evaluate algorithmic trading strategies backed by machine learning."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "A super-fast backtesting engine built in NumPy and accelerated with Numba."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Easy creation of trading rules and models for executing across multiple instruments."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Integration of trading signals across multiple time intervals, including daily, weekly, and monthly."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Access to historical data from Alpaca, Yahoo Finance, AKShare, or from your own data provider."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Model training and backtesting using Walkforward Analysis, which simulates how the strategy would perform during actual trading."
+  },
+  {
+   "source": "README.md@95e00fecb1006490601aca7e2e8de609f032e12d",
+   "text": "Reliable trading metrics that use randomized bootstrapping) to provide more accurate results."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/edtechre/pybroker/tree/95e00fecb1006490601aca7e2e8de609f032e12d",
+  "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/README.md"
+ ]
+}

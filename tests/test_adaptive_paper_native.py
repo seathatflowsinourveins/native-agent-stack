@@ -5,6 +5,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import time
+import uuid
 import unittest
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
@@ -16,6 +17,22 @@ if NATIVE:
     SPEC = importlib.util.spec_from_file_location("adaptive_native", PATH)
     ADAPTER = importlib.util.module_from_spec(SPEC)
     SPEC.loader.exec_module(ADAPTER)
+
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop()
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
 
 
 class FakePort:
@@ -176,6 +193,35 @@ class NativeIntegration(unittest.TestCase):
         self.assertEqual(port.active, {})
         self.assertEqual(port.submissions[0]["reason"], "test")
         self.assertIn("family=momentum", port.submissions[0]["tags"])
+
+    def test_uuid_broker_ids_fill_without_trade_id_overflow(self):
+        # Real Alpaca order ids are 36-character UUIDs; the old "<id>:cum:<qty>" TradeId was 42.
+        original = FakePort.submit
+        async def uuid_submit(port, payload):
+            port.submissions.append(payload)
+            order = {**payload, "id": str(uuid.uuid4()), "filled_qty": "0", "filled_avg_price": None,
+                     "status": "new", "updated_at_ns": time.time_ns()}
+            port.active[payload["client_order_id"]] = order
+            port.on_order(dict(order))
+            order.update(filled_qty=payload["qty"], filled_avg_price=payload["limit_price"], status="filled",
+                         updated_at_ns=time.time_ns())
+            port.qty += int(payload["qty"]) if payload["side"] == "buy" else -int(payload["qty"])
+            port.on_order(dict(order))
+            port.active.pop(payload["client_order_id"])
+            return dict(order)
+        FakePort.submit = uuid_submit
+        try:
+            port, strategy, session = self.run_node("fills")
+        finally:
+            FakePort.submit = original
+        self.assertEqual(session.errors, [])
+        self.assertTrue(strategy.flat_seen)
+        self.assertEqual(port.qty, 0)
+        broker_id = str(uuid.uuid4())
+        first = ADAPTER.fill_trade_id(broker_id, Decimal("1"))
+        self.assertEqual(len(str(first)), 36)
+        self.assertEqual(first, ADAPTER.fill_trade_id(broker_id, Decimal("1")))
+        self.assertNotEqual(first, ADAPTER.fill_trade_id(broker_id, Decimal("2")))
 
     def test_real_native_cancel_confirmation_deduplicated(self):
         port, strategy, session = self.run_node("cancel")

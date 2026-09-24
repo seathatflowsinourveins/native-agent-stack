@@ -1,0 +1,178 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-0",
+  "gap_index": 0,
+  "gap_text_sha256": "8d681bc6791fa524baee71565bd73be8aedb56328c624949e36c955c6c094fa0",
+  "gap_text": "The privacy-filter evidence is one synthetic canary reviewed by a reviewer (observability/receipt.json lines 313-329). The repository has no script that re-runs it, and it covers only tested fields and trusted instrumentation, not arbitrary-content DLP (line 24).",
+  "next_check": "Add a script that emits several synthetic canary secrets through each tested telemetry field, queries Prometheus/Loki/receipts for them, and fails on any leak. Run it and retain the output.",
+  "arms": [
+    {
+      "arm": "add a script that emits several synthetic canaries through each tested telemetry field",
+      "status": "executed",
+      "detail": "privacy_canary.py; 37 negative canaries over OTLP logs, OTLP metrics and the SDK receipt file lane, plus 5 positive/boundary controls"
+    },
+    {
+      "arm": "query Prometheus/Loki/receipts for them",
+      "status": "executed",
+      "detail": "isolated copies running the repository configuration; live stores not queried"
+    },
+    {
+      "arm": "fail on any leak",
+      "status": "executed",
+      "detail": "exit 1 on leak, 2 if any positive control is missing from any expected backend; passthrough self-test exits 1"
+    },
+    {
+      "arm": "run it and retain the output",
+      "status": "executed",
+      "detail": "raw/0-canary-fr3-*.json from the committed script (unedited); earlier runs raw/0-canary-*.json"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "An isolated otelcol-contrib 0.161.0 running the repository collector.yaml privacy processors unchanged (ports rewritten, live-probe pipelines dropped) plus isolated Prometheus 3.14.0 and Loki 3.7.8 will drop synthetic canary secrets placed in every non-allowlisted log/metric/resource/scope field, and the positive control (a canary in an allowlisted attribute) will appear, proving the query paths can detect a leak.",
+    "criteria": "Script exits 0 only if (a) each canary sent through a non-allowlisted field is absent from Prometheus (series + label values), Loki (query_range over the fixture window, all structured metadata) and the file/events receipt file, and (b) the allowlisted-field positive control is found in each backend where that field is exported. A detection self-test (the same script run against a pass-through collector config) must report leaks and exit non-zero. Any leak in the privacy run = fail.",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "fix_round": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "With an explicit field-to-backend expectation matrix for positive controls, the privacy run still reports 0 leaks and every positive control appears in every expected backend; passthrough still reports leaks.",
+      "criteria": "privacy exit 0 with positive_controls_ok for every field/backend pair; passthrough exit 1.",
+      "committed_in": "the commit 'Record the Codex review and preregister the fix round' (2026-09-23T03:28:46Z, before the fix-round runs)"
+    },
+    "fix_round_3": {
+      "expectation": "Rerunning privacy_canary.py exactly as committed (sha256 7b4d22a9..., which publishes only sha256 prefixes of canary values) in privacy and passthrough modes reproduces the earlier result: privacy status passed, 0 leaks over 37 negative canaries, every positive control in every expected backend; passthrough status leak with leaks on 31 of 37 fields.",
+      "criteria": "privacy exit 0 and passthrough exit 1, both from the committed script; the new raw JSON is committed unedited (no manual redaction) and hashed next to the script. The pre-change script is identified by git blob 80b7ec7 (commit 424eeb7) and its sha256 for the earlier runs. Outcome stays advanced (arbitrary-content DLP and live-store coverage remain).",
+      "written_at": "2026-09-23T14:15:26Z",
+      "label": "fix-round-3 preregistration (after the independent Opus review of 2026-09-23), written before any fix-round-3 run; real UTC time from the writer process",
+      "committed_in": "929154c (2026-09-23T14:15:26Z, before any fix-round-3 run)"
+    }
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && for m in privacy passthrough; do timeout 600 python3 blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py --mode $m --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-$m.json > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-$m.stdout.txt 2>evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-$m.stderr.txt; echo \"$m exit=$? $(date -u +%FT%TZ)\" >> evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-exitcodes.txt; done   (fix round 3, 14:15:47-14:16:53Z, committed script sha256 7b4d22a9..., git blob 93e8eae)",
+    "cd $HOME/code/nas-wt-g2-observation-inference && for m in privacy passthrough; do python3 blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py --mode $m --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-$m.json > evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-$m.stdout.txt; echo \"$m exit=$?\" >> evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-exitcodes.txt; done   (fix round 1, 03:31-03:32Z, pre-change script git blob 80b7ec7 from commit 424eeb7, sha256 ca2ecda0...)",
+    "earlier runs retained: 0-canary-privacy-run1.json (02:49Z, boundary token shared the run id) and 0-canary-run2-* (02:50-02:51Z, positive controls only needed one backend)"
+  ],
+  "results": [
+    "fix-round-3 privacy mode (committed script): status='passed', leak_count=0, negative_count=37, arrival={'prom': True, 'loki_otlp': True, 'loki_sdk': True}, positive_control_missing={}",
+    "positive controls found in: {\"logs.resource.ecosystem.task.id(allowlisted)\": [\"collector_file_events\", \"loki_query_range\"], \"logs.attr.tool_name(allowlisted)\": [\"collector_file_events\", \"loki_query_range\"], \"metrics.name(boundary)\": [\"collector_prometheus_exporter\", \"prometheus_federate\", \"prometheus_metadata\"], \"metrics.attr.model(allowlisted)\": [\"collector_prometheus_exporter\", \"prometheus_federate\"], \"sdk.configured_model(allowlisted-as-model)\": [\"collector_file_events\", \"loki_query_range\"]}; expected: {\"logs.resource.ecosystem.task.id(allowlisted)\": [\"collector_file_events\", \"loki_query_range\"], \"logs.attr.tool_name(allowlisted)\": [\"collector_file_events\", \"loki_query_range\"], \"sdk.configured_model(allowlisted-as-model)\": [\"collector_file_events\", \"loki_query_range\"], \"metrics.attr.model(allowlisted)\": [\"collector_prometheus_exporter\", \"prometheus_federate\"], \"metrics.name(boundary)\": [\"collector_prometheus_exporter\", \"prometheus_federate\", \"prometheus_metadata\"]}",
+    "fix-round-3 passthrough self-test: status='leak', leak_count=58 hits over 31 of 37 canary fields",
+    "fix-round-3 exit codes: privacy exit=0 2026-09-23T14:16:19Z | passthrough exit=1 2026-09-23T14:16:53Z",
+    "fix-round-1 runs (pre-change script): privacy status='passed' leak_count=0; passthrough status='leak' leak_count=58 over 31 fields; exit codes: privacy exit=0 2026-09-23T03:31:33Z | passthrough exit=1 2026-09-23T03:32:06Z",
+    "fields with no detection power even without filtering (never persisted by any searched backend): ['metrics.exemplar.attr', 'metrics.metadata', 'metrics.resource.host.name', 'metrics.resource.organization.id', 'metrics.resource.schema_url', 'metrics.resource.user.email']",
+    "earliest runs: run1 status='passed' leak_count=0; run2 status='passed' leak_count=0",
+    "backends searched: collector Prometheus exporter text, Prometheus /federate and /api/v1/metadata, Loki query_range plus every label value, collector file/events receipt file"
+  ],
+  "outcome": "advanced",
+  "note": "A re-runnable script now sends 37 synthetic canaries through every tested log, metric, resource, scope and SDK-receipt field and fails on any leak or missing positive control. With the repository privacy processors nothing leaked in four runs (the latest from the committed script); with them removed the same searches found 31 of the 37 fields. Remaining: (1) arbitrary-content DLP is still not provided: allowlisted attribute values (tool_name, model, ecosystem.task.id, configured_model) and metric names pass through verbatim, as the positive/boundary controls show; (2) six metric resource/metadata/exemplar fields never reach any backend here, so their absence says nothing about the filter; (3) the script targets an isolated copy of the stack, not the live stores.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Isolated stack on free loopback ports with the repository collector.yaml (ports rewritten, metrics/health and metrics/host pipelines removed); live stores were not queried.",
+    "Synthetic OTLP/JSON posts and one synthetic SDK receipt file; no native client emitted these canaries.",
+    "Substring detection of unique CNRY tokens; a transformed (for example hashed) leak would not be detected.",
+    "Canary tokens are deliberately not credential-shaped; the filter is key-based, so value shape does not affect it.",
+    "Script versions: the fix-round-3 raw outputs (0-canary-fr3-*) come from the committed privacy_canary.py (sha256 in helper_scripts, git blob 93e8eae) and are unedited. The earlier runs used git blob 80b7ec7 (commit 424eeb7, sha256 ca2ecda02820...); commit 707430e changed only the published canary field (raw values -> sha256 prefixes) and added a private canaries file; the leak and positive-control code is identical, as `git diff 424eeb7 707430e -- blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py` shows.",
+    "Publication redaction in the earlier runs only: the logs.attr.api_key canary value is withheld in raw/0-canary-privacy.json and siblings (its label plus value tripped the repository gitleaks generic-api-key rule); leak detection used the full value."
+  ],
+  "checked_at": "2026-09-23T14:16:53Z",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+    "round3_opus": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-privacy.json",
+      "sha256": "5bd4016fe6c15ff2bdb6e12a41871dcbef342ddd950a9f5775e193842d9c9d2d"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-privacy.stdout.txt",
+      "sha256": "497ba7dc2010c17f741fdfe79cd9c8e49ae804deaffe2be2a1bc3dea85d00e95"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-privacy.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-passthrough.json",
+      "sha256": "78e333fab197e4b804a01c9f3e8318660c97c4e198558c39b7027f01d8fc6175"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-passthrough.stdout.txt",
+      "sha256": "afa6d69aa26c1014870a0cf5787cec7f3301f29e2e4d6520c8ea88aebf1204a7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-passthrough.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-fr3-exitcodes.txt",
+      "sha256": "1d88b3660acb6701209e3d8a1d0454e4d0d0bb561a969644c7920bedf05fedb7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-opus-round3.json",
+      "sha256": "ecfd0de7932e22eb07f706399761f4bdba8053d19909f3a1f88059e5c375f9e9"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-privacy.json",
+      "sha256": "c537bac3fdfce8a34cc8da380473a80dfb49fc12c2371d90f17c1c13dc1806b7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-privacy.stdout.txt",
+      "sha256": "497ba7dc2010c17f741fdfe79cd9c8e49ae804deaffe2be2a1bc3dea85d00e95"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-passthrough.json",
+      "sha256": "ea0b1cef07dc9e5d8aa6b8b570577854a9200368577cd1287cb803d95ecf80fc"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-passthrough.stdout.txt",
+      "sha256": "afa6d69aa26c1014870a0cf5787cec7f3301f29e2e4d6520c8ea88aebf1204a7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-exitcodes.txt",
+      "sha256": "87feb8189227e77fae911eef1d851882f848ad27a4d458ed45c9183d7e15c3a2"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-run2-privacy.json",
+      "sha256": "b201868af9365713507ed0c99c9eb03582cb23c974e24e39a13d741c95153856"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-run2-privacy.stdout.txt",
+      "sha256": "5fa8b7b350f7b2461388f61decbe7f633a35f2e00fec3777cd98dd6ee16f4846"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-run2-passthrough.json",
+      "sha256": "d32c95acab1c38270efc89ee3643bceecfadd02baa73cbb7749fccdd20f52398"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-run2-passthrough.stdout.txt",
+      "sha256": "7e43f403a56e742f7e9ce491f2356a36feac23aa9c8a0902f713acadd07430a8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-run2-exitcodes.txt",
+      "sha256": "ad0ee7599b73a616a725d09163dc893c959fe61afcf3281e661b34b2df25c21c"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/0-canary-privacy-run1.json",
+      "sha256": "594168b9bc62a00fdd1c0c506d79fe5347ff7aa6a8a79e9ce2091f344c84dba6"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py",
+      "sha256": "7b4d22a9c300edc9802335867ea04b684e0396bcb89216599b804ac12ce1eb45"
+    }
+  ]
+}

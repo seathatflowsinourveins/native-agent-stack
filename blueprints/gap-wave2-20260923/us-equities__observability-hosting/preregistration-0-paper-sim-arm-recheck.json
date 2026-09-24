@@ -1,0 +1,13 @@
+{
+ "written_at": "2026-09-23T16:38:46Z",
+ "label": "fix-round preregistration, written after the independent Codex review of 58b2ba0..49278fa and before the recheck ran; no new workload",
+ "review_findings": [
+  "medium: 'check exit=0' and 'restore exit=0' substring-match the hot-repository lines",
+  "medium: the Loki retention checks compare timestamps and counts, not bodies; the span checks compare names, not values",
+  "medium: 'hot backup during the run' does not test overlap with the workload",
+  "low: the in-script self-telemetry query errors (disclosed; a post-hoc query replaced it)"
+ ],
+ "recheck": "recheck_paper_arm.py reads only committed raw files for rounds 6 and 8 and applies these checks: (a) exact, operation-specific restic exit lines; (b) the multiset of Loki (body) values at each stage equals the step log's MARK lines, and each after-restart or restored (timestamp, body) pair set contains every pre-kill pair; (c) span-metric values per span name are equal across stages; (d) the hot snapshot time from restic-hot.log lies strictly between paper_sim_start.at and paper_sim_end.at, the hot journal passes integrity_check, and its counts differ from or equal the cold counts (reported).",
+ "expectation": "Round 8: every recheck PASSes except those already known. Round 6: (b) FAILs after restart and on restore (duplicates), as already disclosed.",
+ "criteria": "The receipt adopts the recheck's results. The in-script lines stay as recorded but are marked as superseded where weaker."
+}

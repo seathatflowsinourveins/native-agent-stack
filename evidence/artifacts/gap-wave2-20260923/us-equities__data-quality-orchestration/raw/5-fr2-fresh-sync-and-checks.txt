@@ -1,0 +1,57 @@
+started 2026-09-23T05:41:10Z
+lock sha256 5a5ade33a4290d1fdf72c1e95f1c1d064ccb6cf10dc451de5c03a344639b7279 (HEAD df355a4)
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+Using CPython 3.12.3 interpreter at: /usr/bin/python3
+Creating virtual environment at: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/gate-fr2
+Activate with: source $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/gate-fr2/bin/activate
+Using Python 3.12.3 environment at: $HOME/.cache/gap-wave2-20260923/data-quality-orchestration/gate-fr2
+Resolved 21 packages in 84ms
+Installed 21 packages in 76ms
+ + annotated-types==0.8.0
+ + duckdb==1.5.5
+ + exchange-calendars==4.13.2
+ + korean-lunar-calendar==0.4.0
+ + mypy-extensions==1.1.0
+ + numpy==2.5.3
+ + packaging==26.3
+ + pandas==3.0.6
+ + pandera==0.33.1
+ + pyarrow==25.0.1
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + pyluach==2.3.0
+ + python-dateutil==2.9.0.post0
+ + six==1.17.0
+ + toolz==1.1.0
+ + typeguard==4.6.0
+ + typing-extensions==4.16.0
+ + typing-inspect==0.9.0
+ + typing-inspection==0.4.4
+ + tzdata==2026.4
+sync exit 0
+python 3.12.3 duckdb 1.5.5 pandera 0.33.1 pandas 3.0.6 pyarrow 25.0.1 exchange_calendars 4.13.2
+{"all_pandas_match": true, "all_native_match": true}
+pandas good match
+pandas bad match
+pandas null-price-cell match
+pandas empty-snapshot match
+pandas fractional-negative-volume match
+native good match
+native bad match
+native null-price-cell match
+native empty-snapshot match
+native fractional-negative-volume match
+check exit 0
+----------------------------------------------------------------------
+Ran 25 tests in 15.991s
+
+OK
+--- detection control (venv without duckdb, REQUIRE=1)
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)
+--- local default (no override)
+
+OK (skipped=1)
+finished 2026-09-23T05:41:42Z

@@ -18,6 +18,7 @@ gitleaks_runtime="/run/user/$(id -u)"
 # never a successful empty result. Caps apply even if the caller has job defaults.
 export ECOSYSTEM_JOB_MEMORY_HIGH=4G ECOSYSTEM_JOB_MEMORY_MAX=6G
 export ECOSYSTEM_JOB_SWAP_MAX=0 ECOSYSTEM_JOB_SECONDS=600 ECOSYSTEM_JOB_TASKS_MAX=256
+unset ECOSYSTEM_JOB_CPU_QUOTA
 exec {gitleaks_lock_fd}>"$gitleaks_runtime/ecosystem-gitleaks.lock"
 if /usr/bin/flock --nonblock --conflict-exit-code 75 "$gitleaks_lock_fd"; then
     :

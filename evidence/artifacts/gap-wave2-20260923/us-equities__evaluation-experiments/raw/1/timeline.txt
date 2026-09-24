@@ -1,0 +1,19 @@
+2026-09-23T07:28:41.567Z inspect version 0.3.266
+2026-09-23T07:28:42.715Z inspect --help exit=0
+2026-09-23T07:28:42.753Z river version 0.26.1
+2026-09-23T07:28:44.245Z river snippet exit=0
+2026-09-23T07:28:44.283Z mlflow version 3.16.1
+2026-09-23T07:28:49.029Z mlflow snippet exit=0
+2026-09-23T07:28:54.177Z mlflow server port=60402 health=OK after=6s
+2026-09-23T07:28:54.229Z mlflow experiments/search exit=0
+2026-09-23T07:28:56.126Z mlflow server stopped; listeners on port: 0
+2026-09-23T07:29:24.911Z mteb version 2.21.0 torch 2.14.0+cpu
+2026-09-23T07:30:16.794Z mteb minimal run exit=0
+2026-09-23T07:30:29.167Z phoenix version 20.14.0
+2026-09-23T07:32:29.858Z phoenix port=57620 grpc=57754 healthz= after=120s
+2026-09-23T07:32:58.058Z phoenix span roundtrip exit=1
+2026-09-23T07:32:59.073Z phoenix stopped; listeners: http=0 grpc=0
+2026-09-23T07:33:07.014Z phoenix version 20.14.0
+2026-09-23T07:33:19.125Z phoenix port=60384 grpc=60766 healthz=OK after=13s
+2026-09-23T07:33:20.267Z phoenix span roundtrip exit=0
+2026-09-23T07:33:21.441Z phoenix stopped; listeners: http=0 grpc=0

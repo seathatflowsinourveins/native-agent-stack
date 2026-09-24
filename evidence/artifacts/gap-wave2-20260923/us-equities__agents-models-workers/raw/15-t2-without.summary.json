@@ -1,0 +1,34 @@
+{
+ "task": "t2",
+ "arm": "without",
+ "exit": 0,
+ "started_at": "2026-09-23T07:38:57Z",
+ "wall_seconds": 18.86,
+ "turns": 1,
+ "usage_sum": {
+  "input_tokens": 35954,
+  "cached_input_tokens": 29184,
+  "output_tokens": 361,
+  "reasoning_output_tokens": 238,
+  "total_tokens": 36315
+ },
+ "tool_calls": [
+  {
+   "type": "command_execution",
+   "name": "/bin/bash -lc \"jq -c '[.files[] | select(.path | startswith(\\\"evidence/receipts/\\\"))] | {receipt_entries: length, receip",
+   "status": "completed",
+   "error": null,
+   "output_chars": 53
+  }
+ ],
+ "failed_tool_calls": 0,
+ "final": "{\"receipt_entries\":99,\"receipt_bytes_total\":2272055}",
+ "score": {
+  "correct": 2,
+  "total": 2,
+  "per_key": {
+   "receipt_entries": true,
+   "receipt_bytes_total": true
+  }
+ }
+}

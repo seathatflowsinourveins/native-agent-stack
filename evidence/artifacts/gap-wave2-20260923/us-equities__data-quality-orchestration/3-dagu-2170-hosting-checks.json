@@ -1,0 +1,176 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-3-dagu-2170-hosting-checks",
+  "gap_index": 3,
+  "gap_text_sha256": "0cfc3d30e6a0ea8d89e54715a03fe0530a79424ffa6302ba232be3f7dca1d949",
+  "gap_text": "Dagu pin v2.16.6 is behind upstream v2.17.0 (pin_behind_upstream true). The newer release is untested; that means unknown, not failed.",
+  "next_check": "Install dagu v2.17.0 in a new prefix with a disposable DAGU_HOME. Rerun the hosting receipt's failure, abort, cancel and restart-history checks, then compare the outcomes with the v2.16.6 receipt before changing the pin.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "The dagu 2.17.0 upgrade decision belongs to evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json (merged #87), which reran job recovery and the in-flight kill check but not the hosting receipt's failure, cancel and restart-history checks. Running those three checks with the same harness on 2.16.6 and 2.17.0 in disposable DAGU_HOMEs should give identical outcomes: exit-23 step -> failed, dependent step aborted, CLI exit 1; dagu stop -> aborted with stop exit 0; history rows preserved across a server restart.",
+    "criteria": "The pin decision is covered_elsewhere (sota-refresh #87). The supplementary comparison passes iff both versions report the same native statuses for failure, cancel and the restarted server's history API, recorded side by side; any difference is recorded as a finding, not a failure of the upgrade."
+  },
+  "commands": [
+    "cp $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu $C/bin/dagu-2.16.6/; cp .../dagu-2.17.0/dagu $C/bin/dagu-2.17.0/; sha256sum $C/bin/dagu-*/dagu",
+    "curl -sfL -O https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz; curl -sfL -O .../v2.16.6/checksums.txt; awk '$2 == \"dagu_2.16.6_linux_amd64.tar.gz\"' checksums.txt | sha256sum --check --strict; tar -xzf ... -C x; sha256sum x/dagu",
+    "timeout 600 python3 $H/dagu_arm.py --dagu $C/bin/dagu-2.16.6/dagu --work $C/w-hosting-2166 --scenario hosting --port 18651 --sched-port 18652 --tag g2h2166 --out $C/raw/3-hosting-2.16.6.json",
+    "timeout 600 python3 $H/dagu_arm.py --dagu $C/bin/dagu-2.17.0/dagu --work $C/w-hosting-2170 --scenario hosting --port 18661 --sched-port 18662 --tag g2h2170 --out $C/raw/3-hosting-2.17.0.json"
+  ],
+  "results": {
+    "binaries": "raw/0-provenance-reverification.txt (post-hoc re-verification at 05:42:46Z of the same files used at 05:20Z): \"dagu_2.16.6_linux_amd64.tar.gz: OK\" against the publisher checksums.txt, archive sha256 06c3ed951fb5..., 50,466,314 bytes; extracted x/dagu and the used copy both 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7; 2.17.0 copy 71cf450a52133823a0719691961396cbf7b78698c947d6489a2c6cbccbdb4d80, the value sota-refresh records for its checksum-verified extraction.",
+    "dagu_2.16.6": {
+      "failure_fixture": {
+        "requested_step_exit": 23,
+        "cli_exit": 1,
+        "status": "failed",
+        "dependent_step": "aborted"
+      },
+      "cancellation_fixture": {
+        "stop_exit": 0,
+        "cancelled_cli_exit": 0,
+        "status": "aborted"
+      },
+      "success_fixture": {
+        "cli_exit": 0,
+        "status": "succeeded"
+      },
+      "restart_history": {
+        "server_up_before": true,
+        "server_down_between": true,
+        "server_up_after": true,
+        "cli_history_after": {
+          "g2h2166-failure": "failed",
+          "g2h2166-cancel": "aborted",
+          "g2h2166-ok": "succeeded"
+        },
+        "api_latest_runs_after": {
+          "g2h2166-cancel": {
+            "dagRunId": "g2h2166-cancel-1",
+            "statusLabel": "aborted"
+          },
+          "g2h2166-failure": {
+            "dagRunId": "g2h2166-failure-1",
+            "statusLabel": "failed"
+          },
+          "g2h2166-ok": {
+            "dagRunId": "g2h2166-ok-1",
+            "statusLabel": "succeeded"
+          }
+        },
+        "prior_history_rows_preserved": true
+      }
+    },
+    "dagu_2.17.0": {
+      "failure_fixture": {
+        "requested_step_exit": 23,
+        "cli_exit": 1,
+        "status": "failed",
+        "dependent_step": "aborted"
+      },
+      "cancellation_fixture": {
+        "stop_exit": 0,
+        "cancelled_cli_exit": 0,
+        "status": "aborted"
+      },
+      "success_fixture": {
+        "cli_exit": 0,
+        "status": "succeeded"
+      },
+      "restart_history": {
+        "server_up_before": true,
+        "server_down_between": true,
+        "server_up_after": true,
+        "cli_history_after": {
+          "g2h2170-failure": "failed",
+          "g2h2170-cancel": "aborted",
+          "g2h2170-ok": "succeeded"
+        },
+        "api_latest_runs_after": {
+          "g2h2170-cancel": {
+            "dagRunId": "g2h2170-cancel-1",
+            "statusLabel": "aborted"
+          },
+          "g2h2170-failure": {
+            "dagRunId": "g2h2170-failure-1",
+            "statusLabel": "failed"
+          },
+          "g2h2170-ok": {
+            "dagRunId": "g2h2170-ok-1",
+            "statusLabel": "succeeded"
+          }
+        },
+        "prior_history_rows_preserved": true
+      }
+    },
+    "identical_after_tag_normalization": true,
+    "hosting_receipt_2026_09_19": "failure_fixture {requested_step_exit 23, cli_exit 1, status failed, dependent_step aborted}; cancellation_fixture {stop_exit 0, cancelled_cli_exit 0, status aborted}; prior_history_rows_preserved true",
+    "comparison": "Both versions reproduce the 2026-09-19 hosting receipt shape: exit-23 step -> failed with the dependent step aborted and CLI exit 1; dagu stop -> aborted with stop exit 0 and the cancelled dagu start exiting 0; CLI history and the /api/v1/dags latest runs unchanged across a dagu server SIGTERM and restart."
+  },
+  "outcome": "covered_elsewhere",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Disposable DAGU_HOMEs on loopback ports with auth.mode none; the restart is a dagu server process restart in that home, not a systemd user-service restart of dagu-equities (which was not touched).",
+    "Fixture DAGs are minimal shell steps, not the research-evidence.yaml workflow; the 2026-09-19 receipt's LEAN/validator workflow was not rerun.",
+    "Single run per version on one WSL2 host.",
+    "The pin itself was not changed here; the ledger rows are forbidden paths for this unit and the upgrade decision belongs to the sota-refresh record."
+  ],
+  "checked_at": "2026-09-23T05:20:50Z",
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "R": "worktree root (claude/g2-data-quality-orchestration-20260923)",
+    "H": "R/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration"
+  },
+  "covered_by": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json, added on main by commit 43bb931 (#87, \"SOTA refresh evidence wave: pin qualification, observability comparison, hardware profiles\"); it is not present at this unit's base 41d39b3, so read it at 43bb931 or later. That record owns the 2.16.6 -> 2.17.0 pin decision; this receipt adds the hosting-receipt failure/cancel/restart-history comparison that the sota-refresh rerun did not include.",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.16.6.json",
+      "original_sha256": "205c7da5da8b7921a2ddbcb4dfd89959721e8afa2166d7dc1a91272979dcbaec",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/3-hosting-2.16.6.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "6b09dec538907436a521d784ad77edb5b0df3446a648c6d4d5439fb7ed55b829",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.17.0.json",
+      "original_sha256": "2ae12db1334608504e63075c0729c81b1e6413b04c6be15286102000086b2bff",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/3-hosting-2.17.0.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "68039cdd33012b03c219a91311022044a150b4dd884fa06c3166ecd162903d40",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-provenance-reverification.txt",
+      "original_sha256": "e2694d900d4e93e3e875589ad8b8c5483ad2307a7533ed5b322efc0c06409ae2",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-provenance-reverification.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "e57790c6b19c3590fb8020873e0775879bb326286c45bf44dcf72d4c5a456a8a",
+      "bytes": 1573
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "original_sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "bytes": 923
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    }
+  ],
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Finding 3: covered_by was not inspectable at this base and no raw output held the binary verification. Resolved: covered_by names the main commit 43bb931; the checksum verification and binary hashes are retained in raw/0-provenance-reverification.txt (post-hoc, labelled).",
+    "second_review_fix_round_4": "Independent Opus review finding 4 concerned the layer README summary only (it said both binaries match publisher checksums). This receipt's wording was already correct: only 2.16.6 was checked against the publisher checksums.txt; the 2.17.0 binary hash was compared with the value sota-refresh records. The README now says so."
+  }
+}

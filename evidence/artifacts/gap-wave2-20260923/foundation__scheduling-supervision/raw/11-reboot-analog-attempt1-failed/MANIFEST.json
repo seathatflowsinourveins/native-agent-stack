@@ -1,0 +1,49 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g11-run-1790131900",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "6b270894901e8491504896f5b6570051f29a2b12bfa33b7268914c22389a3ac0",
+      "committed_sha256": "6b270894901e8491504896f5b6570051f29a2b12bfa33b7268914c22389a3ac0",
+      "bytes": 3957
+    },
+    {
+      "source": "boot1-identity.json",
+      "committed_as": "boot1-identity.json",
+      "raw_sha256": "734c7e29362e5ada76333e67118331eb2b90005fcaed585a824485bd6a9036b2",
+      "committed_sha256": "734c7e29362e5ada76333e67118331eb2b90005fcaed585a824485bd6a9036b2",
+      "bytes": 151
+    },
+    {
+      "source": "boot2-identity.json",
+      "committed_as": "boot2-identity.json",
+      "raw_sha256": "d7332e5ea1081f35b49872c6c60bc613702bbead01ee1a908beba2ddd9feea96",
+      "committed_sha256": "d7332e5ea1081f35b49872c6c60bc613702bbead01ee1a908beba2ddd9feea96",
+      "bytes": 151
+    },
+    {
+      "source": "boot1-shutdown.json",
+      "committed_as": "boot1-shutdown.json",
+      "raw_sha256": "9d12a2c6b9374ddb5589327f32719d6f7bb093c069d3bf037bb76ff2f9e67d83",
+      "committed_sha256": "9d12a2c6b9374ddb5589327f32719d6f7bb093c069d3bf037bb76ff2f9e67d83",
+      "bytes": 211
+    },
+    {
+      "source": "native/boot2-ns.stderr",
+      "committed_as": "native__boot2-ns.stderr",
+      "raw_sha256": "8d73838673ae6814862fbf9cba8aba3181c74b97217975c8d58166d3653c177a",
+      "committed_sha256": "8d73838673ae6814862fbf9cba8aba3181c74b97217975c8d58166d3653c177a",
+      "bytes": 29
+    },
+    {
+      "source": "native/boot2-ns.stdout",
+      "committed_as": "native__boot2-ns.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "uuid_placeholders": 0
+}

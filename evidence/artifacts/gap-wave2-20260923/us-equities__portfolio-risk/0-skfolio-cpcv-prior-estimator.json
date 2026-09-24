@@ -1,0 +1,114 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-0-skfolio-cpcv-prior-estimator",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 0,
+  "gap_text": "The native evidence for skfolio covers only WalkForward on 3 ETFs (SPY, QQQ, IWM) with raw-price labels. No skfolio optimizer, risk estimator or CPCV path was executed.",
+  "gap_text_sha256": "48df83e4b65d7598d9c3387649b0b952b6e7a5bde2984c75991d78cebfb70477",
+  "next_check": "In the requirements.lock venv, run skfolio CombinatorialPurgedCV and an explicit prior/covariance estimator (for example EmpiricalPrior with LedoitWolf/ShrunkCovariance) plugged into MeanRisk on the frozen plan.json inputs (sha256 b8d1beba...), and retain the results hash.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "On the frozen plan.json inputs (sha256 b8d1beba...), development daily close-to-close returns 2015-01-02..2020-12-31 as in run_optimizer.py, skfolio 1.2.9 in the requirements.lock venv (Python 3.13.15) runs CombinatorialPurgedCV(n_folds=10, n_test_folds=2, purged_size=6, embargo_size=0) with cross_val_predict on two MeanRisk estimators whose prior is explicit: EmpiricalPrior(covariance_estimator=LedoitWolf()) and EmpiricalPrior(covariance_estimator=ShrunkCovariance()). Each yields 45 splits and 9 test paths. A reserved fit on the last 252+6 development sessions with the same explicit priors predicts 2021Q1 weights. The results file hash is retained and committed.",
+    "criteria": "settled iff: (a) CombinatorialPurgedCV reports n_splits==45 and n_test_paths==9 and cross_val_predict returns 9 population paths for each explicit-prior MeanRisk; (b) the fitted estimators' prior_estimator_.covariance_estimator_ are instances of LedoitWolf and ShrunkCovariance respectively and the LedoitWolf shrinkage_ is recorded; (c) every reserved weight vector is finite, non-negative and sums to 1 within 1e-6; (d) the nine LEAN input hashes are unchanged; (e) results.json sha256 is retained and the file committed. Any exception or count mismatch is not_settled. Detection: exact integer comparisons of n_splits/n_test_paths/path counts and isinstance checks on the fitted objects; a wrong estimator or split count raises an assertion in the runner."
+  },
+  "commands": [
+    {
+      "cmd": "cd $REPO && $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-lock/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap0_cpcv.py --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/0/cpcv-results.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:35:15Z",
+      "stdout_sha256_line": "8ecb70aba555aff3b3b5504e34b3ee97c0f6fb3956afe01d1b42545ba3f1ba86"
+    }
+  ],
+  "results": {
+    "cv": {
+      "class": "CombinatorialPurgedCV",
+      "embargo_size": 0,
+      "n_folds": 10,
+      "n_splits": 45,
+      "n_test_folds": 2,
+      "n_test_paths": 9,
+      "purged_size": 6
+    },
+    "development_observations": 1510,
+    "ledoitwolf": {
+      "cpcv_paths": 9,
+      "cpcv_sharpe_mean": 0.6349161578668141,
+      "cpcv_sharpe_std": 8.994010541581008e-07,
+      "fitted_covariance_estimator": "LedoitWolf",
+      "fitted_shrinkage": 0.06026012788256681,
+      "reserved_weights": {
+        "IWM": 1.6691749547534352e-06,
+        "QQQ": 0.27994552325561006,
+        "SPY": 0.7200528075694351
+      }
+    },
+    "shrunkcovariance": {
+      "cpcv_paths": 9,
+      "cpcv_sharpe_mean": 0.6596235288624032,
+      "cpcv_sharpe_std": 0.013017468574331326,
+      "fitted_covariance_estimator": "ShrunkCovariance",
+      "fitted_shrinkage": 0.1,
+      "reserved_weights": {
+        "IWM": 0.03763255686073928,
+        "QQQ": 0.33660294689080716,
+        "SPY": 0.6257644962484535
+      }
+    },
+    "cpcv_path_observations_each": 1510,
+    "inputs_unchanged": true,
+    "results_sha256": "8ecb70aba555aff3b3b5504e34b3ee97c0f6fb3956afe01d1b42545ba3f1ba86",
+    "criteria_check": "a) n_splits 45, n_test_paths 9, 9 paths per arm; b) fitted covariance estimators LedoitWolf (shrinkage_ recorded) and ShrunkCovariance; c) reserved weights finite, non-negative, sum 1; d) inputs unchanged; e) results committed with hash."
+  },
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Same three ETFs and raw close-to-close returns as the original receipt; CPCV path Sharpe values are descriptive, not a skill claim.",
+    "embargo_size 0 was preregistered; the 6-row purge matches the plan's label horizon.",
+    "One run; no repeat was needed for the preregistered structural criteria."
+  ],
+  "checked_at": "2026-09-23T06:35:15Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/0/cpcv-results.json",
+      "sha256": "8ecb70aba555aff3b3b5504e34b3ee97c0f6fb3956afe01d1b42545ba3f1ba86"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/0/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/0/stdout.txt",
+      "sha256": "bd72b2e94e83c1dccb632c8fdb86a9623b2984251e52cbd145af081f4f2dbe1b"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap0_cpcv.py",
+      "sha256": "ea0cab71695a8f773bf8c22f51279cb27cfdf4e6f4cf69908f266a8c7fdd9529"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/common.py",
+      "sha256": "0fe887db31f6cc437129b90aea0d83380b322c5bbde35179b336b8763e6c00cb"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "no finding for this gap",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

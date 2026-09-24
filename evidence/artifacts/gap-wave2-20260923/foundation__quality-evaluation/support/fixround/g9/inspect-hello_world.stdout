@@ -1,0 +1,16 @@
+╭──────────────────────────────────────────────────────────────────────────────╮
+│hello_world (1 sample): vllm/qwen2.5-7b-instruct-awq                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+max_connections: 4, dataset: (samples)                                          
+                                                                                
+total time:                                  0:00:47                            
+vllm/qwen2.5-7b-instruct-awq                 37 tokens [I: 34, O: 3]            
+                                                                                
+exact                                                                           
+mean    1.000                                                                   
+stderr  0.000                                                                   
+                                                                                
+Log:                                                                            
+../../g9/inspect-logs-hello_world/2026-09-23T02-50-07-00-00_hello-world_2zMyWWZx
+yDvVshLi4jP6us.json                                                             
+                                                                                

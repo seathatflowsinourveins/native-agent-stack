@@ -1,0 +1,95 @@
+# Read-only determination for the round-1 Codex call (reconciliation, 2026-09-23)
+## installed CLI
+$ codex --version
+codex-cli 0.155.1
+## upstream source for that version
+url: https://raw.githubusercontent.com/openai/codex/rust-v0.155.1/codex-rs/exec/src/lib.rs
+sha256: 8f4e9c1e1198f8d85f75123e25fc4847391a14b8426f93c8ac18dace0a790a3c  lines: 2336
+## excerpt: run_main, root prompt resolution precedes the in-process app-server start and thread/start (lines 938-979)
+              }
+          }
+          (None, root_prompt, imgs) => {
+              let prompt_text = resolve_root_prompt(root_prompt);
+              let mut items: Vec<UserInput> = imgs
+                  .into_iter()
+                  .map(|path| UserInput::LocalImage { path, detail: None })
+                  .collect();
+              items.push(UserInput::Text {
+                  text: prompt_text.clone(),
+                  // CLI input doesn't track UI element ranges, so none are available here.
+                  text_elements: Vec::new(),
+              });
+              let output_schema = load_output_schema(output_schema_path);
+              (
+                  InitialOperation::UserTurn {
+                      items,
+                      output_schema,
+                  },
+                  prompt_text,
+              )
+          }
+      };
+  
+      // When --yolo (dangerously_bypass_approvals_and_sandbox) is set, also skip the git repo check
+      // since the user is explicitly running in an externally sandboxed environment.
+      if !skip_git_repo_check
+          && !dangerously_bypass_approvals_and_sandbox
+          && get_git_repo_root(&default_cwd).is_none()
+      {
+          eprintln!("Not inside a trusted directory and --skip-git-repo-check was not specified.");
+          std::process::exit(1);
+      }
+  
+      let mut request_ids = RequestIdSequencer::new();
+      let mut client = InProcessAppServerClient::start(in_process_start_args)
+          .await
+          .map_err(|err| {
+              anyhow::anyhow!("failed to initialize in-process app-server client: {err}")
+          })?;
+  
+      // Resolve resume and fork through existing app-server thread lifecycle APIs.
+## excerpt: stdin read (lines 2218-2244)
+  fn read_prompt_from_stdin(behavior: StdinPromptBehavior) -> Option<String> {
+      let stdin_is_terminal = std::io::stdin().is_terminal();
+  
+      match behavior {
+          StdinPromptBehavior::RequiredIfPiped if stdin_is_terminal => {
+              eprintln!(
+                  "No prompt provided. Either specify one as an argument or pipe the prompt into stdin."
+              );
+              std::process::exit(1);
+          }
+          StdinPromptBehavior::RequiredIfPiped => {
+              eprintln!("Reading prompt from stdin...");
+          }
+          StdinPromptBehavior::Forced => {}
+          StdinPromptBehavior::OptionalAppend if stdin_is_terminal => return None,
+          StdinPromptBehavior::OptionalAppend => {
+              eprintln!("Reading additional input from stdin...");
+          }
+      }
+  
+      let mut bytes = Vec::new();
+      if let Err(e) = std::io::stdin().read_to_end(&mut bytes) {
+          eprintln!("Failed to read prompt from stdin: {e}");
+          std::process::exit(1);
+      }
+  
+      let buffer = match decode_prompt_bytes(&bytes) {
+## excerpt: resolve_root_prompt (lines 2291-2302)
+  fn resolve_root_prompt(prompt_arg: Option<String>) -> String {
+      match prompt_arg {
+          Some(prompt) if prompt != "-" => {
+              if let Some(stdin_text) = read_prompt_from_stdin(StdinPromptBehavior::OptionalAppend) {
+                  prompt_with_stdin_context(&prompt, &stdin_text)
+              } else {
+                  prompt
+              }
+          }
+          maybe_dash => resolve_prompt(maybe_dash),
+      }
+  }
+## round-1 raw outputs (commit b37df23, support/codex-c4-review/)
+codex-out.stderr: Reading additional input from stdin...
+codex-out.stdout bytes: 0
+round-1 receipt exit_status: process ran about 5 minutes and was reaped by the internal 'timeout 300'

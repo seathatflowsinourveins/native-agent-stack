@@ -1,0 +1,11 @@
+[
+  {
+    "name": "realmaint",
+    "dagRunId": "034TZZGmlL3sTFRU6oK7Mi",
+    "status": "aborted",
+    "startedAt": "2026-09-22T22:48:00-04:00",
+    "finishedAt": "2026-09-22T22:48:10-04:00",
+    "duration": "10s",
+    "workerId": "local"
+  }
+]

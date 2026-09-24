@@ -1,0 +1,265 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/3-persistent-resume-custom-tool",
+  "gap_index": 3,
+  "gap_text_sha256": "017468d96e93f3881183e40a76352ddfdf79ebef1b1594f097c912e8bdaa53d2",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "A persistent thread (ephemeral false) with one dynamic tool registered via thread/start dynamicTools and answered through the SDK CodexClient approval_handler; a new process resumes by thread ID and recalls the random tool value.",
+    "criteria": [
+      "turn 1: item/tool/call server request answered, dynamicToolCall item completed",
+      "turn 2 in a new OS process via thread/resume: final answer equals a 12-hex random value never present in the turn-2 prompt",
+      "native_worker.py gains --persistent/--resume-thread-id and a resumed run is executed through it",
+      "settled if all three hold"
+    ],
+    "fix_round_2": {
+      "written_at": "2026-09-23T04:38:21Z",
+      "label": "fix-round-2 preregistration, written after the independent Opus review and before the two new worker turns; not back-dated",
+      "expectation": "The committed native_worker.py (new --lookup-tool option) registers one custom tool (vault_lookup) through the SDK's CodexClient thread_start dynamicTools and answers it through CodexClient(approval_handler). Turn 1 runs in a persistent thread and the model calls the tool; turn 2 runs in a new worker process that resumes the thread by id with a decoy tool file and answers with the turn-1 value without calling the tool.",
+      "criteria": [
+        "t1: status completed, thread_mode persistent, dynamic_tool.registered true, at least one answered call for key alpha, a dynamicToolCall item with status completed in the event stream",
+        "t2: status completed, thread_mode resumed, dynamic_tool.calls empty (a call would return the decoy), final response equals the t1 value, t2 prompt does not contain the value",
+        "both receipts carry native_runtime as a dict (the committed revision) and worker_sha256 in worker-tool-runs.json equals the committed file",
+        "settled if all hold; advanced if any fails"
+      ],
+      "detection": "A turn-2 tool call is recorded in dynamic_tool.calls and would return 'decoy-not-the-value'; a missing tool call in turn 1 leaves dynamic_tool.calls empty."
+    }
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/run_worker_tool.py $HOME/.cache/gap-wave2-20260923/agent-sdks $HOME/.cache/gap-wave2-20260923/agent-sdks/runs",
+    "(inside run_worker_tool.py) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t1.json --turn-deadline-seconds 180 --persistent --lookup-tool $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-values.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'",
+    "(inside run_worker_tool.py) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t2.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t2.json --turn-deadline-seconds 180 --resume-thread-id <thread_id from the private worker-tool-t1 receipt> --lookup-tool $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-decoy.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py tool-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py resume-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/resume-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "(superseded, uncommitted worker revision) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-persist-t1.json --turn-deadline-seconds 180 --persistent --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'",
+    "(superseded) TID=<thread_id from the private worker-persist-t1 receipt>",
+    "(superseded, uncommitted worker revision) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-t2.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-resume-t2.json --turn-deadline-seconds 180 --resume-thread-id \"$TID\" --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'"
+  ],
+  "results": {
+    "sdk_custom_tool": {
+      "registration": "thread/start dynamicTools=[vault_lookup] via openai_codex CodexClient.request; answered by CodexClient(approval_handler=...) on item/tool/call",
+      "tool_host_calls": [
+        {
+          "at": 1790133910.4826727,
+          "tool": "vault_lookup",
+          "arguments": {
+            "key": "alpha"
+          },
+          "call_id_present": true,
+          "answered": true
+        }
+      ],
+      "tool_items": [
+        {
+          "server": null,
+          "tool": "vault_lookup",
+          "namespace": null,
+          "status": "completed",
+          "success": true
+        }
+      ],
+      "tool_round_trip": true
+    },
+    "sdk_resume_new_process": {
+      "resumed_thread_matches": true,
+      "turns_in_thread": 2,
+      "final_answer_matches_turn1_tool_value": true,
+      "tool_items_in_turn2": [],
+      "detection": "turn 2's tool host would have answered 'not-the-value' had the model called the tool; the 12-hex value never appears in the turn-2 prompt"
+    },
+    "c4_worker_custom_tool_persistent_then_resume": {
+      "worker_sha256_at_run": "084f82399cf4104996488210440581c7759a6d5a05d2b6abe202b8789cdba74f",
+      "slot_checks": [
+        {
+          "at": "2026-09-23T04:38:29Z",
+          "real_codex_exec": 1
+        },
+        {
+          "at": "2026-09-23T04:38:49Z",
+          "real_codex_exec": 1
+        }
+      ],
+      "t1": {
+        "file": "worker-tool-t1.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "persistent",
+        "sandbox": "read-only",
+        "approval_mode": "deny_all",
+        "final_response_excerpt": "STORED",
+        "tool_items": [
+          {
+            "server": null,
+            "tool": "vault_lookup",
+            "status": "completed"
+          }
+        ],
+        "command_items": {
+          "count": 0,
+          "commands": []
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 17536,
+          "inputTokens": 35753,
+          "outputTokens": 355,
+          "reasoningOutputTokens": 298,
+          "totalTokens": 36108
+        },
+        "dynamic_tool": {
+          "name": "vault_lookup",
+          "registered": true,
+          "calls": [
+            {
+              "tool": "vault_lookup",
+              "key": "alpha",
+              "answered": true
+            }
+          ],
+          "declined_server_requests": []
+        },
+        "native_runtime": {
+          "server_info": null,
+          "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+        }
+      },
+      "t2": {
+        "file": "worker-tool-t2.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "resumed",
+        "sandbox": "read-only",
+        "approval_mode": "deny_all",
+        "final_response_excerpt": "vw-59debe49327d",
+        "tool_items": [],
+        "command_items": {
+          "count": 0,
+          "commands": []
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 35456,
+          "inputTokens": 53869,
+          "outputTokens": 367,
+          "reasoningOutputTokens": 298,
+          "totalTokens": 54236
+        },
+        "dynamic_tool": {
+          "name": "vault_lookup",
+          "registered": "at_thread_start_of_resumed_thread",
+          "calls": [],
+          "declined_server_requests": []
+        },
+        "native_runtime": {
+          "server_info": null,
+          "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+        }
+      },
+      "t2_prompt_contains_value": false,
+      "t2_final_matches_t1_value": true,
+      "detection": "turn 2 ran with a decoy tool file: any tool call would be logged in dynamic_tool.calls and return 'decoy-not-the-value'; the turn-1 value (12 hex) is not in the turn-2 prompt",
+      "side_effects_listing": {
+        "preregistered_expectation": "fix_round_2.items.side_effects (04:38:21Z): with the Context Mode plugin disabled, the listing of ~/.codex/context-mode shows no file attributable to these runs; ~/.codex/sessions gains or changes only this thread's rollout (other concurrent sessions may also change files).",
+        "method": "name, size and mtime listing of $HOME/.codex/context-mode and $HOME/.codex/sessions before turn 1 and after turn 2 (worker-tool-runs.json side_effects, window 2026-09-23T04:38:29Z to 2026-09-23T04:38:53Z). A listing records which files appeared or changed in the window, not which process wrote them.",
+        "context_mode": {
+          "added": [
+            "sessions/7189e576128969a3__7189e576.db-shm",
+            "sessions/7189e576128969a3__7189e576.db-wal"
+          ],
+          "added_count": 2,
+          "removed_count": 0,
+          "changed_count": 59,
+          "changed_stats_pid_files": [
+            "sessions/stats-pid-1224272.json",
+            "sessions/stats-pid-1707499.json",
+            "sessions/stats-pid-2194330.json",
+            "sessions/stats-pid-2525925.json",
+            "sessions/stats-pid-2621277.json",
+            "sessions/stats-pid-2908173.json",
+            "sessions/stats-pid-3812245.json"
+          ],
+          "changed_other_count": 52
+        },
+        "sessions": {
+          "added": [
+            "2026/09/23/rollout-2026-09-23T00-38-30-redacted-id:92d6ac9147cf5fb6.jsonl"
+          ],
+          "changed": [
+            "2026/09/23/rollout-2026-09-23T00-36-33-redacted-id:0981fea4c6677d5a.jsonl",
+            "2026/09/23/rollout-2026-09-23T00-37-08-redacted-id:522fd5db52d5ec67.jsonl"
+          ],
+          "own_rollout_files": 1,
+          "own_rollout_match": "thread id from worker-tool-t1.json contained in the rollout file name (run_worker_tool.py)"
+        },
+        "result": {
+          "context_mode": "not evaluated by the listing: the tree changed during the window (see counts; other Codex and Claude sessions were active on the host), and a name/size/mtime listing cannot attribute a file to a process, so it neither detects nor rules out a file written by these runs. The reading that these runs wrote no Context Mode file is an inference from the per-process override that disabled the plugin (plugins={\"context-mode@context-mode\"={enabled=false}} in both commands) and from neither turn recording an mcpToolCall or commandExecution item; the listing did not detect it.",
+          "sessions": "consistent with the expectation: the one added rollout carries this thread's id; the two changed rollouts are named 00-36-33 and 00-37-08 local time (04:36:33Z and 04:37:08Z), before turn 1 created this thread, so they are other sessions' files. Content written by these runs into another file would not be separable from that session's own writes."
+        }
+      }
+    },
+    "superseded_worker_receipts": {
+      "files": [
+        "worker-persist-t1.json",
+        "worker-resume-t2.json"
+      ],
+      "reading": "Produced at 03:31Z by an uncommitted intermediate revision of native_worker.py (native_runtime is a plain string there; no committed revision writes a string: the base and the first branch commit have no --persistent option or native_runtime field, and every later committed revision writes a dict). Kept for history; the fix-round-2 worker-tool receipts, run with the committed file (sha256 in worker_sha256_at_run), are the evidence for the worker arm."
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/worker-tool-t1.json",
+      "sha256": "55a52d365b1bcd2d0afc0100d0718bce58548dfc629b915e1b80c37810de18dc"
+    },
+    {
+      "path": "raw/worker-tool-t2.json",
+      "sha256": "32032cf7dce311d0cdd454878e940005cb266cd176f4b045c9671d3530df1663"
+    },
+    {
+      "path": "raw/worker-tool-runs.json",
+      "sha256": "2d8170b7087d25b0295260666e20f7fc97bd7db5d54c3681c38630689ed45878"
+    },
+    {
+      "path": "raw/worker-tool-t1.prompt",
+      "sha256": "05095802b1de1b5d1f6801f28d16c241f906e5f3a2588f9b218847ed50473d45"
+    },
+    {
+      "path": "raw/worker-tool-t2.prompt",
+      "sha256": "40b54c6edfda2f1462a0878f7298ce8618f2df30f62d7d18d70cb0a964d8b24e"
+    },
+    {
+      "path": "raw/tool-turn.json",
+      "sha256": "90e6125e799907067c571bb5801f0c41b1a503f974a70f27c19ca1e342969962"
+    },
+    {
+      "path": "raw/resume-turn.json",
+      "sha256": "e9773ec026504f2b5680a95f76445aba4a12dd19b529d205bef56fe5bf38a065"
+    },
+    {
+      "path": "raw/tool-turn.rollout-excerpt.jsonl",
+      "sha256": "40ded5820af6f206ca7ceb421dd9937381c96d57fd4989605a40a1be5c7edb7e"
+    },
+    {
+      "path": "raw/worker-persist-t1.json",
+      "sha256": "eb4582fe5a913e08900e1bf6fa3dc878239b715fe5f2a9f1c0b7aae3aa9a2567"
+    },
+    {
+      "path": "raw/worker-resume-t2.json",
+      "sha256": "e9c5981c453fadf343b0d1fbbe82848405004e02c89e6cd182f1229caf5740be"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "rechecked_at": "2026-09-23T04:38:53Z",
+  "rule_deviations": [
+    {
+      "rule": "wait while 2 or more real codex exec processes run",
+      "status": "unresolved",
+      "observed": "The first Codex SDK model call (tool-turn.json, 03:24:59Z) started while pgrep counted 3 processes matching 'codex exec'. A substring count can include processes that are not codex exec runs (at 04:37Z a similar substring filter matched two codex-linux-sandbox helpers); the 3 were never classified, so the rule may have been broken for this call. Later calls waited; the fix-round-2 driver classifies by argv (worker-tool-runs.json slot_checks: 1 real codex exec before each call)."
+    }
+  ],
+  "limits": [
+    "dynamicTools is an experimental app-server field absent from the SDK's typed ThreadStartParams and the high-level AsyncCodex.thread_start; native_worker.py --lookup-tool therefore uses the SDK's CodexClient (thread_start/thread_resume with JSON params, approval_handler for item/tool/call). The tool path is deny_all only.",
+    "One custom tool, one call; parallel tool calls and tool errors were not exercised.",
+    "Each persistent run leaves a rollout in $HOME/.codex/sessions (fix round 2: 1 added file for this thread, worker-tool-runs.json side_effects). The same listing shows 2 added and 59 changed files under $HOME/.codex/context-mode in the window (7 of them stats-pid-*.json); it cannot attribute them to a process, so 'no Context Mode file from these runs' rests on the disabled plugin, not on the listing (results.c4_worker_custom_tool_persistent_then_resume.side_effects_listing). Recent rollouts feed the Context Mode most-recent-transcript fallback that other concurrent Codex sessions use (gap 4 root cause), so a persistent worker can influence another session's project root; these runs had the plugin disabled."
+  ],
+  "checked_at": "2026-09-23T04:23:16Z"
+}

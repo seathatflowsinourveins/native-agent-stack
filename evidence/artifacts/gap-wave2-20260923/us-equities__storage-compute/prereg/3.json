@@ -1,0 +1,7 @@
+{
+  "gap_index": 3,
+  "written_at": "2026-09-23T05:15:15Z",
+  "expectation": "A fixed-seed OHLCV dataset of 50,000,000 rows (seed 20260923) loads into DuckDB 1.5.5, ClickHouse v26.8.11.7-lts server, QuestDB 10.0.1 (bundled JRE) and pyiceberg 0.12.0 with a SQLite SQL catalog. Expected ordering (prior, not a result): DuckDB and ClickHouse bulk-load fastest (tens of millions of rows/s from Parquet), QuestDB ILP slower (a few million rows/s), pyiceberg bounded by Parquet writing. DuckDB cannot accept a second writer process on the same file (lock error) but accepts concurrent in-process writer threads; pyiceberg concurrent appends through the SQL catalog produce optimistic-commit conflicts that need retries; ClickHouse and QuestDB accept 1/4/8 concurrent writers without errors.",
+  "criteria": "settled only if all four stores complete bulk load, the fixed query set with repeated latency samples, and writers-only and readers-only phases at 1, 4 and 8 clients, with raw timings and resolved versions retained. advanced if at least one store or phase is missing (named). not_settled if the harness cannot complete within 20 minutes per store.",
+  "note": "Written before the check's commands were run."
+}

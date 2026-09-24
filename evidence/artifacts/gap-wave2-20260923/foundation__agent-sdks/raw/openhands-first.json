@@ -1,0 +1,21 @@
+{
+  "phase": "first",
+  "pid": 3567438,
+  "events_before": 0,
+  "events_after": 6,
+  "event_types": [
+    "SystemPromptEvent",
+    "MessageEvent",
+    "ActionEvent",
+    "ObservationEvent",
+    "ActionEvent",
+    "ObservationEvent"
+  ],
+  "observations": [
+    "content=[TextContent(cache_prompt=False, type='text', text='gap8-openhands-3567670')] is_error=False command='echo gap8-openhands-$PPID > proof.txt && cat proof.txt' exit_code=0 timeout=False metadata=CmdOutputMetadata(exit_code=0, pid=-1, username='$USER', hostname='$HOSTNAME', working_dir='/",
+    "content=[TextContent(cache_prompt=False, type='text', text='wrote proof.txt')] is_error=False kind='FinishObservation'"
+  ],
+  "execution_status": "ConversationExecutionStatus.FINISHED",
+  "proof_file": "gap8-openhands-3567670",
+  "llm_calls": 2
+}

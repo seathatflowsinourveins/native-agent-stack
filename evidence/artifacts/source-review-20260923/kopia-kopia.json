@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-kopia-kopia",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/kopia/kopia",
+ "reviewed_commit": "0295aac97fe7e1f9d226b704af0b334ac49e08eb",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "recovery-portability"
+ ],
+ "claim": "Source and documentation review of the repository kopia/kopia at commit 0295aac97fe7e1f9d226b704af0b334ac49e08eb (license Apache-2.0), read from README.md at that revision. Repository description: \"Cross-platform backup tool for Windows, macOS & Linux with fast, incremental backups, client-side end-to-end encryption, compression and data deduplication. CLI and GUI included.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0295aac97fe7e1f9d226b704af0b334ac49e08eb",
+   "text": "Kopia is a fast and secure open-source backup/restore tool that allows you to create encrypted snapshots of your data and save the snapshots to remote or cloud storage of your choice, to network-attached storage or server, or locally on your machine. Kopia does not 'image' your whole machine. Rather, Kopia allows you to backup/restore any and all files/directories that you deem are important or cr"
+  },
+  {
+   "source": "README.md@0295aac97fe7e1f9d226b704af0b334ac49e08eb",
+   "text": "Kopia has both CLI (command-line interface) and GUI (graphical user interface) versions, making it the perfect tool for both advanced and regular users. You can read more about Kopia's unique features -- which include compression, deduplication, user-controlled end-to-end encryption, and error correction -- to get a better understanding of how Kopia works."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/kopia/kopia/tree/0295aac97fe7e1f9d226b704af0b334ac49e08eb",
+  "https://github.com/kopia/kopia/blob/0295aac97fe7e1f9d226b704af0b334ac49e08eb/README.md"
+ ]
+}

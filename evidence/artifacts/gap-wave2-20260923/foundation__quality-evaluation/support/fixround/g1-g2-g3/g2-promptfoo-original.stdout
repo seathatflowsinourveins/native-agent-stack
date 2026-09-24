@@ -1,0 +1,22 @@
+Cache is disabled.
+Starting evaluation eval-KBJ-2026-09-23T02:45:11
+Running 1 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m [exec:python3 echo_provider.py] hello                                                                                  [39m[22m[90m│[39m
+[90m├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤[39m
+[90m│[39m [PASS] EXPECTED_OUTPUT_42                                                                                              [90m│[39m
+[90m└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘[39m
+✓ Eval complete (ID: eval-KBJ-2026-09-23T02:45:11)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 1 passed (100%)
+  0 failed (0%)
+  0 errors (0%)
+Duration: 0s (concurrency: 1)
+

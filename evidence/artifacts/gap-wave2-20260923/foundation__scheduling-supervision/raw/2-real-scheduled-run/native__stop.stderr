@@ -1,0 +1,7 @@
+time=2026-09-22T22:48:10.928-04:00 level=WARN msg="No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account."
+time=2026-09-22T22:48:10.929-04:00 level=INFO msg="Dag-run stop/cancel requested" dag=realmaint
+time=2026-09-22T22:48:10.929-04:00 level=INFO msg="Stopping DAG" dag=realmaint
+time=2026-09-22T22:48:10.943-04:00 level=INFO msg="Cancel request created for attempt" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi attempt-id=ff82b1 file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dagu-home/data/dag-runs/realmaint/dag-runs/2026/09/23/dag-run_20260923_024800Z_034TZZGmlL3sTFRU6oK7Mi/a_20260923_024800_029Z_ff82b1/CANCEL_REQUESTED
+time=2026-09-22T22:48:10.943-04:00 level=INFO msg="Abort flag created for DAG run" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi
+time=2026-09-22T22:48:10.943-04:00 level=INFO msg="Successfully stopped DAG via socket" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi
+time=2026-09-22T22:48:10.943-04:00 level=INFO msg="Dag-run stop/cancel completed" dag=realmaint

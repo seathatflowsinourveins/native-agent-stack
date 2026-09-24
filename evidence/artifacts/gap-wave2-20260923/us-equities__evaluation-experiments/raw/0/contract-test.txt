@@ -1,0 +1,15 @@
+✔ late, missing and impossible timestamps cannot become eligible advice (1.47181ms)
+✔ the cutoff boundary is inclusive; malformed cutoff fails closed (0.165601ms)
+✔ gate rejects malformed verdict and absent evidence (0.449203ms)
+✔ parser refuses drift, missing answers, malformed distributions and unknown usage (0.445103ms)
+✔ cached response usage is not counted as new inference (0.125901ms)
+✔ frozen fixture labels and future-evidence case are explicit (0.193101ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.680407
+exit=0

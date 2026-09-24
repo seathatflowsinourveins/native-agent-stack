@@ -1,0 +1,54 @@
+{
+  "layer": "foundation/mcp-surfaces",
+  "generated_by": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/make_results.py",
+  "results": {
+    "0": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/0-retained-bridge-rerun.json"
+    },
+    "1": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/1-mcporter-0.14.0-matched.json"
+    },
+    "2": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/2-owned-daemon-lifecycle-stages.json"
+    },
+    "3": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/3-retained-operation-ids-defined.json"
+    },
+    "4": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/4-inspector-tools-list-local-servers.json"
+    },
+    "5": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/5-project-config-without-registry.json"
+    },
+    "6": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/6-alternative-bridge-comparison.json"
+    },
+    "7": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/7-awesome-mcp-servers-recovery-review.json"
+    },
+    "8": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/8-inspector-project-file-scope.json"
+    },
+    "9": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/9-induced-stale-metadata-and-startup-timeout.json"
+    },
+    "10": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/10-disposable-daemon-lifecycle-fixture.json"
+    },
+    "12": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/12-matched-set-three-bridges.json"
+    }
+  }
+}

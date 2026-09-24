@@ -1,0 +1,4 @@
+validate exit=0
+lexical exit=0 wall=15.203410896
+bm25 exit=0 wall=16.331335067
+pytest exit=0

@@ -1,0 +1,7 @@
+Dropped 0.3% entries from factor data: 0.3% in forward returns computation and 0.0% in binning phase (set max_loss=0 to see potentially suppressed Exceptions).
+max_loss is 35.0%, not exceeded: OK!
+Dropped 0.3% entries from factor data: 0.3% in forward returns computation and 0.0% in binning phase (set max_loss=0 to see potentially suppressed Exceptions).
+max_loss is 35.0%, not exceeded: OK!
+Dropped 0.3% entries from factor data: 0.3% in forward returns computation and 0.0% in binning phase (set max_loss=0 to see potentially suppressed Exceptions).
+max_loss is 35.0%, not exceeded: OK!
+{"arm": "alphalens", "ic": {"momentum120": {"ic_std": {"1D": 0.738331, "5D": 0.729586}, "mean_ic": {"1D": 0.055113, "5D": 0.101926}, "rows": 4518, "sessions": 1506}, "momentum20": {"ic_std": {"1D": 0.759431, "5D": 0.741171}, "mean_ic": {"1D": 0.042829, "5D": 0.01826}, "rows": 4518, "sessions": 1506}, "momentum60": {"ic_std": {"1D": 0.739024, "5D": 0.726628}, "mean_ic": {"1D": 0.050133, "5D": 0.082005}, "rows": 4518, "sessions": 1506}}, "note": "Spearman IC across only three ETFs per session; alphalens forward returns use raw closes.", "pandas": "2.3.3", "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7", "version": "0.4.6"}

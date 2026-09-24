@@ -8,14 +8,16 @@ from collections import Counter, defaultdict
 from datetime import date
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 from urllib.parse import urlsplit
 
 try:
     from .catalog_decisions import canonical, identity, load, safe_file
+    from . import platform_status as platform_evidence
 except ImportError:
     from catalog_decisions import canonical, identity, load, safe_file
+    import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
 DISPOSITIONS = {
@@ -38,9 +40,572 @@ PLATFORM_KEYS = {"linux-wsl2-x86_64", "macos-arm64"}
 PLATFORM_STATUSES = {"accepted", "conditional", "not_established", "untested"}
 PLATFORM_ALLOWED = {
     "linux-wsl2-x86_64": {"accepted", "conditional", "not_established"},
-    "macos-arm64": {"untested"},
+    "macos-arm64": {"accepted", "conditional", "not_established", "untested"},
 }
+# Platforms whose declared status may not outrank what scripts/platform_status.py derives
+# from the host receipts and registered evidence, on every row. tools/sota-convergence/
+# record_verdicts.py now derives every platform of a new wave through that same function, and
+# validate_verdict_row enforces every platform on a non-grandfathered row; Linux joins this set
+# for the grandfathered rows when they are re-recorded (13 Linux "accepted" rows at 38847e5 cite
+# no registered evidence/ file and would derive "conditional"); that re-record widens it.
+ENFORCED_PLATFORMS = {"macos-arm64"}
 OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
+
+# --- Layer-verdict integrity rules (2026-09-23 peer audit) ---------------------------------------
+# Shared by tools/sota-convergence/record_verdicts.py (record time) and this validator (CI re-check).
+SEALED_BASE_PREFIX = "evidence/artifacts/layer-verdicts-"
+DEFAULT_SEALED_BASE = SEALED_BASE_PREFIX + "20260922"
+# Grandfathered wave: the 32 rows sealed on 2026-09-22 predate these rules. Their lane returns
+# declare no model family or provenance, their adjudications are Opus-only (both presentation
+# orders, no judge identity), they have no run manifest (their packets/ and SHA256SUMS are
+# retained under the sealed base instead), and their Linux platform_status came from the lane's
+# evidence class alone (13 "accepted" winners cite no registered evidence/ file, so
+# scripts/platform_status.py would derive "conditional"). The exemption covers only the committed wave,
+# which is frozen independently of whether a later wave exists yet:
+# - record_verdicts.py has no default --run-id and its --write refuses a grandfathered id once
+#   --root holds that wave (its sealed directory or a registered wave document), so it never
+#   re-records a row or adds a run manifest there;
+# - build_verdicts.py --write refuses to regenerate or re-register a registered grandfathered
+#   wave, and --check compares every row still naming it with the hash-registered
+#   layer-verdicts-20260922.json;
+# - tests/test_layer_verdicts.py GrandfatheredWavePinTests (run by CI's python3 -m unittest) pins
+#   the bytes of that document, its registry entry and every file under the sealed 20260922
+#   directory, and asserts it holds no run-manifest.json.
+# Every other run id gets every rule.
+GRANDFATHERED_RUN_IDS = frozenset({"20260922"})
+LANES = ("claude", "codex")
+LANE_FAMILIES = {"claude": "anthropic", "codex": "openai"}
+FAMILY_MODEL_PATTERNS = {
+    "anthropic": re.compile(r"claude-[A-Za-z0-9._\[\]-]+|opus|sonnet|fable|haiku"),
+    "openai": re.compile(r"gpt-[A-Za-z0-9._-]+|codex"),
+}
+SHA256_TEXT = re.compile(r"[a-f0-9]{64}")
+GIT_COMMIT_TEXT = re.compile(r"[a-f0-9]{40}")
+LANE_PROVENANCE_FIELDS = {
+    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit"),
+    "codex": ("codex_lane_py_sha256", "prompt_sha256"),
+}
+RUN_MANIFEST_NAME = "run-manifest.json"
+# "failed": the lane ran for the layer but returned nothing sealable (a Claude layer whose final was
+# refuted or unknown, a Codex layer that failed after its retry); the reason comes from the lane
+# runner's <work-dir>/<lane>/failures.json (2026-09-23 review of #122, finding 7).
+LANE_OUTCOMES = {"sealed", "rejected", "failed", "missing"}
+# A single-lane decision record must be dated in its file name (YYYY-MM-DD or YYYYMMDD), sit under
+# docs/decisions/ and carry, for each layer it authorizes, the exact line
+# "single-lane-authorization: <catalog>/<layer_id>"; its sha256 is stored on the row
+# (lanes.single_lane_decision_sha256). A wave document or run manifest that merely mentions a layer
+# id authorizes nothing (2026-09-23 review of #122, finding 2).
+DATED_NAME = re.compile(r"(?<![0-9])20[0-9]{2}-?(?:0[1-9]|1[0-2])-?(?:0[1-9]|[12][0-9]|3[01])(?![0-9])")
+SINGLE_LANE_DECISION_DIR = "docs/decisions/"
+SINGLE_LANE_AUTHORIZATION = "single-lane-authorization: {catalog}/{layer_id}"
+# A new wave retains the packets both lanes judged under <sealed_base>/packets/ with their
+# SHA256SUMS, listed in the run manifest's retained_packets (2026-09-23 review of #122, finding 6).
+RETAINED_PACKETS_DIR = "packets"
+# Keys a new-wave (--withhold-labels) packet never carries on a candidate or unclaimed-component
+# copy: popularity and recency signals, the latest upstream release and what is derived from it,
+# the newcomer flag and the candidate-only note (tools/sota-convergence/lane_packets.py
+# withhold_popularity, which imports these).
+POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
+POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
+UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease", "latest_flag")
+COPY_WITHHELD_FIELDS = ("pin_behind_upstream", "newcomer", "note")
+PACKET_UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
+# Review of the #122 fix round (2026-09-23): the withheld-key check walks every depth of the packet,
+# not only the two positions withhold_popularity stripped. At any depth a key is withheld when it is
+# a popularity/recency key, one of COPY_WITHHELD_FIELDS, or names the latest version, any release,
+# a newcomer or a pin-behind comparison (for example upstream.latest_release, upstream.release,
+# upstream.latest_flag, whose tag-listing fallback can be date-shaped, or a top-level newcomers
+# list). archived/license are kept only where the requirement names them (REQUIREMENT_GATED_FIELDS).
+# The packet's own checked_at is its build date, not a candidate signal. On a candidate or component
+# copy the disposition labels are withheld at any depth too: selection, disposition, rationale and
+# current_choice never appear and review_status is null (lane_packets.withhold_labels); at the top
+# level current_choice, decision and rationale never appear (lane_packets.WITHHELD). A packet whose
+# withheld[] lacks a policy label was not built with --withhold-labels.
+WITHHELD_KEY_TOKENS = ("latest", "release", "newcomer", "pin_behind")
+REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"), "license": ("licen",)}
+PACKET_OWN_KEYS = ("checked_at",)
+COPY_DISPOSITION_KEYS = ("selection", "disposition", "rationale", "current_choice")
+COPY_NULL_ONLY_KEYS = ("review_status",)
+TOP_LEVEL_WITHHELD_KEYS = ("current_choice", "decision", "rationale")
+# The Claude lane's refutation summary (layer-verdict-lane.js): both lens votes are required on the
+# object it seals (2026-09-23 review of #122, finding 5).
+REFUTATION_LENSES = ("evidence", "challenger")
+REFUTATION_ROUNDS = ("proposal", "revision")
+REFUTATION_STATUSES = ("unrefuted", "refuted", "unknown")
+# Append-only list of the lane code a new-wave return may name in its provenance: the Claude
+# lane's (workflow_path, workflow_sha256) and the Codex lane's (codex_lane_py_sha256,
+# prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
+# codex_lane.py, lane-prompt.md and vendored workflow bytes.
+LANE_PROVENANCE_REGISTRY = "tools/sota-convergence/lane-provenance.json"
+LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256"),
+                        "codex": ("codex_lane_py_sha256", "prompt_sha256")}
+
+
+def run_id_of(sealed_base):
+    return sealed_base[len(SEALED_BASE_PREFIX):] if isinstance(sealed_base, str) else None
+
+
+def is_grandfathered_run(run_id):
+    return run_id in GRANDFATHERED_RUN_IDS
+
+
+def model_family_issue(model, expected_family, label):
+    """None when ``model`` declares ``expected_family`` and a name matching that family's pattern."""
+    if not isinstance(model, dict):
+        return label + " must be an object"
+    family, name = model.get("family"), model.get("name")
+    if family != expected_family:
+        return f"{label}.family must be {expected_family!r} (got {family!r})"
+    if not (isinstance(name, str) and FAMILY_MODEL_PATTERNS[expected_family].fullmatch(name)):
+        return (f"{label}.name {name!r} does not match the {expected_family} pattern "
+                f"{FAMILY_MODEL_PATTERNS[expected_family].pattern}")
+    return None
+
+
+def lane_model_issue(lane, model):
+    return model_family_issue(model, LANE_FAMILIES[lane], "model")
+
+
+def is_popularity_or_recency_key(key):
+    lowered = key.lower()
+    return (lowered in POPULARITY_RECENCY_FIELDS or lowered.endswith("_at")
+            or any(token in lowered for token in POPULARITY_TOKENS))
+
+
+def requirement_names(field, requirement):
+    """True when the packet requirement names a REQUIREMENT_GATED_FIELDS field (licensing or
+    maintenance status), which makes it evidence rather than a popularity proxy."""
+    text = requirement.lower() if isinstance(requirement, str) else ""
+    return any(token in text for token in REQUIREMENT_GATED_FIELDS[field])
+
+
+def is_withheld_packet_key(key, kept_gated=()):
+    """Whether a --withhold-labels packet may carry ``key`` at any depth (the shared policy of
+    lane_packets.withhold_popularity and withheld_packet_keys); ``kept_gated`` are the
+    REQUIREMENT_GATED_FIELDS the packet's requirement names."""
+    lowered = key.lower()
+    if lowered in REQUIREMENT_GATED_FIELDS:
+        return lowered not in kept_gated
+    return (is_popularity_or_recency_key(key) or lowered in COPY_WITHHELD_FIELDS or lowered == "notes"
+            or any(token in lowered for token in WITHHELD_KEY_TOKENS))
+
+
+def withhold_policy_labels(requirement=None):
+    """The withheld[] labels lane_packets.withhold_popularity always lists for each copy
+    collection; a packet lacking one was not built with --withhold-labels."""
+    gated = [field for field in REQUIREMENT_GATED_FIELDS if not requirement_names(field, requirement)]
+    return sorted(f"{collection}[].{label}" for collection in PACKET_UPSTREAM_COPIES
+                  for label in [f"upstream.{field}" for field in
+                                list(POPULARITY_RECENCY_FIELDS) + list(UPSTREAM_RELEASE_FIELDS) + gated]
+                  + list(COPY_WITHHELD_FIELDS))
+
+
+def withheld_packet_keys(packet):
+    """Labels ("candidates[].upstream.stars", "newcomers", ...) of every withheld key a packet still
+    carries at any depth, plus "withheld[] lacks <label>" for each policy label missing from its
+    withheld list; empty only for a --withhold-labels packet."""
+    if not isinstance(packet, dict):
+        return ["<packet is not a JSON object>"]
+    requirement = packet.get("requirement")
+    kept_gated = {field for field in REQUIREMENT_GATED_FIELDS if requirement_names(field, requirement)}
+    found = set()
+
+    def walk(value, label, in_copy):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                path = f"{label}.{key}" if label else key
+                lowered = key.lower() if isinstance(key, str) else ""
+                if not label and lowered in PACKET_OWN_KEYS:
+                    continue
+                if (is_withheld_packet_key(key, kept_gated)
+                        or (not label and lowered in TOP_LEVEL_WITHHELD_KEYS)
+                        or (in_copy and (lowered in COPY_DISPOSITION_KEYS
+                                         or (lowered in COPY_NULL_ONLY_KEYS and item is not None)))):
+                    found.add(path)
+                    continue
+                walk(item, path, in_copy or (not label and key in PACKET_UPSTREAM_COPIES))
+        elif isinstance(value, list):
+            for item in value:
+                walk(item, f"{label}[]", in_copy)
+
+    walk(packet, "", False)
+    listed = packet.get("withheld")
+    listed = set(listed) if isinstance(listed, list) and all(isinstance(item, str) for item in listed) else set()
+    found |= {f"withheld[] lacks {label}" for label in withhold_policy_labels(requirement) if label not in listed}
+    return sorted(found)
+
+
+def packet_component_id(candidate):
+    """A packet candidate's winner component id: its component_id, else candidate:<owner-repo>
+    (the id record_verdicts.py writes on the row)."""
+    component_id = candidate.get("component_id") if isinstance(candidate, dict) else None
+    if component_id:
+        return component_id
+    try:
+        slug = identity(candidate.get("repository"))
+    except (ValueError, TypeError, AttributeError):
+        slug = None
+    return f"candidate:{(slug or 'unknown').replace('/', '-')}"
+
+
+def lane_winner_components(sealed_return, packet):
+    """(issue, {(component_id, repository)}) of a sealed return's winner_keys resolved against the
+    retained packet it names."""
+    keys = sealed_return.get("winner_keys") if isinstance(sealed_return, dict) else None
+    if not (isinstance(keys, list) and 1 <= len(keys) <= 3 and all(isinstance(key, str) for key in keys)
+            and len(set(keys)) == len(keys)):
+        return "winner_keys must be 1-3 unique packet candidate keys", None
+    candidates = {candidate.get("key"): candidate for candidate in packet.get("candidates") or []
+                  if isinstance(candidate, dict)}
+    unknown = [key for key in keys if key not in candidates]
+    if unknown:
+        return f"winner_keys {unknown} are not candidates of the retained packet", None
+    not_adopted = [key for key in keys if candidates[key].get("adopted") is not True]
+    if not_adopted:
+        # The lane contract forbids a non-adopted winner (record_verdicts.validate_lane_return).
+        return f"winner_keys {not_adopted} are not adopted candidates of the retained packet", None
+    return None, {(packet_component_id(candidates[key]), candidates[key].get("repository")) for key in keys}
+
+
+def claude_refutation_issue(refutation):
+    """None when the Claude lane's refutation summary shows its final object sealed unrefuted: status
+    unrefuted, and both lens votes of the round that produced the final returned refuted == false."""
+    if not isinstance(refutation, dict):
+        return ("a claude lane return needs the refutation summary layer-verdict-lane.js returns "
+                "(refutation {status, final_source, proposal_status, revision_status, votes})")
+    status, source = refutation.get("status"), refutation.get("final_source")
+    if status != "unrefuted":
+        return f"refutation.status is {status!r}: a refuted or unknown final is never sealed"
+    if source not in REFUTATION_ROUNDS or refutation.get(f"{source}_status") != "unrefuted":
+        return "refutation.final_source must name a round (proposal|revision) whose status is unrefuted"
+    votes = refutation.get("votes")
+    if not isinstance(votes, list) or not all(
+            isinstance(vote, dict) and vote.get("lens") in REFUTATION_LENSES and vote.get("round") in REFUTATION_ROUNDS
+            and vote.get("refuted") in (True, False, None) and isinstance(vote.get("reason"), str)
+            for vote in votes):
+        return "refutation.votes must be a list of {lens, round, refuted true|false|null, reason}"
+    final_votes = [vote for vote in votes if vote["round"] == source]
+    if (sorted(vote["lens"] for vote in final_votes) != sorted(REFUTATION_LENSES)
+            or any(vote["refuted"] is not False for vote in final_votes)):
+        return (f"both lens votes ({', '.join(REFUTATION_LENSES)}) on the sealed {source} must be present "
+                "and unrefuted")
+    return None
+
+
+def lane_provenance_issue(lane, provenance):
+    """A new-wave sealed return names what produced it: the Claude lane its workflow file, hash and
+    agent-lab commit; the Codex lane the hashes of codex_lane.py and the prompt it filled."""
+    fields = LANE_PROVENANCE_FIELDS[lane]
+    if not isinstance(provenance, dict) or set(provenance) != set(fields):
+        return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"
+    for field in fields:
+        value = provenance[field]
+        if field.endswith("sha256"):
+            ok = isinstance(value, str) and bool(SHA256_TEXT.fullmatch(value))
+        elif field == "agentlab_commit":
+            ok = isinstance(value, str) and bool(GIT_COMMIT_TEXT.fullmatch(value))
+        else:  # workflow_path: a repository-relative .js path
+            ok = (isinstance(value, str) and value.endswith(".js") and not value.startswith("/")
+                  and ".." not in value.split("/"))
+        if not ok:
+            return f"provenance.{field} is malformed for the {lane} lane"
+    return None
+
+
+def load_lane_provenance_registry(root):
+    """lane -> list of registered provenance entries (empty when the registry is absent)."""
+    path = Path(root) / LANE_PROVENANCE_REGISTRY
+    if not path.is_file():
+        return {lane: [] for lane in LANES}
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return {lane: [entry for entry in document.get(lane) or [] if isinstance(entry, dict)] for lane in LANES}
+
+
+def registered_provenance_entry(lane, provenance, registry):
+    """The registry entry naming this return's lane code, or None."""
+    if not isinstance(provenance, dict):
+        return None
+    fields = LANE_PROVENANCE_KEYS[lane]
+    for entry in registry.get(lane) or []:
+        if all(entry.get(field) == provenance.get(field) for field in fields):
+            return entry
+    return None
+
+
+def lane_provenance_registry_issue(lane, provenance, registry):
+    if registered_provenance_entry(lane, provenance, registry) is None:
+        fields = ", ".join(f"{field}={(provenance or {}).get(field)!r}" for field in LANE_PROVENANCE_KEYS[lane])
+        return f"provenance ({fields}) names {lane} lane code not listed in {LANE_PROVENANCE_REGISTRY}"
+    return None
+
+
+def judge_adjudication(raw, *, grandfathered, packet_sha256=None):
+    """Validate an adjudication record. Returns ``(issue, result)``; ``issue`` is a rejection
+    reason or None. ``result['winner_lane']`` is the lane the adjudication establishes, or None
+    for a split. A new wave establishes a winner only when judgments from BOTH lane families
+    are present, each family covers both presentation orders, all pick the same lane and none
+    is refuted; otherwise it is a split with ``split_reason``. Each new-wave judgment's
+    ``stripped_packet_sha256`` must be ``packet_sha256``, the layer's sealed lane packet (the
+    --withhold-labels packet both lanes judged, listed in packets/SHA256SUMS): the judge is shown
+    that packet, not a private reduction of it. The grandfathered 2026-09-22 rule is the older
+    one: both orders, all the same lane, none refuted, no judge identity."""
+    if not isinstance(raw, dict):
+        return "adjudication must be a JSON object", None
+    winner_lane = raw.get("winner_lane")
+    if "winner_lane" not in raw or winner_lane not in ("claude", "codex", None) or not (
+            isinstance(raw.get("why"), str) and raw["why"].strip()):
+        return "adjudication needs winner_lane claude|codex|null and a nonempty why", None
+    evidence_refs = raw.get("evidence_refs")
+    if not isinstance(evidence_refs, list) or not all(isinstance(item, str) for item in evidence_refs):
+        return "adjudication evidence_refs must be a list of text", None
+    judgments = raw.get("judgments")
+    if not isinstance(judgments, list) or not judgments:
+        return "adjudication needs its judgments from both presentation orders", None
+    for judgment in judgments:
+        if (not isinstance(judgment, dict) or judgment.get("claude_position") not in ("A", "B")
+                or judgment.get("preferred_position") not in ("A", "B")
+                or type(judgment.get("refuting_votes")) is not int or judgment["refuting_votes"] < 0):
+            return ("each judgment needs claude_position A|B, preferred_position A|B "
+                    "and a nonnegative integer refuting_votes"), None
+        lane = "claude" if judgment["preferred_position"] == judgment["claude_position"] else "codex"
+        if judgment.get("preferred_lane") != lane:
+            return "a judgment's preferred_lane contradicts its presentation positions", None
+        if not grandfathered:
+            judge = judgment.get("judge")
+            family = judge.get("family") if isinstance(judge, dict) else None
+            if family not in FAMILY_MODEL_PATTERNS or model_family_issue(
+                    {"family": family, "name": judge.get("model")}, family, "judge") is not None:
+                return ("each judgment needs judge {model, family} with family anthropic|openai and a model "
+                        "matching that family"), None
+            if not (isinstance(judgment.get("stripped_packet_sha256"), str)
+                    and SHA256_TEXT.fullmatch(judgment["stripped_packet_sha256"])):
+                return "each judgment needs the stripped_packet_sha256 of the packet its judge saw", None
+            if not (isinstance(packet_sha256, str) and SHA256_TEXT.fullmatch(packet_sha256)):
+                return "the layer's sealed packet sha256 is unknown, so no judgment can be bound to it", None
+            if judgment["stripped_packet_sha256"] != packet_sha256:
+                return ("a judgment's stripped_packet_sha256 is not the layer's sealed packet sha256 "
+                        f"({packet_sha256}): its judge saw a packet this wave did not seal"), None
+    if {judgment["claude_position"] for judgment in judgments} != {"A", "B"}:
+        return "adjudication judgments must cover both presentation orders", None
+    lanes = {judgment["preferred_lane"] for judgment in judgments}
+    unrefuted = all(judgment["refuting_votes"] == 0 for judgment in judgments)
+    unanimous = next(iter(lanes)) if len(lanes) == 1 and unrefuted else None
+    agreed, split_reason = unanimous, None
+    if agreed is not None and not grandfathered:
+        orders = defaultdict(set)
+        for judgment in judgments:
+            orders[judgment["judge"]["family"]].add(judgment["claude_position"])
+        missing = [family for family in sorted(set(LANE_FAMILIES.values())) if orders.get(family) != {"A", "B"}]
+        if missing:
+            split_reason = ("the adjudication needs unanimous judgments from both lane families in both "
+                            "presentation orders; missing: " + ", ".join(missing))
+            agreed = None
+    # winner_lane is checked after the two-family rule: when that rule alone makes the result a
+    # split, null (the documented split value) and the lane the single family chose are both
+    # accepted, and either way the result is a split, never a malformed record.
+    allowed = {agreed} | ({unanimous} if split_reason else set())
+    if winner_lane not in allowed:
+        return (f"winner_lane {winner_lane!r} must equal the lane every unrefuted judgment chose "
+                f"({agreed!r}; null when the judgments split, any was refuted or a lane family is missing)"), None
+    tally = {lane: sum(judgment["preferred_lane"] == lane for judgment in judgments) for lane in LANES}
+    return None, {"winner_lane": agreed, "tally": tally, "split_reason": split_reason,
+                  "refuted": sum(judgment["refuting_votes"] > 0 for judgment in judgments)}
+
+
+def single_lane_authorizes(text, catalog, layer_id):
+    """True when ``text`` carries the exact line ``single-lane-authorization: <catalog>/<layer_id>``
+    (surrounding whitespace ignored). Mentioning the layer id anywhere else authorizes nothing."""
+    expected = SINGLE_LANE_AUTHORIZATION.format(catalog=catalog, layer_id=layer_id)
+    return isinstance(text, str) and any(line.strip() == expected for line in text.splitlines())
+
+
+def single_lane_decision_path_issue(root, path, label="single-lane decision"):
+    """None when ``path`` is a confined, existing, dated file under docs/decisions/."""
+    if not isinstance(path, str) or not path.strip():
+        return "a single-lane recorded verdict needs lanes.single_lane_decision naming a dated decision record"
+    if not path.startswith(SINGLE_LANE_DECISION_DIR) or ".." in path.split("/"):
+        return f"{label} {path!r} must be a decision record under {SINGLE_LANE_DECISION_DIR}"
+    if not DATED_NAME.search(path.rsplit("/", 1)[-1]):
+        return f"{label} {path!r} must be dated (YYYY-MM-DD or YYYYMMDD in its file name)"
+    try:
+        record = safe_file(Path(root), path)
+    except ValueError:
+        return f"{label} {path!r} is not a confined repository path"
+    if not record.is_file():
+        return f"{label} {path!r} does not exist"
+    return None
+
+
+def single_lane_decision_issue(root, path, catalog, layer_id, sha256=None):
+    """A single-lane (codex_absent) recorded row names a dated docs/decisions/ record carrying the
+    line ``single-lane-authorization: <catalog>/<layer_id>``, and stores that record's sha256."""
+    issue = single_lane_decision_path_issue(root, path, "lanes.single_lane_decision")
+    if issue is not None:
+        return issue
+    data = safe_file(Path(root), path).read_bytes()
+    expected = SINGLE_LANE_AUTHORIZATION.format(catalog=catalog, layer_id=layer_id)
+    if not single_lane_authorizes(data.decode("utf-8", errors="replace"), catalog, layer_id):
+        return f"lanes.single_lane_decision {path!r} must carry the line {expected!r}"
+    if sha256 != hashlib.sha256(data).hexdigest():
+        return (f"lanes.single_lane_decision_sha256 must be the sha256 of {path} "
+                "(the record changed after it authorized this row, or the hash is missing)")
+    return None
+
+
+def run_manifest_row_issue(manifest, run_id, catalog, layer_id, lanes_field):
+    """A new-wave row must appear exactly once in its wave's run manifest with both lanes
+    accounted for: sealed (matching the row's run id and hash) or rejected/missing (the row's
+    lane then carries no sealed hash), and its packet hash listed in packets_sha256sums."""
+    if not isinstance(manifest, dict) or manifest.get("run_id") != run_id or not isinstance(
+            manifest.get("packets"), list):
+        return f"the run manifest for wave {run_id} is malformed"
+    entries = [entry for entry in manifest["packets"]
+               if isinstance(entry, dict) and entry.get("catalog") == catalog and entry.get("layer_id") == layer_id]
+    if len(entries) != 1:
+        return f"{catalog}/{layer_id} must appear exactly once in the run manifest of wave {run_id}"
+    entry = entries[0]
+    packet_sha256 = entry.get("packet_sha256")
+    sums = manifest.get("packets_sha256sums")
+    if not (isinstance(packet_sha256, str) and SHA256_TEXT.fullmatch(packet_sha256) and isinstance(sums, str)
+            and f"{packet_sha256}  {catalog}__{layer_id}.json" in sums.splitlines()):
+        return f"{catalog}/{layer_id} packet hash is not listed in the run manifest's packets_sha256sums"
+    for lane in LANES:
+        outcome = (entry.get("lanes") or {}).get(lane)
+        row_lane = lanes_field.get(lane) or {}
+        if not isinstance(outcome, dict) or outcome.get("outcome") not in LANE_OUTCOMES:
+            return f"the run manifest does not account for the {lane} lane of {catalog}/{layer_id}"
+        if outcome["outcome"] == "sealed":
+            if (outcome.get("sealed_sha256") != row_lane.get("sealed_sha256")
+                    or outcome.get("run_id") != row_lane.get("run_id") or not row_lane.get("sealed_sha256")):
+                return f"the run manifest's sealed {lane} lane of {catalog}/{layer_id} differs from the row"
+        else:
+            if row_lane.get("sealed_sha256"):
+                return f"the row seals a {lane} lane the run manifest records as {outcome['outcome']}"
+            if outcome["outcome"] in ("rejected", "failed") and not (
+                    isinstance(outcome.get("reasons"), list) and outcome["reasons"]
+                    and all(isinstance(reason, str) and reason for reason in outcome["reasons"])):
+                return (f"the run manifest's {outcome['outcome']} {lane} lane of {catalog}/{layer_id} "
+                        "needs its reasons")
+    # A sealed adjudication is bound by the manifest as well as by the row (review of the #122 fix
+    # round), so rewriting one means rewriting the manifest and every row's run_manifest_sha256.
+    adjudication = entry.get("adjudication")
+    manifest_sha256 = (adjudication.get("sha256") if isinstance(adjudication, dict)
+                       and adjudication.get("outcome") == "sealed" else None)
+    if manifest_sha256 != lanes_field.get("adjudication_sha256"):
+        return (f"the run manifest's sealed adjudication of {catalog}/{layer_id} ({manifest_sha256!r}) differs from "
+                f"the row's lanes.adjudication_sha256 ({lanes_field.get('adjudication_sha256')!r})")
+    return None
+
+
+def sha256_of(root, relative):
+    path = safe_file(Path(root), relative)
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+def parse_retained_sha256sums(text):
+    """(issue, {packet name: sha256}) of a retained packets/SHA256SUMS text in sha256sum format
+    ("<hash>  <name>", keyed by the bare file name after an optional leading "*", as
+    record_verdicts.parse_sha256sums reads it). A malformed or duplicated line is an issue, not skipped."""
+    if not isinstance(text, str):
+        return "is not text", {}
+    listed = {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        parts = line.strip().split(None, 1)
+        digest = parts[0].lower() if parts else ""
+        if len(parts) != 2 or not SHA256_TEXT.fullmatch(digest):
+            return f"has a malformed line {line!r}", {}
+        name = PurePosixPath(parts[1].strip().lstrip("*")).name
+        if name in listed:
+            return f"lists {name} twice", {}
+        listed[name] = digest
+    return None, listed
+
+
+def verify_sealed_waves(root, wave_refs):
+    """Wave-level checks of every non-grandfathered sealed folder (evidence/artifacts/
+    layer-verdicts-<run-id>/) under ``root``: its run manifest lists the retained packets and their
+    SHA256SUMS; each retained packet matches its hash and carries no withheld key; every sealed
+    return the manifest names matches its hash; and every file in the folder is referenced by a row
+    (``wave_refs``: wave -> relative paths validate_verdict_row resolved) or by the run manifest."""
+    artifacts = Path(root) / "evidence" / "artifacts"
+    waves = set(wave_refs)
+    if artifacts.is_dir():
+        waves |= {path.name[len("layer-verdicts-"):] for path in artifacts.glob("layer-verdicts-*") if path.is_dir()}
+    for wave in sorted(waves):
+        if is_grandfathered_run(wave):
+            continue
+        # A folder whose id no row can name (the sealed_base pattern) is rejected, not skipped, so
+        # no sealed-looking file sits in evidence/artifacts unchecked (review of the #122 fix round).
+        require(re.fullmatch(r"[0-9A-Za-z]+", wave),
+                f"{SEALED_BASE_PREFIX}{wave} is not a sealed wave folder: a wave id is alphanumeric "
+                "(record_verdicts.py --run-id); move or remove it")
+        base = SEALED_BASE_PREFIX + wave
+        folder = safe_file(Path(root), base)
+        if not folder.is_dir():
+            continue
+        manifest_file = folder / RUN_MANIFEST_NAME
+        require(manifest_file.is_file(), f"sealed wave {base} has no {RUN_MANIFEST_NAME}")
+        manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+        require(isinstance(manifest, dict) and manifest.get("run_id") == wave,
+                f"the run manifest of wave {wave} is malformed")
+        referenced = {RUN_MANIFEST_NAME} | set(wave_refs.get(wave, ()))
+        retained = manifest.get("retained_packets")
+        require(isinstance(retained, list) and all(
+            isinstance(item, dict) and isinstance(item.get("name"), str)
+            and re.fullmatch(r"[a-z-]+__[0-9A-Za-z._-]+\.json", item["name"])
+            and isinstance(item.get("sha256"), str) and SHA256_TEXT.fullmatch(item["sha256"]) for item in retained),
+            f"the run manifest of wave {wave} needs retained_packets [{{name, sha256}}]")
+        retained_sha = {item["name"]: item["sha256"] for item in retained}
+        sums_relative = f"{RETAINED_PACKETS_DIR}/SHA256SUMS"
+        sums_file = folder / sums_relative
+        require(sums_file.is_file() and sums_file.read_text(encoding="utf-8") == manifest.get("packets_sha256sums"),
+                f"wave {wave}: {sums_relative} must be retained and equal the run manifest's packets_sha256sums")
+        # The retained SHA256SUMS must list exactly the retained packets with their actual hashes,
+        # including packets no lane returned for (review of catalog #124).
+        sums_issue, sums_listed = parse_retained_sha256sums(manifest.get("packets_sha256sums"))
+        require(sums_issue is None, f"wave {wave}: {sums_relative} {sums_issue}")
+        require(sums_listed == retained_sha,
+                f"wave {wave}: {sums_relative} must list exactly the retained packets and their sha256 "
+                f"(differs for {sorted(name for name in set(sums_listed) | set(retained_sha) if sums_listed.get(name) != retained_sha.get(name))})")
+        referenced.add(sums_relative)
+        for name, digest in retained_sha.items():
+            relative = f"{RETAINED_PACKETS_DIR}/{name}"
+            packet_file = folder / relative
+            require(packet_file.is_file() and hashlib.sha256(packet_file.read_bytes()).hexdigest() == digest,
+                    f"wave {wave}: retained packet {relative} is missing or differs from its run-manifest sha256")
+            found = withheld_packet_keys(json.loads(packet_file.read_text(encoding="utf-8")))
+            require(not found, f"wave {wave}: retained packet {relative} carries withheld keys {found}; "
+                               "a new wave's lanes judge --withhold-labels packets")
+            referenced.add(relative)
+        for entry in manifest.get("packets") or []:
+            if not isinstance(entry, dict):
+                continue
+            name = f"{entry.get('catalog')}__{entry.get('layer_id')}.json"
+            if entry.get("packet_sha256") is not None:
+                require(retained_sha.get(name) == entry["packet_sha256"],
+                        f"wave {wave}: packet {name} of the run manifest is not retained with its sha256")
+            for lane in LANES:
+                outcome = (entry.get("lanes") or {}).get(lane)
+                if isinstance(outcome, dict) and outcome.get("outcome") == "sealed":
+                    relative = f"{lane}/{outcome.get('run_id')}.json"
+                    require(sha256_of(root, f"{base}/{relative}") == outcome.get("sealed_sha256"),
+                            f"wave {wave}: sealed return {relative} differs from its run-manifest sha256")
+                    referenced.add(relative)
+            adjudication = entry.get("adjudication")
+            if isinstance(adjudication, dict) and adjudication.get("outcome") == "sealed":
+                # The manifest lists each sealed adjudication's sha256 as it lists each sealed return's.
+                relative = f"adjudication/{entry.get('catalog')}-{entry.get('layer_id')}-{wave}.json"
+                require(sha256_of(root, f"{base}/{relative}") == adjudication.get("sha256"),
+                        f"wave {wave}: sealed adjudication {relative} differs from its run-manifest sha256")
+                referenced.add(relative)
+        for path in sorted(folder.rglob("*")):
+            if path.is_file():
+                relative = path.relative_to(folder).as_posix()
+                require(relative in referenced,
+                        f"wave {wave}: {base}/{relative} is referenced by no ledger row and not by the run "
+                        "manifest; a sealed wave is never rewritten or extended outside record_verdicts.py")
 
 
 def require(condition, message):
@@ -74,7 +639,8 @@ def https_url(value):
         return False
 
 
-def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins):
+def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
+                          status_context, lane_registry=None, wave_refs=None):
     """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
     is the confined evidence()/track() helper already bound to this run; a
     winner/alternative's ``evidence_refs`` may be an empty list (schema v2
@@ -109,16 +675,37 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
     # run stays intact and verifiable. A row recorded before this field existed
     # (or one recorded with the default run id) omits it and falls back to the
     # sealed 2026-09-22 wave, keeping every already-checked-in row valid.
-    sealed_base = lanes_field.get("sealed_base") or "evidence/artifacts/layer-verdicts-20260922"
+    sealed_base = lanes_field.get("sealed_base") or DEFAULT_SEALED_BASE
     require(isinstance(sealed_base, str) and re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+",
                                                            sealed_base),
             str(key) + ".lanes.sealed_base must be evidence/artifacts/layer-verdicts-<run-id>")
-    for lane_name in ("claude", "codex"):
+    wave = run_id_of(sealed_base)
+    for lane_name in LANES:
         lane = lanes_field.get(lane_name)
         require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
         require(isinstance(lane.get("run_id"), str), str(key) + f".lanes.{lane_name}.run_id must be text")
-        sealed = lane.get("sealed_sha256")
-        require(isinstance(sealed, str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+        require(isinstance(lane.get("sealed_sha256"), str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+    # A row gets every new-wave rule when its sealed_base OR any lane run id (the recorder's
+    # <catalog>-<layer_id>-<run-id>) names a non-grandfathered wave, whether or not a lane carries a
+    # run id: a hand edit cannot drop the rules by emptying a run id or omitting sealed_base.
+    run_prefix = f"{key[0]}-{key[1]}-"
+    named_waves = {wave} | {lanes_field[lane]["run_id"][len(run_prefix):] for lane in LANES
+                            if lanes_field[lane]["run_id"].startswith(run_prefix)}
+    grandfathered = all(is_grandfathered_run(named) for named in named_waves)
+    if not grandfathered:
+        require(not is_grandfathered_run(wave),
+                str(key) + ".lanes run ids name wave(s) " + ", ".join(sorted(named_waves - {wave}))
+                + " but lanes.sealed_base names the grandfathered wave " + str(wave))
+        for lane_name in LANES:
+            lane = lanes_field[lane_name]
+            require(lane["run_id"] in ("", run_prefix + wave),
+                    str(key) + f".lanes.{lane_name}.run_id must be {run_prefix + wave!r} in wave {wave}")
+            require(bool(lane["run_id"]) == bool(lane["sealed_sha256"]),
+                    str(key) + f".lanes.{lane_name} must carry a run_id exactly when it carries a sealed_sha256")
+    sealed_returns = {}
+    for lane_name in LANES:
+        lane = lanes_field[lane_name]
+        sealed = lane["sealed_sha256"]
         if sealed:
             require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
@@ -126,9 +713,61 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             sealed_file = safe_file(root, sealed_path)
             require(sealed_file.is_file(),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 needs a sealed file: {sealed_path}")
-            require(hashlib.sha256(sealed_file.read_bytes()).hexdigest() == sealed,
+            sealed_bytes = sealed_file.read_bytes()
+            require(hashlib.sha256(sealed_bytes).hexdigest() == sealed,
                     str(key) + f".lanes.{lane_name}.sealed_sha256 does not match {sealed_path}")
+            sealed_returns[lane_name] = sealed_bytes
     require(lanes_field.get("agreement") in LANE_AGREEMENTS, str(key) + ".lanes.agreement is unknown")
+    parsed_returns = {}
+    if not grandfathered:
+        # Lane identity, family and provenance are re-checked from the sealed returns themselves.
+        families = []
+        for lane_name, sealed_bytes in sealed_returns.items():
+            try:
+                sealed_return = json.loads(sealed_bytes)
+            except ValueError as error:
+                raise ValueError(str(key) + f".lanes.{lane_name} sealed return is not JSON") from error
+            require(isinstance(sealed_return, dict), str(key) + f".lanes.{lane_name} sealed return must be an object")
+            issue = lane_model_issue(lane_name, sealed_return.get("model"))
+            require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
+            issue = lane_provenance_issue(lane_name, sealed_return.get("provenance"))
+            require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
+            issue = lane_provenance_registry_issue(lane_name, sealed_return["provenance"],
+                                                   lane_registry if lane_registry is not None
+                                                   else load_lane_provenance_registry(root))
+            require(issue is None, str(key) + f".lanes.{lane_name}: {issue}")
+            if lane_name == "claude":
+                issue = claude_refutation_issue(sealed_return.get("refutation"))
+                require(issue is None, str(key) + f".lanes.claude: {issue}")
+            families.append(sealed_return["model"]["family"])
+            parsed_returns[lane_name] = sealed_return
+        require(len(families) == len(set(families)), str(key) + ".lanes must come from two different model families")
+        # Survivorship: the row must be accounted for in its wave's run manifest.
+        manifest_path = f"{sealed_base}/{RUN_MANIFEST_NAME}"
+        manifest_file = safe_file(root, manifest_path)
+        require(manifest_file.is_file(), str(key) + f" was recorded in wave {wave} but its run manifest "
+                                                  f"{manifest_path} is missing")
+        manifest_bytes = manifest_file.read_bytes()
+        run_manifest = json.loads(manifest_bytes)
+        issue = run_manifest_row_issue(run_manifest, wave, key[0], key[1], lanes_field)
+        require(issue is None, str(key) + ": " + str(issue))
+        # The row is bound to the exact run manifest it was recorded with (finding 3).
+        require(lanes_field.get("run_manifest_sha256") == hashlib.sha256(manifest_bytes).hexdigest(),
+                str(key) + f".lanes.run_manifest_sha256 must be the sha256 of its run manifest {manifest_path}")
+        packet_sha256 = next(entry["packet_sha256"] for entry in run_manifest["packets"]
+                             if isinstance(entry, dict) and (entry.get("catalog"), entry.get("layer_id")) == (key[0], key[1]))
+        # The packet both lanes judged is retained under the sealed folder (finding 6).
+        packet_relative = f"{RETAINED_PACKETS_DIR}/{key[0]}__{key[1]}.json"
+        packet_file = safe_file(root, f"{sealed_base}/{packet_relative}")
+        require(packet_file.is_file() and hashlib.sha256(packet_file.read_bytes()).hexdigest() == packet_sha256,
+                str(key) + f" needs its retained packet {sealed_base}/{packet_relative} with the run manifest's "
+                           "packet_sha256")
+        retained_packet = json.loads(packet_file.read_text(encoding="utf-8"))
+        if wave_refs is not None:
+            wave_refs.setdefault(wave, set()).update(
+                f"{lane}/{lanes_field[lane]['run_id']}.json" for lane in sealed_returns)
+    else:
+        packet_sha256 = None
 
     open_gaps = row.get("open_gaps")
     require(isinstance(open_gaps, list) and all(isinstance(gap, str) and gap.strip() for gap in open_gaps),
@@ -166,6 +805,12 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(value in PLATFORM_ALLOWED[platform],
                     str(key) + ".winner.platform_status." + platform + " must be one of "
                     + ", ".join(sorted(PLATFORM_ALLOWED[platform])))
+            # A new wave's rows were derived through scripts/platform_status.py for every platform
+            # (tools/sota-convergence/record_verdicts.py), so none may claim more than it derives;
+            # grandfathered rows are held to it for ENFORCED_PLATFORMS only.
+            if platform in ENFORCED_PLATFORMS or not grandfathered:
+                error = platform_evidence.declared_status_error(platform, value, winner, status_context)
+                require(error is None, str(key) + ".winner " + str(winner.get("component_id")) + ": " + str(error))
 
     alternatives = row.get("alternatives")
     require(isinstance(alternatives, list), str(key) + ".alternatives must be a list")
@@ -188,6 +833,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
     verdict_overturn_when = row.get("verdict_overturn_when", "")
     require(isinstance(verdict_overturn_when, str), str(key) + ".verdict_overturn_when must be text")
     status = row["verdict_status"]
+    chosen_lane = None
     if status == "recorded":
         require(bool(winners), str(key) + " recorded verdict needs at least one winner")
         require(bool(alternatives), str(key) + " recorded verdict needs at least one alternative")
@@ -202,8 +848,96 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         require(any(marker in verdict_overturn_when for marker in OVERTURN_MARKERS),
                 str(key) + ".verdict_overturn_when must name a fixture/blueprint/test path or a runnable command "
                            "for a recorded verdict")
+        agreement = lanes_field.get("agreement")
+        require(agreement in {"same_winner", "disagree", "codex_absent"},
+                str(key) + " recorded verdict needs lanes.agreement same_winner, disagree or codex_absent")
+        # The lanes each agreement implies must be sealed (a recorded row always seals the claude lane).
+        sealed_lanes = {lane for lane in LANES if lanes_field[lane].get("sealed_sha256")}
+        if agreement == "codex_absent":
+            require(sealed_lanes == {"claude"},
+                    str(key) + " codex_absent verdict needs the claude lane sealed and the codex lane unsealed")
+            issue = single_lane_decision_issue(root, lanes_field.get("single_lane_decision"), key[0], key[1],
+                                               lanes_field.get("single_lane_decision_sha256"))
+            require(issue is None, str(key) + ": " + str(issue))
+            chosen_lane = "claude"
+        elif agreement == "same_winner":
+            require(sealed_lanes == set(LANES), str(key) + " same_winner verdict needs both lanes sealed")
+            chosen_lane = "claude"
+        else:
+            require(sealed_lanes == set(LANES), str(key) + " disagree verdict needs both lanes sealed")
+            adjudication_path = f"{sealed_base}/adjudication/{lanes_field['claude'].get('run_id')}.json"
+            adjudication_file = safe_file(root, adjudication_path)
+            require(adjudication_file.is_file(),
+                    str(key) + f" disagree verdict needs its sealed adjudication {adjudication_path}")
+            issue, result = judge_adjudication(json.loads(adjudication_file.read_text(encoding="utf-8")),
+                                               grandfathered=grandfathered, packet_sha256=packet_sha256)
+            require(issue is None, str(key) + f" adjudication {adjudication_path}: {issue}")
+            require(result["winner_lane"] is not None,
+                    str(key) + f" adjudication {adjudication_path} is a split and cannot record a winner"
+                    + (f" ({result['split_reason']})" if result["split_reason"] else ""))
+            if not grandfathered:
+                require(lanes_field.get("adjudication_sha256") is not None,
+                        str(key) + f".lanes.adjudication_sha256 must bind the sealed adjudication {adjudication_path}")
+            chosen_lane = result["winner_lane"]
     elif status == "no_selection":
         require(bool(open_gaps), str(key) + " no_selection verdict needs open_gaps")
+    if lanes_field.get("single_lane_decision") is not None:
+        require(lanes_field.get("agreement") == "codex_absent",
+                str(key) + ".lanes.single_lane_decision is only meaningful on a codex_absent row")
+    if not grandfathered:
+        verify_new_wave_row(row, key, root=root, sealed_base=sealed_base, wave=wave, lanes_field=lanes_field,
+                            parsed_returns=parsed_returns, retained_packet=retained_packet,
+                            packet_sha256=packet_sha256, winners=winners,
+                            chosen_lane=chosen_lane if status == "recorded" else None, wave_refs=wave_refs)
+
+
+def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parsed_returns, retained_packet,
+                        packet_sha256, winners, chosen_lane, wave_refs):
+    """The new-wave row is what its sealed returns establish (2026-09-23 review of #122, finding 1):
+    every sealed return names the retained packet; the agreement is recomputed from both returns'
+    winner component ids; a recorded row's winners are exactly the chosen lane's (same_winner or
+    codex_absent: the claude lane, disagree: the adjudication's winner_lane); an unrecorded row has
+    none. A sealed adjudication (a recorded disagreement or a sealed split) is bound by
+    lanes.adjudication_sha256 (finding 3)."""
+    lane_sets = {}
+    for lane, sealed_return in parsed_returns.items():
+        require(sealed_return.get("packet_sha256") == packet_sha256,
+                str(key) + f".lanes.{lane} sealed return names packet_sha256 {sealed_return.get('packet_sha256')!r}, "
+                           f"not the retained packet {packet_sha256}")
+        issue, components = lane_winner_components(sealed_return, retained_packet)
+        require(issue is None, str(key) + f".lanes.{lane} sealed return: {issue}")
+        lane_sets[lane] = components
+    if set(lane_sets) == set(LANES):
+        computed = "same_winner" if lane_sets["claude"] == lane_sets["codex"] else "disagree"
+    elif "claude" in lane_sets:
+        computed = "codex_absent"
+    else:
+        computed = "pending"
+    require(lanes_field.get("agreement") == computed,
+            str(key) + f".lanes.agreement {lanes_field.get('agreement')!r} is not what its sealed returns establish "
+                       f"({computed!r}: claude={sorted(c for c, _ in lane_sets.get('claude', ()))}, "
+                       f"codex={sorted(c for c, _ in lane_sets.get('codex', ()))})")
+    row_winners = {(winner.get("component_id"), winner.get("repository")) for winner in winners}
+    if chosen_lane is None:
+        require(not winners, str(key) + " a new-wave row that is not recorded carries no winners")
+    else:
+        require(row_winners == lane_sets.get(chosen_lane) and len(row_winners) == len(winners),
+                str(key) + f" winners {sorted(c for c, _ in row_winners)} are not the {chosen_lane} lane's sealed "
+                           f"winner set {sorted(c for c, _ in lane_sets.get(chosen_lane, ()))}")
+    adjudication_sha256 = lanes_field.get("adjudication_sha256")
+    if adjudication_sha256 is not None:
+        require(lanes_field.get("agreement") == "disagree",
+                str(key) + ".lanes.adjudication_sha256 is only meaningful on a disagree row")
+        relative = f"adjudication/{lanes_field['claude'].get('run_id')}.json"
+        adjudication_file = safe_file(root, f"{sealed_base}/{relative}")
+        require(adjudication_file.is_file()
+                and hashlib.sha256(adjudication_file.read_bytes()).hexdigest() == adjudication_sha256,
+                str(key) + f".lanes.adjudication_sha256 does not match {sealed_base}/{relative}")
+        issue, _ = judge_adjudication(json.loads(adjudication_file.read_text(encoding="utf-8")),
+                                      grandfathered=False, packet_sha256=packet_sha256)
+        require(issue is None, str(key) + f" adjudication {sealed_base}/{relative}: {issue}")
+        if wave_refs is not None:
+            wave_refs.setdefault(wave, set()).add(relative)
 
 
 def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file_url=None):
@@ -238,6 +972,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     require(bool(trading_layer_ids), "trading taxonomy needs at least one layer")
     expected.update(("us-equities", layer_id) for layer_id in trading_layer_ids)
     recipe_map = read("adoption/manifest.json").get("recipe_map", {})
+    lane_registry = load_lane_provenance_registry(root)
+    wave_refs = {}
     # Per-layer, not a single flattened map: a component id can recur across
     # layers with a different pin in each (tools/sota-convergence/build_verdicts.py's
     # sota_layer_index keeps the same per-layer scope for its own join, so the
@@ -261,6 +997,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 track(value)
                 result.append({"path": value, "url": file_url(value)})
         return result
+
+    status_context = platform_evidence.load_context(root)
 
     documents = manifest["catalogs"]
     require(set(documents) == {"foundation", "us-equities"}, "landscape must cover both catalogs")
@@ -288,7 +1026,9 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 require(group is None, str(key) + ".group is only used for trading rows")
             validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
                                   evidence=evidence, recipe_map=recipe_map,
-                                  sota_pins=sota_pins_by_layer.get(key[1], {}))
+                                  sota_pins=sota_pins_by_layer.get(key[1], {}),
+                                  status_context=status_context, lane_registry=lane_registry,
+                                  wave_refs=wave_refs)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")
@@ -318,6 +1058,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
             layers.append({**row, "id": ":".join(key), "candidates": candidates,
                            "sources": source_links, "url": file_url(path), "catalog_candidates": []})
     require(seen == expected, "comparison coverage must exactly match all foundation and domain layers")
+    verify_sealed_waves(root, wave_refs)
 
     component_coverage = []
     for component in stack["components"]:

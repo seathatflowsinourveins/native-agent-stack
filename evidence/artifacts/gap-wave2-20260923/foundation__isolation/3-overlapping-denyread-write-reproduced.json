@@ -1,0 +1,51 @@
+{
+  "id": "gap-wave2-20260923-foundation-isolation-3",
+  "gap_index": 3,
+  "gap_text_sha256": "bf03b7135b7b53c6cf9d43804470f74deaeafa89bf9548e619aafa2b40891de2",
+  "checked_at": "2026-09-23T00:43:27.053Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:52:08.551Z",
+    "expectation": "Reproducing filesystem.denyRead over a directory that is also covered by filesystem.allowWrite:['.'] will show a write inside that directory exit 0 while the host file is never created (an ephemeral hidden mount), contrasting with the direct denyWrite fixture's exit 1.",
+    "criteria": "Exit code of the write, host-side existence check after the sandboxed process exits, and a fresh sandbox invocation's view of the same directory are all recorded.",
+    "late": true,
+    "late_note": "Written at 2026-09-23T00:52:08.551Z by original#66 (Write of $SCRATCHPAD/write_receipts.py; receipts written by original#67 at 00:52:11Z), after the first-pass commands it describes had run (original-session calls 2026-09-23T00:42:49.553Z to 2026-09-23T00:43:27.053Z); any fix-round evidence in this receipt came later and has its own fix-round preregistration where one exists. The previously recorded written_at '2026-09-23T01:10:00Z' was not a real time: the original values were a sequential placeholder series (some later than the commit that introduced them) and are replaced here from the worker transcript timestamps."
+  },
+  "commands": [
+    "original#34 [2026-09-23T00:42:49.553Z]: SRT=$HOME/.local/share/codex-ecosystem/bin/srt\n\"$SRT\" --version\nD=$HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77\nsha256sum \"$D/lib/node_modules/@anthropic-ai/sandbox-runtime/dist/sandbox/index.js\" 2>/dev/null\ncat \"$D/lib/node_modules/@anthropic-ai/sandbox-runtime/package.json\" | grep '\"version\"'\nmkdir -p $HOME/.cache/gap-wave2-20260923/isolation/fsfix\ncd $HOME/.cache/gap-wave2-20260923/isolation/fsfix\nmkdir -p protected allowed\ncat > settings-fs.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[],\"denyWrite\":[\"protected\"]},\"network\":{\"allowedDomains\":[],\"deniedDomains\":[]}}\nEOF\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\nrun \"allowed write\" \"$SRT\" --settings settings-fs.json -c \"echo hello > allowed/ok.txt && cat allowed/ok.txt\"\nrun \"denied write\" \"$SRT\" --settings settings-fs.json -c \"echo bad > protected/bad.txt\"\nls -la protected/ 2>&1\nrun \"denied read (deny outside cwd)\" \"$SRT\" --settings settings-fs.json -c \"cat /etc/shadow\"",
+    "original#35 [2026-09-23T00:43:01.471Z]: SRT=$HOME/.local/share/codex-ecosystem/bin/srt\ncd $HOME/.cache/gap-wave2-20260923/isolation/fsfix\nmkdir -p overlap\necho \"preexisting\" > overlap/marker.txt\ncat > settings-overlap.json <<'EOF'\n{\"filesystem\":{\"allowWrite\":[\".\"],\"denyRead\":[\"overlap\"],\"denyWrite\":[]},\"network\":{\"allowedDomains\":[],\"deniedDomains\":[]}}\nEOF\nrun() { echo \"== $1 ==\"; shift; \"$@\" 2>&1; echo \"exit=$?\"; }\nrun \"write inside denyRead region\" \"$SRT\" --settings settings-overlap.json -c \"echo written > overlap/newfile.txt; echo write_exit=\\$?\"\necho \"-- host state after (outside sandbox) --\"\nls -la overlap/\ncat overlap/marker.txt 2>&1\n[[ -f overlap/newfile.txt ]] && echo \"HOST: newfile.txt EXISTS\" || echo \"HOST: newfile.txt DOES NOT EXIST\"\nrun \"visibility inside a fresh sandbox invocation\" \"$SRT\" --settings settings-overlap.json -c \"ls -la overlap/ 2>&1; cat overlap/newfile.txt 2>&1\"",
+    "original#39 [2026-09-23T00:43:26.287Z]: timeout 15 npm view @anthropic-ai/sandbox-runtime versions --json 2>&1 | tail -20"
+  ],
+  "results": [
+    "Write inside the denyRead-but-allowWrite-covered directory: write_exit=0.",
+    "Host-side, outside the sandbox: overlap/newfile.txt DOES NOT EXIST; only the pre-existing marker.txt remains.",
+    "A fresh sandbox invocation shows overlap/ as an EMPTY directory (only . and ..) \u2014 the pre-existing marker.txt is also invisible from inside the sandbox, consistent with an ephemeral hidden mount (likely a tmpfs-like overlay) shadowing the whole denyRead directory rather than a targeted per-file denial.",
+    "Contrast: the direct denyWrite fixture (gap 1's receipt) gives exit=1 ('Read-only file system') for the same kind of write \u2014 a materially different, non-silent denial."
+  ],
+  "outcome": "settled",
+  "note": "The finding is reproduced exactly as described: overlapping denyRead+allowWrite silently discards the write (exit 0, host unchanged) via what behaves as an ephemeral hidden mount, which is a distinct code path from the direct denyWrite fixture's exit-1 denial.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Reproduced on Linux/bubblewrap only; the underlying mechanism (empty overlay/tmpfs mount over a denyRead region) was inferred from behavior, not confirmed by reading the bubblewrap invocation srt constructs."
+  ],
+  "checked_at_note": "Result timestamp of the last cited call; cited calls span 2026-09-23T00:42:49.553Z to 2026-09-23T00:43:27.053Z. The previous value '2026-09-23T00:52:11.952018+00:00' was the time a receipt-writing script ran, not a check time, and was not updated for the fix-round reruns.",
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/raw/original-session-tool-calls.txt",
+      "sha256": "880d0b8075501d68535ec5d910cdfc78e1b835d7f84b5f3bd192facec5d1e374",
+      "calls": [
+        "original#34",
+        "original#35",
+        "original#39"
+      ],
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "reconciliation": {
+    "written_at": "2026-09-23T02:26:24Z",
+    "new_checks_run": false,
+    "changes": [
+      "Preregistration timestamp corrected from the transcript; exact commands and raw_evidence added. Results already matched original#35 (write_exit=0, host newfile.txt absent, fresh sandbox view empty). Outcome kept settled."
+    ]
+  }
+}

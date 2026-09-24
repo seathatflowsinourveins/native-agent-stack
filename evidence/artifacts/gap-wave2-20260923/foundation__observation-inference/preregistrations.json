@@ -1,0 +1,140 @@
+{
+  "written_at": "2026-09-23T02:46:44Z",
+  "note": "Written before any check below was run; real UTC time from the writer process.",
+  "gaps": {
+    "0": {
+      "gap_text_sha256": "8d681bc6791fa524baee71565bd73be8aedb56328c624949e36c955c6c094fa0",
+      "expectation": "An isolated otelcol-contrib 0.161.0 running the repository collector.yaml privacy processors unchanged (ports rewritten, live-probe pipelines dropped) plus isolated Prometheus 3.14.0 and Loki 3.7.8 will drop synthetic canary secrets placed in every non-allowlisted log/metric/resource/scope field, and the positive control (a canary in an allowlisted attribute) will appear, proving the query paths can detect a leak.",
+      "criteria": "Script exits 0 only if (a) each canary sent through a non-allowlisted field is absent from Prometheus (series + label values), Loki (query_range over the fixture window, all structured metadata) and the file/events receipt file, and (b) the allowlisted-field positive control is found in each backend where that field is exported. A detection self-test (the same script run against a pass-through collector config) must report leaks and exit non-zero. Any leak in the privacy run = fail.",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "1": {
+      "gap_text_sha256": "87ad867c230760815c964ce93c7bad7063f835b3ef9528290a1c921ab0bd9537",
+      "expectation": "A script can run one bounded native Claude -p task against an isolated collector/Prometheus pair and reproduce per-category equality between the stream-json result usage and the Prometheus counter delta for input, output, cacheRead and cacheCreation.",
+      "criteria": "Script exists under blueprints/, runs exactly one claude -p call (bounded max-turns, no tools, no MCP, hooks disabled, user settings not loaded so telemetry goes only to the isolated collector), captures before and after Prometheus snapshots, and prints a per-category comparison. Pass = every category's delta equals the native result usage; mismatch or missing series is reported as such, not coerced.",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "2": {
+      "gap_text_sha256": "0e442b35c8855e0804b1c77591eb1fe0bc9a4921bbe74e7ea4e0c848268e84e5",
+      "expectation": "Enabling a scheduled user unit, daemon-reload/restart of the live user manager and a host-wide wsl --shutdown are outside this unit's isolation rules and would interrupt peer sessions; an isolated systemd user manager is not expected to be startable in an unprivileged namespace here.",
+      "criteria": "Try whether an isolated alternative (unshare user/pid/mount namespace with a private systemd --user instance) can host a timer; if it cannot, record the exact blocker and defer. Settled would need a fired timer across daemon-reload and restart plus a post-wsl---shutdown check_persistence.py pass.",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "3": {
+      "gap_text_sha256": "75590ce7afdd5b26059f48a8099f880ddc52737083ce0638a22838bc0f4a94e6",
+      "expectation": "With an isolated collector/Prometheus pair receiving telemetry only from the single child Claude process, the before snapshot will be empty and the after-minus-before delta per category will equal the native result usage; an attribution side pipeline will show exactly one session.id equal to the --session-id passed to the child.",
+      "criteria": "Pass = before snapshot has no ecosystem_claude_code_token_usage_tokens_total series; after snapshot per type equals the child's stream-json usage; the attribution file shows only the child's session.id. Live Prometheus is queried read-only for that session's absence as a leak detector (the repo pipeline strips session.id, so detection there uses a fresh-series check limited to what is observable).",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "4": {
+      "gap_text_sha256": "beb28cc8f4ed3bc9d488229b2a6fadaa5895a22f0191b8c28d97d56f1cda252a",
+      "expectation": "Inside an unprivileged user+mount namespace, a size-limited tmpfs spool (e.g. 256 KiB) will fill; the SDK receipt writer will fail atomically on ENOSPC without partial files; with the collector stopped for an extended interval and later restarted, file_log will replay every complete receipt into an isolated Loki with no duplicates; an added expiry policy script will delete only receipts older than the TTL whose ingestion is confirmed.",
+      "criteria": "Count: receipts attempted, receipts written, ENOSPC refusals, partial files (must be 0), receipts in Loki after restore (must equal written, distinct receipt_id), duplicates (must be 0). Expiry policy test: unit tests plus a run on the tmpfs spool that frees space and allows new writes. Extended interval = at least 3 minutes collector down and Loki down for part of it.",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "5": {
+      "gap_text_sha256": "b7b6223b0fe93cfbd55f89d01e583d5d04372722e52bd78304e6de9ca2747c15",
+      "expectation": "Jaeger 2.21.0 (checksum-verified, loopback, in-memory storage) will accept OTLP traces from one ephemeral codex exec session configured with a trace_exporter override, and the Jaeger query API will return that trace by its ID.",
+      "criteria": "Pass = at least one trace with service codex_exec (or the native service name) found via /api/v3/traces or /api/traces search, then fetched again by trace ID with span count > 0. Record which spans/attributes exist and whether content leaks. Live pipeline stays trace-disabled (not changed).",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "6": {
+      "gap_text_sha256": "caf4b236a8d1f1ad5ba1f567f1192e6ef7071431f05070d677ef6abd1a60a600",
+      "expectation": "Firing N=20 distinct synthetic alerts through an isolated Alertmanager 0.34.1 using the repository route (group_wait 5s) into an isolated ntfy 2.28.0 with the repository alertmanager template will give an end-to-end latency near group_wait (about 5 s) with small spread.",
+      "criteria": "Report min/median/p90/max of (ntfy stream arrival time - alert POST time) over N alerts, count delivered/lost. Pass = all N delivered and a distribution recorded; the number itself is not pass/fail.",
+      "written_at": "2026-09-23T02:46:44Z"
+    },
+    "8": {
+      "gap_text_sha256": "92b27ec178a9e4709db547f5548bca1e2bdac5f637df413a147e41bd4cf928e2",
+      "expectation": "The pinned llama.cpp b11057 CUDA 13.3 server will serve --parallel 4 concurrent requests across several fixtures on this host's GPU with a locally available small GGUF, fail in-flight requests when killed with SIGKILL mid-load, and recover within tens of seconds after restart.",
+      "criteria": "Record per-phase success rates (concurrent phase, kill phase, post-restart phase), time from restart to first /health 200 and first successful completion. The originally qualified Qwen3.8-27B Q4_K_M route model is not on this host (19 GB download not attempted), so this can at best advance the gap; host portability (a second host) is not reachable here.",
+      "written_at": "2026-09-23T02:46:44Z"
+    }
+  },
+  "followups": {
+    "4": {
+      "written_at": "2026-09-23T03:13:09Z",
+      "label": "follow-up preregistration, written after the first gap-4 run (raw/4-spool-outage.json) and before the follow-up runs",
+      "expectation": "(a) Space freed by the expiry policy is released only after the collector file receiver closes its handles on deleted files, so writes fail for a short interval after expiry and then succeed. (b) With otlphttp/loki retry_on_failure.max_elapsed_time set to 0s (retry indefinitely, persistent queue already configured), a 330 s Loki outage loses 0 of 8 receipts; the unchanged configuration loses them (as in the first run).",
+      "criteria": "(a) Record deleted-but-open file descriptors held by otelcol right after expiry (count of /proc/<pid>/fd links ending in '(deleted)'), time until statvfs free bytes > 0, and whether a write succeeds after that. (b) Run the Loki-outage phase with the overlay; pass = 8/8 in Loki after restore, no duplicates. Both variants use the same isolated harness."
+    },
+    "8": {
+      "written_at": "2026-09-23T03:18:03Z",
+      "label": "revised preregistration, written after the runtime/model downloads and before llama_load.py ran; supersedes the small-GGUF plan in gaps.8",
+      "expectation": "With the actual frozen route (b11057 CUDA 13.3 llama-server sha256 7740775d..., Qwen3.8-27B-Q4_K_M sha256 c600de03..., 32 GPU layers) and --parallel 4 --ctx-size 8192, 12 concurrent requests over 4 fixtures (8 client threads) all succeed but slowly (single-stream generation was about 2.2 tok/s on the original host); SIGKILL 8 s into an 8-request batch fails every in-flight request; restart reaches /health 200 in under 30 s (model pages cached) and the 8 post-restart requests all succeed.",
+      "criteria": "Report success rate per phase, wall time, cold-start and restart-to-healthy seconds, kill-to-first-success seconds, GPU memory min free / max used, memory-guard events. Any post-restart failure counts against recovery. Host portability is not testable here beyond recording this host's GPU (reported RTX 5090 Laptop, 24 GB) versus the RTX4090 in the original receipt."
+    }
+  },
+  "fix_round": {
+    "0": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "With an explicit field-to-backend expectation matrix for positive controls, the privacy run still reports 0 leaks and every positive control appears in every expected backend; passthrough still reports leaks.",
+      "criteria": "privacy exit 0 with positive_controls_ok for every field/backend pair; passthrough exit 1."
+    },
+    "2": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Counting the next 'Starting ecosystem-native-data.service' (not any completion) after each reload/manager start still finds a start after every event; supporting journal lines are retained sanitized.",
+      "criteria": "Per event: seconds to the next Starting line; events without a later Starting line are reported. Manual starts cannot be excluded from the journal alone; stated as a limit."
+    },
+    "3": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "A read-only query of the live Loki (no writes) for the child session.id over 02:53-02:56Z returns no entries, while the same query for this worker's own session.id in the same window returns entries (positive control that the live logs pipeline keeps session.id and the query can detect export).",
+      "criteria": "child-session hit count == 0 and positive-control hit count > 0; otherwise gap 3 stays advanced."
+    },
+    "4": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Overlapping outage with the unchanged configuration: collector down 0-180 s, Loki down 60-240 s; receipts written during the collector outage are replayed at 180 s into the persistent queue and delivered after Loki returns (within the 300 s retry window), so 0 are lost and none duplicated.",
+      "criteria": "lost_in_loki == 0 and duplicates == {} for receipts written while the collector was down."
+    },
+    "6": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Timestamping the resolve POST before sending (as for firing) leaves the distributions essentially unchanged (firing about 5 s; resolved within group_interval 30 s).",
+      "criteria": "20/20 delivered for firing and resolved; distribution reported; the earlier run stays retained as run1."
+    }
+  },
+  "fix_round_3": {
+    "written_at": "2026-09-23T14:15:26Z",
+    "label": "fix-round-3 preregistration (after the independent Opus review of 2026-09-23), written before any fix-round-3 run; real UTC time from the writer process",
+    "gaps": {
+      "0": {
+        "expectation": "Rerunning privacy_canary.py exactly as committed (sha256 7b4d22a9..., which publishes only sha256 prefixes of canary values) in privacy and passthrough modes reproduces the earlier result: privacy status passed, 0 leaks over 37 negative canaries, every positive control in every expected backend; passthrough status leak with leaks on 31 of 37 fields.",
+        "criteria": "privacy exit 0 and passthrough exit 1, both from the committed script; the new raw JSON is committed unedited (no manual redaction) and hashed next to the script. The pre-change script is identified by git blob 80b7ec7 (commit 424eeb7) and its sha256 for the earlier runs. Outcome stays advanced (arbitrary-content DLP and live-store coverage remain)."
+      },
+      "2": {
+        "expectation": "Uncertain. This process sits in the root-owned /init.scope cgroup, so a private systemd --user in an unprivileged user+pid+mount namespace may fail to set up cgroups; if it starts, the pipeline timer settings (OnBootSec=45s, OnUnitActiveSec=2min, AccuracySec=10s, copied verbatim; service replaced by a harmless marker-file append) fire before and after a daemon-reload and after a manager restart.",
+        "criteria": "Harness: unshare --user --map-root-user --pid --fork --mount-proc --mount; tmpfs over /run/user/1000 so the live manager socket is unreachable; temp HOME/XDG_*; SYSTEMD_UNIT_PATH set to a temp dir only; DBUS_SESSION_BUS_ADDRESS unset; enable the timer with systemctl --user enable against the private manager. Detection: each service run appends a UTC timestamp to a marker file; a phase counts as fired only if a new marker line appears after the event (daemon-reload; manager SIGTERM + restart with the same unit dir) within 180 s. If the manager cannot start or cannot run the service, record its exact stderr/exit as the blocker for these arms. Outcome stays advanced regardless: this is a local_integration check of timer semantics on a private manager; the live-manager and wsl --shutdown + check_persistence.py arms stay open. Time-box 20 min.",
+        "addendum": {
+          "written_at": "2026-09-23T14:21:11Z",
+          "label": "addendum written after attempt 1 (14:19:04Z) and the strace diagnosis (14:21:01Z), before attempt 2",
+          "observed_blocker": "private systemd --user exits 1 after openat(/sys/fs/cgroup/init.scope/cgroup.procs) = EACCES: the caller sits in the root-owned /init.scope cgroup (its log target /dev/console is also EACCES, hence no message).",
+          "plan": "Attempt 2 runs the same harness inside the project-sanctioned $HOME/codex-ecosystem/bin/ecosystem-bounded-run, whose transient scope under the live user manager is owned by uid 1000 (ECOSYSTEM_JOB_SECONDS=1100). This creates one transient scope on the live user manager, as every bounded job here does; no unit file, reload or restart of the live manager.",
+          "criteria": "Unchanged from fix_round_3.gaps.2. If the manager still cannot start, the exact failing syscall/stderr is the recorded blocker."
+        },
+        "addendum_2": {
+          "written_at": "2026-09-23T14:43:01Z",
+          "label": "second addendum, written after attempt 2 (14:21:35-14:39:55Z) and before attempt 3",
+          "observed": "Attempt 2: the private manager started (state=running) inside the bounded scope and the timer was enabled and active, but no marker line appeared in 180 s; after daemon-reload the timer showed ActiveState=failed; SIGTERM did not stop the manager (no exit.target in the private unit path), so the harness hung until its 1100 s timeout (exit 143). The manager log was empty because it logs to /dev/console (EACCES).",
+          "plan": "Attempt 3 = same harness plus: /dev/console bind-mounted to a temp file inside the private mount namespace so the manager log is kept; a private exit.target (DefaultDependencies=no, SuccessAction=exit-force) so SIGTERM exits the manager, with a 30 s bound then SIGKILL (recorded); systemctl --user show/status of the service and timer after each phase. Diagnostic of the same criteria; they are unchanged.",
+          "criteria": "Unchanged from fix_round_3.gaps.2. If the stand-in service still does not run, the manager log line that explains it is the recorded blocker."
+        },
+        "addendum_3": {
+          "written_at": "2026-09-23T14:47:11Z",
+          "label": "third addendum, written after attempt 3 (14:43:19-14:46:40Z) and before attempt 4",
+          "observed": "Attempt 3: manager running, SIGTERM bound in place, but the timer went to ActiveState=failed about 40 s after start while the stand-in service never ran (Result=success, ExecMainCode=0, inactive); /dev/console bind produced no log lines. Operator stopped attempt 3 at 14:46:40Z by SIGKILL of the namespace init after an over-broad pkill -f also matched the operator shell.",
+          "hypothesis": "The private unit path lacked basic.target, which user services require through default dependencies, so the timer could not queue the service start job.",
+          "plan": "Attempt 4 = attempt 3 plus stock basic.target, sockets.target, paths.target and shutdown.target copied verbatim from /usr/lib/systemd/user (unit files only, no .wants directories), and the timer Result property in each state line.",
+          "criteria": "Unchanged from fix_round_3.gaps.2. If the service still does not run, record the timer Result and stop; the arms stay open."
+        }
+      },
+      "3": {
+        "expectation": "Read-only GETs to the live stores show no sign of the child (02:54:02-02:54:39Z) in the live pipeline, and both detectors now demonstrate detection power: (a) live Prometheus (127.0.0.1:19090) has no ecosystem_claude_code token-usage series with a haiku model sampled in 02:50-03:05Z, while the same query for model claude-opus-5-5 returns samples (positive control); (b) the Loki api_request signature matcher in live_session_probe.py, given the field values of a known live api_request event from the same window (deterministic choice: the stream whose first entry is earliest), returns >= 1 match (positive control), while the child signature returns 0.",
+        "criteria": "Pass = (a) haiku series with samples in window == 0 AND opus control > 0, AND (b) control-signature matches >= 1 AND child-signature matches == 0. Pass closes the item left open by the earlier round (a live-leak probe with demonstrated detection power, preregistered before it runs) and gap 3 becomes settled; any failure or a positive control of 0 keeps it advanced; haiku samples in window from other live sessions = inconclusive, advanced. Disclosed: the child-signature Loki result (0 of 621) was already observed at 03:30:01Z; only the positive-control arm and the Prometheus arm are new. The originally preregistered live-Prometheus check (02:46:44Z) was not run in earlier rounds; this is its first execution."
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# Codex read-only review 2 (codex exec --sandbox read-only --ephemeral); prompt then final message
+## prompt
+You are an independent reviewer. Read-only. Repository: current directory, commit 6155b51.
+A previous review of a0f57fa raised 7 findings on evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/ and blueprints/gap-wave2-20260923/us-equities__storage-compute/:
+1 recovery check only aggregate count/divisibility; 2 Iceberg recovery time measured mkdir only; 3 embedded-store in-flight write unproven; 4 query digests hide mismatches; 5 receipt 4 quoted ingest fields not in raw; 6 DECIMAL(18,4) cast could hide precision loss; 7 paired verifier lacked handoff (prompt hash) check.
+Round 2 (commit 6155b51, see git show --stat 6155b51 and prereg/*-fixround.json) claims to fix all 7. For each finding say resolved / not resolved with the exact evidence (file + field). Then list any NEW problem in the round-2 code or receipts that would change an outcome (0 advanced, 3 settled, 4 settled, 6 covered_elsewhere, 10 settled), most severe first. Check that results.json equals receipt outcomes and that every raw file cited in receipts exists with the cited sha256. At most 30 lines.
+## final message
+Reviewed `6155b51` read-only. Let `E = evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/` and `B = blueprints/gap-wave2-20260923/us-equities__storage-compute/`.
+
+1. **Resolved:** `B/bench.py:720–787` verifies individual batches. `E/raw/bench-r2-{duckdb,clickhouse,questdb,iceberg}.json` → `kill_recover.all_acked_batches_exact=true`, `unexpected_batch_indices=[]`. `E/raw/kill-verifier-control.json` → `round2_failing_batches=[5,6]` while `round1_aggregate_check_passes=true`.
+2. **Resolved:** `B/bench.py:774–781` measures through the recovery count query, including Iceberg catalog reload/scan. `E/raw/bench-r2-iceberg.json` → `kill_recover.restart_or_reopen_through_first_query_s=0.4738960520044202`.
+3. **Not resolved:** [bench.py:685]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:685) publishes `S` before `fsync`, registration and insertion; line 791 treats an unmatched `S` as `inflight_proven`. An in-memory reproduction returned `inflight_proven=true` before any engine write. The raw files’ `inflight_state_after_recovery={"30":"absent"}` cannot distinguish this case. Under `E/prereg/10-fixround.json.criteria`, **gap 10 must remain advanced**.
+4. **Resolved:** `E/raw/bench-r2-*.json` → `queries.Q1–Q4.canonical_rows`; `B/build_receipts.py:200–212,245` compares full rows. Independent comparison found exact keys/integers and maximum floating relative difference approximately `5.15e-15`, below `1e-9`.
+5. **Resolved:** `E/raw/real-snapshot-summary-r2.json` → `alpaca_snapshots.*.receipt` retains complete ingest objects, including `evidence_class`, first snapshot `symbols_missing=[]`, and dryrun `coverage_problems={}`. Receipt 4 now identifies absent fields explicitly.
+6. **Resolved for recorded inputs:** That summary’s `*.parquet_duckdb` reports `precision_loss_rows=0`, `max_price_decimal_places_in_text=4`, `precision_probe_1_23456_detected=true`. `B/real_snapshot_checks.py:86–96` compares original text at higher precision before accepting the four-decimal conversion.
+7. **Resolved in implementation:** `E/raw/paired-receipt-verification-r2.json` → `checks.astra_prompt_reconstructs=true`, `checks.claude_prompt_embeds_accepted_astra_report=true`. Independent verifier execution and in-memory negative controls reproduced the expected results; publication defect below remains.
+
+**New outcome-affecting problem:**
+
+- **[P2] Missing committed handoff-control evidence.** `E/6-paired-astra-claude-covered.json` → `raw_artifacts[1]` cites `raw/paired-receipt-negative-controls-r2.jsonl`, SHA256 `e8102be6e9ddf63db9480ab7de3899ab8c3b5468ca25f6c1037a683e50d50943`. It exists locally but is absent from `6155b51` (`.gitignore:15`). [build_receipts.py:146]($HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/build_receipts.py:146) consequently fails in a clean checkout. Gap 6’s published evidence package is incomplete despite its working verifier.
+
+`E/results.json` exactly matches all five receipt outcomes: **0 advanced; 3 settled; 4 settled; 6 covered_elsewhere; 10 settled**. Across **74 raw references / 40 distinct files**, **39 committed files have matching SHA256s**; the sole missing file is above. All 40 exist and hash-match locally. No other new outcome-changing problem found.

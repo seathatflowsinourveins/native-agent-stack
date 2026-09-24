@@ -1,0 +1,20 @@
+$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py:385: DeprecationWarning: questdb.ingress is deprecated; import from questdb instead (or use questdb.connect() for QWP/WebSocket).
+  from questdb.ingress import Sender
+Process SpawnProcess-53:
+Traceback (most recent call last):
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 313, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py", line 691, in kill_writer
+    _write_one(store_name, cfg, "KILL", conn)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-storage-compute/blueprints/gap-wave2-20260923/us-equities__storage-compute/bench.py", line 512, in _write_one
+    s.flush()
+    ~~~~~~~^^
+  File "src/questdb/_client.pyx", line 7928, in questdb._client.Sender.flush
+  File "src/questdb/_client.pyx", line 8022, in questdb._client.Sender.flush
+questdb._client.QuestDBError: Could not flush buffer: http://127.0.0.1:19120/write: io: Connection reset by peer (os error 104)
+{"store": "questdb", "error": "", "load": {"seconds": 58.3692893059997, "rows_per_s": 856614.8499406273, "wal_visible_after_s": 0.02530496099643642, "seconds_until_visible": 58.39459426699614, "rows_per_s_until_visible": 856243.6408306265, "row_count": 50000000, "row_count_ok": true}, "queries": {"Q1": 0.0055243569950107485, "Q2": 0.004713048998382874, "Q3": 0.06085882699699141, "Q4": 0.00765437899826793}, "kill": {"killed": "server_process_group", "signal": "SIGKILL", "acked_batches": 30, "acked_rows": 300000, "rows_after_recovery": 300000, "all_acked_present": true, "partial_batch_visible": false, "unacked_batches_visible": 0, "restart_or_reopen_s": 2.233181548996072, "server_ready_s": 2.232965149996744, "questdb_wal_visible_after_s": 0.09661930600123014, "total_rows_after_recovery": 55500000}}

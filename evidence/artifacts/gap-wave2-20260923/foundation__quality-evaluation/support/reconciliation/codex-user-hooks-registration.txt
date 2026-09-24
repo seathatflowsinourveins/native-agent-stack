@@ -1,0 +1,22 @@
+# Codex user hook registration (read-only, reconciliation 2026-09-23); host home shown as $HOME
+hooks.json sha256: 378ad56849871b9107c8564c429d36ab046c04ddda415a5b9e970524bd7403bd
+SessionStart: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event session-start --agent codex --server-url http://127.0.0.1:49374
+UserPromptSubmit: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event user-prompt-submit --agent codex --server-url http://127.0.0.1:49374
+PreToolUse: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-tool-use --agent codex --server-url http://127.0.0.1:49374
+PostToolUse: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event post-tool-use --agent codex --server-url http://127.0.0.1:49374
+PreCompact: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event pre-compact --agent codex --server-url http://127.0.0.1:49374
+Stop: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event stop --agent codex --server-url http://127.0.0.1:49374 --capture-assistant
+SessionEnd: $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory --data-dir $HOME/.local/share/ai-memory hook --event session-end --agent codex --server-url http://127.0.0.1:49374
+config.toml [features] lines:
+  89:[features]
+  90-hooks = true
+  91-plugin_hooks = true
+config.toml trusted hook-state keys for $HOME/.codex/hooks.json:
+  hooks.state."$HOME/.codex/hooks.json:pre_tool_use
+  hooks.state."$HOME/.codex/hooks.json:post_tool_use
+  hooks.state."$HOME/.codex/hooks.json:pre_compact
+  hooks.state."$HOME/.codex/hooks.json:session_start
+  hooks.state."$HOME/.codex/hooks.json:session_end
+  hooks.state."$HOME/.codex/hooks.json:user_prompt_submit
+  hooks.state."$HOME/.codex/hooks.json:stop
+file mtimes: $HOME/.codex/hooks.json 2026-09-21T14:35:14Z (before the round-1 call, which ended before commit b37df23 at 2026-09-23T02:09:22Z); $HOME/.codex/config.toml 2026-09-23T02:30:41Z (after round 1, so its [features] state at round-1 time is not directly shown by the current file)

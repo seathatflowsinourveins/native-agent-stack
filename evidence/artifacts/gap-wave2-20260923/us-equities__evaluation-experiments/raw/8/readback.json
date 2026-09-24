@@ -1,0 +1,94 @@
+{
+ "runs_found": 1,
+ "status": "FINISHED",
+ "evaluate_exit_code": 0,
+ "params_logged": 16,
+ "metrics_logged": 18,
+ "readback_mismatches": [],
+ "negative_probe_changed_ledger_records_detected": true,
+ "dataset_inputs": 9,
+ "dataset_digests_equal_plan_prefix36": true,
+ "first_attempt_note": "full 64-hex sha256 as dataset digest was rejected: 'digest' exceeds the maximum length of 36 characters",
+ "dataset_digest_lengths": [
+  36
+ ],
+ "tags": {
+  "reserved_chosen": "momentum20",
+  "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+  "freeze_sha256": "2ebfed704bca4ea54dd2fb3caa13b0dd4913e554c3ff6839931bfe8e4a172c93",
+  "results_sha256": "fb275b3db5223465fd96bd9985d1d2be03491a8ac0fcb768cc3ae90a50f181ec"
+ },
+ "artifacts": [
+  "freeze.json",
+  "results.json"
+ ],
+ "evaluate_stdout": {
+  "folds": 20,
+  "ledger_records": 6605,
+  "reserved_selection": "momentum20",
+  "reserved_candidates": {
+   "momentum20": {
+    "observed_episodes": 11,
+    "censored_episodes": 1,
+    "invested_episodes": 10,
+    "mean_raw_price_label": "0.003002253484797453652757773582",
+    "mean_net_cost_proxy_label": "0.001184071666615635470939591764"
+   },
+   "momentum60": {
+    "observed_episodes": 11,
+    "censored_episodes": 1,
+    "invested_episodes": 11,
+    "mean_raw_price_label": "0.006403128517506842397527919636",
+    "mean_net_cost_proxy_label": "0.004403128517506842397527919636"
+   },
+   "momentum120": {
+    "observed_episodes": 11,
+    "censored_episodes": 1,
+    "invested_episodes": 11,
+    "mean_raw_price_label": "0.006403128517506842397527919636",
+    "mean_net_cost_proxy_label": "0.004403128517506842397527919636"
+   },
+   "cash": {
+    "observed_episodes": 11,
+    "censored_episodes": 1,
+    "invested_episodes": 0,
+    "mean_raw_price_label": "0",
+    "mean_net_cost_proxy_label": "0.000"
+   },
+   "equalweight": {
+    "observed_episodes": 11,
+    "censored_episodes": 1,
+    "invested_episodes": 11,
+    "mean_raw_price_label": "0.003622928696130345656850000132",
+    "mean_net_cost_proxy_label": "0.001622928696130345656850000132"
+   }
+  },
+  "inputs_unchanged": true
+ },
+ "result_versions": {
+  "numpy": "2.5.3",
+  "pandas": "3.0.6",
+  "scikit-learn": "1.9.1",
+  "skfolio": "1.2.9"
+ },
+ "metrics": {
+  "development_folds": 20,
+  "ledger_records": 6605,
+  "inputs_unchanged": 1,
+  "reserved.cash.mean_raw_price_label": 0.0,
+  "reserved.cash.mean_net_cost_proxy_label": 0.0,
+  "reserved.cash.observed_episodes": 11,
+  "reserved.equalweight.mean_raw_price_label": 0.0036229286961303457,
+  "reserved.equalweight.mean_net_cost_proxy_label": 0.0016229286961303457,
+  "reserved.equalweight.observed_episodes": 11,
+  "reserved.momentum120.mean_raw_price_label": 0.006403128517506842,
+  "reserved.momentum120.mean_net_cost_proxy_label": 0.004403128517506842,
+  "reserved.momentum120.observed_episodes": 11,
+  "reserved.momentum20.mean_raw_price_label": 0.003002253484797454,
+  "reserved.momentum20.mean_net_cost_proxy_label": 0.0011840716666156354,
+  "reserved.momentum20.observed_episodes": 11,
+  "reserved.momentum60.mean_raw_price_label": 0.006403128517506842,
+  "reserved.momentum60.mean_net_cost_proxy_label": 0.004403128517506842,
+  "reserved.momentum60.observed_episodes": 11
+ }
+}

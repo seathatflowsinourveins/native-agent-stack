@@ -1,0 +1,595 @@
+{
+  "python": "3.12.3",
+  "cases": [
+    {
+      "fixture": "good",
+      "loader": "pandas",
+      "gate_exit": 0,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "VARCHAR"
+      },
+      "duckdb": {
+        "status": "pass",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "pass",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {}
+    },
+    {
+      "fixture": "bad",
+      "loader": "pandas",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "VARCHAR"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "fail",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "fail",
+          "high_ge_max_open_close": "fail",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "fail"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "fail",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "fail",
+          "high_ge_max_open_close": "fail",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "fail"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "valid_trading_session": "1 of 4 rows failed; example row indices [2]",
+        "volume_integral_non_negative": "1 of 4 rows failed; example row indices [2]",
+        "observed_at_not_future": "1 of 4 rows failed; example row indices [3]",
+        "high_ge_max_open_close": "1 of 4 rows failed; example row indices [3]",
+        "unique_symbol_session": "2 of 4 rows failed; example row indices [0, 1]"
+      }
+    },
+    {
+      "fixture": "null-price-cell",
+      "loader": "pandas",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "VARCHAR"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass",
+          "unmapped_failures": "fail"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass",
+          "unmapped_failures": "fail"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "unmapped_failures": "unrecognized pandera check identifiers ['not_nullable']; 1 of 2 rows failed; example row indices [0]"
+      }
+    },
+    {
+      "fixture": "empty-snapshot",
+      "loader": "pandas",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "INTEGER",
+        "session": "INTEGER",
+        "open": "INTEGER",
+        "high": "INTEGER",
+        "low": "INTEGER",
+        "close": "INTEGER",
+        "volume": "INTEGER",
+        "observed_at": "INTEGER"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 0,
+        "checks": {
+          "rows_present": "fail",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 0,
+        "checks": {
+          "rows_present": "fail",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "rows_present": "snapshot contains 0 rows"
+      }
+    },
+    {
+      "fixture": "fractional-negative-volume",
+      "loader": "pandas",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "DOUBLE",
+        "observed_at": "VARCHAR"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "volume_integral_non_negative": "1 of 2 rows failed; example row indices [0]"
+      }
+    },
+    {
+      "fixture": "good",
+      "loader": "native",
+      "gate_exit": 0,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "DATE",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "TIMESTAMP WITH TIME ZONE"
+      },
+      "duckdb": {
+        "status": "pass",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "pass",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {}
+    },
+    {
+      "fixture": "bad",
+      "loader": "native",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "DATE",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "TIMESTAMP WITH TIME ZONE"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "fail",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "fail",
+          "high_ge_max_open_close": "fail",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "fail"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 4,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "fail",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "fail",
+          "high_ge_max_open_close": "fail",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "fail"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "valid_trading_session": "1 of 4 rows failed; example row indices [2]",
+        "volume_integral_non_negative": "1 of 4 rows failed; example row indices [2]",
+        "observed_at_not_future": "1 of 4 rows failed; example row indices [3]",
+        "high_ge_max_open_close": "1 of 4 rows failed; example row indices [3]",
+        "unique_symbol_session": "2 of 4 rows failed; example row indices [0, 1]"
+      }
+    },
+    {
+      "fixture": "null-price-cell",
+      "loader": "native",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "DATE",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "BIGINT",
+        "observed_at": "TIMESTAMP WITH TIME ZONE"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass",
+          "unmapped_failures": "fail"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass",
+          "unmapped_failures": "fail"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "unmapped_failures": "unrecognized pandera check identifiers ['not_nullable']; 1 of 2 rows failed; example row indices [0]"
+      }
+    },
+    {
+      "fixture": "empty-snapshot",
+      "loader": "native",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "VARCHAR",
+        "open": "VARCHAR",
+        "high": "VARCHAR",
+        "low": "VARCHAR",
+        "close": "VARCHAR",
+        "volume": "VARCHAR",
+        "observed_at": "VARCHAR"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 0,
+        "checks": {
+          "rows_present": "fail",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 0,
+        "checks": {
+          "rows_present": "fail",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "pass",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "rows_present": "snapshot contains 0 rows"
+      }
+    },
+    {
+      "fixture": "fractional-negative-volume",
+      "loader": "native",
+      "gate_exit": 1,
+      "column_types": {
+        "symbol": "VARCHAR",
+        "session": "DATE",
+        "open": "DOUBLE",
+        "high": "DOUBLE",
+        "low": "DOUBLE",
+        "close": "DOUBLE",
+        "volume": "DOUBLE",
+        "observed_at": "TIMESTAMP WITH TIME ZONE"
+      },
+      "duckdb": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "csv_retained": {
+        "status": "fail",
+        "row_count": 2,
+        "checks": {
+          "rows_present": "pass",
+          "symbol_nonempty": "pass",
+          "valid_trading_session": "pass",
+          "open_positive": "pass",
+          "high_positive": "pass",
+          "low_positive": "pass",
+          "close_positive": "pass",
+          "volume_integral_non_negative": "fail",
+          "observed_at_not_future": "pass",
+          "high_ge_max_open_close": "pass",
+          "low_le_min_open_close": "pass",
+          "unique_symbol_session": "pass"
+        }
+      },
+      "status_match": true,
+      "row_count_match": true,
+      "check_status_diffs": {},
+      "match": true,
+      "failure_details": {
+        "volume_integral_non_negative": "1 of 2 rows failed; example row indices [0]"
+      }
+    }
+  ],
+  "all_pandas_match": true,
+  "all_native_match": true
+}

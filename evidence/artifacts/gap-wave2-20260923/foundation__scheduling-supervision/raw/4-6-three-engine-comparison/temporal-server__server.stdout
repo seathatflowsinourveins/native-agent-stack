@@ -1,0 +1,6 @@
+Temporal CLI 1.9.1 (Server 1.32.0, UI 2.54.1)
+
+Temporal Server:      localhost:58242
+Temporal Persistence: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-run-1790132622/temporal-server/temporal.db
+Temporal HTTP:        localhost:58050
+Temporal Metrics:     http://localhost:58266/metrics

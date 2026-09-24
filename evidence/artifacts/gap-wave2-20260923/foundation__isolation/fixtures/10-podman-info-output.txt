@@ -1,0 +1,4 @@
+$ podman --version
+podman version 6.1.2
+$ podman info
+Error: could not find a working conmon binary (configured options: [/usr/libexec/podman/conmon /usr/local/libexec/podman/conmon /usr/local/lib/podman/conmon /usr/bin/conmon /usr/sbin/conmon /usr/local/bin/conmon /usr/local/sbin/conmon /run/current-system/sw/bin/conmon]: invalid argument)

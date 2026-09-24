@@ -1,0 +1,433 @@
+{
+ "root": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/root.grype.json",
+   "bytes": 50702566,
+   "sha256": "b02527ee4bf8cb70b1fd32199e22a63d01a9743a6e5c72e07af8687402b9fa57",
+   "committed": false
+  },
+  "db_built": "2026-09-23T06:31:39Z",
+  "db_schema": "v6.1.9",
+  "grype_version": "0.119.0",
+  "matches": 5433,
+  "by_artifact_type": {
+   "deb": 3036,
+   "go-module": 2397
+  },
+  "by_severity": {
+   "Medium": 3952,
+   "High": 1012,
+   "Low": 254,
+   "Critical": 184,
+   "Negligible": 21,
+   "Unknown": 10
+  },
+  "by_match_type": {
+   "exact-direct-match": 2930,
+   "exact-indirect-match": 2503
+  }
+ },
+ "ibgw-jars": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/ibgw-jars.grype.json",
+   "bytes": 99756,
+   "sha256": "8ed08d7da652d7294527fdeb2b39ceeaaa0699350e43a591f360b733db845ef6",
+   "committed": false
+  },
+  "db_built": "2026-09-23T06:31:39Z",
+  "db_schema": "v6.1.9",
+  "grype_version": "0.119.0",
+  "matches": 17,
+  "by_artifact_type": {
+   "java-archive": 17
+  },
+  "by_severity": {
+   "High": 9,
+   "Medium": 8
+  },
+  "by_match_type": {
+   "exact-direct-match": 17
+  },
+  "rows": [
+   [
+    "commons-io",
+    "2.11.0",
+    "GHSA-78wr-2p64-hpwj",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-core",
+    "2.12.3",
+    "GHSA-h46c-h94j-95f3",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-core",
+    "2.12.3",
+    "GHSA-r7wm-3cxj-wff9",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-core",
+    "2.12.3",
+    "GHSA-wf8f-6423-gfxg",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-3wrr-7qpf-2prh",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-3x8x-79m2-3w2w",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-57j2-w4cx-62h2",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-5jmj-h7xm-6q6v",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-hgj6-7826-r7m5",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-j3rv-43j4-c7qm",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-jjjh-jjxp-wpff",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-rgv9-q543-rqg4",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "jackson-databind",
+    "2.12.3",
+    "GHSA-rmj7-2vxq-3g9f",
+    "High",
+    "exact-direct-match"
+   ],
+   [
+    "log4j-api",
+    "2.25.3",
+    "GHSA-qv9r-c865-cp47",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "log4j-core",
+    "2.25.3",
+    "GHSA-3pxv-7cmr-fjr4",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "log4j-core",
+    "2.25.3",
+    "GHSA-445c-vh5m-36rj",
+    "Medium",
+    "exact-direct-match"
+   ],
+   [
+    "log4j-core",
+    "2.25.3",
+    "GHSA-6hg6-v5c8-fphq",
+    "Medium",
+    "exact-direct-match"
+   ]
+  ]
+ },
+ "ibgw-jre": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/ibgw-jre.grype.json",
+   "bytes": 82543,
+   "sha256": "839fcc9fe31195a4ccedbbca8eb7eb47b41100dcc0fe5e1f0ffcd12b257cd5c3",
+   "committed": false
+  },
+  "db_built": "2026-09-23T06:31:39Z",
+  "db_schema": "v6.1.9",
+  "grype_version": "0.119.0",
+  "matches": 22,
+  "by_artifact_type": {
+   "binary": 22
+  },
+  "by_severity": {
+   "Medium": 10,
+   "Low": 7,
+   "High": 5
+  },
+  "by_match_type": {
+   "cpe-match": 22
+  },
+  "rows": [
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22007",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22008",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22013",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22016",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22018",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-22021",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-23865",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-34268",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-34282",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-41254",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-46917",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-46968",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-47010",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-47021",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-47027",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-47059",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-47063",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-60147",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-60589",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-61308",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-70906",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "openjdk",
+    "25.0.2.0.101",
+    "CVE-2026-70907",
+    "Medium",
+    "cpe-match"
+   ]
+  ]
+ },
+ "interp": {
+  "source_file": {
+   "cache_path": "$HOME/.cache/gap-wave2-20260923/security-supply-chain/work/syft-binary/interp.grype.json",
+   "bytes": 31680,
+   "sha256": "604f5f5f4a45a9397084b2a10754081715ce9cbdd6db07e92196a44ebe1afc61",
+   "committed": false
+  },
+  "db_built": "2026-09-23T06:31:39Z",
+  "db_schema": "v6.1.9",
+  "grype_version": "0.119.0",
+  "matches": 8,
+  "by_artifact_type": {
+   "binary": 8
+  },
+  "by_severity": {
+   "Medium": 5,
+   "Low": 2,
+   "High": 1
+  },
+  "by_match_type": {
+   "cpe-match": 8
+  },
+  "rows": [
+   [
+    "python",
+    "3.13.15",
+    "CVE-2024-3220",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2025-15367",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-15310",
+    "Low",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-15806",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-17084",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-19672",
+    "Medium",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-82049",
+    "High",
+    "cpe-match"
+   ],
+   [
+    "python",
+    "3.13.15",
+    "CVE-2026-87910",
+    "Medium",
+    "cpe-match"
+   ]
+  ]
+ }
+}

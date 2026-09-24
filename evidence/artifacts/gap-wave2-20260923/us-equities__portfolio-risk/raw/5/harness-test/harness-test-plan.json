@@ -1,0 +1,80 @@
+{
+ "schema_version": 1,
+ "id": "harness-test-inside-inspected-development",
+ "frozen_before_scoring": true,
+ "assets": [
+  "SPY",
+  "QQQ",
+  "IWM"
+ ],
+ "data_start": "2015-03-23",
+ "reserved_start": "2016-10-03",
+ "reserved_end": "2017-09-29",
+ "lookbacks": [
+  20,
+  60,
+  120
+ ],
+ "candidates": [
+  "momentum20",
+  "momentum60",
+  "momentum120",
+  "cash",
+  "equalweight"
+ ],
+ "selection_candidates": [
+  "momentum20",
+  "momentum60",
+  "momentum120",
+  "cash"
+ ],
+ "selection_objective": "Maximum arithmetic mean five-session raw-price label less declared round-trip cost proxy, measured only in eligible training episodes; ties use selection_candidates order. Cash is eligible with zero score.",
+ "splitter": {
+  "note": "No development folds: one reserved selection only, mirroring evaluate.py reserved_train = last 252 decision sessions before a six-session exclusion."
+ },
+ "decision": "At completed close t, select highest positive close[t]/close[t-lookback]-1; ties alphabetically by asset. Otherwise cash. Asset set is fixed ex ante for this engineering experiment.",
+ "entry_offset_sessions": 1,
+ "exit_offset_sessions": 6,
+ "episode_stride_sessions": 5,
+ "episode_anchor": "Reserved start session 2012-10-01 has offset zero; decision sessions at offsets divisible by five, for both training and reserved episodes.",
+ "round_trip_cost_fraction": "0.002",
+ "price_convention": "Unadjusted bundled LEAN integer prices divided by 10000. Open-to-open raw price labels only; cash distributions, financing, liquidity, execution and broker fees are NOT modeled. Cost is an illustrative per-episode fully-invested 20-basis-point deduction, proportional to total allocated weight; cash has zero cost. No compounding, cash account, position or simulated P&L claim.",
+ "corporate_action_policy": "Reject nonconstant split factors or ticker changes whose effective factor/map interval overlaps 2014-01-02 through 2021-03-31. Dividend-related price-factor changes are retained as an explicit raw-price limitation.",
+ "selection_boundary": "Reserved selection uses exactly the last 252 decision sessions before a six-session exclusion preceding 2012-10-01; every training label exit must precede 2012-10-01. Selection written exclusively before reserved labels are materialized.",
+ "embargo": "No future-side training in this strictly chronological design, so no additional post-evaluation embargo. The six-session exclusion follows the declared label horizon; exact intervals are checked independently. This does not guarantee statistical independence.",
+ "reserved_policy": "Scored exactly once. Window chosen because it precedes the research-evaluation data_start 2014-01-02, precedes broad-universe warm-up 2016-01-04, and ends before the 2013-10-07..11 LEAN sample week used by engine/data/hosting receipts. Public bundled data is not demonstrated globally unseen.",
+ "incomplete_labels": "Retain incomplete episode records as censored when exit falls beyond the development_end or reserved_end segment boundary; do not fill, infer or include them in scoring. Development evaluation labels may extend beyond an individual 63-session fold while remaining within the development segment; future outcomes never enter an earlier selection.",
+ "scope": "Chronological engineering control on three selected ETFs; no catalyst, +200% mover, PIT universe, original observation-time or alpha acceptance.",
+ "inputs": {
+  "Data/equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+  "Data/equity/usa/daily/qqq.zip": "09de2fda712d1d54f74b4bd2215c7df8787b7e2643b79c0c2ab531d188a5c056",
+  "Data/equity/usa/daily/iwm.zip": "bf0b841f74504c9bbd346076f3ab3d8b28cdb82815d6cc6e8acc6307b87d77c5",
+  "Data/equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+  "Data/equity/usa/map_files/qqq.csv": "b6d467841dd6f5e433cfc8b989f66550bc4c850b1e6f1d7e6ca243f2ab6ffe82",
+  "Data/equity/usa/map_files/iwm.csv": "44a22894ed923231d258224f46003f027cce88872c7e5e9da9870213ced79356",
+  "Data/equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+  "Data/equity/usa/factor_files/qqq.csv": "780ee5c6a9a4c3b3dbecd13f6a2faf4aa67c4802f08665b66e5e87960a77840b",
+  "Data/equity/usa/factor_files/iwm.csv": "df79d4418768eb6cf2f7f08b7c8027eb680aa9d82a580046ecf6634b30c63819"
+ },
+ "derived_from": {
+  "plan": "blueprints/us-equities/research-evaluation/plan.json",
+  "sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7"
+ },
+ "expected_sessions": {
+  "total": "counted from dates only before freeze: 385 sessions 2011-03-23..2012-09-28 and 250 sessions 2012-10-01..2013-09-30 per asset (date column only; no price read)"
+ },
+ "minimum_completed_episodes_per_candidate": 30,
+ "significance_test": {
+  "primary": "Two-sided one-sample t-test (scipy.stats.ttest_1samp, popmean 0) on paired per-episode differences net_proxy(selected) - net_proxy(equalweight) over completed reserved episodes; alpha 0.05.",
+  "secondary": [
+   "Two-sided Wilcoxon signed-rank test (scipy.stats.wilcoxon, zero_method wilcox) on the same differences.",
+   "Descriptive two-sided one-sample t-tests of each invested candidate net_proxy mean vs 0, Holm-corrected across invested candidates; cash excluded (identically zero)."
+  ],
+  "if_selected_is_equalweight": "equalweight is not a selection candidate, so the paired test is always defined; if selected is cash, differences are -net_proxy(equalweight).",
+  "consequence": "No tuning, promotion, rerun or alpha claim regardless of p-values."
+ },
+ "harness_test_counts": [
+  387,
+  251
+ ]
+}

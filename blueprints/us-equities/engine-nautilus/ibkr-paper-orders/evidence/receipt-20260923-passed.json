@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_paper_orders_nautilus_1_231",
+  "generated_at": "2026-09-23T17:53:25.492627+00:00",
+  "nautilus_trader_version": "1.231.0",
+  "ibapi_version": "10.45.1",
+  "plan_sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
+  "harness_sha256": "9f6c08f1835fe05c3848f318f7e9ca9162fb0580231ed79fb8f1b3a14a1d1b76",
+  "evidence_class": "native_paper",
+  "port": 4002,
+  "status": "passed",
+  "plan_bounds": {
+    "max_orders": 6,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_roundtrip_loss_usd": 5,
+    "commission_allowance_per_order_usd": 1.0,
+    "marketable_offset_usd": 0.05,
+    "resting_fraction_of_bid": 0.5,
+    "resting_price_floor_usd": 1.0,
+    "max_order_submit_rate": "100/00:00:01",
+    "time_in_force": "DAY",
+    "order_type": "LIMIT",
+    "min_submit_spacing_seconds": 1.5,
+    "max_cancel_attempts_per_order": 3,
+    "submit_rate_note": "Nautilus default risk-engine throttle (drops and denies submits beyond the rate); the run's own spacing is enforced by the harness before every order is created, so the throttle never binds."
+  },
+  "session_check": {
+    "fixed_window": "inside_window",
+    "liquid_hours_present": true,
+    "liquid_hours_parsed": true,
+    "with_liquid_hours": "inside_window"
+  },
+  "pre_check": {
+    "client": "ibapi",
+    "client_id": 92,
+    "port": 4002,
+    "status": "passed",
+    "observed": {
+      "account_count": 1,
+      "paper_accounts": true,
+      "server_time_epoch": 1790186004,
+      "positions": 0,
+      "spy_position": false,
+      "open_orders": 0,
+      "open_order_statuses": [],
+      "contract": {
+        "secType": "STK",
+        "currency": "USD",
+        "exchange": "SMART",
+        "primaryExchange": "ARCA",
+        "minTick": 0.01,
+        "timeZoneId": "US/Eastern"
+      },
+      "errors": [],
+      "info": [
+        {
+          "reqId": -1,
+          "code": 2104,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "reqId": -1,
+          "code": 2106,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "reqId": -1,
+          "code": 2158,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "server_minus_local_s": -1.633
+    },
+    "requests_completed": {
+      "accounts": true,
+      "time": true,
+      "positions": true,
+      "orders": true,
+      "contract": true
+    },
+    "time_zone_id": "US/Eastern"
+  },
+  "run": {
+    "run_prefix": "NTP-0923-175325-bee54d",
+    "cases": [
+      {
+        "id": "C1",
+        "name": "accept_resting",
+        "expect": "OrderAccepted",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-09-23T17:53:27.243140+00:00",
+        "ended_at": "2026-09-23T17:53:28.266770+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "side": "BUY",
+            "quantity": "1",
+            "limit_price": "384.28",
+            "notional_usd": "384.28",
+            "time_in_force": "DAY",
+            "order_number": 1,
+            "created_at": "2026-09-23T17:53:27.913999+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:27.913888+00:00",
+            "ts_init": "2026-09-23T17:53:27.913888+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:27.914736+00:00",
+            "ts_init": "2026-09-23T17:53:27.914740+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:28.266566+00:00",
+            "ts_init": "2026-09-23T17:53:28.266576+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:28.266607+00:00",
+            "ts_init": "2026-09-23T17:53:28.266608+00:00",
+            "venue_order_id_present": true
+          }
+        ],
+        "quote": {
+          "bid": "768.57",
+          "ask": "768.58",
+          "age_s": -0.719
+        },
+        "venue_order_id_present": true
+      },
+      {
+        "id": "C2",
+        "name": "cancel_resting",
+        "expect": "OrderCanceled",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-09-23T17:53:28.266778+00:00",
+        "ended_at": "2026-09-23T17:53:28.352045+00:00",
+        "orders": [],
+        "events": [
+          {
+            "type": "OrderPendingCancel",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:28.266810+00:00",
+            "ts_init": "2026-09-23T17:53:28.266810+00:00"
+          },
+          {
+            "type": "OrderCanceled",
+            "client_order_id": "NTP-0923-175325-bee54d-C1",
+            "ts_event": "2026-09-23T17:53:28.351899+00:00",
+            "ts_init": "2026-09-23T17:53:28.351907+00:00"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "name": "fill_buy",
+        "expect": "OrderFilled",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-09-23T17:53:28.352054+00:00",
+        "ended_at": "2026-09-23T17:53:29.972678+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "side": "BUY",
+            "quantity": "1",
+            "limit_price": "768.61",
+            "notional_usd": "768.61",
+            "time_in_force": "DAY",
+            "order_number": 2,
+            "created_at": "2026-09-23T17:53:29.675858+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29.675784+00:00",
+            "ts_init": "2026-09-23T17:53:29.675784+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29.678886+00:00",
+            "ts_init": "2026-09-23T17:53:29.678891+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29.827113+00:00",
+            "ts_init": "2026-09-23T17:53:29.827122+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29.827148+00:00",
+            "ts_init": "2026-09-23T17:53:29.827149+00:00",
+            "venue_order_id_present": true
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29.840381+00:00",
+            "ts_init": "2026-09-23T17:53:29.840390+00:00"
+          },
+          {
+            "type": "OrderFilled",
+            "client_order_id": "NTP-0923-175325-bee54d-C3",
+            "ts_event": "2026-09-23T17:53:29+00:00",
+            "ts_init": "2026-09-23T17:53:29.972159+00:00"
+          }
+        ],
+        "quote": {
+          "bid": "768.55",
+          "ask": "768.56",
+          "age_s": -0.957,
+          "worst_case_roundtrip_loss_usd": "2.11"
+        },
+        "filled_qty": "1",
+        "avg_px": "768.56"
+      },
+      {
+        "id": "C4",
+        "name": "flatten",
+        "expect": "OrderFilled+flat",
+        "outcome": "passed",
+        "reason": null,
+        "started_at": "2026-09-23T17:53:29.972714+00:00",
+        "ended_at": "2026-09-23T17:53:31.322362+00:00",
+        "orders": [
+          {
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "side": "SELL",
+            "quantity": "1",
+            "limit_price": "768.45",
+            "notional_usd": "768.45",
+            "time_in_force": "DAY",
+            "order_number": 3,
+            "created_at": "2026-09-23T17:53:31.242846+00:00"
+          }
+        ],
+        "events": [
+          {
+            "type": "OrderInitialized",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31.242788+00:00",
+            "ts_init": "2026-09-23T17:53:31.242788+00:00"
+          },
+          {
+            "type": "OrderSubmitted",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31.243551+00:00",
+            "ts_init": "2026-09-23T17:53:31.243556+00:00"
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31.290500+00:00",
+            "ts_init": "2026-09-23T17:53:31.290509+00:00"
+          },
+          {
+            "type": "OrderAccepted",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31.290534+00:00",
+            "ts_init": "2026-09-23T17:53:31.290535+00:00",
+            "venue_order_id_present": true
+          },
+          {
+            "type": "OrderUpdated",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31.307125+00:00",
+            "ts_init": "2026-09-23T17:53:31.307136+00:00"
+          },
+          {
+            "type": "OrderFilled",
+            "client_order_id": "NTP-0923-175325-bee54d-C4",
+            "ts_event": "2026-09-23T17:53:31+00:00",
+            "ts_init": "2026-09-23T17:53:31.311924+00:00"
+          }
+        ],
+        "quote": {
+          "bid": "768.50",
+          "ask": "768.51",
+          "age_s": -0.39
+        },
+        "filled_qty": "1",
+        "avg_px": "768.5",
+        "flat": true
+      }
+    ],
+    "fills": [
+      {
+        "case": "C3",
+        "client_order_id": "NTP-0923-175325-bee54d-C3",
+        "side": "BUY",
+        "price": "768.56",
+        "quantity": "1",
+        "commission": "1",
+        "commission_currency": "USD",
+        "ts_event": "2026-09-23T17:53:29+00:00"
+      },
+      {
+        "case": "C4",
+        "client_order_id": "NTP-0923-175325-bee54d-C4",
+        "side": "SELL",
+        "price": "768.50",
+        "quantity": "1",
+        "commission": "1.02",
+        "commission_currency": "USD",
+        "ts_event": "2026-09-23T17:53:31+00:00"
+      }
+    ],
+    "position": {
+      "opened": {
+        "side": "LONG",
+        "quantity": "1",
+        "avg_px_open": "768.56",
+        "ts_event": "2026-09-23T17:53:29+00:00"
+      },
+      "closed": {
+        "realized_pnl": "-2.08",
+        "currency": "USD",
+        "ts_event": "2026-09-23T17:53:31+00:00"
+      }
+    },
+    "roundtrip": {
+      "gross_pnl_usd": "-0.06",
+      "commissions_usd": "2.02",
+      "net_pnl_usd": "-2.08",
+      "max_roundtrip_loss_usd": "5",
+      "loss_bound_breached": false,
+      "nautilus_realized_pnl": "-2.08",
+      "nautilus_realized_pnl_currency": "USD"
+    },
+    "orders_created": 3,
+    "max_orders": 6,
+    "net_quantity_from_fills": "0",
+    "cleanup": {
+      "triggered": false
+    },
+    "unconfirmed_events": [],
+    "duplicate_events": [],
+    "cancel_requests": [
+      {
+        "client_order_id": "NTP-0923-175325-bee54d-C1",
+        "where": "C2",
+        "action": "cancel",
+        "attempt": 1,
+        "status": "ACCEPTED",
+        "at": "2026-09-23T17:53:28.266791+00:00"
+      }
+    ],
+    "node": {
+      "built": true,
+      "strategy_started": true,
+      "stop_requested_by": "strategy:cases_complete",
+      "strategy_started_at": "2026-09-23T17:53:27.241822+00:00",
+      "instrument": {
+        "id": "SPY.ARCA",
+        "price_increment": "0.01",
+        "size_increment": "1",
+        "quote_currency": "USD"
+      },
+      "finish_reason": "cases_complete"
+    },
+    "notes": [],
+    "errors": []
+  },
+  "flat_proof": {
+    "status": "passed",
+    "positions": 0,
+    "open_orders": 0,
+    "attempts": [
+      {
+        "client": "ibapi",
+        "client_id": 92,
+        "port": 4002,
+        "status": "passed",
+        "observed": {
+          "account_count": 1,
+          "paper_accounts": true,
+          "server_time_epoch": 1790186016,
+          "positions": 0,
+          "spy_position": false,
+          "open_orders": 0,
+          "open_order_statuses": [],
+          "contract": null,
+          "errors": [],
+          "info": [
+            {
+              "reqId": -1,
+              "code": 2104,
+              "text": "Market data farm connection is OK:usfarm"
+            },
+            {
+              "reqId": -1,
+              "code": 2106,
+              "text": "HMDS data farm connection is OK:ushmds"
+            },
+            {
+              "reqId": -1,
+              "code": 2158,
+              "text": "Sec-def data farm connection is OK:secdefil"
+            }
+          ],
+          "server_minus_local_s": -0.775
+        },
+        "requests_completed": {
+          "accounts": true,
+          "time": true,
+          "positions": true,
+          "orders": true,
+          "contract": false
+        }
+      }
+    ]
+  },
+  "elapsed_seconds": 11.535,
+  "exit_code": 0
+}

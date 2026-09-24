@@ -1,0 +1,81 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-2",
+  "gap_index": 2,
+  "gap_text_sha256": "ff02b42984ddf72054613cb873247206ea03cff5ac565b7b5b4f5d2db1b9eb1a",
+  "preregistration": {
+    "written_at": "2026-09-22T22:42:40-04:00",
+    "expectation": "A real project workflow (this repository's own maintenance checks: scripts/validate.py and scripts/build_ecosystem.py --check on a git-archive snapshot of HEAD, plus one bounded real model step: codex exec judging the validate output) is triggered by the native `dagu scheduler` from a one-shot cron schedule under pinned Dagu 2.16.6 (sha256 20de7ae9...), stopped with `dagu stop` while its finalize step waits, then recovered with `dagu retry --run-id <same> --step finalize`. Expect scheduler-created run, aborted -> succeeded under one run id, the checkpoint (validate + model) executed exactly once, and finalize outputs identical to a direct reference run of the same scripts on the same snapshot.",
+    "criteria": "Settled iff all of: (1) the run was created by the scheduler (history shows scheduler trigger or the run exists without any manual `dagu start`); (2) history status aborted after stop and all observed owned processes exited; (3) retry uses the same run id and history reports succeeded; (4) checkpoint claim/count stays 1 and checkpoint bytes unchanged (model called exactly once, detected by an exclusive per-call claim file that a second call would fail to create); (5) validate and build_ecosystem --check outputs from the workflow equal the direct reference outputs; (6) the model step returned a verdict and a usage object. Any failure is recorded as not_settled/advanced with the observation.",
+    "committed_before_running": "git commit 7802cab (preregistrations/2.json)"
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py --no-model --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-dry-1790131479   # harness shake-out without the model step (disclosed; passed)",
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602",
+    "(inside) git archive 41d39b3 | tar -x -C snapshot; direct reference runs of scripts/validate.py and scripts/build_ecosystem.py --check on that snapshot",
+    "(inside) dagu scheduler --dags <work>/dags   # DAG realmaint.yaml with a one-shot cron schedule '48 22 * * *'; no manual `dagu start`",
+    "(inside) dagu history realmaint --format json; dagu stop --run-id 034TZZGmlL3sTFRU6oK7Mi realmaint.yaml; dagu history --run-id ... --format json",
+    "(inside) dagu retry --run-id 034TZZGmlL3sTFRU6oK7Mi --step finalize realmaint.yaml; dagu history ...",
+    "trigger-type mapping check: internal/ir/status.go at Dagu source 58fed633 (v2.16.6): TriggerTypeUnknown=0, Scheduler=1, Manual=2, Webhook=3, SubDAG=4, Retry=5; Status: NotStarted=0, Running=1, Failed=2, Aborted=3, Succeeded=4",
+    "fix round 1 (preregistrations/fix-round-1.json (written about 23:26-04:00, after the review of b7aec6b; committed in fdaf6f4 before any rerun)): python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/real_scheduled_recovery.py --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f3-g2-real-1790134079   # private config `scheduler.port: 0`, scheduler listener sampling via `ss -Hltnp`, Codex concurrency gate before the model call"
+  ],
+  "results": [
+    "result.json status=passed with every check true: scheduler_created_run, before_retry_status_aborted, after_retry_status_succeeded, same_native_run_id, single_run_in_history, checkpoint_unchanged, checkpoint_execution_count_one, model_call_claim_single, model_verdict_pass, model_usage_present, validate_equals_reference, ecosystem_equals_reference, owned_processes_retired_after_stop, retry_finalizer_exited (raw/2-real-scheduled-run/result.json)",
+    "native attempt records: a_20260923_024800_029Z_ff82b1 status=3 (aborted) triggerType=1 (scheduler); a_20260923_024811_116Z_eb483c status=4 (succeeded) triggerType=5 (retry); same dagRunId 034TZZGmlL3sTFRU6oK7Mi; history rows total 1",
+    "history row while waiting: {\"dagRunId\":\"034TZZGmlL3sTFRU6oK7Mi\",\"name\":\"realmaint\",\"startedAt\":\"2026-09-22T22:48:00-04:00\",\"status\":\"running\"} -- started on the cron minute",
+    "timeline UTC: scheduler_started 02:46:51.6, finalize_ready 02:48:10.8, stop_issued 02:48:10.9, retry_returned 02:48:16.9",
+    "model step (checkpoint, executed once): codex exec verdict 'PASS', usage {input_tokens 18720, cached_input_tokens 11520, output_tokens 17, reasoning_output_tokens 10}, 6.2 s; model-call-claim.json {\"model_calls\": 1} (a second call would fail to create it)",
+    "outputs: validate {\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"} and build_ecosystem --check {\"bytes\": 12918618, \"sha256\": \"693c295e...\", \"status\": \"passed\"} identical to the direct reference runs on the same snapshot",
+    "after the scheduler was stopped: scheduler_stopped=true, owned_processes_remaining_after_scheduler_stop=0",
+    "fix-round rerun (raw/fix1-F3-gap2-real-scheduled-rerun/result.json): status=passed with all 14 checks true; run 034TaZeXpNwjahO3pxxM0o fired on the cron minute 23:29 (planned '29 23 * * *'); native attempts a_20260923_032900_058Z_26d86b status=3 (aborted) triggerType=1 (scheduler) and a_20260923_032912_319Z_1416af status=4 (succeeded) triggerType=5 (retry); history rows total 1; scheduler stopped, 0 owned processes remaining",
+    "fix-round isolation: scheduler log 'Health check server disabled service=scheduler port=0' and no 'Starting health check server'; 14 `ss -Hltnp` samples of the scheduler process tree from scheduler start to finalize-ready listed 0 listening sockets; detection method: the same `listeners()` parse found a loopback listener opened as a positive control (127.0.0.1:58660, pid of the driver)",
+    "fix-round model step: codex exec verdict 'PASS', usage {input_tokens 18728, cached_input_tokens 11520, output_tokens 17, reasoning_output_tokens 10}, 5.9 s; Codex concurrency gate before the call at 23:29:05.96-04:00: 0 other real codex exec processes, waited 0.0 s. Matcher: argv[0] basename codex and argv[1] exec, or a node launcher whose argv[1] is codex/codex.js and argv[2] exec; controls in raw/fix1-probe-controls.json cover only the plain `codex exec` form (counted) and a `timeout ... codex exec` wrapper (not counted). Blind spot: a call with global options before the subcommand (for example `codex -c k=v exec` or `codex --sandbox read-only exec`) is not counted, so the 0 is a lower bound on other sessions' calls"
+  ],
+  "outcome": "settled",
+  "outcome_detail": "Every clause is closed for this layer's bounded claim: a real application workflow (the repository's own maintenance checks plus a real model triage step) was scheduled by the native Dagu 2.16.6 scheduler, stopped with `dagu stop` mid-run, recovered with `dagu retry` under the same run id, and checked against the job-recovery oracle (aborted -> succeeded, checkpoint and model call executed once, outputs equal to a direct reference). The accepted-workload set is therefore no longer only synthetic or no-model. Fix round 1 reran the check with the Dagu scheduler's health server disabled (no wildcard bind observed) and a recorded Codex concurrency gate; it passed every original criterion and the isolation criteria of the fix-round preregistration. The fix-round rerun is the reported run; the original run (also passed) is retained as superseded because its scheduler bound :8090 on all interfaces.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Single run on one WSL2 host; the stop happened while finalize waited for its release file (the job-recovery fixture's design), not at an arbitrary instruction.",
+    "The workload is this repository's maintenance checks on a git-archive snapshot of base 41d39b3; it is real and non-synthetic but small, and it is not the Codex/Claude 'daily maintenance' automation itself.",
+    "The model step used one bounded Codex call (native sign-in via codex; no paid API key). Retry reuse of the model step is shown by the exclusive claim file, not by provider-side billing records.",
+    "Isolated DAGU_HOME under the cache for the gap-2 runs (original, dry run and fix-round rerun); none of these runs used the host dagu-equities service or its store. This claim is scoped to the gap-2 runs: the unit-level fix-round-1 incident is described in the next limit.",
+    "An earlier interrupted attempt (run realwf-1790129230, manual `dagu start`, no scheduler, no oracle) is superseded; its logs are retained at raw/0-prior-interrupted-attempt/.",
+    "Superseded original run (g2-real-1790131602) and its no-model dry run: the scheduler started its /health server on :8090 (all interfaces; Dagu binds ':<port>' per internal/service/healthcheck/server.go) for about 85 s (real run) and 87 s (dry run, 22:44:47-22:46:14-04:00). This departed from the loopback-only rule; the fix-round rerun disabled it with `scheduler.port: 0` (internal/cmn/config/loader.go setSchedulerDefaults: 0 disables the server when the key is set).",
+    "Fix-round listener samples cover the scheduler tree from its start until finalize-ready (every 5 s); the stop/retry interval after that (about 7 s) was not sampled, but the scheduler log shows the health server was never started.",
+    "Codex concurrency rule: the original run's model call had no recorded process-count check; the fix-round call recorded the gate (0 others). Neither call overlapped another call from this unit.",
+    "The fix-round preregistration was written after the original runs and the review; it is labelled as such.",
+    "Codex concurrency gate matcher (reconciliation 1): codex_exec_processes() in dagu_common.py counts only argv[1] == 'exec' (or argv[2] after a node launcher), so a concurrent `codex <global options> exec ...` from another session would not be counted, and this form was not tested by the probe controls. The gate's '0 others' therefore shows that no plain-form `codex exec` ran, not that no Codex call of any form ran. The gap 2 criteria do not depend on the gate; the wave's concurrency rule is shown to have held only as far as this matcher sees. The helper was not changed, because the executed and committed helpers must stay identical and no rerun was made.",
+    "Unit-level isolation (fix round 2 cross-reference): this receipt's isolation statements cover this gap's own runs only. During fix round 1, between the fix-round preregistration and the F1/F2/F3 reruns, an unquoted heredoc started an unintended `dagu scheduler` (PATH dagu, default config) that wrote state into the default Dagu home $HOME/.local/share/dagu/data and bound :8090 on all interfaces for about 2 min 15 s, and an unintended `codex exec` that was killed while waiting for stdin. Fix round 2 verified that the running host `dagu server` (pid 366, the dagu-equities service) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities, a different store. See incidents/2026-09-22-fix-round-heredoc-substitution.json.",
+    "Helper change after execution (fix round 3): dagu_common.py was edited after this receipt's runs. codex_gate() now raises CodexGateTimeout instead of returning when 2 or more other `codex exec` processes still run at max_wait, and codex_exec_processes() also counts `codex <global options> exec` and the `e` alias. The executed revisions named in this receipt are unchanged and remain the ones that ran. Only one gated model call was made in the whole unit (fix-round F3, gap 2); it waited 0 s with 0 other processes counted by the old matcher, so the timeout path was not reached. Whether the broader matcher would have counted more processes at that time cannot be re-observed. Synthetic test: raw/fix3/codex-gate-test.txt."
+  ],
+  "raw_outputs": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F3-gap2-real-scheduled-rerun/ (reported), raw/2-real-scheduled-run/ and raw/2-real-scheduled-dry-run-no-model/ (superseded), raw/fix1-probe-controls.json, raw/fix1-executed-vs-committed-helpers.json",
+  "checked_at": "2026-09-22T23:31:59-04:00",
+  "fix_round_1": {
+    "preregistration": "preregistrations/fix-round-1.json (written about 23:26-04:00, after the review of b7aec6b; committed in fdaf6f4 before any rerun)",
+    "edited_at": "2026-09-22T23:31:59-04:00",
+    "review_findings_addressed": [
+      3,
+      5
+    ],
+    "outcome_changed": false
+  },
+  "reconciliation_1": {
+    "edited_at": "2026-09-22T23:42:58-04:00",
+    "review_finding": "minor: the Codex concurrency matcher misses `codex <global options> exec`; untested and undisclosed",
+    "change": "result line and a new limit disclose the blind spot; outcome unchanged (settled), since no gap 2 criterion depends on the gate; no command was re-run"
+  },
+  "fix_round_2": {
+    "edited_at": "2026-09-23T08:50:58-04:00",
+    "changes": "Receipt text only; no check re-run. Added the unit-level isolation cross-reference; scoped the dagu-equities sentence to the gap-2 runs."
+  },
+  "fix_round_3": {
+    "edited_at": "2026-09-23T10:18:07-04:00",
+    "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+    "review_findings_addressed": [
+      4
+    ],
+    "changes": "Added the helper-change limit. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/codex-gate-test.txt"
+    ]
+  }
+}

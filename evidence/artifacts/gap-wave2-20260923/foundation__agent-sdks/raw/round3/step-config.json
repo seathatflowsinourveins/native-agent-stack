@@ -1,0 +1,18 @@
+{
+  "step": "config",
+  "started_at": "2026-09-23T12:58:58Z",
+  "parent": 0,
+  "bare": {
+    "exit_code": 0,
+    "seconds": 1.83,
+    "stdout": "{\"features\": {\"hooks\": false, \"plugin_hooks\": false, \"apps\": false}, \"plugins\": {}, \"mcp_servers_configured\": [], \"mcp_status_names\": [], \"hook_count\": 0, \"skill_count\": 6, \"otel\": {\"exporter\": \"none\", \"metrics_exporter\": \"none\"}, \"layer_sources\": [{\"type\": \"user\", \"file\": \"$HOME/.codex/config.toml\", \"profile\": null}, {\"type\": \"system\", \"file\": \"/etc/codex/config.toml\"}], \"codex_home_instruction_files\": [], \"config_top_level_keys\": [\"agents\", \"allow_login_shell\", \"allow_symlinked_codex_home\", \"analytics\", \"approval_policy\", \"approvals_reviewer\", \"apps\", \"apps_mcp_product_sku\", \"audio\", \"auto_review\", \"background_terminal_max_timeout\", \"browser_use\", \"chatgpt_base_url\", \"check_for_update_on_startup\", \"cli_auth_credentials_store\", \"compact_prompt\", \"computer_use\", \"default_permissions\", \"desktop\", \"developer_instructions\", \"disable_paste_burst\", \"experimental_compact_prompt_file\", \"experimental_realtime_start_instructions\", \"experimental_realtime_webrtc_call_base_url\", \"experimental_realtime_ws_backend_prompt\", \"experimental_realtime_ws_base_url\", \"experimental_realtime_ws_model\", \"experimental_realtime_ws_startup_context\", \"experimental_thread_store\", \"experimental_thread_store_endpoint\", \"experimental_use_unified_exec_tool\", \"features\", \"feedback\", \"file_opener\", \"forced_chatgpt_workspace_id\", \"forced_login_method\", \"ghost_snapshot\", \"goals\", \"hide_agent_reasoning\", \"history\", \"hooks\", \"include_apps_instructions\", \"include_collaboration_mode_instructions\", \"include_envi\n",
+    "stderr_tail": []
+  },
+  "ctxmode": {
+    "exit_code": 0,
+    "seconds": 1.94,
+    "stdout": "{\"features\": {\"hooks\": false, \"plugin_hooks\": false, \"apps\": false}, \"plugins\": {\"context-mode@context-mode\": true}, \"mcp_servers_configured\": [], \"mcp_status_names\": [\"context-mode\"], \"hook_count\": 0, \"skill_count\": 14, \"otel\": {\"exporter\": \"none\", \"metrics_exporter\": \"none\"}, \"layer_sources\": [{\"type\": \"user\", \"file\": \"$HOME/.codex/config.toml\", \"profile\": null}, {\"type\": \"system\", \"file\": \"/etc/codex/config.toml\"}], \"codex_home_instruction_files\": [], \"config_top_level_keys\": [\"agents\", \"allow_login_shell\", \"allow_symlinked_codex_home\", \"analytics\", \"approval_policy\", \"approvals_reviewer\", \"apps\", \"apps_mcp_product_sku\", \"audio\", \"auto_review\", \"background_terminal_max_timeout\", \"browser_use\", \"chatgpt_base_url\", \"check_for_update_on_startup\", \"cli_auth_credentials_store\", \"compact_prompt\", \"computer_use\", \"default_permissions\", \"desktop\", \"developer_instructions\", \"disable_paste_burst\", \"experimental_compact_prompt_file\", \"experimental_realtime_start_instructions\", \"experimental_realtime_webrtc_call_base_url\", \"experimental_realtime_ws_backend_prompt\", \"experimental_realtime_ws_base_url\", \"experimental_realtime_ws_model\", \"experimental_realtime_ws_startup_context\", \"experimental_thread_store\", \"experimental_thread_store_endpoint\", \"experimental_use_unified_exec_tool\", \"features\", \"feedback\", \"file_opener\", \"forced_chatgpt_workspace_id\", \"forced_login_method\", \"ghost_snapshot\", \"goals\", \"hide_agent_reasoning\", \"history\", \"hooks\", \"include_apps_instructions\", \"include\n",
+    "stderr_tail": []
+  },
+  "finished_at": "2026-09-23T12:59:03Z"
+}

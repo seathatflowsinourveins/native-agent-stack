@@ -1,0 +1,111 @@
+{
+ "id": "gap0-agent-browser-vs-playwright-cli",
+ "gap_index": 0,
+ "gap_text_sha256": "ad9dcd6f2afe716feb28b7029f780d03147da0757aba1efdaa698b0df60156b6",
+ "preregistration": {
+  "written_at": "2026-09-23T01:40:00Z",
+  "expectation": "Both tools will complete open/fill/click/read tasks on a shared loopback fixture; a nonexistent-selector task will fail for both, but their failure latency/behavior may differ.",
+  "criteria": "Record per-task success, elapsed ms and failure text for agent-browser 0.38.1 and Playwright 1.63.0 (via @playwright/test's chromium driver) on the same 3 loopback tasks.",
+  "written_late": true,
+  "written_late_note": "FIX ROUND: written_at is identical to checked_at (rounded to the same minute) in the original submission, which cannot demonstrate the preregistration preceded execution. It is relabelled late here: the expectation/criteria below were drafted as part of planning this check but recorded concurrently with, not strictly before, the run."
+ },
+ "commands": [
+  "python3 -m http.server 8317 --bind 127.0.0.1  (serving fixtures/greeting.html)",
+  "node pw_tasks.mjs  (Playwright 1.63.0, chromium, PLAYWRIGHT_BROWSERS_PATH isolated to ~/.cache/gap-wave2-20260923/web-research/ms-playwright)",
+  "agent-browser open/get/fill/click/close on the same fixture, timed per subprocess call"
+ ],
+ "results": {
+  "playwright": [
+   {
+    "task": "task1_open_read_title",
+    "success": true,
+    "ms": 18,
+    "detail": "Local browser command check"
+   },
+   {
+    "task": "task2_fill_click_read_status",
+    "success": true,
+    "ms": 68,
+    "detail": "Hello, Gap Wave 2!"
+   },
+   {
+    "task": "task3_nonexistent_selector",
+    "success": false,
+    "ms": 2001,
+    "detail": "TimeoutError: page.click: Timeout 2000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#does-not-exist')\u001b[22m\n"
+   }
+  ],
+  "agent_browser": [
+   {
+    "task": "open",
+    "success": true,
+    "ms": 844,
+    "returncode": 0,
+    "stdout": "\u2713 Local browser command check\n  http://127.0.0.1:8317/greeting.html",
+    "stderr": "[agent-browser] launched browser"
+   },
+   {
+    "task": "task1_read_title",
+    "success": true,
+    "ms": 4,
+    "returncode": 0,
+    "stdout": "Local browser command check",
+    "stderr": ""
+   },
+   {
+    "task": "task2a_fill",
+    "success": true,
+    "ms": 10,
+    "returncode": 0,
+    "stdout": "\u2713 Done",
+    "stderr": ""
+   },
+   {
+    "task": "task2b_click",
+    "success": true,
+    "ms": 16,
+    "returncode": 0,
+    "stdout": "\u2713 Done",
+    "stderr": ""
+   },
+   {
+    "task": "task2c_get_status",
+    "success": true,
+    "ms": 4,
+    "returncode": 0,
+    "stdout": "Hello, Gap Wave 2!",
+    "stderr": ""
+   },
+   {
+    "task": "task3_nonexistent_selector",
+    "success": true,
+    "ms": 3,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "\u2717 Element not found: #does-not-exist. Verify the selector, role, or name is correct and the element exists in the DOM."
+   },
+   {
+    "task": "close",
+    "success": true,
+    "ms": 104,
+    "returncode": 0,
+    "stdout": "\u2713 Browser closed",
+    "stderr": ""
+   }
+  ]
+ },
+ "outcome": "advanced",
+ "outcome_detail": "FIX ROUND (independent review): the original 'settled' call did not hold up against its own next_check criteria and is downgraded to advanced. What the run does show, still real: both tools complete the open/fill/click/read-status tasks, and agent-browser's CLI reports the missing-selector failure in 3ms with an explicit 'Element not found' message versus the driver script's page.click() raising Playwright's default 2000ms actionability-wait TimeoutError. What it does NOT show, corrected here: (1) tokens were never measured -- the 'tokens' criterion in the gap's own next_check is unmet. (2) 'Playwright CLI' was not exercised: pw_tasks.mjs drives the `playwright` npm library directly (package.json pins it with a caret range, `^1.63.0`, not an exact pin) via a hand-written script; there is no comparable imperative `playwright` CLI subcommand, so this is library-vs-CLI, not CLI-vs-CLI as the gap asks. (3) The two timings are not like-for-like: pw_tasks.mjs calls `chromium.launch()` before `timeIt()` starts, so Playwright's task1 (18ms) excludes browser startup, while agent-browser's 'open' step (844ms) includes it -- the totals cannot be compared without adding the (unmeasured) Playwright launch time back in. (4) The '3ms vs 2000ms' contrast is an artifact of the script's explicit `{ timeout: 2000 }` on the click call (see scripts/pw_tasks.mjs line ~31), not Playwright's actual default (30000ms) or any measured property of the tool. (5) The two tools' 'success' fields used inconsistent semantics on task3: agent-browser's failing click (returncode 1, correctly reporting 'Element not found') was recorded as success:true (meaning 'behaved as expected'), while Playwright's failing click (also expected, returncode via exception) was recorded as success:false (meaning 'the click itself failed') -- same underlying outcome, opposite-looking booleans in the raw JSON. The gap text's claim that 'neither has been shown better' is therefore still not closed by this evidence; it is narrowed to one qualified, reproducible micro-observation (differing default failure-timeout behavior on a missing selector) rather than a general comparison.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "Loopback fixture only (fixtures/greeting.html), not a representative sample of real-world page complexity.",
+  "Token cost is not measured; only CLI wall-clock/process time. The gap's 'tokens' criterion is not satisfied by this evidence.",
+  "Playwright was driven via a hand-written test script against the `playwright` library (package.json: `\"playwright\": \"^1.63.0\"`, a caret range, not a pin), not the `playwright` CLI; there is no imperative Playwright CLI subcommand equivalent to agent-browser's fill/click, so this is a library-vs-CLI comparison, not the CLI-vs-CLI the gap asks for.",
+  "The two tools' per-task timings are not like-for-like: Playwright's chromium.launch() runs outside the timed block (scripts/pw_tasks.mjs), while agent-browser's timed 'open' step includes browser launch; totals are not directly comparable without correcting for this.",
+  "The 3ms-vs-2000ms failure-latency contrast reflects the explicit `{ timeout: 2000 }` written into the script, not Playwright's real default timeout (30000ms) or a property intrinsic to either tool.",
+  "success:true/false in the raw results below uses inconsistent meanings between the two tools on task3 (agent-browser: true means 'failed as expected'; Playwright: false means 'the click failed') -- read outcome_detail, not the boolean fields alone, for task3.",
+  "The exact agent-browser driver commands used in the original run were not saved verbatim; scripts/agent_browser_tasks.sh is a reconstruction written during this fix round that reproduces the same steps and matches the receipt's per-task table, not a byte-identical replay artifact.",
+  "Reproducibility: raw scripts are at evidence/artifacts/gap-wave2-20260923/foundation__web-research/scripts/{pw_tasks.mjs,package.json,agent_browser_tasks.sh}; the underlying npm/venv installs and PLAYWRIGHT_BROWSERS_PATH-isolated browser cache used to run them are host-local and not committed."
+ ],
+ "checked_at": "2026-09-23T01:40:00Z"
+}

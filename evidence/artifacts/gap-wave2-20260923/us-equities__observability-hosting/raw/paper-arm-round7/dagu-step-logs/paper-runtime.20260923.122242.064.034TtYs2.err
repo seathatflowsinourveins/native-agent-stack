@@ -1,0 +1,53 @@
+[SandboxDebug] Initializing sandbox...
+[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64
+[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)
+[SandboxDebug] mux: HTTP backend listening on /tmp/srt-mux-1662820-0.sock
+[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:57974
+[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:/tmp/claude-http-21e7ace9a3d8d6f8.sock,fork,reuseaddr TCP:localhost:57974,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+[SandboxDebug] Linux bridges ready after 3 attempts
+[SandboxDebug] Network infrastructure initialized
+[SandboxDebug] Command string mode (-c): sh $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/cfg/paper_step.sh
+[SandboxDebug] {
+  "allowedHosts": []
+}
+[SandboxDebug] [Sandbox Linux] Applying seccomp filter for Unix socket blocking
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stdout -> /dev/stdout
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stdout
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stderr -> /dev/stderr
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stderr
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/null -> /dev/null
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/null
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/tty -> /dev/tty
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/tty
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/dtracehelper -> /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/autofs_nowait -> /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Processing write path: /tmp/claude -> /tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: /private/tmp/claude -> /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: <temp-home>/.npm/_logs -> <temp-home>/.npm/_logs
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: <temp-home>/.npm/_logs
+[SandboxDebug] [Sandbox Linux] Processing write path: <temp-home>/.claude/debug -> <temp-home>/.claude/debug
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: <temp-home>/.claude/debug
+[SandboxDebug] [Sandbox Linux] Processing write path: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/work -> $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/work
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.gitconfig
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.gitmodules
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.bashrc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.bash_profile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.zshrc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.zprofile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.profile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.ripgreprc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.mcp.json
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.vscode
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.idea
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.claude/commands
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/dagu/data/dag-run-work/obsgap-paper/pyx4eaopcsmftzxm445yx55dty/root/.claude/agents
+[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)
+[SandboxDebug] No matching config rule, denying: example.com:443
+[SandboxDebug] Connection blocked to example.com:443
+curl: (56) CONNECT tunnel failed, response 403
+[SandboxDebug] Sent SIGTERM to HTTP bridge process
+[SandboxDebug] Sent SIGTERM to SOCKS bridge process

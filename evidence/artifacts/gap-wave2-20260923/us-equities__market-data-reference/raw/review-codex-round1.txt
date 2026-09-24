@@ -1,0 +1,15 @@
+
+codex
+- [compare_multi.py:218]($HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/compare_multi.py:218): Only the provider’s status is checked. An unavailable reference is treated as empty data; with an empty provider, this returns `"status": "equal"` and zero comparisons. Reproduced in memory.
+
+- [compare_multi.py:82]($HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/compare_multi.py:82): The Alpaca adapter filters bars but retains all action rows. Consequently, per-symbol `provider_records` includes other symbols and out-of-range actions, violating the claimed filtering scope.
+
+- [feast_pit_fixture.py:74]($HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/feast_pit_fixture.py:74): Converting returned keys to a set hides duplicates, and output membership is never checked. Appending either a duplicate valid row or an unrequested `ZZZ` row with null features still exits successfully. The fixture therefore accepts incorrect join cardinality.
+
+- [calendar_check.py:45]($HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py:45): The library comparison checks session dates and early closes but omits opening times. A reproduced 09:30 versus 10:00 opening disagreement produces empty disagreement lists.
+
+- [calendar_check.py:109]($HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py:109): Filtering library early closes to exactly `13:00` suppresses other unexpected closures. Giving both libraries a 14:00 close on a normal NYSE-page day produces no reported page disagreement.
+
+- [5-compare-multi-run.txt]($HOME/code/nas-wt-g2-market-data-reference/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-compare-multi-run.txt): no findings.
+
+- [6-calendar-check.json]($HOME/code/nas-wt-g2-market-data-reference/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-calendar-check.json): no findings.

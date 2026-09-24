@@ -1,0 +1,2 @@
+test_spy_parity exit=0
+test_nautilus_equity_replay exit=0

@@ -1,0 +1,54 @@
+measured_at=2026-09-23T05:02:23Z
+purpose: which list method jcodemunch-mcp 1.108.319 rejects (explains the wong2 interactive-list crash); owned temp HOME/CODE_INDEX_PATH
+== mcp-inspector --cli $ECO/bin/jcodemunch-mcp -e CODE_INDEX_PATH=<temp> -e JCODEMUNCH_SHARE_SAVINGS=0 --method resources/list
+Deprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.
+jcodemunch-mcp 1.108.319 by jgravelle · https://github.com/jgravelle/jcodemunch-mcp
+{
+  "resources": [
+    {
+      "name": "runtime-identity",
+      "uri": "munch://runtime/identity",
+      "description": "Process provenance for this server instance (munch.runtime.identity/v1):
+== mcp-inspector --cli $ECO/bin/jcodemunch-mcp -e CODE_INDEX_PATH=<temp> -e JCODEMUNCH_SHARE_SAVINGS=0 --method resources/templates/list
+Deprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.
+jcodemunch-mcp 1.108.319 by jgravelle · https://github.com/jgravelle/jcodemunch-mcp
+{"error":{"code":"error","message":"Method not found"}}
+
+== mcp-inspector --cli $ECO/bin/jcodemunch-mcp -e CODE_INDEX_PATH=<temp> -e JCODEMUNCH_SHARE_SAVINGS=0 --method prompts/list
+Deprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.
+jcodemunch-mcp 1.108.319 by jgravelle · https://github.com/jgravelle/jcodemunch-mcp
+{
+  "prompts": [
+    {
+      "name": "workflow",
+      "description": "Step-by-step guide for using jcodemunch-mcp tools in Claude Code."
+    },
+    {
+      "name": "explore",
+      "description
+== mcp-inspector --cli $ECO/bin/jcodemunch-mcp -e CODE_INDEX_PATH=<temp> -e JCODEMUNCH_SHARE_SAVINGS=0 --method tools/list
+Deprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.
+jcodemunch-mcp 1.108.319 by jgravelle · https://github.com/jgravelle/jcodemunch-mcp
+{
+  "tools": [
+    {
+      "name": "set_tool_tier",
+      "description": "Explicit tier override for the current session. Narrows or widens the exposed tool list to 'core' / 'standard' / 'full'.
+== wong2 src/mcp.js listPrimitives (lines 38-54): lists resource templates whenever the resources capability is advertised
+  const promises = []
+  if (capabilities.resources) {
+    promises.push(
+      client.listResources().then(({ resources }) => {
+        resources.forEach((item) => primitives.push({ type: 'resource', value: item }))
+      }),
+    )
+    promises.push(
+      client.listResourceTemplates().then(({ resourceTemplates }) => {
+        resourceTemplates.forEach((item) =>
+          primitives.push({
+            type: 'resource-template',
+            value: item,
+          }),
+        )
+      }),
+    )
