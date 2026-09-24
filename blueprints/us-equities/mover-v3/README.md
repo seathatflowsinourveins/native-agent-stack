@@ -104,7 +104,7 @@ V = $1M are v1's loosest gain and middle volume floor, chosen for sample size af
 | H1-D-b_lane-low | H1, tradable cell | mean net(5-session hold, low MAX21 tercile) | greater than 0 | in a long-only study, the one H1 cell for which the prior predicts the best relative return; the high and middle cells are reported descriptively only |
 | H3-a | H3, tradable cell | mean net(enter 09:35, exit 15:55 on t+1) | greater than 0 | the intraday leg as a trade |
 | H3-b | H3, tradable cell | mean net(enter 15:55 on t+1, exit at the first eligible quote from 09:30 on t+2) | greater than 0 | the overnight leg as a trade; neither leg has a sourced sign for movers, so both are kept |
-| H3-c | H3, primary test | mean of (mean of 4 overnight official-print log legs - mean of 4 intraday legs) over t+1 .. t+5 | two-sided at development, then locked to the development sign | the direct test of "overnight versus intraday". It uses official prints only, so it needs no fill or cost model |
+| H3-c | H3, primary test | mean of (mean of 4 overnight official-print log legs - mean of 4 intraday legs) over t+1 .. t+5 | two-sided at every stage, never locked to the survivorship-limited development sign | the direct test of "overnight versus intraday". It uses official prints only, so it needs no fill or cost model |
 
 MAX21 is the largest of the 21 split-consistent official-close returns before the decision session. Its terciles use
 breakpoints from D events in the prior 252 sessions, so they are known at the decision. Research sizing is 1x equal
@@ -115,8 +115,10 @@ the MDE and neither H3-a nor H3-b passes. A high-MAX outperformance is outside H
 claim.
 
 **Outcome labels.** Each test ends in one of three preregistered labels: a pass; *not supported*, with the excluded
-effect size stated; or *underpowered*. A pass is named by its stage: *nominated* at development, *screened* at
-validation and *supported (confirmatory)* only at the holdout. Holm runs over the five core items only. At the
+effect size stated; or *underpowered*. A pass is named by its stage: a descriptive *development pass* that gates
+nothing, *screened* at validation and *supported (confirmatory)* only at the holdout. Development (2017-2019) is
+survivorship-limited, so every item enters validation whatever its development result, no development output feeds
+validation or the holdout, and validation's tercile breakpoints use validation sessions only. Holm runs over the five core items only. At the
 minimum samples the detectable effects are roughly 2-19% (the MDE tables in the core draft), far above the
 literature's roughly 1% a month for MAX, so a miss on H1-D will most likely be labelled underpowered. v3 can detect
 only large mover-specific effects.
@@ -136,7 +138,8 @@ is void. There is no deferral, so its start cannot be chosen after the results a
 the primary statistic. Paper orders in holdout symbol-sessions are logged at order time and removed only in a
 sensitivity, and more than 5% exposed trades labels an item's holdout contaminated. A holdout read is defined
 narrowly: computing any v3 outcome from holdout data outside a granted access-log entry. It voids the holdout rather
-than removing trades.
+than removing trades. The access log has two record kinds: an authorization committed before the action, and a
+completion (status, rows read, result hash, exposure) appended after it, including for failed and partial runs.
 
 Development, validation and the holdout count and read all run from one study-code tree pinned at the freeze, with a
 pinned runtime lockfile. The evaluator refuses a holdout count or read from any other tree. A code change after the
@@ -155,7 +158,7 @@ for, and only the prospective holdout can support a confirmatory claim.
 
 H1 rests on BCW 2011 (**survives**) and the relative-volume/price-return ranking in
 `catalyst-experiment/protocol.json`, which is structurally a MAX-like selection. H3 rests on LPS 2019 and ABJK 2022
-(*contested*). Their full texts must be read before the freeze, and H3-c is two-sided at development, so no test
+(*contested*). Their full texts must be read before the freeze, and H3-c is two-sided at every stage, so no test
 depends on their sign. A VWAP-loss or ladder arm, from Maróy's SSRN 5095349 (posted 2025-01-12, returned HTTP 403,
 never read), is **excluded from the confirmatory family**.
 
@@ -163,7 +166,7 @@ never read), is **excluded from the confirmatory family**.
 
 | Need | Source | Status now | Gate |
 |---|---|---|---|
-| PIT daily and minute SIP bars, quotes, official auction prices, corporate actions (core H1 and H3; H6 later) | Alpaca market data (SIP), already entitled; used by `broad-universe` and `extreme-gainer-audit` | bars **available** (daily from 2016-01-04, minute from 2016-01-01); quote and auction-print coverage for 2016-2020 **unverified** | a metadata coverage check before the freeze; private hashed snapshots pinned, each request with `asof` = its session and the fetch date kept as the vintage. Before 2020, survivorship is limited (`broad-universe/README.md`), so results for 2017-2019 carry that label |
+| PIT daily and minute SIP bars, quotes, official auction prices, corporate actions (core H1 and H3; H6 later) | Alpaca market data (SIP), already entitled; used by `broad-universe` and `extreme-gainer-audit` | bars **available** (daily from 2016-01-04, minute from 2016-01-01); quote and auction-print coverage for 2016-2020 **unverified** | a metadata coverage check before the freeze; private hashed snapshots pinned, each request with `asof` = its session and the fetch date kept as the vintage. Before 2020, survivorship is limited (`broad-universe/README.md`), so results for 2017-2019 carry that label and gate nothing. For 2020 (validation), the broad-universe measure counts 563 names whose last bar falls in 2020, inside 2021-2025's 512-756 (`broad-universe/receipt.json`) |
 | 8-K Item 1.01 acceptance times (H2, deferred to v3.1+) | SEC EDGAR through the catalyst-provenance and catalyst-dataset recipes | **gated**: `catalyst.py` parses no Item and has no historical ticker-to-CIK map, and its availability rule fails every historical filing | a preregistered acceptance-time availability rule, an Item parser, an as-known CIK source and an index-completeness check, all before the freeze |
 | Shares outstanding and public float (screen only) | [SEC XBRL frames](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) | **available** as a screen (*contested*: one misattributed source corrected) | frames give one last-filed value per entity. Each row carries `accn` but no filed date, and superseded vintages are absent. A name that clears the screen must be confirmed from companyfacts (or submissions by `accn`) for the filed date and the original vintage before the float counts as point-in-time |
 | Historical halt, LULD and status events (H4, deferred to v3.1+; halt fidelity in simulation) | Databento XNAS.ITCH normalized status schema (`databento/dbn`, Apache-2.0; *contested*: corrected from raw ITCH H/h/J messages to the normalized schema), cross-checked against the Nasdaq Trader halt history | **gated on paid data the user must buy** (Databento is metered). A free short-window pilot is possible | get a `Historical.metadata.get_cost` quote for one symbol-year; confirm the coverage start and the licence. Per the TotalView-ITCH 5.0 spec, halt and resume state (H, Q, T) covers every security traded on the Nasdaq execution system, including other exchanges' listings; the LULD pause state (P) and the auction collar (J) are for Nasdaq-listed names only, and a pause in another listing appears as a halt |
@@ -437,7 +440,8 @@ into another:
   holdout;
 - the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed, including
   terminal exits, renames and ticker reuse, split and ex-dividend crossings, early-close sessions, segment-end
-  censoring and the embargo, the direction lock and the evaluator's refusals.
+  censoring and the embargo, validation's independence from development outputs, the access-log authorization and
+  completion records and the evaluator's refusals.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
 `protocol-draft.json` (`review_record`); round 5, the restructure into the core, is in `protocol-core-draft.json`.
@@ -478,7 +482,11 @@ in the core for H1 and H3, but they must be resolved again for each deferred ite
   [`h6-execution-parity-draft.json`](h6-execution-parity-draft.json), labelled not part of the alpha family. *Open
   findings:* X2 (no minimum stage length, so a one-session stage passes TOST trivially), X3 (arm b's trigger time is
   in practice its fill time, which biases the common basis), X4 (H6-e eligibility treats the arms asymmetrically) and
-  X6 (labels are undefined for a TOST test with no MDE).
+  X6 (labels are undefined for a TOST test with no MDE). From the PR #167 review: stage membership still follows the
+  closing session, so slow exits move to later stages (freeze entry cohorts and wait for each position's terminal or
+  censoring state); each arm is normalized to its own trigger, so a common frozen shadow trigger policy should be the
+  primary comparison; and the descriptive H6-c call count needs an inclusion list and an allocation rule for shared
+  reconciliation reads, batches and retries.
 - **Population I and the H1 a_fast and c_session arms.** *Reason:* they multiplied cells without adding a test of
   MAX conditioning. *Open finding:* X8 (listing eligibility used an opening print that can come after the decision
   minute).
