@@ -28263,8 +28263,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "10bb4a1c90dbc26e4f7e4e6cd40446eb653e1ae46333b5ab57710060372bf682",
-      "bytes": 8755
+      "sha256": "f6abb6cc41caa9d0b4b72243fda60b290b3e54ac363b5f6a9bdf819214490375",
+      "bytes": 11897
     },
     {
       "path": "scripts/trading_gates.py",
@@ -28763,8 +28763,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "e5ef748e67409701e00853020f95939f894a8e7d3992bf679f4a8337b6aec490",
-      "bytes": 8482
+      "sha256": "a8707108794a9d5920abdf984b5eee6a2a6e4bb21b15e73417631c044e60b5a3",
+      "bytes": 10572
     },
     {
       "path": "tests/test_render_config.py",

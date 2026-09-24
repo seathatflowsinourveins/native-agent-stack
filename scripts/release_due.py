@@ -4,13 +4,17 @@
 A new machine checks out adoption/manifest.json source.release_tag (step 0), then follows the
 documents in that checkout. Main may already describe steps that are not released. This report
 lists, against source.release_commit:
-  due      repository paths referenced by main's new-machine documents that are absent at the release;
-  changed  new-machine files present at both whose content differs: the new-host documents, the
-           platform pages, README.md's Start here section (reported as README.md#start-here) and every
-           path those documents reference. A pinned host runs the release's copy of each, so a
-           changed script, pin file or step is not on a new machine until a release carries it.
-adoption/manifest.json (the pin itself) and manifests/evidence.json (the hash index) always differ
-after a re-pin and are not compared. Either list non-empty means a release (and a re-pin) is due.
+  due      new-machine files on main that are absent at the release: the new-host documents, the
+           platform pages, and every repository path they (or README.md's Start here section)
+           reference, by extension-matched path, relative Markdown link or bare path;
+  changed  those files present in main's HEAD tree and at the release whose mode, object kind or
+           content differs, adoption/manifest.json compared without source.release_tag,
+           source.release_commit and updated_at (a re-pin rewrites them), and README.md's Start
+           here section (reported as README.md#start-here). A pinned host runs the release's copy of
+           each, so a changed script, pin file, profile or step is not on a new machine until a
+           release carries it.
+manifests/evidence.json (the hash index) always differs after a re-pin and is not compared.
+Either list non-empty means a release (and a re-pin) is due.
 
 Modes:
   (default)                       report only, exit 0
@@ -27,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import posixpath
 import re
 import shutil
 import subprocess
@@ -40,9 +45,13 @@ PATH_RE = re.compile(
 # Documents a new machine follows after step 0.
 NEW_HOST_DOCS = ("adoption/bootstrap.md", "adoption/README.md", "docs/next-host-stages.md",
                  "docs/contributing-evidence.md", "docs/new-host-grand-list.md")
-# The pin record and the hash index: a re-pin PR changes both, so they never match the release.
-DRIFT_EXEMPT = frozenset({"adoption/manifest.json", "manifests/evidence.json"})
+# The hash index changes with every registered file (a re-pin PR re-registers the manifest), so it
+# never matches the release; adoption/manifest.json is compared without PIN_FIELDS and updated_at.
+DRIFT_EXEMPT = frozenset({"manifests/evidence.json"})
+PIN_FIELDS = ("release_tag", "release_commit")
 START_HERE = "README.md#start-here"
+LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
+BARE_PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])((?:\.github|scripts|tools|tests|adoption|docs|recipes|catalogs)/[A-Za-z0-9_./-]+)")
 
 
 def git(*args: str, check: bool = False) -> subprocess.CompletedProcess:
@@ -108,47 +117,96 @@ def pin(manifest_text: str) -> tuple[str, str]:
     return source["release_tag"], source["release_commit"]
 
 
+def new_host_docs() -> list[str]:
+    """The new-host documents and platform pages as they exist on main."""
+    pages = platform_docs(lambda d: [f"{d}/{x.name}" for x in (ROOT / d).glob("*")] if (ROOT / d).is_dir() else [])
+    return [rel for rel in (*NEW_HOST_DOCS, *pages) if (ROOT / rel).is_file()]
+
+
+def repo_file(rel: str) -> str | None:
+    """rel normalized, if it names a regular file (or a symlink) inside the repository."""
+    rel = posixpath.normpath(rel)
+    if rel.startswith(("../", "/")) or rel in (".", ".."):
+        return None
+    path = ROOT / rel
+    return rel if (path.is_file() or path.is_symlink()) and not path.is_dir() else None
+
+
+def linked_or_bare(doc: str, text: str) -> set[str]:
+    """Files a document names without a matching PATH_RE extension: relative Markdown link
+    targets (resolved against the document's directory) and bare repository paths such as
+    adoption/tools/ecosystem-bounded-run or adoption/hooks/claude/SHA256SUMS."""
+    base = posixpath.dirname(doc)
+    found = set()
+    for target in LINK_RE.findall(text):
+        target = target.split("#", 1)[0].split("?", 1)[0]
+        if target and not re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I):
+            rel = repo_file(posixpath.join(base, target) if not target.startswith("/") else target.lstrip("/"))
+            if rel:
+                found.add(rel)
+    for token in BARE_PATH_RE.findall(text):
+        rel = repo_file(token.rstrip("./,"))
+        if rel:
+            found.add(rel)
+    return found
+
+
+def new_machine_files() -> set[str]:
+    """Every file a new machine follows or runs: the new-host documents and platform pages, and
+    every file they (or README's Start here section) reference, on main, not git-ignored."""
+    texts = {doc: (ROOT / doc).read_text(encoding="utf-8") for doc in new_host_docs()}
+    readme = ROOT / "README.md"
+    if readme.is_file():
+        texts["README.md"] = start_here_section(readme.read_text(encoding="utf-8"))
+    files = set(texts) - {"README.md"}
+    for doc, text in texts.items():
+        files |= {rel for rel in referenced([text]) if repo_file(rel)} | linked_or_bare(doc, text)
+    return {rel for rel in files if not ignored(rel)}
+
+
 def due(commit: str) -> list[str]:
-    """Paths main's new-machine documents reference that exist on main but not at the release."""
-    return sorted(rel for rel in worktree_paths()
-                  if (ROOT / rel).exists() and not ignored(rel) and not at_commit(commit, rel))
+    """Paths main's new-machine documents reference, and the documents themselves, that exist on
+    main but not at the release."""
+    paths = {rel for rel in worktree_paths() if (ROOT / rel).exists()} | new_machine_files()
+    return sorted(rel for rel in paths if not ignored(rel) and not at_commit(commit, rel))
 
 
-def worktree_blobs(rels: list[str]) -> dict[str, str]:
-    """Blob ids git would store for these working-tree files (same filters as git add)."""
+def tree_entries(ref: str, rels: list[str]) -> dict[str, tuple[str, str, str]]:
+    """(mode, object kind, object id) per path at ref: an executable bit, a symlink or a
+    submodule differs even when the bytes do not."""
     if not rels:
         return {}
-    out = subprocess.run(["git", "-C", str(ROOT), "hash-object", "--stdin-paths"], input="\n".join(rels) + "\n",
-                         capture_output=True, text=True, check=True).stdout.split()
-    return dict(zip(rels, out))
-
-
-def commit_blobs(commit: str, rels: list[str]) -> dict[str, str]:
-    if not rels:
-        return {}
-    out = git("ls-tree", "-r", "-z", "--full-tree", commit, "--", *rels, check=True).stdout
-    blobs = {}
+    out = git("ls-tree", "-r", "-z", "--full-tree", ref, "--", *rels, check=True).stdout
+    entries = {}
     for entry in filter(None, out.split("\0")):
         meta, _, rel = entry.partition("\t")
-        mode, kind, blob = meta.split()
-        if kind == "blob":
-            blobs[rel] = blob
-    return blobs
+        mode, kind, oid = meta.split()
+        entries[rel] = (mode, kind, oid)
+    return entries
+
+
+def comparable_manifest(text: str) -> str:
+    """adoption/manifest.json without the fields a re-pin rewrites."""
+    data = json.loads(text)
+    data.pop("updated_at", None)
+    for field in PIN_FIELDS:
+        data.get("source", {}).pop(field, None)
+    return json.dumps(data, sort_keys=True)
 
 
 def changed(commit: str) -> list[str]:
-    """New-machine files present on main and at the release whose content differs."""
-    worktree_docs = [*NEW_HOST_DOCS, *platform_docs(
-        lambda d: [f"{d}/{x.name}" for x in (ROOT / d).glob("*")] if (ROOT / d).is_dir() else [])]
-    candidates = sorted(rel for rel in (worktree_paths() | set(worktree_docs)) - DRIFT_EXEMPT
-                        if (ROOT / rel).is_file() and not ignored(rel))
-    released = commit_blobs(commit, candidates)
-    current = worktree_blobs([rel for rel in candidates if rel in released])
-    drift = [rel for rel, blob in current.items() if blob != released[rel]]
-    readme = ROOT / "README.md"
-    old_readme = git("show", f"{commit}:README.md")
-    if readme.is_file() and old_readme.returncode == 0 and (
-            start_here_section(readme.read_text(encoding="utf-8")) != start_here_section(old_readme.stdout)):
+    """New-machine files present in main's HEAD tree and at the release whose mode, kind or content
+    differs, adoption/manifest.json apart from its pin fields, and README's Start here section."""
+    candidates = sorted(new_machine_files() - DRIFT_EXEMPT - {"adoption/manifest.json"})
+    head, released = tree_entries("HEAD", candidates), tree_entries(commit, candidates)
+    drift = [rel for rel in candidates if rel in head and rel in released and head[rel] != released[rel]]
+    manifest_now, manifest_then = git("show", "HEAD:adoption/manifest.json"), git("show", f"{commit}:adoption/manifest.json")
+    if manifest_now.returncode == 0 and manifest_then.returncode == 0 and (
+            comparable_manifest(manifest_now.stdout) != comparable_manifest(manifest_then.stdout)):
+        drift.append("adoption/manifest.json")
+    readme_now, readme_then = git("show", "HEAD:README.md"), git("show", f"{commit}:README.md")
+    if readme_now.returncode == 0 and readme_then.returncode == 0 and (
+            start_here_section(readme_now.stdout) != start_here_section(readme_then.stdout)):
         drift.append(START_HERE)
     return sorted(drift)
 
