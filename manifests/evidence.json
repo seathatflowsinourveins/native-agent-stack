@@ -3021,6 +3021,11 @@
   ],
   "files": [
     {
+      "path": ".claude/settings.json",
+      "sha256": "275845f5f7e3d1422aef8b0f52c5407174827cbf7ba6ca1757b4ef511fda1fef",
+      "bytes": 1058
+    },
+    {
       "path": ".gitattributes",
       "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
       "bytes": 467
@@ -3122,8 +3127,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "69dfc36b845b2a2fffe49431a8a5d3c267257ca795a80603e10f53cb012e8977",
-      "bytes": 507
+      "sha256": "c70623eece257cf1a5b26694af88d0a6f5899f2ddb3e09dcb6c3abd30d737f37",
+      "bytes": 725
     },
     {
       "path": ".gitleaks.toml",
@@ -3137,8 +3142,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "7c853106ce46ab7f493cb0d635c3428789335163bd21013cecad7143ccc18e21",
-      "bytes": 10043
+      "sha256": "06a1eaf808a783cd3821e566ef1837503cc13a1f0ba5f516bc59538c79fdcaac",
+      "bytes": 10279
     },
     {
       "path": "CLAUDE.md",
@@ -3177,8 +3182,13 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b39e002f6f8821025d765033f45c627167839530c4d5c6f06fc8301d1fe238c2",
-      "bytes": 20514
+      "sha256": "ff84961451fa443ecb25d7139bc1afdf7714cf54fa3c4a0a797672773d6251f3",
+      "bytes": 20793
+    },
+    {
+      "path": "adoption/credential-inventory.json",
+      "sha256": "78effc097dfbf1e3e09ee1d81f25d0f6cf67e6335cd1208a26403992a391c8d7",
+      "bytes": 11573
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -9642,6 +9652,11 @@
       "bytes": 81210
     },
     {
+      "path": "docs/decisions/2026-09-24-secret-storage.md",
+      "sha256": "01a4be728982f807a23023e7c8576da35411195a9f14f02d58e44f1ab58a2d53",
+      "bytes": 9498
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -9695,6 +9710,16 @@
       "path": "docs/evidence.md",
       "sha256": "533b70565ec01075e79a494897dd448e6ce3a00246a45c8cbdeca11d7aaf5b74",
       "bytes": 11895
+    },
+    {
+      "path": "docs/examples/alpaca-paper.env.example",
+      "sha256": "b85dd6cccbc26e1a1f62f60bebfe1be371d49978f514a3edb55c0241e8bf8afd",
+      "bytes": 393
+    },
+    {
+      "path": "docs/examples/sec-contact.env.example",
+      "sha256": "183e956761139218262df4046126d785f2aea20e946b13d667700353afedf2a7",
+      "bytes": 316
     },
     {
       "path": "docs/foundation-closure-20260921.md",
@@ -9915,6 +9940,11 @@
       "path": "docs/restricted-worker-compatibility.md",
       "sha256": "aac2349d063fffcf90c5dba0cbce89741962b41279a7b07d1453f0c261242954",
       "bytes": 4106
+    },
+    {
+      "path": "docs/secret-storage.md",
+      "sha256": "6c8923e9a688a70c25a871b4c1fcd1547daf6ef68d5d49aa2987d3044dae9f6c",
+      "bytes": 17254
     },
     {
       "path": "docs/stack.md",
@@ -28407,6 +28437,21 @@
       "bytes": 26462
     },
     {
+      "path": "scripts/credential_status.py",
+      "sha256": "a07362ab59c305a8870fff2195b962c3223efe6181e0192ba85fc0f33d05b878",
+      "bytes": 15184
+    },
+    {
+      "path": "scripts/git-hooks/pre-commit",
+      "sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
+      "bytes": 608
+    },
+    {
+      "path": "scripts/hooks/secret_path_guard.py",
+      "sha256": "e1ea08085973ea757894e33f010b8dab21d7ce52ce24967c65f5047cbf45640f",
+      "bytes": 7743
+    },
+    {
       "path": "scripts/host_receipts.py",
       "sha256": "30da2f203f9f3d03c60eec6dc8ce416e84665013523e9001681429fbaf6d7598",
       "bytes": 62536
@@ -28448,8 +28493,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "6acbdb3a2d94d2924f425ecb057f050fc4c7b6c8766fc048d464d7dc18d12e3c",
-      "bytes": 24453
+      "sha256": "fa80b84deed3ac547a05ba2a069d2854c4cf4d30b926fae3458f2bcf886e3e31",
+      "bytes": 25377
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -28707,6 +28752,11 @@
       "bytes": 4471
     },
     {
+      "path": "tests/test_credential_status.py",
+      "sha256": "fe84bb21fcdbee657e0a196394594687e0234a66993f2280e556a715373619a2",
+      "bytes": 9614
+    },
+    {
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
@@ -28962,6 +29012,11 @@
       "bytes": 7481
     },
     {
+      "path": "tests/test_pre_commit_gate.py",
+      "sha256": "305adb9986d82ae10ec7991e49db190d105b5c60a9f0b3796360dd15a3b90fb0",
+      "bytes": 2744
+    },
+    {
       "path": "tests/test_promotion_gate.py",
       "sha256": "8dde55b8406a18d6d5b043fe15289cf7660ee001a465a9927e61982d95afebfa",
       "bytes": 28717
@@ -28995,6 +29050,11 @@
       "path": "tests/test_research_workflow.py",
       "sha256": "a14b3159757516ffd7d8b795a7f3217acf808e186ec5f3e17f2b4b639504a0b7",
       "bytes": 9857
+    },
+    {
+      "path": "tests/test_secret_path_guard.py",
+      "sha256": "98ce97c54c32fe2ba63331e80ba06234808c9396875a5d58bec8f9f96f3983de",
+      "bytes": 6264
     },
     {
       "path": "tests/test_security_identity.py",

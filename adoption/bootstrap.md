@@ -140,6 +140,10 @@ GitHub-hosted macOS runner; see
    Then confirm discovery with `codex mcp list` and `claude mcp list` before any
    scoped task (native verification tier "Client activation" in
    [`adoption/README.md`](README.md#native-verification-tiers)).
+   Provider keys (Alpaca paper, SEC contact, optional paid keys) go in
+   per-provider `0600` files outside the checkout; follow
+   [`docs/secret-storage.md`](../docs/secret-storage.md) and check with
+   `python3 scripts/credential_status.py` (both added after `v2026.09.24.1`).
 
 4. **Render configs.** Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
    with the selected host's `adoption/hosts/<host>.json` (gitignored; copy
