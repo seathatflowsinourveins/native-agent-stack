@@ -1,0 +1,17 @@
+{"ask": "14.94", "at": 1790275929.7513862, "client_id": "mvr-mover-mac-20260924c-0000001", "limit_price": "15.01", "qty": 13, "symbol": "GRML", "type": "mover_entry_submitted"}
+{"at": 1790275929.756452, "client_id": "mvr-mover-mac-20260924c-0000001", "reason": "entry", "side": "buy", "strategy": "MOVER-001-M", "symbol": "GRML", "type": "intent"}
+{"ask": "2.97", "at": 1790275931.0629098, "client_id": "mvr-mover-mac-20260924c-0000002", "limit_price": "2.98", "qty": 67, "symbol": "PFSA", "type": "mover_entry_submitted"}
+{"at": 1790275931.0648792, "client_id": "mvr-mover-mac-20260924c-0000002", "reason": "entry", "side": "buy", "strategy": "MOVER-001-M", "symbol": "PFSA", "type": "intent"}
+{"ask": "5.29", "at": 1790275944.792449, "client_id": "mvr-mover-mac-20260924c-0000003", "limit_price": "5.31", "qty": 37, "symbol": "APUS", "type": "mover_entry_submitted"}
+{"at": 1790275944.795947, "client_id": "mvr-mover-mac-20260924c-0000003", "reason": "entry", "side": "buy", "strategy": "MOVER-001-M", "symbol": "APUS", "type": "intent"}
+{"ask": "32.25", "at": 1790275948.716759, "client_id": "mvr-mover-mac-20260924c-0000004", "limit_price": "32.41", "qty": 6, "symbol": "SRZN", "type": "mover_entry_submitted"}
+{"at": 1790275948.719329, "client_id": "mvr-mover-mac-20260924c-0000004", "reason": "entry", "side": "buy", "strategy": "MOVER-001-M", "symbol": "SRZN", "type": "intent"}
+{"at": 1790275958.3172538, "reason": "entries_not_enabled", "symbol": "GCTK", "type": "mover_entry_skipped"}
+{"at": 1790280082.7967622, "reason": "hard_flatten", "type": "mover_force"}
+{"at": 1790280082.7967622, "reason": "hard_flatten", "symbol": "APUS", "type": "mover_exit_triggered"}
+{"at": 1790280082.7967622, "reason": "hard_flatten", "symbol": "PFSA", "type": "mover_exit_triggered"}
+{"at": 1790280082.7967622, "reason": "hard_flatten", "symbol": "SRZN", "type": "mover_exit_triggered"}
+{"at": 1790280082.7967622, "reason": "hard_flatten", "symbol": "GRML", "type": "mover_exit_triggered"}
+{"at": 1790280086.785463, "bid": "15.05", "client_id": "mvr-mover-mac-20260924c-0000005", "limit_price": "14.98", "qty": 13, "reason": "hard_flatten", "symbol": "GRML", "type": "mover_exit_submitted"}
+{"at": 1790280086.788405, "client_id": "mvr-mover-mac-20260924c-0000005", "reason": "hard_flatten", "side": "sell", "strategy": "MOVER-001-M", "symbol": "GRML", "type": "intent"}
+{"at": 1790280086.936745, "bid": "5.25", "client_id": "mvr-mover-mac-20260924c-0000006", "limit_price": "5.23", "qty": 37, "reason": "hard_flatten", "symbol": "APUS", "type": "mover_exit_submitted"}

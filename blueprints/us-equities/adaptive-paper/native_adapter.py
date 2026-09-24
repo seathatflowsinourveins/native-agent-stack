@@ -24,6 +24,7 @@ _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 from sessions import DEFAULT_SESSION_POLICY, order_extended_hours_flag, reconciliation_receipt
+from fills import report_unit, resolve_execution
 
 from nautilus_trader.common import Environment, FileWriterConfig, LogLevel
 from nautilus_trader.config import DataClientConfig, ExecutionClientConfig, LiveNodeConfig
@@ -77,6 +78,9 @@ def shares(value):
     if value != value.to_integral_value():
         raise ValueError("fractional_shares_unsupported")
     return Quantity.from_int(int(value))
+
+
+FILL_EVENTS = frozenset({"fill", "partial_fill"})  # trade updates that carry one execution's qty and price
 
 
 def instrument(metadata):
@@ -303,8 +307,9 @@ class AlpacaExecutionClient(ExecutionClient):
             raise ValueError("broker_order_identity_changed")
         if filled < prior["qty"]:
             return  # A delayed cumulative snapshot must never roll back fills.
-        value = filled * avg
-        if filled == prior["qty"] and value != prior["value"]:
+        # prior["value"] is the exact notional of the fills resolved so far (fills.resolve_execution);
+        # the broker's average is rounded, so a repeat report agrees within its reporting bound.
+        if filled and filled == prior["qty"] and abs(filled * avg - prior["value"]) >= filled * report_unit(avg):
             raise ValueError("same_quantity_fill_correction_requires_reconciliation")
         if prior["terminal"] and filled > prior["qty"]:
             raise ValueError("post_terminal_fill_requires_reconciliation")
@@ -314,13 +319,15 @@ class AlpacaExecutionClient(ExecutionClient):
             prior["accepted"] = True
         if filled > prior["qty"]:
             delta = filled - prior["qty"]
-            last_px = (value - prior["value"]) / delta
-            if last_px <= 0 or last_px != last_px.quantize(Decimal(1).scaleb(-ins.price_precision)):
-                raise ValueError("cumulative_fill_precision_requires_reconciliation")
+            fill_event = row.get("event") in FILL_EVENTS
+            last_px, notional = resolve_execution(
+                prior["qty"], prior["value"], filled, avg, Decimal(1).scaleb(-ins.price_precision),
+                event_qty=row.get("event_qty") if fill_event else None,
+                event_price=row.get("event_price") if fill_event else None)
             self.generate_order_filled(order, broker_id, None,
-                fill_trade_id(row["id"], filled), shares(delta), Price.from_str(str(last_px)),
+                fill_trade_id(row["id"], filled), shares(delta), Price.from_str(format(last_px, "f")),
                 USD, Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE, stamp)
-            prior["qty"], prior["value"] = filled, value
+            prior["qty"], prior["value"] = filled, notional
         if not prior["terminal"]:
             if status == "canceled":
                 self.generate_order_canceled(order, broker_id, stamp)

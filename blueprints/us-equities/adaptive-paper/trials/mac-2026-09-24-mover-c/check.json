@@ -1,0 +1,130 @@
+{
+  "assumed": "session 1, equity = capital_usd, trial start = now",
+  "config_sha256": "5a8f941686f8883d59763c10e8d8d95c9a50703f6f221b333bda500a2add6905",
+  "exit_parameters": {
+    "rule": "X1",
+    "x1_flatten_at_et": "15:58",
+    "x2_hold_seconds": 3600,
+    "x3_trail_fraction": "0.85",
+    "x4_stop_fraction": "0.85",
+    "x4_target_fraction": "1.50"
+  },
+  "exit_rule": "X1",
+  "freshness_checked": true,
+  "rule": "10:00|G20|V250000|any",
+  "scan_sha256": "afc79cdb670d077dc2b23b0e6497cefc2cec68d41efde0693d178eb8c6e954b3",
+  "session": {
+    "drawdown_factor": "1",
+    "drawdown_fraction": "0.000000",
+    "equity_peak_usd": "10000",
+    "number": 1,
+    "pause_sessions_remaining_after": 0,
+    "paused": false,
+    "reason": null,
+    "rung": "1"
+  },
+  "sizing": {
+    "appreciation_allowance": "2",
+    "engine_leverage_multiple": "1",
+    "entry_limit_cap_bps": "50",
+    "exit_headroom_factor": "10",
+    "exit_limit_cap_bps": "50",
+    "gross_budget_usd": "1000.00",
+    "gross_guard_usd": "1800.00",
+    "ledger_max_order_notional_usd": "2000",
+    "leverage_L": "1",
+    "max_entry_notional_usd": "200",
+    "regime_factor": "1",
+    "regime_source": "scan_inputs_recomputed",
+    "sizing_equity_source": "config capital_usd plus the mover ledger's realized P&L",
+    "sizing_equity_usd": "10000"
+  },
+  "status": "valid",
+  "symbols": [
+    {
+      "binding": "max_entry_notional",
+      "caps_usd": {
+        "dollar_volume_1pct": "3271618.84",
+        "entry_bar_10pct": null,
+        "gross_remaining": "1000.00",
+        "max_entry_notional": "200"
+      },
+      "intended_notional_usd": "200.00",
+      "leverage_i": "1",
+      "rank": 1,
+      "raw_notional_usd": "2000.00",
+      "skip_reason": null,
+      "symbol": "APUS"
+    },
+    {
+      "binding": "max_entry_notional",
+      "caps_usd": {
+        "dollar_volume_1pct": "2079511.71",
+        "entry_bar_10pct": null,
+        "gross_remaining": "800.00",
+        "max_entry_notional": "200"
+      },
+      "intended_notional_usd": "200.00",
+      "leverage_i": "1",
+      "rank": 2,
+      "raw_notional_usd": "2000.00",
+      "skip_reason": null,
+      "symbol": "PFSA"
+    },
+    {
+      "binding": "max_entry_notional",
+      "caps_usd": {
+        "dollar_volume_1pct": "2040769.01",
+        "entry_bar_10pct": null,
+        "gross_remaining": "600.00",
+        "max_entry_notional": "200"
+      },
+      "intended_notional_usd": "200.00",
+      "leverage_i": "1",
+      "rank": 3,
+      "raw_notional_usd": "2000.00",
+      "skip_reason": null,
+      "symbol": "SRZN"
+    },
+    {
+      "binding": "max_entry_notional",
+      "caps_usd": {
+        "dollar_volume_1pct": "1565949.14",
+        "entry_bar_10pct": null,
+        "gross_remaining": "400.00",
+        "max_entry_notional": "200"
+      },
+      "intended_notional_usd": "200.00",
+      "leverage_i": "1",
+      "rank": 4,
+      "raw_notional_usd": "2000.00",
+      "skip_reason": null,
+      "symbol": "GRML"
+    },
+    {
+      "binding": "max_entry_notional",
+      "caps_usd": {
+        "dollar_volume_1pct": "1556464.57",
+        "entry_bar_10pct": null,
+        "gross_remaining": "200.00",
+        "max_entry_notional": "200"
+      },
+      "intended_notional_usd": "200.00",
+      "leverage_i": "1",
+      "rank": 5,
+      "raw_notional_usd": "2000.00",
+      "skip_reason": null,
+      "symbol": "GCTK"
+    }
+  ],
+  "timing": {
+    "entry_deadline": "2026-09-24T18:52:37.534541+00:00",
+    "entry_timeout_seconds": 60.0,
+    "exit_order_timeout_seconds": 10.0,
+    "hard_flatten_at": "2026-09-24T20:00:07.534541+00:00",
+    "sell_window_end": "2026-09-24T20:02:07.534541+00:00",
+    "trial_start": "2026-09-24T18:52:07.534541+00:00",
+    "x1_flatten_at": "2026-09-24T19:58:00+00:00",
+    "x2_hold_seconds": 3600.0
+  }
+}

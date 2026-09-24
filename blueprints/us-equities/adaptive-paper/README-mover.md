@@ -270,9 +270,26 @@ credential.
   retry are code constants (`mover.HANDOFF_EXIT_TIMEOUTS`, `PRE_WIRE_RETRY_SECONDS`)
   chosen without a paper measurement; a broker run that shows slower fills is the
   comparison that would change them.
-- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. A cumulative
-  average finer than that (several partial fills at different prices) still stops the
-  native adapter, as it does for the adaptive lane.
+- **Partial fills at different prices.** Alpaca reports the cumulative average rounded to
+  six decimals, so partial fills a cent apart give a repeating average. The first paper run
+  (`trials/mac-2026-09-24-mover-a/`) stopped on this: 11 shares at 15.00 and then 1 at 15.01,
+  reported as 15.000833, derived as 15.009996. `fills.py` now resolves every fill for both
+  lanes. `filled x avg` misses the true notional by strictly less than `filled x 0.000001`,
+  and every execution price lies on the instrument's grid.
+  - A trade-update event whose quantity is exactly the new shares supplies their price. That
+    price must be on the grid and agree with the average, or the order needs reconciliation
+    (`fill_event_price_requires_reconciliation`).
+  - Otherwise, the new shares' notional must be the only whole number of ticks inside that
+    bound, and it must divide into an on-grid price per share.
+  - Anything else, including several execution prices in one report and an ambiguous
+    notional, still stops the native adapter (`cumulative_fill_precision_requires_reconciliation`).
+  - The ledger's limit check (`incremental_fill_violates_limit`) is unchanged. It compares the
+    price derived from two rounded averages with the limit, so fills exactly at the limit, in
+    parts at different prices, can halt it falsely (1 x 100.00 then 2 x 100.01 at a 100.01 limit
+    derives 100.0100005). Mover orders are marketable limits 50 bps beyond the quote, so their
+    fills do not land on the limit. The fix is tracked separately.
+
+  A 4-decimal instrument carries fills to 0.0001.
 - **Evidence.** Everything here is SYN until an actual broker run: unit tests, the
   native end-to-end tests with `mover_simulation.py` and `synthetic`. Alpaca paper
   fills are the broker's simulation, not exchange executions.

@@ -38,7 +38,7 @@ def tearDownModule():
 class FakePort:
     def __init__(self, mode="fills"):
         self.mode, self.started, self.stopped = mode, 0, 0
-        self.submissions, self.events = [], []
+        self.submissions, self.events, self.fills = [], [], []
         self.qty, self.cash = 0, 10000
         self.active = {}
         self.quote_bid, self.quote_ask = "100.00", "100.01"
@@ -77,6 +77,8 @@ class FakePort:
             return dict(order)
         if self.mode == "cancel":
             return order
+        if self.mode in ("rounded_avg", "rounded_avg_events", "avg_correction"):
+            return self.fill_at_two_prices(payload, order)
         qty = int(payload["qty"])
         for filled in range(1, qty + 1):
             order.update(filled_qty=str(filled), filled_avg_price=payload["limit_price"],
@@ -87,6 +89,34 @@ class FakePort:
             self.on_order(dict(order))  # repeated wire delivery must not duplicate native fills
         self.active.pop(payload["client_order_id"])
         return dict(order)  # REST confirmation repeats the last stream state
+
+    def fill_at_two_prices(self, payload, order):
+        # The 2026-09-24 paper GRML exit: shares filled a cent apart and Alpaca reported the
+        # cumulative average rounded to six decimals, so it repeats (300.01 / 3 -> 100.003333).
+        # A buy fills a cent below its limit and then at it; a sell at its limit and then above.
+        limit, cent = Decimal(payload["limit_price"]), Decimal("0.01")
+        buy = payload["side"] == "buy"
+        steps = ((2, limit - cent if buy else limit), (1, limit if buy else limit + cent))
+        filled = value = Decimal(0)
+        for qty, price in steps:
+            filled += qty
+            value += qty * price
+            avg = (value / filled).quantize(Decimal("0.000001")).normalize()
+            order.update(filled_qty=str(filled), filled_avg_price=format(avg, "f"),
+                         status="filled" if filled == int(payload["qty"]) else "partially_filled",
+                         updated_at_ns=time.time_ns())
+            if self.mode == "rounded_avg_events":
+                order.update(event="fill" if order["status"] == "filled" else "partial_fill",
+                             event_qty=str(qty), event_price=format(price, "f"))
+            self.qty += qty if buy else -qty
+            self.cash += float(-qty * price if buy else qty * price)
+            self.fills.append((payload["side"], qty, price))
+            self.on_order(dict(order))
+        if self.mode == "avg_correction":
+            # A later report of the same quantity at a materially different average.
+            self.on_order(dict(order, filled_avg_price=format(avg + cent, "f"), updated_at_ns=time.time_ns()))
+        self.active.pop(payload["client_order_id"])
+        return dict(order)
 
     async def cancel(self, cid):
         order = self.active.pop(cid)
@@ -110,10 +140,11 @@ if NATIVE:
     class Roundtrip(Strategy):
         def __init__(self, mode="fills"):
             super().__init__(StrategyConfig(log_events=False, log_commands=False))
-            self.mode = mode
+            self.mode, self.qty = mode, 2
             self.order = None
             self.buy_qty = self.sell_qty = 0
             self.fill_events = 0
+            self.fill_prices = []
             self.accepted = self.canceled = self.rejected = 0
             self.flat_seen = False
 
@@ -122,7 +153,7 @@ if NATIVE:
 
         def on_quote(self, tick):
             if self.order is None:
-                self.order = self.order_factory.limit(tick.instrument_id, OrderSide.BUY, Quantity.from_int(2),
+                self.order = self.order_factory.limit(tick.instrument_id, OrderSide.BUY, Quantity.from_int(self.qty),
                     tick.ask_price, time_in_force=TimeInForce.DAY, tags=["reason=test", "family=momentum"])
                 self.submit_order(self.order)
 
@@ -133,14 +164,16 @@ if NATIVE:
 
         def on_order_filled(self, event):
             self.fill_events += 1
+            self.fill_prices.append(("buy" if event.order_side == OrderSide.BUY else "sell",
+                                     int(str(event.last_qty)), Decimal(str(event.last_px))))
             if event.order_side == OrderSide.BUY:
                 self.buy_qty += int(str(event.last_qty))
-                if self.buy_qty == 2:
+                if self.buy_qty == self.qty:
                     self.submit_order(self.order_factory.limit(event.instrument_id, OrderSide.SELL,
-                        Quantity.from_int(2), event.last_px, time_in_force=TimeInForce.DAY))
+                        Quantity.from_int(self.qty), event.last_px, time_in_force=TimeInForce.DAY))
             else:
                 self.sell_qty += int(str(event.last_qty))
-                if self.sell_qty == 2:
+                if self.sell_qty == self.qty:
                     self.flat_seen = self.portfolio.is_net_flat(event.instrument_id)
                     self.shutdown_system("test roundtrip flat")
 
@@ -174,8 +207,9 @@ class NativeIntegration(unittest.TestCase):
                 self.assertEqual(Decimal(str(quote.ask_price)), Decimal(ask))
                 self.assertEqual(port.submissions, [])
 
-    def run_node(self, mode):
+    def run_node(self, mode, qty=2):
         port, strategy = FakePort(mode), Roundtrip(mode)
+        strategy.qty = qty  # Nautilus Strategy.__new__ takes one positional argument
         session = ADAPTER.build_node(port, [{"symbol": "SPY", "currency": "USD"}], [strategy])
         async def exercise():
             await asyncio.wait_for(session.run_async(), timeout=8)
@@ -245,6 +279,22 @@ class NativeIntegration(unittest.TestCase):
         self.assertEqual(strategy.accepted, 0)
         self.assertEqual(strategy.fill_events, 0)
         self.assertEqual(port.stopped, 1)
+
+    def test_rounded_average_partial_fills_carry_each_executions_price(self):
+        # Without the stream's execution price, each price is recovered from the rounded
+        # cumulative average (100.009999 -> 100.01), within the average's reporting bound.
+        for mode in ("rounded_avg", "rounded_avg_events"):
+            with self.subTest(mode=mode):
+                port, strategy, session = self.run_node(mode, qty=3)
+                self.assertEqual(session.errors, [])
+                self.assertEqual((strategy.buy_qty, strategy.sell_qty, strategy.fill_events), (3, 3, 4))
+                self.assertEqual(strategy.fill_prices, port.fills)
+                self.assertTrue(strategy.flat_seen)
+                self.assertEqual(port.qty, 0)
+
+    def test_same_quantity_average_change_beyond_rounding_still_needs_reconciliation(self):
+        port, strategy, session = self.run_node("avg_correction", qty=3)
+        self.assertTrue(any("same_quantity_fill_correction_requires_reconciliation" in e for e in session.errors))
 
     def test_fractional_broker_fill_freezes_and_retains_actual_residual(self):
         port, strategy, session = self.run_node("fractional")

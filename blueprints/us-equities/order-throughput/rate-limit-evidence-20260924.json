@@ -31,8 +31,8 @@
     "class": "measured from committed files (headers recorded by adaptive-paper's GuardedSession observer)",
     "command": "python3 blueprints/us-equities/order-throughput/rate_limit_evidence.py --check",
     "totals_by_origin_and_limit": {
-      "data:10000": 14,
-      "trading:200": 705
+      "data:10000": 16,
+      "trading:200": 1693
     },
     "files": [
       {
@@ -211,6 +211,32 @@
           "read:200": 36
         },
         "min_trading_remaining": 167
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/mover-paper.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 508
+        },
+        "counts_by_request_kind_and_limit": {
+          "data_read:10000": 1,
+          "read:200": 498,
+          "submit:200": 10
+        },
+        "min_trading_remaining": 188
+      },
+      {
+        "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/mover-paper.json",
+        "counts_by_origin_and_limit": {
+          "data:10000": 1,
+          "trading:200": 480
+        },
+        "counts_by_request_kind_and_limit": {
+          "data_read:10000": 1,
+          "read:200": 476,
+          "submit:200": 4
+        },
+        "min_trading_remaining": 189
       }
     ],
     "unattributed": [
