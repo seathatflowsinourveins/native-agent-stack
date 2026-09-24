@@ -15,6 +15,9 @@
     "V9": "P costs: entry at the close pays 0.5 x the half-spread of bucket 10:00-16:00 for its price tier and day d's dollar-volume tier; Z1's exit pays 0.5 x the 09:30-10:00 bucket and Z2's 0.5 x the 10:00-16:00 bucket, using day d+1's price tier and day d's dollar-volume tier; Z3 uses the one it exits at. Fees as v1 at the exit date. Trade-level notional $20,000.",
     "V10": "P capture: the day-d+1 degree tier uses all_c(d+1) / all_c(d) - 1 over every universe row; recall = selected-and-in-tier / in-tier, reported for the qualifying set and for the top-5 set, beside the tier's base rate.",
     "V11": "Portfolio for P: equity marked at day d's close equals the session's starting equity (positions opened at the close and closed the next day before the next entry); gross leverage = min(2, rung x regime x drawdown factor). Family E and F portfolios are v1's, with a decision-time dollar volume cap.",
-    "V12": "Bootstrap seed = int.from_bytes(sha256(b'mover-followup-v2-20260924').digest()[:8], 'big'); each family's rule-exits share one replicate matrix per split; P's calendar is its entry sessions d."
-  }
+    "V12": "Bootstrap seed = int.from_bytes(sha256(b'mover-followup-v2-20260924').digest()[:8], 'big'); each family's rule-exits share one replicate matrix per split; P's calendar is its entry sessions d.",
+    "V13": "Portfolio slots for E and F are filled in entry-time order (then symbol), at most 5 per session, because a live system cannot rank later fires; notional comes from the session's starting equity. P slots rank day d's dollar volume (then symbol). A P trade needs both d and d+1 inside the split, so no trade exits into a later split.",
+    "V14": "P signals use day d's full regular session (close, high, volume), which a live system only approximates at the closing-auction order cutoff; the paper mapping scores a snapshot about 10 minutes before the cutoff and records the difference. This is a limitation of the historical test, not a correction."
+  },
+  "amended_at": "2026-09-24T05:19:01Z (V13, V14 added before any v2 outcome)"
 }
