@@ -3,6 +3,7 @@ from dataclasses import replace
 from decimal import Decimal as D
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
 import sqlite3
 import sys
@@ -551,6 +552,42 @@ class SafetyTests(unittest.TestCase):
         self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0], 1)
         with self.assertRaisesRegex(s.SafetyError, "after_definitive_refusal"):
             self.fill()
+
+    def test_price_outside_minimum_price_variance_is_refused_before_send(self):
+        for cid, price in (("sub-1", "100.0201"), ("sub-2", "0.99991")):
+            with self.assertRaisesRegex(s.SafetyError, "invalid_price_increment"):
+                self.reserve(cid, price=price)
+        self.assertEqual(self.ledger.intents(), [])
+        self.reserve("ok-1", price="0.9999")  # four decimals below $1.00 are valid
+
+    def test_documented_sub_penny_422_is_the_only_definitive_422(self):
+        class Exempt(s.Ledger):  # the native-fault harness's FaultLedger shape
+            def _check_price_increment(self, client_id, price):
+                if client_id != "c04":
+                    super()._check_price_increment(client_id, price)
+        self.ledger.close()
+        self.ledger = Exempt(self.db)
+        with self.assertRaisesRegex(s.SafetyError, "invalid_price_increment"):
+            self.reserve("other", price="100.0201")
+        self.reserve("c04", price="100.0201")
+        self.reserve("valid", price="100.02")
+        for cid in ("c04", "valid"):
+            self.ledger.request_budget(self.now, "submit", cid)
+        for status, refusal in [(422, None), (422, "other"), (403, s.SUB_PENNY_REFUSAL), (400, s.SUB_PENNY_REFUSAL)]:
+            with self.assertRaisesRegex(s.SafetyError, "unsupported_broker_refusal"):
+                self.ledger.mark_broker_refused("c04", status, refusal)
+        # The refusal must agree with the intent's own durable price.
+        with self.assertRaisesRegex(s.SafetyError, "refusal_contradicts_intent_price"):
+            self.ledger.mark_broker_refused("valid", 422, s.SUB_PENNY_REFUSAL)
+        self.assertTrue(self.ledger.mark_broker_refused("c04", 422, s.SUB_PENNY_REFUSAL))
+        self.assertFalse(self.ledger.mark_broker_refused("c04", 422, s.SUB_PENNY_REFUSAL))
+        statuses = {i.client_id: i.status for i in self.ledger.intents()}
+        self.assertEqual(statuses, {"c04": "broker_refused", "valid": "reserved"})
+        payload = json.loads(self.ledger.db.execute(
+            "SELECT payload FROM events WHERE kind='broker_refused' AND client_id='c04'").fetchone()[0])
+        self.assertEqual((payload["http_status"], payload["refusal"]), (422, s.SUB_PENNY_REFUSAL))
+        self.assertEqual(self.ledger.accounting().cash_delta_usd, 0)
+        self.assertEqual(self.ledger.positions(), {})
 
     def test_wide_quote_values_held_loss_but_does_not_block_owned_exit(self):
         self.reserve()

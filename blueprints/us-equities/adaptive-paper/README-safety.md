@@ -62,11 +62,26 @@ limit-order mechanism guarantees a flat finish.
   that no HTTP request was sent; a timeout or other ambiguous send must remain
   unresolved and be queried by its existing client ID. Observed orders cannot
   be marked not sent, and a later broker observation of such an ID fails closed.
-- `mark_broker_refused(client_id, http_status)` records distinct local terminal
+- `mark_broker_refused(client_id, http_status, refusal=None)` records distinct local terminal
   status `broker_refused` for an attempted zero-fill order without broker ID.
   Only HTTP 401/403/404 qualify, and transport must first establish that the
   subsequent client-ID lookup returned 404. It retains the HTTP status and budget.
-  Timeout, 400, 422, 429 and 5xx remain ambiguous. Neither local terminal status is
+  Timeout, 400, 422, 429 and 5xx remain ambiguous, with one exception that Alpaca's
+  documentation proves definitive: a 422 whose `refusal` is `SUB_PENNY_REFUSAL`
+  (`"sub_penny_minimum_price_variance"`), which the transport assigns only to the
+  documented body code 42210000 with "sub-penny increment does not fulfill minimum
+  pricing criteria" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md: such
+  orders "will be rejected"). That page documents the body, not the HTTP status;
+  the 422 was inferred from the code prefix and the POST /v2/orders 422 entry. It
+  was observed once on the paper endpoint in the 2026-09-24 native-fault run
+  (`native-faults/receipt.json`, C04: submit 422, then lookup 404). The same body
+  under any other status still stays ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
+  limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
+  otherwise). Any other 422, including "client_order_id must be unique", stays
+  ambiguous. `reserve_intent` still refuses such a price before send
+  (`invalid_price_increment`, via the overridable `_check_price_increment`); only
+  the native-fault harness's `FaultLedger` exempts its single C04 client ID.
+  Neither local terminal status is
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,

@@ -304,6 +304,40 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(proof["open_orders"], 0)
             ledger.close()
 
+    def test_documented_sub_penny_refusal_is_recorded_through_the_controller(self):
+        from transport import RejectedSubmission, SUB_PENNY_REFUSAL
+        import safety
+
+        class Exempt(Ledger):  # native-faults/harness.py FaultLedger shape
+            def _check_price_increment(self, client_id, price):
+                if client_id != "c04-test":
+                    super()._check_price_increment(client_id, price)
+        now = time.time()
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Exempt(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True)
+
+            class RefusingPort:
+                ready = True
+                async def submit(self, payload):
+                    controller.before_submit(payload)
+                    await controller.before_request("submit", payload["client_order_id"])
+                    raise RejectedSubmission(422, SUB_PENNY_REFUSAL)
+            controller.port = controller.bind(RefusingPort())
+            controller.quote({"symbol": "SPY", "bid": "100", "ask": "100.01", "ts_ns": time.time_ns()})
+            payload = {"client_order_id": "c04-test", "symbol": "SPY", "side": "buy", "qty": "1",
+                       "limit_price": "40.0001"}
+            with self.assertRaises(RejectedSubmission) as caught:
+                asyncio.run(controller.port.submit(payload))
+            self.assertEqual(caught.exception.refusal, safety.SUB_PENNY_REFUSAL)
+            intent = ledger.intents()[0]
+            self.assertEqual((intent.status, intent.limit_price), ("broker_refused", Decimal("40.0001")))
+            self.assertTrue(controller.stop)
+            proof = reconcile(ledger, {"complete": True, "orders": [], "positions": [], "account": {"cash": "100000"}}, "100000")
+            self.assertEqual((proof["open_orders"], proof["positions"]), (0, 0))
+            ledger.close()
+
     def test_recovery_preflight_does_not_require_entry_cash_or_unrelated_quotes(self):
         config, _, _ = load_config(SOURCE / "config.json")
         now = time.time_ns()
