@@ -319,12 +319,14 @@ class NotRead(unittest.TestCase):
             deadline = holdout.read_deadline(ctx, last)
             logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
             write_validation(repo, fx, screened=("H3-a", "H3-c"))
-            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted", items=("H3-a",)))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted", items=("H3-a",),
+                                                         val=validation_sha(("H3-a", "H3-c"))))
             FR.commit_push(repo, FR.git_date(deadline + 60))
             with self.assertRaisesRegex(holdout.HoldoutRefused, "not the validated items"):
                 holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
             logs.append_line(repo / ACCESS_LOG, gate.completion("read-001", "x", "failed", None, 0, None, []))
-            logs.append_line(repo / ACCESS_LOG, auth_rec("count-002", "count", "granted", items=("H3-c",)))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("count-002", "count", "granted", items=("H3-c",),
+                                                         val=validation_sha(("H3-a", "H3-c"))))
             FR.commit_push(repo, FR.git_date(deadline + 180))
             with self.assertRaisesRegex(holdout.HoldoutRefused, "not the validated items"):
                 holdout.count(runner_ctx(repo), "count-002", root, {}, deadline + 240)
@@ -335,6 +337,76 @@ class NotRead(unittest.TestCase):
             FR.commit_push(repo, FR.git_date(deadline + 300))
             with self.assertRaisesRegex(gate.NoAuthorization, "malformed"):
                 holdout.read(runner_ctx(repo), "read-003", root, {}, deadline + 360)
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+
+    def test_a_read_result_left_by_a_hard_kill_is_recomputed(self):
+        """Review round 14, Codex P2: holdout-read.json written but its run-log line lost to a hard kill is not
+        final; the rerun recomputes the same bytes, replaces it and logs it. Once a line cites it, the read is final."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            write_validation(repo, fx)
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted"))
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            with mock.patch.object(logs, "append_line", side_effect=SystemError("power loss")):
+                with self.assertRaises(SystemError):
+                    holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
+            path = repo / RESULTS_DIR / "holdout-read.json"
+            orphan = sha256_file(path)
+            out = holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 180)
+            self.assertEqual(out["results_sha256"], orphan)
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["results_sha256"], line["replaced_uncited_results_sha256"]), (orphan, orphan))
+            FR.commit_push(repo, FR.git_date(deadline + 240))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "read once"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 300)
+
+    def test_the_validation_file_is_bound_at_authorization(self):
+        """Review round 14, Codex P1: a count or read refuses when the working validation file differs from the
+        sha256 its authorization recorded (a local edit of the H3-c estimate's sign after the gate opened), and when
+        the authorization bound other bytes than the governing run-log line names; nothing is written."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            bound = write_validation(repo, fx, screened=("H3-a", "H3-c"))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted", items=("H3-a", "H3-c"),
+                                                         val=bound))
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            path = repo / RESULTS_DIR / "validation.json"
+            body = json.loads(path.read_text())
+            body["items"]["H3-c"]["estimate"] = -0.5        # the sign the read's H3-c pass uses
+            path.write_text(json.dumps(body))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "changed after the authorization"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "changed after the authorization"):
+                holdout.require_validated_carried(runner_ctx(repo), auth_rec("count-009", "count", "granted",
+                                                                            items=("H3-a", "H3-c"), val=bound))
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+            # the committed bytes restored: the bound read goes ahead (here to the not-read label, as the
+            # authorization reached origin/main after the deadline)
+            FR.write(path, validation_body(("H3-a", "H3-c")).decode("utf-8"))
+            out = holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 180)
+            self.assertFalse(out["read"])
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            write_validation(repo, fx)
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "granted", val="f" * 64))
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "changed after the authorization"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
             self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
 
     def test_refused_read_and_missing_collection(self):
@@ -404,24 +476,37 @@ FINAL_COUNT = {"utc_start": "2027-12-10T00:00:00Z", "stage": "holdout", "purpose
                "extension": {"extend": False, "below_minimum": [], "underpowered": []}, "void": False}
 
 
-def auth_rec(aid, purpose, decision, refusal=None, retry_of=None, items=("H3-a",)):
-    """A well-formed authorization record (every gate.AUTH_FIELDS field; review round 12, F1)."""
+def validation_body(screened=("H3-a",)) -> bytes:
+    """The bytes FR.write gives a governing validation results file whose validated items are `screened`."""
+    ids = ("H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c")
+    val = {"labels": {i: ("screened" if i in screened else "underpowered") for i in ids},
+           "items": {i: {"p_stage": 0.01 if i in screened else 1.0} for i in ids}}
+    return json.dumps(val).encode("utf-8")
+
+
+def validation_sha(screened=("H3-a",)) -> str:
+    from core.canon import sha256_bytes
+    return sha256_bytes(validation_body(screened))
+
+
+def auth_rec(aid, purpose, decision, refusal=None, retry_of=None, items=("H3-a",), val=None):
+    """A well-formed authorization record (every gate.AUTH_FIELDS field; review round 12, F1). val: the validation
+    results sha256 it binds (review round 14, Codex P1); by default the one write_validation writes for `items`."""
     return {"utc": "x", "record_kind": "authorization", "authorization_id": aid, "actor_role": "committed automation",
             "protocol_id": "p", "protocol_sha256": "a" * 64, "code_revision": "c", "study_code_tree": "t",
-            "runtime_lock_sha256": "r", "data_file_sha256s": {}, "validation_results_sha256": "v",
+            "runtime_lock_sha256": "r", "data_file_sha256s": {},
+            "validation_results_sha256": val if val is not None else validation_sha(tuple(items) or ("H3-a",)),
             "requested_items": list(items), "purpose": purpose, "decision": decision, "refusal": refusal,
             "retry_of": retry_of}
 
 
 def write_validation(repo, fx, screened=("H3-a",)):
     """A governing validation results file whose validated ('screened') items are `screened`."""
-    ids = ("H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c")
-    val = {"labels": {i: ("screened" if i in screened else "underpowered") for i in ids},
-           "items": {i: {"p_stage": 0.01 if i in screened else 1.0} for i in ids}}
-    FR.write(repo / RESULTS_DIR / "validation.json", json.dumps(val))
+    FR.write(repo / RESULTS_DIR / "validation.json", validation_body(screened).decode("utf-8"))
     logs.append_line(repo / RUN_LOG, {"stage": "validation", "purpose": "evaluate", "status": "complete",
                                       "results_sha256": sha256_file(repo / RESULTS_DIR / "validation.json"),
                                       "study_tree": fx["tree"], "protocol_sha256": fx["protocol_sha256"]})
+    return sha256_file(repo / RESULTS_DIR / "validation.json")
 
 
 class ReadDecidedBeforeOutcome(unittest.TestCase):
@@ -564,6 +649,76 @@ class RetrySnapshot(unittest.TestCase):
                 "input_snapshot_sha256s": ["a" * 64], "snapshot_dir": "count-count-002"}
         ctx = {"access_log": access, "run_log": [line]}
         self.assertEqual(holdout.sealed_refs(ctx), [("collect-collect-001", "c" * 64), ("count-count-002", "a" * 64)])
+
+
+class StaleBase(unittest.TestCase):
+    def test_a_per_event_request_fetched_before_its_data_end_is_fetched_again(self):
+        """Review round 14, F1: the count fetches per-event bars and prints at the close of the window's last session;
+        their 'end' is 5 sessions later, so the read must not reuse that response (a delayed exit after the last
+        session would find no bar and drop out as 'undefined_factor'). A base response fetched after its data end
+        is reused; the live copy governs once fetched; screen requests are never stale."""
+        from core import driver
+        from core.holdout_store import HoldoutStore
+        cal = synth.calendar()
+        t, last = "2020-06-01", "2020-06-05"
+        end = cal.offset(last, 5)
+        early = [r for r in plan.event_requests(cal, "AAA", t, end, holdout=True)]
+        done = [r for r in plan.event_requests(cal, "AAA", t, last, holdout=True)]
+        screen = plan.screen_requests(cal, last, ["AAA"])
+        at_count = synth.iso_us(cal.close(last) + 60)[:19] + "Z"
+        base = Store()
+        for r in early + done + screen:
+            base.put(r, True, [b'{"bars": {}}'], at_count)
+        hs = HoldoutStore([base], Store(), cal)
+        self.assertTrue(all(not hs.has(r["key"]) for r in early))
+        self.assertTrue(all(hs.has(r["key"]) for r in done + screen))
+        calls = []
+
+        class Stub:
+            def get(self, endpoint, params):
+                calls.append(params["end"])
+                return {"complete": True, "pages": [b'{"bars": {}}'], "error": None}
+        driver.to_fixpoint(lambda st: early + done + screen, {"data": Stub(), "trading": Stub()}, hs, "2020-06-15",
+                           clock=lambda: synth.iso_us(cal.close(end) + 60)[:19] + "Z")
+        self.assertEqual(len(calls), len(early))
+        self.assertTrue(all(hs.has(r["key"]) and hs._holder(r["key"]) is hs.live for r in early))
+        # without the calendar (the pre-round-14 store) the count's response was reused as held
+        self.assertTrue(all(HoldoutStore([base], Store()).has(r["key"]) for r in early))
+
+
+class DiscardedAttempt(unittest.TestCase):
+    def test_a_sealed_ledger_without_its_committed_line_is_not_fetched_again(self):
+        """Review round 14, F3: a fetch step whose directory already holds a sealed ledger that no committed line
+        names (a discarded local attempt) is refused before any request, for a holdout count or read and for a stage
+        fetch under its open start line."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "snap"
+            FR.write(root / "read-read-001" / "ledger.jsonl", "")
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "discarded attempt"):
+                holdout._fetch_step({"repo": Path(tmp)}, "read", {"authorization_id": "read-001"}, [], str(root),
+                                    None, "plan", "2027-12-20", {}, None, 0.0, ["2027-01-02", "2027-12-10"], {})
+            self.assertFalse((Path(tmp) / RUN_LOG).exists())
+            ctx = {"repo": Path(tmp), "tree": "t", "protocol_sha256": "p",
+                   "run_log": [{"stage": "validation", "purpose": "fetch_start", "study_tree": "t",
+                                "protocol_sha256": "p"}]}
+            FR.write(root / "validation" / "ledger.jsonl", "")
+            with self.assertRaisesRegex(runner.RunRefused, "discarded attempt"):
+                runner.stage_fetch_run(ctx, "validation", root / "validation", None, {}, None)
+
+
+class OpenList(unittest.TestCase):
+    def test_no_count_is_authorized_while_the_open_list_has_an_entry(self):
+        """Review round 14: open_before_first_holdout_count must be empty before the first holdout count; authorize
+        refuses a 'count' and writes no record while it has an entry."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            ctx["protocol"] = dict(ctx["protocol"], open_before_first_holdout_count=[{"id": "R14-open-1"}])
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "R14-open-1"):
+                holdout.authorize(ctx, "count", ctx["cal"].close(last) + 60)
+            self.assertEqual((repo / ACCESS_LOG).read_text(), "")
 
 
 class Collection(unittest.TestCase):

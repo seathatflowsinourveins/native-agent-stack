@@ -82,21 +82,39 @@ def per_side(hs_cell: float, h_fill: float, imp: float, mode: str = "primary") -
 
 
 class Fees:
+    """Review round 14, F2: the base file's rows of one kind never overlap and each has from <= to (a base that
+    breaks this is refused at load, never at a read). An amendment line supersedes, for the dates it covers, every
+    earlier row of its kind (the base's open-ended last row included): the latest appended line that covers a date
+    governs, and a base row governs a date no amendment line covers. No line is edited; supersession is by
+    precedence. core.holdout.require_fee_coverage checks that every date a count or read can book has a row before
+    that action fetches anything."""
+
     def __init__(self, base: dict, amendments: list[dict] = (), freeze_session: str | None = None):
         """freeze_session, when given, refuses an amendment line whose first date precedes it (review round 9, F5);
         from_files requires it whenever the amendment file has a line."""
         self.sec = list(base["sec_section31_usd_per_million_of_sales"])
         self.taf = list(base["finra_taf_covered_equity_sales"])
+        for name, rows in (("SEC", self.sec), ("TAF", self.taf)):
+            spans = sorted((r["from"], r["to"]) for r in rows)
+            for lo, hi in spans:
+                if lo > hi:
+                    raise ValueError(f"a base {name} fee row runs from {lo} to {hi}")
+            for (_, hi), (lo, _) in zip(spans, spans[1:]):
+                if lo <= hi:
+                    raise ValueError(f"base {name} fee rows overlap on {lo}")
+        self.sec_amend, self.taf_amend = [], []
         for a in amendments:
             if freeze_session is not None and (a.get("from") or "") < freeze_session:
                 raise ValueError(f"fee amendment starts {a.get('from')}, before the freeze session")
+            if not a.get("from") or not a.get("to") or a["from"] > a["to"]:
+                raise ValueError(f"fee amendment runs from {a.get('from')} to {a.get('to')}")
             if a.get("kind") == "sec_section31":
-                self.sec.append(a)
+                self.sec_amend.append(a)
             elif a.get("kind") == "finra_taf":
-                self.taf.append(a)
+                self.taf_amend.append(a)
             else:
                 raise ValueError(f"unknown fee amendment kind {a.get('kind')!r}")
-        if any(r.get("max_per_trade") is None for r in self.taf):
+        if any(r.get("max_per_trade") is None for r in self.taf + self.taf_amend):
             raise ValueError("a TAF row must carry its max_per_trade cap")
 
     @classmethod
@@ -110,26 +128,59 @@ class Fees:
         return cls(base, lines, freeze_session=freeze_session)
 
     @staticmethod
-    def _row(rows, day):
+    def _row(rows, amended, day):
+        for r in reversed(amended):
+            if r["from"] <= day <= r["to"]:
+                return r
         hit = [r for r in rows if r["from"] <= day <= r["to"]]
         if len(hit) != 1:
             raise KeyError(f"{len(hit)} fee rows for {day}")
         return hit[0]
 
     def rates(self, day: str):
-        taf = self._row(self.taf, day)
-        return self._row(self.sec, day)["rate"], taf["usd_per_share"], taf["max_per_trade"]
+        taf = self._row(self.taf, self.taf_amend, day)
+        return self._row(self.sec, self.sec_amend, day)["rate"], taf["usd_per_share"], taf["max_per_trade"]
+
+    def gaps(self, days) -> list:
+        """The days of `days` that have no governing SEC or TAF row."""
+        out = []
+        for d in days:
+            try:
+                self.rates(d)
+            except KeyError:
+                out.append(d)
+        return out
 
     def sale_fees(self, day: str, shares: float, sell_value: float) -> float:
         sec, taf, cap = self.rates(day)
         return sec * sell_value / 1e6 + min(taf * shares, cap)
 
 
-def cash_term(raw_c_e, all_c_e, raw_c_x, all_c_x, F) -> float:
-    """D7's cash per original share, raw_c(e) x all_c(x) / all_c(e) - F x raw_c(x), kept with its sign only when
-    |cash| > 2e-3 x raw_c(e) (review round 8, E6: a symmetric band above the measured 6e-4 rounding noise)."""
-    cash = raw_c_e * all_c_x / all_c_e - F * raw_c_x
-    return cash if abs(cash) > C["cash_band"] * raw_c_e else 0.0
+def cash_term(raw: dict, split: dict, allc: dict, e: str, x: str):
+    """The cash per original share from entry session e to exit session x (review round 14, Codex P2), or None
+    without the raw, split and all bars of e and x.
+
+    D(d) = all_c(d) / split_c(d) is the dividend-only adjustment of session d. Between consecutive sessions p < k
+    of [e, x] that have split and all bars, the step s_k = 1 - D(p) / D(k) is an ex-dividend on k; the cash per
+    split-adjusted share is split_c(p) x s_k (the dividend at the previous close, D7's arithmetic at the ex-date),
+    and per original share it is a(e) x split_c(p) x s_k, a(e) = raw_c(e) / split_c(e). A step with |s_k| at or
+    below 2e-3 is adjustment-rounding noise (review round 8, E6) and books nothing, and the sum is kept with its
+    sign only when |cash| > 2e-3 x raw_c(e). No price after the ex-date enters: D7's raw_c(e) x all_c(x) /
+    all_c(e) - F x raw_c(x) scaled the dividend by the close of x, so an exit at the open of x booked cash that
+    moved with x's later intraday return."""
+    r_e = raw.get(e)
+    days = [d for d in sorted(set(split) & set(allc)) if e <= d <= x
+            and (split[d] or {}).get("c") and (allc[d] or {}).get("c")]
+    if not r_e or not r_e.get("c") or not days or days[0] != e or days[-1] != x:
+        return None
+    a_e = float(r_e["c"]) / float(split[e]["c"])
+    total = 0.0
+    for p_, k in zip(days, days[1:]):
+        step = 1.0 - (allc[p_]["c"] / split[p_]["c"]) / (allc[k]["c"] / split[k]["c"])
+        if abs(step) > C["cash_band"]:
+            total += float(split[p_]["c"]) * step
+    cash = a_e * total
+    return cash if abs(cash) > C["cash_band"] * float(r_e["c"]) else 0.0
 
 
 def trade_net_return(notional, entry_mid, exit_price, F, cash, c_in, c_out, fees: Fees, exit_day: str) -> float:

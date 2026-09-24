@@ -158,6 +158,8 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
     if frozen:
         protocol["status"] = "frozen"
         protocol["frozen_before_outcomes"] = True
+        # review round 14: a freeze that would allow a holdout count has an empty open list (core.holdout.authorize)
+        protocol["open_before_first_holdout_count"] = []
         protocol["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(RATE_LIMIT)
         sc = protocol["run_discipline"]["study_code"]
         sc["tree"] = tree

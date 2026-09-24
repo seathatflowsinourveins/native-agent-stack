@@ -123,8 +123,8 @@ class StageRunsOnce(unittest.TestCase):
                 # F10: killed after the atomic write: the line records the file's sha256 as complete
                 real_write = runner.atomic_write_results
 
-                def write_then_die(path, obj):
-                    real_write(path, obj)
+                def write_then_die(path, obj, *a):
+                    real_write(path, obj, *a)
                     raise KeyboardInterrupt("killed after the results write")
                 with mock.patch.object(runner, "atomic_write_results", write_then_die):
                     with self.assertRaises(KeyboardInterrupt):
@@ -141,6 +141,57 @@ class StageRunsOnce(unittest.TestCase):
                 body = json.loads(results.read_text())
                 self.assertEqual(body["stage_labels"], [])
                 self.assertTrue(all(r["qualifiers"] == [] for r in body["items"].values()))
+
+
+class HardKill(unittest.TestCase):
+    def test_a_results_file_left_by_a_hard_kill_is_recomputed_and_logged(self):
+        """Review round 14, Codex P2: a SIGKILL or power loss between the results rename and the log line (no
+        'finally' runs) leaves a file that no line cites. The next run under the open start recomputes it from the
+        same sealed snapshot, replaces it with identical bytes, and its line names the replaced sha256."""
+        cal = synth.calendar()
+        market, symbols = build_market(cal)
+        enum = {"symbols": symbols, "actions": [], "active": symbols, "counts": {}}
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+            fetch = ["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap]
+            fast = functools.partial(ST.evaluate_stage, B=200)
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(market)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(ST, "evaluate_stage", lambda *a, **k: fast(*a, **k)):
+                run.main(fetch)
+                FR.commit_push(repo, "2026-11-30T01:00:00+00:00")
+                run.main(fetch)
+                FR.commit_push(repo, "2026-12-01T01:00:00+00:00")
+                sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
+                evaluate = ["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]),
+                            "--snapshot", snap, "--sha", sha]
+                run.main(evaluate)
+                FR.commit_push(repo, "2026-12-01T01:30:00+00:00")
+                n = len(logs.read_lines(repo / RUN_LOG))
+                results = repo / RESULTS_DIR / "validation.json"
+                with mock.patch.object(logs, "append_line", side_effect=SystemError("power loss before the line")):
+                    with self.assertRaises(SystemError):
+                        run.main(evaluate)
+                self.assertTrue(results.exists())
+                self.assertEqual(len(logs.read_lines(repo / RUN_LOG)), n)
+                orphan = canon.sha256_file(results)
+                self.assertEqual(run.main(evaluate), 0)
+                last = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((last["status"], last["results_sha256"], last["replaced_uncited_results_sha256"]),
+                                 ("complete", orphan, orphan))
+                self.assertEqual(canon.sha256_file(results), orphan)
+                FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
+                with self.assertRaises(runner.RunRefused):     # now cited: the first results file governs
+                    run.main(evaluate)
+        # a file with other bytes than an uncited one named by the caller is never replaced
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "r.json"
+            path.write_text("{}")
+            with self.assertRaises(canon.ResultsExist):
+                canon.atomic_write_results(path, {"a": 1}, "0" * 64)
+            self.assertEqual(path.read_text(), "{}")
 
 
 class StageOrder(unittest.TestCase):

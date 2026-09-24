@@ -506,7 +506,12 @@ resolved a second Claude review (2 findings) and a second Codex review (5 P2), r
 void deviation applies only if it reached origin/main before the outcome it would void could be computed, and a later
 one is reported, never applied, so no void can cancel the holdout read; evaluations run under pushed start lines;
 identity survivors come from rename records effective by t; and the count retry, retried-count snapshot, quote-merge
-and fee first-use gaps are closed. The next steps are an
+and fee first-use gaps are closed. Review round 14 resolved a third Claude review (2 medium, 2 low) and a third Codex
+review (1 P1, 2 P2), rejecting none: the validation file is bound by sha256 from authorization to the count and read,
+the read refetches per-event data the count fetched too early, fee amendments supersede by precedence and a gap is
+refused before any fetch, dividend cash no longer moves with prices after the ex-date, and a hard-killed results write
+is recovered. Two items that need a redesign are listed in the protocol's `open_before_first_holdout_count`, which
+must be empty before the first holdout count. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 

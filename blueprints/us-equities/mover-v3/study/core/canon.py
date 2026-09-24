@@ -40,11 +40,16 @@ class ResultsExist(Exception):
     pass
 
 
-def atomic_write_results(path, obj) -> str:
+def atomic_write_results(path, obj, replace_uncited: str | None = None) -> str:
     """Write one results file atomically: temporary file, fsync, rename. Refuses to replace an existing
-    results file (a stage has at most one). Returns the sha256 of the bytes written."""
+    results file (a stage has at most one). Returns the sha256 of the bytes written.
+
+    replace_uncited (review round 14, Codex P2): the sha256 of an existing file that no run-log line cites (a run
+    killed between this rename and its log line). The caller has checked that no line cites a results file; the
+    retry recomputes from the same sealed inputs and replaces exactly that file, and its line records the replaced
+    sha256. Any other existing file is refused."""
     path = Path(path)
-    if path.exists():
+    if path.exists() and (replace_uncited is None or sha256_file(path) != replace_uncited):
         raise ResultsExist(f"{path.name}: a results file already exists for this run")
     data = (json.dumps(clean(obj), sort_keys=True, indent=1, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
     tmp = path.with_name(path.name + ".tmp")

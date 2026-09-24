@@ -7,6 +7,13 @@ session): a screen row of session s for symbol X comes from the latest batch who
 (a complete one before an incomplete one), and the rename-day re-fetch rows of X for session s, when present, join
 that screen (they replace the batch's rows for the sessions they hold). Only symbol-sessions that no batch holds
 are requested by the plan (core.stage._screen_reqs), with asof = s. Every other request is found by its key.
+
+Review round 14, F1: a per-event or quote request held by an earlier sealed snapshot (a count's) is found there only
+if that snapshot fetched it after the request's data end had passed: the scheduled close of its 'end' session (daily
+bars, auctions) or its 'end' timestamp (minute bars, quotes) is at or before the request's vintage. Otherwise the
+earlier response cannot hold the sessions after its fetch (the bars and prints of a delayed exit after the window's
+last session, fetched by the count at its close), so the request is fetched again into the live snapshot, and the
+live copy governs. Screen and enumeration requests are unaffected.
 """
 from __future__ import annotations
 
@@ -15,9 +22,27 @@ from core.screen import SCREEN_KINDS
 RENAME_PREFIX = "rename_refetch_"
 
 
+STALE_KINDS = ("event_", "quote_")
+
+
+def data_end(cal, req: dict):
+    """The epoch at which a per-event or quote request's data are complete, or None for another kind."""
+    from core.calendar import parse_utc
+    if not req["kind"].startswith(STALE_KINDS):
+        return None
+    end = (req.get("params") or {}).get("end")
+    if not end:
+        return None
+    if len(end) == 10:
+        return cal.close(end) if cal.is_session(end) else None
+    return parse_utc(end)
+
+
 class HoldoutStore:
-    def __init__(self, bases: list, live):
-        self.bases, self.live = list(bases), live
+    def __init__(self, bases: list, live, cal=None):
+        """cal: the calendar that dates a base response's data end (review round 14, F1); without it every base
+        response is used as held (the pre-round-14 behaviour, kept for the key-only unit tests)."""
+        self.bases, self.live, self.cal = list(bases), live, cal
         self.index, self.rename = {}, {}
         for st in [*self.bases, self.live]:
             for key in sorted(st.req):
@@ -47,11 +72,19 @@ class HoldoutStore:
         return self.live.incomplete_by_kind()
 
     # ------------------------------------------------------------ lookup by key across every store
+    def stale(self, st, key) -> bool:
+        """A base response fetched before its data end (review round 14, F1)."""
+        if self.cal is None:
+            return False
+        from core.calendar import parse_utc
+        end = data_end(self.cal, st.req[key])
+        return end is not None and parse_utc(st.state[key]["vintage"]) < end
+
     def _holder(self, key):
         if self.live.has(key):
             return self.live
         for st in reversed(self.bases):
-            if st.has(key):
+            if st.has(key) and not self.stale(st, key):
                 return st
         return None
 

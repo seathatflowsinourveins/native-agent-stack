@@ -150,7 +150,9 @@ def fee_first_use(lines: list, run_log: list) -> dict:
     for i, rec in enumerate(lines):
         for x in run_log:
             span = x.get("fee_span") or x.get("sessions")
-            if x.get("purpose") not in ("count", "read") or not span:
+            # review round 14, F2: a count's or read's '_fetch' step is a use too, so no fee line for its dates
+            # can be added between the sealed fetch and the evaluation
+            if x.get("purpose") not in ("count", "read", "count_fetch", "read_fetch") or not span:
                 continue
             if span[0] <= rec.get("to", "") and rec.get("from", "") <= span[1]:
                 t = parse_utc(x["utc_start"])

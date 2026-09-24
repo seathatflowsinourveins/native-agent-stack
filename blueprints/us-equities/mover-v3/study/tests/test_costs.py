@@ -111,6 +111,44 @@ class Fees(unittest.TestCase):
             costs.Fees(FEES).sale_fees("2021-07-06", 1, 1)
 
 
+class FeeSupersession(unittest.TestCase):
+    """Review round 14, F2: an SEC or TAF rate change after the freeze is representable over an open-ended base row,
+    base rows that overlap are refused at load, and a count or read refuses a fee gap before it fetches or logs."""
+
+    def test_an_amendment_supersedes_an_open_ended_base_row(self):
+        base = json.loads(json.dumps(FEES))
+        base["sec_section31_usd_per_million_of_sales"][-1]["to"] = "2099-12-31"      # open-ended, as pinned
+        base["finra_taf_covered_equity_sales"][-1]["to"] = "2099-12-31"
+        f = costs.Fees(base, [{"kind": "sec_section31", "from": "2027-05-14", "to": "2099-12-31", "rate": 27.8},
+                              {"kind": "sec_section31", "from": "2027-10-01", "to": "2099-12-31", "rate": 20.6}],
+                       freeze_session="2026-10-05")
+        self.assertEqual(f.rates("2027-05-13")[0], 13.00)
+        self.assertEqual(f.rates("2027-05-14")[0], 27.8)
+        self.assertEqual(f.rates("2027-10-01")[0], 20.6)          # the latest appended line that covers the date
+        self.assertEqual(f.gaps(["2027-05-14", "2027-10-01"]), [])
+
+    def test_overlapping_base_rows_are_refused_and_gaps_are_named(self):
+        bad = json.loads(json.dumps(FEES))
+        bad["sec_section31_usd_per_million_of_sales"][0]["to"] = "2017-10-20"
+        with self.assertRaisesRegex(ValueError, "overlap"):
+            costs.Fees(bad)
+        f = costs.Fees(FEES)                                      # the base ends 2021-06-30
+        self.assertEqual(f.gaps(["2021-06-30", "2021-07-01", "2021-07-02"]), ["2021-07-01", "2021-07-02"])
+
+    def test_a_count_or_read_refuses_a_fee_gap_before_it_fetches(self):
+        from core import holdout, logs
+        cal = synth.calendar(last="2021-12-31")
+        ctx = {"cal": cal, "fees": costs.Fees(FEES)}
+        with self.assertRaisesRegex(holdout.HoldoutRefused, "no governing fee row .first 2021-07-01"):
+            holdout.require_fee_coverage(ctx, ["2021-06-25", "2021-07-09"])
+        holdout.require_fee_coverage(ctx, ["2021-06-01", "2021-06-30"])
+        # a '_fetch' line's dates are a first use: no fee line for them can be added between seal and evaluation
+        line = {"stage": "holdout", "purpose": "read_fetch", "utc_start": "2021-07-12T21:00:00Z",
+                "sessions": ["2021-06-01", "2021-06-30"], "fee_span": ["2021-06-01", "2021-07-08"]}
+        use = logs.fee_first_use([{"kind": "sec_section31", "from": "2021-07-01", "to": "2021-12-31"}], [line])
+        self.assertIn(0, use)
+
+
 class NetReturn(unittest.TestCase):
     def test_formula_on_a_small_table(self):
         f = costs.Fees(FEES)
@@ -132,25 +170,47 @@ class NetReturn(unittest.TestCase):
         e, x = s[1], s[5]
         # an ordinary 1% dividend on s[3]: cash booked, F = 1
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.8, cash_at={s[3]: 0.2})
-        cash = costs.cash_term(raw[e]["c"], allc[e]["c"], raw[x]["c"], allc[x]["c"], 1.0)
-        self.assertAlmostEqual(cash, 0.2, places=9)
+        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.2, places=9)
         # a special 5% dividend: cash, never a share change (split-adjusted closes carry no dividend)
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.0, cash_at={s[3]: 1.0})
         from core import formulas as FM
         self.assertEqual(FM.share_factor(raw, split, e, x), 1.0)
         self.assertFalse(FM.suspected_at(cal, raw, split, s[3]))
-        self.assertAlmostEqual(costs.cash_term(raw[e]["c"], allc[e]["c"], raw[x]["c"], allc[x]["c"], 1.0), 1.0, places=9)
+        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 1.0, places=9)
         # a 2:1 split: F = 2, cash 0
         raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 10.0, split_at={s[3]: 2.0})
-        F = FM.share_factor(raw, split, e, x)
-        self.assertEqual(F, 2.0)
-        self.assertEqual(costs.cash_term(raw[e]["c"], allc[e]["c"], raw[x]["c"], allc[x]["c"], F), 0.0)
+        self.assertEqual(FM.share_factor(raw, split, e, x), 2.0)
+        self.assertEqual(costs.cash_term(raw, split, allc, e, x), 0.0)
+        # a 2:1 split before a $0.20 dividend per new share: 2 new shares per original share receive 0.40
+        raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[2] else (10.0 if d < s[3] else 9.8),
+                                        split_at={s[2]: 2.0}, cash_at={s[3]: 0.2})
+        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.4, places=9)
+        # a missing bar inside the hold is skipped; a missing bar at e or x leaves the cash undefined
+        raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < s[3] else 19.8, cash_at={s[3]: 0.2},
+                                        missing=(s[2],))
+        self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 0.2, places=9)
+        self.assertIsNone(costs.cash_term(raw, split, allc, s[2], x))
+
+    def test_cash_does_not_move_with_prices_after_the_ex_date(self):
+        """Review round 14, Codex P2: entry close $20, a $1 dividend ex on x, an overnight exit at x's open. D7's
+        formula booked cash 1 with x's close at 19 and cash 2 with x's close at 38; the cash is 1 either way."""
+        cal = synth.calendar()
+        s = cal.range("2020-06-01", "2020-06-05")
+        e, x = s[1], s[2]
+        for close_x in (19.0, 38.0):
+            raw, split, allc = synth.series(cal, s[0], s[-1], lambda d: 20.0 if d < x else close_x,
+                                            cash_at={x: 1.0})
+            self.assertAlmostEqual(costs.cash_term(raw, split, allc, e, x), 1.0, places=9)
 
     def test_cash_band_is_symmetric(self):
-        # 5e-4 adjustment noise of either sign books 0 (review round 8, E6)
-        self.assertEqual(costs.cash_term(10.0, 10.0, 10.0, 10.0 * (1 + 5e-4), 1.0), 0.0)
-        self.assertEqual(costs.cash_term(10.0, 10.0, 10.0, 10.0 * (1 - 5e-4), 1.0), 0.0)
-        self.assertAlmostEqual(costs.cash_term(10.0, 10.0, 10.0, 10.0 * (1 - 5e-3), 1.0), -0.05)
+        # 5e-4 adjustment noise of either sign books 0 (review round 8, E6); a 5e-3 step books with its sign
+        cal = synth.calendar()
+        s = cal.range("2020-06-01", "2020-06-05")
+        bar = lambda c: {"o": c, "h": c, "l": c, "c": c, "v": 1}  # noqa: E731
+        raw = {d: bar(10.0) for d in s}
+        for eps, want in ((5e-4, 0.0), (-5e-4, 0.0), (-5e-3, 10.0 * (1 - 1 / (1 - 5e-3)))):
+            allc = {d: bar(10.0 * (1 + eps) if d == s[3] else 10.0) for d in s}
+            self.assertAlmostEqual(costs.cash_term(raw, raw, allc, s[1], s[3]), want, places=12)
 
 
 if __name__ == "__main__":

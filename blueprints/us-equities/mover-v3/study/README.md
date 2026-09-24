@@ -68,6 +68,15 @@ same-session guard use only rename records effective by t and no active status. 
 be its retry; retried counts read their first attempt's snapshot directory; identical quote updates inside a page are
 kept in provider order; and read lines record `fee_span` for fee first use.
 
+Review round 14: `count` and `read` refuse unless the working validation file's sha256 equals the one the
+authorization recorded and the governing run-log line's, and the read takes the H3-c sign from those bytes. A
+per-event or quote response that an earlier count fetched before its data end is fetched again for the read
+(`core/holdout_store.py`). Fee amendment lines supersede earlier rows by precedence, overlapping base rows are
+refused at load, and a count or read refuses a fee gap before it fetches. The dividend cash is taken per ex-date at
+the previous close. A results file left without its line by a hard kill is recomputed and replaced on the retry,
+and a fetch step refuses a sealed ledger that no committed line names. `authorize --purpose count` refuses while the
+protocol's `open_before_first_holdout_count` list has an entry.
+
 ## Tests
 
 From the repository root:

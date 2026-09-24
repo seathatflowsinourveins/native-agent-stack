@@ -284,20 +284,38 @@ def sealed_retry_chain(ctx: dict, purpose: str, retry_of) -> bool:
 def require_validated_carried(ctx: dict, auth: dict) -> tuple:
     """Review round 12, F1: the carried items are exactly the validated items of the governing validation file
     (holdout_gate.opens_only_for), rechecked at the count and the read, not only at authorization. A committed record
-    that lists a subset would otherwise leave a validated item out of the read and out of the not-read label."""
-    res = validation_state(ctx)["results"]
+    that lists a subset would otherwise leave a validated item out of the read and out of the not-read label.
+
+    Review round 14, Codex P1: the validation file is bound by its sha256. The authorization record carries the
+    validation_results_sha256 it was evaluated on, and every count and read (both steps, and the not-read label)
+    refuses unless the working file's sha256 equals that value and the governing run-log line's results_sha256.
+    A local edit after the authorization (the H3-c estimate whose sign the read uses, or a label) is refused, never
+    read. Returns (carried items, the bound validation results)."""
+    val = validation_state(ctx)
+    bound = auth.get("validation_results_sha256")
+    if val["sha256"] != bound or (val["sha256"] is not None and val["sha256"] != val["committed_sha256"]):
+        raise HoldoutRefused(f"{auth.get('authorization_id')} was authorized on validation results "
+                             f"{bound}; the working file is {val['sha256']} and the governing run-log line names "
+                             f"{val['committed_sha256']}: the validation file changed after the authorization")
+    res = val["results"]
     validated = gate.validated_items(res) if res and gate.validation_complete(res) else []
     carried = tuple(auth.get("requested_items") or ())
     if sorted(carried) != sorted(validated):
         raise HoldoutRefused(f"{auth.get('authorization_id')} carries {sorted(carried)}, not the validated items "
                              f"{sorted(validated)} of the governing validation file")
-    return carried
+    return carried, res
 
 
 def authorize(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
     from core.runner import check_clock
     check_clock(ctx, now)
     check_record_times(ctx)
+    # review round 14: open_before_first_holdout_count lists defects the review rounds could not fix without a
+    # redesign; the first holdout count is never authorized while it holds an entry (no record is written)
+    if purpose == "count" and ctx["protocol"].get("open_before_first_holdout_count"):
+        raise HoldoutRefused("the frozen protocol's open_before_first_holdout_count list is not empty: "
+                             + "; ".join(str(x.get("id", x)) if isinstance(x, dict) else str(x)
+                                         for x in ctx["protocol"]["open_before_first_holdout_count"]))
     if purpose == "read" and not read_due(ctx, now):
         _, last = window(ctx, blocks_done(ctx["run_log"]))
         if now < read_deadline(ctx, last):
@@ -519,19 +537,25 @@ def _planner(spec_for, mode, enum_date):
 
 
 def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_date, transports, clock, now,
-                sessions, pins):
+                sessions, pins, span=None):
     """Step 1 of a count or read (review round 10, H2): fetch and seal the action's snapshot, and log a
     '<purpose>_fetch' run-log line with its sha256 and fetch-incomplete rate. No outcome is computed. The step
     that computes (step 2) runs only once this line is on origin/main, over this snapshot alone, so a discarded
     local attempt never yields a second draw of provider data after an outcome was seen."""
     start, status, sha, rate = iso_utc(now), "failed", None, None
     planner = _planner(spec_for, mode, enum_date)
+    # review round 14, F3: a sealed ledger in this action's directory with no committed '_fetch' line is a discarded
+    # local attempt; fetching again would be a second draw after its data could have been opened. Deleting the
+    # directory defeats this check (a recorded limitation, holdout_gate.access_log.rule)
+    if (Path(snapshot_root) / f"{purpose}-{auth['authorization_id']}" / "ledger.jsonl").exists():
+        raise HoldoutRefused(f"{purpose}-{auth['authorization_id']} holds a sealed snapshot that no committed "
+                             f"'{purpose}_fetch' line names: a discarded attempt is not fetched again")
     try:
-        live = HoldoutStore(bases, Store())
+        live = HoldoutStore(bases, Store(), ctx["cal"])
         driver.stage_fetch(planner, transports, live, enum_date, clock=clock)
         sha = live.write(Path(snapshot_root) / f"{purpose}-{auth['authorization_id']}")
         rate = _rate(ctx, HoldoutStore(bases, Store.read(Path(snapshot_root) / f"{purpose}-{auth['authorization_id']}",
-                                                         sha)), planner)
+                                                         sha), ctx["cal"]), planner)
         status = "complete"
     finally:
         from core.runner import run_line
@@ -539,7 +563,8 @@ def _fetch_step(ctx, purpose, auth, bases, snapshot_root, spec_for, mode, enum_d
             ctx, stage="holdout", purpose=f"{purpose}_fetch", commit=ctx["commit"], utc_start=start,
             utc_end=iso_utc(now), snapshots=[sha] if sha else [], status=status, results_sha256=None,
             extra={"authorization_id": auth["authorization_id"], "sessions": sessions,
-                   "enumeration_fetch_date": enum_date, "snapshot_dir": f"{purpose}-{auth['authorization_id']}",
+                   **({"fee_span": span} if span else {}), "enumeration_fetch_date": enum_date,
+                   "snapshot_dir": f"{purpose}-{auth['authorization_id']}",
                    **pins,
                    **({"fetch_incomplete_rate": rate["rate"], "fetch_incomplete_by_kind": rate["by_kind"],
                        "stage_void": rate["void"]} if rate else {})}))
@@ -563,7 +588,7 @@ def _rate(ctx, sealed, planner) -> dict:
 
 def _sealed(ctx, fetch_line, bases, snapshot_root):
     sha = fetch_line["input_snapshot_sha256s"][0]
-    return HoldoutStore(bases, Store.read(Path(snapshot_root) / fetch_line["snapshot_dir"], sha)), sha
+    return HoldoutStore(bases, Store.read(Path(snapshot_root) / fetch_line["snapshot_dir"], sha), ctx["cal"]), sha
 
 
 def _spec_factory(ctx, n0, last, late, exposed, carried):
@@ -592,15 +617,18 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
     if fl is None:
         _, due_last = window(ctx, blocks_done(ctx["run_log"]))
         require_reached_after(ctx, authorization_id, ctx["cal"].close(due_last), f"the close of {due_last}")   # F2
-    carried = require_validated_carried(ctx, auth)
+    carried, _ = require_validated_carried(ctx, auth)
     auth, blocks, n0, last, late, exposed, bases, enum_date, pins = _setup(ctx, "count", authorization_id,
                                                                            snapshot_root, fl)
     enum_date = enum_date or iso_utc(now)[:10]
     path = Path(ctx["repo"]) / RESULTS_DIR / f"holdout-count-{blocks}.json"
-    if path.exists():
+    if any(x.get("block") == blocks for x in count_lines(ctx["run_log"])) or (path.exists() and fl is None):
         raise HoldoutRefused(f"the count of block {blocks} has its results file")
+    # review round 14, Codex P2: a file no line cites (a run killed after its rename) is recomputed and replaced
+    orphan = sha256_file(path) if path.exists() else None
     spec_for = _spec_factory(ctx, n0, last, late, exposed, None)
     if fl is None:
+        require_fee_coverage(ctx, [n0, last])                                  # review round 14, F2
         return _fetch_step(ctx, "count", auth, bases, snapshot_root, spec_for, "count", enum_date, transports, clock,
                            now, [n0, last], pins)
     enum_date = fl["enumeration_fetch_date"]
@@ -618,15 +646,16 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
             "kind": "mover_v3_holdout_count", "block": blocks, "window": [n0, last], "carried": list(carried),
             "counts": counts, "extension": ext, "fetch_incomplete_rate": rate["rate"], "void": void,
             "protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
-            "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha})
+            "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha}, orphan)
         status = "complete"
     finally:
-        if digest is None and path.exists():
+        if digest is None and path.exists() and sha256_file(path) != orphan:
             body = json.loads(path.read_text())
             status, digest, ext, void = "complete", sha256_file(path), body["extension"], body["void"]
         _finish(ctx, authorization_id, start, now, status, sha, rows, digest, [],
                 {"purpose": "count", "sessions": [n0, last], "block": blocks, "extension": ext, "void": void,
-                 "enumeration_fetch_date": enum_date, "validation_results_reach_utc": _validation_reach_utc(ctx)},
+                 "enumeration_fetch_date": enum_date, "validation_results_reach_utc": _validation_reach_utc(ctx),
+                 **({"replaced_uncited_results_sha256": orphan} if orphan else {})},
                 [sha])
     return {"results_sha256": digest, "extension": ext, "window": [n0, last]}
 
@@ -637,6 +666,18 @@ def fee_span(ctx: dict, n0: str, last: str) -> list:
     session. core.logs.fee_first_use takes a fee amendment line's first use from this span."""
     end = ctx["cal"].offset(last, T["search_sessions"])
     return [n0, end or last]
+
+
+def require_fee_coverage(ctx: dict, span: list) -> None:
+    """Review round 14, F2: every session a count or read can book (its sessions; for a read, fee_span) has one
+    governing SEC Section 31 row and one FINRA TAF row (cost_model.fees), checked before the action fetches or
+    logs anything. A gap is refused here, so the missing amendment line can still be appended and logged: once a
+    count or read line names these dates, core.logs.fee_first_use refuses a later line for them."""
+    days = ctx["cal"].range(span[0], span[1])
+    missing = ctx["fees"].gaps(days)
+    if missing:
+        raise HoldoutRefused(f"{len(missing)} sessions of {span[0]} .. {span[1]} have no governing fee row (first "
+                             f"{missing[0]}): append and log the fee amendment before this count or read")
 
 
 def not_read_results(ctx: dict, carried, reason: str) -> dict:
@@ -718,17 +759,30 @@ def _spend_refused(ctx: dict, auth: dict, now: float, deadline: float) -> str:
     return f"refused: {auth.get('refusal')}"
 
 
+def read_results_lines(ctx: dict) -> list:
+    return [x for x in ctx["run_log"] if x.get("stage") == "holdout" and x.get("purpose") == "read"
+            and x.get("results_sha256")]
+
+
+def _uncited(path):
+    """Review round 14, Codex P2: the sha256 of a holdout-read.json that no committed 'read' line cites (the caller
+    has refused when one does), which the recomputation replaces; None when there is no file."""
+    return sha256_file(path) if Path(path).exists() else None
+
+
 def _write_not_read(ctx, auth, authorization_id, carried, reason, now) -> dict:
     path = Path(ctx["repo"]) / RESULTS_DIR / "holdout-read.json"
     if auth.get("decision") == "granted":
         gate.require_granted(ctx["access_log"], authorization_id, "read")
     start = iso_utc(now)
-    digest = atomic_write_results(path, not_read_results(ctx, carried, reason))
+    orphan = _uncited(path)
+    digest = atomic_write_results(path, not_read_results(ctx, carried, reason), orphan)
     from core.runner import run_line
     logs.append_line(Path(ctx["repo"]) / RUN_LOG, run_line(
         ctx, stage="holdout", purpose="read", commit=ctx["commit"], utc_start=start, utc_end=iso_utc(now),
         snapshots=[], status="complete", results_sha256=digest,
-        extra={"authorization_id": authorization_id, "not_read": reason, "decision": auth.get("decision")}))
+        extra={"authorization_id": authorization_id, "not_read": reason, "decision": auth.get("decision"),
+               **({"replaced_uncited_results_sha256": orphan} if orphan else {})}))
     if auth.get("decision") == "granted":
         logs.append_line(Path(ctx["repo"]) / ACCESS_LOG,
                          gate.completion(authorization_id, iso_utc(now), "complete", None, 0, digest, []))
@@ -755,9 +809,9 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
         raise gate.NoAuthorization(f"{authorization_id} is not a 'read' authorization")
     check_record_times(ctx)
     path = Path(ctx["repo"]) / RESULTS_DIR / "holdout-read.json"
-    if path.exists():
+    if read_results_lines(ctx):
         raise HoldoutRefused("the holdout read results file exists: the holdout is read once")
-    carried = require_validated_carried(ctx, auth)
+    carried, val = require_validated_carried(ctx, auth)
     _, last = window(ctx, blocks_done(ctx["run_log"]))
     deadline = read_deadline(ctx, last)
     no_final = final_count(ctx["run_log"]) is None
@@ -790,9 +844,10 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
                                                                            snapshot_root, fl)
     spec_for = _spec_factory(ctx, n0, last, late, exposed, carried)
     if fl is None:
+        require_fee_coverage(ctx, fee_span(ctx, n0, last))                     # review round 14, F2
         return _fetch_step(ctx, "read", auth, bases, snapshot_root, spec_for, "plan", enum_date or iso_utc(now)[:10],
-                           transports, clock, now, [n0, last], pins)
-    val = validation_state(ctx)["results"]
+                           transports, clock, now, [n0, last], pins, fee_span(ctx, n0, last))
+    # review round 14, Codex P1: the sign comes from the validation results bound to the authorization
     signs = {"H3-c": ((val or {}).get("items", {}).get("H3-c") or {}).get("estimate")}
     deviated = ctx["transport_deviation"] is not None or any(
         x.get("study_tree") != ctx["pinned_tree"] for x in ctx["run_log"] if x.get("stage") == "holdout")
@@ -803,6 +858,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     after_seal = ([f"void count (block {x.get('block')})" for x in count_lines(ctx["run_log"]) if x.get("void")]
                   + [f"{v} void (exposure_registry.update_rule)" for v in sorted(ctx.get("voids") or ())])
     sha, rows = fl["input_snapshot_sha256s"][0], 0
+    orphan = _uncited(path)
     try:
         sealed, sha = _sealed(ctx, fl, bases, snapshot_root)
         rate = _rate(ctx, sealed, _planner(spec_for, "plan", fl["enumeration_fetch_date"]))
@@ -819,12 +875,13 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
         res.update({"protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
                     "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha,
                     "fetch_incomplete_rate": rate["rate"]})
-        digest = atomic_write_results(path, res)
+        digest = atomic_write_results(path, res, orphan)
         status = "complete"
     finally:
-        if digest is None and path.exists():
+        if digest is None and path.exists() and sha256_file(path) != orphan:
             status, digest = "complete", sha256_file(path)
         _finish(ctx, authorization_id, start, now, status, sha, rows, digest, [],
                 {"purpose": "read", "sessions": [n0, last], "fee_span": fee_span(ctx, n0, last),
-                 "validation_results_reach_utc": _validation_reach_utc(ctx)}, [sha])
+                 "validation_results_reach_utc": _validation_reach_utc(ctx),
+                 **({"replaced_uncited_results_sha256": orphan} if orphan else {})}, [sha])
     return {"results_sha256": digest, "read": True}

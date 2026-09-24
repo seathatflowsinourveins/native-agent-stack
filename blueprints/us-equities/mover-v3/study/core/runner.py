@@ -358,6 +358,10 @@ def stage_fetch_run(ctx: dict, stage: str, snapshot_dir, planner, transports, cl
     si = begin_or_resume(ctx, stage, "fetch", {}, clock)          # review round 11, F4
     if si is None:
         return {"started": True, "next": "commit and push the start line, then run the fetch again"}
+    # review round 14, F3: a sealed ledger that no committed fetch line names is a discarded local attempt
+    if (Path(snapshot_dir) / "ledger.jsonl").exists():
+        raise RunRefused(f"{snapshot_dir} holds a sealed snapshot that no committed fetch line names: a discarded "
+                         "attempt is not fetched again")
     start, status, sha, rate = clock(), "failed", None, None
     try:
         store = Store()
@@ -376,7 +380,7 @@ def stage_fetch_run(ctx: dict, stage: str, snapshot_dir, planner, transports, cl
 
 
 def evaluate_and_write(ctx: dict, *, stage: str, snapshot_sha256: str, vintages: list, freeze_utc: str,
-                       compute, results_path, before_write=None) -> dict:
+                       compute, results_path, before_write=None, replace_uncited: str | None = None) -> dict:
     """compute() returns the results dict, in memory. Nothing is written until every item is computed; a failure
     before the write leaves no results file (the caller logs the run as failed and may retry from the same tree
     and the same sealed inputs)."""
@@ -392,7 +396,7 @@ def evaluate_and_write(ctx: dict, *, stage: str, snapshot_sha256: str, vintages:
                     "fetch_incomplete_rate": fetch_line["fetch_incomplete_rate"]})
     if before_write is not None:
         before_write()
-    digest = atomic_write_results(results_path, results)
+    digest = atomic_write_results(results_path, results, replace_uncited)
     return {"results_sha256": digest}
 
 
@@ -401,11 +405,16 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
     already has a results file or a results line, when the snapshot is not the one its fetch line sealed, or when
     an earlier failed attempt used another snapshot (review round 9, F1 and M-4). If the run is interrupted after the
     results file is written, the line records that file's sha256 as complete (F10). Two committed steps (review
-    round 13, F1): an 'evaluate_start' line first, then the evaluation under it."""
+    round 13, F1): an 'evaluate_start' line first, then the evaluation under it.
+
+    Review round 14, Codex P2: a hard termination (SIGKILL, power loss) between the results rename and the line
+    leaves a file no line cites. It never governs; the next run under the open start recomputes from the same sealed
+    snapshot, replaces that file, and its line records the replaced sha256 (replaced_uncited_results_sha256)."""
     from core.store import Store
     path = results_path(ctx, stage)
-    if logs.results_lines(ctx["run_log"], stage) or path.exists():
+    if logs.results_lines(ctx["run_log"], stage):
         raise RunRefused(f"{stage} already has its results file; the first one governs and a second is refused")
+    orphan = sha256_file(path) if path.exists() else None
     fetch_line = fetch_line_for(ctx["run_log"], stage, snapshot_sha256)
     if fetch_line is None or fetch_line.get("status") != "complete":
         raise RunRefused(f"{snapshot_sha256} is not the snapshot sealed by {stage}'s logged fetch")
@@ -429,15 +438,16 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
     try:
         out = evaluate_and_write(ctx, stage=stage, snapshot_sha256=snapshot_sha256, vintages=store.vintages(),
                                  freeze_utc=ctx["freeze_utc"], compute=lambda: compute_for(store, fetch_line),
-                                 results_path=path)
+                                 results_path=path, replace_uncited=orphan)
         status, digest = "complete", out["results_sha256"]
     finally:
-        if digest is None and path.exists():
+        if digest is None and path.exists() and sha256_file(path) != orphan:
             status, digest = "complete", sha256_file(path)
         logs.append_line(ctx["repo"] / RUN_LOG, run_line(
             ctx, stage=stage, purpose="evaluate", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=[snapshot_sha256], status=status, results_sha256=digest,
-            extra={"results_path": str(Path(RESULTS_DIR) / path.name), "start_index": si}))
+            extra={"results_path": str(Path(RESULTS_DIR) / path.name), "start_index": si,
+                   **({"replaced_uncited_results_sha256": orphan} if orphan else {})}))
     return {"results_sha256": digest}
 
 

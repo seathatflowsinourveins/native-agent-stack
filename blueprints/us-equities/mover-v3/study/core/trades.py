@@ -101,12 +101,13 @@ def _factor(ev, e, x):
 
 
 def _cash(ev, e, x, F):
+    """populations.corporate_actions (review round 14, Codex P2): the dividend cash of the ex-dates in (e, x], each
+    at its own previous close, so nothing after the exit session's ex-date moves it. F is booked on the shares."""
     if e == x:
         return 0.0
-    r_e, r_x, a_e, a_x = ev["raw"].get(e), ev["raw"].get(x), ev["all"].get(e), ev["all"].get(x)
-    if not (r_e and r_x and a_e and a_x):
+    if not (ev["raw"].get(x) or {}).get("c"):
         return None
-    return costs.cash_term(r_e["c"], a_e["c"], r_x["c"], a_x["c"], F)
+    return costs.cash_term(ev["raw"], ev["split"], ev["all"], e, x)
 
 
 def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
