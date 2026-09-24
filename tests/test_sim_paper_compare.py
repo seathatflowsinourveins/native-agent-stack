@@ -111,6 +111,29 @@ class ClockProvenanceTests(unittest.TestCase):
         self.assertAlmostEqual(hi, 40.769, places=2)
         self.assertTrue(all(v > 0 for v in prov["host_minus_broker_submit_offset_ms"]))
 
+    def test_reports_null_offsets_with_a_reason_when_counts_do_not_match(self):
+        # Regression for the truncated-zip bug: dropping one host submit entry must
+        # not silently produce misaligned "offsets" (a constructed case with this
+        # trial's data reached ~195,441ms from exactly this mistake). Kills a
+        # mutation that forces counts_match=True regardless of the actual counts.
+        orders = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
+        paper_output = json.loads((TRIAL / "paper-output.json").read_text())
+        truncated = json.loads(json.dumps(paper_output))
+        # Drop the first submit request so the lists no longer correspond 1:1.
+        first_submit_index = next(i for i, r in enumerate(truncated["requests"]) if r["kind"] == "submit")
+        del truncated["requests"][first_submit_index]
+        prov = C.clock_provenance(orders, truncated)
+        self.assertFalse(prov["counts_match"])
+        self.assertIsNone(prov["host_minus_broker_submit_offset_ms"])
+        self.assertIsNone(prov["host_minus_broker_submit_offset_ms_range"])
+        self.assertIsNone(prov["host_minus_broker_submit_offset_is_lower_bound"])
+        self.assertIsNotNone(prov["host_minus_broker_submit_offset_unavailable_reason"])
+        self.assertIn("correspondence", prov["host_minus_broker_submit_offset_unavailable_reason"])
+        # And confirm the *real* (untruncated) case is nowhere near the bogus
+        # magnitude a naive truncated zip would have produced here.
+        with_all_requests = C.clock_provenance(orders, paper_output)
+        self.assertLess(max(v for v in with_all_requests["host_minus_broker_submit_offset_ms"]), 1000)
+
 
 class CancelTimestampResolutionTests(unittest.TestCase):
     def setUp(self):
@@ -165,6 +188,52 @@ class CancelTimestampResolutionTests(unittest.TestCase):
         self.assertEqual(resolved["a"]["cancel_ts_ns"], 1_500_000_000)
         self.assertEqual(resolved["b"]["cancel_ts_ns"], 5_500_000_000)
 
+    def test_two_requests_matching_the_same_order_leave_another_order_unmatched_and_are_refused(self):
+        # X (submitted 1s) is the only order open at both request times (2s, 3s);
+        # Y is not submitted until 10s, so neither request could plausibly be for
+        # Y. Both requests therefore uniquely match X (individually valid, per
+        # request), but that leaves Y with no match at all -- count(canceled)=2
+        # still equals count(cancel_reqs)=2, so this can only be caught by
+        # checking the *accumulated* pairing against every canceled order, not by
+        # any single request's own uniqueness check. Must refuse (and must not
+        # raise -- a missing key would otherwise surface as an exception, not a
+        # graceful, observable fallback).
+        base = {"symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        orders = [
+            dict(base, client_order_id="X", status="canceled", submitted_at_ns=1_000_000_000),
+            dict(base, client_order_id="Y", status="canceled", submitted_at_ns=10_000_000_000),
+        ]
+        paper_output = {"requests": [{"kind": "cancel", "timestamp": 2.0}, {"kind": "cancel", "timestamp": 3.0}]}
+        resolved = C.resolve_cancel_timestamps(orders, paper_output, 10)
+        self.assertEqual(resolved["X"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+        self.assertEqual(resolved["Y"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+
+    def test_a_filled_order_stealing_one_pairing_slot_leaves_a_canceled_order_unmatched_and_is_refused(self):
+        # Y (filled, open only in [0s, 2s)) is the unique open order at the first
+        # request (1s); X (canceled, open from 3s) is the unique open order at the
+        # second request (4s); Z (canceled, not submitted until 10s) never
+        # coincides with either request. If a per-request uniqueness match were
+        # ever trusted without checking that the *accumulated* result actually
+        # covers every canceled order (and only canceled orders), Y would
+        # incorrectly take a pairing slot and Z would be left with none --
+        # which, if unguarded, raises a KeyError while building `resolved`
+        # instead of gracefully refusing. Must refuse without raising.
+        y = {"client_order_id": "Y", "symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": "1",
+             "submitted_at_ns": 0, "filled_at_ns": 2_000_000_000}
+        x = {"client_order_id": "X", "symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "canceled", "filled_qty": 0, "filled_avg_price": None,
+             "submitted_at_ns": 3_000_000_000, "filled_at_ns": None}
+        z = {"client_order_id": "Z", "symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "canceled", "filled_qty": 0, "filled_avg_price": None,
+             "submitted_at_ns": 10_000_000_000, "filled_at_ns": None}
+        paper_output = {"requests": [{"kind": "cancel", "timestamp": 1.0}, {"kind": "cancel", "timestamp": 4.0}]}
+        resolved = C.resolve_cancel_timestamps([x, y, z], paper_output, 10)
+        self.assertEqual(resolved["X"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+        self.assertEqual(resolved["Z"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+        self.assertNotIn("Y", resolved)  # Y was never a canceled order; never in the output at all
+
     def test_ambiguous_match_is_refused_and_falls_back_for_all_canceled_orders(self):
         base = {"symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
@@ -194,6 +263,46 @@ class CancelTimestampResolutionTests(unittest.TestCase):
         paper_output = {"requests": [{"kind": "cancel", "timestamp": 2.5}, {"kind": "cancel", "timestamp": 6.0}]}
         resolved = C.resolve_cancel_timestamps(orders, paper_output, 10)
         self.assertEqual(resolved["a"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+
+    def test_accepts_a_valid_timeout_cancel_despite_an_unrelated_later_order_of_another_symbol(self):
+        # The earlier "most-recently-submitted order overall" heuristic wrongly
+        # refused this: order A (INTC) submitted at 0s and canceled by a genuine
+        # timeout request at 10s; order B (GOOGL, a different symbol) submitted at
+        # 5s and filled, entirely unrelated to A's cancel. B being the most
+        # recently submitted order overall at cancel time must not make A's
+        # unambiguous same-symbol pairing ambiguous. Kills a mutation that removes
+        # the open-order-uniqueness check (accepting or rejecting by count alone).
+        a = {"client_order_id": "A", "symbol": "INTC", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "canceled", "filled_qty": 0, "filled_avg_price": None,
+             "submitted_at_ns": 0, "filled_at_ns": None}
+        b = {"client_order_id": "B", "symbol": "GOOGL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": "1",
+             "submitted_at_ns": 5_000_000_000, "filled_at_ns": 5_500_000_000}
+        paper_output = {"requests": [{"kind": "cancel", "timestamp": 10.0}]}
+        resolved = C.resolve_cancel_timestamps([a, b], paper_output, 10)
+        self.assertEqual(resolved["A"]["source"], "recorded_cancel_request")
+        self.assertEqual(resolved["A"]["cancel_ts_ns"], 10_000_000_000)
+
+    def test_refuses_a_race_lost_cancel_that_could_belong_to_a_still_open_unrelated_order(self):
+        # Order B (GOOGL) submitted at 1s and eventually filled, but its fill time
+        # (3s) is *after* the cancel request at 2.5s -- so B was genuinely still
+        # open (a plausible target) when the cancel request fired. Order K (AAPL)
+        # submitted at 1s is canceled. Both are open at 2.5s: this must be refused
+        # as ambiguous regardless of which order is listed first (kills a mutation
+        # that breaks ties by input/sort order instead of refusing them).
+        base_ts = 1_000_000_000
+        f = {"client_order_id": "F", "symbol": "GOOGL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": "1",
+             "submitted_at_ns": base_ts, "filled_at_ns": 3_000_000_000}
+        k = {"client_order_id": "K", "symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1",
+             "time_in_force": "DAY", "status": "canceled", "filled_qty": 0, "filled_avg_price": None,
+             "submitted_at_ns": base_ts, "filled_at_ns": None}
+        paper_output = {"requests": [{"kind": "cancel", "timestamp": 2.5}]}
+        forward = C.resolve_cancel_timestamps([f, k], paper_output, 10)
+        reversed_ = C.resolve_cancel_timestamps([k, f], paper_output, 10)
+        self.assertEqual(forward["K"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+        self.assertEqual(reversed_["K"]["source"], "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
+        self.assertEqual(forward["K"], reversed_["K"])
 
 
 class BuildDecisionsTests(unittest.TestCase):
@@ -492,6 +601,88 @@ class SummarizeSimOrderTests(unittest.TestCase):
         self.assertEqual(summary["fill_ts_ns"], 3_000_000_000)
 
 
+class ClassifyFlipDependenceTests(unittest.TestCase):
+    """Pure-Python (no native runtime) tests of classify_flip_dependence's
+    orchestration logic, via monkeypatching the module-level `_order_agrees_at_latency`
+    it calls -- this is legitimate for testing the *scanning* logic itself,
+    independent of whether a real BacktestEngine fixture can be built to reproduce
+    a shifted boundary precisely."""
+
+    def test_a_flip_that_shifts_elsewhere_in_the_declared_sweep_is_still_independent(self):
+        # Regression for probing only the original bisection endpoints: order "A"'s
+        # own boundary (independent of "B") is at 10ms when B is removed, but at
+        # 30ms when B is present. The original bracket was [20, 50]ms. Probing only
+        # those two endpoints with B removed would see A agreeing at *both* (since
+        # its shifted 10ms boundary means it already agrees by 20ms), wrongly
+        # concluding "no flip -> dependent". Scanning the full declared sweep finds
+        # the real (shifted) flip and correctly reports independent_flip=True.
+        def fake_agrees(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, latency_ns):
+            ms = latency_ns // 10**6
+            has_b = any(o["client_order_id"] == "B" for o in paper_orders)
+            if client_order_id == "A":
+                return ms >= (30 if has_b else 10)
+            if client_order_id == "B":
+                return ms >= 30
+            raise AssertionError(f"unexpected client_order_id {client_order_id}")
+
+        real_fn = C._order_agrees_at_latency
+        C._order_agrees_at_latency = fake_agrees
+        try:
+            paper_orders = [{"client_order_id": "A"}, {"client_order_id": "B"}]
+            flip_bisections = [
+                {"client_order_id": "A", "bracket_ms": [20, 50],
+                 "lo": {"latency_ns": 20_000_000, "agrees": False}, "hi": {"latency_ns": 50_000_000, "agrees": True},
+                 "resolution_ns": 1000},
+                {"client_order_id": "B", "bracket_ms": [20, 50],
+                 "lo": {"latency_ns": 20_000_000, "agrees": False}, "hi": {"latency_ns": 50_000_000, "agrees": True},
+                 "resolution_ns": 1000},
+            ]
+            C.classify_flip_dependence(paper_orders, {}, {}, Path("/unused"), flip_bisections)
+        finally:
+            C._order_agrees_at_latency = real_fn
+
+        entry_a = next(b for b in flip_bisections if b["client_order_id"] == "A")
+        self.assertTrue(entry_a["independent_flip"])
+        self.assertEqual(entry_a["depends_on_client_order_ids"], [])
+        self.assertIsNotNone(entry_a["counterfactual_sweep"])
+        self.assertEqual({p["latency_ms"] for p in entry_a["counterfactual_sweep"]}, set(C.LATENCY_SWEEP_MS))
+        # And confirm the flip really is invisible if only the original two
+        # endpoints (20ms, 50ms) are inspected -- both are True once B is removed,
+        # which is exactly what makes probing only the endpoints unsound here.
+        endpoints_only = {p["agrees"] for p in entry_a["counterfactual_sweep"] if p["latency_ms"] in (20, 50)}
+        self.assertEqual(endpoints_only, {True})
+
+    def test_a_flip_that_truly_disappears_is_reported_dependent(self):
+        def fake_agrees(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, latency_ns):
+            has_b = any(o["client_order_id"] == "B" for o in paper_orders)
+            has_a = any(o["client_order_id"] == "A" for o in paper_orders)
+            ms = latency_ns // 10**6
+            if client_order_id == "A":
+                return True if not has_b else ms >= 30
+            if client_order_id == "B":
+                return True if not has_a else ms >= 30
+            raise AssertionError(f"unexpected client_order_id {client_order_id}")
+
+        real_fn = C._order_agrees_at_latency
+        C._order_agrees_at_latency = fake_agrees
+        try:
+            paper_orders = [{"client_order_id": "A"}, {"client_order_id": "B"}]
+            flip_bisections = [
+                {"client_order_id": "A", "bracket_ms": [20, 50],
+                 "lo": {"latency_ns": 20_000_000, "agrees": False}, "hi": {"latency_ns": 50_000_000, "agrees": True},
+                 "resolution_ns": 1000},
+                {"client_order_id": "B", "bracket_ms": [20, 50],
+                 "lo": {"latency_ns": 20_000_000, "agrees": False}, "hi": {"latency_ns": 50_000_000, "agrees": True},
+                 "resolution_ns": 1000},
+            ]
+            C.classify_flip_dependence(paper_orders, {}, {}, Path("/unused"), flip_bisections)
+        finally:
+            C._order_agrees_at_latency = real_fn
+        entry_a = next(b for b in flip_bisections if b["client_order_id"] == "A")
+        self.assertFalse(entry_a["independent_flip"])
+        self.assertEqual(entry_a["depends_on_client_order_ids"], ["B"])
+
+
 class RedactArgsTests(unittest.TestCase):
     def test_redacts_sensitive_paths_from_a_parsed_namespace(self):
         ap = C.argparse.ArgumentParser(allow_abbrev=False)
@@ -661,7 +852,7 @@ class ReceiptConsistencyTests(unittest.TestCase):
 
     def test_sweep_points_carry_full_per_order_rows_not_only_aggregates(self):
         # Every per-order figure cited in the README's "Latency model semantics"
-        # prose (e.g. order 3's lag from its modeled arrival, order 1's price delta
+        # prose (e.g. order 3's lag from its modeled arrival, order 2's price delta
         # at 100ms) must be traceable to data actually stored in the receipt.
         sweep = self.receipt["latency_sensitivity_sweep"]["points"]
         five_ms = next(p for p in sweep if p["latency_ms"] == 5)
@@ -669,14 +860,23 @@ class ReceiptConsistencyTests(unittest.TestCase):
         row3 = next(r for r in five_ms["rows"] if r["client_order_id"].endswith("0000003"))
         self.assertIsNotNone(row3["sim_fill_ts"])
         self.assertIsNotNone(row3["fill_time_delta_s"])
+        seventy_ms = next(p for p in sweep if p["latency_ms"] == 70)
         hundred_ms = next(p for p in sweep if p["latency_ms"] == 100)
-        row1 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000001"))
-        row2 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000002"))
-        # Order 1 moved from its zero-latency price delta (0.0) to +0.829bps at
-        # 100ms; order 2 stayed at its zero-latency value (-0.8295bps) -- order 1
-        # accounts for the 100ms sweep point's 0.489bps mean, not order 2.
-        self.assertAlmostEqual(row1["fill_price_delta_bps"], 0.829, places=2)
-        self.assertAlmostEqual(row2["fill_price_delta_bps"], -0.8295, places=3)
+        two_fifty_ms = next(p for p in sweep if p["latency_ms"] == 250)
+        row1_100 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000001"))
+        row2_70 = next(r for r in seventy_ms["rows"] if r["client_order_id"].endswith("0000002"))
+        row2_100 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000002"))
+        row2_250 = next(r for r in two_fifty_ms["rows"] if r["client_order_id"].endswith("0000002"))
+        # Order 1 is unchanged across 50-650ms (+0.829bps at every point, including
+        # 70ms and 250ms, not just 100ms) -- it is not what makes 100ms an outlier
+        # relative to its neighbors. Order 2 changes specifically at 100ms
+        # (-0.8295bps) relative to its own value at the neighboring 70ms/250ms
+        # points (0.0bps at both) -- order 2's move is what accounts for the
+        # 100ms sweep point's 0.489bps mean, not order 1.
+        self.assertAlmostEqual(row1_100["fill_price_delta_bps"], 0.829, places=2)
+        self.assertAlmostEqual(row2_70["fill_price_delta_bps"], 0.0, places=6)
+        self.assertAlmostEqual(row2_100["fill_price_delta_bps"], -0.8295, places=3)
+        self.assertAlmostEqual(row2_250["fill_price_delta_bps"], 0.0, places=6)
 
     def test_flip_bisections_record_the_actual_agreement_direction_not_an_assumed_one(self):
         # Bisection-direction regression guard: for this trial, agreement is FALSE
@@ -838,7 +1038,8 @@ class ReadmeReceiptConsistencyTests(unittest.TestCase):
     def test_cancel_pairing_validated_against_every_order_not_only_canceled_ones(self):
         normalized = " ".join(self.readme.split())
         self.assertNotIn("validated, not positional.", normalized)
-        self.assertIn("validated against every order, not positional", normalized)
+        self.assertNotIn("chronological order is the only available signal, and it is validated", normalized)
+        self.assertIn("open-order uniqueness across the whole trial, not positional", normalized)
 
     def test_hypothesis_framing_and_clock_provenance_section_present(self):
         self.assertIn("hypothesis", self.readme.lower())
@@ -1006,6 +1207,32 @@ class PinnedRuntimeTests(unittest.TestCase):
         self.assertEqual(sim_a["status"], "FILLED")
         self.assertEqual(sim_a["fill_ts_ns"], t0 + 50_000_000)  # B's timer, not A's own 30ms modeled arrival or 100ms quote
 
+    def test_a_foreign_instruments_quote_alone_does_not_settle_a_pending_order(self):
+        # Quote-only control for the timer test above: same A (quotes 0ms/100ms,
+        # submitted at 10ms, 20ms latency, modeled arrival 30ms), but BBBB has a
+        # quote at 50ms with NO order of its own submitted at all. A market-data
+        # quote for another instrument is not a timer and must not trigger
+        # cross-instrument settlement -- A must fill at its own next quote (100ms),
+        # not at 50ms.
+        t0 = 7_500_000_000_000
+        quotes = {
+            "AAAA": [
+                {"symbol": "AAAA", "ts_ns": t0, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+                {"symbol": "AAAA", "ts_ns": t0 + 100_000_000, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+            ],
+            "BBBB": [
+                {"symbol": "BBBB", "ts_ns": t0, "bid": "19.90", "ask": "20.00", "bid_size": 100, "ask_size": 100},
+                {"symbol": "BBBB", "ts_ns": t0 + 50_000_000, "bid": "19.90", "ask": "20.00", "bid_size": 100, "ask_size": 100},
+            ],
+        }
+        order_a = {"client_order_id": "a-02", "symbol": "AAAA", "side": "BUY", "qty": 1, "limit_price": "10.00",
+                   "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": None,
+                   "submitted_at_ns": t0 + 10_000_000, "filled_at_ns": None}
+        result = C.run_replay([order_a], quotes, out_dir=self.tmp / "quote-only-control", latency_ns=20_000_000)
+        sim_a = result["sim_by_id"]["a-02"]
+        self.assertEqual(sim_a["status"], "FILLED")
+        self.assertEqual(sim_a["fill_ts_ns"], t0 + 100_000_000)  # A's own next quote, not BBBB's 50ms quote
+
     def test_latency_lower_bounds_the_fill_time_and_settles_at_the_first_eligible_event(self):
         # Magnitude test: a fill must not happen before submit + configured latency,
         # and (with no other order's timer to bring settlement forward) must happen
@@ -1084,6 +1311,74 @@ class PinnedRuntimeTests(unittest.TestCase):
         self.assertTrue(bisection["hi"]["agrees"])
         self.assertLess(bisection["lo"]["latency_ns"], bisection["hi"]["latency_ns"])
 
+    def test_live_sweep_carries_per_order_rows_and_respects_the_latency_lower_bound(self):
+        # Unlike the receipt-based sweep tests (which read the committed,
+        # already-generated JSON and so cannot detect a mutation in
+        # run_latency_sweep itself -- e.g. dropping the "rows" field, or halving
+        # the latency actually passed to run_replay inside the sweep loop), this
+        # test calls run_latency_sweep live against the retained trial.
+        pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        paper = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
+        paper_output = json.loads((TRIAL / "paper-output.json").read_text())
+        ingest_receipt = json.loads((TRIAL / "ingest-receipt.json").read_text())
+        timeout, _ = C.resolve_order_timeout_seconds(ingest_receipt)
+        cancel_resolution = C.resolve_cancel_timestamps(paper, paper_output, timeout)
+        fetcher = C.PageFetcher(pages, headers=None, replay=True)
+        start_ns, end_ns = C.fetch_window(paper)
+        quotes, _ = C.normalize_quote_rows(C.fetch_quotes(fetcher, sorted({o["symbol"] for o in paper}), start_ns,
+                                                            end_ns, C.ns_to_iso(paper[0]["submitted_at_ns"])[:10]))
+        submit_ns_by_id = {o["client_order_id"]: o["submitted_at_ns"] for o in paper}
+        baseline_result = C.run_replay(paper, quotes, out_dir=self.tmp / "live-sweep-base", cancel_resolution=cancel_resolution)
+        baseline = C.compare_orders(paper, baseline_result["sim_by_id"])
+        sweep = C.run_latency_sweep(paper, quotes, cancel_resolution=cancel_resolution,
+                                     out_dir=self.tmp / "live-sweep", baseline_comparison=baseline)
+        for point in sweep["points"]:
+            self.assertIn("rows", point)
+            self.assertEqual(len(point["rows"]), len(paper))
+            for row in point["rows"]:
+                if row["sim_fill_ts"] is None:
+                    continue
+                fill_ns = C.ts_ns(row["sim_fill_ts"])
+                submit_ns = submit_ns_by_id[row["client_order_id"]]
+                # A fill can never happen before submit + this point's configured
+                # latency -- a mutation that halves (or otherwise shrinks) the
+                # latency actually passed to run_replay inside the sweep loop would
+                # violate this for at least one row at a nonzero latency point.
+                self.assertGreaterEqual(fill_ns, submit_ns + point["latency_ms"] * 10**6,
+                                         f"order {row['client_order_id']} at {point['latency_ms']}ms")
+
+    def test_live_sweep_has_a_fill_time_that_actually_differs_by_configured_latency_magnitude(self):
+        # Complements the lower-bound check above with a magnitude check: order 3's
+        # own fill offset from submit must scale with the configured latency (not,
+        # e.g., a constant or halved value) across at least two widely-separated
+        # sweep points where order 3's settlement is driven by its own sparse
+        # quotes (see README "Latency model semantics" -- 266.9ms/466.4ms lag at
+        # 5ms/650ms respectively in the retained receipt).
+        pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        paper = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
+        paper_output = json.loads((TRIAL / "paper-output.json").read_text())
+        ingest_receipt = json.loads((TRIAL / "ingest-receipt.json").read_text())
+        timeout, _ = C.resolve_order_timeout_seconds(ingest_receipt)
+        cancel_resolution = C.resolve_cancel_timestamps(paper, paper_output, timeout)
+        fetcher = C.PageFetcher(pages, headers=None, replay=True)
+        start_ns, end_ns = C.fetch_window(paper)
+        quotes, _ = C.normalize_quote_rows(C.fetch_quotes(fetcher, sorted({o["symbol"] for o in paper}), start_ns,
+                                                            end_ns, C.ns_to_iso(paper[0]["submitted_at_ns"])[:10]))
+        submit_ns = next(o["submitted_at_ns"] for o in paper if o["client_order_id"].endswith("0000003"))
+        offsets_ms = {}
+        for ms in (5, 650):
+            result = C.run_replay(paper, quotes, out_dir=self.tmp / f"live-mag-{ms}", cancel_resolution=cancel_resolution,
+                                   latency_ns=ms * 10**6)
+            fill_ns = result["sim_by_id"]["adp-adaptive-20260923g-0000003"]["fill_ts_ns"]
+            offsets_ms[ms] = (fill_ns - submit_ns) / 1e6
+        # A halved-latency mutation would compress both offsets (and their
+        # difference); assert the real, order-of-magnitude-larger separation.
+        self.assertGreater(offsets_ms[650] - offsets_ms[5], 200)
+
 
 @unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
 class MainReplayNoCredentialTests(unittest.TestCase):
@@ -1159,6 +1454,46 @@ class MainReplayNoCredentialTests(unittest.TestCase):
         written = fake_stdout.getvalue().encode()
         self.assertEqual(hashlib.sha256(written).hexdigest(), receipt["stdout_sha256"])
         self.assertTrue(written.endswith(b"\n"))
+        self.assertEqual(receipt["stdout_sha256_basis"], "utf8_lf_normalized_text")
+
+    def test_stdout_sha256_hashes_the_exact_bytes_written_to_a_binary_buffer_when_one_exists(self):
+        # When sys.stdout has a `.buffer` (the normal case for a real process),
+        # main() must write to it directly and hash exactly those bytes -- not go
+        # through a text-mode `.write()` that could apply newline translation
+        # (e.g. a stream opened with `newline="\r\n"`). This fake stdout's
+        # `.write()` deliberately mangles newlines to CRLF; if main() ever called
+        # it instead of writing to `.buffer` directly, the captured bytes would
+        # contain "\r\n" and this test would catch that.
+        import hashlib
+        import io
+
+        class FakeStdoutWithBuffer:
+            def __init__(self):
+                self.buffer = io.BytesIO()
+
+            def write(self, s):
+                self.buffer.write(s.replace("\n", "\r\n").encode())
+
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        real_pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not real_pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        argv = ["--trial", str(TRIAL), "--pages", str(real_pages), "--out", str(tmp / "out"),
+                "--replay", "--receipt", str(tmp / "receipt.json")]
+        fake_stdout = FakeStdoutWithBuffer()
+        real_stdout = sys.stdout
+        sys.stdout = fake_stdout
+        try:
+            rc = C.main(argv)
+        finally:
+            sys.stdout = real_stdout
+        self.assertEqual(rc, 0)
+        receipt = json.loads((tmp / "receipt.json").read_text())
+        written = fake_stdout.buffer.getvalue()
+        self.assertEqual(hashlib.sha256(written).hexdigest(), receipt["stdout_sha256"])
+        self.assertEqual(receipt["stdout_sha256_basis"], "exact_bytes_written")
+        self.assertNotIn(b"\r\n", written)  # proves .buffer.write() was used, not the mangling .write()
 
     def test_umask_is_restored_after_main_returns(self):
         tmp = Path(tempfile.mkdtemp())

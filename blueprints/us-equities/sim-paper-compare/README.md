@@ -102,11 +102,13 @@ canceled order 4 first) filled order 5 normally. **Order 5 is not an
 independent second flip** -- with order 4 removed from the replay entirely,
 order 5 agrees with paper at every latency in the declared sweep (verified,
 not assumed: the receipt's `latency_sensitivity_sweep.flip_bisections` entry
-for order 5 carries `independent_flip: false` and
-`depends_on_client_order_ids: ["...0000004"]`, computed by re-running the
-replay with order 4 removed and confirming order 5 no longer flips on its
-own). There is exactly one flip in this trial (order 4); order 5's
-apparent flip is a downstream consequence of it.
+for order 5 carries `independent_flip: false`,
+`depends_on_client_order_ids: ["...0000004"]`, and a `counterfactual_sweep`
+recording order 5's own agreement, with order 4 removed, at *every* declared
+sweep latency -- not just the original bracket's two endpoints, since probing
+only those could misread a flip that merely *shifted* elsewhere in the sweep
+as one that disappeared). There is exactly one flip in this trial (order 4);
+order 5's apparent flip is a downstream consequence of it.
 
 **This causal chain is a hypothesis consistent with the retained data, not a
 demonstrated broker-side mechanism.** The paper broker's own broker
@@ -127,22 +129,29 @@ not depend on it (see below).
 The pinned engine (nautilus_trader==2.0.0rc5) does **not** guarantee that a
 `StaticLatencyModel`-delayed command is processed at exactly `submit +
 latency`, and the eligible settlement events are **not limited to that
-order's own instrument's quotes**. Per the engine's own source
-(`crates/backtest/src/engine.rs` around L883, commit
-[1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/backtest/src/engine.rs#L883)),
-`advance_time_impl` settles *all* instruments' due timers/deferred commands
-together at each processed event, not just the arriving event's own
-instrument. Concretely (verified on the pinned runtime, see
+order's own instrument's quotes -- but specifically to due order-command
+timers, not to any event on another instrument**. Per the engine's own source
+(`crates/backtest/src/engine.rs` L1559-1585 for timer collection across the
+whole engine and L1716-1747 for command processing at that point, commit
+[1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/backtest/src/engine.rs#L1559-L1747)),
+`advance_time_impl` processes each due timer (another order's own submit or
+cancel command being applied) as a settlement point for *all* instruments'
+outstanding deferred commands, not only that timer's own instrument. **A plain
+market-data quote for a different instrument, with no order of its own, does
+not do this.** Concretely (both verified on the pinned runtime, see
 `tests.test_sim_paper_compare.PinnedRuntimeTests`): order A (quotes at
 0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms) fills at
-**50ms**, against its existing book, when order B (a *different* instrument)
-is submitted at 50ms -- B's own decision timer is a settlement event that
-processes A's already-due deferred command, well before A's own next quote at
-100ms and without needing any A-specific event anywhere near 30ms. Matching
-happens at the first settlement event *at or after* submit + latency, which
-can be triggered by another order's timer, not only that order's own next
-quote -- and always against the book as of that settlement instant, not a
-book frozen at exactly `submit + latency`.
+**100ms** (its own next quote) if order B (a *different* instrument) merely
+*has a quote* at 50ms with no order of its own -- a foreign quote alone does
+not settle A. It instead fills at **50ms**, against its existing book, if
+order B is *submitted* at 50ms -- B's own decision timer, not B's quote, is
+what processes A's already-due deferred command, well before A's own next
+quote at 100ms and without needing any A-specific event anywhere near 30ms.
+Matching happens at the first settlement event *at or after* submit +
+latency, which can be triggered by another order's timer specifically, not
+only that order's own next quote and not any market-data event on another
+instrument -- and always against the book as of that settlement instant, not
+a book frozen at exactly `submit + latency`.
 
 When quotes for a symbol are sparse (with no other order's timer to bring
 settlement forward), the actual processing instant can land well after the
@@ -150,13 +159,17 @@ modeled arrival instant purely from that symbol's own quotes: in this
 receipt, order 3 (GOOGL) fills **266.9ms** after its modeled 5ms arrival, and
 **466.4ms** after its modeled 650ms arrival, because no GOOGL quote arrived
 any sooner and no other order's timer intervened. At the 100ms sweep point,
-order 1 (INTC) fills at 120.58 (vs. 120.57 at zero latency, its exact paper
-fill price) -- the book moved between submit and the settlement instant that
-actually let the engine process the order (arriving ~0.44ms after the modeled
-100ms arrival, per the receipt's per-order rows), not at a book frozen exactly
-at submit + 100ms. Order 2 is unchanged from its zero-latency price at this
-sweep point; order 1 moving alone accounts for the 100ms row's 0.489bps mean
-price delta (the outlier in the sweep table below).
+order 2 (INTC) fills at 120.54, while the book *at exactly submit + 100ms*
+(16:47:43.244353Z) was still bid 120.55/ask 120.57 (the same book as at the
+neighboring 70ms and 250ms sweep points, where order 2 fills at 120.55) --
+the book had moved to bid 120.54 by the time the next actual settlement event
+let the engine process the order, later than submit + 100ms. Order 1 is
+unchanged across the 50-650ms sweep points (120.58 throughout); order 2's
+move specifically *at* the 100ms point, relative to its own value at the
+neighboring 70ms/250ms points, accounts for the 100ms row's 0.489bps mean
+price delta (the outlier in the sweep table below) -- order 1's own nonzero
+delta at 100ms (+0.829bps) is present at every one of the 50-650ms points and
+so is not what makes 100ms distinct from its neighbors.
 
 **Consequence: the sweep's time/price columns are not a pure function of the
 configured latency alone**, and a quote-derived "marketable window" boundary
@@ -246,30 +259,45 @@ captured *after* Alpaca receives it, so the true clock-source offset is at
 least this measured gap and could be larger by however much
 network/processing time separates those two capture points
 (`clock_provenance.host_minus_broker_submit_offset_is_lower_bound: true` in
-the receipt). **This receipt's outcome is not sensitive to that uncertainty**:
-there is no marketable order-4 quote in the interval from submit+80ms to the
-recorded cancel time + 1.1s, so moving the cancel instant later within the
-plausible clock-offset range does not change which side of the
-marketable-window boundary it falls on. A future trial with a marketable quote
-near a cancel boundary could flip on this offset, and SIP-vs-broker clock
-agreement specifically is not established at all -- treat per-trial clock
-provenance as something to check, not assume.
+the receipt). Since the host clock leads the broker clock, the broker-clock
+instant corresponding to the recorded (host-clock) cancel request is
+*earlier* than the raw number used here, not later. **This receipt's outcome
+is not sensitive to that uncertainty**: there is no marketable order-4 quote
+in the interval from submit+80ms to the recorded cancel time + 1.1s, so
+shifting the cancel instant earlier within the plausible clock-offset range
+does not change which side of the marketable-window boundary it falls on. A
+future trial with a marketable quote near a cancel boundary could flip on
+this offset, and SIP-vs-broker clock agreement specifically is not
+established at all -- treat per-trial clock provenance as something to
+check, not assume. `clock_provenance`'s own submit-timestamp pairing reports
+`null` offsets with an explicit `host_minus_broker_submit_offset_unavailable_reason`
+whenever its own count check (`counts_match`) fails, rather than reporting
+offsets computed from a truncated, misaligned pairing (a dropped entry on
+either side would shift every later pairing by one position and produce
+numbers that look like measurements but pair unrelated events -- as large as
+~195 seconds in a constructed test case).
 
-**Cancel-request matching is validated against every order, not positional
-and not limited to canceled orders.** `requests[]` has no `client_order_id`,
-so pairing a cancel request to a specific canceled order can only use
-chronological order -- `resolve_cancel_timestamps()` validates every
-candidate pairing against *all* paper orders (filled and canceled alike),
-requiring that (a) the cancel request falls strictly after its paired order's
-submit and strictly before the next canceled order's submit, and (b) the
-most-recently-submitted order as of the cancel request's timestamp, considering
-every order in the trial, is the same order the pairing assigned it to. (b)
-specifically catches a cancel request that lost its race to a fill (Alpaca
-filled the order before the cancel took effect, so its final status is
-"filled" even though a genuine cancel request exists for it in the log) from
-silently being absorbed by a *different*, actually-canceled order whose
-counts happen to line up. Any failed validation falls back to
-`submit + order_timeout_seconds` for *all* canceled orders in the trial,
+**Cancel-request matching is by open-order uniqueness across the whole trial,
+not positional and not limited to canceled orders.** `requests[]` has no
+`client_order_id` and no symbol, so a cancel request cannot be attributed to
+a specific order directly. `resolve_cancel_timestamps()` uses a sound rule
+instead of a chronological-order heuristic: a cancel request at time T is
+attributed to order O only if O is the *unique* order that is open (submitted
+by T, and not yet terminal -- a filled order is terminal at its reported
+`filled_at_ns`; a canceled order is never treated as terminal here, since its
+true cancel instant is exactly what this function is solving for) across the
+*entire trial* at T, and O is one of the trial's canceled orders. This
+correctly accepts an unambiguous cross-symbol case (a canceled order's own
+symbol has no other open order at cancel time, even though an unrelated,
+already-resolved order of a *different* symbol was submitted in between --
+the earlier heuristic's "most-recently-submitted order overall" check
+wrongly refused this) and correctly refuses a genuinely ambiguous one (more
+than one order, of any symbol, still open at the cancel instant -- including
+the tied-input-order case, where two same-symbol orders are both open at T
+and the correct answer, "ambiguous," must not depend on which one happens to
+sort first; the previous rule's positional tie-break did). Any failed
+validation falls back to `submit + order_timeout_seconds` for *all* canceled
+orders in the trial,
 rather than guessing. `clock_provenance()`'s submit-timestamp pairing is
 similarly count-checked (`counts_match` in the receipt) before any offsets
 are reported.
@@ -331,9 +359,9 @@ are reported.
 
 - **Cancel timestamp**: resolved from `paper-output.json`'s own `requests` log
   (`resolve_cancel_timestamps()`) when the number of recorded cancel requests
-  matches the number of canceled orders *and* the chronological pairing passes
-  validation against every order in the trial (see "Clock sources and
-  provenance" above); falls back to `submitted_at + order_timeout_seconds`
+  matches the number of canceled orders *and* every request maps to a unique
+  open order across the whole trial that is a canceled order (see "Clock
+  sources and provenance" above); falls back to `submitted_at + order_timeout_seconds`
   (the runner's own cancel-on-timeout rule, with `order_timeout_seconds` read
   from the config file whose sha256 matches this trial's `ingest-receipt.json`)
   whenever that doesn't hold. Neither branch infers a cancel time from a

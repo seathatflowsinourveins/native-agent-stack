@@ -30,24 +30,33 @@ the latency sweep's numbers must be read; both are disclosed rather than hidden:
 
 1. **StaticLatencyModel does not guarantee matching at exactly submit + latency,
    and the eligible settlement events are not limited to that instrument's own
-   quotes.** The pinned engine's `advance_time_impl` settles *all* instruments'
-   due timers/deferred commands together at each processed event, not just the
-   arriving event's own instrument (see the ordering in the pinned engine's own
-   source, `crates/backtest/src/engine.rs` around L883, commit
+   quotes -- but not just any event on another instrument counts, specifically.**
+   The pinned engine's `advance_time_impl` processes each due *timer* (an order
+   command's own scheduled decision/settlement, e.g. another order's submit or
+   cancel being applied) as a settlement event for *all* instruments' outstanding
+   deferred commands, not only the timer's own instrument (see
+   `crates/backtest/src/engine.rs` L1559-1585 for timer collection across the
+   whole engine and L1716-1747 for command processing at that point, commit
    1b0a49d2792a9432a3aca3fcb617ce7a630d905e of
-   https://github.com/nautechsystems/nautilus_trader). Concretely: order A (quotes
-   at 0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms) fills
-   at **50ms**, against its existing book, when order B (a different instrument) is
-   submitted at 50ms -- B's own decision timer is a settlement event that processes
+   https://github.com/nautechsystems/nautilus_trader). **A plain market-data quote
+   for a different instrument does not do this** -- it is not a timer and does not
+   trigger cross-instrument settlement. Concretely (both verified on the pinned
+   runtime): order A (quotes at 0ms/100ms) submitted at 10ms with 20ms latency
+   (modeled arrival 30ms) fills at **100ms** (its own next quote) if order B (a
+   different instrument) merely *has a quote* at 50ms with no order of its own;
+   it instead fills at **50ms**, against its existing book, if order B is
+   *submitted* at 50ms -- B's own decision timer, not B's quote, is what processes
    A's already-due deferred command, well before A's own next quote at 100ms and
    without needing an A-specific event anywhere near 30ms. Matching happens at the
    first settlement event *at or after* submit + latency for that order, which can
-   be triggered by another order's timer, not only that order's own next quote --
-   and always against the book as of that settlement instant, not a book frozen at
-   exactly submit + latency. When quotes for a symbol are sparse, the actual match
-   can land well after the modeled arrival instant purely from that symbol's own
-   quotes (order 3 in the retained receipt fills 266.9ms after its modeled 5ms
-   arrival, and 466.4ms after its modeled 650ms arrival). One consequence: the
+   be triggered by another order's timer specifically, not only that order's own
+   next quote and not any market-data event on another instrument -- and always
+   against the book as of that settlement instant, not a book frozen at exactly
+   submit + latency. When quotes for a symbol are sparse and no other order's
+   timer intervenes, the actual match can land well after the modeled arrival
+   instant purely from that symbol's own quotes (order 3 in the retained receipt
+   fills 266.9ms after its modeled 5ms arrival, and 466.4ms after its modeled
+   650ms arrival). One consequence: the
    fill-price/fill-time columns at a given sweep latency are not a clean function
    of that latency alone. This is disclosed here rather than worked around with
    synthetic arrival-time wakeups, which would need their own validation against
@@ -303,31 +312,56 @@ def resolve_order_timeout_seconds(ingest_receipt: dict) -> tuple[int, str]:
     return DEFAULT_ORDER_TIMEOUT_SECONDS, "default_fallback_no_config_match"
 
 
+def _terminal_at_ns(order: dict):
+    """When `order` stops being a plausible target for an unattributed cancel
+    request, or None if it never does (within what this replay can determine).
+    A canceled order's true cancel instant is exactly what resolve_cancel_timestamps
+    is solving for, so a canceled order is *never* treated as terminal here -- it
+    remains open until the algorithm resolves it. A filled order is terminal at its
+    reported `filled_at_ns`; if that is unknown (fractional/synthetic test fixtures
+    only -- real trial data always has it, see load_paper_orders), it is treated
+    conservatively as terminal immediately at submission, since we have no evidence
+    it was ever open long enough to plausibly race a cancel."""
+    if order["status"] == "canceled":
+        return None
+    return order["filled_at_ns"] if order["filled_at_ns"] is not None else order["submitted_at_ns"]
+
+
+def _is_open_at(order: dict, at_ns: int) -> bool:
+    if order["submitted_at_ns"] > at_ns:
+        return False
+    terminal_ns = _terminal_at_ns(order)
+    return terminal_ns is None or terminal_ns > at_ns
+
+
 def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, order_timeout_seconds: int) -> dict:
     """Resolve each canceled paper order's actual cancel time, in priority order:
     (1) a recorded cancel request in paper-output.json's `requests` log, matched to
-    canceled orders in chronological order when the counts agree *and* every
-    candidate pairing is temporally consistent; (2) submitted_at + order_timeout_seconds,
-    the runner's own cancel-on-timeout rule, used whenever (1) does not hold. Both
-    branches use a real, declared, non-negotiated cancel instant -- never a successor
-    order's submit time.
+    canceled orders by open-order uniqueness (below); (2) submitted_at +
+    order_timeout_seconds, the runner's own cancel-on-timeout rule, used whenever
+    (1) does not hold. Both branches use a real, declared, non-negotiated cancel
+    instant -- never a successor order's submit time.
 
-    `requests[]` carries no client_order_id (adaptive-paper/runner.py's
-    `before_request()` records only `{"timestamp": ..., "kind": ...}`), so pairing by
-    chronological order is the only available signal, and it is validated against
-    *every* paper order, not only the canceled ones: a candidate pairing is refused
-    if (a) the cancel request does not fall strictly after its paired order's submit
-    and strictly before the next canceled order's submit, or (b) the most-recently-
-    submitted order as of the cancel request's timestamp (considering *all* orders,
-    filled or canceled) is not the same order the chronological pairing assigned it
-    to. (b) catches a cancel request that lost its race to a fill -- e.g. Alpaca
-    processed a fill before the cancel took effect, so the order's final status is
-    "filled" even though a genuine cancel request was sent for it -- which would
-    otherwise let the chronologically-next canceled order silently absorb a cancel
-    request that was actually meant for, and temporally coincides with, a different
-    (filled) order. Any failed validation refuses the recorded match and falls back
-    to `submit + order_timeout_seconds` for *all* canceled orders in the trial, not
-    just the ambiguous one, rather than guessing.
+    `requests[]` carries no client_order_id and no symbol (adaptive-paper/runner.py's
+    `before_request()` records only `{"timestamp": ..., "kind": ...}`), so a cancel
+    request cannot be attributed to a specific order directly. The sound rule used
+    here: a cancel request at time T is attributed to order O only if O is the
+    *unique* order that is open (submitted, and not yet terminal -- see
+    `_is_open_at`) across the *entire trial* at T, and O is one of the trial's
+    canceled orders. If zero or more than one order is open at T (including the
+    tied-input-order case: two same-symbol orders both open at T, one eventually
+    filled and one eventually canceled -- the correct outcome, "ambiguous", must not
+    depend on which one happens to sort first), or a request maps to an order that
+    isn't a canceled order, or two requests map to the same order, or any canceled
+    order is left without a match, the recorded log is refused *in its entirety*
+    (falling back to `submit + order_timeout_seconds` for every canceled order in
+    the trial) rather than guessed at per-order. This correctly accepts an
+    unambiguous cross-symbol case (a canceled order's own symbol has no other open
+    order at cancel time, even if an unrelated, already-resolved order of a
+    different symbol was submitted in between) and correctly refuses a genuinely
+    ambiguous one (more than one order, of any symbol, still open at the cancel
+    instant) -- see tests.test_sim_paper_compare.CancelTimestampResolutionTests for
+    both cases.
 
     Clock provenance and uncertainty: `submitted_at`/cancel-fallback timing use the
     broker's own reported clock (Alpaca `submitted_at`); the recorded cancel request
@@ -341,38 +375,58 @@ def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, orde
     not an upper one: the true offset is at least +28.0 to +40.8ms and could be
     larger by however much network/processing time separates those two capture
     points. This is small relative to this trial's ~10s cancel timeout but is not
-    negligible next to sub-100ms marketable windows in general. This receipt is not
-    sensitive to that uncertainty (no marketable order-4 quote exists in the interval
-    from submit+80ms to the recorded cancel time + 1.1s, i.e. moving the cancel
-    instant later within the plausible clock-offset range does not change the
-    outcome here), but a future trial with a marketable quote near a cancel boundary
-    could flip on this offset -- call this out per trial, don't assume it away.
-    Alpaca SIP quote timestamps and Alpaca's own broker clock are a third, separate
-    clock source; their mutual agreement is not established by this replay and is
-    not assumed."""
-    canceled = sorted([o for o in paper_orders if o["status"] == "canceled"], key=lambda o: o["submitted_at_ns"])
-    all_sorted = sorted(paper_orders, key=lambda o: o["submitted_at_ns"])
+    negligible next to sub-100ms marketable windows in general. Since the host
+    clock leads the broker clock, the broker-clock instant corresponding to a
+    recorded (host-clock) cancel request is *earlier*, not later, than the raw
+    number used here. This receipt is not sensitive to that uncertainty (no
+    marketable order-4 quote exists in the interval from submit+80ms to the
+    recorded cancel time + 1.1s, i.e. shifting the cancel instant earlier within
+    the plausible clock-offset range does not change the outcome here), but a
+    future trial with a marketable quote near a cancel boundary could flip on this
+    offset -- call this out per trial, don't assume it away. Alpaca SIP quote
+    timestamps and Alpaca's own broker clock are a third, separate clock source;
+    their mutual agreement is not established by this replay and is not assumed."""
+    canceled = [o for o in paper_orders if o["status"] == "canceled"]
+    canceled_ids = {o["client_order_id"] for o in canceled}
     cancel_reqs = parse_cancel_request_ns(paper_output)
     resolved = {}
     use_recorded = bool(canceled) and len(canceled) == len(cancel_reqs)
+    pairing: dict[str, int] = {}
     if use_recorded:
-        for i, (order, cancel_ns) in enumerate(zip(canceled, cancel_reqs)):
-            if cancel_ns <= order["submitted_at_ns"]:
+        # Process requests in chronological order: once a *canceled* order is
+        # resolved by an earlier request, it must be treated as terminal (at its
+        # own resolved cancel instant) when evaluating openness for any *later*
+        # request -- otherwise a canceled order that was already resolved would
+        # incorrectly still count as "open indefinitely" against a later,
+        # unrelated request, causing a false ambiguity. This override only ever
+        # applies to canceled-status orders: a filled order's openness always
+        # comes from its own `filled_at_ns` regardless of `pairing`, so an
+        # erroneous match to a filled order here can never corrupt a later
+        # iteration's uniqueness check.
+        for cancel_ns in sorted(cancel_reqs):
+            def is_open_given_pairing(o, at_ns=cancel_ns):
+                if o["status"] == "canceled" and o["client_order_id"] in pairing:
+                    return pairing[o["client_order_id"]] > at_ns
+                return _is_open_at(o, at_ns)
+
+            open_orders = [o for o in paper_orders if is_open_given_pairing(o)]
+            if len(open_orders) != 1:
                 use_recorded = False
                 break
-            next_order_submit = canceled[i + 1]["submitted_at_ns"] if i + 1 < len(canceled) else None
-            if next_order_submit is not None and cancel_ns >= next_order_submit:
-                use_recorded = False
-                break
-            # (b) above: check against every order, not just canceled ones.
-            candidates = [o for o in all_sorted if o["submitted_at_ns"] <= cancel_ns]
-            most_recent = candidates[-1] if candidates else None
-            if most_recent is None or most_recent["client_order_id"] != order["client_order_id"]:
-                use_recorded = False
-                break
+            pairing[open_orders[0]["client_order_id"]] = cancel_ns
+        # A single final check replaces separate per-request "is this a canceled
+        # order" / "is this target already paired" guards: those are provably
+        # subsumed by requiring the accumulated pairing keys to equal canceled_ids
+        # exactly -- any request that matched a non-canceled order, or two
+        # requests that matched the same order, would leave `pairing`'s key set
+        # unequal to `canceled_ids` (either an extra non-canceled key, or fewer
+        # distinct keys than canceled orders), which this catches regardless.
+        if use_recorded and set(pairing) != canceled_ids:
+            use_recorded = False
     if use_recorded:
-        for order, cancel_ns in zip(canceled, cancel_reqs):
-            resolved[order["client_order_id"]] = {"cancel_ts_ns": cancel_ns, "source": "recorded_cancel_request"}
+        for order in canceled:
+            resolved[order["client_order_id"]] = {"cancel_ts_ns": pairing[order["client_order_id"]],
+                                                    "source": "recorded_cancel_request"}
     else:
         source = ("submit_plus_order_timeout_seconds" if not canceled or len(canceled) != len(cancel_reqs)
                   else "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
@@ -388,17 +442,30 @@ def clock_provenance(paper_orders: list[dict], paper_output: dict) -> dict:
     """Measured host-clock-vs-broker-clock offset for this trial's submit requests
     (see resolve_cancel_timestamps' docstring for why this matters): host request
     timestamp minus the broker's own `submitted_at`, per order, in milliseconds.
-    Pairing is chronological-order (both sides sorted by time), like the cancel
-    pairing above, and is only reported when the counts agree -- `counts_match`
-    records whether they did; a mismatch means the reported offsets do not cover
-    every order and callers should not treat an incomplete `host_minus_broker_submit_offset_ms`
-    as exhaustive."""
+
+    Pairing is chronological-order (both sides sorted by time), and is reported
+    *only* when the counts agree (`counts_match`). When they do not, correspondence
+    between the two lists cannot be established at all -- a truncated zip of two
+    differently-ordered/differently-sized lists produces numbers that look like
+    measurements but pair unrelated events (a dropped host entry can shift every
+    later pairing by one position, producing offsets of the wrong order of
+    magnitude entirely -- observed as large as ~195 seconds in a constructed test
+    case). Rather than report those, `host_minus_broker_submit_offset_ms` is `null`
+    with an explicit `host_minus_broker_submit_offset_unavailable_reason` whenever
+    `counts_match` is false."""
     orders_sorted = sorted(paper_orders, key=lambda o: o["submitted_at_ns"])
     submit_host_ns = sorted(r["timestamp"] for r in paper_output.get("requests", []) if r.get("kind") == "submit")
     counts_match = len(submit_host_ns) == len(orders_sorted)
-    n = min(len(orders_sorted), len(submit_host_ns))
-    offsets_ms = [(epoch_seconds_to_ns(host_s) - order["submitted_at_ns"]) / 1e6
-                  for order, host_s in zip(orders_sorted[:n], submit_host_ns[:n])]
+    if counts_match:
+        offsets_ms = [(epoch_seconds_to_ns(host_s) - order["submitted_at_ns"]) / 1e6
+                      for order, host_s in zip(orders_sorted, submit_host_ns)]
+        unavailable_reason = None
+    else:
+        offsets_ms = None
+        unavailable_reason = (f"submit request count ({len(submit_host_ns)}) does not match order count "
+                               f"({len(orders_sorted)}); correspondence between the two lists cannot be "
+                               f"established, so no offsets are reported (a truncated pairing would not be "
+                               f"a valid incomplete measurement -- see docstring).")
     return {
         "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)",
         "cancel_clock_source": "host clock, captured just before send in adaptive-paper/runner.py's "
@@ -408,7 +475,8 @@ def clock_provenance(paper_orders: list[dict], paper_output: dict) -> dict:
         "counts_match": counts_match,
         "host_minus_broker_submit_offset_ms": offsets_ms,
         "host_minus_broker_submit_offset_ms_range": [min(offsets_ms), max(offsets_ms)] if offsets_ms else None,
-        "host_minus_broker_submit_offset_is_lower_bound": True,
+        "host_minus_broker_submit_offset_unavailable_reason": unavailable_reason,
+        "host_minus_broker_submit_offset_is_lower_bound": True if counts_match else None,
         "host_minus_broker_submit_offset_note": "host timestamp is captured before network send, broker "
                                                  "timestamp after receipt, so this measured gap understates "
                                                  "(is a lower bound on) the true clock-source offset.",
@@ -806,14 +874,21 @@ def run_latency_sweep(paper_orders: list[dict], quotes_by_symbol: dict[str, list
 def classify_flip_dependence(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, flip_bisections) -> None:
     """For each bracket where more than one order's fill_agreement flips together,
     determine (empirically, not by assumption) whether each flip is independent of
-    the others in that bracket, by re-running the replay at the bracket's lo/hi
-    latencies with the *other* flipping order(s) removed from paper_orders entirely.
-    If the order still flips the same way on its own, its flip is independent; if it
-    now agrees at both endpoints, its apparent flip was a side effect of the other
-    order's outcome (e.g. one order's fill consumes a position the other needs),
-    which this function records as `independent_flip: False` with
-    `depends_on_client_order_ids`. Mutates `flip_bisections` in place, adding these
-    fields to every entry."""
+    the others in that bracket, by re-running the replay across the *entire declared
+    latency sweep* (LATENCY_SWEEP_MS, not just the bracket's original lo/hi bisection
+    endpoints) with the *other* flipping order(s) removed from paper_orders entirely,
+    and retaining every one of those observations (`counterfactual_sweep`) in the
+    result. Probing only the original endpoints is unsound: removing another order
+    can *shift* where this order's own boundary falls (e.g. from ~19.5ms to ~10ms)
+    without eliminating the flip, and checking just the old endpoints would then
+    misreport a still-independently-flipping order as dependent, because both old
+    endpoints now happen to agree. Scanning the full declared sweep instead asks the
+    right question directly: does this order's agreement ever change anywhere in the
+    declared range once the other order is removed? If it does not change anywhere
+    in that range, the flip is recorded as `independent_flip: False` with
+    `depends_on_client_order_ids`; if it changes anywhere, `independent_flip: True`.
+    Mutates `flip_bisections` in place, adding these fields (plus
+    `counterfactual_sweep`) to every entry."""
     by_bracket: dict[tuple, list[dict]] = {}
     for b in flip_bisections:
         by_bracket.setdefault(tuple(b["bracket_ms"]), []).append(b)
@@ -822,17 +897,21 @@ def classify_flip_dependence(paper_orders, quotes_by_symbol, cancel_resolution, 
             for b in group:
                 b["independent_flip"] = True
                 b["depends_on_client_order_ids"] = []
+                b["counterfactual_sweep"] = None
             continue
         ids_in_group = {b["client_order_id"] for b in group}
         for b in group:
             others = ids_in_group - {b["client_order_id"]}
             reduced_orders = [o for o in paper_orders if o["client_order_id"] not in others]
-            lo_ns, hi_ns = b["lo"]["latency_ns"], b["hi"]["latency_ns"]
-            lo_agree = _order_agrees_at_latency(reduced_orders, quotes_by_symbol, cancel_resolution, out_dir,
-                                                 b["client_order_id"], lo_ns)
-            hi_agree = _order_agrees_at_latency(reduced_orders, quotes_by_symbol, cancel_resolution, out_dir,
-                                                 b["client_order_id"], hi_ns)
-            b["independent_flip"] = lo_agree != hi_agree
+            counterfactual_sweep = [
+                {"latency_ms": ms,
+                 "agrees": _order_agrees_at_latency(reduced_orders, quotes_by_symbol, cancel_resolution, out_dir,
+                                                      b["client_order_id"], ms * 10**6)}
+                for ms in LATENCY_SWEEP_MS
+            ]
+            distinct_states = {point["agrees"] for point in counterfactual_sweep}
+            b["counterfactual_sweep"] = counterfactual_sweep
+            b["independent_flip"] = len(distinct_states) > 1
             b["depends_on_client_order_ids"] = [] if b["independent_flip"] else sorted(others)
 
 
@@ -1032,8 +1111,13 @@ def main(argv=None) -> int:
             "latency_model": None if replay_result["engine"]["latency_ns"] == 0 else
                               {"class": "StaticLatencyModel", "base_latency_nanos": replay_result["engine"]["latency_ns"]},
             "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at "
-                                        "the next event for that instrument at or after submit + latency, not "
-                                        "necessarily exactly at that instant; see module docstring.",
+                                        "the first settlement event at or after submit + latency, not "
+                                        "necessarily exactly at that instant; a settlement event is a due "
+                                        "order-command timer (any order's submit/cancel being applied), which "
+                                        "settles all instruments' outstanding deferred commands together, not "
+                                        "only that timer's own instrument -- a plain market-data quote for "
+                                        "another instrument is not a timer and does not trigger this; see "
+                                        "module docstring.",
             "reports": replay_result["reports"],
         },
         "results": comparison,
@@ -1057,16 +1141,27 @@ def main(argv=None) -> int:
         "completed_utc": completed_utc,
         "argv": redact_args(args),
         "stdout_sha256": digest_bytes(stdout_bytes),
+        # When stdout exposes a binary `.buffer` (the normal case for a real
+        # process), that buffer is written to directly and stdout_sha256 hashes
+        # exactly those bytes -- no encoding or newline translation can intervene.
+        # When it does not (e.g. unittest's `-b` output-capture StringIO, which has
+        # no `.buffer` at all), text-mode `.write()` is used instead, and
+        # stdout_sha256 is only a hash of the UTF-8, LF-normalized text -- it is
+        # not a guarantee about the exact bytes some other text stream (e.g. one
+        # opened with `newline="\r\n"`) would actually emit.
+        "stdout_sha256_basis": "exact_bytes_written" if hasattr(sys.stdout, "buffer") else
+                                "utf8_lf_normalized_text",
         "runner_sha256": digest_path(Path(__file__)),
     }
     # The receipt is saved before stdout is written: it is the durable evidence
     # artifact, and a stdout write failure downstream (e.g. a closed pipe) should
-    # not be allowed to leave a successful run with no receipt on disk. Text-mode
-    # `sys.stdout.write` is used (not `.buffer.write`) so this also works when
-    # stdout has been replaced with something that has no `.buffer` attribute at
-    # all, such as unittest's `-b` output-capture StringIO.
+    # not be allowed to leave a successful run with no receipt on disk.
     save(args.receipt, receipt)
-    sys.stdout.write(stdout_bytes.decode())
+    stdout_buffer = getattr(sys.stdout, "buffer", None)
+    if stdout_buffer is not None:
+        stdout_buffer.write(stdout_bytes)
+    else:
+        sys.stdout.write(stdout_bytes.decode())
     return 0
 
 

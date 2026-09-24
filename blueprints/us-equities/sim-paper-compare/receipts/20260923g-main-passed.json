@@ -36,10 +36,11 @@
       40.769
     ],
     "host_minus_broker_submit_offset_note": "host timestamp is captured before network send, broker timestamp after receipt, so this measured gap understates (is a lower bound on) the true clock-source offset.",
+    "host_minus_broker_submit_offset_unavailable_reason": null,
     "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either the host clock or the broker clock is not established by this replay",
     "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)"
   },
-  "completed_utc": "2026-09-24T20:44:57.201231+00:00",
+  "completed_utc": "2026-09-24T21:30:11.423706+00:00",
   "data_provenance": {
     "adjustment": "n/a (quotes)",
     "asof": "2026-09-23",
@@ -106,7 +107,7 @@
       "note": "native default nautilus_trader.execution.FillModel(); matches limit orders against the fed L1 top-of-book quotes deterministically (no probabilistic slippage or partial-fill draw), the same baseline configuration used by engine-nautilus/equity-replay's zero-fee case"
     },
     "latency_model": null,
-    "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at the next event for that instrument at or after submit + latency, not necessarily exactly at that instant; see module docstring.",
+    "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at the first settlement event at or after submit + latency, not necessarily exactly at that instant; a settlement event is a due order-command timer (any order's submit/cancel being applied), which settles all instruments' outstanding deferred commands together, not only that timer's own instrument -- a plain market-data quote for another instrument is not a timer and does not trigger this; see module docstring.",
     "liquidity_consumption": false,
     "oms_type": "NETTING",
     "queue_position": false,
@@ -146,6 +147,40 @@
           70
         ],
         "client_order_id": "adp-adaptive-20260923g-0000004",
+        "counterfactual_sweep": [
+          {
+            "agrees": false,
+            "latency_ms": 0
+          },
+          {
+            "agrees": false,
+            "latency_ms": 5
+          },
+          {
+            "agrees": false,
+            "latency_ms": 50
+          },
+          {
+            "agrees": true,
+            "latency_ms": 70
+          },
+          {
+            "agrees": true,
+            "latency_ms": 100
+          },
+          {
+            "agrees": true,
+            "latency_ms": 250
+          },
+          {
+            "agrees": true,
+            "latency_ms": 650
+          },
+          {
+            "agrees": true,
+            "latency_ms": 1000
+          }
+        ],
         "depends_on_client_order_ids": [],
         "hi": {
           "agrees": true,
@@ -164,6 +199,40 @@
           70
         ],
         "client_order_id": "adp-adaptive-20260923g-0000005",
+        "counterfactual_sweep": [
+          {
+            "agrees": true,
+            "latency_ms": 0
+          },
+          {
+            "agrees": true,
+            "latency_ms": 5
+          },
+          {
+            "agrees": true,
+            "latency_ms": 50
+          },
+          {
+            "agrees": true,
+            "latency_ms": 70
+          },
+          {
+            "agrees": true,
+            "latency_ms": 100
+          },
+          {
+            "agrees": true,
+            "latency_ms": 250
+          },
+          {
+            "agrees": true,
+            "latency_ms": 650
+          },
+          {
+            "agrees": true,
+            "latency_ms": 1000
+          }
+        ],
         "depends_on_client_order_ids": [
           "adp-adaptive-20260923g-0000004"
         ],
@@ -1386,14 +1455,15 @@
       }
     ]
   },
-  "runner_sha256": "5af50c76fd26c2397bd22dc7ac8176784976d870c4a64c90a1852889feb9ec34",
+  "runner_sha256": "aafda327d243e3f1ddea80e0fe1355edc5b0c9095a1930472900f9ec6fe675eb",
   "runtime_environment": {
     "alpaca_py_installed_version": "0.44.0",
     "note": "alpaca-py is installed in this runtime but not used by this script's fetch path (urllib.request directly); recorded for environment reproducibility only."
   },
   "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime. The order-4/order-5 timing explanation in the README is a hypothesis consistent with this receipt's data, not a demonstrated broker-side mechanism.",
-  "started_utc": "2026-09-24T20:44:51.653914+00:00",
+  "started_utc": "2026-09-24T21:30:04.741445+00:00",
   "stdout_sha256": "1b901b223399972f1395e7ca2d4cb91230207c4f8d6958436e292cdf7610113d",
+  "stdout_sha256_basis": "exact_bytes_written",
   "trial": "20260923g-main-passed",
   "trial_window_utc": [
     "2026-09-23T16:46:00Z",
