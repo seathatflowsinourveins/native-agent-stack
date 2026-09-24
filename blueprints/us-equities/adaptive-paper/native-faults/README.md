@@ -142,6 +142,27 @@ above:
   The harness's `FaultLedger` lets only the C04 client id past the pre-send
   `invalid_price_increment` check, so Alpaca itself answers the fault.
 
+## Order-contract boundary (2026-09-24, after the native run)
+
+The engine transport now validates every submit with the order contract's
+`build_envelope()` before any HTTP request (`../README-transport.md`), which also
+refuses a sub-penny price. The harness's default transport is therefore
+`FaultTransport`: the engine transport except that the single C04 client id is
+validated with its price truncated to the cent and then carries its exact
+sub-penny price. Every other contract rule, and the wire check that the POST body
+equals the envelope, still applies to C04; every other client id is validated as
+in the engine. New receipts also bind `../order-contract/order_contract.py` in
+`engine_sources_sha256` and name both exemptions in `c04_pre_send_exemption`.
+
+This change edits `transport.py`, `runner.py` and `harness.py`. The retained
+`receipt.json` (2026-09-24) therefore binds the **older engine**: its
+`harness_sha256` (3f01fb31...) and its `engine_sources_sha256` for runner.py
+(a6101294...) and transport.py (b92e8752...) no longer equal the files here, and
+the "receipt binds this tree" statement above describes the tree as of that run.
+safety.py (ad520fc4...) is unchanged. `receipt-20260923.json` already bound an
+older engine. The wired boundary has local synthetic test coverage only; no
+native run has exercised it.
+
 ## Run
 
 ```

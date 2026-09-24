@@ -31,7 +31,8 @@ validated `leverage-schedule-v1-20260922` policy (see README-safety.md) is
 present in config, a preflight-proven account multiplier at least equal to the
 requested leverage has been confirmed, and this ladder's gate rows
 (`leverage-ladder-1x/2x/4x` in `catalogs/us-equities/gates-20260922.json`) each
-show `needs_attention == 0`.
+show `needs_attention == 0` together with a recorded peak achieved leverage and
+time above the next-lower rung's cap (0.5x for the 1x rung).
 
 The allocator uses one portfolio owner across all families, explicit cost
 hurdles, an exposure reserve below the ledger cap, a cooldown and minimum hold.

@@ -130,6 +130,44 @@ class EvaluateGuardTests(unittest.TestCase):
         decisions = self.evaluate({"AAPL"}, {"MSFT"}, {"AAPL": [], "MSFT": [], "IGNORED": []})
         self.assertEqual(set(decisions), {"AAPL", "MSFT"})
 
+    # -- finding 4: a governing date strictly BETWEEN today and
+    # next_session_date (e.g. a weekend/holiday the ex_date happens to
+    # land on) must still be in range -- not just the two boundary dates
+    # themselves.
+    def test_action_date_strictly_between_today_and_next_session_is_in_range(self):
+        friday, saturday, monday = date(2026, 10, 2), date(2026, 10, 3), date(2026, 10, 5)
+        decisions = CA.evaluate_guard(today=friday, next_session_date=monday, held_symbols={"X"},
+                                      candidate_symbols=set(),
+                                      lookup_results={"X": [action("X", "merger", saturday)]})
+        d = decisions["X"]
+        self.assertTrue(d.block_entry)
+        self.assertTrue(d.must_flatten)
+        self.assertEqual(d.action_date, saturday)
+
+    # -- finding 3: a degraded (stale/failed-refresh) symbol with a
+    # confirmed in-range action keeps must_flatten, but gains
+    # needs_attention; a degraded symbol with NO qualifying action still
+    # blocks entry (cannot trust "no action" from stale data) and gains
+    # needs_attention, but is never force-flattened on staleness alone.
+    def test_degraded_symbol_preserves_confirmed_flatten_and_adds_attention(self):
+        decisions = self.evaluate({"AAPL"}, set(), {"AAPL": [action("AAPL", "cash_dividend", TODAY)]})
+        # Not degraded: baseline.
+        self.assertFalse(decisions["AAPL"].needs_attention)
+        degraded = CA.evaluate_guard(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                     candidate_symbols=set(),
+                                     lookup_results={"AAPL": [action("AAPL", "cash_dividend", TODAY)]},
+                                     degraded_symbols={"AAPL"})["AAPL"]
+        self.assertTrue(degraded.must_flatten, "a confirmed flatten must survive degraded staleness")
+        self.assertTrue(degraded.needs_attention)
+
+    def test_degraded_symbol_with_no_qualifying_action_still_blocks_entry(self):
+        decisions = CA.evaluate_guard(today=TODAY, next_session_date=NEXT_SESSION, held_symbols=set(),
+                                      candidate_symbols={"MSFT"}, lookup_results={"MSFT": []},
+                                      degraded_symbols={"MSFT"})["MSFT"]
+        self.assertTrue(decisions.block_entry)
+        self.assertTrue(decisions.needs_attention)
+        self.assertFalse(decisions.must_flatten)
+
 
 class CorporateActionMonitorTests(unittest.TestCase):
     class FakeSource:
@@ -201,6 +239,182 @@ class CorporateActionMonitorTests(unittest.TestCase):
         monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
         monitor.refresh({"AAPL", "MSFT"}, start=TODAY, end=NEXT_SESSION, now=1001.0)
         self.assertEqual(len(source.calls), 2)
+
+    # -- finding 7b: the throttle must also be keyed on the (start, end)
+    # window, not just symbol coverage -- a caller asking for a DIFFERENT
+    # window than the last cached fetch must never be served a stale
+    # result computed against the OLD window merely because it arrived
+    # within refresh_seconds.
+    def test_refresh_not_throttled_when_the_window_changes_for_the_same_symbols(self):
+        source = self.FakeSource(result={"AAPL": []})
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        monitor.refresh({"AAPL"}, start=NEXT_SESSION, end=FAR_FUTURE, now=1001.0)
+        self.assertEqual(len(source.calls), 2)
+        self.assertEqual(source.calls[1], (("AAPL",), NEXT_SESSION, FAR_FUTURE))
+
+    # -- finding 7a: a source that silently omits a requested symbol from
+    # its returned dict (an injected fake/test source; never true of
+    # AlpacaCorporateActionsSource) must fail closed for that symbol, not
+    # be read as "no action".
+    def test_symbol_omitted_by_the_source_fails_closed_not_no_action(self):
+        class OmittingSource:
+            def fetch(self, symbols, start, end):
+                return {}  # never includes any requested symbol
+        monitor = CA.CorporateActionMonitor(OmittingSource(), clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        decisions = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION,
+                                     held_symbols=set(), candidate_symbols={"AAPL"}, now=1000.0)
+        self.assertTrue(decisions["AAPL"].block_entry)
+        self.assertTrue(decisions["AAPL"].needs_attention)
+        self.assertEqual(decisions["AAPL"].reason, "corporate_action_lookup_failed")
+
+    # -- finding 3: a failed refresh must PRESERVE a previously confirmed
+    # in-range action (must_flatten stays True) instead of silently
+    # cancelling it, while still raising needs_attention so the staleness
+    # is visible.
+    def test_failed_refresh_preserves_a_previously_confirmed_flatten(self):
+        class FlakySource:
+            def __init__(self):
+                self.fail = False
+            def fetch(self, symbols, start, end):
+                if self.fail:
+                    raise CA.CorporateActionLookupError("boom")
+                return {s: [action(s, "forward_split", TODAY)] for s in symbols}
+        source = FlakySource()
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, max_age_seconds=3600, clock=lambda: 1000.0)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        before = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                  candidate_symbols=set(), now=1000.0)["NVDA"]
+        self.assertTrue(before.must_flatten)
+        self.assertFalse(before.needs_attention)
+        source.fail = True
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=2000.0)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                 candidate_symbols=set(), now=2000.0)["NVDA"]
+        self.assertTrue(after.must_flatten, "a confirmed in-range action must survive a later failed refresh")
+        self.assertTrue(after.needs_attention, "the failure must still be surfaced")
+        self.assertEqual(after.reason, "corporate_action_forward_split")
+
+    # -- finding 3 (staleness path): the same preservation must hold when
+    # the whole cache goes stale past max_age_seconds, not just on an
+    # explicit fetch failure.
+    def test_staleness_preserves_a_previously_confirmed_flatten(self):
+        source = self.FakeSource(result={"NVDA": [action("NVDA", "reverse_split", TODAY)]})
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=1, max_age_seconds=100, clock=lambda: 1000.0)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        stale = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                 candidate_symbols=set(), now=1200.0)["NVDA"]
+        self.assertTrue(stale.must_flatten)
+        self.assertTrue(stale.needs_attention)
+
+    # -- finding 8: a failed attempt is retried on the shorter
+    # `retry_seconds` interval, not the full (much longer) refresh_seconds.
+    def test_failed_attempt_retries_on_the_short_retry_interval(self):
+        source = self.FakeSource(error=CA.CorporateActionLookupError("boom"))
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, retry_seconds=60, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        self.assertEqual(len(source.calls), 1)
+        # 70s later: past retry_seconds (60) but nowhere near refresh_seconds (900).
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1070.0)
+        self.assertEqual(len(source.calls), 2, "a failed attempt must retry within retry_seconds, not refresh_seconds")
+
+    def test_successful_attempt_reverts_to_the_ordinary_refresh_interval(self):
+        source = self.FakeSource(error=CA.CorporateActionLookupError("boom"))
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, retry_seconds=60, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        source.error = None
+        source.result = {"AAPL": []}
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1070.0)
+        self.assertEqual(len(source.calls), 2)
+        # Now successful; the NEXT call within 900s (but past 60s) must be throttled again.
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1200.0)
+        self.assertEqual(len(source.calls), 2, "a successful attempt must revert to the ordinary refresh_seconds throttle")
+
+
+ALPACA = importlib.util.find_spec("alpaca") is not None
+
+
+@unittest.skipUnless(ALPACA, "requires the pinned alpaca-py package")
+class AlpacaCorporateActionsSourceTests(unittest.TestCase):
+    """Exercises AlpacaCorporateActionsSource.fetch()'s response-parsing
+    logic with a fake alpaca-py response object (no network, no real
+    credentials -- construction never calls the network; see
+    AlpacaCorporateActionsSource's own docstring), plus its constructor-time
+    request-timeout/retry hardening (finding 2)."""
+
+    class _Item:
+        def __init__(self, **fields):
+            self.__dict__.update(fields)
+
+    class _Response:
+        def __init__(self, data):
+            self.data = data
+
+    def source(self):
+        return CA.AlpacaCorporateActionsSource("fake-key", "fake-secret")
+
+    def test_construction_cuts_retries(self):
+        # finding 2: alpaca-py's RESTClient retries up to 3 times, sleeping
+        # 3s between attempts, by default -- construction must cut this to
+        # the bare minimum.
+        src = self.source()
+        self.assertEqual(src._client._retry, 1)
+        self.assertEqual(src._client._retry_wait, 1)
+
+    def test_construction_bounds_the_underlying_session_request_timeout(self):
+        # finding 2: alpaca-py's RESTClient sets NO per-request timeout at
+        # all by default -- the constructor must wrap the underlying
+        # requests.Session so every call carries a bounded timeout, proven
+        # here by patching requests.Session.request BEFORE construction (so
+        # the wrapper's captured `original_request` is the mock) and
+        # inspecting what it was actually called with.
+        import unittest.mock as mock
+        import requests
+        captured = {}
+
+        def fake_request(self_session, method, url, **kwargs):
+            captured.update(kwargs)
+            raise RuntimeError("no real network call in this test")
+
+        with mock.patch.object(requests.Session, "request", fake_request):
+            src = self.source()
+            with self.assertRaises(RuntimeError):
+                src._client._session.request("GET", "https://example.invalid")
+        self.assertEqual(captured.get("timeout"), (5, 15))
+
+    def test_result_at_the_page_limit_cap_is_ambiguous_fails_closed(self):
+        src = self.source()
+        # 1000 items across (one bucket) at the configured request cap.
+        items = [self._Item(symbol="AAPL", ex_date=TODAY) for _ in range(src._REQUEST_LIMIT)]
+        src._client.get_corporate_actions = lambda request: self._Response({"cash_dividends": items})
+        with self.assertRaises(CA.CorporateActionLookupError):
+            src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+
+    def test_result_under_the_cap_is_trusted(self):
+        src = self.source()
+        items = [self._Item(symbol="AAPL", ex_date=TODAY)]
+        src._client.get_corporate_actions = lambda request: self._Response({"cash_dividends": items})
+        out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(out["AAPL"]), 1)
+        self.assertEqual(out["AAPL"][0].action_type, "cash_dividend")
+        self.assertEqual(out["AAPL"][0].action_date, TODAY)
+
+    def test_unmapped_type_key_fails_closed_instead_of_being_silently_dropped(self):
+        src = self.source()
+        items = [self._Item(symbol="AAPL", ex_date=TODAY)]
+        src._client.get_corporate_actions = lambda request: self._Response({"some_future_action_type": items})
+        with self.assertRaises(CA.CorporateActionLookupError):
+            src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+
+    def test_unit_split_alternate_symbol_is_mapped(self):
+        src = self.source()
+        item = self._Item(old_symbol="OLD", new_symbol="NEW", alternate_symbol="ALT",
+                          effective_date=TODAY)
+        src._client.get_corporate_actions = lambda request: self._Response({"unit_splits": [item]})
+        out = src.fetch(["OLD", "NEW", "ALT"], TODAY, NEXT_SESSION)
+        for symbol in ("OLD", "NEW", "ALT"):
+            self.assertEqual(len(out[symbol]), 1, f"{symbol} must be mapped from a unit_split")
 
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
@@ -411,6 +625,90 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertEqual(len(events), 1)
         self.assertEqual(sorted(events[0]["corporate_action_must_flatten"]), ["AAPL"])
         self.assertEqual(sorted(events[0]["corporate_action_block_entry"]), ["AAPL", "MSFT"])
+
+    # -- finding 6: a session-calendar failure (a clock outside the frozen
+    # calendar's covered years) must block entry and flag needs_attention,
+    # but must NOT force-flatten a held position -- a calendar gap is not
+    # evidence of an actual corporate action.
+    def test_calendar_failure_blocks_entry_but_never_force_flattens(self):
+        # 2028-01-04 10:00 ET -- outside sessions.CALENDAR_YEARS (2026, 2027).
+        out_of_range_clock = lambda: 1830610800.0
+        guard_decisions = {}  # never consulted: the ValueError branch short-circuits first
+        strategy = self.strategy(held={"AAPL": 3}, targets={"AAPL": 3}, guard_decisions=guard_decisions,
+                                 clock=out_of_range_clock)
+        strategy.rebalance()
+        self.assertEqual(strategy.submitted, [], "a calendar failure alone must never force a flatten sell")
+        events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
+        self.assertEqual(len(events), 1)
+        self.assertTrue(events[0]["block_entry"])
+        self.assertFalse(events[0]["must_flatten"])
+        self.assertTrue(events[0]["needs_attention"])
+        self.assertEqual(events[0]["reason"], "corporate_action_session_unknown")
+
+    # -- finding 9: a symbol flagged by BOTH the corporate-action guard
+    # (must_flatten) and the gap-risk stop must get exactly ONE sell
+    # action, not two competing ones.
+    def test_symbol_flagged_by_both_guards_gets_exactly_one_sell(self):
+        guard_decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, must_flatten=True,
+                                                      reason="corporate_action_reverse_split",
+                                                      action_type="reverse_split", action_date=TODAY)}
+        strategy = self.strategy(held={"AAPL": 4}, targets={"AAPL": 4}, guard_decisions=guard_decisions)
+        strategy._gap_risk_stop_symbols = lambda now, held: {"AAPL"}
+        strategy.rebalance()
+        aapl_sells = [c for c in strategy._fake_order_factory.calls
+                     if c["instrument_id"] == "AAPL.ALPACA" and c["side"] == OrderSide.SELL]
+        self.assertEqual(len(aapl_sells), 1, "AAPL must get exactly one sell, not one per guard")
+        self.assertEqual(aapl_sells[0]["quantity"], "4")
+
+    # -- finding 10: a resting BUY order for a symbol newly blocked this
+    # tick must be cancelled, not left to potentially fill afterwards.
+    def test_resting_buy_is_cancelled_for_a_newly_blocked_symbol(self):
+        guard_decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, needs_attention=True,
+                                                      reason="corporate_action_lookup_failed")}
+        strategy = self.strategy(held={}, targets={"AAPL": 1}, guard_decisions=guard_decisions)
+        strategy.cancelled = []
+        strategy.cancel_order = lambda cid: strategy.cancelled.append(str(cid))
+        strategy.pending["resting-buy-1"] = {"symbol": "AAPL", "side": "buy", "created": 0.0}
+        strategy.rebalance()
+        self.assertIn("resting-buy-1", strategy.cancelled)
+        self.assertTrue(strategy.pending["resting-buy-1"]["cancel_requested"])
+
+    # -- finding 11 (byte-identical claim): with the guard off (None,
+    # default), the decision event must carry neither
+    # corporate_action_block_entry nor corporate_action_must_flatten.
+    def test_decision_event_has_no_corporate_action_keys_when_guard_is_off(self):
+        strategy = self.strategy(held={}, targets={"AAPL": 1}, guard_decisions=None)
+        strategy.rebalance()
+        events = [e for e in strategy.events if e.get("type") == "decision"]
+        self.assertEqual(len(events), 1)
+        self.assertNotIn("corporate_action_block_entry", events[0])
+        self.assertNotIn("corporate_action_must_flatten", events[0])
+
+    # -- finding 11 (emit-on-change): an unchanged guard decision for the
+    # same symbol across consecutive ticks must not re-emit a duplicate
+    # corporate_action_guard event.
+    def test_guard_event_not_re_emitted_when_the_decision_is_unchanged(self):
+        guard_decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, must_flatten=True,
+                                                      reason="corporate_action_cash_dividend",
+                                                      action_type="cash_dividend", action_date=TODAY)}
+        strategy = self.strategy(held={"AAPL": 1}, targets={"AAPL": 1}, guard_decisions=guard_decisions)
+        strategy.rebalance()
+        strategy.rebalance()
+        events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
+        self.assertEqual(len(events), 1, "an unchanged decision must be emitted only once")
+
+    def test_guard_event_re_emitted_when_the_decision_changes(self):
+        guard = self._FakeGuard({"AAPL": self.decision_for("AAPL", block_entry=True, needs_attention=True,
+                                                            reason="corporate_action_lookup_failed")})
+        strategy = self.strategy(held={"AAPL": 1}, targets={"AAPL": 1})
+        strategy.corporate_action_guard = guard
+        strategy.rebalance()
+        guard.decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, must_flatten=True,
+                                                      reason="corporate_action_cash_dividend",
+                                                      action_type="cash_dividend", action_date=TODAY)}
+        strategy.rebalance()
+        events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
+        self.assertEqual(len(events), 2, "a changed decision must be re-emitted")
 
 
 if __name__ == "__main__":

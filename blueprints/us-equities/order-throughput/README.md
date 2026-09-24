@@ -316,7 +316,7 @@ IDs.
 |---|---|
 | `capacity.py` | Engine (`CapacityRun`), configuration and bounds, cancel-all guard, journal and `recover`/`audit`, receipt, CLI |
 | `rate_governor.py` | Token bucket + rolling window + remaining/reset + 429 backoff |
-| `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only |
+| `alpaca_capacity_port.py` | Native paper port; reuses adaptive-paper `transport` read-only. Every submit first passes the order-contract boundary (`transport.order_envelope`); a refusal is `not_sent` with error `OrderContractRefused` and reaches no client. Added after the 2026-09-24 native runs, whose receipts bind the older port (`e4c7bd0b...`) |
 | `capacity_fixture.py` | Offline fake clock, broker and `trade_updates` stream |
 | `rate-limit-evidence-20260924.json` | Cited limits, repository-measured header counts, round-trip arithmetic |
 | `rate_limit_evidence.py` | Rebuilds or `--check`s that JSON from the committed trial receipts |

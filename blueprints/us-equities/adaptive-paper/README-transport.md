@@ -52,8 +52,9 @@ the POST /v2/orders 422 entry. It was observed once on the paper endpoint in the
 code, is the discriminator. The transport
 raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
 the body with those constants only, never retaining or raising it. The engine's
-own Ledger refuses such prices before send, so only the native-fault harness,
-which exempts its single C04 client ID, can reach this path. Ambiguous errors
+own Ledger and the order-contract boundary below both refuse such prices before
+send, so only the native-fault harness, whose `FaultLedger` and `FaultTransport`
+each exempt only its single C04 client ID, can reach this path. Ambiguous errors
 retain unresolved state, freeze admission, and perform at most one lookup without
 resubmission. `cancel()` sends the DELETE for every owned order: to the broker ID
 it already observed, or, with no observation, to the ID a client-ID lookup
@@ -69,6 +70,43 @@ and repeating a known terminal observation changes no ledger state. All observat
 observations additionally retain available execution IDs and individual event
 quantity/price. Consumers must deduplicate executions and never manufacture
 individual fills from a cumulative REST snapshot.
+
+## Pre-submission order-contract boundary
+
+Every alpaca-py order submit first passes the offline
+[order contract](../order-contract/order_contract.py)'s `build_envelope()`. After
+the `before_submit` risk callback and before any HTTP request, `submit()` validates
+the exact SDK-bound projection of the normalized intent (symbol, qty, side, limit
+type, DAY, client ID, limit price, `extended_hours`; attribution metadata never
+reaches the wire) and builds the `LimitOrderRequest` only from the envelope. The
+engine's own semantics are passed explicitly: fractional sell quantities up to nine
+decimals (exact residual exits) and `extended_hours: true` only when the transport
+was constructed with extended hours allowed. Everything else is the contract's own
+narrower policy: symbol syntax `[A-Z]{1,5}(\.[A-Z])?` (so `BRK-B` is refused while
+`BRK.B` is admitted), a client ID beginning with a letter or digit, and the
+minimum price increment.
+
+A refusal raises `OrderContractRefused`, a `SubmissionNotSent` subclass with
+`local_refusal="order_contract"` and `not_sent_reason="order_contract_refused"`.
+No request budget is reserved and no HTTP request is sent; a replay of that client
+ID stays a local refusal without a lookup. It is never a `RejectedSubmission`,
+which remains reserved for a broker's definitive HTTP answer. `Controller.bind`
+records the reserved intent as ledger status `not_sent` with event reason
+`order_contract_refused`, distinct from `broker_refused`.
+
+`GuardedSession` also gates the wire: an order POST is admitted only while
+`submit_enveloped()` holds that client ID's envelope, and only when the serialized
+body carries exactly its fields and values. alpaca-py serializes qty and price as
+floats; a float whose text no longer equals the exact envelope decimal, or a
+dropped or added field, is refused locally before the budget hook. The order-
+throughput `AlpacaCapacityPort` uses the same helpers, so no alpaca-py submit
+through `_sdk_client` bypasses the boundary. `order_contract_status(symbols)` is the
+network-free self-test behind `runner.check_order_contract_boundary`. `runner.main`
+runs it before credentials are read (an inactive boundary or an inadmissible
+configured symbol writes `not_started` at stage `order_contract`) and records the
+status as `order_contract` in the preflight summary; `validate_preflight`, which the
+mover runner shares, repeats it and raises `order_contract_boundary_inactive:<check>`. Evidence class for all of this is local synthetic tests; no
+broker run has exercised the wired boundary yet.
 
 `ready` requires successful native authentication, an observed subscription ACK
 from each socket, fresh quotes for the required benchmark basket, and no frozen

@@ -9,7 +9,7 @@ import argparse
 import ast
 import asyncio
 from dataclasses import asdict, replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
@@ -26,7 +26,8 @@ from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerpr
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight
+from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
+                       preflight)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -552,6 +553,19 @@ def _check_margin_entitlement(account, config, lev, session_policy):
     return mult
 
 
+def check_order_contract_boundary(symbols):
+    """Preflight: the transport's pre-submission order-contract boundary is active.
+
+    Local and network-free: the pinned contract loads, accepts a valid sentinel,
+    refuses invalid ones, the POST gate requires a validated envelope, and every
+    configured symbol is admissible. Returns the status recorded in the summary.
+    """
+    try:
+        return order_contract_status(tuple(symbols))
+    except TransportError as exc:
+        raise SafetyError(str(exc)) from None
+
+
 def validate_preflight(observation, config, *, require_open, allow_existing=False,
                        allow_existing_positions=None, session_policy=None,
                        mode=None, gate_result_path=None, snapshot_path=None):
@@ -568,6 +582,7 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     ``held_overnight`` while overnight_holds is enabled), leaving the other
     four guards enforced exactly as for a normal fresh start. Defaults to ``allow_existing`` when not given, so recovery's
     existing behaviour is unchanged."""
+    check_order_contract_boundary(config.get("symbols", ()))
     if mode == "paper":
         _check_promotion_gate(gate_result_path, snapshot_path)
     if allow_existing_positions is None:
@@ -845,7 +860,10 @@ class Controller:
                 intent = next((i for i in self.ledger.intents() if i.client_id == order["client_order_id"]), None)
                 if intent and intent.status == "reserved" and intent.broker_id is None and not intent.filled_qty:
                     if getattr(exc, "not_sent", False) is True:
-                        self.ledger.mark_not_sent(intent.client_id, "transport_proven_not_sent")
+                        # A local order-contract refusal keeps its own reason code;
+                        # it is never recorded as a broker refusal.
+                        self.ledger.mark_not_sent(intent.client_id,
+                                                  getattr(exc, "not_sent_reason", "transport_proven_not_sent"))
                     elif isinstance(exc, RejectedSubmission):
                         self.ledger.mark_broker_refused(intent.client_id, exc.status_code,
                                                         getattr(exc, "refusal", None))
@@ -904,6 +922,83 @@ PROJECT_EQUITY_FLOOR_USD = 25000
 
 RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
 
+# CRITICAL finding 1 (2026-09-24 fix round): Alpaca's `/v1/corporate-actions`
+# endpoint filters by PROCESS date, which for a cash dividend is the payable
+# date -- typically 1-3 weeks AFTER the ex_date this guard actually reasons
+# about (blueprints/us-equities/alpaca-historical/README.md's own documented
+# behaviour; independently confirmed by a native read-only check recorded in
+# corporate-actions-native-check-20260924.json: fetch(['AAPL'],
+# 2024-08-09, 2024-08-12) -- a narrow window around the real 2024-08-12
+# ex-date -- returned []; fetch(['AAPL'], 2024-08-12, 2024-08-16) returned
+# the cash_dividend). A narrow today..next_session request window therefore
+# systematically misses real dividends. Request a WIDE window from the
+# source and let evaluate_guard's own narrow date check (today..
+# next_session_date, inclusive -- finding 4) do the actual filtering
+# locally, exactly as corporate_actions.py's module docstring already
+# describes this split of responsibilities.
+CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS = 7
+CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS = 90
+# HIGH finding 2: the hard ceiling on how long the corporate-action guard's
+# background refresh thread (see _schedule_corporate_action_refresh below)
+# is allowed to run before this coroutine gives up waiting on it (the
+# thread itself may still be blocked in alpaca-py past this point -- the
+# in-flight flag it clears in its `finally` prevents a second overlapping
+# thread from being started meanwhile, see the tick-loop call site).
+CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 20.0
+
+
+def _corporate_action_guard_for_strategy(config, session_policy):
+    """MEDIUM finding 8 (2026-09-24 fix round): pure decision, independently
+    unit-testable without driving run_native's full native tick loop -- the
+    corporate-action guard is wired into the strategy ONLY when
+    `session_policy["overnight_holds"]` is True. No shipped config
+    currently enables overnight_holds; a regular-session-only run never
+    holds a position across a corporate-action date at all (this guard
+    exists specifically for that overnight-hold gap -- audit gap #8), so
+    wiring it in unconditionally used to mean a single failed first fetch
+    could block every entry for a whole regular-session run that could
+    never have benefited from the guard in the first place."""
+    return config.get("_corporate_action_guard") if session_policy["overnight_holds"] else None
+
+
+def _corporate_action_fetch_window(session_date):
+    """The wide fetch window (finding 1) for a corporate-action refresh
+    anchored at `session_date`: `session_date`'s own trading-day horizon
+    (today's session extended through the next trading session -- the
+    guard's actual hold horizon) padded well past Alpaca's process-date
+    filtering lag in both directions. Raises ValueError (uncaught here) if
+    `session_date` cannot be resolved against the session calendar -- every
+    caller already handles that the same way session_at/next_trading_day's
+    other callers do."""
+    next_session_date = next_trading_day(session_date)
+    start = session_date - timedelta(days=CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS)
+    end = next_session_date + timedelta(days=CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS)
+    return next_session_date, start, end
+
+
+async def _schedule_corporate_action_refresh(guard, watch, start, end, now, state):
+    """HIGH finding 2: run `guard.refresh()` (a blocking network call) off
+    the asyncio event loop in a worker thread, bounded by a hard
+    `asyncio.wait_for` timeout, and guarded by `state["in_flight"]` so a
+    still-running previous refresh thread is never overlapped by a second
+    concurrent one -- `CorporateActionMonitor.refresh` is not proven safe
+    for concurrent invocation. A no-op if a refresh is already in flight;
+    callers check `state["in_flight"]` before calling this so a throttled
+    (no-op) `refresh()` call never even spins up a thread."""
+    state["in_flight"] = True
+
+    async def _run():
+        try:
+            await asyncio.wait_for(
+                asyncio.to_thread(guard.refresh, watch, start=start, end=end, now=now),
+                timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
+        except asyncio.TimeoutError:
+            pass
+        finally:
+            state["in_flight"] = False
+
+    asyncio.create_task(_run())
+
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
                      log_directory=None):
@@ -921,10 +1016,26 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     pool, selector = strategy_pool_and_selector(config, registry_entries)
     leverage_policy = config.get("_leverage_policy")
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
+    # MEDIUM finding 8 (2026-09-24 fix round): moved up from further below
+    # so it is available here -- the corporate-action guard is now wired
+    # into the strategy ONLY when overnight_holds is actually enabled. No
+    # shipped config currently enables overnight_holds (see
+    # config*.json); wiring the guard unconditionally used to mean a
+    # regular-session-only run -- which never holds a position across a
+    # corporate-action date at all, and for which this guard's own module
+    # docstring exists specifically because of an overnight-hold gap --
+    # could still have its very first entry blocked for a whole run by a
+    # single failed first fetch it has no way to benefit from.
+    session_policy = validate_session_policy(config)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
                                 account_multiplier=config.get("_account_multiplier"),
-                                corporate_action_guard=config.get("_corporate_action_guard"))
+                                corporate_action_guard=_corporate_action_guard_for_strategy(
+                                    config, session_policy))
+    # HIGH finding 2: a per-run state dict (not a strategy/monitor
+    # attribute) tracking whether a background refresh thread is currently
+    # in flight -- see _schedule_corporate_action_refresh.
+    ca_refresh_state = {"in_flight": False}
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -939,7 +1050,6 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     port.start = start_with_quotes
     metadata = [{"symbol": a["symbol"], "price_precision": 2, "price_increment": "0.01", "lot_size": "1"}
                 for a in assets]
-    session_policy = validate_session_policy(config)
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy,
                          log_directory=log_directory)
@@ -1062,23 +1172,28 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 # Trading-lane audit gap #8: refresh the corporate-action
                 # cache before this tick's rebalance() consults it.
                 # CorporateActionMonitor.refresh is internally rate-limited
-                # (refresh_seconds), so calling it every tick is safe -- most
-                # calls are a no-op cache-hit check, not a request. A session
-                # this tick's clock cannot classify skips the refresh
-                # entirely; rebalance()'s own guard call still fails closed
-                # independently on the same ValueError (see
-                # native_strategy._corporate_action_guard_symbols).
-                if strategy.corporate_action_guard is not None:
+                # (refresh_seconds/retry_seconds), so calling it every tick
+                # is safe -- most calls are a no-op cache-hit check, not a
+                # request. A session this tick's clock cannot classify
+                # skips the refresh entirely; rebalance()'s own guard call
+                # still fails closed independently on the same ValueError
+                # (see native_strategy._corporate_action_guard_symbols).
+                # HIGH finding 2: the actual fetch is dispatched to a worker
+                # thread, bounded by a wait_for timeout, and never launched
+                # while a previous refresh thread is still in flight -- see
+                # _schedule_corporate_action_refresh -- so a slow/stuck
+                # alpaca-py call can never block this async trading loop.
+                if strategy.corporate_action_guard is not None and not ca_refresh_state["in_flight"]:
                     try:
                         ca_session = session_at(datetime.fromtimestamp(now, timezone.utc))
-                        ca_horizon_end = next_trading_day(ca_session.session_date)
+                        ca_next_session, ca_start, ca_end = _corporate_action_fetch_window(ca_session.session_date)
                     except ValueError:
                         pass
                     else:
                         ca_watch = set(config["symbols"]) | {
                             p.symbol for p in controller.ledger.positions().values() if p.qty}
-                        strategy.corporate_action_guard.refresh(
-                            ca_watch, start=ca_session.session_date, end=ca_horizon_end, now=now)
+                        await _schedule_corporate_action_refresh(
+                            strategy.corporate_action_guard, ca_watch, ca_start, ca_end, now, ca_refresh_state)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 strategy.rebalance(now, force_exit=force_exit)
                 if leverage_policy is not None:
@@ -1160,7 +1275,17 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "session_policy": {"extended_hours": session_policy["extended_hours"],
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
-              "elapsed_seconds": time.monotonic() - started}
+              "elapsed_seconds": time.monotonic() - started,
+              # MEDIUM finding 8: a guard summary on every run outcome,
+              # regardless of whether the guard was actually wired in this
+              # run (session_policy["overnight_holds"]). finding 5:
+              # "pending_must_flatten" is read by _honest_overnight_hold
+              # below -- a run cannot end "held_overnight" while a symbol
+              # is still flagged for a forced flatten.
+              "corporate_action_guard": {
+                  "enabled": strategy.corporate_action_guard is not None,
+                  "ever_flagged_symbols": sorted(strategy._ca_ever_flagged),
+                  "pending_must_flatten": sorted(strategy._ca_last_must_flatten)}}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
@@ -1253,7 +1378,16 @@ def _honest_overnight_hold(outcome, session_policy, now):
         with positions still open";
       - run_native's own reconciliation succeeded (its outcome carries a
         non-None ``reconciliation``);
-      - there were no adapter errors and no risk halt.
+      - there were no adapter errors and no risk halt;
+      - MEDIUM finding 5 (2026-09-24 fix round): the corporate-action
+        guard summary (``outcome["corporate_action_guard"]``) carries no
+        ``pending_must_flatten`` symbol -- a held symbol still flagged
+        must_flatten at the run's own boundary means a confirmed
+        in-range corporate action was never actually flattened (an order
+        never filled, was rejected, or the run simply ended before the
+        engine-layer forced-sell path caught up); that is a genuine
+        failure, not an intentional overnight hold, and must instead take
+        the recovery path below.
 
     Any other non-flat end must stay "needs_attention" (routed through the
     force-flat/recover path below) so a genuine failure is never silently
@@ -1266,9 +1400,11 @@ def _honest_overnight_hold(outcome, session_policy, now):
     except ValueError:
         return False
     boundary_reached = kind in (SessionKind.POST, SessionKind.CLOSED)
+    guard_clear = not (outcome.get("corporate_action_guard") or {}).get("pending_must_flatten")
     return (boundary_reached and outcome.get("reconciliation") is not None
             and not outcome.get("adapter_errors")
-            and not (outcome.get("accounting") or {}).get("halted_reason"))
+            and not (outcome.get("accounting") or {}).get("halted_reason")
+            and guard_clear)
 
 
 # D6 (round 8): the failed/sticky pre-recovery statuses -- see
@@ -1421,6 +1557,14 @@ def main():
         raise ValueError("invalid_trial_id")
     config, limits, policy_config = load_config(args.config)
     session_policy = validate_session_policy(config)
+    try:
+        # Before credentials or any request: no order path without the boundary.
+        contract_status = check_order_contract_boundary(config["symbols"])
+    except SafetyError as exc:
+        result = {"status": "not_started", "stage": "order_contract", "reason": str(exc), "orders_submitted": 0}
+        save(args.output, result)
+        print(json.dumps(result))
+        return 2
     key, secret = credentials(args.env_file)
     # Trading-lane audit gap #8: constructed unconditionally (object
     # construction only, no network call -- see AlpacaCorporateActionsSource's
@@ -1452,6 +1596,7 @@ def main():
         return 2
     summary = public_preflight(observation, config)
     summary["http"] = responses
+    summary["order_contract"] = contract_status
     summary["config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
     if args.command == "preflight":
         try:
@@ -1615,6 +1760,35 @@ def main():
                     controller.port = fresh_port(True)
                     return await recover(controller, metadata, config)
                 controller.port = fresh_port()
+                # HIGH finding 2 ("do the first fetch in preflight"): only
+                # meaningful (and only ever attempted) when overnight_holds
+                # is enabled -- see run_native's own gating of the guard
+                # (finding 8) -- so the guard's cache is already warm
+                # before run_native's tick loop starts its first refresh,
+                # instead of every trial's very first tick paying for a
+                # cold background fetch. Bounded exactly like the tick-loop
+                # refresh (finding 2): a worker thread with a wait_for
+                # timeout; never raises, and a failure here is simply left
+                # for the first in-loop refresh to retry.
+                guard = _corporate_action_guard_for_strategy(config, session_policy)
+                if guard is not None:
+                    try:
+                        preflight_now = time.time()
+                        preflight_session = session_at(datetime.fromtimestamp(preflight_now, timezone.utc))
+                        _, preflight_start, preflight_end = _corporate_action_fetch_window(
+                            preflight_session.session_date)
+                    except ValueError:
+                        pass
+                    else:
+                        preflight_watch = set(config["symbols"]) | {
+                            p.symbol for p in ledger.positions().values() if p.qty}
+                        try:
+                            await asyncio.wait_for(
+                                asyncio.to_thread(guard.refresh, preflight_watch, start=preflight_start,
+                                                  end=preflight_end, now=preflight_now),
+                                timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
+                        except asyncio.TimeoutError:
+                            pass
                 try:
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint,

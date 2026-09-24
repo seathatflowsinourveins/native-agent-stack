@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--playwright-test--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "3699012eb6ad3d970727b5098eb3cc7303680281",
+  "recorded_by": {
+    "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "playwright-test",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && pnpm exec playwright --version",
+      "exit": 0,
+      "duration_s": 0.467,
+      "output_sha256": "d7c5db04b50deee0a63f39717c2bba38e0feb295937e1e74dfd18a66df37dcf0",
+      "output_excerpt": "Version 1.63.0\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && pnpm test:e2e",
+      "exit": 0,
+      "duration_s": 1.581,
+      "output_sha256": "8eac36ff5d86b3bdeb316fcb2c2dd693df5098ccd2b9adfb73770ac3e4d71ccc",
+      "output_excerpt": "\nRunning 1 test using 1 worker\n\n  \u2713  1 browser/ledger.spec.ts:4:5 \u203a create and update a recorded run through the production UI (366ms)\n\n  1 passed (1.3s)\n$ playwright test\n"
+    }
+  ],
+  "tool_versions": {
+    "playwright-test": "1.63.0"
+  },
+  "observed_at_utc": "2026-09-24T16:38:30Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB, macOS arm64), Playwright Test 1.63.0 (the catalog pin) started the blueprint's API and Next servers, drove installed Chrome through a fresh browser context to create a run and change its status, and stopped the servers: 1 passed, 0 failed, 0 flaky (all commands exit 0).",
+  "limitations": [
+    "Exercised through the committed typed run-ledger blueprint (blueprints/convergence-practice/application-delivery) with synthetic data: no authentication, production deployment, load, pagination beyond 100 rows or backup/restore qualification.",
+    "The committed blueprint pins packageManager pnpm@12.4.2, so its pnpm commands ran pnpm 12.4.2 through pnpm's own version management although the host's global pnpm is 12.6.0. The pnpm 12.6.0 variant run is recorded in blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json.",
+    "One spec in the Chrome channel; no other browsers, traces or parallel workers were exercised.",
+    "Recorded outside Claude Code's Seatbelt sandbox: on this host the sandbox blocks PostgreSQL shared memory, loopback database connections and pnpm 12 network and store operations (evidence/artifacts/macos-application-20260924/run-summary.json). Recorded from a detached checkout of main 3699012 (adoption/update.md). adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:38:30Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#201 independent review (foundation-lane-setup) at a5b9aea: catalog_revision 3699012 verified (ancestor of origin/main, present in a fresh single-branch main clone); version 1.63.0 = catalog pin; both recorded commands re-run from a clean detached checkout of 3699012 with installed Chrome 153.0.8010.53: exit 0 each; the version output is byte-identical; the e2e output hash-matches modulo timings; the JSON reporter shows expected 1, unexpected 0, flaky 0, skipped 0; ports 18080/18081 free afterwards",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T17:13:49Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#201 independent review by agent-lab-e9 (WSL authoring host), workflow wf_f7021e8d-fd3 at a5b9aea6, PR comment 5818957285: needs_changes; reproducing the commands does not establish that they exercise the layer role, a positive control or the pin",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-24T19:15:40Z",
+      "reviewer": {
+        "identity_sha256": "a8c58742b9c83b2a9f3b226bcdf09fd461d938ed3c4f2ef62e0bc1949e3ed771",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

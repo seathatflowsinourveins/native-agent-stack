@@ -62,6 +62,10 @@ limit-order mechanism guarantees a flat finish.
   that no HTTP request was sent; a timeout or other ambiguous send must remain
   unresolved and be queried by its existing client ID. Observed orders cannot
   be marked not sent, and a later broker observation of such an ID fails closed.
+  The transport's pre-submission order-contract boundary (`README-transport.md`)
+  is one such definitive pre-send refusal: `Controller.bind` passes its reason
+  `order_contract_refused`, so the ledger records a local `not_sent`, never
+  `broker_refused`. Other not-sent refusals seen by `bind` keep `transport_proven_not_sent`.
 - `mark_broker_refused(client_id, http_status, refusal=None)` records distinct local terminal
   status `broker_refused` for an attempted zero-fill order without broker ID.
   Only HTTP 401/403/404 qualify, and transport must first establish that the
@@ -80,7 +84,9 @@ limit-order mechanism guarantees a flat finish.
   otherwise). Any other 422, including "client_order_id must be unique", stays
   ambiguous. `reserve_intent` still refuses such a price before send
   (`invalid_price_increment`, via the overridable `_check_price_increment`); only
-  the native-fault harness's `FaultLedger` exempts its single C04 client ID.
+  the native-fault harness's `FaultLedger` exempts its single C04 client ID (its
+  `FaultTransport` exempts the same ID, and only its price increment, from the
+  transport's order-contract boundary, which otherwise refuses such a price too).
   Neither local terminal status is
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
@@ -181,8 +187,9 @@ schedule/ladder contract and
 for the design record. Leverage above 1x is paper-only, requires a
 preflight-proven account multiplier at least equal to the requested
 leverage (`runner._check_margin_entitlement`), and remains unqualified
-until each rung's `leverage-ladder-1x/2x/4x` gate row shows
-`needs_attention == 0`.
+until each rung's `leverage-ladder-1x/2x/4x` gate row's flip condition holds:
+`needs_attention == 0` and achieved exposure above the rung's threshold (see
+the gate-condition paragraph below).
 
 F2 (2026-09-22 residual review, reachability): a rung's `max_leverage`,
 schedule cells and drawdown ladder establish the safety **envelope** in
@@ -214,11 +221,52 @@ sizing math, which stay a ceiling, not a target, per
 `agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md`.
 A rung's gate row is not, by itself, evidence that the rung's exposure was
 ever achieved -- that evidence is this recorded achieved-leverage receipt.
-No gate row in `catalogs/us-equities/gates-20260922.json` currently reads
-`peak_achieved_leverage`/`seconds_above_next_lower_rung_ceiling`, so a gate
-row can still flip to established on a receipt whose achieved exposure never
-exceeded a lower rung's own ceiling; the rung configs' `notes` have been
-corrected to say so instead of claiming the opposite.
+
+Gate condition (2026-09-24, audit gap #5): until this date no gate row read
+`peak_achieved_leverage`/`seconds_above_next_lower_rung_ceiling`, so a rung
+could flip on `needs_attention == 0` alone from a trial whose achieved
+exposure never exceeded the next-lower rung's cap. Each
+`leverage-ladder-1x/2x/4x` row's `flip_condition` is now an `all_of`
+(`scripts/trading_gates.py` gained `all_of` and a `greater_than` comparison
+that reads the runner's decimal strings and JSON numbers exactly) over the
+rung receipt preregistered in the gate note -- `{"schema_version": 1,
+"kind": "leverage_ladder_rung_receipt", "rung", "needs_attention",
+"source": {"paper_output_path", "paper_output_sha256",
+"certified_run_status"}, "leverage"}`, where `leverage` is the certified
+run's `paper-output.json` `leverage` block copied verbatim: the receipt's
+`schema_version`, `kind` and `rung`, `/needs_attention == 0`,
+`/source/certified_run_status == "passed"`, a `source_matches` binding (the
+named in-tree `paper-output.json` must hash to the recorded sha256 and its
+`/leverage` and `/status` must equal the receipt's `/leverage` and
+`/source/certified_run_status` exactly, so the leverage block and the passed
+status come from one hashed run; fix round 2026-09-24),
+`/leverage/config_max_leverage` equal to the rung, `/leverage/
+next_lower_rung_ceiling` equal to the rung's threshold,
+`/leverage/peak_achieved_leverage` greater than it and
+`/leverage/seconds_above_next_lower_rung_ceiling` greater than 0. The
+thresholds are 1x for the 2x rung and 2x for the 4x rung; the 1x rung has no
+lower rung, so `leverage.next_lower_rung_ceiling(1)` now returns the
+documented minimum exposure `leverage.ONE_X_MINIMUM_EXPOSURE` (0.5x; the 1x
+config's entry budget permits up to 0.9x) instead of `None`, and the 1x
+receipt's `seconds_above_next_lower_rung_ceiling` accumulates above 0.5x. It
+is a receipt threshold, not a sizing target. `tests/test_trading_gates.py`
+(`LeverageLadderFlipConditionTests`) and `tests/test_adaptive_paper_runner.py`
+(`AchievedLeverageGateTraceTests`, which folds per-tick traces through
+`runner._leverage_achievement_step`) show that a clean trial that never
+exceeds the lower cap does not satisfy its rung. These are offline unit tests
+(synthetic receipts and traces); no paper trial was run for this change and no
+rung receipt exists yet. Limits: `seconds_above_next_lower_rung_ceiling` is a
+per-tick approximation, and no minimum duration above the threshold is set --
+any positive time satisfies the checker, so how long the rung was used is
+judged at the manual qualification before a dated flip commit.
+`needs_attention` counts every run at the rung and is not bound to the
+hashed file, so it too is checked against the rung's trial directories at
+that qualification. The binding needs the certified `paper-output.json`
+committed in the tree; it proves the receipt matches those bytes, not that
+the bytes came from a real broker session. `runner.py`
+was left byte-identical so the native-fault receipt's engine-source binding
+still holds; its inline comments that say the 1x threshold is `None` and that
+no gate row reads these fields predate this change and are superseded here.
 
 2026-09-22 leverage fix round 1 (LEV-RI-A/CX-P1/EH-1/CX-P2, all `major`/
 `blocker` findings against G-e/F2): `strategies_v1._decide_core`'s

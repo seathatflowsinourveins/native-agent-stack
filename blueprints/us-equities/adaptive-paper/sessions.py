@@ -64,6 +64,47 @@ EARLY_CLOSES_2026 = frozenset({
     date(2026, 12, 24),  # Christmas Eve
 })
 
+# NYSE 2027 full-closure holidays (finding 6, 2026-09-24 fix round). This
+# sandboxed environment has no outbound network access to re-fetch
+# https://www.nyse.com/markets/hours-calendars directly (verified: a direct
+# curl from this host returns a redirect with no page body), so these dates
+# are derived the same way the module docstring already documents the 2026
+# table's own cross-check rules (New Year's Day; MLK Day, 3rd Monday of
+# January; Washington's Birthday, 3rd Monday of February; Good Friday,
+# Gregorian Easter Sunday minus two days; Memorial Day, last Monday of May;
+# Juneteenth, June 19 fixed, observed the preceding Friday when it falls on
+# a Saturday; Independence Day, July 4 fixed, observed the preceding Friday
+# on a Saturday or the following Monday on a Sunday; Labor Day, 1st Monday
+# of September; Thanksgiving Day, 4th Thursday of November; Christmas Day,
+# December 25 fixed, observed the preceding Friday on a Saturday or the
+# following Monday on a Sunday) -- the same NYSE observance convention as
+# every other year's calendar, not a guess. Independently reconcilable
+# against `exchange_calendars`' XNYS calendar (see
+# `exchange_calendars_agrees_2026`'s 2026-only sibling check) or the
+# official NYSE calendar once network access is available; treat as
+# unverified against the live NYSE page pending that reconciliation.
+HOLIDAYS_2027 = frozenset({
+    date(2027, 1, 1),    # New Year's Day (Friday)
+    date(2027, 1, 18),   # Martin Luther King, Jr. Day
+    date(2027, 2, 15),   # Washington's Birthday
+    date(2027, 3, 26),   # Good Friday
+    date(2027, 5, 31),   # Memorial Day
+    date(2027, 6, 18),   # Juneteenth National Independence Day (observed; Jun 19 falls on Saturday)
+    date(2027, 7, 5),    # Independence Day (observed; Jul 4 falls on Sunday)
+    date(2027, 9, 6),    # Labor Day
+    date(2027, 11, 25),  # Thanksgiving Day
+    date(2027, 12, 24),  # Christmas Day (observed; Dec 25 falls on Saturday)
+})
+
+# NYSE 2027 scheduled early closes (regular session ends 13:00 ET). Only the
+# Friday after Thanksgiving applies this year: Christmas Eve (Dec 24, 2027)
+# is itself the observed Christmas Day full closure above (Dec 25 falls on a
+# Saturday), so there is no separate Christmas Eve half day in 2027. Same
+# derivation/verification caveat as HOLIDAYS_2027 above.
+EARLY_CLOSES_2027 = frozenset({
+    date(2027, 11, 26),  # Friday after Thanksgiving
+})
+
 PRE_OPEN = dtime(4, 0)
 RTH_OPEN = dtime(9, 30)
 RTH_CLOSE = dtime(16, 0)
@@ -72,12 +113,16 @@ POST_CLOSE = dtime(20, 0)
 
 _MAX_HOLIDAY_RUN_DAYS = 10  # bounds the trading-day search; NYSE never closes this long
 
-# Years the frozen HOLIDAYS_2026/EARLY_CLOSES_2026 tables actually cover.
+# year -> that year's frozen full-closure-holiday/early-close tables.
+_HOLIDAYS_BY_YEAR = {2026: HOLIDAYS_2026, 2027: HOLIDAYS_2027}
+_EARLY_CLOSES_BY_YEAR = {2026: EARLY_CLOSES_2026, 2027: EARLY_CLOSES_2027}
+
+# Years the frozen holiday/early-close tables above actually cover.
 # session_at()/is_trading_session() refuse any other year unless the optional
 # exchange_calendars backend is importable and can answer for that specific
-# date (D7): silently reusing the 2026 table for a different year's calendar
-# would misclassify real holidays/early closes.
-CALENDAR_YEARS = frozenset({2026})
+# date (D7): silently reusing a covered year's table for an uncovered year's
+# calendar would misclassify real holidays/early closes.
+CALENDAR_YEARS = frozenset(_HOLIDAYS_BY_YEAR)
 
 
 class SessionKind(str, Enum):
@@ -128,8 +173,8 @@ def _require_supported_calendar_year(d: date) -> None:
 
 
 def _is_trading_day(d: date) -> bool:
-    if d.year in CALENDAR_YEARS:
-        return d.weekday() < 5 and d not in HOLIDAYS_2026
+    if d.year in _HOLIDAYS_BY_YEAR:
+        return d.weekday() < 5 and d not in _HOLIDAYS_BY_YEAR[d.year]
     fallback = _exchange_calendars_day(d)
     if fallback is None:
         raise ValueError("session_calendar_out_of_range")
@@ -137,8 +182,8 @@ def _is_trading_day(d: date) -> bool:
 
 
 def _rth_close_time(d: date) -> dtime:
-    if d.year in CALENDAR_YEARS:
-        return RTH_EARLY_CLOSE if d in EARLY_CLOSES_2026 else RTH_CLOSE
+    if d.year in _HOLIDAYS_BY_YEAR:
+        return RTH_EARLY_CLOSE if d in _EARLY_CLOSES_BY_YEAR.get(d.year, frozenset()) else RTH_CLOSE
     fallback = _exchange_calendars_day(d)
     if fallback is None or fallback[1] is None:
         raise ValueError("session_calendar_out_of_range")
@@ -182,7 +227,7 @@ def session_at(ts: datetime) -> SessionInfo:
     ts_ny = ts.astimezone(NY)
     d = ts_ny.date()
     _require_supported_calendar_year(d)
-    is_early = d in EARLY_CLOSES_2026
+    is_early = d in _EARLY_CLOSES_BY_YEAR.get(d.year, frozenset())
 
     if _is_trading_day(d):
         pre_open, rth_open, rth_close, post_close = _boundaries(d)

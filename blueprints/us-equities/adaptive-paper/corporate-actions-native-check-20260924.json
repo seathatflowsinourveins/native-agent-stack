@@ -15,8 +15,16 @@
      "expected": "AAPL quarterly cash dividend, ex-date 2024-08-12", "match": true},
     {"symbols": ["TSLA"], "start": "2024-06-01", "end": "2024-06-15",
      "observed": [],
-     "expected": "no corporate action in the window", "match": true}
+     "expected": "no corporate action in the window", "match": true},
+    {"symbols": ["AAPL"], "start": "2024-08-09", "end": "2024-08-12",
+     "observed": [],
+     "expected": "CRITICAL finding 1 (fix round, 2026-09-24): this is the guard's actual PRE-FIX production window -- today..next_session around the real 2024-08-12 ex-date -- proving the endpoint filters by process date (a cash dividend's payable date, typically 1-3 weeks after ex_date), not ex_date, so a narrow window systematically misses a real dividend it should have caught",
+     "match": true, "note": "negative result -- confirms the bug, not a mismatch against an expected action"},
+    {"symbols": ["AAPL"], "start": "2024-08-05", "end": "2024-11-10",
+     "observed": [{"symbol": "AAPL", "action_type": "cash_dividend", "action_date": "2024-08-12"}],
+     "expected": "AAPL quarterly cash dividend, ex-date 2024-08-12 -- re-check with the FIXED window logic (runner._corporate_action_fetch_window: anchor-7d .. anchor+90d, matching CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS/FUTURE_DAYS), which recovers the same dividend the narrow window above missed",
+     "match": true}
   ],
-  "claim_boundary": "Confirms that the live Alpaca source returns and normalizes these three historical windows correctly (type and governing date). It does not exercise the guard inside a running paper trial, a multi-day overnight resume, the refresh cadence against the endpoint's rate limits, or action types other than forward split and cash dividend.",
+  "claim_boundary": "Confirms that the live Alpaca source returns and normalizes these historical windows correctly (type and governing date), AND that the guard's original today..next_session fetch window was too narrow to reliably observe a real dividend (Alpaca's endpoint filters by process/payable date, not the ex_date this guard's evaluate_guard logic checks against) -- see corporate-actions-native-check-20260924's negative_query row above and blueprints/us-equities/alpaca-historical/README.md:35-36/collect.py:202-204 for the documented endpoint behaviour this reflects. The 2026-09-24 fix round widens the fetch window to anchor-7d..anchor+90d (runner.py's CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS/FUTURE_DAYS) and filters locally on the governing date in evaluate_guard, which the wide-window re-check row above confirms recovers the dividend. This check still does not exercise the guard inside a running paper trial end-to-end, a multi-day overnight resume against the live endpoint, the refresh cadence against the endpoint's rate limits, or action types other than forward split and cash dividend -- and a single historical dividend's 1-3-week process-date lag is not proof that every action type's process-date lag fits within the fixed 90-day forward pad.",
   "not_retained": "The raw API responses and the exact command line were not retained; the observed values above are the complete normalized output."
 }

@@ -1,5 +1,6 @@
 """Local cross-module tests: native engine, controller, ledger, synthetic port."""
 import asyncio
+import contextlib
 from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -335,6 +336,59 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual((intent.status, intent.limit_price), ("broker_refused", Decimal("40.0001")))
             self.assertTrue(controller.stop)
             proof = reconcile(ledger, {"complete": True, "orders": [], "positions": [], "account": {"cash": "100000"}}, "100000")
+            self.assertEqual((proof["open_orders"], proof["positions"]), (0, 0))
+            ledger.close()
+
+    def test_order_contract_refusal_is_local_not_sent_and_never_reaches_the_fake_broker(self):
+        """Controller.bind over the real AlpacaPaperTransport: a symbol the ledger and
+        the transport accept but the order contract does not (BRK-B, not BRK.B)
+        is refused before any HTTP request and recorded as local not_sent."""
+        from unittest.mock import Mock
+        import transport as engine_transport
+        now = time.time()
+
+        async def scenario(ledger, controller):
+            port = engine_transport.AlpacaPaperTransport(
+                "fixture-key", "fixture-secret", ["SPY", "BRK-B"], before_request=controller.before_request,
+                before_submit=controller.before_submit, sink_observation=controller.observe)
+            port._loop = asyncio.get_running_loop()
+            port._started = True
+            for channel in ("quotes", "orders"):
+                port._authorized(channel)
+                port._ack(channel, True)
+            for symbol in ("SPY", "BRK-B"):
+                port._quote_seen[symbol] = time.monotonic()
+                port._quote_values[symbol] = {"ts_ns": time.time_ns()}
+                controller.quote({"symbol": symbol, "bid": "100", "ask": "100.01", "ts_ns": time.time_ns()})
+            controller.port = controller.bind(port)
+            broker = Mock()
+            payload = {"client_order_id": "contract-test", "symbol": "BRK-B", "side": "buy", "qty": "1",
+                       "limit_price": "100.03", "type": "limit", "time_in_force": "day", "extended_hours": False}
+            try:
+                with patch.object(port._client._session._session, "request", broker):
+                    with self.assertRaises(engine_transport.OrderContractRefused) as caught:
+                        await controller.port.submit(payload)
+            finally:
+                await port.stop()
+            broker.assert_not_called()
+            return caught.exception
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True)
+            error = asyncio.run(scenario(ledger, controller))
+            self.assertNotIsInstance(error, engine_transport.RejectedSubmission)
+            intent = ledger.intents()[0]
+            self.assertEqual((intent.client_id, intent.status, intent.submit_attempted),
+                             ("contract-test", "not_sent", False))
+            reason = ledger.db.execute("SELECT payload FROM events WHERE kind='intent_not_sent' AND client_id=?",
+                                       ("contract-test",)).fetchone()[0]
+            self.assertEqual(json.loads(reason), {"reason": "order_contract_refused"})
+            self.assertFalse(ledger.db.execute("SELECT 1 FROM events WHERE kind='broker_refused'").fetchone())
+            self.assertFalse(controller.stop)  # a local refusal is not a broker refusal stop
+            proof = reconcile(ledger, {"complete": True, "orders": [], "positions": [],
+                                       "account": {"cash": "100000"}}, "100000")
             self.assertEqual((proof["open_orders"], proof["positions"]), (0, 0))
             ledger.close()
 
@@ -725,6 +779,34 @@ class IntegratedRunner(unittest.TestCase):
         # overnight_holds itself disabled: never a hold regardless of the rest.
         self.assertFalse(_honest_overnight_hold(clean_outcome, {"overnight_holds": False}, post_ts))
 
+    def test_honest_overnight_hold_false_when_corporate_action_guard_still_pending(self):
+        """MEDIUM finding 5 (2026-09-24 fix round): a held symbol still
+        flagged must_flatten by the corporate-action guard at the run's own
+        boundary must make the run needs_attention (take the recovery path)
+        rather than a legitimate held_overnight -- a confirmed in-range
+        corporate action that never actually got flattened (order never
+        filled/was rejected/run ended too soon) is a genuine failure, not
+        an intentional hold."""
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        post_ts = datetime(2026, 3, 10, 18, 0, tzinfo=ny).astimezone(timezone.utc).timestamp()
+        session_policy = {"overnight_holds": True, "extended_hours": True}
+        clean_outcome = {"reconciliation": {"positions": 1, "open_orders": 0},
+                         "adapter_errors": [], "accounting": {"halted_reason": None},
+                         "corporate_action_guard": {"enabled": True, "ever_flagged_symbols": ["AAPL"],
+                                                    "pending_must_flatten": ["AAPL"]}}
+        self.assertFalse(_honest_overnight_hold(clean_outcome, session_policy, post_ts))
+        # Same outcome but the guard's pending_must_flatten has cleared (the
+        # flatten actually completed): a genuine hold is allowed again.
+        cleared = {**clean_outcome, "corporate_action_guard": {"enabled": True, "ever_flagged_symbols": ["AAPL"],
+                                                                "pending_must_flatten": []}}
+        self.assertTrue(_honest_overnight_hold(cleared, session_policy, post_ts))
+        # No guard summary at all (guard disabled/never wired): unaffected,
+        # same as before this finding's fix.
+        no_guard = {k: v for k, v in clean_outcome.items() if k != "corporate_action_guard"}
+        self.assertTrue(_honest_overnight_hold(no_guard, session_policy, post_ts))
+
     def test_run_native_status_mid_rth_non_flat_end_is_needs_attention_not_held_overnight(self):
         """D1: run_native's own status computation used to set
         "held_overnight" purely from `overnight_holds and reconciled and
@@ -989,6 +1071,74 @@ def _full_gate_result(*, status="pass", row_count=1, checks_status="pass", input
         "versions": {"pandera": "0.33.1"},
         "checked_at": "2026-09-22T00:00:00+00:00",
     }
+
+
+class OrderContractPreflight(unittest.TestCase):
+    """The runner refuses to start unless the transport's pre-submission
+    order-contract boundary is active. Local; no pinned runtime or network."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.env_file = self.root / "paper.env"
+        self.env_file.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(self.env_file, 0o600)
+        self.config_file = self.root / "config.json"
+        self.config_file.write_text("{}")
+        self.output = self.root / "output.json"
+        self.observation = _paper_ready_observation(time.time_ns())
+        self.observation["account_identity_sha256"] = "fixture-account"
+        self.config = _paper_ready_config()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _main(self, command, status_error=None):
+        from unittest.mock import Mock
+        network, creds = Mock(return_value=self.observation), Mock(return_value=("fixture-key", "fixture-secret"))
+        argv = ["runner.py", command, "--env-file", str(self.env_file), "--config", str(self.config_file),
+                "--output", str(self.output), "--state-root", str(self.root / "state")]
+        patches = [patch.object(sys, "argv", argv),
+                   patch.object(runner_module, "load_config", return_value=(self.config, None, None)),
+                   patch.object(runner_module, "credentials", creds),
+                   patch.object(runner_module, "preflight", network)]
+        if status_error is not None:
+            patches.append(patch.object(runner_module, "order_contract_status", side_effect=status_error))
+        with contextlib.ExitStack() as stack:
+            for item in patches:
+                stack.enter_context(item)
+            code = runner_module.main()
+        return code, json.loads(self.output.read_text()), network, creds
+
+    def test_active_boundary_is_checked_and_recorded_in_the_preflight_summary(self):
+        status = runner_module.check_order_contract_boundary(["SPY", "BRK.B"])
+        self.assertTrue(status["active"])
+        self.assertEqual(status["symbols_checked"], 2)
+        code, summary, network, _ = self._main("preflight")
+        self.assertEqual((code, summary["status"]), (0, "ready"))
+        self.assertTrue(summary["order_contract"]["active"])
+        self.assertEqual(summary["order_contract"]["symbols_checked"], 1)
+        network.assert_called_once()
+
+    def test_inactive_boundary_refuses_before_credentials_or_any_request(self):
+        error = runner_module.TransportError("order_contract_boundary_inactive:invalid_sentinel_accepted")
+        for command in ("preflight", "paper", "recover"):
+            with self.subTest(command=command):
+                code, result, network, creds = self._main(command, status_error=error)
+                self.assertEqual(code, 2)
+                self.assertEqual(result, {"status": "not_started", "stage": "order_contract", "orders_submitted": 0,
+                                          "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted"})
+                network.assert_not_called()
+                creds.assert_not_called()
+
+    def test_validate_preflight_requires_the_boundary_and_admissible_symbols(self):
+        validate_preflight_always(self.observation, self.config, require_open=True)
+        with self.assertRaisesRegex(SafetyErrorAlways, "^order_contract_boundary_inactive:configured_symbol"):
+            validate_preflight_always(self.observation, _paper_ready_config(("SPY", "BRK-B")), require_open=True)
+        error = runner_module.TransportError("order_contract_boundary_inactive:contract_module_not_loaded")
+        with patch.object(runner_module, "order_contract_status", side_effect=error):
+            with self.assertRaisesRegex(SafetyErrorAlways, "contract_module_not_loaded"):
+                validate_preflight_always(self.observation, self.config, require_open=True, allow_existing=True)
 
 
 class PromotionGatePreflight(unittest.TestCase):
@@ -1803,9 +1953,10 @@ class AchievedLeverageReceiptStepTests(unittest.TestCase):
         self.assertEqual(state["seconds_above_next_lower_rung_ceiling"], 0.0)
 
     def test_no_next_lower_ceiling_never_accumulates(self):
-        """The 1x rung: leverage.next_lower_rung_ceiling(1) is None, so no
-        amount of dt/achieved leverage at this rung ever accumulates --
-        there is no lower rung to have shown 1x exceeded."""
+        """A None threshold (leverage.next_lower_rung_ceiling for a value
+        below the lowest rung; since audit gap #5 the 1x rung itself is
+        compared against leverage.ONE_X_MINIMUM_EXPOSURE, 0.5) never
+        accumulates, whatever dt/achieved leverage is observed."""
         state = self._initial()
         for _ in range(5):
             state = runner_module._leverage_achievement_step(
@@ -1838,6 +1989,100 @@ class AchievedLeverageReceiptStepTests(unittest.TestCase):
                 state, dt_seconds=bad_dt, achieved_leverage=Decimal("3"),
                 ceiling=Decimal("4"), next_lower_ceiling=Decimal("2"))
             self.assertEqual(state["seconds_above_next_lower_rung_ceiling"], before)
+
+
+class AchievedLeverageGateTraceTests(unittest.TestCase):
+    """Audit gap #5 (2026-09-24): per-tick achieved-leverage traces folded
+    through runner._leverage_achievement_step with each rung's
+    leverage.next_lower_rung_ceiling threshold, serialized the way
+    run_native's outcome["leverage"] block writes them, and judged by the
+    repository's leverage-ladder gate rows through scripts/trading_gates.py.
+    Pure and offline: no paper trial, no broker."""
+
+    @classmethod
+    def setUpClass(cls):
+        scripts = str(SOURCE.parents[2] / "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        import trading_gates
+        cls.gates = trading_gates
+        document = trading_gates.load_json(SOURCE.parents[2] / trading_gates.GATES)
+        cls.gates_by_id = {gate["id"]: gate for gate in document["gates"]}
+
+    def _receipt(self, rung, trace, tick_seconds=0.1):
+        import leverage
+        max_leverage = Decimal(rung)
+        threshold = leverage.next_lower_rung_ceiling(max_leverage)
+        state = dict(runner_module._INITIAL_LEVERAGE_ACHIEVEMENT_STATE)
+        for index, achieved in enumerate(trace):
+            state = runner_module._leverage_achievement_step(
+                state, dt_seconds=0.0 if index == 0 else tick_seconds, achieved_leverage=Decimal(achieved),
+                ceiling=max_leverage, next_lower_ceiling=threshold)
+        # Mirrors run_native's outcome["leverage"] serialization of these fields.
+        block = {"config_max_leverage": str(max_leverage),
+                 "next_lower_rung_ceiling": str(threshold) if threshold is not None else None,
+                 "peak_achieved_leverage": str(state["peak_achieved_leverage"]),
+                 "ceiling_at_peak_achieved_leverage": str(state["ceiling_at_peak"]),
+                 "seconds_above_next_lower_rung_ceiling": state["seconds_above_next_lower_rung_ceiling"]}
+        # A synthetic stand-in for the certified run's committed paper-output.json,
+        # which the gate's source_matches member binds the receipt to by sha256.
+        source = (json.dumps({"status": "passed", "leverage": block}, indent=2, sort_keys=True) + "\n").encode("utf-8")
+        digest = hashlib.sha256(source).hexdigest()
+        path = f"blueprints/us-equities/adaptive-paper/ladder/{rung}x/trace-{digest[:12]}/paper-output.json"
+        self._sources[path] = source
+        return {"schema_version": 1, "kind": "leverage_ladder_rung_receipt", "rung": f"{rung}x", "needs_attention": 0,
+                "source": {"paper_output_path": path, "paper_output_sha256": digest, "certified_run_status": "passed"},
+                "leverage": json.loads(json.dumps(block))}
+
+    def setUp(self):
+        self._sources = {}
+
+    def _holds(self, rung, receipt):
+        gate = {**self.gates_by_id[f"leverage-ladder-{rung}x"], "status": "not_established", "evidence_class": "none"}
+        with tempfile.TemporaryDirectory() as root:
+            for relative, data in self._sources.items():
+                (Path(root) / relative).parent.mkdir(parents=True, exist_ok=True)
+                (Path(root) / relative).write_bytes(data)
+            path = Path(root) / gate["receipt_path"]
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(receipt), encoding="utf-8")
+            return self.gates.condition_holds(Path(root), gate)
+
+    def test_trial_that_never_exceeds_the_lower_cap_does_not_satisfy_the_rung(self):
+        # Clean (needs_attention 0) trials whose exposure rises to, but never
+        # past, the next-lower cap: 0.5x for 1x, 1x for 2x, 2x for 4x.
+        traces = {"1": ["0", "0.2", "0.45", "0.5", "0.5", "0.3"],
+                  "2": ["0", "0.6", "1", "1", "0.9"],
+                  "4": ["0", "1.5", "2", "2", "1.8"]}
+        for rung, trace in traces.items():
+            with self.subTest(rung=rung):
+                receipt = self._receipt(rung, trace)
+                self.assertEqual(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+                holds, detail = self._holds(rung, receipt)
+                self.assertFalse(holds, detail)
+                # Only the achievement members fail; the receipt is otherwise well formed and bound.
+                self.assertIn("2 of 10 failed", detail)
+                self.assertNotIn("source_matches", detail)
+
+    def test_trial_that_exceeds_the_lower_cap_satisfies_the_rung(self):
+        traces = {"1": ["0", "0.4", "0.62", "0.7", "0.4"],
+                  "2": ["0", "1.2", "1.6", "0.8"],
+                  "4": ["0", "2.5", "3.4", "1.9"]}
+        for rung, trace in traces.items():
+            with self.subTest(rung=rung):
+                receipt = self._receipt(rung, trace)
+                self.assertGreater(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+                holds, detail = self._holds(rung, receipt)
+                self.assertTrue(holds, detail)
+
+    def test_a_single_first_tick_above_the_cap_records_no_time_and_does_not_satisfy(self):
+        # The first tick has no preceding interval (dt 0), so a peak observed
+        # only there accrues no seconds_above; the peak alone is not enough.
+        receipt = self._receipt("2", ["1.5", "0.5"])
+        self.assertEqual(receipt["leverage"]["peak_achieved_leverage"], "1.5")
+        self.assertEqual(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+        holds, detail = self._holds("2", receipt)
+        self.assertFalse(holds, detail)
 
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
@@ -1947,12 +2192,13 @@ class AchievedLeverageReceiptIntegrationTests(unittest.TestCase):
             for key in ("next_lower_rung_ceiling", "peak_achieved_leverage",
                        "ceiling_at_peak_achieved_leverage", "seconds_above_next_lower_rung_ceiling"):
                 self.assertIn(key, lev, lev)
-            # The 1x rung has no lower rung to compare against (F2 design:
-            # leverage.next_lower_rung_ceiling(D("1")) is None), so this
-            # metric can never accumulate at this rung regardless of what
-            # was achieved.
-            self.assertIsNone(lev["next_lower_rung_ceiling"])
-            self.assertEqual(lev["seconds_above_next_lower_rung_ceiling"], 0.0)
+            # The 1x rung has no lower rung; since audit gap #5 (2026-09-24)
+            # its threshold is the documented 0.5x minimum exposure
+            # (leverage.ONE_X_MINIMUM_EXPOSURE), which the leverage-ladder-1x
+            # gate's flip condition requires peak_achieved_leverage and
+            # seconds_above_next_lower_rung_ceiling to exceed.
+            self.assertEqual(lev["next_lower_rung_ceiling"], "0.5")
+            self.assertGreaterEqual(lev["seconds_above_next_lower_rung_ceiling"], 0.0)
             peak_achieved = Decimal(lev["peak_achieved_leverage"])
             ceiling_at_peak = Decimal(lev["ceiling_at_peak_achieved_leverage"])
             self.assertTrue(peak_achieved.is_finite())
@@ -2285,6 +2531,167 @@ class LeveragePreflightIntegrationTests(unittest.TestCase):
         observation["positions"] = [{"symbol": "SPY"}]
         validate_preflight_always(observation, config, require_open=True, allow_existing=True)
         self.assertNotIn("_account_multiplier", config)
+
+
+class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
+    """Runner-level tests (per the fix-round brief) of the corporate-action
+    guard's fetch-window sizing (finding 1), its wiring decision (finding
+    8), and its bounded/threaded refresh scheduling (finding 2) -- the
+    pure/async seams runner.py factors these into specifically so they are
+    testable without driving a full native tick loop."""
+
+    def test_fetch_window_is_wide_not_narrow(self):
+        """CRITICAL finding 1: the fetch window sent to the source must be
+        padded well past the today..next_session horizon in both
+        directions (Alpaca filters corporate actions by process date,
+        which for a dividend is 1-3 weeks after the governing ex_date this
+        guard actually reasons about -- a narrow window misses it; the
+        native check in corporate-actions-native-check-20260924.json
+        confirms this for a real AAPL dividend)."""
+        from datetime import date, timedelta
+        import runner as runner_module
+        session_date = date(2026, 9, 24)
+        next_session, start, end = runner_module._corporate_action_fetch_window(session_date)
+        self.assertEqual(next_session, date(2026, 9, 25))
+        self.assertEqual(start, session_date - timedelta(days=7))
+        self.assertEqual(end, next_session + timedelta(days=90))
+        self.assertLess(start, session_date)
+        self.assertGreater(end, next_session + timedelta(days=14))  # comfortably past a 1-3 week dividend lag
+
+    def test_guard_wired_only_when_overnight_holds_enabled(self):
+        """MEDIUM finding 8: the guard is only ever handed to the strategy
+        when overnight_holds is actually enabled -- a regular-session-only
+        run (no shipped config currently enables overnight_holds) never
+        gets it wired in, regardless of whether config["_corporate_action_
+        guard"] is present."""
+        import runner as runner_module
+        sentinel = object()
+        config = {"_corporate_action_guard": sentinel}
+        self.assertIs(
+            runner_module._corporate_action_guard_for_strategy(config, {"overnight_holds": True}), sentinel)
+        self.assertIsNone(
+            runner_module._corporate_action_guard_for_strategy(config, {"overnight_holds": False}))
+        self.assertIsNone(
+            runner_module._corporate_action_guard_for_strategy({}, {"overnight_holds": True}))
+
+    def test_scheduled_refresh_runs_off_the_event_loop_and_clears_in_flight(self):
+        """HIGH finding 2: the fetch runs in a worker thread (never blocks
+        the event loop -- proven by a concurrent loop-tick counter still
+        advancing while the fetch thread sleeps), and the in-flight flag is
+        set immediately and cleared once the background task completes."""
+        import asyncio
+        import time as time_module
+        from datetime import date
+        import runner as runner_module
+
+        class SlowGuard:
+            def __init__(self):
+                self.calls = []
+
+            def refresh(self, symbols, *, start, end, now):
+                self.calls.append((tuple(sorted(symbols)), start, end, now))
+                time_module.sleep(0.2)  # a blocking call, run inside asyncio.to_thread
+
+        async def scenario():
+            guard = SlowGuard()
+            state = {"in_flight": False}
+            ticks = {"count": 0}
+
+            async def tick_counter():
+                while state["in_flight"] or ticks["count"] < 3:
+                    ticks["count"] += 1
+                    await asyncio.sleep(0.02)
+
+            await runner_module._schedule_corporate_action_refresh(
+                guard, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+            self.assertTrue(state["in_flight"], "in_flight must be set immediately, before the thread finishes")
+            await tick_counter()
+            self.assertFalse(state["in_flight"], "in_flight must clear once the background refresh completes")
+            self.assertEqual(len(guard.calls), 1)
+            self.assertEqual(guard.calls[0], (("AAPL",), date(2026, 9, 17), date(2026, 12, 24), 1000.0))
+            self.assertGreaterEqual(ticks["count"], 3, "the event loop must keep ticking while the fetch runs")
+
+        asyncio.run(scenario())
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_run_native_actually_schedules_a_refresh_when_overnight_holds_is_enabled(self):
+        """Runner-level test of BOTH the wiring (finding 8) and the refresh
+        call site (finding 2/M13): drives run_native's real tick loop (via
+        SimulatedPort, the same lightweight harness IntegratedRunner uses
+        elsewhere in this file) with overnight_holds enabled and a fake
+        corporate-action guard installed on config -- confirms the guard is
+        actually wired into the strategy AND that its refresh() is actually
+        invoked at least once during the run, not merely constructed and
+        left untouched."""
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=2, cleanup_seconds=2, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class FakeGuard:
+            def __init__(self):
+                self.refresh_calls = []
+
+            def refresh(self, symbols, *, start, end, now):
+                self.refresh_calls.append((tuple(sorted(symbols)), start, end, now))
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {}
+
+        guard = FakeGuard()
+        config["_corporate_action_guard"] = guard
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=2, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            controller.port = port
+            asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                   "fixture", config, "100000"))
+            ledger.close()
+        self.assertGreater(len(guard.refresh_calls), 0,
+                           "the guard's refresh() must actually be invoked during a run with overnight_holds on")
+        symbols, start, end, _ = guard.refresh_calls[0]
+        self.assertIn("SPY", symbols)
+        self.assertLess(start, end)
+
+    def test_scheduled_refresh_times_out_and_still_clears_in_flight(self):
+        """HIGH finding 2: a refresh() call that runs longer than
+        CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS is abandoned (wait_for
+        gives up) but the in-flight flag is still cleared, so a later tick
+        is not permanently locked out from ever refreshing again."""
+        import asyncio
+        import time as time_module
+        from datetime import date
+        import runner as runner_module
+
+        class HangingGuard:
+            def refresh(self, symbols, *, start, end, now):
+                time_module.sleep(runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS + 5)
+
+        async def scenario():
+            state = {"in_flight": False}
+            original_timeout = runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS
+            runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 0.05
+            try:
+                await runner_module._schedule_corporate_action_refresh(
+                    HangingGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                self.assertTrue(state["in_flight"])
+                for _ in range(50):
+                    if not state["in_flight"]:
+                        break
+                    await asyncio.sleep(0.02)
+                self.assertFalse(state["in_flight"], "a timed-out refresh must still clear in_flight")
+            finally:
+                runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
+
+        asyncio.run(scenario())
 
 
 if __name__ == "__main__":

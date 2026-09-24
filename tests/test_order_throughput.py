@@ -16,6 +16,7 @@ import signal
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/order-throughput"
@@ -599,6 +600,57 @@ class NativePortLogicTests(unittest.TestCase):
         self.assertEqual((len(orders), complete, len(responses), len(client.calls)), (500, False, 1, 1))
         with self.assertRaises(Exception):
             port.cancel_all()
+
+    def test_contract_refused_submit_never_reaches_a_client(self):
+        class Client:
+            def __getattr__(self, name):
+                raise AssertionError("client touched: " + name)
+
+        port, native = self.port(Client())
+        for args in (("cap-x-000001", "SPY", 1, "100.001", False),   # sub-penny limit price
+                     ("cap-x-000002", "BRK-B", 1, "100.01", False),  # outside the contract's symbol syntax
+                     ("cap-x-000003", "SPY", "0.5", "100.01", False),  # fractional buy
+                     ("_cap-x-000004", "SPY", 1, "100.01", False)):  # identifier syntax
+            with self.subTest(args=args):
+                response = port.submit(*args)
+                self.assertEqual((response.status, response.not_sent, response.error),
+                                 (None, True, "OrderContractRefused"))
+        self.assertEqual(port._pool.qsize(), 1)
+
+    def test_submit_posts_only_its_validated_envelope(self):
+        try:
+            import requests
+            from alpaca.trading.requests import LimitOrderRequest  # noqa: F401
+        except ImportError:
+            self.skipTest("requires isolated reviewed alpaca-py runtime")
+        import threading
+        import uuid
+        port, native = self.port(object())
+        client = native.transport._sdk_client("k", "s", port._before_request, port._observe, lock=threading.Lock())
+        self.addCleanup(client._session.close)
+        port._pool = __import__("queue").Queue()
+        port._pool.put(client)
+        bodies = []
+
+        def request(method, url, **kwargs):
+            bodies.append(kwargs["json"])
+            raw = requests.Response()
+            raw.status_code = 200
+            raw._content = json.dumps({"id": str(uuid.UUID(int=1)), "client_order_id": kwargs["json"]["client_order_id"],
+                                       "status": "new", "symbol": "SPY", "side": "buy", "qty": "1",
+                                       "filled_qty": "0"}).encode()
+            return raw
+        with patch.object(client._session._session, "request", side_effect=request) as http:
+            response = port.submit("cap-x-000001", "SPY", 1, Decimal("100.01"), True)
+            self.assertEqual((response.status, response.not_sent), (200, False))
+            refused = port.submit("cap-x-000002", "SPY", 1, "100.001", False)
+        self.assertEqual((refused.not_sent, refused.error), (True, "OrderContractRefused"))
+        self.assertEqual(http.call_count, 1)
+        envelope = native.transport.order_envelope(
+            {"client_order_id": "cap-x-000001", "symbol": "SPY", "side": "buy", "qty": "1", "limit_price": "100.01",
+             "extended_hours": True}, extended_hours_allowed=True)
+        self.assertTrue(native.transport.wire_matches_envelope(bodies[0], envelope))
+        self.assertEqual(client._session._envelopes, {})
 
     def test_stream_owner_callbacks_drive_health(self):
         port, _ = self.port(object())
