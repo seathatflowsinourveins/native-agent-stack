@@ -6519,6 +6519,11 @@
       "bytes": 2556
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/credential_guard.py",
+      "sha256": "adad0bc38af1323eb3713a313440e71c7de9f91a8393fe539f611a29fc555b9d",
+      "bytes": 5556
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
       "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf",
       "bytes": 869
@@ -6665,8 +6670,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "75acac96abbdbc44b254d00d81a218375f7d69c64637693e28901246a83f0792",
-      "bytes": 5870
+      "sha256": "b6c92f2ef934c88c674bbabb0ce0e52407c4c0ae96288898c8efa8f1d32021ab",
+      "bytes": 6001
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",

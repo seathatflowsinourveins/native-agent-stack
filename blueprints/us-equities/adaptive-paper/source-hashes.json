@@ -7,6 +7,7 @@
   "blueprints/us-equities/adaptive-paper/config-mover.json": "560849b980082a72f8ec45a32ffae51b1f50a502e739c94346ff501a46777ea8",
   "blueprints/us-equities/adaptive-paper/config-sip.json": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
   "blueprints/us-equities/adaptive-paper/config.json": "2b555982034af02b9d0d2e1d20e17d22c1e83f2b0c4d60b61d91307ebec63562",
+  "blueprints/us-equities/adaptive-paper/credential_guard.py": "adad0bc38af1323eb3713a313440e71c7de9f91a8393fe539f611a29fc555b9d",
   "blueprints/us-equities/adaptive-paper/exits.py": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
   "blueprints/us-equities/adaptive-paper/feeds.py": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb",
   "blueprints/us-equities/adaptive-paper/leverage.py": "7f4a86f312d718a0a0b87e6eafe9a2d57b8709ec85a8746fdf7def0a5b502ea0",
