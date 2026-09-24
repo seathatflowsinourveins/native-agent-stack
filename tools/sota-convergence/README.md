@@ -1413,7 +1413,8 @@ What remains and how it is handled:
   written (kept only as `<name>.json.audit-flagged`), and a resume re-audits a kept return's events, rerunning it
   when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
-  - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
+  - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
+    (Python's `Path.cwd()/ref`) and a URL's `//` after `:` start no path. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
     `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
     after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
@@ -1425,7 +1426,15 @@ What remains and how it is handled:
   - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
     `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget;
+  - name git, sqlite3, curl or wget anywhere in the command. A blind child's PATH resolves none of ai-memory,
+    agentsview, mcporter, qmd, socraticode, jcodemunch, serena, codex or claude: `child_env` sets it to the system
+    directories (`/usr/bin:/bin:/usr/sbin:/sbin`), codex is launched by the absolute path the caller's PATH resolves,
+    and `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves
+    there or in what the login shell adds (measured per run: Codex runs commands with `bash -lc`, and
+    /etc/profile.d adds `/snap/bin` here; macOS path_helper adds /etc/paths). So their names are not flagged in a
+    blind run, since they are also candidates a lane must search for; a non-blind run still flags them. Measured
+    2026-09-24 with a real blind child: every one of them, and node, npx and uvx, was missing, while python3, git
+    and Codex's bundled rg resolved;
   - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
     literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
     name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
@@ -1768,6 +1777,21 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **The first 2026-09-24 re-record attempt (wave 20260924 at catalog 149940af), set aside:**
+  - **The Codex lane voided 15 of 32 layers with no read outside the export.** The reasons:
+    - 15 flags named a retrieval CLI that was only a search term or a Python list item (`rg -i 'qmd|...'`,
+      `for t in ['serena', ...]`);
+    - 8 were a quoted `'/'` joining path parts (`p+'/'+k`);
+    - 2 were `Path.cwd()/ref` and `'https://'` read as absolute paths;
+    - 1 was a backtick in a quoted heredoc (REG7-3, kept).
+  - **The fix is enforcement rather than a name heuristic** (the blind audit above). A blind child's PATH resolves
+    no retrieval CLI, which a real child confirmed, and a host where one would resolve is refused. So those names are
+    no longer flagged. The root and path rules skip the Python forms.
+  - **Replayed over that run's 420 commands, 1 of the 32 layers is still flagged** (the backtick). The same replay
+    over the `test_real_reaches_still_flag` cases still flags each.
+  - **The Claude lane was killed 20 minutes in.** `claude -p` ended its background workflow 600 s after its turn
+    ended. The recipe now sets `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`.
+  - **Nothing from the attempt is recorded:** codex_lane.py's hash changed, so both lanes rerun on a new wave.
 - **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
   - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text
     before its first `*?[{`, cut at the last `/`) through the same trimming path helper, so `<export>/.. /*` listed

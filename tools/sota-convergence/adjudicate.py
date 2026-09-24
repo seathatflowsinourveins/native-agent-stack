@@ -887,7 +887,7 @@ def run_codex(args) -> int:
         return 2
     with contextlib.ExitStack() as stack:
         if pending:
-            issue = codex_lane.codex_home_issue(work_dir, repo)
+            issue = codex_lane.codex_home_issue(work_dir, repo) or codex_lane.blind_path_issue()
             if issue:
                 print(f"adjudicate: {issue}", file=sys.stderr)
                 return 2
