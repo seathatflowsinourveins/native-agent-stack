@@ -24,6 +24,10 @@
   "input_tokens": 302,
   "cache_read_input_tokens": 8233147,
   "cache_creation_input_tokens": 773809,
+  "status": "incomplete (child-usage.mjs: 8 children have no journal result)",
+  "lower_bound": true,
+  "unobserved_remainder": "unknown: an interrupted request whose final usage was never written is absent",
+  "retained_output": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
   "note": "The workflow runtime's own subagent-token total is reported only for a completed run; none exists for this stopped run. Do not sum these per-request counters with the runtime's counter."
  },
  "layers": [
