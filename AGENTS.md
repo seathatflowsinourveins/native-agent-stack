@@ -62,6 +62,11 @@ Use upstream executables and supported integration formats. Keep client accounts
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
 
+Until the trading lane moves to its own repository, `docs/lanes.md` assigns
+foundation, trading and shared paths, gives the protocol for shared hot files
+such as `manifests/evidence.json`, and requires one `lane:*` label per PR.
+Hand off to a live session that owns an area instead of editing it.
+
 For general engineering and ecosystem changes, start with
 `docs/convergence-architecture.md`. New convergence claims use
 `scripts/validate_convergence.py` with a scoped experiment record. Preserve failed

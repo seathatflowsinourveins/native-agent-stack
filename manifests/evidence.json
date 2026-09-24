@@ -3047,8 +3047,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "74da954045c961a0867f77dc4e7a1315c82ab34b4f061a54f70e351dbf4b827e",
-      "bytes": 1818
+      "sha256": "414a6890b079dde81f3ba595eabb6727907bd9bea223d310015e901a34424262",
+      "bytes": 2024
     },
     {
       "path": ".github/requirements-ci.lock",
@@ -3137,8 +3137,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "7c853106ce46ab7f493cb0d635c3428789335163bd21013cecad7143ccc18e21",
-      "bytes": 10043
+      "sha256": "8664697f992ec0ac11182398caa70440fd100a2507207cc8a4b00abd23fa2c23",
+      "bytes": 10341
     },
     {
       "path": "CLAUDE.md",
