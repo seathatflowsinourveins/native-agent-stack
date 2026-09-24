@@ -10,7 +10,7 @@ absolute path, the repository root and ``LANE=codex``, then run
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
         -c model_reasoning_effort=<effort> \
         --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
-        -c 'web_search="disabled"' <prompt>
+        -c 'web_search="disabled"' -c 'cli_auth_credentials_store="file"' <prompt>
 
 capturing the JSON event stream to
 ``<work-dir>/codex/events/<catalog>__<layer_id>.jsonl`` and a usage row per
@@ -58,6 +58,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import tempfile
 import sys
 import threading
 import time
@@ -273,8 +274,10 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
 # post-run blind audit below. A non-blind --allow-git-history run inherits the native Codex home.
 # Per-server ``mcp_servers.<name>.enabled=false`` overrides are not used: codex rejects them as a partial
 # table ("invalid transport") when the loaded config does not define that server.
+# The file credential store is pinned (round 5, ISO-R5-4): a keyring or auto store from a system or managed layer
+# would save a blind child's rotated tokens apart from the native auth.json.
 ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false",
-                  "-c", 'web_search="disabled"')
+                  "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
 AUDIT_NAME = "blind-audit.json"
 # CLIs that reach memory stores, code indexes, session history, git history or the network.
@@ -285,7 +288,9 @@ HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 # Any other environment variable used as a path (``$CODEX_HOME/AGENTS.md``, ``${XDG_DATA_HOME}/x``) can point
 # outside the repository; only its value, which the event does not show, says where (round-2 review).
 VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]\w*)/[^\s'\"|;&<>()`]*")
-PARAMETER_EXPANSION = re.compile(r"\$\{[^}]*\}")
+# Only an expansion that transforms its value (${X%/*}, ${X:-/p}, ${X/a/b}, ${!X}) hides the path it builds; a plain
+# ${name} is caught by VARIABLE_PATH when used as a path (independent review of 52344da8).
+PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
 CD_TARGET = re.compile(r"(?:^|[;&|\n(]|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*cd(?=$|[\s;&|)'\"])([^;&|\n)]*)")
@@ -382,9 +387,10 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
 
 # The CODEX_HOME every blind child runs with (isolated_codex_home), or None to inherit the caller's.
 CHILD_CODEX_HOME = None
-# Where run-scoped Codex homes live: one per work dir, outside the work dir (which holds both lanes' returns) and
-# outside the adjudication state dir (the position index), so no path a child derives from $CODEX_HOME reaches
-# either (independent review of #145, BIND-R4-7).
+# Where run-scoped Codex homes live: outside the work dir (which holds both lanes' returns) and outside the
+# adjudication state dir (the position index), so no path a child derives from $CODEX_HOME reaches either
+# (independent review of #145, BIND-R4-7). Each run gets a fresh directory there (mkdtemp); nothing is ever
+# removed to make one (round 5, INT-R5-2: removing a home that was, or held, the native home deleted it).
 CODEX_HOME_BASE_ENV = "NAS_CODEX_HOME_DIR"
 DEFAULT_CODEX_HOME_BASE = Path("~/.local/state/native-agent-stack/codex-home")
 
@@ -393,62 +399,67 @@ class CodexHomeRefused(ValueError):
     """The run-scoped Codex home cannot be set up without touching a credential or a lane input."""
 
 
-def codex_home_for(work_dir: Path) -> Path:
-    """The run-scoped CODEX_HOME of ``work_dir``: ``$NAS_CODEX_HOME_DIR`` (or
-    ``~/.local/state/native-agent-stack/codex-home``) / sha256(resolved work dir)[:16]."""
-    base = Path(os.environ.get(CODEX_HOME_BASE_ENV) or DEFAULT_CODEX_HOME_BASE).expanduser().absolute()
-    return base / hashlib.sha256(str(Path(work_dir).resolve()).encode("utf-8")).hexdigest()[:16]
+def codex_home_base() -> Path:
+    """``$NAS_CODEX_HOME_DIR``, else ``~/.local/state/native-agent-stack/codex-home``, absolutized."""
+    return Path(os.environ.get(CODEX_HOME_BASE_ENV) or DEFAULT_CODEX_HOME_BASE).expanduser().absolute()
+
+
+def codex_home_prefix(work_dir: Path) -> str:
+    """The name prefix of ``work_dir``'s run homes under codex_home_base: sha256(resolved work dir)[:16]."""
+    return hashlib.sha256(str(Path(work_dir).resolve()).encode("utf-8")).hexdigest()[:16]
+
+
+def native_codex_home() -> Path:
+    """The native Codex home: ``$CODEX_HOME``, else ``~/.codex``, absolutized."""
+    return Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().absolute()
 
 
 def native_auth_path() -> Path:
-    """The native Codex credential: ``$CODEX_HOME/auth.json`` (else ``~/.codex/auth.json``), absolutized."""
-    return (Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().absolute() / "auth.json")
+    """The native Codex credential, ``native_codex_home()/auth.json``."""
+    return native_codex_home() / "auth.json"
 
 
 def _contains(outer: Path, inner: Path) -> bool:
     return inner == outer or outer in inner.parents
 
 
+def _overlap(first: Path, second: Path) -> bool:
+    spellings = [(a, b) for a in {first, Path(os.path.realpath(first))} for b in {second, Path(os.path.realpath(second))}]
+    return any(_contains(a, b) or _contains(b, a) for a, b in spellings)
+
+
 def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
-    """Create the run-scoped CODEX_HOME (codex_home_for, mode 0700) holding only a symlink to the native
+    """Create a fresh run-scoped CODEX_HOME (mode 0700) under codex_home_base, holding only a symlink to the native
     ``auth.json`` (never a copy) and the child's empty HOME. ``--ignore-user-config`` skips config.toml but not
     ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools (measured 2026-09-24: a
-    child quoted its "# AGENTS.md instructions" block; with this home it answered "none"). The home is recreated
-    on every blind run (Codex review of #145), so a leftover AGENTS.md or config is never loaded, and the caller
-    removes the credential link when the run ends (remove_codex_home_link).
+    child quoted its "# AGENTS.md instructions" block; with this home it answered "none"). A fresh directory per
+    run (tempfile.mkdtemp) means no leftover AGENTS.md or config is loaded and nothing is removed to make it; the
+    caller removes the credential link when the run ends (remove_codex_home_link). The child's sessions and logs
+    stay in the run home for inspection.
 
-    The child's HOME is the empty ``<codex-home>/home`` (child_home): Codex also discovers user Agent Skills
-    under ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child
-    with this CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it
-    listed only the CLI's bundled skills).
+    The child's HOME is the empty ``<run home>/home`` (child_home): Codex also discovers user Agent Skills under
+    ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child with this
+    CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it listed only the
+    CLI's bundled skills).
 
-    Raises CodexHomeRefused, removing nothing (independent review of #145, BIND-R4-1 and R4-REG-9), when the home
-    is a symlink or not a directory, when it holds a regular auth.json, when the native credential or its target
-    lies inside it, when it lies inside the work dir or ``repo``, or when there is neither a native auth.json nor
-    CODEX_API_KEY/OPENAI_API_KEY."""
-    home = codex_home_for(work_dir)
-    native = native_auth_path()
-    native_targets = {native, Path(os.path.realpath(native))}
+    Raises CodexHomeRefused, creating nothing, when the base and the native Codex home are one directory or one
+    lies inside the other (either spelling), when the base lies inside the work dir or ``repo``, or when there is
+    neither a native auth.json nor CODEX_API_KEY/OPENAI_API_KEY (independent review of #145, rounds 4 and 5)."""
+    base = codex_home_base()
+    native_home = native_codex_home()
+    if _overlap(base, native_home):
+        raise CodexHomeRefused(f"the run-scoped Codex homes' base {base} and the native Codex home {native_home} "
+                               f"overlap; set {CODEX_HOME_BASE_ENV} to a directory apart from the native home")
     for place in (Path(work_dir).resolve(), *([Path(repo).resolve()] if repo is not None else [])):
-        if _contains(place, home) or _contains(place, Path(os.path.realpath(home))):
-            raise CodexHomeRefused(f"the run-scoped Codex home {home} lies inside {place}; set {CODEX_HOME_BASE_ENV} "
-                                   "to a directory outside the work dir and the export")
-    if home.is_symlink():
-        raise CodexHomeRefused(f"the run-scoped Codex home {home} is a symlink; remove it by hand")
-    for spelling in {home, Path(os.path.realpath(home))}:
-        if any(_contains(spelling, target) for target in native_targets):
-            raise CodexHomeRefused(f"the native Codex credential {native} lies inside the run-scoped home {home}; "
-                                   f"point CODEX_HOME at the native home or set {CODEX_HOME_BASE_ENV} elsewhere")
-    if home.exists():
-        link = home / "auth.json"
-        if not home.is_dir() or (link.exists() and not link.is_symlink()):
-            raise CodexHomeRefused(f"{home} is not a run-scoped Codex home (not a directory, or it holds a regular "
-                                   "auth.json); refusing to remove it")
-        shutil.rmtree(home)
+        if _overlap(base, place):
+            raise CodexHomeRefused(f"the run-scoped Codex homes' base {base} overlaps {place}; set "
+                                   f"{CODEX_HOME_BASE_ENV} to a directory outside the work dir and the export")
+    native = native_auth_path()
     if not native.is_file() and not (os.environ.get("CODEX_API_KEY") or os.environ.get("OPENAI_API_KEY")):
         raise CodexHomeRefused(f"no native Codex credential at {native} and no CODEX_API_KEY or OPENAI_API_KEY; sign "
                                "in natively with `codex login`")
-    home.mkdir(parents=True, mode=0o700)
+    base.mkdir(parents=True, exist_ok=True, mode=0o700)
+    home = Path(tempfile.mkdtemp(prefix=f"{codex_home_prefix(work_dir)}-", dir=base))
     home.chmod(0o700)
     child_home(home).mkdir(mode=0o700)
     if native.is_file():
@@ -492,9 +503,24 @@ def exclusive_run_lock(path: Path):
         handle.close()
 
 
+# The environment a blind child gets (independent review of #145, round 5, ISO-R5-2): not the caller's, which
+# carries the coordinator's transcript pointer, cross-session messaging socket and token, and broker variables.
+CHILD_ENV_ALLOWLIST = ("PATH", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TERM", "SSL_CERT_FILE", "SSL_CERT_DIR",
+                       "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "ALL_PROXY", "https_proxy", "http_proxy", "no_proxy",
+                       "all_proxy")
+# Extra variable-name prefixes a child keeps; empty in production (the test fixtures' fake codex reads its own).
+CHILD_ENV_EXTRA_PREFIXES = ()
+
+
 def child_env(codex_home: Path) -> dict:
-    """The environment overrides of a blind child (CODEX_HOME and its empty HOME)."""
-    return {"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home))}
+    """The whole environment of a blind child: the allowlisted variables, CODEX_HOME, the empty HOME, and an API
+    key variable only when the run home holds no linked auth.json."""
+    env = {key: value for key, value in os.environ.items()
+           if key in CHILD_ENV_ALLOWLIST or (CHILD_ENV_EXTRA_PREFIXES and key.startswith(CHILD_ENV_EXTRA_PREFIXES))}
+    env.update({"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home))})
+    if not (Path(codex_home) / "auth.json").exists():
+        env.update({key: os.environ[key] for key in ("CODEX_API_KEY", "OPENAI_API_KEY") if os.environ.get(key)})
+    return env
 
 
 def child_home(codex_home: Path) -> Path:
@@ -504,9 +530,11 @@ def child_home(codex_home: Path) -> Path:
 
 def run_attempt(cmd: list, timeout: float) -> dict:
     started = time.monotonic()
-    env = dict(os.environ, **child_env(CHILD_CODEX_HOME)) if CHILD_CODEX_HOME is not None else None
+    env = child_env(CHILD_CODEX_HOME) if CHILD_CODEX_HOME is not None else None
     try:
-        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
+        # No stdin (round 5, ISO-R5-3): codex exec appends a non-terminal stdin to the prompt and waits for its end.
+        completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env,
+                                   stdin=subprocess.DEVNULL)
         return {
             "exit_code": completed.returncode,
             "stdout": completed.stdout or "",
@@ -691,6 +719,46 @@ def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: 
     return provenance
 
 
+# The withheld labels of a packet whose candidates' manifest fields are sealed (scripts/landscape.py
+# sealed_candidate_labels; tests/test_codex_lane.py checks both agree), and the digest a return's provenance names
+# for the sealing packet-keys entry (landscape.packet_keys_entry_sha256): stdlib only, as this runner is.
+SEALED_PACKET_LABELS = ("candidates[].component_id", "candidates[].pin", "candidates[].upstream",
+                        "candidates[].recipe_ref", "candidates[].decisions")
+
+
+def packet_seals_candidates(packet) -> bool:
+    listed = packet.get("withheld") if isinstance(packet, dict) else None
+    return isinstance(listed, list) and all(label in listed for label in SEALED_PACKET_LABELS)
+
+
+def packet_keys_entry_sha256(entry) -> str:
+    return hashlib.sha256(json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def packet_provenances(packets, provenance: dict, keys_path) -> dict:
+    """packet file name -> the return provenance of a packet that seals its candidates: ``provenance`` plus
+    packet_keys_sha256, the digest of its --packet-keys entry, which binds the restored component ids to what the
+    lane judged (independent review of #145, round 5, INT-R5-1). Raises ValueError when a sealing packet has no
+    entry for its bytes."""
+    keys = None
+    if keys_path is not None:
+        document = json.loads(Path(keys_path).read_text(encoding="utf-8"))
+        keys = document.get("packets") if isinstance(document, dict) else None
+        if not isinstance(keys, dict):
+            raise ValueError(f"--packet-keys {keys_path} is not a packet-keys document")
+    bound = {}
+    for _catalog, _layer_id, packet_path in packets:
+        packet = json.loads(packet_path.read_text(encoding="utf-8"))
+        if not packet_seals_candidates(packet):
+            continue
+        entry = (keys or {}).get(packet_path.name)
+        if not isinstance(entry, dict) or entry.get("packet_sha256") != sha256_file(packet_path):
+            raise ValueError(f"{packet_path.name} seals its candidates' manifest fields; pass --packet-keys (the "
+                             "lane_packets.py --keys-out file) with an entry for its bytes")
+        bound[packet_path.name] = dict(provenance, packet_keys_sha256=packet_keys_entry_sha256(entry))
+    return bound
+
+
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
                           event_model_name, effort: str, provenance: dict = None,
                           configured_model: str = None) -> dict:
@@ -711,6 +779,9 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[2] if len(__doc__.splitlines()) > 2 else __doc__)
     parser.add_argument("--work-dir", required=True, type=Path)
     parser.add_argument("--repo", required=True, type=Path)
+    parser.add_argument("--packet-keys", type=Path, default=None,
+                        help="The lane_packets.py --keys-out file: required when the packets seal their candidates' "
+                             "manifest fields; each return's provenance names its entry's digest.")
     parser.add_argument("--layers", default=None,
                          help="Comma-separated layer ids to run (matched across every catalog); default: all.")
     parser.add_argument("--effort", default=DEFAULT_EFFORT, help="model_reasoning_effort passed via -c.")
@@ -789,11 +860,17 @@ def main(argv=None) -> int:
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"codex_lane: {error}", file=sys.stderr)
         return 2
+    try:
+        bound = packet_provenances(packets, provenance, args.packet_keys)
+    except (OSError, ValueError) as error:
+        print(f"codex_lane: {error}", file=sys.stderr)
+        return 2
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model,
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256,
+                                    bound.get(packet_path.name, provenance), args.model,
                                     args.effort):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
@@ -803,8 +880,13 @@ def main(argv=None) -> int:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
         # A blind child's environment is printed with its command; the dry run creates no home (OPS-4).
-        env_prefix = ["env", *(f"{key}={value}" for key, value in child_env(codex_home_for(work_dir)).items())] \
-            if blind else []
+        run_home = codex_home_base() / f"{codex_home_prefix(work_dir)}-<run>"
+        if blind:
+            print(f"# a real run creates a fresh {run_home} (mkdtemp) and runs each child with only this environment",
+                  file=sys.stderr)
+        # Never an API key value on stdout: the printed environment omits the key variables.
+        env_prefix = ["env", "-i", *(f"{key}={value}" for key, value in child_env(run_home).items()
+                                     if key not in ("CODEX_API_KEY", "OPENAI_API_KEY"))] if blind else []
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
@@ -834,14 +916,14 @@ def main(argv=None) -> int:
                 return 2
         try:
             return run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path,
-                               pending, provenance)
+                               pending, provenance, bound)
         finally:
             remove_codex_home_link(CHILD_CODEX_HOME)
             CHILD_CODEX_HOME = None
 
 
 def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
-                provenance) -> int:
+                provenance, bound=None) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
@@ -904,7 +986,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 continue
 
             final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
-                                         provenance, configured_model=args.model)
+                                         (bound or {}).get(packet_path.name, provenance), configured_model=args.model)
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
             succeeded = True

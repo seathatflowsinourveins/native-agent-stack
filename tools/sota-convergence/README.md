@@ -716,7 +716,8 @@ packet requirement names releases, versions or maintenance), together with
 `upstream.latest_flag`, the flagged tag-listing fallback (it can be
 date-shaped, such as `release/2025-11-28`). The strip reaches any depth of a
 copy, not only the copy and its `upstream` record. The pin
-itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
+and `upstream.renamed_to` of an unclaimed sota component stay; a candidate's pin and whole `upstream` record are
+sealed out of a blind packet since round 4 (below). The default mode is byte-identical, so the retained
 2026-09-22 packets still reproduce; they were built before this rule and carry
 those fields.
 
@@ -994,7 +995,7 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
     --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/state/blind/export \
-    --resolved-model claude-opus-5-5
+    --packet-keys /path/to/keys/packet-keys.json --resolved-model claude-opus-5-5
   ```
 
 **Two-family adjudication is keep-but-compare** (decision
@@ -1159,7 +1160,7 @@ prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs
 **Remaining limits: what the export still carries.** The export strips the JSON label fields under
 `catalogs/`, `adoption/` and `blueprints/` (below), the instruction files, and, in an allowlisted export, every
 prose sentence that names a candidate with a selection word (round 4, below). Measured on the allowlisted
-2026-09-23 export (604 files), it still carries:
+2026-09-23 export (633 files), it still carries:
 - **Evidence prose in JSON.** String values are not redacted. Sentences naming a winner with a selection word
   remain in 65 JSON files (82 matches under `evidence/`, 20 under `blueprints/`, 12 under `catalogs/`, 3 under
   `observability/`). Most use the words in their technical sense ("selected-step retry", "retained checkpoint").
@@ -1268,11 +1269,12 @@ codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
   -C <repo> --output-schema <schema> -o <out.tmp> --json \
   -c model_reasoning_effort=<effort> \
   --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
-  -c 'web_search="disabled"' <filled prompt>
+  -c 'web_search="disabled"' -c 'cli_auth_credentials_store="file"' <filled prompt>
 ```
 
-The four isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/test_codex_lane.py` fails when
-this block or the module docstring leaves one out.
+The five isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/test_codex_lane.py` fails when
+this block or the module docstring leaves one out. A blind child runs this with only an allowlisted environment,
+a fresh run-scoped `CODEX_HOME`, an empty `HOME` and no stdin (below).
 
 capturing the full JSON event stream to
 `<work-dir>/codex/events/<catalog>__<layer_id>.jsonl` and appending one usage
@@ -1428,8 +1430,8 @@ where the two lanes chose different winner components (2026-09-23 re-record).
   the packet and the blind export.
 
 ```sh
-python3 tools/sota-convergence/adjudicate.py inputs --work-dir W \
-  --lane-repo-root <claude lane export> --lane-repo-root <codex lane export>   # AB and BA inputs, adjudication-index.json
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir W --lane-repo-root <blind export> \
+  --packet-keys <keys>/packet-keys.json   # AB and BA inputs, adjudication-index.json
 python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> --run-dir <blind export> > args.json
 # run tools/sota-convergence/adjudication-lane.js with args.json (blind-adjudicator agents)
@@ -1620,7 +1622,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   - **UTF-8 only (L2).** Lane returns are decoded as UTF-8 before parsing, so a BOM or UTF-16/32 is refused.
   - **Allowlisted export (F1, F2).** `blind_checkout.py --export … --allow-from-packets <work-dir>/packets` exports
     only the following, and nothing else:
-    - the paths the lane packets reference (evidence refs, registered receipts, recipe refs; directories
+    - the paths the lane packets reference (evidence refs and registered receipts; since round 4 a blind packet
+      carries no recipe ref, which is sealed, so a file cited only as a recipe_ref leaves the export; directories
       recursively);
     - one level of `evidence/` and `blueprints/` paths named inside those JSON files;
     - the root instruction stubs.
@@ -1630,7 +1633,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
     the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
 
-    On the 2026-09-23 packets the export holds 604 files after the round-4 removals below (666 before them, 902
+    On the 2026-09-23 packets the export holds 633 files at this head (604 after the round-4 removals below, 660
+    after sealing recipe_ref dropped six recipe-only files, 666 before them, 902
     with the tests/, tools/ and scripts/ trees, 697 before the role-label removal). Before the allowlist it held the
     whole repository.
 
@@ -1684,6 +1688,51 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-5 review of a516c477 and the review of 52344da8:**
+  - **Fresh Codex homes, allowlisted children (INT-R5-2, ISO-R5-1..4).** Each blind run makes a fresh home with
+    `tempfile.mkdtemp` under the base; nothing is ever removed to make one (the round-4 home was recreated with
+    `rmtree`, which deleted a native home placed at that path). The base and the native Codex home may not be
+    one directory or nest either way, and the base may not overlap the work dir or export. A child's environment
+    is an allowlist (`PATH`, locale, `TMPDIR`, `TERM`, certificate and proxy variables), plus `CODEX_HOME`, the
+    empty `HOME`, and an API key variable only when no credential is linked: not the caller's, which carries the
+    coordinator's transcript pointer, cross-session socket and token, and broker variables. Children get no stdin,
+    and the file credential store is pinned (`-c cli_auth_credentials_store="file"`). Probe 2026-09-24,
+    `codex-cli 0.155.1`: a child with only `CODEX_HOME`, `HOME`, `LANG`, `PATH` and `TERM` signed in, listed
+    only the CLI's bundled skills and received no AGENTS.md; the native credential was intact and the link was
+    removed after.
+  - **Keys bound to the returns (INT-R5-1).** A return of a packet that seals its candidates names the digest of
+    its packet-keys entry (`provenance.packet_keys_sha256`, stamped by `codex_lane.py --packet-keys` and
+    `claude_lane.py --packet-keys`). `record_verdicts.py` rejects a lane whose digest differs, and
+    `scripts/landscape.py` refuses a sealed return whose digest is not that of the retained entry, so a later
+    edit of `packet-keys.json` cannot swap or relabel a recorded winner's component. `record_verdicts.py --write`
+    also refuses a retained entry that does not seal exactly its packet's candidates (INT-R5-4), and a bad
+    `--packet-keys` file is a clean refusal (R5-REG-8).
+  - **Packet prose (N1, N2, N4).** A sentence is dropped only when it states the catalog's choice: a choice phrase
+    ("current choice", "selected destination", "incumbent") or a selection word with a candidate. Other candidate
+    names are written `<candidate>`. Terms cover full names, repository names, component ids, owners and name
+    parts unique to one candidate (outside the layer's own title and scope words) with `-`/`_`/space variants, and
+    short names such as `gh`, `uv` or `RTK` as whole case-sensitive tokens. On the 2026-09-23 packets, 1
+    requirement is emptied (13 before) and 55 names are written `<candidate>`. A packet without `layer_scope_terms`
+    is no longer pointed at them. Candidates' `role` and `card_limitations` are reduced too (any selection word
+    there goes, since the text is about that candidate). Prose runs before the popularity strip, so the
+    archived/license gating reads the requirement the lanes see, and every blind packet is checked with
+    `withheld_packet_keys` before anything is written. The export gives the ledger rows and the quality review's
+    layer entries the packets' reduced text and drops the review's `evidence_gap`.
+  - **`evidence_kind` withheld (N5).** A selected candidate must carry a strong kind, so the kind held exactly the
+    winners in 7 layers; blind packets drop it and the export strips it from ledger candidates. The packet check
+    now also tests values: a categorical scalar, or a list element shared by two or more winners. At this head
+    only `registered_receipts` (11 layers) and `evidence_refs` (2) isolate winners, as evidence.
+  - **Export redaction as table units, stricter evidence classes (review of 52344da8).** A Markdown table goes whole
+    when any row states the choice, so no single broken row marks the winner. Inside evidence records a
+    `selected_repositories`-style selection or an unambiguous role word (winner, incumbent, chosen) is a label,
+    and such selections are stripped under `evidence/`. Named role keys are never exempt as evidence objects.
+    Six complement lists remain in receipts (commands resolved, components covered) for code-navigation and
+    git-github-automation; they record what a session ran and are kept as evidence.
+  - **Smaller fixes.** A leak is recorded only when the call's full provenance (code, prompt, schemas, tree) is
+    unchanged. A glued segment naming a file under a lane root stays as repository evidence (R5-REG-5), and a host
+    path after a URL-closing `|` is scrubbed (R5-REG-6). The review gate accepts a documented `failed` lane
+    outcome with its reasons (ops N2). `${...}` is flagged only with an operator. A refused export also removes its
+    worktree. The lane prompt no longer promises upstream metadata (N6), and its hash is re-registered.
 - **Independent round-4 review of 2a2ffb8d (blindness, binding, regressions and operability lenses):**
   - **Id-aware isolation check and removed selection records (F1).** `export_isolation_check.py` read only
     github.com/huggingface.co URLs, so id-keyed lists passed. It now matches every list (its strings and its
@@ -1730,9 +1779,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     of mode 0700. Measured 2026-09-24 with `codex-cli 0.155.1`: with the isolated `CODEX_HOME` and the
     caller's `HOME`, a probe child listed qmd, tavily-* and typesafe-ai among its skills. With the empty
     `HOME`, it listed only the CLI's bundled skills.
-  - **Codex home safety (BIND-R4-1, R4-REG-3, R4-REG-9, BIND-R4-7, OPS-4).** The run-scoped home now lives at
-    `$NAS_CODEX_HOME_DIR` (default `~/.local/state/native-agent-stack/codex-home`) `/<sha256(work dir)[:16]>`,
-    outside the work dir and the adjudication state dir. `isolated_codex_home` refuses, removing nothing, when
+  - **Codex home safety (BIND-R4-1, R4-REG-3, R4-REG-9, BIND-R4-7, OPS-4).** The run-scoped homes live under
+    `$NAS_CODEX_HOME_DIR` (default `~/.local/state/native-agent-stack/codex-home`), named
+    `<sha256(work dir)[:16]>-<random>` since round 5, outside the work dir and the adjudication state dir. `isolated_codex_home` refuses, removing nothing, when
     the home is a symlink or not a directory, holds a regular `auth.json`, contains the native credential or
     its target, or lies inside the work dir or export, and when there is neither a native `auth.json` nor
     `CODEX_API_KEY`/`OPENAI_API_KEY`. The home is created only after every refusal and the dry-run branch, and

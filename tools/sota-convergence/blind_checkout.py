@@ -142,7 +142,8 @@ CATALOGS_NONEMPTY_KEYS = frozenset({
 BLUEPRINT_CONDITIONAL_KEYS = frozenset({"selection", "decision", "disposition", "current_choice", "review_status"})
 
 LEDGER_ROW_LABEL_KEYS = ("current_choice", "decision", "rationale")
-LEDGER_CANDIDATE_LABEL_KEYS = ("disposition", "rationale", "review_status")
+# evidence_kind: a selected candidate must carry a strong kind, so it marks the winners (round 5, N5).
+LEDGER_CANDIDATE_LABEL_KEYS = ("disposition", "rationale", "review_status", "evidence_kind")
 
 PENDING_LANES = {
     "verdict_status": "pending_lanes",
@@ -384,13 +385,23 @@ def _is_evidence_object(value) -> bool:
 
 
 def _role_key(key, value=None) -> bool:
-    return (isinstance(key, str) and not _is_evidence_object(value)
-            and (key in CATALOGS_NONEMPTY_KEYS or key in ROLE_LABEL_KEYS or bool(ROLE_KEY.search(key))))
+    if not isinstance(key, str):
+        return False
+    if key in CATALOGS_NONEMPTY_KEYS or key in ROLE_LABEL_KEYS:
+        # Named labels go whatever their value holds (review of 52344da8: the evidence-object exemption applies only
+        # to keys matched by the ROLE_KEY pattern).
+        return True
+    return bool(ROLE_KEY.search(key)) and not _is_evidence_object(value)
+
+
+# A selection of candidates recorded in evidence: the upstream-check crosswalk (F1) and an observation's
+# selected_repositories (review of 52344da8: it named the durable-memory winner alone). Receipts' other
+# selected_* keys are data (selected files, sources, steps) and stay.
+EVIDENCE_SELECTION_KEY = re.compile(r"^selected_(?:component|repositor|tool|candidate|stack)")
 
 
 def _evidence_verdict_key(key, value=None) -> bool:
-    # A crosswalk of selected components (claude-upstream-checks provenance.json) names the winners by id (F1).
-    return isinstance(key, str) and (key in EVIDENCE_VERDICT_KEYS or key.startswith("selected_component"))
+    return isinstance(key, str) and (key in EVIDENCE_VERDICT_KEYS or bool(EVIDENCE_SELECTION_KEY.match(key)))
 
 
 def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
@@ -708,6 +719,57 @@ def build_allowlist(dest: Path, packets_dir: Path) -> dict:
 
 
 PROSE_SUFFIXES = (".md", ".markdown", ".txt", ".rst")
+LEDGER_EXPORTS = {"foundation": "catalogs/landscape/foundation.json", "us-equities": "catalogs/landscape/us-equities.json"}
+QUALITY_REVIEW_EXPORT = "catalogs/landscape/candidate-quality-review.json"
+
+
+def align_exported_prose(export: Path, packets_dir: Path) -> int:
+    """Give the exported ledger rows and quality-review layer entries the packets' reduced requirement, limitations
+    and overturn text, and drop the quality review's evidence_gap (the catalog's analysis of its current choice):
+    the sentences a packet withholds were otherwise exported verbatim (round 5, N2). Returns the entries changed."""
+    packets = {}
+    for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
+        packet = json.loads(packet_file.read_text(encoding="utf-8"))
+        packets[(packet.get("catalog"), packet.get("layer_id"))] = packet
+    changed = 0
+
+    def rewrite(relative, update):
+        nonlocal changed
+        path = export / relative
+        if path.is_symlink() or not path.is_file():
+            return
+        document = json.loads(path.read_text(encoding="utf-8"))
+        changed += update(document)
+        path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    def ledger(catalog):
+        def update(document):
+            count = 0
+            for row in document.get("layers") or []:
+                packet = packets.get((catalog, row.get("layer_id")))
+                if isinstance(row, dict) and packet is not None:
+                    row.update({"requirement": packet.get("requirement"), "limitations": packet.get("limitations"),
+                                "overturn_when": packet.get("existing_overturn_when")})
+                    count += 1
+            return count
+        return update
+
+    def quality(document):
+        count = 0
+        for entry in document.get("layer_coverage") or []:
+            if not isinstance(entry, dict):
+                continue
+            packet = packets.get((entry.get("catalog"), entry.get("layer_id")))
+            entry.pop("evidence_gap", None)
+            entry["requirement"] = packet.get("requirement") if packet else None
+            entry["overturn_when"] = packet.get("existing_overturn_when") if packet else None
+            count += 1
+        return count
+
+    for catalog, relative in LEDGER_EXPORTS.items():
+        rewrite(relative, ledger(catalog))
+    rewrite(QUALITY_REVIEW_EXPORT, quality)
+    return changed
 
 
 def redact_selection_prose(export: Path, packets_dir: Path) -> dict:
@@ -719,21 +781,24 @@ def redact_selection_prose(export: Path, packets_dir: Path) -> dict:
     here = str(Path(__file__).resolve().parent)
     if here not in sys.path:
         sys.path.insert(0, here)
-    from lane_packets import SELECTION_WORD, candidate_terms
-    terms = set()
+    from lane_packets import candidate_matcher, states_choice
+    candidates = []
     for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
-        terms |= set(candidate_terms(json.loads(packet_file.read_text(encoding="utf-8"))))
-    if not terms:
+        candidates.extend(json.loads(packet_file.read_text(encoding="utf-8")).get("candidates") or [])
+    if not candidates:
         return {}
-    term = re.compile(r"(?<![\w-])(?:" + "|".join(re.escape(t) for t in sorted(terms, key=len, reverse=True))
-                      + r")(?![\w-])", re.I)
+    matcher = candidate_matcher(candidates)
+
+    def choice(sentence):
+        return states_choice(sentence, matcher)
+
     redacted = {}
     for path in sorted(export.rglob("*")):
         if path.is_symlink() or not path.is_file() or path.suffix.lower() not in PROSE_SUFFIXES \
                 or path.name in INSTRUCTION_FILE_NAMES:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
-        lines, dropped = _redact_blocks(text.split("\n"), SELECTION_WORD, term)
+        lines, dropped = _redact_blocks(text.split("\n"), choice)
         if dropped:
             path.write_text("\n".join(lines), encoding="utf-8")
             redacted[path.relative_to(export).as_posix()] = dropped
@@ -744,13 +809,14 @@ def redact_selection_prose(export: Path, packets_dir: Path) -> dict:
 _BLOCK_START = re.compile(r"^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*|\|))")
 
 
-def _redact_blocks(lines: list, selection_word, term) -> tuple:
+def _redact_blocks(lines: list, states_choice) -> tuple:
     """(lines, sentences dropped): each prose block (a paragraph or list item with its wrapped continuation
-    lines; a table row alone) is read as one text, so a sentence wrapped over two lines is still one sentence.
-    A block that loses a sentence is written back on one line; fenced code is kept as it is."""
-    out, dropped, fenced, block = [], 0, False, []
+    lines) is read as one text, so a sentence wrapped over two lines is still one sentence, and a block that loses
+    a sentence is written back on one line. A table is one unit: when any row states the choice, the whole table
+    goes, so no single broken row marks the winner (review of 52344da8). Fenced code is kept as it is."""
+    out, dropped, fenced, block, table = [], 0, False, [], []
 
-    def flush():
+    def flush_block():
         nonlocal dropped
         if not block:
             return
@@ -758,7 +824,7 @@ def _redact_blocks(lines: list, selection_word, term) -> tuple:
         prefix = match.group(1) if match else block[0][:len(block[0]) - len(block[0].lstrip())]
         content = " ".join([block[0][len(prefix):].strip()] + [line.strip() for line in block[1:]])
         sentences = re.split(r"(?<=[.!?;])\s+", content)
-        kept = [sentence for sentence in sentences if not (selection_word.search(sentence) and term.search(sentence))]
+        kept = [sentence for sentence in sentences if not states_choice(sentence)]
         if len(kept) == len(sentences):
             out.extend(block)
         else:
@@ -767,22 +833,40 @@ def _redact_blocks(lines: list, selection_word, term) -> tuple:
                 out.append(prefix + " ".join(kept))
         block.clear()
 
+    def flush_table():
+        nonlocal dropped
+        if not table:
+            return
+        rows = [row for row in table if not re.fullmatch(r"\s*\|?[\s:|-]*\|?\s*", row)]
+        if any(states_choice(row) for row in rows):
+            dropped += len(rows)
+        else:
+            out.extend(table)
+        table.clear()
+
     for line in lines:
         fence = line.lstrip().startswith("```")
         if fenced or fence:
-            flush()
+            flush_block()
+            flush_table()
             out.append(line)
             if fence:
                 fenced = not fenced
             continue
+        if line.lstrip().startswith("|"):
+            flush_block()
+            table.append(line)
+            continue
+        flush_table()
         if not line.strip():
-            flush()
+            flush_block()
             out.append(line)
             continue
-        if _BLOCK_START.match(line) or not block or block[0].lstrip().startswith("|"):
-            flush()
+        if _BLOCK_START.match(line) or not block:
+            flush_block()
         block.append(line)
-    flush()
+    flush_block()
+    flush_table()
     return out, dropped
 
 
@@ -872,6 +956,7 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
             root_file.write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
             if name not in replaced:
                 replaced.append(name)
+    aligned = align_exported_prose(export, allow_from_packets) if allow_from_packets is not None else 0
     redacted = redact_selection_prose(export, allow_from_packets) if allow_from_packets is not None else {}
     # A stripped (rewritten) file would otherwise carry a newer mtime than an untouched one.
     for directory, dirs, files in os.walk(export, topdown=False, followlinks=False):
@@ -888,7 +973,8 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
     if allowlist is not None:
         result.update({"allowlisted_files": len(allowed_files), "missing_refs": allowlist["missing_refs"],
                        "transitive_refs": len(allowlist["transitive_refs"]),
-                       "redacted_prose_sentences": sum(redacted.values()), "redacted_prose_files": len(redacted)})
+                       "redacted_prose_sentences": sum(redacted.values()), "redacted_prose_files": len(redacted),
+                       "aligned_prose_entries": aligned})
     return result
 
 
@@ -949,6 +1035,8 @@ def main(argv=None) -> int:
         # packets with lane_packets.py --withhold-labels, which drops references to removed files.
         missing = sanitized["missing_refs"]
         shutil.rmtree(export)
+        # The worktree goes too, so a rerun is not refused with "--dest already exists" (review of 52344da8).
+        subprocess.run(["git", "worktree", "remove", "--force", str(dest)], cwd=str(source), capture_output=True)
         raise SystemExit(f"the packets reference {len(missing)} path(s) the export lacks ({', '.join(missing[:10])}); "
                          "rebuild them with lane_packets.py --withhold-labels, or pass --allow-missing-refs")
     key_path = dest.parent / f"{dest.name}.hmac-key"

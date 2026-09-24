@@ -218,6 +218,15 @@ PACKET_KEYS_NAME = "packet-keys.json"
 PACKET_KEYS_SCHEMA_VERSION = 1
 
 
+# Candidate labels a blind packet drops outright (round 5, N5): a selected candidate must carry a strong evidence_kind,
+# so the kind marks the winners.
+WITHHELD_CANDIDATE_LABELS = ("evidence_kind",)
+
+
+def withheld_candidate_label_labels():
+    return [f"candidates[].{field}" for field in WITHHELD_CANDIDATE_LABELS]
+
+
 def sealed_candidate_labels():
     return [f"candidates[].{field}" for field in SEALED_CANDIDATE_FIELDS]
 
@@ -247,6 +256,23 @@ def packet_keys_issue(keys_doc, name, packet_sha256, packet):
     for key, fields in sealed.items():
         if not isinstance(fields, dict) or set(fields) - set(SEALED_CANDIDATE_FIELDS):
             return f"the packet-keys entry for {name} seals fields other than {list(SEALED_CANDIDATE_FIELDS)} for {key}"
+    return None
+
+
+def packet_keys_entry_sha256(entry) -> str:
+    """The digest a lane return's provenance.packet_keys_sha256 carries for its packet's keys entry."""
+    return hashlib.sha256(json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def packet_keys_binding_issue(provenance, keys_entry):
+    """None when a return's provenance names the digest of the keys entry sealing its packet: the restored
+    component ids are then bound to what the lane judged, so a later edit of packet-keys.json cannot swap or
+    relabel a recorded winner's component (independent review of #145, round 5, INT-R5-1)."""
+    named = provenance.get("packet_keys_sha256") if isinstance(provenance, dict) else None
+    expected = packet_keys_entry_sha256(keys_entry)
+    if named != expected:
+        return (f"provenance.packet_keys_sha256 {named!r} is not the digest {expected} of the packet-keys entry "
+                "sealing its packet")
     return None
 
 
@@ -292,13 +318,14 @@ def withheld_packet_keys(packet):
             if not isinstance(item, dict):
                 continue
             if collection == "candidates":
-                found |= {f"candidates[].{field}" for field in SEALED_CANDIDATE_FIELDS if field in item}
+                found |= {f"candidates[].{field}" for field in SEALED_CANDIDATE_FIELDS + WITHHELD_CANDIDATE_LABELS
+                          if field in item}
             if any(isinstance(receipt, dict) and "matched_by" in receipt for receipt in item.get("registered_receipts") or []):
                 found.add(f"{collection}[].registered_receipts[].matched_by")
     listed = packet.get("withheld")
     listed = set(listed) if isinstance(listed, list) and all(isinstance(item, str) for item in listed) else set()
     found |= {f"withheld[] lacks {label}" for label in withhold_policy_labels(requirement) + sealed_candidate_labels()
-              if label not in listed}
+              + withheld_candidate_label_labels() if label not in listed}
     return sorted(found)
 
 
@@ -364,9 +391,11 @@ def lane_provenance_issue(lane, provenance):
     commit and the hash of the role definition its stages ran as; the Codex lane the hashes of codex_lane.py
     and the prompt it filled. Both name the digest of the evidence tree they read (repo_tree_sha256)."""
     fields = LANE_PROVENANCE_FIELDS[lane]
-    if not isinstance(provenance, dict) or set(provenance) != set(fields):
+    # packet_keys_sha256 binds a --withhold-labels packet's sealed candidate fields (round 5, INT-R5-1); it is
+    # required where the packet seals them (packet_keys_binding_issue), so it is optional here.
+    if not isinstance(provenance, dict) or set(provenance) - {"packet_keys_sha256"} != set(fields):
         return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"
-    for field in fields:
+    for field in fields + (("packet_keys_sha256",) if "packet_keys_sha256" in provenance else ()):
         value = provenance[field]
         if field.endswith("sha256"):
             ok = isinstance(value, str) and bool(SHA256_TEXT.fullmatch(value))
@@ -881,6 +910,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                 str(key) + f" needs its retained packet {sealed_base}/{packet_relative} with the run manifest's "
                            "packet_sha256")
         retained_packet = json.loads(packet_file.read_text(encoding="utf-8"))
+        keys_entry = None
         if packet_seals_candidates(retained_packet):
             # Winner component ids resolve against the candidates' sealed manifest fields (review of #145).
             keys_file = safe_file(root, f"{sealed_base}/{PACKET_KEYS_NAME}")
@@ -891,12 +921,14 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             packet_name = f"{key[0]}__{key[1]}.json"
             issue = packet_keys_issue(keys_doc, packet_name, packet_sha256, retained_packet)
             require(issue is None, str(key) + f": {issue}")
+            keys_entry = keys_doc["packets"][packet_name]
             retained_packet = unseal_packet(retained_packet, keys_doc, packet_name)
         if wave_refs is not None:
             wave_refs.setdefault(wave, set()).update(
                 f"{lane}/{lanes_field[lane]['run_id']}.json" for lane in sealed_returns)
     else:
         packet_sha256 = None
+        keys_entry = None
 
     open_gaps = row.get("open_gaps")
     require(isinstance(open_gaps, list) and all(isinstance(gap, str) and gap.strip() for gap in open_gaps),
@@ -1016,12 +1048,12 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
     if not grandfathered:
         verify_new_wave_row(row, key, root=root, sealed_base=sealed_base, wave=wave, lanes_field=lanes_field,
                             parsed_returns=parsed_returns, retained_packet=retained_packet,
-                            packet_sha256=packet_sha256, winners=winners,
+                            packet_sha256=packet_sha256, winners=winners, keys_entry=keys_entry,
                             chosen_lane=chosen_lane if status == "recorded" else None, wave_refs=wave_refs)
 
 
 def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parsed_returns, retained_packet,
-                        packet_sha256, winners, chosen_lane, wave_refs):
+                        packet_sha256, winners, chosen_lane, wave_refs, keys_entry=None):
     """The new-wave row is what its sealed returns establish (2026-09-23 review of #122, finding 1):
     every sealed return names the retained packet; the agreement is recomputed from both returns'
     winner component ids; a recorded row's winners are exactly the chosen lane's (same_winner or
@@ -1033,6 +1065,9 @@ def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parse
         require(sealed_return.get("packet_sha256") == packet_sha256,
                 str(key) + f".lanes.{lane} sealed return names packet_sha256 {sealed_return.get('packet_sha256')!r}, "
                            f"not the retained packet {packet_sha256}")
+        if keys_entry is not None:
+            issue = packet_keys_binding_issue(sealed_return.get("provenance"), keys_entry)
+            require(issue is None, str(key) + f".lanes.{lane} sealed return: {issue}")
         issue, components = lane_winner_components(sealed_return, retained_packet)
         require(issue is None, str(key) + f".lanes.{lane} sealed return: {issue}")
         lane_sets[lane] = components

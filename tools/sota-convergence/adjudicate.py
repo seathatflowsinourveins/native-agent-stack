@@ -190,14 +190,15 @@ def bare_paths(value, repo_roots=()):
 # any other absolute path, ~ or $HOME path, or <host-path> placeholder becomes the bare <outside-path>.
 # http(s) URLs are left alone.
 _PATH_CHARS = r"[^\s'\"|;&<>()`,]"
-_PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>]))"
+_PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>|;&]))"
 # The first character of an absolute path's first segment (Codex review of #145): any word character,
 # Unicode included (/évidence/x), or a dot; any other legal character (/-private/x, /@host/x) only when a
 # later "/" shows a path, so prose such as "+/-" is not taken for one.
 _SEGMENT_START = r"(?:[\w.]|(?!/)" + _PATH_CHARS + r"(?=" + _PATH_CHARS + r"*/))"
 # A URL ends at a field separator too (Codex review of #145): "source=https://x;local=/home/..." must not exempt the
 # host path after the semicolon.
-URL = re.compile(r"https?://[^\s<>\"'`)\];,]+")
+# RFC 3986 never allows | { } \\ ^ unencoded either (round 5, R5-REG-6: "https://x|/home/example/notes.md").
+URL = re.compile(r"https?://[^\s<>\"'`)\];,|{}\\^]+")
 ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+" + _SEGMENT_START + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
@@ -218,13 +219,29 @@ OUTSIDE = "<outside-path>"
 _OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?:[ \t]+[^\s'\"|;&<>()`,]+)+)")
 
 
-# A path segment glued to a delimiter the scrubber stops at ("/home/example,private/result.json") continues the
-# path when a / or \ follows: absorbed whole (Codex review of #145).
-_OUTSIDE_GLUED = re.compile(r"<outside-path>[,;()'\"`|&]+[^\s<>]*[/\\][^\s<>]*")
-# A segment glued to the path by "," or ";" with no space after it ("/home/example/private,key.json") is part of
-# the path's name even without a separator; prose puts a space after the comma (independent review of #145,
-# round 4, R4-REG-5).
-_OUTSIDE_GLUED_TOKEN = re.compile(r"<outside-path>(?:[,;][^\s<>]+)+")
+# A segment glued to an outside path by one delimiter the scrubber stops at ("/home/example,private/result.json",
+# "/home/example/private,key.json") is part of the path's name (Codex review of #145; round 4, R4-REG-5) and is
+# absorbed, one delimiter and one segment at a time, unless it names a file under a lane root: then it is
+# repository evidence and stays, and the clause absorption stops there (round 5, R5-REG-5). Prose puts a space
+# after the delimiter, which leaves the segment empty and the text as it is.
+_GLUED = re.compile(r"<outside-path>([,;()'\"`|&])([^\s<>,;()'\"`|&]*)")
+
+
+def _names_repo_file(segment: str, repo_roots) -> bool:
+    core = segment.rstrip(".:!?")
+    return bool(core) and ".." not in Path(core).parts and not core.startswith("/") and any(
+        (Path(root) / core).is_file() for root in repo_roots)
+
+
+def absorb_glued(text: str, repo_roots=()) -> str:
+    def glued(match):
+        if not match.group(2) or _names_repo_file(match.group(2), repo_roots):
+            return match.group(0)
+        return OUTSIDE
+    previous = None
+    while previous != text:
+        previous, text = text, _GLUED.sub(glued, text)
+    return text
 
 
 def _absorb_clause(match) -> str:
@@ -314,8 +331,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
     text = HOME_TEXT_PATH.sub(outside, text)
     text = PARENT_TEXT_PATH.sub(outside, text)
     text = ABSOLUTE_TEXT_PATH.sub(absolute, text)
-    text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
-    text = _OUTSIDE_GLUED_TOKEN.sub(OUTSIDE, text)
+    text = absorb_glued(text, repo_roots)
     return _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
 
 
@@ -922,9 +938,10 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         elif inputs_changed(index, [stem]):
             # The input changed while the judges read it (Codex review of #145).
             judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
-        elif not tree_unchanged(repo, run_provenance):
-            # Checked after each call (independent review of #145, BIND-R4-4), so an interrupted run never leaves a
-            # judgment of a changed tree for resume.
+        elif not provenance_unchanged(args.prompt, repo, run_provenance):
+            # Checked after each call (independent review of #145, BIND-R4-4): the tree, code, prompt and schemas, so
+            # an interrupted run never leaves a judgment, or records a leak, the run end would void (review of
+            # 52344da8).
             judge, refuter, leak, failure = None, None, None, TREE_CHANGED
         # This call's own audit, before its record is written (binding re-review N2): a flagged call is void even if
         # the run is interrupted before the end-of-run audit, and a resume never counts it.
@@ -1038,8 +1055,7 @@ def redact_leak_text(text):
     for pattern in (WINDOWS_TEXT_PATH, HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH,
                     *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
-    text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
-    text = _OUTSIDE_GLUED_TOKEN.sub(OUTSIDE, text)
+    text = absorb_glued(text)
     text = _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
     return text[:LEAK_TEXT_LIMIT]
 
@@ -1432,10 +1448,11 @@ DEFAULT_ADJUDICATOR_FILE = Path.home() / ".claude" / "agents" / f"{ADJUDICATOR_R
 tree_sha256 = codex_lane.tree_sha256
 
 
-def tree_unchanged(repo: Path, run_provenance: dict) -> bool:
-    """Whether the evidence tree still has the digest this run launched with (False when it cannot be hashed)."""
+def provenance_unchanged(prompt_path: Path, repo: Path, run_provenance: dict) -> bool:
+    """Whether the code, prompt, schemas, role and evidence tree still have the provenance this run launched with
+    (False when it cannot be computed)."""
     try:
-        return tree_sha256(Path(repo)) == run_provenance.get("repo_tree_sha256")
+        return adjudication_provenance(prompt_path, repo) == run_provenance
     except (OSError, ValueError):
         return False
 

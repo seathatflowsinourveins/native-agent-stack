@@ -35,7 +35,8 @@ OPENAI = {"name": "gpt-5.2", "family": "openai", "effort": "high"}
 PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
     {"key": "c1", "repository": "https://github.com/example/one", "adopted": True},
     {"key": "c2", "repository": "https://github.com/example/two", "adopted": True},
-], "withheld": landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()}
+], "withheld": landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
+    + landscape.withheld_candidate_label_labels()}
 KEYS = {"c1": {"component_id": "comp-one", "pin": "1.0"}, "c2": {"component_id": "comp-two"}}
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
@@ -355,6 +356,21 @@ class EvidencedRowTests(GateFixture):
         self.rebase()
         self.record(codex=False, single_lane=DECISION)
         self.assertPasses(self.report())
+
+
+class FailedLaneOutcomeTests(GateFixture):
+    """Round 5, ops N2: a documented "failed" lane outcome (a Codex layer failed after retry, a Claude layer refuted
+    twice) carries its reasons in the run manifest, and the gate accepts it as landscape.py does."""
+
+    def test_a_failed_codex_lane_with_reasons_passes_and_without_reasons_fails(self):
+        self.decision("# Single lane\n\nsingle-lane-authorization: foundation/beta\n")
+        self.rebase()
+        self.record(codex=False, single_lane=DECISION)
+        self.manifest_entries["beta"]["lanes"]["codex"] = {"outcome": "failed",
+                                                            "reasons": ["failed after retry: timed out"]}
+        self.assertPasses(self.report())
+        self.manifest_entries["beta"]["lanes"]["codex"] = {"outcome": "failed", "reasons": []}
+        self.assertFails(self.report(), "failed codex lane of foundation/beta needs its reasons")
 
 
 class MissingEvidenceTests(GateFixture):
@@ -999,7 +1015,8 @@ class ToolingAlignmentTests(GateFixture):
     def test_packet_own_checked_at_is_not_withheld(self):
         self.record(packet={**PACKET, "checked_at": "2026-09-23"})
         self.assertPasses(self.report())
-        labels = landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
+        labels = (landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
+                  + landscape.withheld_candidate_label_labels())
         self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}], "withheld": labels}),
                          ["c[].checked_at"])
 

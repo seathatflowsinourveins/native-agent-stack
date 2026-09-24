@@ -674,8 +674,8 @@ class AllowlistExportTests(BlindCheckoutFixture):
         with self.assertRaisesRegex(SystemExit, "reference 1 path\\(s\\) the export lacks \\(evidence/missing.md\\)"):
             blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(dest),
                                  "--export", str(export), "--allow-from-packets", str(self.packets)])
-        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(dest)], self.source))
         self.assertFalse(export.exists())
+        self.assertFalse(dest.exists())  # the worktree goes too, so a rerun can reuse --dest (review of 52344da8)
 
     def test_an_export_inside_the_worktree_is_refused(self):
         # Round 4, R4-REG-8.
@@ -791,17 +791,24 @@ class RealExportIsolationTests(unittest.TestCase):
         self.assertEqual(isolation.packet_role_label_hits(fields), [{"layer": "foundation::layer", "field": "pin"}])
 
     def test_selection_sentences_naming_a_candidate_are_redacted_by_block(self):
-        # Round 4, F3: a sentence wrapped over two Markdown lines is one sentence; fenced commands and table rows
-        # without a selection statement are kept.
+        # Round 4, F3: a sentence wrapped over two Markdown lines is one sentence; fenced commands are kept. Review of
+        # 52344da8: a table is one unit, so no single broken row marks the winner.
         lane_packets = load_module("lane_packets_for_redaction", "lane_packets.py")
-        term = re.compile(r"(?<![\w-])(?:serena|nautilus)(?![\w-])", re.I)
+        matcher = lane_packets.candidate_matcher([{"name": "Serena"}, {"name": "Nautilus"}, {"name": "LEAN"}])
+
+        def choice(sentence):
+            return lane_packets.states_choice(sentence, matcher)
+
         text = ("# Title\n\nSerena is the\nselected navigation layer. It indexes code.\n"
-                "- Nautilus stays the default engine. It runs replay.\n- Other item\n"
-                "| Layer | Pick |\n| nav | Serena selected |\n```\nserena --select x\n```\nPlain text.")
-        lines, dropped = blind_checkout._redact_blocks(text.split("\n"), lane_packets.SELECTION_WORD, term)
-        self.assertEqual(dropped, 3)
-        self.assertEqual("\n".join(lines), "# Title\n\nIt indexes code.\n- It runs replay.\n- Other item\n"
-                                            "| Layer | Pick |\n```\nserena --select x\n```\nPlain text.")
+                "- Nautilus stays the default engine. It runs replay.\n- Other item\n\n"
+                "| Candidate | Decision |\n| --- | --- |\n| LEAN | Conditional |\n| Nautilus | Selected |\n\n"
+                "| Tool | Use |\n| --- | --- |\n| Serena | symbols |\n"
+                "```\nserena --select x\n```\nPlain text.")
+        lines, dropped = blind_checkout._redact_blocks(text.split("\n"), choice)
+        self.assertEqual(dropped, 5)  # two sentences and the three rows of the table that goes
+        self.assertEqual("\n".join(lines), "# Title\n\nIt indexes code.\n- It runs replay.\n- Other item\n\n\n"
+                                            "| Tool | Use |\n| --- | --- |\n| Serena | symbols |\n"
+                                            "```\nserena --select x\n```\nPlain text.")
 
     def test_id_keyed_containers_are_matched_and_classified(self):
         # Round 4, F1 and F6: an id-keyed list or key set naming the winner alone outside an evidence record is a

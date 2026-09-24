@@ -651,7 +651,9 @@ class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
             if key != "withheld":
                 expected = scrub_popularity(plain[key])
                 if key == "candidates":
-                    expected = [{field: value for field, value in candidate.items() if field not in SEALED_CANDIDATE_FIELDS}
+                    # Sealed fields and the withheld evidence_kind label (round 5, N5) leave the packet.
+                    expected = [{field: value for field, value in candidate.items()
+                                 if field not in SEALED_CANDIDATE_FIELDS + ("evidence_kind",)}
                                 for candidate in expected]
                 self.assertEqual(expected, withheld[key], key)
         self.assertEqual(plain["withheld"], withheld["withheld"][:len(plain["withheld"])])
@@ -801,7 +803,7 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
 
     @staticmethod
     def seal(packet):
-        return lane_packets.seal_candidate_fields(packet)[0]
+        return lane_packets.seal_candidate_fields(lane_packets.withhold_candidate_labels(packet))[0]
 
     def test_a_withhold_labels_packet_is_clean(self):
         # Controls: a null review_status, the packet's own checked_at and the output enums stay.
@@ -865,7 +867,8 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
                                "upstream": {"latest_flag": {"tag": "release/2025-11-28"},
                                             "release": {"published_at": "2026-09-01", "tag": "v1"}}}],
                "sota_components_not_in_candidates": []}
-        built, sealed = lane_packets.seal_candidate_fields(lane_packets.withhold_popularity(copy.deepcopy(raw)))
+        built, sealed = lane_packets.seal_candidate_fields(lane_packets.withhold_candidate_labels(
+            lane_packets.withhold_popularity(copy.deepcopy(raw))))
         self.assertNotIn("2025-11-28", json.dumps([built, sealed]))
         self.assertEqual(built["candidates"][0]["evidence"], {"kept": 1})
         self.assertEqual(sealed["c1"]["upstream"], {})
@@ -889,10 +892,34 @@ class WithheldProseTests(unittest.TestCase):
                   "existing_overturn_when": "Reopen if a parity check fails. Keep the prior oracle.",
                   "withheld": []}
         out = lane_packets.withhold_prose(packet)
-        self.assertEqual(out["requirement"], lane_packets.NEUTRAL_REQUIREMENT)
-        self.assertEqual(out["limitations"], ["Fills are synthetic."])
-        self.assertEqual(out["existing_overturn_when"], "Reopen if a parity check fails.")
-        self.assertTrue(any("selection word" in label for label in out["withheld"]))
+        # No layer_scope_terms in this packet, so it is not pointed at them (round 5, N1/N4).
+        self.assertEqual(out["requirement"], lane_packets.NEUTRAL_REQUIREMENT_NO_SCOPE)
+        # Round 5, N1: a sentence naming a candidate without stating the choice keeps its content with the name
+        # redacted; a bare "Keep" names no choice and stays.
+        self.assertEqual(out["limitations"], ["<candidate> 2.0.0rc5 is a prerelease.", "Fills are synthetic."])
+        self.assertEqual(out["existing_overturn_when"], "Reopen if a parity check fails. Keep the prior oracle.")
+        self.assertTrue(any("state the current choice" in label for label in out["withheld"]))
+
+    def test_short_names_owners_variants_and_candidate_prose_are_covered(self):
+        # Round 5, N2, and the review of 52344da8: gh, RTK or an owner survived; role and card_limitations kept
+        # selection prose.
+        packet = {"title": "Git and GitHub automation", "candidates": [
+            {"name": "gh", "repository": "https://github.com/cli/cli", "role": "The selected GitHub CLI."},
+            {"name": "RTK", "repository": "https://github.com/rtk-ai/rtk",
+             "card_limitations": ["Output is condensed.", "RTK stays the default filter."]},
+            {"name": "Nautilus Trader", "repository": "https://github.com/nautechsystems/nautilus_trader"}],
+                  "requirement": "Automate reviews with gh. Use the gh CLI by default. The nautilus-trader engine replays. "
+                                 "Selected pages are cached. Keep receipts.",
+                  "withheld": []}
+        out = lane_packets.withhold_prose(packet)
+        self.assertEqual(out["requirement"], "Automate reviews with <candidate>. The <candidate> engine replays. "
+                                             "Selected pages are cached. Keep receipts.")
+        self.assertIsNone(out["candidates"][0]["role"])
+        self.assertEqual(out["candidates"][1]["card_limitations"], ["Output is condensed."])
+        matcher = lane_packets.candidate_matcher(packet["candidates"])
+        self.assertTrue(matcher.search("see nautechsystems releases"))  # an owner unique to one candidate
+        self.assertFalse(matcher.search("the ghost of rtkx"))  # whole tokens only
+        self.assertFalse(lane_packets.candidate_matcher([{"component_id": "one"}]).search("only one run"))
 
     def test_a_neutral_requirement_is_kept(self):
         packet = {"candidates": [{"name": "Widget One", "repository": "https://github.com/acme/widget-one"}],

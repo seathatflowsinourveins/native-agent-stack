@@ -90,6 +90,10 @@ class AdjudicateFixture(unittest.TestCase):
                                              adjudicate.codex_lane.CODEX_HOME_BASE_ENV: str(self.base / "codex-homes")})
         state.start()
         self.addCleanup(state.stop)
+        # The fake codex reads its CODEX_FAKE_* settings; production children get only the allowlist (ISO-R5-2).
+        prefixes = mock.patch.object(adjudicate.codex_lane, "CHILD_ENV_EXTRA_PREFIXES", ("CODEX_FAKE_",))
+        prefixes.start()
+        self.addCleanup(prefixes.stop)
         self.work = self.base / "work"
         # blind-adjudicator refuses a repository root with fewer than four path components.
         self.repo = self.base / "hosts" / "blind" / "repo"
@@ -1806,6 +1810,32 @@ class ScrubRound4Tests(unittest.TestCase):
             with self.subTest(text):
                 self.assertEqual(adjudicate.redact_leak_text(text), expected)
                 self.assertEqual(adjudicate.unscrubbed_paths([adjudicate.redact_leak_text(text)]), [])
+
+
+class ScrubRound5Tests(unittest.TestCase):
+    """Round 5: a glued segment naming a file under a lane root is repository evidence and stays, and stops the
+    clause absorption (R5-REG-5); a host path after a URL-closing "|" is scrubbed (R5-REG-6)."""
+
+    def test_glued_repository_evidence_stays_and_host_paths_go(self):
+        root = Path(tempfile.mkdtemp()) / "srv" / "state" / "blind" / "export"
+        self.addCleanup(shutil.rmtree, root.parents[3])
+        for relative in ("docs/b.md", "docs/c.md", "evidence/receipts/r.json"):
+            (root / relative).parent.mkdir(parents=True, exist_ok=True)
+            (root / relative).write_text("x", encoding="utf-8")
+        cases = {
+            "see /home/example/x.json,docs/b.md and evidence/c.json": "see <outside-path>,docs/b.md and evidence/c.json",
+            "read /home/example/a.json;evidence/receipts/r.json for the numbers":
+                "read <outside-path>;evidence/receipts/r.json for the numbers",
+            '{"from":"/home/example/a.json","to":"docs/b.md"}': '{"from":"<outside-path>","to":"docs/b.md"}',
+            f"{root}/docs/a.md,/home/example/b.json,docs/c.md": "docs/a.md,<outside-path>,docs/c.md",
+            "source=https://example.com|/home/example/private/notes.md": "source=https://example.com|<outside-path>",
+            "/home/example,private/result.json": "<outside-path>",
+        }
+        for text, expected in cases.items():
+            with self.subTest(text):
+                out = adjudicate.scrub_text(text, "/nonexistent", (str(root),))
+                self.assertEqual(out, expected)
+                self.assertEqual(adjudicate.unscrubbed_paths([out]), [])
 
 
 if __name__ == "__main__":

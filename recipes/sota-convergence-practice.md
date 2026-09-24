@@ -111,13 +111,14 @@ python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("re
   "$WORK_DIR/claude-workflow-output.json" "$WORK_DIR/claude-result.json"
 python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.json" --work-dir "$WORK_DIR" \
   --agentlab-root "$AL" --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo "$BLIND_DIR/export" \
-  --resolved-model claude-opus-5-5
+  --packet-keys "$KEYS_DIR/packet-keys.json" --resolved-model claude-opus-5-5
 #    The resolved child model, read from the session the lane ran in:
 #    (cd "$BLIND_DIR/export" && node "$AL/.claude/workflows/child-usage.mjs" --latest)
 
 # 4. Codex lane on the same export (a separate account/quota, resumable; codex_lane.py refuses a --repo below
 #    any .git). A deliberately non-blind run passes --allow-git-history --repo . instead.
 python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
+  --packet-keys "$KEYS_DIR/packet-keys.json" \
   --model <openai model> --effort high --jobs 2
 
 # 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication"). inputs exits

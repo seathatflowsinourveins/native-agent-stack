@@ -129,7 +129,8 @@
         "agent_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "codex_lane_py_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
         "prompt_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-        "repo_tree_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        "repo_tree_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "packet_keys_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
   }

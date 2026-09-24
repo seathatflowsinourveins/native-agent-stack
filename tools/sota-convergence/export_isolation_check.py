@@ -42,6 +42,9 @@ EVIDENCE_KEY_TOKENS = frozenset({"source", "sources", "reference", "references",
 ROLE_WORDS = frozenset({"selected", "winner", "winners", "default", "primary", "incumbent", "incumbents", "chosen",
                         "adopted", "stack"})
 EVIDENCE_PREFIXES = ("evidence/", "blueprints/", "observability/")
+# The keys blind_checkout.py strips under evidence/ as a selection of candidates (EVIDENCE_SELECTION_KEY there).
+EVIDENCE_SELECTION_KEY = re.compile(r"^selected_(?:component|repositor|tool|candidate|stack)")
+EVIDENCE_ROLE_WORDS = frozenset({"winner", "winners", "incumbent", "incumbents", "chosen"})
 # Positions reviewed as evidence although neither rule covers them: (file, container path) -> why.
 REVIEWED_EVIDENCE_PATHS = {
     ("catalogs/landscape/native-practice.json", "$.installation_method.agents"):
@@ -50,7 +53,9 @@ REVIEWED_EVIDENCE_PATHS = {
 # Object fields read as a list element's identity.
 ELEMENT_ID_FIELDS = ("id", "component_id", "selected_component_id", "repository", "repo", "url", "name")
 # Packet candidate fields a lane opens or reads as evidence and description; the candidate's identity fields.
-EVIDENCE_FIELDS = frozenset({"evidence_refs", "registered_receipts", "evidence_kind", "role", "card_limitations"})
+# role and card_limitations are prose (reduced by lane_packets.withhold_prose) and evidence_kind a label (withheld),
+# so an isolation there fails (round 5, N5).
+EVIDENCE_FIELDS = frozenset({"evidence_refs", "registered_receipts"})
 IDENTITY_FIELDS = frozenset({"key", "name", "repository", "adopted"})
 
 
@@ -182,12 +187,18 @@ def _key_tokens(json_path: str) -> set:
 
 
 def evidence_hit(hit: dict) -> bool:
-    """Whether an isolating container is evidence (see the module docstring)."""
+    """Whether an isolating container is evidence (see the module docstring). Inside an evidence record, a key that
+    carries a role word (selected_repositories, primary_stack) is a label all the same (review of 52344da8)."""
     if (hit["file"], hit["path"]) in REVIEWED_EVIDENCE_PATHS:
         return True
-    if hit["file"].startswith(EVIDENCE_PREFIXES) or "receipt" in hit["file"].rsplit("/", 1)[-1]:
-        return True
     tokens = _key_tokens(hit["path"])
+    last = hit["path"].rsplit(".", 1)[-1].replace("{keys}", "").replace("[]", "")
+    if hit["file"].startswith(EVIDENCE_PREFIXES) or "receipt" in hit["file"].rsplit("/", 1)[-1]:
+        # A selection of candidates, or a strong role word, is a label even in an evidence record; a receipt's
+        # other selected_* data (selected_checks: the commands run and their output) is evidence.
+        # "primary" (primary sources) and "default" (default config) are ordinary in receipts, so only the
+        # unambiguous role words count there.
+        return not (EVIDENCE_SELECTION_KEY.match(last) or tokens & EVIDENCE_ROLE_WORDS)
     return hit["mode"] == "names_alone" and bool(tokens & EVIDENCE_KEY_TOKENS) and not tokens & ROLE_WORDS
 
 
@@ -210,6 +221,25 @@ def packet_field_hits(packets_dir: Path, winners: dict) -> dict:
         for field in sorted(fields):
             present = {c.get("key") for c in adopted if c.get(field) not in (None, "", [], {})}
             if present and present != everyone and present == win:
+                hits.append(field)
+                continue
+            # A value, or a list element, held by exactly the winners isolates them too (round 5, N5).
+            holders: dict = {}
+            listed = any(isinstance(candidate.get(field), list) for candidate in adopted)
+            for candidate in adopted:
+                value = candidate.get(field)
+                for item in (value if isinstance(value, list) else [value]):
+                    if item not in (None, "", [], {}):
+                        holders.setdefault(json.dumps(item, sort_keys=True), set()).add(candidate.get("key"))
+            # A scalar field only when categorical (some value shared by two or more candidates, as evidence_kind
+            # was); a list element only when shared by two or more winners. A value unique to one candidate says
+            # nothing about which one won.
+            if listed:
+                isolating = any(keys == win and len(win) >= 2 and keys != everyone for keys in holders.values())
+            else:
+                isolating = any(len(keys) >= 2 for keys in holders.values()) and any(
+                    keys == win and keys != everyone for keys in holders.values())
+            if isolating:
                 hits.append(field)
         report[layer] = hits
     return report

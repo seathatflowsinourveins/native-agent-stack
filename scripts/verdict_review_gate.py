@@ -869,8 +869,15 @@ class RowCheck:
             sealed = field.get("sealed_sha256")
             if not sealed:
                 outcome = ((manifest_entry or {}).get("lanes") or {}).get(lane) or {}
-                if manifest_entry is not None and outcome.get("outcome") not in ("rejected", "missing"):
-                    self.fail(f"the unsealed {lane} lane is not recorded as rejected or missing in the run manifest")
+                # "failed" (a Claude layer refuted twice, a Codex layer failed after retry) is a documented outcome
+                # with its reasons, as scripts/landscape.run_manifest_row_issue accepts (round 5, ops N2).
+                failed_with_reasons = (outcome.get("outcome") == "failed" and isinstance(outcome.get("reasons"), list)
+                                       and any(isinstance(reason, str) and reason.strip()
+                                               for reason in outcome["reasons"]))
+                if manifest_entry is not None and outcome.get("outcome") not in ("rejected", "missing") \
+                        and not failed_with_reasons:
+                    self.fail(f"the unsealed {lane} lane is not recorded as rejected, missing or failed with its "
+                              "reasons in the run manifest")
                 continue
             expected_run = f"{catalog}-{layer_id}-{run_id}"
             if field.get("run_id") != expected_run:

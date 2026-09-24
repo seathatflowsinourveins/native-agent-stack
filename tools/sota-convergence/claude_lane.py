@@ -51,7 +51,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CATALOG_ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
-from codex_lane import root_issue, tree_sha256  # noqa: E402  (one root rule and tree digest for both lanes)
+from codex_lane import packet_provenances, root_issue, tree_sha256  # noqa: E402  (one root rule, tree digest and
+# packet-keys binding for both lanes)
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
 VENDORED_LANES = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "vendored-lanes.json"
 # The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
@@ -262,6 +263,9 @@ def parse_args(argv=None):
                              "(Codex review of #145).")
     parser.add_argument("--repo", type=Path, required=True,
                         help="The blind export the lane read (the workflow args' repo).")
+    parser.add_argument("--packet-keys", type=Path, default=None,
+                        help="The lane_packets.py --keys-out file: required when the packets seal their candidates' "
+                             "manifest fields; each return's provenance names its entry's digest.")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)
@@ -275,8 +279,15 @@ def main(argv=None) -> int:
         consumed_packets_issue(result, args.work_dir)
         provenance["prompt_sha256"] = consumed_prompt_sha256(result)
         provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve(), provenance["agent_sha256"])
+        packets = [(path.stem.split("__", 1)[0], path.stem.split("__", 1)[1], path)
+                   for path in sorted((args.work_dir / "packets").glob("*__*.json"))]
+        # Each return of a packet that seals its candidates names its keys entry (round 5, INT-R5-1).
+        bound = packet_provenances(packets, provenance, args.packet_keys)
     except ProvenanceError as error:
         print(error, file=sys.stderr)
+        return 2
+    except (OSError, ValueError) as error:
+        print(f"claude_lane: {error}", file=sys.stderr)
         return 2
     out_dir = args.work_dir / "claude"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -291,7 +302,7 @@ def main(argv=None) -> int:
             failures.append({"catalog": layer["catalog"], "layer_id": layer["layer_id"],
                              "reason": failure_reason(layer)})
             continue
-        data = lane_return(layer, provenance, args.resolved_model)
+        data = lane_return(layer, bound.get(name, provenance), args.resolved_model)
         (out_dir / name).write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         written.append(name)
     for lost in result.get("lost") or []:

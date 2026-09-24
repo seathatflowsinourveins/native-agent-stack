@@ -9,7 +9,8 @@ import tempfile
 import unittest
 
 from scripts.landscape import (MANIFEST, SEALED_CANDIDATE_FIELDS, build_landscape, judge_adjudication,
-                               sealed_candidate_labels, verify_sealed_waves, withhold_policy_labels)
+                               packet_keys_entry_sha256, sealed_candidate_labels, verify_sealed_waves,
+                               withheld_candidate_label_labels, withhold_policy_labels)
 from scripts import platform_status
 
 
@@ -468,7 +469,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                       {"key": "c1", "repository": self.candidate["repository"], "adopted": True},
                       {"key": "c2", "repository": "https://github.com/example/alternative", "adopted": True}],
                   "sota_components_not_in_candidates": [],
-                  "withheld": withhold_policy_labels("Find the source") + sealed_candidate_labels(),
+                  "withheld": withhold_policy_labels("Find the source") + sealed_candidate_labels()
+                              + withheld_candidate_label_labels(),
                   **(packet_extra or {})}
         name = f"foundation__{layer_id}.json"
         self.write(f"{NEW_WAVE_BASE}/packets/{name}", packet)
@@ -488,7 +490,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             sealed = {"lane": lane, "model": models[lane], "packet_sha256": packet_sha256,
                       "winner_keys": ["c1"] if lane == "claude" else [codex_winner]}
             if provenance.get(lane) is not None:
-                sealed["provenance"] = provenance[lane]
+                # The runner binds the packet's keys entry into the provenance (round 5, INT-R5-1).
+                sealed["provenance"] = dict(provenance[lane],
+                                            packet_keys_sha256=packet_keys_entry_sha256(keys["packets"][name]))
             if lane == "claude":
                 sealed["refutation"] = copy.deepcopy(NEW_WAVE_REFUTATION if refutation is None else refutation)
             self.write(f"{NEW_WAVE_BASE}/{lane}/{run_id}.json", sealed)
@@ -1149,7 +1153,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         digest = hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest()
         lanes = self.edit_manifest(lanes, lambda manifest: manifest.update(packet_keys_sha256=digest))
         self.layer.update(self.recorded_fields(lanes=lanes))
-        with self.assertRaisesRegex(ValueError, "are not the claude lane's sealed winner set"):
+        # Re-bound in the manifest, the changed entry no longer matches the digest each sealed return names
+        # (round 5, INT-R5-1), so the relabelled component is refused.
+        with self.assertRaisesRegex(ValueError, "is not the digest .* of the packet-keys entry sealing its packet"):
             self.build()
         (self.root / NEW_WAVE_BASE / "packet-keys.json").unlink()
         with self.assertRaisesRegex(ValueError, "packet-keys.json"):
@@ -1178,7 +1184,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 c1, dict(c2, decisions=[{"id": "d1", "selection": "default"}])]},
             "newcomers": {"newcomers": ["c2"]},
             "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]
-                                                             + sealed_candidate_labels()},
+                                                             + sealed_candidate_labels()
+                                                             + withheld_candidate_label_labels()},
         }
         for label, extra in cases.items():
             with self.subTest(label):

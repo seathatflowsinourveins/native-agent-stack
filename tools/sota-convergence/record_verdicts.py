@@ -99,7 +99,7 @@ from scripts.landscape import (  # noqa: E402
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
     withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
-    packet_keys_issue, packet_seals_candidates, unseal_packet,
+    packet_keys_binding_issue, packet_keys_issue, packet_seals_candidates, unseal_packet,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -729,6 +729,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     packet_path = work_dir / "packets" / packet_filename
     packet = load_packet(packet_path)
     packet_mismatch = None
+    keys_entry = None
     if packet is not None:
         actual = hashlib.sha256(packet_path.read_bytes()).hexdigest()
         if packet_filename not in sha256sums:
@@ -741,6 +742,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                                else "the packet seals its candidates' manifest fields: pass --packet-keys "
                                     "(the lane_packets.py --keys-out file of this run)")
             if packet_mismatch is None:
+                keys_entry = packet_keys["packets"][packet_filename]
                 packet = unseal_packet(packet, packet_keys, packet_filename)
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
@@ -780,6 +782,13 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                              f"{valid['codex']['provenance'].get('repo_tree_sha256')}, not the claude lane's "
                              f"{valid['claude']['provenance'].get('repo_tree_sha256')}; rerun it on the same export")
         del valid["codex"]
+    if keys_entry is not None and not grandfathered:
+        # The restored component ids are bound to what each lane judged (round 5, INT-R5-1).
+        for lane in list(valid):
+            issue = packet_keys_binding_issue(valid[lane].get("provenance"), keys_entry)
+            if issue:
+                reject_lane(lane, issue)
+                del valid[lane]
     if not grandfathered and lane_root_trees:
         # Each --lane-repo-root must hold the tree the lanes read (independent review of #145, BIND-R4-9): sources
         # under another checkout would be relativized as if they were the export's.
@@ -1168,13 +1177,27 @@ def run_manifest_document(work_dir: Path, run_date: str, sealed_base: str, outco
     }
 
 
-def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, packet_keys, only) -> str:
+def load_packet_keys(path) -> dict:
+    """The --packet-keys document, or SystemExit with a message (round 5, R5-REG-8)."""
+    try:
+        document = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise SystemExit(f"--packet-keys {path}: {error}")
+    if not (isinstance(document, dict) and document.get("schema_version") == PACKET_KEYS_SCHEMA_VERSION
+            and isinstance(document.get("packets"), dict)):
+        raise SystemExit(f"--packet-keys {path} is not a packet-keys document (schema_version "
+                         f"{PACKET_KEYS_SCHEMA_VERSION}, packets object); pass the lane_packets.py --keys-out file")
+    return document
+
+
+def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, packet_keys, only,
+                              work_dir: Path = None) -> str:
     """The wave's packet-keys document (<sealed_base>/packet-keys.json): the --packet-keys entry of every packet
     retained now and, under --append-rows, the sealed document's entry of every carried-over packet."""
     existing_path = root / sealed_base / PACKET_KEYS_NAME
     existing = {}
     if only is not None and existing_path.is_file():
-        existing = json.loads(existing_path.read_text(encoding="utf-8")).get("packets") or {}
+        existing = load_packet_keys(existing_path).get("packets") or {}
     current = (packet_keys or {}).get("packets") or {}
     entries = {}
     for item in retained:
@@ -1183,6 +1206,13 @@ def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, pack
         if not isinstance(entry, dict) or entry.get("packet_sha256") != item["sha256"]:
             raise SystemExit(f"--packet-keys has no entry for the retained packet {name} with its sha256; pass the "
                              "lane_packets.py --keys-out file of this run")
+        packet_path = (work_dir / "packets" / name) if work_dir is not None else None
+        if packet_path is not None and packet_path.is_file() and not (only is not None and name not in only):
+            # The entry must seal exactly this packet's candidates, as CI checks (round 5, INT-R5-4).
+            issue = packet_keys_issue({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": {name: entry}}, name,
+                                      item["sha256"], json.loads(packet_path.read_text(encoding="utf-8")))
+            if issue:
+                raise SystemExit(f"--packet-keys: {issue}")
         entries[name] = entry
     return sealed_text({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": entries})
 
@@ -1300,7 +1330,7 @@ def main(argv=None) -> int:
     status_context = load_context(root)
     lane_code = load_lane_code(root)
     failures = load_lane_failures(work_dir)
-    packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8")) if args.packet_keys else None
+    packet_keys = load_packet_keys(args.packet_keys) if args.packet_keys else None
     lane_root_trees = {}
     if not grandfathered:
         for lane_root in args.lane_repo_root:
@@ -1373,7 +1403,8 @@ def main(argv=None) -> int:
                                  "judge packets built with lane_packets.py --withhold-labels")
             sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / item["name"], text))
         sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS", manifest["packets_sha256sums"]))
-        keys_text = retained_packet_keys_text(root, sealed_base, manifest["retained_packets"], packet_keys, only)
+        keys_text = retained_packet_keys_text(root, sealed_base, manifest["retained_packets"], packet_keys, only,
+                                              work_dir)
         manifest["packet_keys_sha256"] = hashlib.sha256(keys_text.encode("utf-8")).hexdigest()
         sealed_writes.append((root / sealed_base / PACKET_KEYS_NAME, keys_text))
         manifest_text = sealed_text(manifest)
