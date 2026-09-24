@@ -83,7 +83,8 @@ lane's `winner_evidence_class`.
 # examples/claude-native/ copies, installed as ~/.claude/agents/blind-*.md.
 CATALOG=$(pwd -P)
 
-# 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached, and the candidates'
+# 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached, the dated manifest's
+#    surviving newcomers carried with their registered source-review files, and the candidates'
 #    manifest-only fields (component_id, pin, upstream, recipe_ref, decisions) sealed into a packet-keys document
 #    that each packet commits to (sealed_candidates_sha256). Never pass --gap-receipts in a blind wave (it names
 #    the previous winner; refused with --withhold-labels). A model worker runs as this user and can read any file
@@ -97,7 +98,7 @@ printf 'WAVE_DATE=%s\nWAVE_MANIFEST=%s\n' "$(date +%Y-%m-%d)" catalogs/sota-conv
 packets_args() {  # the wave's fixed build arguments, from KEYS_DIR/wave.env
   . "$KEYS_DIR/wave.env"
   PACKETS_ARGS=(--root . --manifest "$WAVE_MANIFEST" --trading-candidates manifest --withhold-labels
-    --registered-receipts --checked-at "$WAVE_DATE" --seed "${WAVE_DATE//-/}")
+    --registered-receipts --manifest-newcomers --checked-at "$WAVE_DATE" --seed "${WAVE_DATE//-/}")
 }
 packets_args
 python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$WORK_DIR" \
