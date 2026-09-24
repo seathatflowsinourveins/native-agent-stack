@@ -8477,6 +8477,26 @@
       "bytes": 3358
     },
     {
+      "path": "blueprints/us-equities/mover-v3/README.md",
+      "sha256": "5728609b55cf20969342f7bccbc5dd14bf41af0dbcb6a540eaba9d400891b6d2",
+      "bytes": 51853
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
+      "sha256": "09d91ded5109e67c824ea27a3735419654142ac42c1fe87fe4e65cdc6e546e7f",
+      "bytes": 22949
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
+      "sha256": "7274c29ed1f902cbf9605e049bfafd1856f2fe7d76d5fbb6962c4ba38a757af4",
+      "bytes": 113618
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/protocol-draft.json",
+      "sha256": "a239aa326cb0f17509559a6ca8f4072ef4677ee767a0d258353a2ed9325f732a",
+      "bytes": 99446
+    },
+    {
       "path": "blueprints/us-equities/nanosecond-replay/README.md",
       "sha256": "de230378bc13af4ffd17d39a142ae8c8a624a80bcc95272487ae0f0693b63644",
       "bytes": 5819
@@ -9183,8 +9203,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "7f0977dadd2f04ae9563b2456777f7ec00d07c3e23aac79fccd1f27cf4d70557",
-      "bytes": 15337
+      "sha256": "9add859b3528ad05c7e830261b1ae42c2deb4dca5961108ee876ac02a9c5819e",
+      "bytes": 15649
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -9328,8 +9348,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "f305a462b8ef3b51c90f5998164ecb88c48c79875de9d354be0eab67a5ff12d0",
-      "bytes": 719950
+      "sha256": "43e3b625548ffffa63035c3562ab934748dfe074a371e1f8ab7ac299ef88a394",
+      "bytes": 722880
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -9400,6 +9420,11 @@
       "path": "catalogs/us-equities/models.md",
       "sha256": "798b07a2703bb53cc253caa5b2a460fb75ed3b81ea9ebce7ecf24ef33671ad76",
       "bytes": 21253
+    },
+    {
+      "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+      "sha256": "2efd9d4f533743b82465f74a43702c88512190c5bef1e9753fcdf59b962785d3",
+      "bytes": 23704
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",

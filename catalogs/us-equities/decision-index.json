@@ -333,6 +333,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+      "collection": "/repository_decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/security-identity-review.json",
       "collection": "/decisions",
       "repository_field": "repository",
@@ -380,7 +386,7 @@
     "repositories": 844,
     "public_star_repositories": 342,
     "beyond_public_stars": 502,
-    "references": 1961,
+    "references": 1969,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
@@ -1503,6 +1509,14 @@
           "pointer": "/decisions/2",
           "decision": "retain_prior_alias_evidence_without_refetch",
           "evidence_level": "prior_native_receipt_reuse"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/0",
+          "id": "mover-v3-alpaca-py-order-classes",
+          "decision": "add_execution_method_candidate",
+          "evidence_level": "official_docs_metadata"
         },
         {
           "kind": "research_supplement",
@@ -5219,6 +5233,14 @@
           "pointer": "/candidates/102",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/3",
+          "id": "mover-v3-kelly-code-discovery-only",
+          "decision": "retain_discovery_only",
+          "evidence_level": "live_repository_metadata"
         }
       ]
     },
@@ -5572,6 +5594,14 @@
           "pointer": "/entries/7",
           "decision": "add_conditional_exact_market_record_format",
           "evidence_level": "source_sections_reviewed"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/1",
+          "id": "mover-v3-dbn-status-schema",
+          "decision": "compare_status_schema_for_halt_reconstruction",
+          "evidence_level": "unpinned_source_read"
         }
       ]
     },
@@ -12005,6 +12035,14 @@
           "id": "backtrader",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/7",
+          "id": "mover-v3-backtrader-no-change",
+          "decision": "no_change_duplicate_of_catalog",
+          "evidence_level": "live_repository_metadata"
         }
       ]
     },
@@ -12375,6 +12413,14 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/5",
+          "id": "mover-v3-qlib-recheck",
+          "decision": "no_change_existing_card_current",
+          "evidence_level": "live_repository_metadata"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/security-identity-review.json",
           "pointer": "/decisions/2",
           "decision": "retain_conditional_membership_span_reference",
@@ -12396,6 +12442,14 @@
           "pointer": "/candidates/248",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/4",
+          "id": "mover-v3-rd-agent-recheck",
+          "decision": "no_change_existing_card_current",
+          "evidence_level": "live_repository_metadata"
         }
       ]
     },
@@ -13558,6 +13612,14 @@
           "pointer": "/entries/6",
           "decision": "microstructure_reference_if_horizon_justifies_tick_data",
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/2",
+          "id": "mover-v3-hftbacktest-latency-protocol",
+          "decision": "no_change_add_latency_protocol_gate_note",
+          "evidence_level": "existing_record"
         }
       ]
     },
@@ -15651,6 +15713,14 @@
           "id": "vectorbt",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/mover-v3-sweep-20260924.json",
+          "pointer": "/repository_decisions/6",
+          "id": "mover-v3-vectorbt-recheck",
+          "decision": "no_change_existing_card_current",
+          "evidence_level": "live_repository_metadata"
         }
       ]
     },
