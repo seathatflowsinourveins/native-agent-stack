@@ -32,16 +32,47 @@ NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "fami
 NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64,
-               "repo_tree_sha256": "7" * 64},
+               "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
     "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
 }
 # The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
 NEW_WAVE_REGISTRY = {
     "claude": [{"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                 "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64}],
+                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64, "prompt_sha256": "d" * 64}],
     "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
+    "adjudication": [{key: "f" * 64 for key in ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256",
+                                                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")}],
 }
+
+class AdjudicationBindingTests(unittest.TestCase):
+    """Independent review of #145, M2: a new-wave adjudication must name the sealed lane returns, the lanes' one
+    evidence tree and registered adjudication code."""
+
+    def setUp(self):
+        from scripts import landscape
+        self.landscape = landscape
+        self.code = dict(NEW_WAVE_REGISTRY["adjudication"][0])
+        self.raw = {"lane_returns_sha256": {"claude": "1" * 64, "codex": "2" * 64},
+                    "provenance": {**self.code, "repo_tree_sha256": "7" * 64}}
+        self.registry = {"adjudication": [self.code]}
+
+    def issue(self, raw=None, sealed=None, trees=None):
+        return self.landscape.adjudication_binding_issue(
+            raw or self.raw, sealed or {"claude": "1" * 64, "codex": "2" * 64},
+            trees or {"claude": "7" * 64, "codex": "7" * 64}, self.registry)
+
+    def test_a_bound_adjudication_passes(self):
+        self.assertIsNone(self.issue())
+
+    def test_other_returns_trees_or_unregistered_code_are_refused(self):
+        self.assertIn("sealed lane returns", self.issue(sealed={"claude": "1" * 64, "codex": "3" * 64}))
+        self.assertIn("one tree", self.issue(trees={"claude": "7" * 64, "codex": "8" * 64}))
+        self.assertIn("one tree", self.issue(raw=dict(self.raw, provenance={**self.code, "repo_tree_sha256": "9" * 64})))
+        edited = dict(self.raw, provenance={**self.code, "prompt_sha256": "0" * 64, "repo_tree_sha256": "7" * 64})
+        self.assertIn("not listed", self.issue(raw=edited))
+        self.assertIn("must carry", self.issue(raw=dict(self.raw, provenance={"repo_tree_sha256": "7" * 64})))
+
 
 class LandscapeTests(unittest.TestCase):
     def setUp(self):
@@ -790,6 +821,11 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                 judgments.append(judgment)
         adjudication = {"winner_lane": winner_lane, "why": "Retained receipt decides it.",
                         "evidence_refs": ["receipt.json"], "judgments": judgments}
+        if lanes is not None and all(isinstance(lanes.get(lane), dict) for lane in ("claude", "codex")):
+            # A new-wave adjudication names the sealed returns it compared, the lanes' evidence tree and
+            # registered adjudication code (independent review of #145, M2).
+            adjudication["lane_returns_sha256"] = {lane: lanes[lane].get("sealed_sha256") for lane in ("claude", "codex")}
+            adjudication["provenance"] = {**NEW_WAVE_REGISTRY["adjudication"][0], "repo_tree_sha256": "7" * 64}
         self.write(f"{base}/adjudication/{run_id}.json", adjudication)
         if lanes is not None:
             digest = hashlib.sha256(json.dumps(adjudication).encode("utf-8")).hexdigest()

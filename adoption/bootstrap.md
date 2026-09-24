@@ -183,7 +183,7 @@ GitHub-hosted macOS runner; see
      to `~/.claude/hooks/effort-default-guard.py`, refusing to install unless
      its sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS);
      skipped if the installed copy already matches.
-   - **agents**: copies the five [`adoption/agents/claude/*.md`](agents/claude/)
+   - **agents**: copies the seven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical.
    - **MCP servers**: for each entry in

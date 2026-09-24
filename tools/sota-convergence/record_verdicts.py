@@ -97,7 +97,7 @@ from scripts.landscape import (  # noqa: E402
     lane_model_issue, lane_provenance_issue, load_lane_provenance_registry,
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
-    withheld_packet_keys,
+    withheld_packet_keys, adjudication_binding_issue,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -283,7 +283,9 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     hash; a Codex return the current codex_lane.py and lane-prompt.md hashes of this checkout."""
     try:
         # ``raw``: the bytes the caller captured once, so validation, hashing and sealing share one snapshot.
-        data = json.loads(raw) if raw is not None else load_json(path)
+        # UTF-8 only, as load_json reads (independent review of #145, L2): json.loads on bytes would accept a
+        # BOM or UTF-16/32.
+        data = json.loads(raw.decode("utf-8")) if raw is not None else load_json(path)
     except (OSError, UnicodeError, ValueError) as error:
         raise LaneRejected(f"unreadable or invalid JSON: {error}") from error
 
@@ -854,9 +856,19 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         if adjudication is not None and not grandfathered:
             # The adjudication must have compared exactly the lane returns sealed here (Codex review of #145):
             # a lane rerun after assemble would otherwise inherit a winner_lane its judges never saw.
-            current = {lane: hashlib.sha256(lane_bytes[lane]).hexdigest() for lane in LANES}
+            # The sealed form of each lane return (what CI sees as lanes.<lane>.sealed_sha256), from the one
+            # snapshot of its bytes (independent review of #145, M2).
+            current = {}
+            for lane in LANES:
+                try:
+                    current[lane] = hashlib.sha256(sealed_text(valid[lane]).encode("utf-8")).hexdigest()
+                except ValueError:  # LeakDetected: the return cannot be sealed, so nothing binds to it
+                    current[lane] = None
             lanes_tree = valid["claude"]["provenance"].get("repo_tree_sha256")
             adjudication_tree = (adjudication["raw"].get("provenance") or {}).get("repo_tree_sha256")
+            binding = adjudication_binding_issue(
+                adjudication["raw"], current, {lane: valid[lane]["provenance"].get("repo_tree_sha256") for lane in LANES},
+                load_lane_provenance_registry(root))
             if adjudication["raw"].get("lane_returns_sha256") != current:
                 rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
                                    "reason": "the adjudication's lane_returns_sha256 does not name the lane "
@@ -867,6 +879,10 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                 rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
                                    "reason": f"the adjudication read evidence tree {adjudication_tree}, not the "
                                              f"lanes' {lanes_tree}; adjudicate against the lanes' export"})
+                adjudication = None
+            elif binding is not None:
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": f"the adjudication {binding}"})
                 adjudication = None
         if adjudication is not None:
             try:

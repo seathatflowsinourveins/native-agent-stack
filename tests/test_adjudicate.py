@@ -87,7 +87,8 @@ class AdjudicateFixture(unittest.TestCase):
 
     def judgment(self, lane, order, preferred_lane, refuted=False, model=None):
         family = adjudicate.FAMILIES[lane]
-        claude_position = adjudicate.CLAUDE_POSITION[order]
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        claude_position = adjudicate.claude_position(entry, order)
         other = "B" if claude_position == "A" else "A"
         input_path = self.work / "adjudication-inputs" / f"{NAME}.{order}.json"
         record = adjudicate.judgment_record(
@@ -99,6 +100,12 @@ class AdjudicateFixture(unittest.TestCase):
             input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None,
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
+
+    def input_body(self, order="AB"):
+        """The input with the Claude return as A, whichever position the index's secret map gave it (F3)."""
+        body = json.loads((self.work / "adjudication-inputs" / f"{NAME}.{order}.json").read_text(encoding="utf-8"))
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        return dict(body, A=body["B"], B=body["A"]) if adjudicate.claude_position(entry, order) == "B" else body
 
     def snapshot_packet(self, name=NAME, sha=None):
         """The immutable packet copy judges read (Codex review of #145, round 8)."""
@@ -143,7 +150,7 @@ class InputsTests(AdjudicateFixture):
     def test_disagreement_is_detected_and_both_returns_are_scrubbed(self):
         code, _err = self.inputs()
         self.assertEqual(code, 0)
-        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
         entry = index["layers"][0]
         self.assertEqual(entry["agreement"], "disagree")
         self.assertEqual(entry["components"]["claude"], [["comp-one", "https://github.com/example/one"]])
@@ -153,8 +160,12 @@ class InputsTests(AdjudicateFixture):
         self.assertEqual(ab["packet_sha256"], self.sha)
         self.assertEqual(ab["A"], ba["B"])
         self.assertEqual(ab["B"], ba["A"])
-        self.assertEqual(ab["A"]["winner_keys"], ["c1"])
-        self.assertEqual(ab["B"]["winner_keys"], ["c2"])
+        # The Claude return (winner c1) sits where the index's secret claude_position says (F3).
+        claude_side = adjudicate.claude_position(entry, "AB")
+        codex_side = "B" if claude_side == "A" else "A"
+        self.assertEqual(ab[claude_side]["winner_keys"], ["c1"])
+        self.assertEqual(ab[codex_side]["winner_keys"], ["c2"])
+        self.assertEqual(adjudicate.claude_position(entry, "BA"), codex_side)
         for side in (ab["A"], ab["B"]):
             self.assertEqual(set(side), set(adjudicate.SCRUB_KEEP))
             for key in ("lane", "model", "provenance", "refutation", "final_source", "packet_sha256",
@@ -178,7 +189,7 @@ class InputsTests(AdjudicateFixture):
                           challenger_preferred={"key": "c1", "evidence_refs": ["tests/x.py"]})
         code, _err = self.inputs(claude_repo, self.repo)
         self.assertEqual(code, 0)
-        ab = json.loads((self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        ab = self.input_body("AB")
         claude_side, codex_side = ab["A"], ab["B"]
         self.assertEqual(claude_side["sources_read"], ["docs/a.md#setup", "docs/b.md", "evidence/receipt.json"])
         self.assertEqual(claude_side["sources_read"], codex_side["sources_read"])
@@ -192,7 +203,7 @@ class InputsTests(AdjudicateFixture):
     def test_agreeing_layer_writes_no_input(self):
         self.write_return("codex", "c1")
         self.inputs()
-        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
         self.assertEqual(index["layers"][0]["agreement"], "agree")
         self.assertFalse((self.work / "adjudication-inputs" / f"{NAME}.AB.json").exists())
 
@@ -481,8 +492,11 @@ class CodexTests(AdjudicateFixture):
     def test_a_position_biased_codex_judge_splits_the_layer(self):
         # The fake answers "B" in both orders: codex in AB, claude in BA, so counterbalancing exposes it.
         self.run_codex()
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        # The Claude family picks the codex return in both orders, wherever the secret map put it (F3).
+        codex_side = {order: "B" if adjudicate.claude_position(entry, order) == "A" else "A" for order in adjudicate.ORDERS}
         result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
-                             "judge": {"preferred": "B" if order == "AB" else "A", "why": WHY,
+                             "judge": {"preferred": codex_side[order], "why": WHY,
                                        "evidence_refs": ["evidence/receipt.json"]},
                              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
                             for order in adjudicate.ORDERS]}
@@ -620,7 +634,7 @@ class RereviewOf145Tests(AdjudicateFixture):
         out = self.base / "adjudications"
         out.mkdir()
         (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
-        index_path = self.work / "adjudication-inputs" / "index.json"
+        index_path = self.work / adjudicate.INDEX_NAME
         index = json.loads(index_path.read_text(encoding="utf-8"))
         index["skipped"] = [{"layer": NAME, "reason": "host paths remain after scrubbing"}]
         index["layers"] = []
@@ -660,7 +674,7 @@ class SecondRereviewOf145Tests(AdjudicateFixture):
         (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
         (self.work / "codex" / f"{NAME}.json").unlink()
         self.inputs()
-        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
         self.assertIn(NAME, [entry["layer"] for entry in index["skipped"]])
         quiet(adjudicate.main, ["assemble", "--work-dir", str(self.work), "--out", str(out)])
         self.assertFalse((out / f"{NAME}.json").exists())
@@ -705,11 +719,11 @@ class ThirdRereviewOf145Tests(AdjudicateFixture):
         self.inputs()
         edited = self.base / "blind-adjudicator.md"
         edited.write_text(adjudicate.VENDORED_ADJUDICATOR.read_text(encoding="utf-8") + "\nextra\n", encoding="utf-8")
-        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo), "--run-dir", str(self.repo),
                                             "--agent-file", str(edited)])
         self.assertEqual(code, 2)
         self.assertIn("is not the vendored", err)
-        code, _err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+        code, _err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo), "--run-dir", str(self.repo),
                                              "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)])
         self.assertEqual(code, 0)
         self.assertIn("adjudicator_role_sha256", adjudicate.adjudication_provenance())
@@ -772,7 +786,7 @@ class FifthRereviewOf145Tests(AdjudicateFixture):
         run_dir = self.base / "hosts" / "blind" / "run"
         (run_dir / ".claude" / "agents").mkdir(parents=True)
         (run_dir / ".claude" / "agents" / "blind-adjudicator.md").write_text("broader\n", encoding="utf-8")
-        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo), "--run-dir", str(self.repo),
                                             "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR),
                                             "--run-dir", str(run_dir)])
         self.assertEqual(code, 2)
@@ -788,7 +802,7 @@ class FifthRereviewOf145Tests(AdjudicateFixture):
         self.assertNotEqual(adjudicate.tree_sha256(self.repo), before)
 
     def test_a_packet_changed_after_inputs_is_refused(self):
-        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
         packet = Path(index["layers"][0]["packet_path"])
         packet.write_text(packet.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "packets changed after"):
@@ -806,7 +820,7 @@ class SixthRereviewOf145Tests(AdjudicateFixture):
     def test_claude_args_refuses_a_git_backed_repository(self):
         self.inputs()
         (self.repo / ".git").mkdir()
-        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo), "--run-dir", str(self.repo),
                                             "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)])
         self.assertEqual(code, 2)
         self.assertIn(".git", err)
@@ -847,9 +861,6 @@ class SeventhRereviewOf145Tests(AdjudicateFixture):
 class InputScrubTests(AdjudicateFixture):
     """Round-2 review (adjudication round 3): every real input tripped the leak rule, because inputs carried
     the packet's absolute path and left absolute paths outside the lane roots."""
-
-    def input_body(self, order="AB"):
-        return json.loads((self.work / "adjudication-inputs" / f"{NAME}.{order}.json").read_text(encoding="utf-8"))
 
     def test_inputs_carry_no_packet_path_and_no_host_path(self):
         packet = self.work / "packets" / f"{NAME}.json"
@@ -911,7 +922,7 @@ class RootDepthTests(AdjudicateFixture):
         self.assertEqual(code, 2)
         self.assertIn("path components", err)
         self.inputs()
-        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(shallow)])
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(shallow), "--run-dir", str(shallow)])
         self.assertEqual(code, 2)
         self.assertIn("blind-adjudicator refuses", err)
         code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", "/home",
@@ -1044,11 +1055,18 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
 
     def test_an_unchanged_tree_keeps_the_judgments_and_the_snapshots_are_audit_roots(self):
         self.inputs()
+        events = self.work / "adjudication-judgments" / "codex" / "events"
+        events.mkdir(parents=True, exist_ok=True)
+        (events / f"{NAME}.AB.judge.jsonl").write_text("", encoding="utf-8")
         code, err = self.run_codex(["a" * 64, "a" * 64])
         self.assertEqual(code, 0, err)
         audit = json.loads((self.work / "adjudication-judgments" / "codex" / "blind-audit.json")
                            .read_text(encoding="utf-8"))
-        self.assertIn(str(self.work / adjudicate.PACKET_SNAPSHOTS_DIR), audit["allowed_roots"])
+        # Each call may read the repository, its own input and its packet snapshot only (F3): not the inputs
+        # directory or the index.
+        self.assertEqual(audit["allowed_roots"][f"{NAME}.AB.judge"],
+                         [str(self.repo), str(self.work / "adjudication-inputs" / f"{NAME}.AB.json"),
+                          str(self.snapshot_packet())])
 
     def test_claude_collect_refuses_judgments_when_the_tree_changed_after_claude_args(self):
         (self.repo / "evidence").mkdir()
@@ -1145,7 +1163,8 @@ class TenthRereviewOf145Tests(AdjudicateFixture):
         code, err, record = self.assemble()
         self.assertEqual(code, 0, err)
         self.assertEqual(record["lane_returns_sha256"],
-                         {lane: adjudicate.sha256_file(self.work / lane / f"{NAME}.json") for lane in ("claude", "codex")})
+                         {lane: adjudicate.current_return_sha256(self.work / lane / f"{NAME}.json")
+                          for lane in ("claude", "codex")})
         self.write_return("codex", "c2", limits=["rerun after inputs"])
         code, err, record = self.assemble()
         self.assertEqual(code, 1)
@@ -1193,7 +1212,8 @@ class EleventhRereviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(Path, "read_bytes", read_bytes), mock.patch.object(adjudicate, "load_json", load_json):
             self.inputs()
         index = adjudicate.load_index(self.work)
-        self.assertEqual(index["layers"][0]["lane_returns_sha256"]["codex"], hashlib.sha256(original).hexdigest(),
+        self.assertEqual(index["layers"][0]["lane_returns_sha256"]["codex"],
+                         adjudicate.sealed_form_sha256(json.loads(original)),
                          "the hash is of the bytes the inputs were built from")
 
 class TwelfthRereviewOf145Tests(AdjudicateFixture):
@@ -1216,7 +1236,7 @@ class TwelfthRereviewOf145Tests(AdjudicateFixture):
     def test_a_missing_repository_is_refused_before_hashing(self):
         self.inputs()
         missing = self.base / "hosts" / "blind" / "gone"
-        for argv in (["claude-args", "--work-dir", str(self.work), "--repo", str(missing),
+        for argv in (["claude-args", "--work-dir", str(self.work), "--repo", str(missing), "--run-dir", str(missing),
                       "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)],
                      ["codex", "--work-dir", str(self.work), "--repo", str(missing), "--model", "gpt-6-astra"]):
             code, err = quiet(adjudicate.main, argv)
@@ -1300,6 +1320,40 @@ class FourteenthRereviewOf145Tests(AdjudicateFixture):
         self.assertIn("path: i.path, packet_path: i.packet_path", source)
         self.assertEqual(source.count("...echo(i)"), 5)
         self.assertIn("prompt: PROMPT", source)
+
+
+class IndependentReviewOf145Tests(AdjudicateFixture):
+    """Independent review of #145: the A/B family map is a per-layer secret kept outside the inputs directory
+    (F3), a judgment counts only for this index's input (M3), and claude-args names where the workflow runs (M4)."""
+
+    def test_the_family_position_is_a_per_layer_secret_outside_the_inputs_directory(self):
+        with mock.patch.object(adjudicate.secrets, "choice", return_value="B"):
+            self.inputs()
+        self.assertFalse((self.work / "adjudication-inputs" / "index.json").exists())
+        entry = adjudicate.load_index(self.work)["layers"][0]
+        self.assertEqual(entry["claude_position"], {"AB": "B", "BA": "A"})
+        ab = json.loads((self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual(ab["A"]["winner_keys"], ["c2"], "the Codex return is A when the secret says so")
+        self.assertNotIn("Claude return", (TOOL_DIR / "adjudication-prompt.md").read_text(encoding="utf-8"))
+
+    def test_a_judgment_of_another_directorys_input_does_not_count(self):
+        self.inputs()
+        entry = adjudicate.load_index(self.work)["layers"][0]
+        self.judgment("claude", "AB", "claude")
+        data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertIsNone(adjudicate.usable_judgment(data, "anthropic", "AB", self.sha, entry=entry))
+        copied_input = self.base / "other-work" / "adjudication-inputs" / f"{NAME}.AB.json"
+        copied_input.parent.mkdir(parents=True)
+        copied_input.write_bytes(Path(data["input_path"]).read_bytes())
+        moved = dict(data, input_path=str(copied_input))
+        self.assertEqual(adjudicate.usable_judgment(moved, "anthropic", "AB", self.sha, entry=entry),
+                         "judged an input this index did not build")
+
+    def test_claude_args_requires_run_dir(self):
+        self.inputs()
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+            adjudicate.main(["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo)])
+        self.assertEqual(raised.exception.code, 2)
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")

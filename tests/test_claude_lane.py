@@ -65,7 +65,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                              {"lens": "challenger", "round": "proposal", "refuted": None, "reason": "no vote returned"}]}
         self.result = self.tmp / "result.json"
         self.result.write_text(json.dumps({
-            "lane": "claude", "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+            "lane": "claude", "prompt": (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"),
+            "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                          "agent_sha256": self.role},
             "layers": [
                 {"catalog": "foundation", "layer_id": "l1", "final": final, "refutation": self.unrefuted},
@@ -109,6 +110,20 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                                 ({"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                   "agent_sha256": "f" * 64}, "was launched with role")):
             self.rewrite_launch(launch)
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_main(), 2)
+            self.assertIn(message, err.getvalue())
+            self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+
+    def test_a_result_without_or_with_another_prompt_is_refused(self):
+        # Independent review of #145, M1: the Claude lane's returns are bound to this catalog's lane-prompt.md.
+        for prompt, message in ((None, "carries no prompt"), ("You are the {LANE} lane.", "not this catalog's")):
+            data = json.loads(self.result.read_text(encoding="utf-8"))
+            if prompt is None:
+                data.pop("prompt")
+            else:
+                data["prompt"] = prompt
+            self.result.write_text(json.dumps(data), encoding="utf-8")
             with contextlib.redirect_stderr(io.StringIO()) as err:
                 self.assertEqual(self.run_main(), 2)
             self.assertIn(message, err.getvalue())

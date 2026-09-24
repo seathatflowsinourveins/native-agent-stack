@@ -82,7 +82,8 @@ FAMILY_MODEL_PATTERNS = {
 SHA256_TEXT = re.compile(r"[a-f0-9]{64}")
 GIT_COMMIT_TEXT = re.compile(r"[a-f0-9]{40}")
 LANE_PROVENANCE_FIELDS = {
-    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256", "repo_tree_sha256"),
+    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256", "prompt_sha256",
+               "repo_tree_sha256"),
     "codex": ("codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"),
 }
 RUN_MANIFEST_NAME = "run-manifest.json"
@@ -140,7 +141,7 @@ REFUTATION_STATUSES = ("unrefuted", "refuted", "unknown")
 # prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
 # codex_lane.py, lane-prompt.md and vendored workflow bytes.
 LANE_PROVENANCE_REGISTRY = "tools/sota-convergence/lane-provenance.json"
-LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256", "agent_sha256"),
+LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256", "agent_sha256", "prompt_sha256"),
                         "codex": ("codex_lane_py_sha256", "prompt_sha256")}
 
 
@@ -317,12 +318,49 @@ def lane_provenance_issue(lane, provenance):
 
 
 def load_lane_provenance_registry(root):
-    """lane -> list of registered provenance entries (empty when the registry is absent)."""
+    """lane -> list of registered provenance entries (empty when the registry is absent); the "adjudication"
+    key holds the registered adjudication code (independent review of #145, M2)."""
     path = Path(root) / LANE_PROVENANCE_REGISTRY
     if not path.is_file():
-        return {lane: [] for lane in LANES}
+        return {lane: [] for lane in (*LANES, "adjudication")}
     document = json.loads(path.read_text(encoding="utf-8"))
-    return {lane: [entry for entry in document.get(lane) or [] if isinstance(entry, dict)] for lane in LANES}
+    return {lane: [entry for entry in document.get(lane) or [] if isinstance(entry, dict)]
+            for lane in (*LANES, "adjudication")}
+
+
+# What produced an adjudication (tools/sota-convergence/adjudicate.py adjudication_provenance, less the evidence tree,
+# which varies per run): a new-wave adjudication must name code, prompt, schemas, workflow and role that
+# lane-provenance.json registers (independent review of #145, M2).
+ADJUDICATION_PROVENANCE_KEYS = ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256", "refute_schema_sha256",
+                                "workflow_sha256", "adjudicator_role_sha256")
+
+
+def adjudication_provenance_issue(provenance, registry):
+    """None when ``provenance`` names registered adjudication code and carries an evidence-tree digest."""
+    if not isinstance(provenance, dict) or not all(isinstance(provenance.get(key), str) and SHA256_TEXT.fullmatch(
+            provenance[key]) for key in (*ADJUDICATION_PROVENANCE_KEYS, "repo_tree_sha256")):
+        return ("adjudication provenance must carry " + ", ".join((*ADJUDICATION_PROVENANCE_KEYS, "repo_tree_sha256"))
+                + " as sha256 text")
+    for entry in registry.get("adjudication") or []:
+        if all(entry.get(key) == provenance.get(key) for key in ADJUDICATION_PROVENANCE_KEYS):
+            return None
+    return f"adjudication provenance names adjudication code not listed in {LANE_PROVENANCE_REGISTRY}"
+
+
+def adjudication_binding_issue(raw, sealed_sha256, lane_trees, registry):
+    """None when a new-wave adjudication compared exactly the sealed lane returns (``sealed_sha256``: lane ->
+    the row's lanes.<lane>.sealed_sha256), read the lanes' one evidence tree (``lane_trees``) and names
+    registered adjudication code (independent review of #145, M2)."""
+    if not isinstance(raw, dict):
+        return "adjudication must be a JSON object"
+    if raw.get("lane_returns_sha256") != sealed_sha256:
+        return "its lane_returns_sha256 does not name the sealed lane returns"
+    trees = set(lane_trees.values())
+    provenance = raw.get("provenance") if isinstance(raw.get("provenance"), dict) else {}
+    if len(trees) != 1 or provenance.get("repo_tree_sha256") not in trees:
+        return (f"it read evidence tree {provenance.get('repo_tree_sha256')!r}, not the lanes' one tree "
+                f"({sorted(str(tree) for tree in trees)})")
+    return adjudication_provenance_issue(provenance, registry)
 
 
 def registered_provenance_entry(lane, provenance, registry):
@@ -911,6 +949,11 @@ def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parse
         issue, components = lane_winner_components(sealed_return, retained_packet)
         require(issue is None, str(key) + f".lanes.{lane} sealed return: {issue}")
         lane_sets[lane] = components
+    if set(parsed_returns) == set(LANES):
+        trees = {lane: (sealed_return.get("provenance") or {}).get("repo_tree_sha256")
+                 for lane, sealed_return in parsed_returns.items()}
+        require(trees["claude"] == trees["codex"],
+                str(key) + f" the sealed lane returns read different evidence trees ({trees})")
     if set(lane_sets) == set(LANES):
         computed = "same_winner" if lane_sets["claude"] == lane_sets["codex"] else "disagree"
     elif "claude" in lane_sets:
@@ -937,8 +980,13 @@ def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parse
         require(adjudication_file.is_file()
                 and hashlib.sha256(adjudication_file.read_bytes()).hexdigest() == adjudication_sha256,
                 str(key) + f".lanes.adjudication_sha256 does not match {sealed_base}/{relative}")
-        issue, _ = judge_adjudication(json.loads(adjudication_file.read_text(encoding="utf-8")),
-                                      grandfathered=False, packet_sha256=packet_sha256)
+        raw = json.loads(adjudication_file.read_text(encoding="utf-8"))
+        issue, _ = judge_adjudication(raw, grandfathered=False, packet_sha256=packet_sha256)
+        require(issue is None, str(key) + f" adjudication {sealed_base}/{relative}: {issue}")
+        issue = adjudication_binding_issue(
+            raw, {lane: lanes_field[lane].get("sealed_sha256") for lane in LANES},
+            {lane: (parsed_returns.get(lane, {}).get("provenance") or {}).get("repo_tree_sha256") for lane in LANES},
+            load_lane_provenance_registry(root))
         require(issue is None, str(key) + f" adjudication {sealed_base}/{relative}: {issue}")
         if wave_refs is not None:
             wave_refs.setdefault(wave, set()).add(relative)

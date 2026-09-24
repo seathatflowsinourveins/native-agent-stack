@@ -7,6 +7,7 @@ validate.yml); record_verdicts.py accepts a new-wave Claude return only when its
 provenance.workflow_sha256 matches that SHA256SUMS entry.
 """
 import hashlib
+import importlib.util
 import json
 import unittest
 from pathlib import Path
@@ -63,6 +64,20 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         listed = [{key: entry[key] for key in current} for entry in self.registry()["codex"]]
         self.assertIn(current, listed, "append the current codex_lane.py/lane-prompt.md hashes to "
                                        "tools/sota-convergence/lane-provenance.json")
+
+    def test_the_current_adjudication_code_is_registered(self):
+        """Independent review of #145, M2: record_verdicts.py and scripts/landscape.py refuse a new-wave
+        adjudication whose code is not listed, so the current adjudicate.py, prompt, schemas, workflow and
+        vendored blind-adjudicator role must be (append an entry whenever one of them changes)."""
+        spec = importlib.util.spec_from_file_location("adjudicate_for_registry", TOOLS / "adjudicate.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        provenance = module.adjudication_provenance()
+        keys = ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256", "refute_schema_sha256",
+                "workflow_sha256", "adjudicator_role_sha256")
+        self.assertTrue(any(all(entry.get(key) == provenance[key] for key in keys)
+                            for entry in self.registry().get("adjudication") or []),
+                        "append the current adjudication provenance to tools/sota-convergence/lane-provenance.json")
 
     def test_every_vendored_lane_workflow_is_registered_under_its_source_and_vendored_paths(self):
         pin = json.loads((WORKFLOWS / "vendored-lanes.json").read_text(encoding="utf-8"))

@@ -13,7 +13,8 @@ adding the two runner-owned fields a new-wave Claude return must carry
 - ``model.family`` is ``"anthropic"``; ``model.name`` is ``--resolved-model``
   when given (the resolved child model, for example ``claude-opus-5-5`` from
   ``child-usage.mjs --latest``), else the workflow's bound alias.
-- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256, repo_tree_sha256}``:
+- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256, prompt_sha256,
+  repo_tree_sha256}`` (``prompt_sha256``: the echoed prompt, which must be this catalog's lane-prompt.md):
   the workflow path relative to the agent-lab checkout, the sha256 of those
   bytes, that checkout's ``HEAD``, the lane role's sha256, and the digest of the
   evidence tree (``--repo``) the lane read. The workflow echoes the caller's
@@ -150,6 +151,23 @@ def failure_reason(layer: dict) -> str:
     return f"no final: refutation status {status}" + (f"; {'; '.join(reasons)}" if reasons else "")
 
 
+LANE_PROMPT = HERE / "lane-prompt.md"
+
+
+def consumed_prompt_sha256(result: dict) -> str:
+    """sha256 of the prompt the workflow echoes (independent review of #145, M1); it must be this catalog's
+    lane-prompt.md, as the Codex lane's prompt_sha256 is, so a run on an edited or built-in prompt is refused."""
+    prompt = result.get("prompt") if isinstance(result, dict) else None
+    if not isinstance(prompt, str):
+        raise ProvenanceError("the workflow result carries no prompt; run a layer-verdict-lane.js that echoes it, "
+                              "with args.prompt set to tools/sota-convergence/lane-prompt.md")
+    digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    expected = hashlib.sha256(LANE_PROMPT.read_bytes()).hexdigest()
+    if digest != expected:
+        raise ProvenanceError(f"the workflow ran prompt {digest}, not this catalog's lane-prompt.md {expected}")
+    return digest
+
+
 def launch_tree(result: dict, repo: Path, role_sha256: str = None) -> str:
     """The evidence-tree digest the result was launched on (Codex review of #145): the workflow echoes the
     caller's args.launch, which prepare wrote as {repo, repo_tree_sha256, agent_sha256}; it must name ``repo``,
@@ -196,6 +214,7 @@ def main(argv=None) -> int:
     try:
         provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
         result = json.loads(args.result.read_text(encoding="utf-8"))
+        provenance["prompt_sha256"] = consumed_prompt_sha256(result)
         provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve(), provenance["agent_sha256"])
     except ProvenanceError as error:
         print(error, file=sys.stderr)

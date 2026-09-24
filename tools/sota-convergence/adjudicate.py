@@ -6,8 +6,10 @@ when their winner component sets, resolved against the layer packet with
 ``scripts/landscape.py lane_winner_components``, differ. Such a layer is judged blind by both model
 families, each in both presentation orders, and every judgment is attacked by one refuter:
 
-1. ``inputs``: writes ``<work-dir>/adjudication-inputs/<name>.AB.json`` (A = the scrubbed Claude
-   return, B = the scrubbed Codex return) and ``<name>.BA.json`` (swapped), plus ``index.json``.
+1. ``inputs``: writes ``<work-dir>/adjudication-inputs/<name>.AB.json`` and ``<name>.BA.json``, the two
+   scrubbed returns in complementary positions, plus ``<work-dir>/adjudication-index.json``. Which position
+   holds the Claude return is drawn per layer and recorded only in that index, outside the inputs directory, so
+   neither a file name nor this code tells a judge which family wrote A (independent review of #145).
    Scrubbing keeps only the judged content (SCRUB_KEEP) and drops any kept key present in one return
    but not the other, so lane identity, model and provenance are not shown to the judge.
 2. ``codex``: one ``codex exec`` judge call and one refuter call per input file, built like
@@ -38,6 +40,7 @@ import json
 import os
 import posixpath
 import re
+import secrets
 import shutil
 import sys
 import threading
@@ -51,6 +54,7 @@ for _path in (HERE, REPO_ROOT):
         sys.path.insert(0, str(_path))
 
 import codex_lane  # noqa: E402
+from build_manifest import sanitize_value  # noqa: E402  (the sealed form record_verdicts.sealed_text writes)
 from scripts.landscape import (  # noqa: E402
     FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components, model_family_issue)
 
@@ -60,8 +64,30 @@ REFUTE_SCHEMA = HERE / "adjudication-refute.schema.json"
 WORKFLOW_PATH = HERE / "adjudication-lane.js"
 REFUTER_MARKER = "<!-- refuter -->"
 ORDERS = ("AB", "BA")
-# claude_position per order: AB shows the Claude return as A, BA shows it as B.
-CLAUDE_POSITION = {"AB": "A", "BA": "B"}
+# Which position shows the Claude return is a per-layer secret (independent review of #145, F3): `inputs` draws it
+# for each layer and records it only in the index outside the inputs directory, so neither an input's file name
+# nor this code tells a judge which family wrote A. The two orders always show it in complementary positions.
+
+
+def claude_position(entry: dict, order: str):
+    """The position ("A" or "B") that showed the Claude return in ``order`` for this index entry, or None."""
+    value = (entry.get("claude_position") or {}).get(order) if isinstance(entry, dict) else None
+    return value if value in ("A", "B") else None
+
+
+def current_return_sha256(path: Path):
+    """sealed_form_sha256 of the lane return at ``path`` now, or None when it is missing or not UTF-8 JSON."""
+    try:
+        return sealed_form_sha256(json.loads(Path(path).read_bytes().decode("utf-8")))
+    except (OSError, ValueError):
+        return None
+
+
+def sealed_form_sha256(data) -> str:
+    """sha256 of a lane return in the form record_verdicts.py seals it (sanitized, sorted, indent 1, newline):
+    the adjudication binds these, so CI can compare them with the row's lanes.<lane>.sealed_sha256 (independent
+    review of #145, M2)."""
+    return hashlib.sha256((json.dumps(sanitize_value(data), sort_keys=True, indent=1) + "\n").encode("utf-8")).hexdigest()
 FAMILIES = {"claude": "anthropic", "codex": "openai"}
 assert FAMILIES == LANE_FAMILIES
 SCRUB_KEEP = ("winner_keys", "why_selected", "winner_evidence_class", "winner_evidence_refs", "alternatives",
@@ -72,6 +98,9 @@ IDENTITY_WORDS = re.compile(r"\b(claude|codex|anthropic|openai|opus|sonnet|haiku
 MIN_WHY = 60
 DEFAULT_TIMEOUT = 900.0
 INPUTS_DIR = "adjudication-inputs"
+# The index (with each layer's secret claude_position map) sits beside, not inside, the inputs directory, which
+# the Codex judges may read (independent review of #145, F3).
+INDEX_NAME = "adjudication-index.json"
 JUDGMENTS_DIR = "adjudication-judgments"
 JUDGMENT_SCHEMA_VERSION = 1
 
@@ -361,16 +390,15 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
         returns, reasons, return_sha256 = {}, [], {}
         try:
             packet_bytes = packet_path.read_bytes()
-            packet = json.loads(packet_bytes)
+            packet = json.loads(packet_bytes.decode("utf-8"))
         except (OSError, ValueError) as error:
             index["skipped"].append({"layer": name, "reason": f"packet unreadable: {error}"})
             continue
         packet_sha256 = hashlib.sha256(packet_bytes).hexdigest()
         for lane, path in paths.items():
             try:
-                raw = path.read_bytes()
-                return_sha256[lane] = hashlib.sha256(raw).hexdigest()
-                data = json.loads(raw)
+                data = json.loads(path.read_bytes().decode("utf-8"))
+                return_sha256[lane] = sealed_form_sha256(data)
             except (OSError, ValueError) as error:
                 reasons.append(f"{lane} return does not parse: {error}")
                 continue
@@ -407,6 +435,8 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             index["layers"].append(entry)
             continue
         entry["agreement"] = "disagree"
+        first = secrets.choice(("A", "B"))
+        entry["claude_position"] = {"AB": first, "BA": "B" if first == "A" else "A"}
         claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"], repo_roots, packets_dir)
         offenders = unscrubbed_paths([name, claude_scrubbed, codex_scrubbed])
         if offenders:
@@ -420,7 +450,8 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
                                             | set(identity_mentions(codex_scrubbed)))
         entry["inputs"], entry["input_sha256"] = {}, {}
         for order in ORDERS:
-            a, b = (claude_scrubbed, codex_scrubbed) if order == "AB" else (codex_scrubbed, claude_scrubbed)
+            a, b = ((claude_scrubbed, codex_scrubbed) if entry["claude_position"][order] == "A"
+                    else (codex_scrubbed, claude_scrubbed))
             input_path = out_dir / f"{name}.{order}.json"
             write_json(input_path, {"layer": name, "packet_sha256": packet_sha256, "A": a, "B": b})
             entry["inputs"][order] = str(input_path)
@@ -429,7 +460,7 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
     if layers:
         # A selective rebuild keeps every other layer's earlier entry, so assemble still purges (or rebuilds)
         # their records instead of leaving them unrepresented (Codex review of #145).
-        previous_path = out_dir / "index.json"
+        previous_path = work_dir / INDEX_NAME
         previous = load_json(previous_path) if previous_path.is_file() else {}
         rebuilt = {item["layer"] for item in index["layers"] + index["skipped"]}
 
@@ -448,12 +479,13 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
                     kept[key].append(item)
         for key in ("layers", "skipped"):
             index[key] = kept[key] + index[key]
-    write_json(out_dir / "index.json", index)
+    write_json(work_dir / INDEX_NAME, index)
+    (out_dir / "index.json").unlink(missing_ok=True)  # the pre-F3 location, never read again
     return index
 
 
 def load_index(work_dir: Path) -> dict:
-    path = Path(work_dir).resolve() / INPUTS_DIR / "index.json"
+    path = Path(work_dir).resolve() / INDEX_NAME
     if not path.is_file():
         raise SystemExit(f"adjudicate: {path} is missing; run `adjudicate.py inputs` first")
     return load_json(path)
@@ -562,7 +594,7 @@ def model_issue(model, family):
     return model_family_issue({"family": family, "name": model}, family, "model")
 
 
-def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None):
+def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None, entry=None):
     """None when the judgment file counts, else the reason it does not. A judgment whose model does not
     match its family's pattern (for example "unknown") does not count, so a resumed run reruns it rather
     than leaving a record judge_adjudication will reject. ``leaked_inputs`` (``recorded_leaks``) makes a
@@ -573,6 +605,12 @@ def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None):
         return LEAK
     if data.get("family") != family or data.get("order") != order:
         return "family or order does not match its file name"
+    if entry is not None and (data.get("layer") != entry.get("layer")
+                              or data.get("input_path") != (entry.get("inputs") or {}).get(order)
+                              or data.get("input_sha256") != (entry.get("input_sha256") or {}).get(order)):
+        # The judgment must name this index's input for the layer (independent review of #145, M3): a copied
+        # work dir's judgments point at another directory's inputs.
+        return "judged an input this index did not build"
     # A judgment counts only for the input content it judged (Codex review of #145): rerunning `inputs`
     # after a lane return changed must not let an old A/B preference be read against new returns.
     input_path = data.get("input_path")
@@ -675,6 +713,7 @@ def run_codex(args) -> int:
     packets = packet_paths(index)
     leaked_inputs = recorded_leaks(work_dir)
     items = pending_items(index, layers)
+    entries_by_layer = {entry["layer"]: entry for entry in index.get("layers") or []}
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
     # The code, prompt and evidence tree this run judges with, captured at launch (Codex review of #145).
     run_provenance = adjudication_provenance(args.prompt, repo)
@@ -696,7 +735,8 @@ def run_codex(args) -> int:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model and effort, under this run's
             # provenance: the same code, prompt, schemas, role and evidence tree (Codex review of #145).
-            if (usable_judgment(existing, "openai", order, packet_sha256) is None
+            if (usable_judgment(existing, "openai", order, packet_sha256,
+                                entry=entries_by_layer.get(name)) is None
                     and existing.get("model") == args.model and existing.get("effort") == args.effort
                     and existing.get("provenance") == run_provenance):
                 continue
@@ -788,10 +828,17 @@ def run_codex(args) -> int:
             failures.append((f"{name}.{order}", TREE_CHANGED))
 
     # The judges' labelled packet paths are the content-addressed snapshots (Codex review of #145).
-    roots = [str(repo), str((work_dir / INPUTS_DIR).resolve()), str((work_dir / "packets").resolve()),
-             str((work_dir / PACKET_SNAPSHOTS_DIR).resolve())]
-    audit = {stem.name[:-len(".jsonl")]: codex_lane.blind_audit(stem, roots) for stem in sorted(events_dir.glob("*.jsonl"))}
-    write_json(out_dir / "blind-audit.json", {"schema_version": 1, "allowed_roots": roots, "calls": audit})
+    # Each call may read only the repository, its own input file and its packet snapshot (independent review of
+    # #145, F3): not the inputs directory, which could hold other inputs, and not the index with the positions.
+    call_files = {f"{name}.{order}": [input_path, packets.get(name, "")]
+                  for name, order, input_path, _packet_sha256 in items}
+    audit, roots_by_call = {}, {}
+    for events in sorted(events_dir.glob("*.jsonl")):
+        call = events.name[:-len(".jsonl")]
+        stem = call.rsplit(".", 1)[0]
+        roots_by_call[call] = [str(repo)] + [str(Path(path).resolve()) for path in call_files.get(stem, []) if path]
+        audit[call] = codex_lane.blind_audit(events, roots_by_call[call])
+    write_json(out_dir / "blind-audit.json", {"schema_version": 2, "allowed_roots": roots_by_call, "calls": audit})
     flagged = sorted(key for key, entry in audit.items()
                      if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
     if flagged:
@@ -1111,7 +1158,7 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
             except (OSError, ValueError):
                 notes.append(f"{family} {order}: no judgment file")
                 continue
-            reason = usable_judgment(data, family, order, packet_sha256, leaked_inputs)
+            reason = usable_judgment(data, family, order, packet_sha256, leaked_inputs, entry)
             if reason:
                 notes.append(f"{family} {order}: {reason}")
                 continue
@@ -1119,11 +1166,14 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
             provenances.append(data.get("provenance"))
             if isinstance(data.get("repo"), str):
                 repos.add(data["repo"])
-            claude_position = CLAUDE_POSITION[order]
+            position = claude_position(entry, order)
+            if position is None:
+                notes.append(f"{family} {order}: the index has no claude_position for it; rerun inputs")
+                continue
             preferred = judge["preferred"]
             judgments.append({
-                "claude_position": claude_position, "preferred_position": preferred,
-                "preferred_lane": "claude" if preferred == claude_position else "codex",
+                "claude_position": position, "preferred_position": preferred,
+                "preferred_lane": "claude" if preferred == position else "codex",
                 "refuting_votes": 1 if refuter["refuted"] else 0,
                 "judge": {"model": data.get("model"), "family": family},
                 "stripped_packet_sha256": packet_sha256})
@@ -1219,8 +1269,8 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         if layers and name not in layers and name.split("__", 1)[1] not in layers:
             continue
         indexed_returns = entry.get("lane_returns_sha256") or {}
-        changed_returns = [lane for lane in FAMILIES if not (work_dir / lane / f"{name}.json").is_file()
-                           or indexed_returns.get(lane) != sha256_file(work_dir / lane / f"{name}.json")]
+        changed_returns = [lane for lane in FAMILIES
+                           if indexed_returns.get(lane) != current_return_sha256(work_dir / lane / f"{name}.json")]
         if changed_returns:
             # A lane was rerun after `inputs` (Codex review of #145): the judges compared other returns.
             issues.append((name, f"the {', '.join(changed_returns)} lane return changed after `inputs`; rerun "
@@ -1296,9 +1346,10 @@ def parse_args(argv=None):
     cargs.add_argument("--work-dir", required=True, type=Path)
     cargs.add_argument("--repo", required=True, type=Path)
     cargs.add_argument("--layers", default=None)
-    cargs.add_argument("--run-dir", type=Path, default=None,
-                       help="The directory the adjudication workflow runs from (default: --repo); a project-level "
-                            "blind-adjudicator.md there must also be the vendored one.")
+    cargs.add_argument("--run-dir", required=True, type=Path, default=None,
+                       help="The directory the headless adjudication session runs from (for the blind flow, the "
+                            "export root); required so a project-level blind-adjudicator.md there is checked "
+                            "(independent review of #145, M4), and it must also be the vendored one.")
     cargs.add_argument("--agent-file", type=Path, default=DEFAULT_ADJUDICATOR_FILE,
                        help="The blind-adjudicator definition the Claude judges will load (default: the user-level "
                             "copy; a project-level copy in the directory the workflow runs from wins over it).")

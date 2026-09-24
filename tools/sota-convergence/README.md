@@ -1420,9 +1420,9 @@ where the two lanes chose different winner components (2026-09-23 re-record).
 
 ```sh
 python3 tools/sota-convergence/adjudicate.py inputs --work-dir W \
-  --lane-repo-root <claude lane export> --lane-repo-root <codex lane export>   # A/B and B/A inputs, index.json
+  --lane-repo-root <claude lane export> --lane-repo-root <codex lane export>   # AB and BA inputs, adjudication-index.json
 python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
-python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> > args.json
+python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> --run-dir <blind export> > args.json
 # run tools/sota-convergence/adjudication-lane.js with args.json (blind-adjudicator agents)
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir W --result <workflow result> --model <resolved>
 python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjudications
@@ -1449,7 +1449,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 
     http(s) URLs are left alone. `--lane-repo-root` is required and repeatable.
   - **No packet path in an input.** An input is `{layer, packet_sha256, A, B}`. The judge's labelled
-    `Packet file:` line carries the packet path, which `claude-args` and `codex` take from `index.json`.
+    `Packet file:` line carries the packet path, which `claude-args` and `codex` take from `adjudication-index.json`.
   - **Refusal on a surviving path.** If an absolute path, a `~` path, `$HOME` or `${HOME}`, or a `<host-path>`
     placeholder still remains after scrubbing, `inputs` writes no input for that layer and removes a stale
     one. It lists the offenders in `index.json` `skipped[].unscrubbed` and exits 1, so a known leak is never
@@ -1467,7 +1467,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **Prompt and leak check (both families, round-2 review):**
   - Every judge and refuter task starts with three labelled lines: `Input file: <path>`, `Packet file: <path>`
     and `Repository root: <path>`. `adjudication-prompt.md` refers only to them and treats any other path as
-    data. `claude-args` gives each item its `packet_path` from `index.json`.
+    data. `claude-args` gives each item its `packet_path` from `adjudication-index.json`.
   - The judge and the refuter first check their input for reviewer identity: a lane, model, provenance or
     refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that
     attributes a return; or a host path outside the repository root. A candidate that shares a vendor name
@@ -1588,6 +1588,23 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
     adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
   - Leak records keep input basenames only.
+- **Independent review of #145 (four Opus lenses: blindness, binding, regressions, operability):**
+  - **Family position is a secret (F3).** `inputs` draws, per layer, which position (A or B) shows the Claude
+    return in `AB`, and `BA` shows the complement. The map is kept only in `<work-dir>/adjudication-index.json`,
+    outside `adjudication-inputs/`. Each Codex judge call's audit allows only the repository, its own input file
+    and its packet snapshot.
+  - **Judgments are bound to this index (M3).** A judgment counts only when its layer, input path and input
+    sha256 are the index entry's.
+  - **`claude-args --run-dir` is required (M4),** so the project-level role in the directory the workflow runs
+    from is always checked. In the blind flow this is the export root.
+  - **Prompt binding for the Claude lane (M1).** The layer-verdict workflow (agent-lab #45) refuses a real run
+    without `args.prompt` and echoes it. `claude_lane.py` requires the echoed prompt to be this catalog's
+    `lane-prompt.md` and records `prompt_sha256`, which `scripts/landscape.py` now requires and the registry keys.
+  - **Adjudication code is registered (M2).** `lane-provenance.json` has an `adjudication` list. A new-wave
+    adjudication must name registered code, the lanes' one evidence tree, and `lane_returns_sha256` equal to the
+    row's sealed `lanes.<lane>.sealed_sha256` (the sealed form, so CI recomputes it). `record_verdicts.py` and
+    `scripts/landscape.py` both check this, and CI also requires both sealed lane returns to name one tree.
+  - **UTF-8 only (L2).** Lane returns are decoded as UTF-8 before parsing, so a BOM or UTF-16/32 is refused.
 - **Round 14:**
   - `adjudication-lane.js` echoes the prompt it read and each item's consumed input and packet paths.
     `claude-collect` requires the prompt to hash to the snapshot's `prompt_sha256` and the repo to be the

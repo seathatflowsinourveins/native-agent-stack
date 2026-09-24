@@ -190,11 +190,13 @@ def write_adjudication(adjudications_dir: Path, catalog: str, layer_id: str, dat
     when both are already written under the work dir beside ``adjudications_dir``)."""
     lanes = {lane: adjudications_dir.parent / lane / f"{catalog}__{layer_id}.json" for lane in ("claude", "codex")}
     if "lane_returns_sha256" not in data and all(path.is_file() for path in lanes.values()):
-        data = dict(data, lane_returns_sha256={lane: hashlib.sha256(path.read_bytes()).hexdigest()
-                                               for lane, path in lanes.items()})
+        # The sealed form of each return (what CI sees as lanes.<lane>.sealed_sha256).
+        data = dict(data, lane_returns_sha256={
+            lane: hashlib.sha256(record_verdicts.sealed_text(json.loads(path.read_text(encoding="utf-8")))
+                                 .encode("utf-8")).hexdigest() for lane, path in lanes.items()})
     if "provenance" not in data:
-        # The evidence tree the judges read: the one both fixture lanes read.
-        data = dict(data, provenance={"repo_tree_sha256": REPO_TREE_SHA256})
+        # Registered adjudication code and the evidence tree both fixture lanes read.
+        data = dict(data, provenance={**ADJUDICATION_CODE, "repo_tree_sha256": REPO_TREE_SHA256})
     adjudications_dir.mkdir(parents=True, exist_ok=True)
     (adjudications_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
 
@@ -1364,12 +1366,16 @@ VENDORED_WORKFLOW = "examples/claude-native/workflows/layer-verdict-lane.js"
 SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
 AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
 REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not registered: it varies per run)
+# The fixture's registered adjudication code (lane-provenance.json "adjudication").
+ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256",
+                                               "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")}
 
 
 def lane_provenance(lane):
     if lane == "claude":
         return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40,
-                "agent_sha256": AGENT_SHA256, "repo_tree_sha256": REPO_TREE_SHA256}
+                "agent_sha256": AGENT_SHA256, "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(),
+                "repo_tree_sha256": REPO_TREE_SHA256}
     return {"codex_lane_py_sha256": hashlib.sha256(CODEX_LANE_BYTES).hexdigest(),
             "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(), "repo_tree_sha256": REPO_TREE_SHA256}
 
@@ -1421,8 +1427,10 @@ def prepare_new_wave_root(fixture):
     fixture.write("tools/sota-convergence/lane-provenance.json", {
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
-                    "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256}],
-        "codex": [{key: value for key, value in lane_provenance("codex").items() if key != "repo_tree_sha256"}]})
+                    "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256,
+                    "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest()}],
+        "codex": [{key: value for key, value in lane_provenance("codex").items() if key != "repo_tree_sha256"}],
+        "adjudication": [dict(ADJUDICATION_CODE)]})
     fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})
     receipt_bytes = (fixture.root / "evidence/receipt.json").read_bytes()
     fixture.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
@@ -1666,6 +1674,27 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
             code, output = self.run_wave(adjudications=adjudications)
         self.assertEqual(code, 1, output)
         self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
+
+    def test_an_adjudication_from_unregistered_code_is_rejected(self):
+        # Independent review of #145, M2: a locally edited adjudication prompt or script must not seal a winner.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest),
+                                provenance={**ADJUDICATION_CODE, "prompt_sha256": "0" * 64,
+                                            "repo_tree_sha256": REPO_TREE_SHA256}))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("adjudication code not listed", output)
+
+    def test_a_lane_return_with_a_byte_order_mark_is_rejected(self):
+        # Independent review of #145, L2: lane returns are UTF-8 without a BOM, as load_json reads them.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        codex_file.write_bytes(b"\xef\xbb\xbf" + codex_file.read_bytes())
+        code, output = self.run_wave()
+        self.assertEqual(code, 1, output)
+        self.assertIn("unreadable or invalid JSON", output)
 
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")

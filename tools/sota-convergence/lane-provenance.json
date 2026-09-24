@@ -1,4 +1,15 @@
 {
+ "adjudication": [
+  {
+   "adjudicate_py_sha256": "b81d2ee42676faf1edbb25bac409a869c4045ecaba9786b65678e610e9eecf01",
+   "adjudicator_role_sha256": "ecc7e8faa2c7c349e98f48cce3f164a4884c86e07e717fbcab03d5c8929578e0",
+   "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
+   "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
+   "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
+   "registered_at": "2026-09-24",
+   "workflow_sha256": "9647926dfe08970363109e8ee36f42c46f722ee3fd1fcbf7bd61275c3cfbda7c"
+  }
+ ],
  "claude": [
   {
    "registered_at": "2026-09-23",
@@ -64,6 +75,7 @@
   },
   {
    "agent_sha256": "40f8470900672411e4a1d56fe9b35edc3b6f2f011de65fe8e8d4b721cb37b3de",
+   "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
    "registered_at": "2026-09-23",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": ".claude/workflows/layer-verdict-lane.js",
@@ -71,6 +83,7 @@
   },
   {
    "agent_sha256": "40f8470900672411e4a1d56fe9b35edc3b6f2f011de65fe8e8d4b721cb37b3de",
+   "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
    "registered_at": "2026-09-23",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
@@ -140,5 +153,5 @@
   }
  ],
  "schema_version": 1,
- "scope": "Append-only registry of the lane code a layer-verdict return outside the grandfathered 2026-09-22 wave may name in its provenance (2026-09-23 verdict-integrity review). tools/sota-convergence/record_verdicts.py accepts a Claude return only when its (workflow_path, workflow_sha256) is listed here and equals the current examples/claude-native/workflows/SHA256SUMS entry of the listed vendored_path, and a Codex return only when its (codex_lane_py_sha256, prompt_sha256) is listed here and equals this checkout's codex_lane.py and lane-prompt.md; scripts/landscape.py re-checks every sealed new-wave return against this list in CI. Append an entry (never edit or remove one) when codex_lane.py, lane-prompt.md or the vendored workflow changes; tests/test_verdict_lane_vendoring.py fails until the current bytes are listed."
+ "scope": "Append-only registry of the lane code a layer-verdict return outside the grandfathered 2026-09-22 wave may name in its provenance (2026-09-23 verdict-integrity review). tools/sota-convergence/record_verdicts.py accepts a Claude return only when its (workflow_path, workflow_sha256) is listed here and equals the current examples/claude-native/workflows/SHA256SUMS entry of the listed vendored_path, and a Codex return only when its (codex_lane_py_sha256, prompt_sha256) is listed here and equals this checkout's codex_lane.py and lane-prompt.md; scripts/landscape.py re-checks every sealed new-wave return against this list in CI. Append an entry (never edit or remove one) when codex_lane.py, lane-prompt.md or the vendored workflow changes; tests/test_verdict_lane_vendoring.py fails until the current bytes are listed. The \"adjudication\" list registers adjudicate.py, adjudication-prompt.md, both adjudication schemas, adjudication-lane.js and the vendored blind-adjudicator.md by sha256; record_verdicts.py and scripts/landscape.py refuse a new-wave adjudication whose provenance names unlisted code (append an entry when any of them changes)."
 }
