@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import time
 import unittest
+from unittest import mock
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -145,16 +146,27 @@ class SessionClockTests(unittest.TestCase):
             self.skipTest("exchange_calendars is not installed in this shared engine environment")
         self.assertTrue(result)
 
+    def test_exchange_calendars_agreement_2027_or_absent(self):
+        # The 2027 table (NYSE hours-calendars page, fetched 2026-09-24) must
+        # match XNYS session by session, including the 13:00 early close.
+        result = sess.exchange_calendars_agrees(2027)
+        if result is None:
+            self.skipTest("exchange_calendars is not installed in this shared engine environment")
+        self.assertTrue(result)
+
     def test_year_outside_calendar_refused(self):
         # D7/finding-6 (2026-09-24 fix round): dates outside the frozen
         # table's year(s) must not be silently classified against another
-        # year's table. exchange_calendars is not installed in this
-        # environment, so both raise. 2027 is now covered by HOLIDAYS_2027
-        # (see test_2027_calendar_covered below); 2028 remains uncovered.
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2025, 12, 25, 12, 0))
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2028, 1, 1, 12, 0))
+        # year's table. The exchange_calendars fallback is disabled here so
+        # the result does not depend on whether that package is installed
+        # (CI installs it from blueprints/us-equities/data/requirements.lock).
+        # 2027 is covered by HOLIDAYS_2027 (see test_2027_calendar_covered
+        # below); 2025 and 2028 are not.
+        with mock.patch.object(sess, "_exchange_calendars_day", return_value=None):
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2025, 12, 25, 12, 0))
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2028, 1, 1, 12, 0))
 
     def test_year_inside_calendar_still_works(self):
         info = sess.session_at(ny(2026, 12, 31, 12, 0))

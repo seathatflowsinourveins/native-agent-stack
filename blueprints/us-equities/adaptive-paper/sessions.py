@@ -64,25 +64,11 @@ EARLY_CLOSES_2026 = frozenset({
     date(2026, 12, 24),  # Christmas Eve
 })
 
-# NYSE 2027 full-closure holidays (finding 6, 2026-09-24 fix round). This
-# sandboxed environment has no outbound network access to re-fetch
-# https://www.nyse.com/markets/hours-calendars directly (verified: a direct
-# curl from this host returns a redirect with no page body), so these dates
-# are derived the same way the module docstring already documents the 2026
-# table's own cross-check rules (New Year's Day; MLK Day, 3rd Monday of
-# January; Washington's Birthday, 3rd Monday of February; Good Friday,
-# Gregorian Easter Sunday minus two days; Memorial Day, last Monday of May;
-# Juneteenth, June 19 fixed, observed the preceding Friday when it falls on
-# a Saturday; Independence Day, July 4 fixed, observed the preceding Friday
-# on a Saturday or the following Monday on a Sunday; Labor Day, 1st Monday
-# of September; Thanksgiving Day, 4th Thursday of November; Christmas Day,
-# December 25 fixed, observed the preceding Friday on a Saturday or the
-# following Monday on a Sunday) -- the same NYSE observance convention as
-# every other year's calendar, not a guess. Independently reconcilable
-# against `exchange_calendars`' XNYS calendar (see
-# `exchange_calendars_agrees_2026`'s 2026-only sibling check) or the
-# official NYSE calendar once network access is available; treat as
-# unverified against the live NYSE page pending that reconciliation.
+# NYSE 2027 full-closure holidays. Source: the NYSE published holiday calendar,
+# https://www.nyse.com/markets/hours-calendars (fetched 2026-09-24; it lists
+# 2026, 2027 and 2028). Cross-checked the same day against exchange_calendars
+# 4.13.2's XNYS calendar, whose 2027 weekday closures and early closes equal
+# these two sets exactly.
 HOLIDAYS_2027 = frozenset({
     date(2027, 1, 1),    # New Year's Day (Friday)
     date(2027, 1, 18),   # Martin Luther King, Jr. Day
@@ -100,7 +86,7 @@ HOLIDAYS_2027 = frozenset({
 # Friday after Thanksgiving applies this year: Christmas Eve (Dec 24, 2027)
 # is itself the observed Christmas Day full closure above (Dec 25 falls on a
 # Saturday), so there is no separate Christmas Eve half day in 2027. Same
-# derivation/verification caveat as HOLIDAYS_2027 above.
+# source and cross-check as HOLIDAYS_2027 above.
 EARLY_CLOSES_2027 = frozenset({
     date(2027, 11, 26),  # Friday after Thanksgiving
 })
@@ -449,16 +435,23 @@ def must_end_flat(policy: dict, *, is_final_boundary: bool) -> bool:
 # ---------------------------------------------------------------------------
 
 def exchange_calendars_agrees_2026():
+    """The 2026 case of ``exchange_calendars_agrees``."""
+    return exchange_calendars_agrees(2026)
+
+
+def exchange_calendars_agrees(year):
     """Return True/False if ``exchange_calendars`` is importable and its XNYS
-    calendar was compared against the frozen 2026 table above, or None if the
-    package is not installed. Never raises for an absent package."""
+    calendar was compared against the frozen table for ``year`` above, or None
+    if the package is not installed. Never raises for an absent package."""
     try:
         import exchange_calendars as xcals
     except ImportError:
         return None
-    cal = xcals.get_calendar("XNYS")
-    d = date(2026, 1, 1)
-    end = date(2026, 12, 31)
+    # Padded so every day of the year is inside the calendar's bounds even when
+    # the first or last day of the year is not a session.
+    cal = xcals.get_calendar("XNYS", start=f"{year - 1}-12-01", end=f"{year + 1}-01-31")
+    d = date(year, 1, 1)
+    end = date(year, 12, 31)
     while d <= end:
         expected_open = _is_trading_day(d)
         actual_open = bool(cal.is_session(d.isoformat()))
