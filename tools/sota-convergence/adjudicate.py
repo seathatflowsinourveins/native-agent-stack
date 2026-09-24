@@ -106,6 +106,18 @@ INPUTS_DIR = "adjudication-inputs"
 # The index (with each layer's secret claude_position map) sits beside, not inside, the inputs directory, which
 # the Codex judges may read (independent review of #145, F3).
 INDEX_NAME = "adjudication-index.json"
+# The index lives outside the work dir (Codex review of #145): every input path names the work dir, so a judge that
+# listed it could read the positions. It sits under a state directory keyed by the work dir's path
+# (NAS_ADJUDICATION_STATE_DIR, else ~/.local/state/native-agent-stack/adjudication), which no task names. Claude
+# judges' reads are instruction-bound (the role and prompt name the only three paths); Codex judges' reads are
+# audited, and a flagged call voids its judgment.
+STATE_DIR_ENV = "NAS_ADJUDICATION_STATE_DIR"
+
+
+def index_path(work_dir: Path) -> Path:
+    base = Path(os.environ.get(STATE_DIR_ENV) or Path.home() / ".local" / "state" / "native-agent-stack" / "adjudication")
+    key = hashlib.sha256(str(Path(work_dir).resolve()).encode("utf-8")).hexdigest()[:16]
+    return base / key / INDEX_NAME
 JUDGMENTS_DIR = "adjudication-judgments"
 JUDGMENT_SCHEMA_VERSION = 1
 
@@ -443,7 +455,7 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
     if layers:
         # A selective rebuild keeps every other layer's earlier entry, so assemble still purges (or rebuilds)
         # their records instead of leaving them unrepresented (Codex review of #145).
-        previous_path = work_dir / INDEX_NAME
+        previous_path = index_path(work_dir)
         previous = load_json(previous_path) if previous_path.is_file() else {}
         rebuilt = {item["layer"] for item in index["layers"] + index["skipped"]}
 
@@ -462,13 +474,14 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
                     kept[key].append(item)
         for key in ("layers", "skipped"):
             index[key] = kept[key] + index[key]
-    write_json(work_dir / INDEX_NAME, index)
+    write_json(index_path(work_dir), index)
+    (work_dir / INDEX_NAME).unlink(missing_ok=True)  # the round-15 location inside the work dir
     (out_dir / "index.json").unlink(missing_ok=True)  # the pre-F3 location, never read again
     return index
 
 
 def load_index(work_dir: Path) -> dict:
-    path = Path(work_dir).resolve() / INDEX_NAME
+    path = index_path(work_dir)
     if not path.is_file():
         raise SystemExit(f"adjudicate: {path} is missing; run `adjudicate.py inputs` first")
     return load_json(path)
@@ -699,7 +712,11 @@ def run_codex(args) -> int:
     entries_by_layer = {entry["layer"]: entry for entry in index.get("layers") or []}
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
     # The code, prompt and evidence tree this run judges with, captured at launch (Codex review of #145).
-    run_provenance = adjudication_provenance(args.prompt, repo)
+    try:
+        run_provenance = adjudication_provenance(args.prompt, repo)
+    except ValueError as error:  # an escaping symlink: not a blind export
+        print(f"adjudicate: {error}", file=sys.stderr)
+        return 2
     pending, failures = [], []
     for name, order, input_path, packet_sha256 in items:
         out_path = out_dir / f"{name}.{order}.json"
@@ -825,8 +842,19 @@ def run_codex(args) -> int:
     flagged = sorted(key for key, entry in audit.items()
                      if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
     if flagged:
-        print(f"adjudicate: blind audit flags {len(flagged)} call(s) for review: {', '.join(flagged)}",
-              file=sys.stderr)
+        print(f"adjudicate: blind audit flags {len(flagged)} call(s): {', '.join(flagged)}", file=sys.stderr)
+    # A flagged call (web search, an MCP tool, or a command reaching outside the repository, its input and its
+    # packet) voids that judgment (Codex review of #145): it may have read the index or other inputs.
+    this_run = {f"{name}.{order}" for name, order, _input, _sha, _out in pending}
+    for stem in sorted({call.rsplit(".", 1)[0] for call in flagged} & this_run):
+        record_path = out_dir / f"{stem}.json"
+        try:
+            record = load_json(record_path)
+        except (OSError, ValueError):
+            continue
+        record.update({"judge": None, "refuter": None, "failure": AUDIT_FLAGGED})
+        write_json(record_path, record)
+        failures.append((stem, AUDIT_FLAGGED))
     record_leaks(out_dir / LEAKS_NAME, index, leaks)
     for stem, failure in sorted(failures):
         print(f"adjudicate: codex {stem}: {failure}", file=sys.stderr)
@@ -838,6 +866,7 @@ def run_codex(args) -> int:
 LEAKS_NAME = "leaks.json"
 _LEAKS_LOCK = threading.Lock()
 TREE_CHANGED = "the evidence tree or adjudication code changed during the run; rerun on a fixed export"
+AUDIT_FLAGGED = "the blind audit flagged this judgment's calls (web, MCP or a read outside its input, packet and repository)"
 ROLE_CHANGED = "the blind-adjudicator definition the workflow loads changed after claude-args; rerun claude-args"
 LEAK_TEXT_LIMIT = 400
 
@@ -1123,11 +1152,37 @@ def relative_ref(ref: str, repo) -> str:
     return ref
 
 
+def positions_from_content(work_dir: Path, entry: dict) -> dict:
+    """order -> "A" or "B": where each input file shows the Claude return, found by re-scrubbing the current lane
+    returns (bound by lane_returns_sha256 before assemble gets here) and comparing; an order whose input matches
+    neither arrangement is left out."""
+    name = entry["layer"]
+    try:
+        returns = {lane: json.loads((Path(work_dir) / lane / f"{name}.json").read_bytes().decode("utf-8"))
+                   for lane in FAMILIES}
+    except (OSError, ValueError):
+        return {}
+    claude_scrubbed, codex_scrubbed = scrub_pair(returns["claude"], returns["codex"], entry.get("lane_repo_roots") or (),
+                                                 str((Path(work_dir) / "packets").resolve()))
+    positions = {}
+    for order, input_path in (entry.get("inputs") or {}).items():
+        try:
+            body = load_json(Path(input_path))
+        except (OSError, ValueError):
+            continue
+        if body.get("A") == claude_scrubbed and body.get("B") == codex_scrubbed:
+            positions[order] = "A"
+        elif body.get("A") == codex_scrubbed and body.get("B") == claude_scrubbed:
+            positions[order] = "B"
+    return positions
+
+
 def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
     """(record, notes, leaked input names) for one disagreeing layer; notes name every judgment that does not
     count. Every judgment of an input whose current content has a recorded leak (either family) is dropped."""
     name, packet_sha256 = entry["layer"], entry["packet_sha256"]
     judgments, whys, refs, notes, provenances, repos = [], [], set(), [], [], set()
+    content_positions = positions_from_content(work_dir, entry)
     leaked_orders = [order for order in ORDERS
                      if input_key((entry.get("inputs") or {}).get(order)) in leaked_inputs]
     for lane, family in FAMILIES.items():
@@ -1150,8 +1205,10 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
             if isinstance(data.get("repo"), str):
                 repos.add(data["repo"])
             position = claude_position(entry, order)
-            if position is None:
-                notes.append(f"{family} {order}: the index has no claude_position for it; rerun inputs")
+            if position is None or content_positions.get(order) != position:
+                # The position is derived from the input contents (the hash-bound lane returns re-scrubbed), so an
+                # edited index map cannot flip which family a preference counts for (Codex review of #145).
+                notes.append(f"{family} {order}: the index position does not match the input contents; rerun inputs")
                 continue
             preferred = judge["preferred"]
             judgments.append({

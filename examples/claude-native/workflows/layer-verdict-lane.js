@@ -82,8 +82,10 @@ const summary = (votes) => votes.map((v) => {
   const blocking = (v.findings || []).filter((f) => f && f.severity !== 'minor').map((f) => f.claim).filter(nonblank)
   return { lens: v.lens, round: v.round, refuted: v.refuted, reason: nonblank(v.reason) ? v.reason : blocking.length ? blocking.join('; ') : v.refuted === null ? 'no vote returned' : 'no reason given' }
 })
+// Each layer echoes the packet path its agents read (catalog Codex review of #145): the collector requires it to be
+// the work dir's packet with that sha256, so edited args cannot pass a different packet under the same hash.
 const layer = (p, proposal, votes, revised, revisionVotes, final, finalSource, status) => ({
-  catalog: p.catalog, layer_id: p.layer_id, packet_sha256: p.sha256, proposal, votes, revised, revision_votes: revisionVotes, final, final_source: finalSource,
+  catalog: p.catalog, layer_id: p.layer_id, packet_sha256: p.sha256, packet_path: p.path, proposal, votes, revised, revision_votes: revisionVotes, final, final_source: finalSource,
   refutation: { status, final_source: finalSource, proposal_status: votes.length ? roundStatus(votes) : null, revision_status: revisionVotes.length ? roundStatus(revisionVotes) : null, votes: summary([...votes, ...revisionVotes]) },
 })
 const chain = async (p) => {

@@ -63,14 +63,24 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         refuted = {"status": "refuted", "final_source": None, "proposal_status": "refuted", "revision_status": None,
                    "votes": [{"lens": "evidence", "round": "proposal", "refuted": True, "reason": "A cited path is missing."},
                              {"lens": "challenger", "round": "proposal", "refuted": None, "reason": "no vote returned"}]}
+        # The packets the lane ran on: each layer echoes its path and sha256 (agent-lab #47).
+        packets = self.work / "packets"
+        packets.mkdir(parents=True)
+        self.packet = {}
+        for layer_id in ("l1", "l2"):
+            path = packets / f"foundation__{layer_id}.json"
+            path.write_text(json.dumps({"layer_id": layer_id}), encoding="utf-8")
+            self.packet[layer_id] = {"packet_path": str(path.resolve()),
+                                     "packet_sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
         self.result = self.tmp / "result.json"
         self.result.write_text(json.dumps({
             "lane": "claude", "prompt": (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"),
             "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                          "agent_sha256": self.role},
             "layers": [
-                {"catalog": "foundation", "layer_id": "l1", "final": final, "refutation": self.unrefuted},
-                {"catalog": "foundation", "layer_id": "l2", "proposal": {"x": 1}, "final": None,
+                {"catalog": "foundation", "layer_id": "l1", **self.packet["l1"], "final": final,
+                 "refutation": self.unrefuted},
+                {"catalog": "foundation", "layer_id": "l2", **self.packet["l2"], "proposal": {"x": 1}, "final": None,
                  "refutation": refuted}],
             "lost": ["us-equities/l3"]}), encoding="utf-8")
 
@@ -142,16 +152,27 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        packets = self.work / "packets"
-        packets.mkdir(parents=True)
-        (packets / "foundation__l1.json").write_text("{}", encoding="utf-8")
         args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT)
         self.assertEqual(args["launch"], {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                           "agent_sha256": self.role})
         self.assertEqual(args["prompt"], (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"))
-        self.assertEqual([(p["catalog"], p["layer_id"]) for p in args["packets"]], [("foundation", "l1")])
+        self.assertEqual([(p["catalog"], p["layer_id"], p["path"], p["sha256"]) for p in args["packets"]],
+                         [("foundation", layer_id, self.packet[layer_id]["packet_path"], self.packet[layer_id]["packet_sha256"])
+                          for layer_id in ("l1", "l2")])
         with self.assertRaises(module.claude_lane.ProvenanceError):
             module.lane_args(self.work, self.agentlab, claude_lane.VENDORED_AGENT)
+
+    def test_a_layer_run_on_another_packet_path_is_refused(self):
+        # Codex review of #145: edited args could run another packet under the same hash.
+        data = json.loads(self.result.read_text(encoding="utf-8"))
+        other = self.tmp / "elsewhere" / "foundation__l1.json"
+        other.parent.mkdir()
+        other.write_bytes((self.work / "packets" / "foundation__l1.json").read_bytes())
+        data["layers"][0]["packet_path"] = str(other)
+        self.result.write_text(json.dumps(data), encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("was run on packet", err.getvalue())
 
     def test_a_missing_evidence_repository_is_refused(self):
         # Codex review of #145: an empty walk must not yield a valid-looking tree digest.

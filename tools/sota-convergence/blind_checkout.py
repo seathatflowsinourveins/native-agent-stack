@@ -469,9 +469,11 @@ EXPORT_INSTRUCTION_STUB = (
 EXPORT_TIMESTAMP = 0
 
 
-# With --allow-from-packets, these trees are always exported: they hold the code that packet overturn
-# commands name. The root instruction stubs are always written as well.
-ALWAYS_EXPORTED_TREES = ("tests", "tools", "scripts")
+# With --allow-from-packets no tree is exported whole: tests/, tools/ and scripts/ hold selection-bearing data
+# and assertions (tools/sota-convergence/reconciliations-*.json, tests/test_catalogs.py name the incumbents), so
+# a file there reaches the export only when a packet references it (Codex review of #145). The root instruction
+# stubs are always written.
+ALWAYS_EXPORTED_TREES = ()
 # Transitive references (one level, from included JSON files) are followed only into these trees, so a
 # catalogs/, docs/, recipes/, manifests/, adoption/ or README path named inside an evidence file is never
 # pulled into the export this way.
@@ -614,8 +616,8 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
     (README.md, docs/, blueprints/ and others) is copied unchanged and can still name the incumbent choices.
 
     With ``allow_from_packets`` (a lane-packets directory), the export holds only the paths those packets
-    reference, one level of evidence/ and blueprints/ paths named inside included JSON files, the
-    ALWAYS_EXPORTED_TREES and the root instruction stubs (see build_allowlist); the result then also carries
+    reference, one level of evidence/ and blueprints/ paths named inside included JSON files and the root
+    instruction stubs (see build_allowlist); the result then also carries
     ``allowlisted_files`` (count), ``missing_refs`` (sorted list) and ``transitive_refs`` (count).
 
     Every regular file, directory and symlink in the export gets the same fixed atime/mtime (0), so a

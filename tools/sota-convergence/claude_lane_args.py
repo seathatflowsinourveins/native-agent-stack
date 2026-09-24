@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -30,12 +31,16 @@ from codex_lane import tree_sha256  # noqa: E402
 
 
 def lane_args(work_dir: Path, repo: Path, agent_file: Path) -> dict:
+    given = Path(os.path.abspath(repo))
     repo = repo.resolve()
     if not repo.is_dir():
         raise claude_lane.ProvenanceError(f"--repo {repo} is not an existing directory")
-    issue = claude_lane.repo_issue(repo)
-    if issue:
-        raise claude_lane.ProvenanceError(issue)
+    # The path as given and its resolved form both pass the blind root rule: on macOS /home is a symlink whose
+    # target is deep enough to pass (Codex review of #145), as the other blind entry points check.
+    for candidate in (given, repo):
+        issue = claude_lane.repo_issue(candidate)
+        if issue:
+            raise claude_lane.ProvenanceError(issue)
     role = claude_lane.agent_sha256(agent_file)
     packets = []
     for path in sorted((Path(work_dir).resolve() / "packets").glob("*__*.json")):
@@ -45,7 +50,14 @@ def lane_args(work_dir: Path, repo: Path, agent_file: Path) -> dict:
     if not packets:
         raise claude_lane.ProvenanceError(f"{work_dir}/packets has no packets; run lane_packets.py first")
     return {"repo": str(repo), "packets": packets, "prompt": claude_lane.LANE_PROMPT.read_text(encoding="utf-8"),
-            "launch": {"repo": str(repo), "repo_tree_sha256": tree_sha256(repo), "agent_sha256": role}}
+            "launch": {"repo": str(repo), "repo_tree_sha256": tree_digest(repo), "agent_sha256": role}}
+
+
+def tree_digest(repo: Path) -> str:
+    try:
+        return tree_sha256(repo)
+    except ValueError as error:  # an escaping symlink: not a blind export
+        raise claude_lane.ProvenanceError(str(error)) from error
 
 
 def main(argv=None) -> int:

@@ -656,7 +656,7 @@ class AllowlistExportTests(BlindCheckoutFixture):
                                                   "--allow-from-packets", str(self.packets)]), 0)
         self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
 
-    def test_export_holds_only_referenced_transitive_and_code_paths(self):
+    def test_export_holds_only_referenced_and_transitive_paths(self):
         exported = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*") if p.is_file())
         self.assertEqual(exported, sorted([
             "AGENTS.md", "CLAUDE.md",
@@ -665,9 +665,11 @@ class AllowlistExportTests(BlindCheckoutFixture):
             "evidence/dir/sub/y.txt", "evidence/dir/x.txt",
             "evidence/receipts/a.json", "evidence/receipts/b.md", "evidence/receipts/c.json",
             "evidence/receipts/d.json",
-            "scripts/example.sh", "tests/test_example.py", "tools/example/tool.py",
         ]))
-        for excluded in ("README.md", "docs/keep-me.md", "catalogs/other/decisions.json",
+        # tests/, tools/ and scripts/ are not exported whole: they carry selection-bearing data and assertions
+        # (Codex review of #145); a file there is exported only when a packet references it.
+        for excluded in ("scripts/example.sh", "tests/test_example.py", "tools/example/tool.py",
+                         "README.md", "docs/keep-me.md", "catalogs/other/decisions.json",
                          "evidence/receipts/e.md", "evidence/receipts/unreferenced.md"):
             self.assertFalse((self.export / excluded).exists(), excluded)
         # Included files still get the export's stripping and stubs.
@@ -681,7 +683,7 @@ class AllowlistExportTests(BlindCheckoutFixture):
         printed = json.loads(self.out.getvalue())
         self.assertEqual(printed["export_missing_refs"], ["evidence/missing.md"])
         self.assertEqual(printed["export_transitive_refs"], 2)  # b.md (from a.json) and d.json (from c.json)
-        self.assertEqual(printed["export_allowlisted_files"], 11)
+        self.assertEqual(printed["export_allowlisted_files"], 8)
 
     def test_bare_reference_reduction(self):
         reduce = blind_checkout.bare_reference

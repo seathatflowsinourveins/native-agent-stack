@@ -1610,7 +1610,6 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     - the paths the lane packets reference (evidence refs, registered receipts, recipe refs; directories
       recursively);
     - one level of `evidence/` and `blueprints/` paths named inside those JSON files;
-    - the `tests/`, `tools/` and `scripts/` trees;
     - the root instruction stubs.
 
     Files that name every layer's winners are removed even when referenced (component-evidence-matrix,
@@ -1625,6 +1624,22 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     3 `adoption/` files and `manifests/stack.json`, whose prose can call the current choice "selected". They
     are kept because leaving an incumbent's cited evidence out of the export would bias lanes against it; the
     lane prompt and role forbid looking for the current choice.
+- **Codex review at a2434e2e and the Codex cross-family review:**
+  - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
+    and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a
+    packet references it.
+  - **Escaping symlinks.** `codex_lane.tree_sha256` refuses a symlink that is absolute or resolves outside the
+    tree, and every lane and adjudication entry point exits 2 on it.
+  - **Position map integrity and location.** `assemble` derives each order's Claude position from the input
+    contents, re-scrubbing the hash-bound lane returns, and refuses a judgment whose index map disagrees. The
+    index moves out of the work dir, to `$NAS_ADJUDICATION_STATE_DIR` or
+    `~/.local/state/native-agent-stack/adjudication/<sha256(work dir)[:16]>/adjudication-index.json`.
+  - **Audit and instruction boundaries.** A Codex judge call flagged by its blind audit voids that judgment.
+    Claude judges' reads are instruction-bound: the role and prompt name only three paths, and no filesystem
+    sandbox enforces that.
+  - **Packet paths.** The Claude lane layers echo `packet_path` (agent-lab #47), and `claude_lane.py` requires
+    it to be the work dir's packet with the layer's `packet_sha256`.
+  - **Unresolved path check.** `claude_lane_args.py` checks the `--repo` as given, not only resolved.
 - **Round 14:**
   - `adjudication-lane.js` echoes the prompt it read and each item's consumed input and packet paths.
     `claude-collect` requires the prompt to hash to the snapshot's `prompt_sha256` and the repo to be the

@@ -81,7 +81,7 @@ python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR" \
   --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest \
   --withhold-labels --registered-receipts --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)"
 
-# 2. Blind export: only what the packets reference (plus tests/, tools/, scripts/), labels stripped, no .git.
+# 2. Blind export: only what the packets reference, labels stripped, no .git.
 #    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
 python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD \
   --dest "$BLIND_DIR/checkout" --export "$BLIND_DIR/export" --allow-from-packets "$WORK_DIR/packets"

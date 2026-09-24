@@ -515,11 +515,18 @@ def tree_sha256(repo: Path) -> str:
         # An empty walk would hash to a valid-looking digest (Codex review of #145).
         raise NotADirectoryError(f"evidence repository {repo} is not an existing directory")
     digest = hashlib.sha256()
+    root = repo.resolve()
     for path in sorted(repo.rglob("*")):
         relative = path.relative_to(repo).as_posix()
         if path.is_symlink():
-            # A retained internal link: its text is part of the tree, so retargeting it changes the digest.
-            digest.update(f"{relative}\0->{os.readlink(path)}\n".encode("utf-8"))
+            target = os.readlink(path)
+            resolved = (path.parent / target).resolve()
+            if os.path.isabs(target) or not (resolved == root or root in resolved.parents):
+                # Content behind an escaping link could change under an unchanged digest (Codex review of #145);
+                # blind_checkout --export removes such links, so one here means the tree is not a blind export.
+                raise ValueError(f"evidence repository {repo} has a symlink leaving it: {relative} -> {target}")
+            # A retained internal link: its text is part of the tree (the target file is hashed on its own).
+            digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
         elif path.is_file():
             digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
     return digest.hexdigest()
@@ -619,7 +626,11 @@ def main(argv=None) -> int:
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
 
-    provenance = lane_provenance(prompt_path, repo)
+    try:
+        provenance = lane_provenance(prompt_path, repo)
+    except ValueError as error:  # an escaping symlink: not a blind export
+        print(f"codex_lane: {error}", file=sys.stderr)
+        return 2
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
@@ -726,7 +737,11 @@ def main(argv=None) -> int:
         for item in pending:
             process(item)
 
-    if pending and tree_sha256(repo) != provenance["repo_tree_sha256"]:
+    try:
+        tree_after = tree_sha256(repo)
+    except ValueError:
+        tree_after = None
+    if pending and tree_after != provenance["repo_tree_sha256"]:
         # The evidence changed while the children read it (Codex review of #145): no return of this run is
         # bound to one tree, so each is set aside (kept for inspection, never resumed or sealed).
         for catalog, layer_id, _packet_path, _packet_sha256, out_path in pending:

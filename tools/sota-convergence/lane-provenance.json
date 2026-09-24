@@ -1,7 +1,7 @@
 {
  "adjudication": [
   {
-   "adjudicate_py_sha256": "57c249248f11852ad55fa03156fb3e30736eb3516f5fcf2ed4af7b97cd2e5ec5",
+   "adjudicate_py_sha256": "24be95c65e072c2f86c0d4c5a6e6587df3992e39c4709a9e2ffabba411520ccc",
    "adjudicator_role_sha256": "ecc7e8faa2c7c349e98f48cce3f164a4884c86e07e717fbcab03d5c8929578e0",
    "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
    "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
@@ -79,7 +79,7 @@
    "registered_at": "2026-09-24",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": ".claude/workflows/layer-verdict-lane.js",
-   "workflow_sha256": "ca5d5a2b65f2d1a7e3597a388944ee41b0de5f9f75c97221b2ff47e26dd1f8c6"
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6"
   },
   {
    "agent_sha256": "40f8470900672411e4a1d56fe9b35edc3b6f2f011de65fe8e8d4b721cb37b3de",
@@ -87,7 +87,7 @@
    "registered_at": "2026-09-24",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-   "workflow_sha256": "ca5d5a2b65f2d1a7e3597a388944ee41b0de5f9f75c97221b2ff47e26dd1f8c6"
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6"
   }
  ],
  "codex": [
@@ -153,6 +153,11 @@
   },
   {
    "codex_lane_py_sha256": "6e87887124d9be6db99fd2d3dc8e88ec8e340097d5464ffee56e624630b8f573",
+   "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
+   "registered_at": "2026-09-24"
+  },
+  {
+   "codex_lane_py_sha256": "e2cceabda8ee2e40c0dd4c64041187ccc492e248f2faa45adb2ab805cba8b7aa",
    "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
    "registered_at": "2026-09-24"
   }

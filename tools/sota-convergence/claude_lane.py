@@ -154,6 +154,18 @@ def failure_reason(layer: dict) -> str:
 LANE_PROMPT = HERE / "lane-prompt.md"
 
 
+def consumed_packets_issue(result: dict, work_dir: Path) -> None:
+    """Every layer must echo the packet its agents read (Codex review of #145, agent-lab #47): the work dir's
+    ``packets/<catalog>__<layer_id>.json``, whose current bytes hash to the layer's packet_sha256."""
+    for layer in result.get("layers") or [] if isinstance(result, dict) else []:
+        name = f"{layer.get('catalog')}__{layer.get('layer_id')}.json"
+        expected = (Path(work_dir).resolve() / "packets" / name)
+        if layer.get("packet_path") != str(expected):
+            raise ProvenanceError(f"layer {name} was run on packet {layer.get('packet_path')!r}, not {expected}")
+        if not expected.is_file() or hashlib.sha256(expected.read_bytes()).hexdigest() != layer.get("packet_sha256"):
+            raise ProvenanceError(f"layer {name}: {expected} does not hash to the packet_sha256 the lane ran with")
+
+
 def consumed_prompt_sha256(result: dict) -> str:
     """sha256 of the prompt the workflow echoes (independent review of #145, M1); it must be this catalog's
     lane-prompt.md, as the Codex lane's prompt_sha256 is, so a run on an edited or built-in prompt is refused."""
@@ -200,7 +212,10 @@ def launch_tree(result: dict, repo: Path, role_sha256: str = None) -> str:
     export_issue = repo_issue(repo)
     if export_issue:
         raise ProvenanceError(export_issue)
-    current = tree_sha256(repo)
+    try:
+        current = tree_sha256(repo)
+    except ValueError as error:
+        raise ProvenanceError(str(error)) from error
     if current != launch["repo_tree_sha256"]:
         raise ProvenanceError(f"the evidence tree under --repo is {current}, not the launch digest "
                               f"{launch['repo_tree_sha256']}; it changed after launch, so rerun on a fixed export")
@@ -229,6 +244,7 @@ def main(argv=None) -> int:
     try:
         provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
         result = json.loads(args.result.read_text(encoding="utf-8"))
+        consumed_packets_issue(result, args.work_dir)
         provenance["prompt_sha256"] = consumed_prompt_sha256(result)
         provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve(), provenance["agent_sha256"])
     except ProvenanceError as error:

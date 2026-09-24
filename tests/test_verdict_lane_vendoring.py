@@ -70,6 +70,7 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         return both and refuse a promptless real run (agent-lab #42 and #45)."""
         source = (ROOT / "examples" / "claude-native" / "workflows" / "layer-verdict-lane.js").read_text(encoding="utf-8")
         self.assertIn("return { lane: 'claude', launch: LAUNCH, prompt: PROMPT,", source)
+        self.assertIn("packet_sha256: p.sha256, packet_path: p.path,", source)
         self.assertIn("prompt must be the lane-prompt.md text when packets are given", source)
         self.assertIn("launch must be an object whose repo equals repo", source)
 

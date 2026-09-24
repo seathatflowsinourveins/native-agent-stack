@@ -796,6 +796,22 @@ class EvidenceTreeProvenanceTests(CodexLaneFixture):
         self.assertIn("the evidence tree changed during the run", err.getvalue())
 
 
+class EscapingSymlinkTreeTests(CodexLaneFixture):
+    """Codex review of #145: content behind a symlink leaving the tree could change under an unchanged digest."""
+
+    def test_the_tree_digest_refuses_a_symlink_leaving_the_repository(self):
+        (self.repo / "inner.md").write_text("x", encoding="utf-8")
+        os.symlink("inner.md", self.repo / "inner-link.md")
+        codex_lane.tree_sha256(self.repo)
+        os.symlink("/etc/hostname", self.repo / "outside-link")
+        with self.assertRaises(ValueError):
+            codex_lane.tree_sha256(self.repo)
+        self.write_packet("foundation", "native-clients")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_lane(), 2)
+        self.assertIn("symlink leaving it", err.getvalue())
+
+
 class ExactProvenanceResumeTests(CodexLaneFixture):
     """Round-8 review of #145: resume needs the recorded provenance to equal the current one exactly; a return
     carrying an extra or changed provenance field is not resumed."""

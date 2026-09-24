@@ -63,6 +63,10 @@ class AdjudicateFixture(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.base = Path(temporary.name).resolve()
+        # The position index lives outside the work dir, under this state directory (never the real one in tests).
+        state = mock.patch.dict(os.environ, {adjudicate.STATE_DIR_ENV: str(self.base / "state")})
+        state.start()
+        self.addCleanup(state.stop)
         self.work = self.base / "work"
         # blind-adjudicator refuses a repository root with fewer than four path components.
         self.repo = self.base / "hosts" / "blind" / "repo"
@@ -150,7 +154,7 @@ class InputsTests(AdjudicateFixture):
     def test_disagreement_is_detected_and_both_returns_are_scrubbed(self):
         code, _err = self.inputs()
         self.assertEqual(code, 0)
-        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
+        index = json.loads((adjudicate.index_path(self.work)).read_text(encoding="utf-8"))
         entry = index["layers"][0]
         self.assertEqual(entry["agreement"], "disagree")
         self.assertEqual(entry["components"]["claude"], [["comp-one", "https://github.com/example/one"]])
@@ -203,7 +207,7 @@ class InputsTests(AdjudicateFixture):
     def test_agreeing_layer_writes_no_input(self):
         self.write_return("codex", "c1")
         self.inputs()
-        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
+        index = json.loads((adjudicate.index_path(self.work)).read_text(encoding="utf-8"))
         self.assertEqual(index["layers"][0]["agreement"], "agree")
         self.assertFalse((self.work / "adjudication-inputs" / f"{NAME}.AB.json").exists())
 
@@ -634,7 +638,7 @@ class RereviewOf145Tests(AdjudicateFixture):
         out = self.base / "adjudications"
         out.mkdir()
         (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
-        index_path = self.work / adjudicate.INDEX_NAME
+        index_path = adjudicate.index_path(self.work)
         index = json.loads(index_path.read_text(encoding="utf-8"))
         index["skipped"] = [{"layer": NAME, "reason": "host paths remain after scrubbing"}]
         index["layers"] = []
@@ -674,7 +678,7 @@ class SecondRereviewOf145Tests(AdjudicateFixture):
         (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
         (self.work / "codex" / f"{NAME}.json").unlink()
         self.inputs()
-        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
+        index = json.loads((adjudicate.index_path(self.work)).read_text(encoding="utf-8"))
         self.assertIn(NAME, [entry["layer"] for entry in index["skipped"]])
         quiet(adjudicate.main, ["assemble", "--work-dir", str(self.work), "--out", str(out)])
         self.assertFalse((out / f"{NAME}.json").exists())
@@ -802,7 +806,7 @@ class FifthRereviewOf145Tests(AdjudicateFixture):
         self.assertNotEqual(adjudicate.tree_sha256(self.repo), before)
 
     def test_a_packet_changed_after_inputs_is_refused(self):
-        index = json.loads((self.work / adjudicate.INDEX_NAME).read_text(encoding="utf-8"))
+        index = json.loads((adjudicate.index_path(self.work)).read_text(encoding="utf-8"))
         packet = Path(index["layers"][0]["packet_path"])
         packet.write_text(packet.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "packets changed after"):
@@ -1330,6 +1334,8 @@ class IndependentReviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate.secrets, "choice", return_value="B"):
             self.inputs()
         self.assertFalse((self.work / "adjudication-inputs" / "index.json").exists())
+        self.assertFalse((self.work / adjudicate.INDEX_NAME).exists())
+        self.assertFalse(adjudicate.index_path(self.work).is_relative_to(self.work))
         entry = adjudicate.load_index(self.work)["layers"][0]
         self.assertEqual(entry["claude_position"], {"AB": "B", "BA": "A"})
         ab = json.loads((self.work / "adjudication-inputs" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
@@ -1364,6 +1370,45 @@ class RereviewR2Tests(unittest.TestCase):
         roots = ("/x/hosts/blind/export",)
         sealed = record_verdicts.sealed_text(record_verdicts.with_relative_sources(data, adjudicate.REPO_ROOT, roots))
         self.assertEqual(adjudicate.sealed_form_sha256(data, roots), hashlib.sha256(sealed.encode("utf-8")).hexdigest())
+
+
+class SixteenthRereviewOf145Tests(AdjudicateFixture):
+    """Codex review of #145 at a2434e2e: the index cannot flip a winner, and a flagged Codex audit voids the
+    judgment."""
+
+    JUDGE = NinthRereviewOf145Tests.JUDGE
+    REFUTE = NinthRereviewOf145Tests.REFUTE
+
+    def test_an_edited_position_map_does_not_flip_the_winner(self):
+        self.inputs()
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "claude")
+        code, err, record = self.assemble()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(record["winner_lane"], "claude")
+        path = adjudicate.index_path(self.work)
+        index = json.loads(path.read_text(encoding="utf-8"))
+        flip = {"A": "B", "B": "A"}
+        index["layers"][0]["claude_position"] = {order: flip[pos] for order, pos in index["layers"][0]["claude_position"].items()}
+        path.write_text(json.dumps(index), encoding="utf-8")
+        code, err, record = self.assemble()
+        self.assertIn("does not match the input contents", err)
+        self.assertIsNone(record)
+
+    def test_a_flagged_codex_audit_voids_the_judgment(self):
+        self.inputs()
+        events = self.work / "adjudication-judgments" / "codex" / "events"
+        events.mkdir(parents=True, exist_ok=True)
+        index_file = adjudicate.index_path(self.work)
+        (events / f"{NAME}.AB.judge.jsonl").write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": f"cat {index_file}"}}) + "\n", encoding="utf-8")
+        code, err = NinthRereviewOf145Tests.run_codex(self, ["a" * 64, "a" * 64])
+        self.assertEqual(code, 1)
+        self.assertIn(adjudicate.AUDIT_FLAGGED, err)
+        record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual(record["failure"], adjudicate.AUDIT_FLAGGED)
+        self.assertIsNone(record["judge"])
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
