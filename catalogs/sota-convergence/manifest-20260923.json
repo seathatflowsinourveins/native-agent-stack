@@ -903,6 +903,91 @@
      "lane": "landscape-sweep-20260923"
     },
     {
+     "repository": "https://github.com/obra/superpowers",
+     "source": "landscape-sweep-20260923: completeness-critic-named; independently verified via gh api against affaan-m/ECC and the Anthropic official marketplace listing",
+     "demonstrated_gap": "Direct competitor to the recorded winner affaan-m/ECC \u2014 same category (a skill/instinct framework teaching a development methodology) \u2014 but with more stars than ECC (290,678 vs 266,188) and than anthropics/skills itself (177,828), plus confirmed inclusion in Anthropic's own curated plugin directory (anthropics/claude-plugins-official marketplace.json, 1 of 311 entries), a signal ECC is not confirmed to hold. This directly answers the completeness critic's fairness challenge: the sweep rejected other community skill collections as 'not official specs' while keeping ECC, itself a community skill collection; superpowers is a same-category, officially-listed, more-starred alternative that was ne",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run the same bounded task set through ECC-installed skills and through superpowers-installed skills on the same worker model/effort and harness; measure task-quality/acceptance pass rate, loaded-context tokens per task, and whether the worker (not just the client) actually discovers and triggers the relevant skill. Matching or better quality and worker-level discovery at equal-or-lower token cost displaces or adds superpowers as winner; a clear ECC win or tie at lower footprint keeps ECC and leaves superpowers keep_but_compare.",
+     "evidence": [
+      "gh api repos/obra/superpowers",
+      "gh api repos/obra/superpowers/releases/latest",
+      "gh api repos/obra/superpowers/readme \u2014 Codex App/Codex CLI sections (README lines ~95-105), \"the skills trigger automatically\" (line 46), cross-harness native SessionStart hook across Claude Code/Codex/Cursor/Gemini/Pi (line 282)",
+      "gh api repos/anthropics/claude-plugins-official/contents/.claude-plugin/marketplace.json \u2014 decoded and parsed: plugin entry name=\"superpowers\", source https://github.com/obra/superpowers.git, 1 of 311 total entries",
+      "gh api repos/affaan-m/ECC (rechecked for comparison: 266,188 stars, pushed 2026-09-22T23:09:59Z)"
+     ],
+     "upstream_now": {
+      "latest": "v6.4.1",
+      "released_at": "2026-09-19",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 290234,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api confirms repo exists, fork:false, archived:false, stars 290681 (claimed 290678, within 10%), pushed_at exact, latest v6.4.1 exact incl. published_at. README lines verified exact (Codex sections ~95-105, line 282 SessionStart text verbatim). marketplace.json: 311 entries confirmed, superpowers entry+source URL exact. ECC comparison stats confirmed. No inaccuracies found."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Already dispositioned: independent-discovery.json discovery_only (2026-09-21), manifest-20260922 keep_but_compare ('second mandatory methodology plus hooks'). README: 'Mandatory workflows, not suggestions'; SessionStart hook on startup|clear|compact; 'YOU MUST USE IT'. That violates 'without activating whole catalogs'. Gap is stars+listing; ECC kept only as 2 pinned skills."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/vercel-labs/skills",
+     "source": "landscape-sweep-20260923: completeness-critic-named; independently verified via gh api and README against the 3 current content winners",
+     "demonstrated_gap": "None of the layer's 3 winners (ECC, typesafe-ai/skills, openai/skills) is an installer/activation-scoping tool \u2014 all three are skill-content sources, not a selective-install mechanism. vercel-labs/skills is the scoped-installation layer the requirement's 'without activating whole catalogs' clause names, and can be pointed at any of the 3 winners' own repos or the already-known vercel-labs/agent-skills.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Compare a worker given the current full-repo sync of ECC/openai-skills/typesafe-ai-skills against a worker given only the `npx skills add <repo> -s <matching-skill> -a claude-code` scoped subset, on the same task set. Measure loaded-context tokens per task and task-quality/acceptance pass rate. Matching quality at materially lower token cost adopts vercel-labs/skills as the installation layer for the existing content winners; missed skills (lower quality) from scoping keeps the current whole-repo sync.",
+     "evidence": [
+      "gh api repos/vercel-labs/skills",
+      "gh api repos/vercel-labs/skills/releases/latest",
+      "gh api repos/vercel-labs/skills/readme \u2014 'Install a Skill' / 'Use a Skill Without Installing' / 'Options' table listing -g/--global, -a/--agent, -s/--skill, -l/--list, --copy, -y/--yes, --all",
+      "distinct repo from the already-known vercel-labs/agent-skills (skill-content collection) confirmed via separate gh api repos/vercel-labs/agent-skills lookup, fork:false for vercel-labs/skills"
+     ],
+     "upstream_now": {
+      "latest": "v1.7.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 32350,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api confirms repo exists, fork:false, archived:false, stars 32351 (claimed 32350), pushed_at exact, latest v1.7.0+published_at exact. README headings 'Install a Skill'/'Use a Skill Without Installing'/'Options' confirmed; all 7 cited flags (-g,-a,-s,-l,--copy,-y,--all) verified present. Distinct id from known vercel-labs/agent-skills. No inaccuracies found."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Fit and standing are real, but there is no gap: it is already this layer's installer. native-practice.json installation_method.tool is 'npx skills' (npm skills 1.7.0 = vercel-labs/skills) with --skill/--agent commands; ~/.agents/.skill-lock.json v3 lists 11 per-skill installs. The 'full-repo sync' baseline does not exist. Record repo+CLI pin; not a candidate."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
      "repository": "https://github.com/anthropics/skills",
      "source": "sickn33/agentic-awesome-skills 'Official Sources' and quemsah/awesome-claude-plugins top-100",
      "demonstrated_gap": "No demonstrated gap. This is the official Agent Skills repository and it is absent from all six working files (known-repository set built from foundation-layers, trading-catalog, star-candidates, github-freshness). Individual skills may duplicate installed ones (docx/pdf/pptx/xlsx/skill-creator appear in this session's anthropic-skills listing), but provenance was not checked.",
@@ -934,6 +1019,48 @@
      },
      "disposition": "refuted_keep_but_compare",
      "lane": "beyond"
+    },
+    {
+     "repository": "https://github.com/intellectronica/ruler",
+     "source": "landscape-sweep-20260923: completeness-critic-named; independently verified via gh api/README and cross-checked against two gh search sweeps of the same niche",
+     "demonstrated_gap": "No winner addresses canonical-rules propagation at all. This project's own CLAUDE.md -> @AGENTS.md -> @RTK.md three-file chain (agent-lab/CLAUDE.md, AGENTS.md, RTK.md, mirrored again under ~/.claude/) is exactly the hand-maintained multi-file drift ruler is built to replace with one source. Weaker signal than the other 3 candidates: only 2,933 stars, self-labelled 'Beta Research Preview,' and its last tagged release (v0.3.44) is from 2026-06-30, about 3 months old, despite the repo itself being pushed today.",
+     "proposed_label": "keep_but_compare",
+     "comparison_that_would_overturn": "On a fixture with a deliberate CLAUDE.md/AGENTS.md drift case (two files given conflicting rules for the same task), compare task correctness and rule-adherence between the current hand-maintained multi-file state and files generated from one `.ruler/` source via `ruler apply`. If drift-induced errors drop and the generated files pass this project's existing gitleaks/zizmor-style checks unchanged, adopt ruler for rules authoring; if the beta tooling mishandles this project's nested AGENTS.md/CLAUDE.md @-include structure or introduces new errors, keep hand-maintained files and leave ruler keep_but_compare.",
+     "evidence": [
+      "gh api repos/intellectronica/ruler",
+      "gh api repos/intellectronica/ruler/releases/latest",
+      "gh api repos/intellectronica/ruler/readme \u2014 'Why Ruler?', 'Core Features' (Centralised Rule Management, Nested Rule Loading, Automatic Distribution, MCP Server Propagation), 'Supported AI Agents' table rows for Claude Code (.claude/skills/) and OpenAI Codex CLI (.agents/skills/)",
+      "gh search repos \"AGENTS.md\" --sort stars --limit 20 and gh search repos \"agent rules\" --sort stars --limit 15 \u2014 no larger direct competitor in the same rules-sync niche surfaced (closest: PanisHandsome/ai-rules-sync at 119 stars)"
+     ],
+     "upstream_now": {
+      "latest": "v0.3.44",
+      "released_at": "2026-06-30",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 2933,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api confirms repo exists, fork:false, archived:false, stars 2933 exact, pushed_at exact (today), latest v0.3.44+published_at exact, self-labeled beta (~3mo-old tag) as claimed. README Core Features/Supported Agents rows (Claude Code .claude/skills/, Codex .agents/skills/) confirmed verbatim. PanisHandsome/ai-rules-sync=119 stars confirmed; candidate1 misattributes same repo elsewhere."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Self-labelled 'Beta Research Preview', nested mode experimental, 2,933 stars, last release 2026-06-30: niche. Gap false: CLAUDE.md '@AGENTS.md' is Claude Code's documented one-file method ('never makes Claude read AGENTS.md twice'); the RTK.md files differ by scope. Ruler writes a generated CLAUDE.md and gitignores outputs by default. The fixture tests a failure mode that is absent here."
+       }
+      ]
+     },
+     "disposition": "refuted_keep_but_compare",
+     "lane": "landscape-sweep-20260923"
     }
    ],
    "open_gaps": [
@@ -1320,6 +1447,93 @@
      },
      "disposition": "not_adopted_confirmed",
      "lane": "beyond"
+    },
+    {
+     "repository": "https://github.com/HKUDS/DeepCode",
+     "source": "landscape-sweep-20260923: found via gh search repos \"agent orchestration\" --sort stars (WebSearch was exhausted session-wide before this layer's independent-discovery pass, so GitHub search substitute",
+     "demonstrated_gap": "Direct competitor to the already-known full-product entries on this layer (claude-code, openhands/openhands, openai/codex) on the exact delegate+preserve+review pattern the requirement names, but delivered as one integrated product rather than composed from Claude Code + Worktrunk; also bears on open gap 1 (no executed head-to-head comparison against any challenger) and gap 6 (worktree-cleanup/no-dirty-state proof is missing for the current winners), since DeepCode's 'isolated worktrees with explicit conflict handling' is an alternate, unevaluated implementation of the same guarantee.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run the same two bounded tasks used for the Gas Town comparison (including one injected failing change) through DeepCode's Loop-Engineering worktree delegation, and compare against native Claude Code workers + Worktrunk on: (1) whether the failed verification's diff, reasoning and evidence are actually retained and reviewable in the Session afterward, as documented; (2) whether DeepCode's worktree conflict handling leaves clean state after an interrupted/failed run; (3) review-gate strength, i.e. whether 'genuinely blocked' routes to a human decision point comparable to PR review or only to another automated repair loop. A measured win on retained-failure fidelity and clean-interruption beha",
+     "evidence": [
+      "gh api repos/HKUDS/DeepCode --jq '{stargazers_count,pushed_at,archived,license,fork}' -> 16628 stars, pushed_at 2026-09-22T10:35:19Z, archived:false, MIT, fork:false",
+      "gh api repos/HKUDS/DeepCode/releases/latest -> tag v2.2.0, published_at 2026-09-06T10:17:59Z, prerelease:false",
+      "gh api repos/HKUDS/DeepCode/readme (base64-decoded, 1452 lines) -> lines 572, 581-583, 681-683 quoted above, fetched and grepped directly",
+      "gh search repos \"agent orchestration\" --sort stars --json fullName,stargazersCount,pushedAt,isArchived,description -> surfaced HKUDS/DeepCode at 16628 stars (WebSearch substitute, see limits)",
+      "https://github.com/HKUDS/DeepCode"
+     ],
+     "upstream_now": {
+      "latest": "v2.2.0",
+      "released_at": "2026-09-06",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 16628,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Independently re-verified via gh api: fork:false, parent:null, not archived. Stars 16628/pushed_at/license/v2.2.0 release match claim exactly. README (1452 lines) quotes confirmed at/within 1-2 lines of cited locations. HKUDS/LightRAG, HKUDS/Vibe-Trading confirm same org. Absent from known-all.json and layer's known_repositories."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Source contradicts fit and gap 6: control.py merges a sub-agent branch into base (merge --no-ff) as each turn ends, before review; finally-blocks run worktree remove --force + branch -D even on conflict/exception, so failed diffs are not kept. Standing: stars/SOTA are Paper2Code (README: not a general coding benchmark); coding agent dates 2026-07-08; 12 issues since v2.0."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/gastownhall/gastown",
+     "source": "landscape-sweep-20260923: named directly by the follow-up completeness-critic round (pre-labeled targeted_candidate); independently re-verified from primary source via gh api repo/README/release/graph",
+     "demonstrated_gap": "Direct competitor to the claude-code + worktrunk winner pair on this layer's own recorded open gaps: gap 1 (no executed head-to-head comparison exists against any challenger \u2014 Gas Town is an unevaluated challenger), gap 4 (usage/accounting is unresolved: recovery native cumulative usage exceeds deduplicated persisted usage by 205701 tokens \u2014 Gas Town's per-Polecat persistent identity/work-history tracking is an alternate, unevaluated accounting model), and gap 6 (worktree crash cleanup that deletes no unrelated/dirty state is not proven for Worktrunk \u2014 Gas Town's Hooks claim the same crash/restart-survival property by design, also unevaluated).",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "In a disposable owned repository, run two bounded tasks through Gas Town (gt sling/gt convoy dispatching Polecats within a Rig) and the same two tasks through native Claude Code workers + Worktrunk, injecting one deliberately failing change into each arm. Measure: (1) whether the failing change is retained/isolated rather than silently merged (Refinery isolation vs. Worktrunk's dirty-worktree refusal); (2) whether post-run worktree/hook cleanup leaves no unrelated or dirty state; (3) whether total token/usage accounting reconciles completely across both arms. A measured win for Gas Town on at least 2 of 3 axes, with no new isolation or credential-boundary regression, would be grounds to prom",
+     "evidence": [
+      "gh api repos/gastownhall/gastown --jq '{stargazers_count,pushed_at,archived,license,fork}' -> 18168 stars, pushed_at 2026-09-18T00:41:51Z, archived:false, MIT, fork:false",
+      "gh api repos/gastownhall/gastown/releases/latest -> tag v1.2.1, published_at 2026-06-06T17:17:53Z, prerelease:false",
+      "gh api repos/steveyegge/gastown -> resolves to full_name gastownhall/gastown (302-style redirect confirmed via REST)",
+      "gh api graphql 'repository(owner:\"steveyegge\",name:\"gastown\"){nameWithOwner url isFork parent{nameWithOwner}}' -> nameWithOwner gastownhall/gastown, isFork:false, parent:null",
+      "gh api repos/gastownhall/gastown/readme (base64-decoded, 842 lines) -> lines 7, 70, 94-96, 661 quoted above, fetched and grepped directly",
+      "https://github.com/gastownhall/gastown"
+     ],
+     "upstream_now": {
+      "latest": "v1.2.1",
+      "released_at": "2026-06-06",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 18168,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Re-verified independently via gh api: not a fork (fork:false, parent:null), not archived, transferred from steveyegge/gastown (confirmed via 301 redirect), not a rename-away duplicate. Stars/pushed_at/license/v1.2.1 release match claim exactly. README quotes confirmed at cited lines. Absent from known-all.json and layer's known_repositories (only gastownhall/beads present)."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Standing fails: named repo is dormant. 0 main commits since 2026-07-23, 0 PRs merged since 07-24; pushed_at 09-18 is an auto-closed dependabot PR. Org docs say the machinery was extracted into gastownhall/gascity (Gas Town now a gascity-packs pack). v1.2.1 pins beads v1.0.5 vs v1.3.0 (#4789 outage). Gap 4/6 claims unsupported; open #4439/#4440 show owned-branch clobbering."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
     },
     {
      "repository": "https://github.com/nimbalyst/nimbalyst",
@@ -2480,6 +2694,50 @@
    ],
    "candidates": [
     {
+     "repository": "https://github.com/PaddlePaddle/PaddleOCR",
+     "source": "landscape-sweep-20260923: completeness-critic follow-up (PaddleOCR pre-labeled targeted_candidate, metrics pre-supplied) independently re-verified via gh api graphql and cross-checked against the inde",
+     "demonstrated_gap": "Direct gap-filler for the layer's own named OCR/inferred-layout gap. On opendatalab's OmniDocBench v1.6 leaderboard PaddleOCR-VL-1.6 ranks 1st Overall (96.34), ahead of MinerU2.5-Pro (95.75) and MinerU-Pipeline (86.47); on the independent Ai2 olmOCR-bench, PaddleOCR-VL scores 80.0+/-1.0 Overall (self-reported by PaddlePaddle per that table's footnote), second only to Chandra (83.1, also self-reported) and above Marker's Ai2-in-house-reproduced 76.1 and MinerU 2.5.4's self-reported 75.2.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run PP-StructureV3 and PaddleOCR-VL-1.6, alongside poppler+MarkItDown (current winners) and Marker/MinerU/Chandra, on the project's own frozen scanned+born-digital corpus (the critic's own protocol); score text edit distance, table TEDS, and whether QMD can retrieve the source body, and record GPU/CPU cost on this WSL host. If poppler+MarkItDown with a lighter OCR fallback, or another candidate, matches PaddleOCR's accuracy at materially lower compute, PaddleOCR is not warranted.",
+     "evidence": [
+      "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
+      "gh api graphql repository(owner:\"PaddlePaddle\",name:\"PaddleOCR\") this session: stargazerCount 90099, pushedAt 2026-09-16T03:31:50Z, isArchived false, isFork false, licenseInfo Apache-2.0, latestRelease v3.7.0 @ 2026-06-11T12:09:14Z (exactly matches the critic-supplied figures)",
+      "https://github.com/PaddlePaddle/PaddleOCR",
+      "opendatalab/OmniDocBench README v1.6_full leaderboard (as quoted by the completeness critic, itself from gh api repos/opendatalab/OmniDocBench/readme): PaddleOCR-VL-1.6 Overall 96.34, rank 1",
+      "allenai/olmocr README olmOCR-bench table, fetched via gh api repos/allenai/olmocr/readme this session (cached at docret-aOTu/olmocr_bench_readme.md): PaddleOCR-VL* Overall 80.0+/-1.0; footnote: 'Results are reproduced in-house, except those marked with *, which are reported by model authors'",
+      "https://huggingface.co/PaddlePaddle/PaddleOCR-VL (WebFetch this session): ~1.0B params (0.9B VLM + 0.3B ERNIE-4.5 LM), 7,841 monthly downloads, 1.66k likes, 27 Spaces"
+     ],
+     "upstream_now": {
+      "latest": "v3.7.0",
+      "released_at": "2026-06-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-16",
+      "stars": 90099,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": true,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api graphql+REST: exists, resolves to itself (isFork/isMirror false, parent null), not archived. Absent from 259-entry known list and layer's 7 known_repositories. pushed_at 2026-09-16 (6d ago, within 6mo). upstream_now exact match: stars 90099, latest v3.7.0@2026-06-11T12:09:14Z, Apache-2.0, archived=false. All claimed facts independently verified."
+       },
+       {
+        "lens": 1,
+        "refuted": false,
+        "confidence": "medium",
+        "reasoning": "Fit/standing hold: PP-StructureV3/PaddleOCR-VL-1.6 emit Markdown/JSON with coordinates for poppler's OCR gap; 90,099 stars; Apache-2.0 code+weights; overturn vs poppler+MarkItDown is measurable. Correct: OmniDocBench v1.6 rank is 3rd (TeleOCR 96.91, OvisOCR2 96.47; commit 6ab5f3067e, 2026-09-11), not 1st, voiding the targeted_candidate basis; Docling (catalog layout candidate) is not an arm."
+       }
+      ]
+     },
+     "disposition": "targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
      "repository": "https://github.com/datalab-to/marker",
      "source": "landscape-sweep-20260923: WebSearch 'best open source PDF to Markdown document parsing library 2026 leader' + WebSearch 'MinerU vs Marker vs Docling document parsing benchmark 2026' + gh api repos/dat",
      "demonstrated_gap": "The layer's own open gap says poppler's acceptance covers only 'designed born-digital Latin pages with explicit table geometry' and that 'OCR, inferred layouts, arbitrary filings and semantic questions remain unqualified.' Marker is purpose-built for exactly that unqualified territory. On the third-party olmocr-bench (Ai2's benchmark, not Datalab's own), Marker's README reports balanced mode at 76.0% overall / 83.5% on born-digital PDFs, 'ahead of MinerU and docling,' at ~5x MinerU's pages/sec in the apples-to-apples pipeline comparison -- a direct competitor to poppler (and to known-but-non-winner docling) on the flagged OCR/layout gap.",
@@ -2526,9 +2784,9 @@
     {
      "repository": "https://github.com/opendatalab/MinerU",
      "source": "landscape-sweep-20260923: WebSearch 'MinerU vs Marker vs Docling document parsing benchmark 2026' + gh api repos/opendatalab/MinerU + gh api repos/opendatalab/MinerU/readme + gh api repos/opendatalab/",
-     "demonstrated_gap": "Same explicit gap as Marker, but MinerU is a distinct, independently-vendored competitor: per its own README it is benchmarked on OmniDocBench (opendatalab/OmniDocBench, linked from MinerU's own repo), where 2026 secondary coverage reports it leading with an English text error rate of 0.061 and Chinese 0.215 -- a CJK/complex-layout strength no layer winner currently covers. Caveat: this leadership figure is on OpenDataLab's own benchmark (self-reported); see limits.",
+     "demonstrated_gap": "Same explicit gap as Marker: the layer's open gap says OCR, inferred layouts and arbitrary filings remain unqualified for poppler. MinerU is an independently vendored document-parsing pipeline that its README benchmarks on OpenDataLab's own OmniDocBench. The fit review records MinerU2.5-Pro at 4/35 on OmniDocBench v1.6 (self-reported benchmark, not verified here); the English/Chinese error-rate figures first cited were v1.0-era and are removed, and CJK is not a recorded layer gap. A pinned current benchmark result is still needed before any differentiation claim.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run MinerU against poppler, MarkItDown and Marker on the catalog's own representative complex-layout/CJK/multi-column document set (or reproduce OmniDocBench and olmocr-bench for all three), scoring markdown/table/formula fidelity and end-to-end RAG-answer accuracy; if the catalog's actual documents are Latin/born-digital only and never require CJK or complex-layout inference, MinerU's specific strength is moot for this catalog.",
+     "comparison_that_would_overturn": "Run MinerU against poppler, MarkItDown and Marker on the catalog's own representative complex-layout, multi-column and scanned document set, scoring markdown/table/formula fidelity and end-to-end RAG-answer accuracy, with a pinned current OmniDocBench or olmocr-bench result recorded for context; if the catalog's documents need no complex-layout inference, MinerU adds nothing here.",
      "evidence": [
       "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
       "gh api repos/opendatalab/MinerU -> stars 80537, pushed_at 2026-09-23T20:01:32Z, archived false, fork false, parent null",
@@ -2690,6 +2948,47 @@
       ]
      },
      "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/datalab-to/chandra",
+     "source": "landscape-sweep-20260923: named by the completeness critic as 'the sweep itself flagged' this repo; metadata and README independently fetched and verified this session",
+     "demonstrated_gap": "The only one of the four OCR candidates here that tops the independent olmOCR-bench (83.1+/-0.9, self-reported) among OCR-specialist tools, ahead of PaddleOCR-VL (80.0) and well ahead of Marker (76.1, independently reproduced) and MinerU (75.2); explicitly flagged by this project's own sweep as 'a further arm.' Caveats: far smaller project (12,317 stars vs 80k-90k for PaddleOCR/MinerU); its most recent tagged GitHub release (v0.2.0) is from 2026-03-18 even though commits continue through 2026-06-26 and its own README dates 'Chandra 2' to 3/2026 with no corresponding newer git tag; its independent-bench score is self-reported, not third-party reproduced.",
+     "proposed_label": "keep_but_compare",
+     "comparison_that_would_overturn": "Same frozen-corpus run, scoring text edit distance/table TEDS/QMD retrievability and GPU/CPU cost; because Chandra's headline advantage is self-reported on a benchmark it does not control (unlike its own datalab.to marketing), an in-house reproduction that confirms or refutes the 83.1 figure on this project's corpus would directly decide whether Chandra or Marker is the better OCR-specialist arm to keep.",
+     "evidence": [
+      "gh api graphql repository(owner:\"datalab-to\",name:\"chandra\") this session: stargazerCount 12317, pushedAt 2026-06-26T10:26:47Z, isArchived false, licenseInfo Apache-2.0, latestRelease v0.2.0 @ 2026-03-18T15:16:25Z",
+      "gh api repos/datalab-to/chandra/contents/README.md this session: 'Chandra OCR 2 is a state of the art OCR model that converts images and PDFs into structured HTML/Markdown/JSON'; 'Tops external olmocr benchmark'; News: '3/2026 - Chandra 2 is here'; Model License badge OpenRAIL-M",
+      "allenai/olmocr README olmOCR-bench table: Chandra OCR 0.1.0* Overall 83.1+/-0.9, top score among the OCR-specialist rows on this table"
+     ],
+     "upstream_now": {
+      "latest": "v0.2.0",
+      "released_at": "2026-03-18",
+      "prerelease": false,
+      "pushed_at": "2026-06-26",
+      "stars": 12317,
+      "license": "Apache-2.0 (code); model weights under OpenRAIL-M via datalab.to pricing, same commercial structure as Marker",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api graphql+REST: exists, resolves to itself, not fork/mirror/archived. Absent from known lists. pushed_at 2026-06-26 (88d/~2.9mo ago, within 6mo window). upstream_now exact match: stars 12317, latest v0.2.0@2026-03-18T15:16:25Z, Apache-2.0, archived=false. All claimed facts independently verified; candidate's own caveat about tag lagging commits is accurate, not a freshness violation."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "medium",
+        "reasoning": "Fit/standing hold (chandra-ocr-2: 2,479,114 HF downloads/30d), but the entry misstates facts. Weights: free only under $2M, 'cannot be used competitively with our API', commercial self-hosting needs a license (not Marker's terms). 83.1 is superseded Chandra 1; v0.2.0 IS Chandra OCR 2 (85.9 self-reported). Its rule is Chandra-vs-Marker on that figure, not vs winners. Re-propose corrected."
+       }
+      ]
+     },
+     "disposition": "refuted_keep_but_compare",
      "lane": "landscape-sweep-20260923"
     },
     {
@@ -3128,6 +3427,50 @@
     }
    ],
    "candidates": [
+    {
+     "repository": "https://github.com/ollama/ollama",
+     "source": "landscape-sweep-20260923: named directly by the completeness critic from SocratiCode's own README default-stack language; verified read-only via gh api and Ollama's own docs/faq.mdx",
+     "demonstrated_gap": "direct competitor to vllm-project/vllm (embedding-service component). SocratiCode's README (fetched via gh api repos/giancarloerra/socraticode/readme; lines ~82, 122, 130) names the local Qdrant+Ollama stack as default, has OLLAMA_MODE=auto auto-detect/start native Ollama, and recommends native Ollama over Docker for Metal/CUDA acceleration on medium-to-large repos \u2014 yet this project instead runs vLLM 0.25.0 via the generic lmstudio-compatible path, and open gaps 1 (no cross-model retrieval-quality benchmark) and 2 (index/watcher recovery not_established beyond Qdrant snapshot/query state) have never been measured against the vendor-documented default backend. Gap 4 (only vLLM 0.25.0 accepte",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run SocratiCode's embedding index/query path against native Ollama and against vLLM 0.25.0 using the same embedding-model family (e.g. nomic-embed-text or a shared bge/mxbai variant), explicitly recording Ollama's GGUF build vs vLLM's HF/safetensors weights, over a frozen held-out set of code questions. Measure retrieval quality (top-k correctness/MRR), index build time, peak GPU memory, and index+watcher recovery time after a backend restart (Ollama's documented 5-minute default keep_alive / OLLAMA_KEEP_ALIVE unload-reload cycle, per docs/faq.mdx, vs vLLM cold start). Ollama would be adopted as the qualified local embedding service only if it matches or beats vLLM 0.25.0 on retrieval qualit",
+     "evidence": [
+      "evidence/artifacts/landscape-sweep-20260923/ollama-ollama.json",
+      "gh api repos/ollama/ollama -q '{stars,pushed_at,archived,license,fork}' -> stars 181534, pushed_at 2026-09-23T23:54:41Z, archived false, license MIT, fork false, full_name unchanged (no rename)",
+      "gh api repos/ollama/ollama/releases/latest -> tag v0.34.3, published_at 2026-09-19T00:02:57Z, prerelease false",
+      "gh api repos/ollama/ollama/contents/docs/faq.mdx -> 'How do I keep a model loaded in memory or make it unload immediately?': default 5-minute keep_alive, OLLAMA_KEEP_ALIVE env var, keep_alive=-1/0 semantics, request queuing while a model (re)loads",
+      "gh api repos/giancarloerra/socraticode/readme -> lines 82 ('Docker running for the default local Qdrant and Ollama stack'), 122 ('OLLAMA_MODE=auto reuses a detected native Ollama instance or starts managed Ollama'), 130 ('install native Ollama ... for Metal/CUDA acceleration'), and line 859 ('ollama pull nomic-embed-text')",
+      "https://ollama.com/blog/embedding-models (WebFetch) -> lists mxbai-embed-large, nomic-embed-text, all-minilm as supported embedding models"
+     ],
+     "upstream_now": {
+      "latest": "v0.34.3",
+      "released_at": "2026-09-19",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 181494,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": true,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Resolves to itself: fork:false, parent:null, html_url canonical, direct URL 200 (no redirect). archived:false, pushed_at 2026-09-23T23:54:41Z (today) matches claim exactly. stars 181534, latest v0.34.3 released 2026-09-19T00:02:57Z prerelease:false, license MIT all match upstream_now exactly. Not in the 259-entry sweep-known-all.json nor the layer's own known_repositories. Checked the pre-rename o"
+       },
+       {
+        "lens": 1,
+        "refuted": false,
+        "confidence": "medium",
+        "reasoning": "Fit and standing hold: SocratiCode README L1541 makes ollama the default EMBEDDING_PROVIDER, its v1.14.0 watcher/embeddings/e2e tests run real Ollama, and vLLM is never mentioned; 181,534 stars. Fix before running: Ollama's library has no Nemotron embed, so nomic/mxbai arms swap the model; add a vLLM 0.25.0+Nemotron-3-Embed-1B incumbent arm and numeric thresholds."
+       }
+      ]
+     },
+     "disposition": "targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
     {
      "repository": "https://github.com/CoIR-team/coir",
      "source": "WebSearch (arXiv 2407.02883 / ACL 2025) + gh api graphql",
@@ -4189,6 +4532,51 @@
       ]
      },
      "disposition": "keep_but_compare",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+     "source": "landscape-sweep-20260923: completeness-critic-directed re-evaluation of ChromeDevTools/chrome-devtools-mcp, corroborated independently via gh api metadata, the repo's own README, and the official Chro",
+     "demonstrated_gap": "Direct competitor to agent-browser and playwright-cli: neither known winner exposes CDP-depth introspection (performance-trace/Core-Web-Vitals insights, network-request bodies, source-mapped console stack traces) that chrome-devtools-mcp provides. It reaches the page through a different vendor/engine path (Google's Chrome DevTools Protocol via Puppeteer) than the Playwright-engine path shared by both winners and by the already-rejected microsoft/playwright-mcp, so it is a distinct arm rather than a re-run of that prior rejection.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "On the retained loopback page-interaction fixture and the Nautilus-adapter-guide case Tavily missed, run agent-browser, playwright-cli, and chrome-devtools-mcp (--headless --isolated) side by side and measure task success, recorded tool version and host OS, recovery behavior after a forced browser crash, and context tokens consumed per step. A result where chrome-devtools-mcp matches or beats both winners on success and crash-recovery at comparable or lower tokens/step would justify promoting it alongside or in place of one; the README's disclaimer that the server 'exposes content of the browser instance to the MCP clients ... allowing them to inspect, debug, and modify any data in the brows",
+     "evidence": [
+      "gh api repos/ChromeDevTools/chrome-devtools-mcp -> stars 52527, archived false, fork false, license Apache-2.0, pushed_at 2026-09-23T20:48:41Z",
+      "gh api repos/ChromeDevTools/chrome-devtools-mcp/releases/latest -> tag chrome-devtools-mcp-v1.10.1, published_at 2026-09-23T10:37:16Z, prerelease false",
+      "gh api repos/ChromeDevTools/chrome-devtools-mcp/contents/README.md -> Key features section (perf traces, network, source-mapped console), Disclaimers block (lines 24-51), --slim/--headless example (line 93), --headless/--isolated/--slim parameter list (line 125)",
+      "gh api repos/ChromeDevTools/devtools-frontend -> 'The Chrome DevTools UI', confirms the ChromeDevTools org is the real upstream Chrome DevTools source (official-vendor corroboration)",
+      "gh search repos 'chrome devtools mcp' --sort stars --limit 20 -> next-largest independent hit is a 957-star downstream skill built on top of it; no comparable competitor",
+      "WebFetch https://developer.chrome.com/blog/chrome-devtools-mcp -> official Chrome for Developers announcement authored by Mathias Bynens and Michael Hablich (Chrome team), independent of GitHub metadata",
+      "grep -i against sweep-known-all.json (259 entries) for 'chrome'/'devtools' -> 0 matches, confirms not already known"
+     ],
+     "upstream_now": {
+      "latest": "chrome-devtools-mcp-v1.10.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 52527,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api: stars 52527, pushed 2026-09-23, tag v1.10.1, Apache-2.0, archived/fork=false all match. Not fork/rename (isFork false, parent null, no redirect). README lines 93/125 verbatim-confirmed. Blog genuine (Bynens/Hablich). Absent from sweep-known-all.json. Caveat: sibling catalog logs repo + playwright-mcp as keep_but_compare, not rejected as claimed - narrative flaw, identity sound."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Official ChromeDevTools repo (52.5k stars) but the gap claim is false: agent-browser v0.38.1 README has trace, profiler, console --json (raw CDP), network request/HAR bodies, vitals, and is native-Rust CDP ('No Playwright'); playwright-cli v0.1.21 has console/requests/tracing. Unique tools (Lighthouse, heap) are web-app debugging. Not new: 2026-09-22 record, 0/3 yes."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
      "lane": "landscape-sweep-20260923"
     },
     {
@@ -9408,7 +9796,7 @@
      "source": "landscape-sweep-20260923: WebSearch 'best open source secret scanning tools 2026 gitleaks trufflehog comparison' (named field co-leader) + gh api repos/trufflesecurity/trufflehog + WebFetch of README",
      "demonstrated_gap": "Direct competitor to gitleaks (this layer's winner) with a concrete capability difference: gitleaks does regex/entropy pattern matching only, while TruffleHog additionally verifies each match is a live credential via the real provider API (README: \"For every potential credential that is detected, we've painstakingly implemented programmatic verification against the API that we think it belongs to\"), which directly separates real incidents from noise \u2014 a capability the layer's known set (gitleaks, trivy) does not have.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run gitleaks and TruffleHog (--only-verified) over the same fixture (this repo's synthetic secret fixtures plus a seeded git history with at least one live-format credential): if verification measurably cuts false-positive triage effort or catches a live-credential incident gitleaks' rules miss, TruffleHog is added alongside gitleaks; if gitleaks' existing ruleset plus manual triage already reaches the same outcome with less overhead, it stays out.",
+     "comparison_that_would_overturn": "Run gitleaks and TruffleHog over the same fixture (this repository's synthetic secret fixtures plus a seeded git history). For the verification arm use a controlled, revocable test credential kept outside the published fixture (or an upstream-supported verification test mechanism), revoked after the run: synthetic or format-only secrets cannot exercise verification (--only-verified reports nothing for them). If verification measurably cuts false-positive triage effort or confirms a live credential gitleaks' rules miss, TruffleHog is added alongside gitleaks; otherwise it stays out.",
      "evidence": [
       "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
       "https://github.com/trufflesecurity/trufflehog",
@@ -9444,6 +9832,50 @@
       ]
      },
      "disposition": "targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/betterleaks/betterleaks",
+     "source": "landscape-sweep-20260923: named directly by the completeness-critic follow-up round; confirmed independently via gitleaks' own README and betterleaks' own repo/README/release metadata (gh api)",
+     "demonstrated_gap": "direct competitor to gitleaks/gitleaks: gitleaks' own README (gh api repos/gitleaks/gitleaks/readme) states 'Gitleaks is feature complete... Future releases will be security patches only. I'm shifting my focus to Betterleaks.' Betterleaks adds Expr-based contextual filters (a more expressive successor to gitleaks' [[allowlist]] TOML), asynchronous live secret validation, BPE-based false-positive filtering, and more scan sources than gitleaks' engine currently has.",
+     "proposed_label": "keep_but_compare",
+     "comparison_that_would_overturn": "Through the host's guarded, bounded runner (the repo's comparison-execute stage), run betterleaks on the same synthetic inert fixtures and the 22-commit range the gitleaks receipt used; compare findings/recall, false positives, exit-code semantics, migration from .gitleaks.toml, and whether betterleaks' v1.8.1 release artifact is signature- or provenance-verifiable. Overturn gitleaks only if recall matches or improves, false positives do not rise, and the release artifact is verifiable.",
+     "evidence": [
+      "evidence/artifacts/landscape-sweep-20260923/betterleaks-betterleaks.json",
+      "gh api repos/betterleaks/betterleaks -> stars 2012, pushed_at 2026-09-23T18:15:01Z, archived false, license MIT, fork false, parent null",
+      "gh api repos/betterleaks/betterleaks/releases/latest -> v1.8.1 published_at 2026-08-18T21:15:55Z",
+      "gh api repos/betterleaks/betterleaks/readme -> 'maintained by the folks who made Gitleaks, including the original author'; Expr-based filtering described as 'a more expressive [[allowlist]] system'",
+      "gh api repos/gitleaks/gitleaks/readme -> warning banner: 'Gitleaks is feature complete... Future releases will be security patches only. I'm shifting my focus to Betterleaks'",
+      "gh api repos/gitleaks/gitleaks/releases/latest -> v8.30.1 published_at 2026-03-21T02:17:58Z vs repos/gitleaks/gitleaks pushed_at 2026-09-23T04:14:00Z"
+     ],
+     "upstream_now": {
+      "latest": "v1.8.1",
+      "released_at": "2026-08-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 2012,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": true,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api: repo resolves to itself, fork=false, parent=null, mirror_url=null, archived=false, created 2026-02-03 (independent, not a gitleaks fork). Stars 2012, pushed_at and latest tag v1.8.1 match claim exactly. Not in known-all.json (259 entries) or layer known list. Gitleaks own README independently links to it as successor."
+       },
+       {
+        "lens": 1,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Fits: git/dir scanner with git --pre-commit --staged. Gap verified: gitleaks README says feature complete, security patches only, focus shifted to Betterleaks; zricethezav is top contributor to both. Standing: MegaLinter v10 replaced gitleaks with it; Homebrew core. 463 default rules vs 222; validation off by default; v1.8.1 has a sigstore bundle. Overturn test is measurable."
+       }
+      ]
+     },
+     "disposition": "keep_but_compare",
      "lane": "landscape-sweep-20260923"
     },
     {
@@ -9528,6 +9960,48 @@
       ]
      },
      "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/GitGuardian/ggshield",
+     "source": "landscape-sweep-20260923: gh search repos 'secrets detection' --sort stars leader-field scan, cross-checked against sweep-known-all.json absence, confirmed via gh api",
+     "demonstrated_gap": "direct competitor to gitleaks/gitleaks: GitGuardian is a named vendor with a continuously updated, 500+ detector catalog plus validity checks and official pre-commit/pre-push/pre-receive hook modes aimed squarely at stopping secrets before publication, a commercially backed alternative to a project whose maintainer has now put it into security-patch-only mode.",
+     "proposed_label": "keep_but_compare",
+     "comparison_that_would_overturn": "Run ggshield against the same fixtures/commit range in local-only mode (no GitGuardian cloud dashboard); compare recall, false-positive rate, and CI exit-code semantics against the current gitleaks wiring, and confirm whether its validity-check features degrade gracefully without a GitGuardian API key. Overturn gitleaks only if local-only ggshield matches or improves recall/false-positives at full offline parity.",
+     "evidence": [
+      "gh search repos 'secrets detection' --sort stars --json ... -> GitGuardian/ggshield stars 1999, pushed_at 2026-09-23T18:37:16Z, description 'Detect and validate 500+ types of hardcoded secrets... pre-commit hook, GitHub Action, or CLI'",
+      "gh api repos/GitGuardian/ggshield -> archived false, fork false, license MIT",
+      "gh api repos/GitGuardian/ggshield/releases/latest -> v1.54.0 published_at 2026-08-26T12:48:29Z",
+      "grep -i 'ggshield|gitguardian' over sweep-known-all.json (259 entries) -> no match"
+     ],
+     "upstream_now": {
+      "latest": "v1.54.0",
+      "released_at": "2026-08-26",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 1999,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "gh api: repo resolves to itself, fork=false, parent=null, mirror_url=null, archived=false, created 2020-04-20 (mature, 6yr). Stars 1999, pushed_at same-day, latest tag v1.54.0 match claim exactly. Not in known-all.json or layer known list. README confirms 500+ secret-type detection claim verbatim."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "A client of GitGuardian's SaaS, not a local scanner: README says it scans through GitGuardian's API and needs auth to its servers; rust/hook/src/lib.rs says 'Detection is server-side... no rules live here.' The 'local-only'/'full offline parity' overturn cannot run by design and would upload repo content to a vendor. Hooks are no gap: gitleaks ships pre-commit."
+       }
+      ]
+     },
+     "disposition": "refuted_keep_but_compare",
      "lane": "landscape-sweep-20260923"
     },
     {
@@ -9797,6 +10271,50 @@
    ],
    "candidates": [
     {
+     "repository": "https://github.com/anthropics/claude-code-action",
+     "source": "landscape-sweep-20260923: relayed by completeness critic (follow-up round: anthropics/claude-code-action), verified via gh api metadata + action.yml + README content fetch",
+     "demonstrated_gap": "Layer open_gaps #2: \"No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate.\" None of the 3 current winners (worktrunk, cli/cli, difftastic) run an automated review; cli/cli only wraps `gh pr review` for a human/script to invoke. claude-code-action is the official Anthropic-authenticated action that performs that review autonomously on PR events.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run claude-code-action on a disposable repo's PR (scoped permissions contents:read, pull-requests:write) against a clean diff and a deliberately-broken diff; capture its posted review comments, its behavior on the failing diff, and its OAuth-token vs anthropic_api_key secret handling. Diff that output against (i) the local /codex:review lane and (ii) github/gh-aw's Claude-engine workflow on the identical diff, scored on review precision/recall and secret hygiene. NOT run in this pass -- see limits.",
+     "evidence": [
+      "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+      "gh api repos/anthropics/claude-code-action -> stars 8934, pushed_at 2026-09-23T19:41:08Z, archived false, license MIT, fork false",
+      "gh api repos/anthropics/claude-code-action/tags -> newest v1.0.233 (git tags run ahead of the GitHub Release object)",
+      "gh api repos/anthropics/claude-code-action/releases/latest -> tag_name v1, published_at 2025-08-26T17:01:10Z, prerelease false (older Release object; no Release exists specifically for v1.0.233)",
+      "gh api repos/anthropics/claude-code-action/contents/action.yml -> claude_code_oauth_token described as \"Claude Code OAuth token (alternative to anthropic_api_key)\"",
+      "gh api repos/anthropics/claude-code-action/contents/README.md -> Solutions Guide bullets \"Automatic PR Code Review\" and \"Path-Specific Reviews\""
+     ],
+     "upstream_now": {
+      "latest": "v1.0.233",
+      "released_at": null,
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 8934,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": true,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Confirmed via gh api: not fork/rename, absent from known lists, archived=false, stars 8934 and pushed_at exact matches today. action.yml and README lines 39-40 verbatim confirmed. Note: a real GitHub Release exists for v1.0.233 (published today), contradicting the evidence's 'no Release exists' parenthetical, but the stated latest-tag value itself is correct."
+       },
+       {
+        "lens": 1,
+        "refuted": false,
+        "confidence": "medium",
+        "reasoning": "Holds on fit/standing: official docs (code.claude.com/docs/en/github-actions) show a PR review workflow posting inline comments and a subscription token via claude setup-token; README 39-40 and action.yml 70-71 match. Fixes: Release v1.0.233 exists (2026-09-23T19:40:57Z); already targeted_candidate (SDK sweep) and HOST-09; add the Claude App permission cost and a c2 gh PR arm."
+       }
+      ]
+     },
+     "disposition": "targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
      "repository": "https://github.com/The-PR-Agent/pr-agent",
      "source": "landscape-sweep-20260923: WebSearch 'best open source AI PR code review tool 2026 GitHub' ranked PR-Agent as the most capable fully open-source, self-hostable option, distinct from the closed Qodo hos",
      "demonstrated_gap": "Layer open_gaps #2: 'No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate.' PR-Agent is a dedicated tool for exactly this unestablished function (automated review content on real PRs), complementary to and narrower than gh-aw's broader agentic-workflow approach.",
@@ -9874,6 +10392,48 @@
         "refuted": true,
         "confidence": "high",
         "reasoning": "Fails 'Own Git worktrees' on the current release: latest jj docs say 'git-worktree: No' and hooks unsupported; worktree bridging (PR #9941) and `jj workspace remove` exist only in CHANGELOG [Unreleased], after v0.45.1. The op log undoes repo operations, not worktree cleanup. README calls jj experimental; the cited Wavect post itself advises Git worktrees first."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
+     "repository": "https://github.com/openai/codex-action",
+     "source": "landscape-sweep-20260923: relayed by completeness critic (follow-up round: openai/codex-action), verified via gh api metadata + README content fetch",
+     "demonstrated_gap": "Same open_gaps #2 (no gh PR create/review/merge result recorded for any candidate) -- codex-action is the Codex-authenticated path for it, but with a materially different auth/fit profile than claude-code-action: README line 5 states \"Users must provide an API key for their chosen provider (for example, OPENAI_API_KEY or AZURE_OPENAI_API_KEY...) as a GitHub Actions secret\"; no OAuth/ChatGPT-sign-in alternative is offered, and it has no GitHub Release objects at all (only git tags), a lighter packaging signal than claude-code-action or gh-aw.",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "Run the same disposable-repo, clean-diff/failing-diff protocol used for claude-code-action, but for codex-action, additionally verifying its docs/security.md sandboxing claim (\"tight control over the privileges available to Codex\") and its API-key-only secret handling, compared against gh-aw's OpenAI-engine workflow and claude-code-action's OAuth path on the identical diff. NOT run in this pass -- see limits.",
+     "evidence": [
+      "gh api repos/openai/codex-action -> stars 1246, pushed_at 2026-09-19T01:29:33Z, archived false, license Apache-2.0, fork false",
+      "gh api repos/openai/codex-action/tags -> newest v1.12",
+      "gh api repos/openai/codex-action/releases/latest -> 404 Not Found; gh api repos/openai/codex-action/releases -> [] (no GitHub Release objects exist, only tags)",
+      "gh api repos/openai/codex-action/contents/README.md -> line 5 \"Users must provide an API key for their chosen provider... as a GitHub Actions secret\"; \"Create Your Own Pull Request Bot\" example"
+     ],
+     "upstream_now": {
+      "latest": "v1.12",
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-19",
+      "stars": 1246,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Confirmed via gh api: not fork/rename, absent from known lists, archived=false, stars 1246 and pushed_at exact matches. Zero Release objects and 404 on releases/latest verified exactly as claimed. README line 5 API-key requirement and 'Create Your Own Pull Request Bot' heading confirmed verbatim. No discrepancies found."
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "low",
+        "reasoning": "Official and on-scope (README PR-bot example; OpenAI docs: post reviews), but no codex-action-specific gap: Codex-family PR review is c3's recorded path under native sign-in (verdict_overturn_when c), and this action takes only openai-api-key (action.yml), a route the catalog records at $0 hosted spend. The 'tight control' quote is README line 3, not docs/security.md."
        }
       ]
      },
@@ -11359,6 +11919,52 @@
    "alternatives_keep_but_compare": [],
    "candidates": [
     {
+     "repository": "https://github.com/duckdb/ducklake",
+     "source": "landscape-sweep-20260923: named by the completeness critic's follow-up round as the winning engine's own lakehouse-format companion; independently re-verified here via gh api repo/tags/releases/readme",
+     "demonstrated_gap": "Direct extension of the winner duckdb/duckdb, not a replacement. It closes part of open_gaps[3] ('No throughput, concurrency or multi-writer measurement exists for DuckDB or any server or lake alternative') by giving DuckDB a documented multi-writer path: per ducklake.select's catalog-database docs, a DuckDB-file catalog is single-client only, SQLite supports limited local multi-process access, and Postgres is the recommended backend for a 'multi-user lakehouse' with no stated writer limitation \u2014 raw DuckDB+Parquet has no equivalent native option. It also touches open_gaps[5] (hash-reproduction today depends on an external LEAN order-events file) by giving native, engine-level snapshot IDs/t",
+     "proposed_label": "targeted_candidate",
+     "comparison_that_would_overturn": "On the existing SEC-shaped and LEAN order-event fixtures: (1) write an initial DuckLake snapshot, then a corrected re-write, and confirm `AT (VERSION => n)` returns the exact original snapshot while `table_changes(...)` surfaces the correction \u2014 versus plain DuckDB+Parquet+DVC, where the same property needs an external commit/file scheme; (2) run the same fixtures with a DuckDB-file catalog (documented single-client limit) versus a Postgres catalog under two concurrent writers, recording success/failure/corruption \u2014 the first concurrency/multi-writer measurement this layer currently lacks (open_gaps[3]). If plain DuckDB+Parquet+DVC matches DuckLake's snapshot-reread and correction-retention ",
+     "evidence": [
+      "gh api repos/duckdb/ducklake (stars=2999, pushed_at=2026-09-22T15:13:52Z, archived=false, license=MIT, fork=false)",
+      "gh api repos/duckdb/ducklake/tags -> [] (no tags)",
+      "gh api repos/duckdb/ducklake/releases -> [] (no releases; ships as a DuckDB extension, not a tagged release)",
+      "gh api repos/duckdb/ducklake/readme -> path docs/README.md; line 12 (format description); lines 62-89 (Time Travel, Schema Evolution, Change Data Feed)",
+      "gh api repos/duckdb/duckdb (winner engine context: stars=41669, pushed_at=2026-09-23T19:09:31Z, archived=false) and repos/duckdb/duckdb/releases/latest (tag=v1.5.5, published_at=2026-07-22T10:51:50Z, prerelease=false)",
+      "https://ducklake.select/docs/stable/ (WebFetch: confirms DuckLake v1.0, marked stable, older versions 0.1-0.4 superseded)",
+      "https://ducklake.select/docs/stable/duckdb/usage/choosing_a_catalog_database (WebFetch: DuckDB catalog = single-client; SQLite = local multi-process with write-lock retry; Postgres = recommended for 'multi-user lakehouse', no stated writer limitation; MySQL = explicitly 'do not recommend ... as a catalog', known issues)",
+      "grep -i ducklake sweep-known-all.json -> no match (confirmed not in catalog-wide known list)"
+     ],
+     "upstream_now": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 2999,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "adversarial_verification": {
+      "survives": false,
+      "votes": [
+       {
+        "lens": 0,
+        "refuted": false,
+        "confidence": "high",
+        "reasoning": "Independently re-verified via gh api: resolves to itself (HTTP 200, no redirect), fork=false, archived=false, disabled=false, stars=2999, pushed_at=2026-09-22T15:13:52Z, license=MIT, no tags/releases (extension) - all exact matches to claim. Not in sweep-known-all.json or layer known_repositories. README docs/README.md line 12 and lines 62-89 match claimed content exactly. WebFetch confirmed v1.0-"
+       },
+       {
+        "lens": 1,
+        "refuted": true,
+        "confidence": "high",
+        "reasoning": "Fit/standing pass (official DuckDB lake format, v1.0 stable 2026-04-13, 2999 stars). Gap fails: open_gaps[3] is a measurement gap; layer admits a lake only after DuckDB concurrency is shown insufficient. 'No writer limit' is contradicted by open #1283/#1094/#1404; #1215 still loses deletes on 1.5.5. open_gaps[5] untouched. Part 2 tests DuckLake vs itself; no Iceberg arm or decimal check."
+       }
+      ]
+     },
+     "disposition": "refuted_targeted_candidate",
+     "lane": "landscape-sweep-20260923"
+    },
+    {
      "repository": "https://github.com/fivetran/great_expectations",
      "source": "landscape-sweep-20260923: WebSearch comparison of Python data-validation frameworks (Great Expectations vs Pandera, 2026) surfaced GE as the pipeline-governance-grade competitor to the layer's known P",
      "demonstrated_gap": "Direct competitor to the layer's known unionai-oss/pandera, which the layer record calls out as tested 'only on synthetic 4-row CSV fixtures' with 'no production bars/universe ingest' producing a real snapshot yet, and the record separately states 'No evidence I read shows the store rejecting data whose historical availability or eligibility is unknown.' Pandera is a lightweight, ~12-dependency DataFrame schema-validation library with no built-in pipeline governance, no persisted validation-result history, and no generated stakeholder-facing audit trail. GX adds exactly those three missing pieces (Checkpoints, a validation-result store, Data Docs) plus multi-engine support (pandas/Spark/SQL/",
@@ -12431,7 +13037,7 @@
      "source": "landscape-sweep-20260923: gh search repos 'RD-Agent quant' returned nothing, so queried gh api repos/microsoft/RD-Agent directly; WebFetch of the README confirmed the quant-finance scenario built on Q",
      "demonstrated_gap": "None of the 40 known repositories automate the factor+model research loop itself: qlib supplies the platform and data pipeline, and a human (or this workflow's own agents) must still manually design factors/models and run the qualification cycle. RD-Agent(Q) is Microsoft's own actively developed agentic layer performing exactly that on top of Qlib, reporting (per its own README/tech report, unverified on this project's data) roughly 2x the annualized return of benchmark factor libraries using over 70% fewer factors.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "On this project's own PIT equity universe and purged/embargoed folds: run RD-Agent(Q)'s automated factor+model co-evolution for a fixed wall-clock/compute budget against a human-run qlib LGBModel baseline workflow, scoring both on IC, realized Sharpe net of costs, and factor count on the same held-out split. If RD-Agent's loop doesn't beat the human-run baseline net of its own compute cost, or doesn't reproduce its published return/factor-count advantage on this project's actual panel (versus the paper's benchmark), it stays keep-but-compare.",
+     "comparison_that_would_overturn": "On this project's own PIT equity universe and purged/embargoed folds: run RD-Agent(Q)'s automated factor+model co-evolution for a fixed wall-clock/compute budget against a human-run qlib LGBModel baseline workflow. Reserve a final segment before the run that RD-Agent's loop never sees (its feedback step selects iterations on the test segment's IC/ARR, so that segment is not held out), and score both on it only once, after factor/model evolution has finished: IC, realized Sharpe net of costs, and factor count. If RD-Agent's loop does not beat the human-run baseline net of its own compute cost on that untouched segment, it stays keep-but-compare.",
      "evidence": [
       "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
       "https://github.com/microsoft/RD-Agent",
@@ -16156,7 +16762,7 @@
      "source": "landscape-sweep-20260923: found via this project's own earlyoom process-preference record naming it alongside the three current winners, then verified against GitHub via gh api and checked absent from",
      "demonstrated_gap": "Direct competitor to gitleaks. TruffleHog adds live verification -- calling the credential's own provider (AWS, GitHub, Stripe, etc.) to confirm whether a matched secret is still active -- which gitleaks does not do. That is a concrete capability gitleaks structurally lacks, and it directly answers the recorded gap's own phrasing ('does not certify that no secrets exist') by turning a pattern match into a certified live/dead result.",
      "proposed_label": "targeted_candidate",
-     "comparison_that_would_overturn": "Run trufflehog (verification on) over the same commit range already covered by the dated 2026-09-19 gitleaks receipt; adopt/add only if verification confirms true-positive live secrets gitleaks' rules miss, or measurably cuts false positives an operator would otherwise have to triage on that same fixture.",
+     "comparison_that_would_overturn": "Run trufflehog with verification over the commit range already covered by the dated 2026-09-19 gitleaks receipt, plus a controlled, revocable test credential kept outside the published fixture (or an upstream-supported verification test mechanism) and revoked after the run, since synthetic secrets cannot exercise verification; add it only if verification confirms live secrets gitleaks' rules miss or measurably cuts false positives an operator would otherwise triage on that same fixture.",
      "evidence": [
       "gh api repos/trufflesecurity/trufflehog -> stars 28034, archived false, pushed_at 2026-09-23T22:55:03Z, license AGPL-3.0",
       "gh api repos/trufflesecurity/trufflehog/releases/latest -> v3.97.8, published 2026-09-23T18:11:54Z, prerelease false",
@@ -16780,9 +17386,9 @@
    "web_search": 0
   },
   "landscape-sweep-20260923": {
-   "web_search": 160,
-   "web_fetch": 61,
-   "gh_api": 871
+   "web_search": 182,
+   "web_fetch": 74,
+   "gh_api": 1107
   }
  },
  "lane_limits": {
@@ -16854,8 +17460,11 @@
    "Discovery: one Sonnet 5 researcher per layer at effort max (WebSearch <=10, WebFetch <=4, gh api <=30 per layer); adversarial verification: a facts/identity refuter (Sonnet 5, max) and a fit/standing refuter (Opus 5.5, max) per layer, each defaulting to refuted; a candidate survives only when neither refutes it; one Opus 5.5 (max) completeness critic and one bounded follow-up round over at most 8 critic-flagged layers.",
    "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a winner; survival means the proposal withstood fact and fit checks, not that the candidate is better than a winner.",
    "upstream_now values are as observed by the researcher's gh api calls during the run (2026-09-23/24 UTC), not a github_freshness.py fetch.",
-   "Call counts cover the discovery agents only; refuter and critic calls are not counted here.",
-   "A first run at lower worker effort was stopped at 7 of 32 discovery returns when the effort policy changed; its partial results were discarded, not merged."
+   "Call counts cover the discovery agents only; refuter and critic calls are not counted here. Completed run wf_38aa6d5d-d6c: 119 agents (32 discovery, 31+31 refuters, 1 critic, 8 follow-up discovery with 8+8 refuters), 12,123,864 subagent tokens, 2,823 tool uses, 6,615 s wall clock, as reported by the workflow runtime.",
+   "The completeness critic's follow-up round (8 critic-flagged layers, same two-refuter rule) is merged into this lane with the first round.",
+   "Prior documentary records of survivors (no catalog decision, so they remain candidates): PaddlePaddle/PaddleOCR is discovery_only in catalogs/landscape/claude-independent-discovery.json, where a 2026-09-21 refuter recorded PP-StructureV3 below MinerU2.5 on OmniDocBench; anthropics/claude-code-action is keep_but_compare in catalogs/sota-convergence/sdk-runtime-coverage-20260922.json (an SDK/runtime coverage study, not this layer).",
+   "A first run (workflow wf_28d47bbc-1b5) at lower worker effort (discovery Sonnet high, refuters Sonnet medium and Opus high) was stopped after 9 of 32 discovery returns and no refuter returns, when the effort policy changed to max for every worker. It is retained, not merged, at evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json with each returned repository, its call counts, and whether this run re-proposed it; its provider usage was not captured (unknown).",
+   "Post-review amendments (Codex cross-family review of #153, 2026-09-24), votes and survival unchanged: RD-Agent's comparison now scores on a final segment its feedback loop never sees; both TruffleHog comparisons use a controlled, revocable credential for the verification arm; MinerU's stale v1.0-era OmniDocBench figures and CJK framing are removed from its gap and comparison."
   ]
  },
  "reconciliations": [
@@ -17082,7 +17691,7 @@
   "trading_layers_note": "trading_layers counts only taxonomy layers with at least one selected entry, unlike foundation_layers (which counts every row); trading[] itself always has one row per taxonomy id, so len(manifest[\"trading\"]) can exceed trading_layers whenever a taxonomy layer happens to have zero selected entries",
   "components_confirmed": 120,
   "pins_behind_upstream": 51,
-  "candidates_total": 166,
+  "candidates_total": 180,
   "pins_behind_upstream_unique_components": 25,
   "pins_behind_upstream_by_review_status": {
    "not_individually_reviewed": 11,
@@ -17106,11 +17715,11 @@
   },
   "pins_not_compared_note": "rows whose pin the generator could not compare with upstream (the exclusions above, plus a pin or upstream latest with no parseable version, reason unversioned) carry pin_behind_upstream null and pin_comparison not_compared, never a definite false",
   "candidates_by_disposition": {
-   "refuted_targeted_candidate": 84,
-   "refuted_keep_but_compare": 36,
+   "refuted_targeted_candidate": 91,
+   "refuted_keep_but_compare": 39,
    "not_adopted_confirmed": 29,
-   "targeted_candidate": 6,
-   "keep_but_compare": 2,
+   "targeted_candidate": 9,
+   "keep_but_compare": 3,
    "refuted_not_adopted": 3,
    "keep_but_compare_unverified": 1,
    "not_adopted_unverified": 4,

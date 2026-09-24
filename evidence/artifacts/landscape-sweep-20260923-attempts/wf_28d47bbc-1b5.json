@@ -1,0 +1,221 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260923-attempt-1",
+ "workflow_run": "wf_28d47bbc-1b5",
+ "superseded_by": "wf_38aa6d5d-d6c",
+ "status": "stopped",
+ "stop_reason": "Stopped by the coordinator when the user's effort policy changed to effort max for every worker; relaunched with identical prompts at effort max as wf_38aa6d5d-d6c.",
+ "worker_settings": {
+  "discovery": "sonnet/high",
+  "facts_refuter": "sonnet/medium",
+  "fit_refuter": "opus/high",
+  "critic": "opus/high"
+ },
+ "discovery_returns": 9,
+ "refuter_returns": 0,
+ "provider_usage": "unknown: the workflow runtime reports usage only for a completed run, and none was captured for this stopped run",
+ "layers": [
+  {
+   "layer_id": "code-navigation",
+   "calls": {
+    "web_search": 6,
+    "web_fetch": 0,
+    "gh_api": 30
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/scip-code/scip",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/facebookincubator/Glean",
+     "proposed_again_in_completed_run": false
+    },
+    {
+     "repository": "https://github.com/universal-ctags/ctags",
+     "proposed_again_in_completed_run": true
+    }
+   ]
+  },
+  {
+   "layer_id": "document-retrieval",
+   "calls": {
+    "web_search": 3,
+    "web_fetch": 0,
+    "gh_api": 19
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/opendatalab/MinerU",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/datalab-to/marker",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/allenai/olmocr",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/Unstructured-IO/unstructured",
+     "proposed_again_in_completed_run": true
+    }
+   ]
+  },
+  {
+   "layer_id": "durable-memory",
+   "calls": {
+    "web_search": 8,
+    "web_fetch": 0,
+    "gh_api": 21
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/doobidoo/mcp-memory-service",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/MemTensor/MemOS",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/NevaMind-AI/memU",
+     "proposed_again_in_completed_run": false
+    },
+    {
+     "repository": "https://github.com/modelcontextprotocol/servers",
+     "proposed_again_in_completed_run": false
+    }
+   ]
+  },
+  {
+   "layer_id": "instructions-skills",
+   "calls": {
+    "web_search": 8,
+    "web_fetch": 0,
+    "gh_api": 18
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/agentsmd/agents.md",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/agent-ecosystem/skill-validator",
+     "proposed_again_in_completed_run": false
+    }
+   ]
+  },
+  {
+   "layer_id": "isolation",
+   "calls": {
+    "web_search": 2,
+    "web_fetch": 0,
+    "gh_api": 9
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/firecracker-microvm/firecracker",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/kata-containers/kata-containers",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/containers/bubblewrap",
+     "proposed_again_in_completed_run": false
+    },
+    {
+     "repository": "https://github.com/google/nsjail",
+     "proposed_again_in_completed_run": false
+    }
+   ]
+  },
+  {
+   "layer_id": "native-clients",
+   "calls": {
+    "web_search": 5,
+    "web_fetch": 0,
+    "gh_api": 26
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/google-gemini/gemini-cli",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/anomalyco/opencode",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/aaif-goose/goose",
+     "proposed_again_in_completed_run": false
+    }
+   ]
+  },
+  {
+   "layer_id": "semantic-rag",
+   "calls": {
+    "web_search": 4,
+    "web_fetch": 0,
+    "gh_api": 19
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/huggingface/text-embeddings-inference",
+     "proposed_again_in_completed_run": true
+    }
+   ]
+  },
+  {
+   "layer_id": "web-research",
+   "calls": {
+    "web_search": 3,
+    "web_fetch": 0,
+    "gh_api": 18
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/microsoft/playwright-mcp",
+     "proposed_again_in_completed_run": false
+    },
+    {
+     "repository": "https://github.com/browserbase/stagehand",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/exa-labs/exa-mcp-server",
+     "proposed_again_in_completed_run": true
+    },
+    {
+     "repository": "https://github.com/jina-ai/reader",
+     "proposed_again_in_completed_run": true
+    }
+   ]
+  },
+  {
+   "layer_id": "workers",
+   "calls": {
+    "web_search": 4,
+    "web_fetch": 0,
+    "gh_api": 20
+   },
+   "repositories": [
+    {
+     "repository": "https://github.com/BloopAI/vibe-kanban",
+     "proposed_again_in_completed_run": false
+    },
+    {
+     "repository": "https://github.com/smtg-ai/claude-squad",
+     "proposed_again_in_completed_run": false
+    }
+   ]
+  }
+ ],
+ "limitations": [
+  "Retained for audit only; nothing here was merged into manifest-20260923. No refuter evaluated these returns.",
+  "Repositories not proposed again by the completed run are not candidates of this wave; they are dated inputs for a later sweep."
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "schema_version": 1,
+ "id": "source-review-paddlepaddle-paddleocr",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/PaddlePaddle/PaddleOCR",
+ "reviewed_commit": "dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of PaddlePaddle/PaddleOCR at commit dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf (license Apache-2.0), read from README.md at that commit. Repository description: \"Turn any PDF or image document into structured data for your AI. A powerful, lightweight OCR toolkit that bridges the gap between images/PDFs and LLMs. Supports 100+ languages.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf",
+   "text": "- Other Enhancements: - Separated core and optional dependencies. Only minimal core dependencies are required for basic text recognition; additional dependencies for document parsing and information extraction can be installed as needed. - Enabled support for NVIDIA RTX 50 series graphics cards on Windows; users can refer to the installation guide for the corresponding PaddlePaddle framework versi"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/PaddlePaddle/PaddleOCR/tree/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf",
+  "https://github.com/PaddlePaddle/PaddleOCR/blob/dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf/README.md"
+ ]
+}

@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "2b9dc0fd80da25f1eb30442087d7e7eb3e8735f19e14d0fdc74490d923885052",
-      "bytes": 1061957
+      "sha256": "512cbb18602ee4ebe9ba793cf66926c8295e5a8cf52c47448334b3ae530f15a6",
+      "bytes": 1116799
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -23949,9 +23949,24 @@
       "bytes": 7401
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
+      "sha256": "3785003ac2d1079949e5be864c88f174db1e802775626f6468df5bfcc3fc89ba",
+      "bytes": 5551
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+      "sha256": "3def2204893bc2df60d65a50ef5a9d2d2494d8a9c3bbf56f53ce85a6bb35d257",
+      "bytes": 3133
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/betterleaks-betterleaks.json",
+      "sha256": "c01632833de3bd4700416f250eab5d1a18cfad84add3fcba4382a895956c7e24",
+      "bytes": 2039
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
-      "sha256": "da2873ea8322fb8674302860163b3bc4453336fc3f40bfcfd1bb347592b17ec6",
-      "bytes": 1840
+      "sha256": "c283eb9a8c254f61311d7640ae8ecc59d1873bddd55b65d6f54f3d7c98d303fd",
+      "bytes": 2278
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
@@ -23974,9 +23989,19 @@
       "bytes": 2121
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260923/ollama-ollama.json",
+      "sha256": "a21bc0b12ec95c1b8631852be2f4e1d6088114c05e51f53f2394d4952444b504",
+      "bytes": 1563
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
       "sha256": "76e52c9ecae5e87f8006ee8e2b85117fbd2b611b25a633a8ab1c8d0124838d0b",
       "bytes": 1877
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json",
+      "sha256": "3571f9400d931202581a357fba4172100a40311af86bed8829946f6fc17be3ea",
+      "bytes": 1846
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
