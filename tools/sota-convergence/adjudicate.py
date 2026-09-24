@@ -292,10 +292,12 @@ def root_issue(path) -> str:
     return None
 
 
-def refuse_roots(label: str, roots) -> str:
-    """The exit-2 message for the first refused root, or None."""
+def refuse_roots(label: str, roots, must_exist: bool = False) -> str:
+    """The exit-2 message for the first refused root, or None. ``must_exist``: the root's tree is hashed, so a
+    missing directory (whose empty walk hashes to a valid-looking digest) is refused (Codex review of #145)."""
     for root in roots:
-        issue = root_issue(root)
+        issue = root_issue(root) or (f"{str(root)!r} is not an existing directory"
+                                     if must_exist and not Path(root).is_dir() else None)
         if issue:
             return (f"adjudicate: {label} {issue}; blind-adjudicator refuses such a repository root, so neither "
                     "family would judge it -- use a blind export at least four directories deep")
@@ -651,7 +653,7 @@ def run_codex(args) -> int:
         print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
               f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
         return 2
-    refusal = refuse_roots("--repo", [repo]) or refuse_git_repo(repo) or refuse_work_dir_inside(work_dir, repo)
+    refusal = refuse_roots("--repo", [repo], must_exist=True) or refuse_git_repo(repo) or refuse_work_dir_inside(work_dir, repo)
     if refusal:
         print(refusal, file=sys.stderr)
         return 2
@@ -794,6 +796,7 @@ def run_codex(args) -> int:
 LEAKS_NAME = "leaks.json"
 _LEAKS_LOCK = threading.Lock()
 TREE_CHANGED = "the evidence tree or adjudication code changed during the run; rerun on a fixed export"
+ROLE_CHANGED = "the blind-adjudicator definition the workflow loads changed after claude-args; rerun claude-args"
 LEAK_TEXT_LIMIT = 400
 
 
@@ -892,7 +895,7 @@ CLAUDE_ARGS_SNAPSHOT = "args-snapshot.json"
 CLAUDE_LANE_EFFORT = "high"
 
 
-def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, layers=None) -> dict:
+def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, layers=None, role_files=None) -> dict:
     """The adjudication-lane.js args for every disagreeing layer. The packet path comes from index.json. An
     input with a recorded leak (``recorded_leaks``) is left out and listed under ``leaked`` until ``inputs``
     rebuilds it."""
@@ -916,7 +919,12 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     snapshot = {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
                 "provenance": adjudication_provenance(prompt_path, repo),
                 # claude-collect recomputes the provenance from these to catch a tree changed during the run.
-                "prompt_path": str(Path(prompt_path).resolve()), "repo": str(repo)}
+                "prompt_path": str(Path(prompt_path).resolve()), "repo": str(repo),
+                # The effective blind-adjudicator definitions the workflow will load (Codex review of #145);
+                # claude-collect requires them unchanged.
+                # The CLI passes --agent-file and any project-level copy; a library caller gets the vendored file.
+                "roles": {str(Path(path).resolve()): sha256_file(Path(path))
+                          for path in (role_files if role_files is not None else [VENDORED_ADJUDICATOR])}}
     snapshot["snapshot_id"] = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode("utf-8")).hexdigest()
     write_json(Path(work_dir).resolve() / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT, snapshot)
     return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked,
@@ -972,8 +980,11 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     try:
         tree_changed = adjudication_provenance(Path(snapshot_doc["prompt_path"]),
                                                Path(snapshot_doc["repo"])) != snapshot_provenance
-    except (KeyError, TypeError, OSError):
+    except (KeyError, TypeError, OSError, ValueError):
         tree_changed = True
+    roles = snapshot_doc.get("roles")
+    roles_changed = not (isinstance(roles, dict) and roles and all(
+        Path(path).is_file() and sha256_file(Path(path)) == digest for path, digest in roles.items()))
     for name, order, input_path, packet_sha256 in pending_items(index):
         if f"{name}.{order}" not in snapshot:
             # Only the items claude-args gave this workflow run are collected; other layers' judgment files
@@ -1029,6 +1040,8 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
             failure, judge, refuter, leak = "the packet snapshot changed; rerun inputs", None, None, None
         elif tree_changed and failure != LEAK:
             failure, judge, refuter = TREE_CHANGED, None, None
+        elif roles_changed and failure != LEAK:
+            failure, judge, refuter = ROLE_CHANGED, None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
             leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance))
@@ -1294,14 +1307,15 @@ def main(argv=None) -> int:
         project_role = run_dir / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
         # A project-level role in the directory the workflow runs from wins over --agent-file (Codex review of
         # #145), so both must be the vendored definition.
-        refusal = (refuse_roots("--repo", [repo]) or refuse_git_repo(repo)
+        refusal = (refuse_roots("--repo", [repo], must_exist=True) or refuse_git_repo(repo)
                    or refuse_work_dir_inside(args.work_dir, repo) or adjudicator_role_issue(args.agent_file)
                    or (adjudicator_role_issue(project_role) if project_role.exists() else None))
         if refusal:
             print(refusal, file=sys.stderr)
             return 2
         try:
-            result = claude_args(args.work_dir, repo, layers=layer_set(args.layers))
+            result = claude_args(args.work_dir, repo, layers=layer_set(args.layers),
+                                 role_files=[args.agent_file] + ([project_role] if project_role.exists() else []))
         except ValueError as error:
             print(error, file=sys.stderr)
             return 2

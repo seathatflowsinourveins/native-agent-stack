@@ -53,6 +53,7 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.export.mkdir(parents=True)
         (self.export / "evidence.json").write_text("{}", encoding="utf-8")
         self.tree = claude_lane.tree_sha256(self.export)
+        self.role = hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest()
         final = {"schema_version": 1, "lane": "claude", "catalog": "foundation", "layer_id": "l1",
                  "packet_sha256": "0" * 64, "model": {"name": "opus", "effort": "high"}}
         self.unrefuted = {"status": "unrefuted", "final_source": "proposal", "proposal_status": "unrefuted",
@@ -64,7 +65,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                              {"lens": "challenger", "round": "proposal", "refuted": None, "reason": "no vote returned"}]}
         self.result = self.tmp / "result.json"
         self.result.write_text(json.dumps({
-            "lane": "claude", "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree},
+            "lane": "claude", "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                         "agent_sha256": self.role},
             "layers": [
                 {"catalog": "foundation", "layer_id": "l1", "final": final, "refutation": self.unrefuted},
                 {"catalog": "foundation", "layer_id": "l2", "proposal": {"x": 1}, "final": None,
@@ -102,12 +104,24 @@ class ClaudeLaneWriterTests(unittest.TestCase):
     def test_a_result_without_or_with_another_launch_is_refused(self):
         # Codex review of #145: the result itself must name the export it was launched on.
         for launch, message in ((None, "carries no launch"),
-                                ({"repo": "/elsewhere/blind/export/x", "repo_tree_sha256": self.tree}, "was launched on")):
+                                ({"repo": "/elsewhere/blind/export/x", "repo_tree_sha256": self.tree,
+                                  "agent_sha256": self.role}, "was launched on"),
+                                ({"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                  "agent_sha256": "f" * 64}, "was launched with role")):
             self.rewrite_launch(launch)
             with contextlib.redirect_stderr(io.StringIO()) as err:
                 self.assertEqual(self.run_main(), 2)
             self.assertIn(message, err.getvalue())
             self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+
+    def test_a_missing_evidence_repository_is_refused(self):
+        # Codex review of #145: an empty walk must not yield a valid-looking tree digest.
+        shutil.rmtree(self.export)
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("is not an existing directory", err.getvalue())
+        with self.assertRaises(NotADirectoryError):
+            claude_lane.tree_sha256(self.export)
 
     def test_an_evidence_tree_changed_since_launch_is_refused(self):
         # Codex review of #145: a return must be bound to the evidence bytes the lane read.

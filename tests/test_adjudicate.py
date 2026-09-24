@@ -1174,6 +1174,34 @@ class EleventhRereviewOf145Tests(AdjudicateFixture):
         self.assertEqual(index["layers"][0]["lane_returns_sha256"]["codex"], hashlib.sha256(original).hexdigest(),
                          "the hash is of the bytes the inputs were built from")
 
+class TwelfthRereviewOf145Tests(AdjudicateFixture):
+    """Round-12 review of #145: the effective adjudicator role is snapshotted and rechecked, and a missing
+    evidence repository is refused before its tree is hashed."""
+
+    def test_claude_collect_refuses_judgments_when_the_loaded_role_changed_after_claude_args(self):
+        self.inputs()
+        role = self.base / "agents" / "blind-adjudicator.md"
+        role.parent.mkdir()
+        role.write_bytes(adjudicate.VENDORED_ADJUDICATOR.read_bytes())
+        args = adjudicate.claude_args(self.work, self.repo, role_files=[role])
+        result = {"snapshot_id": args["snapshot_id"],
+                  "items": [{"name": NAME, "order": order, "judge": NinthRereviewOf145Tests.JUDGE,
+                             "refuter": NinthRereviewOf145Tests.REFUTE} for order in adjudicate.ORDERS]}
+        role.write_text(role.read_text(encoding="utf-8") + "\nextra rule\n", encoding="utf-8")
+        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", str(self.repo))
+        self.assertEqual({reason for _, reason in missing}, {adjudicate.ROLE_CHANGED})
+
+    def test_a_missing_repository_is_refused_before_hashing(self):
+        self.inputs()
+        missing = self.base / "hosts" / "blind" / "gone"
+        for argv in (["claude-args", "--work-dir", str(self.work), "--repo", str(missing),
+                      "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)],
+                     ["codex", "--work-dir", str(self.work), "--repo", str(missing), "--model", "gpt-6-astra"]):
+            code, err = quiet(adjudicate.main, argv)
+            self.assertEqual(code, 2, argv[0])
+            self.assertIn("is not an existing directory", err)
+
+
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
 class CodexLeakTests(AdjudicateFixture):
     def setUp(self):

@@ -18,7 +18,8 @@ adding the two runner-owned fields a new-wave Claude return must carry
   bytes, that checkout's ``HEAD``, the lane role's sha256, and the digest of the
   evidence tree (``--repo``) the lane read. The workflow echoes the caller's
   ``args.launch`` as ``launch``; the script refuses (exit 2) unless it is
-  ``{repo, repo_tree_sha256}`` naming ``--repo`` and that tree's current digest,
+  ``{repo, repo_tree_sha256, agent_sha256}`` naming ``--repo``, that tree's current
+  digest and the vendored role digest the launcher checked before launching,
   so a result from another launch, or over a tree changed since launch, is never
   recorded. The script refuses (exit 2) when the
   workflow file differs from ``HEAD`` or its sha256 is not the vendored
@@ -149,17 +150,23 @@ def failure_reason(layer: dict) -> str:
     return f"no final: refutation status {status}" + (f"; {'; '.join(reasons)}" if reasons else "")
 
 
-def launch_tree(result: dict, repo: Path) -> str:
+def launch_tree(result: dict, repo: Path, role_sha256: str = None) -> str:
     """The evidence-tree digest the result was launched on (Codex review of #145): the workflow echoes the
-    caller's args.launch, which prepare wrote as {repo, repo_tree_sha256}; it must name ``repo`` and that tree's
-    current digest."""
+    caller's args.launch, which prepare wrote as {repo, repo_tree_sha256, agent_sha256}; it must name ``repo``,
+    that tree's current digest and ``role_sha256``, the vendored role digest this collector verified (the
+    launcher checks the loaded role against the same digest before and after the run)."""
     launch = result.get("launch") if isinstance(result, dict) else None
     if not (isinstance(launch, dict) and isinstance(launch.get("repo"), str)
-            and isinstance(launch.get("repo_tree_sha256"), str)):
-        raise ProvenanceError("the workflow result carries no launch {repo, repo_tree_sha256}; launch the lane with "
-                              "args.launch so its result names the export it read")
+            and isinstance(launch.get("repo_tree_sha256"), str) and isinstance(launch.get("agent_sha256"), str)):
+        raise ProvenanceError("the workflow result carries no launch {repo, repo_tree_sha256, agent_sha256}; launch "
+                              "the lane with args.launch so its result names the export and role it ran with")
     if launch["repo"] != str(repo):
         raise ProvenanceError(f"the result was launched on {launch['repo']!r}, not --repo {str(repo)!r}")
+    if role_sha256 is not None and launch["agent_sha256"] != role_sha256:
+        raise ProvenanceError(f"the result was launched with role {launch['agent_sha256']}, not the vendored "
+                              f"{role_sha256}")
+    if not repo.is_dir():
+        raise ProvenanceError(f"--repo {repo} is not an existing directory")
     current = tree_sha256(repo)
     if current != launch["repo_tree_sha256"]:
         raise ProvenanceError(f"the evidence tree under --repo is {current}, not the launch digest "
@@ -189,7 +196,7 @@ def main(argv=None) -> int:
     try:
         provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
         result = json.loads(args.result.read_text(encoding="utf-8"))
-        provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve())
+        provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve(), provenance["agent_sha256"])
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2

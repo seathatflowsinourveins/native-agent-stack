@@ -478,8 +478,11 @@ def tree_sha256(repo: Path) -> str:
     """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted,
     and each retained symlink's text. The packet names evidence paths, not their bytes, so a return (and an
     adjudication judgment) is bound to the tree it read."""
-    digest = hashlib.sha256()
     repo = Path(repo)
+    if not repo.is_dir():
+        # An empty walk would hash to a valid-looking digest (Codex review of #145).
+        raise NotADirectoryError(f"evidence repository {repo} is not an existing directory")
+    digest = hashlib.sha256()
     for path in sorted(repo.rglob("*")):
         relative = path.relative_to(repo).as_posix()
         if path.is_symlink():
@@ -556,6 +559,9 @@ def main(argv=None) -> int:
         print(f"codex_lane: output schema not found: {schema_path}", file=sys.stderr)
         return 2
     template = prompt_path.read_text(encoding="utf-8")
+    if not repo.is_dir():
+        print(f"codex_lane: --repo {repo} is not an existing directory", file=sys.stderr)
+        return 2
     git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
     if git_dirs and not args.allow_git_history:
         # git walks up from a subdirectory, so an export inside any repository still reaches history.

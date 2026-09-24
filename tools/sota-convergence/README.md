@@ -1575,8 +1575,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   - `codex_lane` hashes the tree at launch and again after its calls. If the tree changed, it sets that run's
     returns aside as `<name>.json.tree-changed`, and a resume against another export reruns.
   - `claude_lane.py` needs `--repo`. The workflow echoes the caller's `args.launch` (vendored bytes from
-    agent-lab #42), and the script refuses (exit 2) unless that launch is `{repo, repo_tree_sha256}` naming
-    `--repo` and the tree's current digest (round 10).
+    agent-lab #42), and the script refuses (exit 2) unless that launch is `{repo, repo_tree_sha256,
+    agent_sha256}` naming `--repo`, the tree's current digest and the vendored role (rounds 10 and 12).
   - `adjudicate codex` recomputes its provenance after the calls and voids that run's judgments when it
     changed. `claude-collect` recomputes it from the `claude-args` snapshot, which now records `prompt_path`
     and `repo`.
@@ -1588,6 +1588,14 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
     adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
   - Leak records keep input basenames only.
+- **Bindings added in round 12:**
+  - The Claude lane's echoed `launch` also carries `agent_sha256`, the role digest the launcher checked
+    before and after the run. `claude_lane.py` requires it to equal the vendored role digest.
+  - `claude-args` snapshots the sha256 of each effective blind-adjudicator definition (`--agent-file` and any
+    project-level copy under `--run-dir`). `claude-collect` records every judgment as missing when one of them
+    changed.
+  - `codex_lane.tree_sha256` refuses a path that is not an existing directory, and `codex_lane`,
+    `adjudicate codex`, `adjudicate claude-args` and `claude_lane.py` refuse (exit 2) a missing `--repo`.
 - **Bindings added in round 11:**
   - `inputs` reads each packet and lane return once. The parsed object, its sha256 and the packet snapshot
     all come from those bytes.
