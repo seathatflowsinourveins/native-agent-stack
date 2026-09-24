@@ -8,10 +8,17 @@ executes inside the native LiveNode. Every order it proposes still passes the
 engine's controller and ledger checks (``safety.Ledger.reserve_intent``) before
 any broker request; nothing here relaxes a ledger cap.
 
-Protocol constants (the sizing formula, the drawdown ladder and the X1-X4
-parameters) are fixed below rather than configurable, so a config cannot drift
-from the protocol. The config selects the rule, the exit, the rung schedule, the
-entry/exit limit caps and timeouts, and the engine's own risk caps.
+Two per-order caps apply. The mover entry cap (``mover.max_entry_notional_usd``)
+sizes and bounds every buy; ``mover_runner.MoverController`` also refuses a larger
+buy before the ledger reserves it. The ledger's per-order cap
+(``max_order_notional_usd``) bounds every order, exit sells included, so config
+load requires it to be at least ``EXIT_HEADROOM_FACTOR`` times the entry cap.
+
+Protocol constants (the sizing formula, the drawdown ladder, the X1-X4
+parameters and the exit headroom factor) are fixed below rather than
+configurable, so a config cannot drift from the protocol. The config selects the
+rule, the exit, the rung schedule, the entry/exit limit caps and timeouts, the
+entry cap and the engine's own risk caps.
 """
 from __future__ import annotations
 
@@ -75,6 +82,19 @@ X4_TARGET_FRACTION = D("1.50")
 PRE_WIRE_RETRY_SECONDS = 1.0
 HANDOFF_EXIT_TIMEOUTS = 3
 EXIT_BUDGET_EXHAUSTED = ("exit_orders_exhausted", "exit_refusals_exhausted")
+
+# Exit headroom: the ledger's per-order cap bounds exit sells as well as buys, so config load
+# requires max_order_notional_usd >= EXIT_HEADROOM_FACTOR x mover.max_entry_notional_usd. An
+# entry is at most the entry cap, so a leg then sells in one order through a tenfold rise, and
+# in whole-share chunks until one share is worth more than the ledger cap. Past that no engine
+# order can sell it: the book blocks the leg (exit_share_exceeds_ledger_order_cap), recovery
+# ends needs_attention, and the receipt lists the position (share_exceeds_ledger_order_cap).
+# Ten is the largest factor the example's 2000 USD gross cap allows over its 200 USD entry cap
+# (RiskLimits keeps the per-order cap at or below the gross cap). Keep-but-compare: the
+# historical distribution of scanned movers' largest rise within the hold is the comparison
+# that would change it.
+EXIT_HEADROOM_FACTOR = D(10)
+EXIT_SHARE_BLOCKED = "exit_share_exceeds_ledger_order_cap"
 
 PRE_MARKET_OPEN_ET = dtime(4, 0)
 RTH_OPEN_ET = dtime(9, 30)
@@ -215,6 +235,7 @@ class MoverSettings:
     flatten_reserve_seconds: int
     max_scan_age_seconds: int
     max_symbols: int
+    max_entry_notional_usd: Decimal
     appreciation_allowance: Decimal
     gross_guard_fraction: Decimal
     stream_quote_timeout_seconds: int
@@ -272,7 +293,9 @@ def load_mover_config(path):
     trial adds ``symbols`` from the scan (see ``engine_config``). The same lane gates
     as ``runner.load_config`` apply: paper endpoint only, catalysts off, leverage above
     1x only under a validated ``leverage_policy`` block, and the consolidated session
-    policy. The universe must not be fixed in config.
+    policy. The universe must not be fixed in config. ``mover.max_entry_notional_usd`` is
+    required, and the ledger's ``max_order_notional_usd`` (which also bounds every exit
+    sell) must be at least ``EXIT_HEADROOM_FACTOR`` times it.
     """
     try:
         config = json.loads(Path(path).read_text())
@@ -336,8 +359,8 @@ def load_mover_config(path):
     if not isinstance(block, dict):
         raise ValueError("invalid_mover_block")
     allowed = {"rule", "session_scope", "trial_end_et", "exit", "entry", "exit_orders", "flatten_reserve_seconds",
-               "max_scan_age_seconds", "max_symbols", "appreciation_allowance", "gross_guard_fraction",
-               "stream_quote_timeout_seconds", "rung_schedule"}
+               "max_scan_age_seconds", "max_symbols", "max_entry_notional_usd", "appreciation_allowance",
+               "gross_guard_fraction", "stream_quote_timeout_seconds", "rung_schedule"}
     if set(block) - allowed:
         raise ValueError("invalid_mover_block")
     rule = parse_rule(block.get("rule"))
@@ -377,6 +400,7 @@ def load_mover_config(path):
         flatten_reserve_seconds=_int_setting(block, "flatten_reserve_seconds", 10, 600, 120),
         max_scan_age_seconds=_int_setting(block, "max_scan_age_seconds", 1, MAX_SCAN_AGE_SECONDS, MAX_SCAN_AGE_SECONDS),
         max_symbols=_int_setting(block, "max_symbols", 1, MAX_SYMBOLS, MAX_SYMBOLS),
+        max_entry_notional_usd=_decimal_setting(block, "max_entry_notional_usd", ZERO, D(10000), low_inclusive=False),
         appreciation_allowance=_decimal_setting(block, "appreciation_allowance", D(1), D(10), "2"),
         gross_guard_fraction=_decimal_setting(block, "gross_guard_fraction", D("0.5"), D("0.99"), "0.9"),
         stream_quote_timeout_seconds=(quote_age if "stream_quote_timeout_seconds" not in block else
@@ -385,6 +409,9 @@ def load_mover_config(path):
         benchmarks=benchmarks)
     if limits.max_held_symbols < settings.max_symbols or limits.max_outstanding_orders < 2 * settings.max_symbols:
         raise ValueError("mover_symbol_or_order_caps_below_scan_size")
+    if limits.max_order_notional_usd < settings.max_entry_notional_usd * EXIT_HEADROOM_FACTOR:
+        # The ledger's per-order cap also bounds every exit sell (see EXIT_HEADROOM_FACTOR).
+        raise ValueError("mover_ledger_order_cap_below_exit_headroom")
     top_rung = max(rung for _, _, rung in settings.rung_schedule)
     if top_rung > 1 and (leverage is None or leverage.max_leverage < top_rung):
         raise ValueError("mover_rung_requires_leverage_policy")
@@ -662,15 +689,17 @@ def symbol_price_decimals(price_at_t):
     return 4
 
 
-def size_symbols(symbols, *, equity, leverage, gross_budget, per_order_cap, allowance):
+def size_symbols(symbols, *, equity, leverage, gross_budget, entry_cap, allowance):
     """Deterministic per-symbol entry notionals, in scan rank order.
 
     notional_i = equity x L_i / 5 with L_i = min(L, 1) below 5 USD, capped at 1% of
-    dollar_volume_at_t, 10% of entry_bar_dollar_volume (when supplied), the ledger's
-    per-order notional cap and the remaining gross budget. A symbol whose scan price
-    times the appreciation allowance exceeds the per-order cap is skipped, because the
-    ledger's per-order cap also bounds every exit sell and one share must stay
-    sellable after the allowed appreciation."""
+    dollar_volume_at_t, 10% of entry_bar_dollar_volume (when supplied), the mover entry
+    cap and the remaining gross budget. A symbol whose scan price times the appreciation
+    allowance exceeds the entry cap is skipped. Exits are bounded by the ledger's
+    per-order cap instead, at least EXIT_HEADROOM_FACTOR times the entry cap (checked at
+    config load), so one share of an entered leg stays sellable through a rise of about
+    EXIT_HEADROOM_FACTOR x allowance (a share costs at most its buy limit, up to the entry
+    limit cap above entry cap / allowance)."""
     result, allocated = [], ZERO
     with localcontext() as context:
         context.prec = 40
@@ -682,7 +711,7 @@ def size_symbols(symbols, *, equity, leverage, gross_budget, per_order_cap, allo
                     "entry_bar_10pct": (None if item.entry_bar_dollar_volume is None else
                                         (item.entry_bar_dollar_volume * ENTRY_BAR_CAP_FRACTION).quantize(
                                             CENT, rounding=ROUND_FLOOR)),
-                    "per_order": D(per_order_cap),
+                    "max_entry_notional": D(entry_cap),
                     "gross_remaining": max(ZERO, D(gross_budget) - allocated)}
             binding, notional = "formula", raw
             for name, cap in caps.items():
@@ -692,8 +721,8 @@ def size_symbols(symbols, *, equity, leverage, gross_budget, per_order_cap, allo
             skip = None
             if leverage_i <= 0:
                 skip = "leverage_zero"
-            elif item.price_at_t * D(allowance) > D(per_order_cap):
-                skip = "price_exceeds_per_order_headroom"
+            elif item.price_at_t * D(allowance) > D(entry_cap):
+                skip = "price_exceeds_entry_headroom"
             elif notional < item.price_at_t:
                 skip = "notional_below_one_share"
             if skip is None:
@@ -746,6 +775,8 @@ class MoverPlan:
     entry_cap_bps: Decimal
     exit_cap_bps: Decimal
     max_exit_orders_per_symbol: int
+    max_entry_notional_usd: Decimal
+    ledger_max_order_notional_usd: Decimal
     appreciation_allowance: Decimal
     gross_guard_usd: Decimal
     timing: Timing
@@ -773,7 +804,9 @@ def build_plan(settings, limits, scan, session, *, trial_id, evidence_class, t0,
     entries never exceed what ``safety.Ledger.reserve_intent`` admits. Entries use at
     most ``max_gross_exposure_usd / appreciation_allowance``: the ledger halts the
     whole lane when marked gross exposure exceeds its cap, so rising positions need
-    headroom. ``timing`` overrides the real schedule only for synthetic runs."""
+    headroom. Each entry is capped at ``settings.max_entry_notional_usd``; the ledger's
+    per-order cap is kept on the plan for the receipt. ``timing`` overrides the real
+    schedule only for synthetic runs."""
     if evidence_class not in EVIDENCE_CLASSES:
         raise MoverRefusal("invalid_evidence_class")
     if type(trial_id) is not str or not re.fullmatch(r"[a-z0-9-]{1,24}", trial_id):
@@ -783,11 +816,12 @@ def build_plan(settings, limits, scan, session, *, trial_id, evidence_class, t0,
     budget = max(ZERO, min(limits.max_gross_exposure_usd / settings.appreciation_allowance,
                            equity * D(engine_leverage_multiple))).quantize(CENT, rounding=ROUND_FLOOR)
     sizing = size_symbols(scan.symbols, equity=equity, leverage=leverage, gross_budget=budget,
-                          per_order_cap=limits.max_order_notional_usd, allowance=settings.appreciation_allowance)
+                          entry_cap=settings.max_entry_notional_usd, allowance=settings.appreciation_allowance)
     timing = timing or plan_timing(settings, limits, t0=t0, session_date=scan.session_date)
     guard = (limits.max_gross_exposure_usd * settings.gross_guard_fraction).quantize(CENT, rounding=ROUND_FLOOR)
     return MoverPlan(trial_id, evidence_class, settings.rule, settings.exit_rule, settings.entry_cap_bps,
-                     settings.exit_cap_bps, settings.max_exit_orders_per_symbol, settings.appreciation_allowance,
+                     settings.exit_cap_bps, settings.max_exit_orders_per_symbol, settings.max_entry_notional_usd,
+                     limits.max_order_notional_usd, settings.appreciation_allowance,
                      guard, timing, session, scan.regime_factor, scan.regime_source, leverage,
                      D(engine_leverage_multiple), equity, budget, scan.sha256, scan.scan_time, sizing)
 
@@ -968,8 +1002,9 @@ class MoverBook:
     sent while that symbol's buy is open (a wash-trade refusal would stop the run);
     exits are marketable limit sells at bid x (1 - cap) in every session because the
     transport only carries limit/DAY orders, re-priced after ``exit_timeout_seconds``
-    and chunked to the ledger's per-order caps; a latched force reason (kill switch,
-    risk halt, transport gap, hard flatten, ...) cancels open buys and flattens.
+    and chunked to the ledger's per-order caps (buys to the mover entry cap); a latched
+    force reason (kill switch, risk halt, transport gap, hard flatten, ...) cancels open
+    buys and flattens, in the evaluation that latched it.
 
     Exit budget: no sell is sent on a halted quote, a pre-wire refusal is retried after
     PRE_WIRE_RETRY_SECONDS without being charged, a latched force reason grants each leg
@@ -1093,48 +1128,74 @@ class MoverBook:
         return largest if largest is not None and total >= self.plan.gross_guard_usd else None
 
     def evaluate(self, now, *, entries_enabled, symbols=None):
-        actions = []
+        """The actions for ``symbols`` (every leg by default) at ``now``.
+
+        Cancels and exits come first, for every leg in scope, reading the force reason per
+        leg. A force that latches during that pass (an exhausted exit budget, in ``_exit``)
+        sends every leg through it once more, so the latch cancels open buys and flattens
+        every leg in this same evaluation: legs evaluated before it, and legs outside
+        ``symbols``, included. Entries come last, under the force as it then stands, so no
+        buy is sent in an evaluation that latched a force (none is sent and canceled in
+        one batch either)."""
         if self.force_reason is None and now >= self.plan.timing.hard_flatten_at:
             self.set_force("hard_flatten", now)
-        force = self.force_reason
+        force_before = self.force_reason
         positions = self._positions()
         self._note_progress(positions, now)
         guard = self._guard_symbol(positions)
-        for symbol in (symbols if symbols is not None else tuple(self.legs)):
+        scope = tuple(symbols) if symbols is not None else tuple(self.legs)
+        actions = []
+        for symbol in scope:
+            actions += self._manage(symbol, now, positions, guard)
+        if force_before is None and self.force_reason is not None:
+            scope = tuple(self.legs)
+            for symbol in scope:
+                actions += self._manage(symbol, now, positions, guard)
+        for symbol in scope:
             leg = self.legs.get(symbol)
-            if leg is None:
-                continue
-            quote = self._quote(symbol)
-            fresh = self._fresh(quote, now)
-            position = positions.get(symbol)
-            held = position.qty if position is not None and position.qty > 0 else ZERO
-            if held > 0 and leg.first_fill_at is not None and fresh:
-                bid = D(quote.bid)
-                leg.running_high = bid if leg.running_high is None else max(leg.running_high, bid)
-            actions += self._cancels(leg, symbol, now, force)
-            if leg.state == "waiting_entry":
-                action = self._entry(leg, symbol, quote, fresh, positions, now, force, entries_enabled)
+            if leg is not None and leg.state == "waiting_entry":
+                quote = self._quote(symbol)
+                action = self._entry(leg, symbol, quote, self._fresh(quote, now), positions, now,
+                                     self.force_reason, entries_enabled)
                 if action is not None:
                     actions.append(action)
-            if held > 0:
-                if leg.exit_reason is None:
-                    reason = force or ("gross_cap_guard" if guard == symbol else None)
-                    if reason is None and fresh and position is not None:
-                        reason = rule_exit_reason(self.plan.exit_rule, now=now, bid=D(quote.bid),
-                                                  entry_price=position.average_cost, running_high=leg.running_high,
-                                                  first_fill_at=leg.first_fill_at, timing=self.plan.timing)
-                    if reason is not None:
-                        leg.exit_reason, leg.exit_triggered_at = reason, now
-                        self.events({"type": "mover_exit_triggered", "symbol": symbol, "reason": reason, "at": now})
-                        actions += self._cancels(leg, symbol, now, force)
-                if leg.exit_reason is not None and not self.open_orders(symbol):
-                    leg.exit_wait_reason = self._exit_wait(leg, quote, fresh, now)
-                    if leg.exit_wait_reason is None:
-                        action = self._exit(leg, symbol, quote, held, now)
-                        if action is not None:
-                            actions.append(action)
-            elif leg.state in ("holding", "exiting") and not self.open_orders(symbol):
-                leg.state, leg.closed_at = "closed", leg.closed_at or now
+        return actions
+
+    def _manage(self, symbol, now, positions, guard):
+        """One leg's cancels, exit trigger and exit order (no entry), under the force
+        reason as it stands now: an earlier leg's ``_exit`` may have latched one."""
+        leg = self.legs.get(symbol)
+        if leg is None:
+            return []
+        actions = []
+        force = self.force_reason
+        quote = self._quote(symbol)
+        fresh = self._fresh(quote, now)
+        position = positions.get(symbol)
+        held = position.qty if position is not None and position.qty > 0 else ZERO
+        if held > 0 and leg.first_fill_at is not None and fresh:
+            bid = D(quote.bid)
+            leg.running_high = bid if leg.running_high is None else max(leg.running_high, bid)
+        actions += self._cancels(leg, symbol, now, force)
+        if held > 0:
+            if leg.exit_reason is None:
+                reason = force or ("gross_cap_guard" if guard == symbol else None)
+                if reason is None and fresh and position is not None:
+                    reason = rule_exit_reason(self.plan.exit_rule, now=now, bid=D(quote.bid),
+                                              entry_price=position.average_cost, running_high=leg.running_high,
+                                              first_fill_at=leg.first_fill_at, timing=self.plan.timing)
+                if reason is not None:
+                    leg.exit_reason, leg.exit_triggered_at = reason, now
+                    self.events({"type": "mover_exit_triggered", "symbol": symbol, "reason": reason, "at": now})
+                    actions += self._cancels(leg, symbol, now, force)
+            if leg.exit_reason is not None and not self.open_orders(symbol):
+                leg.exit_wait_reason = self._exit_wait(leg, quote, fresh, now)
+                if leg.exit_wait_reason is None:
+                    action = self._exit(leg, symbol, quote, held, now)
+                    if action is not None:
+                        actions.append(action)
+        elif leg.state in ("holding", "exiting") and not self.open_orders(symbol):
+            leg.state, leg.closed_at = "closed", leg.closed_at or now
         return actions
 
     def _note_progress(self, positions, now):
@@ -1163,7 +1224,7 @@ class MoverBook:
 
         - ``exits_blocked``: every held leg's exits are blocked with nothing open for it
           (budget exhausted after the force's fresh budget, a limit that is not positive, or
-          one share above the per-order cap);
+          one share above the ledger's per-order cap);
         - ``no_exit_progress``: the held quantity has not fallen for HANDOFF_EXIT_TIMEOUTS
           exit timeouts since the latch or the last fill, which covers exits resting
           unfilled, refused, waiting on a halt, or impossible without a fresh quote.
@@ -1236,16 +1297,16 @@ class MoverBook:
         if limit is None:
             self._skip(leg, symbol, "entry_cap_below_tick", now)
             return None
-        per_order = self.limits.max_order_notional_usd
-        if ask * self.plan.appreciation_allowance > per_order:
-            self._skip(leg, symbol, "price_exceeds_per_order_headroom", now)
+        entry_cap = self.plan.max_entry_notional_usd
+        if ask * self.plan.appreciation_allowance > entry_cap:
+            self._skip(leg, symbol, "price_exceeds_entry_headroom", now)
             return None
         notional, leverage_i = leg.sizing.notional_usd, leg.sizing.leverage_i
         if ask < LOW_PRICE_USD and leverage_i > LOW_PRICE_MAX_LEVERAGE:
             leverage_i = LOW_PRICE_MAX_LEVERAGE
             notional = min(notional, (self.plan.sizing_equity_usd * leverage_i / SLOTS).quantize(
                 CENT, rounding=ROUND_FLOOR))
-        bounds = {"notional": whole_shares(notional / limit), "per_order_notional": whole_shares(per_order / limit),
+        bounds = {"notional": whole_shares(notional / limit), "max_entry_notional": whole_shares(entry_cap / limit),
                   "max_order_qty": int(self.limits.effective_max_order_qty(limit, quote_price=ask))}
         binding = min(bounds, key=lambda name: bounds[name])
         quantity = bounds[binding]
@@ -1286,11 +1347,13 @@ class MoverBook:
         if limit is None:
             self._block_exit(leg, symbol, "exit_price_not_positive", now)
             return None
+        # The ledger's per-order caps bound sells too (not the mover entry cap), so an exit is
+        # chunked to them; one share above them is unsellable by any engine order.
         per_order = self.limits.max_order_notional_usd
         chunk = min(whole_shares(held), whole_shares(per_order / limit),
                     int(self.limits.effective_max_order_qty(limit, quote_price=bid)))
         if chunk < 1:
-            self._block_exit(leg, symbol, "exit_share_exceeds_per_order_cap", now)
+            self._block_exit(leg, symbol, EXIT_SHARE_BLOCKED, now)
             return None
         record = OrderRecord(self._next_client_id(), symbol, "sell", D(chunk), limit, leg.exit_reason, now, bid)
         self.orders[record.client_id] = record

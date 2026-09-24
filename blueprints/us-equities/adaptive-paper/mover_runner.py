@@ -34,9 +34,9 @@ _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 import safety  # noqa: E402
-from mover import (PROTOCOL_ID, X1_FLATTEN_AT_ET, X2_HOLD_SECONDS, X3_TRAIL_FRACTION, X4_STOP_FRACTION,  # noqa: E402
-                   X4_TARGET_FRACTION, MoverBook, MoverRefusal, Timing, build_plan, engine_config, load_mover_config,
-                   load_scan, plan_session, session_state_after, text)
+from mover import (EXIT_HEADROOM_FACTOR, PROTOCOL_ID, X1_FLATTEN_AT_ET, X2_HOLD_SECONDS,  # noqa: E402
+                   X3_TRAIL_FRACTION, X4_STOP_FRACTION, X4_TARGET_FRACTION, MoverBook, MoverRefusal, Timing,
+                   build_plan, engine_config, load_mover_config, load_scan, plan_session, session_state_after, text)
 from runner import (Controller, LiveEventLog, _apply_forced_recovery_outcome, _run_native_status,  # noqa: E402
                     credentials, public_preflight, reconcile, save, trial_phase_and_exit_code, validate_preflight)
 from safety import Ledger, SafetyError, account_lock_fingerprint  # noqa: E402
@@ -99,17 +99,40 @@ FOREIGN_TERMINAL_STATUSES = frozenset({"filled", "canceled", "expired", "rejecte
 
 class MoverController(Controller):
     """runner.Controller, except that an order this ledger does not own and that is
-    already terminal is ignored (counted) instead of freezing the ledger.
+    already terminal is ignored (counted) instead of freezing the ledger, and that a
+    buy above the mover entry cap is refused before the ledger reserves it.
 
     The transport's snapshot pages and the trade stream carry every order on the
     account since the lane's first trial, including another lane's (the adaptive
     lane's) finished orders. A foreign order that is still open still freezes the
     ledger exactly as before, and a foreign fill during the trial still surfaces as a
-    cash or position mismatch at the next reconciliation (mover_reconcile)."""
+    cash or position mismatch at the next reconciliation (mover_reconcile).
 
-    def __init__(self, *args, **kwargs):
+    The ledger's per-order cap is sized for exit sells (at least
+    mover.EXIT_HEADROOM_FACTOR times the entry cap), so it no longer bounds an entry by
+    itself; ``max_entry_notional_usd`` (required) keeps that bound outside the book."""
+
+    def __init__(self, *args, max_entry_notional_usd, **kwargs):
         super().__init__(*args, **kwargs)
+        cap = Decimal(str(max_entry_notional_usd))
+        if not cap.is_finite() or cap <= 0:
+            raise SafetyError("invalid_mover_entry_cap")
+        self.max_entry_notional_usd = cap
         self.foreign_terminal_orders = 0
+
+    def before_submit(self, order):
+        """Refuse (before any ledger reservation or broker request) a buy whose
+        quantity x limit exceeds the mover entry cap; anything else goes to
+        runner.Controller.before_submit unchanged."""
+        if order.get("side") != "sell":
+            try:
+                notional = Decimal(str(order["qty"])) * Decimal(str(order["limit_price"]))
+            except (KeyError, ArithmeticError, ValueError):
+                notional = None
+            if notional is None or not notional.is_finite() or notional > self.max_entry_notional_usd:
+                from native_adapter import NativeOrderRejected
+                raise NativeOrderRejected("mover_entry_notional_cap_exceeded")
+        return super().before_submit(order)
 
     def observe(self, order):
         known = {i.client_id for i in self.ledger.intents()}
@@ -157,13 +180,33 @@ def scope_recovery_adoption(port, ledger):
     return port
 
 
+def unsellable_positions(controller):
+    """Residual positions that no engine order can sell: one share at the last observed
+    bid is worth more than the ledger's per-order cap, so the ledger's share cap for a
+    sell (RiskLimits.effective_max_order_qty) is zero and every whole-share sell is
+    refused. recovery.recover reports these as recovery_quantity_not_representable;
+    this names the symbol, quantity, bid and cap so the needs_attention record says why."""
+    cap = controller.ledger.limits.max_order_notional_usd
+    rows = []
+    for symbol, position in sorted(controller.ledger.positions().items()):
+        quote = controller.quotes.get(symbol)
+        bid = None if quote is None else Decimal(str(quote.bid))
+        if bid is not None and bid > cap:
+            rows.append({"symbol": symbol, "qty": text(position.qty), "bid": text(bid),
+                         "ledger_max_order_notional_usd": text(cap), "reason": "share_exceeds_ledger_order_cap"})
+    return rows
+
+
 async def recover_mover(controller, metadata, config):
     """recovery.recover on the controller's fresh, unstarted port with the mover's
-    adoption scope and reconciliation (mover_reconcile). Sell-only, as the engine's."""
+    adoption scope and reconciliation (mover_reconcile). Sell-only, as the engine's.
+    ``unsellable_positions`` lists any residual one share of which exceeds the ledger's
+    per-order cap."""
     from recovery import recover
     port = scope_recovery_adoption(controller.port, controller.ledger)
     result = await recover(controller, metadata, config, reconcile_fn=mover_reconcile)
     result["adoption_scope"] = getattr(port, "adoption_scope", None)
+    result["unsellable_positions"] = unsellable_positions(controller)
     return result
 
 
@@ -365,7 +408,10 @@ def plan_receipt(plan):
                    "gross_budget_usd": text(plan.gross_budget_usd),
                    "appreciation_allowance": text(plan.appreciation_allowance),
                    "gross_guard_usd": text(plan.gross_guard_usd), "entry_limit_cap_bps": text(plan.entry_cap_bps),
-                   "exit_limit_cap_bps": text(plan.exit_cap_bps)},
+                   "exit_limit_cap_bps": text(plan.exit_cap_bps),
+                   "max_entry_notional_usd": text(plan.max_entry_notional_usd),
+                   "ledger_max_order_notional_usd": text(plan.ledger_max_order_notional_usd),
+                   "exit_headroom_factor": text(EXIT_HEADROOM_FACTOR)},
         "exit_parameters": {"rule": plan.exit_rule, "x1_flatten_at_et": X1_FLATTEN_AT_ET.strftime("%H:%M"),
                             "x2_hold_seconds": X2_HOLD_SECONDS, "x3_trail_fraction": text(X3_TRAIL_FRACTION),
                             "x4_stop_fraction": text(X4_STOP_FRACTION), "x4_target_fraction": text(X4_TARGET_FRACTION)},
@@ -427,6 +473,9 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
                         "halted_reason": after.halted_reason},
         "force_reason": outcome.get("force_reason"), "force_at": outcome.get("force_at"),
         "handoff_to_recovery": outcome.get("handoff_to_recovery"),
+        # Positions still held because one share exceeds the ledger's per-order cap (the
+        # reason a trial that moved past the exit headroom ends needs_attention).
+        "unsellable_positions": list((outcome.get("recovery") or {}).get("unsellable_positions", [])),
         "adapter_errors": outcome.get("adapter_errors", []), "error_type": outcome.get("error_type"),
         "error_reason": outcome.get("error_reason"),
         "foreign_terminal_orders_ignored": outcome.get("foreign_terminal_orders_ignored", 0),
@@ -638,7 +687,8 @@ def command_paper(args):
                         "lane_state": session_state_after(session_plan, equity_end=equity), "history": history}
             save(metadata_path, metadata)
             controller_close, market_open = _controller_session(close, now, session_policy)
-            controller = MoverController(ledger, controller_close, market_open=market_open)
+            controller = MoverController(ledger, controller_close, market_open=market_open,
+                                         max_entry_notional_usd=settings.max_entry_notional_usd)
             if args.live_dir is not None:
                 controller.events = LiveEventLog(args.live_dir / "events.jsonl")
                 (args.live_dir / "run.json").write_text(json.dumps(
@@ -745,7 +795,8 @@ def command_recover(args):
             close = validate_preflight(observation, trial_config, require_open=True, allow_existing=True,
                                        session_policy=session_policy)
             controller_close, market_open = _controller_session(close, time.time(), session_policy)
-            controller = MoverController(ledger, controller_close, market_open=market_open)
+            controller = MoverController(ledger, controller_close, market_open=market_open,
+                                         max_entry_notional_usd=settings.max_entry_notional_usd)
             recovering = sorted(owned) or list(settings.benchmarks)
             controller.port = controller.bind(AlpacaPaperTransport(
                 key, secret, trial_config["symbols"], before_request=controller.before_request,
@@ -827,7 +878,8 @@ def command_synthetic(args):
             timing = synthetic_timing(now, hold_seconds=args.hold_seconds, exit_rule=settings.exit_rule)
             plan = build_plan(settings, limits, scan, session_plan, trial_id=args.trial, evidence_class="SYN", t0=now,
                               equity=limits.capital_usd, timing=timing)
-            controller = MoverController(ledger, now + 36000, market_open=True)
+            controller = MoverController(ledger, now + 36000, market_open=True,
+                                         max_entry_notional_usd=settings.max_entry_notional_usd)
             port = MoverSimulatedPort(controller, syn_config["symbols"], path=synthetic_path(plan, args.hold_seconds))
             controller.port = port
             baseline = port.cash

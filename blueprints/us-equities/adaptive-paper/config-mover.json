@@ -15,7 +15,7 @@
   "benchmarks": ["SPY"],
   "capital_usd": "10000",
   "max_gross_exposure_usd": "2000",
-  "max_order_notional_usd": "200",
+  "max_order_notional_usd": "2000",
   "max_order_quantity": 100,
   "max_order_qty_mode": "notional",
   "max_held_symbols": 5,
@@ -41,10 +41,11 @@
     "flatten_reserve_seconds": 120,
     "max_scan_age_seconds": 300,
     "max_symbols": 5,
+    "max_entry_notional_usd": "200",
     "appreciation_allowance": "2",
     "gross_guard_fraction": "0.9",
     "stream_quote_timeout_seconds": 3,
     "rung_schedule": [{"from_session": 1, "to_session": 20, "rung": "1"}]
   },
-  "notes": "Example mover paper trial (protocol mover-early-entry-v1-20260924, paper_e2e). Pre-market only: entries at trial start, hard flatten at 09:25 ET (or earlier when the ledger's 3600 s trial + 600 s cleanup sell window less the 120 s reserve ends first), exit X2 (60 minutes after the first entry fill), rung 1 for paper sessions 1-20. The rule string is a placeholder until the historical study selects the rule; the scanner's file must carry the identical string. Conservative caps: 200 USD per order and 2000 USD ledger gross cap with a 2x appreciation allowance, so entries use at most 1000 USD and the sizing formula (equity x L / 5) is bound by the per-order cap; the 1000 USD gross-loss and drawdown caps are the engine maximum (capital / 10) and are lifetime budgets of this mover ledger. Quote age 3 s and the 3 s stream timeout are the engine's own limits; the 2026-09-23 after-hours trial stopped on that stream timeout, so a longer stream_quote_timeout_seconds is a separate recorded decision. Spread cap 100 bps is the engine maximum for entries."
+  "notes": "Example mover paper trial (protocol mover-early-entry-v1-20260924, paper_e2e). Pre-market only: entries at trial start, hard flatten at 09:25 ET (or earlier when the ledger's 3600 s trial + 600 s cleanup sell window less the 120 s reserve ends first), exit X2 (60 minutes after the first entry fill), rung 1 for paper sessions 1-20. The rule string is a placeholder until the historical study selects the rule; the scanner's file must carry the identical string. Conservative caps: 200 USD per entry (mover.max_entry_notional_usd) and a 2000 USD ledger gross cap with a 2x appreciation allowance, so entries use at most 1000 USD and the sizing formula (equity x L / 5) is bound by the entry cap. The ledger per-order cap bounds exit sells too, so it is 2000 USD, ten times the entry cap (mover.EXIT_HEADROOM_FACTOR, checked at load) and the most RiskLimits allows under this gross cap: a leg sells in one order through a tenfold rise, in whole-share chunks beyond it; the 1000 USD gross-loss and drawdown caps are the engine maximum (capital / 10) and are lifetime budgets of this mover ledger. Quote age 3 s and the 3 s stream timeout are the engine's own limits; the 2026-09-23 after-hours trial stopped on that stream timeout, so a longer stream_quote_timeout_seconds is a separate recorded decision. Spread cap 100 bps is the engine maximum for entries."
 }

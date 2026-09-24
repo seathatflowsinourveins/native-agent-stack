@@ -10,7 +10,7 @@ the trial is parameterised by `mover.rule` and `mover.exit` in the config. Modul
 | `mover_strategy.py` | NautilusTrader strategy shell that executes the book's actions |
 | `mover_runner.py` | `check` / `paper` / `recover` / `synthetic` commands, the native trial loop and the recovery adoption scope |
 | `mover_simulation.py` | Synthetic broker port (scripted quotes, resting limits, partial fills; intents follow the transport's `normalize_intent` contract) |
-| `config-mover.json` | Example: pre-market only, trial end 09:25 ET, exit X2, rung 1, conservative caps |
+| `config-mover.json` | Example: pre-market only, trial end 09:25 ET, exit X2, rung 1, conservative caps (200 USD per entry, 2000 USD ledger per-order and gross caps) |
 
 A mover trial reuses the engine: the paper-only endpoint gate, `runner.credentials`,
 `transport.preflight`, `runner.validate_preflight` (flat account, no open orders,
@@ -58,12 +58,14 @@ sessions. Each notional is capped, in scan rank order, at:
 
 - 1% of `dollar_volume_at_t`;
 - 10% of `entry_bar_dollar_volume`;
-- the ledger per-order cap;
+- the mover entry cap, `mover.max_entry_notional_usd` (200 USD in the example);
 - the remaining gross budget, `min(max_gross_exposure_usd / appreciation_allowance, equity x ledger leverage envelope)`.
 
-A symbol whose price times the allowance exceeds the per-order cap is skipped; see
-below. Rungs come from `rung_schedule` (sessions 1-20 at rung 1 in the example); a
-session beyond the schedule is refused. A rung above 1 needs the canonical
+A symbol whose price times the allowance exceeds the entry cap is skipped
+(`price_exceeds_entry_headroom`). The entry cap is separate from the ledger's
+per-order cap because the ledger's cap bounds every order, exit sells included; see
+*Two caps* below. Rungs come from `rung_schedule` (sessions 1-20 at rung 1 in the
+example); a session beyond the schedule is refused. A rung above 1 needs the canonical
 `leverage_policy` block, whose PRE and POST cells cap the ledger at 1x. The config must
 set `max_order_qty_mode: "notional"` (`mover_requires_notional_order_qty_mode`
 otherwise): only then is the ledger's per-order share cap, which also sizes recovery's
@@ -93,10 +95,17 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   (X4's stop does for any entry up to about 1.17 USD), and a 2-decimal instrument can
   neither price a marketable limit under a sub-penny bid nor carry the sub-penny fill
   (the native adapter refuses it as `cumulative_fill_precision_requires_reconciliation`).
-- **Chunking.** The ledger's per-order notional and quantity caps also bound sells, so
-  an appreciated position exits in chunks, one open order per symbol at a time. A
-  sell is never sent while that symbol's buy is open, because a wash-trade refusal
-  would stop the run.
+- **Two caps.** `mover.max_entry_notional_usd` (200 USD) sizes and bounds each buy;
+  `MoverController` also refuses a larger buy before the ledger reserves it
+  (`mover_entry_notional_cap_exceeded`). The ledger's `max_order_notional_usd` (2000
+  USD) and 100-share cap bound every order, exit sells included. Config load requires
+  the ledger cap to be at least ten times the entry cap (`mover.EXIT_HEADROOM_FACTOR`;
+  `mover_ledger_order_cap_below_exit_headroom` otherwise). A leg therefore sells in one
+  order through a tenfold rise. Beyond that it sells in whole-share chunks, one open
+  order per symbol at a time, until one share is worth more than the ledger cap. At
+  the 2x allowance an entered share costs about 100 USD at most, so that point needs
+  about a twentyfold rise. A sell is never sent while that symbol's buy is open, because a
+  wash-trade refusal would stop the run.
 - **Exit budget.** Each leg may send `exit_orders.max_orders_per_symbol` exits, counted
   from the latest grant. No exit is sent on a halted quote (it could not fill; the leg
   waits). A sell refused before any broker request (the ledger or NautilusTrader
@@ -104,6 +113,11 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   1 s and has its own bound of the same size. A latched force reason grants each leg one
   fresh budget. A leg that exhausts its budget before any force latches the book-wide
   force `exit_orders_exhausted` (or `exit_refusals_exhausted`), so every leg flattens.
+  Each evaluation handles cancels and exits for every leg before any entry. A force that
+  latches during it sends every leg through the cancels and exits once more, and the
+  entries that follow see it. That same evaluation therefore cancels open buys, flattens
+  every leg and skips waiting entries, and it sends no buy (so no buy is sent and
+  canceled in one batch).
 - **Force reasons** cancel open buys and flatten: the STOP file, a controller stop
   (SIGINT/SIGTERM), an adapter error, a ledger halt, a transport gap, a
   mark-to-market failure, the session close, an exhausted exit budget and the hard
@@ -113,12 +127,12 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
 - **Hand-off to recovery.** Once a force has latched and a position or an open order
   remains, the native loop stops and leaves the residual to recovery when every held
   leg's exits are blocked (budget spent after the fresh grant, a limit that is not
-  positive, or one share above the per-order cap), or when no exit has filled for three
-  exit timeouts (30 s in the example) since the latch or the last fill. That covers exits
-  resting unfilled, refused, waiting on a halt, or impossible without fresh quotes, so a
-  stuck position is not left unmanaged until the sell window ends. Before a force, a
-  blocked leg keeps retrying and the other legs keep their rules: recovery stops at its
-  first failed symbol, so an early hand-off could leave sellable legs unsold. The
+  positive, or one share above the ledger's per-order cap), or when no exit has filled
+  for three exit timeouts (30 s in the example) since the latch or the last fill. That
+  covers exits resting unfilled, refused, waiting on a halt, or impossible without fresh
+  quotes, so a stuck position is not left unmanaged until the sell window ends. Before a
+  force, a blocked leg keeps retrying and the other legs keep their rules: recovery stops
+  at its first failed symbol, so an early hand-off could leave sellable legs unsold. The
   receipt's `handoff_to_recovery` records the reason and the seconds after the force.
 - **Gross guard.** When marked gross exposure reaches `gross_guard_fraction` of the
   ledger cap, the largest position exits (`gross_cap_guard`). The ledger halts
@@ -142,10 +156,13 @@ terminal intent stays covered: the snapshot pages every order since the lane's f
 trial, and reconciliation raises `submitted_intent_absent` for any attempted ledger intent
 it lacks. The recovery receipt's `adoption_scope` counts adopted and skipped intents.
 Each recovery exit is sized in whole shares within the ledger's cap at the bid
-(`floor(max_order_notional_usd / bid)` in notional mode), so an appreciated position exits
-in chunks. A trial that needed a forced recovery stays `needs_attention` even when the
-recovery passed; `recover` then takes a fresh broker proof and, when it passes, sets
-`trial.json` back to `finished`.
+(`floor(max_order_notional_usd / bid)` in notional mode), so a position worth more than
+the ledger cap exits in chunks. When one share alone is worth more than it, recovery ends
+`needs_attention` (`recovery_quantity_not_representable`). Its result and the trial
+receipt then list the position under `unsellable_positions`: symbol, quantity, bid, cap
+and `share_exceeds_ledger_order_cap`. A trial that needed a forced recovery stays
+`needs_attention` even when the recovery passed; `recover` then takes a fresh broker
+proof and, when it passes, sets `trial.json` back to `finished`.
 
 ## Commands
 
@@ -173,7 +190,10 @@ next one until `recover` passes. Exit codes follow the engine: 0 passed or no si
 - the ledger's final order status and whether a refusal came before any broker request;
 - the exit reason, the exit budget state and realized P&L.
 
-A native loop that handed its residual to recovery records `handoff_to_recovery`.
+A native loop that handed its residual to recovery records `handoff_to_recovery`, and a
+position no engine order could sell is listed under `unsellable_positions`. The
+`sizing` block records the entry cap, the ledger's per-order cap and the exit
+headroom factor.
 
 It also carries totals checked against the ledger delta, start and end reconciliation,
 and evidence class PAPER (broker) or SYN (synthetic). It has no account id, balance or
@@ -206,13 +226,24 @@ credential.
   keeps its 3 s order gate; choosing a value is a separate recorded decision.
 - **Low prices and spreads.** The entry spread cap is at most 100 bps. Per-order
   quantity is at most 100 shares, so low-priced symbols buy less than their notional.
-  Symbols priced above `max_order_notional_usd / appreciation_allowance` are skipped.
-- **Unsellable shares.** Once one share is worth more than `max_order_notional_usd` (a
-  symbol entered near the allowance limit that then more than doubles), no engine path
-  can sell it: the ledger's per-order cap binds the book and recovery alike. The leg
-  retries until a force, then hands off, and recovery ends `needs_attention` with the
-  position held (`recovery_quantity_not_representable`). The appreciation allowance at
-  entry is the only guard.
+  Symbols priced above `mover.max_entry_notional_usd / appreciation_allowance` are skipped.
+- **Exit headroom.** A leg stays sellable until one share is worth more than the
+  ledger's per-order cap. In the example that is 2000 USD, about a twentyfold rise from
+  an entered share (about 100 USD at most). One such share also exceeds the 2000 USD
+  gross cap, so the ledger has halted by then. Past that point no engine order can sell
+  the leg. The book blocks it (`exit_share_exceeds_ledger_order_cap`) and keeps retrying
+  until a force, then hands off. Recovery ends `needs_attention` with the position held,
+  and `unsellable_positions` names it. RiskLimits keeps the per-order cap at or below the
+  gross cap, so a larger bound needs a larger gross cap. The tenfold minimum
+  (`mover.EXIT_HEADROOM_FACTOR`) is a code constant. It is the largest factor the
+  example's gross cap allows over its entry cap, and it was chosen without a measured
+  distribution of scanned movers' largest rise within the hold. That distribution is
+  the comparison that would change it.
+- **Ledger limits are pinned.** A mover ledger keeps the risk limits it was created with
+  and refuses to open under different ones (`persisted_risk_limits_differ`). A ledger
+  created under the earlier single 200 USD per-order cap keeps a 200 USD sell cap: its
+  config must keep `max_order_notional_usd` at 200, which the headroom check allows only
+  with an entry cap of at most 20 USD.
 - **Fixed constants.** The hand-off bound (three exit timeouts) and the 1 s pre-wire
   retry are code constants (`mover.HANDOFF_EXIT_TIMEOUTS`, `PRE_WIRE_RETRY_SECONDS`)
   chosen without a paper measurement; a broker run that shows slower fills is the

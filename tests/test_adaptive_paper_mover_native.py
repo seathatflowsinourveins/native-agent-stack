@@ -73,11 +73,12 @@ def flat(price, spread="0.02"):
 class MoverNativeEndToEnd(unittest.TestCase):
     def run_trial(self, rows, points, *, exit_rule="X2", hold=1.5, flatten=6.0, window=10.0, entry_timeout=1.0,
                   partial_fill=None, stop_after=None, extended_hours=False, block_sells=False, trial="t1",
-                  snapshot_latency=0.0, reconcile_every=None, exit_orders=None):
+                  snapshot_latency=0.0, reconcile_every=None, exit_orders=None, quote_path=None):
         """One trial through run_mover. With ``block_sells`` no sell fills during the trial;
         the residual then goes through mover_runner.recover_mover on a fresh port on the
         same synthetic account (sells fill), as command_paper does. ``self.outcome`` keeps
-        run_mover's own outcome and ``self.recovery_port`` the recovery port."""
+        run_mover's own outcome and ``self.recovery_port`` the recovery port. ``quote_path``
+        replaces ``piecewise_path(points)`` (e.g. a price gap)."""
         data = json.loads(CONFIG.read_text())
         data["mover"]["exit"] = exit_rule
         data["mover"]["exit_orders"].update(exit_orders or {})
@@ -99,8 +100,9 @@ class MoverNativeEndToEnd(unittest.TestCase):
                                       t0 + hold if exit_rule == "X1" else None, hold)
                 plan = mover.build_plan(settings, limits, scan, session, trial_id=trial, evidence_class="SYN", t0=t0,
                                         equity=limits.capital_usd, timing=timing)
-                controller = mover_runner.MoverController(ledger, t0 + 36000, market_open=True)
-                port = MoverSimulatedPort(controller, cfg["symbols"], path=piecewise_path(points),
+                controller = mover_runner.MoverController(ledger, t0 + 36000, market_open=True,
+                                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+                port = MoverSimulatedPort(controller, cfg["symbols"], path=quote_path or piecewise_path(points),
                                           partial_fill=partial_fill, extended_hours_allowed=extended_hours)
                 port.fill_sells = not block_sells
                 port.snapshot_latency = snapshot_latency
@@ -188,7 +190,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assertGreaterEqual(D(leg["running_high"]), D("11.9"))
         self.assertLessEqual(D(leg["exits"][0]["reference_price"]), D("0.85") * D(leg["running_high"]))
 
-    def test_x4_brackets_target_and_stop_with_chunked_exits(self):
+    def test_x4_brackets_target_and_stop_each_in_one_order(self):
         rows = [row("AAA", 1, "10.00"), row("BBB", 2, "10.00")]
         points = {"AAA": [(0, D("10.00"), D("0.02")), (1.0, D("10.00"), D("0.02")), (2.0, D("15.60"), D("0.02"))],
                   "BBB": [(0, D("10.00"), D("0.02")), (1.0, D("10.00"), D("0.02")), (2.0, D("8.00"), D("0.02"))]}
@@ -196,11 +198,12 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assert_clean(receipt, held, unresolved)
         legs = self.legs(receipt)
         self.assertEqual((legs["AAA"]["exit_reason"], legs["BBB"]["exit_reason"]), ("x4_target", "x4_stop"))
-        # 19 shares near 15 USD exceed the 200 USD per-order cap, so the target exit is chunked.
-        self.assertGreaterEqual(len(legs["AAA"]["exits"]), 2)
+        # 19 shares near 15 USD are above the 200 USD entry cap, but the ledger's per-order cap
+        # (2000 USD), which bounds sells, is ten times it: each exit is one order.
         for leg in legs.values():
-            for order in leg["exits"]:
-                self.assertLessEqual(D(order["qty"]) * D(order["limit_price"]), D(200))
+            self.assertEqual([order["qty"] for order in leg["exits"]], [leg["entry"]["filled_qty"]])
+            self.assertLessEqual(D(leg["entry"]["qty"]) * D(leg["entry"]["limit_price"]), D(200))
+        self.assertGreater(D(legs["AAA"]["exits"][0]["qty"]) * D(legs["AAA"]["exits"][0]["limit_price"]), D(200))
 
     def test_hard_flatten_preempts_a_longer_x2_hold(self):
         rows = [row("AAA", 1, "10.00")]
@@ -258,21 +261,85 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assertTrue(receipt["totals"]["pnl_consistent"])
 
     def test_forced_recovery_sells_an_appreciated_position_in_whole_shares(self):
-        # 19 shares entered near 10; at recovery the bid is 10.60, so the ledger admits at most
-        # floor(200 / 10.60) = 18 shares per sell. The notional capacity at the 10.58 limit is
-        # 18.90 shares, which reserve_intent would refuse.
+        # 19 shares entered near 10 rise elevenfold; at recovery the bid is 110.60, so the ledger
+        # admits at most floor(2000 / 110.60) = 18 shares per sell. The notional capacity at the
+        # 110.58 limit is 18.09 shares, which reserve_intent would refuse. The position is above
+        # the 2000 USD gross cap, so the ledger has also halted (sells stay admitted).
         rows = [row("AAA", 1, "10.00")]
-        points = {"AAA": [(0, D("10.00"), D("0.02")), (1.0, D("10.00"), D("0.02")), (2.0, D("10.61"), D("0.02"))]}
+        points = {"AAA": [(0, D("10.00"), D("0.02")), (1.0, D("10.00"), D("0.02")), (2.0, D("110.61"), D("0.02"))]}
         receipt, port, held, unresolved = self.run_trial(rows, points, hold=1.0, flatten=4.0, window=6.0,
                                                          block_sells=True)
         self.assertEqual(receipt["status"], "needs_attention")        # the trial's own exits could not fill
         self.assertTrue(receipt["flat"])
         self.assertEqual((held, unresolved), ({}, 0))
+        self.assertEqual(receipt["ledger_risk"]["halted_reason"], "gross_exposure_cap_exceeded")
         recovery = receipt["reconciliation"]["recovery"]
-        self.assertEqual((recovery["status"], recovery["errors"]), ("passed", []))
+        self.assertEqual((recovery["status"], recovery["errors"], recovery["unsellable_positions"]), ("passed", [], []))
         sells = [p for p in self.recovery_port.payloads if p["side"] == "sell"]
-        self.assertEqual([(p["qty"], p["limit_price"]) for p in sells], [("18", "10.58"), ("1", "10.58")])
+        self.assertEqual([(p["qty"], p["limit_price"]) for p in sells], [("18", "110.58"), ("1", "110.58")])
         self.assertTrue(receipt["totals"]["pnl_consistent"])
+
+    def test_a_leg_that_more_than_doubles_past_the_entry_cap_still_exits_through_the_book(self):
+        # Two shares bought near 90 (within the 200 USD entry cap) rise to 250: one share is then
+        # above the entry cap. The ledger's per-order cap bounds sells and is ten times the entry
+        # cap, so the X2 exit sells both shares in one order and the trial ends flat.
+        rows = [row("AAA", 1, "90.00")]
+        points = {"AAA": [(0, D("90.00"), D("0.02")), (1.0, D("90.00"), D("0.02")), (2.0, D("250.00"), D("0.02"))]}
+        receipt, port, held, unresolved = self.run_trial(rows, points, hold=2.5, flatten=6.0, window=10.0)
+        self.assert_clean(receipt, held, unresolved)
+        leg = self.legs(receipt)["AAA"]
+        self.assertEqual((leg["entry"]["qty"], leg["exit_reason"], leg["exit_blocked"]), ("2", "x2_time", None))
+        self.assertLessEqual(D(leg["entry"]["qty"]) * D(leg["entry"]["limit_price"]), D(200))
+        self.assertEqual([(order["qty"], order["status"]) for order in leg["exits"]], [("2", "filled")])
+        self.assertGreater(D(leg["exits"][0]["limit_price"]), D(200))
+        self.assertIsNone(receipt["handoff_to_recovery"])
+        self.assertEqual(receipt["unsellable_positions"], [])
+
+    def test_a_share_worth_more_than_the_ledger_order_cap_ends_needs_attention_with_its_reason(self):
+        # A gap from 90 to 2100: one share is worth more than the 2000 USD ledger per-order cap,
+        # so no whole-share sell fits it (the position also breaches the gross cap, and the
+        # ledger halts). The book blocks the leg, hands it to recovery once the halt latches a
+        # force, and recovery cannot sell it either: the trial is needs_attention, and the
+        # receipt names the position and why.
+        before, after = piecewise_path({"AAA": flat("90.00")}), piecewise_path({"AAA": flat("2100.00")})
+        receipt, port, held, unresolved = self.run_trial(
+            [row("AAA", 1, "90.00")], {}, hold=30.0, flatten=20.0, window=25.0, block_sells=True,
+            quote_path=lambda symbol, elapsed: (before if elapsed < 1.0 else after)(symbol, elapsed))
+        self.assertEqual((receipt["status"], receipt["flat"], held), ("needs_attention", False, {"AAA": "2"}))
+        leg = self.legs(receipt)["AAA"]
+        self.assertEqual((leg["exit_blocked"], leg["exits"]), ("exit_share_exceeds_ledger_order_cap", []))
+        self.assertEqual(self.outcome["handoff_to_recovery"]["reason"], "exits_blocked")
+        self.assertEqual(receipt["ledger_risk"]["halted_reason"], "gross_exposure_cap_exceeded")
+        self.assertEqual(receipt["reconciliation"]["recovery"]["errors"], ["recovery_quantity_not_representable"])
+        self.assertEqual(receipt["unsellable_positions"],
+                         [{"symbol": "AAA", "qty": "2", "bid": "2099.99", "ledger_max_order_notional_usd": "2000",
+                           "reason": "share_exceeds_ledger_order_cap"}])
+        self.assertLess(self.outcome["elapsed_seconds"], 10)          # handed off soon after the halt
+
+    def test_the_mover_controller_holds_buys_to_the_entry_cap(self):
+        # The ledger's per-order cap (2000 USD) is sized for exit sells, so the controller refuses a
+        # buy above the mover entry cap (200 USD) before the ledger reserves anything; sells pass.
+        config, limits, settings = mover.load_mover_config(CONFIG)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "ledger.sqlite3", limits)
+            try:
+                now = time.time()
+                ledger.begin_next_trial(now, "t1")
+                controller = mover_runner.MoverController(ledger, now + 36000, market_open=True, clock=lambda: now,
+                                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+                controller.port = type("Ready", (), {"ready": True})()
+                controller.quote({"symbol": "AAA", "bid": "100.00", "ask": "100.02", "ts_ns": int(now * 1e9)})
+                order = {"client_order_id": "mvr-t1-0000001", "symbol": "AAA", "side": "buy", "qty": "2",
+                         "limit_price": "100.52"}
+                with self.assertRaisesRegex(native_adapter.NativeOrderRejected, "^mover_entry_notional_cap_exceeded$"):
+                    controller.before_submit(order)                    # 201.04 > 200, though the ledger admits it
+                self.assertEqual(ledger.intents(), [])
+                controller.before_submit(dict(order, client_order_id="mvr-t1-0000002", qty="1"))
+                self.assertEqual([(i.side, i.qty) for i in ledger.intents()], [("buy", D(1))])
+                with self.assertRaises(TypeError):
+                    mover_runner.MoverController(ledger, now + 36000, market_open=True)   # no default entry cap
+            finally:
+                ledger.close()
 
     def test_exhausted_exits_hand_off_to_recovery_soon_after_the_hard_flatten(self):
         # No sell fills, the sell window is 60 s and each leg may send two exits. Without the
@@ -399,13 +466,17 @@ class MoverPaperCommandWiring(unittest.TestCase):
             return real_build_plan(settings, limits, scan, session, t0=t0, timing=timing, **kwargs)
 
         def fake_transport(key, secret, symbols, **kwargs):
-            # One synthetic "account": orders, positions and cash persist across ports and
-            # trials, as the broker's do (the real snapshot pages all orders since the lane began).
+            # One synthetic "account": orders, positions, cash and the quote timeline persist
+            # across ports and trials, as the broker's do (the real snapshot pages all orders
+            # since the lane began). ``self.path_points`` overrides the flat 10.00 path per symbol.
             controller = kwargs["before_request"].__self__
-            port = MoverSimulatedPort(controller, symbols, path=piecewise_path({s: flat("10.00") for s in symbols}),
+            points = {s: flat("10.00") for s in symbols}
+            points.update({s: p for s, p in (self.path_points or {}).items() if s in points})
+            port = MoverSimulatedPort(controller, symbols, path=piecewise_path(points),
                                       extended_hours_allowed=kwargs.get("extended_hours_allowed", False))
             if self.broker is not None:
                 port.orders, port.positions, port.cash = self.broker.orders, self.broker.positions, self.broker.cash
+                port.t0 = self.broker.t0
             port.fill_sells = self.sell_blocked_ports <= 0     # the next N ports leave every sell resting
             self.sell_blocked_ports -= 1
             self.ports.append(port)
@@ -439,6 +510,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         self.broker = None
         self.sell_blocked_ports = 0
         self.ports = []
+        self.path_points = None
 
     def fast_config(self, root):
         """config-mover.json with a 1 s recovery order timeout (the example uses 10 s)."""
@@ -536,6 +608,28 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.assertEqual(self.trial_json(root)["phase"], "finished")
             code, receipt = self.run_paper(root, "lane-3", config=config)
             self.assertEqual((code, receipt["status"]), (0, "passed"))
+
+    def test_recover_sells_a_position_whose_share_rose_above_the_entry_cap(self):
+        # Two shares bought near 90 rise to 250 while every sell rests (the trial's port and the
+        # forced recovery's). One share is then above the 200 USD entry cap; the ledger's
+        # per-order cap (2000 USD) still fits a whole-share sell, so ``recover`` flattens the lane.
+        with tempfile.TemporaryDirectory() as root:
+            config, scan = self.fast_config(root), Path(root) / "scan.json"
+            scan.write_bytes(scan_raw([row("AAA", 1, "90.00")]))
+            self.path_points = {"AAA": [(0, D("90.00"), D("0.02")), (1.0, D("90.00"), D("0.02")),
+                                        (2.0, D("250.00"), D("0.02"))]}
+            self.sell_blocked_ports = 2
+            code, receipt = self.run_paper(root, "lane-1", config=config)
+            self.assertEqual((code, receipt["status"], receipt["flat"]), (3, "needs_attention", False))
+            self.assertEqual(receipt["reconciliation"]["recovery"]["errors"], ["exit_unfilled_no_blind_retry"])
+            self.assertEqual(receipt["unsellable_positions"], [])
+            self.assertEqual(self.broker.positions.get("AAA"), D(2))
+            code, result = self.run_recover(root, config=config)
+            self.assertEqual((code, result["status"], result["flat"], result["errors"]), (0, "passed", True, []))
+            self.assertEqual(result["unsellable_positions"], [])
+            sells = [p for p in self.broker.payloads if p["side"] == "sell"]
+            self.assertEqual([(p["qty"], p["limit_price"]) for p in sells], [("2", "249.97")])
+            self.assertEqual(self.trial_json(root)["phase"], "finished")
 
 
 if __name__ == "__main__":

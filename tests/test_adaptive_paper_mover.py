@@ -82,7 +82,11 @@ class RuleAndConfig(unittest.TestCase):
         self.assertEqual(settings.rung_schedule, ((1, 20, D(1)),))
         self.assertEqual((settings.entry_cap_bps, settings.entry_timeout_seconds), (D(50), 60))
         self.assertEqual(settings.max_scan_age_seconds, 300)
-        self.assertEqual((limits.max_order_notional_usd, limits.max_gross_exposure_usd), (D(200), D(2000)))
+        # Two caps: 200 USD per entry, and a ledger per-order cap (which also bounds every exit
+        # sell) at the 2000 USD gross cap, ten times the entry cap.
+        self.assertEqual(settings.max_entry_notional_usd, D(200))
+        self.assertEqual((limits.max_order_notional_usd, limits.max_gross_exposure_usd), (D(2000), D(2000)))
+        self.assertEqual(settings.max_entry_notional_usd * mover.EXIT_HEADROOM_FACTOR, limits.max_order_notional_usd)
         self.assertEqual(limits.max_order_qty_mode, "notional")
         self.assertIsNone(limits.leverage)
         self.assertTrue(config["sessions"]["extended_hours"])
@@ -137,6 +141,14 @@ class RuleAndConfig(unittest.TestCase):
         # recovery.recover would size a "fixed"-mode chunk as the fractional notional capacity.
         case("mover_requires_notional_order_qty_mode", lambda d: d.update(max_order_qty_mode="fixed"))
         case("mover_requires_notional_order_qty_mode", lambda d: d.pop("max_order_qty_mode"))
+        # The ledger's per-order cap also bounds every exit sell, so it must cover the entry cap
+        # times EXIT_HEADROOM_FACTOR; the entry cap is its own required setting.
+        case("mover_ledger_order_cap_below_exit_headroom", lambda d: d.update(max_order_notional_usd="1999.99"))
+        case("mover_ledger_order_cap_below_exit_headroom",
+             lambda d: d["mover"].update(max_entry_notional_usd="200.01"))
+        case("invalid_mover_setting:max_entry_notional_usd", lambda d: d["mover"].pop("max_entry_notional_usd"))
+        case("invalid_mover_setting:max_entry_notional_usd", lambda d: d["mover"].update(max_entry_notional_usd="0"))
+        case("invalid_mover_setting:max_entry_notional_usd", lambda d: d["mover"].update(max_entry_notional_usd=200))
         for reason, data in cases:
             with self.subTest(reason=reason), self.assertRaisesRegex(ValueError, "^" + re.escape(reason) + "$"):
                 load(data)
@@ -290,26 +302,26 @@ class SessionsSizingAndTiming(unittest.TestCase):
         symbols = (self.row("AAA", 1, "10", "50000000"), self.row("BBB", 2, "3", "50000000"),
                    self.row("CCC", 3, "10", "100000"), self.row("DDD", 4, "10", "50000000", "5000"))
         sized = mover.size_symbols(symbols, equity=D(10000), leverage=D(2), gross_budget=D(100000),
-                                   per_order_cap=D(10000), allowance=D(1))
+                                   entry_cap=D(10000), allowance=D(1))
         a, b, c, d = sized
         self.assertEqual((a.leverage_i, a.raw_notional_usd, a.notional_usd, a.binding), (D(2), D(4000), D(4000), "formula"))
         self.assertEqual((b.leverage_i, b.notional_usd), (D(1), D(2000)))  # below 5 USD: L_i = min(L, 1)
         self.assertEqual((c.notional_usd, c.binding), (D(1000), "dollar_volume_1pct"))
         self.assertEqual((d.notional_usd, d.binding), (D(500), "entry_bar_10pct"))
-        per_order = mover.size_symbols(symbols[:1], equity=D(10000), leverage=D(1), gross_budget=D(100000),
-                                       per_order_cap=D(200), allowance=D(2))[0]
-        self.assertEqual((per_order.notional_usd, per_order.binding), (D(200), "per_order"))
+        entry_capped = mover.size_symbols(symbols[:1], equity=D(10000), leverage=D(1), gross_budget=D(100000),
+                                          entry_cap=D(200), allowance=D(2))[0]
+        self.assertEqual((entry_capped.notional_usd, entry_capped.binding), (D(200), "max_entry_notional"))
 
     def test_gross_budget_allocates_in_rank_order_and_skips(self):
         symbols = (self.row("AAA", 1, "10", "50000000"), self.row("BBB", 2, "10", "50000000"),
                    self.row("CCC", 3, "10", "50000000"), self.row("EXP", 4, "1500", "50000000"))
         a, b, c, e = mover.size_symbols(symbols, equity=D(10000), leverage=D(1), gross_budget=D(2500),
-                                        per_order_cap=D(2000), allowance=D(2))
+                                        entry_cap=D(2000), allowance=D(2))
         self.assertEqual((a.notional_usd, b.notional_usd, b.binding), (D(2000), D(500), "gross_remaining"))
         self.assertEqual((c.notional_usd, c.skip_reason), (D(0), "notional_below_one_share"))
-        self.assertEqual(e.skip_reason, "price_exceeds_per_order_headroom")  # 1500 x 2 > 2000 per order
+        self.assertEqual(e.skip_reason, "price_exceeds_entry_headroom")  # 1500 x 2 > the 2000 entry cap
         paused = mover.size_symbols(symbols[:1], equity=D(10000), leverage=D(0), gross_budget=D(2500),
-                                    per_order_cap=D(2000), allowance=D(2))[0]
+                                    entry_cap=D(2000), allowance=D(2))[0]
         self.assertEqual(paused.skip_reason, "leverage_zero")
 
     def test_plan_uses_the_appreciation_allowance_and_guard(self):
@@ -320,7 +332,10 @@ class SessionsSizingAndTiming(unittest.TestCase):
         self.assertEqual(plan.leverage, D("0.5"))            # rung 1 x regime 0.5 (absent) x drawdown 1
         self.assertEqual(plan.gross_budget_usd, D(1000))     # min(2000 / 2, 10000 x 1)
         self.assertEqual(plan.gross_guard_usd, D(1800))      # 0.9 x ledger gross cap
-        self.assertEqual([s.notional_usd for s in plan.symbols], [D(200), D(200)])
+        # Entries stay at the 200 USD entry cap, not the ledger's 2000 USD per-order cap.
+        self.assertEqual((plan.max_entry_notional_usd, plan.ledger_max_order_notional_usd), (D(200), D(2000)))
+        self.assertEqual([(s.notional_usd, s.binding) for s in plan.symbols],
+                         [(D(200), "max_entry_notional"), (D(200), "max_entry_notional")])
         self.assertEqual([s.price_decimals for s in plan.symbols], [4, 4])   # every mover instrument
         with self.assertRaisesRegex(mover.MoverRefusal, "invalid_evidence_class"):
             mover.build_plan(self.settings, self.limits, scan, session, trial_id="t1", evidence_class="LIVE",
@@ -572,29 +587,54 @@ class BookStateMachine(unittest.TestCase):
         sells = {s.symbol: s.reason for s in submits(h.evaluate(now + 2), "sell")}
         self.assertEqual(sells, {"ABCD": "x4_target", "WXYZ": "x4_stop"})
 
-    def test_exit_reprices_after_its_timeout_and_chunks_to_the_per_order_cap(self):
+    def test_exit_reprices_after_its_timeout_and_sells_a_doubled_leg_in_one_order(self):
+        # The entry cap (200 USD) bounds the buy only; the ledger's per-order cap (2000 USD)
+        # bounds the exit, so a leg that doubled is still sold whole.
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1])
+        now = h.t0 + 1
+        h.quote("ABCD", "3.21", "3.22", now)
+        buy = submits(h.evaluate(now), "buy")[0]
+        self.assertLessEqual(buy.qty * buy.limit_price, h.settings.max_entry_notional_usd)
+        h.fill(buy, 61, "3.22", now)
+        at = now + 3600
+        h.quote("ABCD", "6.40", "6.41", at)                         # the position doubled: 61 x 6.37 > 200
+        first = submits(h.evaluate(at), "sell")[0]
+        self.assertEqual((first.qty, first.limit_price), (D(61), D("6.37")))
+        h.quote("ABCD", "6.30", "6.31", at + 10)
+        self.assertEqual(cancels(h.evaluate(at + 10)), [first.client_id])
+        self.assertEqual(first.cancel_reason, "exit_reprice")
+        h.book.on_terminal(first.client_id, "canceled")
+        second = submits(h.evaluate(at + 10.1), "sell")[0]
+        self.assertEqual((second.qty, second.limit_price, second.reason), (D(61), D("6.27"), "x2_time"))
+        h.fill(second, 61, "6.30", at + 10.2)
+        h.evaluate(at + 10.5)
+        self.assertEqual(h.book.legs["ABCD"].state, "closed")
+        self.assertTrue(h.book.complete())
+
+    def test_a_leg_worth_more_than_the_ledger_order_cap_exits_in_whole_share_chunks(self):
         h = BookHarness(self, symbols=scan_dict()["symbols"][:1])
         now = h.t0 + 1
         h.quote("ABCD", "3.21", "3.22", now)
         buy = submits(h.evaluate(now), "buy")[0]
         h.fill(buy, 61, "3.22", now)
         at = now + 3600
-        h.quote("ABCD", "6.40", "6.41", at)                         # the position doubled: 61 x 6.37 > 200
+        h.quote("ABCD", "33.00", "33.01", at)                       # about 10x: 61 x 32.84 > 2000
         first = submits(h.evaluate(at), "sell")[0]
-        self.assertEqual((first.qty, first.limit_price), (D(31), D("6.37")))   # floor(200 / 6.37) = 31
-        h.quote("ABCD", "6.30", "6.31", at + 10)
-        self.assertEqual(cancels(h.evaluate(at + 10)), [first.client_id])
-        self.assertEqual(first.cancel_reason, "exit_reprice")
-        h.book.on_terminal(first.client_id, "canceled")
-        second = submits(h.evaluate(at + 10.1), "sell")[0]
-        self.assertEqual((second.qty, second.limit_price, second.reason), (D(31), D("6.27"), "x2_time"))
-        h.fill(second, 31, "6.30", at + 10.2)
-        third = submits(h.evaluate(at + 10.3), "sell")[0]
-        self.assertEqual(third.qty, D(30))
-        h.fill(third, 30, "6.30", at + 10.4)
-        h.evaluate(at + 10.5)
-        self.assertEqual(h.book.legs["ABCD"].state, "closed")
-        self.assertTrue(h.book.complete())
+        # The gross guard (1800) fires first; floor(2000 / 32.84) = 60 shares fit the ledger cap.
+        self.assertEqual((first.qty, first.limit_price, first.reason), (D(60), D("32.84"), "gross_cap_guard"))
+        self.assertLessEqual(first.qty * first.limit_price, h.limits.max_order_notional_usd)
+        h.fill(first, 60, "33.00", at + 0.1)
+        rest = submits(h.evaluate(at + 0.2), "sell")[0]
+        self.assertEqual((rest.qty, rest.reason), (D(1), "gross_cap_guard"))
+
+    def test_an_entry_priced_above_the_entry_headroom_is_skipped(self):
+        # Sized from a 90 USD scan price, the symbol's ask is 100.01 at trial start:
+        # 100.01 x the 2x allowance is above the 200 USD entry cap.
+        h = BookHarness(self, symbols=[dict(scan_dict()["symbols"][1], rank=1, price_at_t="90.00")])
+        now = h.t0 + 1
+        h.quote("WXYZ", "100.00", "100.01", now)
+        self.assertEqual(submits(h.evaluate(now)), [])
+        self.assertEqual(h.book.legs["WXYZ"].skip_reason, "price_exceeds_entry_headroom")
 
     def test_never_sends_a_sell_while_the_symbols_buy_is_open(self):
         h = BookHarness(self, exit_rule="X4", symbols=scan_dict()["symbols"][:1])
@@ -642,12 +682,12 @@ class BookStateMachine(unittest.TestCase):
         self.assertEqual(submits(h.evaluate(h.timing.hard_flatten_at - 0.1)), [])
         h.quote("ABCD", "3.30", "3.31", h.timing.hard_flatten_at)
         sell = submits(h.evaluate(h.timing.hard_flatten_at), "sell")[0]
-        # 61 x 3.29 would exceed the 200 USD per-order cap the ledger applies to sells too.
-        self.assertEqual((sell.reason, sell.qty, sell.limit_price), ("hard_flatten", D(60), D("3.29")))
+        # 61 x 3.29 = 200.69 is above the 200 USD entry cap but within the ledger's per-order cap.
+        self.assertEqual((sell.reason, sell.qty, sell.limit_price), ("hard_flatten", D(61), D("3.29")))
         self.assertEqual(h.book.force_reason, "hard_flatten")
-        h.fill(sell, 60, "3.30", h.timing.hard_flatten_at + 0.1)
-        rest = submits(h.evaluate(h.timing.hard_flatten_at + 0.2), "sell")[0]
-        self.assertEqual((rest.reason, rest.qty), ("hard_flatten", D(1)))
+        h.fill(sell, 61, "3.30", h.timing.hard_flatten_at + 0.1)
+        self.assertEqual(submits(h.evaluate(h.timing.hard_flatten_at + 0.2)), [])
+        self.assertTrue(h.book.complete())
 
     def test_gross_guard_exits_the_largest_position_before_the_ledger_cap(self):
         h = BookHarness(self)
@@ -717,11 +757,11 @@ class ExitBudgetAndHandoff(unittest.TestCase):
             at += 10.1
         self.assertIsNone(h.book.force_reason)
         h.quote("ABCD", "3.20", "3.21", at)
-        self.assertEqual(submits(h.evaluate(at)), [])               # two charged exits exhaust the budget,
-        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")   # which latches a book-wide flatten
-        self.assertEqual(len(h.book.legs["ABCD"].exits), 3)
-        h.quote("ABCD", "3.20", "3.21", at + 0.1)
-        self.assertEqual(submits(h.evaluate(at + 0.1), "sell")[0].reason, "x2_time")   # with one fresh budget
+        sells = submits(h.evaluate(at), "sell")                     # two charged exits exhaust the budget,
+        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")   # which latches a book-wide flatten,
+        self.assertEqual([s.reason for s in sells], ["x2_time"])    # and the same pass uses the fresh budget
+        leg = h.book.legs["ABCD"]
+        self.assertEqual((len(leg.exits), leg.exit_budget_from, leg.exit_blocked), (4, 3, None))
 
     def test_pre_wire_refusals_have_their_own_bound(self):
         h, at = self.exit_due(2)
@@ -731,8 +771,9 @@ class ExitBudgetAndHandoff(unittest.TestCase):
             h.book.on_terminal(sell.client_id, "denied", "outstanding_order_cap_reached", pre_wire=True, at=at)
             at += mover.PRE_WIRE_RETRY_SECONDS
         h.quote("ABCD", "3.20", "3.21", at)
-        self.assertEqual(submits(h.evaluate(at)), [])
+        sells = submits(h.evaluate(at), "sell")
         self.assertEqual(h.book.force_reason, "exit_refusals_exhausted")
+        self.assertEqual((len(sells), h.book.legs["ABCD"].exit_budget_from), (1, 2))   # only on the fresh budget
 
     def test_a_refusal_after_the_broker_saw_the_order_is_charged(self):
         h, at = self.exit_due(1)
@@ -742,8 +783,82 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         h.book.on_terminal(sell.client_id, "rejected", "broker_rejected", pre_wire=True, at=at + 0.2)
         self.assertFalse(sell.pre_wire)
         h.quote("ABCD", "3.20", "3.21", at + 0.3)
-        self.assertEqual(submits(h.evaluate(at + 0.3)), [])
+        sells = submits(h.evaluate(at + 0.3), "sell")
         self.assertEqual(h.book.force_reason, "exit_orders_exhausted")
+        self.assertEqual((len(sells), h.book.legs["ABCD"].exit_budget_from), (1, 1))   # only on the fresh budget
+
+    def test_a_force_latched_mid_pass_reaches_every_leg_in_the_same_pass(self):
+        # _exit latches exit_orders_exhausted part-way through evaluate's pass over the legs.
+        # No leg may buy in that pass, before or after the latching leg (a buy sent and then
+        # canceled in one batch can race its own cancel), and the legs before it must still
+        # cancel their open buys and flatten in that same pass.
+        def row(symbol, rank, price):
+            return {"symbol": symbol, "rank": rank, "price_at_t": price, "dollar_volume_at_t": "8000000",
+                    "entry_bar_dollar_volume": None}
+
+        rows = [dict(scan_dict()["symbols"][0], rank=1),                           # ABCD: held, no exit yet
+                row("BBBB", 2, "10.00"),                                            # an unfilled buy rests
+                row("CCCC", 3, "12.00"),                                            # waiting, before the latch
+                dict(scan_dict()["symbols"][1], rank=4),                           # WXYZ: spends its exit budget
+                row("EFGH", 5, "8.00")]                                             # waiting, after the latch
+        h = BookHarness(self, exit_rule="X4", symbols=rows, exit_orders={"max_orders_per_symbol": 1})
+        now = h.t0 + 1
+
+        def quote_all(at, *, wxyz=("38.60", "38.70"), waiting=True):
+            h.quote("ABCD", "3.21", "3.22", at)
+            h.quote("BBBB", "10.00", "10.01", at)
+            h.quote("WXYZ", *wxyz, at)
+            if waiting:
+                h.quote("CCCC", "12.00", "12.01", at)
+                h.quote("EFGH", "8.00", "8.01", at)
+
+        quote_all(now, wxyz=("45.40", "45.50"), waiting=False)                     # CCCC, EFGH: no quote yet
+        buys = {b.symbol: b for b in submits(h.evaluate(now), "buy")}
+        self.assertEqual(sorted(buys), ["ABCD", "BBBB", "WXYZ"])
+        h.fill(buys["ABCD"], buys["ABCD"].qty, "3.22", now + 0.1)
+        h.fill(buys["WXYZ"], buys["WXYZ"].qty, "45.50", now + 0.1)
+        quote_all(now + 1, waiting=False)                                           # WXYZ at its X4 stop
+        first = submits(h.evaluate(now + 1, symbols=("WXYZ",)), "sell")[0]
+        quote_all(now + 11, waiting=False)
+        self.assertEqual(cancels(h.evaluate(now + 11, symbols=("WXYZ",))), [first.client_id])   # re-price
+        h.book.on_terminal(first.client_id, "canceled")
+        at = now + 11.5
+        quote_all(at)
+        actions = h.evaluate(at)
+        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")
+        self.assertEqual(submits(actions, "buy"), [])                               # no buy in the latching pass
+        for waiting in ("CCCC", "EFGH"):
+            self.assertEqual((h.book.legs[waiting].state, h.book.legs[waiting].skip_reason),
+                             ("skipped", "force:exit_orders_exhausted"))
+        self.assertEqual(cancels(actions), [buys["BBBB"].client_id])
+        self.assertEqual(buys["BBBB"].cancel_reason, "force:exit_orders_exhausted")
+        self.assertEqual({s.symbol: (s.qty, s.reason) for s in submits(actions, "sell")},
+                         {"ABCD": (buys["ABCD"].qty, "exit_orders_exhausted"), "WXYZ": (buys["WXYZ"].qty, "x4_stop")})
+
+    def test_a_force_latched_by_one_symbols_evaluation_reaches_every_leg(self):
+        # MoverStrategy.on_quote evaluates one symbol. A force latched there still cancels the
+        # other legs' open buys, skips their waiting entries and flattens them in that evaluation.
+        rows = [dict(scan_dict()["symbols"][1], rank=1),                           # WXYZ: spends its exit budget
+                dict(scan_dict()["symbols"][0], rank=2)]                           # ABCD: held, no exit yet
+        h = BookHarness(self, exit_rule="X4", symbols=rows, exit_orders={"max_orders_per_symbol": 1})
+        now = h.t0 + 1
+        h.quote("WXYZ", "45.40", "45.50", now)
+        h.quote("ABCD", "3.21", "3.22", now)
+        buys = {b.symbol: b for b in submits(h.evaluate(now), "buy")}
+        for buy, price in ((buys["WXYZ"], "45.50"), (buys["ABCD"], "3.22")):
+            h.fill(buy, buy.qty, price, now + 0.1)
+        h.quote("WXYZ", "38.60", "38.70", now + 1)
+        h.quote("ABCD", "3.21", "3.22", now + 1)
+        first = submits(h.evaluate(now + 1, symbols=("WXYZ",)), "sell")[0]
+        h.quote("WXYZ", "38.60", "38.70", now + 11)
+        h.quote("ABCD", "3.21", "3.22", now + 11)
+        h.evaluate(now + 11, symbols=("WXYZ",))
+        h.book.on_terminal(first.client_id, "canceled")
+        h.quote("WXYZ", "38.60", "38.70", now + 11.5)
+        h.quote("ABCD", "3.21", "3.22", now + 11.5)
+        sells = submits(h.evaluate(now + 11.5, symbols=("WXYZ",)), "sell")
+        self.assertEqual(h.book.force_reason, "exit_orders_exhausted")
+        self.assertEqual({s.symbol: s.reason for s in sells}, {"WXYZ": "x4_stop", "ABCD": "exit_orders_exhausted"})
 
     def test_a_latched_force_grants_one_fresh_budget_then_blocked_exits_hand_off(self):
         h, at = self.exit_due(1)
@@ -793,21 +908,36 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         h.evaluate(at + 0.6)
         self.assertIsNone(h.book.handoff_reason(at + 10000))        # flat, nothing open
 
-    def test_an_unsellable_leg_hands_off_only_once_a_force_latches(self):
-        # One share above the per-order cap cannot be sold by any engine path. Before a force
-        # the leg keeps retrying (the price may come back) and the other legs keep their rules.
-        h = BookHarness(self, symbols=[dict(scan_dict()["symbols"][1], rank=1)])       # WXYZ at 45.50
+    def held_wxyz(self):
+        """WXYZ bought at 45.50 (4 shares) with its X2 exit due at the returned time."""
+        h = BookHarness(self, symbols=[dict(scan_dict()["symbols"][1], rank=1)])
         now = h.t0 + 1
         h.quote("WXYZ", "45.40", "45.50", now)
         buy = submits(h.evaluate(now), "buy")[0]
         h.fill(buy, buy.qty, "45.50", now)
-        at = now + 3600
+        return h, buy, now + 3600
+
+    def test_a_share_above_the_entry_cap_is_still_sold(self):
+        # One share at 250 is above the 200 USD entry cap. The ledger's per-order cap, which
+        # bounds sells, is ten times the entry cap, so the whole leg still sells in one order.
+        h, buy, at = self.held_wxyz()
         h.quote("WXYZ", "250.00", "250.10", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        self.assertEqual((sell.qty, sell.limit_price, sell.reason), (buy.qty, D("248.75"), "x2_time"))
+        self.assertIsNone(h.book.legs["WXYZ"].exit_blocked)
+
+    def test_a_share_above_the_ledger_order_cap_is_blocked_and_hands_off_only_once_a_force_latches(self):
+        # One share above the ledger's per-order cap cannot be sold by any engine path. Before a
+        # force the leg keeps retrying (the price may come back) and the other legs keep their rules.
+        h, buy, at = self.held_wxyz()
+        h.quote("WXYZ", "2500.00", "2500.10", at)
         self.assertEqual(submits(h.evaluate(at)), [])
-        self.assertEqual(h.book.legs["WXYZ"].exit_blocked, "exit_share_exceeds_per_order_cap")
+        self.assertEqual(h.book.legs["WXYZ"].exit_blocked, "exit_share_exceeds_ledger_order_cap")
+        self.assertIn({"type": "mover_exit_blocked", "symbol": "WXYZ", "reason": "exit_share_exceeds_ledger_order_cap",
+                       "at": at}, h.events)
         self.assertIsNone(h.book.handoff_reason(at))
         h.book.set_force("hard_flatten", at + 1)
-        h.quote("WXYZ", "250.00", "250.10", at + 1)
+        h.quote("WXYZ", "2500.00", "2500.10", at + 1)
         h.evaluate(at + 1)
         self.assertEqual(h.book.handoff_reason(at + 1), "exits_blocked")
 
@@ -866,13 +996,14 @@ class ForeignOrdersOnASharedAccount(unittest.TestCase):
     up as a cash or position mismatch."""
 
     def setUp(self):
-        _, self.limits, _ = mover.load_mover_config(CONFIG)
+        _, self.limits, settings = mover.load_mover_config(CONFIG)
         self.root = tempfile.TemporaryDirectory()
         self.ledger = Ledger(Path(self.root.name) / "ledger.sqlite3", self.limits)
         self.now = SCAN_TIME + 30
         self.ledger.begin_next_trial(self.now, "t1")
         self.controller = mover_runner.MoverController(self.ledger, self.now + 36000, market_open=True,
-                                                       clock=lambda: self.now)
+                                                       clock=lambda: self.now,
+                                                       max_entry_notional_usd=settings.max_entry_notional_usd)
 
     def tearDown(self):
         self.ledger.close()
@@ -996,8 +1127,11 @@ class ReceiptAndCommands(unittest.TestCase):
             result = json.loads(out.read_text())
         self.assertEqual((code, result["status"], result["freshness_checked"]), (0, "valid", False))
         self.assertEqual([(s["symbol"], s["intended_notional_usd"], s["binding"]) for s in result["symbols"]],
-                         [("ABCD", "200.00", "per_order"), ("WXYZ", "200.00", "per_order")])
-        self.assertEqual(result["sizing"]["gross_budget_usd"], "1000.00")
+                         [("ABCD", "200.00", "max_entry_notional"), ("WXYZ", "200.00", "max_entry_notional")])
+        sizing = result["sizing"]
+        self.assertEqual((sizing["gross_budget_usd"], sizing["max_entry_notional_usd"],
+                          sizing["ledger_max_order_notional_usd"], sizing["exit_headroom_factor"]),
+                         ("1000.00", "200", "2000", "10"))
 
 
 if __name__ == "__main__":
