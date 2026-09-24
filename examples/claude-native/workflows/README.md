@@ -85,13 +85,16 @@ contract suite covers every file in `agents/`.
 - `layer-verdict-lane`: this catalog's own Claude lane of the layer-verdict
   convergence, vendored byte-identical under `SHA256SUMS`. After
   `tools/sota-convergence/lane_packets.py` writes the packets, pass `repo`,
-  `packets` (`{catalog, layer_id, path, sha256}`) and the lane `prompt`; per
-  packet a `semantic-evidence-reviewer` proposes the winner set, two
-  `evidence-reviewer` lenses try to refute it and one revision round follows a
-  refutation. It writes nothing; `tools/sota-convergence/record_verdicts.py`
-  applies the rules (see `docs/decisions/2026-09-23-verdict-integrity.md`). It
-  needs the project-local `semantic-evidence-reviewer` agent, so a project
-  that does not record layer verdicts can leave it out.
+  `packets` (`{catalog, layer_id, path, sha256}`), the lane `prompt` and the
+  `launch` identity (`tools/sota-convergence/claude_lane_args.py` prints all
+  four). Every stage runs as `blind-lane-reviewer` (Read, Glob and Grep, no
+  skills, no project instructions): per packet one proposal, two lenses that
+  try to refute it and one revision round after a refutation. It writes
+  nothing; `tools/sota-convergence/claude_lane.py` collects the result and
+  `record_verdicts.py` applies the rules (see
+  `docs/decisions/2026-09-23-verdict-integrity.md`). It needs the vendored
+  `examples/claude-native/agents/blind-lane-reviewer.md`, so a project that does
+  not record layer verdicts can leave it out.
 
 Both workflows retain native model/schema errors and missing results. Claims and
 returned source summaries remain model judgments; deterministic coverage checks

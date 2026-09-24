@@ -474,6 +474,38 @@ def extract_events_summary(events: list):
 LANE_FAMILY = "openai"
 
 
+# The repository roots the blind-adjudicator role refuses (agent-lab PR #40), enforced by every blind tool:
+# blind_checkout --export, both lane runners and adjudicate (round-2 review; independent review of #145, O3).
+MIN_ROOT_COMPONENTS = 4
+REFUSED_ROOTS = ("/", "/home", "/tmp", "/Users", "/root")
+
+
+def root_issue(path) -> str:
+    """None when ``path`` is a repository root blind-adjudicator accepts, else why not: it must be absolute with
+    no ``.``/``..`` segment, ``~``, ``$`` or wildcard, and not ``/``, ``/home``, ``/tmp``, a home directory
+    (``/home/<name>``, ``/Users/<name>``, ``/root`` or this user's home) or a path of fewer than four
+    components."""
+    text = str(path)
+    parts = [part for part in text.split("/") if part]
+    if not text.startswith("/"):
+        return f"{text!r} is not an absolute path"
+    if any(part in (".", "..") for part in parts) or any(char in text for char in "~$*?["):
+        return f"{text!r} has a '.', '..', '~', '$' or wildcard segment"
+    if any(char.isspace() for char in text):
+        # Path scrubbing tokenizes on whitespace, so a root with a space could not be recognized in the returns.
+        return f"{text!r} contains whitespace"
+    if not re.fullmatch(r"[A-Za-z0-9._/-]+", text):
+        # Parentheses, quotes, backticks and the other tokenizer delimiters would split the root in scrubbing.
+        return f"{text!r} contains a character outside [A-Za-z0-9._/-]"
+    home = str(Path.home()).rstrip("/")
+    if (text.rstrip("/") or "/") in REFUSED_ROOTS or text.rstrip("/") == home or (
+            len(parts) == 2 and parts[0] in ("home", "Users")):
+        return f"{text!r} is /, /home, /tmp or a home directory"
+    if len(parts) < MIN_ROOT_COMPONENTS:
+        return f"{text!r} has {len(parts)} path components; a repository root needs at least {MIN_ROOT_COMPONENTS}"
+    return None
+
+
 def tree_sha256(repo: Path) -> str:
     """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted,
     and each retained symlink's text. The packet names evidence paths, not their bytes, so a return (and an
@@ -562,6 +594,14 @@ def main(argv=None) -> int:
     if not repo.is_dir():
         print(f"codex_lane: --repo {repo} is not an existing directory", file=sys.stderr)
         return 2
+    if not args.allow_git_history:
+        # The blind export must sit where the adjudicator role accepts it, checked as given and resolved (O3).
+        for candidate in (Path(os.path.abspath(args.repo)), repo):
+            issue = root_issue(candidate)
+            if issue:
+                print(f"codex_lane: --repo {issue}; place the blind export at least four directories deep, outside "
+                      "home, /tmp and every repository", file=sys.stderr)
+                return 2
     git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
     if git_dirs and not args.allow_git_history:
         # git walks up from a subdirectory, so an export inside any repository still reaches history.

@@ -78,9 +78,10 @@ class CodexLaneFixture(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         base = Path(temporary.name).resolve()
-        self.repo = base / "repo"
+        # A blind export sits at least four directories deep (codex_lane.root_issue, independent review of #145).
+        self.repo = base / "hosts" / "blind" / "repo"
         self.work_dir = base / "work"
-        self.repo.mkdir()
+        self.repo.mkdir(parents=True)
         self.work_dir.mkdir()
         (self.work_dir / "packets").mkdir()
 

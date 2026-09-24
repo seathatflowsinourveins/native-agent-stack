@@ -298,36 +298,11 @@ def scrub_pair(claude_return: dict, codex_return: dict, repo_roots=(), packets_d
                  for data in (claude_return, codex_return))
 
 
-# The repository roots the blind-adjudicator role refuses (agent-lab PR #40): enforced here first, so the Claude
-# family never refuses alone while the Codex family judges (round-2 review, adjudication round 3).
-MIN_ROOT_COMPONENTS = 4
-REFUSED_ROOTS = ("/", "/home", "/tmp", "/Users", "/root")
-
-
-def root_issue(path) -> str:
-    """None when ``path`` is a repository root blind-adjudicator accepts, else why not: it must be absolute with
-    no ``.``/``..`` segment, ``~``, ``$`` or wildcard, and not ``/``, ``/home``, ``/tmp``, a home directory
-    (``/home/<name>``, ``/Users/<name>``, ``/root`` or this user's home) or a path of fewer than four
-    components."""
-    text = str(path)
-    parts = [part for part in text.split("/") if part]
-    if not text.startswith("/"):
-        return f"{text!r} is not an absolute path"
-    if any(part in (".", "..") for part in parts) or any(char in text for char in "~$*?["):
-        return f"{text!r} has a '.', '..', '~', '$' or wildcard segment"
-    if any(char.isspace() for char in text):
-        # Path scrubbing tokenizes on whitespace, so a root with a space could not be recognized in the returns.
-        return f"{text!r} contains whitespace"
-    if not re.fullmatch(r"[A-Za-z0-9._/-]+", text):
-        # Parentheses, quotes, backticks and the other tokenizer delimiters would split the root in scrubbing.
-        return f"{text!r} contains a character outside [A-Za-z0-9._/-]"
-    home = str(Path.home()).rstrip("/")
-    if (text.rstrip("/") or "/") in REFUSED_ROOTS or text.rstrip("/") == home or (
-            len(parts) == 2 and parts[0] in ("home", "Users")):
-        return f"{text!r} is /, /home, /tmp or a home directory"
-    if len(parts) < MIN_ROOT_COMPONENTS:
-        return f"{text!r} has {len(parts)} path components; a repository root needs at least {MIN_ROOT_COMPONENTS}"
-    return None
+# The repository-root rule lives in codex_lane.py so every blind tool enforces the same one (independent
+# review of #145, O3); adjudicate keeps its names.
+MIN_ROOT_COMPONENTS = codex_lane.MIN_ROOT_COMPONENTS
+REFUSED_ROOTS = codex_lane.REFUSED_ROOTS
+root_issue = codex_lane.root_issue
 
 
 def refuse_roots(label: str, roots, must_exist: bool = False) -> str:

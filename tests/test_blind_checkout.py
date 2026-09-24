@@ -381,7 +381,7 @@ class ExportTests(BlindCheckoutFixture):
     """2026-09-23 re-record: lanes get a copy without .git, whose history recovers every stripped value."""
 
     def test_export_has_the_stripped_tree_without_git_or_the_manifest(self):
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
                                                   "--dest", str(self.dest), "--export", str(export)]), 0)
@@ -395,11 +395,20 @@ class ExportTests(BlindCheckoutFixture):
                          (self.dest / "catalogs/other/decisions.json").read_bytes())
 
     def test_an_existing_export_is_refused_before_anything_is_created(self):
-        export = self.dest.parent / "export"
-        export.mkdir()
+        export = self.dest.parent / "hosts" / "blind" / "export"
+        export.mkdir(parents=True)
         with self.assertRaises(SystemExit):
             blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(self.dest),
                                  "--export", str(export)])
+        self.assertFalse(self.dest.exists())
+
+    def test_a_shallow_export_is_refused_before_anything_is_created(self):
+        # Independent review of #145, O3: the lanes and the adjudicator refuse such a root, so refuse it here.
+        shallow = self.dest.parent / "export"
+        with self.assertRaises(SystemExit) as raised:
+            blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(self.dest),
+                                 "--export", str(shallow)])
+        self.assertIn("path components", str(raised.exception))
         self.assertFalse(self.dest.exists())
 
     def test_the_export_replaces_every_project_instruction_file_and_leaves_the_worktree_alone(self):
@@ -416,7 +425,7 @@ class ExportTests(BlindCheckoutFixture):
         self.write("docs/sub/.claude/agents/judge.md", f"# {label}\n")
         git(["add", "-A"], self.source)
         git(["commit", "-q", "-m", "instructions"], self.source)
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
@@ -438,7 +447,7 @@ class ExportTests(BlindCheckoutFixture):
                          [".agents", ".claude", ".codex", "docs/sub/.claude"])
 
     def test_an_export_without_instruction_files_still_gets_the_root_stubs(self):
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         self.run_checkout()
         self.addCleanup(self.remove_worktree)
         result = blind_checkout.export_tree(self.dest, export)
@@ -459,7 +468,7 @@ class ExportSymlinkTests(BlindCheckoutFixture):
         os.symlink("../../../outside", self.source / "docs" / "escaping-link")
         git(["add", "-A"], self.source)
         git(["commit", "-q", "-m", "links"], self.source)
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         with contextlib.redirect_stdout(io.StringIO()) as out:
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
                                                   "--dest", str(self.dest), "--export", str(export)]), 0)
@@ -481,7 +490,7 @@ class ExportSymlinkTests(BlindCheckoutFixture):
         os.symlink("sub", self.source / "docs" / "CLAUDE.md")
         git(["add", "-A"], self.source)
         git(["commit", "-q", "-m", "directory-valued instruction links"], self.source)
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
                                                   "--dest", str(self.dest), "--export", str(export)]), 0)
@@ -541,7 +550,7 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
                                "dual_lane_same_winner": True, "empty_winners": [], "winners_note": ""}]})
         git(["add", "-A"], self.source)
         git(["commit", "-q", "-m", "winner catalogs"], self.source)
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
                                                   "--dest", str(self.dest), "--export", str(export)]), 0)
@@ -581,7 +590,7 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
 
 class ExportTimestampTests(BlindCheckoutFixture):
     def test_every_exported_path_has_the_same_fixed_timestamp(self):
-        export = self.dest.parent / "export"
+        export = self.dest.parent / "hosts" / "blind" / "export"
         self.run_checkout()
         self.addCleanup(self.remove_worktree)
         blind_checkout.export_tree(self.dest, export)
@@ -639,7 +648,7 @@ class AllowlistExportTests(BlindCheckoutFixture):
         }
         (self.packets / "foundation__native-clients.json").write_text(json.dumps(packet), encoding="utf-8")
         (self.packets / "SHA256SUMS").write_text("ignored\n", encoding="utf-8")
-        self.export = self.dest.parent / "export"
+        self.export = self.dest.parent / "hosts" / "blind" / "export"
         self.out = io.StringIO()
         with contextlib.redirect_stdout(self.out):
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",

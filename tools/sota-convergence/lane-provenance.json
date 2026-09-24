@@ -1,7 +1,7 @@
 {
  "adjudication": [
   {
-   "adjudicate_py_sha256": "b81d2ee42676faf1edbb25bac409a869c4045ecaba9786b65678e610e9eecf01",
+   "adjudicate_py_sha256": "25a8174170b141550bae4bc1f9434967438eb6895e17c70da76caafa787f1165",
    "adjudicator_role_sha256": "ecc7e8faa2c7c349e98f48cce3f164a4884c86e07e717fbcab03d5c8929578e0",
    "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
    "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
@@ -148,6 +148,11 @@
   },
   {
    "codex_lane_py_sha256": "904498014731de499b4060c7b9b5118ff02af00c1bdb02b5e4927477c8936fc2",
+   "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
+   "registered_at": "2026-09-24"
+  },
+  {
+   "codex_lane_py_sha256": "6e87887124d9be6db99fd2d3dc8e88ec8e340097d5464ffee56e624630b8f573",
    "prompt_sha256": "fa75f1132febf2320f7678fc64a0553d08f625f722ce5d4524f359657d90aee2",
    "registered_at": "2026-09-24"
   }

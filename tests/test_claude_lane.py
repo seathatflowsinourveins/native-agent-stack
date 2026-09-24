@@ -129,6 +129,30 @@ class ClaudeLaneWriterTests(unittest.TestCase):
             self.assertIn(message, err.getvalue())
             self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
+    def test_an_export_inside_a_git_repository_is_refused(self):
+        # Independent review of #145, O4: git history recovers every stripped label, as codex_lane refuses.
+        inside = self.agentlab / "hosts" / "blind" / "export"
+        inside.mkdir(parents=True)
+        self.assertIn("inside the git repository", claude_lane.repo_issue(inside.resolve()))
+        self.assertIsNone(claude_lane.repo_issue(self.export.resolve()))
+        self.assertIn("path components", claude_lane.repo_issue(Path("/srv/export")))
+
+    def test_claude_lane_args_builds_the_launch_the_collector_requires(self):
+        # Independent review of #145, O1: the documented flow needs a command that writes launch and prompt.
+        spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        packets = self.work / "packets"
+        packets.mkdir(parents=True)
+        (packets / "foundation__l1.json").write_text("{}", encoding="utf-8")
+        args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT)
+        self.assertEqual(args["launch"], {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                          "agent_sha256": self.role})
+        self.assertEqual(args["prompt"], (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"))
+        self.assertEqual([(p["catalog"], p["layer_id"]) for p in args["packets"]], [("foundation", "l1")])
+        with self.assertRaises(module.claude_lane.ProvenanceError):
+            module.lane_args(self.work, self.agentlab, claude_lane.VENDORED_AGENT)
+
     def test_a_missing_evidence_repository_is_refused(self):
         # Codex review of #145: an empty walk must not yield a valid-looking tree digest.
         shutil.rmtree(self.export)

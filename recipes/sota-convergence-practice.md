@@ -70,36 +70,66 @@ verdicts" section; the same evidence-class distinctions above apply to every
 lane's `winner_evidence_class`.
 
 ```sh
-# 1. Packets -- one per (catalog, layer_id), with the retained evidence a
-#    lane may read and the withheld fields (current_choice/decision/
-#    rationale) it must argue past.
-python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR"
+# Layout: WORK_DIR and BLIND_DIR sit outside every repository, and BLIND_DIR/export is at least four
+# directories deep, outside home and /tmp. Every blind tool below refuses otherwise (the shared root rule in
+# tools/sota-convergence/codex_lane.py). AL is a clean agent-lab checkout whose .claude/workflows/
+# layer-verdict-lane.js is the vendored examples/claude-native/workflows/ copy.
 
-# 2. Claude lane -- the agent-lab saved workflow, run per packet; each
-#    return is written to "$WORK_DIR/claude/<catalog>__<layer_id>.json".
-# 3. Codex lane -- a separate account/quota, resumable. It runs on a blind
-#    export placed outside every repository: codex_lane.py refuses a --repo
-#    below any .git (exit 2), since git history recovers every stripped label.
-#    BLIND_DIR must not be inside any repository.
+# 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached. Never pass
+#    --gap-receipts in a blind wave (it names the previous winner; refused with --withhold-labels).
+python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR" \
+  --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest \
+  --withhold-labels --registered-receipts --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)"
+
+# 2. Blind export: only what the packets reference (plus tests/, tools/, scripts/), labels stripped, no .git.
+#    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
 python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD \
-  --dest "$BLIND_DIR/checkout" --export "$BLIND_DIR/export"
-python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export"
+  --dest "$BLIND_DIR/checkout" --export "$BLIND_DIR/export" --allow-from-packets "$WORK_DIR/packets"
 git worktree remove --force "$BLIND_DIR/checkout"
-#    A deliberately non-blind run passes --allow-git-history instead:
-#    python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo . --allow-git-history
 
-# 4. Record: validate every lane file (a rejected file is reported and
-#    treated as absent, never aborts the run), seal the accepted ones, and
-#    write the ledger rows.
-#    --run-id is required; the grandfathered 20260922 wave is never re-recorded.
-python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --write
-python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir "$WORK_DIR" --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --check
+# 3. Claude lane: args carry the launch identity {repo, repo_tree_sha256, agent_sha256} and lane-prompt.md,
+#    which the workflow echoes; run it headless from the export root with hooks disabled (every stage runs as
+#    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
+python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
+  --agent-file ~/.claude/agents/blind-lane-reviewer.md > "$WORK_DIR/claude-args.json"
+(cd "$BLIND_DIR/export" && claude -p --settings '{"disableAllHooks": true}' "Use a workflow. Run the saved \
+workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the JSON \
+object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
+$WORK_DIR/claude-workflow-output.json.")
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("result", d), open(sys.argv[2], "w"))' \
+  "$WORK_DIR/claude-workflow-output.json" "$WORK_DIR/claude-result.json"
+python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.json" --work-dir "$WORK_DIR" \
+  --agentlab-root "$AL" --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo "$BLIND_DIR/export" \
+  --resolved-model claude-opus-5-5   # the resolved child model: node $AL/.claude/workflows/child-usage.mjs --latest
 
-# 5. Register the new wave document, refresh the narrative and rerun the standing checks.
+# 4. Codex lane on the same export (a separate account/quota, resumable; codex_lane.py refuses a --repo below
+#    any .git). A deliberately non-blind run passes --allow-git-history --repo . instead.
+python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
+  --model <openai model> --effort high --jobs 2
+
+# 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication").
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export"
+python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
+  --model <openai model> --jobs 2
+python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
+  --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
+#    Run tools/sota-convergence/adjudication-lane.js headless from the export root as in step 3, with
+#    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
+python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \
+  --result "$WORK_DIR/adjudication-claude-result.json" --model claude-opus-5-5
+python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --out "$WORK_DIR/adjudications"
+
+# 6. Record: validate every lane file (a rejected file is reported and treated as absent, never aborts the
+#    run), seal the accepted ones and the adjudications, and write the ledger rows. Pass the same
+#    --adjudications to --check. --run-id is required; the grandfathered 20260922 wave is never re-recorded.
+python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --write
+python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" \
+  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --check
+
+# 7. Register the new wave document, refresh the narrative and rerun the standing checks.
 python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
-  --checked-at "$(date +%Y-%m-%d)"
+  --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 python3 -m unittest
@@ -119,7 +149,7 @@ the winning candidate's own v1 pin text if any (`source_pin`, else
 `revision` -- see `catalogs/landscape/{foundation,us-equities}.json`'s real
 `candidates[]` fields), else `"unpinned"`.
 
-Step 5's `build_verdicts.py --write` is the only step that regenerates
+Step 7's `build_verdicts.py --write` is the only step that regenerates
 `docs/grand-catalog-handbook.md`'s generated block (tables and per-layer
 narrative). `build_verdicts.py --check` fails whenever that block differs from
 the checked-in handbook: after rows were recorded, and also after any change to

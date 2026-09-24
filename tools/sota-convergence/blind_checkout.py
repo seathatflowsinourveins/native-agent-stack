@@ -109,6 +109,7 @@ import os
 import re
 import secrets
 import shutil
+import sys
 import subprocess
 from pathlib import Path
 
@@ -732,6 +733,16 @@ def main(argv=None) -> int:
     packets = args.allow_from_packets.resolve() if args.allow_from_packets else None
     if export is not None and export.exists():
         raise SystemExit(f"--export {export} already exists")
+    if export is not None:
+        # The blind lanes and the adjudicator refuse an export outside the shared root rule, so refuse it before
+        # any work (independent review of #145, O3).
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from codex_lane import root_issue
+        for candidate in (Path(os.path.abspath(args.export)), export):
+            issue = root_issue(candidate)
+            if issue:
+                raise SystemExit(f"--export {issue}; place the blind export at least four directories deep, outside "
+                                 "home, /tmp and every repository")
     if packets is not None:
         packet_references(packets)  # refuses a directory without packets before the worktree is created
     manifest = run_blind_checkout(source, args.rev, dest)

@@ -27085,8 +27085,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "f863ee722a8cdde7340db0166fc9dc9b052875909b0cb11bef69f9a016a43b3a",
-      "bytes": 17480
+      "sha256": "fd2bb74cb0f15f52ef96f241c056b5be010cb66b6a35e53cea7e894c9a8b3052",
+      "bytes": 17670
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -27545,8 +27545,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "4ea2fc878b53998eb21f6ba2c6d1f53f3ca38ace211e130ba880868b0e415cf6",
-      "bytes": 11063
+      "sha256": "1f7adb4d2c9dabee9ed7ce0821167b572e3a98f3252011c91e97f146f11092b4",
+      "bytes": 14219
     },
     {
       "path": "recipes/tavily.md",

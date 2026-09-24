@@ -51,7 +51,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CATALOG_ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
-from codex_lane import tree_sha256  # noqa: E402  (one evidence-tree digest for both lanes)
+from codex_lane import root_issue, tree_sha256  # noqa: E402  (one root rule and tree digest for both lanes)
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
 # The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
 # (Read/Glob/Grep, no skills, omitClaudeMd), so a return names the role bytes it ran with (Codex review of #145).
@@ -168,6 +168,18 @@ def consumed_prompt_sha256(result: dict) -> str:
     return digest
 
 
+def repo_issue(repo: Path):
+    """Why ``repo`` cannot be a blind export, or None (independent review of #145, O3/O4): it must pass the
+    adjudicator's root rule and sit outside every git repository, whose history recovers every stripped label."""
+    issue = root_issue(repo)
+    if issue:
+        return f"--repo {issue}; place the blind export at least four directories deep, outside home and /tmp"
+    for path in (repo, *repo.parents):
+        if (path / ".git").exists():
+            return f"--repo {repo} is inside the git repository {path}; the Claude lane must read a blind export"
+    return None
+
+
 def launch_tree(result: dict, repo: Path, role_sha256: str = None) -> str:
     """The evidence-tree digest the result was launched on (Codex review of #145): the workflow echoes the
     caller's args.launch, which prepare wrote as {repo, repo_tree_sha256, agent_sha256}; it must name ``repo``,
@@ -185,6 +197,9 @@ def launch_tree(result: dict, repo: Path, role_sha256: str = None) -> str:
                               f"{role_sha256}")
     if not repo.is_dir():
         raise ProvenanceError(f"--repo {repo} is not an existing directory")
+    export_issue = repo_issue(repo)
+    if export_issue:
+        raise ProvenanceError(export_issue)
     current = tree_sha256(repo)
     if current != launch["repo_tree_sha256"]:
         raise ProvenanceError(f"the evidence tree under --repo is {current}, not the launch digest "
