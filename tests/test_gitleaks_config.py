@@ -23,6 +23,7 @@ class).
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -50,6 +51,14 @@ GH_PAT_SHAPED_VALUE = "".join(_GH_PAT_SHAPE_PARTS)
 CURSOR = "QU1EfER8MTU5NTkwODgwMDAwMDAwMDAwMA=="
 
 GITLEAKS = shutil.which("gitleaks")
+
+
+class GitleaksPresenceTests(unittest.TestCase):
+    def test_gitleaks_is_on_path_when_the_ci_step_requires_it(self):
+        """The secret-scan job sets GITLEAKS_TESTS_REQUIRED and puts the pinned binary on PATH; without
+        it the allowlist tests below would silently skip there, as they do in the validate job."""
+        if os.environ.get("GITLEAKS_TESTS_REQUIRED"):
+            self.assertIsNotNone(GITLEAKS, "GITLEAKS_TESTS_REQUIRED is set but gitleaks is not on PATH")
 
 
 class _LockBusy(Exception):
@@ -262,6 +271,44 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                              f"the non-pin token line in the reviewed manifest must still be detected: {by_file}")
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
+
+    # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
+    # .gitleaks.toml entry pins by value.
+    REVIEWED_FINGERPRINTS = ["ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db", "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0", "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1", "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9"]
+
+    def _fingerprint_fixture(self, target: Path, relative: str, extra: dict, values=None) -> None:
+        """The shape of ai-memory's scheduled-learning report: 64-hex rejection fingerprints under "key"."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        rows = [{"key": value, "count": 10 - i} for i, value in enumerate(values or self.REVIEWED_FINGERPRINTS[:2])]
+        report = {"learning": {"report": {"aggregate": {"repeated_rejection_fingerprints": rows}, **extra}}}
+        path.write_text(json.dumps(report, indent=2))
+
+    def test_e_memory_rejection_fingerprints_are_not_detected(self):
+        """ai-memory's SHA-256 rejection fingerprints in the reviewed evidence file are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {})
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], "rejection fingerprints in the reviewed file must not be flagged")
+
+    def test_e2_other_fields_and_other_paths_stay_detected(self):
+        """Only the reviewed digests on whole "key" lines of that exact file are exempt: an unreviewed 64-hex
+        "key" value and an api_key in the same file, and the same lines in another file, are still findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            # The reviewed file: one exempt digest, one unreviewed 64-hex "key" value, and an api_key.
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json", {"api_key": HEX64},
+                                      values=[self.REVIEWED_FINGERPRINTS[0], HEX64[::-1]])
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260924.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "generic-api-key":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260923.json", [])), 2,
+                             f"the unreviewed key value and the api_key in the reviewed file must be detected: {by_file}")
+            self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
+                             f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.

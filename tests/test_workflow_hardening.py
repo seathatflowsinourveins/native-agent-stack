@@ -701,5 +701,20 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
         self.assertEqual(unittest_invocations("run: python3 -m unittest -v >full.log 2>&1\n"), [["-v"]])
 
 
+
+class GitleaksConfigTestsRunInCI(unittest.TestCase):
+    """The allowlist regression tests need a gitleaks binary, which only the secret-scan job installs
+    (Codex review of #155): pin that the job runs them with the pinned binary and fails if it is absent."""
+
+    def test_secret_scan_job_runs_the_gitleaks_config_tests_with_the_pinned_binary(self):
+        job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["secret-scan"]
+        step = step_block(job, "gitleaks allowlist regression tests")
+        self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
+        self.assertIn('export PATH="$RUNNER_TEMP/gitleaks:$PATH"', step)
+        self.assertRegex(step, r"python3 -m unittest tests\.test_gitleaks_config\b")
+        install = job.index("Install checksum-verified pinned gitleaks")
+        self.assertLess(install, job.index("gitleaks allowlist regression tests"),
+                        "the tests must run after the pinned binary is installed")
+
 if __name__ == "__main__":
     unittest.main()

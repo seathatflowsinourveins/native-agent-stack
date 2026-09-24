@@ -3094,8 +3094,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "9efab8fdab0c762ad785f751e7f267a8874f75180971463447bc13265cb21d84",
-      "bytes": 16743
+      "sha256": "2752d215e78278e4937107bf98fde5f4ad95c31a5447104417ec0cad5a176e7e",
+      "bytes": 17272
     },
     {
       "path": ".gitignore",
@@ -3104,8 +3104,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "78246d3ff1fab05fca2aec90714f86683e40cbe8ba804de64e412908c2a8334f",
-      "bytes": 24041
+      "sha256": "35a3e985b43c6a869718cb2d7373de5b977913fc18812a33a9bbc282f2aa2e69",
+      "bytes": 25402
     },
     {
       "path": ".gitleaksignore",
@@ -28390,8 +28390,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "eabadbe44b38a3c4e4fd7ae180fb83b060deac3d1e221adadc3d6d74eb4f97a6",
-      "bytes": 34344
+      "sha256": "7ae277702e707230df21041df67d9fb212463bf8c560b3a018c617863d9a185f",
+      "bytes": 37816
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -28640,8 +28640,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "45d653a42656437beabbd96d549468e13687d110c094228ff6848aa675b49fa4",
-      "bytes": 41369
+      "sha256": "7ecbde4156ce4484091e33cd934636755ed6a14b764aa6a3100dc5164d2d408b",
+      "bytes": 42344
     },
     {
       "path": "tests/test_workflow_security.py",
