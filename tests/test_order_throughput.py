@@ -1041,5 +1041,204 @@ class EvidenceFileTests(unittest.TestCase):
         self.assertEqual(rows[1000]["round_trips_per_minute_two_submits"], 500)
 
 
+class PullRequestReviewTests(unittest.TestCase):
+    """Regressions for the PR #165 review threads."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def harness(self, broker, clock, **config):
+        cfg = c.CapacityConfig(**dict({"max_duration_seconds": 130.0, "required_windows": 2}, **config))
+        return c.CapacityRun(broker, cfg, clock=clock, executor=c.InlineExecutor(),
+                             stop_file=stop_path(self.tmp.name))
+
+    # Reconciliation compares the whole position snapshot, not only the probe symbol.
+    def test_non_probe_symbol_position_drift_makes_reconciliation_unclean(self):
+        clock = fx.FakeClock()
+
+        class Drift(fx.FakeBroker):
+            def positions(self):
+                held, responses = super().positions()
+                return [dict(p, qty="6") if p["symbol"] == "AAPL" else p for p in held], responses
+
+        broker = Drift(clock, positions=[{"symbol": "AAPL", "qty": "5"}])
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=clock, acknowledged_positions=1)
+        rec = receipt["reconciliation"]
+        self.assertTrue(rec["position_unchanged"])  # the probe symbol itself did not move
+        self.assertFalse(rec["all_positions_unchanged"])
+        self.assertEqual(rec["changed_position_symbols"], 1)
+        self.assertFalse(rec["clean"])
+        self.assertEqual(receipt["status"], "needs_attention")
+        # A new nonzero position in another symbol is drift as well.
+
+        class Appears(fx.FakeBroker):
+            def positions(self):
+                held, responses = super().positions()
+                return held + [{"symbol": "MSFT", "qty": "1"}], responses
+
+        broker = Appears(fx.FakeClock())
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock)
+        self.assertFalse(receipt["reconciliation"]["clean"])
+        self.assertEqual(receipt["reconciliation"]["changed_position_symbols"], 1)
+        # Unchanged positions stay clean.
+        broker = fx.FakeBroker(fx.FakeClock(), positions=[{"symbol": "AAPL", "qty": "5"}])
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock, acknowledged_positions=1)
+        self.assertTrue(receipt["reconciliation"]["all_positions_unchanged"])
+        self.assertTrue(receipt["reconciliation"]["clean"])
+
+    # Stale quotes are refused before any order, and a stale refresh freezes submissions.
+    def test_stale_or_undated_quote_fails_closed(self):
+        broker = fx.FakeBroker(fx.FakeClock(), quote_age=120.0)
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock)
+        self.assertEqual((receipt["status"], receipt["refusal_reason"]), ("refused", "quote_stale"))
+        self.assertEqual(broker.submit_count, 0)
+        broker = fx.FakeBroker(fx.FakeClock(), quote_age=-5.0)  # far ahead of the host clock
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock)
+        self.assertEqual(receipt["refusal_reason"], "quote_stale")
+
+        class Undated(fx.FakeBroker):
+            def latest_quote(self):
+                return {"bid": self.bid, "ask": self.ask}
+
+        broker = Undated(fx.FakeClock())
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock)
+        self.assertEqual(receipt["refusal_reason"], "quote_timestamp_missing")
+        self.assertEqual(broker.submit_count, 0)
+        broker = fx.FakeBroker(fx.FakeClock(), quote_age=59.0)
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=broker.clock)
+        self.assertEqual(receipt["status"], "completed")
+
+    def test_stale_requote_freezes_submissions_and_cleans_up(self):
+        clock = fx.FakeClock()
+
+        class AgesLater(fx.FakeBroker):
+            def submit(self, *args):
+                if self.submit_count == 20:
+                    self.quote_age = 600.0
+                return super().submit(*args)
+
+        broker = AgesLater(clock)
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=clock)
+        self.assertIn("requote_quote_stale", receipt["health_freezes"])
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    def test_native_port_keeps_quote_timestamp(self):
+        import alpaca_capacity_port as native
+        port = native.AlpacaCapacityPort("k", "s", "SPY")
+        pre = {"account_identity_sha256": "a" * 64, "positions": [], "orders": [],
+               "open_orders_complete": True, "assets": [{"symbol": "SPY", "tradable": True, "status": "active"}],
+               "quotes": [{"symbol": "SPY", "bid": "500", "ask": "500.02", "ts_ns": 1_790_000_000_000_000_000}]}
+        original, native.transport.preflight = native.transport.preflight, lambda *a, **k: pre
+        port._ensure_pool = lambda: None
+        try:
+            self.assertEqual(port.preflight()["quote"]["ts_ns"], 1_790_000_000_000_000_000)
+        finally:
+            native.transport.preflight = original
+
+    # Recovery needs only the trading endpoint.
+    def test_recover_survives_market_data_outage(self):
+        class Crash(BaseException):
+            pass
+
+        clock = fx.FakeClock()
+
+        class CrashAt5(fx.FakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count == 5:
+                    raise Crash()
+                return response
+
+        broker = CrashAt5(clock, drop_events={"new"})
+        journal = Path(self.tmp.name) / "private" / "run.journal.jsonl"
+        harness = c.CapacityRun(broker, c.CapacityConfig(max_duration_seconds=130.0), clock=clock,
+                                executor=c.InlineExecutor(), stop_file=stop_path(self.tmp.name),
+                                journal_path=journal)
+
+        def killed():
+            raise Crash()
+        harness._cleanup = killed
+        with self.assertRaises(Crash):
+            harness.run()
+        harness.journal.close()
+        prefix = harness.prefix
+        self.assertEqual(len(broker.open_orders_with_prefix(prefix)), 5)
+        broker.market_data_available = False
+        with self.assertRaises(RuntimeError):
+            broker.preflight()  # the full preflight would fail before any cancel
+        receipt = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                                stop_file=stop_path(self.tmp.name)).recover(journal)
+        self.assertEqual((receipt["mode"], receipt["status"]), ("recover", "completed"))
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])
+
+    def test_native_recovery_preflight_reads_only_the_trading_account(self):
+        import hashlib
+        import alpaca_capacity_port as native
+        seen = {}
+
+        class Session:
+            def close(self):
+                seen["closed"] = True
+
+        class Client:
+            def __init__(self, observer):
+                self.observer, self._session = observer, Session()
+
+            def get_account(self):
+                self.observer({"kind": "read", "status": 200, "headers": {"x-ratelimit-limit": "200"}})
+                return {"id": "account-1"}
+
+        def sdk_client(key, secret, before, observer=None, *, data=False, read_only=False, lock=None):
+            seen.setdefault("clients", []).append((data, read_only))
+            return Client(observer)
+
+        def no_full_preflight(*args, **kwargs):
+            raise AssertionError("recovery must not read assets or market data")
+
+        port = native.AlpacaCapacityPort("k", "s", "SPY")
+        port._ensure_pool = lambda: None
+        saved = native.transport._sdk_client, native.transport.preflight
+        native.transport._sdk_client, native.transport.preflight = sdk_client, no_full_preflight
+        try:
+            pre = port.recovery_preflight()
+        finally:
+            native.transport._sdk_client, native.transport.preflight = saved
+        self.assertEqual(seen["clients"], [(False, True)])  # one read-only trading client, no data client
+        self.assertTrue(seen["closed"])
+        self.assertEqual(pre["account_identity_sha256"], hashlib.sha256(b"account-1").hexdigest())
+        self.assertEqual([o["origin"] for o in pre["observations"]], ["trading"])
+
+    # A broker-designated delay longer than max_backoff is honoured in full.
+    def test_retry_after_beyond_max_backoff_is_honoured(self):
+        gov, clock = governor()
+        self.assertTrue(gov.try_acquire("submit"))
+        self.assertEqual(gov.on_response("submit", 429, {"retry-after": "300"}), 300.0)
+        self.assertEqual(gov.summary()["backoffs_over_max"], 1)
+        clock.t += 299.0
+        self.assertFalse(gov.try_acquire("submit"))
+        clock.t += 2.0
+        self.assertTrue(gov.try_acquire("submit"))
+        gov, clock = governor()
+        reset = str(int(clock.wall()) + 120)
+        self.assertAlmostEqual(gov.on_response("submit", 429, {"x-ratelimit-reset": reset}), 120.0, delta=1.0)
+        # Only the harness's own exponential fallback is capped.
+        gov, _ = governor(max_backoff=2.0)
+        self.assertEqual([gov.on_response("submit", 429, {}) for _ in range(3)], [1.0, 2.0, 2.0])
+        self.assertEqual(gov.stats["backoffs_over_max"], 0)
+
+    def test_long_retry_after_stops_submissions_without_sending_while_frozen(self):
+        clock = fx.FakeClock()
+        broker = fx.FakeBroker(clock, force_429_calls={25}, retry_after="90")
+        receipt, _, _ = run(self.tmp.name, broker=broker, clock=clock)
+        self.assertEqual(receipt["stop_reason"], "rate_limit_backoff_exceeds_max")
+        self.assertEqual(receipt["rate"]["backoffs"][0]["seconds"], 90.0)
+        rejected = broker.call_log[24]["t"]
+        self.assertGreaterEqual(broker.call_log[25]["t"] - rejected, 90.0 - 0.05)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+
 if __name__ == "__main__":
     unittest.main()

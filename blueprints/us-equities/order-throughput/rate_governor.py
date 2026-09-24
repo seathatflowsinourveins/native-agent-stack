@@ -13,7 +13,8 @@ call is admitted:
 
 A 429 freezes every admission, is counted and backs off for ``Retry-After``
 (seconds or HTTP-date), else until ``x-ratelimit-reset``, else an exponential
-backoff. A changed ``x-ratelimit-limit`` header recomputes the budget, still
+backoff capped at ``max_backoff``. A broker-designated delay is honoured in
+full even beyond ``max_backoff`` and counted in ``backoffs_over_max``. A changed ``x-ratelimit-limit`` header recomputes the budget, still
 bounded by the configured cap, so the same code runs at 200/min and at
 1000/min once the header rises. Only trading-origin responses may be fed to
 ``on_response``; the market-data origin carries its own, unrelated limit.
@@ -94,7 +95,7 @@ class RateGovernor:
         self.stats = {"admitted": {kind: 0 for kind in KINDS}, "http_429": 0,
                       "backoff_seconds": 0.0, "backoffs": [], "denied_frozen": 0,
                       "denied_window": 0, "denied_server_remaining": 0, "denied_tokens": 0,
-                      "external_calls_noted": 0}
+                      "external_calls_noted": 0, "backoffs_over_max": 0}
 
     # -- budget -----------------------------------------------------------------
     @property
@@ -251,8 +252,13 @@ class RateGovernor:
         if delay is None and reset is not None and reset > wall:
             delay, source = reset - wall, "ratelimit_reset"
         if delay is None:
-            delay, source = 2.0 ** (self.consecutive_429 - 1), "exponential"
-        delay = min(self.max_backoff, max(1.0, float(delay)))
+            delay, source = min(self.max_backoff, 2.0 ** (self.consecutive_429 - 1)), "exponential"
+        # A broker-designated delay (Retry-After or x-ratelimit-reset) is honoured in
+        # full, never truncated to max_backoff; max_backoff bounds only the exponential
+        # fallback. A longer broker delay is counted so the caller can stop submitting.
+        delay = max(1.0, float(delay))
+        if delay > self.max_backoff:
+            self.stats["backoffs_over_max"] += 1
         self.frozen_until = max(self.frozen_until or now, now + delay)
         self.tokens = 0.0
         self._last_refill = now
@@ -268,6 +274,7 @@ class RateGovernor:
                 "admitted": dict(self.stats["admitted"]), "http_429": self.stats["http_429"],
                 "backoff_seconds": round(self.stats["backoff_seconds"], 3),
                 "backoffs": list(self.stats["backoffs"]),
+                "backoffs_over_max": self.stats["backoffs_over_max"],
                 "denied": {key[len("denied_"):]: value for key, value in self.stats.items()
                            if key.startswith("denied_")},
                 "external_calls_noted": self.stats["external_calls_noted"]}

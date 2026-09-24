@@ -49,12 +49,15 @@ class FakeBroker:
                  reject_submit_seqs=None, fill_submit_seqs=(), drop_events=(), crash_on_submit_seq=None,
                  supports_cancel_all=True, hide_from_listing=(), listing_status_override=None,
                  ghost_order=False, open_orders_complete=True, stream_ready=True, data_limit=10000,
-                 page_size=None, lost_response_seqs=None, silent_submit_seqs=()):
+                 page_size=None, lost_response_seqs=None, silent_submit_seqs=(), quote_age=0.0,
+                 market_data_available=True):
         self.clock = clock
         self.limit = limit
         self.limit_schedule = limit_schedule
         self.symbol = symbol
         self.bid, self.ask = bid, ask
+        self.quote_age = quote_age
+        self.market_data_available = market_data_available
         self._positions = [dict(p) for p in positions]
         self.submit_latency, self.cancel_latency, self.read_latency = submit_latency, cancel_latency, read_latency
         self.force_429_calls = set(force_429_calls)
@@ -149,15 +152,24 @@ class FakeBroker:
         observations.append({"origin": "data", "kind": "data_read", "status": 200,
                              "headers": {"x-ratelimit-limit": str(self.data_limit),
                                          "x-ratelimit-remaining": str(self.data_limit - 1)}})
+        if not self.market_data_available:
+            raise RuntimeError("fixture market-data outage")
         open_orders = [dict(o) for o in self.orders.values() if o["status"] not in
                        {"filled", "canceled", "expired", "rejected", "replaced"}]
         return {"account_identity_sha256": hashlib.sha256(b"fixture-account").hexdigest(),
                 "positions": [dict(p) for p in self._positions], "open_orders": open_orders,
                 "open_orders_complete": self.open_orders_complete, "asset_tradable": True,
-                "quote": {"bid": self.bid, "ask": self.ask}, "observations": observations}
+                "quote": self.latest_quote(), "observations": observations}
+
+    def recovery_preflight(self):
+        _, headers = self._admit("read")  # account only; never market data
+        return {"account_identity_sha256": hashlib.sha256(b"fixture-account").hexdigest(),
+                "observations": [{"origin": "trading", "kind": "read", "status": 200, "headers": headers}]}
 
     def latest_quote(self):
-        return {"bid": self.bid, "ask": self.ask}
+        if not self.market_data_available:
+            raise RuntimeError("fixture market-data outage")
+        return {"bid": self.bid, "ask": self.ask, "ts_ns": int((self.clock.time() - self.quote_age) * 1e9)}
 
     def start_stream(self, callback, timeout):
         self.callback = callback

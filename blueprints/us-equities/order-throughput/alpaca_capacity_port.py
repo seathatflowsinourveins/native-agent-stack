@@ -12,6 +12,7 @@ Everything that touches the network is reused read-only from
   x-ratelimit-remaining, x-ratelimit-reset and retry-after headers per call.
 * ``preflight`` performs the read-only account/clock/positions/open-orders/
   asset/latest-quote preflight and hashes the account identity.
+  ``recovery_preflight`` reads only GET /v2/account on the trading origin.
 * ``_stream_classes`` / ``_protocol_factory`` provide the ``trade_updates``
   TradingStream pinned to wss://paper-api.alpaca.markets/stream with
   redirect rejection before authentication.
@@ -25,6 +26,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timezone
+import hashlib
 from pathlib import Path
 import queue
 import sys
@@ -133,7 +135,32 @@ class AlpacaCapacityPort:
                 "positions": pre["positions"], "open_orders": pre["orders"],
                 "open_orders_complete": pre["open_orders_complete"],
                 "asset_tradable": bool(asset.get("tradable")) and asset.get("status") == "active",
-                "quote": None if quote is None else {"bid": quote["bid"], "ask": quote["ask"]},
+                "quote": None if quote is None else {"bid": quote["bid"], "ask": quote["ask"],
+                                                     "ts_ns": quote["ts_ns"]},
+                "observations": observations}
+
+    def recovery_preflight(self):
+        """Trading-origin only (GET /v2/account): the account identity, hashed as
+        ``transport.preflight`` hashes it, and the trading rate-limit headers.
+        No asset or market-data read, so crash recovery survives a data outage."""
+        observations, attempts = [], []
+
+        def before(kind, **_):
+            attempts.append(kind)
+            if len(attempts) > 5:
+                raise SafetyError("preflight_request_bound")
+
+        def observer(observation):
+            observations.append(dict(observation, origin="trading"))
+
+        client = transport._sdk_client(self._key, self._secret, before, observer, read_only=True,
+                                       lock=threading.Lock())
+        try:
+            raw_account = client.get_account()
+        finally:
+            client._session.close()
+        self._ensure_pool()
+        return {"account_identity_sha256": hashlib.sha256(str(raw_account["id"]).encode()).hexdigest(),
                 "observations": observations}
 
     def latest_quote(self):
@@ -145,7 +172,7 @@ class AlpacaCapacityPort:
         quotes = self._data.get_stock_latest_quote(
             StockLatestQuoteRequest(symbol_or_symbols=[self.symbol], feed=DataFeed(self.feed)))
         quote = transport.normalize_quote(quotes[self.symbol], self.symbol)
-        return {"bid": quote["bid"], "ask": quote["ask"]}
+        return {"bid": quote["bid"], "ask": quote["ask"], "ts_ns": quote["ts_ns"]}
 
     def submit(self, client_order_id, symbol, qty, limit_price, extended_hours):
         from alpaca.trading.requests import LimitOrderRequest

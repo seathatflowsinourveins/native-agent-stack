@@ -67,6 +67,8 @@ CLEANUP_BACKOFF_PERIODS = 3
 CLEANUP_VERIFY_ROUNDS = 3
 RECONCILE_SECONDS = 30.0
 SESSION_MARGIN_SECONDS = 30.0
+# A quote timestamp may lead the host clock by at most this much (clock skew).
+QUOTE_FUTURE_TOLERANCE_SECONDS = 1.0
 # Frozen qualification criteria (README "Acceptance criteria"). Configurable
 # values below these stay exploratory: acceptance.passed is then false.
 FROZEN_REQUIRED_WINDOWS = 5
@@ -110,6 +112,7 @@ class CapacityConfig:
     stream_start_timeout_seconds: float = 15.0
     cleanup_timeout_seconds: float = 60.0
     requote_seconds: float = 60.0
+    max_quote_age_seconds: float = 60.0
     allow_extended_hours: bool = True
     allow_cancel_all: bool = False
     acknowledged_positions: int = 0
@@ -135,6 +138,7 @@ class CapacityConfig:
         floats = {"headroom": (0.1, 1.0), "max_duration_seconds": (1.0, 3600.0),
                   "stream_timeout_seconds": (0.5, 120.0), "stream_start_timeout_seconds": (1.0, 120.0),
                   "cleanup_timeout_seconds": (5.0, 900.0), "requote_seconds": (5.0, 3600.0),
+                  "max_quote_age_seconds": (1.0, 3600.0),
                   "target_actions_ratio": (0.1, 1.0)}
         for name, (low, high) in floats.items():
             value = getattr(self, name)
@@ -396,7 +400,10 @@ class CapacityRun:
     ``cancel(order_id)`` and ``cancel_all()`` -> Response;
     ``list_orders(status, after_wall, admit)`` -> (orders, complete, [Response]),
     where ``admit()`` must return True before each page after the first;
-    ``positions()`` -> (positions, [Response]); ``latest_quote()`` -> dict;
+    ``positions()`` -> (positions, [Response]); ``latest_quote()`` -> dict with
+    ``bid`` and the quote's ``ts_ns`` (Unix nanoseconds); ``recovery_preflight()``
+    -> dict with ``account_identity_sha256`` and trading-origin ``observations``
+    only (no asset or quote read, so recovery never depends on market data);
     ``start_stream(callback, timeout)``, ``stream_health()`` and ``stop_stream()``.
     """
 
@@ -779,6 +786,14 @@ class CapacityRun:
     def _price(self, quote):
         if not quote or "bid" not in quote:
             raise HarnessRefusal("quote_unavailable")
+        # A stale bid can sit above the market, so band_bps below it may be
+        # marketable: fail closed on a missing or old quote timestamp.
+        ts_ns = quote.get("ts_ns")
+        if type(ts_ns) is not int or ts_ns <= 0:
+            raise HarnessRefusal("quote_timestamp_missing")
+        age = self.clock.time() - ts_ns / 1e9
+        if not -QUOTE_FUTURE_TOLERANCE_SECONDS <= age <= self.config.max_quote_age_seconds:
+            raise HarnessRefusal("quote_stale")
         price = limit_price_below_bid(quote["bid"], self.config.band_bps)
         if price * self.config.qty > Decimal(self.config.max_order_notional_usd):
             raise HarnessRefusal("order_notional_cap_exceeded")
@@ -816,6 +831,10 @@ class CapacityRun:
             return "duration_reached"
         if self.governor.stats["http_429"] > self.config.max_http_429:
             return "http_429_cap_exceeded"
+        if self.governor.stats["backoffs_over_max"]:
+            # The broker asked for a longer pause than max_backoff; it is honoured,
+            # and submissions stop so cleanup starts as soon as the freeze ends.
+            return "rate_limit_backoff_exceeds_max"
         if self.consecutive_rejections >= self.config.max_consecutive_rejections:
             return "consecutive_rejections"
         if len(self.probes) >= self.config.max_orders and not self._live and not self._inflight:
@@ -1075,14 +1094,25 @@ class CapacityRun:
         symbol = self.config.symbol
         position_unchanged = (positions_after is not None and Decimal(positions_after.get(symbol, "0"))
                               == Decimal(self._preflight_positions.get(symbol, "0")))
+        # The whole nonzero-position snapshot must match the preflight: a change in
+        # any symbol is unexplained account drift during the run.
+        changed_positions = None
+        if positions_after is not None:
+            changed_positions = sum(
+                1 for name in set(positions_after) | set(self._preflight_positions)
+                if Decimal(positions_after.get(name, "0")) != Decimal(self._preflight_positions.get(name, "0")))
+        all_positions_unchanged = changed_positions == 0
         clean = (bool(complete) and not unknown and not missing and not mismatched and not non_terminal
-                 and not filled and ambiguous["unresolved"] == 0 and position_unchanged)
+                 and not filled and ambiguous["unresolved"] == 0 and position_unchanged
+                 and all_positions_unchanged)
         self.reconciliation = {"performed": True, "listing_complete": bool(complete),
                                "broker_orders_with_prefix": len(ours), "local_probes": len(self.probes),
                                "unknown_prefix_orders": len(unknown), "missing_from_broker": missing,
                                "status_mismatches": mismatched, "non_terminal_at_end": non_terminal,
                                "filled_probes": filled, "ambiguous_submits": ambiguous,
-                               "position_unchanged": position_unchanged, "clean": clean}
+                               "position_unchanged": position_unchanged,
+                               "all_positions_unchanged": all_positions_unchanged,
+                               "changed_position_symbols": changed_positions, "clean": clean}
 
     # -- entry point ------------------------------------------------------------
     def run(self):
@@ -1193,7 +1223,9 @@ class CapacityRun:
             self.started_wall = float(record["start"]["started_wall"])
             self.config.validate()
             self.stage = "preflight"
-            pre = self.port.preflight()
+            # Trading-only: a market-data outage or a symbol-specific data failure
+            # must not keep a crashed run's orders open.
+            pre = self.port.recovery_preflight()
             self._governor_from(pre)
             with self.account_scope(pre.get("account_identity_sha256")):
                 for intent in record["intents"]:

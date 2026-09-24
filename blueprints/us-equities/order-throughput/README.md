@@ -36,7 +36,9 @@ evidence of strategy quality.
 
    A 429 freezes every admission and is counted. The run then backs off for
    `Retry-After` (seconds or HTTP-date), or until `x-ratelimit-reset`, or
-   exponentially if neither header is present. A changed `x-ratelimit-limit`
+   exponentially (capped at 60 s) if neither header is present. A
+   broker-designated delay is honoured in full, never truncated; one longer
+   than 60 s stops submissions (`rate_limit_backoff_exceeds_max`). A changed `x-ratelimit-limit`
    header recomputes the budget, still bounded by `--cap`. The same code
    therefore runs at 200/min, and at 1000/min once the header rises and
    `--cap 1000` allows it.
@@ -44,8 +46,12 @@ evidence of strategy quality.
    symbol (default SPY). It is priced `--band-bps` (default 500 = 5%) below the
    current bid, rounded down to the cent. The price is refreshed from the data
    endpoint every 60 s on a worker thread, so the main loop never blocks on it,
-   and the refresh does not use the trading budget. If a refresh fails,
-   submissions freeze and cleanup runs. In the PRE or
+   and the refresh does not use the trading budget. A quote without a
+   timestamp, or one older than `max_quote_age_seconds` (60 s) or more than
+   1 s ahead of the host clock, refuses the run before any order
+   (`quote_stale`, `quote_timestamp_missing`), because a stale bid could make
+   the probe marketable. If a refresh fails or is stale, submissions freeze
+   and cleanup runs. In the PRE or
    POST session, orders carry `extended_hours=true`. The CLOSED session is
    refused. The calendar is adaptive-paper `sessions.py` (2026 only). A
    synchronous rejection, such as a price collar, is recorded as data by HTTP
@@ -71,7 +77,8 @@ evidence of strategy quality.
    The cleanup deadline is `cleanup_timeout_seconds` (60 s) of time outside
    any governor freeze. A 429 backoff during cleanup extends it, up to a hard
    ceiling of the timeout plus 3 x the governor's 60 s maximum backoff (240 s
-   by default). If a verification listing is incomplete or still shows
+   by default). A broker delay that outlasts the ceiling is still honoured,
+   so cleanup then ends unverified. If a verification listing is incomplete or still shows
    orders, the sweep and verification run again, at most 3 rounds, within the
    ceiling. A failing step is recorded in `step_errors`, and the next step
    still runs. A 429 storm longer than the ceiling ends as `needs_attention`
@@ -82,7 +89,9 @@ evidence of strategy quality.
    admits every page. No page goes out unadmitted. Any of the following makes the run
    unclean: an order missing at the broker, an unknown order with the prefix,
    a stream/REST terminal-status mismatch, a non-terminal order, a filled
-   probe, an unresolved ambiguous submit, or a changed position.
+   probe, an unresolved ambiguous submit, or any changed position. The whole
+   nonzero-position snapshot is compared with the preflight, not only the
+   probe symbol (`all_positions_unchanged`, `changed_position_symbols`).
 
 ## Safety
 
@@ -113,7 +122,8 @@ evidence of strategy quality.
   600, at most 20000), duration (`--duration`, default 330 s, at most 3600),
   and open orders (`--max-open-orders`, default 10). It also bounds per-order
   and open notional (`--max-order-notional` 1000 and `--max-open-notional`
-  10000 USD), 429s (`max_http_429` 5), consecutive rejections and in-flight
+  10000 USD), 429s (`max_http_429` 5 tolerated; the run stops on the next
+  one, so 0 stops at the first), consecutive rejections and in-flight
   REST calls (`--inflight` 4). The run must also finish inside the current
   session segment. The submission phase ends early enough to leave room for
   the stream start (15 s), the cleanup ceiling (240 s), reconciliation (30 s)
@@ -126,7 +136,9 @@ evidence of strategy quality.
   flushed before its POST, and the end record is fsynced. After SIGKILL, OOM
   or power loss, `capacity.py recover --journal ...` cancels every open order
   with that prefix, individually and through the governor, and verifies zero
-  open. The prefix alone is enough, even if the last intent lines were lost.
+  open. Its preflight reads only `GET /v2/account` on the trading endpoint
+  (identity and rate headers), so a market-data outage or a symbol-specific
+  data failure cannot block it. The prefix alone is enough, even if the last intent lines were lost.
   `audit` lists the prefix's orders read-only. Like adaptive-paper's STOP,
   which blocks entries but never cancels, the STOP file does not block
   `recover`.
@@ -304,4 +316,4 @@ IDs.
 | Measured (repository files) | 419 trading-origin `x-ratelimit-limit: 200` and 9 data-origin `10000` headers in the retained adaptive-paper trial outputs. |
 | Not yet measured | Any native paper run of this harness. |
 | Not exercised against the SDK | `alpaca_capacity_port.py` was not run with alpaca-py 0.44.0 in this change, because the SDK was not installed on the authoring host and no network was used. |
-| Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination (adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |
+| Unverified assumptions | Whether the paper endpoint honours `after_order_id` pagination in practice (it is documented on the Trading API "Get All Orders" reference, updated 2026-05-27, as exclusive and not to be combined with `after`/`until`; adaptive-paper uses the same cursor), exact `trade_updates` event names under load, and Alpaca price-collar behavior for far-from-market limits. |
