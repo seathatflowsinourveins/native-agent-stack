@@ -9098,8 +9098,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "e304d8e97767d4853c9baa634f3014233524cdc56e435a6a7944c7f25dcd5585",
-      "bytes": 180735
+      "sha256": "e17de974d4392761a2d4b43c81de023c1a7bbf0f262dfea20c85e74c1162d76c",
+      "bytes": 181283
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9153,8 +9153,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "4485ce7f6f3ceb56775e83cfe4d356e74fbeb166ff99df73bc1deaafa510be1f",
-      "bytes": 76626
+      "sha256": "44eec09c3ace39cb26331b7b47837729a40eac3ab32063ffdec3c6571d031657",
+      "bytes": 76611
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9588,8 +9588,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "debc3ae5e7689793d1b74d68cda5a0c4515778d7aa79763d67d391358fe374ba",
-      "bytes": 18445
+      "sha256": "f30769819c3cc0c6acdf3582e8a3059a2c3f0fadbd79b1a3be932e3c09a314ee",
+      "bytes": 18656
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -9878,8 +9878,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8d88fe3333cb8896c5683fd7015d2e7396ae0795c36af71cd91bcd0d3b86bb75",
-      "bytes": 15123
+      "sha256": "319b7de114f0f2247fc9875df3d398b9fe04d824efcf84ae703a5e06cc9cc031",
+      "bytes": 15108
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -27333,8 +27333,8 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
-      "sha256": "7a9a5ad8fd583313cc4dd80e8abf99ddde795a9dbe6bb562c8ae4bc50d0e9557",
-      "bytes": 3538
+      "sha256": "99fbd1ed952c0c533f70224d39e4e8ee8180eea07dab4d09742dba1654d1576a",
+      "bytes": 7964
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
@@ -27343,13 +27343,13 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",
-      "sha256": "07d9bd358c3516d50d2623b896f178950aa6c88be2a8506e6e5f3b07aeb5c4c7",
-      "bytes": 3260
+      "sha256": "a465d15d5a1a8d66fd665bd07d027530fbb0902ed850adc7f122c71aaa9dba8d",
+      "bytes": 3760
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--worktrunk--use--20260924.json",
-      "sha256": "c4469eda80312be957f73acaa0ac2864cb0fed7ac787d7c5784a04606abc9288",
-      "bytes": 8077
+      "sha256": "8e869fd705140f3535959e242f81af56345a4af9bca5b25f36abd521dfdd533c",
+      "bytes": 8920
     },
     {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",

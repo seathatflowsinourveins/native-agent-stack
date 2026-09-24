@@ -35,9 +35,9 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (conditional [0/0/0/0] / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/recovery-portability` | dual_lane_same_winner | restic (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:astral-sh-uv (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/scheduling-supervision` | dual_lane_same_winner | dagu (conditional [0/0/0/0] / untested [0/0/0/0]); systemd (conditional [0/0/0/0] / untested [0/0/0/0]) |
-| `foundation/secrets-credentials` | dual_lane_same_winner | gitleaks (conditional [0/0/0/0] / host_verified [1/0/1/0]) |
+| `foundation/secrets-credentials` | dual_lane_same_winner | gitleaks (conditional [0/0/0/0] / untested [1/0/0/0]) |
 | `foundation/semantic-rag` | dual_lane_same_winner | socraticode (accepted [0/0/0/0] / untested [0/0/0/0]); qdrant (accepted [0/0/0/0] / untested [0/0/0/0]); vllm (accepted [1/0/0/0] / untested [0/0/0/0]) |
-| `foundation/token-efficiency` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json`) | rtk (conditional [1/0/0/0] / host_verified [1/0/1/0]); headroom (conditional [0/0/0/0] / untested [0/0/0/0]); ccusage (conditional [0/0/0/0] / untested [0/0/0/0]) |
+| `foundation/token-efficiency` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json`) | rtk (conditional [1/0/0/0] / untested [1/0/0/0]); headroom (conditional [0/0/0/0] / untested [0/0/0/0]); ccusage (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/web-research` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json`) | tavily-cli (conditional [0/0/0/0] / untested [0/0/0/0]); agent-browser (conditional [0/0/0/0] / untested [0/0/0/0]); openresearch (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/workers` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json`) | claude-code (conditional [0/0/0/0] / untested [0/0/0/0]); worktrunk (conditional [0/0/0/0] / untested [1/0/0/0]) |
 | `us-equities/agents-models-workers` | dual_lane_same_winner | codex-native-sdk (accepted [0/0/0/0] / untested [0/0/0/0]); foundation-ai-memory (accepted [0/0/0/0] / untested [0/0/0/0]); foundation-socraticode (accepted [0/0/0/0] / untested [0/0/0/0]) |
@@ -50,7 +50,7 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `us-equities/observability-hosting` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json`) | - |
 | `us-equities/portfolio-risk` | dual_lane_same_winner | skfolio (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/research-factors-ml` | dual_lane_same_winner | skfolio (accepted [0/0/0/0] / untested [0/0/0/0]); data-edgartools (accepted [0/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/security-supply-chain` | dual_lane_same_winner | grype (accepted [0/0/0/0] / untested [0/0/0/0]); syft (accepted [0/0/0/0] / untested [0/0/0/0]); gitleaks (accepted [0/0/0/0] / host_verified [1/0/1/0]) |
+| `us-equities/security-supply-chain` | dual_lane_same_winner | grype (accepted [0/0/0/0] / untested [0/0/0/0]); syft (accepted [0/0/0/0] / untested [0/0/0/0]); gitleaks (accepted [0/0/0/0] / untested [1/0/0/0]) |
 | `us-equities/storage-compute` | dual_lane_same_winner | data-duckdb (accepted [0/0/0/0] / untested [0/0/0/0]) |
 
 ## Needs host evidence
@@ -128,11 +128,13 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `foundation/recovery-portability`: `restic` (catalog/e2e state: untested)
 - `foundation/scheduling-supervision`: `dagu` (catalog/e2e state: untested)
 - `foundation/scheduling-supervision`: `systemd` (catalog/e2e state: untested)
+- `foundation/secrets-credentials`: `gitleaks` (catalog/e2e state: untested)
 - `foundation/semantic-rag`: `qdrant` (catalog/e2e state: untested)
 - `foundation/semantic-rag`: `socraticode` (catalog/e2e state: untested)
 - `foundation/semantic-rag`: `vllm` (catalog/e2e state: untested)
 - `foundation/token-efficiency`: `ccusage` (catalog/e2e state: untested)
 - `foundation/token-efficiency`: `headroom` (catalog/e2e state: untested)
+- `foundation/token-efficiency`: `rtk` (catalog/e2e state: untested)
 - `foundation/web-research`: `agent-browser` (catalog/e2e state: untested)
 - `foundation/web-research`: `openresearch` (catalog/e2e state: untested)
 - `foundation/web-research`: `tavily-cli` (catalog/e2e state: untested)
@@ -155,6 +157,7 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `us-equities/portfolio-risk`: `skfolio` (catalog/e2e state: untested)
 - `us-equities/research-factors-ml`: `data-edgartools` (catalog/e2e state: untested)
 - `us-equities/research-factors-ml`: `skfolio` (catalog/e2e state: untested)
+- `us-equities/security-supply-chain`: `gitleaks` (catalog/e2e state: untested)
 - `us-equities/security-supply-chain`: `grype` (catalog/e2e state: untested)
 - `us-equities/security-supply-chain`: `syft` (catalog/e2e state: untested)
 - `us-equities/storage-compute`: `data-duckdb` (catalog/e2e state: untested)
