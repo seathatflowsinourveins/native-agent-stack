@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "independent_observation",
+  "evidence_class": "independent_observation",
+  "observed_on": "2026-09-24",
+  "observer": "workflow coordinator session (not the harness process)",
+  "method": "alpaca-py SDK order and position listing against the paper account, run separately from the harness code path (not capacity.py, alpaca_capacity_port.py or adaptive-paper transport)",
+  "subject_receipt": "capacity-200-20260924-rth2.json",
+  "client_order_id_prefix": "cap-20260924t135000-acc709-",
+  "listing_since": "2026-09-24T13:50:01.273707+00:00 (the receipt's started_at)",
+  "observed": {
+    "orders_with_prefix": 496,
+    "statuses": {
+      "canceled": 496
+    },
+    "filled_qty_total": "0",
+    "open_orders": 0,
+    "positions": 0
+  },
+  "compared_with_receipt": {
+    "receipt_submits_accepted": 496,
+    "receipt_cancels_acknowledged": 496,
+    "receipt_broker_orders_with_prefix": 496,
+    "counts_match": true
+  },
+  "claim_boundary": "Confirms only the listed properties: 496 orders with this prefix since started_at, all canceled, filled quantity 0, and no open orders or positions at observation time. It uses the same broker API and account, so it is independent of the harness code, not of the broker. It does not confirm per-window rates, latencies, websocket completeness or 429 handling, and it is not a strategy result.",
+  "not_recorded": "The exact SDK calls, alpaca-py version and raw listing output were not retained in this repository."
+}
