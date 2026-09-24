@@ -1588,6 +1588,13 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
     adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
   - Leak records keep input basenames only.
+- **Round 13:**
+  - `claude-collect` recomputes the `claude-args` snapshot's digest and refuses a snapshot edited under an
+    unchanged `snapshot_id`.
+  - An outside host path that holds spaces is scrubbed whole: each following space-separated token that
+    continues it with a `/` or `\` is absorbed, so no suffix of it survives.
+  - `blind_checkout --export` replaces an instruction name that is a symlink to a directory, or a directory
+    itself, with the stub, root files included.
 - **Bindings added in round 12:**
   - The Claude lane's echoed `launch` also carries `agent_sha256`, the role digest the launcher checked
     before and after the run. `claude_lane.py` requires it to equal the vendored role digest.

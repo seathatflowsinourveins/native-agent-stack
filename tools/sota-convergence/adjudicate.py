@@ -155,6 +155,11 @@ PARENT_TEXT_PATH = re.compile(_PATH_START + r"\.\.(?:/" + _PATH_CHARS + r"*)?(?!
 WINDOWS_TEXT_PATH = re.compile(r"(?<![\w\\])(?:[A-Za-z]:[\\/]|\\{1,2}(?=[^\s\\'\"|;&<>()`,]+\\))"
                                + _PATH_CHARS + "*")
 OUTSIDE = "<outside-path>"
+# A host path can hold spaces (/home/example user/x.json, C:\Users\Example User\x.json): after an outside
+# path is replaced, each following space-separated token that continues it (holds a / or \ separator) is
+# absorbed too, so no suffix of it survives (Codex review of #145). Repository roots and work dirs cannot hold
+# spaces (root_issue, refuse_work_dir_inside), so only outside paths need this.
+_OUTSIDE_CONTINUATION = re.compile(r"<outside-path>(?: +[^\s/\\'\"|;&<>()`,]*[/\\][^\s'\"|;&<>()`,]*)+")
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
 # ~ path (~/x or ~user/x), $HOME or ${HOME}, or a <host-path> placeholder.
@@ -222,7 +227,8 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
     text = HOST_PLACEHOLDER.sub(outside, text)
     text = HOME_TEXT_PATH.sub(outside, text)
     text = PARENT_TEXT_PATH.sub(outside, text)
-    return ABSOLUTE_TEXT_PATH.sub(absolute, text)
+    text = ABSOLUTE_TEXT_PATH.sub(absolute, text)
+    return _OUTSIDE_CONTINUATION.sub(OUTSIDE, text)
 
 
 def scrub_strings(value, packets_dir: str, repo_roots=()):
@@ -809,6 +815,7 @@ def redact_leak_text(text):
     for pattern in (WINDOWS_TEXT_PATH, HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH,
                     *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
+    text = _OUTSIDE_CONTINUATION.sub(OUTSIDE, text)
     return text[:LEAK_TEXT_LIMIT]
 
 
@@ -960,6 +967,12 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     snapshot_path = work_dir / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT
     snapshot_doc = load_json(snapshot_path) if snapshot_path.is_file() else {}
     returned_id = result.get("snapshot_id") if isinstance(result, dict) else None
+    # The stored snapshot must still hash to its own id (Codex review of #145): an edited snapshot could swap
+    # in another run's repository, provenance and input hashes under an unchanged snapshot_id.
+    unsealed = {key: value for key, value in snapshot_doc.items() if key != "snapshot_id"}
+    if hashlib.sha256(json.dumps(unsealed, sort_keys=True).encode("utf-8")).hexdigest() != snapshot_doc.get("snapshot_id"):
+        raise ValueError("adjudicate: the claude-args snapshot does not hash to its snapshot_id (it was edited); "
+                         "rerun claude-args and the workflow")
     if returned_id is None or returned_id != snapshot_doc.get("snapshot_id"):
         # The result came from another claude-args run (Codex review of #145): its judgments ran under that
         # snapshot's inputs and evidence tree, not this one's.

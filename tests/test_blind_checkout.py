@@ -467,6 +467,28 @@ class ExportSymlinkTests(BlindCheckoutFixture):
         self.assertFalse(os.path.lexists(export / "docs" / "escaping-link"))
         self.assertIn("docs/absolute-link", out.getvalue())
 
+    def test_instruction_names_that_are_directory_symlinks_become_stubs(self):
+        # Codex review of #145: os.walk lists a symlink to a directory in dirs, so a files-only loop missed it
+        # and the root stub was not written because the link's target existed.
+        (self.source / "docs" / "sub").mkdir(parents=True, exist_ok=True)
+        (self.source / "docs" / "sub" / "notes.md").write_text("notes\n", encoding="utf-8")
+        for stale in ("AGENTS.md", "CLAUDE.md"):
+            if (self.source / stale).exists() or (self.source / stale).is_symlink():
+                (self.source / stale).unlink()
+        os.symlink("docs/sub", self.source / "AGENTS.md")
+        os.symlink("sub", self.source / "docs" / "CLAUDE.md")
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "directory-valued instruction links"], self.source)
+        export = self.dest.parent / "export"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(export)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+        for relative in ("AGENTS.md", "CLAUDE.md", "docs/CLAUDE.md"):
+            path = export / relative
+            self.assertFalse(path.is_symlink(), relative)
+            self.assertEqual(path.read_text(encoding="utf-8"), blind_checkout.EXPORT_INSTRUCTION_STUB, relative)
+
 
 if __name__ == "__main__":
     unittest.main()

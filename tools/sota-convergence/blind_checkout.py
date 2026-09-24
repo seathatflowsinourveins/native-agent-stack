@@ -457,18 +457,29 @@ def export_tree(dest: Path, export: Path) -> dict:
     replaced: list = []
     # os.walk without followlinks: a symlinked directory in the tree may point outside the export, and
     # nothing outside the export is ever written.
-    for directory, _dirs, files in os.walk(export, followlinks=False):
-        for name in sorted(files):
-            if name not in INSTRUCTION_FILE_NAMES:
-                continue
+    for directory, dirs, files in os.walk(export, followlinks=False):
+        # An instruction name can be a symlink to a directory, which os.walk lists in dirs (Codex review of
+        # #145), or even a real directory: every form is replaced by the stub.
+        for name in sorted(set(dirs + files) & set(INSTRUCTION_FILE_NAMES)):
             path = Path(directory) / name
-            path.unlink()
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+            if name in dirs:
+                dirs.remove(name)
             path.write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
             replaced.append(path.relative_to(export).as_posix())
     for name in ROOT_INSTRUCTION_STUBS:
-        if not (export / name).exists():
-            (export / name).write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
-            replaced.append(name)
+        root_file = export / name
+        if root_file.is_symlink() or not root_file.is_file():
+            if root_file.is_symlink() or root_file.is_file():
+                root_file.unlink()
+            elif root_file.is_dir():
+                shutil.rmtree(root_file)
+            root_file.write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
+            if name not in replaced:
+                replaced.append(name)
     return {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs),
             "removed_escaping_symlinks": sorted(removed_links)}
 

@@ -613,9 +613,11 @@ class RereviewOf145Tests(AdjudicateFixture):
         for order in adjudicate.ORDERS:
             self.judgment("claude", order, "claude")
         before = (self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes()
+        empty = {"inputs": {}}
+        empty_id = hashlib.sha256(json.dumps(empty, sort_keys=True).encode("utf-8")).hexdigest()
         adjudicate.write_json(self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT,
-                              {"inputs": {}, "snapshot_id": "s1"})
-        self.assertEqual(adjudicate.collect_claude(self.work, {"snapshot_id": "s1", "items": []}, "claude-opus-5-5"), [])
+                              {**empty, "snapshot_id": empty_id})
+        self.assertEqual(adjudicate.collect_claude(self.work, {"snapshot_id": empty_id, "items": []}, "claude-opus-5-5"), [])
         self.assertEqual((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes(), before)
 
     def test_a_leak_on_an_input_rebuilt_after_claude_args_is_discarded(self):
@@ -1200,6 +1202,33 @@ class TwelfthRereviewOf145Tests(AdjudicateFixture):
             code, err = quiet(adjudicate.main, argv)
             self.assertEqual(code, 2, argv[0])
             self.assertIn("is not an existing directory", err)
+
+
+class ThirteenthRereviewOf145Tests(AdjudicateFixture):
+    """Round-13 review of #145: whitespace-bearing host paths are scrubbed whole, and an edited claude-args
+    snapshot is refused."""
+
+    def test_host_paths_with_spaces_leave_no_suffix(self):
+        packets = str(self.work / "packets")
+        for text, expected in (("see /home/example user/private.json now", "see <outside-path> now"),
+                               (r"at C:\Users\Example User\private.json", "at <outside-path>"),
+                               ("~/My Docs/x.json and more", "<outside-path> and more"),
+                               ("/home/example/a b/c d/e.json end", "<outside-path> end")):
+            self.assertEqual(adjudicate.scrub_text(text, packets), expected, text)
+            self.assertEqual(adjudicate.redact_leak_text(text), expected, text)
+        self.assertEqual(adjudicate.scrub_text("evidence/a.json and plain words", packets),
+                         "evidence/a.json and plain words")
+
+    def test_an_edited_snapshot_is_refused_even_with_its_old_snapshot_id(self):
+        self.inputs()
+        args = adjudicate.claude_args(self.work, self.repo)
+        path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
+        snapshot = json.loads(path.read_text(encoding="utf-8"))
+        snapshot["inputs"] = {key: "0" * 64 for key in snapshot["inputs"]}
+        path.write_text(json.dumps(snapshot), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "does not hash to its snapshot_id"):
+            adjudicate.collect_claude(self.work, {"snapshot_id": args["snapshot_id"], "items": []},
+                                      "claude-opus-5-5", str(self.repo))
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
