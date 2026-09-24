@@ -6448,8 +6448,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/config-mover.json",
-      "sha256": "560849b980082a72f8ec45a32ffae51b1f50a502e739c94346ff501a46777ea8",
-      "bytes": 2975
+      "sha256": "118cf74f59cdd0274efa9fd0512b6e0fef4b573cc3eda2325a21326e533cb176",
+      "bytes": 2974
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/config-sip.json",
@@ -8433,8 +8433,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-early-entry/mover_scan.py",
-      "sha256": "c88e09cc25995945c3f4469a8c4880f866d04c8ed74f422dd70c382ed0a0d870",
-      "bytes": 17041
+      "sha256": "f584b2c9d5719ceb237d7b57db9c610935b5348b7bc4fe2634359e8b61e480d9",
+      "bytes": 17209
     },
     {
       "path": "blueprints/us-equities/mover-early-entry/paper_compare.py",
