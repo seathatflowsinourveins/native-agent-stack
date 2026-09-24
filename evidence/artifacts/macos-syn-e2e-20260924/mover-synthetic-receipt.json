@@ -1,0 +1,433 @@
+{
+  "adapter_errors": [],
+  "config_sha256": "560849b980082a72f8ec45a32ffae51b1f50a502e739c94346ff501a46777ea8",
+  "error_reason": null,
+  "error_type": null,
+  "events": [
+    {
+      "ask": "3.22",
+      "at": 1790255660.5335429,
+      "client_id": "mvr-synthetic-0000001",
+      "limit_price": "3.23",
+      "qty": 61,
+      "symbol": "ZZSA",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "ask": "12.45",
+      "at": 1790255660.5335429,
+      "client_id": "mvr-synthetic-0000002",
+      "limit_price": "12.51",
+      "qty": 15,
+      "symbol": "ZZSB",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-synthetic-0000001",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "ZZSA",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-synthetic-0000002",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "ZZSB",
+      "type": "intent"
+    },
+    {
+      "at": 1790255664.5433369,
+      "reason": "x2_time",
+      "symbol": "ZZSA",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790255664.5433369,
+      "bid": "3.03",
+      "client_id": "mvr-synthetic-0000003",
+      "limit_price": "3.02",
+      "qty": 61,
+      "reason": "x2_time",
+      "symbol": "ZZSA",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "at": 1790255664.5438669,
+      "reason": "x2_time",
+      "symbol": "ZZSB",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790255664.5438669,
+      "bid": "11.75",
+      "client_id": "mvr-synthetic-0000004",
+      "limit_price": "11.70",
+      "qty": 15,
+      "reason": "x2_time",
+      "symbol": "ZZSB",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-synthetic-0000003",
+      "reason": "x2_time",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "ZZSA",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-synthetic-0000004",
+      "reason": "x2_time",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "ZZSB",
+      "type": "intent"
+    }
+  ],
+  "evidence_class": "SYN",
+  "exit_parameters": {
+    "rule": "X2",
+    "x1_flatten_at_et": "15:58",
+    "x2_hold_seconds": 3600,
+    "x3_trail_fraction": "0.85",
+    "x4_stop_fraction": "0.85",
+    "x4_target_fraction": "1.50"
+  },
+  "exit_rule": "X2",
+  "flat": true,
+  "force_at": null,
+  "force_reason": null,
+  "foreign_terminal_orders_ignored": 0,
+  "handoff_to_recovery": null,
+  "kind": "mover_trial_receipt",
+  "ledger_risk": {
+    "drawdown_usd": "57.79",
+    "halted_reason": null,
+    "lifetime_gross_loss_usd": "22.09",
+    "lifetime_realized_pnl_usd": "-22.09"
+  },
+  "limitations": [
+    "Synthetic port: scripted quotes and immediate marketable fills; no broker, network, fees, halts, auctions, queue priority or latency. Not paper or live evidence.",
+    "Timing is compressed; the protocol's real X2 hold (3600 s) and trial end are not exercised.",
+    "The synthetic run uses the regular-session order flag; the extended-hours flag is covered by unit tests."
+  ],
+  "native": {
+    "dropped_quotes": {
+      "by_reason": {},
+      "by_symbol": {}
+    },
+    "elapsed_seconds": 4.4089673749986105,
+    "engine": "NautilusTrader LiveNode 2.0.0rc5",
+    "native_fill_events": 4,
+    "native_quotes": 400,
+    "native_rejections": 0,
+    "orders_submitted": 4,
+    "requests": {
+      "read": 2,
+      "submit": 4
+    },
+    "session_policy": {
+      "extended_hours": false,
+      "overnight_holds": false
+    }
+  },
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": {
+    "end": {
+      "cash_delta_usd": "-22.09",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "recovery": null,
+    "start": {
+      "checked_by": "runner.validate_preflight and the native adapter's startup snapshot",
+      "flat_account_and_no_open_orders": true
+    }
+  },
+  "rule": "08:00|G20|V1000000|any",
+  "scan": {
+    "age_seconds_at_trial_start": 4455.318,
+    "regime_inputs": null,
+    "scan_time": "2026-09-24T12:00:05+00:00",
+    "session_date": "2026-09-24",
+    "symbols": 2
+  },
+  "scan_sha256": "a9ed86f3c55b8f574535a7c1b553dcaf698096396186b208a48df46636092605",
+  "schema_version": 1,
+  "section": "paper_e2e",
+  "session": {
+    "drawdown_factor": "1",
+    "drawdown_fraction": "0.000000",
+    "equity_peak_usd": "10000",
+    "number": 1,
+    "pause_sessions_remaining_after": 0,
+    "paused": false,
+    "reason": null,
+    "rung": "1"
+  },
+  "sizing": {
+    "appreciation_allowance": "2",
+    "engine_leverage_multiple": "1",
+    "entry_limit_cap_bps": "50",
+    "exit_headroom_factor": "10",
+    "exit_limit_cap_bps": "50",
+    "gross_budget_usd": "1000.00",
+    "gross_guard_usd": "1800.00",
+    "ledger_max_order_notional_usd": "2000",
+    "leverage_L": "0.5",
+    "max_entry_notional_usd": "200",
+    "regime_factor": "0.5",
+    "regime_source": "absent_conservative_default",
+    "sizing_equity_source": "config capital_usd plus the mover ledger's realized P&L",
+    "sizing_equity_usd": "10000"
+  },
+  "status": "passed",
+  "symbols": [
+    {
+      "closed_at": "2026-09-24T13:14:24.563508+00:00",
+      "entry": {
+        "accepted_at": "2026-09-24T13:14:20.535342+00:00",
+        "average_fill_price": "3.220000",
+        "broker_order_ref": "9ba6061748b427f1",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-synthetic-0000001",
+        "detail": null,
+        "filled_qty": "61",
+        "fills": [
+          {
+            "at": "2026-09-24T13:14:20.535577+00:00",
+            "price": "3.22",
+            "qty": "61"
+          }
+        ],
+        "ledger_filled_qty": "61",
+        "ledger_status": "filled",
+        "limit_price": "3.23",
+        "pre_wire_refusal": false,
+        "qty": "61",
+        "reason": "entry",
+        "reference_price": "3.22",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-24T13:14:20.533543+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "x2_time",
+      "exit_triggered_at": "2026-09-24T13:14:24.543337+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-24T13:14:24.545307+00:00",
+          "average_fill_price": "3.030000",
+          "broker_order_ref": "7a88ca55fdb443f8",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-synthetic-0000003",
+          "detail": null,
+          "filled_qty": "61",
+          "fills": [
+            {
+              "at": "2026-09-24T13:14:24.545665+00:00",
+              "price": "3.03",
+              "qty": "61"
+            }
+          ],
+          "ledger_filled_qty": "61",
+          "ledger_status": "filled",
+          "limit_price": "3.02",
+          "pre_wire_refusal": false,
+          "qty": "61",
+          "reason": "x2_time",
+          "reference_price": "3.03",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-24T13:14:24.543337+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "61",
+        "buy_notional_usd": "196.42",
+        "flat": true,
+        "realized_pnl_usd": "-11.5900",
+        "sell_notional_usd": "184.83",
+        "sold_qty": "61"
+      },
+      "first_fill_at": "2026-09-24T13:14:20.535577+00:00",
+      "last_wait_reason": null,
+      "rank": 1,
+      "realized_pnl_usd": "-11.5900",
+      "recovery_exits": [],
+      "running_high": "3.52",
+      "scan": {
+        "dollar_volume_at_t": "12500000",
+        "entry_bar_dollar_volume": "450000",
+        "gain_pct_at_t": "45.2",
+        "news_before_t": false,
+        "price_at_t": "3.21"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "125000.00",
+          "entry_bar_10pct": "45000.00",
+          "gross_remaining": "1000.00",
+          "max_entry_notional": "200"
+        },
+        "entry_leverage_i": "0.5",
+        "entry_notional_usd": "200.00",
+        "entry_order_notional_usd": "197.03",
+        "entry_qty_binding": "notional",
+        "intended_notional_usd": "200.00",
+        "leverage_i": "0.5",
+        "price_decimals": 4,
+        "raw_notional_usd": "1000.00"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "ZZSA"
+    },
+    {
+      "closed_at": "2026-09-24T13:14:24.563544+00:00",
+      "entry": {
+        "accepted_at": "2026-09-24T13:14:20.536366+00:00",
+        "average_fill_price": "12.450000",
+        "broker_order_ref": "f796ee38244c7022",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-synthetic-0000002",
+        "detail": null,
+        "filled_qty": "15",
+        "fills": [
+          {
+            "at": "2026-09-24T13:14:20.536574+00:00",
+            "price": "12.45",
+            "qty": "15"
+          }
+        ],
+        "ledger_filled_qty": "15",
+        "ledger_status": "filled",
+        "limit_price": "12.51",
+        "pre_wire_refusal": false,
+        "qty": "15",
+        "reason": "entry",
+        "reference_price": "12.45",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-24T13:14:20.533543+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "x2_time",
+      "exit_triggered_at": "2026-09-24T13:14:24.543867+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-24T13:14:24.547251+00:00",
+          "average_fill_price": "11.750000",
+          "broker_order_ref": "fd8e1f8afa0b694a",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-synthetic-0000004",
+          "detail": null,
+          "filled_qty": "15",
+          "fills": [
+            {
+              "at": "2026-09-24T13:14:24.547783+00:00",
+              "price": "11.75",
+              "qty": "15"
+            }
+          ],
+          "ledger_filled_qty": "15",
+          "ledger_status": "filled",
+          "limit_price": "11.70",
+          "pre_wire_refusal": false,
+          "qty": "15",
+          "reason": "x2_time",
+          "reference_price": "11.75",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-24T13:14:24.543867+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "15",
+        "buy_notional_usd": "186.75",
+        "flat": true,
+        "realized_pnl_usd": "-10.5000",
+        "sell_notional_usd": "176.25",
+        "sold_qty": "15"
+      },
+      "first_fill_at": "2026-09-24T13:14:20.536574+00:00",
+      "last_wait_reason": null,
+      "rank": 2,
+      "realized_pnl_usd": "-10.5000",
+      "recovery_exits": [],
+      "running_high": "13.63",
+      "scan": {
+        "dollar_volume_at_t": "4200000",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "27.5",
+        "news_before_t": false,
+        "price_at_t": "12.40"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "42000.00",
+          "entry_bar_10pct": null,
+          "gross_remaining": "800.00",
+          "max_entry_notional": "200"
+        },
+        "entry_leverage_i": "0.5",
+        "entry_notional_usd": "200.00",
+        "entry_order_notional_usd": "187.65",
+        "entry_qty_binding": "notional",
+        "intended_notional_usd": "200.00",
+        "leverage_i": "0.5",
+        "price_decimals": 4,
+        "raw_notional_usd": "1000.00"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "ZZSB"
+    }
+  ],
+  "synthetic": {
+    "hold_seconds": 4.0,
+    "path": "mover_runner.synthetic_path",
+    "scan_age_check": "skipped"
+  },
+  "timing": {
+    "entry_deadline": "2026-09-24T13:14:22.317780+00:00",
+    "entry_timeout_seconds": 2.0,
+    "exit_order_timeout_seconds": 1.0,
+    "hard_flatten_at": "2026-09-24T13:14:30.317780+00:00",
+    "sell_window_end": "2026-09-24T13:14:38.317780+00:00",
+    "trial_start": "2026-09-24T13:14:20.317780+00:00",
+    "x1_flatten_at": null,
+    "x2_hold_seconds": 4.0
+  },
+  "totals": {
+    "buy_notional_usd": "383.17",
+    "entries_filled": 2,
+    "entries_submitted": 2,
+    "exit_orders_submitted": 2,
+    "ledger_cash_delta_usd": "-22.09",
+    "ledger_realized_pnl_delta_usd": "-22.09",
+    "native_fill_events": 4,
+    "native_rejections": 0,
+    "pnl_consistent": true,
+    "realized_pnl_usd": "-22.0900",
+    "sell_notional_usd": "361.08",
+    "symbols": 2
+  },
+  "trial_id": "synthetic",
+  "unsellable_positions": []
+}
