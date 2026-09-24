@@ -20,15 +20,17 @@ job_max=${ECOSYSTEM_JOB_MEMORY_MAX:-6G}
 job_swap=${ECOSYSTEM_JOB_SWAP_MAX:-0}
 job_seconds=${ECOSYSTEM_JOB_SECONDS:-600}
 job_tasks=${ECOSYSTEM_JOB_TASKS_MAX:-256}
+job_cpu=${ECOSYSTEM_JOB_CPU_QUOTA:-}
 for job_size in "$job_high" "$job_max"; do
     [[ "$job_size" =~ ^[1-9][0-9]*[KMGT]?$ ]] || fail 'memory limits must be positive finite sizes'
 done
 [[ "$job_swap" =~ ^(0|[1-9][0-9]*[KMGT]?)$ ]] || fail 'swap limit must be a finite size'
 [[ "$job_seconds" =~ ^[1-9][0-9]*$ && "$job_tasks" =~ ^[1-9][0-9]*$ ]] || fail 'runtime and task limits must be positive integers'
+[[ -z "$job_cpu" || "$job_cpu" =~ ^[1-9][0-9]{0,5}%$ ]] || fail 'CPU quota must be a positive percentage such as 200%'
 
 # systemd starts a scope even when it has to mask a limit (an ancestor that
-# does not delegate the memory or pids controller), so the job's own cgroup is
-# checked from inside the scope before the command runs. The kernel keeps
+# does not delegate the memory, pids or cpu controller), so the job's own cgroup
+# is checked from inside the scope before the command runs. The kernel keeps
 # memory.max in whole pages, rounding the requested byte count down.
 case $job_max in
     *K) job_shift=10 ;; *M) job_shift=20 ;; *G) job_shift=30 ;; *T) job_shift=40 ;; *) job_shift=0 ;;
@@ -43,6 +45,34 @@ job_max_bytes=$(( (job_max_count << job_shift) / job_page * job_page ))
 # Never fall back to running the command without containment.
 export XDG_RUNTIME_DIR="$job_runtime"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=$job_runtime/bus"
+
+# CPUQuota counts one CPU as 100%; the default leaves two online CPUs to the
+# interactive sessions, the same CPUs - 2 rule as the client's workflow cap.
+# The cpu controller reaches user scopes only where the user manager delegates
+# it (the default since systemd 252). Without it the default quota is skipped
+# with a note, and an explicit quota is refused because it cannot be enforced.
+job_manager=$(/usr/bin/timeout 5s /usr/bin/systemctl --user show --property=ControlGroup --value) || fail 'cannot read the user manager cgroup; command was not started'
+[[ "$job_manager" == /?* ]] || fail 'cannot read the user manager cgroup; command was not started'
+# Every live cgroup v2 directory has a readable cgroup.controllers, so a failed
+# read means the manager path is wrong: refuse rather than guess "no cpu".
+{ read -r job_controllers < "/sys/fs/cgroup$job_manager/cgroup.controllers"; } 2>/dev/null \
+    || fail "cannot read the user manager's cgroup controllers ($job_manager); command was not started"
+job_cpu_props=()
+job_cpu_max=skip
+if [[ " $job_controllers " == *" cpu "* ]]; then
+    if [[ -z "$job_cpu" ]]; then
+        job_cpus=$(/usr/bin/getconf _NPROCESSORS_ONLN) || fail 'cannot read the CPU count; command was not started'
+        [[ "$job_cpus" =~ ^[1-9][0-9]*$ ]] || fail 'cannot read the CPU count; command was not started'
+        job_cpu="$(( job_cpus > 2 ? (job_cpus - 2) * 100 : 100 ))%"
+    fi
+    # systemd writes CPUQuota=N% as N ms of CPU time per default 100 ms period.
+    job_cpu_max="$(( ${job_cpu%\%} * 1000 )) 100000"
+    job_cpu_props=(--property="CPUQuota=$job_cpu")
+elif [[ -n "$job_cpu" ]]; then
+    fail "CPU quota $job_cpu needs the cpu controller, which the user manager does not delegate (Delegate=cpu memory pids in user@.service); command was not started"
+else
+    printf 'ecosystem-bounded-run: note: no CPU quota; the user manager does not delegate the cpu controller (systemd before 252)\n' >&2
+fi
 job_unit="ecosystem-job-${job_uid}-${BASHPID}-${RANDOM}.scope"
 job_pid=
 # The in-scope check creates this marker just before it execs the command, so
@@ -53,8 +83,8 @@ job_started="$job_state/started"
 # Runs inside the scope as /bin/sh; its arguments are expanded there, not here.
 # shellcheck disable=SC2016
 job_check='
-marker=$1 unit=$2 memory=$3 tasks=$4
-shift 4
+marker=$1 unit=$2 memory=$3 tasks=$4 cpu=$5
+shift 5
 refuse() { printf "ecosystem-bounded-run: %s; command was not started\n" "$*" >&2; exit 78; }
 cgroup=
 while IFS= read -r line; do
@@ -65,6 +95,10 @@ read -r have_memory < "/sys/fs/cgroup$cgroup/memory.max" || refuse "memory.max i
 read -r have_tasks < "/sys/fs/cgroup$cgroup/pids.max" || refuse "pids.max is not enforced for $unit"
 [ "$have_memory" = "$memory" ] || refuse "memory.max is $have_memory, not $memory"
 [ "$have_tasks" = "$tasks" ] || refuse "pids.max is $have_tasks, not $tasks"
+if [ "$cpu" != skip ]; then
+    read -r have_cpu < "/sys/fs/cgroup$cgroup/cpu.max" || refuse "cpu.max is not enforced for $unit"
+    [ "$have_cpu" = "$cpu" ] || refuse "cpu.max is $have_cpu, not $cpu"
+fi
 # exec only runs files, so look the name up the way exec does: a path must be an
 # executable file; a bare name must be an executable file in a PATH directory
 # (a shell builtin such as cd with no file would otherwise fail after the start).
@@ -104,11 +138,12 @@ trap 'stop_job 143' TERM
     --property="MemoryMax=$job_max" \
     --property="MemorySwapMax=$job_swap" \
     --property="TasksMax=$job_tasks" \
+    "${job_cpu_props[@]}" \
     --property="RuntimeMaxSec=$job_seconds" \
     --property=TimeoutStopSec=5s \
     --property=OOMPolicy=kill \
     -- /bin/sh -c "$job_check" ecosystem-bounded-run \
-    "$job_started" "$job_unit" "$job_max_bytes" "$job_tasks" "$@" <&0 &
+    "$job_started" "$job_unit" "$job_max_bytes" "$job_tasks" "$job_cpu_max" "$@" <&0 &
 job_pid=$!
 job_status=0
 wait "$job_pid" || job_status=$?

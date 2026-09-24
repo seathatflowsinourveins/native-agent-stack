@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "extreme_gainer_price_audit_plan",
+  "frozen_at_utc": "2026-09-24T03:05:00Z",
+  "frozen_before_first_run": true,
+  "question": "Do the research package's 957 event-day gains, and its T+1/T+5/T+20 forward returns, reproduce from an independent source (Alpaca SIP official closes), and how many of its 271 rows without computed prices can that source recover?",
+  "inputs": {
+    "package_zip_sha256": "a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c",
+    "forward_returns_csv": {
+      "path_in_package": "datasets/forward-returns-2021-2026.csv",
+      "sha256": "d4f80668ea33191a955d2b86b125e2d4dfcbe3263421410117920e73fde48ec0",
+      "rows": 957
+    },
+    "alias_map_csv": {
+      "path_in_package": "datasets/alias-map.csv",
+      "sha256": "6a75792c73faa572434346af0f79dbbf87008960d89431cb7fab235f714099da",
+      "rows": 265
+    },
+    "package_location": "private research intake (outside git); inputs are identified by sha256 only"
+  },
+  "source": {
+    "provider": "Alpaca Market Data API v2",
+    "feed": "sip",
+    "endpoints": [
+      "/v2/stocks/{symbol}/auctions (official opening and closing auction prints)",
+      "/v2/stocks/{symbol}/bars timeframe=1Day adjustment=raw",
+      "/v2/stocks/{symbol}/bars timeframe=1Day adjustment=split"
+    ],
+    "asof": "the event date, so a later rename resolves to the entity that traded on that date",
+    "window_calendar_days": {"before": 12, "after": 45},
+    "rate_limit_observed": "X-RateLimit-Limit 10000 per minute on this account's data API (2026-09-24 probe); this run self-limits to 20 requests per second"
+  },
+  "official_close_rule": [
+    "the day's closing-auction record with condition 6 (closing print)",
+    "else a condition M record on the exchange of the day's condition O opening record",
+    "else the day's daily bar close (flagged bar_close_fallback)"
+  ],
+  "gain_definition": "official close on the event date divided by the official close on the latest earlier trading date that has one, minus 1, in percent, from raw prices. When the ratio of raw to split-adjusted daily closes differs between those two dates (a split or reverse split between them), both closes are divided by their date's ratio before the gain is taken, and the row is flagged split_between.",
+  "forward_return_definition": "split-adjusted daily bar close N trading days after the event date divided by the event date's split-adjusted daily bar close, minus 1, in percent, for N = 1, 5, 20",
+  "package_reference": {
+    "event_gain": "Computed_Gain_Pct when Status is OK, else Gain_Pct_Dataset (the package's catalogued gain)",
+    "forward_returns": "Ret_T1_Pct, Ret_T5_Pct, Ret_T20_Pct where present"
+  },
+  "symbol_resolution": [
+    "Ticker_Used when present, else Ticker, with asof = the event date",
+    "if that returns no event-date data: the alias-map Alias_Symbol for the same Date and Ticker, with asof = the event date"
+  ],
+  "tolerance": {
+    "event_gain": {"abs_pct_points": 0.5, "rel_fraction": 0.005},
+    "forward_returns": {"abs_pct_points": 1.0, "rel_fraction": 0.02},
+    "rule": "match when |alpaca - package| <= max(abs_pct_points, rel_fraction * |package|)",
+    "basis": "both sources record official closes to the cent, so a correct pair differs only by rounding; the forward-return band is wider because the two sources' split-adjustment factors are applied independently"
+  },
+  "verdicts": {
+    "match": "package had computed prices (Status OK) and the gains agree within tolerance",
+    "mismatch": "package had computed prices and the gains disagree",
+    "recovered_match": "package had no computed prices; Alpaca yields a gain that agrees with Gain_Pct_Dataset",
+    "recovered_mismatch": "package had no computed prices; Alpaca yields a gain that disagrees with Gain_Pct_Dataset",
+    "no_source_data": "no event-date close from any resolved symbol",
+    "no_prev_close": "an event-date close but no earlier close in the window"
+  },
+  "outputs": {
+    "committed": "results JSON with per-event gains, differences, verdicts and source flags (no raw prices), summary counts, the snapshot's sha256 and the request log",
+    "private": "the snapshot of raw API responses (SIP prices), kept outside the repository because of market-data redistribution terms"
+  },
+  "reproduction": {
+    "deterministic": "compare: the same snapshot and package CSVs give byte-identical results",
+    "re-runnable": "fetch: a later fetch can differ if Alpaca revises history; compare two snapshots by their result tables"
+  },
+  "not_measured": [
+    "whether an event's catalyst tag, story or causal claim is right",
+    "intraday behaviour (halts, VWAP, premarket), volume multiples and float figures",
+    "events whose symbols Alpaca cannot resolve"
+  ],
+  "overturn": "If the independent source disagrees with the package on more than 5% of rows that both cover, the package's price-derived statistics (chapters 15, 17, 19, 20 and the forward-return tables) are treated as unverified until each mismatch is adjudicated against a third source."
+}
