@@ -495,7 +495,16 @@ class NoticeFailSafeTests(unittest.TestCase):
             starts = [subprocess.Popen([sys.executable, str(GUARD_PATH)], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                                        env=guard_env(home)) for _ in range(8)]
-            outputs = [start.communicate(event, timeout=20) for start in starts]
+            # Feed and close every stdin from its own thread so the eight guards race for the claim.
+            import threading
+            barrier = threading.Barrier(len(starts))
+            outputs = [None] * len(starts)
+            def feed(i, start):
+                barrier.wait()
+                outputs[i] = start.communicate(event, timeout=20)
+            threads = [threading.Thread(target=feed, args=(i, s)) for i, s in enumerate(starts)]
+            for t in threads: t.start()
+            for t in threads: t.join()
             self.assertEqual([start.returncode for start in starts], [0] * 8)
             shown = [out for out, _ in outputs if out.strip()]
             self.assertEqual(len(shown), 1, outputs)

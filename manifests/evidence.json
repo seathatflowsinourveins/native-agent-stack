@@ -9403,8 +9403,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "34ac90f688defa26c775f18e7decba368d5f839eef80d557be6ca0ba54a24438",
-      "bytes": 36701
+      "sha256": "f9880956124e66995b9a34a47608c01a477d79b16414cd08ee4ea171508b04a2",
+      "bytes": 36779
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -28538,8 +28538,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "8cfeabec43231741e1f0669e3582fa8b7a111d3b1630924b7b34924d01a481f8",
-      "bytes": 27141
+      "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
+      "bytes": 27591
     },
     {
       "path": "tests/test_execution_realism.py",
