@@ -27528,8 +27528,8 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
-      "sha256": "fe5c7c05a4c7eb63006533be5756112add07788dfd298458b162b22119cac824",
-      "bytes": 8737
+      "sha256": "842219f23e3d68e4974a3d7f03661b7854aa042d2e459f0eaff1fdde6b5bead0",
+      "bytes": 9319
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
@@ -27538,13 +27538,13 @@
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",
-      "sha256": "c674f37e1900c59f2f9a9449c9c63a351b34849a4e2ed8b5ed0cbd44775244c8",
-      "bytes": 4465
+      "sha256": "28e04ed3156acbcf9571223d3062bd7a3631db972485899942f69d3f760f5b01",
+      "bytes": 5047
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--worktrunk--use--20260924.json",
-      "sha256": "57939ff8e2f144c63bd09c18a6fafa2a20f3e11ebc954be3a13f3f00ac9616f2",
-      "bytes": 9687
+      "sha256": "d524f6df375ae5eaa4f64ef333264626beb5f936bffae1268cd1993981080199",
+      "bytes": 10269
     },
     {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
