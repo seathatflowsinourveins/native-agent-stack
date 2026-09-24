@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import gzip
+import hashlib
 import json
 import math
 import os
@@ -46,6 +47,8 @@ OPRA_WS = "wss://stream.data.alpaca.markets/v1beta1/opra"
 NEWS_WS = "wss://stream.data.alpaca.markets/v1beta1/news"
 EDGAR_CURRENT = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type={form}&company=&dateb=&owner=include&start=0&count=100&output=atom"
 EDGAR_TICKERS = "https://www.sec.gov/files/company_tickers.json"
+EDGAR_FUND_TICKERS = "https://www.sec.gov/files/company_tickers_mf.json"  # 1940 Act funds, incl. most ETFs
+FUND_NAME = re.compile(r"\b(ETF|ETN|ETP|Fund|Trust)\b", re.IGNORECASE)
 HALTS_RSS = "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
 # EDGAR's type filter is a prefix match ("4" also returns 424B2), so rows are kept by exact form afterwards.
 EDGAR_FORMS = {"8-K": ("8-K", "8-K/A"), "6-K": ("6-K", "6-K/A"), "SCHEDULE 13D": ("SCHEDULE 13D", "SCHEDULE 13D/A"),
@@ -111,7 +114,10 @@ class Sink:
                 for old in [p for p in self.files if p.parent != path.parent]:
                     self.files.pop(old).close()
                 path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                torn = path.exists() and path.stat().st_size > 0 and path.read_bytes()[-1:] != b"\n"  # a crash mid-line
                 handle = self.files[path] = os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600), "a", buffering=1)
+                if torn:
+                    handle.write("\n")
             handle.write(line)
 
     def close(self) -> None:
@@ -179,11 +185,12 @@ class OptionsAggregator:
                                "price": price, "size": size, "premium": round(premium, 2), "trade_ts": ts_text(msg.get("t")),
                                "exchange": msg.get("x"), "condition": msg.get("c")})
 
-    def drain(self, minute: str) -> tuple[list, list]:
+    def drain(self, drained_at: str) -> tuple[list, list]:
+        """Rows of the trades received since the previous drain (one sweep interval), labelled with this drain's time."""
         by_root = defaultdict(dict)
         for (root, right, bucket), (volume, premium, trades) in self.cells.items():
             by_root[root][f"{right}|{bucket}"] = [volume, round(premium, 2), trades]
-        rows = [{"minute": minute, "root": root, "cells": cells} for root, cells in sorted(by_root.items())]
+        rows = [{"drained_at": drained_at, "root": root, "cells": cells} for root, cells in sorted(by_root.items())]
         large, self.large = self.large, []
         self.cells = defaultdict(lambda: [0, 0.0, 0])
         return rows, large
@@ -350,6 +357,13 @@ def restore(state: State, day_dir: Path) -> dict:
             if received is not None and row.get("id") is not None:
                 state.news[symbol].setdefault(row["id"], received)
         counts["news"] += 1
+    for row in lines("halts"):
+        if row.get("HaltDate") == state.today.strftime("%m/%d/%Y") and row.get("IssueSymbol"):
+            key = (row["IssueSymbol"], row.get("HaltDate"), row.get("HaltTime"))
+            if key not in state.halt_rows:
+                state.halts[row["IssueSymbol"]].append(row)
+            state.halt_rows[key] = {k: v for k, v in row.items() if k != "received_at"}
+            counts["halts"] += 1
     for row in lines("options-minute"):
         totals = state.options.day[row["root"]]
         for cell, (volume, premium, _trades) in row.get("cells", {}).items():
@@ -376,9 +390,35 @@ def root_symbol(root: str, universe: set) -> str | None:
     return dotted if dotted in universe else None
 
 
-def load_universe(http: Http) -> list[str]:
+def load_assets(http: Http) -> dict:
+    """Active tradable US equities: symbol -> Alpaca asset name."""
     assets = http.alpaca_json(TRADING, "/v2/assets", {"status": "active", "asset_class": "us_equity"})
-    return sorted(a["symbol"] for a in assets if a.get("tradable") and "/" not in a["symbol"] and " " not in a["symbol"])
+    return {a["symbol"]: a.get("name") or "" for a in assets if a.get("tradable") and "/" not in a["symbol"] and " " not in a["symbol"]}
+
+
+def load_universe(http: Http) -> list[str]:
+    return sorted(load_assets(http))
+
+
+def load_fund_tickers(http: Http) -> set:
+    body = json.loads(http.sec(EDGAR_FUND_TICKERS))
+    column = body["fields"].index("symbol")
+    return {str(row[column]).replace("-", ".") for row in body["data"]}
+
+
+def operating_symbols(names: dict, company_tickers: set, fund_tickers: set) -> set:
+    """Operating companies: an SEC company ticker, not a registered fund's, and no fund-like word in the asset name."""
+    return {s for s, name in names.items() if s in company_tickers and s not in fund_tickers and not FUND_NAME.search(name)}
+
+
+def retry(call, attempts: int = 5, first_wait: float = 2.0):
+    for attempt in range(attempts):
+        try:
+            return call()
+        except Exception:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(first_wait * 2 ** attempt)
 
 
 def load_adv(http: Http, symbols: list[str], today: date) -> dict:
@@ -421,8 +461,9 @@ def sweep_snapshots(http: Http, symbols: list[str], state: State, sink: Sink, at
 
 
 def attach_filing(state: "State", row: dict) -> None:
-    """Credit a filing to its issuer only: a bidder or holder ("Filed by") is not the incentive's subject."""
-    if row.get("role") == "Filed by":
+    """Credit a filing to its issuer only: M&A forms to their Subject, other forms to their Filer; never "Filed by"."""
+    role = row.get("role")
+    if role == "Filed by" or (row.get("form") in MNA_FORMS and role != "Subject"):
         return
     for ticker in row.get("tickers") or []:
         state.filings[ticker].append(row)
@@ -462,7 +503,8 @@ def poll_halts(http: Http, state: State, sink: Sink) -> int:
     return changed
 
 
-NON_PRICE_PARTS = {"news", "mna_filing", "material_8k", "dilution_filing", "news_halt", "volatility_halt", "short_dated_calls", "large_option_prints"}
+# Components that are not derived from the name's own price or volume (volatility halts are price-triggered).
+NON_PRICE_PARTS = {"news", "mna_filing", "material_8k", "dilution_filing", "news_halt", "short_dated_calls", "large_option_prints"}
 
 
 def build_board(state: State, at: datetime, top: int = 100) -> tuple[list[dict], list[str]]:
@@ -543,9 +585,10 @@ async def run(args) -> int:
     until = datetime.combine(state.today, datetime.strptime(args.until_et, "%H:%M").time(), ET)
     sink.write("monitor", {"event": "start", "at": now_utc(), "mode": args.mode, "until_et": args.until_et, "sweep_seconds": args.sweep_seconds,
                            "pid": os.getpid(), "sources": ["sip_snapshots", "opra_trades", "news", "edgar", "nasdaq_halts"]})
-    symbols = await asyncio.to_thread(load_universe, http)
+    symbols = await asyncio.to_thread(retry, lambda: load_universe(http))
     state.universe = set(symbols)
-    state.cik_tickers = await asyncio.to_thread(load_cik_tickers, http)
+    state.cik_tickers = await asyncio.to_thread(retry, lambda: load_cik_tickers(http))
+    code_sha256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()  # the code this process loaded
     state.restored = restore(state, sink.path(""))
     sink.write("monitor", {"event": "restored", "at": now_utc(), "counts": state.restored})
     adv_task = asyncio.create_task(asyncio.to_thread(load_adv, http, symbols, state.today))
@@ -573,6 +616,8 @@ async def run(args) -> int:
             if adv_task.done() and not state.adv:
                 try:
                     state.adv = adv_task.result()
+                    if not state.adv:
+                        raise ValueError("no daily bars returned")
                     sink.replace("adv20.json", json.dumps(state.adv, sort_keys=True).encode())
                 except Exception as exc:  # retried next sweep; relvol stays empty meanwhile
                     stats["adv_error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
@@ -596,7 +641,7 @@ async def run(args) -> int:
                     for name in ("news", "opra")}
             payload = {"at": at.isoformat(timespec="seconds"), "evidence_class": "unvalidated_detector", "board": board,
                        "incentive_symbols": incentive,
-                       "monitor": {"started_at": state.started_at, "restored": state.restored, "stream_down_seconds": down,
+                       "monitor": {"started_at": state.started_at, "code_sha256": code_sha256, "restored": state.restored, "stream_down_seconds": down,
                                    "adv_loaded": bool(state.adv), "sweep_errors": sorted(k for k in stats if k.endswith("_error"))}}
             sink.replace("board.json", json.dumps(payload, indent=1).encode())
             sink.write("board", {"at": payload["at"], "board": board[:50]})

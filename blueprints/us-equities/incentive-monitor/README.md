@@ -27,7 +27,7 @@ python monitor.py run  --env-file ENV --out DIR --until-et 20:00
 ```
 
 Output (owner-only files under `DIR/<YYYYMMDD>/`): `news.jsonl`, `edgar.jsonl`, `halts.jsonl`,
-`options-minute.jsonl` (per root and minute, by right and days-to-expiry bucket), `options-large.jsonl` (prints of
+`options-minute.jsonl` (per root and sweep interval, labelled `drained_at`, by right and days-to-expiry bucket), `options-large.jsonl` (prints of
 at least 100,000 USD premium), `snapshots/HHMMSS.json.gz` (rows whose last trade changed), `regime.jsonl` (breadth,
 dispersion, 10% mover counts, index changes), `board.json` and `board.jsonl`, `monitor.jsonl` (sweeps, call counts,
 stream health). Every record carries the monitor's receive time. The data stays private: it is licensed market data
@@ -52,7 +52,9 @@ and 13:30 ET (refused after 13:35 or 10:35), `board_scan.py` takes at most five 
 whose fresh SIP snapshot is 0-10% above the reference close, records four untraded incentive-free controls per name
 from the same gain bucket, writes a selection record with the sha256 of the code, protocol, pinned config
 ([config-forward-1030.json](config-forward-1030.json), [config-forward-1330.json](config-forward-1330.json)) and scan,
-and then the engine's mover scan (`HH:MM|G0|V1000000|any`, exit X2, 200 USD per entry, 1x). The analysis runs once,
+and then the engine's mover scan. Selection and controls are limited to operating companies (SEC company tickers, less
+registered funds and fund-like asset names); a session's two decisions never share a control; the ledger holds one
+exclusive record per decision (no re-rolls) and a record for every refusal (`HH:MM|G0|V1000000|any`, exit X2, 200 USD per entry, 1x). The analysis runs once,
 after the first trading day with at least 20 sessions and 100 round trips. It is paper forward evidence only: the live gate also needs a historical holdout,
 which this study cannot supply for its history-less components.
 

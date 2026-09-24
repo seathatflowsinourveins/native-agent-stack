@@ -3,30 +3,42 @@
   "id": "incentive-board-forward-v1-20260924",
   "status": "frozen_before_first_order",
   "evidence_class": "paper_forward_prospective",
-  "question": "Do early-stage names on the incentive board, meaning a non-price incentive present (news, a material 8-K, an M&A filing naming the name as subject, a news halt, short-dated call flow or large option prints) and a price 0-10% above the reference close, earn a positive net return over the engine's X2 one-hour hold on Alpaca paper, and more than gain-matched controls without any non-price incentive?",
+  "question": "Do early-stage names on the incentive board, meaning a non-price incentive present (news, a material 8-K, an M&A filing (Schedule 13D, SC TO-T, 425) naming the company as its Subject, a news halt, short-dated call flow or large option prints) and a price 0-10% above the reference close, earn a positive net return over the engine's X2 one-hour hold on Alpaca paper, and more than gain-matched controls without any non-price incentive?",
   "why_forward": "Several board components have no usable history: option-trade flow is recorded from 2026-09-24 (Alpaca OPRA history starts 2024-02 and has no receive times), and halt and news receive times exist only from the monitor's first day. A prospective paper study is therefore the first honest test; it is preregistered here before any order and is never tuned on its own outcomes.",
-  "decision_times_et": ["10:30", "13:30"],
+  "decision_times_et": [
+    "10:30",
+    "13:30"
+  ],
   "late_guard_seconds": 300,
   "selection": {
     "board_max_age_seconds": 150,
     "min_score": 3.0,
-    "required_any_component": ["news", "material_8k", "mna_filing", "news_halt", "short_dated_calls", "large_option_prints"],
-    "excluded_components": ["dilution_filing"],
+    "required_any_component": [
+      "news",
+      "material_8k",
+      "mna_filing",
+      "news_halt",
+      "short_dated_calls",
+      "large_option_prints"
+    ],
+    "excluded_components": [
+      "dilution_filing"
+    ],
     "symbol_pattern": "^[A-Z]{1,5}(?:[.-][A-Z])?$",
     "min_price_usd": 2.0,
     "max_spread_bps": 50.0,
     "min_day_dollar_volume_usd": 1000000,
     "min_gain": 0.0,
-    "max_gain_exclusive": 0.10,
+    "max_gain_exclusive": 0.1,
     "max_last_trade_age_seconds": 120,
     "max_symbols": 5,
     "order": "score descending, then relative volume descending (missing last), then symbol",
-    "note": "The board's own stage label is not used; the gain range is checked on a fresh SIP snapshot taken after the decision time. volatility_halt (a price-triggered pause) is scored by the board but does not count as a non-price incentive."
+    "note": "The board's own stage label is not used; the gain range is checked on a fresh SIP snapshot taken after the decision time. volatility_halt (a price-triggered pause) is scored by the board but is not a non-price incentive, for selection or for the control exclusion."
   },
   "controls": {
-    "pool": "names in the same fresh full-market snapshot that pass every price, spread, dollar-volume, gain, liveness and symbol filter and have no non-price incentive component at the decision (monitor board.json incentive_symbols, which lists every symbol with any component other than relvol, regardless of score)",
-    "matching": "gain bucket at the decision: [0, 3%), [3%, 6%), [6%, 10%)",
-    "count": "4 per selected name from its gain bucket, drawn without replacement across the session's selections",
+    "pool": "operating companies in the same fresh full-market snapshot that pass every price, spread, dollar-volume, gain, liveness and symbol filter, are not on the board, have no non-price incentive component at the decision (monitor board.json incentive_symbols: news, mna_filing, material_8k, dilution_filing, news_halt, short_dated_calls or large_option_prints, whatever the score), and were neither selected nor used as a control by the session's other decision",
+    "matching": "gain bucket at the decision: [0, 3%), [3%, 6%), [6%, 10%); not matched on relative volume (a limitation)",
+    "count": "4 per selected name from its gain bucket, without replacement across the whole session (both decisions)",
     "draw": "ascending sha256(protocol id | session date | decision time | symbol)",
     "traded": false,
     "outcome": "SIP 1-minute bars after the session: open of the first bar that starts strictly after the selection record's snapshot_completed_at, to the open of the bar 60 minutes later, less a round-trip cost of twice the cost table's half-spread for the name's cell (rules.time_bucket of the decision time, rules.price_tier of the snapshot price, rules.dv_tier of the snapshot day dollar volume) plus rules.sell_fees on the exit"
@@ -34,8 +46,14 @@
   "execution": {
     "engine": "adaptive-paper mover trial mode (blueprints/us-equities/adaptive-paper, merged #172); the scan's protocol field stays the engine's execution protocol mover-early-entry-v1-20260924 and its source field names this study",
     "configs": {
-      "10:30": {"path": "blueprints/us-equities/incentive-monitor/config-forward-1030.json", "sha256": "71b8b0222aed48b8a089d591762d9d92b72699888995ccca996052db1e9c1dc8"},
-      "13:30": {"path": "blueprints/us-equities/incentive-monitor/config-forward-1330.json", "sha256": "5f21ad1d5e8c135b3c708c6a705a3cddf412bc8e0c9217c7cadee0e389b0bae5"}
+      "10:30": {
+        "path": "blueprints/us-equities/incentive-monitor/config-forward-1030.json",
+        "sha256": "71b8b0222aed48b8a089d591762d9d92b72699888995ccca996052db1e9c1dc8"
+      },
+      "13:30": {
+        "path": "blueprints/us-equities/incentive-monitor/config-forward-1330.json",
+        "sha256": "5f21ad1d5e8c135b3c708c6a705a3cddf412bc8e0c9217c7cadee0e389b0bae5"
+      }
     },
     "rule_template": "HH:MM|G0|V1000000|any",
     "exit": "X2 (60 minutes after the first entry fill)",
@@ -43,16 +61,22 @@
     "limit_cap_bps": 50,
     "leverage": "1x (rung 1 for engine sessions 1-400)",
     "account": "isolated Alpaca paper account (alpaca-paper-2) with its own engine state root, so these sessions, sizing equity and loss budgets are not shared with other mover trials",
-    "bound_code": "each selection record carries the sha256 of monitor.py, board_scan.py, this protocol, the engine config and the written scan, and is written before the scan"
+    "bound_code": "each decision record carries the sha256 of monitor.py, board_scan.py, this protocol, the engine config, the engine files (adaptive-paper mover.py, mover_runner.py, mover_strategy.py, safety.py, runner.py, native_adapter.py, transport.py and mover-early-entry/rules.py) and the written scan, plus the running monitor's own code sha256 from board.json; it is created exclusively before the scan, so a decision cannot be re-rolled"
   },
   "outcomes": {
     "primary": "per round trip, net return = (exit fill value - entry fill value - rules.sell_fees on the exit, fees.json sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d) / entry fill value, from the engine receipt's fills; Alpaca paper charges no commission and fills at quotes, so spread cost is inside the fills",
-    "secondary": ["mean control-matched difference: selected model return minus the mean of its matched controls' model returns (both on the controls' outcome definition)", "per-component means (reported, not tested)"],
-    "cost_table": {"path": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json", "sha256": "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13"},
-    "session_unit": "a trading day (both decisions of a day belong to one session)",
-    "analysis_point": "exactly once, after the first trading day at whose end at least 20 sessions with a started decision and at least 100 completed round trips exist; no interim test is run",
+    "secondary": [
+      "mean control-matched difference: selected model return minus the mean of its matched controls' model returns (both on the controls' outcome definition)",
+      "per-component means (reported, not tested)"
+    ],
+    "cost_table": {
+      "path": "blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json",
+      "sha256": "be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13"
+    },
+    "session_unit": "a trading day on which the study was scheduled, whatever its decisions' status; both decisions of a day belong to one session, and days whose decisions were all refused or selected nothing count as sessions without trades",
+    "analysis_point": "exactly once, after the first trading day at whose end at least 20 sessions and at least 100 completed round trips exist; no interim test is run. If a stop rule ends the study first, the same analysis runs once on the data so far and is reported as stopped early and underpowered, never as a pass",
     "estimator": "pooled mean of per-round-trip net returns over the sessions in the sample",
-    "test": "circular block bootstrap over sessions in calendar order, blocks of 5 sessions, B = 20000 resamples of the same session count; each resample's statistic is the pooled mean of the round trips in its sessions (sessions without trades contribute none); one-sided 95% lower bound = 5th percentile (numpy.percentile, method linear); RNG numpy.random.default_rng(int(sha256(id).hexdigest()[:16], 16))",
+    "test": "circular block bootstrap over the n sessions in calendar order: rng = numpy.random.default_rng(int(sha256(id).hexdigest()[:16], 16)); for each of B = 20000 resamples draw k = ceil(n / 5) block starts with rng.integers(0, n, size=k), take sessions (start + j) mod n for j = 0..4 from each block in draw order, concatenate and keep the first n; the resample statistic is the pooled mean of the round trips in those sessions (sessions without trades contribute none; a resample without any round trip is dropped and counted); one-sided 95% lower bound = numpy.percentile(statistics, 5, method='linear')",
     "pass": "lower bound > 0 and the secondary mean difference > 0"
   },
   "stop_rules": [
@@ -62,13 +86,16 @@
   ],
   "missed_sessions": "a stale board, an early or late run, or a refused scan writes a refusal record; such decisions count as sessions without trades",
   "gate_relation": "A pass is paper performance evidence for strategy-paper-performance. The live gate also requires strategy-historical-holdout, which this study cannot supply for its history-less components; whether a preregistered forward period may stand in for that holdout is an open gate decision, not assumed here.",
-  "amendments_before_first_order": "2026-09-24, from the independent pre-outcome review (no order placed yet): volatility_halt removed from the non-price list; controls restricted to names without any non-price incentive and matched on gain bucket; the control outcome window starts after the snapshot completes; a single analysis point, estimator, bootstrap, RNG, fees and cost table fixed; rung schedule extended to 400 engine sessions and the configs pinned by sha256; code, config and scan hashes recorded before the scan; a 300 s late guard and refusal records; M&A filings credited to the subject only; monitor state restored from its files after a restart, with its start time and stream downtime recorded.",
+  "amendments_before_first_order": "2026-09-24, from the independent pre-outcome review (no order placed yet): volatility_halt removed from the non-price list; controls restricted to names without any non-price incentive and matched on gain bucket; the control outcome window starts after the snapshot completes; a single analysis point, estimator, bootstrap, RNG, fees and cost table fixed; rung schedule extended to 400 engine sessions and the configs pinned by sha256; code, config and scan hashes recorded before the scan; a 300 s late guard and refusal records; M&A filings credited to the subject only; monitor state restored from its files after a restart, with its start time and stream downtime recorded. Second pre-outcome review (still no order): M&A forms credited to their Subject only; volatility_halt kept out of the control exclusion list; controls without replacement across both decisions of a day; an exclusive decision ledger (no re-rolls) with refusal records for every failure; operating companies only; engine files and the running monitor's code bound in each record; the late guard re-checked after the snapshot; session, bootstrap and early-stop analysis defined exactly; halts restored after a monitor restart.",
   "limitations": [
     "the board score is a heuristic detector fixed on 2026-09-24 without outcome data",
     "relative volume assumes a linear volume clock, so it reads higher at 10:30 than at 13:30 for the same activity",
     "some Benzinga articles are themselves price-driven (movers lists), so the news component is partly price-derived",
     "session option totals and news windows depend on the monitor's uptime; restarts restore them from the monitor's files, and each record carries the monitor start time and stream downtime",
     "paper fills are simulated by Alpaca and can differ from live fills",
-    "two decisions per session share market conditions, so sessions (not trades) are the bootstrap unit"
-  ]
+    "two decisions per session share market conditions, so sessions (not trades) are the bootstrap unit",
+    "controls are matched on the gain bucket only, not on relative volume, which selection favours"
+  ],
+  "universe": "operating companies only, for selection and controls: an Alpaca active tradable US equity whose symbol is in SEC company_tickers.json (dashes read as dots), is not in SEC company_tickers_mf.json (registered funds, including most ETFs), and whose Alpaca asset name has no ETF, ETN, ETP, Fund or Trust word (grantor-trust ETPs such as SPY or GLD, closed-end funds; some REITs named Trust are excluded too)",
+  "records": "an append-only ledger directory: one decision record <session>-<HHMM>.json per session and decision time, created exclusively; every refusal gets its own <session>-<HHMM>-refused-<time>.json"
 }

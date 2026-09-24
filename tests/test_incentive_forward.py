@@ -87,6 +87,30 @@ class Selection(unittest.TestCase):
         self.assertLessEqual(len(sym["dollar_volume_at_t"].partition(".")[2]), 9)
 
 
+class Ledger(unittest.TestCase):
+    def test_decisions_are_exclusive_and_session_controls_are_shared(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = Path(tmp)
+            B.write_exclusive(ledger / "2026-09-24-1030.json", {"selected": [{"symbol": "AAA"}], "controls": {"AAA": [{"symbol": "CCA"}, {"symbol": "CCB"}]}})
+            B.write_exclusive(ledger / "2026-09-24-1030-refused-1.json", {"selected": [{"symbol": "ZZZ"}]})
+            with self.assertRaises(FileExistsError):
+                B.write_exclusive(ledger / "2026-09-24-1030.json", {})
+            self.assertEqual(B.session_used(ledger, "2026-09-24", "13:30"), {"AAA", "CCA", "CCB"})
+            self.assertEqual(B.session_used(ledger, "2026-09-24", "10:30"), set())  # its own record is not "the other decision"
+            self.assertEqual(B.session_used(ledger, "2026-09-25", "10:30"), set())
+
+    def test_operating_universe_excludes_funds(self):
+        M = B.M
+        names = {"AAPL": "Apple Inc. Common Stock", "SPY": "SPDR S&P 500 ETF Trust", "QQQ": "Invesco QQQ Trust", "GLD": "SPDR Gold Trust",
+                 "BRK.B": "Berkshire Hathaway Inc. Class B", "CEF": "Sprott Physical Gold and Silver Fund", "NOSEC": "Unlisted Corp"}
+        company = {"AAPL", "SPY", "GLD", "BRK.B", "CEF"}
+        self.assertEqual(M.operating_symbols(names, company, {"QQQ"}), {"AAPL", "BRK.B"})
+        features = {"AAPL": feat("AAPL"), "SPY": feat("SPY")}
+        chosen, rejected = B.select([row("AAPL"), row("SPY")], features, NOW, {"AAPL"})
+        self.assertEqual(([r["symbol"] for r in chosen], rejected), (["AAPL"], {"SPY": "not_operating_company"}))
+
+
 class EngineAcceptsTheScan(unittest.TestCase):
     """The engine's own scan loader accepts the bridge's output under the forward rule (skipped without the engine)."""
 

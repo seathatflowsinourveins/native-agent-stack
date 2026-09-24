@@ -56,7 +56,7 @@ class Parsing(unittest.TestCase):
         self.assertEqual(agg.day["ABC"]["C_premium_0_7"], 152_000.0)
         self.assertEqual(agg.day["ABC"]["large_prints"], 1)
         rows, large = agg.drain("2026-09-24T10:30")
-        self.assertEqual(rows, [{"minute": "2026-09-24T10:30", "root": "ABC", "cells": {"C|0-7": [310, 152000.0, 2], "P|31+": [5, 500.0, 1]}}])
+        self.assertEqual(rows, [{"drained_at": "2026-09-24T10:30", "root": "ABC", "cells": {"C|0-7": [310, 152000.0, 2], "P|31+": [5, 500.0, 1]}}])
         self.assertEqual([x["premium"] for x in large], [150000.0])
         self.assertEqual(agg.drain("2026-09-24T10:31"), ([], []))
         self.assertEqual(agg.day["ABC"]["C_volume"], 310)  # session totals survive a drain
@@ -163,7 +163,26 @@ class Scoring(unittest.TestCase):
         M.attach_filing(state, {"form": "SC TO-T", "role": "Filed by", "tickers": ["BIDDER"]})
         M.attach_filing(state, {"form": "SC TO-T", "role": "Subject", "tickers": ["TARGET"]})
         M.attach_filing(state, {"form": "8-K", "role": "Filer", "tickers": ["ISSUER"]})
-        self.assertEqual(sorted(state.filings), ["ISSUER", "TARGET"])
+        M.attach_filing(state, {"form": "425", "role": "Filer", "tickers": ["ACQUIRER"]})   # an M&A form without a Subject role
+        M.attach_filing(state, {"form": "425", "role": "Subject", "tickers": ["TARGETB"]})
+        self.assertEqual(sorted(state.filings), ["ISSUER", "TARGET", "TARGETB"])
+
+    def test_volatility_halt_is_not_a_non_price_incentive(self):
+        state = M.State()
+        state.halts["V"].append({"IssueSymbol": "V", "ReasonCode": "LUDP"})
+        state.features = {"V": {"s": "V", "chg": 0.02, "p": 1, "v": None, "spr_bps": None}}
+        _, incentive = M.build_board(state, datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc))
+        self.assertEqual(incentive, [])
+
+    def test_torn_last_line_is_terminated_before_appending(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sink = M.Sink(Path(tmp))
+            path = sink.path("news.jsonl")
+            path.parent.mkdir(parents=True)
+            path.write_text('{"a":1}\n{"b":')
+            sink.write("news", {"c": 3})
+            sink.close()
+            self.assertEqual(path.read_text(), '{"a":1}\n{"b":\n{"c":3}\n')
 
 
 class Restart(unittest.TestCase):
@@ -179,7 +198,7 @@ class Restart(unittest.TestCase):
                 (day / f"{name}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in items) + "not json\n")
             state = M.State()
             counts = M.restore(state, day)
-            self.assertEqual((counts["edgar"], counts["news"], counts["options_minutes"], counts["options_large"]), (1, 1, 1, 1))
+            self.assertEqual((counts["edgar"], counts["news"], counts["options_minutes"], counts["options_large"], counts.get("halts", 0)), (1, 1, 1, 1, 0))
             self.assertEqual(counts["news_unreadable"], 1)
             self.assertEqual(len(state.filings["T"]), 1)
             self.assertEqual(state.news["N"], {7: datetime(2026, 9, 24, 14, tzinfo=timezone.utc).timestamp()})
