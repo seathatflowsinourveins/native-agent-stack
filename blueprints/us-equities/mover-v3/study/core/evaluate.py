@@ -15,7 +15,14 @@ from core.params import ALTERNATIVE, BOOT, CHRONO, FETCH, ITEM_IDS, TRADABLE
 from core.trades import h3c_event, trade
 
 ARM_OF = {"H1-D": "b_lane", "H1-D-b_lane-low": "b_lane", "H3-a": "a_intraday", "H3-b": "b_overnight"}
+ARMS = ("b_lane", "a_intraday", "b_overnight")
 SENSITIVITY_MODES = ("c0.5", "c2.0", "table_only", "stress")
+TERMINAL_KINDS = ("terminal_zero", "terminal_merger", "censored_terminal")
+
+
+def arms_for(items) -> tuple:
+    """The arms that the given items use (review round 9, M-1: at the holdout only the carried items' arms)."""
+    return tuple(a for a in ARMS if any(ARM_OF.get(i) == a for i in items))
 
 
 class Unsealed(Exception):
@@ -51,19 +58,20 @@ def assign_terciles(events: list, pool: list, members) -> dict:
     return out
 
 
-def build_trades(events: list, ctx, store, stage_sessions: set, terc: dict):
+def build_trades(events: list, ctx, store, stage_sessions: set, terc: dict, arms=ARMS, with_h3c: bool = True):
     trades, h3c, needs = [], [], []
     for ev in events:
         if not in_stage(ctx, ev, stage_sessions):
             continue
-        for arm in ("b_lane", "a_intraday", "b_overnight"):
+        for arm in arms:
             tr = trade(ev, arm, ctx, store)
             if "needs" in tr:
                 needs.extend(tr["needs"])
                 continue
             tr["tercile"] = terc.get((ev["symbol"], ev["t"]))
             trades.append(tr)
-        h3c.append(h3c_event(ev, ctx))
+        if with_h3c:
+            h3c.append(h3c_event(ev, ctx))
     return trades, h3c, needs
 
 
@@ -133,10 +141,12 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
             {"all_positive": False}
         res["robustness"] = rob
         res["sensitivities"] = {m: _mean([r["rec"]["nets"][m] for r in rows]) for m in SENSITIVITY_MODES}
+        # a trade whose backward window is fetch-incomplete (and has no merger record) leaves this sensitivity only
+        # (populations.fetch_failures; review round 9, L-1)
         res["sensitivities"]["terminal_zero_rebooked_at_last_bid"] = _mean(
             [r["rec"].get("terminal_rebooked_at_last_bid", r["value"]) if r["rec"].get("exit") in
              ("terminal_zero", "censored_terminal") and r["rec"].get("terminal_rebooked_at_last_bid") is not None
-             else r["value"] for r in rows])
+             else r["value"] for r in rows if not r["rec"].get("backward_incomplete")])
         res["sensitivities"]["ratio_rule_holds_removed"] = _mean(
             [r["value"] for r in rows if not r["rec"].get("ratio_rule_in_hold")])
         res["sensitivities"]["censored_removed"] = _mean([r["value"] for r in rows if not r["rec"].get("censored")])
@@ -148,18 +158,44 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
         res["two_way_clustered"] = ST.two_way_cluster([r["value"] for r in rows], [r["session"] for r in rows],
                                                       [r["rec"]["symbol"] for r in rows])
         res["bh_diagnostics"] = bh_diagnostics(item, rows)
+    if item == "H1-D":
+        # terminal_exits.in_statistics: exit counts for every item; H1-D's are per group (review round 9, L-4)
+        res["exits_by_group"] = {g: dict(Counter(r["rec"]["exit"] for r in rows if r["group"] == g))
+                                 for g in ("high", "low")}
     res["paper_exposed_fraction"] = (sum(1 for r in rows if r["rec"].get("paper_exposed")) / len(rows)) if rows else 0.0
     return res
 
 
+def terminal_by_arm_year(trades: list) -> dict:
+    """terminal_exits.booking: per arm and entry year, terminal-zero trades (with no merger record, and with a
+    rename record in the window), terminal-merger trades and mergers without a bid (review round 9, L-4)."""
+    out = {}
+    for t in trades:
+        if t.get("status") != "filled" or t.get("exit") not in TERMINAL_KINDS:
+            continue
+        row = out.setdefault(t["arm"], {}).setdefault(t["entry_session"][:4], Counter())
+        row[t["exit"]] += 1
+        for flag in ("no_merger_record", "rename_record_in_window", "merger_without_bid"):
+            row[flag] += bool(t.get(flag))
+    return {a: {y: dict(c) for y, c in ys.items()} for a, ys in out.items()}
+
+
 def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_sessions: list, pool: list,
              tested: bool = True, void: dict | None = None, carried: tuple = ITEM_IDS,
-             validation_signs: dict | None = None, B: int | None = None) -> dict:
+             validation_signs: dict | None = None, B: int | None = None, qualifiers: tuple = (),
+             identity_limited: dict | None = None) -> dict:
     """Every item of one stage. stage_sessions: the stage's kept sessions (the bootstrap list and the decision
-    sessions); pool: the tercile pool (warm-up included for development)."""
+    sessions); pool: the tercile pool (warm-up included for development).
+
+    At the holdout only the carried items are computed, from only the arms they use: holdout_gate.opens_only_for
+    opens the read for validated items alone (review round 9, M-1). qualifiers are stage-level qualifiers
+    ('transport-deviation'); identity_limited ({"rate": 2020's identity-unreached rate}), when given, labels every
+    validation result identity-limited with the rate stated (chronology.labels.validation; M-8)."""
     sset = set(stage_sessions)
+    computed = tuple(i for i in ITEM_IDS if stage != "holdout" or i in carried)
+    arms = arms_for(computed)
     terc = assign_terciles(events, pool, lambda ev: in_stage(ctx, ev, sset))
-    trades, h3c, needs = build_trades(events, ctx, store, sset, terc)
+    trades, h3c, needs = build_trades(events, ctx, store, sset, terc, arms=arms, with_h3c="H3-c" in computed)
     if needs:
         raise Unsealed(f"{len(needs)} planned requests are not sealed; no outcome is computed from unsealed data")
     counts = {"trades_by_arm_status": dict(Counter(f"{t['arm']}:{t['status']}" for t in trades)),
@@ -167,27 +203,45 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
               "terciles": dict(Counter(str(v) for v in terc.values())),
               "terminal_zero_without_merger_record": sum(1 for t in trades if t.get("no_merger_record")),
               "terminal_zero_with_rename_record": sum(1 for t in trades if t.get("rename_record_in_window")),
-              "merger_without_bid": sum(1 for t in trades if t.get("merger_without_bid"))}
+              "merger_without_bid": sum(1 for t in trades if t.get("merger_without_bid")),
+              "terminal_by_arm_year": terminal_by_arm_year(trades),
+              # terminal_exits.booking (E9): whether an eligible quote exists under the new symbol
+              "rename_sensitivity": dict(Counter(f"{t['arm']}:{t['rename_sensitivity']['status']}"
+                                                 for t in trades if t.get("rename_sensitivity"))),
+              "backward_incomplete": sum(1 for t in trades if t.get("backward_incomplete"))}
     is_void = bool(void and void.get("void"))
     items = {}
     for item in ITEM_IDS:
+        if item not in computed:
+            items[item] = {"item": item, "carried": False}
+            continue
         rows = item_trades(item, trades, h3c)
         items[item] = item_result(item, stage, rows, stage_sessions, protocol_id, B=B, fees=ctx.fees)
-    # descriptive H1 cells
+    # descriptive H1 cells (at the holdout only when an H1 item is carried, so its b_lane trades were built)
     desc = {}
-    for terc_name in ("high", "middle"):
-        vals = [t["nets"]["primary"] for t in trades if t["arm"] == "b_lane" and t["status"] == "filled"
-                and t["tercile"] == terc_name]
-        desc[f"b_lane_{terc_name}"] = {"n": len(vals), "mean": _mean(vals)}
+    if "b_lane" in arms:
+        for terc_name in ("high", "middle"):
+            vals = [t["nets"]["primary"] for t in trades if t["arm"] == "b_lane" and t["status"] == "filled"
+                    and t["tercile"] == terc_name]
+            desc[f"b_lane_{terc_name}"] = {"n": len(vals), "mean": _mean(vals)}
     # stage p-values
-    p_raw = {i: (items[i]["p"] if (tested and not is_void and i in carried) else 1.0) for i in ITEM_IDS}
+    p_raw = {i: (items[i]["p"] if (tested and not is_void and i in computed and i in carried) else 1.0)
+             for i in ITEM_IDS}
     if stage == "development":
         p_stage = p_raw
     else:
-        p_stage = ST.holm(p_raw, {i: items[i]["p_normal_tail"] for i in ITEM_IDS})
-    labels = {}
+        p_stage = ST.holm(p_raw, {i: items[i].get("p_normal_tail", 1.0) for i in ITEM_IDS})
+    labels, stage_labels = {}, []
+    if stage == "development":
+        stage_labels.append("survivorship-limited")
+    if stage == "validation" and identity_limited is not None:
+        stage_labels.append(f"identity-limited (2020 identity-unreached rate {identity_limited.get('rate')})")
     for i in ITEM_IDS:
         r = items[i]
+        if i not in computed:
+            labels[i] = ST.item_label(stage, i, p_stage=1.0, n_ok=False, robust_ok=False, mde_ok=False, carried=False)
+            r.update({"p_stage": 1.0, "label": labels[i], "qualifiers": []})
+            continue
         sign_ok = True
         if stage == "holdout" and i == "H3-c":
             vs = (validation_signs or {}).get("H3-c")
@@ -199,5 +253,8 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
                                   contaminated=contaminated, carried=i in carried)
         r["p_stage"] = p_stage[i]
         r["label"] = labels[i]
+        r["qualifiers"] = ST.qualifiers(stage, labels[i], r["lineage_confirmed"], qualifiers)
     return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
-            "verdicts": ST.hypothesis_verdict(stage, labels), "descriptive": desc, "counts": counts}
+            "stage_labels": stage_labels,
+            "verdicts": ST.hypothesis_verdict(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
+            "descriptive": desc, "counts": counts}

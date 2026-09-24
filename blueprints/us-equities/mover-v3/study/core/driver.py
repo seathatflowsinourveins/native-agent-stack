@@ -27,7 +27,7 @@ def to_fixpoint(planner, transports, store, fetch_date: str, clock=utc_now, max_
         if not new:
             return n
         for req in sorted({r["key"]: r for r in new}.values(), key=lambda r: r["key"]):
-            check_asof(req, fetch_date)
+            check_asof(req)
             _fetch(req, transports, store, clock(), attempt=0)
             n += 1
     raise RuntimeError("the plan did not reach a fixpoint")

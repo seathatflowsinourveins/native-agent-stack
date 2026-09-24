@@ -134,15 +134,15 @@ class AsofIdentity(unittest.TestCase):
     def test_request_with_the_fetch_date_as_asof_is_refused(self):
         cal = self.cal
         req = plan.event_requests(cal, "ABC", "2020-06-01", "2020-06-15")[0]
-        identity.check_asof(req, "2026-12-01")
+        identity.check_asof(req)
         bad = json.loads(json.dumps(req))
         bad["params"]["asof"] = "2026-12-01"
         with self.assertRaises(identity.AsofRefused):
-            identity.check_asof(bad, "2026-12-01")
+            identity.check_asof(bad)
         nothing = json.loads(json.dumps(req))
         del nothing["params"]["asof"]
         with self.assertRaises(identity.AsofRefused):
-            identity.check_asof(nothing, "2026-12-01")
+            identity.check_asof(nothing)
         # the driver refuses before any request leaves
         m = synth.FakeMarket(cal)
         with self.assertRaises(identity.AsofRefused):

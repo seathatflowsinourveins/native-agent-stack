@@ -4,6 +4,9 @@ amendment files (run_discipline.data_files, run_log).
 Review round 8, R8-2: every run-log line and every results file carries protocol_sha256.
 Review round 8, R8-10: an amendment line must reach origin/main (the GitHub-recorded time) before 09:30 ET of the
 session it concerns (a calendar line), or before the first holdout count or read that used its dates (a fee line).
+Review round 9, M-3 and F5: core.runner.context applies both checks before every run. A line's reach time is the
+committer time of the first first-parent commit of origin/main whose version of the file holds it (line_reach); the
+repository squash-merges, and GitHub sets a squash commit's committer time when it merges the pull request.
 """
 from __future__ import annotations
 
@@ -11,6 +14,7 @@ import json
 from pathlib import Path
 
 from core.canon import dumps, sha256_bytes
+from core.calendar import parse_utc
 
 RUN_LOG_FIELDS = ("utc_start", "utc_end", "stage", "purpose", "commit", "study_tree", "runtime_lock_sha256",
                   "protocol_sha256", "data_file_sha256s", "amendment_files", "input_snapshot_sha256s", "status",
@@ -104,3 +108,37 @@ def governing_results(run_log: list, stage: str, purpose: str = "evaluate"):
     if len(lines) > 1:
         raise AppendOnlyViolation(f"{stage}: {len(lines)} results files; a stage has one governing results file")
     return lines[0] if lines else None
+
+
+def results_attempts(run_log: list, stage: str, purpose: str = "evaluate") -> list:
+    return [x for x in run_log if x.get("stage") == stage and x.get("purpose") == purpose]
+
+
+def line_reach(repo, path: str, ref: str = "origin/main") -> list:
+    """[(commit, committer epoch)] per line of the append-only file at ref: the first first-parent commit of ref
+    whose version of the file holds that line."""
+    from core.guards import committed_bytes, git
+    rows = git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref, "--", path).splitlines()
+    out = []
+    for row in rows:
+        commit, ct = row.split()
+        data = committed_bytes(repo, commit, path) or b""
+        n = len([x for x in data.decode("utf-8").splitlines() if x.strip()])
+        while len(out) < n:
+            out.append((commit, int(ct)))
+    return out
+
+
+def fee_first_use(lines: list, run_log: list) -> dict:
+    """{line index: epoch of the first holdout count or read (run-log utc_start) whose sessions overlap the line's
+    from .. to}."""
+    out = {}
+    for i, rec in enumerate(lines):
+        for x in run_log:
+            span = x.get("sessions")
+            if x.get("purpose") not in ("count", "read") or not span:
+                continue
+            if span[0] <= rec.get("to", "") and rec.get("from", "") <= span[1]:
+                t = parse_utc(x["utc_start"])
+                out[i] = min(out.get(i, t), t)
+    return out

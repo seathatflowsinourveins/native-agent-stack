@@ -18,8 +18,8 @@ class Unsealed(KeyError):
     pass
 
 
-def event_data(store, cal, symbol: str, t: str, end: str, strict: bool = True):
-    reqs = {r["kind"]: r for r in plan.event_requests(cal, symbol, t, end)}
+def event_data(store, cal, symbol: str, t: str, end: str, strict: bool = True, holdout: bool = False):
+    reqs = {r["kind"]: r for r in plan.event_requests(cal, symbol, t, end, holdout=holdout)}
     status = {k: store.status(r["key"]) for k, r in reqs.items()}
     missing = [k for k, v in status.items() if v is None]
     if missing:
@@ -35,8 +35,9 @@ def event_data(store, cal, symbol: str, t: str, end: str, strict: bool = True):
             "empty": sorted(k for k, r in reqs.items() if status[k] == "complete" and store.empty(r["key"], symbol))}
 
 
-def build_event(cal, cand: dict, data: dict, counts: Counter):
-    """The D event for a screen candidate, or None (with the reason counted)."""
+def build_event(cal, cand: dict, data: dict, counts: Counter, holdout: bool = False):
+    """The D event for a screen candidate, or None (with the reason counted). A holdout event has no least-exposed
+    flag: the slice is a validation sensitivity, and its t-60 lookback is not fetched at the holdout (L-5)."""
     sym, t = cand["symbol"], cand["t"]
     inc = set(data["incomplete"])
     for k in data["empty"]:
@@ -68,5 +69,5 @@ def build_event(cal, cand: dict, data: dict, counts: Counter):
     med = FM.med20(dvs, w)
     sig = FM.sigma_d(cal, prints, raw, split, w) if not ({"event_daily_split", "event_auctions"} & inc) else None
     return {"symbol": sym, "t": t, "dv_reg": dv, "max21": m21, "med20": med, "sigma_d": sig,
-            "least_exposed": FM.least_exposed(cal, raw, t), "incomplete": sorted(inc), "data": data,
+            "least_exposed": None if holdout else FM.least_exposed(cal, raw, t), "incomplete": sorted(inc), "data": data,
             "raw": raw, "split": split, "all": allc, "prints": prints, "minute": minute}

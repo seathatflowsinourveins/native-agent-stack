@@ -234,6 +234,10 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
             if last_bid is not None:
                 rebook = book(last_bid[0], et_date(last_bid[1]), lambda mode, im: 0.0)
                 res["terminal_rebooked_at_last_bid"] = None if rebook is None else rebook["nets"]["primary"]
+            elif bkind == "incomplete":
+                # populations.fetch_failures: without a merger record, an incomplete backward window removes the
+                # trade from the terminal-zero rebooking sensitivity only (review round 9, L-1)
+                res["backward_incomplete"] = True
     res["ratio_rule_in_hold"] = _ratio_rule_in_hold(cal, ev, d1, res.get("exit_session") or e_session)
     res["paper_exposed"] = _paper_exposed(ctx, sym, t, res.get("exit_session") or search_last or e_session)
     return res
@@ -298,4 +302,7 @@ def h3c_event(ev: dict, ctx: Ctx) -> dict:
         overnight.append(math.log(num / closes[k]))
     for k in range(2, 6):
         intraday.append(math.log(closes[k] / opens[k]))
-    return {**out, "status": "complete", "value": sum(overnight) / 4.0 - sum(intraday) / 4.0}
+    # chronology.holdout.accrual_exposure: an H3-c event is paper-exposed if a session t .. t+5 is (review round 9,
+    # L-2)
+    return {**out, "status": "complete", "value": sum(overnight) / 4.0 - sum(intraday) / 4.0,
+            "paper_exposed": _paper_exposed(ctx, ev["symbol"], t, d[5])}

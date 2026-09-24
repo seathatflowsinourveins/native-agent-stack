@@ -7,7 +7,7 @@ sealed snapshot and requires byte equality with the sealed request records.
 Request kinds and their shapes (universe_and_identity.request_shapes):
   assets, corporate_actions                   enumeration (no asof; the corporate-action end is the fetch date)
   screen_daily_{raw,split,all}, screen_auctions  sessions s-1 and s for a batch of symbols, asof = s
-  event_daily_{raw,split,all}                 as-known symbol, asof = t, t-60 .. end session
+  event_daily_{raw,split,all}                 as-known symbol, asof = t, t-60 (holdout: t-22) .. end session
   event_auctions                              asof = t, t-22 .. end session
   event_minute                                asof = t, 04:00 ET of t-19 .. scheduled close of the end session
   quote_entry, quote_exit, quote_backward, quote_rename  quote windows (below), asof = t (rename: asof = the
@@ -91,12 +91,17 @@ def screen_requests(cal, s: str, symbols: list) -> list:
 
 # ---------------------------------------------------------------- per event
 
-def event_requests(cal, symbol: str, t: str, end: str) -> list:
-    d60, d22, d19 = cal.offset(t, -60), cal.offset(t, -22), cal.offset(t, -19)
-    if d60 is None:
-        raise ValueError(f"the calendar does not reach 60 sessions before {t}")
+def event_requests(cal, symbol: str, t: str, end: str, holdout: bool = False) -> list:
+    """The per-event requests. The daily bars start at t-60 for a development or validation event (t-60 serves only
+    the least-exposed slice, a validation sensitivity of exposure_registry.consequence) and at t-22 for a holdout
+    event, which needs no slice: t-22 covers MAX21 and exclusion 3, and for a decision on N0 - 1 or later it lies
+    after the freeze session, so no holdout lookback reaches #162's reserved window (review round 9, L-5)."""
+    d_first = cal.offset(t, -22 if holdout else -60)
+    d22, d19 = cal.offset(t, -22), cal.offset(t, -19)
+    if d_first is None:
+        raise ValueError(f"the calendar does not reach the lookback before {t}")
     out = [make(f"event_daily_{adj}", DATA, "/v2/stocks/bars",
-                {"symbols": symbol, "timeframe": "1Day", "start": d60, "end": end, "adjustment": adj, "asof": t,
+                {"symbols": symbol, "timeframe": "1Day", "start": d_first, "end": end, "adjustment": adj, "asof": t,
                  "feed": FETCH["feed"], "limit": FETCH["page_limit"]}, t, "daily_bars") for adj in ADJ]
     out.append(make("event_auctions", DATA, "/v2/stocks/auctions",
                     {"symbols": symbol, "start": d22, "end": end, "asof": t, "feed": FETCH["feed"],
@@ -112,6 +117,16 @@ def quote_request(kind: str, symbol: str, asof: str, start: float, end: float) -
     return make(kind, DATA, "/v2/stocks/quotes",
                 {"symbols": symbol, "start": t_floor(start), "end": t_ceil(end), "asof": asof, "feed": FETCH["feed"],
                  "limit": FETCH["page_limit"], "sort": "asc"}, asof, "quotes")
+
+
+def per_event_requests_max() -> int:
+    """The most requests the plan can make for one D event: its 5 per-event requests, and per arm one entry window,
+    at most 2 + 5 forward exit windows (W0, W1, E+1 .. E+5) and as many rename-sensitivity windows, plus the backward
+    windows (5 for b_lane, 1 for a_intraday, 2 for b_overnight). The fetch-time estimate uses it
+    (coverage_rule.thresholds.fetch_estimate; review round 9, M-2)."""
+    forward = 2 + T["search_sessions"]
+    backward = T["holding_sessions_b_lane"] + 1 + 2
+    return 5 + 3 * (1 + 2 * forward) + backward
 
 
 # ---------------------------------------------------------------- stamps and windows

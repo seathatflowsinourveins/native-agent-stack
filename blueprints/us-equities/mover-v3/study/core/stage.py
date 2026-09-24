@@ -36,7 +36,14 @@ class StageSpec:
     cells: dict | None = None
     paper_exposed: frozenset = frozenset()
     late_sessions: frozenset = frozenset()
+    carried: tuple | None = None
     extra: dict = field(default_factory=dict)
+
+    def arms(self, mode: str) -> tuple:
+        """Every arm, except at a holdout read, which plans and books only the carried items' arms (M-1)."""
+        if self.stage == "holdout" and self.carried is not None and mode != "count":
+            return EV.arms_for(self.carried)
+        return EV.ARMS
 
     @property
     def segs(self):
@@ -74,8 +81,19 @@ class StageSpec:
                    paper_exposed=self.paper_exposed, late_sessions=self.late_sessions)
 
 
-def _screen_reqs(spec) -> list:
-    return [r for s in spec.screen_sessions() for r in plan.screen_requests(spec.cal, s, spec.symbols)]
+def _screen_reqs(spec, store=None) -> list:
+    """The screen requests of the stage. A holdout store holds the sealed collection batches, merged per (symbol,
+    session); only the symbol-sessions that no batch holds are requested (review round 9, M-6)."""
+    uncovered = getattr(store, "uncovered", None)
+    if uncovered is None:
+        return [r for s in spec.screen_sessions() for r in plan.screen_requests(spec.cal, s, spec.symbols)]
+    out = []
+    for s in spec.screen_sessions():
+        for batch in plan.batches(spec.symbols):
+            missing = uncovered(s, batch)
+            if missing:
+                out.extend(plan.screen_requests(spec.cal, s, missing))
+    return out
 
 
 def d_events(spec, store, strict: bool = True):
@@ -87,14 +105,15 @@ def d_events(spec, store, strict: bool = True):
     counts.update(sc)
     events, needs, used = [], [], []
     segs = spec.segs
+    hold = spec.stage == "holdout"
     for c in cands:
         end = plan.event_end(spec.cal, c["t"], segs)
-        used.extend(plan.event_requests(spec.cal, c["symbol"], c["t"], end))
-        data = EVS.event_data(store, spec.cal, c["symbol"], c["t"], end, strict=strict)
+        used.extend(plan.event_requests(spec.cal, c["symbol"], c["t"], end, holdout=hold))
+        data = EVS.event_data(store, spec.cal, c["symbol"], c["t"], end, strict=strict, holdout=hold)
         if "needs" in data:
             needs.extend(data["needs"])
             continue
-        ev = EVS.build_event(spec.cal, c, data, counts)
+        ev = EVS.build_event(spec.cal, c, data, counts, holdout=hold)
         if ev is not None:
             events.append(ev)
     counts["d_events"] = len(events)
@@ -104,7 +123,7 @@ def d_events(spec, store, strict: bool = True):
 def planner(spec, mode: str = "plan"):
     """The plan as a function of the sealed store (core.driver.to_fixpoint and the reproduction check)."""
     def requests(store) -> list:
-        reqs = _screen_reqs(spec)
+        reqs = _screen_reqs(spec, store)
         if any(not store.has(r["key"]) for r in reqs):
             return reqs
         events, _, needs, used = d_events(spec, store, strict=False)
@@ -116,7 +135,7 @@ def planner(spec, mode: str = "plan"):
         for ev in events:
             if not EV.in_stage(ctx, ev, sset):
                 continue
-            for arm in ("b_lane", "a_intraday", "b_overnight"):
+            for arm in spec.arms(mode):
                 tr = trade(ev, arm, ctx, store)
                 reqs.extend(tr.get("needs", []))
         reqs.extend(ctx.trace)
@@ -124,12 +143,15 @@ def planner(spec, mode: str = "plan"):
     return requests
 
 
-def evaluate_stage(spec, store, protocol_id: str, *, tested=True, void=None, carried=None, validation_signs=None, B=None):
+def evaluate_stage(spec, store, protocol_id: str, *, tested=True, void=None, carried=None, validation_signs=None, B=None,
+                   qualifiers=(), identity_limited=None):
     events, counts, _, _ = d_events(spec, store, strict=True)
+    carried = carried if carried is not None else spec.carried
     res = EV.evaluate(spec.stage, events, spec.ctx("read"), store, protocol_id=protocol_id,
                       stage_sessions=spec.stage_sessions(), pool=spec.pool(), tested=tested, void=void,
                       carried=tuple(carried) if carried is not None else EV.ITEM_IDS,
-                      validation_signs=validation_signs, B=B)
+                      validation_signs=validation_signs, B=B, qualifiers=tuple(qualifiers),
+                      identity_limited=identity_limited)
     res["counts"].update({"membership": counts})
     return res
 

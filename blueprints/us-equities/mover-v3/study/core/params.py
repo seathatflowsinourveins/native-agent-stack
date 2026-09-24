@@ -14,6 +14,10 @@ DATA_DIR = "blueprints/us-equities/mover-v3/data"
 RUN_LOG = "blueprints/us-equities/mover-v3/run-log.jsonl"
 ACCESS_LOG = "blueprints/us-equities/mover-v3/holdout-access-log.jsonl"
 DEVIATIONS = "blueprints/us-equities/mover-v3/deviations.json"
+# Results files have fixed paths (one per stage, count block and read), so a second results file for a stage is
+# refused by the atomic write itself (run_discipline.once; review round 9, F1 and F10).
+RESULTS_DIR = "blueprints/us-equities/mover-v3/results"
+COUNT_ONLY_OUTPUT = "blueprints/us-equities/mover-v3/results/count-only-output.json"
 
 PARAMETERS = {
     "item_ids": ["H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c"],
@@ -78,5 +82,6 @@ SAMPLING = PARAMETERS["sampling"]
 COST_TABLE = PARAMETERS["cost_table"]
 
 # The sha256 of coverage_rule (canonical JSON) that this count-only code was written against
-# (coverage_rule.decided_by_code). tests/test_coverage_rule.py recomputes it from the protocol.
+# (coverage_rule.decided_by_code). tests/test_params.py (test_coverage_rule_hash_is_recorded) recomputes it from
+# the protocol.
 COVERAGE_RULE_SHA256 = "365a6cdef21aba117d32976a96f6f03efd06b745cb4255d9ee6957842d625407"

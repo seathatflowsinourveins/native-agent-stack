@@ -17,6 +17,37 @@ class Chronology(unittest.TestCase):
         self.assertNotIn("2018-06-01", kept)
         self.assertEqual(kept[kept.index("2017-12-29") + 1], "2019-01-02")  # the bootstrap wraps over kept sessions
 
+    def test_dropped_middle_year_breakpoints_and_bootstrap_wrap(self):
+        """coverage_rule.dropped_year_consequences (a) and (c), review round 9, M-7: a dropped year's events never
+        enter a trailing window, and the circular block bootstrap wraps over the kept sessions in date order."""
+        import numpy as np
+        from core import stats as ST
+        from core import terciles as TC
+        dy = frozenset({2018})
+        pool = TC.pool_development(self.cal, dy)
+        by = {d: [1.0 + (i % 3)] for i, d in enumerate(self.cal.range("2017-01-03", "2017-12-29"))}
+        by.update({d: [500.0] for d in self.cal.range("2018-01-02", "2018-12-31")})
+        s = "2019-01-15"
+        bps = TC.breakpoints(pool, by, s)
+        self.assertLess(bps[1], 500.0)                                   # no 2018 event in the window
+        self.assertEqual(TC.trailing_window(pool, s)[-1], "2019-01-14")
+        self.assertIn("2017-12-29", TC.trailing_window(pool, s))
+        self.assertGreaterEqual(TC.breakpoints(TC.pool_development(self.cal), by, s)[1], 500.0)   # kept: it enters
+        kept = CH.kept_sessions(self.cal, "2017-01-03", "2019-12-31", dy)
+        n, L = len(kept), 10
+
+        class Starts:                                                    # fixed block starts for the draw
+            def integers(self, lo, hi, size):
+                return np.array([[kept.index("2017-12-22")] + [n - 3] * (size[1] - 1)] * size[0])
+        idx = ST._draw_indices(Starts(), n, L, 1)[0]
+        first = [kept[i] for i in idx[:L]]
+        self.assertEqual(first[:6], ["2017-12-22", "2017-12-26", "2017-12-27", "2017-12-28", "2017-12-29",
+                                     "2019-01-02"])
+        wrap = [kept[i] for i in idx[L: 2 * L]]
+        self.assertEqual(wrap[:4], ["2019-12-27", "2019-12-30", "2019-12-31", "2017-01-03"])
+        with self.assertRaises(ValueError):                              # a 2018 trade is in no kept session
+            ST.session_arrays(kept, [{"session": "2018-06-01", "value": 1.0}])
+
     def test_embargo_after_a_dropped_year_and_at_validation_start(self):
         dy = frozenset({2018})
         segs = CH.stage_segments(self.cal, "development", dy)

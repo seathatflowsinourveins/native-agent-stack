@@ -173,6 +173,69 @@ class Arms(unittest.TestCase):
         self.assertEqual(trade(ev, "b_lane", ctx_for(cal), Store())["status"], "fetch_incomplete")
 
 
+class Round9(unittest.TestCase):
+    """Review round 9: paper exposure and late sessions at the holdout (M-7, L-2), backward windows that are
+    fetch-incomplete (M-7, L-1) and the ratio rule inside a hold (M-7)."""
+
+    def setUp(self):
+        self.cal = synth.calendar("2026-06-01", "2028-06-30")
+        self.t = "2027-02-01"
+        self.d = [self.cal.offset(self.t, k) for k in range(0, 12)]
+        self.seg = [("2026-11-30", self.cal.offset("2026-11-30", 251))]
+
+    def hctx(self, **kw):
+        return Ctx(cal=self.cal, stage="holdout", segs=self.seg, fees=costs.Fees(FEES_2028), cells=CELLS, **kw)
+
+    def test_paper_exposure_and_late_sessions_at_the_holdout(self):
+        cal, d = self.cal, self.d
+        ev = make_event(cal, self.t)
+        qs = {"MOVR": [book(cal, d[1], "09:35"), book(cal, d[5], "15:55")]}
+        self.assertFalse(resolve(ev, "b_lane", self.hctx(), Store(), qs)["paper_exposed"])
+        exposed = resolve(ev, "b_lane", self.hctx(paper_exposed=frozenset({("MOVR", d[3])})), Store(), qs)
+        self.assertTrue(exposed["paper_exposed"])
+        self.assertTrue(resolve(ev, "b_lane", self.hctx(late_sessions=frozenset({d[4]})), Store(), qs)["paper_exposed"])
+        # a session after the exit does not expose the trade
+        self.assertFalse(resolve(ev, "b_lane", self.hctx(late_sessions=frozenset({d[7]})), Store(), qs)["paper_exposed"])
+        # L-2: an H3-c event is exposed over t .. t+5
+        self.assertFalse(h3c_event(ev, self.hctx())["paper_exposed"])
+        self.assertTrue(h3c_event(ev, self.hctx(paper_exposed=frozenset({("MOVR", d[5])})))["paper_exposed"])
+        self.assertFalse(h3c_event(ev, self.hctx(paper_exposed=frozenset({("MOVR", d[6])})))["paper_exposed"])
+        rows = EV.item_trades("H3-c", [], [h3c_event(ev, self.hctx(late_sessions=frozenset({d[2]})))])
+        self.assertTrue(rows[0]["rec"]["paper_exposed"])
+
+    def test_merger_with_an_incomplete_backward_window_excludes_the_trade(self):
+        cal = synth.calendar()
+        t = "2020-06-01"
+        d = [cal.offset(t, k) for k in range(0, 12)]
+        ev = make_event(cal, t)
+        merger = {"type": "cash_merger", "acquiree_symbol": "MOVR", "date": d[4]}
+        tr = resolve(ev, "b_lane", ctx_for(cal, actions=[merger]), Store(), {"MOVR": [book(cal, d[1], "09:35")]},
+                     fail=("quote_backward",))
+        self.assertEqual((tr["status"], tr["incomplete"]), ("fetch_incomplete", ["quote_backward"]))
+        # without a merger record the trade stays terminal-zero, flagged for the rebooking sensitivity only (L-1)
+        tr = resolve(ev, "b_lane", ctx_for(cal), Store(), {"MOVR": [book(cal, d[1], "09:35")]}, fail=("quote_backward",))
+        self.assertEqual((tr["status"], tr["exit"], tr["nets"]["primary"]), ("filled", "terminal_zero", -1.0))
+        self.assertTrue(tr["backward_incomplete"])
+        self.assertNotIn("terminal_rebooked_at_last_bid", tr)
+
+    def test_ratio_rule_inside_the_hold_is_flagged(self):
+        cal = synth.calendar()
+        t = "2020-06-01"
+        d = [cal.offset(t, k) for k in range(0, 12)]
+        ev = make_event(cal, t)
+        qs = {"MOVR": [book(cal, d[1], "09:35"), book(cal, d[5], "15:55")]}
+        self.assertFalse(resolve(ev, "b_lane", ctx_for(cal), Store(), qs)["ratio_rule_in_hold"])
+        ev["raw"][d[3]] = dict(ev["raw"][d[3]], c=ev["raw"][d[2]]["c"] * 2.0)   # a 2:1 raw ratio with f = 1
+        ev["split"][d[3]] = dict(ev["split"][d[3]], c=ev["split"][d[3]]["c"] * 2.0)
+        self.assertTrue(resolve(ev, "b_lane", ctx_for(cal), Store(), qs)["ratio_rule_in_hold"])
+
+
+FEES_2028 = {"sec_section31_usd_per_million_of_sales": [
+    {"from": "2016-01-01", "to": "2028-12-31", "rate": 13.00, "source": "synthetic"}],
+    "finra_taf_covered_equity_sales": [
+    {"from": "2016-01-01", "to": "2028-12-31", "usd_per_share": 0.000119, "max_per_trade": 5.95, "source": "synthetic"}]}
+
+
 class Splits(unittest.TestCase):
     def setUp(self):
         self.cal = synth.calendar()

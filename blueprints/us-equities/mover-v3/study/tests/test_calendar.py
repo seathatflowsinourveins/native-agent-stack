@@ -47,7 +47,11 @@ class CalendarTests(unittest.TestCase):
             removed = cal0.offset(n0, 100)
             amend.write_text(json.dumps({"kind": "remove_session", "session": removed,
                                          "source": "https://www.nyse.com/ (synthetic notice)"}) + "\n")
-            cal1 = Calendar.from_files(base, amend)
+            with self.assertRaises(ValueError):            # an amendment applies only with the freeze session known
+                Calendar.from_files(base, amend)
+            with self.assertRaises(ValueError):            # and never to a session before it (review round 9, F5)
+                Calendar.from_files(base, amend, freeze_session=cal0.offset(removed, 1))
+            cal1 = Calendar.from_files(base, amend, freeze_session="2026-10-05")
             seg1 = CH.holdout_segment(cal1, n0)
             self.assertFalse(cal1.is_session(removed))
             self.assertEqual(len(cal1.range(*seg1)), 252)

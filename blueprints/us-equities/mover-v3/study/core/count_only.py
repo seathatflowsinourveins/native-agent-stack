@@ -13,15 +13,22 @@ from __future__ import annotations
 import hashlib
 import math
 from collections import Counter, defaultdict
+from pathlib import Path
 
+from core import driver
 from core import formulas as FM
-from core import plan
+from core import identity, plan
 from core.calendar import year_of
+from core.canon import dumps, sha256_bytes
 from core.coverage_rule import (checked_thresholds, fetch_margin, identity_limited, item_rule, probe_decision,
                                 rule_sha256, year_decision)
 from core.fills import fill_at
 from core.params import FETCH, SAMPLING, T
+from core.records import MERGER_TYPES
+from core.store import Store
 from pinned.sessions_io_copy import official_price
+
+PART1_RANGE = ("2016-01-04", "2020-12-31")
 
 
 def _hmod(prefix: str, *parts) -> int:
@@ -164,6 +171,13 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
                     continue
                 c[y]["with_daily_bar"] += 1
                 c[y][f"with_daily_bar:{ex}"] += 1
+                f_t = FM.share_factor(raw.get(x, {}), split.get(x, {}), prev, s)
+                prev_b = raw.get(x, {}).get(prev)
+                suspected = FM.suspected_unadjusted_split(b["c"], prev_b["c"] if prev_b else None, f_t)
+                # the candidate count applies D's floor to the accepted official close only, never to the raw daily
+                # close, so a pair with raw close < $1 and official close >= $1 still counts (review round 9, L-3)
+                if not suspected and _sampled_candidate(x, s, prev, pr, f_t):
+                    c[y]["sampled_candidates"] += 1
                 if b["c"] < 1.0:
                     continue
                 c[y]["with_bar_close_ge_1"] += 1
@@ -173,17 +187,18 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
                 c[y][f"open_label:{label_o}"] += 1
                 if FM.official_close(pr.get(s)) is not None:
                     c[y]["accepted_official_close"] += 1
-                f_t = FM.share_factor(raw.get(x, {}), split.get(x, {}), prev, s)
-                prev_b = raw.get(x, {}).get(prev)
-                if FM.suspected_unadjusted_split(b["c"], prev_b["c"] if prev_b else None, f_t):
+                if suspected:
                     c[y]["suspected_unadjusted_split"] += 1
-                    continue
-                close_t, prev_close = FM.official_close(pr.get(s)), FM.official_close(pr.get(prev))
-                ref = prev_close / f_t if (prev_close is not None and f_t is not None) else None
-                if (FM.gain_passes(close_t, ref) and close_t >= 1.0 and FM.listing_exchange(pr.get(s))
-                        and not FM.exclusion2(x)):
-                    c[y]["sampled_candidates"] += 1
     return c
+
+
+def _sampled_candidate(x: str, s: str, prev: str, pr: dict, f_t) -> bool:
+    """The gain condition, D's $1 floor on the accepted official close, and exclusions 1 and 2 (a count only)."""
+    if FM.listing_exchange(pr.get(s)) is None or FM.exclusion2(x):
+        return False
+    close_t, prev_close = FM.official_close(pr.get(s)), FM.official_close(pr.get(prev))
+    ref = prev_close / f_t if (prev_close is not None and f_t is not None) else None
+    return FM.gain_passes(close_t, ref) and close_t >= FM.M["min_official_close"]
 
 
 def phase2_counts(store, cal, sessions: list, symbols: list, c: dict) -> None:
@@ -326,3 +341,98 @@ def dry_run_counts(store) -> dict:
         parsed = store.parsed(key)
         row["records"] += len(parsed) if isinstance(parsed, list) else sum(len(v) for v in parsed.values())
     return {k: dict(v) for k, v in out.items()}
+
+
+# ---------------------------------------------------------------- the committed count-only run (review round 9, M-2)
+
+def part0_requests(fetch_date: str) -> list:
+    """Part 0: the asset master (trading API) and every corporate action from 2016-01-01 to the fetch date."""
+    return plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", fetch_date)]
+
+
+def enumeration_from(store) -> dict:
+    """The sealed symbol list from part 0's responses (every request complete, or the run stops)."""
+    assets, actions = [], []
+    for key, req in sorted(store.req.items()):
+        if store.status(key) != "complete":
+            raise RuntimeError(f"enumeration request {key} is incomplete")
+        if req["kind"] == "assets":
+            assets.extend(store.parsed(key))
+        elif req["kind"] == "corporate_actions":
+            actions.extend(store.parsed(key))
+    enum = identity.enumerate_symbols(assets, actions)
+    return {"symbols": enum["symbols"], "counts": enum["counts"], "actions": actions,
+            "active": sorted(x["symbol"] for x in assets if x.get("status") == "active")}
+
+
+def part0_counts(enum: dict) -> dict:
+    """Per year, split, reverse-split, cash-dividend, merger and name-change records, and enumerated symbols per
+    source (exposure_registry.pre_freeze_access_path.outputs)."""
+    by = defaultdict(Counter)
+    for r in enum["actions"]:
+        typ = "merger" if r.get("type") in MERGER_TYPES else r.get("type")
+        if typ in ("forward_split", "reverse_split", "cash_dividend", "merger", "name_change") and r.get("date"):
+            by[r["date"][:4]][typ] += 1
+    return {"enumerated_symbols": dict(enum["counts"]), "actions_by_year": {y: dict(v) for y, v in sorted(by.items())}}
+
+
+def part1_planner(cal, sessions: list, symbols: list):
+    def requests(store) -> list:
+        reqs = [r for s in sessions for r in part1_requests(cal, s, symbols)]
+        if any(not store.has(r["key"]) for r in reqs):
+            return reqs
+        for s in sessions:
+            for batch in plan.batches([x for x in symbols if sampled(x, s)]):
+                key = next(r["key"] for r in plan.screen_requests(cal, s, batch) if r["kind"] == "screen_daily_raw")
+                if store.status(key) != "complete":
+                    continue
+                raw = store.parsed(key)
+                reqs += part1_phase2(cal, s, [x for x in batch if (raw.get(x, {}).get(s) or {}).get("c", 0) >= 1.0])
+        return reqs
+    return requests
+
+
+def fetch_estimate(cal, n_symbols: int, k_by_year: dict, rate_per_minute: float) -> dict:
+    """coverage_rule.thresholds.fetch_estimate.rule: the full 2016-2020 screen requests plus, per year,
+    candidate_bound(k) candidates times the per-event request count (core.plan.per_event_requests_max), at the
+    documented rate limit."""
+    screen = len(cal.range(*PART1_RANGE)) * 4 * math.ceil(n_symbols / FETCH["screen_symbols_per_request"])
+    per_event = plan.per_event_requests_max()
+    bounds = {str(y): candidate_bound(k) for y, k in sorted(k_by_year.items())}
+    requests = screen + per_event * sum(bounds.values())
+    return {"screen_requests": screen, "per_event_requests": per_event, "candidate_bounds": bounds,
+            "requests": requests, "rate_per_minute": rate_per_minute,
+            "estimate_seconds": requests / rate_per_minute * 60.0}
+
+
+def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, rate_per_minute: float,
+        clock=driver.utc_now, sessions: list | None = None) -> dict:
+    """Parts 0, 1 (with its second phase) and 3, each fetched through core.driver.stage_fetch, sealed, re-read from
+    the seal and counted. coverage_rule's hash is checked before any fetch or read (coverage_rule.decided_by_code;
+    review round 9, L-3). Returns the output (counts, rates and decisions only) and the sealed snapshot hashes."""
+    checked_thresholds(protocol)
+    root = Path(snapshot_root)
+
+    def sealed(name, planner):
+        store = Store()
+        driver.stage_fetch(planner, transports, store, fetch_date, clock=clock)
+        sha = store.write(root / name)
+        return Store.read(root / name, sha), sha
+
+    s0, sha0 = sealed("part0", lambda st: part0_requests(fetch_date))
+    enum = enumeration_from(s0)
+    enum_bytes = (dumps(enum) + "\n").encode("utf-8")
+    (root / "enumeration.json").write_bytes(enum_bytes)
+    sessions = sessions or cal.range(*PART1_RANGE)
+    s1, sha1 = sealed("part1", part1_planner(cal, sessions, enum["symbols"]))
+    probes = probe_list(cal, enum["actions"])
+    s3, sha3 = sealed("part3", lambda st: probe_requests(cal, probes))
+    c = part1_counts(s1, cal, sessions, enum["symbols"], enum["actions"])
+    phase2_counts(s1, cal, sessions, enum["symbols"], c)
+    part0 = {**part0_counts(enum), "enumeration_sha256": sha256_bytes(enum_bytes)}
+    est = fetch_estimate(cal, len(enum["symbols"]), {y: c.get(y, Counter())["sampled_candidates"]
+                                                     for y in range(2016, 2021)}, rate_per_minute)
+    out = outputs(protocol, c, probe_counts(s3, cal, probes), part0, est["estimate_seconds"])
+    out["fetch_estimate"] = est
+    out["snapshots"] = {"part0": sha0, "part1": sha1, "part3": sha3}
+    return out

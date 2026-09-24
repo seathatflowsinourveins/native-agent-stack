@@ -82,10 +82,14 @@ def per_side(hs_cell: float, h_fill: float, imp: float, mode: str = "primary") -
 
 
 class Fees:
-    def __init__(self, base: dict, amendments: list[dict] = ()):
+    def __init__(self, base: dict, amendments: list[dict] = (), freeze_session: str | None = None):
+        """freeze_session, when given, refuses an amendment line whose first date precedes it (review round 9, F5);
+        from_files requires it whenever the amendment file has a line."""
         self.sec = list(base["sec_section31_usd_per_million_of_sales"])
         self.taf = list(base["finra_taf_covered_equity_sales"])
         for a in amendments:
+            if freeze_session is not None and (a.get("from") or "") < freeze_session:
+                raise ValueError(f"fee amendment starts {a.get('from')}, before the freeze session")
             if a.get("kind") == "sec_section31":
                 self.sec.append(a)
             elif a.get("kind") == "finra_taf":
@@ -96,12 +100,14 @@ class Fees:
             raise ValueError("a TAF row must carry its max_per_trade cap")
 
     @classmethod
-    def from_files(cls, base_path, amendments_path=None):
+    def from_files(cls, base_path, amendments_path=None, *, freeze_session: str | None = None):
         base = json.loads(Path(base_path).read_text(encoding="utf-8"))
         lines = []
         if amendments_path and Path(amendments_path).exists():
             lines = [json.loads(x) for x in Path(amendments_path).read_text(encoding="utf-8").splitlines() if x.strip()]
-        return cls(base, lines)
+        if lines and freeze_session is None:
+            raise ValueError("a fee amendment line applies only with the freeze session known")
+        return cls(base, lines, freeze_session=freeze_session)
 
     @staticmethod
     def _row(rows, day):

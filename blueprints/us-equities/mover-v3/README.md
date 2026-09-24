@@ -476,12 +476,17 @@ are in `protocol-core-draft.json` (`run_discipline.study_code`). These are synth
 not a native run: no market data was read and no provider was called. Review round 8 resolved the 21 remaining
 findings of the last core review in code and in the protocol, including the two high ones: the request plan and
 parsing left `study/fetch/`, so a transport deviation cannot change a stamp or a window (R8-1), and duckdb is an
-allowed, pinned import so that the pinned dedup runs (E1). The next steps are an independent review of the draft and
-its study tree from a different model family, then the other preconditions, then the freeze. Until then every fetch
-and evaluation command refuses to run.
+allowed, pinned import so that the pinned dedup runs (E1). Review round 9 resolved the 28 findings of a review of the
+study tree: the holdout path is now wired end to end through `run.py` (authorization records, collection batches
+merged per symbol and session, counts with the extension decision, the read of the carried items only and the
+not-read label), a run refuses unless its log and amendment lines are on origin/main and the protocol is the freeze
+commit's blob, a transport deviation governs only when committed and passing, each stage is fetched and evaluated
+once into a fixed results file, and the count-only run has its own committed command. The next steps are an
+independent review of the draft and its study tree from a different model family, then the other preconditions, then
+the freeze. Until then every fetch and evaluation command refuses to run.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-8 (the restructure into the core, its two review rounds and the code-first round) are in
+`protocol-draft.json` (`review_record`); rounds 5-9 (the restructure into the core, its two review rounds, the code-first round and the study-tree review) are in
 `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

@@ -29,7 +29,8 @@ class Guards(unittest.TestCase):
         with self.assertRaises(guards.Refused):
             guards.require_frozen(frozen, "b" * 40)
 
-    def test_the_current_draft_refuses_every_fetch_and_evaluation(self):
+    def test_the_protocol_refuses_a_tree_it_does_not_pin(self):
+        # true of the draft (not frozen) and of the frozen protocol (another tree), so it holds after the freeze (F6)
         proto = json.loads((Path(__file__).resolve().parents[2] / "protocol-core-draft.json").read_text())
         with self.assertRaises(guards.Refused):
             guards.require_frozen(proto, "a" * 40)

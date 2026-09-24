@@ -53,16 +53,20 @@ class Calendar:
         self.removed = tuple(sorted(removed))
 
     @classmethod
-    def from_files(cls, calendar_path, amendments_path=None):
+    def from_files(cls, calendar_path, amendments_path=None, *, freeze_session: str | None = None):
+        """The pinned calendar with its amendment lines applied. An amendment line applies only when the freeze
+        session is known, and one that concerns a session before it is refused (review round 9, F5): no amendment
+        can move a development, validation or pre-freeze session."""
         body = json.loads(Path(calendar_path).read_text(encoding="utf-8"))
         removed = []
-        if amendments_path and Path(amendments_path).exists():
-            for line in Path(amendments_path).read_text(encoding="utf-8").splitlines():
-                if line.strip():
-                    rec = json.loads(line)
-                    if rec.get("kind") != "remove_session":
-                        raise ValueError(f"unknown calendar amendment kind {rec.get('kind')!r}")
-                    removed.append(rec["session"])
+        for rec in read_amendments(amendments_path):
+            if rec.get("kind") != "remove_session":
+                raise ValueError(f"unknown calendar amendment kind {rec.get('kind')!r}")
+            if freeze_session is None:
+                raise ValueError("a calendar amendment line applies only with the freeze session known")
+            if not rec.get("session") or rec["session"] < freeze_session:
+                raise ValueError(f"calendar amendment concerns {rec.get('session')}, before the freeze session")
+            removed.append(rec["session"])
         return cls(body["sessions"], tuple(removed))
 
     def is_session(self, d: str) -> bool:
@@ -112,6 +116,12 @@ class Calendar:
 
 def session_of_time(cal: Calendar, ts: float) -> str | None:
     return cal.session_of_time(ts)
+
+
+def read_amendments(path) -> list:
+    if not path or not Path(path).exists():
+        return []
+    return [json.loads(x) for x in Path(path).read_text(encoding="utf-8").splitlines() if x.strip()]
 
 
 def year_of(d: str) -> int:

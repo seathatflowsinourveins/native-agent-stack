@@ -37,9 +37,17 @@ class Runtime(unittest.TestCase):
         sc = proto["run_discipline"]["study_code"]
         self.assertEqual(sc["runtime_lock"], "blueprints/us-equities/mover-v3/study/runtime.lock")
         self.assertEqual(sc["test_command"], LOCK["test_command"])
-        self.assertIsNone(sc["tree"])
-        self.assertEqual(proto["status"], "draft_pending_independent_pre_outcome_review")
-        self.assertIs(proto["frozen_before_outcomes"], False)
+        # review round 9, F6: the assertion holds before and after the freeze, so the suite of the pinned tree still
+        # passes on the frozen commit
+        if proto["status"] == "frozen":
+            self.assertIs(proto["frozen_before_outcomes"], True)
+            self.assertRegex(sc["tree"], "^[0-9a-f]{40}$")
+        else:
+            self.assertIsNone(sc["tree"])
+            self.assertIs(proto["frozen_before_outcomes"], False)
+
+    def test_run_command_isolates_the_interpreter(self):
+        self.assertIn("python -I -B ", LOCK["run_command"])
 
 
 if __name__ == "__main__":

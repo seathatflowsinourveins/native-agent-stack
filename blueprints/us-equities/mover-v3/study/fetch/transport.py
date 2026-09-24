@@ -20,6 +20,7 @@ import urllib.parse
 import urllib.request
 
 HOST = "https://data.alpaca.markets"
+TRADING_HOST = "https://paper-api.alpaca.markets"   # the asset master (GET /v2/assets) is a trading-API endpoint
 RETRY_WAITS_S = (1, 4, 16)
 TIMEOUT_S = 60
 MAX_PAGES = 100_000

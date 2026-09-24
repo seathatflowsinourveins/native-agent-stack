@@ -1,5 +1,5 @@
 """The screen: session-s rows from asof = s requests, identity dedup, and the candidate conditions that the
-screen data decide (gain, $1 floor, suspected unadjusted split at t, exclusions 1 and 2).
+screen data decide (exclusion 1, the accepted close, gain, $1 floor, suspected unadjusted split at t, exclusion 2).
 
 Fetch failures (review round 8, R8-5 and E5): a screen batch whose daily-bar or auction request is incomplete
 after the re-fetch makes every symbol-session of that batch membership-unknown: excluded and counted by kind.
@@ -13,13 +13,27 @@ from core import identity, plan
 from core.calendar import year_of
 
 
-def _batch_data(store, cal, s, batch):
-    reqs = plan.screen_requests(cal, s, batch)
-    kinds = {r["kind"]: r for r in reqs}
+SCREEN_KINDS = ("screen_daily_raw", "screen_daily_split", "screen_daily_all", "screen_auctions")
+
+
+def _default_view(store, cal, s, batch) -> dict:
+    """One batch of session s from the stage's own screen requests (keys of plan.screen_requests)."""
+    kinds = {r["kind"]: r for r in plan.screen_requests(cal, s, batch)}
     status = {k: store.status(r["key"]) for k, r in kinds.items()}
     if any(v is None for v in status.values()):
         raise KeyError(f"screen {s}: unsealed request (no outcome is computed from unsealed data)")
-    return kinds, status
+    bad = sorted(k for k, v in status.items() if v != "complete")
+    return {"requests": len(kinds), "incomplete_kinds": bad, "unknown": set(batch) if bad else set(),
+            "empty": [k for k, r in kinds.items() if status[k] == "complete" and store.empty(r["key"])],
+            "data": {} if bad else {k: store.parsed(r["key"]) for k, r in kinds.items()}}
+
+
+def view(store, cal, s, batch) -> dict:
+    """The screen rows of one batch of session s: {"requests", "incomplete_kinds", "unknown" (symbols whose
+    screen request is fetch-incomplete: membership-unknown), "empty" (kinds with no row), "data" {kind: {symbol:
+    rows}}}. A holdout store merges its sealed collection batches per (symbol, session) (core.holdout_store)."""
+    fn = getattr(store, "screen_view", None)
+    return fn(cal, s, batch) if fn is not None else _default_view(store, cal, s, batch)
 
 
 def screen_rows(store, cal, sessions: list, symbols: list):
@@ -28,20 +42,19 @@ def screen_rows(store, cal, sessions: list, symbols: list):
     unknown = set()
     for s in sessions:
         for batch in plan.batches(symbols):
-            kinds, status = _batch_data(store, cal, s, batch)
-            counts["screen_requests"] += len(kinds)
-            bad = [k for k, v in status.items() if v != "complete"]
-            if bad:
-                for k in bad:
-                    counts[f"screen_incomplete:{k}"] += 1
-                counts["membership_unknown_symbol_sessions"] += len(batch)
-                unknown.update((sym, s) for sym in batch)
-                continue
-            for k, r in kinds.items():
-                if store.empty(r["key"]):
-                    counts[f"screen_empty:{k}"] += 1
-            raw = store.parsed(kinds["screen_daily_raw"]["key"])
+            v = view(store, cal, s, batch)
+            counts["screen_requests"] += v["requests"]
+            for k in v["incomplete_kinds"]:
+                counts[f"screen_incomplete:{k}"] += 1
+            for k in v["empty"]:
+                counts[f"screen_empty:{k}"] += 1
+            if v["unknown"]:
+                counts["membership_unknown_symbol_sessions"] += len(v["unknown"])
+                unknown.update((sym, s) for sym in v["unknown"])
+            raw = v["data"].get("screen_daily_raw", {})
             for sym in batch:
+                if sym in v["unknown"]:
+                    continue
                 b = raw.get(sym, {}).get(s)
                 if b:
                     rows.append({"symbol": sym, "session": s, "o": b["o"], "h": b["h"], "l": b["l"], "c": b["c"],
@@ -63,18 +76,21 @@ def candidates(store, cal, sessions: list, symbols: list, renames: set, active: 
         y = year_of(s)
         prev = cal.offset(s, -1)
         for batch in plan.batches(symbols):
-            if (batch[0], s) in unknown:
-                continue
-            kinds, _ = _batch_data(store, cal, s, batch)
-            raw = store.parsed(kinds["screen_daily_raw"]["key"])
-            split = store.parsed(kinds["screen_daily_split"]["key"])
-            prints = store.parsed(kinds["screen_auctions"]["key"])
+            v = view(store, cal, s, batch)
+            raw = v["data"].get("screen_daily_raw", {})
+            split = v["data"].get("screen_daily_split", {})
+            prints = v["data"].get("screen_auctions", {})
             for sym in batch:
-                if (sym, s) not in with_bar or (sym, s) in removed:
+                if (sym, s) in unknown or (sym, s) not in with_bar or (sym, s) in removed:
                     continue
                 pr = prints.get(sym, {})
                 label = FM.close_label(pr.get(s))
                 counts[f"close_label:{y}:{label}"] += 1
+                # exclusion 1 comes first: without a listing-exchange opening print no close is accepted, so after
+                # the accepted-close check this rule could never fire (review round 9, M-7)
+                if FM.listing_exchange(pr.get(s)) is None:
+                    counts["not_event:exclusion1_not_listed"] += 1
+                    continue
                 close_t = FM.official_close(pr.get(s))
                 if close_t is None:
                     counts["not_event:no_accepted_official_close"] += 1
@@ -93,9 +109,6 @@ def candidates(store, cal, sessions: list, symbols: list, renames: set, active: 
                     continue
                 if FM.suspected_unadjusted_split(r_sym[s]["c"], (r_sym.get(prev) or {}).get("c"), f_t):
                     counts["gain_but:suspected_unadjusted_split"] += 1
-                    continue
-                if FM.listing_exchange(pr.get(s)) is None:
-                    counts["gain_but:exclusion1_not_listed"] += 1
                     continue
                 if FM.exclusion2(sym):
                     counts["gain_but:exclusion2_derivative"] += 1

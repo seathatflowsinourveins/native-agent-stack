@@ -204,6 +204,61 @@ class Exclusions(unittest.TestCase):
         del raw[prior[9]]
         self.assertTrue(FM.exclusion3(cal, raw, t))         # 20 of 22 (E8: the per-event window)
 
+    def test_rule1_counted_before_the_accepted_close(self):
+        """Review round 9, M-7: a session with a close print but no listing-exchange opening print is exclusion 1,
+        counted as such (before the accepted-close check, which it would otherwise always fail first)."""
+        from collections import Counter
+        from core import driver, plan, screen
+        from core.store import Store
+        from tests.test_identity import fixed_clock, issuer_data, transports
+        cal = synth.calendar()
+        sess = cal.range("2020-06-01", "2020-06-05")
+        m = synth.FakeMarket(cal)
+        for sym, no_open in (("LIST", False), ("OTCX", True)):
+            daily, prints = issuer_data(cal, cal.offset(sess[0], -1), sess[-1],
+                                        lambda d: 5.0 if d < "2020-06-03" else 7.0)
+            if no_open:
+                prints = {d: synth.auction(b["o"], b["c"], no_open=True) for d, b in daily["raw"].items()}
+            m.add(sym, [("2015-01-01", sym)], daily=daily, auctions=prints)
+        store = Store()
+        reqs = [r for s in sess for r in plan.screen_requests(cal, s, ["LIST", "OTCX"])]
+        driver.stage_fetch(lambda st: reqs, transports(m), store, "2026-12-01", clock=fixed_clock)
+        cands, counts, _ = screen.candidates(store, cal, sess, ["LIST", "OTCX"], set())
+        self.assertEqual([(c["symbol"], c["t"]) for c in cands], [("LIST", "2020-06-03")])
+        self.assertEqual(counts["not_event:exclusion1_not_listed"], len(sess))
+        self.assertNotIn("not_event:no_accepted_official_close", Counter(counts))
+
+
+class LeastExposed(unittest.TestCase):
+    """exposure_registry.consequence's slice, restated from broad-universe at aa6fc79 (review round 9, L-7)."""
+
+    def setUp(self):
+        self.cal = synth.calendar()
+        self.t = "2020-06-01"
+        self.prior = [self.cal.offset(self.t, -k) for k in range(0, 61)]
+
+    def raw(self, close=5.0, volume=1_000_000):
+        return {d: {"c": close, "v": volume} for d in self.prior}
+
+    def test_a_lane_decision_is_not_least_exposed(self):
+        self.assertFalse(FM.least_exposed(self.cal, self.raw(), self.t))           # med20 = $5M, 60 bars, >= $1
+
+    def test_each_condition(self):
+        cal, t = self.cal, self.t
+        self.assertTrue(FM.least_exposed(cal, self.raw(volume=390_000), t))        # med20 $1.95M < $2M
+        self.assertFalse(FM.least_exposed(cal, self.raw(volume=400_000), t))       # med20 exactly $2M
+        low = self.raw()
+        low[t] = {"c": 0.95, "v": 1_000_000}
+        self.assertTrue(FM.least_exposed(cal, low, t))                             # raw close < $1 on t
+        gap = self.raw()
+        del gap[cal.offset(t, -45)]
+        self.assertTrue(FM.least_exposed(cal, gap, t))                             # has_gap inside 60 sessions
+        short = {d: v for d, v in self.raw().items() if d >= cal.offset(t, -59)}
+        self.assertTrue(FM.least_exposed(cal, short, t))                           # 59 prior bars
+        nobar = self.raw()
+        del nobar[t]
+        self.assertTrue(FM.least_exposed(cal, nobar, t))                           # no bar on t
+
 
 if __name__ == "__main__":
     unittest.main()

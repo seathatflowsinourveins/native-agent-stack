@@ -16,14 +16,23 @@ input is synthetic.
 | `core/formulas.py`, `core/fills.py`, `core/costs.py`, `core/trades.py` | `populations`, `arms`, `cost_model` and the net return |
 | `core/terciles.py`, `core/chronology.py`, `core/stats.py`, `core/evaluate.py` | `tercile_rule`, `chronology`, `statistics`, `multiple_testing` and `outcome_reporting` |
 | `core/count_unit.py`, `core/gate.py`, `core/logs.py`, `core/guards.py`, `core/runner.py` | the holdout count, the gate, the access log, the evaluator refusals, the append-only files and the runtime lock |
+| `core/holdout.py`, `core/holdout_store.py` | the holdout path: authorization, collection batches merged per (symbol, session), counts with the extension decision, the read and the not-read label (review round 9) |
 | `core/count_only.py`, `core/coverage_rule.py` | the pre-freeze count-only code and `coverage_rule.decided_by_code` |
 | `core/transport_check.py` | the transport-deviation reproduction check |
 | `pinned/`, `pinned_copies.json` | byte-for-byte copies of the aa6fc79 definitions (`run_discipline.pinned_copies`) |
 | `core/params.py` | every parameter; equal to `run_discipline.study_code.parameters` |
 | `runtime.lock`, `runtime-requirements.txt` | the pinned runtime |
 
-Data files that are appended after the freeze (`../data/`), the run log, the access log and the deviations file sit
-outside this tree, so appending to them never changes the tree hash.
+Data files that are appended after the freeze (`../data/`), the run log, the access log, the deviations file and the
+results files (`../results/`) sit outside this tree, so appending to them never changes the tree hash.
+
+## Entry points
+
+`run.py` is the only entry point (`study/runtime.lock` `run_command`, run as `python -I -B`). Before the freeze only
+`build-calendar` and `count-only` run; after it, `fetch` and `evaluate` (development and validation, each once) and the
+holdout commands `authorize`, `collect`, `count` and `read`. Every command refuses unless its run-log, access-log and
+amendment lines are committed and pushed to origin/main, and a holdout action runs only under its own committed
+authorization record. Results files have fixed paths under `../results/`.
 
 ## Tests
 

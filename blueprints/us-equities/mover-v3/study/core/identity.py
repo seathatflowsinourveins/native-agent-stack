@@ -43,9 +43,12 @@ def rename_pairs(actions: list[dict]) -> set:
             if r.get("type") == "name_change" and r.get("old_symbol") and r.get("new_symbol")}
 
 
-def check_asof(request: dict, fetch_date: str | None = None) -> None:
+def check_asof(request: dict) -> None:
     """Every bars, auctions or quotes request carries asof = its defining session (universe_and_identity.asof).
-    Refuses a missing asof, one that differs from the defining session, and one set to the fetch date."""
+    Refuses a missing asof and one that differs from the defining session. A request built with the fetch date as
+    asof is refused by the second rule: the plan (core.plan) sets asof_session to the session that defines the
+    request (s for a screen row, t for an event), never to the fetch date (review round 9, L-6: the former separate
+    fetch-date clause could never fire)."""
     if request["kind"] in ("assets", "corporate_actions") or request["kind"].startswith("count_default_asof"):
         return  # enumeration, and the count-only identity_diagnostic copy at the provider default asof
     asof = request["params"].get("asof")
@@ -53,8 +56,6 @@ def check_asof(request: dict, fetch_date: str | None = None) -> None:
         raise AsofRefused(f"{request['key']}: no asof (the provider default is never used)")
     if asof != request["asof_session"]:
         raise AsofRefused(f"{request['key']}: asof {asof} is not the defining session {request['asof_session']}")
-    if fetch_date is not None and asof == fetch_date and request["asof_session"] != fetch_date:
-        raise AsofRefused(f"{request['key']}: asof is the fetch date")
 
 
 def dedupe_screen(rows: list[dict], renames: set, active: frozenset = frozenset()) -> dict:

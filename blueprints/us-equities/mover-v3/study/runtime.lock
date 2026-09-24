@@ -16,6 +16,7 @@
  },
  "requirements_file": "runtime-requirements.txt",
  "test_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -m unittest discover -s blueprints/us-equities/mover-v3/study/tests -t blueprints/us-equities/mover-v3/study",
- "run_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python blueprints/us-equities/mover-v3/study/run.py",
- "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python, numpy, pandas, exchange_calendars or duckdb version differs"
+ "run_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -I -B blueprints/us-equities/mover-v3/study/run.py",
+ "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python, numpy, pandas, exchange_calendars or duckdb version differs",
+ "verified": "2026-09-24, review round 9: uv 0.12.17 with uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu) and exactly the packages above from runtime-requirements.txt, run by test_command: 216 tests, 0 failures, 0 errors, 0 skips"
 }

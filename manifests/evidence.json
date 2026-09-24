@@ -3122,8 +3122,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "69dfc36b845b2a2fffe49431a8a5d3c267257ca795a80603e10f53cb012e8977",
-      "bytes": 507
+      "sha256": "fe93d19129467b9dd7a02a78ab8ba02e504a725e22dad96aed08a2cdc8d39393",
+      "bytes": 810
     },
     {
       "path": ".gitleaks.toml",
@@ -8478,8 +8478,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/README.md",
-      "sha256": "1b9f5d81b80e29d97ae10efe64fb66da00d88631b1bc8f8c56601a5aebe2db34",
-      "bytes": 53552
+      "sha256": "c9724bc9a9645f65a257b518d885851401f527316046378b460c47be1ae3367d",
+      "bytes": 54173
     },
     {
       "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
@@ -8488,8 +8488,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
-      "sha256": "85377a75d6752a0b4d13eda37a392642285b5c890b51dbbc09d9f4a840702b79",
-      "bytes": 143682
+      "sha256": "e8a451c5c075cf1bd84d3bd51612e497f615a8245a7c9c20e4c3a843552d90c8",
+      "bytes": 157089
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-draft.json",

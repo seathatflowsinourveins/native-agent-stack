@@ -214,14 +214,28 @@ def contiguous_prior_bars(cal, raw: dict, t: str, limit: int = 60) -> int:
     return n
 
 
+LANE_MIN_RAW_CLOSE = 1.0          # broad-universe descriptive_microcap_lane.min_raw_close_usd (the widest lane)
+LANE_MED20_MIN = 2_000_000.0      # broad-universe descriptive_microcap_lane.median_dollar_volume_min_usd
+LANE_PRIOR_BARS = 60              # broad-universe eligibility.min_prior_sessions_with_bars and window_contiguity
+
+
 def least_exposed(cal, raw: dict, t: str) -> bool:
-    """exposure_registry.consequence's slice, as v3 operationalizes it from the per-event daily bars: the
-    median of raw close x volume over the 20 sessions ending at t-1 is below $2M, or fewer than 60 contiguous
-    prior sessions have a bar (broad-universe's eligibility lookback and has_gap)."""
-    prior = [cal.offset(t, -k) for k in range(1, 21)]
-    vals = [raw[s]["c"] * raw[s]["v"] for s in prior if s and raw.get(s)]
-    med = float(np.median(vals)) if len(vals) == 20 else 0.0
-    return med < 2_000_000.0 or contiguous_prior_bars(cal, raw, t) < 60
+    """exposure_registry.consequence's slice: True when (symbol, t) was not a broad-universe lane decision. Restated
+    from broad-universe protocol.json and evaluate.py at aa6fc79 (review round 9, L-7): a lane decision of the widest
+    lane (descriptive_microcap, which contains every primary decision) needs a raw daily bar on t with raw close
+    >= $1; 60 prior bars that are calendar-contiguous (span60 = 60, so neither insufficient_history nor has_gap);
+    and med20, the median of raw close x raw volume over the 20 sessions t-20 .. t-1, > 0 and >= $2,000,000.
+    Broad-universe's suffix exclusion needs no restatement: every v3 event passes exclusion 2, whose pattern removes
+    every suffix broad-universe excludes. Limitation: the bars are the event's asof = t response, not
+    broad-universe's default-asof history."""
+    b = raw.get(t)
+    if not b or b["c"] < LANE_MIN_RAW_CLOSE:
+        return True
+    if contiguous_prior_bars(cal, raw, t, LANE_PRIOR_BARS) < LANE_PRIOR_BARS:
+        return True
+    prior = [cal.offset(t, -k) for k in range(1, M["sizing_window"] + 1)]
+    med = float(np.median([raw[s]["c"] * raw[s]["v"] for s in prior]))
+    return med <= 0.0 or med < LANE_MED20_MIN
 
 
 def finite(x) -> bool:

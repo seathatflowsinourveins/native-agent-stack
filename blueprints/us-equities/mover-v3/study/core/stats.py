@@ -223,11 +223,12 @@ PASS_NAME = {"development": "development pass", "validation": "screened", "holdo
 def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: bool, mde_ok: bool,
                void: bool = False, sign_ok: bool = True, contaminated: bool = False, carried: bool = True) -> str:
     """outcome_reporting.labels: the stage pass name, 'not_supported_mde_excluded' or 'underpowered'.
-    p_stage is the unadjusted p at development and the Holm-adjusted p at validation and the holdout."""
-    if void or not n_ok:
-        return "underpowered"
+    p_stage is the unadjusted p at development and the Holm-adjusted p at validation and the holdout. At the holdout
+    an item that was not carried is 'not carried' whatever its sample (review round 9, M-1)."""
     if stage == "holdout" and not carried:
         return "not carried"
+    if void or not n_ok:
+        return "underpowered"
     # the robustness means are required for a tradable cell's validation and holdout pass, not at development
     passes = p_stage <= TEST["alpha"] and (robust_ok or item not in TRADABLE or stage == "development")
     if stage == "holdout" and item == "H3-c":
@@ -241,14 +242,28 @@ def item_label(stage: str, item: str, *, p_stage: float, n_ok: bool, robust_ok: 
     return "underpowered"
 
 
-def hypothesis_verdict(stage: str, labels: dict) -> dict:
-    """outcome_reporting.hypothesis_verdict for H1 (H1-D, H1-D-b_lane-low) and H3 (H3-a, H3-b, H3-c)."""
+def qualifiers(stage: str, label: str, lineage_ok: bool, stage_qualifiers=()) -> list:
+    """outcome_reporting.qualifiers attached to one item's label (review round 9, M-8): 'transport-deviation' for a
+    stage fetched, collected or run under a transport deviation, and 'lineage-unconfirmed' for a 'supported
+    (confirmatory)' item that is not lineage-confirmed (multiple_testing.lineage_sensitivity). Contamination is in
+    the label itself ('screened (contaminated holdout)')."""
+    out = list(stage_qualifiers)
+    if stage == "holdout" and label == PASS_NAME["holdout"] and not lineage_ok:
+        out.append("lineage-unconfirmed")
+    return out
+
+
+def hypothesis_verdict(stage: str, labels: dict, item_qualifiers: dict | None = None) -> dict:
+    """outcome_reporting.hypothesis_verdict for H1 (H1-D, H1-D-b_lane-low) and H3 (H3-a, H3-b, H3-c). A pass
+    verdict carries the qualifiers of its passing items."""
     out = {}
+    item_qualifiers = item_qualifiers or {}
     groups = {"H1": ("H1-D", "H1-D-b_lane-low"), "H3": ("H3-a", "H3-b", "H3-c")}
     for h, items in groups.items():
         passing = [i for i in items if labels.get(i) == PASS_NAME[stage]]
         if passing:
-            out[h] = {"verdict": PASS_NAME[stage], "items": passing}
+            quals = sorted({q for i in passing for q in item_qualifiers.get(i, ())})
+            out[h] = {"verdict": PASS_NAME[stage], "items": passing, "qualifiers": quals}
             continue
         if stage == "holdout":
             carried = [i for i in items if labels.get(i) not in (None, "not carried")]

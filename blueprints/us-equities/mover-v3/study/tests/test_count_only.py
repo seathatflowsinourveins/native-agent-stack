@@ -2,9 +2,11 @@
 from the hashed thresholds (R8-9), minute-bar coverage (E3), the identity diagnostic and probe, and an output with
 no symbol, price or event row."""
 import json
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
+from unittest import mock
 
 from core import count_only as CO
 from core import coverage_rule, driver
@@ -144,6 +146,85 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(out["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
         self.assertFalse(out["item_rule"]["items_tested"] and not out["years"]["2020"]["decision"]["kept"])
         self.assertEqual(out["years"]["2020"]["counts"]["distinct_unreached_symbols"], 1 if unreached else 0)
+
+
+class Round9(unittest.TestCase):
+    """Review round 9: the candidate count uses D's floor on the official close only (L-3), coverage_rule's hash is
+    checked before any fetch (L-3), and the committed count-only command (M-2, F8)."""
+
+    def test_candidate_with_raw_close_below_one_and_official_close_above(self):
+        cal = synth.calendar()
+        s = "2020-06-03"
+        prev = cal.offset(s, -1)
+        name = next(f"Q{i:03d}" for i in range(2000) if CO.sampled(f"Q{i:03d}", s))
+        daily, prints = issuer_data(cal, cal.offset(s, -3), s, lambda d: 0.98 if d == s else 0.8)
+        prints[prev] = synth.auction(1.0, 1.0)
+        prints[s] = synth.auction(1.2, 1.25)
+        m = synth.FakeMarket(cal)
+        m.add("q", [("2015-01-01", name)], daily=daily, auctions=prints)
+        store = Store()
+        driver.stage_fetch(CO.part1_planner(cal, [s], [name]), transports(m), store, "2026-09-25", clock=fixed_clock)
+        c = CO.part1_counts(store, cal, [s], [name], [])
+        self.assertEqual(c[2020]["sampled_candidates"], 1)
+        self.assertEqual(c[2020]["with_bar_close_ge_1"], 0)
+
+    def test_changed_coverage_rule_is_refused_before_any_fetch(self):
+        bad = json.loads(json.dumps(PROTOCOL))
+        bad["coverage_rule"]["thresholds"]["minute_bar_rate_min"] = 0.5
+        m = synth.FakeMarket(synth.calendar())
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(coverage_rule.CoverageRuleChanged):
+                CO.run(bad, synth.calendar(), transports(m), tmp, "2026-09-25", 10_000, clock=fixed_clock)
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+        self.assertEqual(m.calls, [])
+
+    def test_count_only_command_runs_once_from_a_committed_tree(self):
+        import run
+        from core import logs, runner
+        from core.canon import sha256_file
+        from core.params import COUNT_ONLY_OUTPUT, RUN_LOG
+        from fetch.transport import TRADING_HOST
+        from tests import fixture_repo as FR
+        self.assertEqual(run.transports()["trading"].host, TRADING_HOST)
+        self.assertTrue(all(r["api"] == "trading" for r in CO.part0_requests("2026-09-25") if r["kind"] == "assets"))
+        cal = synth.calendar()
+        m = synth.FakeMarket(cal)
+        syms = [f"S{chr(65 + i)}" for i in range(12)]
+        for i, sym in enumerate(syms):
+            daily, prints = issuer_data(cal, "2020-05-01", "2020-06-30", lambda d, i=i: 3.0 + i)
+            m.add(sym, [("2015-01-01", sym)], daily=daily, auctions=prints)
+        m.assets = [{"symbol": x, "status": "active", "class": "us_equity"} for x in syms]
+        m.actions = [{"type": "cash_dividend", "symbol": "SB", "ex_date": "2020-06-02"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, frozen=False)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            argv = ["count-only", "--snapshot-root", root, "--rate-per-minute", "10000", "--rate-source", "synthetic"]
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda: transports(m)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(CO, "PART1_RANGE", ("2020-06-01", "2020-06-05")):
+                (repo / COUNT_ONLY_OUTPUT).unlink()                # the fixture's placeholder output
+                FR.commit_push(repo, "2026-09-25T12:00:00+00:00")
+                logs.append_line(repo / RUN_LOG, {"stage": "pre_freeze", "purpose": "note"})
+                with self.assertRaises(runner.guards.Refused):     # a run log that differs from HEAD
+                    run.main(argv)
+                FR.sh(repo, "checkout", "--", RUN_LOG)
+                self.assertEqual(run.main(argv), 0)
+                out = json.loads((repo / COUNT_ONLY_OUTPUT).read_text())
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((line["purpose"], line["status"]), ("count_only", "complete"))
+                self.assertEqual(line["results_sha256"], sha256_file(repo / COUNT_ONLY_OUTPUT))
+                self.assertEqual(line["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
+                self.assertEqual((out["study_tree"], out["code_revision"]), (fx["tree"], FR.sh(repo, "rev-parse", "HEAD")))
+                self.assertEqual(set(out["snapshots"]), {"part0", "part1", "part3"})
+                self.assertEqual(out["part0"]["enumeration_sha256"], sha256_file(Path(root) / "enumeration.json"))
+                self.assertEqual(out["fetch_estimate"]["screen_requests"], 5 * 4 * 1)
+                self.assertEqual(out["part0"]["actions_by_year"], {"2020": {"cash_dividend": 1}})
+                self.assertFalse(any(f'"{x}"' in json.dumps(out) for x in syms))
+                self.assertIn(("/v2/assets", {"status": "active", "asset_class": "us_equity"}), m.calls)
+                FR.commit_push(repo, "2026-09-25T13:00:00+00:00")
+                with self.assertRaises(runner.RunRefused):            # it runs once
+                    run.main(argv)
 
 
 class Probe(unittest.TestCase):

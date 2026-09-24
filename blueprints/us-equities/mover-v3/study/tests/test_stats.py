@@ -161,12 +161,33 @@ class Labels(unittest.TestCase):
         self.assertEqual(ST.item_label("holdout", "H3-c", p_stage=0.001, sign_ok=False, **kw), "underpowered")
         self.assertEqual(ST.item_label("holdout", "H3-c", p_stage=0.001, sign_ok=True, **kw), "supported (confirmatory)")
 
+    def test_not_carried_precedes_the_minimum_sample(self):
+        # review round 9, M-1: a holdout item the gate did not open is 'not carried', whatever its sample
+        self.assertEqual(ST.item_label("holdout", "H3-b", p_stage=1.0, n_ok=False, robust_ok=False, mde_ok=False,
+                                       carried=False), "not carried")
+        self.assertEqual(ST.item_label("holdout", "H3-b", p_stage=1.0, n_ok=False, robust_ok=False, mde_ok=False),
+                         "underpowered")
+
+    def test_lineage_and_qualifiers(self):
+        level = 0.05 / (1012 + 60 + 5)
+        self.assertTrue(ST.lineage_confirmed(level, level))
+        self.assertFalse(ST.lineage_confirmed(level, level * 1.01))
+        self.assertFalse(ST.lineage_confirmed(1e-6, 0.01))
+        self.assertEqual(ST.qualifiers("holdout", "supported (confirmatory)", False), ["lineage-unconfirmed"])
+        self.assertEqual(ST.qualifiers("holdout", "supported (confirmatory)", True), [])
+        self.assertEqual(ST.qualifiers("validation", "screened", False, ("transport-deviation",)),
+                         ["transport-deviation"])
+        labels = {"H1-D": "underpowered", "H1-D-b_lane-low": "underpowered", "H3-a": "supported (confirmatory)",
+                  "H3-b": "underpowered", "H3-c": "not carried"}
+        v = ST.hypothesis_verdict("holdout", labels, {"H3-a": ["lineage-unconfirmed", "transport-deviation"]})
+        self.assertEqual(v["H3"]["qualifiers"], ["lineage-unconfirmed", "transport-deviation"])
+
     def test_verdicts(self):
         labels = {"H1-D": "not_supported_mde_excluded", "H1-D-b_lane-low": "underpowered", "H3-a": "screened",
                   "H3-b": "underpowered", "H3-c": "underpowered"}
         v = ST.hypothesis_verdict("validation", labels)
         self.assertEqual(v["H1"]["verdict"], "not supported")
-        self.assertEqual(v["H3"], {"verdict": "screened", "items": ["H3-a"]})
+        self.assertEqual(v["H3"], {"verdict": "screened", "items": ["H3-a"], "qualifiers": []})
         labels = {i: "not supported (holdout not read)" for i in ("H3-a", "H3-c")}
         labels.update({"H1-D": "not carried", "H1-D-b_lane-low": "not carried", "H3-b": "not carried"})
         v = ST.hypothesis_verdict("holdout", labels)

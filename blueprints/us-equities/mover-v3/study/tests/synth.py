@@ -4,6 +4,7 @@ data: every number here is invented.
 """
 from __future__ import annotations
 
+import bisect
 import json
 import urllib.error
 import urllib.parse
@@ -187,9 +188,8 @@ class FakeMarket:
                 if iid is None:
                     continue
                 d = self.issuers[iid]["daily"].get(p["adjustment"], {})
-                for s in sorted(d):
-                    if p["start"] <= s <= p["end"]:
-                        rows.append((sym, {**d[s], "t": day_iso(s), "n": 1}))
+                for s in _in_range(d, p["start"], p["end"]):
+                    rows.append((sym, {**d[s], "t": day_iso(s), "n": 1}))
             chunk, nxt = self._page(rows, p, "bars")
             out = {}
             for sym, r in chunk:
@@ -218,9 +218,8 @@ class FakeMarket:
                 if iid is None:
                     continue
                 a = self.issuers[iid]["auctions"]
-                for s in sorted(a):
-                    if p["start"] <= s <= p["end"]:
-                        rows.append((sym, {"d": s, **a[s]}))
+                for s in _in_range(a, p["start"], p["end"]):
+                    rows.append((sym, {"d": s, **a[s]}))
             chunk, nxt = self._page(rows, p, "auctions")
             out = {}
             for sym, r in chunk:
@@ -243,6 +242,11 @@ class FakeMarket:
                 out.setdefault(sym, []).append(r)
             return {"quotes": out, "next_page_token": nxt}
         raise ValueError(path)
+
+
+def _in_range(by_day: dict, first: str, last: str) -> list:
+    days = sorted(by_day)
+    return days[bisect.bisect_left(days, first): bisect.bisect_right(days, last)]
 
 
 def session_of(ts):

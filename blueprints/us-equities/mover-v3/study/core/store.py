@@ -143,6 +143,8 @@ class Store:
             raise SealError("snapshot ledger sha256 differs from the sealed value")
         store, pages = cls(), {}
         for line in data.decode("utf-8").splitlines():
+            if not line.strip():
+                continue   # the ledger of a snapshot that sealed no new request (a later holdout count)
             rec = json.loads(line)
             ev = rec.pop("event")
             if ev == "request":

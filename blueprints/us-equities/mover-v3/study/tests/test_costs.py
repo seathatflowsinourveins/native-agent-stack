@@ -95,6 +95,18 @@ class Fees(unittest.TestCase):
         self.assertAlmostEqual(amended.sale_fees("2027-02-01", 1000, 10_000), 0.30 + 0.2)
         with self.assertRaises(ValueError):
             costs.Fees(base, [{"kind": "finra_taf", "from": "2027-01-01", "to": "2027-12-31", "usd_per_share": 0.0002}])
+        # review round 9, F5: a line that starts before the freeze session is refused
+        early = {"kind": "sec_section31", "from": "2020-01-01", "to": "2020-12-31", "rate": 99.0}
+        with self.assertRaises(ValueError):
+            costs.Fees(base, [early], freeze_session="2026-10-05")
+        with tempfile.TemporaryDirectory() as tmp:
+            b, a = Path(tmp) / "fees.json", Path(tmp) / "amend.jsonl"
+            b.write_text(json.dumps(base))
+            a.write_text(json.dumps(early) + "\n")
+            with self.assertRaises(ValueError):          # no freeze session: the line cannot apply
+                costs.Fees.from_files(b, a)
+            with self.assertRaises(ValueError):
+                costs.Fees.from_files(b, a, freeze_session="2026-10-05")
         with self.assertRaises(KeyError):
             costs.Fees(FEES).sale_fees("2021-07-06", 1, 1)
 

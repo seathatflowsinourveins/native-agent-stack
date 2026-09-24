@@ -104,13 +104,41 @@ class EndToEnd(unittest.TestCase):
         again = ST.evaluate_stage(self.spec, Store.read(self.tmp.name, self.sha), PID, B=B)
         self.assertEqual(json.dumps(again, sort_keys=True), json.dumps(self.results, sort_keys=True))
 
-    def test_validation_ignores_development_period_data(self):
-        m2, syms = build_market(self.cal, extra_dev_event=True)
-        store = Store()
-        driver.stage_fetch(ST.planner(spec_for(self.cal, syms)), transports(m2), store, "2026-12-01", clock=fixed_clock)
-        res = ST.evaluate_stage(spec_for(self.cal, syms), store, PID, B=B)
-        self.assertEqual({i: (r["n"], r["p"], r["estimate"]) for i, r in res["items"].items()},
-                         {i: (r["n"], r["p"], r["estimate"]) for i, r in self.results["items"].items()})
+    def test_validation_is_independent_of_every_development_output(self):
+        """multiple_testing.no_direction_lock (review round 9, M-7): development-period events with extreme MAX21
+        values, handed to the evaluation itself (not only to a screen that never reaches them), change no validation
+        tercile, estimate or p-value. The test fails if the tercile pool or the stage filter admits development
+        sessions."""
+        from core import evaluate as EV
+        events, _, _, _ = ST.d_events(self.spec, self.store)
+        dev = [{**ev, "t": d, "max21": 50.0 + i} for i, ev in enumerate(events)
+               for d in ("2019-06-03", "2019-11-01", "2019-12-02")]
+        kw = dict(protocol_id=PID, stage_sessions=self.spec.stage_sessions(), pool=self.spec.pool(), B=B)
+        base = EV.evaluate("validation", events, self.spec.ctx("read"), self.store, **kw)
+        with_dev = EV.evaluate("validation", events + dev, self.spec.ctx("read"), self.store, **kw)
+        self.assertEqual(json.dumps(with_dev, sort_keys=True), json.dumps(base, sort_keys=True))
+        # and when the validation pool has at least 60 prior events, the breakpoints come from it alone
+        sessions = self.spec.pool()
+        val = [{"symbol": f"V{i}", "t": sessions[i], "max21": float(i % 10)} for i in range(120)]
+        devs = [{"symbol": f"D{i}", "t": d, "max21": 100.0 + i} for i, d in enumerate(("2019-03-01", "2019-12-31") * 40)]
+        members = lambda ev: ev["t"] >= "2020-01-02"  # noqa: E731
+        self.assertEqual(EV.assign_terciles(val + devs, sessions, members), EV.assign_terciles(val, sessions, members))
+        self.assertIsNotNone(EV.assign_terciles(val, sessions, members)[("V100", sessions[100])])
+
+    def test_labels_qualifiers_and_rename_counts(self):
+        """Review round 9, M-8: the identity-limited validation label with its rate, the survivorship-limited
+        development label, the transport-deviation qualifier on every item and verdict, and the E9 counts."""
+        res = ST.evaluate_stage(self.spec, self.store, PID, B=200, qualifiers=("transport-deviation",),
+                                identity_limited={"rate": 0.031})
+        self.assertEqual(res["stage_labels"], ["identity-limited (2020 identity-unreached rate 0.031)"])
+        self.assertTrue(all(r["qualifiers"] == ["transport-deviation"] for r in res["items"].values()))
+        self.assertIn("rename_sensitivity", res["counts"])
+        self.assertIn("terminal_by_arm_year", res["counts"])
+        self.assertEqual(ST.evaluate_stage(self.spec, self.store, PID, B=200)["stage_labels"], [])
+        from core import evaluate as EV
+        dev = EV.evaluate("development", [], self.spec.ctx("read"), self.store, protocol_id=PID, stage_sessions=[],
+                          pool=[], B=50)
+        self.assertEqual(dev["stage_labels"], ["survivorship-limited"])
 
     def test_kill_before_write_then_retry_reproduces_an_uninterrupted_run(self):
         ctx = {"protocol_sha256": "a" * 64, "tree": "t" * 40, "runtime_lock_sha256": "r" * 64,
