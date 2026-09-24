@@ -383,17 +383,17 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 844,
-    "public_star_repositories": 342,
-    "beyond_public_stars": 502,
-    "references": 1969,
+    "repositories": 850,
+    "public_star_repositories": 357,
+    "beyond_public_stars": 493,
+    "references": 1999,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
       "legacy_candidate": 20,
-      "public_star": 342,
+      "public_star": 357,
       "research_supplement": 567,
-      "star_review": 342
+      "star_review": 357
     }
   },
   "records": [
@@ -473,7 +473,7 @@
       ]
     },
     {
-      "repository": "https://github.com/666ghj/mirofish",
+      "repository": "https://github.com/6551team/opennews-mcp",
       "aliases": [],
       "public_star": true,
       "record_types": [
@@ -485,6 +485,31 @@
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/3",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/342",
+          "decision": "obsolete_or_ineligible",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/666ghj/mirofish",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/4",
           "disposition": "no_catalog_card"
         },
         {
@@ -517,7 +542,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/4",
+          "pointer": "/stars/5",
           "disposition": "no_catalog_card"
         },
         {
@@ -542,7 +567,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/5",
+          "pointer": "/stars/6",
           "disposition": "no_catalog_card"
         },
         {
@@ -567,7 +592,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/6",
+          "pointer": "/stars/7",
           "disposition": "no_catalog_card"
         },
         {
@@ -592,7 +617,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/7",
+          "pointer": "/stars/8",
           "disposition": "no_catalog_card"
         },
         {
@@ -633,7 +658,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/8",
+          "pointer": "/stars/9",
           "disposition": "no_catalog_card"
         },
         {
@@ -658,7 +683,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/9",
+          "pointer": "/stars/10",
           "disposition": "no_catalog_card"
         },
         {
@@ -699,7 +724,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/10",
+          "pointer": "/stars/11",
           "disposition": "baseline_record"
         },
         {
@@ -773,7 +798,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/11",
+          "pointer": "/stars/12",
           "disposition": "no_catalog_card"
         },
         {
@@ -810,7 +835,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/12",
+          "pointer": "/stars/13",
           "disposition": "no_catalog_card"
         },
         {
@@ -943,10 +968,12 @@
     {
       "repository": "https://github.com/ai4finance-foundation/finrl-trading",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
         "catalog_card",
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -957,12 +984,26 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/14",
+          "disposition": "catalog_reviewed"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/32",
           "id": "finrl-x",
           "decision": "watch",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/343",
+          "decision": "already_covered",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         }
       ]
     },
@@ -1019,7 +1060,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/13",
+          "pointer": "/stars/15",
           "disposition": "no_catalog_card"
         },
         {
@@ -1080,7 +1121,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/14",
+          "pointer": "/stars/16",
           "disposition": "catalog_reviewed"
         },
         {
@@ -1142,7 +1183,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/15",
+          "pointer": "/stars/17",
           "disposition": "no_catalog_card"
         },
         {
@@ -1219,7 +1260,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/16",
+          "pointer": "/stars/18",
           "disposition": "no_catalog_card"
         },
         {
@@ -1261,7 +1302,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/17",
+          "pointer": "/stars/19",
           "disposition": "no_catalog_card"
         },
         {
@@ -1286,7 +1327,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/18",
+          "pointer": "/stars/20",
           "disposition": "no_catalog_card"
         },
         {
@@ -1403,11 +1444,13 @@
     {
       "repository": "https://github.com/alpacahq/alpaca-py",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
         "catalog_card",
         "component_record",
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -1481,6 +1524,12 @@
           "evidence_level": "source_sections_reviewed"
         },
         {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/21",
+          "disposition": "catalog_reviewed"
+        },
+        {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/data-readiness-review.json",
           "pointer": "/decisions/2",
@@ -1531,6 +1580,14 @@
           "pointer": "/decisions/4",
           "decision": "retain_existing_native_sdk",
           "evidence_level": "readme_and_license_existing_pin"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/344",
+          "decision": "already_covered",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         },
         {
           "kind": "component_record",
@@ -2163,7 +2220,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/19",
+          "pointer": "/stars/22",
           "disposition": "baseline_record"
         },
         {
@@ -2315,7 +2372,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/20",
+          "pointer": "/stars/23",
           "disposition": "baseline_record"
         },
         {
@@ -2346,7 +2403,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/21",
+          "pointer": "/stars/24",
           "disposition": "no_catalog_card"
         },
         {
@@ -2371,7 +2428,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/22",
+          "pointer": "/stars/25",
           "disposition": "no_catalog_card"
         },
         {
@@ -2464,7 +2521,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/23",
+          "pointer": "/stars/26",
           "disposition": "catalog_reviewed"
         },
         {
@@ -2541,7 +2598,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/24",
+          "pointer": "/stars/27",
           "disposition": "baseline_record"
         },
         {
@@ -2572,7 +2629,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/25",
+          "pointer": "/stars/28",
           "disposition": "no_catalog_card"
         },
         {
@@ -2597,7 +2654,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/26",
+          "pointer": "/stars/29",
           "disposition": "no_catalog_card"
         },
         {
@@ -2622,7 +2679,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/27",
+          "pointer": "/stars/30",
           "disposition": "no_catalog_card"
         },
         {
@@ -2647,7 +2704,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/28",
+          "pointer": "/stars/31",
           "disposition": "no_catalog_card"
         },
         {
@@ -2851,7 +2908,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/29",
+          "pointer": "/stars/32",
           "disposition": "no_catalog_card"
         },
         {
@@ -2946,7 +3003,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/30",
+          "pointer": "/stars/33",
           "disposition": "catalog_reviewed"
         },
         {
@@ -3088,7 +3145,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/31",
+          "pointer": "/stars/34",
           "disposition": "no_catalog_card"
         },
         {
@@ -3121,7 +3178,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/32",
+          "pointer": "/stars/35",
           "disposition": "no_catalog_card"
         },
         {
@@ -3234,7 +3291,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/33",
+          "pointer": "/stars/36",
           "disposition": "no_catalog_card"
         },
         {
@@ -3259,14 +3316,14 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/34",
+          "pointer": "/stars/37",
           "disposition": "no_catalog_card"
         },
         {
           "kind": "star_review",
           "path": "catalogs/us-equities/star-audit.json",
           "pointer": "/entries/97",
-          "decision": "targeted_candidate",
+          "decision": "obsolete_or_ineligible",
           "review_level": "source_review",
           "review_depth": "selected_primary_files"
         }
@@ -3284,7 +3341,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/35",
+          "pointer": "/stars/38",
           "disposition": "no_catalog_card"
         },
         {
@@ -3309,7 +3366,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/36",
+          "pointer": "/stars/39",
           "disposition": "no_catalog_card"
         },
         {
@@ -3334,7 +3391,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/37",
+          "pointer": "/stars/40",
           "disposition": "no_catalog_card"
         },
         {
@@ -3359,7 +3416,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/38",
+          "pointer": "/stars/41",
           "disposition": "no_catalog_card"
         },
         {
@@ -3384,7 +3441,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/39",
+          "pointer": "/stars/42",
           "disposition": "no_catalog_card"
         },
         {
@@ -3512,7 +3569,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/40",
+          "pointer": "/stars/43",
           "disposition": "no_catalog_card"
         },
         {
@@ -3602,7 +3659,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/41",
+          "pointer": "/stars/44",
           "disposition": "no_catalog_card"
         },
         {
@@ -3627,7 +3684,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/42",
+          "pointer": "/stars/45",
           "disposition": "no_catalog_card"
         },
         {
@@ -3652,7 +3709,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/43",
+          "pointer": "/stars/46",
           "disposition": "no_catalog_card"
         },
         {
@@ -3726,7 +3783,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/44",
+          "pointer": "/stars/47",
           "disposition": "no_catalog_card"
         },
         {
@@ -3854,7 +3911,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/45",
+          "pointer": "/stars/48",
           "disposition": "no_catalog_card"
         },
         {
@@ -3879,7 +3936,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/46",
+          "pointer": "/stars/49",
           "disposition": "no_catalog_card"
         },
         {
@@ -3904,7 +3961,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/47",
+          "pointer": "/stars/50",
           "disposition": "no_catalog_card"
         },
         {
@@ -3960,7 +4017,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/48",
+          "pointer": "/stars/51",
           "disposition": "no_catalog_card"
         },
         {
@@ -4002,7 +4059,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/49",
+          "pointer": "/stars/52",
           "disposition": "no_catalog_card"
         },
         {
@@ -4044,7 +4101,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/50",
+          "pointer": "/stars/53",
           "disposition": "no_catalog_card"
         },
         {
@@ -4129,7 +4186,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/51",
+          "pointer": "/stars/54",
           "disposition": "catalog_reviewed"
         },
         {
@@ -4213,7 +4270,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/52",
+          "pointer": "/stars/55",
           "disposition": "no_catalog_card"
         },
         {
@@ -4238,7 +4295,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/53",
+          "pointer": "/stars/56",
           "disposition": "no_catalog_card"
         },
         {
@@ -4263,7 +4320,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/54",
+          "pointer": "/stars/57",
           "disposition": "no_catalog_card"
         },
         {
@@ -4328,7 +4385,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/55",
+          "pointer": "/stars/58",
           "disposition": "no_catalog_card"
         },
         {
@@ -4370,7 +4427,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/56",
+          "pointer": "/stars/59",
           "disposition": "no_catalog_card"
         },
         {
@@ -4397,6 +4454,31 @@
           "pointer": "/candidates/86",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/chrisworsey55/atlas-gic",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/60",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/345",
+          "decision": "obsolete_or_ineligible",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         }
       ]
     },
@@ -4429,7 +4511,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/57",
+          "pointer": "/stars/61",
           "disposition": "no_catalog_card"
         },
         {
@@ -4455,7 +4537,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/58",
+          "pointer": "/stars/62",
           "disposition": "no_catalog_card"
         },
         {
@@ -4487,7 +4569,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/59",
+          "pointer": "/stars/63",
           "disposition": "no_catalog_card"
         },
         {
@@ -4539,7 +4621,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/60",
+          "pointer": "/stars/64",
           "disposition": "catalog_reviewed"
         },
         {
@@ -4580,7 +4662,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/61",
+          "pointer": "/stars/65",
           "disposition": "no_catalog_card"
         },
         {
@@ -4605,7 +4687,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/62",
+          "pointer": "/stars/66",
           "disposition": "no_catalog_card"
         },
         {
@@ -4647,7 +4729,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/63",
+          "pointer": "/stars/67",
           "disposition": "no_catalog_card"
         },
         {
@@ -4689,7 +4771,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/64",
+          "pointer": "/stars/68",
           "disposition": "no_catalog_card"
         },
         {
@@ -4714,7 +4796,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/65",
+          "pointer": "/stars/69",
           "disposition": "no_catalog_card"
         },
         {
@@ -4730,9 +4812,11 @@
     {
       "repository": "https://github.com/coding-kitties/investing-algorithm-framework",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -4741,6 +4825,20 @@
           "pointer": "/candidates/92",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/70",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/346",
+          "decision": "alternative",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         }
       ]
     },
@@ -4763,7 +4861,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/66",
+          "pointer": "/stars/71",
           "disposition": "no_catalog_card"
         },
         {
@@ -4788,7 +4886,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/67",
+          "pointer": "/stars/72",
           "disposition": "no_catalog_card"
         },
         {
@@ -4813,7 +4911,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/68",
+          "pointer": "/stars/73",
           "disposition": "no_catalog_card"
         },
         {
@@ -4838,7 +4936,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/69",
+          "pointer": "/stars/74",
           "disposition": "no_catalog_card"
         },
         {
@@ -4863,7 +4961,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/70",
+          "pointer": "/stars/75",
           "disposition": "no_catalog_card"
         },
         {
@@ -4888,7 +4986,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/71",
+          "pointer": "/stars/76",
           "disposition": "no_catalog_card"
         },
         {
@@ -4913,7 +5011,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/72",
+          "pointer": "/stars/77",
           "disposition": "no_catalog_card"
         },
         {
@@ -4938,7 +5036,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/73",
+          "pointer": "/stars/78",
           "disposition": "no_catalog_card"
         },
         {
@@ -5055,7 +5153,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/74",
+          "pointer": "/stars/79",
           "disposition": "no_catalog_card"
         },
         {
@@ -5097,7 +5195,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/75",
+          "pointer": "/stars/80",
           "disposition": "no_catalog_card"
         },
         {
@@ -5173,7 +5271,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/76",
+          "pointer": "/stars/81",
           "disposition": "no_catalog_card"
         },
         {
@@ -5307,7 +5405,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/77",
+          "pointer": "/stars/82",
           "disposition": "no_catalog_card"
         },
         {
@@ -5644,7 +5742,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/78",
+          "pointer": "/stars/83",
           "disposition": "baseline_record"
         },
         {
@@ -5701,7 +5799,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/79",
+          "pointer": "/stars/84",
           "disposition": "no_catalog_card"
         },
         {
@@ -5893,7 +5991,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/80",
+          "pointer": "/stars/85",
           "disposition": "no_catalog_card"
         },
         {
@@ -5925,7 +6023,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/81",
+          "pointer": "/stars/86",
           "disposition": "no_catalog_card"
         },
         {
@@ -5967,7 +6065,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/82",
+          "pointer": "/stars/87",
           "disposition": "no_catalog_card"
         },
         {
@@ -6023,7 +6121,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/83",
+          "pointer": "/stars/88",
           "disposition": "catalog_reviewed"
         },
         {
@@ -6119,7 +6217,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/84",
+          "pointer": "/stars/89",
           "disposition": "catalog_reviewed"
         },
         {
@@ -6179,7 +6277,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/85",
+          "pointer": "/stars/90",
           "disposition": "no_catalog_card"
         },
         {
@@ -6246,7 +6344,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/86",
+          "pointer": "/stars/91",
           "disposition": "catalog_reviewed"
         },
         {
@@ -6277,7 +6375,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/87",
+          "pointer": "/stars/92",
           "disposition": "no_catalog_card"
         },
         {
@@ -6337,7 +6435,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/88",
+          "pointer": "/stars/93",
           "disposition": "no_catalog_card"
         },
         {
@@ -6447,7 +6545,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/89",
+          "pointer": "/stars/94",
           "disposition": "no_catalog_card"
         },
         {
@@ -6472,7 +6570,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/90",
+          "pointer": "/stars/95",
           "disposition": "no_catalog_card"
         },
         {
@@ -6521,7 +6619,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/91",
+          "pointer": "/stars/96",
           "disposition": "no_catalog_card"
         },
         {
@@ -6652,7 +6750,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/92",
+          "pointer": "/stars/97",
           "disposition": "no_catalog_card"
         },
         {
@@ -6709,7 +6807,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/93",
+          "pointer": "/stars/98",
           "disposition": "no_catalog_card"
         },
         {
@@ -6758,7 +6856,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/94",
+          "pointer": "/stars/99",
           "disposition": "no_catalog_card"
         },
         {
@@ -6801,7 +6899,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/95",
+          "pointer": "/stars/100",
           "disposition": "no_catalog_card"
         },
         {
@@ -6877,7 +6975,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/96",
+          "pointer": "/stars/101",
           "disposition": "no_catalog_card"
         },
         {
@@ -6902,7 +7000,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/97",
+          "pointer": "/stars/102",
           "disposition": "no_catalog_card"
         },
         {
@@ -6929,7 +7027,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/98",
+          "pointer": "/stars/103",
           "disposition": "catalog_reviewed"
         },
         {
@@ -6968,7 +7066,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/99",
+          "pointer": "/stars/104",
           "disposition": "no_catalog_card"
         },
         {
@@ -7059,7 +7157,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/100",
+          "pointer": "/stars/105",
           "disposition": "no_catalog_card"
         },
         {
@@ -7135,7 +7233,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/101",
+          "pointer": "/stars/106",
           "disposition": "no_catalog_card"
         },
         {
@@ -7151,9 +7249,11 @@
     {
       "repository": "https://github.com/fasiondog/hikyuu",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -7162,6 +7262,20 @@
           "pointer": "/candidates/137",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/107",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/347",
+          "decision": "outside_north_star",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
         }
       ]
     },
@@ -7225,7 +7339,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/102",
+          "pointer": "/stars/108",
           "disposition": "no_catalog_card"
         },
         {
@@ -7268,7 +7382,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/103",
+          "pointer": "/stars/109",
           "disposition": "catalog_reviewed"
         },
         {
@@ -7342,7 +7456,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/104",
+          "pointer": "/stars/110",
           "disposition": "no_catalog_card"
         },
         {
@@ -7412,7 +7526,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/105",
+          "pointer": "/stars/111",
           "disposition": "no_catalog_card"
         },
         {
@@ -7454,7 +7568,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/106",
+          "pointer": "/stars/112",
           "disposition": "no_catalog_card"
         },
         {
@@ -7479,7 +7593,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/107",
+          "pointer": "/stars/113",
           "disposition": "no_catalog_card"
         },
         {
@@ -7504,7 +7618,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/108",
+          "pointer": "/stars/114",
           "disposition": "no_catalog_card"
         },
         {
@@ -7580,7 +7694,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/109",
+          "pointer": "/stars/115",
           "disposition": "no_catalog_card"
         },
         {
@@ -7622,7 +7736,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/110",
+          "pointer": "/stars/116",
           "disposition": "no_catalog_card"
         },
         {
@@ -7663,7 +7777,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/111",
+          "pointer": "/stars/117",
           "disposition": "no_catalog_card"
         },
         {
@@ -7826,7 +7940,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/112",
+          "pointer": "/stars/118",
           "disposition": "no_catalog_card"
         },
         {
@@ -8022,7 +8136,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/113",
+          "pointer": "/stars/119",
           "disposition": "catalog_reviewed"
         },
         {
@@ -8112,7 +8226,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/114",
+          "pointer": "/stars/120",
           "disposition": "no_catalog_card"
         },
         {
@@ -8161,7 +8275,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/115",
+          "pointer": "/stars/121",
           "disposition": "catalog_reviewed"
         },
         {
@@ -8263,7 +8377,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/116",
+          "pointer": "/stars/122",
           "disposition": "no_catalog_card"
         },
         {
@@ -8339,7 +8453,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/117",
+          "pointer": "/stars/123",
           "disposition": "no_catalog_card"
         },
         {
@@ -8364,7 +8478,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/118",
+          "pointer": "/stars/124",
           "disposition": "no_catalog_card"
         },
         {
@@ -8406,7 +8520,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/119",
+          "pointer": "/stars/125",
           "disposition": "no_catalog_card"
         },
         {
@@ -8432,7 +8546,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/120",
+          "pointer": "/stars/126",
           "disposition": "catalog_reviewed"
         },
         {
@@ -8465,7 +8579,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/121",
+          "pointer": "/stars/127",
           "disposition": "no_catalog_card"
         },
         {
@@ -8683,7 +8797,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/122",
+          "pointer": "/stars/128",
           "disposition": "no_catalog_card"
         },
         {
@@ -8708,7 +8822,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/123",
+          "pointer": "/stars/129",
           "disposition": "no_catalog_card"
         },
         {
@@ -8750,7 +8864,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/124",
+          "pointer": "/stars/130",
           "disposition": "no_catalog_card"
         },
         {
@@ -8839,7 +8953,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/125",
+          "pointer": "/stars/131",
           "disposition": "catalog_reviewed"
         },
         {
@@ -8928,7 +9042,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/126",
+          "pointer": "/stars/132",
           "disposition": "no_catalog_card"
         },
         {
@@ -8953,7 +9067,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/127",
+          "pointer": "/stars/133",
           "disposition": "no_catalog_card"
         },
         {
@@ -8978,7 +9092,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/128",
+          "pointer": "/stars/134",
           "disposition": "no_catalog_card"
         },
         {
@@ -9003,7 +9117,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/129",
+          "pointer": "/stars/135",
           "disposition": "no_catalog_card"
         },
         {
@@ -9067,7 +9181,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/130",
+          "pointer": "/stars/136",
           "disposition": "no_catalog_card"
         },
         {
@@ -9100,7 +9214,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/131",
+          "pointer": "/stars/137",
           "disposition": "no_catalog_card"
         },
         {
@@ -9133,7 +9247,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/132",
+          "pointer": "/stars/138",
           "disposition": "no_catalog_card"
         },
         {
@@ -9337,7 +9451,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/133",
+          "pointer": "/stars/139",
           "disposition": "no_catalog_card"
         },
         {
@@ -9497,7 +9611,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/134",
+          "pointer": "/stars/140",
           "disposition": "no_catalog_card"
         },
         {
@@ -9522,7 +9636,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/135",
+          "pointer": "/stars/141",
           "disposition": "no_catalog_card"
         },
         {
@@ -9590,7 +9704,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/136",
+          "pointer": "/stars/142",
           "disposition": "catalog_reviewed"
         },
         {
@@ -9784,7 +9898,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/137",
+          "pointer": "/stars/143",
           "disposition": "baseline_record"
         },
         {
@@ -9800,6 +9914,31 @@
           "path": "manifests/stack.json",
           "pointer": "/components/7",
           "id": "claude-hud"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/jarrodwatts/jev-trader",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/144",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/348",
+          "decision": "outside_north_star",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         }
       ]
     },
@@ -9821,7 +9960,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/138",
+          "pointer": "/stars/145",
           "disposition": "no_catalog_card"
         },
         {
@@ -9873,7 +10012,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/139",
+          "pointer": "/stars/146",
           "disposition": "no_catalog_card"
         },
         {
@@ -10000,7 +10139,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/140",
+          "pointer": "/stars/147",
           "disposition": "no_catalog_card"
         },
         {
@@ -10061,7 +10200,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/141",
+          "pointer": "/stars/148",
           "disposition": "no_catalog_card"
         },
         {
@@ -10132,7 +10271,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/142",
+          "pointer": "/stars/149",
           "disposition": "no_catalog_card"
         },
         {
@@ -10157,7 +10296,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/143",
+          "pointer": "/stars/150",
           "disposition": "no_catalog_card"
         },
         {
@@ -10222,7 +10361,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/144",
+          "pointer": "/stars/151",
           "disposition": "no_catalog_card"
         },
         {
@@ -10255,7 +10394,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/145",
+          "pointer": "/stars/152",
           "disposition": "baseline_record"
         },
         {
@@ -10286,7 +10425,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/146",
+          "pointer": "/stars/153",
           "disposition": "no_catalog_card"
         },
         {
@@ -10351,7 +10490,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/147",
+          "pointer": "/stars/154",
           "disposition": "catalog_reviewed"
         },
         {
@@ -10409,7 +10548,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/148",
+          "pointer": "/stars/155",
           "disposition": "no_catalog_card"
         },
         {
@@ -10451,7 +10590,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/149",
+          "pointer": "/stars/156",
           "disposition": "no_catalog_card"
         },
         {
@@ -10476,7 +10615,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/150",
+          "pointer": "/stars/157",
           "disposition": "no_catalog_card"
         },
         {
@@ -10524,7 +10663,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/151",
+          "pointer": "/stars/158",
           "disposition": "no_catalog_card"
         },
         {
@@ -10600,7 +10739,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/152",
+          "pointer": "/stars/159",
           "disposition": "no_catalog_card"
         },
         {
@@ -10728,7 +10867,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/153",
+          "pointer": "/stars/160",
           "disposition": "no_catalog_card"
         },
         {
@@ -10840,7 +10979,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/154",
+          "pointer": "/stars/161",
           "disposition": "no_catalog_card"
         },
         {
@@ -10865,7 +11004,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/155",
+          "pointer": "/stars/162",
           "disposition": "no_catalog_card"
         },
         {
@@ -10916,7 +11055,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/156",
+          "pointer": "/stars/163",
           "disposition": "no_catalog_card"
         },
         {
@@ -10975,7 +11114,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/157",
+          "pointer": "/stars/164",
           "disposition": "no_catalog_card"
         },
         {
@@ -11017,7 +11156,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/158",
+          "pointer": "/stars/165",
           "disposition": "no_catalog_card"
         },
         {
@@ -11137,7 +11276,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/159",
+          "pointer": "/stars/166",
           "disposition": "no_catalog_card"
         },
         {
@@ -11162,7 +11301,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/160",
+          "pointer": "/stars/167",
           "disposition": "no_catalog_card"
         },
         {
@@ -11187,7 +11326,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/161",
+          "pointer": "/stars/168",
           "disposition": "no_catalog_card"
         },
         {
@@ -11236,7 +11375,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/162",
+          "pointer": "/stars/169",
           "disposition": "no_catalog_card"
         },
         {
@@ -11269,7 +11408,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/163",
+          "pointer": "/stars/170",
           "disposition": "no_catalog_card"
         },
         {
@@ -11294,7 +11433,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/164",
+          "pointer": "/stars/171",
           "disposition": "no_catalog_card"
         },
         {
@@ -11336,7 +11475,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/165",
+          "pointer": "/stars/172",
           "disposition": "no_catalog_card"
         },
         {
@@ -11363,7 +11502,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/166",
+          "pointer": "/stars/173",
           "disposition": "no_catalog_card"
         },
         {
@@ -11405,7 +11544,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/167",
+          "pointer": "/stars/174",
           "disposition": "no_catalog_card"
         },
         {
@@ -11470,7 +11609,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/168",
+          "pointer": "/stars/175",
           "disposition": "catalog_reviewed"
         },
         {
@@ -11520,7 +11659,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/169",
+          "pointer": "/stars/176",
           "disposition": "no_catalog_card"
         },
         {
@@ -11545,7 +11684,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/170",
+          "pointer": "/stars/177",
           "disposition": "no_catalog_card"
         },
         {
@@ -11587,7 +11726,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/171",
+          "pointer": "/stars/178",
           "disposition": "no_catalog_card"
         },
         {
@@ -11807,7 +11946,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/172",
+          "pointer": "/stars/179",
           "disposition": "no_catalog_card"
         },
         {
@@ -11846,7 +11985,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/173",
+          "pointer": "/stars/180",
           "disposition": "baseline_record"
         },
         {
@@ -11894,7 +12033,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/174",
+          "pointer": "/stars/181",
           "disposition": "no_catalog_card"
         },
         {
@@ -11961,7 +12100,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/175",
+          "pointer": "/stars/182",
           "disposition": "catalog_reviewed"
         },
         {
@@ -12060,7 +12199,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/176",
+          "pointer": "/stars/183",
           "disposition": "catalog_reviewed"
         },
         {
@@ -12219,7 +12358,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/177",
+          "pointer": "/stars/184",
           "disposition": "catalog_reviewed"
         },
         {
@@ -12335,7 +12474,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/178",
+          "pointer": "/stars/185",
           "disposition": "no_catalog_card"
         },
         {
@@ -12465,7 +12604,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/179",
+          "pointer": "/stars/186",
           "disposition": "no_catalog_card"
         },
         {
@@ -12473,6 +12612,31 @@
           "path": "catalogs/us-equities/star-audit.json",
           "pointer": "/entries/168",
           "decision": "targeted_candidate",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/mighty-alien/ai-trader-bot",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/187",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/349",
+          "decision": "reject_security_risk",
           "review_level": "source_review",
           "review_depth": "selected_primary_files"
         }
@@ -12507,7 +12671,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/180",
+          "pointer": "/stars/188",
           "disposition": "no_catalog_card"
         },
         {
@@ -12549,7 +12713,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/181",
+          "pointer": "/stars/189",
           "disposition": "no_catalog_card"
         },
         {
@@ -12627,7 +12791,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/182",
+          "pointer": "/stars/190",
           "disposition": "catalog_reviewed"
         },
         {
@@ -12724,7 +12888,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/183",
+          "pointer": "/stars/191",
           "disposition": "catalog_reviewed"
         },
         {
@@ -12834,7 +12998,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/184",
+          "pointer": "/stars/192",
           "disposition": "no_catalog_card"
         },
         {
@@ -12876,7 +13040,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/185",
+          "pointer": "/stars/193",
           "disposition": "no_catalog_card"
         },
         {
@@ -12901,7 +13065,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/186",
+          "pointer": "/stars/194",
           "disposition": "no_catalog_card"
         },
         {
@@ -12961,7 +13125,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/187",
+          "pointer": "/stars/195",
           "disposition": "no_catalog_card"
         },
         {
@@ -13003,7 +13167,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/188",
+          "pointer": "/stars/196",
           "disposition": "no_catalog_card"
         },
         {
@@ -13028,7 +13192,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/189",
+          "pointer": "/stars/197",
           "disposition": "no_catalog_card"
         },
         {
@@ -13070,7 +13234,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/190",
+          "pointer": "/stars/198",
           "disposition": "no_catalog_card"
         },
         {
@@ -13095,7 +13259,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/191",
+          "pointer": "/stars/199",
           "disposition": "no_catalog_card"
         },
         {
@@ -13128,7 +13292,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/192",
+          "pointer": "/stars/200",
           "disposition": "no_catalog_card"
         },
         {
@@ -13170,7 +13334,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/193",
+          "pointer": "/stars/201",
           "disposition": "no_catalog_card"
         },
         {
@@ -13260,7 +13424,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/194",
+          "pointer": "/stars/202",
           "disposition": "catalog_reviewed"
         },
         {
@@ -13417,7 +13581,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/195",
+          "pointer": "/stars/203",
           "disposition": "no_catalog_card"
         },
         {
@@ -13449,7 +13613,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/196",
+          "pointer": "/stars/204",
           "disposition": "no_catalog_card"
         },
         {
@@ -13474,7 +13638,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/197",
+          "pointer": "/stars/205",
           "disposition": "no_catalog_card"
         },
         {
@@ -13499,7 +13663,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/198",
+          "pointer": "/stars/206",
           "disposition": "no_catalog_card"
         },
         {
@@ -13635,7 +13799,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/199",
+          "pointer": "/stars/207",
           "disposition": "no_catalog_card"
         },
         {
@@ -13660,7 +13824,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/200",
+          "pointer": "/stars/208",
           "disposition": "no_catalog_card"
         },
         {
@@ -13685,7 +13849,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/201",
+          "pointer": "/stars/209",
           "disposition": "no_catalog_card"
         },
         {
@@ -13710,7 +13874,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/202",
+          "pointer": "/stars/210",
           "disposition": "no_catalog_card"
         },
         {
@@ -13752,7 +13916,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/203",
+          "pointer": "/stars/211",
           "disposition": "no_catalog_card"
         },
         {
@@ -13785,7 +13949,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/204",
+          "pointer": "/stars/212",
           "disposition": "no_catalog_card"
         },
         {
@@ -13810,7 +13974,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/205",
+          "pointer": "/stars/213",
           "disposition": "no_catalog_card"
         },
         {
@@ -13843,7 +14007,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/206",
+          "pointer": "/stars/214",
           "disposition": "no_catalog_card"
         },
         {
@@ -13868,7 +14032,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/207",
+          "pointer": "/stars/215",
           "disposition": "no_catalog_card"
         },
         {
@@ -13901,7 +14065,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/208",
+          "pointer": "/stars/216",
           "disposition": "no_catalog_card"
         },
         {
@@ -13944,7 +14108,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/209",
+          "pointer": "/stars/217",
           "disposition": "no_catalog_card"
         },
         {
@@ -13977,7 +14141,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/210",
+          "pointer": "/stars/218",
           "disposition": "no_catalog_card"
         },
         {
@@ -14002,7 +14166,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/211",
+          "pointer": "/stars/219",
           "disposition": "no_catalog_card"
         },
         {
@@ -14045,7 +14209,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/212",
+          "pointer": "/stars/220",
           "disposition": "no_catalog_card"
         },
         {
@@ -14077,7 +14241,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/213",
+          "pointer": "/stars/221",
           "disposition": "no_catalog_card"
         },
         {
@@ -14102,7 +14266,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/214",
+          "pointer": "/stars/222",
           "disposition": "no_catalog_card"
         },
         {
@@ -14352,7 +14516,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/215",
+          "pointer": "/stars/223",
           "disposition": "baseline_record"
         },
         {
@@ -14440,7 +14604,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/216",
+          "pointer": "/stars/224",
           "disposition": "catalog_reviewed"
         },
         {
@@ -14465,7 +14629,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/217",
+          "pointer": "/stars/225",
           "disposition": "no_catalog_card"
         },
         {
@@ -14515,7 +14679,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/218",
+          "pointer": "/stars/226",
           "disposition": "no_catalog_card"
         },
         {
@@ -14683,7 +14847,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/219",
+          "pointer": "/stars/227",
           "disposition": "no_catalog_card"
         },
         {
@@ -14759,7 +14923,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/220",
+          "pointer": "/stars/228",
           "disposition": "no_catalog_card"
         },
         {
@@ -14962,7 +15126,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/221",
+          "pointer": "/stars/229",
           "disposition": "catalog_reviewed"
         },
         {
@@ -15001,7 +15165,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/222",
+          "pointer": "/stars/230",
           "disposition": "no_catalog_card"
         },
         {
@@ -15026,7 +15190,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/223",
+          "pointer": "/stars/231",
           "disposition": "no_catalog_card"
         },
         {
@@ -15075,7 +15239,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/224",
+          "pointer": "/stars/232",
           "disposition": "no_catalog_card"
         },
         {
@@ -15100,7 +15264,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/225",
+          "pointer": "/stars/233",
           "disposition": "no_catalog_card"
         },
         {
@@ -15125,7 +15289,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/226",
+          "pointer": "/stars/234",
           "disposition": "no_catalog_card"
         },
         {
@@ -15226,7 +15390,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/227",
+          "pointer": "/stars/235",
           "disposition": "no_catalog_card"
         },
         {
@@ -15251,7 +15415,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/228",
+          "pointer": "/stars/236",
           "disposition": "no_catalog_card"
         },
         {
@@ -15276,7 +15440,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/229",
+          "pointer": "/stars/237",
           "disposition": "no_catalog_card"
         },
         {
@@ -15309,7 +15473,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/230",
+          "pointer": "/stars/238",
           "disposition": "no_catalog_card"
         },
         {
@@ -15351,7 +15515,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/231",
+          "pointer": "/stars/239",
           "disposition": "no_catalog_card"
         },
         {
@@ -15442,7 +15606,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/232",
+          "pointer": "/stars/240",
           "disposition": "no_catalog_card"
         },
         {
@@ -15467,7 +15631,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/233",
+          "pointer": "/stars/241",
           "disposition": "no_catalog_card"
         },
         {
@@ -15631,7 +15795,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/234",
+          "pointer": "/stars/242",
           "disposition": "catalog_reviewed"
         },
         {
@@ -15655,10 +15819,12 @@
     {
       "repository": "https://github.com/polakowo/vectorbt",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
         "catalog_card",
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -15707,6 +15873,12 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/243",
+          "disposition": "catalog_reviewed"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/5",
@@ -15721,6 +15893,14 @@
           "id": "mover-v3-vectorbt-recheck",
           "decision": "no_change_existing_card_current",
           "evidence_level": "live_repository_metadata"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/350",
+          "decision": "already_covered",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
         }
       ]
     },
@@ -15776,7 +15956,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/235",
+          "pointer": "/stars/244",
           "disposition": "no_catalog_card"
         },
         {
@@ -15889,7 +16069,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/236",
+          "pointer": "/stars/245",
           "disposition": "catalog_reviewed"
         },
         {
@@ -15914,7 +16094,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/237",
+          "pointer": "/stars/246",
           "disposition": "no_catalog_card"
         },
         {
@@ -16100,7 +16280,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/238",
+          "pointer": "/stars/247",
           "disposition": "catalog_reviewed"
         },
         {
@@ -16165,7 +16345,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/239",
+          "pointer": "/stars/248",
           "disposition": "no_catalog_card"
         },
         {
@@ -16199,7 +16379,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/240",
+          "pointer": "/stars/249",
           "disposition": "no_catalog_card"
         },
         {
@@ -16249,16 +16429,16 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/241",
+          "pointer": "/stars/250",
           "disposition": "no_catalog_card"
         },
         {
           "kind": "star_review",
           "path": "catalogs/us-equities/star-audit.json",
           "pointer": "/entries/209",
-          "decision": "targeted_candidate",
+          "decision": "overlaps_established",
           "review_level": "source_review",
-          "review_depth": "selected_primary_files"
+          "review_depth": "readme_license_overview"
         }
       ]
     },
@@ -16366,7 +16546,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/242",
+          "pointer": "/stars/251",
           "disposition": "no_catalog_card"
         },
         {
@@ -16474,11 +16654,13 @@
     {
       "repository": "https://github.com/quantconnect/lean",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
         "catalog_card",
         "component_record",
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -16534,6 +16716,12 @@
           "evidence_level": "retained_prior_native_acceptance"
         },
         {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/252",
+          "disposition": "catalog_reviewed"
+        },
+        {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/data-readiness-review.json",
           "pointer": "/decisions/1",
@@ -16554,6 +16742,14 @@
           "pointer": "/decisions/4",
           "decision": "retain_selected_map_semantics_with_coverage_guard",
           "evidence_level": "source_sections_reviewed"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/351",
+          "decision": "already_covered",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
         },
         {
           "kind": "component_record",
@@ -16793,7 +16989,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/243",
+          "pointer": "/stars/253",
           "disposition": "no_catalog_card"
         },
         {
@@ -17151,7 +17347,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/244",
+          "pointer": "/stars/254",
           "disposition": "no_catalog_card"
         },
         {
@@ -17279,7 +17475,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/245",
+          "pointer": "/stars/255",
           "disposition": "catalog_reviewed"
         },
         {
@@ -17310,7 +17506,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/246",
+          "pointer": "/stars/256",
           "disposition": "no_catalog_card"
         },
         {
@@ -17349,9 +17545,11 @@
     {
       "repository": "https://github.com/ricequant/rqalpha",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -17360,6 +17558,20 @@
           "pointer": "/candidates/334",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/257",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/352",
+          "decision": "outside_north_star",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
         }
       ]
     },
@@ -17375,7 +17587,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/247",
+          "pointer": "/stars/258",
           "disposition": "no_catalog_card"
         },
         {
@@ -17442,7 +17654,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/248",
+          "pointer": "/stars/259",
           "disposition": "no_catalog_card"
         },
         {
@@ -17467,7 +17679,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/249",
+          "pointer": "/stars/260",
           "disposition": "no_catalog_card"
         },
         {
@@ -17526,7 +17738,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/250",
+          "pointer": "/stars/261",
           "disposition": "no_catalog_card"
         },
         {
@@ -17551,7 +17763,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/251",
+          "pointer": "/stars/262",
           "disposition": "no_catalog_card"
         },
         {
@@ -17624,7 +17836,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/252",
+          "pointer": "/stars/263",
           "disposition": "catalog_reviewed"
         },
         {
@@ -17725,7 +17937,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/253",
+          "pointer": "/stars/264",
           "disposition": "no_catalog_card"
         },
         {
@@ -17887,7 +18099,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/254",
+          "pointer": "/stars/265",
           "disposition": "no_catalog_card"
         },
         {
@@ -17912,7 +18124,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/255",
+          "pointer": "/stars/266",
           "disposition": "no_catalog_card"
         },
         {
@@ -17937,7 +18149,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/256",
+          "pointer": "/stars/267",
           "disposition": "no_catalog_card"
         },
         {
@@ -17980,7 +18192,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/257",
+          "pointer": "/stars/268",
           "disposition": "no_catalog_card"
         },
         {
@@ -18087,7 +18299,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/258",
+          "pointer": "/stars/269",
           "disposition": "baseline_record"
         },
         {
@@ -18118,7 +18330,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/259",
+          "pointer": "/stars/270",
           "disposition": "no_catalog_card"
         },
         {
@@ -18143,7 +18355,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/260",
+          "pointer": "/stars/271",
           "disposition": "no_catalog_card"
         },
         {
@@ -18168,7 +18380,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/261",
+          "pointer": "/stars/272",
           "disposition": "no_catalog_card"
         },
         {
@@ -18193,7 +18405,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/262",
+          "pointer": "/stars/273",
           "disposition": "no_catalog_card"
         },
         {
@@ -18218,7 +18430,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/263",
+          "pointer": "/stars/274",
           "disposition": "no_catalog_card"
         },
         {
@@ -18251,7 +18463,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/264",
+          "pointer": "/stars/275",
           "disposition": "no_catalog_card"
         },
         {
@@ -18382,7 +18594,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/265",
+          "pointer": "/stars/276",
           "disposition": "no_catalog_card"
         },
         {
@@ -18407,7 +18619,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/266",
+          "pointer": "/stars/277",
           "disposition": "no_catalog_card"
         },
         {
@@ -18432,7 +18644,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/267",
+          "pointer": "/stars/278",
           "disposition": "no_catalog_card"
         },
         {
@@ -18613,7 +18825,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/268",
+          "pointer": "/stars/279",
           "disposition": "no_catalog_card"
         },
         {
@@ -18725,7 +18937,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/269",
+          "pointer": "/stars/280",
           "disposition": "no_catalog_card"
         },
         {
@@ -18869,9 +19081,11 @@
     {
       "repository": "https://github.com/stefan-jansen/machine-learning-for-trading",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -18880,6 +19094,20 @@
           "pointer": "/candidates/370",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/281",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/353",
+          "decision": "overlaps_established",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
         }
       ]
     },
@@ -19049,7 +19277,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/270",
+          "pointer": "/stars/282",
           "disposition": "no_catalog_card"
         },
         {
@@ -19121,6 +19349,31 @@
       ]
     },
     {
+      "repository": "https://github.com/supabase/supabase",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/283",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/354",
+          "decision": "outside_north_star",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/superclaude-org/superclaude_framework",
       "aliases": [],
       "public_star": true,
@@ -19132,7 +19385,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/271",
+          "pointer": "/stars/284",
           "disposition": "no_catalog_card"
         },
         {
@@ -19184,7 +19437,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/272",
+          "pointer": "/stars/285",
           "disposition": "catalog_reviewed"
         },
         {
@@ -19217,7 +19470,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/273",
+          "pointer": "/stars/286",
           "disposition": "no_catalog_card"
         },
         {
@@ -19389,7 +19642,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/274",
+          "pointer": "/stars/287",
           "disposition": "catalog_reviewed"
         },
         {
@@ -19504,7 +19757,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/275",
+          "pointer": "/stars/288",
           "disposition": "no_catalog_card"
         },
         {
@@ -19654,7 +19907,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/276",
+          "pointer": "/stars/289",
           "disposition": "catalog_reviewed"
         },
         {
@@ -19693,7 +19946,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/277",
+          "pointer": "/stars/290",
           "disposition": "no_catalog_card"
         },
         {
@@ -19718,7 +19971,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/278",
+          "pointer": "/stars/291",
           "disposition": "no_catalog_card"
         },
         {
@@ -19883,7 +20136,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/279",
+          "pointer": "/stars/292",
           "disposition": "catalog_reviewed"
         },
         {
@@ -19922,7 +20175,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/280",
+          "pointer": "/stars/293",
           "disposition": "no_catalog_card"
         },
         {
@@ -19964,7 +20217,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/281",
+          "pointer": "/stars/294",
           "disposition": "no_catalog_card"
         },
         {
@@ -20031,7 +20284,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/282",
+          "pointer": "/stars/295",
           "disposition": "no_catalog_card"
         },
         {
@@ -20056,7 +20309,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/283",
+          "pointer": "/stars/296",
           "disposition": "no_catalog_card"
         },
         {
@@ -20169,7 +20422,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/284",
+          "pointer": "/stars/297",
           "disposition": "catalog_reviewed"
         },
         {
@@ -20236,7 +20489,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/285",
+          "pointer": "/stars/298",
           "disposition": "catalog_reviewed"
         },
         {
@@ -20275,7 +20528,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/286",
+          "pointer": "/stars/299",
           "disposition": "no_catalog_card"
         },
         {
@@ -20323,6 +20576,31 @@
       ]
     },
     {
+      "repository": "https://github.com/traderalice/openalice",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/300",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/355",
+          "decision": "alternative",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/tradermonty/claude-trading-skills",
       "aliases": [],
       "public_star": true,
@@ -20335,7 +20613,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/287",
+          "pointer": "/stars/301",
           "disposition": "no_catalog_card"
         },
         {
@@ -20367,7 +20645,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/288",
+          "pointer": "/stars/302",
           "disposition": "no_catalog_card"
         },
         {
@@ -20406,7 +20684,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/289",
+          "pointer": "/stars/303",
           "disposition": "no_catalog_card"
         },
         {
@@ -20549,9 +20827,11 @@
     {
       "repository": "https://github.com/trycua/cua",
       "aliases": [],
-      "public_star": false,
+      "public_star": true,
       "record_types": [
-        "research_supplement"
+        "public_star",
+        "research_supplement",
+        "star_review"
       ],
       "references": [
         {
@@ -20567,6 +20847,20 @@
           "decision": "targeted_candidate",
           "review_level": "source_review",
           "review_depth": "selected_primary_files"
+        },
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/304",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/356",
+          "decision": "targeted_candidate",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
         }
       ]
     },
@@ -20622,7 +20916,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/290",
+          "pointer": "/stars/305",
           "disposition": "no_catalog_card"
         },
         {
@@ -20647,7 +20941,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/291",
+          "pointer": "/stars/306",
           "disposition": "no_catalog_card"
         },
         {
@@ -20673,7 +20967,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/292",
+          "pointer": "/stars/307",
           "disposition": "no_catalog_card"
         },
         {
@@ -20705,7 +20999,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/293",
+          "pointer": "/stars/308",
           "disposition": "no_catalog_card"
         },
         {
@@ -20832,7 +21126,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/294",
+          "pointer": "/stars/309",
           "disposition": "no_catalog_card"
         },
         {
@@ -20857,7 +21151,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/295",
+          "pointer": "/stars/310",
           "disposition": "no_catalog_card"
         },
         {
@@ -20944,7 +21238,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/296",
+          "pointer": "/stars/311",
           "disposition": "no_catalog_card"
         },
         {
@@ -20990,7 +21284,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/297",
+          "pointer": "/stars/312",
           "disposition": "no_catalog_card"
         },
         {
@@ -21092,7 +21386,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/298",
+          "pointer": "/stars/313",
           "disposition": "no_catalog_card"
         },
         {
@@ -21134,7 +21428,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/299",
+          "pointer": "/stars/314",
           "disposition": "no_catalog_card"
         },
         {
@@ -21176,7 +21470,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/300",
+          "pointer": "/stars/315",
           "disposition": "no_catalog_card"
         },
         {
@@ -21219,7 +21513,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/301",
+          "pointer": "/stars/316",
           "disposition": "catalog_reviewed"
         },
         {
@@ -21280,7 +21574,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/302",
+          "pointer": "/stars/317",
           "disposition": "catalog_reviewed"
         },
         {
@@ -21319,7 +21613,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/303",
+          "pointer": "/stars/318",
           "disposition": "no_catalog_card"
         },
         {
@@ -21344,7 +21638,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/304",
+          "pointer": "/stars/319",
           "disposition": "no_catalog_card"
         },
         {
@@ -21437,7 +21731,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/305",
+          "pointer": "/stars/320",
           "disposition": "no_catalog_card"
         },
         {
@@ -21536,7 +21830,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/306",
+          "pointer": "/stars/321",
           "disposition": "no_catalog_card"
         },
         {
@@ -21569,7 +21863,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/307",
+          "pointer": "/stars/322",
           "disposition": "no_catalog_card"
         },
         {
@@ -21595,7 +21889,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/308",
+          "pointer": "/stars/323",
           "disposition": "catalog_reviewed"
         },
         {
@@ -21628,7 +21922,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/309",
+          "pointer": "/stars/324",
           "disposition": "no_catalog_card"
         },
         {
@@ -21653,7 +21947,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/310",
+          "pointer": "/stars/325",
           "disposition": "no_catalog_card"
         },
         {
@@ -21800,7 +22094,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/311",
+          "pointer": "/stars/326",
           "disposition": "catalog_reviewed"
         },
         {
@@ -21839,7 +22133,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/312",
+          "pointer": "/stars/327",
           "disposition": "no_catalog_card"
         },
         {
@@ -21879,7 +22173,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/313",
+          "pointer": "/stars/328",
           "disposition": "no_catalog_card"
         },
         {
@@ -21904,7 +22198,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/314",
+          "pointer": "/stars/329",
           "disposition": "no_catalog_card"
         },
         {
@@ -21929,7 +22223,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/315",
+          "pointer": "/stars/330",
           "disposition": "no_catalog_card"
         },
         {
@@ -21954,7 +22248,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/316",
+          "pointer": "/stars/331",
           "disposition": "no_catalog_card"
         },
         {
@@ -22013,7 +22307,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/317",
+          "pointer": "/stars/332",
           "disposition": "no_catalog_card"
         },
         {
@@ -22046,7 +22340,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/318",
+          "pointer": "/stars/333",
           "disposition": "no_catalog_card"
         },
         {
@@ -22071,7 +22365,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/319",
+          "pointer": "/stars/334",
           "disposition": "no_catalog_card"
         },
         {
@@ -22096,7 +22390,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/320",
+          "pointer": "/stars/335",
           "disposition": "no_catalog_card"
         },
         {
@@ -22121,7 +22415,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/321",
+          "pointer": "/stars/336",
           "disposition": "no_catalog_card"
         },
         {
@@ -22163,7 +22457,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/322",
+          "pointer": "/stars/337",
           "disposition": "no_catalog_card"
         },
         {
@@ -22239,7 +22533,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/323",
+          "pointer": "/stars/338",
           "disposition": "no_catalog_card"
         },
         {
@@ -22295,7 +22589,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/324",
+          "pointer": "/stars/339",
           "disposition": "no_catalog_card"
         },
         {
@@ -22378,7 +22672,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/325",
+          "pointer": "/stars/340",
           "disposition": "no_catalog_card"
         },
         {
@@ -22420,7 +22714,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/326",
+          "pointer": "/stars/341",
           "disposition": "no_catalog_card"
         },
         {
@@ -22445,7 +22739,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/327",
+          "pointer": "/stars/342",
           "disposition": "no_catalog_card"
         },
         {
@@ -22471,7 +22765,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/328",
+          "pointer": "/stars/343",
           "disposition": "catalog_reviewed"
         },
         {
@@ -22504,7 +22798,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/329",
+          "pointer": "/stars/344",
           "disposition": "no_catalog_card"
         },
         {
@@ -22545,7 +22839,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/330",
+          "pointer": "/stars/345",
           "disposition": "catalog_reviewed"
         },
         {
@@ -22584,7 +22878,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/331",
+          "pointer": "/stars/346",
           "disposition": "no_catalog_card"
         },
         {
@@ -22609,7 +22903,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/332",
+          "pointer": "/stars/347",
           "disposition": "no_catalog_card"
         },
         {
@@ -22634,7 +22928,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/333",
+          "pointer": "/stars/348",
           "disposition": "no_catalog_card"
         },
         {
@@ -22659,7 +22953,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/334",
+          "pointer": "/stars/349",
           "disposition": "no_catalog_card"
         },
         {
@@ -22721,7 +23015,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/335",
+          "pointer": "/stars/350",
           "disposition": "no_catalog_card"
         },
         {
@@ -22746,7 +23040,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/336",
+          "pointer": "/stars/351",
           "disposition": "no_catalog_card"
         },
         {
@@ -22771,7 +23065,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/337",
+          "pointer": "/stars/352",
           "disposition": "no_catalog_card"
         },
         {
@@ -22796,7 +23090,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/338",
+          "pointer": "/stars/353",
           "disposition": "no_catalog_card"
         },
         {
@@ -22822,7 +23116,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/339",
+          "pointer": "/stars/354",
           "disposition": "no_catalog_card"
         },
         {
@@ -22862,7 +23156,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/340",
+          "pointer": "/stars/355",
           "disposition": "no_catalog_card"
         },
         {
@@ -22946,7 +23240,7 @@
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
-          "pointer": "/stars/341",
+          "pointer": "/stars/356",
           "disposition": "no_catalog_card"
         },
         {

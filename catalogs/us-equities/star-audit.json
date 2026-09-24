@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-19",
-  "scope": "Decision coverage of every public repository in the latest 342-star snapshot; the earlier 337-star review remains a dated baseline. This is not a claim of exhaustive ecosystem discovery, full code/security audit, installation, performance superiority or profitable trading.",
+  "scope": "Decision coverage of every repository in the latest 357-star snapshot (2026-09-24 authenticated refresh, all public); the earlier 342-star and 337-star reviews remain dated baselines. This is not a claim of exhaustive ecosystem discovery, full code/security audit, installation, performance superiority or profitable trading.",
   "method": {
-    "discovery": "Latest discovery uses the paginated public users/seathatflowsinourveins/starred endpoint recorded in latest_public_refresh: 342 public repositories, five additions and no removals. Private-star inventory was not observed by this refresh.",
+    "discovery": "Latest discovery (2026-09-24) uses the authenticated user/starred endpoint with the star+json media type, recorded in latest_public_refresh: 357 repositories, 15 additions since the 342-row public snapshot and no removals. All 357 are public: the 342 earlier identities came from the public endpoint and a GraphQL check confirmed the 15 additions are public. The 342-row snapshot (2026-09-20) used the paginated public users/seathatflowsinourveins/starred endpoint and added five repositories to the 337-row baseline.",
     "baseline_discovery": "Earlier 2026-09-19 337-star audit: native GitHub CLI paginated authenticated starred endpoint with star+json media type; private flag checked before inclusion. That repository set matched its prior snapshot.",
-    "source_capture": "For each previously unassessed public repository, resolve default-branch HEAD, then request README and license at that commit. One oversized README used a successful raw-media fallback. Full captures remain private; only typed conclusions and public source links are published.",
-    "review": "Individually authored dispositions after primary README purpose/heading and license-declaration inspection. Selected candidates received additional documentation/API/source-section inspection. Mechanical excerpt selection was used to bound reading; no keyword score made the decisions.",
+    "source_capture": "For each previously unassessed public repository, resolve default-branch HEAD, then request README and license at that commit. One oversized README used a successful raw-media fallback. Full captures remain private; only typed conclusions and public source links are published. The 2026-09-24 refresh resolved default-branch HEAD for each addition and for six re-reviewed targeted candidates, then read the files listed per entry at that commit; release and package-index metadata were checked where an entry says so.",
+    "review": "Individually authored dispositions after primary README purpose/heading and license-declaration inspection. Selected candidates received additional documentation/API/source-section inspection. Mechanical excerpt selection was used to bound reading; no keyword score made the decisions. The 2026-09-24 reviews also record a wiring verdict (wire_now, wire_after_acceptance, reference_only or do_not_wire) and any proposed acceptance case in each entry's limitations.",
     "depth_boundary": "readme_license_overview is a narrow source screen, not a deep review. selected_primary_files means only the enumerated sections were inspected; it does not certify the whole repository. prior_evidence_link retains earlier scope without re-review.",
-    "private_handling": "Only public repositories are included. No credentials, private account data, star-user timeline, private repository names, raw source cache or native session identifiers are published; the public GitHub username identifies the discovery endpoint.",
-    "runtime_boundary": "No new runtime/model/broker work in this audit. Existing native evidence remains in linked typed receipts.",
+    "private_handling": "Only public repositories are included. No credentials, private account data, star-user timeline, private repository names, raw source cache or native session identifiers are published; the public GitHub username identifies the discovery endpoint. The 2026-09-24 authenticated listing contained no private repository; per-repository star timestamps are not published.",
+    "runtime_boundary": "No new runtime/model/broker work in this audit. Existing native evidence remains in linked typed receipts. The 2026-09-24 refresh cloned, installed and executed nothing; proposed acceptance cases are unexecuted.",
     "source_pin_scope": "Default-branch source snapshots are not necessarily published releases or installed versions. Null source_date on prior evidence means no fresh commit-date lookup.",
     "decision_meanings": {
       "already_covered": "Existing catalog/baseline card retained; see its decision and evidence.",
@@ -18,37 +18,40 @@
       "alternative": "Credible conditional substitute or optional extension, not selected default.",
       "targeted_candidate": "A specific gap warrants a bounded future acceptance case; not installed or accepted by this label.",
       "obsolete_or_ineligible": "Deprecated, unavailable terms, incompatible scope or unjustified risk prevents current adoption.",
-      "inaccessible": "Primary evidence could not be retrieved; uncertainty retained."
-    }
+      "inaccessible": "Primary evidence could not be retrieved; uncertainty retained.",
+      "reject_security_risk": "Primary source shows a deceptive or fund-draining pattern; never install, deploy, fund or link it."
+    },
+    "date_scope": "Header checked_at stays equal to catalogs/us-equities/manifest.json checked_at (2026-09-19), as scripts/validate_catalogs.py requires for this audit, coverage.json and the four catalog files. The 2026-09-24 refresh date is in latest_public_refresh.checked_at_utc and its receipt, and each entry carries its own source pin and date."
   },
   "counts": {
-    "public_stars": 342,
+    "public_stars": 357,
     "private_stars_excluded": 0,
     "previously_covered": 51,
-    "new_source_dispositions": 291,
+    "new_source_dispositions": 306,
     "unassessed": 0,
     "by_review_level": {
-      "source_review": 291,
+      "source_review": 306,
       "prior_catalog": 41,
       "prior_baseline": 10
     },
     "by_review_depth": {
-      "readme_license_overview": 273,
+      "readme_license_overview": 280,
       "prior_evidence_link": 51,
-      "selected_primary_files": 18
+      "selected_primary_files": 26
     },
     "by_decision": {
-      "outside_north_star": 53,
-      "overlaps_established": 50,
-      "already_covered": 51,
-      "alternative": 156,
-      "targeted_candidate": 14,
-      "obsolete_or_ineligible": 13,
+      "outside_north_star": 57,
+      "overlaps_established": 52,
+      "already_covered": 55,
+      "alternative": 158,
+      "targeted_candidate": 13,
+      "obsolete_or_ineligible": 16,
       "defer_memory_workflow_overlap": 1,
       "defer_remote_operator_surface": 1,
       "catalog_macos_host_maintenance": 1,
       "catalog_network_client_only": 1,
-      "discovery_only": 1
+      "discovery_only": 1,
+      "reject_security_risk": 1
     }
   },
   "entries": [
@@ -851,47 +854,56 @@
       "layers": [
         "backtesting-mcp"
       ],
-      "rationale": "Potential bounded backtest tool for research agents; inspect tool permissions, input data and simulation outputs without replacing the accepted LEAN path or granting order access.",
+      "rationale": "Re-check at the identical pinned commit (unchanged since the 2026-09-19 audit; pushed_at still 2026-03-28) reconfirms four MCP tools (run_backtest, quick_backtest, fetch_market_data, list_strategies) with no order-submission tool, and the bundled US-stock sample config still carries a Taiwan-commission comment; propose a bounded offline acceptance test before any wiring rather than upgrading the decision on README claims alone.",
       "license": "GPL-3.0",
       "license_classifier": "GPL-3.0",
       "sources": [
+        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/ai_trader/mcp/server.py",
+        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/pyproject.toml",
+        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/config/backtest/classic/sma_example.yaml",
         "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/README.md",
         "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/LICENSE",
-        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/ai_trader/mcp/server.py",
-        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/ai_trader/mcp/models.py",
-        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/config/backtest/classic/sma_example.yaml",
-        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/pyproject.toml"
+        "https://github.com/whchien/ai-trader/commit/7681fe331fb638beab1ae20d3552c802bbaa9174",
+        "https://github.com/whchien/ai-trader/blob/7681fe331fb638beab1ae20d3552c802bbaa9174/ai_trader/mcp/models.py"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "Four MCP tools cover backtest, quick backtest, data fetch and strategy listing. The sample US-stock CSV configuration carries a Taiwan commission comment and 95% sizing, so sample defaults are not accepted US execution assumptions."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at 7681fe331fb638beab1ae20d3552c802bbaa9174; re-reviewed 2026-09-24 at 7681fe331fb638beab1ae20d3552c802bbaa9174 (commit unchanged).",
+        "2026-09-19 pass at 7681fe331fb6: Four MCP tools cover backtest, quick backtest, data fetch and strategy listing. The sample US-stock CSV configuration carries a Taiwan commission comment and 95% sizing, so sample defaults are not accepted US execution assumptions.",
+        "HEAD is unchanged since the prior 2026-09-19 targeted_candidate audit (identical commit 7681fe3); README.md and LICENSE were reviewed previously at this same commit and were not re-fetched in this pass.",
+        "GPL-3.0 copyleft applies to this component itself; keep it isolated from any proprietarily-licensed NAS code path.",
+        "fetch_market_data depends on yfinance/twstock, both of which require live network access; only run_backtest/quick_backtest against the bundled local CSV are offline-capable.",
+        "Sample config's commission (0.1425%) is explicitly commented as a Taiwan stock rate and position sizing is 95% of capital; neither is a calibrated US-broker assumption.",
+        "pyproject.toml declares version 0.3.4, one patch ahead of the latest tagged release v0.3.3 (2026-01-05); repository has had no further pushes since 2026-03-28.",
+        "Proposed acceptance case (2026-09-24, not run): In an isolated throwaway virtualenv on pinned commit 7681fe331fb638beab1ae20d3552c802bbaa9174 (never the NAS project env), run `pip install -e .` then `ai-trader run config/backtest/classic/sma_example.yaml` twice with outbound network access disabled, and separately launch `python -m ai_trader.mcp` and call list_strategies then quick_backtest against the same bundled data/us_stock/tsm.csv. Pass condition: both paths complete with zero outbound network calls, produce identical backtest stats (final value, trade count) across the two runs, and the MCP tool list is exactly {run_backtest, quick_backtest, fetch_market_data, list_strategies} with no hidden order-submission tool. Passing would move ai-trader from targeted_candidate to an accepted, isolated, no-order-authority research tool for backtest-only MCP calls; failing on network isolation, non-determinism, or an unexpected tool would keep it at targeted_candidate or move it to do_not_wire.",
+        "Wiring verdict (2026-09-24): wire_after_acceptance. If the acceptance test passes, wire only as an isolated, no-order-authority MCP backtest/data tool for research agents, called out-of-process from the accepted LEAN/NautilusTrader execution path, and never given broker credentials or order-submission rights."
       ],
       "evidence_refs": [],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
-          "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
-        },
-        {
-          "path": "LICENSE",
-          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
-        },
-        {
           "path": "ai_trader/mcp/server.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
-        },
-        {
-          "path": "ai_trader/mcp/models.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
-        },
-        {
-          "path": "config/backtest/classic/sma_example.yaml",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "MCP tool registration: function names, docstrings, parameters; confirmed no order-submission tool among the four (run_backtest, quick_backtest, fetch_market_data, list_strategies)."
         },
         {
           "path": "pyproject.toml",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Package name/version, Python constraint (>=3.11,<4.0), CLI entry point (ai-trader -> ai_trader.cli:cli), pinned dependencies (backtrader==1.9.78.123, fastmcp>=2.0.0, yfinance, twstock)."
+        },
+        {
+          "path": "config/backtest/classic/sma_example.yaml",
+          "extent": "Sample config fields: local CSV data path (data/us_stock/tsm.csv), Taiwan-commission comment, 95% position sizing."
+        },
+        {
+          "path": "README.md",
+          "extent": "Reviewed at this same commit in the 2026-09-19 audit; not re-read on 2026-09-24."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Reviewed at this same commit in the 2026-09-19 audit; not re-read on 2026-09-24."
+        },
+        {
+          "path": "ai_trader/mcp/models.py",
+          "extent": "Reviewed at this same commit in the 2026-09-19 audit; not re-read on 2026-09-24."
         }
       ],
       "archived": false,
@@ -3610,12 +3622,12 @@
       "source_date": "2026-09-01T15:15:48Z",
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
-      "decision": "targeted_candidate",
-      "role": "TradingView-derived market analysis and backtesting MCP server",
+      "decision": "obsolete_or_ineligible",
+      "role": "Unofficial TradingView-derived market analysis, screener and backtesting MCP server, also resold as a paid hosted subscription",
       "layers": [
         "financial-data-mcp"
       ],
-      "rationale": "Relevant bounded research interface, but verify unofficial feed access, point-in-time behavior and provider rights; never substitute a convenient MCP response for entitled authoritative data.",
+      "rationale": "Re-review at the same pinned commit confirms the technical-analysis and screener tools depend on the unofficial tradingview-screener/tradingview-ta scraping libraries and that backtests and news pull live from Yahoo Finance, MarketWatch and CNBC with only a 60-second cache and no point-in-time archive; the README itself disclaims data accuracy and assigns source-terms compliance to the operator, so this downgrades from the prior targeted-candidate reading.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
@@ -3625,15 +3637,21 @@
         "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/src/tradingview_mcp/server.py"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "Package metadata declares tradingview-mcp-server 0.9.0 and Python >=3.10,<3.14. Read-only MCP annotations and upstream no-order claims do not establish feed rights, latency or point-in-time accuracy."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at a1e54b07e5c21b375363607920f297c5adfbeed4; re-reviewed 2026-09-24 at a1e54b07e5c21b375363607920f297c5adfbeed4 (commit unchanged).",
+        "2026-09-19 pass at a1e54b07e5c2: Package metadata declares tradingview-mcp-server 0.9.0 and Python >=3.10,<3.14. Read-only MCP annotations and upstream no-order claims do not establish feed rights, latency or point-in-time accuracy.",
+        "Source commit, README, LICENSE and pyproject.toml are unchanged since the 2026-09-19 catalog audit (identical HEAD/pushed_at); this pass re-read them and targeted server.py by keyword search plus the backtest_strategy/compare_strategies sections (around lines 790-850 of 1284) rather than the full file.",
+        "Package metadata declares tradingview-mcp-server 0.9.0 (Python 3.10-3.13), but no GitHub Release exists for it; the latest git tag is v0.8.0 (2026-07-29), and PyPI publication of 0.9.0 was not independently checked.",
+        "No point-in-time or leakage-safe historical archive was found; backtest_strategy/compare_strategies fetch a trailing window (max period '2y') from Yahoo Finance at call time, so results are not reproducible against a fixed historical snapshot.",
+        "Data rights: Not affiliated with TradingView; pulls technical-analysis/screener data via the unofficial tradingview-screener/tradingview-ta libraries and historical bars via Yahoo Finance, with the README disclaiming warranty/accuracy and assigning source-terms compliance to the operator -- no demonstrated redistribution or trading-use rights for any underlying feed, yet the identical pipeline is sold as a paid hosted subscription.",
+        "Wiring verdict (2026-09-24): do_not_wire. Would otherwise be wired as a technical-analysis/screener MCP in the research-signals layer; confirmed unofficial/scraped TradingView+Yahoo+CNBC sourcing and no point-in-time archive mean it should not be wired anywhere in NAS ahead of the entitled Alpaca/EDGAR pipeline."
       ],
       "evidence_refs": [],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
           "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
+          "extent": "Purpose/overview and heading inspection; first 120 lines covering positioning, disclaimers and the hosted-vs-self-host comparison."
         },
         {
           "path": "LICENSE",
@@ -3641,19 +3659,15 @@
         },
         {
           "path": "pyproject.toml",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Full dependency list and version-pin comments (tradingview-screener==3.0.0, tradingview-ta>=3.3.0)."
         },
         {
           "path": "src/tradingview_mcp/server.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Keyword search across all 1284 lines plus direct reading of the backtest_strategy/compare_strategies/walk_forward tool definitions; not a whole-file review."
         }
       ],
       "archived": false,
-      "prospective_workflow": [
-        "tradingview-mcp"
-      ],
-      "workflow_scope": "Upstream CLI/API examples inspected, not executed. Use the recorded source pin in isolation; resolve prerequisites and data/model/permission costs first. Placeholder paths and issue IDs are operator-selected.",
-      "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
+      "relevance": "Not eligible for current adoption under the observed scope, maintenance or license boundary."
     },
     {
       "repository": "https://github.com/0xNyk/council-of-high-intelligence",
@@ -4457,46 +4471,61 @@
     },
     {
       "repository": "https://github.com/tradermonty/claude-trading-skills",
-      "source_commit": "8f787ab23ceb346e4bfc936785f92fd162087d82",
-      "source_date": "2026-09-19T03:45:22Z",
+      "source_commit": "28503f67265b9e57a40175b8ded222cd9271deac",
+      "source_date": "2026-09-24T13:19:04Z",
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
       "decision": "targeted_candidate",
-      "role": "Equity review, risk planning, journaling and strategy workflow skills",
+      "role": "Claude Code skill library (77 skills) for equity screening, technical/risk analysis, circuit-breaker risk planning, journaling and strategy-workflow orchestration",
       "layers": [
         "financial-research-skills"
       ],
-      "rationale": "Directly relevant research checklists with upstream's explicit no-AI-buy/sell-authority boundary; select individual skills after inspecting input sources and service costs.",
+      "rationale": "Re-check at a newer commit confirms a repo-wide 'not ... a broker execution platform' disclaimer; of 3 individually inspected skills, backtest-expert (stress-testing/walk-forward/sample-size methodology) and drawdown-circuit-breaker (local-file-only, no-API-key risk advisory) are dependency-light and well matched to NAS's in-progress overfitting controls, while mt5-robot-tester only drives the offline MT5 Strategy Tester and additionally requires Windows, so it is not currently portable to this Mac-based stack.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
-        "https://github.com/tradermonty/claude-trading-skills/blob/8f787ab23ceb346e4bfc936785f92fd162087d82/README.md",
-        "https://github.com/tradermonty/claude-trading-skills/blob/8f787ab23ceb346e4bfc936785f92fd162087d82/LICENSE",
-        "https://github.com/tradermonty/claude-trading-skills/blob/8f787ab23ceb346e4bfc936785f92fd162087d82/skills/backtest-expert/SKILL.md",
-        "https://github.com/tradermonty/claude-trading-skills/blob/8f787ab23ceb346e4bfc936785f92fd162087d82/workflows/market-regime-daily.yaml"
+        "https://github.com/tradermonty/claude-trading-skills/blob/28503f67265b9e57a40175b8ded222cd9271deac/README.md",
+        "https://github.com/tradermonty/claude-trading-skills/blob/28503f67265b9e57a40175b8ded222cd9271deac/LICENSE",
+        "https://github.com/tradermonty/claude-trading-skills/blob/28503f67265b9e57a40175b8ded222cd9271deac/skills/backtest-expert/SKILL.md",
+        "https://github.com/tradermonty/claude-trading-skills/blob/28503f67265b9e57a40175b8ded222cd9271deac/skills/drawdown-circuit-breaker/SKILL.md",
+        "https://github.com/tradermonty/claude-trading-skills/blob/28503f67265b9e57a40175b8ded222cd9271deac/skills/mt5-robot-tester/SKILL.md"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "The backtest skill explicitly emphasizes pessimistic costs, stress tests and robustness. Its daily workflow produces exposure posture rather than an order directive; scripts and data sources still require independent evaluation."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at 8f787ab23ceb346e4bfc936785f92fd162087d82; re-reviewed 2026-09-24 at 28503f67265b9e57a40175b8ded222cd9271deac.",
+        "2026-09-19 pass at 8f787ab23ceb: The backtest skill explicitly emphasizes pessimistic costs, stress tests and robustness. Its daily workflow produces exposure posture rather than an order directive; scripts and data sources still require independent evaluation.",
+        "77 skills exist in this repository; only 3 SKILL.md files were inspected this pass, so no claim is made about the other ~74 skills' safety, cost or quality (mover-v3-sweep-20260924.json separately notes vcp-screener's feature vocabulary is already covered elsewhere and not a new candidate).",
+        "backtest-expert and drawdown-circuit-breaker SKILL.md files were read only to their first 100 lines (of 234 and 175 respectively); their scripts/ and references/ subdirectories were listed but not opened.",
+        "No skill's Python scripts were executed; 'no API keys / no network' claims are taken from each SKILL.md's own Prerequisites section, not independently verified by running the code.",
+        "No GitHub release was observed on 2026-09-24.",
+        "Order authority: Skills are Claude Code markdown/script instructions only; the repository's own README states it is 'not ... a broker execution platform' and places all trading decisions on the user. No inspected skill places or transmits broker orders; mt5-robot-tester only drives the offline MT5 Strategy Tester.",
+        "Proposed acceptance case (2026-09-24, not run): Offline, no network or execution, on the pinned commit 28503f67265b9e57a40175b8ded222cd9271deac: read skills/backtest-expert/SKILL.md and its scripts/*.py source only (no script run) and check whether it (1) requires out-of-sample/walk-forward validation, (2) sets a minimum trade-count floor, and (3) requires pessimistic-slippage stress testing, then compare against the frozen Mover v3 preregistration's confirmatory/exploratory split. Pass condition: all three are present and none conflicts with or weakens the preregistration. A pass moves the single backtest-expert skill (checklist text only, not its scripts) from targeted_candidate to wire_now as a research-review reference; a conflict, or any live-order capability found in its scripts, keeps it targeted_candidate.",
+        "Wiring verdict (2026-09-24): wire_after_acceptance. If the acceptance_case passes, only the backtest-expert skill's stress-test checklist text would be adapted into a NAS research-review skill/prompt for Mover v3-style strategy vetting; no script from the repository would be executed and no order path is touched."
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "catalogs/us-equities/mover-v3-sweep-20260924.json"
+      ],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
           "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
+          "extent": "Targeted search over 450 lines for order-authority/disclaimer language; found the repo-wide 'not a signal service ... or a broker execution platform' disclaimer."
         },
         {
           "path": "LICENSE",
-          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
+          "extent": "Full read (21 lines): standard MIT license, copyright TraderMonty."
         },
         {
           "path": "skills/backtest-expert/SKILL.md",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Read first 100 of 234 lines: core philosophy, hypothesis/rule codification, and stress-test methodology (parameter sensitivity, execution friction, sample-size, walk-forward out-of-sample)."
         },
         {
-          "path": "workflows/market-regime-daily.yaml",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "path": "skills/drawdown-circuit-breaker/SKILL.md",
+          "extent": "Read first 100 of 175 lines: explicitly a local-file (trader-memory-core YAML), no-API-key, fail-closed advisory tool that 'does not enforce broker-side blocks or automated order rejection'."
+        },
+        {
+          "path": "skills/mt5-robot-tester/SKILL.md",
+          "extent": "Full read (181 lines): drives the MT5 Strategy Tester (backtesting/optimization only, not live orders); requires Windows + MetaTrader 5 installed locally."
         }
       ],
       "archived": false,
@@ -5791,68 +5820,59 @@
     },
     {
       "repository": "https://github.com/HKUDS/Vibe-Trading",
-      "source_commit": "2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021",
-      "source_date": "2026-09-19T08:41:45Z",
+      "source_commit": "1f6e05d3ba147a7b44d8199464deb6a57956f7cf",
+      "source_date": "2026-09-24T12:08:03Z",
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
       "decision": "targeted_candidate",
-      "role": "Natural-language trading research, alpha examples and shadow-account interface",
+      "role": "Natural-language trading research assistant with a mandate-gated, fail-closed multi-broker order layer and a broker-journal Shadow Account diagnostic",
       "layers": [
-        "trading-research-agent"
+        "trading-research-agent",
+        "broker-adapter"
       ],
-      "rationale": "Direct finance relevance warrants deeper inspection of data, order paths and paper boundaries; alpha-zoo or shadow-account output is not accepted real execution or profitable performance.",
+      "rationale": "Re-check five days after the 2026-09-19 audit (new commit, same MIT license, no catalog_entry_ids or acceptance work recorded yet) shows continued, substantial safety engineering: a fail-closed LiveOrderGuardTool mandate/kill-switch gate and an AST-based structural test that asserts every paper-capped broker's order entry points refuse a non-paper config before the SDK call. This remains a research/connector reference, not accepted execution or performance evidence.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/README.md",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/LICENSE",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/agent/src/trading/connectors/alpaca/sdk.py",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/agent/src/live/order_guard.py",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/agent/src/live/runtime/reconcile.py",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/agent/src/live/sdk_order_gate.py",
-        "https://github.com/HKUDS/Vibe-Trading/blob/2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021/agent/src/trading/connectors/alpaca/profiles.py"
+        "https://github.com/HKUDS/Vibe-Trading/blob/1f6e05d3ba147a7b44d8199464deb6a57956f7cf/README.md",
+        "https://github.com/HKUDS/Vibe-Trading/blob/1f6e05d3ba147a7b44d8199464deb6a57956f7cf/LICENSE",
+        "https://github.com/HKUDS/Vibe-Trading/blob/1f6e05d3ba147a7b44d8199464deb6a57956f7cf/agent/src/live/order_guard.py",
+        "https://github.com/HKUDS/Vibe-Trading/blob/1f6e05d3ba147a7b44d8199464deb6a57956f7cf/agent/tests/test_paper_capped_connectors_refuse_live.py"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "Selected Alpaca SDK/profiles, order guard and reconciliation source include paper/read-only/live distinctions, caller-enforced live mandates and halt/expiry checks. Presence of these modules is not proof that every route is fail-closed or broker-compatible."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at 2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021; re-reviewed 2026-09-24 at 1f6e05d3ba147a7b44d8199464deb6a57956f7cf.",
+        "2026-09-19 pass at 2dfbc03dd633: Selected Alpaca SDK/profiles, order guard and reconciliation source include paper/read-only/live distinctions, caller-enforced live mandates and halt/expiry checks. Presence of these modules is not proof that every route is fail-closed or broker-compatible.",
+        "This pass reused file-tree confirmation (existence only, not content re-read) for agent/src/trading/connectors/alpaca/sdk.py, agent/src/live/sdk_order_gate.py, agent/src/live/runtime/reconcile.py and agent/src/trading/connectors/alpaca/profiles.py, which were content-reviewed in the 2026-09-19 audit at the older commit 2dfbc03dd633bde4fdb3f6a550d2ff9a2b7b1021; they were not re-read at the new commit.",
+        "order_guard.py has grown to 961 lines; only its module docstring (~40 lines) was read this pass, not the full mandate/consent/halt implementation.",
+        "README.md is 2148 lines; only the changelog and disclaimer sections were searched (grep-bounded), not a full read.",
+        "Structural/AST tests proving a paper/live guard exists are not the same as a network-connected behavioral proof; this review did not execute any test.",
+        "Latest GitHub release observed 2026-09-24: v0.1.15, published 2026-09-09T07:49:47Z.",
+        "Order authority: The agent (LLM) invokes broker order-placing MCP tools; a deterministic LiveOrderGuardTool intercepts every call and enforces a pre-established, expiring human 'mandate', kill switch, account binding and notional caps fail-closed before any live broker call, per source and an AST-verified test suite. 11 brokers are structurally paper-capped by design; 12 (including Alpaca) are gated as live-capable through the mandate layer. No NAS installation, credential connection or execution was performed.",
+        "Proposed acceptance case (2026-09-24, not run): Offline, no network/credentials, on the pinned commit 1f6e05d3ba147a7b44d8199464deb6a57956f7cf: run `python3 -m pytest agent/tests/test_paper_capped_connectors_refuse_live.py agent/tests/test_sdk_order_gate.py agent/tests/test_killswitch_blocks_orders.py -q` (pure static AST/unit checks; no broker SDK network calls). Pass condition: every connector is classified and every paper-capped broker's place_order/cancel_order refuses a non-paper config as its first or second statement, and the kill-switch/order-gate unit tests pass. A pass moves Vibe-Trading's structural safety-gate design from an unverified README/source claim toward wire_after_acceptance as a reference for NAS's own Alpaca-adapter paper/live gate; a failure, or any case that only passes with live network/credentials, keeps it targeted_candidate and flags the structural-gate claim as unverified.",
+        "Wiring verdict (2026-09-24): wire_after_acceptance. If the acceptance_case passes, the AST-based structural paper/live-gate test pattern and the LiveOrderGuardTool mandate design would be referenced (not merged) when NAS designs its own Alpaca-adapter paper/live safety review; no Vibe-Trading code would run inside NAS and no order path is touched."
       ],
       "evidence_refs": [],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
           "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
+          "extent": "Targeted search over 2148 lines for shadow-account description and safety-relevant changelog entries (order gate, kill switch, mandate commits, paper-capped connectors)."
         },
         {
           "path": "LICENSE",
-          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
-        },
-        {
-          "path": "agent/src/trading/connectors/alpaca/sdk.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Header confirmed MIT license, copyright Vibe-Trading Contributors."
         },
         {
           "path": "agent/src/live/order_guard.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Module docstring read (~40 of 961 lines): describes the fail-closed LiveOrderGuardTool pre-trade gate (mandate load, expiry, halt flag, account binding, order-intent extraction, notional cap, audit logging, no-retry)."
         },
         {
-          "path": "agent/src/live/runtime/reconcile.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
-        },
-        {
-          "path": "agent/src/live/sdk_order_gate.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
-        },
-        {
-          "path": "agent/src/trading/connectors/alpaca/profiles.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "path": "agent/tests/test_paper_capped_connectors_refuse_live.py",
+          "extent": "Full read (135 lines): an AST-based structural test enumerating 11 paper-capped and 12 live-capable (including alpaca) connectors and asserting each capped broker's place_order/cancel_order refuses a non-paper config as its first statement."
         }
       ],
       "archived": false,
-      "prospective_workflow": [
-        "vibe-trading connector validate <connector-directory>"
-      ],
-      "workflow_scope": "Upstream CLI/API examples inspected, not executed. Use the recorded source pin in isolation; resolve prerequisites and data/model/permission costs first. Placeholder paths and issue IDs are operator-selected.",
       "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
     },
     {
@@ -7769,55 +7789,52 @@
     },
     {
       "repository": "https://github.com/pydantic/pydantic",
-      "source_commit": "915896d163835a57fd7987180087409a3229bd71",
-      "source_date": "2026-09-18T08:08:30Z",
+      "source_commit": "0384c970e37a59b344e75161eb106ea9996378ba",
+      "source_date": "2026-09-23T02:29:52Z",
       "review_level": "source_review",
-      "review_depth": "selected_primary_files",
-      "decision": "targeted_candidate",
+      "review_depth": "readme_license_overview",
+      "decision": "overlaps_established",
       "role": "Typed Python data validation",
       "layers": [
         "validation",
         "risk"
       ],
-      "rationale": "Useful for explicit signal/order-intent schemas and rejection of malformed inputs; validation must be strict where needed and cannot itself enforce economic risk limits or reconciliation.",
+      "rationale": "The order-intent schema role this entry originally targeted is now substantially covered by NAS's own hand-rolled boundary: open PR #198 wires order_contract.py's build_envelope()/canonicalize() into every alpaca-py paper submit ahead of any network call, and that module deliberately has no pydantic (or any SDK) import so it can preserve exact Decimal-string precision.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
-        "https://github.com/pydantic/pydantic/blob/915896d163835a57fd7987180087409a3229bd71/README.md",
-        "https://github.com/pydantic/pydantic/blob/915896d163835a57fd7987180087409a3229bd71/LICENSE",
-        "https://github.com/pydantic/pydantic/blob/915896d163835a57fd7987180087409a3229bd71/docs/concepts/strict_mode.md",
-        "https://github.com/pydantic/pydantic/blob/915896d163835a57fd7987180087409a3229bd71/pydantic/config.py"
+        "https://github.com/pydantic/pydantic/blob/0384c970e37a59b344e75161eb106ea9996378ba/README.md",
+        "https://github.com/pydantic/pydantic/blob/0384c970e37a59b344e75161eb106ea9996378ba/LICENSE",
+        "https://github.com/pydantic/pydantic/releases/tag/v2.13.5"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "Strict validation is opt-in; extra fields default to ignore. ConfigDict(strict=True, extra=\"forbid\") is supported, but JSON date types have documented strict-mode exceptions and business constraints still need explicit checks."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at 915896d163835a57fd7987180087409a3229bd71; re-reviewed 2026-09-24 at 0384c970e37a59b344e75161eb106ea9996378ba.",
+        "2026-09-19 pass at 915896d16383: Strict validation is opt-in; extra fields default to ignore. ConfigDict(strict=True, extra=\"forbid\") is supported, but JSON date types have documented strict-mode exceptions and business constraints still need explicit checks.",
+        "This pass rechecks only the latest release and NAS PR #198; it does not re-review pydantic's own source files. The primary-source review of docs/concepts/strict_mode.md and pydantic/config.py remains the 2026-09-19 pass at 915896d163835a57fd7987180087409a3229bd71 (commit dated 2026-09-18), summarized above.",
+        "Whether pydantic could still add value outside this specific order-intent boundary (e.g. broader strategy/signal config schemas elsewhere in NAS) was not checked in this bounded review; coverage.json still records pydantic as disposition no_catalog_card.",
+        "2026-09-24 re-review scope: the v2.13.5 release notes (2026-08-28; patch-level GC-traversal and smart-union validation fixes only), NAS PR #198 (title, body and changed-file list) and NAS blueprints/us-equities/order-contract/order_contract.py and README.md. The integrating pass re-read pydantic README.md and LICENSE (MIT) at this commit.",
+        "On main, order_contract.py defines canonicalize() and imports no pydantic or SDK module; open PR #198 adds build_envelope() and wires the boundary into transport.py, runner.py and alpaca_capacity_port.py without adding a pydantic import.",
+        "Wiring verdict (2026-09-24): reference_only. The order-intent boundary this entry targeted is implemented natively in blueprints/us-equities/order-contract/order_contract.py and wired by open PR #198 into transport.py/runner.py/alpaca_capacity_port.py; pydantic is not imported there, so keep it as a reference/comparison point rather than adding it as a dependency for this boundary."
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/198",
+        "blueprints/us-equities/order-contract/order_contract.py",
+        "blueprints/us-equities/order-contract/README.md"
+      ],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
           "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
+          "extent": "Purpose/overview and installation sections re-read at this commit by the integrating pass on 2026-09-24; the re-review itself checked release notes and NAS PR #198."
         },
         {
           "path": "LICENSE",
-          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
-        },
-        {
-          "path": "docs/concepts/strict_mode.md",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
-        },
-        {
-          "path": "pydantic/config.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "License declaration re-read at this commit (MIT); not a legal audit of all dependencies."
         }
       ],
       "archived": false,
-      "prospective_workflow": [
-        "from pydantic import BaseModel, ConfigDict"
-      ],
-      "workflow_scope": "Upstream CLI/API examples inspected, not executed. Use the recorded source pin in isolation; resolve prerequisites and data/model/permission costs first. Placeholder paths and issue IDs are operator-selected.",
-      "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
+      "relevance": "Relevant capability or reference already represented in the selected foundation."
     },
     {
       "repository": "https://github.com/VoltAgent/awesome-openclaw-skills",
@@ -10835,12 +10852,12 @@
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
       "decision": "targeted_candidate",
-      "role": "Financial candlestick foundation model",
+      "role": "Open-weight foundation model for financial candlestick (K-line/OHLCV) forecasting",
       "layers": [
         "forecasting",
         "trading"
       ],
-      "rationale": "Useful conditional forecast baseline distinct from a trading engine; needs chronological evaluation, training-overlap scrutiny, execution-cost modeling and model-specific licensing review.",
+      "rationale": "Both the repository code and the released Kronos-small weights are independently confirmed MIT-licensed and the model is now AAAI 2026-accepted peer-reviewed work, but the pretraining corpus ('45 global exchanges', 12B+ K-line records) has no published cutoff date or venue list, and the bundled example/fine-tune path targets Chinese A-share/Qlib data, so US-equity applicability and train/test leakage remain open questions a bounded chronological test can resolve.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
@@ -10848,34 +10865,42 @@
         "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/LICENSE",
         "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/model/kronos.py",
         "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/finetune/config.py",
-        "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/examples/prediction_example.py"
+        "https://github.com/shiyu-coder/Kronos/blob/67b630e67f6a18c9e9be918d9b4337c960db1e9a/examples/prediction_example.py",
+        "https://huggingface.co/NeoQuasar/Kronos-small"
       ],
       "limitations": [
-        "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "The example loads NeoQuasar/Kronos-small and its tokenizer. Fine-tuning config defaults to Qlib cn_data/csi300 with explicit overlapping lookback ranges; this is not a turnkey US-equity validation or broker path."
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "2026-09-19 audit decision: targeted_candidate at 67b630e67f6a18c9e9be918d9b4337c960db1e9a; re-reviewed 2026-09-24 at 67b630e67f6a18c9e9be918d9b4337c960db1e9a (commit unchanged).",
+        "2026-09-19 pass at 67b630e67f6a: The example loads NeoQuasar/Kronos-small and its tokenizer. Fine-tuning config defaults to Qlib cn_data/csi300 with explicit overlapping lookback ranges; this is not a turnkey US-equity validation or broker path.",
+        "Source commit is unchanged since the 2026-09-19 catalog audit; the model/kronos.py, finetune/config.py and examples/prediction_example.py extents are carried over from that pass and were not re-fetched here -- this pass re-read README.md and LICENSE and additionally checked the NeoQuasar/Kronos-small Hugging Face model card (https://huggingface.co/NeoQuasar/Kronos-small).",
+        "No GitHub Releases or tags exist for this repository; 'current releases' are the four entries in the README's Model Zoo table (Kronos-mini/small/base open, Kronos-large 499M closed-weight), unchanged from the prior audit.",
+        "The Hugging Face card states 'License: mit' for Kronos-small only; Kronos-mini/base were not individually re-verified, and no training-data cutoff date, per-exchange breakdown, or confirmation of US-equity inclusion is published, so pretrain/evaluation overlap cannot be ruled out from public documentation alone.",
+        "Data rights: Code and released Kronos-mini/small/base weights (NeoQuasar org on Hugging Face) are MIT-licensed by the paper authors (arXiv:2508.02739, AAAI 2026); the pretraining corpus is self-described only as '12B+ K-line records from 45 global exchanges' with no published venue list or cutoff date, so US-equity inclusion and any evaluation-window overlap are unverified; Kronos-large (499M) is not open-sourced.",
+        "Proposed acceptance case (2026-09-24, not run): Download the MIT-licensed NeoQuasar/Kronos-small weights and tokenizer once (24.7M params, forward-inference only, CPU/MPS on Apple Silicon, no fine-tuning) and run KronosPredictor.predict() zero-shot via the documented API on a fixed basket of about 20 liquid S&P 100 symbols using NAS's own entitled Alpaca SIP daily bars restricted to a window entirely after this repository's 2026-04-13 last commit (e.g. 2026-05-01 to 2026-09-01), lookback <=512 bars, pred_len=5 trading days. Preregister the comparison against two deterministic NAS baselines (naive last-value persistence and a simple moving-average) computed on the identical bars and dates. Pass condition: Kronos beats naive-persistence MAE on a majority (>=11/20) of symbols and shows directional accuracy distinguishable from 50% (binomial test p<0.05) with no US-equity fine-tuning. Passing would move the NAS decision from targeted_candidate to wire_after_acceptance as a bounded conditional-forecast baseline in the research/forecasting layer only; failing would move it to obsolete_or_ineligible for unfinetuned US-equity forecasting.",
+        "Wiring verdict (2026-09-24): wire_after_acceptance. If the bounded zero-shot chronological test above passes, wire Kronos-small as an optional conditional-forecast baseline feeding the existing research/forecasting layer only, reading already-ingested Alpaca OHLCV bars; deterministic risk/order-state code stays untouched and unconditioned on its output."
       ],
       "evidence_refs": [],
       "catalog_entry_ids": [],
       "reviewed_files": [
         {
           "path": "README.md",
-          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted."
+          "extent": "Full file (337 lines) re-read this pass, including the Model Zoo table, forecasting quick-start and A-share finetuning walkthrough."
         },
         {
           "path": "LICENSE",
-          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
+          "extent": "License declaration/scope inspection, re-read this pass; not a legal audit of all dependencies."
         },
         {
           "path": "model/kronos.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Selected workflow, configuration, API or implementation sections; carried over unchanged from the 2026-09-19 audit at this same pinned commit."
         },
         {
           "path": "finetune/config.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Selected workflow, configuration, API or implementation sections; carried over unchanged from the 2026-09-19 audit at this same pinned commit."
         },
         {
           "path": "examples/prediction_example.py",
-          "extent": "Selected workflow, configuration, API or implementation sections; not whole-repository review."
+          "extent": "Selected workflow, configuration, API or implementation sections; carried over unchanged from the 2026-09-19 audit at this same pinned commit."
         }
       ],
       "archived": false,
@@ -12513,16 +12538,831 @@
       "evidence_refs": [
         "catalogs/us-equities/simulation-data-review.json"
       ]
+    },
+    {
+      "repository": "https://github.com/6551Team/opennews-mcp",
+      "source_commit": "e329f36187e4a51a0878823e4fdd4d8f42134e80",
+      "source_date": "2026-08-18T03:21:53Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "obsolete_or_ineligible",
+      "role": "Paid, token-gated MCP aggregating 85+ crypto/equity news, exchange-listing and on-chain sources with AI-generated ratings and trading signals",
+      "layers": [
+        "financial-data-mcp",
+        "news"
+      ],
+      "rationale": "Redistributes premium copyrighted news (Bloomberg, Reuters, FT, CNBC and more) through an unverified third-party token-gated service with no stated publisher licensing, mixes in undisclosed black-box 'AI rating'/'trading signal' outputs, and exposes no point-in-time archive, so it cannot substitute for the entitled Alpaca/Benzinga and SEC EDGAR pipeline.",
+      "license": "MIT",
+      "license_classifier": "MIT",
+      "sources": [
+        "https://github.com/6551Team/opennews-mcp/blob/e329f36187e4a51a0878823e4fdd4d8f42134e80/README.md",
+        "https://github.com/6551Team/opennews-mcp/blob/e329f36187e4a51a0878823e4fdd4d8f42134e80/LICENSE",
+        "https://github.com/6551Team/opennews-mcp/blob/e329f36187e4a51a0878823e4fdd4d8f42134e80/config.json",
+        "https://github.com/6551Team/opennews-mcp/blob/e329f36187e4a51a0878823e4fdd4d8f42134e80/src/opennews_mcp/api_client.py",
+        "https://github.com/6551Team/opennews-mcp/blob/e329f36187e4a51a0878823e4fdd4d8f42134e80/src/opennews_mcp/tools/news.py"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Content licensing for the 85+ aggregated sources (Bloomberg, Reuters, FT, CNBC, exchange announcements, social/on-chain feeds) is asserted only by the operator's own README table; no publisher license or redistribution terms are documented anywhere in this repository, and only api_client.py and tools/news.py were inspected out of six tool modules.",
+        "Tools return live 'most recent'/keyword-search results from the ai.6551.io REST/WebSocket API; no point-in-time 'as of' query or immutable historical archive was found, so this cannot support leakage-safe historical research.",
+        "The README embeds a ready-made prompt inviting an AI assistant to review api_client.py/config.py/tools for safety and then self-install the server; this review read that text as inert data and did not follow, evaluate against, or act on those instructions.",
+        "No GitHub release was observed on 2026-09-24.",
+        "Data rights: Aggregates 85+ third-party sources (Bloomberg, Reuters, FT, CNBC, exchange announcements, social/on-chain feeds) via the paid, token-gated ai.6551.io API; no evidence of licensing from the original publishers, and no redistribution or trading-use rights are stated beyond the MIT license on the client code itself.",
+        "Wiring verdict (2026-09-24): do_not_wire. Would otherwise be considered for the research-signals layer as a news/sentiment MCP, but unresolved rights over redistributed premium news, an opaque AI-rating/signal layer and no point-in-time archive mean nothing here should be wired; keep Benzinga-via-Alpaca as the news path."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted (first 160 of 774 lines, covering install flow and the full data-source table)."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
+        },
+        {
+          "path": "config.json",
+          "extent": "Full file; confirms api_base_url/wss_url point only to ai.6551.io."
+        },
+        {
+          "path": "src/opennews_mcp/api_client.py",
+          "extent": "Selected workflow, configuration, API or implementation sections; first 140 lines covering both REST client classes, not whole-file review."
+        },
+        {
+          "path": "src/opennews_mcp/tools/news.py",
+          "extent": "Selected workflow, configuration, API or implementation sections; first 90 lines covering three of the module's tools, not whole-file review."
+        }
+      ],
+      "archived": false,
+      "relevance": "Not eligible for current adoption under the observed scope, maintenance or license boundary."
+    },
+    {
+      "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "source_date": "2026-09-18T01:13:20Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "already_covered",
+      "role": "FinRL successor: target-weight/adaptive-rotation US-equity strategy engine with an in-repo Alpaca-oriented trade executor",
+      "layers": [
+        "ml-trading-research",
+        "execution-engine"
+      ],
+      "rationale": "NAS's prior selected-file review of this exact commit found unsafe non-fail-closed fallbacks in the executor (placeholder symbol map, zero-value-on-exception, price substituted on quote failure) and rejected the current execution path while retaining the research/backtest code as reference; repository HEAD and pushed_at are unchanged on re-check.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/README.md",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/LICENSE",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/deploy.sh",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/trade_executor.py",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/universe_manager.py",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/walk_forward.py",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/risk_manager.py",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/backtest/backtest_engine.py"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "This entry reuses the prior selected-file review recorded in catalogs/us-equities/architecture/trading.json (decision reject_current_execution_path_retain_research_reference) and engines-strategies.json (id finrl-x, decision watch); this pass reconfirmed repository/HEAD/license metadata unchanged on 2026-09-24 via the GitHub API but did not re-fetch file content, since source_commit is byte-identical to the prior review.",
+        "Cited unsafe fallback lines (trade_executor.py:370-408) were located in the prior review pass, not re-verified line-by-line in this pass.",
+        "Latest GitHub release observed 2026-09-24: v1.0.0, published 2026-03-25T08:24:51Z.",
+        "Order authority: The repo's own trade_executor.py (not a human) would issue orders if installed and run; NAS's prior review found it is not fail-closed (placeholder symbol map, zero-value-after-exception, price substitution on quote failure), so NAS has not installed or authorized any execution path from this repository.",
+        "Wiring verdict (2026-09-24): reference_only. Nothing new to wire this pass; NAS already retains this repository's walk-forward/target-weight research code as a rejected-execution, research-only reference in architecture/trading.json, and no order path is or would be wired."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/architecture/trading.json",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [
+        "finrl-x"
+      ],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview and heading inspection; selected relevant README sections where noted. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License declaration/scope inspection. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "deploy.sh",
+          "extent": "Selected workflow/CLI sections. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "src/trading/trade_executor.py",
+          "extent": "Selected implementation sections showing order-submission and error-fallback behavior. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "src/strategies/universe_manager.py",
+          "extent": "Selected workflow/implementation sections. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "src/strategies/adaptive_rotation/walk_forward.py",
+          "extent": "Selected workflow/implementation sections. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "src/strategies/adaptive_rotation/risk_manager.py",
+          "extent": "Selected workflow/implementation sections. (Reused evidence; commit unchanged.)"
+        },
+        {
+          "path": "src/backtest/backtest_engine.py",
+          "extent": "Selected workflow/implementation sections. (Reused evidence; commit unchanged.)"
+        }
+      ],
+      "archived": false,
+      "relevance": "Existing selected or compared component; relevance inherited from the linked card."
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "source_date": "2026-08-11T09:58:28Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "already_covered",
+      "role": "Pinned Python execution/market-data SDK wrapping Alpaca's paper trading REST and WebSocket APIs",
+      "layers": [
+        "execution",
+        "market-data"
+      ],
+      "rationale": "v0.44.0 (commit cc4cb3b7b) is confirmed the latest official release on both GitHub releases and PyPI info.version as of 2026-09-24, matching NAS's existing lock/SDK_VERSION pin exactly, so no bump is warranted and the existing selection stands.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/pyproject.toml",
+        "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "https://pypi.org/pypi/alpaca-py/json"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "alpaca-py's default branch is 15 commits ahead of the v0.44.0 tag (unreleased, not yet an official release), including modifications to alpaca/data/requests.py and tests/data/test_websockets.py; those unreleased changes were not reviewed as release content.",
+        "pyproject.toml's websockets bound (>=10.4, no upper pin) and NAS's private-attribute/internal-method coupling (client._retry, client._session, TradingStream/StockDataStream._connect/_auth/_dispatch, websockets.legacy.client.WebSocketClientProtocol) were inspected for forward risk only, not exercised at runtime.",
+        "Release check (2026-09-24): the GitHub releases list (20 most recent) and PyPI info.version both show 0.44.0 as the latest published release, and tag v0.44.0 resolves to this commit; compare v0.44.0...master was read at filename level only.",
+        "Bump check (2026-09-24): from 0.44.0 to 0.44.0; no bump. Changes touching NAS: 0. Risk: None from an official release, because no release exists after 0.44.0 (verified via GitHub releases and PyPI info.version). Latent forward risk only: alpaca-py's own pyproject.toml pins websockets unbounded (\">=10.4\") while transport.py subclasses TradingStream/StockDataStream, patches the private websockets.legacy.client.WebSocketClientProtocol.handshake, and overrides private client._retry/client._session attributes; a future alpaca-py release that changes stream internals or drops the websockets.legacy shim would break transport.py at connect time without any pip version conflict warning it.",
+        "Bump recommendation: No bump now. Re-run this check when alpaca-py cuts a new tag (master already carries 15 unreleased commits touching alpaca/data/requests.py, the home of StockLatestQuoteRequest that NAS imports, and tests/data/test_websockets.py). When a future release lands, the acceptance test is: run tests/test_adaptive_paper_transport.py, test_adaptive_paper_native.py, test_adaptive_paper_runner.py, test_adaptive_paper_mover.py and test_adaptive_paper_mover_native.py; then `python3 blueprints/us-equities/adaptive-paper/mover_runner.py synthetic --config blueprints/us-equities/adaptive-paper/config-mover.json --scan <fixture>` (evidence class SYN) must exit clean against the synthetic port; only then run a bounded paper-account smoke (small symbol set, short duration, existing paper credentials) before moving the lock pin.",
+        "Wiring verdict (2026-09-24): wire_now. alpaca-py 0.44.0 is already the sole SDK imported by blueprints/us-equities/adaptive-paper/transport.py (TradingClient, StockHistoricalDataClient, TradingStream, StockDataStream, LimitOrderRequest, StockLatestQuoteRequest, DataFeed) and native_adapter.py's port contract; keep the current pin, no change needed until a new tag is cut."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/data-research.json",
+        "https://github.com/alpacahq/alpaca-py/compare/v0.44.0...master",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [
+        "alpaca-py",
+        "data-alpaca-py"
+      ],
+      "reviewed_files": [
+        {
+          "path": "pyproject.toml",
+          "extent": "Dependency bounds only (websockets pin) at the v0.44.0 tag commit."
+        }
+      ],
+      "archived": false,
+      "relevance": "Existing selected or compared component; relevance inherited from the linked card."
+    },
+    {
+      "repository": "https://github.com/chrisworsey55/atlas-gic",
+      "source_commit": "cf4349f15c9d68a67042f792973372f2e0231088",
+      "source_date": "2026-09-22T11:51:43Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "obsolete_or_ineligible",
+      "role": "Marketing/architecture documentation for a proprietary 25-agent 'self-improving' macro/equity trading system; execution logic not included",
+      "layers": [
+        "trading-research-agent",
+        "architecture-reference"
+      ],
+      "rationale": "README and architecture docs describe an 'Autonomous Execution' agent and a daily cycle ending in 'Trade execution (if market open)', and claim the system is 'now running live with real capital' with specific backtest/return figures, but the repository explicitly withholds the trained prompts and execution logic as proprietary ('What's NOT Included'); no order-placement or broker code exists to install, run or verify, and the return claims are unverifiable README assertions.",
+      "license": "Modified MIT (adds a clause excluding proprietary trained agent prompts, which are not included in this repository)",
+      "license_classifier": "NOASSERTION",
+      "sources": [
+        "https://github.com/chrisworsey55/atlas-gic/blob/cf4349f15c9d68a67042f792973372f2e0231088/README.md",
+        "https://github.com/chrisworsey55/atlas-gic/blob/cf4349f15c9d68a67042f792973372f2e0231088/LICENSE",
+        "https://github.com/chrisworsey55/atlas-gic/blob/cf4349f15c9d68a67042f792973372f2e0231088/src/janus.py",
+        "https://github.com/chrisworsey55/atlas-gic/blob/cf4349f15c9d68a67042f792973372f2e0231088/architecture/overview.md"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "GitHub's license detector returned NOASSERTION; the LICENSE file is near-verbatim MIT text plus a non-standard carve-out, which likely explains the classifier miss. Treat as no confirmed unencumbered reuse grant for anything beyond the shared architecture/docs.",
+        "18-month backtest, PRISM regime-cohort and 'live with real capital' performance figures in the README are unaudited self-reported claims with no accompanying data or code in this repository; a star, chart or README claim is not evidence of returns.",
+        "src/mirofish/* simulation files and results/* artifacts (equity_curve.png, portfolio_trajectory.csv, summary.json) were listed but not opened in this pass.",
+        "No GitHub release was observed on 2026-09-24.",
+        "Order authority: No order-placement or broker-integration code is present in the reviewed repository. README claims a separate, undisclosed production system with an 'Autonomous Execution' agent and a CIO agent that 'makes the final call' is 'running live with real capital', but that execution logic is explicitly excluded from this repository.",
+        "Wiring verdict (2026-09-24): do_not_wire. Nothing to wire: the repository ships no order-placement or broker code, and its live-capital and backtest-return claims cannot be checked against any implementation actually included."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Full read (219 lines): architecture, 'now running live with real capital' and Autonomous-Execution-agent claims, backtest/return tables, explicit 'What's Included' / 'What's NOT Included' sections."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Full read (27 lines): MIT text plus an added clause excluding proprietary trained agent prompts."
+        },
+        {
+          "path": "src/janus.py",
+          "extent": "Keyword search (order/broker/alpaca/ibkr/execute/buy/sell/api_key/live/paper) plus targeted read (571 lines); a meta-layer regime-weighting module with no broker or order-placement code found."
+        },
+        {
+          "path": "architecture/overview.md",
+          "extent": "Full read (102 lines): 4-layer agent pipeline diagram and a daily cycle ending '07:00 Trade execution (if market open)'."
+        }
+      ],
+      "archived": false,
+      "relevance": "Not eligible for current adoption under the observed scope, maintenance or license boundary."
+    },
+    {
+      "repository": "https://github.com/coding-kitties/investing-algorithm-framework",
+      "source_commit": "097c2a93a543d7832fe810040cd621fed92a15f1",
+      "source_date": "2026-09-24T11:23:52Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "alternative",
+      "role": "General Python framework combining vectorized/event-driven backtest, dashboard and crypto-first paper/live execution",
+      "layers": [
+        "vectorized-research",
+        "backtesting",
+        "paper-trading"
+      ],
+      "rationale": "Genuinely supports US-equities research via built-in Polygon/Alpha Vantage/Yahoo data providers (Polygon module explicitly documents 'US stocks... standard ticker formats e.g. AAPL') and a broker-agnostic, no-network paper-trading executor, but its only live order_executor is CCXT (crypto) and its showcased examples are crypto bots, so it does not demonstrate a US-equities live-execution path.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/coding-kitties/investing-algorithm-framework/blob/097c2a93a543d7832fe810040cd621fed92a15f1/README.md",
+        "https://github.com/coding-kitties/investing-algorithm-framework/blob/097c2a93a543d7832fe810040cd621fed92a15f1/LICENSE",
+        "https://github.com/coding-kitties/investing-algorithm-framework/blob/097c2a93a543d7832fe810040cd621fed92a15f1/investing_algorithm_framework/infrastructure/data_providers/polygon.py",
+        "https://github.com/coding-kitties/investing-algorithm-framework/blob/097c2a93a543d7832fe810040cd621fed92a15f1/investing_algorithm_framework/infrastructure/order_executors/paper_trading_order_executor.py",
+        "https://github.com/coding-kitties/investing-algorithm-framework/commit/097c2a93a543d7832fe810040cd621fed92a15f1"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Only CCXT (crypto exchanges) and a broker-agnostic paper-trading simulator were found under infrastructure/order_executors; no Alpaca or Interactive Brokers live-execution adapter exists in the reviewed source, so live US-equities order routing is not demonstrated.",
+        "The Polygon-based US-equities data path duplicates a data source NAS already tracks under a separate catalog entry ('Official Massive SDK, formerly Polygon.io' in data-research.json), so it mainly adds packaging (vector + event-driven + dashboard), not a new data capability.",
+        "v8.10.0 (2026-05-24) is the latest tagged release; pushed_at shows commits as recent as the review date, so HEAD trails an unknown amount of untagged work ahead of that release.",
+        "examples/ top-level bots (bitvavo_trading_bot.py, coinbase_trading_bot.py) are crypto-only; no equivalent US-equities example was found in the directories inspected (algorithm_examples, tutorial).",
+        "Wiring verdict (2026-09-24): reference_only. Not wired; if ever adopted it would sit next to vectorbt/backtrader as an offline research-and-vectorized-backtest alternative, not as a live order path, since only CCXT (crypto) and paper-trading executors exist upstream."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose, asset classes, brokers/exchanges and data providers, license badge."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Full license text identification (plain Apache-2.0, no custom clause)."
+        },
+        {
+          "path": "investing_algorithm_framework/infrastructure/data_providers/polygon.py",
+          "extent": "Data-provider class, endpoint (Polygon.io REST via polygon-api-client), credential handling, US-stock ticker example."
+        },
+        {
+          "path": "investing_algorithm_framework/infrastructure/order_executors/paper_trading_order_executor.py",
+          "extent": "Class docstring and method signatures confirming simulated, no-network order fills."
+        }
+      ],
+      "archived": false,
+      "relevance": "Potential substitute or conditional extension; no demonstrated replacement need."
+    },
+    {
+      "repository": "https://github.com/fasiondog/hikyuu",
+      "source_commit": "0d5fa041e93132d1f65cc6cfaee6c7e304c5426b",
+      "source_date": "2026-09-24T17:24:39Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "outside_north_star",
+      "role": "C++/Python quantitative research and backtesting framework for China A-share markets",
+      "layers": [
+        "backtesting",
+        "market-data-fetcher"
+      ],
+      "rationale": "README explicitly states HikyuuTDX imports China A-share historical data only and that overseas markets including US stocks 'are not available yet'; the fetcher and trade_manage source directories contain only China-specific data sources (Sina/QQ/Eastmoney/QMT) and a Chinese broker-automation bridge (easytrader), so it does not demonstrably serve US equities.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/fasiondog/hikyuu/blob/0d5fa041e93132d1f65cc6cfaee6c7e304c5426b/readme.md",
+        "https://github.com/fasiondog/hikyuu/blob/0d5fa041e93132d1f65cc6cfaee6c7e304c5426b/LICENSE",
+        "https://github.com/fasiondog/hikyuu/tree/0d5fa041e93132d1f65cc6cfaee6c7e304c5426b/hikyuu/fetcher/stock",
+        "https://github.com/fasiondog/hikyuu/tree/0d5fa041e93132d1f65cc6cfaee6c7e304c5426b/hikyuu/trade_manage",
+        "https://github.com/fasiondog/hikyuu/commit/0d5fa041e93132d1f65cc6cfaee6c7e304c5426b"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "China-market framework: README states overseas markets including US stocks are not yet supported; no US brokerage or US-equities data adapter was found in the directories inspected.",
+        "THIRD_PARTY_LICENSES.md at the repo root was not reviewed; bundled C++ dependencies may carry separate license terms.",
+        "Repository also contains a root-level AGENTS.md; its content was not read and was not treated as an instruction to this review, per the read-only review-as-data rule.",
+        "Latest GitHub release observed 2026-09-24: 2.8.2, published 2026-08-20T11:41:42Z.",
+        "Wiring verdict (2026-09-24): do_not_wire. Do not wire; no US-equities data or broker path exists in the reviewed source to connect to NAS's IBKR/Alpaca/NautilusTrader runtime."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "readme.md",
+          "extent": "Purpose, target markets, data sources, broker mentions, explicit statement that overseas/US markets are unsupported."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License identification only (Apache-2.0, unmodified template)."
+        },
+        {
+          "path": "hikyuu/fetcher/stock",
+          "extent": "Directory listing only (file names: zh_block_em.py, zh_stock_a_qmt.py, zh_stock_a_sina_qq.py) to confirm data-source targets."
+        },
+        {
+          "path": "hikyuu/trade_manage",
+          "extent": "Directory listing only (file names: broker.py, broker_easytrader.py, broker_mail.py, trade.py) to confirm broker-adapter targets."
+        }
+      ],
+      "archived": false,
+      "relevance": "Outside the current research-first US-equity and native-agent scope."
+    },
+    {
+      "repository": "https://github.com/jarrodwatts/jev-trader",
+      "source_commit": "b587759e459ea049590102e54a0b07800864cdc3",
+      "source_date": "2026-09-17T02:48:21Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "outside_north_star",
+      "role": "Autonomous LLM market-making bot posting live limit orders every ~300ms on the Kuru MON-USDC crypto DEX (Monad chain)",
+      "layers": [
+        "execution-engine",
+        "trading"
+      ],
+      "rationale": "This trades MON-USDC perpetually on a Monad-chain DEX, not US equities, so it has no current role in US-equity research, engineering or execution; it is also a direct instance of the pattern NAS's own policy excludes, since the LLM's buy/sell call is posted on-chain automatically every block with no human confirmation step evident in the source.",
+      "license": "MIT",
+      "license_classifier": "MIT",
+      "sources": [
+        "https://github.com/jarrodwatts/jev-trader/blob/b587759e459ea049590102e54a0b07800864cdc3/README.md",
+        "https://github.com/jarrodwatts/jev-trader/blob/b587759e459ea049590102e54a0b07800864cdc3/LICENSE",
+        "https://github.com/jarrodwatts/jev-trader/blob/b587759e459ea049590102e54a0b07800864cdc3/src/trader.ts",
+        "https://github.com/jarrodwatts/jev-trader/blob/b587759e459ea049590102e54a0b07800864cdc3/src/model.ts"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "No wallet, RPC endpoint or exchange was connected, by review scope; the order-authority assessment rests on reading model.ts and trader.ts plus the README's own description, not on observed runtime behavior.",
+        "src/chain.ts, src/market.ts, src/book.ts, src/config.ts and the web/ dashboard were listed in the file tree but not opened in this pass.",
+        "No GitHub release was observed on 2026-09-24.",
+        "Order authority: When MODEL=jev and PRIVATE_KEY are configured, the LLM (JevModel.decide) directly returns buy/sell every Monad block (~300ms), and trader.ts posts a live on-chain post-only limit order on that side with no human confirmation step in the reviewed code; a deterministic position-size/margin cap is the only backstop. Venue is a live crypto DEX (Kuru on Monad), never a US-equities or paper broker.",
+        "Wiring verdict (2026-09-24): do_not_wire. Nothing to wire: a crypto-DEX market-making bot with direct, unmediated LLM order authority is outside the US-equities scope and contrary to NAS's no-agent-order-authority policy; not even treated as a reference pattern."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Full read (70 lines): live/dry-run behavior gated by presence of a PRIVATE_KEY, per-block decision/order/fill event schema, and the 300ms hot-loop design."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Header confirmed standard MIT license text."
+        },
+        {
+          "path": "src/trader.ts",
+          "extent": "Keyword search (PRIVATE_KEY/confirm/approve/human/cap/dryRun) plus targeted read (307 lines): confirms a deterministic position-size/margin cap but no human confirmation step between model decision and order submission."
+        },
+        {
+          "path": "src/model.ts",
+          "extent": "Full read (107 lines): JevModel.decide() calls an LLM via the AI SDK experimental_evaluate and returns buy/sell directly; MockModel is a deterministic heuristic stand-in used when MODEL != jev."
+        }
+      ],
+      "archived": false,
+      "relevance": "Outside the current research-first US-equity and native-agent scope."
+    },
+    {
+      "repository": "https://github.com/MIgHTy-alIeN/ai-trader-bot",
+      "source_commit": "db429bddb0cfc663ced7261d51aee33afae3fcf0",
+      "source_date": "2026-09-24T17:36:45Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "reject_security_risk",
+      "role": "Solidity \"arbitrage bot\" contract marketed through an external no-code deploy/fund/automate funnel",
+      "layers": [
+        "defi-contract"
+      ],
+      "rationale": "contract.sol, README.md and LICENSE (all 3 files in the repo) show a scam-funnel structure rather than a benign tool: the README/NOTICE describe five functions (depositEth, emergencyWithdrawAll, withdrawETH, getOwner, TARGET_ADDRESS) that are not defined anywhere in contract.sol, the only \"automation\" is an unreviewable third-party site the README tells users to fund with real ETH, and the repo bot-commits meaningless \"Update LICENSE\" churn roughly once a minute to inflate apparent activity.",
+      "license": "MIT",
+      "license_classifier": "NOASSERTION",
+      "sources": [
+        "https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/contract.sol",
+        "https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md",
+        "https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/LICENSE"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Never compiled, deployed or ran any contract or script; never visited the external etherlabs-sol.github.io deployer or any wallet link, by review scope.",
+        "The actual transaction-construction/\"automation\" logic is not in this repository (only LICENSE, README.md and contract.sol exist); it runs on an external, unreviewed third-party site, so the exact drain mechanism could not be directly inspected from source alone.",
+        "On-chain addresses hardcoded in contract.sol (Uniswap V3 SwapRouter, WETH, USDT) match well-known legitimate Ethereum mainnet contracts; no attacker-controlled destination address was found hardcoded in this particular contract file.",
+        "No GitHub release was observed on 2026-09-24.",
+        "Security finding, README.md lines 19-20 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md#L19-L20): Lists withdrawETH(), getOwner() and TARGET_ADDRESS() as contract functions; none of these identifiers appears anywhere in contract.sol, indicating boilerplate describing a different contract than the one shipped in this repo. (owner() does exist, as the getter of `address public owner` at contract.sol line 76.)",
+        "Security finding, README.md line 30 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md#L30): Directs users to compile and deploy through a third-party no-code site (etherlabs-sol.github.io, not visited) instead of a standard toolchain (Remix/Hardhat/Foundry); that site's code is not in this repository and cannot be reviewed here.",
+        "Security finding, README.md lines 46 and 48 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md#L46-L48): Instructs the user to connect a real wallet (\"MetaMask or Phantom\") and \"fund the balance\" of the freshly deployed contract by sending \"0.5 to 1 ETH\" directly to it -- an explicit instruction to fund a contract, framed as \"enough for beginners.\"",
+        "Security finding, README.md lines 54, 56 and 64 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md#L54-L64): Tells the user to run an opaque external \"Python Automation\" that decides what to submit and to \"confirm the launch\"/\"confirmed once in MetaMask\", then \"Do not close the page while the bot is running\" -- the actual signed calldata is produced off-repo and is not auditable from this source.",
+        "Security finding, README.md line 71 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/README.md#L71): Unverifiable, implausible profit claim: \"a deposit of 1 ETH can realistically average around ~$500 a day\" (roughly a 20%/day return) presented as a realistic expectation.",
+        "Security finding, contract.sol lines 40-44 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/contract.sol#L40-L44): NOTICE comment documents depositEth() (accepts ETH from any address, untracked per-depositor balance) and emergencyWithdrawAll(), an owner-only path said to \"move the full contract balance (ETH or tokens) to any address\" -- neither function exists in the actual contract body below; the description again mismatches the shipped code.",
+        "Security finding, contract.sol lines 189-197 (https://github.com/MIgHTy-alIeN/ai-trader-bot/blob/db429bddb0cfc663ced7261d51aee33afae3fcf0/contract.sol#L189-L197): function withdraw(address token, address to, uint256 amount) external onlyOwner can send any amount, up to the full balance, of ETH or any token to an arbitrary caller-supplied `to` with no destination allowlist; combined with the off-repo automation that actually proposes the transaction the owner's wallet signs, this is the fund-movement path a hidden malicious automation step would call.",
+        "Security finding, commit history: Automated \"Update LICENSE\" commits land roughly once per minute with no content purpose (e.g. db429bdd at 2026-09-24T17:36:45Z, 0ccfe1ed at 17:36:40Z, bee839c3 at 17:37:48Z, ...), consistent with astroturfing recent-activity signals; the repo shows 2,711 stars and 1,899 forks after being created 2026-07-17 while containing only 3 files.",
+        "Wiring verdict (2026-09-24): do_not_wire. No NAS integration point exists or would be appropriate; this is an unrelated Solidity/DeFi contract with no connection to NAS's US-equities/Alpaca/NautilusTrader architecture, recorded here solely as a security rejection of a repository the user starred."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "contract.sol",
+          "extent": "Full file read (508 lines): constructor, all onlyOwner admin/withdraw functions, swap/quickSwap/executeArbitrage paths, internal token-call helpers."
+        },
+        {
+          "path": "README.md",
+          "extent": "Full file read (70 lines): step-by-step deployment/funding/automation instructions and profit claims."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Full file read: MIT header plus an appended non-standard 'Additional Disclaimer' section (source of the NOASSERTION classifier)."
+        }
+      ],
+      "archived": false,
+      "relevance": "Rejected as a security risk; never install, deploy, fund or link it."
+    },
+    {
+      "repository": "https://github.com/polakowo/vectorbt",
+      "source_commit": "a3c0f40979648585b4581fc4694fd6e92b3fffca",
+      "source_date": "2026-09-17T20:12:21Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "already_covered",
+      "role": "Vectorized parameter-sweep and portfolio-simulation research library",
+      "layers": [
+        "vectorized-research",
+        "backtesting"
+      ],
+      "rationale": "Already catalogued as an alternative vectorized research/backtesting engine (id vectorbt, engines-strategies.json); this pass reconfirms the Apache-2.0-plus-Commons-Clause license and current activity (v1.1.0, pushed 2026-09-17) without repeating the prior file-level review.",
+      "license": "Apache-2.0 with Commons Clause License Condition v1.0",
+      "license_classifier": "NOASSERTION",
+      "sources": [
+        "https://github.com/polakowo/vectorbt/blob/a3c0f40979648585b4581fc4694fd6e92b3fffca/README.md",
+        "https://github.com/polakowo/vectorbt/blob/a3c0f40979648585b4581fc4694fd6e92b3fffca/LICENSE.md",
+        "https://github.com/polakowo/vectorbt/commit/a3c0f40979648585b4581fc4694fd6e92b3fffca"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Apache-2.0 is combined with the 'Commons Clause' License Condition v1.0, which bars selling a product/service whose value derives substantially from this software; GitHub's own license API reports NOASSERTION for the repository, consistent with this custom condition. Treat as source-available, not unrestricted open source.",
+        "PRO is a separate paid product (vectorbt.pro); its code and terms were not reviewed here.",
+        "This is a light readme/license re-check; the deeper packaging/runtime review already recorded in engines-strategies.json (id vectorbt) is not repeated here.",
+        "Wiring verdict (2026-09-24): reference_only. Not wired into any NAS runtime path; would only be usable as an optional offline research/parameter-sweep notebook tool outside the accepted LEAN/NautilusTrader path, and only after confirming the Commons Clause terms fit the intended use."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [
+        "vectorbt"
+      ],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview and PRO-product mention; light re-check pass."
+        },
+        {
+          "path": "LICENSE.md",
+          "extent": "Full license text identification (Apache-2.0 base plus Commons Clause v1.0 'Sell' restriction, unchanged from prior review)."
+        }
+      ],
+      "archived": false,
+      "relevance": "Existing selected or compared component; relevance inherited from the linked card."
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "source_commit": "a092eb6069a90c30e7dd75ed036b5ed6446eca20",
+      "source_date": "2026-09-24T15:47:14Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "already_covered",
+      "role": "Frozen historical backtest comparator/oracle for the accepted engine path, not the live runtime",
+      "layers": [
+        "backtesting",
+        "execution-engine"
+      ],
+      "rationale": "Already the accepted comparator in engines-strategies.json (id lean, decision default, native_proven evidence); this pass reconfirms an unarchived, Apache-2.0, actively pushed repo at a newer commit without repeating the prior file-level engine/brokerage review.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/QuantConnect/Lean/blob/a092eb6069a90c30e7dd75ed036b5ed6446eca20/readme.md",
+        "https://github.com/QuantConnect/Lean/blob/a092eb6069a90c30e7dd75ed036b5ed6446eca20/LICENSE",
+        "https://github.com/QuantConnect/Lean/commit/a092eb6069a90c30e7dd75ed036b5ed6446eca20"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "GitHub 'latest release' (v2.4.0.1, published 2017-08-08) is stale; LEAN ships primarily via pip/NuGet/LEAN CLI rather than GitHub Releases, so this field understates current activity (pushed_at 2026-09-24).",
+        "This is a light readme/license re-check; the deeper engine and AlpacaBrokerageModel.cs review already recorded in engines-strategies.json (id lean, pinned at 985ef30) is not repeated here.",
+        "Wiring verdict (2026-09-24): wire_now. Already wired as the frozen backtest oracle/comparator per engines-strategies.json (id lean) and blueprints/us-equities/engine/receipt.json; this review confirms currency and changes no wiring."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "blueprints/us-equities/engine/receipt.json",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [
+        "lean"
+      ],
+      "reviewed_files": [
+        {
+          "path": "readme.md",
+          "extent": "Purpose/overview and license mention; light re-check pass, not a re-run of the full prior deep review."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License identification only (Apache-2.0, unmodified Apache template with QuantConnect Corporation copyright)."
+        }
+      ],
+      "archived": false,
+      "relevance": "Existing selected or compared component; relevance inherited from the linked card."
+    },
+    {
+      "repository": "https://github.com/ricequant/rqalpha",
+      "source_commit": "0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f",
+      "source_date": "2026-09-24T03:26:27Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "outside_north_star",
+      "role": "Chinese event-driven algorithmic backtest and live-trading platform",
+      "layers": [
+        "backtesting",
+        "execution-engine"
+      ],
+      "rationale": "README and module layout confirm a China A-share/futures/bonds/convertible-bonds focus using RQData/Tushare data with no US equities, Alpaca or Interactive Brokers integration, and the LICENSE overrides Apache-2.0 with a Chinese-language clause restricting commercial use without Ricequant's authorization.",
+      "license": "Apache-2.0 base text overridden by a custom Chinese-language non-commercial/authorization clause (Ricequant)",
+      "license_classifier": "NOASSERTION",
+      "sources": [
+        "https://github.com/ricequant/rqalpha/blob/0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f/README.rst",
+        "https://github.com/ricequant/rqalpha/blob/0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f/LICENSE",
+        "https://github.com/ricequant/rqalpha/tree/0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f/rqalpha/mod",
+        "https://github.com/ricequant/rqalpha/tree/0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f/rqalpha/data/base_data_source",
+        "https://github.com/ricequant/rqalpha/commit/0d98adefa87956e26f3e7ca5b26b5f3fc7ca834f"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "China-market framework: README documents A-shares/indices/funds/futures/bonds/convertible-bonds via RQData (proprietary) and Tushare; no US equities, Alpaca or Interactive Brokers integration was found.",
+        "LICENSE is not plain Apache-2.0: a Chinese-language clause states unauthorized commercial use is prohibited without Ricequant authorization and that this clause overrides Apache-2.0 on conflict; GitHub's own license detector reports NOASSERTION for the repository, consistent with this custom text.",
+        "Repository also contains a root-level CLAUDE.md; its content was not read and was not treated as an instruction to this review, per the read-only review-as-data rule.",
+        "Latest GitHub release observed 2026-09-24: release/6.4.0, published 2026-09-18T03:36:13Z.",
+        "Wiring verdict (2026-09-24): do_not_wire. Do not wire; no US-equities data or broker path exists in the reviewed source, and the custom commercial-use clause is an added reason to keep it out of any NAS execution or data path."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.rst",
+          "extent": "Purpose, target markets, data sources (RQData/Tushare), platform description, license statement."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Full license text identification (Apache-2.0 base plus custom Chinese-language commercial-authorization clause taking precedence)."
+        },
+        {
+          "path": "rqalpha/mod",
+          "extent": "Directory listing only (rqalpha_mod_sys_accounts/analyser/progress/risk/scheduler/simulation/transaction_cost) to confirm module/account scope."
+        },
+        {
+          "path": "rqalpha/data/base_data_source",
+          "extent": "Directory listing only (data_source.py, storages.py, adjust.py) to confirm data-source abstraction."
+        }
+      ],
+      "archived": false,
+      "relevance": "Outside the current research-first US-equity and native-agent scope."
+    },
+    {
+      "repository": "https://github.com/stefan-jansen/machine-learning-for-trading",
+      "source_commit": "243bc7a2cdbfa5569e85790a56031131c754d0ce",
+      "source_date": "2026-09-24T17:36:05Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "overlaps_established",
+      "role": "Companion code and nine case studies for the Machine Learning for Trading 3rd-edition book, spanning data sourcing, overfitting-control methodology and live-trading demos",
+      "layers": [
+        "quant-research-reference"
+      ],
+      "rationale": "A large, actively maintained (pushed the same day as this review) teaching corpus whose most NAS-relevant contribution -- point-in-time validation, survivorship-bias detection and overfitting controls (Deflated Sharpe Ratio, White's Reality Check, purged/embargoed CV) -- already has dedicated candidate libraries tracked separately in NAS's own data-evaluation and engines-strategies catalogs, so this repo is a design/methodology reference rather than a new dependency to wire.",
+      "license": "MIT",
+      "license_classifier": "MIT",
+      "sources": [
+        "https://github.com/stefan-jansen/machine-learning-for-trading/blob/243bc7a2cdbfa5569e85790a56031131c754d0ce/README.md",
+        "https://github.com/stefan-jansen/machine-learning-for-trading/blob/243bc7a2cdbfa5569e85790a56031131c754d0ce/LICENSE",
+        "https://github.com/stefan-jansen/machine-learning-for-trading/blob/243bc7a2cdbfa5569e85790a56031131c754d0ce/02_financial_data_universe/README.md"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "27-chapter repository with bundled/fetched third-party vendor samples (e.g. the discontinued Quandl 'Wiki Prices' US-equity archive, AlgoSeek S&P 500 options analytics, CME futures data, Binance and OANDA feeds); these are pedagogical datasets under the book's own terms, not entitled or current data for NAS's production pipeline, and were not individually re-licensed or re-verified here.",
+        "Reviewed only the root README, LICENSE and the Chapter 2 data-universe README; the other 26 chapters, the six companion 'ml4t-data'-family production libraries and the 61 published agent skills referenced from the README were not inspected.",
+        "Prior NAS record for this repository (catalogs/landscape/claude-independent-discovery.json, candidate 370) was discovery_only and cited only star count as evidence; this review performed an independent primary-source read and does not rely on that prior claim.",
+        "Latest GitHub release observed 2026-09-24: v3.1.0-artifacts, published 2026-09-20T15:14:58Z.",
+        "Data rights: Repository code is MIT-licensed by Stefan Jansen; bundled/fetched example datasets (Quandl Wiki Prices, AlgoSeek options analytics, CME futures, Binance, OANDA) are third-party vendor samples provided for the book's pedagogical use, not a licensed feed for production redistribution or trading.",
+        "Wiring verdict (2026-09-24): reference_only. Not wired as a running dependency; use the Chapter 2 point-in-time/survivorship-bias/data-quality notebooks and the overfitting-control chapters as a design reference alongside NAS's already-tracked purged-CV candidates (eslazarev/purged-cross-validation, landtml/purgedcv, skfolio) rather than adopting this repository's own environment."
+      ],
+      "evidence_refs": [
+        "catalogs/landscape/claude-independent-discovery.json",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview and heading inspection; first 110 lines covering the third-edition scope, methodology claims and the nine case-study table."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
+        },
+        {
+          "path": "02_financial_data_universe/README.md",
+          "extent": "Full chapter README, covering data-source taxonomy, the notebook list (incl. point-in-time validation and survivorship-bias detection) and named vendor datasets."
+        }
+      ],
+      "archived": false,
+      "relevance": "Relevant capability or reference already represented in the selected foundation."
+    },
+    {
+      "repository": "https://github.com/supabase/supabase",
+      "source_commit": "21df8d02e62a3cc3f0b4eeebeecec3241be2ff48",
+      "source_date": "2026-09-24T17:29:31Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "outside_north_star",
+      "role": "Hosted/self-hosted Postgres backend-as-a-service platform (auth, storage, realtime, edge functions, REST/GraphQL APIs)",
+      "layers": [
+        "database-platform"
+      ],
+      "rationale": "A generic Firebase-alternative application backend (Postgres plus auth, storage, realtime and edge-function services) with no financial-data, signals or forecasting capability; its primary model is a paid hosted platform, and self-hosting pulls in a multi-service stack NAS's local DuckDB/SQLite research storage does not need.",
+      "license": "Apache-2.0",
+      "license_classifier": "Apache-2.0",
+      "sources": [
+        "https://github.com/supabase/supabase/blob/21df8d02e62a3cc3f0b4eeebeecec3241be2ff48/README.md",
+        "https://github.com/supabase/supabase/blob/21df8d02e62a3cc3f0b4eeebeecec3241be2ff48/LICENSE"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Reviewed only the root README (first 70 lines) and the LICENSE header; the self-hosted docker-compose stack, individual service repositories (Realtime, GoTrue, PostgREST, storage-api, pg_graphql, postgres-meta) and their own separate licenses were not inspected.",
+        "No financial-data, US-equities or trading-specific capability was found in the reviewed material; conclusion is scoped to the root platform repository only.",
+        "Latest GitHub release observed 2026-09-24: v1.26.08, published 2026-08-07T13:57:57Z.",
+        "Data rights: Apache-2.0-licensed platform code; the hosted product is a commercial paid service (supabase.com) and self-hosting pulls in separately licensed sibling services (Realtime, GoTrue, storage-api, etc.); no financial-market data of any kind is involved.",
+        "Wiring verdict (2026-09-24): do_not_wire. No wiring location applies in NAS; the research/simulation stack uses local DuckDB/SQLite directly and paid hosting is out of the current paper scope, so a hosted/self-hosted Postgres BaaS platform has no current role."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview and heading inspection; first 70 lines covering the feature list and self-host/hosted architecture summary."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "License declaration/scope inspection, not a legal audit of all dependencies."
+        }
+      ],
+      "archived": false,
+      "relevance": "Outside the current research-first US-equity and native-agent scope."
+    },
+    {
+      "repository": "https://github.com/TraderAlice/OpenAlice",
+      "source_commit": "0d4faa90c67d6c24685c7b40679bea5a5742a215",
+      "source_date": "2026-09-24T14:50:52Z",
+      "review_level": "source_review",
+      "review_depth": "selected_primary_files",
+      "decision": "alternative",
+      "role": "Multi-broker, multi-asset AI trading desktop/CLI orchestrator (Alpaca, IBKR, crypto exchanges, Longbridge, forex) with agent-staged, human-approved order execution",
+      "layers": [
+        "trading-research-agent",
+        "broker-adapter"
+      ],
+      "rationale": "A capable, very actively developed (pushed and released same day) multi-broker/multi-asset trading app whose Alpaca client defaults to paper but is configurable to live order placement across equities, options and crypto; its broad scope, AGPL-3.0 license, agent-staged/human-approved governance model and self-declared 'Trading execution is beta' status make it a conditional reference, not a fit for NAS's narrower deterministic-order-state architecture.",
+      "license": "AGPL-3.0",
+      "license_classifier": "AGPL-3.0",
+      "sources": [
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/README.md",
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/LICENSE",
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/packages/guardian-runtime/src/trading-mode.ts",
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/packages/uta-broker-alpaca/src/index.ts",
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/packages/uta-protocol/src/brokers/presets.ts",
+        "https://github.com/TraderAlice/OpenAlice/blob/0d4faa90c67d6c24685c7b40679bea5a5742a215/services/uta/src/domain/trading/brokers/alpaca/AlpacaBroker.ts"
+      ],
+      "limitations": [
+        "No installation, execution, broker call or native acceptance was performed by this review.",
+        "Repository is a very large (100+ package) actively developed monorepo; this review sampled 6 files out of thousands and cannot certify the behavior of the full order-authority, credential-sealing, or multi-broker code paths (IBKR, ccxt crypto, Longbridge, LeverUp were not opened).",
+        "AGPL-3.0 is a strong copyleft license; no code was read for reuse and none would be reused under a reference-only treatment.",
+        "README's 'You review and approve execution through Trading as Git' human-gate claim was not traced into executable code in this bounded review; only the underlying AlpacaBroker.placeOrder client (paper defaults true, configurable to live) was confirmed directly.",
+        "Latest GitHub release observed 2026-09-24: v0.94.1, published 2026-09-24T16:23:10Z.",
+        "Order authority: Agents stage proposed operations; the README states a human must review and approve execution ('Trading as Git'), but AlpacaBroker.placeOrder itself directly calls Alpaca's order API once configured, and the paper flag (default true) can be set to false for live orders across equities/options/crypto. No NAS installation or credential connection was performed.",
+        "Wiring verdict (2026-09-24): reference_only. At most the 'Trading as Git' staged-approval UX pattern and Unified Trading Account broker-abstraction idea would inform NAS's own future paper/live approval-flow design notes; no code would be imported (AGPL-3.0) and no order path would be wired."
+      ],
+      "evidence_refs": [
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Full read (185 lines): product description, 'Trading execution is beta' caution, and the 'Trading as Git' human review/approve claim."
+        },
+        {
+          "path": "LICENSE",
+          "extent": "Confirmed verbatim GNU AGPL-3.0 license text."
+        },
+        {
+          "path": "packages/guardian-runtime/src/trading-mode.ts",
+          "extent": "Full read (102 lines): local trading-mode/config tier resolution (lite/readonly/pro) and sealed local credential-store handling; not a paper/live safety gate."
+        },
+        {
+          "path": "packages/uta-broker-alpaca/src/index.ts",
+          "extent": "Full read (9 lines): thin wrapper re-exporting the real AlpacaBroker implementation."
+        },
+        {
+          "path": "packages/uta-protocol/src/brokers/presets.ts",
+          "extent": "Full read (72 lines): catalog of supported broker presets spanning equities/crypto/forex."
+        },
+        {
+          "path": "services/uta/src/domain/trading/brokers/alpaca/AlpacaBroker.ts",
+          "extent": "Selected sections (placeOrder/modifyOrder/cancelOrder/closePosition, roughly lines 150-470 of 845): confirms a functioning Alpaca order client defaulting to paper (config.paper=true) but configurable to live, across equity/option/crypto order types."
+        }
+      ],
+      "archived": false,
+      "relevance": "Potential substitute or conditional extension; no demonstrated replacement need."
+    },
+    {
+      "repository": "https://github.com/trycua/cua",
+      "source_commit": "210efbceb46bf1acb0f66985a098262445d91e93",
+      "source_date": "2026-09-24T17:29:37Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "targeted_candidate",
+      "role": "Computer-use stack: desktop automation driver, local macOS/Linux VMs (Lume), paid cloud desktop fleets, specialist models and benchmarks",
+      "layers": [
+        "platform",
+        "browser-and-ui"
+      ],
+      "rationale": "No US-equity trading role. The foundation-lane record (agent-ecosystem PR #30, merged 2026-09-24) moves trycua/cua from rejected to trial in the platform layer for Lume only: MIT-licensed throwaway macOS VMs, preferred over tart (deferred; FSL-1.1-ALv2, not OSI-approved), with the pin unset and the earlier duplicate-coverage (R-DUP) reason kept for the rest of the stack. The 2026-09-21 NAS landscape review at 9bbfa7dd already holds Cua Driver as a conditional targeted candidate. At this commit the README still describes Lume as local macOS and Linux VMs on Apple Silicon through Apple's Virtualization.Framework, and the root license is plain MIT.",
+      "license": "MIT",
+      "license_classifier": "MIT",
+      "sources": [
+        "https://github.com/trycua/cua/blob/210efbceb46bf1acb0f66985a098262445d91e93/README.md",
+        "https://github.com/trycua/cua/blob/210efbceb46bf1acb0f66985a098262445d91e93/LICENSE.md"
+      ],
+      "limitations": [
+        "No installation, execution, VM creation, cloud resource or native acceptance was performed by this review.",
+        "README/license overview only: README.md purpose, component and license sections and the root LICENSE.md (MIT, copyright 2025 Cua AI, Inc.) at this commit; libs/lume, libs/cua-driver and the linked tutorials were not opened in this pass.",
+        "The README's curl-to-shell installers for Cua Driver and Lume were read as data and not run. Cua Fleets is a paid hosted service whose pools can retain paid capacity; paid hosting is outside the current scope.",
+        "Optional components carry other terms: cua-som is AGPL-3.0-or-later, the cua-perception extension combines an AGPL-3.0-only OmniParser model artifact with Apache-2.0 PP-OCR artifacts, and CUA-S1 weights and datasets on Hugging Face have their own cards. The Lume-only trial does not cover them.",
+        "Foundation-lane acceptance for the trial (agent-ecosystem next_action, not run here): on the Mac, create, boot and destroy one ephemeral macOS VM with Lume; record disk use, boot time and teardown; confirm no persistent daemon remains; compare against tart only if Lume fails.",
+        "Wiring verdict (2026-09-24): wire_after_acceptance, foundation lane only (the Lume VM trial). No trading-lane wiring."
+      ],
+      "evidence_refs": [
+        "catalogs/landscape/upstream-snapshot.json",
+        "https://github.com/seathatflowsinourveins/agent-ecosystem/pull/30",
+        "catalogs/us-equities/star-refresh-20260924.json"
+      ],
+      "catalog_entry_ids": [],
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "extent": "Purpose/overview, component (Fleets, Driver, CUA-S1, Lume, Bench) and license sections; installers read as data, not run."
+        },
+        {
+          "path": "LICENSE.md",
+          "extent": "Full root license text (MIT); not a legal audit of optional components, model artifacts or dependencies."
+        }
+      ],
+      "archived": false,
+      "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
     }
   ],
   "latest_public_refresh": {
-    "checked_at_utc": "2026-09-20T00:03:16.689897+00:00",
-    "endpoint": "GET /users/seathatflowsinourveins/starred?per_page=100 (all pages)",
-    "public_repositories": 342,
-    "added_since_recorded_snapshot": 0,
+    "checked_at_utc": "2026-09-24T17:33:14Z",
+    "endpoint": "GET /user/starred (authenticated; Accept: application/vnd.github.star+json; all pages)",
+    "public_repositories": 357,
+    "added_since_recorded_snapshot": 15,
     "removed_since_recorded_snapshot": 0,
     "duplicate_ids": 0,
-    "evidence_ref": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
-    "scope": "Public endpoint identity refresh; no private-star inventory or source-execution claim."
+    "evidence_ref": "catalogs/us-equities/star-refresh-20260924.json",
+    "scope": "Authenticated star identity refresh. All 357 repositories are public (15 additions confirmed by GraphQL isPrivate), so no private star is excluded; no source-execution claim."
   }
 }

@@ -126,12 +126,14 @@ The later [native observability receipt](../../observability/receipt.json) estab
 The September 20 native public-endpoint refresh contained **342 public stars**, with
 zero added, removed or renamed identity pairs since the previous refresh. The
 [refresh receipt](../../blueprints/us-equities/authenticated-data/public-stars-refresh.json)
-preserves the identity hash and scope. The card-membership ledger and 105
-beyond-star baseline card identities remain in [coverage.json](coverage.json);
+preserves the identity hash and scope. The September 24 authenticated refresh
+contained **357 stars**: 15 additions, no removals and no private repositories
+([receipt](star-refresh-20260924.json)). The card-membership ledger and 102
+beyond-star card identities remain in [coverage.json](coverage.json);
 the [complete star audit](star-audit.md) and typed union include subsequent
 additions. A recorded disposition is distinct from code review or native execution.
 
-Source review covered official metadata, README/license text and relevant API/source documentation at the date and depth stated per record. It did not deeply benchmark all 342 stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
+Source review covered official metadata, README/license text and relevant API/source documentation at the date and depth stated per record. It did not deeply benchmark all 357 stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
 ## Decision and evidence vocabulary
 
