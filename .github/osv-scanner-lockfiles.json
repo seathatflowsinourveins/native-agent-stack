@@ -129,6 +129,10 @@
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
@@ -147,6 +151,10 @@
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",
       "lockfile": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock"
+    },
+    {
+      "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
+      "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
     }
   ],
   "excluded": [

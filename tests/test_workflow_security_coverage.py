@@ -59,6 +59,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "dependency-review.yml",
             "hardware-profile-smoke.yml",
             "receipt-staleness.yml",
+            "saturation-tracking.yml",
         }
         self.assertEqual(
             actual, expected,
@@ -90,6 +91,17 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
     def test_hardware_profile_smoke_workflow_has_no_offline_findings(self):
         with tempfile.TemporaryDirectory() as temporary:
             result = _analyze(WORKFLOWS_DIR / "hardware-profile-smoke.yml", Path(temporary))
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
+
+    def test_saturation_tracking_workflow_has_no_offline_findings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = _analyze(WORKFLOWS_DIR / "saturation-tracking.yml", Path(temporary))
         try:
             findings = json.loads(result.stdout)
         except json.JSONDecodeError:

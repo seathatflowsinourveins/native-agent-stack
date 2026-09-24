@@ -46,8 +46,9 @@ contains "sub-penny increment does not fulfill minimum pricing criteria", for a
 first POST whose limit price really has more than two decimals at or above $1.00
 (four below), followed by an absent-ID lookup. Alpaca states such orders "will be
 rejected" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md). That page
-documents the body but not the HTTP status; 422 is inferred from the code prefix and
-the POST /v2/orders 422 entry, pending native confirmation, and the message, not the
+documents the body but not the HTTP status. 422 was inferred from the code prefix and
+the POST /v2/orders 422 entry. It was observed once on the paper endpoint in the
+2026-09-24 native-fault run (`native-faults/receipt.json`, C04). The message, not the
 code, is the discriminator. The transport
 raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
 the body with those constants only, never retaining or raising it. The engine's

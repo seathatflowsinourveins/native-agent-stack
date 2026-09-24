@@ -255,7 +255,11 @@ def engine_scan(out: dict) -> dict:
     USD, numbers as decimal strings, the regime inputs so the engine recomputes the factor itself."""
     t, g, v, n = parse_rule(out["rule"])
     d = out["regime_detail"]
-    fmt = lambda x: None if x is None else format(x, ".10g")  # noqa: E731
+    def fmt(x):  # decimal text with at most 9 places, the engine's scan limit (mover._scan_decimal)
+        if x is None:
+            return None
+        t = f"{x:.9f}".rstrip("0").rstrip(".")
+        return t if t not in ("", "-0") else "0"
     return {"schema_version": 1, "kind": "mover_scan", "protocol": out["protocol"],
             "rule": f"{t}|G{fmt(g * 100)}|V{int(v)}|{n}",
             "scan_time": datetime.fromisoformat(out["scan_time_utc"]).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

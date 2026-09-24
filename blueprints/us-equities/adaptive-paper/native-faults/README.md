@@ -2,40 +2,97 @@
 
 Gate: `native-fault-behaviour` in `catalogs/us-equities/gates-20260922.json`
 (receipt path `blueprints/us-equities/adaptive-paper/native-faults/receipt.json`).
-This directory holds the harness, its frozen `plan.json`, this note and the
-first live receipt `receipt.json`. The offline suite
+This directory holds the harness, its frozen `plan.json`, this note, the current
+live receipt `receipt.json` (the 2026-09-24 run) and the retained receipt of the
+earlier incomplete run, `receipt-20260923.json`. The offline suite
 `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
-**Engine change of 2026-09-24 (offline only; no paper run since).** The two
-gaps that held the 2026-09-23 run at `native_faults_incomplete` are closed in
-the engine and harness, so a live run can now reach `native_faults_passed`:
+## Native run of 2026-09-24: `native_faults_passed`
 
-- C05: `AlpacaPaperTransport.cancel` now sends the DELETE for every owned order
-  to its known broker id instead of returning early when a client-id lookup
-  shows it terminal. Alpaca's answer is data. A 404 or 422 is accepted without a
-  freeze when the follow-up lookup shows the order terminal. The repeated terminal
-  observation changes no ledger state.
-- C04: Alpaca's documented sub-penny rejection body (HTTP 422 inferred, not yet
-  observed) is recognised as definitive. See "C04 choice" below.
-  The harness's `FaultLedger` lets only the C04 client id past the pre-send
-  `invalid_price_increment` check, so Alpaca itself answers the fault.
+One live Alpaca paper run at 2026-09-24 14:39:05Z to 14:39:06Z, started by the
+workflow coordinator from this branch's code at commit 8051464. The host class
+is the WSL2 workstation (Linux, Python from the pinned adaptive-paper runtime),
+against a paper account dedicated to this PC. No account id, credential or
+host path is recorded. The raw stdout stays private (231 bytes, sha256
+`1481924e43f2867e5e62338ab60bb5b60cbe9ff9df3f54c36f8fa348f082ecac`). The run
+wrote `receipt.json` in place, replacing the 2026-09-23 receipt, which is kept
+byte-for-byte as `receipt-20260923.json`.
 
-This is offline evidence only: unit tests with a fake broker and mocked HTTP.
-`receipt.json` is still the 2026-09-23 run. It is bound to the old plan, harness
-and engine hashes and stays `native_faults_incomplete` until a new paper run
-replaces it.
+The receipt binds this tree. Its `harness_sha256` (3f01fb31...), `plan_sha256`
+(f276b26c...) and `engine_sources_sha256` for runner.py (a6101294...), safety.py
+(ad520fc4...) and transport.py (b92e8752...) equal the SHA-256 of those files
+here and the engine entries in `../source-hashes.json`. The later merge of
+origin/main changed none of these five files.
 
-The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
-harness commit) predates the engine change. It produced the incomplete result
-in the table below. Its `plan_sha256`, `harness_sha256` (742fb666...) and
-`engine_sources_sha256` (runner.py, safety.py, transport.py) are the
-pre-change hashes and do not match this tree. Before the engine change,
+| Case | Outcome | Evidence class | Broker requests |
+|---|---|---|---|
+| C01 accept resting buy (SPY 1 @ 382.96, bid 765.92) | passed | native_paper | submit 200, `pending_new`, broker id recorded |
+| C02 cancel resting | passed | native_paper | cancel 204 plus five reads 200; ledger and fresh snapshot `canceled`, zero filled |
+| C05 cancel again | passed | native_paper | DELETE sent (`delete_sent: true`), answered 204, then one read 200; no new freeze reason; `ledger_before` equals `ledger_after` (`canceled`, zero filled) |
+| C04 definitive rejection (306.3601) | passed | native_paper | submit 422, then client-id read 404; ledger `broker_refused` with `{"http_status": 422, "refusal": "sub_penny_minimum_price_variance"}` |
+
+`posts_reserved` was 2 of 4, with one transport build, no stop error and no
+interruption. Cleanup proved flat with `runner.reconcile` over a fresh snapshot:
+zero open orders, zero positions, cash delta 0.00. The `IN_FLIGHT` marker was
+removed. The receipt does not record the process exit code. By harness design,
+`native_faults_passed` is the exit-0 status.
+
+C05 differs from the expectation written before the run: Alpaca paper answered
+the DELETE of an already-canceled order with 204, not the 422 its DELETE
+reference suggests ("The order status is not cancelable"). The plan accepts 204,
+404 or 422 as data. So `broker_refusal_observed` is false, and the case shows
+that the engine sends the repeat DELETE and stays consistent with any of the
+three answers. It does not show how the engine handles a 422 cancel refusal;
+that path is covered only offline.
+
+**What C04's definitive refusal rests on.** Alpaca documents that orders
+exceeding the minimum price variance "will be rejected", with the body
+`{"code": 42210000, "message": "... sub-penny increment does not fulfill
+minimum pricing criteria"}`
+(https://docs.alpaca.markets/us/docs/orders-at-alpaca.md). This run observed
+that body with HTTP 422 on the first and only POST of the C04 client id. The
+limit price 306.3601 violates the two-decimal increment. The follow-up
+client-id lookup returned 404, and there was no position or cash effect before
+or after. The transport raises `RejectedSubmission(422,
+"sub_penny_minimum_price_variance")` only when all of these hold, and the ledger
+then records `broker_refused`. This is one observation, on the paper endpoint,
+from one host and one account. It confirms the previously inferred 422 for this
+body there. It is not evidence for the live endpoint, and it does not make 422
+definitive in general. The comments in `safety.py` and `transport.py` still
+describe the 422 as inferred. They are left as they are because editing them
+would change the engine hashes this receipt binds.
+
+**Gate status.** `scripts/trading_gates.py` now lists `native-fault-behaviour`
+as a flip candidate (`/status == "native_faults_passed"` holds). The gate's own
+rule still keeps it `not_established` in this change. The ladder allows a
+status change "only by a dated commit after the checker lists the gate as a flip
+candidate". The gate note adds that "native (non-synthetic) faults were actually
+exercised ... is qualified manually before the dated commit that flips this
+gate". `docs/acceptance-evidence-policy.md` says "Parsing a wrapper's own
+`passed` field is not independent confirmation". The qualification therefore
+needs an independent observation that has not been made yet, for example an
+order listing by a separate method (not the harness or the engine transport)
+for prefix `nf-20260924t143905-29d7ec-`. It would show the C01 order `canceled`
+with zero filled, no broker order for the C04 client id, and zero open orders
+and positions. The order-throughput `independent-observation-20260924.json` is
+the pattern to follow.
+
+## Retained history: the incomplete run of 2026-09-23
+
+Retained as `receipt-20260923.json`, byte-identical to the `receipt.json`
+registered before the 2026-09-24 run (sha256 28b9db92...).
+
+The first live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
+harness commit) predates the 2026-09-24 engine change. It produced the
+incomplete result in the table below. Its `plan_sha256`, `harness_sha256`
+(742fb666...) and `engine_sources_sha256` (runner.py, safety.py, transport.py)
+are the pre-change hashes and do not match this tree. Before the engine change,
 `harness.py` was also changed after the run, following review: an
 exception inside cleanup still writes `CLEANUP_REQUIRED` and a receipt (the run
 itself cleaned up without error), a leftover marker from an earlier run
 refuses a new start, the write-ahead marker is fsynced, and a failed transport
-stop fails the run. The next run therefore binds a new harness hash.
+stop fails the run.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|
@@ -46,7 +103,21 @@ stop fails the run. The next run therefore binds a new harness hash.
 
 Cleanup proved flat with zero open orders by `runner.reconcile` (cash delta
 0.00). One POST was reserved out of the four allowed. Status:
-`native_faults_incomplete`, so the gate stays `not_established`.
+`native_faults_incomplete`.
+
+The 2026-09-24 engine change closed its two gaps. It was verified offline first,
+with unit tests using a fake broker and mocked HTTP, then natively by the run
+above:
+
+- C05: `AlpacaPaperTransport.cancel` now sends the DELETE for every owned order
+  to its known broker id instead of returning early when a client-id lookup
+  shows it terminal. Alpaca's answer is data. A 404 or 422 is accepted without a
+  freeze when the follow-up lookup shows the order terminal. The repeated terminal
+  observation changes no ledger state.
+- C04: Alpaca's documented sub-penny rejection body is recognised as definitive
+  only with HTTP 422. See "C04 choice" below.
+  The harness's `FaultLedger` lets only the C04 client id past the pre-send
+  `invalid_price_increment` check, so Alpaca itself answers the fault.
 
 ## Run
 
@@ -166,11 +237,11 @@ will be rejected", and gives the body `{"code": 42210000, "message": "invalid
 limit_price 290.123. sub-penny increment does not fulfill minimum pricing
 criteria"}`.
 
-That page documents the body and the rejection, not the HTTP status. The 422
-is an inference: the code's 422 prefix and the create-order reference's only
+That page documents the body and the rejection, not the HTTP status. Before
+the 2026-09-24 run, the 422 was an inference: the code's 422 prefix and the create-order reference's only
 input-refusal status, 422 "Input parameters are not recognized."
-(https://docs.alpaca.markets/us/reference/postorder.md). The next native run
-must confirm it. The engine fails closed if it is wrong: `documented_refusal`
+(https://docs.alpaca.markets/us/reference/postorder.md). The 2026-09-24 run
+observed it once on the paper endpoint (see above). The engine fails closed if it is wrong: `documented_refusal`
 requires status 422, and any other status with this body stays ambiguous.
 The code 42210000 alone is not treated as sufficient, since it may be shared
 by other 422 refusals (the offline fixtures use it for several). The message
@@ -196,7 +267,15 @@ The pre-send check stays for the engine. The only exemption is the harness's
 `FaultLedger`, for its single `<prefix>c04` client id. No engine path can send a
 sub-penny price.
 
-## What the next native run must show
+## What a qualifying native run must show
+
+This list was written before the 2026-09-24 run and is kept unchanged. That
+run's receipt meets every item it can record. It does not record the exit
+code, which follows from `native_faults_passed` by harness design. C05's DELETE
+answer was 204 rather than the expected 422, and 204 is one of the accepted
+answers. Meeting the list makes the receipt
+a flip candidate. The dated flip commit still needs the manual qualification
+described under "Gate status" above.
 
 A receipt can flip the gate only when it shows all of the following, bound to
 this tree's plan, harness and engine hashes:

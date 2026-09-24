@@ -22,14 +22,17 @@ cover. Each test below names the drift it stops:
   pinned release lacks (scripts/release_due.py's ``due`` list) says "added after `<release_tag>`";
 - a new-host page that mentions an install input (bootstrap script or pin file) whose content
   differs between the pinned release and HEAD says "changed after `<release_tag>`" in a unit
-  that mentions it. release_due.py only reports missing paths, so this is the check that sees
-  a changed script;
+  that mentions it. release_due.py reports every changed new-machine file in its ``changed``
+  list; this check requires the per-page note for the install inputs;
 - bootstrap.md's plugin revision check quotes the same commits as the recipes/README.md rows
   it names, and its install commands are the recipe's own commands (nothing else binds those
   copies, and a marketplace source cannot enforce a commit);
 - no documented `claude plugin marketplace add` passes a commit as its ref: a Claude marketplace
   source takes a branch or tag, and the `@<commit>` form exits 1 (dated records and retained
-  evidence, which quote that failure, are exempt).
+  evidence, which quote that failure, are exempt);
+- every documented `gh attestation verify` of the catalog's own publication binds the commit
+  (--source-digest), and bootstrap.md's release archive check also binds the tag (--source-ref)
+  and runs `gh release verify-asset`.
 
 The markers name the release they were written against, so they stay true in every later
 checkout: at a newer release they are history, and a re-pin needs no documentation edit for
@@ -602,6 +605,54 @@ class MarketplaceCommitRefTests(unittest.TestCase):
         self.assertEqual(self.errors("claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user\n"
                                      "claude plugin marketplace add mksglu/context-mode --scope user\n"
                                      "codex plugin marketplace add mksglu/context-mode --ref " + "a" * 40, "ok"), [])
+
+
+class CatalogAttestationBindingTests(unittest.TestCase):
+    """Every documented check of the catalog's own attestation (signed by publish-catalog.yml)
+    binds the commit with --source-digest, and bootstrap.md's release archive check also binds the
+    tag with --source-ref. Without them `gh attestation verify` exited 0 for the attested archive
+    of unreleased commit 41d39b39 (workflow_dispatch run 35803145596) saved under the
+    v2026.09.23.1 file name; with --source-digest it exited 1 (2026-09-24)."""
+
+    COMMAND_RE = re.compile(r"gh attestation verify (?:[^\n]*\\\n)*[^\n]*")  # with backslash continuations
+    # Dated records and retained evidence may quote an older, unbound command as history.
+    EXEMPT = MarketplaceCommitRefTests.EXEMPT
+
+    def pages(self) -> list[Path]:
+        tracked = git_tracked()
+        if tracked is None:
+            tracked = {rel(path) for path in ROOT.rglob("*.md") if ".git" not in path.parts}
+        return sorted(ROOT / path for path in tracked if path.endswith(".md") and not path.startswith(self.EXEMPT))
+
+    @classmethod
+    def errors(cls, text: str, label: str, flags: tuple[str, ...] = ("--source-digest",)) -> list[str]:
+        return [f"{label}: `{' '.join(command.split())[:90]}…` lacks {flag}"
+                for command in cls.COMMAND_RE.findall(text) if "publish-catalog.yml" in command
+                for flag in flags if flag not in command]
+
+    def test_catalog_attestation_checks_bind_the_commit(self):
+        pages = self.pages()
+        errors = [error for path in pages if path.is_file()
+                  for error in self.errors(path.read_text(encoding="utf-8", errors="replace"), rel(path))]
+        self.assertEqual(errors, [])
+        # The publication guides that carry such a command are all in scope (not a fixed list).
+        self.assertTrue({"SECURITY.md", "adoption/bootstrap.md", "adoption/update.md", "docs/catalog-provenance.md",
+                         "docs/github-automation.md"} <= {rel(path) for path in pages})
+
+    def test_the_bootstrap_archive_check_binds_the_release_tag_and_commit(self):
+        text = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        self.assertTrue(any("publish-catalog.yml" in command for command in self.COMMAND_RE.findall(text)))
+        self.assertEqual(self.errors(text, "adoption/bootstrap.md",
+                                     ("--source-digest <release_commit>", "--source-ref refs/tags/<release_tag>")), [])
+        self.assertIn("gh release verify-asset <release_tag> native-agent-stack-<release_commit>.tar.gz", text)
+
+    def test_the_check_rejects_an_unbound_command_and_ignores_other_signers(self):
+        unbound = ("gh attestation verify native-agent-stack-<c>.tar.gz \\\n  --repo o/r \\\n"
+                   "  --signer-workflow o/r/.github/workflows/publish-catalog.yml\n")
+        self.assertEqual(len(self.errors(unbound, "mutant")), 1)
+        bound = unbound.replace("publish-catalog.yml\n", "publish-catalog.yml \\\n  --source-digest <c>\n")
+        self.assertEqual(self.errors(bound, "ok"), [])
+        self.assertEqual(self.errors("gh attestation verify -R rhysd/actionlint actionlint.tar.gz\n", "ok"), [])
 
 
 if __name__ == "__main__":
