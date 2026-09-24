@@ -696,6 +696,44 @@ same receipts without the flag. The export keeps `evidence/artifacts/gap-wave2-2
 `blind_checkout.py` strips only label keys from them, not gap text. A coordinator discloses this with the
 wave.
 
+**Manifest newcomers** (`--manifest-newcomers`, 2026-09-23 landscape sweep). Before this flag, only
+manifest-mode trading packets carried the dated manifest's newcomer candidates. Foundation packets took their
+candidates from the frozen v1 ledger, so a repository discovered after the ledger never reached a foundation
+lane. With the flag:
+- **Foundation packets gain newcomers.** Each takes its manifest row's `candidates` and
+  `alternatives_keep_but_compare` whose repository is not already a candidate. They are shuffled together
+  with the ledger candidates, so a key's position does not tell them apart.
+- **Refuted discoveries are left out.** In both catalogs, a repository with a `refuted_*` disposition in any
+  of its entries is left out, even where another list repeats it. The refutation is of the discovery
+  proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
+  catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
+- **Registered evidence is attached.** A newcomer's `evidence_refs` hold the repository-relative
+  `evidence/` path each `evidence[]` entry leads with, when that path is listed in `manifests/evidence.json`
+  `files[]` and still has its listed sha256. A locator after the path (`items[3]`, `(lines 1-9)`) is dropped.
+  Command/result prose and an unregistered or edited file are not attached. The 2026-09-23 manifest names one
+  such file; the landscape-sweep source-review receipts supply the rest. Under `--withhold-labels`, a path that names a selection role or a manifest disposition (for
+  example `keep-but-compare`, `refuted`, `targeted-candidate` or `newcomer`) is not attached either; the same
+  wider vocabulary applies to registered receipts.
+
+The flag is off by default, so the 2026-09-22 packets reproduce. A non-GitHub https repository, such as a
+Hugging Face model, is identified by its lowercased URL rather than dropped. With `manifest-20260923.json`, the
+flag adds 35 foundation newcomers, 6 of them Hugging Face models, and removes 9 refuted trading newcomers
+across the 32 blind packets (312 candidates).
+
+A newcomer's name must not redact the packet's shared prose (Codex review of #151 at `cf82e689`). A name part
+unique to one candidate is a redaction term, so granite-embedding's "embedding" had turned semantic-rag's
+requirement "a compatible embedding service" into "a compatible <candidate> service". Capability and format words
+seen in newcomer names (`embedding`, `embed`, `reranker`, `multilingual`, `bench`, `https`, `typescript`,
+`parallel`, `orchestrator`, `group`, `brokerage` and their variants) are now generic name parts, as `retrieval` and
+`memory` already were. A test builds the real 2026-09-24 packets and requires that newcomers add no placeholder
+to any packet's requirement, limitations or overturn text. The same list restores "Brokerage model defaults ..."
+in LEAN's own card limitation in execution-broker, the only default-build packet it changes.
+
+A newcomer is never adopted, and the lane contract forbids a non-adopted winner
+(`scripts/landscape.py lane_winner_components`). A lane can prefer one as its challenger
+(`challenger_preferred`) with an overturn protocol. Promoting it takes the measured comparison that protocol
+names.
+
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
 `candidates[].upstream`). Under `--withhold-labels` every packet -- manifest-mode
