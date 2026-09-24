@@ -950,6 +950,9 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
                 "path outside the repository and packets: //localhost/etc/passwd",
             "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
+            "/bin/bash -lc \"python3 -c \\\"print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')\\\"\"":
+                "path outside the repository and packets: //%2Frun%2Fuser%2F1000%2Fx.sock/v1",
+            "/bin/bash -lc \"python3 -c \\\"print('local://etc/passwd')\\\"\"": "path outside the repository and packets: //etc/passwd",
             "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
                 "runs qmd by path: /usr/local/bin/qmd",
         }
@@ -1006,6 +1009,13 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
                 self.assertEqual(self.run_lane(), 2)
         self.assertIn("shell-script launcher", err.getvalue())
         self.assertFalse(self.argv_log.exists() and self.argv_log.read_text(encoding="utf-8").strip())
+        # An env-style shell launcher (asdf's shims) is a shell-script launcher too.
+        (bin_dir / "asdf-codex").write_text('#!/usr/bin/env bash\nexec asdf exec codex "$@"\n', encoding="utf-8")
+        (bin_dir / "asdf-codex").chmod(0o755)
+        self.assertIn("shell-script launcher (bash)", codex_lane.codex_launch_issue(str(bin_dir / "asdf-codex")))
+        (bin_dir / "s-codex").write_text('#!/usr/bin/env -S bash -e\n', encoding="utf-8")
+        (bin_dir / "s-codex").chmod(0o755)
+        self.assertIn("shell-script launcher (bash -e)", codex_lane.codex_launch_issue(str(bin_dir / "s-codex")))
         # The fixture's env-style launcher, a missing codex and a binary are not refused.
         self.assertIsNone(codex_lane.codex_launch_issue())
         self.assertIsNone(codex_lane.codex_launch_issue("no-such-codex"))

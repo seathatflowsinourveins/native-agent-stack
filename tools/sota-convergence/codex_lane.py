@@ -368,7 +368,14 @@ def network_authority(command: str, match) -> bool:
     #206, P2; independent review of #206, C1)."""
     path = match.group(1)
     scheme = URL_SCHEME_BEFORE.search(command[max(0, match.start(1) - 32):match.start(1)])
-    return path.startswith("//") and not path.startswith("///") and bool(scheme) and scheme.group(1).lower() != "file"
+    return path.startswith("//") and not path.startswith("///") and bool(scheme) and not local_scheme(scheme.group(1))
+
+
+def local_scheme(scheme: str) -> bool:
+    """A scheme whose authority names a local path: ``file``, fsspec's ``local`` and any ``unix`` one
+    (``http+unix://%2Frun%2F...``) (independent review of #206 at 891ab70f)."""
+    scheme = scheme.lower()
+    return scheme in ("file", "local") or "unix" in scheme
 
 
 def outside_paths(command: str, allowed_roots) -> list:
@@ -840,6 +847,9 @@ def codex_launch_issue(name: str = "codex"):
     except OSError:
         return None
     words = first[2:].decode("utf-8", errors="replace").split() if first.startswith(b"#!") else []
+    # An env-style launcher names its interpreter after env (asdf's shims are #!/usr/bin/env bash; review at 891ab70f).
+    if len(words) >= 2 and os.path.basename(words[0]) == "env":
+        words = words[2:] if words[1] == "-S" else words[1:]
     if words and os.path.basename(words[0]) in SHELL_INTERPRETERS:
         return (f"{program} is a shell-script launcher ({' '.join(words)}); it runs its tools by name, which a blind "
                 f"child's PATH ({BLIND_CHILD_PATH}) does not resolve, so a blind run is refused. Put a native codex "
