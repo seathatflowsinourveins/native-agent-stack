@@ -51,6 +51,21 @@ def rule_ids():
             "P": sorted(f"P|{s}|{z}" for s in P_SCORES for z in Z_EXITS)}
 
 
+def p_net(T, i, notional, broker="alpaca", mult=1.0):
+    """D7: net return of a P trade whose shares change by a split between d and d+1 (share_mult) and which
+    receives cash (a dividend per original share); fees use the actual exit shares and raw exit price."""
+    entry, exit_, cin, cout = float(T.entry[i]), float(T.exit[i]), float(T.cin[i]), float(T.cout[i])
+    shares = notional / entry
+    out_shares = shares * float(T.share_mult[i])
+    basis = shares * entry * (1 + mult * cin)
+    gross_sell = out_shares * exit_
+    proceeds = gross_sell * (1 - mult * cout) - R.sell_fees(T.day[i], out_shares, gross_sell) + shares * float(T.cash[i])
+    if broker == "ibkr":
+        basis += R.ibkr_commission(shares, shares * entry)
+        proceeds -= R.ibkr_commission(out_shares, gross_sell)
+    return proceeds / basis - 1
+
+
 class Trades:
     """Column arrays for one family's trades across its rule-exits."""
 
@@ -60,8 +75,10 @@ class Trades:
         self.cols = defaultdict(list)
 
     def add(self, rid, day, symbol, entry, exit_px, c_in, c_out, decision_price, decision_dv, bar_dv, order_key,
-            supplement=False, basis_uncertain=False, flag=None, exit_day=None, forced_return=None):
+            supplement=False, basis_uncertain=False, flag=None, exit_day=None, forced_return=None, share_mult=1.0, cash=0.0):
         c = self.cols
+        c["share_mult"].append(share_mult)
+        c["cash"].append(cash)
         c["rid"].append(rid)
         c["sess"].append(self.cidx[day])
         c["day"].append(exit_day or day)
@@ -85,7 +102,7 @@ class Trades:
         self.rid = np.array(c["rid"], dtype=object)
         self.symbol, self.day, self.flag = c["symbol"], c["day"], np.array(c["flag"], dtype=object)
         self.sess = np.array(c["sess"], dtype=int)
-        for k in ("entry", "exit", "cin", "cout", "price", "dv", "bar_dv", "order", "forced"):
+        for k in ("entry", "exit", "cin", "cout", "price", "dv", "bar_dv", "order", "forced", "share_mult", "cash"):
             setattr(self, k, np.array(c[k], dtype=float))
         self.supplement = np.array(c["supplement"], dtype=bool)
         self.basis_uncertain = np.array(c["basis_uncertain"], dtype=bool)
@@ -94,9 +111,12 @@ class Trades:
         self.taf = np.array([f[1] for f in fees]) if fees else np.zeros(0)
         self.capv = np.array([f[2] for f in fees]) if fees else np.zeros(0)
         self.net = {}
+        special = (self.share_mult != 1.0) | (self.cash != 0.0) if self.n else np.zeros(0, dtype=bool)
         for name, broker, mult in V1.VARIANTS:
             net = R.net_return_np(self.entry, self.exit, self.cin, self.cout, self.sec, self.taf, self.capv, REF, broker, mult) \
                 if self.n else np.zeros(0)
+            for i in np.flatnonzero(special):  # D7: P holds across a split or an ex-dividend date
+                net[i] = p_net(self, i, REF, broker, mult)
             self.net[name] = np.where(np.isnan(self.forced), net, self.forced)  # V17: a forced -100% loss
         syms = {s: i for i, s in enumerate(sorted(set(self.symbol)))}
         self.sym = np.array([syms[s] for s in self.symbol], dtype=int)
@@ -108,8 +128,8 @@ class Trades:
 
     def break_even(self, idx):
         """v1 C8 on this family's trades."""
-        if not len(idx) or np.isnan(self.forced[idx]).sum() != len(idx):
-            return None  # forced losses have no cost to scale
+        if not len(idx) or np.isnan(self.forced[idx]).sum() != len(idx) or ((self.share_mult[idx] != 1.0) | (self.cash[idx] != 0.0)).any():
+            return None  # forced losses and split/dividend holds have no single cost scale (D7)
 
         def mean_at(k):
             return float(R.net_return_np(self.entry[idx], self.exit[idx], self.cin[idx], self.cout[idx], self.sec[idx], self.taf[idx],
@@ -165,6 +185,8 @@ def simulate(T: Trades, idx, regime, rung, cap_leverage, start_equity=100_000.0,
                 filled_t += notional
                 if not math.isnan(T.forced[i]):
                     net = float(T.forced[i])
+                elif T.share_mult[i] != 1.0 or T.cash[i] != 0.0:
+                    net = p_net(T, i, notional)
                 else:
                     net = R.net_return(float(T.entry[i]), float(T.exit[i]), float(T.cin[i]), float(T.cout[i]), T.day[i], notional)
                 pnl += net * notional * (1 + float(T.cin[i]))
@@ -209,7 +231,8 @@ def evaluate_family(T: Trades, rids, regime, cap_leverage, lag_booking=False):
         codes = {"by_year": (T.years, T.year[idx]), "by_price_tier": (V1.PRICE_LABELS, T.ptier[idx]),
                  "by_v_tier": (V1.V_LABELS, T.vtier[idx]),
                  "by_concurrency": (V1.CONC_LABELS, np.searchsorted([1, 5, 20], conc_n, side="left") if len(idx) else conc_n)}
-        m = V1.summarise(nets["primary"], T.exit[idx] / T.entry[idx] - 1 if len(idx) else np.zeros(0), T.sess[idx], S, codes)
+        gross = (T.share_mult[idx] * T.exit[idx] + T.cash[idx]) / T.entry[idx] - 1 if len(idx) else np.zeros(0)
+        m = V1.summarise(nets["primary"], gross, T.sess[idx], S, codes)
         if len(idx):
             m["mean_stress"] = V1.rnd(float(nets["stress"].sum()) / len(idx) / Q)
             m["mean_ibkr"] = V1.rnd(float(nets["ibkr"].sum()) / len(idx) / Q)
@@ -378,6 +401,8 @@ def p_trades(daily: Path, costs: V1.Costs, cal_all, split_cal, lo: str, hi: str)
         for sc, ok in scores.items():
             if ok:
                 qualifying[(sc, d)].append((dv, sym, (raw_c, raw_on, raw_cn, dv, c, o_next, c_next, exit_kind, exit_day)))
+                # D7: shares change by the split factor between d and the exit row; the rest of the adjusted
+                # close-to-close ratio is cash (a dividend) per original share
     selected = defaultdict(set)
     for (sc, d), items in sorted(qualifying.items()):
         for dv, sym, (raw_c, raw_on, raw_cn, dv_, c, o_next, c_next, exit_kind, exit_day) in sorted(items, key=lambda x: (-x[0], x[1]))[:5]:  # V18
@@ -389,9 +414,14 @@ def p_trades(daily: Path, costs: V1.Costs, cal_all, split_cal, lo: str, hi: str)
                           exit_day=exit_day, forced_return=-1.0)
                     continue
                 use_open = z == "Z1" or (z == "Z3" and o_next < 0.95 * c)
-                exit_raw = raw_c * (o_next if use_open else c_next) / c
-                hs_out = costs.cells[f"{2 if use_open else 3}|{R.price_tier(raw_on if use_open else raw_cn)}|{R.dv_tier(dv)}"]["half_spread"]
-                T.add(f"P|{sc}|{z}", d, sym, raw_c, exit_raw, 0.5 * hs_in, 0.5 * hs_out, raw_c, dv, None, -dv, flag=exit_kind, exit_day=exit_day)
+                f = (raw_c / c) / (raw_cn / c_next)
+                share_mult = f if abs(f - 1) > R.SPLIT_TOLERANCE else 1.0
+                cash = raw_c * c_next / c - share_mult * raw_cn
+                cash = cash if cash > 1e-4 * raw_c else 0.0
+                exit_raw = raw_on if use_open else raw_cn
+                hs_out = costs.cells[f"{2 if use_open else 3}|{R.price_tier(exit_raw)}|{R.dv_tier(dv)}"]["half_spread"]
+                T.add(f"P|{sc}|{z}", d, sym, raw_c, exit_raw, 0.5 * hs_in, 0.5 * hs_out, raw_c, dv, None, -dv, flag=exit_kind, exit_day=exit_day,
+                      share_mult=share_mult, cash=cash)
     cap = p_capture(universe, qualifying, selected)
     return T.finish(), cap, dict(skips)
 

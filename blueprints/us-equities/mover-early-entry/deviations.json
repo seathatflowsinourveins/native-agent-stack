@@ -78,6 +78,16 @@
       "change": "Post hoc and labelled as such: capture and replication are also reported without basis-uncertain rows (ref from the daily-close fallback, or a split day: 6,845 development and 3,922 validation symbol-days), and both use the C25 epsilon. Selection, pass criteria and every trade metric are unchanged (verified: identical development and validation blocks), so the no-pass result stands.",
       "effect": "Results sha256 9d8c3d5b... (two independent runs byte-identical). The >= 10x tier holds 62 symbol-days, 16 without basis-uncertain rows. Wave H: 62.9% (all rows) and 69.7% (without basis-uncertain rows, 1,212 days) were +20% at 09:25; Spearman 0.257 and 0.248.",
       "v2": "Protocol v2 preregisters the same basis-uncertain sensitivity (clarifications-v2 V20) before any v2 outcome."
+    },
+    {
+      "id": "D7",
+      "recorded_at": "2026-09-24T06:31:21Z",
+      "kind": "post_outcome_correction",
+      "protocol": "mover-followup-v2-20260924",
+      "what": "Codex review on PR #162: a P trade held across a split or an ex-dividend date priced its exit as day d's raw close times the adjusted return, so fees used the pre-split share count and spread/SEC fees fell on dividend cash.",
+      "change": "P exits use the exit row's raw price; shares change by the daily dataset's split factor between d and the exit row (when it differs from 1 by more than 1e-2); the remainder of the adjusted close-to-close return is booked as cash per original share, without spread or fees. E and F are unaffected.",
+      "effect": "Results sha256 75a5004b... (two runs byte-identical): E and F blocks identical; P means change by at most 0.00002; no family has a development pass, as before.",
+      "also": "quotes.py now records each stamp's timestamp, reuses a completion only for the same timestamp, and table refuses a stamp whose quotes fall outside [ts - 60 s, ts]; the frozen cost table reproduces byte for byte under that check (all 4,725 stamps with quotes lie inside their windows). paper_compare.py pins asof to the trade session and uses the daily-close fallback."
     }
   ]
 }

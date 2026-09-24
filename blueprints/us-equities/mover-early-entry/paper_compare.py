@@ -34,15 +34,23 @@ def compare(f: Fetcher, scan: dict, fills: list, exit_rule: str):
     day = scan["session"]
     syms = sorted({x["symbol"] for x in fills})
     bars = {s: [] for s in syms}
+    # asof = the trade session: the tickers the scanner traded that day (a later rename or reuse cannot change them)
     for body in f.get(DATA, "/v2/stocks/bars", {"symbols": ",".join(syms), "timeframe": "1Min", "start": et_iso(day, "04:00"),
-                                                 "end": et_iso(day, "20:00"), "feed": "sip", "adjustment": "raw", "limit": 10000, "sort": "asc"}):
+                                                 "end": et_iso(day, "20:00"), "feed": "sip", "adjustment": "raw", "asof": day,
+                                                 "limit": 10000, "sort": "asc"}):
         for s, items in (body.get("bars") or {}).items():
             bars[s].extend(items)
     auctions = {}
-    for body in f.get(DATA, "/v2/stocks/auctions", {"symbols": ",".join(syms), "start": day, "end": day, "feed": "sip", "limit": 10000}):
+    for body in f.get(DATA, "/v2/stocks/auctions", {"symbols": ",".join(syms), "start": day, "end": day, "feed": "sip", "asof": day, "limit": 10000}):
         for s, days in (body.get("auctions") or {}).items():
             for d in days or []:
                 auctions[s] = {"o": d.get("o") or [], "c": d.get("c") or []}
+    daily_close = {}
+    for body in f.get(DATA, "/v2/stocks/bars", {"symbols": ",".join(syms), "timeframe": "1Day", "start": day, "end": day, "feed": "sip",
+                                                 "adjustment": "raw", "asof": day, "limit": 10000}):
+        for s, items in (body.get("bars") or {}).items():
+            if items:
+                daily_close[s] = items[-1]["c"]
     rows = []
     for x in fills:
         s = x["symbol"]
@@ -55,7 +63,7 @@ def compare(f: Fetcher, scan: dict, fills: list, exit_rule: str):
                "model_entry_ts": m_ts, "model_entry_source": m_src, "entry_diff_bps": bps(x.get("entry_price"), m_entry),
                "actual_exit": x.get("exit_price"), "actual_exit_ts": x.get("exit_ts"), "actual_exit_reason": x.get("exit_reason")}
         if m_entry is not None:
-            ex, high, halt, close_src = R.exits_for(m_entry, m_ts, b, day, oc)
+            ex, high, halt, close_src = R.exits_for(m_entry, m_ts, b, day, oc, daily_close.get(s))  # C22 fallback order
             px, ts, fb = ex[exit_rule]
             row.update({"model_exit": px, "model_exit_ts": ts, "model_exit_close_fallback": fb, "exit_diff_bps": bps(x.get("exit_price"), px),
                         "model_gross": px / m_entry - 1,

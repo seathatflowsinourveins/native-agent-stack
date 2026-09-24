@@ -27,7 +27,7 @@ clean; D6), so its capture numbers are reported with and without those rows.
 
 ## Result (v2, development and validation)
 
-`evidence/summary-v2-dev-val-run-v1.json` (results sha256 `3334962f...`, two independent runs byte-identical): **no
+`evidence/summary-v2-dev-val-run-v1.json` (results sha256 `75a5004b...` after the D7 P correction, two independent runs byte-identical): **no
 rule-exit passes development in any family**, so nothing validates and no holdout is read.
 
 - **E, first-cross (earliest-stage) entries**: all 216 rule-exits have negative mean net returns (median -3.1%); none

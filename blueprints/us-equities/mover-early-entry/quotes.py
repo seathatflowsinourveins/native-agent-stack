@@ -137,6 +137,17 @@ def fetch_one(client_headers, limiter, symbol, session, ts, max_pages=10):
 PROTOCOL_ASOF = "2026-09-21"  # the candidate list's naming date (deviations.json D2)
 
 
+def quote_epoch(ts: str) -> float:
+    """RFC 3339 with up to nanoseconds, e.g. 2021-01-04T14:34:59.965123456Z."""
+    head, _, frac = ts.rstrip("Z").partition(".")
+    return datetime.fromisoformat(head).replace(tzinfo=timezone.utc).timestamp() + (float("0." + frac) if frac else 0.0)
+
+
+def in_window(quotes, ts) -> bool:
+    """Every quote of a stamp lies in its request window [ts - 60 s, ts] (guards against reusing another stamp's pages)."""
+    return all(ts - 60 - 1e-6 <= quote_epoch(q["t"]) <= ts + 1e-6 for q in quotes)
+
+
 def valid_quote(quotes):
     """The newest quote (input newest first) that is not crossed, locked or zero-priced."""
     for q in quotes:
@@ -153,17 +164,20 @@ def cmd_fetch(a) -> int:
     sample = json.loads(a.sample.read_bytes())
     a.out.mkdir(parents=True, exist_ok=True, mode=0o700)
     ledger_path = a.out / "ledger.jsonl"
-    done = set()
+    done = {}
     if ledger_path.exists():
         for line in ledger_path.read_text().splitlines():
             rec = json.loads(line)
             if rec.get("event") == "stamp_complete":
-                done.add(rec["key"])
+                done[rec["key"]] = rec.get("ts")
+            elif rec.get("event") == "stamp_incomplete":
+                done.pop(rec["key"], None)
     todo = []
     for s in sample["sample"]:
         for ts, _, kind in s["stamps"]:
             k = f"{s['symbol']}|{s['session']}|{s['time']}|{kind}"
-            if k not in done:
+            # reuse only a completion for this exact timestamp; a legacy record without one is re-checked by `table`
+            if k not in done or (done[k] is not None and done[k] != ts):
                 todo.append((k, s["symbol"], s["session"], ts))
     limiter, lock = Limiter(a.per_second), threading.Lock()
     with ledger_path.open("a") as ledger:
@@ -181,7 +195,7 @@ def cmd_fetch(a) -> int:
                 recs.append({"event": "page", "key": k, "file": f"{name}-{i:02d}.json.gz", "status": status,
                              "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
             ok = all(r["status"] == 200 for r in recs)
-            recs.append({"event": "stamp_complete" if ok else "stamp_incomplete", "key": k, "pages": len(pages)})
+            recs.append({"event": "stamp_complete" if ok else "stamp_incomplete", "key": k, "ts": ts, "pages": len(pages)})
             with lock:
                 for r in recs:
                     ledger.write(json.dumps(r) + "\n")
@@ -241,6 +255,8 @@ def cmd_table(a) -> int:
                 if hashlib.sha256(raw).hexdigest() != p["sha256"]:
                     raise SystemExit(f"quote page hash mismatch: {p['file']}")
                 quotes.extend((json.loads(raw).get("quotes") or {}).get(s["symbol"]) or [])
+            if not in_window(quotes, ts):
+                raise SystemExit(f"stamp {k}: pages hold quotes outside [ts - 60 s, ts]; re-fetch it")
             q = valid_quote(quotes)
             if q is None:
                 missing += 1
