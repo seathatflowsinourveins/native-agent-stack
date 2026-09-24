@@ -23,6 +23,7 @@ class).
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -50,6 +51,14 @@ GH_PAT_SHAPED_VALUE = "".join(_GH_PAT_SHAPE_PARTS)
 CURSOR = "QU1EfER8MTU5NTkwODgwMDAwMDAwMDAwMA=="
 
 GITLEAKS = shutil.which("gitleaks")
+
+
+class GitleaksPresenceTests(unittest.TestCase):
+    def test_gitleaks_is_on_path_when_the_ci_step_requires_it(self):
+        """The secret-scan job sets GITLEAKS_TESTS_REQUIRED and puts the pinned binary on PATH; without
+        it the allowlist tests below would silently skip there, as they do in the validate job."""
+        if os.environ.get("GITLEAKS_TESTS_REQUIRED"):
+            self.assertIsNotNone(GITLEAKS, "GITLEAKS_TESTS_REQUIRED is set but gitleaks is not on PATH")
 
 
 class _LockBusy(Exception):
