@@ -117,7 +117,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "gitleaks",
           "repository": "https://github.com/gitleaks/gitleaks"
@@ -708,16 +708,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -1319,16 +1319,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2359,16 +2359,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '8.30.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2671,16 +2671,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.49.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -3132,16 +3132,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -4583,16 +4583,16 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin 'v8.30.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-24T14:20:45Z",
+                "pass": 1
               },
               "qualified_models": []
             }

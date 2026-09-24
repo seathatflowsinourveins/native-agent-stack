@@ -236,6 +236,30 @@
         }
       },
       "sizing_arithmetic": null
+    },
+    {
+      "id": "macos-m5pro-20260924",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 24 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "assumptions": null,
+      "measured_tiers": {
+        "concurrent_use_warning": "Unified memory is one pool shared by the local generation model and the embedding/semantic-RAG stack; the local_generation_model_tier and embedding_semantic_rag_tier budgets below are sequential-use capacity estimates, not a verified concurrent-use budget. Running both near their tier ceiling at the same time on this host is not accounted for here.",
+        "ecosystem_job_memory_high_gb": 4.0,
+        "ecosystem_job_memory_max_gb": 6,
+        "embedding_semantic_rag_tier": "light",
+        "local_generation_model_tier": "mid-14b-q4-or-8b-q8",
+        "workflow_concurrency_cap": 16
+      },
+      "measured": {
+        "arm64": true,
+        "cores": 18,
+        "cpu_brand": "Apple M5 Pro",
+        "effective_ram_gb": 24.0,
+        "evidence_class": "native_proven",
+        "platform": "macos",
+        "unified_memory_gb": 24.0
+      },
+      "sizing_arithmetic": null
     }
   ],
   "layers": [
