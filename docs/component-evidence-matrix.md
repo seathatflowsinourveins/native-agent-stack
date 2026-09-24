@@ -26,13 +26,13 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `foundation/document-retrieval` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json`) | qmd (conditional [0/0/0/0] / untested [0/0/0/0]); markitdown (conditional [0/0/0/0] / untested [0/0/0/0]); poppler (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/durable-memory` | dual_lane_same_winner | ai-memory (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/git-github-automation` | dual_lane_same_winner | worktrunk (not_established [0/0/0/0] / host_verified [1/0/1/0]); candidate:cli-cli (not_established [0/0/0/0] / untested [0/0/0/0]); difftastic (not_established [0/1/0/0] / untested [0/0/0/0]) |
-| `foundation/hosting-services` | dual_lane_same_winner | fastapi (accepted [0/0/0/0] / untested [0/0/0/0]); nextjs (accepted [0/0/0/0] / untested [0/0/0/0]); postgresql (accepted [0/0/0/0] / untested [0/0/0/0]) |
+| `foundation/hosting-services` | dual_lane_same_winner | fastapi (accepted [0/0/0/0] / host_verified [1/0/1/0]); nextjs (accepted [0/0/0/0] / host_verified [1/0/1/0]); postgresql (accepted [0/0/0/0] / host_verified [1/0/1/0]) |
 | `foundation/instructions-skills` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json`) | affaan-m/ECC (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:typesafe-ai-skills (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:openai-skills (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/isolation` | dual_lane_same_winner | worktrunk (accepted [0/0/0/0] / host_verified [1/0/1/0]); sandbox-runtime (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/mcp-surfaces` | dual_lane_same_winner | mcporter (accepted [0/0/0/0] / untested [0/0/0/0]); mcp-inspector (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/native-clients` | dual_lane_same_winner | claude-code (accepted [0/0/0/0] / untested [0/0/0/0]); codex (accepted [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/observation-inference` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json`) | opentelemetry-collector-contrib (conditional [0/0/0/0] / untested [0/0/0/0]); prometheus (conditional [0/0/0/0] / untested [0/0/0/0]); loki (conditional [0/0/0/0] / untested [0/0/0/0]) |
-| `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (conditional [0/0/0/0] / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / untested [0/0/0/0]) |
+| `foundation/quality-evaluation` | dual_lane_same_winner | promptfoo (conditional [0/0/0/0] / untested [0/0/0/0]); playwright-test (conditional [0/0/0/0] / host_verified [1/0/1/0]) |
 | `foundation/recovery-portability` | dual_lane_same_winner | restic (conditional [0/0/0/0] / untested [0/0/0/0]); candidate:astral-sh-uv (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/scheduling-supervision` | dual_lane_same_winner | dagu (conditional [0/0/0/0] / untested [0/0/0/0]); systemd (conditional [0/0/0/0] / untested [0/0/0/0]) |
 | `foundation/secrets-credentials` | dual_lane_same_winner | gitleaks (conditional [0/0/0/0] / host_verified [1/0/1/0]) |
@@ -106,9 +106,6 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `foundation/durable-memory`: `ai-memory` (catalog/e2e state: untested)
 - `foundation/git-github-automation`: `candidate:cli-cli` (catalog/e2e state: untested)
 - `foundation/git-github-automation`: `difftastic` (catalog/e2e state: untested)
-- `foundation/hosting-services`: `fastapi` (catalog/e2e state: untested)
-- `foundation/hosting-services`: `nextjs` (catalog/e2e state: untested)
-- `foundation/hosting-services`: `postgresql` (catalog/e2e state: untested)
 - `foundation/instructions-skills`: `affaan-m/ECC` (catalog/e2e state: untested)
 - `foundation/instructions-skills`: `candidate:openai-skills` (catalog/e2e state: untested)
 - `foundation/instructions-skills`: `candidate:typesafe-ai-skills` (catalog/e2e state: untested)
@@ -120,7 +117,6 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `foundation/observation-inference`: `loki` (catalog/e2e state: untested)
 - `foundation/observation-inference`: `opentelemetry-collector-contrib` (catalog/e2e state: untested)
 - `foundation/observation-inference`: `prometheus` (catalog/e2e state: untested)
-- `foundation/quality-evaluation`: `playwright-test` (catalog/e2e state: untested)
 - `foundation/quality-evaluation`: `promptfoo` (catalog/e2e state: untested)
 - `foundation/recovery-portability`: `candidate:astral-sh-uv` (catalog/e2e state: untested)
 - `foundation/recovery-portability`: `restic` (catalog/e2e state: untested)

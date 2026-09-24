@@ -135,6 +135,9 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+    },
+    {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock",
       "parser": "requirements.txt"
     }
@@ -159,6 +162,10 @@
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
       "lockfile": "blueprints/us-equities/mover-v3/data-tools/requirements.lock"
+    },
+    {
+      "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+      "lockfile": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
     },
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",

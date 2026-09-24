@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "8314468fc13980d4c4aecb42eeb87b577bbc63035c530f3b60f8c6608908e238",
-      "bytes": 9021
+      "sha256": "8f86ba2318a55fe16b461f05af53d07d4a7976f2bdb481cd969d6b12fc5f75a0",
+      "bytes": 9305
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3469,8 +3469,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "a536189115ee351b903a5b815227e77b7da6caa31bf81b771c3915284405c7f2",
-      "bytes": 8302
+      "sha256": "4d6c01c4fbd881b1a55f0cb6472ca778d50b4def31c08bb839c9cd558b504422",
+      "bytes": 9437
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -3531,6 +3531,11 @@
       "path": "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
       "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6",
       "bytes": 1119
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+      "bytes": 25990
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment.json",
@@ -9315,8 +9320,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "ab6e87803b74ffd3d4f027e6c2436a1c02a3eaa18b33442ec482499263a198a8",
-      "bytes": 180203
+      "sha256": "aed574090f2ae3716719e36e0f42cc3ed79de8926d1a6d9e2dd75f4b76fc8ce5",
+      "bytes": 179660
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9370,8 +9375,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "b511a3f313dd15942b745bb8f7ccf66158d844a7fd4872ab3c3c23fdacdaa19c",
-      "bytes": 76641
+      "sha256": "84f4cd52cdcf0abe9c51390c4fce9441f0a7effc3be667868d84a982fbab4a3f",
+      "bytes": 76661
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9805,8 +9810,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "687cd2f40ea575b892848d1e25d4b5ab70e0bdf8142ecd981ef75b5da6935114",
-      "bytes": 18246
+      "sha256": "9b8aeada8a7c5f440ffdaa601a0a54f4ca2e08c9838da6ba9b03ac222c668733",
+      "bytes": 17962
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10110,8 +10115,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "516114c5801eb11eb19c4689ef106cf5a1bc0c5f7136fd92ef1f54253d2b0c4b",
-      "bytes": 15138
+      "sha256": "f2504883970ee5dfdae4eba3ac192a394c42ea3293ecbd5ad6d87c8f2e33e96d",
+      "bytes": 15158
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -25254,6 +25259,21 @@
       "bytes": 3987
     },
     {
+      "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+      "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b",
+      "bytes": 12066
+    },
+    {
+      "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+      "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc",
+      "bytes": 792
+    },
+    {
+      "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+      "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+      "bytes": 32972
+    },
+    {
       "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
       "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
       "bytes": 20209
@@ -27589,6 +27609,16 @@
       "bytes": 8721
     },
     {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--duckdb--use--20260924.json",
+      "sha256": "b9d6aeebe8ca0a6a99015eab4b83e2b93c8e45ed01558657fa41f22bda6f7ece",
+      "bytes": 4440
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--fastapi--use--20260924.json",
+      "sha256": "bb389756d7069c3614af126948391572631153f15a5d687f7d89f50177b29196",
+      "bytes": 5267
+    },
+    {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
       "sha256": "842219f23e3d68e4974a3d7f03661b7854aa042d2e459f0eaff1fdde6b5bead0",
       "bytes": 9319
@@ -27597,6 +27627,31 @@
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
       "sha256": "b90aa27b31398d1ee5319f134ac2468cafa2c6576cd2475db3287489e610ebb8",
       "bytes": 9533
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nextjs--use--20260924.json",
+      "sha256": "c73a9cb55032181ba810c98573ac375582e1a4d84f2ee2cd9417668c87859054",
+      "bytes": 4819
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-cli--use--20260924.json",
+      "sha256": "196831792c316a0bb302c356c48304da43d1ac361d9234f193d9eebf89a27fef",
+      "bytes": 5058
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-test--use--20260924.json",
+      "sha256": "fff12a16cad0ab59765e7cdab8f45f6f89e8d089921b9fc2ff6c99aa45a8bfe7",
+      "bytes": 4208
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--postgresql--use--20260924.json",
+      "sha256": "46e16ad94f3a6f4ca5f35a6e57547f20a3d83c8bb1d0c5503eb39a2cbc1919a9",
+      "bytes": 5800
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--react--use--20260924.json",
+      "sha256": "cce77bcab5b54558d05e14095c26aed289ca6d33bc487fda68afbcb715ef310e",
+      "bytes": 5046
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",
@@ -29552,6 +29607,7 @@
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json"
   ]
 }

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--postgresql--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "3699012eb6ad3d970727b5098eb3cc7303680281",
+  "recorded_by": {
+    "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "postgresql",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && .runtime/postgresql/18.6/bin/postgres --version",
+      "exit": 0,
+      "duration_s": 0.005,
+      "output_sha256": "66cbaae4250f039f92200da1428bbd0f3f0850da18716bb1ce501a178c259711",
+      "output_excerpt": "postgres (PostgreSQL) 18.6\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && grep -o 555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f Makefile && shasum -a 256 .runtime/postgresql-source/postgresql-18.6.tar.bz2 | cut -d' ' -f1",
+      "exit": 0,
+      "duration_s": 0.054,
+      "output_sha256": "99c6a2992dda671f6ae6be27f3b001ee954c1e168085eb31e7048001263e454c",
+      "output_excerpt": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f\n555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && .runtime/postgresql/18.6/bin/pg_ctl -D .runtime/native-pgdata status | head -1",
+      "exit": 0,
+      "duration_s": 0.006,
+      "output_sha256": "eb526d9987b3064ded0be63f672a72b06c0b0f445a7abe6e90a6e50ef1f8b0e7",
+      "output_excerpt": "pg_ctl: server is running (PID: 52425)\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && .runtime/postgresql/18.6/bin/psql -h 127.0.0.1 -p 15432 -U postgres -d ledger_test -v ON_ERROR_STOP=1 -At -c 'select version_num from alembic_version'",
+      "exit": 0,
+      "duration_s": 0.008,
+      "output_sha256": "24d9b35c727e6c78676c2ad378a8c3c47cfb539f3583d3cd9e1eafee51d5679d",
+      "output_excerpt": "0001\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && .runtime/postgresql/18.6/bin/psql -h 127.0.0.1 -p 15432 -U postgres -d ledger_test -v ON_ERROR_STOP=1 -At -c 'begin' -c 'create temporary table receipt_probe (x integer primary key)' -c 'insert into receipt_probe values (1), (2), (3)' -c 'select sum(x) from receipt_probe' -c 'rollback'",
+      "exit": 0,
+      "duration_s": 0.009,
+      "output_sha256": "fd49e67b17f2280c51af660f892cd20545c7c0d79be37e01adb1758233c9f35a",
+      "output_excerpt": "BEGIN\nCREATE TABLE\nINSERT 0 3\n6\nROLLBACK\n"
+    }
+  ],
+  "tool_versions": {
+    "postgresql": "18.6"
+  },
+  "observed_at_utc": "2026-09-24T16:38:24Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB, macOS arm64), PostgreSQL 18.6 (the catalog pin), built by the blueprint from the source archive whose SHA-256 the Makefile pins, reported its version, showed the archive hash equal to the pinned value, reported its loopback server running, returned Alembic revision 0001 from the migrated ledger_test database, and ran a transaction that created a temporary table, inserted three rows, summed them to 6 and rolled back (all commands exit 0).",
+  "limitations": [
+    "PostgreSQL is the blueprint's own source build under .runtime (no ICU, readline, zlib or TLS; loopback TCP, trust authentication), not a production database installation.",
+    "Exercised through the committed typed run-ledger blueprint (blueprints/convergence-practice/application-delivery) with synthetic data: no authentication, production deployment, load, pagination beyond 100 rows or backup/restore qualification.",
+    "One transaction and one catalog read; no concurrency, replication, backup, restore or crash-recovery behavior was exercised.",
+    "Recorded outside Claude Code's Seatbelt sandbox: on this host the sandbox blocks PostgreSQL shared memory, loopback database connections and pnpm 12 network and store operations (evidence/artifacts/macos-application-20260924/run-summary.json). Recorded from a detached checkout of main 3699012 (adoption/update.md). adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:38:24Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#201 independent review (foundation-lane-setup) at a5b9aea: catalog_revision 3699012 verified (ancestor of origin/main, present in a fresh single-branch main clone); version 18.6 = catalog pin; rebuilt from a clean detached checkout of 3699012 (make setup, postgres-install with archive SHA-256 OK, postgres-init/start/databases, migrate, migrate-test) and re-ran all 5 recorded commands: exit 0 each, 4/5 output_sha256 byte-identical, pg_ctl status differs only by PID; the transaction sums to 6 and rolls back; cluster stopped and port 15432 free afterwards",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T17:13:49Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
