@@ -405,12 +405,16 @@ def compare(args) -> int:
         # v1 without a supplement keeps the preregistered run's exact output bytes.
         summary["rules"] = rules
         summary["fetch_error_rows"] = sum(1 for r in results if r.get("fetch_errors"))
+        summary["closing_print_other_exchange_legs"] = sum(
+            (r.get("event_close_source") == "closing_print_other_exchange") + (r.get("prev_close_source") == "closing_print_other_exchange")
+            for r in results)
         extra = {"rules": rules, "supplement_sha256": sha256_file(args.supplement) if supplement_doc else None}
     out = {"kind": "extreme_gainer_price_audit_results", "plan_sha256": sha256_file(HERE / "plan.json"), **extra,
            "inputs": {k: PLAN["inputs"][k]["sha256"] for k in ("forward_returns_csv", "alias_map_csv")},
            "snapshot_sha256": sha256_file(args.snapshot), "snapshot_fetched_at_utc": snapshot["fetched_at_utc"],
            "summary": summary, "events": results}
     args.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
+    os.chmod(args.out, 0o600)  # per-event results are private
     print(json.dumps(summary))
     return 0
 

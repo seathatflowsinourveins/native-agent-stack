@@ -63,7 +63,7 @@
    "recovered_mismatch": 59
   }
  },
- "privacy": "per-event results (tickers, dates, the package's gains) and the raw snapshot stay private; they would republish the package's dataset and SIP prices",
+ "privacy": "per-event results (the full event list and the package's gains) and the raw snapshot stay private; a few public tickers are named as examples in README.md and deviations.json, without prices or gains",
  "private_posthoc_sha256": "667b42bbefd8d99a47471f014876eea9d00ee1f18d789191dbbfc47f27665ddc",
  "private_results_sha256": "bcc62428ff9d3455b629c201e2aa79eb0267ba1f651e07795c478de5a1e7133d",
  "run": "run-20260924a",

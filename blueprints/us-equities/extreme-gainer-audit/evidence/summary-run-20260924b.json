@@ -26,18 +26,19 @@
    "prev_close_differs": 4,
    "split_between": 1
   },
-  "note": "Explains the preregistered mismatches; the plan.json verdicts and overturn stand.",
+  "note": "Explains the v2 (deviations.json) mismatches; the preregistered v1 verdicts and overturn stand.",
   "preregistered": false,
   "unflagged_ok_rows_compared": 643
  },
- "privacy": "per-event results and the raw snapshot and supplement stay private",
- "private_posthoc_sha256": "256c7c034e6ade8b317be855837c348271f686a5581af369e3007b14a40dbea5",
- "private_results_sha256": "c0c251a136a2dd697857b8b47d6692e9a4c6e8453d180a3df8a7e60cb44ee6c4",
+ "privacy": "per-event results (the full event list and the package's gains) and the raw snapshot and supplement stay private; a few public tickers are named as examples in README.md and deviations.json, without prices or gains",
+ "private_posthoc_sha256": "79b6b6a26c790e5f68a0dae4356282940d28eac1f7a04af97e91c0bcaad4cc72",
+ "private_results_sha256": "7e8b6999f52bfbbf5e45d0bdcbdf681aa119dff5f88d22b9d00e2604c7ce8b82",
  "rules": "v2",
  "run": "run-20260924b (v2 rules on the run-20260924a snapshot plus supplement)",
  "snapshot_sha256": "0d98909f091fb4d0562c03a981a81ff0602e6a8665e2aa736c2133adb93e6e49",
  "summary": {
   "bar_close_fallback_rows": 19,
+  "closing_print_other_exchange_legs": 15,
   "events": 957,
   "fetch_error_rows": 0,
   "forward_returns": {

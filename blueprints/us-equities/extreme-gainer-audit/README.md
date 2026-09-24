@@ -17,7 +17,11 @@ returns, from Alpaca SIP official closes.
 
 ```
 python3 audit.py fetch --env-file PAPER_ENV --package-dir PKG --out-dir PRIVATE
-python3 audit.py compare --snapshot PRIVATE/snapshot.json --package-dir PKG --out results.json
+python3 audit.py compare --snapshot PRIVATE/snapshot.json --package-dir PKG --out PRIVATE/results-a.json      # preregistered v1
+python3 posthoc.py --snapshot PRIVATE/snapshot.json --package-dir PKG --results PRIVATE/results-a.json --out PRIVATE/posthoc-a.json
+python3 audit.py supplement --env-file PAPER_ENV --snapshot PRIVATE/snapshot.json --package-dir PKG --out PRIVATE/supplement-b.json
+python3 audit.py compare --rules v2 --snapshot PRIVATE/snapshot.json --supplement PRIVATE/supplement-b.json --package-dir PKG --out PRIVATE/results-b.json
+python3 posthoc.py --snapshot PRIVATE/snapshot.json --supplement PRIVATE/supplement-b.json --package-dir PKG --results PRIVATE/results-b.json --out PRIVATE/posthoc-b.json
 ```
 
 `compare` refuses inputs whose SHA-256 differs from the plan's, and a snapshot fetched under a different plan. A
@@ -81,5 +85,8 @@ What this does and does not establish:
 
 ### Still owed under the overturn rule
 
-Each preregistered mismatch must be adjudicated against a third source before the package's price-derived statistics
-are used: 137 under v1, and 84 plus 45 recovered mismatches under v2. Until then those statistics are unverified.
+Each mismatch must be adjudicated against a third source before the package's price-derived statistics are used:
+- under v1, 137 mismatches plus 59 recovered mismatches;
+- under v2, 84 mismatches, 45 recovered mismatches and 1 package_uncomputed mismatch.
+
+Until then those statistics are unverified.

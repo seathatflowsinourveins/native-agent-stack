@@ -86,7 +86,8 @@ def main(argv=None) -> int:
     q = statistics.quantiles(gaps, n=20) if len(gaps) > 20 else []
     out = {"kind": "extreme_gainer_price_audit_posthoc", "preregistered": False,
            **({"rules": results["rules"]} if "rules" in results else {}),
-           "note": "Explains the preregistered mismatches; the plan.json verdicts and overturn stand.",
+           "note": ("Explains the preregistered (v1) mismatches; the plan.json verdicts and overturn stand." if results.get("rules", "v1") == "v1"
+                    else "Explains the v2 (deviations.json) mismatches; the preregistered v1 verdicts and overturn stand."),
            "snapshot_sha256": results["snapshot_sha256"], "results_sha256": A.sha256_file(a.results),
            "unflagged_ok_rows_compared": n,
            "agree_official_close_gain": sum(v for (o, _), v in basis.items() if o),
@@ -98,6 +99,8 @@ def main(argv=None) -> int:
            "mismatch_leg_classes": dict(legs.most_common()),
            "mismatch_leg_examples": {k: v[:12] for k, v in sorted(leg_examples.items())}}
     a.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
+    import os
+    os.chmod(a.out, 0o600)
     print(json.dumps({k: out[k] for k in ("unflagged_ok_rows_compared", "agree_official_close_gain", "agree_bar_close_gain",
                                           "agree_bar_only", "agree_neither", "mismatch_leg_classes")}))
     return 0
