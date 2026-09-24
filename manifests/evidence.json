@@ -8859,6 +8859,16 @@
       "bytes": 8910
     },
     {
+      "path": "blueprints/us-equities/order-throughput/README.md",
+      "sha256": "4098e6cd8ddbd0b39b6a8525a141eb799714760fff1a43ee479d38fac0d2e97b",
+      "bytes": 24967
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/rate-limit-evidence-20260924.json",
+      "sha256": "8af45f43fd0366a827c8d19e8620493fcddf8bfc0003965d185578439c6ee137",
+      "bytes": 10913
+    },
+    {
       "path": "blueprints/us-equities/paper-e2e-20260921/README.md",
       "sha256": "81315bad5c7e1263ecea292db9a5691c4ddcc27437dc7e8b904d034538e48134",
       "bytes": 3469
@@ -29417,6 +29427,11 @@
       "path": "tests/test_order_contract.py",
       "sha256": "440bf4c0d27110e8ae80b12a1b213e0237e66f7dde82cdbb88c2c6d1bf777c7a",
       "bytes": 6602
+    },
+    {
+      "path": "tests/test_order_throughput.py",
+      "sha256": "438874c51fc641ae5b43184c3db8fd1c0d96ea9106d38baebc917b5f01a349f2",
+      "bytes": 69726
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
