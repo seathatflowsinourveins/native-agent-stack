@@ -20,11 +20,25 @@
     "order_timeout_seconds": 10,
     "order_timeout_seconds_source": "matched_config:config-sip.json"
   },
-  "completed_utc": "2026-09-24T19:25:26.868092+00:00",
+  "clock_provenance": {
+    "cancel_clock_source": "host clock, captured just before send in adaptive-paper/runner.py's before_request() (no client_order_id recorded alongside it)",
+    "host_minus_broker_submit_offset_ms": [
+      40.769,
+      37.225,
+      36.418,
+      27.994,
+      31.882
+    ],
+    "host_minus_broker_submit_offset_ms_range": [
+      27.994,
+      40.769
+    ],
+    "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either the host clock or the broker clock is not established by this replay",
+    "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)"
+  },
+  "completed_utc": "2026-09-24T19:54:25.878282+00:00",
   "data_provenance": {
     "adjustment": "n/a (quotes)",
-    "alpaca_py_version": "0.44.0",
-    "alpaca_py_version_measured": true,
     "asof": "2026-09-23",
     "feed": "sip",
     "page_ledger_sha256": "08117d4acbc965c238b28ab156347f2f049d472402e9503317d0cfca1d188291",
@@ -64,6 +78,7 @@
         "one_sided_or_nonpositive": 0
       }
     },
+    "reproducibility_note": "hashes identify the retained page cache and support same-page replay; independent-request reproducibility against the live endpoint is untested.",
     "source": "Alpaca historical quotes, GET https://data.alpaca.markets/v2/stocks/quotes",
     "symbols": [
       "GOOGL",
@@ -88,6 +103,7 @@
       "note": "native default nautilus_trader.execution.FillModel(); matches limit orders against the fed L1 top-of-book quotes deterministically (no probabilistic slippage or partial-fill draw), the same baseline configuration used by engine-nautilus/equity-replay's zero-fee case"
     },
     "latency_model": null,
+    "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at the next event for that instrument at or after submit + latency, not necessarily exactly at that instant; see module docstring.",
     "liquidity_consumption": false,
     "oms_type": "NETTING",
     "queue_position": false,
@@ -103,7 +119,6 @@
     }
   },
   "evidence_class": "local_integration_check",
-  "exit_code": 0,
   "inputs_sha256": {
     "broker_orders_json": "7f84a869e033e4692bcb755486dcffa05278fd441e9cafb541a470de9b8047c3",
     "ingest_receipt_json": "3f340e37b1254578197c27bc75652ee626ac6966bb43642ebf8c7f49a2df3bb4",
@@ -120,6 +135,28 @@
       250,
       650,
       1000
+    ],
+    "flip_bisections": [
+      {
+        "agrees_at_or_below_latency_ns": 69216918,
+        "bracket_ms": [
+          50,
+          70
+        ],
+        "client_order_id": "adp-adaptive-20260923g-0000004",
+        "disagrees_at_or_above_latency_ns": 69217529,
+        "resolution_ns": 1000
+      },
+      {
+        "agrees_at_or_below_latency_ns": 69216918,
+        "bracket_ms": [
+          50,
+          70
+        ],
+        "client_order_id": "adp-adaptive-20260923g-0000005",
+        "disagrees_at_or_above_latency_ns": 69217529,
+        "resolution_ns": 1000
+      }
     ],
     "points": [
       {
@@ -212,7 +249,7 @@
         "orders": 5
       }
     ],
-    "purpose": "Sensitivity check, not a calibration: shows how fill agreement changes as StaticLatencyModel's broker/network latency assumption increases from the zero-latency default."
+    "purpose": "Sensitivity check, not a calibration: shows how fill agreement changes as StaticLatencyModel's broker/network latency assumption increases from the zero-latency default. Time/price columns are not a pure function of latency alone (see module docstring); flip_bisections is the authoritative flip point, not a quote-derived marketable-window boundary."
   },
   "protocol": "sim-paper-compare-v1-20260924",
   "replay_from_retained_pages_only": true,
@@ -352,10 +389,14 @@
       }
     ]
   },
-  "runner_sha256": "2a86a1825f1e6b90b0900082abc02cfa2be7656e7ea965195c1ce566854ed70a",
-  "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime.",
-  "started_utc": "2026-09-24T19:25:25.284601+00:00",
-  "stdout_sha256": "5b2bdcf8d66b5c5a2f1b7819bed2fa8fde5e0c77f56f77807c219f2b67d028fd",
+  "runner_sha256": "d79d68890b26d37314ad6dbb2a2275e6f42b604fd91f0db658c685467a545645",
+  "runtime_environment": {
+    "alpaca_py_installed_version": "0.44.0",
+    "note": "alpaca-py is installed in this runtime but not used by this script's fetch path (urllib.request directly); recorded for environment reproducibility only."
+  },
+  "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime. The order-4/order-5 timing explanation in the README is a hypothesis consistent with this receipt's data, not a demonstrated broker-side mechanism.",
+  "started_utc": "2026-09-24T19:54:20.743321+00:00",
+  "stdout_sha256": "1b901b223399972f1395e7ca2d4cb91230207c4f8d6958436e292cdf7610113d",
   "trial": "20260923g-main-passed",
   "trial_window_utc": [
     "2026-09-23T16:46:00Z",

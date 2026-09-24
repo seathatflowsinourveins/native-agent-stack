@@ -24,6 +24,29 @@ This is a single trial with five orders (four filled, one canceled). It measures
 paper/simulated fill agreement for that one window, at a declared latency-sensitivity
 sweep (see LATENCY_SWEEP_MS). It is not a fill-rate or slippage calibration and must
 not be read as one.
+
+Two behaviors of the pinned engine (nautilus_trader==2.0.0rc5) materially affect how
+the latency sweep's numbers must be read; both are disclosed rather than hidden:
+
+1. **StaticLatencyModel does not guarantee matching at exactly submit + latency.**
+   The pinned engine only processes a deferred command at a subsequent event for
+   that instrument (see the ordering in the pinned engine's own source,
+   `crates/backtest/src/engine.rs` around L883, commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e
+   of https://github.com/nautechsystems/nautilus_trader) -- i.e. matching happens at
+   the next quote *at or after* submit + latency, against the book as of that later
+   quote, not a book frozen at exactly submit + latency. When quotes for a symbol are
+   sparse, the actual match can land well after the modeled arrival instant (order 3
+   in the retained receipt fills 266.9ms after its modeled 5ms arrival, and 466.4ms
+   after its modeled 650ms arrival). One consequence: the fill-price/fill-time
+   columns at a given sweep latency are not a clean function of that latency alone.
+   This is disclosed here rather than worked around with synthetic arrival-time
+   wakeups, which would need their own validation against sparse-quote symbols.
+2. **The declared per-order marketable-window boundary (e.g. "order 4 stops being
+   marketable at submit + 69.273ms", derived directly from the fetched SIP quotes) is
+   corroborating evidence, not the reported flip point.** The receipt's
+   `latency_sensitivity_sweep.flip_bisections` reports the actual bisected fill/
+   no-fill boundary from re-running `run_replay` at that resolution (to 1us), which is
+   the number that should be cited for "where the outcome changes."
 """
 from __future__ import annotations
 
@@ -271,26 +294,80 @@ def resolve_order_timeout_seconds(ingest_receipt: dict) -> tuple[int, str]:
 
 def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, order_timeout_seconds: int) -> dict:
     """Resolve each canceled paper order's actual cancel time, in priority order:
-    (1) a recorded cancel request in paper-output.json's `requests` log, matched
-    to canceled orders in submission order when the counts agree (unambiguous for
-    the common single-cancel case, and this trial has exactly one of each); (2)
-    submitted_at + order_timeout_seconds, the runner's own cancel-on-timeout rule,
-    when no recorded cancel request is available or counts disagree. Both branches
-    use a real, declared, non-negotiated cancel instant -- never a successor
-    order's submit time."""
-    canceled = [o for o in paper_orders if o["status"] == "canceled"]
+    (1) a recorded cancel request in paper-output.json's `requests` log, matched to
+    canceled orders in chronological order when the counts agree *and* every
+    candidate pairing is temporally consistent (each cancel request must fall after
+    its paired order's submit and before the next canceled order's submit, if any --
+    `requests[]` carries no client_order_id (adaptive-paper/runner.py's
+    `before_request()` records only `{"timestamp": ..., "kind": ...}`), so pairing by
+    chronological order is the only available signal and is validated rather than
+    trusted blindly); (2) submitted_at + order_timeout_seconds, the runner's own
+    cancel-on-timeout rule, used whenever (1) does not hold, including when the
+    validation fails -- an ambiguous match is refused (falls back for *all* canceled
+    orders, not just the ambiguous one) rather than guessed. Both branches use a
+    real, declared, non-negotiated cancel instant -- never a successor order's submit
+    time.
+
+    Clock provenance and uncertainty: `submitted_at`/cancel-fallback timing use the
+    broker's own reported clock (Alpaca `submitted_at`); the recorded cancel request
+    timestamp is the adaptive-paper runner's local host clock, captured just before
+    the cancel request is sent, not Alpaca's received-at time. For this trial the
+    host clock read +28.0 to +40.8ms ahead of the broker's own submit timestamps
+    (measured by comparing each order's `submitted_at` to its corresponding host
+    `requests[]` submit entry) -- i.e. up to ~41ms of clock-source disagreement, which
+    is small relative to this trial's ~10s cancel timeout but is not negligible next
+    to sub-100ms marketable windows in general. This receipt is not sensitive to that
+    uncertainty (no marketable order-4 quote exists in the interval from submit+80ms
+    to the recorded cancel time + 1.1s, i.e. moving the cancel instant within the
+    plausible clock-offset range does not change the outcome here), but a future
+    trial with a marketable quote near a cancel boundary could flip on this offset --
+    call this out per trial, don't assume it away. Alpaca SIP quote timestamps and
+    Alpaca's own broker clock are a third, separate clock source; their mutual
+    agreement is not established by this replay and is not assumed."""
+    canceled = sorted([o for o in paper_orders if o["status"] == "canceled"], key=lambda o: o["submitted_at_ns"])
     cancel_reqs = parse_cancel_request_ns(paper_output)
     resolved = {}
-    if canceled and len(canceled) == len(cancel_reqs):
+    use_recorded = bool(canceled) and len(canceled) == len(cancel_reqs)
+    if use_recorded:
+        for i, (order, cancel_ns) in enumerate(zip(canceled, cancel_reqs)):
+            if cancel_ns <= order["submitted_at_ns"]:
+                use_recorded = False
+                break
+            next_order_submit = canceled[i + 1]["submitted_at_ns"] if i + 1 < len(canceled) else None
+            if next_order_submit is not None and cancel_ns >= next_order_submit:
+                use_recorded = False
+                break
+    if use_recorded:
         for order, cancel_ns in zip(canceled, cancel_reqs):
             resolved[order["client_order_id"]] = {"cancel_ts_ns": cancel_ns, "source": "recorded_cancel_request"}
     else:
+        source = ("submit_plus_order_timeout_seconds" if not canceled or len(canceled) != len(cancel_reqs)
+                  else "submit_plus_order_timeout_seconds_ambiguous_recorded_match_refused")
         for order in canceled:
             resolved[order["client_order_id"]] = {
                 "cancel_ts_ns": order["submitted_at_ns"] + order_timeout_seconds * 10**9,
-                "source": "submit_plus_order_timeout_seconds",
+                "source": source,
             }
     return resolved
+
+
+def clock_provenance(paper_orders: list[dict], paper_output: dict) -> dict:
+    """Measured host-clock-vs-broker-clock offset for this trial's submit requests
+    (see resolve_cancel_timestamps' docstring for why this matters): host request
+    timestamp minus the broker's own `submitted_at`, per order, in milliseconds."""
+    submit_host_ns = [r["timestamp"] for r in paper_output.get("requests", []) if r.get("kind") == "submit"]
+    offsets_ms = []
+    for order, host_s in zip(sorted(paper_orders, key=lambda o: o["submitted_at_ns"]), submit_host_ns):
+        offsets_ms.append((epoch_seconds_to_ns(host_s) - order["submitted_at_ns"]) / 1e6)
+    return {
+        "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)",
+        "cancel_clock_source": "host clock, captured just before send in adaptive-paper/runner.py's "
+                                "before_request() (no client_order_id recorded alongside it)",
+        "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either "
+                                   "the host clock or the broker clock is not established by this replay",
+        "host_minus_broker_submit_offset_ms": offsets_ms,
+        "host_minus_broker_submit_offset_ms_range": [min(offsets_ms), max(offsets_ms)] if offsets_ms else None,
+    }
 
 
 def build_decisions(paper_orders: list[dict], cancel_resolution: dict | None = None) -> list[dict]:
@@ -383,7 +460,10 @@ def compare_orders(paper_orders: list[dict], sim_orders_by_id: dict[str, dict]) 
             "sim_filled_qty": sim_filled_qty, "sim_filled": sim_filled_qty > 0,
             "sim_reject_reason": sim.get("reject_reason") if sim else None,
             "sim_fill_price": sim.get("avg_px") if sim else None,
-            "sim_fill_ts": ns_to_iso(sim["ts_last"]) if sim and sim_filled_qty else None,
+            # From the last OrderFilled event's ts_event (see run_replay), not
+            # order.ts_last -- a partial fill followed by a cancel must not report
+            # the cancel's timestamp as the fill time.
+            "sim_fill_ts": ns_to_iso(sim["fill_ts_ns"]) if sim and sim_filled_qty and sim.get("fill_ts_ns") is not None else None,
             # Quantity-based agreement (not a status-string comparison) so a partial
             # fill on one side and a full/no fill on the other is scored as a real
             # disagreement rather than folded into a boolean "filled" match.
@@ -393,9 +473,9 @@ def compare_orders(paper_orders: list[dict], sim_orders_by_id: dict[str, dict]) 
             "sim_slippage_vs_limit_bps": (signed_slippage_bps(paper["side"], sim.get("avg_px"), paper["limit_price"])
                                            if sim and sim_filled_qty else None),
         }
-        if paper["filled_qty"] and sim_filled_qty and paper["filled_at_ns"] and sim.get("ts_last") is not None:
+        if paper["filled_qty"] and sim_filled_qty and paper["filled_at_ns"] and sim.get("fill_ts_ns") is not None:
             row["fill_price_delta_bps"] = bps(row["sim_fill_price"], row["paper_fill_price"])
-            row["fill_time_delta_s"] = (sim["ts_last"] - paper["filled_at_ns"]) / 1e9
+            row["fill_time_delta_s"] = (sim["fill_ts_ns"] - paper["filled_at_ns"]) / 1e9
         else:
             row["fill_price_delta_bps"] = None
             row["fill_time_delta_s"] = None
@@ -538,13 +618,20 @@ def run_replay(paper_orders: list[dict], quotes_by_symbol: dict[str, list[dict]]
             avg_px = str(order.avg_px) if order.avg_px is not None else None
             ts_last = int(order.ts_last) if order.ts_last else None
             reject_reason = None
-            if status == "REJECTED":
-                events = order.events() if callable(order.events) else order.events
-                for ev in events:
-                    if type(ev).__name__ == "OrderRejected":
-                        reject_reason = getattr(ev, "reason", None)
+            # fill_ts_ns comes from the *last OrderFilled event's* ts_event, not
+            # order.ts_last: ts_last is the order's last event of any kind, so a
+            # partial fill followed by a later cancel would otherwise report the
+            # cancel's timestamp as the fill time.
+            fill_ts_ns = None
+            events = order.events() if callable(order.events) else order.events
+            for ev in events:
+                ev_type = type(ev).__name__
+                if ev_type == "OrderRejected":
+                    reject_reason = getattr(ev, "reason", None)
+                elif ev_type == "OrderFilled":
+                    fill_ts_ns = int(ev.ts_event)
             sim_by_id[coid] = {"status": status, "filled_qty": filled_qty, "avg_px": avg_px,
-                                "ts_last": ts_last, "reject_reason": reject_reason}
+                                "ts_last": ts_last, "fill_ts_ns": fill_ts_ns, "reject_reason": reject_reason}
 
         fill_rows = json.loads(fills_report.reset_index().to_json(orient="records", default_handler=str, date_format="iso"))
         order_rows = json.loads(orders_report.reset_index().to_json(orient="records", default_handler=str, date_format="iso"))
@@ -569,12 +656,45 @@ def run_replay(paper_orders: list[dict], quotes_by_symbol: dict[str, list[dict]]
         engine.dispose()
 
 
+def _order_agrees_at_latency(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, latency_ns):
+    result = run_replay(paper_orders, quotes_by_symbol, out_dir=out_dir, cancel_resolution=cancel_resolution,
+                         latency_ns=latency_ns)
+    row = next(r for r in compare_orders(paper_orders, result["sim_by_id"])["rows"]
+               if r["client_order_id"] == client_order_id)
+    return row["fill_agreement"]
+
+
+def bisect_fill_agreement_flip(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id,
+                                lo_ns, hi_ns, resolution_ns=1000):
+    """Bisect, to `resolution_ns` (default 1us), the exact latency boundary at which
+    `client_order_id`'s fill_agreement changes between lo_ns and hi_ns. This is the
+    number that should be cited for "where the outcome flips" -- not a boundary
+    derived from the raw quote data, since the engine's actual arrival/matching
+    instant is not guaranteed to equal submit + latency (see module docstring)."""
+    lo_agrees = _order_agrees_at_latency(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, lo_ns)
+    hi_agrees = _order_agrees_at_latency(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, hi_ns)
+    if lo_agrees == hi_agrees:
+        return None
+    lo, hi = lo_ns, hi_ns
+    while hi - lo > resolution_ns:
+        mid = (lo + hi) // 2
+        if _order_agrees_at_latency(paper_orders, quotes_by_symbol, cancel_resolution, out_dir, client_order_id, mid) == lo_agrees:
+            lo = mid
+        else:
+            hi = mid
+    return {"client_order_id": client_order_id, "agrees_at_or_below_latency_ns": lo, "disagrees_at_or_above_latency_ns": hi,
+            "resolution_ns": resolution_ns}
+
+
 def run_latency_sweep(paper_orders: list[dict], quotes_by_symbol: dict[str, list[dict]], *, cancel_resolution: dict,
-                       out_dir: Path, baseline_comparison: dict) -> list[dict]:
-    """Run the declared latency-sensitivity sweep (LATENCY_SWEEP_MS) and report
-    agreement/deltas at each point. This is a sensitivity check, not a calibration:
-    it shows how the zero-latency default's disagreement on orders 4/5 changes as
-    StaticLatencyModel's broker/network latency assumption increases, nothing more."""
+                       out_dir: Path, baseline_comparison: dict) -> dict:
+    """Run the declared latency-sensitivity sweep (LATENCY_SWEEP_MS), report
+    agreement/deltas at each point, and bisect the exact latency boundary for any
+    order whose fill_agreement changes between two consecutive sweep points. This is
+    a sensitivity check, not a calibration: it shows how the zero-latency default's
+    disagreement changes as StaticLatencyModel's broker/network latency assumption
+    increases, nothing more -- and per the module docstring, the sweep's time/price
+    columns are not a pure function of the modeled latency alone."""
     sweep = []
     for ms in LATENCY_SWEEP_MS:
         if ms == 0:
@@ -592,40 +712,59 @@ def run_latency_sweep(paper_orders: list[dict], quotes_by_symbol: dict[str, list
             "abs_fill_time_delta_s_mean": agg["abs_fill_time_delta_s_mean"],
             "disagreeing_client_order_ids": sorted(r["client_order_id"] for r in comparison["rows"] if not r["fill_agreement"]),
         })
-    return sweep
+
+    flip_bisections = []
+    for prev, nxt in zip(sweep, sweep[1:]):
+        changed = (set(prev["disagreeing_client_order_ids"]) ^ set(nxt["disagreeing_client_order_ids"]))
+        for coid in sorted(changed):
+            bisection = bisect_fill_agreement_flip(paper_orders, quotes_by_symbol, cancel_resolution,
+                                                     out_dir / "bisect", coid,
+                                                     prev["latency_ms"] * 10**6, nxt["latency_ms"] * 10**6)
+            if bisection is not None:
+                bisection["bracket_ms"] = [prev["latency_ms"], nxt["latency_ms"]]
+                flip_bisections.append(bisection)
+    return {"points": sweep, "flip_bisections": flip_bisections}
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
-def redact_argv(argv: list[str]) -> list[str]:
-    """Redact the values of flags that can carry a private credential-file path or
-    another host-specific private path (page cache, output directory). Flag names
-    are kept (so the recorded argv still shows what was passed) but no personal
-    path or session identifier ever enters the committed receipt."""
-    redact_flags = {"--env-file", "--env-file-from-file", "--pages", "--out"}
-    out = []
-    redact_next = False
-    for arg in argv:
-        if redact_next:
-            out.append("<redacted>")
-            redact_next = False
+_SENSITIVE_ARG_NAMES = ("env_file", "env_file_from_file", "pages", "out")
+_ARG_ORDER = ("trial", "env_file", "env_file_from_file", "pages", "out", "replay", "receipt")
+
+
+def redact_args(args: argparse.Namespace) -> list[str]:
+    """Canonical, redacted representation of the *parsed* CLI arguments -- built
+    from the argparse namespace, never from raw sys.argv text. Redacting raw text
+    is bypassable by any accepted alternate spelling (abbreviations, `--flag=value`
+    joins); building the record from the parsed namespace after `allow_abbrev=False`
+    closes that off structurally instead of trying to enumerate every spelling."""
+    parts = []
+    for name in _ARG_ORDER:
+        value = getattr(args, name, None)
+        flag = "--" + name.replace("_", "-")
+        if name == "replay":
+            if value:
+                parts.append(flag)
             continue
-        if "=" in arg and arg.split("=", 1)[0] in redact_flags:
-            out.append(arg.split("=", 1)[0] + "=<redacted>")
+        if value is None:
             continue
-        out.append(arg)
-        if arg in redact_flags:
-            redact_next = True
-    return out
+        parts.append(flag)
+        parts.append("<redacted>" if name in _SENSITIVE_ARG_NAMES else str(value))
+    return parts
 
 
 def main(argv=None) -> int:
     started_utc = datetime.now(UTC).isoformat()
-    raw_argv = list(argv if argv is not None else sys.argv[1:])
 
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    # allow_abbrev=False: with it left at argparse's default, `--pag`/`--ou`/`--rec`
+    # etc. are silently accepted as unambiguous prefixes of --pages/--out/--receipt,
+    # which bypassed a prior raw-argv-text redaction (only exact flag strings were
+    # matched). Rejecting abbreviations outright, plus building the recorded argv
+    # from the parsed namespace (see redact_args) rather than scanning argv text,
+    # closes this from two independent directions.
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0], allow_abbrev=False)
     ap.add_argument("--trial", type=Path, required=True, help="Retained adaptive-paper trial directory")
     ap.add_argument("--env-file", type=Path, help="Private paper-credential env file (never printed); "
                                                     "not required in --replay mode")
@@ -644,6 +783,7 @@ def main(argv=None) -> int:
 
     # --replay never opens a credential file: the page cache already holds every
     # response this run needs, and PageFetcher(replay=True) never sends a request.
+    # `import runner` (the credential loader) is not even reached in this branch.
     key = secret = None
     if not args.replay:
         env_file = args.env_file
@@ -666,12 +806,20 @@ def main(argv=None) -> int:
 
     order_timeout_seconds, timeout_source = resolve_order_timeout_seconds(ingest_receipt)
     cancel_resolution = resolve_cancel_timestamps(paper_orders, paper_output, order_timeout_seconds)
+    provenance = clock_provenance(paper_orders, paper_output)
 
     if args.out.exists() and any(args.out.iterdir()):
         raise SystemExit(f"--out must be a fresh (empty or nonexistent) directory: {args.out} is not empty")
-    os.umask(0o077)
-    args.out.mkdir(parents=True, exist_ok=True)
-    chmod_private_dir(args.out)
+    # Narrow the umask only for the directory/file creation below, then restore it --
+    # os.umask(0o077) with no matching restore would leave every later os call in
+    # this same process (and any code that imports this module as a library) under
+    # a process-wide umask change with no obvious cause.
+    previous_umask = os.umask(0o077)
+    try:
+        args.out.mkdir(parents=True, exist_ok=True)
+        chmod_private_dir(args.out)
+    finally:
+        os.umask(previous_umask)
 
     fetcher = PageFetcher(args.pages, {"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret} if key else None,
                            replay=args.replay)
@@ -686,16 +834,21 @@ def main(argv=None) -> int:
     latency_sweep = run_latency_sweep(paper_orders, quotes, cancel_resolution=cancel_resolution,
                                        out_dir=args.out / "latency-sweep", baseline_comparison=comparison)
 
+    # alpaca-py's installed version is recorded for the environment record only --
+    # this replay fetches quotes with urllib directly (see fetch_quotes/PageFetcher),
+    # and --replay makes no request at all, so this is not data provenance.
     try:
-        alpaca_py_version = importlib.metadata.version("alpaca-py")
+        alpaca_py_installed_version = importlib.metadata.version("alpaca-py")
     except importlib.metadata.PackageNotFoundError:
-        alpaca_py_version = None
+        alpaca_py_installed_version = None
 
-    completed_utc = datetime.now(UTC).isoformat()
     summary = {"receipt": str(args.receipt), "aggregates": comparison["aggregates"],
                "latency_sweep": [{"latency_ms": s["latency_ms"], "fill_agreement_rate": s["fill_agreement_rate"]}
-                                  for s in latency_sweep]}
-    stdout_text = json.dumps(summary, indent=2)
+                                  for s in latency_sweep["points"]]}
+    # print() appends a trailing newline; stdout_sha256 must hash exactly the bytes
+    # actually written to stdout, not the pre-newline JSON string.
+    stdout_bytes = (json.dumps(summary, indent=2) + "\n").encode()
+    completed_utc = datetime.now(UTC).isoformat()
 
     receipt = {
         "kind": "sim_vs_paper_fill_comparison",
@@ -708,6 +861,10 @@ def main(argv=None) -> int:
             "paper_output_json": digest_path(args.trial / "paper-output.json"),
             "ingest_receipt_json": digest_path(args.trial / "ingest-receipt.json"),
         },
+        # A checksum ledger identifies the retained inputs and supports deterministic
+        # replay *from those same retained pages*; it does not demonstrate that an
+        # independent, fresh request against the live Alpaca endpoint would return
+        # byte-identical data (historical quote revisions are not ruled out).
         "data_provenance": {
             "source": "Alpaca historical quotes, GET https://data.alpaca.markets/v2/stocks/quotes",
             "feed": "sip", "adjustment": "n/a (quotes)", "symbols": symbols,
@@ -717,14 +874,22 @@ def main(argv=None) -> int:
             "page_ledger_sha256": digest_path(args.pages / "ledger.jsonl"),
             "page_sources": {"cache": fetcher.from_cache, "network": fetcher.from_network,
                               "pages": fetcher.page_events},
-            "alpaca_py_version": alpaca_py_version,
-            "alpaca_py_version_measured": alpaca_py_version is not None,
+            "reproducibility_note": "hashes identify the retained page cache and support same-page replay; "
+                                     "independent-request reproducibility against the live endpoint is untested.",
+        },
+        "runtime_environment": {
+            # Informational only -- see the note above run_replay's fetcher usage;
+            # this is not part of how the data in this receipt was obtained.
+            "alpaca_py_installed_version": alpaca_py_installed_version,
+            "note": "alpaca-py is installed in this runtime but not used by this script's fetch path "
+                    "(urllib.request directly); recorded for environment reproducibility only.",
         },
         "cancel_timestamp_resolution": {
             "order_timeout_seconds": order_timeout_seconds,
             "order_timeout_seconds_source": timeout_source,
             "by_client_order_id": cancel_resolution,
         },
+        "clock_provenance": provenance,
         "engine": {
             "engine_version": importlib.metadata.version("nautilus_trader"),
             "book_type": "L1_MBP", "oms_type": "NETTING", "account_type": "CASH",
@@ -734,6 +899,9 @@ def main(argv=None) -> int:
             "queue_position": replay_result["engine"]["queue_position"],
             "latency_model": None if replay_result["engine"]["latency_ns"] == 0 else
                               {"class": "StaticLatencyModel", "base_latency_nanos": replay_result["engine"]["latency_ns"]},
+            "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at "
+                                        "the next event for that instrument at or after submit + latency, not "
+                                        "necessarily exactly at that instant; see module docstring.",
             "reports": replay_result["reports"],
         },
         "results": comparison,
@@ -741,22 +909,26 @@ def main(argv=None) -> int:
             "declared_sweep_ms": list(LATENCY_SWEEP_MS),
             "purpose": "Sensitivity check, not a calibration: shows how fill agreement changes as "
                        "StaticLatencyModel's broker/network latency assumption increases from the "
-                       "zero-latency default.",
-            "points": latency_sweep,
+                       "zero-latency default. Time/price columns are not a pure function of latency "
+                       "alone (see module docstring); flip_bisections is the authoritative flip point, "
+                       "not a quote-derived marketable-window boundary.",
+            "points": latency_sweep["points"],
+            "flip_bisections": latency_sweep["flip_bisections"],
         },
         "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement "
                  "measurement between one paper session and one deterministic quote-driven replay, not a fill-rate "
-                 "or slippage calibration, and not a claim about any other trial, symbol, session or market regime.",
+                 "or slippage calibration, and not a claim about any other trial, symbol, session or market regime. "
+                 "The order-4/order-5 timing explanation in the README is a hypothesis consistent with this "
+                 "receipt's data, not a demonstrated broker-side mechanism.",
         "replay_from_retained_pages_only": args.replay,
         "started_utc": started_utc,
         "completed_utc": completed_utc,
-        "exit_code": 0,
-        "argv": redact_argv(raw_argv),
-        "stdout_sha256": digest_bytes(stdout_text.encode()),
+        "argv": redact_args(args),
+        "stdout_sha256": digest_bytes(stdout_bytes),
         "runner_sha256": digest_path(Path(__file__)),
     }
     save(args.receipt, receipt)
-    print(stdout_text)
+    sys.stdout.buffer.write(stdout_bytes)
     return 0
 
 
