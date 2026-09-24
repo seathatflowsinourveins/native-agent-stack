@@ -1,0 +1,8 @@
+{"schema_version": 1, "kind": "mover_scan", "protocol": "mover-early-entry-v1-20260924",
+ "rule": "08:00|G20|V1000000|any", "scan_time": "2026-09-24T12:00:05Z",
+ "symbols": [
+  {"symbol": "ZZSA", "rank": 1, "price_at_t": "3.21", "dollar_volume_at_t": "12500000",
+   "entry_bar_dollar_volume": "450000", "gain_pct_at_t": "45.2", "news_before_t": false},
+  {"symbol": "ZZSB", "rank": 2, "price_at_t": "12.40", "dollar_volume_at_t": "4200000",
+   "entry_bar_dollar_volume": null, "gain_pct_at_t": "27.5", "news_before_t": false}
+ ]}
