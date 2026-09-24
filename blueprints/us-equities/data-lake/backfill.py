@@ -9,8 +9,9 @@
 Scope: DIR/<dataset>/scope.json records the sha256 of this file, the endpoint, the fixed request parameters, the
 sha256 of the symbol task list and the span. The first run writes it. A run whose scope differs in any field, a header
 that no longer hashes to its fingerprint, or a manifest without a header is refused (exit 2) before any request, so
-completed work is never reused for another scope (the rule broad-universe/collect_daily.py applies). A lock file
-admits one run per dataset at a time.
+completed work is never reused for another scope (the rule broad-universe/collect_daily.py applies). Each page-capture
+manifest row also carries that fingerprint, and a row naming another one never counts as done. A lock file admits one
+run per dataset at a time.
 
 news keeps the record capture its 2015-2026 archive was collected with: one task per UTC calendar day, the day's
 records re-serialized (sorted keys) into DIR/news/<YYYY>/<MM>/<DD>.jsonl.gz, one manifest row per day.
@@ -22,8 +23,9 @@ the request `asof`). A task is 100 symbols x one calendar month, from 04:00 ET o
 19:59:59.999999999 ET on the last. Each page is requested with Accept-Encoding: gzip, stored exactly as received and
 written as it arrives. The task's manifest row records every page's request parameters (the task parameters plus
 its page_token), sha256 and sizes, and lists bars outside 04:00-20:00 ET as quarantined instead of failing the task.
-A full run requires a passing pilot for the same scope: --pilot N fetches N evenly spread tasks, reports raw bytes
-per page, bytes per bar and peak RSS, and projects the disk the full span needs, refusing above 40% of free disk.
+A full run requires a passing pilot for the same scope: --pilot N fetches N (at most 20) evenly spread tasks, reports
+raw bytes per page, bytes per bar and peak RSS, and projects the disk the full span needs, refusing above 40% of free
+disk.
 
 A shared token bucket keeps the whole run under --rate requests per minute (at most 6,000 of the account's
 10,000/min data limit measured on 2026-09-24, which every other data client shares), and an HTTP 429 waits for the
@@ -59,6 +61,7 @@ DATA = "https://data.alpaca.markets"
 ET = ZoneInfo("America/New_York")
 MAX_RATE = 6000
 FREE_DISK_SHARE = 0.40  # a pilot refuses when the projected full-span disk use exceeds this share of free space
+MAX_PILOT_TASKS = 20  # a pilot runs before any disk gate, so it stays a bounded sample and can never be the full run
 MAX_PAGES_PER_TASK = 2000  # 100 symbols x 23 sessions x 960 minutes fill at most 221 pages of 10,000 bars
 SYMBOL = re.compile(r"^[A-Z]+(\.[A-Z]+)?$")  # broad-universe/collect_daily.py DATA_SYMBOL: what the bars API accepts
 MONTH = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
@@ -247,19 +250,30 @@ def refuse_headerless(ds_dir: Path) -> None:
                       "cannot be verified and it is not resumed: collect into a new --out directory.")
 
 
+def read_header(ds_dir: Path) -> dict | None:
+    """The dataset's scope header, None when it has none; refused when it is unreadable or no longer hashes to its
+    recorded fingerprint."""
+    header_path = ds_dir / "scope.json"
+    if not header_path.exists():
+        return None
+    try:
+        recorded = json.loads(header_path.read_text())
+        intact = (isinstance(recorded.get("scope"), dict)
+                  and recorded.get("fingerprint") == scope_fingerprint(recorded["scope"]))
+    except (ValueError, AttributeError, TypeError):
+        intact = False
+    if not intact:
+        raise Refused(f"{header_path} is unreadable or does not hash to its recorded fingerprint (edited or corrupt)")
+    return recorded
+
+
 def check_scope(ds_dir: Path, scope: dict, provenance: dict) -> dict:
     """Write the dataset's scope header on first use; refuse any later run whose scope differs from it."""
     header_path = ds_dir / "scope.json"
     fingerprint = scope_fingerprint(scope)
-    if header_path.exists():
-        try:
-            recorded = json.loads(header_path.read_text())
-            recorded_scope = recorded.get("scope") or {}
-            intact = recorded.get("fingerprint") == scope_fingerprint(recorded_scope)
-        except (ValueError, AttributeError, TypeError):
-            intact = False
-        if not intact:
-            raise Refused(f"{header_path} is unreadable or does not hash to its recorded fingerprint (edited or corrupt)")
+    recorded = read_header(ds_dir)
+    if recorded is not None:
+        recorded_scope = recorded["scope"]
         if recorded["fingerprint"] != fingerprint:
             changed = "; ".join(f"{key}: recorded={recorded_scope.get(key)!r} requested={scope.get(key)!r}"
                                 for key in sorted(set(recorded_scope) | set(scope))
@@ -440,8 +454,9 @@ def task_dir(task: dict) -> str:
     return f"{month[:4]}/{month[5:]}/{batch}"
 
 
-def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str) -> dict:
-    """Page one task to its terminal page, writing each wire page (gzip) as it arrives; returns its manifest row."""
+def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str, fingerprint: str) -> dict:
+    """Page one task to its terminal page, writing each wire page (gzip) as it arrives; returns its manifest row,
+    which carries the dataset's scope fingerprint so every task row names the scope it was collected under."""
     spec = DATASETS[dataset]
     rel = task_dir(task)
     final = root / dataset / rel
@@ -489,37 +504,38 @@ def page_task(client: Client, dataset: str, task: dict, root: Path, asof: str) -
         shutil.rmtree(final)  # a completed attempt whose manifest row a crash lost
     os.replace(part, final)
     return {"task": task["task"], "month": task["month"], "symbols": len(task["symbols"]),
-            "symbols_sha256": symbols_digest(task["symbols"]), "params": params, "pages": pages, "bars": bars,
-            "quarantine": quarantine, "unexpected_symbols": sorted(unexpected), "fetched_at": utc_now(),
-            "seconds": round(time.monotonic() - started, 3)}
+            "symbols_sha256": symbols_digest(task["symbols"]), "scope_fingerprint": fingerprint, "params": params,
+            "pages": pages, "bars": bars, "quarantine": quarantine, "unexpected_symbols": sorted(unexpected),
+            "fetched_at": utc_now(), "seconds": round(time.monotonic() - started, 3)}
 
 
-def done_tasks(manifest: Path) -> dict:
-    """{task: (symbols_sha256, stored page bytes)}; a torn line is skipped, so that task is fetched again."""
-    done = {}
+def scope_rows(manifest: Path, fingerprint: str):
+    """Manifest rows collected under `fingerprint`. A torn line, or a row naming another scope, is skipped, so its
+    task counts as not done and is fetched again."""
     if manifest.exists():
         with open(manifest, encoding="utf-8") as handle:
             for line in handle:
                 try:
                     row = json.loads(line)
-                    done[row["task"]] = (row["symbols_sha256"], sum(page["bytes"] for page in row["pages"]))
-                except (ValueError, KeyError, TypeError):
+                except ValueError:
                     continue
+                if isinstance(row, dict) and row.get("scope_fingerprint") == fingerprint:
+                    yield row
+
+
+def done_tasks(manifest: Path, fingerprint: str) -> dict:
+    """{task: (symbols_sha256, stored page bytes)} for the tasks completed under this scope."""
+    done = {}
+    for row in scope_rows(manifest, fingerprint):
+        try:
+            done[row["task"]] = (row["symbols_sha256"], sum(page["bytes"] for page in row["pages"]))
+        except (KeyError, TypeError):
+            continue
     return done
 
 
-def task_rows(manifest: Path, wanted: set) -> dict:
-    rows = {}
-    if manifest.exists():
-        with open(manifest, encoding="utf-8") as handle:
-            for line in handle:
-                try:
-                    row = json.loads(line)
-                    if row["task"] in wanted:
-                        rows[row["task"]] = row
-                except (ValueError, KeyError, TypeError):
-                    continue
-    return rows
+def task_rows(manifest: Path, wanted: set, fingerprint: str) -> dict:
+    return {row["task"]: row for row in scope_rows(manifest, fingerprint) if row.get("task") in wanted}
 
 
 # --------------------------------------------------------------------------- pilot and disk gate
@@ -674,6 +690,9 @@ def run(client: Client, dataset: str, start: date, end: date, root: Path, worker
     spec = DATASETS[dataset]
     if end < start:
         raise Refused(f"--end {end} precedes --start {start}")
+    if not 0 <= pilot <= MAX_PILOT_TASKS:
+        raise Refused(f"--pilot {pilot}: a pilot samples at most {MAX_PILOT_TASKS} tasks, because it runs before the "
+                      "disk gate")
     ds_dir = root / dataset
     refuse_headerless(ds_dir)  # before the lock file: a refused legacy directory is left untouched
     ds_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -728,7 +747,7 @@ def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: in
     ds_dir = root / dataset
     manifest = ds_dir / "manifest.jsonl"
     repair_manifest_tail(manifest)
-    done = done_tasks(manifest)
+    done = done_tasks(manifest, fingerprint)
     selected = pilot_tasks(tasks, pilot) if pilot else tasks
     if not pilot:
         require_pilot(ds_dir, fingerprint, sum(size for _, size in done.values()), disk_free(ds_dir))
@@ -737,7 +756,8 @@ def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: in
     started, requests_before = time.monotonic(), client.requests
     fd = os.open(manifest, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
     with os.fdopen(fd, "a", buffering=1) as log, ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(unless_stopped, stop_file, page_task, client, dataset, t, root, asof): t for t in todo}
+        futures = {pool.submit(unless_stopped, stop_file, page_task, client, dataset, t, root, asof, fingerprint): t
+                   for t in todo}
         for future in as_completed(futures):  # only this thread writes the manifest
             task = futures[future]
             try:
@@ -758,7 +778,8 @@ def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: in
               "throttled": client.throttled, "ratelimit_remaining_min": client.ratelimit_remaining_min}
     if pilot:
         report = pilot_report(ds_dir, dataset, fingerprint, tasks, selected,
-                              task_rows(manifest, {t["task"] for t in selected}), free_bytes=disk_free(ds_dir),
+                              task_rows(manifest, {t["task"] for t in selected}, fingerprint),
+                              free_bytes=disk_free(ds_dir),
                               rss_bytes=peak_rss(), seconds=time.monotonic() - started,
                               requests=client.requests - requests_before, fetched_now=totals["tasks"], rate=rate)
         write_private(ds_dir / "pilot.json", (json.dumps(report, indent=1, sort_keys=True) + "\n").encode())
@@ -770,16 +791,27 @@ def run_pages(client: Client, dataset: str, tasks: list, root: Path, workers: in
 
 
 def verify_dataset(root: Path, dataset: str, examples: int = 20) -> dict:
-    """Re-hash every recorded file against the manifest; for page capture also check each page chain and bar total."""
+    """Re-hash every recorded file against the manifest. For page capture, also check the scope header, that each
+    row names the header's fingerprint, each page chain and each bar total. A record-capture dataset may lack a
+    header: the news archive predates headers."""
     spec, ds_dir = DATASETS[dataset], root / dataset
-    result = {"dataset": dataset, "scope_header": (ds_dir / "scope.json").exists(), "rows": 0, "torn_lines": 0,
-              "files": 0, "problems": 0, "examples": []}
+    result = {"dataset": dataset, "scope_header": (ds_dir / "scope.json").exists(), "scope_fingerprint": None,
+              "rows": 0, "torn_lines": 0, "files": 0, "problems": 0, "examples": []}
 
     def problem(detail: dict) -> None:
         result["problems"] += 1
         if len(result["examples"]) < examples:
             result["examples"].append(detail)
 
+    try:
+        header = read_header(ds_dir)
+    except Refused:
+        header = None
+        problem({"file": "scope.json", "problem": "unreadable or does not hash to its recorded fingerprint"})
+    else:
+        if header is None and spec["capture"] == "pages":
+            problem({"file": "scope.json", "problem": "missing"})
+    fingerprint = result["scope_fingerprint"] = header["fingerprint"] if header else None
     with open(ds_dir / "manifest.jsonl", encoding="utf-8") as handle:
         for line in handle:
             try:
@@ -792,6 +824,8 @@ def verify_dataset(root: Path, dataset: str, examples: int = 20) -> dict:
                 day = row["day"]
                 checks = [(f"{day[:4]}/{day[5:7]}/{day[8:10]}.jsonl.gz", row["sha256"], None)]
             else:
+                if fingerprint is not None and row.get("scope_fingerprint") != fingerprint:
+                    problem({"task": row["task"], "problem": "row names another scope fingerprint than the header"})
                 pages = row["pages"]
                 chained = (bool(pages) and pages[0]["page_token"] is None and not pages[-1]["next_page_token"]
                            and all(page["next_page_token"] for page in pages[:-1])
@@ -874,13 +908,13 @@ def main(argv=None, opener=None) -> int:
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--universe", type=Path, help="asof-aware monthly universe (stock_bars_1min), built by `backfill.py universe`")
     ap.add_argument("--pilot", type=int, default=0, metavar="N",
-                    help="fetch N evenly spread tasks of the span, report bytes, bytes per bar and peak RSS, project "
-                         "the span's disk use and record the verdict a full run requires")
+                    help=f"fetch N (at most {MAX_PILOT_TASKS}) evenly spread tasks of the span, report bytes, bytes per "
+                         "bar and peak RSS, project the span's disk use and record the verdict a full run requires")
     a = ap.parse_args(argv)
     if not 1 <= a.rate <= MAX_RATE:
         raise SystemExit("--rate must leave headroom for the live monitor, scans and the engine (at most 6000/min)")
-    if a.workers < 1 or a.pilot < 0:
-        raise SystemExit("--workers must be at least 1 and --pilot at least 0")
+    if a.workers < 1 or not 0 <= a.pilot <= MAX_PILOT_TASKS:
+        raise SystemExit(f"--workers must be at least 1 and --pilot between 0 and {MAX_PILOT_TASKS}")
     if DATASETS[a.dataset]["capture"] == "pages" and a.universe is None:
         raise SystemExit(f"{a.dataset} needs --universe (built by `backfill.py universe`)")
     try:

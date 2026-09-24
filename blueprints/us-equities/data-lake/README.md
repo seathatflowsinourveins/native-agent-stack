@@ -21,7 +21,9 @@ Every dataset directory `<out>/<dataset>/` carries `scope.json`, which the first
 | `task`, `capture` | task unit (batch size, New York session window) and raw capture mode |
 
 `fingerprint` is the sha256 of that scope; `provenance` (creation time, universe file and source hashes) is recorded
-beside it but is not part of it. Each of these is refused with exit 2 before any request:
+beside it but is not part of it. Every page-capture manifest row repeats the fingerprint as `scope_fingerprint` (D1:
+each task carries its scope fingerprint). A row naming another fingerprint never counts as done, so its task is fetched
+again, and `verify` reports it. Each of these is refused with exit 2 before any request:
 
 - a run whose scope differs in any field;
 - a header that no longer hashes to its fingerprint;
@@ -35,7 +37,7 @@ the same dataset.
 
 | Dataset | Endpoint and fixed parameters | Task | Raw capture | Status |
 | --- | --- | --- | --- | --- |
-| `news` | `/v1beta1/news` (Benzinga via Alpaca), `include_content=true`, 50 per page, ascending | one UTC calendar day | records | Backfilled 2015-01-01..2026-09-23 on 2026-09-24: 4,284 days, 2,213,433 articles, 46,568 requests, 0 HTTP 429, 0 failed days, 947 s at `--rate 3000 --workers 8` (private; about 1.1 GB) |
+| `news` | `/v1beta1/news` (Benzinga via Alpaca), `include_content=true`, 50 per page, ascending | one UTC calendar day | records | Backfilled 2015-01-01..2026-09-23 on 2026-09-24: the manifest holds 4,284 days, 2,217,343 records and 46,650 pages (private; about 1.1 GB). Two runs wrote it: 2026-09-14..20 first (7 days, 3,910 records, 82 pages), then the other 4,277 days (2,213,433 records, 46,568 requests, 0 HTTP 429, 0 failed days, about 947 s at `--rate 3000 --workers 8`) |
 | `stock_bars_1min` | `/v2/stocks/bars`, `timeframe=1Min`, `feed=sip`, `adjustment=raw`, `limit=10000`, `sort=asc`, `asof` = the universe's naming date (2026-09-21) | 100 symbols x one calendar month, from 04:00 ET on the first day to 19:59:59.999999999 ET on the last | wire pages | Code and synthetic tests only; not yet run against the provider |
 
 ### news: kept as collected (record capture)
@@ -46,7 +48,8 @@ the same dataset.
   parameters and no code sha. The task is held in memory until the day is complete.
 - The 2015-2026 archive predates scope headers. It has no `scope.json`, so a news run into that directory is refused.
   - Its operator-written `run-header.json` records code sha256 `1119c92b…`, which is the committed `backfill.py` at
-    `1d52ed21`, and the fixed parameters.
+    `1d52ed21`, and the fixed parameters. Its `result` block pairs the archive's 4,284 days with the second run's
+    record and request counts; the manifest totals above are the archive's.
   - `backfill.py verify news` re-hashed all 4,284 day files against the manifest on 2026-09-24 with 0 problems
     (local integration, read-only).
   - The archive is complete and needs no resume. An incremental pull goes into a new `--out` with its own header.
@@ -74,8 +77,11 @@ the same dataset.
   - An interrupted attempt's pages sit in `b<NNNN>.part/` and are replaced when the task is fetched again.
   - A failed task is listed in the run result and retried on the next run of the same scope.
   - A page chain that repeats a token or passes 2,000 pages fails its task.
-- **Verification.** `verify` re-hashes every page, checks each chain runs from no token to a null next token, and
-  checks that page bars sum to the task total.
+- **Verification.** `verify` re-hashes every page and checks:
+  - that the scope header is present and intact;
+  - that every row names the header's fingerprint;
+  - that each chain runs from no token to a null next token;
+  - that page bars sum to the task total.
 
 ### The asof-aware monthly universe
 
@@ -114,7 +120,8 @@ deregistrations for the same years. Names delisted before 2020 without Alpaca ba
 ### Pilot and disk gate
 
 - **Pilot.** `--pilot N` fetches N tasks spread evenly over the planned order (for 2016-01..2026-08: `2019-06-b0017`
-  and `2024-08-b0009`). It writes `stock_bars_1min/pilot.json` with:
+  and `2024-08-b0009`). N is at most 20, because the pilot runs before any disk gate; without that bound, a pilot as
+  large as the plan would fetch the whole span ungated. It writes `stock_bars_1min/pilot.json` with:
   - raw (wire) bytes per page, decoded bytes per page, raw and on-disk bytes per bar;
   - bars per page, the non-terminal page fullness, and pages against the ideal count;
   - peak RSS (`getrusage`) and calls per minute.
@@ -168,6 +175,9 @@ tasks not started are left for the next run.
 - For renamed or reused tickers, `asof=2026-09-21` is only as good as the provider's symbol mapping (critique U11).
   The pilot's two tasks need not contain a renamed issuer. Spot-check one task holding `META` before 2022 against its
   daily bars.
+- The disk gate is checked when a run starts, against the pilot's projection. Nothing checks free space while the
+  run is going. A run can exhaust the disk only by writing more than 2.5 times the largest projection the gate admits,
+  for example if the two pilot tasks badly under-sample the 2020-2021 minute-bar density.
 - A task whose symbol list the provider rejects (HTTP 400) fails whole and is retried unchanged; there is no bisection.
   Every universe symbol came from accepted daily requests.
 - The universe inherits the daily dataset's identity limits: 80 partial overlaps and 6 `identity_unresolved` pairs,
@@ -180,9 +190,11 @@ covers:
 
 - the scope header's fields, and refusal of a changed span, code, universe or naming date;
 - refusal of a header-less or edited header, and of a concurrent run;
-- news paging, 429 back-off, resume, torn manifest line and STOP;
+- the fingerprint on every row: a row naming another scope is fetched again and reported by `verify`, which also
+  reports a missing or edited header on a page dataset;
+- news paging, 429 back-off, resume, torn manifest line and STOP, and `verify` on a header-less news archive;
 - page capture byte for byte: gzip and identity pages, token chain, hashes, DST windows, quarantine, a failed task's
   clean retry, and tamper detection by `verify`;
 - universe membership, naming date and malformed input;
-- pilot selection, metrics and projection, the 40% refusal and the full-run gate;
-- the rate cap.
+- pilot selection, metrics and projection, the 20-task pilot bound, the 40% refusal and the full-run gate;
+- the rate cap, with a 6,000/min control that passes it.

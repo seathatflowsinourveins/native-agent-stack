@@ -177,6 +177,9 @@ class BackfillTests(unittest.TestCase):
             self.assertEqual((again["days"], again["skipped_already_done"], calls["n"]), (0, 3, before))
             check = B.verify_dataset(root, "news")
             self.assertEqual((check["ok"], check["rows"], check["files"], check["problems"]), (True, 3, 3, 0))
+            (root / "news/scope.json").unlink()  # the 2015-2026 archive's shape: record capture without a header
+            check = B.verify_dataset(root, "news")
+            self.assertEqual((check["ok"], check["scope_header"], check["problems"]), (True, False, 0))
             day1.write_bytes(gzip.compress(b'{"id":0}\n', mtime=0))
             self.assertEqual(B.verify_dataset(root, "news")["examples"],
                              [{"file": "2026/09/01.jsonl.gz", "problem": "sha256 differs from the manifest"}])
@@ -229,7 +232,8 @@ class BackfillTests(unittest.TestCase):
             with self.assertRaises(B.Refused) as caught:
                 B.run(self.client(forbidden), "news", date(2026, 9, 1), date(2026, 9, 30), root, workers=1)
             self.assertIn("does not hash to its recorded fingerprint", str(caught.exception))
-            for garbage in ("[", "[]"):  # unreadable or not an object: refused, not a traceback
+            # unreadable, not an object, or a scope that is not an object (fingerprint matching): refused, not a traceback
+            for garbage in ("[", "[]", json.dumps({"scope": "news", "fingerprint": canonical_sha("news")})):
                 path.write_text(garbage)
                 with self.subTest(garbage), self.assertRaises(B.Refused) as caught:
                     B.run(self.client(forbidden), "news", date(2026, 9, 1), date(2026, 9, 1), root, workers=1)
@@ -265,10 +269,15 @@ class BackfillTests(unittest.TestCase):
             self.assertTrue(m.read_text().endswith('{"day": "2026-09-0\n'))
 
     def test_rate_cap_leaves_headroom(self):
+        """The cap is what refuses: at 6,000/min the same command passes it and fails on the missing files."""
         for dataset in ("news", "stock_bars_1min"):
-            with self.subTest(dataset), self.assertRaises(SystemExit):
-                B.main([dataset, "--env-file", "/nonexistent", "--out", "/tmp/x", "--start", "2026-01-01",
-                        "--end", "2026-01-02", "--rate", "6001"])
+            args = [dataset, "--env-file", "/nonexistent", "--out", "/nonexistent/lake", "--universe", "/nonexistent",
+                    "--start", "2026-01-01", "--end", "2026-01-02", "--rate"]
+            with self.subTest(dataset), self.assertRaises(SystemExit) as caught:
+                B.main(args + ["6001"])
+            self.assertIn("at most 6000/min", str(caught.exception))
+            with self.subTest(dataset), self.assertRaises(FileNotFoundError):
+                B.main(args + ["6000"])
 
 
 class UniverseTests(unittest.TestCase):
@@ -455,6 +464,35 @@ class ScopeTests(BarsCase):
             "capture": "pages"})
         self.assertEqual(header["fingerprint"], canonical_sha(header["scope"]))
         self.assertEqual(header["provenance"]["universe"]["naming_asof"], NAMING)
+        self.assertEqual({row["scope_fingerprint"] for row in self.rows().values()}, {header["fingerprint"]})
+        self.assertEqual(B.verify_dataset(self.root, "stock_bars_1min")["scope_fingerprint"], header["fingerprint"])
+
+    def test_rows_naming_another_scope_are_fetched_again_and_flagged(self):
+        fake = FakeBars(BARS)
+        self.run_bars(fake, pilot=3)
+        manifest = self.ds / "manifest.jsonl"
+        rows = [json.loads(line) for line in manifest.read_text().splitlines()]
+        for row in rows:
+            if row["task"] == "2026-03-b0000":
+                row["scope_fingerprint"] = "0" * 64
+        manifest.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows))
+        check = B.verify_dataset(self.root, "stock_bars_1min")
+        self.assertEqual((check["ok"], check["examples"]), (False, [
+            {"task": "2026-03-b0000", "problem": "row names another scope fingerprint than the header"}]))
+        sent = len(fake.calls)
+        again = self.run_bars(fake, pilot=3)  # that row does not count as done under the header's scope
+        self.assertEqual((again["tasks"], again["skipped_already_done"]), (1, 2))
+        self.assertEqual({call["query"]["symbols"] for call in fake.calls[sent:]}, {"AAA,META,NEWL"})
+
+    def test_verify_checks_the_scope_header(self):
+        self.run_bars(FakeBars(BARS), pilot=3)
+        path = self.ds / "scope.json"
+        path.write_text(path.read_text().replace('"sip"', '"iex"'))  # edited: no longer hashes to its fingerprint
+        self.assertEqual(B.verify_dataset(self.root, "stock_bars_1min")["examples"],
+                         [{"file": "scope.json", "problem": "unreadable or does not hash to its recorded fingerprint"}])
+        path.unlink()  # a page-capture dataset is always collected under a header
+        check = B.verify_dataset(self.root, "stock_bars_1min")
+        self.assertEqual((check["ok"], check["examples"]), (False, [{"file": "scope.json", "problem": "missing"}]))
 
     def test_changed_scope_refuses_to_resume(self):
         fake = FakeBars(BARS)
@@ -555,6 +593,17 @@ class PilotTests(BarsCase):
         self.assertEqual((full["tasks"], full["skipped_already_done"], full["failed"]), (4, 2, []))
         self.assertEqual(len(fake.calls) - before, full["pages"])  # one request per page of the four remaining tasks
         self.assertTrue(B.verify_dataset(self.root, "stock_bars_1min")["ok"])
+
+    def test_pilot_is_a_bounded_sample(self):
+        """A pilot runs before any disk gate, so an oversized one would fetch the whole span ungated."""
+        with self.assertRaises(B.Refused) as caught:
+            self.run_bars(forbidden, pilot=B.MAX_PILOT_TASKS + 1)
+        self.assertIn(f"at most {B.MAX_PILOT_TASKS} tasks", str(caught.exception))
+        self.assertFalse(self.ds.exists())  # refused before the header, the lock or any request
+        with self.assertRaises(SystemExit) as caught:  # a missing universe file would raise FileNotFoundError instead
+            B.main(["stock_bars_1min", "--env-file", "/nonexistent", "--out", str(self.root), "--universe",
+                    "/nonexistent", "--start", "2026-02-01", "--end", "2026-03-31", "--pilot", str(B.MAX_PILOT_TASKS + 1)])
+        self.assertIn(f"--pilot between 0 and {B.MAX_PILOT_TASKS}", str(caught.exception))
 
     def test_unreadable_pilot_report_refuses_the_full_run(self):
         self.run_bars(FakeBars(self.bars, per_page=40), pilot=2)
