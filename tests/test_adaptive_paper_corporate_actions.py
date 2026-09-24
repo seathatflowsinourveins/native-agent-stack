@@ -397,6 +397,46 @@ class CorporateActionMonitorTests(unittest.TestCase):
                                                "leaving the symbol degraded from the timeout")
         self.assertFalse(after.must_flatten)
 
+    def test_per_symbol_ambiguous_result_never_erases_a_confirmed_action(self):
+        """HIGH finding 1 (fix round 4): reproduces the review's own Q2a
+        probe -- a confirmed split, then a LATER fetch that reports the
+        SAME symbol LOOKUP_AMBIGUOUS (a real, whole-symbol sentinel a
+        source's fetch() can still legitimately return) must not erase
+        the earlier confirmed action; it must degrade instead."""
+        seq = [{"NVDA": [action("NVDA", "forward_split", NEXT_SESSION)]}, {"NVDA": CA.LOOKUP_AMBIGUOUS}]
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                return seq.pop(0)
+
+        monitor = CA.CorporateActionMonitor(Src(), refresh_seconds=0, clock=lambda: 1000.0)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        before = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                  candidate_symbols=set(), now=1000.0)["NVDA"]
+        self.assertTrue(before.must_flatten)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1100.0)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                 candidate_symbols=set(), now=1100.0)["NVDA"]
+        self.assertTrue(after.must_flatten, "a later per-symbol LOOKUP_AMBIGUOUS must not silently "
+                                            "cancel an already-confirmed action")
+        self.assertTrue(after.needs_attention)
+
+    def test_timeout_processed_just_after_a_committed_success_is_ignored(self):
+        """NIT finding 9 (fix round 4): reproduces the review's own Q5
+        probe -- refresh_timed_out() firing for the CURRENT generation
+        AFTER that same generation already committed a successful result
+        must be a no-op (the fresh, just-written result must not be
+        degraded for the retry_seconds interval for no reason)."""
+        source = self.FakeSource(result={"AAPL": []})
+        monitor = CA.CorporateActionMonitor(source, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        self.assertFalse(monitor._last_attempt_failed)
+        monitor.refresh_timed_out({"AAPL"})  # wait_for fired just after the thread finished
+        d = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                             candidate_symbols=set(), now=1001.0)["AAPL"]
+        self.assertFalse(d.needs_attention, "a timeout for an already-committed generation must be ignored")
+        self.assertFalse(monitor._last_attempt_failed, "the retry interval must stay the ordinary one")
+
     def test_omission_after_a_prior_success_preserves_the_confirmed_action(self):
         """LOW finding 7 (fix round 3): a symbol omitted from an OTHERWISE
         successful fetch (most requested symbols resolved fine, this one
@@ -478,6 +518,31 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
 
         return mock.patch.object(requests.Session, "request", fake_request), captured
 
+    def _mock_http_pages(self, pages):
+        """LOW finding 4 (fix round 4): like `_mock_http` but for a
+        SEQUENCE of pages -- `pages` is a list of (body, next_page_token)
+        pairs; each successive HTTP request consumes the next entry,
+        returning that page's own `next_page_token` in its envelope. Lets
+        a test exercise this wrapper's OWN pagination loop with a REAL
+        (non-null) continuation token, which the fixed single-page
+        `_mock_http` (always `next_page_token=None`) cannot -- a pagination
+        regression (e.g. never reading `next_page_token`, or never sending
+        `page_token` on the next request) would otherwise pass unnoticed.
+        Returns (patcher, calls) where `calls` collects each outgoing
+        request's kwargs, in order."""
+        import unittest.mock as mock
+        import requests
+        calls = []
+        remaining = list(pages)
+
+        def fake_request(self_session, method, url, **kwargs):
+            calls.append(kwargs)
+            body, next_token = remaining.pop(0)
+            envelope = {"corporate_actions": body, "next_page_token": next_token}
+            return self._fake_http_response(envelope)
+
+        return mock.patch.object(requests.Session, "request", fake_request), calls
+
     def test_construction_cuts_retries(self):
         # finding 2: alpaca-py's RESTClient retries up to 3 times, sleeping
         # 3s between attempts, by default -- construction must cut this to
@@ -556,33 +621,110 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         self.assertEqual(out["AAPL"][0].action_type, "cash_dividend")
         self.assertEqual(out["AAPL"][0].action_date, TODAY)
 
-    def test_unmapped_type_key_fails_closed_instead_of_being_silently_dropped(self):
-        # HIGH finding 2 (fix round 3): `reorganizations` is a real,
-        # Alpaca-documented bucket type this guard's _TYPE_FIELD_MAP does
-        # not (yet) model. With raw_data=True this reaches this wrapper's
-        # own fail-closed path directly -- the pre-fix code went through
-        # the SDK's CorporateActionsSet, whose 13-branch parser (verified
-        # via inspect.getsource against the installed package) has no
-        # else/default clause and silently drops any bucket it does not
-        # recognize, turning this exact case into an apparently-clear
-        # {'AAPL': []} instead of raising.
-        patcher, _ = self._mock_http({"reorganizations": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]})
+    def test_unmapped_type_key_degrades_only_the_symbols_it_names(self):
+        # LOW finding 5 (fix round 4): `reorganizations` is a real,
+        # Alpaca-documented bucket type (per
+        # https://docs.alpaca.markets/us/reference/corporateactions-1,
+        # fetched by the coordinator 2026-09-24) this guard's
+        # _TYPE_FIELD_MAP does not (yet) model. It must degrade ONLY the
+        # symbol(s) its own row actually names -- AAPL here -- never fail
+        # the whole fetch for every requested symbol (an earlier round did
+        # exactly that: one QQQ capital_gains_distributions row blocked
+        # SPY/IWM/DIA/QQQ for the whole ~97-day window).
+        patcher, _ = self._mock_http({"reorganizations": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}],
+                                      "cash_dividends": [{"symbol": "MSFT", "ex_date": TODAY.isoformat()}]})
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+        self.assertEqual(len(out["MSFT"]), 1, "an unmapped bucket must never affect an unrelated symbol")
+
+    def test_unmapped_type_row_with_no_symbol_degrades_every_requested_symbol(self):
+        # MEDIUM finding 2 (fix round 4) applied to an unmapped bucket: a
+        # row naming no symbol at all cannot be ruled out for any
+        # requested symbol.
+        patcher, _ = self._mock_http({"reorganizations": [{"ex_date": TODAY.isoformat()}]})
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+        self.assertEqual(out["MSFT"], CA.LOOKUP_AMBIGUOUS)
+
+    def test_unmapped_type_with_a_thousand_records_still_fails_closed(self):
+        # finding 2 (round 3): 1000 records of an unmapped type used to
+        # become a silently-clear result AND evade the cap check (the SDK
+        # dropped the bucket before either check ever saw it). The cap
+        # check still sees every raw row regardless of bucket.
+        items = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(1000)]
+        patcher, _ = self._mock_http({"reorganizations": items})
         with patcher:
             src = self.source()
             with self.assertRaises(CA.CorporateActionLookupError):
                 src.fetch(["AAPL"], TODAY, NEXT_SESSION)
 
-    def test_unmapped_type_with_a_thousand_records_still_fails_closed(self):
-        # finding 2: 1000 records of an unmapped type used to become a
-        # silently-clear result AND evade the cap check (the SDK dropped
-        # the bucket before either check ever saw it). Both this wrapper's
-        # cap check and its unmapped-type check now see the raw bucket;
-        # either failing closed is acceptable, but a clear/successful
-        # result is not.
-        items = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(1000)]
-        patcher, _ = self._mock_http({"reorganizations": items})
+    def test_row_with_no_identifiable_symbol_degrades_every_requested_symbol(self):
+        # MEDIUM finding 2 (fix round 4): a MAPPED bucket's row that names
+        # no symbol at all (every symbol field blank/missing) must not
+        # silently return "clear" for the requested symbol(s) -- any of
+        # them could be the intended target.
+        patcher, _ = self._mock_http({"cash_dividends": [{"ex_date": TODAY.isoformat()}]})
         with patcher:
             src = self.source()
+            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+
+    def test_ambiguity_never_replaces_a_confirmed_record_in_the_same_response(self):
+        # HIGH finding 1 (fix round 4): the SAME response carries a valid,
+        # in-range AAPL split AND an AAPL cash dividend missing its ex_date
+        # -- the confirmed split must survive, not be discarded/replaced by
+        # LOOKUP_AMBIGUOUS.
+        patcher, _ = self._mock_http({
+            "forward_splits": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}],
+            "cash_dividends": [{"symbol": "AAPL"}]})  # no ex_date at all
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertNotEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+        self.assertEqual(len(out["AAPL"]), 1)
+        self.assertEqual(out["AAPL"][0].action_type, "forward_split")
+
+    def test_pagination_follows_a_real_continuation_token_across_pages(self):
+        # LOW finding 4 (fix round 4): a real (non-null) next_page_token
+        # must actually be followed -- items from BOTH pages are combined.
+        pages = [
+            ({"cash_dividends": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]}, "page-2-token"),
+            ({"forward_splits": [{"symbol": "AAPL", "ex_date": NEXT_SESSION.isoformat()}]}, None),
+        ]
+        patcher, calls = self._mock_http_pages(pages)
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(calls), 2, "both pages must actually be requested")
+        self.assertNotIn("page_token", calls[0]["params"])
+        self.assertEqual(calls[1]["params"].get("page_token"), "page-2-token",
+                         "the second request must carry the first page's own continuation token")
+        self.assertEqual(len(out["AAPL"]), 2, "records from both pages must be combined")
+
+    def test_cap_is_enforced_across_pages_not_just_within_one(self):
+        # LOW finding 4 (fix round 4): 600 + 600 items across two pages
+        # totals 1200 >= the 1000 cap -- must fail closed even though
+        # neither single page alone reaches it.
+        items_a = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(600)]
+        items_b = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(600)]
+        pages = [({"cash_dividends": items_a}, "page-2"), ({"cash_dividends": items_b}, None)]
+        patcher, _ = self._mock_http_pages(pages)
+        with patcher:
+            src = self.source()
+            with self.assertRaises(CA.CorporateActionLookupError):
+                src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+
+    def test_exhausting_max_pages_with_a_token_still_present_fails_closed(self):
+        # LOW finding 4 (fix round 4): a still-present continuation token
+        # after _MAX_PAGES pages must never be silently truncated.
+        src = self.source()
+        pages = [({"cash_dividends": []}, f"tok-{i}") for i in range(src._MAX_PAGES)]
+        patcher, _ = self._mock_http_pages(pages)
+        with patcher:
             with self.assertRaises(CA.CorporateActionLookupError):
                 src.fetch(["AAPL"], TODAY, NEXT_SESSION)
 
@@ -856,6 +998,23 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertFalse(events[0]["must_flatten"])
         self.assertTrue(events[0]["needs_attention"])
         self.assertEqual(events[0]["reason"], "corporate_action_session_unknown")
+        # G10 (fix round 4): a held symbol must also land in the
+        # needs_attention_held tracking a calendar failure produces --
+        # runner.py's outcome/hold-decision wiring reads this attribute,
+        # not just the emitted event.
+        self.assertEqual(strategy._ca_last_needs_attention_held, {"AAPL"})
+
+    def test_held_symbol_missing_from_the_guards_own_decisions_is_not_verified_clear(self):
+        """G9 (fix round 4): a misbehaving guard that omits a HELD symbol
+        from its returned decisions dict entirely (evaluate_guard itself
+        never does this -- it decides every held|candidate symbol -- but
+        this method must not trust that blindly) must still be treated as
+        NOT positively verified clear, landing in
+        _ca_last_needs_attention_held."""
+        guard_decisions = {}  # AAPL, held, gets no decision at all
+        strategy = self.strategy(held={"AAPL": 1}, targets={"AAPL": 1}, guard_decisions=guard_decisions)
+        strategy.rebalance()
+        self.assertIn("AAPL", strategy._ca_last_needs_attention_held)
 
     # -- fix round 3 (mutation F4a): the guard's own hold horizon must be
     # the NEXT TRADING DAY (skipping weekends/holidays), not a raw

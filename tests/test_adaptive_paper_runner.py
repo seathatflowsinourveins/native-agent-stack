@@ -2863,48 +2863,153 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
         self.assertFalse(state["in_flight"])
 
     @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
-    def test_outcome_pending_must_flatten_reflects_the_strategys_own_state(self):
-        """fix round 3 (mutations F5a 'outcome never reports pending_must_
-        flatten' and F5b 'strategy never records this tick's must_flatten').
-        A guard that unconditionally reports a confirmed must_flatten for
-        SPY must make run_native's own returned outcome carry SPY in
-        outcome["corporate_action_guard"]["pending_must_flatten"] -- this
-        exercises BOTH the strategy actually recording it
-        (_ca_last_must_flatten, F5b) AND run_native's outcome construction
-        actually reading that real attribute rather than a hardcoded
-        empty list (F5a)."""
+    def test_outcome_pending_must_flatten_reflects_the_guards_final_state(self):
+        """fix round 3 (mutations F5a/F5b), fix round 4 (finding 3): the
+        outcome's corporate_action_guard summary is now RECOMPUTED fresh
+        (_final_corporate_action_guard_summary) against the guard's own
+        evaluate() and the truly final held positions, right before the
+        outcome is built -- not a stale per-tick snapshot. A guard that
+        reports must_flatten=True for a symbol genuinely still held at run
+        end must make run_native's own returned outcome carry it in
+        outcome["corporate_action_guard"]["pending_must_flatten"]."""
         import corporate_actions as CA
         from simulation import SimulatedPort
         config, _, _ = load_config(SOURCE / "config.json")
-        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1)
+        config.update(duration_seconds=2, cleanup_seconds=2, order_timeout_seconds=1)
         config["sessions"] = {"extended_hours": True, "overnight_holds": True,
                               "overnight_gross_multiple": "1.0"}
         config["regular_session_only"] = False
         config["extended_hours_enabled"] = True
 
-        class AlwaysFlattenGuard:
+        class FlattenOnceHeldGuard:
+            """Real evaluate_guard-style semantics: must_flatten only once
+            AAPL is genuinely held, so it is bought normally first, then
+            flagged -- unlike an unconditional guard, this cannot be
+            satisfied by a symbol that was never actually held."""
             def refresh(self, symbols, *, start, end, now):
                 pass
 
             def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
-                return {"SPY": CA.GuardDecision(symbol="SPY", block_entry=True, must_flatten=True,
-                                                needs_attention=False, reason="corporate_action_cash_dividend",
-                                                action_type="cash_dividend", action_date=today)}
+                if "AAPL" not in held_symbols:
+                    return {}
+                return {"AAPL": CA.GuardDecision(symbol="AAPL", block_entry=True, must_flatten=True,
+                                                 needs_attention=False, reason="corporate_action_cash_dividend",
+                                                 action_type="cash_dividend", action_date=today)}
 
-        config["_corporate_action_guard"] = AlwaysFlattenGuard()
+        config["_corporate_action_guard"] = FlattenOnceHeldGuard()
         with tempfile.TemporaryDirectory() as root:
-            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=2, cleanup_seconds=2))
             ledger.start_trial(time.time())
             controller = Controller(ledger, time.time() + 3600, market_open=True)
-            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+            # AAPL is not one of PolicyConfig's own default benchmarks
+            # (SPY/QQQ/IWM/DIA) -- it needs a real positive EDGE over them
+            # to ever be selected, which the price() slope below provides
+            # (benchmarks are all equal to each other, so a universe of
+            # only benchmarks never generates a signal).
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL"), max_positions=5, warmup_samples=4,
                                   warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
                                   min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
-            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            # A port whose sells never actually execute keeps AAPL held
+            # through to the outcome, so the forced flatten this guard
+            # requests stays genuinely pending -- proving the recomputed
+            # summary reflects reality, not merely an echoed guard opinion.
+            # Price drift (not a flat constant) is needed for the policy to
+            # actually generate a real buy signal.
+            def price(symbol, tick):
+                slope = Decimal(".03") if symbol in policy.benchmarks else Decimal(".10")
+                return Decimal("100") + min(tick, 70) * slope
+
+            port = SimulatedPort(controller, policy.symbols, price=price)
+            original_submit = port.submit
+
+            async def submit_buys_only(payload):
+                if payload.get("side") == "sell":
+                    # Accept the forced-flatten sell as a resting (never
+                    # filled) order so SPY stays genuinely held all the way
+                    # through to the outcome -- proving the recomputed
+                    # summary reflects an ACTUALLY still-pending flatten,
+                    # not merely an echoed guard opinion about a symbol
+                    # that was already sold.
+                    import inspect as inspect_module
+                    import time as time_module
+                    controller.before_submit(payload)
+                    await controller.before_request("submit", client_id=payload["client_order_id"])
+                    order = dict(payload, id=f"sim-resting-{payload['client_order_id']}", status="new",
+                                filled_qty="0", filled_avg_price="0", updated_at_ns=time_module.time_ns())
+                    port.orders[payload["client_order_id"]] = order
+                    controller.observe(order)
+                    result = port.on_order(dict(order))
+                    if inspect_module.isawaitable(result):
+                        await result
+                    return dict(order)
+                return await original_submit(payload)
+
+            port.submit = submit_buys_only
             controller.port = port
             outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
                                              "fixture", config, "100000"))
             ledger.close()
-        self.assertIn("SPY", outcome["corporate_action_guard"]["pending_must_flatten"])
+        self.assertIn("AAPL", outcome["corporate_action_guard"]["pending_must_flatten"])
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_final_summary_uses_the_guards_current_state_not_a_stale_strategy_snapshot(self):
+        """MEDIUM finding 3 (fix round 4): reproduces the independent
+        review's own probe scenario directly against
+        `_final_corporate_action_guard_summary` -- the exact function
+        run_native's outcome construction calls. Even when the
+        strategy's own last-tick bookkeeping (`_ca_ever_flagged`) is
+        stale/empty (as it would be if a refresh only failed/completed
+        AFTER the last rebalance() tick ran), the summary must reflect the
+        guard's CURRENT evaluate() answer for the CURRENT held positions --
+        not silently report a clear state just because the strategy's own
+        tick-level snapshot never saw the change."""
+        import corporate_actions as CA
+        import runner as runner_module
+
+        class StaleSnapshotStrategy:
+            """Stands in for a real AdaptiveStrategy whose own per-tick
+            bookkeeping is stale -- _ca_ever_flagged deliberately empty,
+            simulating a strategy that never got another rebalance() tick
+            after the guard's state changed."""
+            def __init__(self, guard):
+                self.corporate_action_guard = guard
+                self._ca_ever_flagged = set()
+
+        class LateGuard:
+            """The monitor's CURRENT state, as of right now -- reflecting
+            a refresh that failed/was cancelled after the last tick."""
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {"AAPL": CA.GuardDecision(symbol="AAPL", block_entry=True, must_flatten=False,
+                                                 needs_attention=True, reason="corporate_action_lookup_failed")}
+
+        strategy = StaleSnapshotStrategy(LateGuard())
+        # 2026-09-24 09:30:00 America/New_York (RTH open) -- resolves
+        # without a ValueError under the frozen calendar.
+        summary = runner_module._final_corporate_action_guard_summary(strategy, {"AAPL"}, 1790256600.0)
+        self.assertIn("AAPL", summary["pending_needs_attention_held"],
+                      "the recomputed summary must reflect the guard's CURRENT state, not the "
+                      "strategy's stale (empty) _ca_ever_flagged snapshot")
+        self.assertIn("AAPL", summary["ever_flagged_symbols"])
+
+    def test_final_summary_is_clear_when_the_guard_is_actually_clear(self):
+        """The mirror case: a guard reporting a genuinely clear state for
+        every held symbol must not be reported as pending."""
+        import corporate_actions as CA
+        import runner as runner_module
+
+        class ClearGuard:
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {"AAPL": CA.GuardDecision(symbol="AAPL", block_entry=False, must_flatten=False,
+                                                 needs_attention=False, reason=None)}
+
+        class Strategy:
+            def __init__(self, guard):
+                self.corporate_action_guard = guard
+                self._ca_ever_flagged = set()
+
+        summary = runner_module._final_corporate_action_guard_summary(Strategy(ClearGuard()), {"AAPL"}, 1790256600.0)
+        self.assertEqual(summary["pending_must_flatten"], [])
+        self.assertEqual(summary["pending_needs_attention_held"], [])
 
     def test_scheduled_refresh_times_out_and_still_clears_in_flight(self):
         """HIGH finding 1/2 (fix round 3): a refresh() call that runs
@@ -2950,6 +3055,43 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
                 runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
 
         asyncio.run(scenario())
+
+    def test_hung_refresh_does_not_delay_process_exit(self):
+        """LOW finding 6 (fix round 4): `asyncio.run()`'s own cleanup joins
+        every outstanding `asyncio.to_thread`/default-executor thread
+        before returning, regardless of any Task cancellation -- a single
+        still-hanging refresh used to delay the whole process's own exit
+        (and, in runner.py's real main(), the result-save and account-lock
+        release) by the hang's full duration. `_schedule_corporate_action_
+        refresh` now bridges the worker to a DAEMON thread via
+        `loop.call_soon_threadsafe` instead, which `asyncio.run()` never
+        waits for. Measured: `asyncio.run(scenario())` itself must return
+        in well under the hang's own duration (here 3s), not ~3s."""
+        import asyncio
+        import time as time_module
+        from datetime import date
+        import runner as runner_module
+
+        class HangingGuard:
+            def refresh(self, symbols, *, start, end, now):
+                time_module.sleep(3.0)  # a long hang, well past the timeout below
+
+        async def scenario():
+            state = {"in_flight": False}
+            original_timeout = runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS
+            runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 0.05
+            try:
+                await runner_module._schedule_corporate_action_refresh(
+                    HangingGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                await asyncio.sleep(0.1)  # let the timeout actually fire
+            finally:
+                runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
+
+        started = time_module.monotonic()
+        asyncio.run(scenario())
+        elapsed = time_module.monotonic() - started
+        self.assertLess(elapsed, 1.5, f"asyncio.run() must not be delayed by the hanging worker "
+                                      f"(daemon-thread bridge, not asyncio.to_thread); took {elapsed:.2f}s")
 
     def test_real_monitor_generation_drops_a_superseded_late_write(self):
         """HIGH finding 1 (fix round 3): reproduces the reviewer's own
@@ -3031,6 +3173,64 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             await runner_module._shutdown_corporate_action_tasks({"in_flight": False, "tasks": []})
 
         asyncio.run(scenario())
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_run_native_actually_cancels_a_hanging_refresh_at_its_own_shutdown(self):
+        """G6 (fix round 4): run_native's OWN finally block must actually
+        CALL _shutdown_corporate_action_tasks (not merely that the
+        function works when called directly, tested above) -- a guard
+        whose refresh() hangs well past the trial's own duration must be
+        genuinely cancelled by the time run_native returns. G5: the
+        cancellation path (not just an ordinary timeout) must also
+        invalidate the attempt via refresh_timed_out(), proven here by the
+        guard recording that call. The daemon-thread bridge (finding 6)
+        keeps this test itself fast regardless of the hang's length."""
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=1, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class HangingGuard:
+            def __init__(self):
+                self.timed_out_calls = []
+
+            def refresh(self, symbols, *, start, end, now):
+                import time as time_module
+                time_module.sleep(30)  # outlives the trial + cleanup + shutdown entirely
+
+            def refresh_timed_out(self, symbols):
+                self.timed_out_calls.append(tuple(sorted(symbols)))
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {}
+
+        guard = HangingGuard()
+        config["_corporate_action_guard"] = guard
+        ca_refresh_state = {"in_flight": False}
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=1))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            controller.port = port
+            started = time.monotonic()
+            asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                   "fixture", config, "100000", ca_refresh_state=ca_refresh_state))
+            elapsed = time.monotonic() - started
+            ledger.close()
+        self.assertLess(elapsed, 15, "run_native must not be delayed by the hanging refresh thread")
+        pending = [t for t in ca_refresh_state.get("tasks", []) if not t.done()]
+        self.assertEqual(pending, [], "run_native's own shutdown must actually cancel the hanging task")
+        self.assertTrue(any(t.cancelled() for t in ca_refresh_state.get("tasks", [])),
+                        "at least one task must have been genuinely cancelled, not merely completed")
+        self.assertGreater(len(guard.timed_out_calls), 0,
+                           "cancellation must invalidate the attempt via refresh_timed_out()")
 
 
 if __name__ == "__main__":

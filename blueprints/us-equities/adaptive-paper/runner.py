@@ -18,6 +18,7 @@ from pathlib import Path
 import re
 import shlex
 import signal
+import threading
 import time
 
 from corporate_actions import AlpacaCorporateActionsSource, CorporateActionMonitor
@@ -995,17 +996,29 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
     """HIGH finding 1/2 (fix round 3): run `guard.refresh()` (a blocking
     network call) off the asyncio event loop in a worker thread, bounded by
     a hard `asyncio.wait_for` timeout, and guarded by `state["in_flight"]`
-    so a still-running previous refresh thread is never overlapped by a
-    second concurrent one -- `state` is a plain dict callers own and can
-    share across call sites (the tick loop AND the preflight fetch both
-    pass the SAME dict, fix round 3, so an in-flight preflight thread is
+    -- as an ordinary (not a guaranteed) scheduling check -- so a
+    still-running previous refresh thread is not ORDINARILY overlapped by
+    a second concurrent one from this scheduler's own perspective (LOW
+    finding 1 wording, fix round 4: this check alone does not GUARANTEE no
+    overlap at the OS-thread level -- see this function's own docstring
+    below for what actually makes an overlap harmless). `state` is a plain
+    dict callers own and can share across call sites (the tick loop AND
+    the preflight fetch both pass the SAME dict, fix round 3, so an
+    in-flight preflight thread is
     visible to the tick loop's first check too).
 
     `wait_for`'s timeout only stops THIS coroutine from waiting; it cannot
     stop the worker thread itself (Python cannot forcibly kill a thread) --
     reproduced by an independent review: the thread kept running past the
-    timeout and later wrote a stale result over a newer one. Two defenses,
-    both now in place:
+    timeout and later wrote a stale result over a newer one. LOW finding 1
+    (fix round 4, wording): refreshes are never overlapped only because
+    `CorporateActionMonitor`'s own generation check (under its lock) drops
+    any write from a superseded attempt -- this scheduling layer's
+    `state["in_flight"]` check is a best-effort scheduling optimization
+    (avoid spinning up a redundant thread most of the time), not itself a
+    correctness guarantee; a timed-out worker can still overlap a later one
+    at the OS-thread level, and the generation check is what makes that
+    harmless. Defenses in place:
       1. `guard.refresh_timed_out(watch)` (if the guard exposes it -- the
          real CorporateActionMonitor does) is called on timeout, which
          bumps that monitor's internal generation counter so the abandoned
@@ -1018,6 +1031,17 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
          `finally` block) can cancel and join every still-pending
          corporate-action refresh task at shutdown, instead of leaving
          them as untracked, unaccounted-for background work.
+      3. LOW finding 6 (fix round 4): the worker itself runs on a DAEMON
+         thread bridged back to this event loop via `loop.call_soon_
+         threadsafe` (not `asyncio.to_thread`, which uses the loop's
+         default `ThreadPoolExecutor` -- `asyncio.run()`'s own cleanup
+         joins every outstanding default-executor thread before returning,
+         so a single still-hanging refresh used to delay the WHOLE
+         process's result-save and account-lock release by the hang's full
+         duration, measured: a 4s hang delayed both by ~4s with
+         `asyncio.to_thread`, vs ~0.1s with this daemon-thread bridge,
+         which never blocks `asyncio.run()`'s shutdown). A daemon thread is
+         not joined at interpreter exit either.
 
     A no-op if a refresh is already in flight; callers check
     `state["in_flight"]` before calling this so a throttled (no-op)
@@ -1029,10 +1053,26 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
     state["in_flight"] = True
 
     async def _run():
+        loop = asyncio.get_running_loop()
+        fut = loop.create_future()
+
+        def worker():
+            try:
+                guard.refresh(watch, start=start, end=end, now=now)
+            except Exception:
+                pass  # CorporateActionMonitor.refresh() never raises; defensive only
+            finally:
+                def _resolve():
+                    if not fut.done():
+                        fut.set_result(None)
+                try:
+                    loop.call_soon_threadsafe(_resolve)
+                except RuntimeError:
+                    pass  # the loop is already closed -- the late result is simply dropped
+
+        threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
         try:
-            await asyncio.wait_for(
-                asyncio.to_thread(guard.refresh, watch, start=start, end=end, now=now),
-                timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
+            await asyncio.wait_for(fut, timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
         except asyncio.TimeoutError:
             if hasattr(guard, "refresh_timed_out"):
                 guard.refresh_timed_out(watch)
@@ -1110,6 +1150,61 @@ async def _preflight_corporate_action_refresh(config, session_policy, ledger, ca
     # intended -- "do the first fetch in preflight") until the fetch
     # resolves or times out, never longer.
     await preflight_task
+
+
+def _final_corporate_action_guard_summary(strategy, held_symbols, now):
+    """MEDIUM finding 3 (fix round 4): the run-outcome guard summary,
+    recomputed FRESH against `held_symbols` (the CURRENT holdings, read
+    right before this call) and the guard's CURRENT monitor state --
+    deliberately NOT `strategy._ca_last_must_flatten`/`_ca_last_needs_
+    attention_held`, which are only as fresh as the last rebalance() tick
+    that actually ran. A refresh that fails, times out, or is cancelled
+    AFTER that last tick (e.g. during run_native's own shutdown, just
+    before this function is called) changes the monitor's state without
+    any further rebalance() tick ever re-reading it -- reproduced by an
+    independent review's own probe: `monitor.evaluate(...)` already
+    reported `needs_attention=True` for a held symbol, while the stale
+    tick snapshot still reported `pending_needs_attention_held=[]`,
+    letting `_honest_overnight_hold` wrongly approve a `held_overnight`
+    outcome. This function calls `strategy.corporate_action_guard.
+    evaluate()` directly (the same call `_corporate_action_guard_symbols`
+    makes every tick) one more time, right here, so the outcome always
+    reflects the guard's truly final state -- never emits an event or
+    mutates the strategy (a pure read), unlike the per-tick method."""
+    guard = strategy.corporate_action_guard
+    ever_flagged = set(strategy._ca_ever_flagged)
+    if guard is None:
+        return {"enabled": False, "ever_flagged_symbols": sorted(ever_flagged),
+                "pending_must_flatten": [], "pending_needs_attention_held": []}
+    if not held_symbols:
+        return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
+                "pending_must_flatten": [], "pending_needs_attention_held": []}
+    try:
+        info = session_at(datetime.fromtimestamp(now, timezone.utc))
+        next_session_date = next_trading_day(info.session_date)
+    except ValueError:
+        # Fail-closed exactly like _corporate_action_guard_symbols's own
+        # ValueError branch (finding 6, round 3): every held symbol is not
+        # positively verified clear, but none is force-flattened purely
+        # because the calendar itself failed to classify this instant.
+        return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged | set(held_symbols)),
+                "pending_must_flatten": [], "pending_needs_attention_held": sorted(held_symbols)}
+    decisions = guard.evaluate(today=info.session_date, next_session_date=next_session_date,
+                               held_symbols=set(held_symbols), candidate_symbols=set(), now=now)
+    pending_must_flatten = {symbol for symbol, decision in decisions.items() if decision.must_flatten}
+    pending_needs_attention_held = {symbol for symbol, decision in decisions.items()
+                                    if decision.needs_attention and symbol in held_symbols}
+    # G9 (fix round 4): a held symbol absent from `decisions` entirely
+    # (should not happen -- evaluate() decides every held|candidate symbol
+    # -- but this function does not trust that blindly, matching
+    # _corporate_action_guard_symbols's own equivalent defensive union)
+    # counts as NOT verified, never silently "clear".
+    pending_needs_attention_held |= set(held_symbols) - set(decisions)
+    ever_flagged |= {symbol for symbol, decision in decisions.items()
+                    if decision.block_entry or decision.must_flatten or decision.needs_attention}
+    return {"enabled": True, "ever_flagged_symbols": sorted(ever_flagged),
+            "pending_must_flatten": sorted(pending_must_flatten),
+            "pending_needs_attention_held": sorted(pending_needs_attention_held)}
 
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
@@ -1374,17 +1469,35 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     finally:
         strategy.enabled = False
         controller.stop = True
-        session.stop()
+        # LOW finding 7 (fix round 4): _shutdown_corporate_action_tasks
+        # must run even if session.stop(), the task wait/cancel, or
+        # port.stop() itself raises -- an ordinary exception in any of
+        # those used to skip refresh-task cleanup entirely, leaving a
+        # still-pending task retained but never cancelled/joined. Its own
+        # nested `finally` guarantees this regardless of what happens
+        # above it.
         try:
-            await asyncio.wait_for(task, 20)
-        except (asyncio.TimeoutError, asyncio.CancelledError):
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
-        await port.stop()
-        await _shutdown_corporate_action_tasks(ca_refresh_state)
+            session.stop()
+            try:
+                await asyncio.wait_for(task, 20)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+            await port.stop()
+        finally:
+            await _shutdown_corporate_action_tasks(ca_refresh_state)
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
     port_health = getattr(port, "health", {})
+    # MEDIUM finding 3 (fix round 4): recomputed fresh against the CURRENT
+    # held positions and the CURRENT monitor state, not the strategy's
+    # last-tick snapshot (_ca_last_must_flatten/_ca_last_needs_attention_
+    # held) -- a refresh that fails, times out, or is cancelled AFTER the
+    # last rebalance() tick (e.g. during the shutdown just above) would
+    # otherwise leave the outcome reporting a stale, already-superseded
+    # guard state. See _final_corporate_action_guard_summary's own
+    # docstring.
+    held_symbols_now = {p.symbol for p in controller.ledger.positions().values() if p.qty}
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
               "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                                  "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}},
@@ -1397,21 +1510,14 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
               "elapsed_seconds": time.monotonic() - started,
-              # MEDIUM finding 8: a guard summary on every run outcome,
-              # regardless of whether the guard was actually wired in this
-              # run (session_policy["overnight_holds"]). finding 5:
-              # "pending_must_flatten" is read by _honest_overnight_hold
-              # below -- a run cannot end "held_overnight" while a symbol
-              # is still flagged for a forced flatten.
-              "corporate_action_guard": {
-                  "enabled": strategy.corporate_action_guard is not None,
-                  "ever_flagged_symbols": sorted(strategy._ca_ever_flagged),
-                  "pending_must_flatten": sorted(strategy._ca_last_must_flatten),
-                  # MEDIUM finding 4 (fix round 3): every currently HELD
-                  # symbol not positively verified clear as of the run's
-                  # last tick (lookup failed/ambiguous/degraded/session-
-                  # unknown) -- read by _honest_overnight_hold below.
-                  "pending_needs_attention_held": sorted(strategy._ca_last_needs_attention_held)}}
+              # MEDIUM finding 8 (round 3)/finding 3 (round 4): a guard
+              # summary on every run outcome, regardless of whether the
+              # guard was actually wired in this run. "pending_must_flatten"
+              # and "pending_needs_attention_held" are read by
+              # _honest_overnight_hold below -- a run cannot end
+              # "held_overnight" while either is non-empty.
+              "corporate_action_guard": _final_corporate_action_guard_summary(
+                  strategy, held_symbols_now, time.time())}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
