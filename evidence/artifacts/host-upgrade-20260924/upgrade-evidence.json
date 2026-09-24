@@ -1,0 +1,129 @@
+{
+ "schema_version": 1,
+ "id": "host-upgrade-evidence-20260924",
+ "date": "2026-09-24",
+ "question": "Does the measured load on the macOS host in service (Apple M5 Pro, 24 GB) justify a larger-memory Mac, which configuration fits this repository's host roles, and what must the replacement Mac pick up?",
+ "supersedes": [
+  {
+   "ref": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json#/items/7",
+   "id": "macbook-64gb",
+   "reason": "That item assessed a projected 64 GB Mac. The macOS host actually in service is macos-m5pro-20260924 with 24 GB, and its measured load is recorded below."
+  }
+ ],
+ "measured_on": {
+  "host": "macos-m5pro-20260924: MacBook Pro Mac17,8, Apple M5 Pro, 18 cores (6 super, 12 performance), 24 GB unified memory (hw.memsize 25769803776), macOS 26.5.1 build 25F80; booted 2026-09-19 14:51 local time. Its hardware profile and use receipts are recorded separately in pull request #185.",
+  "evidence_class": "native_proven, point-in-time local measurement on the host while eight to nine native agent sessions, the Claude and Codex desktop apps and the shared foundation services were running; the raw inputs (Jetsam reports, vm_stat, top, ps, the Ollama API) stay on the host and are not retained in this repository",
+  "ram": {
+   "memory_kill_events_20260924": "Two JetsamEvent reports, 09:45:02 and 09:46:13 EDT, both with largestProcess gitleaks. Three gitleaks processes had a combined footprint (rpages x 16 KiB) of 52.77 GiB, then 58.19 GiB, and three git processes 3.09 GiB. The compressor held 79.83 GiB in 13.29 GiB, then 84.27 GiB in 11.87 GiB. macOS killed 405 processes (356 jettisoned, 49 vm-compressor-space-shortage), then 4,255 (4,243 jettisoned, 11 idle-exit, 1 vm-compressor-space-shortage).",
+   "footprint_without_the_runaway": "In the 09:45:02 report the processes other than gitleaks and git held 26.84 GiB: Chrome 12.84, other processes 8.01, Claude Code CLI 2.05, Codex 1.44, node tool servers 1.28, Claude desktop 1.21; plus 3.07 GiB wired. That exceeds the 24 GiB installed.",
+   "swap_since_boot": "vm_stat at 10:19 on 2026-09-24: 23,451,584 swap-outs and 14,573,587 swap-ins of 16 KiB pages, 357.8 GiB out and 222.4 GiB in over 4.81 days of uptime (74.4 GiB of swap writes per day).",
+   "calm_snapshot": "10:20: top PhysMem 14G used (2944M wired, 372M compressor), 8706M unused; vm.swapusage 1640 of 3072 MB used; memory_pressure free 84%; eight claude processes held 3,202 MiB RSS (about 0.39 GiB per session). Chrome was not running.",
+   "rag_embedder_load": "One embed request to the shared Ollama (qwen3-embedding:4b, Q4_K_M, 2560 dimensions, context 4096), sent before the Mac's single-writer boundary was agreed: the model loaded at 4.09 GiB, all resident on the GPU; wired memory rose from 2,985 MB to 7,173 MB, unused memory fell from 6,468 MB to 2,079 MB, and memory_pressure free fell from 85% to 67%, with Chrome not running. Load took 2,077 ms. The service keeps models loaded for 30 s (OLLAMA_KEEP_ALIVE=30s). Resident sizes at the same time: Qdrant 651 MiB, ai-memory 16 MiB, context-mode plus socraticode node servers 749 MiB."
+  },
+  "gpu": "Metal recommendedMaxWorkingSetSize 17.76 GiB (0.74 of 24 GiB), read with MTLCreateSystemDefaultDevice(); sysctl iogpu.wired_limit_mb 0 (the default).",
+  "tiers": "python3 scripts/hardware_profile.py (read-only run, 2026-09-24): unified_memory_gb 24.0, local_generation_model_tier mid-14b-q4-or-8b-q8, embedding_semantic_rag_tier light, workflow_concurrency_cap 16.",
+  "limits": [
+   "One incident window and a few snapshots, not continuous monitoring over days.",
+   "The memory-kill trigger was a software runaway (gitleaks), bounded separately in pull request #193; it is not a sizing input, and the 26.84 GiB figure excludes it.",
+   "Jetsam rpages is a per-process footprint that includes compressed pages; memory the report does not attribute to a process (kernel, some shared memory) is not counted.",
+   "Service, research-burst, cache and model working-memory sizes in the sizing items are estimates; only values in measured_on were observed.",
+   "The 0.74 GPU working-set fraction was measured at 24 GB; applying it to 48, 64 or 128 GB is an assumption.",
+   "Prices are US Apple Store list prices read on 2026-09-24 (14-inch, Space Black, standard display); they change without notice."
+  ]
+ },
+ "items": [
+  {
+   "id": "macos-24gb-current-load",
+   "kind": "hardware",
+   "target": "macos-m5pro-20260924",
+   "change": "More unified memory.",
+   "verdict": "needed_measured",
+   "evidence": "Without the runaway, the 09:45 footprint was 26.84 GiB plus 3.07 GiB wired on a 24 GiB machine; 357.8 GiB of swap writes in 4.81 days. The current load does not fit before any further layer is added."
+  },
+  {
+   "id": "macos-rag-embedder-residency",
+   "kind": "hardware",
+   "target": "macos-m5pro-20260924",
+   "change": "Keep the local RAG embedder (and a future reranker) resident beside the interactive load.",
+   "verdict": "constrained_measured",
+   "evidence": "Loading qwen3-embedding:4b leaves 2,079 MB unused with Chrome closed. The shared service already unloads models after 30 s, so a search after an idle period pays a load of about 2.1 s. The agent-ecosystem retrieval check (agent-ecosystem commit 8c40da8, evidence/foundation-lane-2026-09-24/retrieval-check.json) recorded memory_pressure free of 65-66% during an index run."
+  },
+  {
+   "id": "macos-local-generation-27b",
+   "kind": "hardware",
+   "target": "macos-m5pro-20260924",
+   "change": "Run or qualify the repository's 27B local generation model on macOS.",
+   "verdict": "not_feasible_on_this_host",
+   "evidence": "The demonstrated Qwen3.8-27B Q4_K_M file is 18.97 GB (17.67 GiB) before any KV cache or compute buffers, against a Metal working-set limit of 17.76 GiB. The agent-ecosystem catalog records the same conclusion (Qwen3.8-27B does not fit 24 GiB; 4090 host only), as reported by the mac-coordinator session on 2026-09-24."
+  },
+  {
+   "id": "gitleaks-runaway-bound",
+   "kind": "software",
+   "target": "every macOS host",
+   "change": "Bound gitleaks scans on macOS (per-user lock and a footprint watch).",
+   "verdict": "needed_now",
+   "owner": "pull request #193",
+   "evidence": "It was the largest process in both memory-kill reports, at 52.77 and 58.19 GiB. Linux caps the same scans with systemd MemoryMax; macOS had no equivalent."
+  },
+  {
+   "id": "replacement-mac",
+   "kind": "hardware",
+   "target": "replacement macOS host",
+   "change": "MacBook Pro 14-inch, M5 Pro (18-core CPU, 20-core GPU), 64 GB, 2 TB: US$4,199.",
+   "verdict": "recommended",
+   "evidence": "Sizing with heavy sessions on the workstation (role item below): about 36.5 GiB for the cockpit load (the measured browser and apps, two local sessions, the local foundation stack and one research burst) leaves +11.5 GiB at 48 GB and +27.5 GiB at 64 GB; adding a 27B model test on macOS (about 19.7 GiB) makes about 56.2 GiB, which leaves -8.2 GiB at 48 GB and +7.8 GiB at 64 GB. Running every layer on the Mac instead (the rejected architecture) is about 67.7 GiB, and about 96.3 GiB with an 8-bit 27B model and an 8B embedder.",
+   "alternatives": [
+    {"config": "M5 Pro, 48 GB, 2 TB", "price_usd": 3799, "when": "Only if local-model testing on macOS is dropped."},
+    {"config": "M5 Max (40-core GPU), 64 GB, 2 TB", "price_usd": 5099, "when": "Only if fast local models away from the workstation are wanted: 614 GB/s against 307 GB/s memory bandwidth, the same 18-core CPU."},
+    {"config": "M5 Max (40-core GPU), 128 GB, 2 TB", "price_usd": 6699, "when": "Not justified: no selected model needs it, the heavy lanes run on the workstation, and cluster-class models (for example Qwen3.8-Flash-Next, 180.00B parameters, about 94 GiB of weights at 4.5 bits) do not fit beside the workload even at 128 GB."}
+   ]
+  },
+  {
+   "id": "macos-host-role",
+   "kind": "architecture",
+   "target": "macOS host and the WSL2 workstation",
+   "change": "The Mac is the cockpit and coordinator: native Claude and Codex clients, review and integration, light local work, a small local foundation stack for offline use, the macOS acceptance lane and second-machine paper trials. The WSL2 workstation runs the always-on shared services, the north-star engine, always-on operation of both paper lanes, the GPU models and heavy agent sessions.",
+   "verdict": "recommended",
+   "evidence": "Only Linux x86_64 with Python 3.13 is an accepted platform (adoption/manifest.json); the macos-arm64 profile is drafted_not_accepted; hosting.md calls macOS a development/client profile; the trading profile's network-isolated replay needs bwrap, which macOS lacks. The Alpaca paper lane did run end to end on this 24 GB Mac as the second physical machine (#188: trial passed flat, STOP drill passed, native_proven alpaca-py use receipt), so paper trials fit here; always-on operation stays with the workstation. Claude desktop SSH sessions run Claude Code on a Linux or macOS remote and read MCP servers, hooks, settings and skills from the remote's own ~/.claude (code.claude.com/docs/en/desktop), and Remote Control keeps execution on the machine where the session runs (code.claude.com/docs/en/remote-control), so the Mac never depends on another host's localhost service. Mac global state has one writer: the foundation-lane-setup session (user decision 2026-09-24, agent-ecosystem#28)."
+  },
+  {
+   "id": "macos-foundation-alignment",
+   "kind": "assessment",
+   "target": "macOS host foundation layers",
+   "change": "Memory, RAG and foundation-layer alignment on the Mac, and the model candidates for the replacement Mac.",
+   "verdict": "see_record",
+   "evidence": "evidence/artifacts/host-upgrade-20260924/foundation-alignment.json"
+  }
+ ],
+ "pricing": {
+  "retrieved_at": "2026-09-24",
+  "evidence_level": "official_docs_metadata",
+  "apple_store_us_14_inch": [
+   {"chip": "M5 Pro 18-core CPU, 20-core GPU", "memory_gb": 24, "storage": "2 TB", "price_usd": 3199},
+   {"chip": "M5 Pro 18-core CPU, 20-core GPU", "memory_gb": 48, "storage": "2 TB", "price_usd": 3799, "memory_addon_usd": 600},
+   {"chip": "M5 Pro 18-core CPU, 20-core GPU", "memory_gb": 64, "storage": "2 TB", "price_usd": 4199, "memory_addon_usd": 1000},
+   {"chip": "M5 Max 18-core CPU, 40-core GPU", "memory_gb": 48, "storage": "2 TB", "price_usd": 4699},
+   {"chip": "M5 Max 18-core CPU, 40-core GPU", "memory_gb": 64, "storage": "2 TB", "price_usd": 5099, "memory_addon_usd": 400},
+   {"chip": "M5 Max 18-core CPU, 40-core GPU", "memory_gb": 128, "storage": "2 TB", "price_usd": 6699, "memory_addon_usd": 2000}
+  ],
+  "notes": [
+   "The 16-inch models start US$300 higher (M5 Pro 18/20 from US$2,999; M5 Max 18/40 from US$4,999).",
+   "Apple's pairing: 36 GB only with the M5 Max 32-core GPU; 48 GB with M5 Pro or M5 Max 40-core GPU; 64 GB with M5 Pro 20-core GPU or M5 Max 40-core GPU; 128 GB only with M5 Max 40-core GPU. Memory bandwidth: M5 Pro 307 GB/s, M5 Max 32-core GPU 460 GB/s, M5 Max 40-core GPU 614 GB/s.",
+   "The 64 GB and 128 GB upgrades for the M5 Max doubled in price in June 2026 (launch add-ons were US$200 and US$1,000)."
+  ],
+  "sources": [
+   "https://www.apple.com/shop/buy-mac/macbook-pro/14-inch-m5-max",
+   "https://support.apple.com/en-us/126318",
+   "https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/",
+   "https://9to5mac.com/2026/06/29/a-maxed-out-16-inch-macbook-pro-now-has-a-5-figure-price-tag/",
+   "https://everymac.com/systems/apple/macbook_pro/specs/macbook-pro-m5-max-18-core-cpu-40-core-gpu-14-2026-specs.html"
+  ]
+ },
+ "decision": {
+  "date": "2026-09-24",
+  "by": "user",
+  "value": "Switch to a larger-memory Mac if the measurements show a RAM gate.",
+  "status": "The gate is shown by macos-24gb-current-load, macos-rag-embedder-residency and macos-local-generation-27b. The configuration is chosen at purchase; the recommendation is replacement-mac."
+ },
+ "summary": "The 24 GB macOS host is RAM-limited by measurement: its current load exceeds physical memory, the RAG embedder cannot stay resident, and the 27B local model exceeds the Metal working-set limit. Replace it with a 64 GB Mac (M5 Pro recommended) used as the cockpit and coordinator, with heavy and always-on work on the WSL2 workstation. The gitleaks runaway is a separate software fix (#193)."
+}

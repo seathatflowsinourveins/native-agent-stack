@@ -10096,8 +10096,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "84a0dc27cba7f857a0a3a3fa96c30eeb68abb6d4b9ed7edd9fe79d22f74f0e3a",
-      "bytes": 8472
+      "sha256": "aa6824a2acad9721de6af12d4db3de3b79bb6954d51f81601d597dbdf4d216b3",
+      "bytes": 11260
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -24518,6 +24518,16 @@
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
       "sha256": "746b8bac3212d2a1df220db6c25b203de44208a37ea4741d352fa599d4ab884c",
       "bytes": 7401
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/foundation-alignment.json",
+      "sha256": "06defa2553eb0a9bcca24a49ea1de9b9e0a35b2886fc50b2a798d312c5fa1711",
+      "bytes": 16235
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json",
+      "sha256": "067d5349bfc1ccad0a76cd24ccf221c2d8702d1e32cdafb80c4cc412bca99686",
+      "bytes": 12326
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
