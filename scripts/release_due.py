@@ -52,7 +52,7 @@ PIN_FIELDS = ("release_tag", "release_commit")
 START_HERE = "README.md#start-here"
 LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 BARE_PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])((?:\.github|scripts|tools|tests|adoption|docs|recipes|catalogs)/[A-Za-z0-9_./-]+)")
-# Install guides one reference away from the new-host documents are followed one more hop.
+# Referenced install guides (Markdown under these prefixes) are followed through nested guides.
 GUIDE_PREFIXES = ("adoption/", "recipes/")
 
 
@@ -163,7 +163,7 @@ def new_machine_files() -> set[str]:
     """Every file a new machine follows or runs: the new-host documents and platform pages, every
     file they (or README's Start here section) reference, and every file referenced by a referenced
     install guide (a Markdown file under adoption/ or recipes/, e.g. adoption/tools/README.md, which
-    installs the guarded runners), on main, not git-ignored."""
+    installs the guarded runners), followed through nested guides, on main, not git-ignored."""
     texts = {doc: (ROOT / doc).read_text(encoding="utf-8") for doc in new_host_docs()}
     readme = ROOT / "README.md"
     if readme.is_file():
@@ -171,9 +171,15 @@ def new_machine_files() -> set[str]:
     files = set(texts) - {"README.md"}
     for doc, text in texts.items():
         files |= mentioned(doc, text)
-    for guide in sorted(rel for rel in files - set(texts)
-                        if rel.endswith(".md") and rel.startswith(GUIDE_PREFIXES) and (ROOT / rel).is_file()):
-        files |= mentioned(guide, (ROOT / guide).read_text(encoding="utf-8"))
+    visited = set(texts)
+    while True:  # follow install guides to closure; the visited set bounds a cycle of links
+        guides = sorted(rel for rel in files - visited
+                        if rel.endswith(".md") and rel.startswith(GUIDE_PREFIXES) and (ROOT / rel).is_file())
+        if not guides:
+            break
+        for guide in guides:
+            visited.add(guide)
+            files |= mentioned(guide, (ROOT / guide).read_text(encoding="utf-8"))
     return {rel for rel in files if not ignored(rel)}
 
 

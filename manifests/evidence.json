@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "412da169efcadb679eaaf96d843d9f4c63ef666b293f17c8397ed55deb1eaa7b",
-      "bytes": 20394
+      "sha256": "b39e002f6f8821025d765033f45c627167839530c4d5c6f06fc8301d1fe238c2",
+      "bytes": 20514
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3272,13 +3272,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "9ec0a3e2a27760e60d5550e2054ae8f10bdd6e7dcb960e71f3660b80c360e771",
-      "bytes": 6314
+      "sha256": "cd517021c129ee2ef93ef8f44e2ffba693dccfbb0226ae7223fe15dab747aab8",
+      "bytes": 6401
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "52e6a3b6828ba4b8c7f6b0fa5c413dea6f623144932d838a0753b39e2830b400",
-      "bytes": 40355
+      "sha256": "146e5065d42199409327668fefd6f88c890ffe8060adbe9b7c21b9105bcedc16",
+      "bytes": 40489
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -28263,8 +28263,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "7c88158cbb1647cb8168f72f524e0d694e56c1613c76595e4c630f7c8b38ad13",
-      "bytes": 12674
+      "sha256": "5017806bd9a88f536a81bc505899e9904d8a739ed6a0a38b2eae546cdb506089",
+      "bytes": 12930
     },
     {
       "path": "scripts/trading_gates.py",
@@ -28763,8 +28763,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "0a1428533f74ff0eb8df25fad027308e22f098012c53f3269f734a8171334964",
-      "bytes": 11772
+      "sha256": "73f9c5f0719b9404abcf53f382db42f81a4516bfe71d79ab47290c90d1acf7b3",
+      "bytes": 12267
     },
     {
       "path": "tests/test_render_config.py",

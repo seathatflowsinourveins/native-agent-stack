@@ -95,7 +95,9 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
                                       "Profiles live in adoption/manifest.json; hashes in "
                                       "[the index](../manifests/evidence.json). Install per "
                                       "adoption/tools/README.md.\n"),
-            "adoption/tools/README.md": "Install adoption/tools/guarded with install -m 0755.\n",
+            "adoption/tools/README.md": "Install adoption/tools/guarded with install -m 0755; see adoption/tools/more.md.\n",
+            "adoption/tools/more.md": "Then run [the deep step](deep).\n",
+            "adoption/tools/deep": "#!/bin/sh\necho deep v1\n",
             "adoption/tools/guarded": "#!/bin/sh\necho guarded v1\n",
             "adoption/platforms/linux-wsl2.md": "Linux page.\n",
             "adoption/tools/runner": "#!/bin/sh\necho v1\n",
@@ -180,6 +182,12 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         self.write("adoption/tools/guarded", "#!/bin/sh\necho guarded v2\n")
         self.commit()
         self.assertEqual(self.report()[1]["changed"], ["adoption/tools/guarded"])
+
+    def test_nested_install_guides_are_followed(self):
+        # bootstrap.md -> adoption/tools/README.md -> adoption/tools/more.md -> adoption/tools/deep
+        self.write("adoption/tools/deep", "#!/bin/sh\necho deep v2\n")
+        self.commit()
+        self.assertEqual(self.report()[1]["changed"], ["adoption/tools/deep"])
 
     def test_a_mode_or_kind_change_is_drift_even_with_the_same_bytes(self):
         (self.repo / "adoption/tools/runner").chmod(0o755)

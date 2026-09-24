@@ -615,7 +615,14 @@ class CatalogAttestationBindingTests(unittest.TestCase):
     v2026.09.23.1 file name; with --source-digest it exited 1 (2026-09-24)."""
 
     COMMAND_RE = re.compile(r"gh attestation verify (?:[^\n]*\\\n)*[^\n]*")  # with backslash continuations
-    PAGES = sorted({*COMMAND_DOCS, ROOT / "SECURITY.md", ROOT / "README.md", ROOT / "docs/catalog-provenance.md"})
+    # Dated records and retained evidence may quote an older, unbound command as history.
+    EXEMPT = MarketplaceCommitRefTests.EXEMPT
+
+    def pages(self) -> list[Path]:
+        tracked = git_tracked()
+        if tracked is None:
+            tracked = {rel(path) for path in ROOT.rglob("*.md") if ".git" not in path.parts}
+        return sorted(ROOT / path for path in tracked if path.endswith(".md") and not path.startswith(self.EXEMPT))
 
     @classmethod
     def errors(cls, text: str, label: str, flags: tuple[str, ...] = ("--source-digest",)) -> list[str]:
@@ -624,9 +631,13 @@ class CatalogAttestationBindingTests(unittest.TestCase):
                 for flag in flags if flag not in command]
 
     def test_catalog_attestation_checks_bind_the_commit(self):
-        errors = [error for path in self.PAGES if path.is_file()
-                  for error in self.errors(path.read_text(encoding="utf-8"), rel(path))]
+        pages = self.pages()
+        errors = [error for path in pages if path.is_file()
+                  for error in self.errors(path.read_text(encoding="utf-8", errors="replace"), rel(path))]
         self.assertEqual(errors, [])
+        # The publication guides that carry such a command are all in scope (not a fixed list).
+        self.assertTrue({"SECURITY.md", "adoption/bootstrap.md", "adoption/update.md", "docs/catalog-provenance.md",
+                         "docs/github-automation.md"} <= {rel(path) for path in pages})
 
     def test_the_bootstrap_archive_check_binds_the_release_tag_and_commit(self):
         text = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")

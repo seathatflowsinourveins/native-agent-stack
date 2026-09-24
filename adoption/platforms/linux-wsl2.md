@@ -92,8 +92,9 @@ itself evidence the WSL UVA gap closed.
 4. Start selected `systemd --user` units per
    [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle);
    never stop the shared MCPorter daemon to clean up another component.
-5. Run `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json` (Ubuntu 24.04's
-   `python3` is 3.12, which the manifest does not support) and record
+5. Run `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json` (changed after
+   `v2026.09.23.1`, which runs plain `python3`: Ubuntu 24.04's `python3` is 3.12,
+   which the manifest does not support; run this form there too) and record
    the per-host receipt (`adoption/bootstrap.md` steps 6–7).
 6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
    from a branch of current `main`, refresh the generated matrix and grand
