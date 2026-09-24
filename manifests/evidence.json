@@ -8448,8 +8448,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/README.md",
-      "sha256": "8a736ba481187b93132e47a088dbcf7c8c2d40ed3de23b61a247a96d1bf54c58",
-      "bytes": 49529
+      "sha256": "5728609b55cf20969342f7bccbc5dd14bf41af0dbcb6a540eaba9d400891b6d2",
+      "bytes": 51853
     },
     {
       "path": "blueprints/us-equities/mover-v3/h6-execution-parity-draft.json",
@@ -8458,8 +8458,8 @@
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
-      "sha256": "14c576fc6c5594bd807f09f79ce7ae6dfddeae4f177491039d88c2a1fd255ef7",
-      "bytes": 85121
+      "sha256": "7274c29ed1f902cbf9605e049bfafd1856f2fe7d76d5fbb6962c4ba38a757af4",
+      "bytes": 113618
     },
     {
       "path": "blueprints/us-equities/mover-v3/protocol-draft.json",

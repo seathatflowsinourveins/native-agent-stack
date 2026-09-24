@@ -12,8 +12,9 @@ decisions from the same sweep are in
 
 **Why a core.** Three review rounds of the full draft (75 fixes) did not converge: high-severity findings went 4, 3
 and then 4. The full draft covered 35 items across H1-H6 plus an execution study. The core keeps the two hypotheses
-that can be computed from the Alpaca SIP data the repository already uses, with the fewest populations, arms and
-cells that still test them: one population (D), three arms and five items (m = 5). It fixes every remaining review
+that can be computed from Alpaca SIP data types the repository is already entitled to, with the fewest populations,
+arms and cells that still test them (quote and auction-print coverage for 2016-2020 is unverified and is decided by the
+coverage rule at the freeze): one population (D), three arms and five items (m = 5). It fixes every remaining review
 finding that applies to them. The core's `review_record` maps each finding to the section that resolves it.
 
 **Evidence class.** This plan rests on literature and metadata evidence, plus a few unpinned source reads, all from a
@@ -75,8 +76,13 @@ The draft restates every formula exactly, since `rules.py` does not define `ref`
 closes count only from the listing exchange's auction print or official close. A close printed only on another
 exchange, or a missing previous close, means no event, with no bar fallback. A session whose raw close ratio sits
 within 1% of an integer split ratio with no adjustment is treated as an unadjusted split and is excluded before
-membership. Split factors come from split-adjusted bars, so a large cash dividend is booked as cash, not as a share
-change (a stated departure from #162's D7 code, which used all-adjusted bars). OTC names are excluded by as-known
+membership. Inside a hold that ratio rule is only a sensitivity, because hold-period ratios are outcomes: a trade is
+excluded only when a retained split record falls in the hold and the adjusted bars do not carry it. Split factors come
+from split-adjusted bars, so a large cash dividend is booked as cash, not as a share change (a stated departure from
+#162's D7 code, which used all-adjusted bars). They telescope across sessions with bars, so a split on a session with
+no bar is still booked, and a missing input makes a factor undefined rather than 1. Hold-period daily bars are fetched
+per event under the as-known symbol with `asof` = the decision session, and the share factor and dividend cash use only
+those responses. The net-return formula and D7's cash clamp are stated exactly in the core draft. OTC names are excluded by as-known
 session data (no listing-exchange opening print), never by today's asset flags. Every such case is counted.
 
 **Universe and identity.** The 2016-2020 symbol list is the Alpaca asset master (active and inactive, every current
@@ -90,8 +96,9 @@ counted, never silently dropped.
 
 **Symbols that stop quoting.** An exit waits for an eligible quote for at most 5 sessions after the planned exit
 session. A position still without one is terminal (a delisting, a move to OTC, a suspension, or a halt that does not
-resume). It is booked at the last eligible bid of the hold when a retained merger record explains the delisting,
-and at 0 otherwise. Terminal trades stay in every primary statistic and are counted per item. Booking every terminal
+resume). It is booked at the last eligible bid of the hold when a retained cash, stock or stock-and-cash merger record
+names the held symbol as the acquiree, and at 0 otherwise. A trade censored at a segment end searches past the end for
+its exit quote under the same 5-session rule, so a segment boundary alone never books a total loss. Terminal trades stay in every primary statistic and are counted per item. Booking every terminal
 trade at the last eligible bid is only a sensitivity.
 
 No halt data are used. As in the catalyst experiment, a halt is never inferred from missing data. G = 0.20 and
@@ -104,7 +111,7 @@ V = $1M are v1's loosest gain and middle volume floor, chosen for sample size af
 | H1-D-b_lane-low | H1, tradable cell | mean net(5-session hold, low MAX21 tercile) | greater than 0 | in a long-only study, the one H1 cell for which the prior predicts the best relative return; the high and middle cells are reported descriptively only |
 | H3-a | H3, tradable cell | mean net(enter 09:35, exit 15:55 on t+1) | greater than 0 | the intraday leg as a trade |
 | H3-b | H3, tradable cell | mean net(enter 15:55 on t+1, exit at the first eligible quote from 09:30 on t+2) | greater than 0 | the overnight leg as a trade; neither leg has a sourced sign for movers, so both are kept |
-| H3-c | H3, primary test | mean of (mean of 4 overnight official-print log legs - mean of 4 intraday legs) over t+1 .. t+5 | two-sided at every stage, never locked to the survivorship-limited development sign | the direct test of "overnight versus intraday". It uses official prints only, so it needs no fill or cost model |
+| H3-c | H3, primary test | mean of (mean of 4 overnight official-print log legs - mean of 4 intraday legs) over t+1 .. t+5 | two-sided at every stage, never locked to the survivorship-limited development sign; a holdout pass also needs validation's sign | the direct test of "overnight versus intraday". It uses official prints only, so it needs no fill or cost model |
 
 MAX21 is the largest of the 21 split-consistent official-close returns before the decision session. Its terciles use
 breakpoints from D events in the prior 252 sessions, so they are known at the decision. Research sizing is 1x equal
@@ -124,8 +131,10 @@ literature's roughly 1% a month for MAX, so a miss on H1-D will most likely be l
 only large mover-specific effects.
 
 **Data status is fixed at the freeze.** One coverage rule covers all five items, with one set of kept years: a
-2016-2020 year below 90% official-close coverage or 80% eligible-quote coverage is dropped for every item. With fewer
-than 2 development years left, or without 2020, no item is tested. A dropped year's edges are segment boundaries,
+2016-2020 year below 90% official-close coverage or 80% eligible-quote coverage (fetch-incomplete stamps count against
+it), or with more than 10% of sampled histories unreachable by `asof` = session screening, is dropped for every item.
+The count-only code applies the rule itself, and the rule text is pinned by hash. Without 2020, no item is tested;
+development years condition nothing. A dropped year's edges are segment boundaries,
 its events leave the tercile windows and the bootstrap wraps over the kept sessions. Data from a new source or a new
 historical range obtained after the freeze can only start a new protocol version (v3.1+), so it cannot change this
 family's Holm thresholds after results are seen.
@@ -140,11 +149,17 @@ sensitivity, and more than 5% exposed trades labels an item's holdout contaminat
 narrowly: computing any v3 outcome from holdout data outside a granted access-log entry. It voids the holdout rather
 than removing trades. The access log has two record kinds: an authorization committed before the action, and a
 completion (status, rows read, result hash, exposure) appended after it, including for failed and partial runs.
+The read is mandatory: committed automation performs it within 15 sessions after the last holdout session, and a
+holdout that is not read, refused or void labels every carried item *not supported (holdout not read)*.
 
-Development, validation and the holdout count and read all run from one study-code tree pinned at the freeze, with a
-pinned runtime lockfile. The evaluator refuses a holdout count or read from any other tree. A code change after the
-freeze is a numbered deviation whose results are reported beside the governing ones with no label. The one exception
-is a rerun after a crash that changes no rule and reproduces every written outcome byte for byte. Calendar and fee
+Development, validation and the holdout count and read all run from one study-code tree pinned at the freeze by its
+tree hash (not a commit, since pull requests are squash-merged), with a pinned runtime lockfile. The tree imports
+nothing from earlier studies; it holds byte-for-byte copies of the pinned definitions it needs, tested against their
+blobs. The evaluator refuses a holdout count or read from any other tree. Each stage writes its results atomically in
+one file, so a crashed run writes nothing and may be retried from the unchanged tree. A code change after the freeze is
+a numbered deviation whose results are reported beside the governing ones with no label, and a stage that cannot
+complete without one is void. The only exception is a fetch-transport fix confined to `study/fetch/`, accepted only if
+it reproduces already-sealed pages byte for byte. Calendar and fee
 amendments go in append-only data files outside the study tree, so appending one never changes the tree.
 
 The 2017-2020 windows are disjoint from #162's v1 and v2, but not unseen. The broad-universe study computed forward
@@ -432,19 +447,24 @@ into another:
 - the session calendar, the fee file and their empty append-only amendment files committed as data files outside the
   study tree and pinned;
 - the enumerated symbol list and the pre-freeze snapshot sealed and pinned, every request with `asof` = its session;
+  its 2016-2020 part is a hashed 1-in-20 sample of symbol-sessions, and the full screen is fetched only after the
+  freeze;
 - metadata-only coverage checks, run only by committed count-only code that emits counts and rates and seals the raw
   pages unopened: 2016-2020 official prints by source label, quotes at non-v3 coverage stamps, corporate-action
-  records, suspected unadjusted splits, symbols per enumeration source and empty responses;
+  records, suspected unadjusted splits, a sampled candidate count, symbols per enumeration source, empty responses and
+  the share of histories that `asof` = session screening cannot reach;
+- a native count-only probe of `asof` identity on 2016-2020 renames and ticker reuses, with match thresholds;
 - H1 and H3 recorded as tested or permanently not tested by the coverage rule;
-- the documented market-data rate limit and a fetch-time estimate with margin under the 40 sessions before the
-  holdout;
+- the documented market-data rate limit and a fetch-time estimate, from the sampled candidate count, with margin under
+  the 40 sessions before the holdout;
+- the holdout collector committed and scheduled so that its first batch covers the freeze session;
 - the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed, including
   terminal exits, renames and ticker reuse, split and ex-dividend crossings, early-close sessions, segment-end
   censoring and the embargo, validation's independence from development outputs, the access-log authorization and
   completion records and the evaluator's refusals.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); round 5, the restructure into the core, is in `protocol-core-draft.json`.
+`protocol-draft.json` (`review_record`); rounds 5-7 (the restructure into the core and its two review rounds) are in `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.
 
