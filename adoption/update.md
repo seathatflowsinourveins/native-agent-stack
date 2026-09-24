@@ -115,7 +115,7 @@ git checkout "$tag"
    ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
-3. Rerun `python3 scripts/adoption_status.py --profile <id> --json`.
+3. Rerun `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`.
 4. In the default-branch clone from step 1 (`cd "$RUN_DIR/catalog-main"`, on the
    branch step 4 creates), record a new receipt with
    `python3 scripts/host_receipts.py record` for every component whose pin changed (in the pin files, `manifests/stack.json`, or a

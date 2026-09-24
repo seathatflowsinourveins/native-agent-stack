@@ -73,7 +73,7 @@ release, the note is history and the step is in your checkout (`test -e
    (#94), run this page from step 2 onward from a default-branch clone** and
    record the receipts with that clone's `catalog_revision` (main-only
    evidence, labelled as such).
-5. `python3 scripts/adoption_status.py --profile macos-arm64-foundation --json`,
+5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`,
    then the per-host receipt ([`adoption/bootstrap.md`](../bootstrap.md) steps 6–7).
 6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
    (`--platform-id macos-arm64`, and `--second-physical-machine` on a real Mac

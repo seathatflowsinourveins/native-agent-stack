@@ -279,8 +279,9 @@ GitHub-hosted macOS runner; see
    templates were added after `v2026.09.23`). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
-6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`
-   reports command presence and recipe-path presence only; it never logs in,
+6. **Prerequisite report.** `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`
+   (the manifest supports Python 3.13 only, so a plain `python3` that is 3.12, as on
+   Ubuntu 24.04, reports `prerequisites_missing` and exits 2) reports command presence and recipe-path presence only; it never logs in,
    edits configuration, starts services, or certifies functional acceptance
    (see its own docstring and `adoption/README.md`'s "Native verification
    tiers" table).
