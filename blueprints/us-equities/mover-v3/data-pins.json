@@ -11,8 +11,8 @@
   "base_files": [
     {
       "path": "blueprints/us-equities/mover-v3/data/session-calendar.json",
-      "sha256": "fba93303b31f68ba9fceddcaa43e09c33649852313bc948a8748abf648abe965",
-      "bytes": 502703
+      "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+      "bytes": 514006
     },
     {
       "path": "blueprints/us-equities/mover-v3/data/fees-v3.json",
@@ -37,7 +37,7 @@
     "files": [
       {
         "path": "blueprints/us-equities/mover-v3/data-tools/generate_session_calendar.py",
-        "sha256": "88bb18f8eace8dd8d2a1e09c3a10b3cef60b3b950994015483bcb8b245511903"
+        "sha256": "c646bcd8deda457e6009e62c3eb507f3295ca9a69cfea209ec19068447923b04"
       },
       {
         "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
@@ -60,13 +60,13 @@
     "exchange_calendars": "4.13.2",
     "tzdata": "2026.4 (IANA 2026d)",
     "requested_range": [
-      "2016-01-01",
+      "2015-09-01",
       "2030-12-31"
     ],
-    "first_session": "2016-01-04",
+    "first_session": "2015-09-01",
     "last_session": "2030-12-31",
-    "session_count": 3769,
-    "early_close_count": 32,
+    "session_count": 3854,
+    "early_close_count": 34,
     "early_closes_2016_2020": [
       "2016-11-25",
       "2017-07-03",

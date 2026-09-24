@@ -109,7 +109,7 @@ class SessionCalendar(unittest.TestCase):
         self.assertEqual((doc["calendar"], doc["source"]["package"], doc["source"]["version"]),
                          ("XNYS", "exchange_calendars", "4.13.2"))
         self.assertEqual(doc["columns"], ["session", "open_et", "close_et", "open_utc", "close_utc", "early_close"])
-        self.assertEqual(doc["requested_range"], {"start": "2016-01-01", "end": "2030-12-31"})
+        self.assertEqual(doc["requested_range"], {"start": "2015-09-01", "end": "2030-12-31"})
         self.assertEqual((doc["first_session"], doc["last_session"]), (self.dates[0], self.dates[-1]))
         self.assertEqual(doc["session_count"], len(self.rows))
         self.assertEqual(doc["early_close_count"], sum(row[5] for row in self.rows))
@@ -119,8 +119,9 @@ class SessionCalendar(unittest.TestCase):
     def test_sessions_are_unique_ascending_weekdays_covering_the_protocol_chronology(self):
         self.assertEqual(self.dates, sorted(set(self.dates)))
         self.assertTrue(all(date.fromisoformat(day).weekday() < 5 for day in self.dates))
-        self.assertEqual(self.dates[0], "2016-01-04")
-        for day in ("2016-01-04", "2016-12-30", "2017-01-03", "2019-12-31", "2020-01-02", "2020-12-31"):
+        # The t-60 lookbacks of the first 2016 sessions reach back to 2015-09 (#190 N01).
+        self.assertEqual(self.dates[0], "2015-09-01")
+        for day in ("2015-09-01", "2015-11-27", "2015-12-24", "2016-01-04", "2016-12-30", "2017-01-03", "2019-12-31", "2020-01-02", "2020-12-31"):
             self.assertIn(day, self.dates)  # chronology warmup, development and validation bounds
 
     def test_times_are_consistent_scheduled_opens_and_closes(self):
@@ -146,9 +147,11 @@ class SessionCalendar(unittest.TestCase):
             self.assertEqual(opened.utcoffset(), opened.replace(tzinfo=new_york).utcoffset(), session)
 
     def test_2016_2020_early_closes_include_the_protocol_cases(self):
-        early = [row[0] for row in self.rows if row[5] and row[0] <= "2020-12-31"]
+        early = [row[0] for row in self.rows if row[5] and "2016-01-01" <= row[0] <= "2020-12-31"]
         self.assertEqual(early, ["2016-11-25", "2017-07-03", "2017-11-24", "2018-07-03", "2018-11-23", "2018-12-24",
                                  "2019-07-03", "2019-11-29", "2019-12-24", "2020-11-27", "2020-12-24"])
+        self.assertEqual([row[0] for row in self.rows if row[5] and row[0] < "2016-01-01"],
+                         ["2015-11-27", "2015-12-24"])  # the 2015-09 lookback reach (#190 N01)
         for day in ("2017-07-03", "2017-11-24", "2018-11-23", "2019-12-24", "2020-11-27"):  # session_calendar
             self.assertIn(day, early)
 
