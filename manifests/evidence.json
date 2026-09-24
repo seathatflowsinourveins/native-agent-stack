@@ -3450,8 +3450,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "a536189115ee351b903a5b815227e77b7da6caa31bf81b771c3915284405c7f2",
-      "bytes": 8302
+      "sha256": "4d6c01c4fbd881b1a55f0cb6472ca778d50b4def31c08bb839c9cd558b504422",
+      "bytes": 9437
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -3512,6 +3512,11 @@
       "path": "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
       "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6",
       "bytes": 1119
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+      "bytes": 25990
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment.json",
@@ -25230,6 +25235,21 @@
       "bytes": 3987
     },
     {
+      "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
+      "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b",
+      "bytes": 12066
+    },
+    {
+      "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
+      "sha256": "02becfe07513621c35367d1cd703d2ba2fb5965eb6b719790e040a0a70295ddc",
+      "bytes": 792
+    },
+    {
+      "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+      "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+      "bytes": 32972
+    },
+    {
       "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
       "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
       "bytes": 20209
@@ -29563,6 +29583,7 @@
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json"
   ]
 }
