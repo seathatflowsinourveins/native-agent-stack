@@ -3022,8 +3022,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "275845f5f7e3d1422aef8b0f52c5407174827cbf7ba6ca1757b4ef511fda1fef",
-      "bytes": 1058
+      "sha256": "7b586a519802aa839d6405825d6965855fcb9f225d6d0e32c5ee874304bde665",
+      "bytes": 1134
     },
     {
       "path": ".gitattributes",
@@ -3327,8 +3327,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "68a6a973d3a08ae12b9d0c60209a5f25b877441ca9ff8275ada91446270e7f42",
-      "bytes": 7328
+      "sha256": "17b522046f18394f08dded7debf6e6b7573fe5429265f22979f32cc406aabc60",
+      "bytes": 7404
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -9943,8 +9943,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "fbcb8a5b9b659936c4122715c756d77273f099f65dbb82e8ea908553e1ca6585",
-      "bytes": 23939
+      "sha256": "3a984c5d785b7bd849842250fa924822a4af8425407bcde37452e09557991b70",
+      "bytes": 24231
     },
     {
       "path": "docs/stack.md",
@@ -28448,8 +28448,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "580cf3effc6fc36afaafc2f1b70cea01a25d8ede50c0e18a103808293cbb9bee",
-      "bytes": 15034
+      "sha256": "653a990deef23cfcda736a35079df079e420c34e5efd669dcd325be85f82e460",
+      "bytes": 16239
     },
     {
       "path": "scripts/host_receipts.py",
@@ -29053,8 +29053,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "fee883d95a2a9d446f07691b5c9a765863143df937856c36744d0dcc36d1c5b0",
-      "bytes": 13727
+      "sha256": "2e82daa80c6ebbf9d5b95528b41b7093f628b3a98294bb76a210068b53030b27",
+      "bytes": 15791
     },
     {
       "path": "tests/test_security_identity.py",

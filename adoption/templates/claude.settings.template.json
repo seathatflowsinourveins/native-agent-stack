@@ -44,6 +44,8 @@
       "Bash(gh auth token)",
       "Bash(gh auth token *)",
       "Bash(* --show-token*)",
+      "Bash(git credential fill*)",
+      "Bash(gh auth git-credential *)",
       "Bash(security find-generic-password *)"
     ],
     "defaultMode": "bypassPermissions"

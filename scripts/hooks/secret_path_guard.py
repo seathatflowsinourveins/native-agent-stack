@@ -8,7 +8,8 @@ behaviour); exit 0 lets it continue.
 
 This is a deterministic text heuristic that stops accidental exposure:
 naming a credential store, dumping the environment, echoing a secret
-variable, tracing a process, printing a native token, reading or searching
+variable, tracing a process, printing a native token (including through a
+git credential helper), reading or searching
 credential files or secret variable names, tracing a shell while it sources a
 credential file, and dumping the environment after sourcing one. It is not a
 security boundary. A process that imports a loader, or a renamed or
@@ -43,12 +44,17 @@ STORE_PATHS = (
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
 )
+# Every secret `variables` name and every `must_not_be_set` name of
+# adoption/credential-inventory.json; tests/test_secret_path_guard.py fails when
+# the inventory gains a name this tuple lacks, so the hook needs no file read.
 SECRET_NAMES = (
     "APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ALPACA_API_KEY", "ALPACA_SECRET_KEY",
-    "DATABENTO_API_KEY", "TYPESAFE_API_KEY", "OMNIROUTE_API_KEY",
+    "DATABENTO_API_KEY", "TYPESAFE_API_KEY", "OMNIROUTE_API_KEY", "MASSIVE_API_KEY",
     "GF_SECURITY_ADMIN_PASSWORD", "GF_SECURITY_SECRET_KEY",
     "GH_TOKEN", "GITHUB_TOKEN", "HF_TOKEN", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-    "CODEX_API_KEY", "TWS_PASSWORD",
+    "CODEX_API_KEY", "OPENROUTER_API_KEY", "MISTRAL_API_KEY", "QDRANT_API_KEY",
+    "PREFECT_API_KEY", "MC_API_KEY", "MSB_API_KEY", "PAPERCLIP_API_KEY",
+    "TWS_USERNAME", "TWS_PASSWORD", "TWS_ACCOUNT", "IBKR_ACCOUNT_ID",
 )
 _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
@@ -308,10 +314,27 @@ def traces(words: list[str]) -> bool:
     return False
 
 
+def prints_helper_credential(words: list[str]) -> bool:
+    """`git credential fill`, a helper's `get` and `gh auth git-credential` print a stored token."""
+    program = program_of(words)
+    if program == "git":
+        subcommand, rest = git_subcommand_args(words)
+        if subcommand == "credential":
+            return "fill" in rest
+        return bool(subcommand and subcommand.startswith("credential-")) and "get" in rest
+    if program.startswith("git-credential-"):
+        return "get" in words[1:]
+    if program == "gh":
+        return [w for w in words[1:] if not w.startswith("-")][:2] == ["auth", "git-credential"]
+    return False
+
+
 def segment_reason(words: list[str]) -> str | None:
     program = program_of(words)
     if is_environment_dump(words):
         return "environment_dump"
+    if prints_helper_credential(words):
+        return "native_token_print"
     if program in TRACERS:
         return "process_trace"
     if any(word in {"<", "<<<", "<>"} and position + 1 < len(words) and POINTER_VARIABLE.search(words[position + 1])

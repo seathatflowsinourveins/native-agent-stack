@@ -31,6 +31,19 @@ BLOCKED = {
     "gh auth token": "native_token_print",
     "gh auth status --show-token": "native_token_print",
     "gh auth status -t": "native_token_print",
+    # After `gh auth setup-git` a credential helper prints the same token.
+    "printf 'protocol=https\\nhost=github.com\\n\\n' | git credential fill": "native_token_print",
+    "git -c credential.helper= credential fill <<< 'url=https://github.com'": "native_token_print",
+    "echo host=github.com | gh auth git-credential get": "native_token_print",
+    "gh auth git-credential get < request.txt": "native_token_print",
+    "echo host=github.com | git credential-store get": "native_token_print",
+    "git credential-cache --timeout 60 get < request.txt": "native_token_print",
+    "git-credential-libsecret get < request.txt": "native_token_print",
+    "bash -c 'git credential fill < request.txt'": "native_token_print",
+    "echo \"$OPENROUTER_API_KEY\"": "secret_variable_reference",
+    "echo $MISTRAL_API_KEY": "secret_variable_reference",
+    "python3 -c 'import os;print(os.environ[\"MASSIVE_API_KEY\"])'": "secret_variable_reference",
+    "printf '%s' \"$TWS_USERNAME\"": "secret_variable_reference",
     "security find-generic-password -s x -w": "keychain_read",
     "echo $APCA_API_SECRET_KEY": "secret_variable_reference",
     "printf '%s' \"${DATABENTO_API_KEY}\"": "secret_variable_reference",
@@ -138,6 +151,10 @@ SAFE_CORPUS = [
     "git push origin HEAD:feature",
     "gh pr view 12 --json title",
     "gh auth status",
+    "gh auth setup-git",
+    "git config --get credential.helper",
+    "git credential-cache exit",
+    "git commit -m 'Block git credential fill in the guard'",
     "grep -rn TODO docs",
     "grep -rn 'def check' scripts/hooks",
     "grep -n OTEL_LOG_TOOL_CONTENT docs/secret-storage.md",
@@ -229,6 +246,19 @@ class SecretPathGuardTests(unittest.TestCase):
                 self.assertEqual(guard.check(f"rg -n {name}"), "secret_name_search")
                 self.assertIsNone(guard.check(f"rg -n MY_{name}_HINT"))
 
+    def test_inventory_secret_names_are_all_guarded(self):
+        # Contact identities (SEC_USER_AGENT) are private data that recipes pass to
+        # curl by reference, and CI secrets live only in GitHub Actions; neither is
+        # an agent-side authentication value, so both stay out of the hook's list.
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
+        names = set(inventory["must_not_be_set"])
+        for entry in inventory["entries"]:
+            if entry["class"] not in {"contact_identity", "ci_secret"}:
+                names.update(entry.get("variables", []))
+        self.assertTrue(names)
+        self.assertEqual(sorted(names - set(guard.SECRET_NAMES)), [])
+        self.assertEqual(len(guard.SECRET_NAMES), len(set(guard.SECRET_NAMES)))
+
     def test_known_bypasses_are_recorded_not_claimed(self):
         for command in EXPECTED_PASS_THROUGH:
             with self.subTest(command=command):
@@ -256,7 +286,8 @@ class SecretPathGuardTests(unittest.TestCase):
         for rule in ("Read(~/.config/native-agent-stack/**)", "Edit(~/.config/native-agent-stack/**)",
                      "Read(~/.claude/.credentials.json)", "Read(~/.codex/auth.json)",
                      "Read(~/.config/gh/hosts.yml)", "Read(//proc/*/environ)",
-                     "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)"):
+                     "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
+                     "Bash(git credential fill*)", "Bash(gh auth git-credential *)"):
             self.assertIn(rule, deny)
         self.assertLess(deny.index("Read(.env.*)"), deny.index("Read(!.env.example)"))
         hooks = settings["hooks"]["PreToolUse"]
