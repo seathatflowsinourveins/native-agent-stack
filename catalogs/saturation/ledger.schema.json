@@ -1,0 +1,125 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "catalogs/saturation/ledger.schema.json",
+ "title": "Saturation ledger",
+ "description": "Append-only record of landscape sweeps per layer. Structure only: scripts/saturation_ledger.py --check also verifies the hash chain, the manifest/evidence bindings, known/new, and recomputes survival from the votes.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["schema_version", "policy", "sweeps", "head_sha256"],
+ "properties": {
+  "schema_version": {"const": 1},
+  "policy": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["K", "min_gap_days"],
+   "properties": {
+    "K": {"type": "integer", "minimum": 1, "description": "Consecutive clean completed sweeps for a saturation candidate."},
+    "min_gap_days": {"type": "integer", "minimum": 0, "description": "Minimum days between two counted sweeps."}
+   }
+  },
+  "sweeps": {"type": "array", "items": {"$ref": "#/$defs/sweep"}},
+  "head_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of the canonical JSON of the last sweep (of {schema_version, policy} when there is none)."}
+ },
+ "$defs": {
+  "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+  "path": {"type": "string", "minLength": 1, "pattern": "^[^/\\\\]"},
+  "repo": {"type": "string", "minLength": 1},
+  "vote": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["vote", "ref"],
+   "properties": {
+    "vote": {"enum": ["refuted", "not_refuted"]},
+    "ref": {"type": "string", "minLength": 1, "description": "Registered evidence file, optionally with #/json/pointer to an object carrying boolean refuted."}
+   }
+  },
+  "lens_vote": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["lens", "vote", "ref"],
+   "properties": {
+    "lens": {"enum": [0, 1]},
+    "vote": {"enum": ["refuted", "not_refuted"]},
+    "ref": {"type": "string", "minLength": 1}
+   }
+  },
+  "outcome": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["repo"],
+   "properties": {
+    "repo": {"$ref": "#/$defs/repo"},
+    "source_review": {"$ref": "#/$defs/path"},
+    "facts": {"$ref": "#/$defs/vote"},
+    "fit": {"$ref": "#/$defs/vote"},
+    "lens_votes": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/lens_vote"}}
+   },
+   "oneOf": [
+    {"required": ["facts", "fit"], "not": {"required": ["lens_votes"]}},
+    {"required": ["lens_votes"], "not": {"anyOf": [{"required": ["facts"]}, {"required": ["fit"]}]}}
+   ]
+  },
+  "survivor": {
+   "allOf": [{"$ref": "#/$defs/outcome"}, {"required": ["source_review"]}]
+  },
+  "reopen": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["trigger", "ref"],
+   "properties": {
+    "trigger": {"enum": ["requirement_changed", "platform_profile_changed", "retained_failure", "missing_capability", "comparison_changed", "pin_moved", "stale_receipt", "selection_changed"]},
+    "ref": {"type": "string", "minLength": 1}
+   }
+  },
+  "layer": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "proposed", "known", "new", "survived", "refuted", "reopen"],
+   "properties": {
+    "catalog": {"enum": ["foundation", "us-equities"]},
+    "layer_id": {"type": "string", "minLength": 1},
+    "requirement_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical {next_action, decision_ref} of the layer's research-state row at append time."},
+    "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},
+    "votes": {"enum": ["retained", "not_retained", "not_returned"]},
+    "votes_note": {"type": "string", "minLength": 1},
+    "calls": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}}]},
+    "proposed": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
+    "known": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
+    "new": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
+    "survived": {"type": "array", "items": {"$ref": "#/$defs/survivor"}},
+    "refuted": {"type": "array", "items": {"$ref": "#/$defs/outcome"}},
+    "reopen": {"type": "array", "items": {"$ref": "#/$defs/reopen"}}
+   },
+   "if": {"properties": {"votes": {"const": "retained"}}},
+   "else": {"required": ["votes_note"]}
+  },
+  "sweep": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["sweep_id", "date", "workflow_run", "status", "lane", "prompts_sha256", "usage_ref", "usage_sha256", "lower_bound_usage", "prev_sha256", "layers"],
+   "properties": {
+    "sweep_id": {"type": "string", "minLength": 1},
+    "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "workflow_run": {"type": "string", "minLength": 1},
+    "status": {"enum": ["completed", "stopped"]},
+    "manifest_ref": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/path"}]},
+    "manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "lane": {"type": "string", "minLength": 1},
+    "prompts_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+    "usage_ref": {"$ref": "#/$defs/path"},
+    "usage_sha256": {"$ref": "#/$defs/sha256"},
+    "lower_bound_usage": {"type": "boolean"},
+    "record_ref": {"$ref": "#/$defs/path"},
+    "lane_calls": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "not_retained": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "prev_sha256": {"$ref": "#/$defs/sha256"},
+    "layers": {"type": "array", "items": {"$ref": "#/$defs/layer"}}
+   },
+   "allOf": [
+    {"if": {"properties": {"status": {"const": "stopped"}}}, "then": {"properties": {"lower_bound_usage": {"const": true}}}},
+    {"if": {"properties": {"status": {"const": "completed"}}}, "then": {"required": ["manifest_ref", "manifest_sha256"], "properties": {"lower_bound_usage": {"const": false}}}}
+   ]
+  }
+ }
+}

@@ -15,6 +15,7 @@ The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Pyth
 | [Native upgrades (2026-09-21)](native-upgrades-20260921.md) | Dated upgrade commands, including Worktrunk worktree creation and removal |
 | [Tavily](tavily.md) | Tavily CLI installation, sign-in and returned results |
 | [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
+| [Saturation sweep](saturation-sweep.md) | A person-started landscape sweep scoped to the layers the weekly `saturation-tracking` issue lists as due, with the evidence it must keep and the append to `catalogs/saturation/ledger.json` |
 
 ## Paths, pins and installation conventions
 

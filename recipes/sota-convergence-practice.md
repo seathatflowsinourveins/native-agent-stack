@@ -7,7 +7,10 @@ current using [`tools/sota-convergence/`](../tools/sota-convergence/README.md). 
 ## When to rerun
 
 - **Monthly**, as a bounded freshness check (steps 1, 2, 4 -- skip a full lane
-  re-review if no selection changed).
+  re-review if no selection changed). The open `saturation-tracking` issue,
+  updated weekly by `.github/workflows/saturation-tracking.yml`, lists the
+  layers due for a landscape sweep; run it with
+  [the saturation sweep recipe](saturation-sweep.md).
 - **When a layer decision changes**: a component is added/removed/promoted in
   `catalogs/foundation/decisions.json` or a `catalogs/us-equities/*.json` card
   changes `decision`, or the taxonomy in a prior dated manifest is edited.

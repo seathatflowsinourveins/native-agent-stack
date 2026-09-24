@@ -99,3 +99,11 @@ gap remains. Reopen it for a changed requirement/platform, a credible missing
 capability, a retained failure or a new comparison that changes the result.
 Do not endlessly add repositories to increase a count. This package provides
 continuation instructions; it creates no unattended research, service or schedule.
+
+Sweep-over-sweep results are recorded in the append-only
+[saturation ledger](../catalogs/saturation/README.md). It counts consecutive clean
+sweeps per layer and names saturation candidates, which are inputs to closure,
+never closures: a layer still closes only through this queue's `closure_refs`. Its
+weekly workflow (`.github/workflows/saturation-tracking.yml`) calls no model; it
+updates one tracking issue listing the due layers, and a person starts each sweep
+([recipe](../recipes/saturation-sweep.md)), so the statement above still holds.
