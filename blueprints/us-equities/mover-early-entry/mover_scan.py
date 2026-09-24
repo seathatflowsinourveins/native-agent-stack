@@ -250,6 +250,24 @@ def scan(f: Fetcher, rule: str, now: datetime):
                             "entry_bar_dollar_volume is unknown at scan time, so the 10% entry-bar capacity cap does not apply live"]}
 
 
+def engine_scan(out: dict) -> dict:
+    """The adaptive engine's mover trial scan file (README-mover.md): rule with G in percent points and V in
+    USD, numbers as decimal strings, the regime inputs so the engine recomputes the factor itself."""
+    t, g, v, n = parse_rule(out["rule"])
+    d = out["regime_detail"]
+    fmt = lambda x: None if x is None else format(x, ".10g")  # noqa: E731
+    return {"schema_version": 1, "kind": "mover_scan", "protocol": out["protocol"],
+            "rule": f"{t}|G{fmt(g * 100)}|V{int(v)}|{n}",
+            "scan_time": datetime.fromisoformat(out["scan_time_utc"]).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "regime": {"factor": fmt(out["regime_factor"]),
+                       "inputs": {"spy_prev_close": fmt(d["spy_prev_close"]), "spy_sma20": fmt(d["mean20"]),
+                                  "spy_rv20": fmt(d["vol20"]), "spy_rv20_median252": fmt(d["vol20_median252"])}},
+            "symbols": [{"symbol": c["symbol"], "rank": c["rank"], "price_at_t": fmt(c["price_at_t"]),
+                         "dollar_volume_at_t": fmt(c["dollar_volume_at_t"]), "entry_bar_dollar_volume": None,
+                         "gain_pct_at_t": fmt(c["gain_at_t"] * 100), **({"news_before_t": True} if n == "news_before_t" else {})}
+                        for c in out["candidates"]]}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--env-file", type=Path)
@@ -258,6 +276,7 @@ def main(argv=None) -> int:
     ap.add_argument("--pages", type=Path, help="retain pages here (live mode)")
     ap.add_argument("--replay", type=Path, help="derive the scan from retained pages")
     ap.add_argument("--at", help="scan time (ISO); replay mode requires it")
+    ap.add_argument("--engine-out", type=Path, help="also write the engine's mover trial scan file")
     a = ap.parse_args(argv)
     if a.replay:
         if not a.at:
@@ -272,6 +291,9 @@ def main(argv=None) -> int:
     body = json.dumps(out, indent=1, sort_keys=True) + "\n"
     a.out.write_text(body)
     os.chmod(a.out, 0o600)
+    if a.engine_out:
+        a.engine_out.write_text(json.dumps(engine_scan(out), indent=1, sort_keys=True) + "\n")
+        os.chmod(a.engine_out, 0o600)
     print(json.dumps({"rule": out["rule"], "session": out["session"], "fired": out["fired"], "candidates": [c["symbol"] for c in out["candidates"]],
                       "regime_factor": out["regime_factor"], "sha256": hashlib.sha256(body.encode()).hexdigest()}))
     return 0

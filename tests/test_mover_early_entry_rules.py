@@ -5,15 +5,18 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/mover-early-entry"
-sys.path.insert(0, str(HERE))
-spec = importlib.util.spec_from_file_location("mover_rules", HERE / "rules.py")
-R = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(R)
+HAS_NUMPY = importlib.util.find_spec("numpy") is not None
+R = None
+if HAS_NUMPY:  # the protocol pins numpy 2.5.3; without it these tests are skipped, like the other mover tests
+    sys.path.insert(0, str(HERE))
+    spec = importlib.util.spec_from_file_location("mover_rules", HERE / "rules.py")
+    R = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(R)
 
 DAY = "2023-03-15"
 
 
-def bar(hhmm, o, h, l, c, v=1000, vw=None):
+def bar(hhmm, o, h, l, c, v=1000, vw=None):  # noqa: E741
     return {"t": R.et_epoch(DAY, hhmm), "o": o, "h": h, "l": l, "c": c, "v": v, "vw": vw if vw is not None else c}
 
 
@@ -25,6 +28,7 @@ def ex(entry, hhmm, rows, close):
     return R.exits_for(entry, R.et_epoch(DAY, hhmm), bars(*rows), DAY, close)
 
 
+@unittest.skipUnless(HAS_NUMPY, "requires the pinned numpy runtime (protocol inputs.runtime)")
 class Basics(unittest.TestCase):
     def test_split_factor_converts_a_reverse_split_and_ignores_dividend_drift(self):
         f, split = R.split_factor(0.50, 5.00, 7.50, 7.50)  # 1:10 reverse split effective on the session
@@ -70,6 +74,7 @@ class Basics(unittest.TestCase):
         self.assertLess(R.net_return(10.0, 10.0, 0.01, 0.01, "2025-06-02", 20_000, "ibkr"), net)
 
 
+@unittest.skipUnless(HAS_NUMPY, "requires the pinned numpy runtime (protocol inputs.runtime)")
 class Entries(unittest.TestCase):
     def test_premarket_entry_uses_the_next_bar_within_5_minutes_and_before_09_30(self):
         b = bars(bar("09:24", 1, 1, 1, 1), bar("09:26", 1.4, 1.5, 1.4, 1.45), bar("09:31", 2, 2, 2, 2))
@@ -107,6 +112,7 @@ class Entries(unittest.TestCase):
         self.assertFalse(R.fires(None, 0.0, None, False, 0.20, 250_000, "any"))
 
 
+@unittest.skipUnless(HAS_NUMPY, "requires the pinned numpy runtime (protocol inputs.runtime)")
 class Exits(unittest.TestCase):
     def test_trailing_uses_the_previous_bars_high_and_gap_fills_at_the_open(self):
         rows = [bar("09:35", 10, 12, 10, 12), bar("09:36", 12, 13, 12.5, 13), bar("09:37", 10, 10.5, 9, 9.5)]
