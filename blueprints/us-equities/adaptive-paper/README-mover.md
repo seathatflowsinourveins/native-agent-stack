@@ -85,7 +85,7 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   fresh marks on held symbols. Any unfilled remainder is canceled after
   `entry.timeout_seconds`. A buy is never re-priced or re-sent, even after a refusal.
 - **Exits** run on every quote and on the runner's 0.1 s tick:
-  - X1 at 15:58 ET;
+  - X1 two minutes before the session's regular close (15:58 ET; 12:58 on early closes);
   - X2 60 minutes after the first fill;
   - X3 when the bid is at or below 0.85 x the running high since entry;
   - X4 when the bid is at or below 0.85 x or at or above 1.50 x the entry price.
@@ -238,6 +238,10 @@ credential.
   (`mover_x1_preempted_by_session_close`). The native loop latches `session_close`
   `cleanup_seconds` before the controller close, which is 16:00 without extended hours
   (20:00 with them), so a regular-session X1 config needs `cleanup_seconds` below 120.
+  That is necessary, not sufficient: each plan is also refused (`mover_x1_unreachable`)
+  when its hard flatten (the trial end, or the sell window less `flatten_reserve_seconds`)
+  comes at or before X1. X1 is two minutes before the session's regular close from the
+  engine calendar (15:58, or 12:58 on a scheduled early close; study clarification C26).
 - **Pre-market data.** `quote_max_age_seconds` is at most 3 s. The 2026-09-23 after-hours
   trial stopped on the stream's 3 s data timeout (`trials/20260923-post-extended-hours`).
   `stream_quote_timeout_seconds` can lengthen that transport timeout while the ledger

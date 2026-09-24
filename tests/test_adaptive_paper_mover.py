@@ -436,6 +436,18 @@ class SessionsSizingAndTiming(unittest.TestCase):
         _, limits, settings = load(data)
         timing = mover.plan_timing(settings, limits, t0=mover.et_epoch(date, dtime(14, 51)), session_date=date)
         self.assertEqual(timing.x1_at, mover.et_epoch(date, dtime(15, 58)))
+        # X1 is two minutes before the session's regular close (C26): 12:58 on an early close.
+        early = datetime(2026, 11, 27).date()
+        timing = mover.plan_timing(settings, limits, t0=mover.et_epoch(early, dtime(11, 51)), session_date=early)
+        self.assertEqual(timing.x1_at, mover.et_epoch(early, dtime(12, 58)))
+        # A plan whose hard flatten comes at or before X1 is refused: the latest start the preflight allows
+        # a regular-session trial (16:00 - duration - cleanup - 60 s) flattens at 15:57 with a 120 s reserve.
+        data.update(regular_session_only=True, extended_hours_enabled=False, cleanup_seconds=119)
+        data["sessions"]["extended_hours"] = False
+        _, limits, settings = load(data)
+        latest = mover.et_epoch(date, dtime(16, 0)) - limits.trial_seconds - limits.cleanup_seconds - 60
+        with self.assertRaisesRegex(mover.MoverRefusal, "mover_x1_unreachable"):
+            mover.plan_timing(settings, limits, t0=latest, session_date=date)
 
 
 class Pricing(unittest.TestCase):
