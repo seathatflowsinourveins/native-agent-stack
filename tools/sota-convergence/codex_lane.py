@@ -359,6 +359,15 @@ def executable_token_starts(command: str) -> set:
     return {match.end() for match in EXECUTABLE_TOKEN.finditer(command)}
 
 
+def network_authority(command: str, match) -> bool:
+    """Whether an ABSOLUTE_PATH match is a network URL's authority (``https://host/x``, a bare ``'https://'``), which is
+    no filesystem path (2026-09-24 re-record); ``file://`` and ``https:///`` are not one (Codex review of #206, P2;
+    independent review of #206, C1)."""
+    path = match.group(1)
+    return (path.startswith("//") and not path.startswith("///")
+            and bool(NETWORK_SCHEME_BEFORE.search(command[max(0, match.start(1) - 12):match.start(1)])))
+
+
 def outside_paths(command: str, allowed_roots) -> list:
     """Absolute paths in ``command`` outside ``allowed_roots``, except /dev/null and a segment's system
     executable token."""
@@ -368,10 +377,7 @@ def outside_paths(command: str, allowed_roots) -> list:
         path = match.group(1)
         if path in EXEMPT_PATHS:
             continue
-        # A network URL's authority (``https://host/x``, a bare ``'https://'``) is no filesystem path (2026-09-24
-        # re-record); a ``file://`` URL is, so it stays checked (Codex review of #206, P2).
-        if (path.startswith("//") and not path.startswith("///")
-                and NETWORK_SCHEME_BEFORE.search(command[max(0, match.start(1) - 12):match.start(1)])):
+        if network_authority(command, match):
             continue
         if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
             continue
@@ -382,15 +388,18 @@ def outside_paths(command: str, allowed_roots) -> list:
 
 
 def names_root(command: str) -> bool:
-    """Whether ``command`` names the filesystem root ``/``: ROOT_PATH, except a quoted ``'/'`` joined with ``+`` on both
-    sides, which joins two parts (``p+'/'+k`` walking a JSON document) and names no directory; ``os.walk('/')``,
-    ``'/'+'etc/passwd'`` and ``ls /`` still do (2026-09-24 re-record: 8 voided layers)."""
+    """Whether ``command`` names the filesystem root ``/``: ROOT_PATH, except a quoted ``'/'`` joined with ``+`` between
+    two non-literal operands (``p+'/'+k``, ``path + '/' + str(i)`` walking a JSON document), which names no directory;
+    ``os.walk('/')``, ``'/'+'etc/passwd'``, ``''+'/'+'etc'`` and ``ls /`` still do (2026-09-24 re-record: 8 voided
+    layers)."""
     for match in ROOT_PATH.finditer(command):
         slash = match.end() - 1
         quote = command[slash - 1:slash]
-        # Both sides joined: '/'+'etc/passwd' builds /etc/passwd (independent review of #206, C2).
+        # Joined between two non-literal operands only: '/'+'etc/passwd' and ''+'/'+'etc/passwd' build /etc/passwd
+        # (independent review of #206, C2 and round 1 (a)).
         if quote in ("'", '"') and command[slash + 1:slash + 2] == quote and (
-                re.search(r"\+\s*\Z", command[:slash - 1]) and re.match(r"\s*\+", command[slash + 2:])):
+                re.search(r"[\w)\]]\s*\+\s*\Z", command[:slash - 1])
+                and re.match(r"\s*\+\s*[A-Za-z_(]", command[slash + 2:])):
             continue
         return True
     return False
@@ -456,8 +465,11 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
             # A CLI named by an absolute path runs whatever PATH says (``/usr/local/bin/qmd``, an exempt system
             # executable token otherwise), so its basename is checked against every audited CLI (Codex review of
             # #206, P2); a bare search word is not a path.
-            reasons += [f"runs {name} by path: {path}" for path in ABSOLUTE_PATH.findall(command)
-                        for name in [os.path.basename(path.rstrip("/"))]
+            # A network URL ending in a CLI's name (``https://github.com/tobi/qmd``) is a search term (Codex review of
+            # #206 at 882ba4b9).
+            reasons += [f"runs {name} by path: {path}" for match in ABSOLUTE_PATH.finditer(command)
+                        if not network_authority(command, match)
+                        for path in [match.group(1)] for name in [os.path.basename(path.rstrip("/"))]
                         if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
                         and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
             if reasons:

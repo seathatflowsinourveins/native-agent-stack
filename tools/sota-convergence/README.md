@@ -1415,8 +1415,11 @@ What remains and how it is handled:
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
     (Python's `Path.cwd()/ref`) starts no path, and neither does the `//` of a network URL (`https://host`,
-    `ssh://`), though `file:///` and `https:///` do. The root rule skips a quoted `'/'` joined with `+` on
-    both sides (`p+'/'+k`), but not `'/'+'etc/passwd'`. Only `/dev/null` and a
+    `ssh://`), though `file:///` and `https:///` do. A network URL reaches nothing from a blind child: measured
+    2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
+    had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
+    not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
+    two non-literal operands (`p+'/'+k`), but not `'/'+'etc/passwd'` or `''+'/'+x`. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
     `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
     after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under

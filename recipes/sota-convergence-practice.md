@@ -171,7 +171,7 @@ python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
 #    Run $CATALOG/tools/sota-convergence/adjudication-lane.js (the export has no tools/) headless from the
-#    export root as in step 3 (its --output-format json to adjudication-session.json), with
+#    export root as in step 3, with CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 (its --output-format json to adjudication-session.json), with
 #    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
 #    claude-collect audits each judgment on what its agents opened, from that run's transcripts.
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \

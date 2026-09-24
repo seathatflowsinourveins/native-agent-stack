@@ -919,6 +919,8 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             with self.subTest(command=command):
                 self.assertIn(reason, self.reasons(command))
         for command in (f"/bin/bash -lc 'rg -n x {repo}/docs/qmd'", "/bin/bash -lc 'rg -n ssh://host/x docs'",
+                        "/bin/bash -lc \"rg -n 'https://github.com/tobi/qmd' catalogs\"",
+                        "/bin/bash -lc \"rg -n 'https://example.invalid/tools/serena/' catalogs\"",
                         "/bin/bash -lc \"rg -n 'wss://host/x|sftp://h/y' docs\""):
             with self.subTest(command=command):
                 self.assertEqual(self.reasons(command), [])
@@ -928,7 +930,13 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         expected = {
             "/bin/bash -lc \"python3 -c \\\"print(open('/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x = 'etc' ; print(open('/' + x))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"print(open(''+'/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc 'python3 - <<\"PY\"\nprint(open(\"/\"+\"etc\"))\nPY'": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"x='a'; print(open(x+'/'+'etc'))\\\"\"": "names the filesystem root /",
+            "/bin/bash -lc \"python3 -c \\\"x='etc'; print(open(''+'/'+x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'cat https:///etc/passwd'": "path outside the repository and packets: ///etc/passwd",
+            "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
+                "runs qmd by path: /usr/local/bin/qmd",
         }
         for command, reason in expected.items():
             with self.subTest(command=command):
