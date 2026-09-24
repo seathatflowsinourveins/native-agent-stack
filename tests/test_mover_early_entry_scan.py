@@ -45,7 +45,11 @@ class Scanner(unittest.TestCase):
 
         class Fake:
             def get(self, base, path, params):
-                if path == "/v2/assets":
+                if path == "/v2/calendar":
+                    yield [{"date": d} for d in ("2026-03-16", prev, day)]
+                elif path == "/v1/corporate-actions":
+                    yield {"corporate_actions": {}}
+                elif path == "/v2/assets":
                     yield data["/v2/assets"]
                 elif path == "/v2/stocks/snapshots":
                     yield {s: data["snapshots"][s] for s in params["symbols"].split(",") if s in data["snapshots"]}
@@ -77,6 +81,13 @@ class Scanner(unittest.TestCase):
         # A higher dollar-volume floor removes BBBB; the 1M floor removes both.
         self.assertEqual(self.S.scan(self.fake(), "08:00|G0.20|V1000000|any", now)["fired"], 0)
         self.assertEqual([c["symbol"] for c in self.S.scan(self.fake(), "08:00|G0.30|V250000|any", now)["candidates"]], ["AAAA"])
+
+    def test_the_0930_rule_waits_for_its_signal_cutoff(self):
+        at = datetime.fromtimestamp(self.R.et_epoch("2026-03-18", "09:28") - 5, timezone.utc)
+        with self.assertRaises(SystemExit):
+            self.S.scan(self.fake(), "09:30|G0.20|V250000|any", at)
+        ok = datetime.fromtimestamp(self.R.et_epoch("2026-03-18", "09:28") + 2, timezone.utc)
+        self.assertEqual(self.S.scan(self.fake(), "09:30|G0.20|V250000|any", ok)["prev_session"], "2026-03-17")
 
     def test_scan_refuses_before_the_rule_time_and_news_variant_needs_headlines(self):
         early = datetime.fromtimestamp(self.R.et_epoch("2026-03-18", "08:00") - 5, timezone.utc)

@@ -111,6 +111,9 @@ class Portfolio(unittest.TestCase):
         E.X1_px = 10.0 * (1 + np.array(nets))
         E.X1_cin = np.zeros(n)
         E.X1_cout = np.zeros(n)
+        # every fire filled unless a test removes it (C24 fired arrays)
+        E.f_sess, E.f_dv, E.f_price, E.f_symbol = E.sess.copy(), E.dv.copy(), E.price.copy(), list(E.symbol)
+        E.f_entry_index = np.arange(n)
         return E
 
     def test_leverage_regime_and_sub5_cap(self):
@@ -124,6 +127,28 @@ class Portfolio(unittest.TestCase):
         cheap = self.entries([0.10], prices=[3.0])
         stats, _, _ = self.E.simulate(cheap, self.E.top5_by_session(cheap, self.np.arange(1)), "X1", {cheap.cal[0]: 1.0}, 4)
         self.assertAlmostEqual(stats["final_equity"], 102000, delta=5)
+
+    def test_an_unfilled_fire_keeps_its_slot(self):
+        np = self.np
+        E = self.entries([0.10, 0.10])
+        E.sess = np.array([0, 0])
+        E.cal = E.cal[:1]
+        E.f_sess = np.array([0, 0, 0, 0, 0, 0])
+        E.f_dv = np.array([9e9, 8e9, 7e9, 6e9, 5e9, 1e9])
+        E.f_price = np.full(6, 10.0)
+        E.f_symbol = ["A", "B", "C", "D", "E", "F"]
+        E.f_entry_index = np.array([-1, -1, -1, -1, 0, 1])  # the five largest include four unfilled fires
+        stats, taken, _ = self.E.simulate(E, self.E.top5_by_session(E, np.arange(6)), "X1", {E.cal[0]: 1.0}, 1)
+        self.assertEqual(stats["trades_taken"], 1)  # F is sixth: it never replaces an unfilled fire
+        self.assertAlmostEqual(stats["fill_ratio"], 0.2)
+
+    def test_pnl_is_booked_on_the_cost_basis(self):
+        E = self.entries([0.10])
+        E.X1_cin = self.np.array([0.01])
+        stats, _, _ = self.E.simulate(E, self.E.top5_by_session(E, self.np.arange(1)), "X1", {E.cal[0]: 1.0}, 5)
+        # 4x cap -> notional 80k, basis 80.8k (1% cost), proceeds 88k less 2023-01 SEC ($22.90/M) and TAF fees
+        fees = 22.90 * 88_000 / 1e6 + 0.000145 * 8_000
+        self.assertAlmostEqual(stats["final_equity"], 100_000 + 88_000 - 80_800 - fees, places=2)
 
     def test_capacity_cap_and_drawdown_cooldown(self):
         E = self.entries([0.10], dv=100_000.0)

@@ -211,13 +211,14 @@ def read_outcomes(path: Path, split: str):
 
 
 class Spy:
-    """C4: SPY adjusted closes from 2019-11-01; regime factor per session and the session calendar."""
+    """D4: SPY adjusted closes from 2019-11-01 up to the stage's last session; the regime factor (C4) and the calendar."""
 
-    def __init__(self, daily_path: Path):
+    def __init__(self, daily_path: Path, last: str):
         import duckdb
         rows = duckdb.connect().execute(
             f"""SELECT CAST(session_date AS VARCHAR), all_c FROM read_parquet('{daily_path}')
-                WHERE symbol = 'SPY' AND session_date >= DATE '2019-11-01' ORDER BY session_date""").fetchall()
+                WHERE symbol = 'SPY' AND session_date >= DATE '2019-11-01' AND session_date <= DATE '{last}'
+                ORDER BY session_date""").fetchall()
         self.days = [d for d, _ in rows]
         self.pos = {d: i for i, d in enumerate(self.days)}
         self.closes = np.array([c for _, c in rows], dtype=float)
@@ -243,17 +244,18 @@ class Spy:
         return out
 
 
-def iwm_open_to_close(bench_dir: Path, lo: str, hi: str):
+def iwm_open_to_close(bench_dir: Path, cal):
+    """IWM official open-to-close per calendar session; sessions without both prints are counted."""
     import benchmarks
+    days = benchmarks.load(bench_dir)
     out, missing = {}, 0
-    for d, auc in benchmarks.load(bench_dir).items():
-        if lo <= d <= hi:
-            o, _ = official_price(auc, "o")
-            c, _ = official_price(auc, "c")
-            if o and c:
-                out[d] = c / o - 1
-            else:
-                missing += 1
+    for d in cal:
+        o, _ = official_price(days.get(d), "o")
+        c, _ = official_price(days.get(d), "c")
+        if o and c:
+            out[d] = c / o - 1
+        else:
+            missing += 1
     return out, missing
 
 
@@ -287,10 +289,22 @@ class Entries:
         self.years = sorted(yidx, key=yidx.get)
         sidx = {s: i for i, s in enumerate(syms)}
         cols = defaultdict(list)
+        fired = defaultdict(list)  # C24: every loosest-rule fire, filled or not
         for r in rows:
             for ti, t in enumerate(R.TIMES):
                 row = r["t"][t]
-                if not (row.get("loosest") and row.get("entry") is not None):
+                if not row.get("loosest"):
+                    continue
+                fired["time"].append(ti)
+                fired["sess"].append(cidx[r["session"]])
+                fired["symbol"].append(r["symbol"])
+                fired["price"].append(row["price"])
+                fired["dv"].append(row["dv"])
+                fired["gain"].append(row["gain"])
+                fired["news"].append(bool(row["news120"]))
+                fired["news600"].append(bool(row["news600"]))
+                fired["entry_index"].append(len(cols["time"]) if row.get("entry") is not None else -1)
+                if row.get("entry") is None:
                     continue
                 day, e = r["session"], row["entry"]
                 cols["time"].append(ti)
@@ -302,6 +316,7 @@ class Entries:
                 cols["dv"].append(row["dv"])
                 cols["gain"].append(row["gain"] if row["gain"] is not None else np.nan)
                 cols["news"].append(bool(row["news120"]))
+                cols["news600"].append(bool(row["news600"]))
                 cols["entry"].append(e)
                 cols["bar_dv"].append(row["entry_bar_dv"] if row["entry_bar_dv"] is not None else np.nan)
                 cols["halt"].append(bool(row["halt"]))
@@ -333,8 +348,13 @@ class Entries:
         self.symbol = cols.pop("symbol")
         self.day = cols.pop("day")
         for k, v in cols.items():
-            dtype = int if k in ("time", "sess", "sym", "year") else (bool if k in ("news", "halt", "fallback_row", "supplement") or k.endswith("_fb") else float)
+            dtype = int if k in ("time", "sess", "sym", "year") else (bool if k in ("news", "news600", "halt", "fallback_row", "supplement") or k.endswith("_fb") else float)
             setattr(self, k.replace("-", "_"), np.array(v, dtype=dtype) if v else np.zeros(0, dtype=dtype))
+        self.f_symbol = fired.pop("symbol", [])
+        for k, v in fired.items():
+            dtype = int if k in ("time", "sess", "entry_index") else (bool if k in ("news", "news600") else float)
+            setattr(self, "f_" + k, np.array(v, dtype=dtype) if v else np.zeros(0, dtype=dtype))
+        self.n_fired = len(self.f_symbol)
         self.net = {}
         for x in R.EXITS:
             for name, broker, mult in VARIANTS:
@@ -343,9 +363,16 @@ class Entries:
         self.ptier = np.searchsorted(R.PRICE_TIERS, self.price, side="right") if self.n else np.zeros(0, dtype=int)
         self.vtier = np.searchsorted(R.DV_TIERS, self.dv, side="right") if self.n else np.zeros(0, dtype=int)
 
-    def mask(self, t, g, v, n):
-        m = (self.time == R.TIMES.index(t)) & (self.gain >= g) & (self.dv >= v) & (self.price >= R.MIN_PRICE)
-        return np.flatnonzero(m & self.news) if n == "news_before_t" else np.flatnonzero(m)
+    def mask(self, t, g, v, n, fired=False):
+        """Filled entries (or, with fired=True, every fire) of a rule; n may also be 'news600' (sensitivity)."""
+        pre = "f_" if fired else ""
+        m = ((getattr(self, pre + "time") == R.TIMES.index(t)) & (getattr(self, pre + "gain") >= g - R.GAIN_EPS)
+             & (getattr(self, pre + "dv") >= v) & (getattr(self, pre + "price") >= R.MIN_PRICE))
+        if n == "news_before_t":
+            m &= getattr(self, pre + "news")
+        elif n == "news600":
+            m &= getattr(self, pre + "news600")
+        return np.flatnonzero(m)
 
     def break_even(self, idx, x):
         """C8."""
@@ -367,13 +394,15 @@ class Entries:
         return lo
 
 
-def top5_by_session(E: Entries, idx):
-    """The entries a 5-position portfolio takes each session: dollar volume descending, then symbol."""
-    order = sorted(idx.tolist(), key=lambda i: (E.sess[i], -E.dv[i], E.symbol[i]))
+def top5_by_session(E: Entries, fidx):
+    """C24: the five slots per session over every fire (dollar volume descending, then symbol), as entry
+    indices; a fire without a fill keeps its slot as -1 (zero P&L, counted in the desired notional)."""
+    order = sorted(fidx.tolist(), key=lambda i: (E.f_sess[i], -E.f_dv[i], E.f_symbol[i]))
     out = defaultdict(list)
     for i in order:
-        if len(out[E.sess[i]]) < 5:
-            out[E.sess[i]].append(i)
+        s = int(E.f_sess[i])
+        if len(out[s]) < 5:
+            out[s].append((int(E.f_entry_index[i]), float(E.f_dv[i]), float(E.f_price[i])))
     return out
 
 
@@ -401,19 +430,21 @@ def simulate(E: Entries, top5, x, regime, rung, start_equity=100_000.0):
             continue
         lev = min(4.0, rung * regime[s] * (1.0 if dd <= 0.10 else 0.5))
         pnl = 0.0
-        for i in top5.get(si, ()):
-            li = min(lev, 1.0) if E.price[i] < 5 else lev
+        for i, f_dv, f_price in top5.get(si, ()):
+            li = min(lev, 1.0) if f_price < 5 else lev
             desired = equity * li / 5
+            desired_total += desired
+            if i < 0:  # C24: fired but not filled
+                continue
             cap = 0.01 * E.dv[i]
             if not math.isnan(E.bar_dv[i]):
                 cap = min(cap, 0.10 * E.bar_dv[i])
             notional = min(desired, cap)
-            desired_total += desired
             if notional <= 0:
                 continue
             filled_total += notional
             net = R.net_return(float(E.entry[i]), float(px[i]), float(cin[i]), float(cout[i]), E.day[i], notional)
-            pnl += notional * net
+            pnl += net * notional * (1 + float(cin[i]))  # net is a return on the basis (C6)
             taken_sess.append(si)
             taken_net.append(net)
         rets.append(pnl / equity)
@@ -438,21 +469,28 @@ def simulate(E: Entries, top5, x, regime, rung, start_equity=100_000.0):
 # ---------------------------------------------------------------- per split
 
 
-def evaluate_split(E: Entries, regime, portfolio: bool = True):
+def evaluate_split(E: Entries, regime, portfolio: bool = True, only=None):
+    """Per rule-exit metrics; `only` limits the rule-exits evaluated (the holdout's at most five)."""
     S = len(E.cal)
     C = replicate_counts(S)
     out, cols, cnts, keys = {}, [], [], []
     tops = {}
     for (t, g, v, n) in RULES:
+        if only is not None and not any(rule_id(t, g, v, n, x) in only for x in R.EXITS):
+            continue
         idx = E.mask(t, g, v, n)
-        conc_n = np.bincount(E.sess[idx], minlength=S)[E.sess[idx]] if len(idx) else np.zeros(0, dtype=int)
+        fidx = E.mask(t, g, v, n, fired=True)
+        fires_per_session = np.bincount(E.f_sess[fidx], minlength=S)  # C13: fires, filled or not
+        conc_n = fires_per_session[E.sess[idx]] if len(idx) else np.zeros(0, dtype=int)
         conc = np.searchsorted([1, 5, 20], conc_n, side="left") if len(idx) else conc_n
         codes = {"by_year": (E.years, E.year[idx]), "by_price_tier": (PRICE_LABELS, E.ptier[idx]),
                  "by_v_tier": (V_LABELS, E.vtier[idx]), "by_concurrency": (CONC_LABELS, conc)}
-        top5 = top5_by_session(E, idx) if portfolio else None
+        top5 = top5_by_session(E, fidx) if portfolio else None
         tops[rule_id(t, g, v, n)] = top5
         for x in R.EXITS:
             rid = rule_id(t, g, v, n, x)
+            if only is not None and rid not in only:
+                continue
             nets = {name: quantise(E.net[(x, name)][idx]) for name, _, _ in VARIANTS}
             gross = getattr(E, f"{x}_px")[idx] / E.entry[idx] - 1
             m = summarise(nets["primary"], gross, E.sess[idx], S, codes)
@@ -480,6 +518,13 @@ def evaluate_split(E: Entries, regime, portfolio: bool = True):
                 cols.append(np.bincount(E.sess[idx], weights=nets[name], minlength=S))
                 cnts.append(np.bincount(E.sess[idx], minlength=S).astype(float))
                 keys.append((rid, name))
+            if n == "news_before_t":  # the preregistered 600 s news-lag sensitivity (not used for selection)
+                i6 = E.mask(t, g, v, "news600")
+                n6 = quantise(E.net[(x, "primary")][i6])
+                out[rid]["news600_sensitivity"] = {"trades": int(len(i6)), "mean": rnd(float(n6.sum()) / len(i6) / Q) if len(i6) else None}
+                cols.append(np.bincount(E.sess[i6], weights=n6, minlength=S))
+                cnts.append(np.bincount(E.sess[i6], minlength=S).astype(float))
+                keys.append((rid, "news600"))
             if portfolio:
                 out[rid]["portfolio"] = {}
                 for rung in RUNGS:
@@ -497,6 +542,8 @@ def evaluate_split(E: Entries, regime, portfolio: bool = True):
         for j, (rid, name) in enumerate(keys[lo:lo + 256]):
             if name.startswith("portfolio_"):
                 out[rid]["portfolio"][name.split("_")[1]].update({"p": rnd(p[j], 10), "lower_bound": rnd(lb[j])})
+            elif name == "news600":
+                out[rid]["news600_sensitivity"].update({"p": rnd(p[j], 10), "lower_bound": rnd(lb[j])})
             else:
                 suffix = "" if name == "primary" else f"_{name}"
                 out[rid]["p" + suffix] = rnd(p[j], 10)
@@ -554,7 +601,7 @@ def replication(rows):
 
 def completeness(rows, meta):
     return {"sessions": meta["sessions"], "symbol_days": len(rows),
-            "incomplete_sessions_in_any_collection": len(meta.get("incomplete_sessions_in_any_collection") or []),
+            "split_sessions_ever_incomplete_elsewhere": len(meta.get("split_sessions_ever_incomplete_elsewhere") or []),
             "zero_bar_symbol_days": sum(1 for r in rows if r["bars"] == 0),
             "ref_from_daily_bar_close": sum(1 for r in rows if r["ref_source"] == "daily_bar_close"),
             "ref_missing": sum(1 for r in rows if r["ref"] is None),
@@ -566,9 +613,11 @@ def completeness(rows, meta):
             "premarket_supplement_symbol_days": sum(1 for r in rows if r.get("supplement"))}
 
 
-def coverage(audit_path: Path, candidates_path: Path, lo: str, hi: str):
-    """C21."""
-    cand = {(r["symbol"], r["session_date"]) for r in csv.DictReader(candidates_path.open(newline=""))}
+def coverage(audit_path: Path, candidate_paths, lo: str, hi: str):
+    """C21, against the evaluated universe: the main list plus the D3 pre-market supplement."""
+    cand = set()
+    for path in candidate_paths:
+        cand |= {(r["symbol"], r["session_date"]) for r in csv.DictReader(path.open(newline=""))}
     tiers = defaultdict(lambda: [0, 0])
     for e in json.loads(audit_path.read_text())["events"]:
         if e["verdict"] not in ("match", "recovered_match") or e.get("alpaca_gain_pct") is None:
@@ -587,53 +636,96 @@ def coverage(audit_path: Path, candidates_path: Path, lo: str, hi: str):
 # ---------------------------------------------------------------- stages
 
 
-def dev_val(a) -> int:
+def check_inputs(a):
+    """Frozen inputs and runtime (protocol inputs; C28 records what each check covers)."""
+    import duckdb
+    rt = PROTOCOL["inputs"]["runtime"]
+    have = {"python": sys.version.split()[0], "duckdb": duckdb.__version__, "numpy": np.__version__}
+    if have != rt:
+        raise SystemExit(f"runtime {have} differs from the protocol's {rt}")
+    daily_sha = hashlib.sha256(a.daily.read_bytes()).hexdigest()
+    if daily_sha != PROTOCOL["inputs"]["daily_dataset"]["sha256"]:
+        raise SystemExit("daily dataset does not match protocol.json")
+    main_list = a.state / "candidates-provable-20260924.csv"
+    supp = a.state / "candidates-premarket-20260924.csv"
+    d3 = next(d for d in json.loads((HERE / "deviations.json").read_text())["deviations"] if d["id"] == "D3")
+    if hashlib.sha256(main_list.read_bytes()).hexdigest() != PROTOCOL["inputs"]["candidates"]["sha256"]:
+        raise SystemExit("candidate list does not match protocol.json")
+    if hashlib.sha256(supp.read_bytes()).hexdigest() != d3["supplement_candidates_sha256"]:
+        raise SystemExit("pre-market supplement does not match deviations.json D3")
     table_bytes = a.cost_table.read_bytes()
-    costs = Costs(json.loads(table_bytes))
+    return {"runtime": have, "daily_sha256": daily_sha, "cost_table_sha256": sha256_bytes(table_bytes),
+            "fees_sha256": sha256_bytes((HERE / "fees.json").read_bytes()),
+            "clarifications_sha256": sha256_bytes((HERE / "clarifications.json").read_bytes()),
+            "deviations_sha256": sha256_bytes((HERE / "deviations.json").read_bytes()),
+            "audit_sha256": sha256_bytes(a.audit.read_bytes()), "bootstrap": {"B": B, "block": BLOCK, "seed": SEED}}, \
+        json.loads(table_bytes), [main_list, supp]
+
+
+def gate_outcomes(meta, name, want_table_sha):
+    if meta.get("cost_table_sha256") != want_table_sha:
+        raise SystemExit(f"{name} outcomes were not computed against this cost table (costs.sample ordering)")
+
+
+def dev_val(a) -> int:
+    inputs, table, cand_paths = check_inputs(a)
+    costs = Costs(table)
     dev_rows, dev_meta = read_outcomes(a.outcomes_dev, "dev")
     val_rows, val_meta = read_outcomes(a.outcomes_val, "val")
+    gate_outcomes(dev_meta, "development", inputs["cost_table_sha256"])
+    gate_outcomes(val_meta, "validation", inputs["cost_table_sha256"])
     lo, hi = SPLITS["development"][0], SPLITS["validation"][1]
-    iwm, iwm_missing = iwm_open_to_close(a.benchmarks, lo, hi)
-    spy = Spy(a.daily)
+    spy = Spy(a.daily, hi)
     dev_cal, val_cal = spy.calendar("development"), spy.calendar("validation")
+    iwm, iwm_missing = iwm_open_to_close(a.benchmarks, dev_cal + val_cal)
     regime = spy.regime(dev_cal + val_cal)
     dev_E, val_E = Entries(dev_rows, costs, iwm, dev_cal), Entries(val_rows, costs, iwm, val_cal)
     dev = evaluate_split(dev_E, regime)
     val = evaluate_split(val_E, regime)
     rids = [rule_id(*re) for re in RULE_EXITS]
+    robust = ("winsorised_mean", "mean_without_top5_sessions", "mean_of_session_means")
     dev_pass = [r for r in rids if dev[r]["trades"] >= 200 and dev[r].get("p") is not None and dev[r]["p"] <= 0.05]
     val_p = [val[r]["p"] if val[r]["trades"] else 1.0 for r in dev_pass]
     confirm, validated = {}, []
     for r, pa, pb in zip(dev_pass, bh(val_p), by(val_p)):
         v = val[r]
-        ok = bool(v["trades"] >= 100 and pa <= 0.10 and all((v.get(k) or 0) > 0 for k in
-                  ("winsorised_mean", "mean_without_top5_sessions", "mean_of_session_means")))
+        ok = bool(v["trades"] >= 100 and pa <= 0.10 and all((v.get(k) or 0) > 0 for k in robust))
         confirm[r] = {"validation_trades": v["trades"], "validation_p": v.get("p"), "bh_adjusted": rnd(pa, 10),
                       "by_adjusted_sensitivity": rnd(pb, 10), "confirmed": ok}
         if ok:
             validated.append(r)
-    dev_bh = bh([dev[r]["p"] if dev[r]["trades"] else 1.0 for r in rids])
-    holdout_list = sorted(validated, key=lambda r: (val[r]["p"], r))[:5]
-    most_traded = sorted(rids, key=lambda r: (-dev[r]["trades"], dev[r].get("p") or 1.0, r))[0]
-    if validated:
-        candidate = {"rule_exit": sorted(validated, key=lambda r: (-(val[r]["lower_bound"] if val[r]["lower_bound"] is not None else -1e18), r))[0],
-                     "basis": "highest validation lower bound (holdout pending)", "mechanics_only": False}
+    # C29: BH across all 768 rule-exits, at each stage's own thresholds (sensitivities, not selection)
+    dev_bh = dict(zip(rids, bh([dev[r]["p"] if dev[r]["trades"] else 1.0 for r in rids])))
+    val_bh = dict(zip(rids, bh([val[r]["p"] if val[r]["trades"] else 1.0 for r in rids])))
+    sens = {"development_bh768_passes": sorted(r for r in rids if dev[r]["trades"] >= 200 and dev_bh[r] <= 0.05),
+            "validation_bh768_confirmations": sorted(r for r in rids if val[r]["trades"] >= 100 and val_bh[r] <= 0.10
+                                                     and all((val[r].get(k) or 0) > 0 for k in robust))}
+
+    def lb_key(stats, r):
+        return stats[r]["lower_bound"] if stats[r].get("lower_bound") is not None else -1e18
+    # C27: the holdout's five: lowest validation p, then higher validation lower bound, then rule id
+    holdout_list = sorted(validated, key=lambda r: (val[r]["p"], -lb_key(val, r), r))[:5]
+    paperable = [r for r in rids if not r.startswith("09:30|")]  # C31
+    most_traded = sorted(paperable, key=lambda r: (-dev[r]["trades"], dev[r].get("p") or 1.0, r))[0]
+    val_paper = [r for r in validated if not r.startswith("09:30|")]
+    if val_paper:
+        candidate = {"rule_exit": sorted(val_paper, key=lambda r: (-lb_key(val, r), r))[0],
+                     "basis": "highest validation lower bound (holdout pending; 09:30 rules excluded, C31)", "mechanics_only": False}
     else:
         candidate = {"rule_exit": most_traded, "basis": "most-traded development rule-exit (C20); nothing validated", "mechanics_only": True}
     results = {
         "schema_version": 1, "protocol": PROTOCOL["id"], "stage": "dev_val", "protocol_sha256": sha256_bytes(PROTOCOL_BYTES),
-        "inputs": {"cost_table_sha256": sha256_bytes(table_bytes), "outcomes_dev_content_sha256": dev_meta["content_sha256"],
-                   "outcomes_val_content_sha256": val_meta["content_sha256"], "audit_sha256": sha256_bytes(a.audit.read_bytes()),
-                   "bootstrap": {"B": B, "block": BLOCK, "seed": SEED}, "iwm_sessions_missing_official_open_or_close": iwm_missing,
-                   "runtime": {"python": sys.version.split()[0], "numpy": np.__version__}},
+        "inputs": dict(inputs, outcomes_dev_content_sha256=dev_meta["content_sha256"], outcomes_val_content_sha256=val_meta["content_sha256"],
+                       iwm_calendar_sessions_without_official_open_and_close=iwm_missing),
         "regime_factor_share_1": {"development": rnd(np.mean([regime[d] == 1.0 for d in dev_cal])),
                                   "validation": rnd(np.mean([regime[d] == 1.0 for d in val_cal]))},
         "completeness": {"development": completeness(dev_rows, dev_meta), "validation": completeness(val_rows, val_meta)},
-        "coverage": coverage(a.audit, a.state / "candidates-provable-20260924.csv", lo, hi),
-        "entries_fired_loosest": {"development": dev_E.n, "validation": val_E.n},
+        "coverage": coverage(a.audit, cand_paths, lo, hi),
+        "entries_fired_loosest": {"development": {"fires": dev_E.n_fired, "filled": dev_E.n},
+                                  "validation": {"fires": val_E.n_fired, "filled": val_E.n}},
         "development": dev, "validation": val,
         "selection": {"development_passes": dev_pass, "validation": confirm, "validated": validated, "holdout_candidates": holdout_list,
-                      "sensitivity_bh_across_768_development_at_0_10": sorted(r for r, p in zip(rids, dev_bh) if p <= 0.10)},
+                      "sensitivities": sens},
         "paper_candidate": candidate,
         "capture": {"development": capture(dev_rows), "validation": capture(val_rows), "development_and_validation": capture(dev_rows + val_rows)},
         "replication_wave_h": replication(dev_rows + val_rows),
@@ -651,35 +743,41 @@ def holdout(a) -> int:
     prior = json.loads(prior_bytes)
     if prior["stage"] != "dev_val":
         raise SystemExit("holdout needs the dev_val results")
-    table_bytes = a.cost_table.read_bytes()
-    if sha256_bytes(table_bytes) != prior["inputs"]["cost_table_sha256"]:
+    inputs, table, cand_paths = check_inputs(a)
+    if inputs["cost_table_sha256"] != prior["inputs"]["cost_table_sha256"]:
         raise SystemExit("the cost table changed after dev_val")
     todo = prior["selection"]["holdout_candidates"]
     rows, meta = read_outcomes(a.outcomes_holdout, "holdout")
+    gate_outcomes(meta, "holdout", inputs["cost_table_sha256"])
+    if meta.get("dev_val_sha256") != sha256_bytes(prior_bytes):
+        raise SystemExit("holdout outcomes were not gated on these dev_val results")
     lo, hi = SPLITS["holdout"]
-    iwm, iwm_missing = iwm_open_to_close(a.benchmarks, lo, hi)
-    spy = Spy(a.daily)
+    spy = Spy(a.daily, hi)
     cal = spy.calendar("holdout")
-    E = Entries(rows, Costs(json.loads(table_bytes)), iwm, cal)
-    stats = evaluate_split(E, spy.regime(cal))
+    iwm, iwm_missing = iwm_open_to_close(a.benchmarks, cal)
+    E = Entries(rows, Costs(table), iwm, cal)
+    stats = evaluate_split(E, spy.regime(cal), only=set(todo)) if todo else {}
     ps = [stats[r]["p"] if stats[r]["trades"] >= 50 else 1.0 for r in todo]
     passes = {r: {"trades": stats[r]["trades"], "p": stats[r].get("p"), "holm_adjusted": rnd(pa, 10),
                   "lower_bound": stats[r].get("lower_bound"), "passed": bool(stats[r]["trades"] >= 50 and pa <= 0.05)}
               for r, pa in zip(todo, holm(ps) if todo else [])}
-    passed = [r for r in todo if passes[r]["passed"]]
-    if passed:
-        cand = {"rule_exit": sorted(passed, key=lambda r: (-(stats[r]["lower_bound"] if stats[r]["lower_bound"] is not None else -1e18), r))[0],
-                "basis": "highest holdout lower bound", "mechanics_only": False}
-    elif todo:
-        cand = {"rule_exit": prior["paper_candidate"]["rule_exit"], "basis": "highest validation lower bound; no holdout pass", "mechanics_only": True}
+    if todo:
+        # C30: paper_e2e's first clause: the evaluated rule-exit with the highest holdout lower bound;
+        # it is labelled mechanics-only unless it passed the holdout.
+        pool = [r for r in todo if not r.startswith("09:30|")]  # C31
+        if pool:
+            best = sorted(pool, key=lambda r: (-(stats[r]["lower_bound"] if stats[r].get("lower_bound") is not None else -1e18), r))[0]
+            cand = {"rule_exit": best, "basis": "highest holdout lower bound among the evaluated non-09:30 rule-exits",
+                    "mechanics_only": not passes[best]["passed"], "holdout_passed": passes[best]["passed"]}
+        else:
+            cand = dict(prior["paper_candidate"], note="every evaluated rule-exit is a 09:30 rule (C31)")
     else:
         cand = prior["paper_candidate"]
     results = {"schema_version": 1, "protocol": PROTOCOL["id"], "stage": "holdout", "dev_val_sha256": sha256_bytes(prior_bytes),
-               "outcomes_holdout_content_sha256": meta["content_sha256"], "evaluated": todo,
-               "holdout": {r: stats[r] for r in todo}, "passes": passes, "completeness": completeness(rows, meta),
-               "coverage": coverage(a.audit, a.state / "candidates-provable-20260924.csv", lo, hi),
-               "iwm_sessions_missing_official_open_or_close": iwm_missing, "paper_candidate": cand,
-               "paper_candidate_holdout": stats.get(cand["rule_exit"])}
+               "inputs": dict(inputs, outcomes_holdout_content_sha256=meta["content_sha256"],
+                              iwm_calendar_sessions_without_official_open_and_close=iwm_missing),
+               "evaluated": todo, "holdout": {r: stats[r] for r in todo}, "passes": passes,
+               "completeness": completeness(rows, meta), "coverage": coverage(a.audit, cand_paths, lo, hi), "paper_candidate": cand}
     body = (json.dumps(results, indent=1, sort_keys=True) + "\n").encode()
     a.out.write_bytes(body)
     os.chmod(a.out, 0o600)

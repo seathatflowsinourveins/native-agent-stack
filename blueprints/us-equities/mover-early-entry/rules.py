@@ -32,6 +32,15 @@ TIME_BUCKETS = (("04:00", "08:00"), ("08:00", "09:30"), ("09:30", "10:00"), ("10
 PRICE_TIERS = (2.0, 5.0, 20.0)
 DV_TIERS = (1_000_000.0, 5_000_000.0)
 FEES = json.loads((Path(__file__).with_name("fees.json")).read_text())
+# C26: NYSE scheduled 13:00 ET early closes, 2021-2026, from exchange_calendars 4.13.2 (XNYS schedule).
+# The protocol's "16:00" (exit window, X1, halt flag, close fallback) is the session's close.
+EARLY_CLOSES = frozenset({"2021-11-26", "2022-11-25", "2023-07-03", "2023-11-24", "2024-07-03", "2024-11-29",
+                          "2024-12-24", "2025-07-03", "2025-11-28", "2025-12-24", "2026-11-27", "2026-12-24"})
+GAIN_EPS = 1e-9  # C25: gain = price / ref - 1 is compared with G - 1e-9 so an exact +G price fires
+
+
+def close_hhmm(day: str) -> str:
+    return "13:00" if day in EARLY_CLOSES else "16:00"
 
 
 @lru_cache(maxsize=None)
@@ -124,15 +133,18 @@ def entry_for(day: str, hhmm: str, bars: Bars, official_open):
     return None, None, "no_bar_within_5m", None
 
 
-def exits_for(entry: float, entry_ts: float, bars: Bars, day: str, official_close):
+def exits_for(entry: float, entry_ts: float, bars: Bars, day: str, official_close, daily_close=None):
     """{X: (exit_price, exit_ts, used_close_fallback)}, session_high_after_entry, halt flag, close source.
 
-    The window is the entry bar through the last bar starting before 16:00. The close fallback is the
-    official close, else the session's last bar close before 16:00 (flagged), else the entry price."""
-    close_ts = et_epoch(day, "16:00")
+    The window is the entry bar through the last bar starting before the session close (C26). The close
+    is the official close, else the daily bar close (C22; the audit's v2 fallback), else the session's
+    last bar close before the close, else the entry price (each flagged)."""
+    close_ts = et_epoch(day, close_hhmm(day))
     i0, i1 = bars.index(entry_ts), bars.index(close_ts)
     if official_close is not None:
         close, close_src = float(official_close), "official"
+    elif daily_close:
+        close, close_src = float(daily_close), "daily_close"
     elif i1 > 0:
         close, close_src = float(bars.c[i1 - 1]), "bar_close"
     else:
@@ -169,7 +181,7 @@ def exits_for(entry: float, entry_ts: float, bars: Bars, day: str, official_clos
 def halt_flag(bars: Bars, entry_ts: float, day: str) -> bool:
     """5+ consecutive minutes without a bar during 09:30-16:00 after entry (C2: the edges count)."""
     start = max(entry_ts, et_epoch(day, "09:30"))
-    end = et_epoch(day, "16:00")
+    end = et_epoch(day, close_hhmm(day))
     n = int((end - start) // 60)
     if n < 5:
         return False
@@ -182,7 +194,7 @@ def halt_flag(bars: Bars, entry_ts: float, day: str) -> bool:
 
 
 def fires(price, dv, gain, news, g, v, variant) -> bool:
-    return (gain is not None and gain >= g and dv >= v and price is not None and price >= MIN_PRICE
+    return (gain is not None and gain >= g - GAIN_EPS and dv >= v and price is not None and price >= MIN_PRICE
             and (variant == "any" or bool(news)))
 
 

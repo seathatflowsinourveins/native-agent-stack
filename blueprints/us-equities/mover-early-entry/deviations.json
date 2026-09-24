@@ -48,7 +48,27 @@
         "finalized_at": "2026-09-24T04:33:03Z",
         "scan_pages": 36185,
         "scan_pages_non_200": 0
-      }
+      },
+      "known_gaps": [
+        "Splits after the daily dataset's 2026-09-21 adjustment date rescale the scan's provider-adjusted pre-market highs against the dataset's lows. Alpaca corporate actions (first page, ex-dates 2026-09-21..25) list 20 splits: one forward split (UNX 4:1, 2026-09-22), whose history can have missed pre-market touches, and 19 reverse splits, which can only add candidates (evaluated on raw bars, so harmless).",
+        "A symbol-day with pre-market trading but no regular-session trade (for example halted before the open) has no daily row and is in neither list.",
+        "For a reused ticker, headlines tagged with the ticker may belong to the previous holder (news variant only)."
+      ]
+    },
+    {
+      "id": "D4",
+      "recorded_at": "2026-09-24T05:09:59Z",
+      "kind": "input_window",
+      "protocol_text": "data.market: 'SPY daily closes from the daily dataset, 2020-01-02 onward (the 252-session window starts before 2021)'",
+      "problem": "A 252-session median of a 20-session volatility needs 272 closes before 2021-01-04; 2020 supplies about 253.",
+      "change": "SPY fully adjusted closes from 2019-11-01 (the daily dataset starts 2016-01-04), read only up to the stage's last session. Moved here from clarification C4 after the pre-outcome review."
+    },
+    {
+      "id": "D5",
+      "recorded_at": "2026-09-24T05:09:59Z",
+      "kind": "review_record",
+      "what": "An independent pre-outcome review (3 Opus reviewers, 2 refuters per blocking/major finding; workflow run wf_d470e1c6-e08) of commit 1c61c78f found 10 blocking/major findings (all survived refutation; 7 distinct) and 28 minor ones. All were resolved before any outcome: the 600 s news sensitivity is reported; portfolio slots rank every fire (C24); outcome and holdout reads are gated in code (C32); collections are identity- and count-checked; the live scanner uses the calendar's previous session and the signal cutoff (C31); holdout statistics cover only the evaluated rule-exits (C30); portfolio P&L is booked on the basis; exact-threshold fires (C25); early closes (C26); the daily-close fallback (C22); the table's own 90th percentile (C9); sensitivities and tie-breaks (C27-C29); coverage against the evaluated union; per-split completeness; input and runtime hash checks.",
+      "effect": "The cost sample's close-5m stamps on the four development early-close sessions move to 12:55 ET, so those stamps are re-fetched and the cost table rebuilt before it is committed."
     }
   ]
 }

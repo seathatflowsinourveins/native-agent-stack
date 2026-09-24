@@ -66,22 +66,35 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+ASOF = "2026-09-21"  # deviations.json D2
+
+
 def ledger(coll: Path):
-    pages, complete, incomplete = {}, set(), set()
+    """(pages, complete sessions, incomplete sessions, symbols per complete session); refuses a collection
+    any of whose runs used an asof other than the candidate list's naming date (D2)."""
+    pages, complete, incomplete, symbols = {}, set(), set(), {}
     for line in (coll / "ledger.jsonl").read_text().splitlines():
         rec = json.loads(line)
+        if rec["event"] == "run_start" and rec.get("asof") != ASOF:
+            raise SystemExit(f"{coll.name}: a run used asof {rec.get('asof')!r}, not {ASOF}")
         if rec["event"] == "page":
             pages[(rec["session"], rec["kind"], rec["batch"], rec["page"])] = (rec["sha256"], rec["status"])
         elif rec["event"] == "session_complete":
             complete.add(rec["session"])
             incomplete.discard(rec["session"])
+            symbols[rec["session"]] = rec["symbols"]
         elif rec["event"] == "session_incomplete":
             incomplete.add(rec["session"])
-    return pages, complete, incomplete
+    return pages, complete, incomplete, symbols
 
 
 def read_pages(sdir: Path, session: str, kind: str, pages: dict):
-    for f in sorted(sdir.glob(f"{kind}-*.json.gz")):
+    on_disk = sorted(sdir.glob(f"{kind}-*.json.gz"))
+    names = {f.name for f in on_disk}
+    for (sess, k, batch, page) in pages:
+        if sess == session and k == kind and f"{kind}-{batch:04d}-{page:04d}.json.gz" not in names:
+            raise SystemExit(f"ledger page without a file: {sdir}/{kind}-{batch:04d}-{page:04d}")
+    for f in on_disk:
         _, batch, page = f.name.removesuffix(".json.gz").split("-")
         raw = gzip.decompress(f.read_bytes())
         want, status = pages[(session, kind, int(batch), int(page))]
@@ -139,8 +152,8 @@ def entry_fields(day, hhmm, bars, oo, open_dv):
     return {"entry": px, "entry_ts": ts, "entry_source": src, "entry_bar_dv": bar_dv, "entry_cum_dv": bars.cum_dv(ts)}
 
 
-def exit_fields(entry, entry_ts, bars, day, oc):
-    out, high, halt, close_src = R.exits_for(entry, entry_ts, bars, day, oc)
+def exit_fields(entry, entry_ts, bars, day, oc, daily_close):
+    out, high, halt, close_src = R.exits_for(entry, entry_ts, bars, day, oc, daily_close)
     return {"exits": {x: [p, ts, fb, bars.cum_dv(ts)] for x, (p, ts, fb) in out.items()},
             "high": high, "halt": halt, "close_source": close_src}
 
@@ -163,12 +176,14 @@ def symbol_day(session, sym, prev_date, gap, rows, auc, news_ts, daily, outcomes
            "daily_missing": not daily, "t": {}}
     if outcomes:
         rec["official_close"], rec["official_close_source"] = oc, oc_src
-        close_ts = R.et_epoch(session, "16:00")
+        close_ts = R.et_epoch(session, R.close_hhmm(session))
         i1 = bars.index(close_ts)
         rec["bar_close"] = float(bars.c[i1 - 1]) if i1 else None
-        eod = oc if oc is not None else rec["bar_close"]
+        # C22 (amended): official close, else the daily bar close, else the last bar close before the close
+        eod, src = ((oc, "official") if oc is not None else (daily.get("raw_c"), "daily_close") if daily.get("raw_c")
+                    else (rec["bar_close"], "bar_close") if rec["bar_close"] else (None, None))
         rec["eventual_gain"] = eod / ref - 1 if (eod and ref) else None
-        rec["eventual_source"] = "official" if oc is not None else ("bar_close" if eod else None)
+        rec["eventual_source"] = src
     for hhmm in R.TIMES:
         price, dv = bars.state(R.signal_cutoff(session, hhmm))
         tt = R.et_epoch(session, hhmm)
@@ -180,12 +195,13 @@ def symbol_day(session, sym, prev_date, gap, rows, auc, news_ts, daily, outcomes
         row["loosest"] = loosest
         if loosest and row["entry"] is not None:
             e_ts = row["entry_ts"]
-            row["sample_cum_dv"] = [bars.cum_dv(e_ts + 900), bars.cum_dv(e_ts + 3600), bars.cum_dv(R.et_epoch(session, "15:55"))]
+            row["sample_cum_dv"] = [bars.cum_dv(e_ts + 900), bars.cum_dv(e_ts + 3600),
+                                    bars.cum_dv(R.et_epoch(session, R.close_hhmm(session)) - 300)]
             if outcomes:
-                row.update(exit_fields(row["entry"], e_ts, bars, session, oc))
+                row.update(exit_fields(row["entry"], e_ts, bars, session, oc, daily.get("raw_c")))
                 p = entry_fields(session, R.PLACEBO[hhmm], bars, oo, open_dv)
                 if p["entry"] is not None:
-                    p.update(exit_fields(p["entry"], p["entry_ts"], bars, session, oc))
+                    p.update(exit_fields(p["entry"], p["entry_ts"], bars, session, oc, daily.get("raw_c")))
                 row["placebo"] = p
         rec["t"][hhmm] = row
     return rec
@@ -223,6 +239,9 @@ def load_inputs(daily_path: Path, state: Path, split: str):
             if lo <= r["session_date"] <= hi:
                 gap = (datetime.fromisoformat(r["session_date"]) - datetime.fromisoformat(r["prev_date"])).days > 7
                 by_day[r["session_date"]].append((r["symbol"], r["prev_date"], gap, supp))
+    for d, rows in by_day.items():
+        if len({r[0] for r in rows}) != len(rows):
+            raise SystemExit(f"{d}: a symbol-day is in the candidate list twice or in both lists (D3 requires disjoint lists)")
     import duckdb
     con = duckdb.connect()
     con.execute("PRAGMA threads=4")
@@ -247,7 +266,18 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--max-sessions", type=int, default=0, help="trial runs only")
+    ap.add_argument("--cost-table", type=Path, help="outcomes mode: the committed cost table (costs.sample ordering)")
+    ap.add_argument("--dev-val", type=Path, help="holdout split: the dev_val results (selection.holdout ordering)")
     a = ap.parse_args(argv)
+    gate = {}
+    if a.mode == "outcomes":
+        if not a.cost_table:
+            raise SystemExit("outcomes mode needs --cost-table: no exit path is computed before the cost table is fixed")
+        gate["cost_table_sha256"] = sha256_file(a.cost_table)
+    if a.split == "holdout":
+        if not a.dev_val or json.loads(a.dev_val.read_text()).get("stage") != "dev_val":
+            raise SystemExit("the holdout split is read only after dev_val results exist (--dev-val)")
+        gate["dev_val_sha256"] = sha256_file(a.dev_val)
     colls = sorted(p for p in a.state.glob(COLLECTION_GLOB) if (p / "ledger.jsonl").exists())
     supps = sorted(p for p in a.state.glob(SUPPLEMENT_GLOB) if (p / "ledger.jsonl").exists())
     ledgers = {c.name: ledger(c) for c in colls + supps}
@@ -260,9 +290,13 @@ def main(argv=None) -> int:
                 c = next((c for c in group if d in ledgers[c.name][1]), None)
                 if c is None:
                     raise SystemExit(f"session {d} is not complete in any {'supplement' if group is supps else 'main'} collection")
+                want = sum(1 for x in cands if x[3] == (group is supps))
+                if ledgers[c.name][3][d] != want:
+                    raise SystemExit(f"{c.name} {d}: collected {ledgers[c.name][3][d]} symbols, the frozen list has {want}")
                 src.append(c.name)
         source[d] = src
-    incomplete = sorted(set().union(*(ledgers[c.name][2] for c in colls + supps)))
+    # sessions of this split that some collection once marked incomplete (each was then completed where it is read)
+    incomplete = sorted(d for d in by_day if any(d in ledgers[c.name][2] for c in colls + supps))
     jobs = [(d, by_day[d], daily.get(d, {}), a.mode == "outcomes", source[d]) for d in sorted(by_day)]
     if a.max_sessions:
         jobs = jobs[: a.max_sessions]
@@ -285,7 +319,7 @@ def main(argv=None) -> int:
         os.umask(old)
     tmp.replace(a.out)
     meta = {"mode": a.mode, "split": a.split, "sessions": len(jobs), "max_sessions": a.max_sessions, "symbol_days": n, "content_sha256": h.hexdigest(),
-            "file_sha256": sha256_file(a.out), "incomplete_sessions_in_any_collection": incomplete,
+            "file_sha256": sha256_file(a.out), "split_sessions_ever_incomplete_elsewhere": incomplete, **gate,
             "collections": sorted({c for j in jobs for c in j[4]}),
             "supplement_symbol_days": sum(1 for j in jobs for c in j[1] if c[3]),
             "candidates_sha256": PROTOCOL["inputs"]["candidates"]["sha256"], "daily_sha256": PROTOCOL["inputs"]["daily_dataset"]["sha256"],

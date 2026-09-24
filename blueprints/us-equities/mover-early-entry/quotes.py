@@ -47,12 +47,14 @@ def iso(ts: float) -> str:
 
 def cmd_sample(a) -> int:
     meta = json.loads(Path(str(a.signals) + ".meta.json").read_text())
-    if meta["mode"] != "signals" or meta["split"] != "dev":
-        raise SystemExit("the cost sample reads development signals only")
+    if meta["mode"] != "signals" or meta["split"] != "dev" or meta.get("max_sessions"):
+        raise SystemExit("the cost sample reads a full development signals file only")
     fired, picked = 0, []
-    with gzip.open(a.signals, "rt") as f:
-        for line in f:
-            rec = json.loads(line)
+    h = hashlib.sha256()
+    with gzip.open(a.signals, "rb") as f:
+        for raw_line in f:
+            h.update(raw_line)
+            rec = json.loads(raw_line)
             if not (DEV[0] <= rec["session"] <= DEV[1]):
                 raise SystemExit("non-development session in the signals file")
             for hhmm, row in sorted(rec["t"].items()):
@@ -62,11 +64,14 @@ def cmd_sample(a) -> int:
                 if not sample_key(rec["symbol"], rec["session"], hhmm):
                     continue
                 e = row["entry_ts"]
+                # C26: the protocol's 15:55 stamp is 5 minutes before the session's close (13:00 on early closes)
                 stamps = [(e, row["entry_cum_dv"], "entry"), (e + 900, row["sample_cum_dv"][0], "entry+15m"),
                           (e + 3600, row["sample_cum_dv"][1], "entry+60m"),
-                          (R.et_epoch(rec["session"], "15:55"), row["sample_cum_dv"][2], "15:55")]
+                          (R.et_epoch(rec["session"], R.close_hhmm(rec["session"])) - 300, row["sample_cum_dv"][2], "close-5m")]
                 picked.append({"session": rec["session"], "symbol": rec["symbol"], "time": hhmm,
                                "entry_source": row["entry_source"], "stamps": stamps})
+    if h.hexdigest() != meta["content_sha256"]:
+        raise SystemExit("signals content hash mismatch")
     out = {"signals_content_sha256": meta["content_sha256"], "fired_entries": fired, "sampled_entries": len(picked),
            "requests": 4 * len(picked), "sample": picked}
     body = json.dumps(out, sort_keys=True, separators=(",", ":")).encode()
@@ -249,7 +254,20 @@ def cmd_table(a) -> int:
                 continue
             obs.append((tb, R.price_tier(mid), R.dv_tier(cum_dv), hs, kind))
     pooled = [o[3] for o in obs]
-    p90 = percentile(pooled, 0.90) if pooled else None
+    pooled_p90 = percentile(pooled, 0.90) if pooled else None
+    # C9 (amended): "the table's 90th percentile" is over the table's own values: the cells that have a
+    # measured value (>= 30 samples) or a time x price fallback value.
+    measured = []
+    for tb in range(len(R.TIME_BUCKETS)):
+        for pt in range(len(R.PRICE_TIERS) + 1):
+            tp = [o[3] for o in obs if o[0] == tb and o[1] == pt]
+            for dt in range(len(R.DV_TIERS) + 1):
+                xs = [o[3] for o in obs if o[0] == tb and o[1] == pt and o[2] == dt]
+                if len(xs) >= MIN_CELL:
+                    measured.append(trimmed_mean(xs))
+                elif len(tp) >= MIN_CELL:
+                    measured.append(trimmed_mean(tp))
+    p90 = percentile(measured, 0.90) if measured else pooled_p90
     cells = {}
     for tb in range(len(R.TIME_BUCKETS)):
         for pt in range(len(R.PRICE_TIERS) + 1):
@@ -261,17 +279,17 @@ def cmd_table(a) -> int:
                 elif len(tp) >= MIN_CELL:
                     cell = {"half_spread": trimmed_mean(tp), "n": len(xs), "n_fallback": len(tp), "source": "time_x_price"}
                 else:
-                    cell = {"half_spread": p90, "n": len(xs), "n_fallback": len(tp), "source": "pooled_p90"}
+                    cell = {"half_spread": p90, "n": len(xs), "n_fallback": len(tp), "source": "table_p90"}
                 cells[f"{tb}|{pt}|{dt}"] = cell
     out = {"schema_version": 1, "protocol": PROTOCOL["id"], "kind": "quote_measured_cost_table",
            "sample_sha256": hashlib.sha256(sample_bytes).hexdigest(), "signals_content_sha256": sample["signals_content_sha256"],
            "fired_entries_development": sample["fired_entries"], "sampled_entries": sample["sampled_entries"],
            "stamps": 4 * sample["sampled_entries"], "observations": len(obs), "stamps_without_valid_quote": missing,
            "stamps_incomplete": incomplete, "invalid_quotes_skipped_before_a_valid_one": dropped,
-           "pooled_p90_half_spread": p90, "min_cell": MIN_CELL,
+           "table_p90_half_spread": p90, "pooled_sample_p90_half_spread": pooled_p90, "min_cell": MIN_CELL,
            "time_buckets_et": [list(b) for b in R.TIME_BUCKETS], "price_tier_bounds": list(R.PRICE_TIERS),
            "dv_tier_bounds": list(R.DV_TIERS), "cell_key": "time_bucket|price_tier|dv_tier", "cells": cells,
-           "observations_by_stamp": {k: sum(1 for o in obs if o[4] == k) for k in ("entry", "entry+15m", "entry+60m", "15:55")}}
+           "observations_by_stamp": {k: sum(1 for o in obs if o[4] == k) for k in ("entry", "entry+15m", "entry+60m", "close-5m")}}
     a.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
     print(json.dumps({k: v for k, v in out.items() if k != "cells"}))
     return 0

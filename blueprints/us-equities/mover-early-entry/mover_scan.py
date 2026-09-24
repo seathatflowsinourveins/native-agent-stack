@@ -137,28 +137,54 @@ def regime_factor(f: Fetcher, day: str):
                                              "vol20": float(vol[-1]), "vol20_median252": float(np.median(vol[-252:]))}
 
 
+def previous_session(f: Fetcher, day: str) -> str:
+    """The trading session before day, from the broker calendar (C31/D5), refusing a non-trading day."""
+    start = (datetime.fromisoformat(day) - timedelta(days=14)).date().isoformat()
+    days = []
+    for body in f.get(TRADING, "/v2/calendar", {"start": start, "end": day}):
+        days.extend(x["date"] for x in (body if isinstance(body, list) else []))
+    if day not in days:
+        raise SystemExit(f"{day} is not a trading session")
+    return max(d for d in days if d < day)
+
+
 def scan(f: Fetcher, rule: str, now: datetime):
     t, g, v, n = parse_rule(rule)
     day = now.astimezone(R.ET).date().isoformat()
-    if now.timestamp() < R.et_epoch(day, t):
-        raise SystemExit(f"it is before the rule time {t} ET")
+    cutoff = R.signal_cutoff(day, t)
+    if now.timestamp() < cutoff:
+        raise SystemExit(f"it is before the rule's signal cutoff ({t} ET rule)")
+    prev_day = previous_session(f, day)
     syms = universe(f)
     snaps = {}
     for i in range(0, len(syms), 500):
         for body in f.get(DATA, "/v2/stocks/snapshots", {"symbols": ",".join(syms[i:i + 500]), "feed": "sip"}):
             snaps.update(body)
-    pre = []
+    def bar_day(b):
+        return datetime.fromisoformat(b["t"].replace("Z", "+00:00")).astimezone(R.ET).date().isoformat() if b.get("t") else None
+
+    def prev_bar(sn):
+        """The snapshot's daily bar dated the previous session: dailyBar before today's first regular-session
+        trade, otherwise prevDailyBar; None when neither carries that date."""
+        for key in ("dailyBar", "prevDailyBar"):
+            b = (sn or {}).get(key) or {}
+            if bar_day(b) == prev_day:
+                return b
+        return None
+
+    # symbols with a split effective today always pass the prefilter; the exact rule below applies the split factor
+    split_today = set()
+    for body in f.get(DATA, "/v1/corporate-actions", {"types": "forward_split,reverse_split", "start": day, "end": day, "limit": 1000}):
+        for items in (body.get("corporate_actions") or {}).values():
+            split_today.update(x["symbol"] for x in items if x.get("symbol"))
+    pre, undated = [], 0
     for s, sn in sorted(snaps.items()):
-        lt, pdb = (sn or {}).get("latestTrade") or {}, (sn or {}).get("prevDailyBar") or {}
-        if lt.get("p") and pdb.get("c") and lt["p"] >= R.MIN_PRICE and lt["p"] >= (1 + PREFILTER * g) * pdb["c"]:
+        lt, pb = (sn or {}).get("latestTrade") or {}, prev_bar(sn)
+        if pb is None:
+            undated += 1
+            continue
+        if lt.get("p") and pb.get("c") and lt["p"] >= R.MIN_PRICE and (s in split_today or lt["p"] >= (1 + PREFILTER * g) * pb["c"]):
             pre.append(s)
-    prev_day = None
-    for sn in snaps.values():
-        pdb = (sn or {}).get("prevDailyBar") or {}
-        if pdb.get("t"):
-            d = datetime.fromisoformat(pdb["t"].replace("Z", "+00:00")).astimezone(R.ET).date().isoformat()
-            prev_day = max(prev_day or d, d)
-    cutoff = R.signal_cutoff(day, t)
     rows = []
     for i in range(0, len(pre), 100):
         chunk = pre[i:i + 100]
@@ -185,8 +211,8 @@ def scan(f: Fetcher, rule: str, now: datetime):
                                    "vw": x.get("vw") or x["c"]} for x in bars[s]], R.et_epoch(day, "04:00"))
             prev_close, src = official_price(auctions.get(s, {}).get(prev_day), "c")
             if prev_close is None:
-                pdb = (snaps.get(s) or {}).get("prevDailyBar") or {}
-                prev_close, src = pdb.get("c"), "daily_bar_close"
+                pb = prev_bar(snaps.get(s))
+                prev_close, src = (pb or {}).get("c"), "daily_bar_close"
             fr = factors.get(s, {})
             f_split, split = (fr["raw"] / fr["split"], True) if (fr.get("raw") and fr.get("split") and abs(fr["raw"] / fr["split"] - 1) > R.SPLIT_TOLERANCE) else (1.0, False)
             ref = prev_close / f_split if prev_close else None
@@ -215,9 +241,11 @@ def scan(f: Fetcher, rule: str, now: datetime):
     rf, rdetail = regime_factor(f, day)
     return {"schema_version": 1, "protocol": "mover-early-entry-v1-20260924", "rule": rule, "session": day, "prev_session": prev_day,
             "rule_time_et": t, "scan_time_utc": now.astimezone(timezone.utc).isoformat(), "signal_cutoff_utc": datetime.fromtimestamp(cutoff, timezone.utc).isoformat(),
-            "universe": len(syms), "snapshots": len(snaps), "prefiltered": len(pre), "fired": len(fired),
+            "universe": len(syms), "snapshots": len(snaps), "snapshots_without_previous_session_bar": undated,
+            "prefiltered": len(pre), "fired": len(fired),
             "regime_factor": rf, "regime_detail": rdetail, "candidates": fired[:TOP], "fired_beyond_top": [r["symbol"] for r in fired[TOP:]],
-            "limitations": ["the snapshot prefilter uses the previous daily close with a 10% margin on G; a symbol whose latest trade fell below it after t is missed",
+            "splits_effective_today": sorted(split_today),
+            "limitations": ["the snapshot prefilter keeps latest trades >= (1 + 0.9 G) x the previous daily close (and every split effective today); a symbol that met the rule before t but traded below that by the scan is missed",
                             "the split factor uses split-only adjusted previous-day bars (dividends ignored), unlike the study's fully adjusted ratio with a 1e-2 tolerance",
                             "entry_bar_dollar_volume is unknown at scan time, so the 10% entry-bar capacity cap does not apply live"]}
 

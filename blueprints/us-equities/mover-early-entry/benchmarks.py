@@ -51,23 +51,30 @@ def main(argv=None) -> int:
 
 
 def load(out: Path, symbol: str = "IWM") -> dict:
-    """{date: {"o": [...], "c": [...]}} from every complete tag, each page checked against the ledger."""
-    pages, done = {}, set()
+    """{date: {"o": [...], "c": [...]}} from each tag whose latest run completed, using only that run's
+    HTTP-200 pages, each checked against the ledger."""
+    runs = {}
+    cur = {}
     for line in (out / "ledger.jsonl").read_text().splitlines():
         rec = json.loads(line)
-        if rec["event"] == "page":
-            pages[rec["file"]] = rec
-        elif rec["event"] == "complete":
-            done.add(rec["tag"])
+        if rec["event"] == "run_start":
+            cur[rec["tag"]] = []
+        elif rec["event"] == "page":
+            cur.setdefault(rec["tag"], []).append(rec)
+        elif rec["event"] in ("complete", "incomplete"):
+            runs[rec["tag"]] = (rec["event"], cur.get(rec["tag"], []))
     days = {}
-    for name, rec in sorted(pages.items()):
-        if rec["tag"] not in done or not rec["tag"].startswith(symbol + "-"):
+    for tag, (state, pages) in sorted(runs.items()):
+        if state != "complete" or not tag.startswith(symbol + "-"):
             continue
-        raw = gzip.decompress((out / name).read_bytes())
-        if hashlib.sha256(raw).hexdigest() != rec["sha256"]:
-            raise SystemExit(f"benchmark page hash mismatch: {name}")
-        for d in (json.loads(raw).get("auctions") or {}).get(symbol) or []:
-            days.setdefault(d["d"], {"o": d.get("o") or [], "c": d.get("c") or []})
+        for rec in pages:
+            raw = gzip.decompress((out / rec["file"]).read_bytes())
+            if hashlib.sha256(raw).hexdigest() != rec["sha256"]:
+                raise SystemExit(f"benchmark page hash mismatch: {rec['file']}")
+            if rec["status"] != 200:
+                raise SystemExit(f"complete tag {tag} holds a non-200 page")
+            for d in (json.loads(raw).get("auctions") or {}).get(symbol) or []:
+                days.setdefault(d["d"], {"o": d.get("o") or [], "c": d.get("c") or []})
     return days
 
 

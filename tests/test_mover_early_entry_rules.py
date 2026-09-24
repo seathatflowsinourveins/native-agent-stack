@@ -85,6 +85,18 @@ class Entries(unittest.TestCase):
         self.assertEqual(R.signal_cutoff(DAY, "09:30"), R.et_epoch(DAY, "09:28"))
         self.assertEqual(R.signal_cutoff(DAY, "09:35"), R.et_epoch(DAY, "09:35"))
 
+    def test_exact_threshold_fires_and_early_close_ends_the_window(self):
+        self.assertTrue(R.fires(6.0, 1e6, 6.0 / 5.0 - 1, False, 0.20, 250_000, "any"))  # C25
+        day = "2023-11-24"  # a 13:00 early close (C26)
+        rows = [{"t": R.et_epoch(day, "12:30"), "o": 10, "h": 10, "l": 10, "c": 10, "v": 1, "vw": 10},
+                {"t": R.et_epoch(day, "13:30"), "o": 20, "h": 20, "l": 1, "c": 20, "v": 1, "vw": 20}]
+        b = R.Bars.from_rows(rows, R.et_epoch(day, "04:00"))
+        out, high, halt, src = R.exits_for(10.0, R.et_epoch(day, "12:30"), b, day, None, 11.0)
+        self.assertEqual(out["X1"][:2], (11.0, R.et_epoch(day, "13:00")))
+        self.assertEqual(src, "daily_close")
+        self.assertEqual(out["X4"][0], 11.0)  # the post-close 13:30 bar is outside the window
+        self.assertEqual(high, 10)
+
     def test_fires(self):
         self.assertTrue(R.fires(2.5, 2_000_000, 0.35, False, 0.30, 1_000_000, "any"))
         self.assertFalse(R.fires(2.5, 2_000_000, 0.35, False, 0.50, 1_000_000, "any"))

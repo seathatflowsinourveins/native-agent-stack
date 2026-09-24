@@ -1,0 +1,321 @@
+{
+ "cell_key": "time_bucket|price_tier|dv_tier",
+ "cells": {
+  "0|0|0": {
+   "half_spread": 0.004823604341652349,
+   "n": 6,
+   "n_fallback": 41,
+   "source": "time_x_price"
+  },
+  "0|0|1": {
+   "half_spread": 0.004823604341652349,
+   "n": 24,
+   "n_fallback": 41,
+   "source": "time_x_price"
+  },
+  "0|0|2": {
+   "half_spread": 0.004823604341652349,
+   "n": 11,
+   "n_fallback": 41,
+   "source": "time_x_price"
+  },
+  "0|1|0": {
+   "half_spread": 0.004826108743920893,
+   "n": 12,
+   "n_fallback": 56,
+   "source": "time_x_price"
+  },
+  "0|1|1": {
+   "half_spread": 0.004826108743920893,
+   "n": 22,
+   "n_fallback": 56,
+   "source": "time_x_price"
+  },
+  "0|1|2": {
+   "half_spread": 0.004826108743920893,
+   "n": 22,
+   "n_fallback": 56,
+   "source": "time_x_price"
+  },
+  "0|2|0": {
+   "half_spread": 0.005257623119235278,
+   "n": 2,
+   "n_fallback": 55,
+   "source": "time_x_price"
+  },
+  "0|2|1": {
+   "half_spread": 0.005257623119235278,
+   "n": 22,
+   "n_fallback": 55,
+   "source": "time_x_price"
+  },
+  "0|2|2": {
+   "half_spread": 0.0037858146887311617,
+   "n": 31,
+   "source": "cell"
+  },
+  "0|3|0": {
+   "half_spread": 0.0055285034997380736,
+   "n": 3,
+   "n_fallback": 17,
+   "source": "table_p90"
+  },
+  "0|3|1": {
+   "half_spread": 0.0055285034997380736,
+   "n": 5,
+   "n_fallback": 17,
+   "source": "table_p90"
+  },
+  "0|3|2": {
+   "half_spread": 0.0055285034997380736,
+   "n": 9,
+   "n_fallback": 17,
+   "source": "table_p90"
+  },
+  "1|0|0": {
+   "half_spread": 0.003428518093344821,
+   "n": 14,
+   "n_fallback": 193,
+   "source": "time_x_price"
+  },
+  "1|0|1": {
+   "half_spread": 0.003803755595119887,
+   "n": 54,
+   "source": "cell"
+  },
+  "1|0|2": {
+   "half_spread": 0.003244314284501707,
+   "n": 125,
+   "source": "cell"
+  },
+  "1|1|0": {
+   "half_spread": 0.0027970378472373203,
+   "n": 12,
+   "n_fallback": 274,
+   "source": "time_x_price"
+  },
+  "1|1|1": {
+   "half_spread": 0.0044159640640613245,
+   "n": 59,
+   "source": "cell"
+  },
+  "1|1|2": {
+   "half_spread": 0.0021838781084817824,
+   "n": 203,
+   "source": "cell"
+  },
+  "1|2|0": {
+   "half_spread": 0.003127029229761654,
+   "n": 22,
+   "n_fallback": 338,
+   "source": "time_x_price"
+  },
+  "1|2|1": {
+   "half_spread": 0.00652906811191031,
+   "n": 55,
+   "source": "cell"
+  },
+  "1|2|2": {
+   "half_spread": 0.0023708837995590672,
+   "n": 261,
+   "source": "cell"
+  },
+  "1|3|0": {
+   "half_spread": 0.0028161485170671895,
+   "n": 0,
+   "n_fallback": 108,
+   "source": "time_x_price"
+  },
+  "1|3|1": {
+   "half_spread": 0.0028161485170671895,
+   "n": 14,
+   "n_fallback": 108,
+   "source": "time_x_price"
+  },
+  "1|3|2": {
+   "half_spread": 0.0024070895621461485,
+   "n": 94,
+   "source": "cell"
+  },
+  "2|0|0": {
+   "half_spread": 0.004140899329750126,
+   "n": 6,
+   "n_fallback": 164,
+   "source": "time_x_price"
+  },
+  "2|0|1": {
+   "half_spread": 0.004140899329750126,
+   "n": 23,
+   "n_fallback": 164,
+   "source": "time_x_price"
+  },
+  "2|0|2": {
+   "half_spread": 0.003784980543766903,
+   "n": 135,
+   "source": "cell"
+  },
+  "2|1|0": {
+   "half_spread": 0.0027710024209175125,
+   "n": 9,
+   "n_fallback": 275,
+   "source": "time_x_price"
+  },
+  "2|1|1": {
+   "half_spread": 0.0027710024209175125,
+   "n": 29,
+   "n_fallback": 275,
+   "source": "time_x_price"
+  },
+  "2|1|2": {
+   "half_spread": 0.002511924691324042,
+   "n": 237,
+   "source": "cell"
+  },
+  "2|2|0": {
+   "half_spread": 0.0031622098665604905,
+   "n": 13,
+   "n_fallback": 332,
+   "source": "time_x_price"
+  },
+  "2|2|1": {
+   "half_spread": 0.006182971902197628,
+   "n": 48,
+   "source": "cell"
+  },
+  "2|2|2": {
+   "half_spread": 0.0024855206246564435,
+   "n": 271,
+   "source": "cell"
+  },
+  "2|3|0": {
+   "half_spread": 0.003365981632298623,
+   "n": 1,
+   "n_fallback": 138,
+   "source": "time_x_price"
+  },
+  "2|3|1": {
+   "half_spread": 0.003365981632298623,
+   "n": 16,
+   "n_fallback": 138,
+   "source": "time_x_price"
+  },
+  "2|3|2": {
+   "half_spread": 0.002301187746046106,
+   "n": 121,
+   "source": "cell"
+  },
+  "3|0|0": {
+   "half_spread": 0.004001038156096586,
+   "n": 15,
+   "n_fallback": 463,
+   "source": "time_x_price"
+  },
+  "3|0|1": {
+   "half_spread": 0.00589708112115418,
+   "n": 32,
+   "source": "cell"
+  },
+  "3|0|2": {
+   "half_spread": 0.0037805977891734,
+   "n": 416,
+   "source": "cell"
+  },
+  "3|1|0": {
+   "half_spread": 0.002703662996516209,
+   "n": 12,
+   "n_fallback": 876,
+   "source": "time_x_price"
+  },
+  "3|1|1": {
+   "half_spread": 0.00570909042007327,
+   "n": 57,
+   "source": "cell"
+  },
+  "3|1|2": {
+   "half_spread": 0.0024845642717942,
+   "n": 807,
+   "source": "cell"
+  },
+  "3|2|0": {
+   "half_spread": 0.0024091101681281827,
+   "n": 5,
+   "n_fallback": 963,
+   "source": "time_x_price"
+  },
+  "3|2|1": {
+   "half_spread": 0.0074502924724879765,
+   "n": 35,
+   "source": "cell"
+  },
+  "3|2|2": {
+   "half_spread": 0.0022684966261102813,
+   "n": 923,
+   "source": "cell"
+  },
+  "3|3|0": {
+   "half_spread": 0.0020167074759263616,
+   "n": 2,
+   "n_fallback": 431,
+   "source": "time_x_price"
+  },
+  "3|3|1": {
+   "half_spread": 0.0020167074759263616,
+   "n": 17,
+   "n_fallback": 431,
+   "source": "time_x_price"
+  },
+  "3|3|2": {
+   "half_spread": 0.0017731206101631067,
+   "n": 412,
+   "source": "cell"
+  }
+ },
+ "dv_tier_bounds": [
+  1000000.0,
+  5000000.0
+ ],
+ "fired_entries_development": 24219,
+ "invalid_quotes_skipped_before_a_valid_one": 469,
+ "kind": "quote_measured_cost_table",
+ "min_cell": 30,
+ "observations": 4724,
+ "observations_by_stamp": {
+  "close-5m": 1201,
+  "entry": 1172,
+  "entry+15m": 1167,
+  "entry+60m": 1184
+ },
+ "pooled_sample_p90_half_spread": 0.007160504121470996,
+ "price_tier_bounds": [
+  2.0,
+  5.0,
+  20.0
+ ],
+ "protocol": "mover-early-entry-v1-20260924",
+ "sample_sha256": "ce2ae169b4b3444ebcce48117f08d26207fd2d7a810a91c509459216be55b2b9",
+ "sampled_entries": 1220,
+ "schema_version": 1,
+ "signals_content_sha256": "27cbcb09fe2b268246ceed3b6a8a21965a6b282a3f89db21c574448ef577aafd",
+ "stamps": 4880,
+ "stamps_incomplete": 0,
+ "stamps_without_valid_quote": 156,
+ "table_p90_half_spread": 0.0055285034997380736,
+ "time_buckets_et": [
+  [
+   "04:00",
+   "08:00"
+  ],
+  [
+   "08:00",
+   "09:30"
+  ],
+  [
+   "09:30",
+   "10:00"
+  ],
+  [
+   "10:00",
+   "16:01"
+  ]
+ ]
+}
