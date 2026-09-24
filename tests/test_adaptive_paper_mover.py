@@ -831,6 +831,49 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         sell = submits(h.evaluate(at + 5), "sell")[0]
         self.assertEqual((sell.qty, sell.reason, leg.exit_wait_reason), (D(61), "x2_time", None))
 
+    def test_a_resting_exit_is_not_repriced_while_halted_and_reprices_after_the_resume(self):
+        # E4: a LULD pause lasts 5-10 minutes; re-pricing every 10 s would spend the 20-order
+        # exit budget in about 200 s. The resting exit waits; re-pricing resumes after the pause.
+        h, at = self.exit_due(20)
+        h.quote("ABCD", "3.20", "3.21", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        for second in range(10, 601, 10):               # a ten-minute pause, evaluated every 10 s
+            h.quote("ABCD", "3.20", "3.21", at + second, halted=True)
+            self.assertEqual(h.evaluate(at + second), [])
+        leg = h.book.legs["ABCD"]
+        self.assertEqual((sell.cancel_requested, len(leg.exits)), (False, 1))   # one exit spent, still resting
+        h.quote("ABCD", "3.15", "3.16", at + 610)       # trading again
+        self.assertEqual(cancels(h.evaluate(at + 610)), [sell.client_id])
+        self.assertEqual(sell.cancel_reason, "exit_reprice")
+        h.book.on_terminal(sell.client_id, "canceled")
+        again = submits(h.evaluate(at + 610.5), "sell")[0]
+        self.assertEqual((again.qty, again.limit_price), (D(61), D("3.14")))
+
+    def test_a_halt_through_the_hard_flatten_rests_the_exit_and_hands_off(self):
+        # B3: the hard flatten (or the close) falls inside a halt. Nothing is re-priced or re-sent
+        # while halted; the book hands the residual to recovery after its no-progress bound.
+        t0 = SCAN_TIME + 25
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1],
+                        timing=mover.Timing(t0, t0 + 30, 60.0, 10.0, t0 + 100, t0 + 4200, None, 3600.0))
+        now = h.t0 + 1
+        h.quote("ABCD", "3.21", "3.22", now)
+        buy = submits(h.evaluate(now), "buy")[0]
+        h.fill(buy, 61, "3.22", now)
+        h.quote("ABCD", "3.30", "3.31", h.timing.hard_flatten_at)
+        sell = submits(h.evaluate(h.timing.hard_flatten_at), "sell")[0]
+        self.assertEqual(h.book.force_reason, "hard_flatten")
+        halted_until = h.timing.hard_flatten_at + mover.HANDOFF_EXIT_TIMEOUTS * h.timing.exit_timeout_seconds
+        at = h.timing.hard_flatten_at + 10
+        while at < halted_until:
+            h.quote("ABCD", "3.30", "3.31", at, halted=True)
+            self.assertEqual(h.evaluate(at), [])
+            self.assertIsNone(h.book.handoff_reason(at))
+            at += 10
+        h.quote("ABCD", "3.30", "3.31", at, halted=True)
+        self.assertEqual(h.evaluate(at), [])
+        self.assertFalse(sell.cancel_requested)
+        self.assertEqual(h.book.handoff_reason(at), "no_exit_progress")
+
     def test_a_pre_wire_refusal_backs_off_and_is_not_charged(self):
         h, at = self.exit_due(2)
         h.quote("ABCD", "3.20", "3.21", at)

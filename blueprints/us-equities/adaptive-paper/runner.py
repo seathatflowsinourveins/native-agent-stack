@@ -21,14 +21,28 @@ import signal
 import time
 
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
-from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
+from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
+                    execution_from_observation)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight
+from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight,
+                       halt_statuses_supported, nasdaq_halt_seed)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
+# E4: how long entries wait at startup for the halt seed read (one halts feed request run
+# while the node connects) before the stream alone decides.
+HALT_SEED_WAIT_SECONDS = 3.0
+
+
+def _seed_failure(exc):
+    """A bounded reason for a failed halt seed read: the transport's own sanitized message
+    (it never carries provider text) or the exception type."""
+    text = str(exc)
+    if isinstance(exc, TransportError) and re.fullmatch(r"[a-z ]{1,60}", text):
+        return text
+    return type(exc).__name__
 
 
 def save(path, data):
@@ -721,6 +735,15 @@ class Controller:
         self.defer_until = 0
         self.halted_symbols = set()
         self.last_status_ts = {}
+        self.halt_states = {}      # symbol -> last applied trading status (receipts)
+        self.status_messages = 0
+        # E4 startup state: a blocking callable (symbols) -> transport.nasdaq_halt_seed
+        # result, set by the paper entry points on a feed that streams statuses; None
+        # (simulations, tests, other feeds) seeds nothing.
+        self.halt_seed_fetch = None
+        self.halt_seed = {"status": "not_configured"}
+        self._halt_seed_task = None
+        self._halt_seed_deadline = 0.0
 
     async def before_request(self, kind, client_id=None):
         if kind == "data_read":
@@ -771,7 +794,8 @@ class Controller:
             self.ledger.freeze("external_order_detected")
             raise SafetyError("external_order_detected")
         self.ledger.record_order(order["client_order_id"], order["id"], order["status"], order["filled_qty"],
-                                 order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9)
+                                 order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
+                                 execution=execution_from_observation(order))
 
     def quote(self, quote):
         # halted merges the per-quote signal (transport.normalize_quote's
@@ -785,10 +809,18 @@ class Controller:
             self.quotes[q.symbol] = q
 
     def trading_status(self, status):
-        """Consume a normalize_trading_status(...) result (deliverable D3).
-        Not yet driven by a live websocket subscription in this change; see
-        the task handoff. Kept separate from quote() so a future subscription
-        only needs to call this, not touch the quote path.
+        """Consume a transport.normalize_trading_status(...) result: the transport's
+        ``sink_status`` delivers every trading status message of a subscribed symbol
+        (statuses ride the quote connection). ``halted`` True halts the symbol (no
+        entries: its stored quote is marked halted, which reserve_intent refuses; no
+        exit re-pricing: the strategies read is_halted), False resumes it, None (CTA 6
+        trading range indication, E short-sale restriction, F LULD limit state, imbalance
+        indicators) never changes it and does not move the per-symbol ordering guard, so
+        a late genuine halt is still applied. A halt and a resume with the same timestamp resolve to halted.
+        The stream sends no snapshot at subscribe time: a symbol already halted when the
+        engine subscribed is known from the startup seed (start_halt_seed) or from its
+        next status message (a quotation-only period or a CTA price indication halts on
+        arrival; a resume with no halt seen leaves it trading).
 
         D6: a halt must take effect immediately, not only once a strictly
         newer quote update arrives (quote() only ever replaces the stored
@@ -821,18 +853,103 @@ class Controller:
             self.events.append({"type": "trading_status_ignored", "symbol": symbol,
                                "reason": "missing_or_invalid_ts_ns"})
             return
-        last_ts = self.last_status_ts.get(symbol)
-        if last_ts is not None and ts_ns <= last_ts:
+        self.status_messages += 1
+        detail = {key: status.get(key) for key in ("state", "status_code", "reason_code", "tape")}
+        halted = status.get("halted")
+        if halted is None:
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "unchanged",
+                                "ts_ns": ts_ns, **detail})
             return
+        self._apply_halt(symbol, ts_ns, bool(halted), detail, source="stream")
+
+    def _apply_halt(self, symbol, ts_ns, halted, detail, *, source):
+        """Apply one halt or resume at ``ts_ns`` unless a newer one is already applied (a
+        halt wins a tie). Returns whether it was applied."""
+        last_ts = self.last_status_ts.get(symbol)
+        if last_ts is not None and (ts_ns < last_ts or (ts_ns == last_ts and not halted)):
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "stale_ignored",
+                                "ts_ns": ts_ns, "source": source, **detail})
+            return False
         self.last_status_ts[symbol] = ts_ns
-        halted = bool(status.get("halted"))
         if halted:
             self.halted_symbols.add(symbol)
         else:
             self.halted_symbols.discard(symbol)
+        self.halt_states[symbol] = {"halted": halted, "ts_ns": ts_ns, "source": source, **detail}
+        self.events.append({"type": "trading_status", "symbol": symbol,
+                            "effect": "halted" if halted else "resumed", "ts_ns": ts_ns, "source": source,
+                            **detail})
         stored = self.quotes.get(symbol)
         if stored is not None and stored.halted != halted:
             self.quotes[symbol] = replace(stored, halted=halted)
+        return True
+
+    def start_halt_seed(self, symbols, *, wait_seconds=HALT_SEED_WAIT_SECONDS):
+        """E4 startup state, called on the owner loop as the node starts: run
+        ``halt_seed_fetch(symbols)`` (one halts feed read) in a worker thread and apply
+        its halts when it returns. Entries wait for it (halt_seed_pending) for at most
+        ``wait_seconds``; a failed or late read leaves the symbols to the stream alone and
+        is recorded, never retried."""
+        if self.halt_seed_fetch is None:
+            self.halt_seed = {"status": "not_configured"}
+            return None
+        self.halt_seed = {"status": "pending", "symbols": sorted(symbols)}
+        self._halt_seed_deadline = self.clock() + wait_seconds
+        fetch = self.halt_seed_fetch
+
+        async def resolve():
+            try:
+                seed = await asyncio.to_thread(fetch, sorted(symbols))
+            except asyncio.CancelledError:
+                self.halt_seed = {**self.halt_seed, "status": "cancelled"}
+                raise
+            except Exception as exc:
+                self.halt_seed = {**self.halt_seed, "status": "unavailable", "reason": _seed_failure(exc)}
+                self.events.append({"type": "halt_seed", "status": "unavailable",
+                                    "reason": self.halt_seed["reason"]})
+                return
+            self.apply_halt_seed(seed)
+
+        self._halt_seed_task = asyncio.get_running_loop().create_task(resolve())
+        return self._halt_seed_task
+
+    def halt_seed_pending(self):
+        """True while the startup halt seed is in flight and its wait has not run out."""
+        return self.halt_seed.get("status") == "pending" and self.clock() < self._halt_seed_deadline
+
+    def apply_halt_seed(self, seed):
+        """Mark each seeded symbol halted from its halt time (state ``seeded_halt``). A
+        stream status newer than that time wins, so a resume streamed before the seed
+        returned is not undone, and a later streamed resume clears the seeded halt."""
+        halts = seed.get("halts") or {}
+        applied = [symbol for symbol, halt in sorted(halts.items())
+                   if self._apply_halt(symbol, int(halt["halted_at_ns"]), True,
+                                       {"state": "seeded_halt", "status_code": None,
+                                        "reason_code": halt.get("reason_code"), "tape": None},
+                                       source=str(seed.get("source")))]
+        self.halt_seed = {**self.halt_seed, "status": "seeded",
+                          **{key: seed.get(key) for key in ("source", "url", "fetched_at_ns", "sha256", "bytes",
+                                                            "items")},
+                          "halted": sorted(halts), "applied": applied}
+        self.events.append({"type": "halt_seed", "status": "seeded", "halted": sorted(halts), "applied": applied,
+                            "sha256": seed.get("sha256")})
+
+    async def stop_halt_seed(self):
+        """Cancel a seed read still in flight (the run is over)."""
+        task, self._halt_seed_task = self._halt_seed_task, None
+        if task is not None and not task.done():
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+
+    def is_halted(self, symbol):
+        """True while a trading status or the quote's own condition marks ``symbol``
+        halted, paused or quotation-only: no entry and no exit re-pricing then."""
+        return symbol in self.halted_symbols or bool(getattr(self.quotes.get(symbol), "halted", False))
+
+    def halt_summary(self):
+        return {"status_messages": self.status_messages, "halted_now": sorted(self.halted_symbols),
+                "last_status": {symbol: dict(state) for symbol, state in sorted(self.halt_states.items())},
+                "seed": dict(self.halt_seed)}
 
     def bind(self, port):
         """Retain proven negative outcomes before native/recovery callbacks."""
@@ -922,7 +1039,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
-                                account_multiplier=config.get("_account_multiplier"))
+                                account_multiplier=config.get("_account_multiplier"),
+                                halted=controller.is_halted)
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -941,6 +1059,13 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy,
                          log_directory=log_directory)
+    # A guarded order/position callback that raises stops the session here: the
+    # adapter then denies submits, the node stops, and main() recovers any residual.
+    strategy.fault_sink = session.fail
+    # E4: the startup halt seed (when main() configured one) is read while the node
+    # connects, for the symbols whose statuses the port streams; entries wait for it
+    # (halt_seed_pending, bounded).
+    controller.start_halt_seed(list(getattr(port, "symbols", None) or [m["symbol"] for m in metadata]))
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -1019,7 +1144,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 controller.stop = True
                 force_exit = True
             strategy.enabled = (strategy.started and port.ready and not force_exit
-                                and now >= controller.defer_until)
+                                and now >= controller.defer_until and not controller.halt_seed_pending())
             fresh_quotes = [q for q in controller.quotes.values()
                             if -.25 <= now - q.timestamp <= config["quote_max_age_seconds"]]
             try:
@@ -1117,6 +1242,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     finally:
         strategy.enabled = False
         controller.stop = True
+        await controller.stop_halt_seed()
         session.stop()
         try:
             await asyncio.wait_for(task, 20)
@@ -1134,6 +1260,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "policy_selections": strategy.policy.counts, "accounting": state,
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
               "adapter_errors": list(session.errors), "flat": is_flat,
+              "execution_stats": dict(session.execution_stats),
+              "average_invariant_mismatches": list(session.average_invariant_mismatches),
+              "callback_faults": list(strategy.callback_faults), "halts": controller.halt_summary(),
               "requests": controller.requests, "events": controller.events,
               "session_policy": {"extended_hours": session_policy["extended_hours"],
                                  "overnight_holds": session_policy["overnight_holds"]},
@@ -1527,6 +1656,9 @@ def main():
                 if controller_market_open:
                     controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
+            # E4: seed halts already in force at startup only where the stream carries
+            # statuses (SIP), since only a streamed resume can clear a seeded halt.
+            controller.halt_seed_fetch = nasdaq_halt_seed if halt_statuses_supported(config["feed"]) else None
             if args.live_dir is not None:
                 controller.events = LiveEventLog(args.live_dir / "events.jsonl")
                 # Binds this run's live record to its own ledger and kill switch for
@@ -1571,7 +1703,8 @@ def main():
                 needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
                 return controller.bind(AlpacaPaperTransport(key, secret, config["symbols"],
                     before_request=controller.before_request, before_submit=controller.before_submit,
-                    sink_observation=controller.observe, request_observer=responses.append,
+                    sink_observation=controller.observe, sink_status=controller.trading_status,
+                    request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),

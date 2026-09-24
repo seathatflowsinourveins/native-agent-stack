@@ -73,7 +73,7 @@ def flat(price, spread="0.02"):
 class MoverNativeEndToEnd(unittest.TestCase):
     def run_trial(self, rows, points, *, exit_rule="X2", hold=1.5, flatten=6.0, window=10.0, entry_timeout=1.0,
                   partial_fill=None, stop_after=None, extended_hours=False, block_sells=False, trial="t1",
-                  snapshot_latency=0.0, reconcile_every=None, exit_orders=None, quote_path=None):
+                  snapshot_latency=0.0, reconcile_every=None, exit_orders=None, quote_path=None, halt_seed=None):
         """One trial through run_mover. With ``block_sells`` no sell fills during the trial;
         the residual then goes through mover_runner.recover_mover on a fresh port on the
         same synthetic account (sells fill), as command_paper does. ``self.outcome`` keeps
@@ -102,6 +102,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
                                         equity=limits.capital_usd, timing=timing)
                 controller = mover_runner.MoverController(ledger, t0 + 36000, market_open=True,
                                                           max_entry_notional_usd=settings.max_entry_notional_usd)
+                controller.halt_seed_fetch = halt_seed   # E4 startup seed, as command_paper sets it on SIP
                 port = MoverSimulatedPort(controller, cfg["symbols"], path=quote_path or piecewise_path(points),
                                           partial_fill=partial_fill, extended_hours_allowed=extended_hours)
                 port.fill_sells = not block_sells
@@ -405,6 +406,104 @@ class MoverNativeEndToEnd(unittest.TestCase):
         strategy.on_quote(object())
         book.evaluate.assert_not_called()
         self.assertEqual(strategy.received_quotes, 1)
+
+    def test_an_order_callback_exception_freezes_stops_the_node_and_recovery_cleans_up(self):
+        # E3, nautilus_trader#5039: rc5's LiveNode discards an exception raised in on_order_filled.
+        # The fault is injected beneath the guard (the book's fill bookkeeping), not into the handler.
+        rows = [row("AAA", 1, "10.00")]
+        with patch.object(mover.MoverBook, "on_fill", side_effect=RuntimeError("injected book fault")):
+            receipt, port, held, unresolved = self.run_trial(rows, {"AAA": flat("10.00")}, hold=1.0, flatten=4.0,
+                                                             window=8.0, block_sells=True)
+        reason = "strategy_callback_exception_on_order_filled"
+        self.assertEqual(self.outcome["status"], "needs_attention")
+        self.assertEqual(set(self.outcome["adapter_errors"]), {reason + ":RuntimeError"})
+        fault = self.outcome["callback_faults"][0]
+        self.assertEqual((fault["callback"], fault["error_type"], fault["freeze_reason"]),
+                         ("on_order_filled", "RuntimeError", reason))
+        self.assertEqual(receipt["ledger_risk"]["halted_reason"], reason)
+        # Nothing was sent by the engine after the entry whose fill raised; recovery sold it.
+        self.assertEqual([p["side"] for p in port.payloads], ["buy"])
+        self.assertEqual([p["side"] for p in self.recovery_port.payloads], ["sell"])
+        self.assertTrue(all(p["client_order_id"].startswith("rec-t1-") for p in self.recovery_port.payloads))
+        self.assertEqual(receipt["reconciliation"]["recovery"]["status"], "passed")
+        self.assertEqual((receipt["status"], receipt["flat"], held, unresolved), ("needs_attention", True, {}, 0))
+        self.assertLess(self.outcome["elapsed_seconds"], 4.0)    # the node stopped on the fault, not at the flatten
+        self.assertEqual(receipt["callback_faults"][0]["callback"], "on_order_filled")
+
+    def test_a_trade_halt_blocks_the_entry_and_the_receipt_records_it(self):
+        # E4 through the native loop: a volatility pause arrives (documented schema) before the
+        # entry; no buy is sent while it lasts, and the resumption lets the entry through.
+        from transport import normalize_trading_status
+        rows = [row("AAA", 1, "10.00")]
+        original = MoverSimulatedPort.start
+
+        async def start_paused(port, on_quote, on_order):
+            await original(port, on_quote, on_order)
+            status = {"T": "s", "S": "AAA", "sc": "P", "sm": "Volatility Trading Pause", "rc": "LUDP",
+                      "rm": "Volatility Trading Pause", "t": "2026-09-24T15:40:40.219046565Z", "z": "C"}
+            port.controller.trading_status(normalize_trading_status(status))
+
+            async def resume():
+                await asyncio.sleep(0.6)
+                port.resumed_at = time.time()
+                port.controller.trading_status(normalize_trading_status(
+                    dict(status, sc="T", sm="Trading Resumption", rc="C11", t="2026-09-24T15:45:40.219163054Z")))
+            port.task_resume = asyncio.create_task(resume())
+
+        with patch.object(MoverSimulatedPort, "start", start_paused):
+            receipt, port, held, unresolved = self.run_trial(rows, {"AAA": flat("10.00")}, hold=1.5, flatten=6.0,
+                                                             window=10.0)
+        self.assert_clean(receipt, held, unresolved)
+        statuses = [e for e in receipt["events"] if e.get("type") == "trading_status"]
+        self.assertEqual([(e["effect"], e["state"]) for e in statuses],
+                         [("halted", "volatility_pause"), ("resumed", "trading")])
+        self.assertEqual(receipt["halts"]["halted_now"], [])
+        self.assertEqual(self.buys_per_symbol(port), {"AAA": 1})
+        entry = self.legs(receipt)["AAA"]["entry"]
+        self.assertGreaterEqual(datetime.fromisoformat(entry["submitted_at"]).timestamp(), port.resumed_at)
+
+    def test_a_symbol_halted_before_the_engine_subscribed_is_seeded_and_entered_after_its_resume(self):
+        # E4 startup state: the stream sends no snapshot, so AAA's pause, begun before the
+        # subscription, comes from the startup halt seed (a halts-feed result in the shape
+        # transport.nasdaq_halt_seed returns). No buy is sent until the pause's streamed
+        # resumption; BBB, not halted, enters normally.
+        from transport import normalize_trading_status
+        rows = [row("AAA", 1, "10.00"), row("BBB", 2, "5.50")]
+        halted_at, reads = time.time_ns() - 60 * 10 ** 9, []
+
+        def seed(symbols):
+            reads.append(list(symbols))
+            return {"source": "nasdaq_trade_halts_rss", "fetched_at_ns": time.time_ns(), "sha256": "0" * 64,
+                    "bytes": 1, "items": 1, "halts": {"AAA": {"halted_at_ns": halted_at, "resumption_trade_ns": None,
+                                                              "reason_code": "LUDP", "market": "NASDAQ"}}}
+        original = MoverSimulatedPort.start
+
+        async def start_then_resume(port, on_quote, on_order):
+            await original(port, on_quote, on_order)
+
+            async def resume():
+                await asyncio.sleep(0.6)
+                port.resumed_at = time.time()
+                now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                port.controller.trading_status(normalize_trading_status(
+                    {"T": "s", "S": "AAA", "sc": "T", "sm": "Trading Resumption", "rc": "C11",
+                     "rm": "Trade Halt Concluded By Other Regulatory Auth,; Quotes/Trades Resume", "t": now, "z": "C"}))
+            port.task_resume = asyncio.create_task(resume())
+
+        with patch.object(MoverSimulatedPort, "start", start_then_resume):
+            receipt, port, held, unresolved = self.run_trial(rows, {"AAA": flat("10.00"), "BBB": flat("5.50")},
+                                                             hold=1.5, flatten=6.0, window=10.0, halt_seed=seed)
+        self.assert_clean(receipt, held, unresolved)
+        self.assertEqual(len(reads), 1)
+        self.assertIn("AAA", reads[0])
+        seeded = receipt["halts"]["seed"]
+        self.assertEqual((seeded["status"], seeded["halted"], seeded["applied"]), ("seeded", ["AAA"], ["AAA"]))
+        aaa = [e for e in receipt["events"] if e.get("type") == "trading_status" and e.get("symbol") == "AAA"]
+        self.assertEqual([(e["effect"], e["state"]) for e in aaa], [("halted", "seeded_halt"), ("resumed", "trading")])
+        self.assertEqual(receipt["halts"]["halted_now"], [])
+        self.assertEqual(self.buys_per_symbol(port), {"AAA": 1, "BBB": 1})
+        entry = self.legs(receipt)["AAA"]["entry"]
+        self.assertGreaterEqual(datetime.fromisoformat(entry["submitted_at"]).timestamp(), port.resumed_at)
 
     def test_synthetic_command_writes_a_syn_receipt(self):
         with tempfile.TemporaryDirectory() as root:

@@ -110,10 +110,23 @@ this account's observed entitlement or a1000-trades guarantee.
 ## Lifecycle and native boundaries
 
 The SQLite ledger fsyncs intent and request reservations before sending. Stable
-IDs, cumulative fill accounting and an account-specific exclusive lock prevent
-blind retries and competing writers. Shared STOP blocks new entries; confirmed
-owned exits remain available. Fresh startup requires a flat account with no open
-orders. Periodic and final snapshots compare positions and cash to the ledger.
+IDs, per-execution fill accounting (cumulative averages only where an execution is
+missing) and an account-specific exclusive lock prevent blind retries and competing
+writers. Shared STOP blocks new entries; confirmed owned exits remain available. Fresh
+startup requires a flat account with no open orders. Periodic and final snapshots
+compare positions and cash to the ledger.
+
+Engine release of 2026-09-24 (items 2-4 of the data and execution convergence
+record): each broker execution is booked at its own quantity and price, with fill gaps
+closed from the order's FILL activities (README-native.md, README-safety.md); every
+strategy order and position callback is guarded, because rc5 discards an exception
+raised there (README-native.md); and on SIP the engine tracks per-symbol trading halts,
+LULD pauses and quotation-only periods from the status stream plus a startup seed, with
+no entries and no exit re-pricing while a symbol is halted (README-transport.md,
+README-mover.md). The evidence is synthetic fixtures and local integration against the
+real rc5 `LiveNode`; no paper session has run this release yet. It changes engine files
+that a forward protocol pins, so such a protocol needs a new version before it counts
+sessions run on this release.
 
 Stream authentication/subscription acknowledgement, queue integrity, per-symbol
 freshness and connection generations are observed explicitly. Models never own

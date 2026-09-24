@@ -1288,7 +1288,13 @@ class MoverBook:
         return None
 
     def _cancels(self, leg, symbol, now, force):
+        """Cancels for one leg. A resting exit is re-priced after the exit timeout,
+        except while its quote is halted (a trading halt, LULD pause or quotation-only
+        period): a limit sell cannot fill then, and a cancel and re-send every exit
+        timeout would spend the exit budget (20 orders in about 200 s against 5-10 min
+        pauses). It rests; re-pricing resumes once the symbol trades again."""
         actions = []
+        halted = bool(getattr(self._quote(symbol), "halted", False))
         for record in self.open_orders(symbol):
             if record.cancel_requested:
                 continue
@@ -1300,7 +1306,7 @@ class MoverBook:
                     why = "exit_triggered"
                 elif now - record.created >= self.plan.timing.entry_timeout_seconds:
                     why = "entry_timeout"
-            elif now - record.created >= self.plan.timing.exit_timeout_seconds:
+            elif now - record.created >= self.plan.timing.exit_timeout_seconds and not halted:
                 why = "exit_reprice"
             if why is not None:
                 record.cancel_requested, record.cancel_reason = True, why

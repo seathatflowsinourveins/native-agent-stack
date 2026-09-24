@@ -24,7 +24,9 @@ or throughput. The observed broker rate, numerical risk and session limits belon
 to the coordinator's policy.
 
 The port contract is async `start(on_quote, on_order)`, `stop()`, `submit(dict)`,
-`cancel(client_order_id)` and `snapshot()`. Callbacks run on the native owner loop.
+`cancel(client_order_id)`, `snapshot()` and `fill_activities(order_id)` (every
+execution of one broker order, oldest first, each with its own `qty`, `price` and the
+order's `cum_qty` after it). Callbacks run on the native owner loop.
 Data and execution clients share one started/stopped port. Metadata has `symbol`,
 `currency` (USD), `price_precision`, `price_increment` and `lot_size`; the final
 three default to 2, 0.01 and 1. Quotes are native `QuoteTick` values delivered to
@@ -34,11 +36,35 @@ Supported entry commands are whole-share equity LIMIT/DAY. Order tags, strategy
 identity and an optional `reason=...` tag remain in the port payload for journal
 attribution; the transport strips these before SDK serialization. Native order
 submission precedes the awaitable broker request, but acceptance, cancellation
-and fills require returned confirmations. Repeated REST/stream cumulative fills
-do not duplicate native economics. Derived incremental prices must be exactly
-representable; changed cumulative notional without changed quantity freezes for
-reconciliation. Synthetic cumulative trade IDs are adapter identities, not claims
-that Alpaca supplied individual execution identifiers.
+and fills require returned confirmations.
+
+Fills are booked one broker execution at a time (E2 of the 2026-09-24 convergence
+record). A `fill` or `partial_fill` trade update that carries `execution_id`, `qty`
+and `price` becomes exactly one native `OrderFilled`: `TradeId` is the execution id
+(a 36-character UUID, rc5's `TradeId` limit; a longer id is digested to 36
+characters) and `last_px` is that execution's price. No price is ever derived from
+Alpaca's cumulative `filled_avg_price`, which is rounded to 6 decimals: under the old
+cumulative booking the 2026-09-24 APUS sell (26 @ 5.62, 2 @ 5.61, 1 @ 5.61; averages
+5.62, 5.619286, 5.618966) derived an off-grid 5.610004 and froze the adapter.
+Executions are keyed by the order's cumulative quantity after them, so a repeated,
+reordered or REST-overtaken delivery never books twice; a conflicting or overlapping
+execution freezes. A cumulative quantity that no booked execution explains is a fill
+gap. If it is still open after `fill_gap_grace_seconds` (2 s), the adapter reads the
+order's executions once through the port's `fill_activities` (`GET
+/v2/account/activities/FILL?order_id=`) and books the missing ones, joined on
+cumulative quantity: that an activity id's UUID equals the stream `execution_id` is
+not documented. A cancel or expiry reported before its fills (for example by the REST
+read after a cancel) waits for them. These still freeze for reconciliation: an
+execution after the native terminal event, a changed average at an unchanged
+cumulative quantity, a gap the activities cannot close, a replace event, the rare
+`done_for_day`, `calculated`, `stopped`, `suspended` and `restated` events, and any
+undocumented event string. Trade corrections and busts are not `trade_updates`
+events (Alpaca documents them only as activities, `/v2beta1/events/activities`,
+which this release does not consume). The executions' notional is compared with
+`filled_qty x filled_avg_price` within Alpaca's rounding and a difference is recorded
+(`average_invariant_mismatches`), never a freeze. Receipts carry `execution_stats`;
+its `fill_events_missing_execution_fields` is E2's overturn metric and must stay 0
+on paper.
 
 Only exceptions with `definitive_rejection=True` become native order rejections.
 `NativeOrderRejected` is provided for a refusal known to occur before acceptance.
@@ -53,8 +79,12 @@ historical rows remain in the external journal rather than being manufactured as
 new native fills. Non-flat recovery is reconciliation/liquidation outside this
 new native session; resumed native strategy entry is not qualified. Initial
 reconciliation uses explicit empty order/fill/position reports only after checking
-that snapshot. Unknown stream orders are sent as native status reports, never
-assigned to a strategy by guessing an intent.
+that snapshot. With `overnight_holds` an adopted open order that has fills reports one
+`FillReport` per execution from its FILL activities, which must tile the snapshot's
+filled quantity (`historical_fill_ledger_incomplete` otherwise); a port without
+`fill_activities` still refuses (`historical_fill_ledger_not_supplied_by_port`). Unknown
+stream orders are sent as native status reports, never assigned to a strategy by
+guessing an intent.
 
 The native v2 `Equity` model has size precision 0 and size increment 1 even when
 given a fractional lot size. A fractional broker fill therefore **freezes this
@@ -71,6 +101,24 @@ Custom Python clients cannot use Redis/PostgreSQL native cache backing in this
 version. This node uses an in-memory cache; durable recovery is the port's journal
 and broker reconciliation responsibility. No credential reads, broker client,
 data acquisition or external model calls are present in this module.
+
+## Order and position callbacks (E3)
+
+NautilusTrader 2.0.0rc5's `LiveNode` discards an exception raised in a Strategy order
+or position callback (upstream issue #5039: `strategy.rs` dispatches with `let _ =`).
+`UpstreamCallbackLoss` in `tests/test_adaptive_paper_native.py` reproduces this on the
+pinned wheel: nothing reaches the session, dispatch continues, and the raising call's
+own bookkeeping is lost. Every `on_order_*` and `on_position_*` handler of
+`AdaptiveStrategy`, `MoverStrategy` and `CapacityProbe` is therefore wrapped by
+`guarded_callback`. On an exception the guard records the callback name, exception
+type and a traceback SHA-256 (`callback_faults`), latches `faulted` (no further submit;
+cancels still go out), freezes the ledger with
+`strategy_callback_exception_<handler>`, calls the runner's `fault_sink`
+(`NativeSession.fail`: the node stops and the adapter denies every submit) and
+re-raises. The run ends `needs_attention` and any residual goes to recovery. An AST
+test fails on any unwrapped handler. Overturn: a released version that surfaces the
+exception or stops the node fails the characterization test, and the guard can then
+shrink to record and freeze.
 
 ## Verification
 

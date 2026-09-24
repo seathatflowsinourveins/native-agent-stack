@@ -11,6 +11,7 @@ from nautilus_trader.model import (ClientOrderId, InstrumentId, OrderSide, Price
                                   Quantity, StrategyId, TimeInForce)
 from exits import REASON_PRICE_RULE
 from leverage import LeverageInputs
+from native_adapter import guarded_callback
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
 from sessions import SessionKind, previous_trading_day, session_at
 from strategies import AdaptivePolicy, OperationalStatus, QUOTE_FUTURE_TOLERANCE_SECONDS, limit_price
@@ -22,13 +23,22 @@ class AdaptiveStrategy(Strategy):
                                 order_id_tag="A", log_events=False, log_commands=False, manage_stop=False))
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
-                 transport=None, stop_file=None, clock=time.time, account_multiplier=None):
+                 transport=None, stop_file=None, clock=time.time, account_multiplier=None, halted=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
+        # E4: a symbol halted, paused or quotation-only (runner.Controller.is_halted)
+        # gets no new order and its resting exit is not re-priced until it resumes.
+        self._halted = halted or (lambda symbol: False)
+        # E3: native_adapter.guarded_callback records an order/position callback
+        # exception here, latches `faulted` (no further submits) and calls fault_sink
+        # (runner binds NativeSession.fail, which stops the session).
+        self.callback_faults = []
+        self.faulted = False
+        self.fault_sink = None
         # G-e: the broker-proven margin multiplier (runner.py's config
         # "_account_multiplier", only ever set after preflight has checked
         # multiplier >= requested leverage -- see runner._check_margin_
@@ -132,6 +142,7 @@ class AdaptiveStrategy(Strategy):
                                quote.ts_event / 1_000_000_000):
             self.received_quotes += 1
 
+    @guarded_callback
     def on_order_filled(self, event):
         self.native_fills += 1
         client_id = str(event.client_order_id)
@@ -151,6 +162,7 @@ class AdaptiveStrategy(Strategy):
         self._release_staged_replacement(client_id, terminal="fill")
         self._finish_if_terminal(client_id)
 
+    @guarded_callback
     def on_order_canceled(self, event):
         """D1 (round 6): unlike on_order_rejected/denied/expired/
         cancel_rejected, an ordinary (non-replace) cancel of a
@@ -176,12 +188,14 @@ class AdaptiveStrategy(Strategy):
         else:
             self._clear_gap_stop_applied_if_matches(info)
 
+    @guarded_callback
     def on_order_expired(self, event):
         client_id = str(event.client_order_id)
         self._release_staged_replacement(client_id)
         self._clear_gap_stop_applied_if_matches(self.pending.get(client_id))
         self.pending.pop(client_id, None)
 
+    @guarded_callback
     def on_order_rejected(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
@@ -193,6 +207,7 @@ class AdaptiveStrategy(Strategy):
             self._mark_definitive_refusal(client_id)
         self.pending.pop(client_id, None)
 
+    @guarded_callback
     def on_order_denied(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
@@ -201,6 +216,7 @@ class AdaptiveStrategy(Strategy):
         self._mark_definitive_refusal(client_id)
         self.pending.pop(client_id, None)
 
+    @guarded_callback
     def on_order_cancel_rejected(self, event):
         """D1 (round 3): the *cancel* itself failed -- the resting order
         is still live and unmodified (replace_exit's cancel never took
@@ -666,7 +682,10 @@ class AdaptiveStrategy(Strategy):
                               self.account_multiplier, acct.pending_buy_notional_usd)
 
     def rebalance(self, now=None, *, force_exit=False):
-        """Called on the native owner loop, never a socket thread."""
+        """Called on the native owner loop, never a socket thread. A strategy whose
+        order callback raised (``faulted``) submits nothing more; recovery cleans up."""
+        if self.faulted:
+            return None
         now = self._clock() if now is None else now
         self.policy.sync_positions(self.positions(), now)
         for client_id in list(self.pending):
@@ -753,6 +772,12 @@ class AdaptiveStrategy(Strategy):
                          next((x.family for x in decision.signals if x.symbol == s), "rebalance"))
                         for s, qty in decision.targets.items() if qty > held.get(s, 0)]
         for symbol, side, quantity, reason in actions:
+            if self._halted(symbol):
+                # E4: halted, paused or quotation-only: no entry, and a resting exit is
+                # neither replaced nor joined by a new one (a limit sell cannot fill in
+                # a halt); the next tick after the resume acts again. A gap_risk_stop
+                # stays armed (fire-once is only marked on submit).
+                continue
             quote = self.policy.latest.get(symbol)
             if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS:
@@ -1002,8 +1027,12 @@ class AdaptiveStrategy(Strategy):
         symbol = replacement["symbol"]
         self._exit_replace_busy.discard(symbol)
         quote = self.policy.latest.get(symbol)
-        if (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+        if (self.faulted or self._halted(symbol) or not quote
+                or now - quote.timestamp > self.policy.config.quote_age_seconds
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
+            # E3/E4: a faulted strategy submits nothing; a symbol that halted while its
+            # cancel was in flight is not re-priced (the ordinary path acts after it
+            # resumes), exactly as for a stale quote below.
             # No fresh quote right now -- leave it to the next rebalance()
             # tick's ordinary exit-action path (see replace_exit's
             # docstring); this symbol is no longer busy or "resting", so
@@ -1038,8 +1067,13 @@ class AdaptiveStrategy(Strategy):
             self._gap_stop_applied.add(symbol)
 
     def cancel_expired(self, now, timeout, *, all_entries=False):
+        """Cancel timed-out orders (every resting entry when ``all_entries``). A resting
+        exit of a halted symbol is left to rest, not cancelled for re-pricing: it cannot
+        fill during the halt, and re-pricing resumes once the symbol trades again (E4)."""
         for client_id, info in list(self.pending.items()):
             if info.get("cancel_requested"):
+                continue
+            if info["side"] == "sell" and self._halted(info["symbol"]):
                 continue
             if now - info["created"] >= timeout or (all_entries and info["side"] == "buy"):
                 self.cancel_order(ClientOrderId(client_id))
