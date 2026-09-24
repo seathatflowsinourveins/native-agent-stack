@@ -12,7 +12,9 @@ run directory before the first POST and removed only after cleanup proves
 flat; SIGKILL or a crash leaves it for manual recovery.
 The ledger is FaultLedger: the engine Ledger except that the single C04 client id
 may carry a sub-penny price to Alpaca, whose documented 422 refusal the engine
-records as broker_refused (see README.md, "C04 choice").
+records as broker_refused (see README.md, "C04 choice"). The default transport is
+FaultTransport, the engine transport with the same single-id exemption at its
+order-contract boundary.
 
 Usage: harness.py run --env-file PATH --state-root PATH --out PATH
 """
@@ -41,7 +43,8 @@ from runner import Controller, credentials, reconcile, save  # noqa: E402
 from safety import (DEFAULT_STOP, DEFINITIVE_REFUSAL_STATUSES, SUB_PENNY_REFUSAL,  # noqa: E402
                     TERMINAL as LEDGER_TERMINAL, Ledger, SafetyError, account_lock_fingerprint,
                     price_increment_valid)
-from transport import TERMINAL, AlpacaPaperTransport, TransportError, timestamp_ns  # noqa: E402
+from transport import (TERMINAL, AlpacaPaperTransport, TransportError, limit_order_request,  # noqa: E402
+                       order_envelope, timestamp_ns)
 
 PLAN_PATH = HERE / "plan.json"
 STATE_BASE = Path.home() / ".local/state/native-agent-stack"
@@ -73,6 +76,36 @@ class FaultLedger(Ledger):
         if client_id == self.sub_penny_client_id and not price_increment_valid(price):
             return
         super()._check_price_increment(client_id, price)
+
+
+class FaultTransport(AlpacaPaperTransport):
+    """The engine transport with one harness-only change, mirroring FaultLedger:
+    the single C04 client id may carry its sub-penny limit price through the
+    order-contract boundary. Its other fields are validated by the contract as
+    usual (with the price truncated to the cent), and the serialized POST body
+    must still equal its envelope. Every other client id is validated exactly as
+    in the engine."""
+
+    sub_penny_client_id = None
+
+    def _validated_request(self, intent):
+        price = Decimal(intent["limit_price"])
+        if (self.sub_penny_client_id is None or intent["client_order_id"] != self.sub_penny_client_id
+                or price_increment_valid(price)):
+            return super()._validated_request(intent)
+        on_cent = dict(intent, limit_price=str(price.quantize(CENT, ROUND_DOWN)))
+        envelope = order_envelope(on_cent, extended_hours_allowed=self.extended_hours_allowed)
+        envelope["intent"]["limit_price"] = intent["limit_price"]
+        return envelope, limit_order_request(envelope)
+
+
+def fault_transport(sub_penny_client_id):
+    """Factory for FaultTransport exempting exactly one client id."""
+    def build(*args, **kwargs):
+        port = FaultTransport(*args, **kwargs)
+        port.sub_penny_client_id = sub_penny_client_id
+        return port
+    return build
 
 
 def sha256(path):
@@ -469,15 +502,17 @@ class Harness:
         return {"schema_version": 1, "kind": "native_fault_behaviour_receipt", "status": status,
                 "broker": "alpaca", "endpoint": "paper", "gate": "native-fault-behaviour",
                 "plan_sha256": self.plan_sha, "harness_sha256": sha256(__file__),
-                "engine_sources_sha256": {n: sha256(ENGINE / n) for n in ("transport.py", "safety.py", "runner.py")},
+                "engine_sources_sha256": {n: sha256(ENGINE / n) for n in ("transport.py", "safety.py", "runner.py",
+                                                                         "../order-contract/order_contract.py")},
                 "started_at": self.started_at, "finished_at": datetime.now(timezone.utc).isoformat(),
                 "client_id_prefix": self.prefix, "symbol": self.symbol, "transport_builds": self.builds,
                 "posts_reserved": self.posts, "max_posts": self.plan["max_posts"],
                 "submit_responses": sum(r["kind"] == "submit" for r in self.responses),
                 "interrupted": self.interrupted, "error": error, "stop_error": stop_error,
                 "cases": cases, "cleanup": cleanup,
-                "c04_pre_send_exemption": ("FaultLedger exempts only client id %sc04 from invalid_price_increment"
-                                           % self.prefix),
+                "c04_pre_send_exemption": ("FaultLedger exempts only client id %sc04 from invalid_price_increment; "
+                                           "FaultTransport exempts only its limit price increment from the "
+                                           "order-contract boundary" % self.prefix),
                 "in_flight_marker_present": self.in_flight.exists(),
                 "evidence_note": ("native_paper marks a case only when the engine transport's request observer "
                                   "recorded a broker HTTP response inside that case and, for C05, only when "
@@ -510,7 +545,7 @@ def run(env_file, state_root, out, *, factory=None, plan_path=PLAN_PATH):
     handled = (signal.SIGINT, signal.SIGTERM)
     previous = {sig: signal.signal(sig, harness.on_signal) for sig in handled}  # before any transport exists
     try:
-        receipt = asyncio.run(harness.execute(factory or AlpacaPaperTransport, key, secret))
+        receipt = asyncio.run(harness.execute(factory or fault_transport(prefix + "c04"), key, secret))
     finally:
         for sig, handler in previous.items():
             signal.signal(sig, handler)
