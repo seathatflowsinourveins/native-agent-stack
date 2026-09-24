@@ -52,6 +52,7 @@ HERE = Path(__file__).resolve().parent
 CATALOG_ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 from codex_lane import root_issue, tree_sha256  # noqa: E402  (one root rule and tree digest for both lanes)
+import transcript_audit  # noqa: E402
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
 VENDORED_LANES = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "vendored-lanes.json"
 # The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
@@ -162,6 +163,7 @@ def lane_return(layer: dict, provenance: dict, resolved_model=None) -> dict:
 
 
 FAILURES_NAME = "failures.json"
+TRANSCRIPT_AUDIT_NAME = "transcript-audit.json"
 
 
 def failure_reason(layer: dict) -> str:
@@ -262,6 +264,9 @@ def parse_args(argv=None):
                              "(Codex review of #145).")
     parser.add_argument("--repo", type=Path, required=True,
                         help="The blind export the lane read (the workflow args' repo).")
+    parser.add_argument("--transcripts", type=Path, required=True,
+                        help="The workflow run's agent transcript directory (~/.claude/projects/<export slug>/<session>/"
+                             "subagents/workflows/<run id>): each layer's return is audited on what its agents read.")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)
@@ -278,11 +283,34 @@ def main(argv=None) -> int:
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2
+    if not transcript_audit.transcript_files(args.transcripts):
+        print(f"claude_lane: --transcripts {args.transcripts} holds no agent transcripts; name the workflow run's "
+              "subagents/workflows/<run id> directory", file=sys.stderr)
+        return 2
     out_dir = args.work_dir / "claude"
     out_dir.mkdir(parents=True, exist_ok=True)
+    # The blind rule, checked in what the agents opened (Codex review of #145 at 68e74f2c): Read, Glob and Grep have
+    # no path limit, so each layer's agents may read only its packet and the export.
+    packets_dir = str((args.work_dir / "packets").resolve())
+    export = str(args.repo.resolve())
+    audit_items = {f"{layer['catalog']}__{layer['layer_id']}": {
+        "marker": str(layer.get("packet_path") or ""), "roots": [export, str(layer.get("packet_path") or "")]}
+        for layer in result.get("layers") or [] if isinstance(layer.get("final"), dict)}
+    report = transcript_audit.audit(args.transcripts, audit_items, marker_prefix=packets_dir + "/")
+    (out_dir / TRANSCRIPT_AUDIT_NAME).write_text(json.dumps({"dir": str(args.transcripts.resolve()), **report},
+                                                            indent=1, sort_keys=True) + "\n", encoding="utf-8")
     written, without_final, failures = [], [], []
     for layer in result.get("layers") or []:
         name = f"{layer['catalog']}__{layer['layer_id']}.json"
+        if isinstance(layer.get("final"), dict) and name[:-len(".json")] in report["flagged_items"]:
+            # Void: a return whose agents read outside the export and its packet is kept only for inspection.
+            (out_dir / name).unlink(missing_ok=True)
+            (out_dir / f"{name}.audit-flagged").write_text(json.dumps(layer, indent=1, sort_keys=True) + "\n",
+                                                           encoding="utf-8")
+            failures.append({"catalog": layer["catalog"], "layer_id": layer["layer_id"],
+                             "reason": "the transcript audit flagged this layer's agents (a read outside the export "
+                                       "and its packet, or a tool other than Read, Glob and Grep)"})
+            continue
         if not isinstance(layer.get("final"), dict):
             # A prior run's return for this layer must not survive this run's
             # failure, or record_verdicts.py would seal the stale return.

@@ -90,13 +90,44 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                 {"catalog": "foundation", "layer_id": "l2", **self.packet["l2"], "proposal": {"x": 1}, "final": None,
                  "refutation": refuted}],
             "lost": ["us-equities/l3"]}), encoding="utf-8")
+        # The workflow run's agent transcripts (Codex review of #145 at 68e74f2c): l1's agent read its packet and the
+        # export only.
+        self.transcripts = self.tmp / "transcripts"
+        self.write_transcript("l1", [str(self.export / "evidence.json")])
+
+    def write_transcript(self, layer_id, reads):
+        self.transcripts.mkdir(exist_ok=True)
+        packet = self.packet[layer_id]["packet_path"]
+        calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": path}} for path in [packet, *reads]]
+        lines = [{"type": "user", "cwd": str(self.export), "message": {"content": f"Read the packet at {packet}"}},
+                 {"type": "assistant", "cwd": str(self.export), "message": {"content": calls}}]
+        (self.transcripts / f"agent-{layer_id}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
+                                                                   encoding="utf-8")
 
     def run_main(self, *extra):
         # The vendored role stands in for the host's installed copy, which CI does not have.
         return claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
                                  "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
-                                 "--agent-file",
+                                 "--transcripts", str(self.transcripts), "--agent-file",
                                  str(claude_lane.VENDORED_AGENT), *extra])
+
+    def test_a_layer_whose_agents_read_outside_the_export_is_void(self):
+        # Codex review of #145 at 68e74f2c: Read, Glob and Grep have no path limit; the transcripts show each read.
+        self.write_transcript("l1", [str(self.work / "codex" / "foundation__l1.json")])
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        claude = self.work / "claude"
+        self.assertFalse((claude / "foundation__l1.json").exists())
+        self.assertTrue((claude / "foundation__l1.json.audit-flagged").exists())
+        failures = json.loads((claude / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertIn("transcript audit flagged", next(f["reason"] for f in failures if f["layer_id"] == "l1"))
+
+    def test_missing_transcripts_are_refused(self):
+        self.transcripts = self.tmp / "no-transcripts"
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 2)
+        self.assertIn("no agent transcripts", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
     def test_written_return_carries_family_and_vendored_provenance(self):
         self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
@@ -232,7 +263,7 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()) as err:
             code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
                                      "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
-                                 "--agent-file",
+                                     "--transcripts", str(self.transcripts), "--agent-file",
                                      str(self.result.parent / "missing.md")])
         self.assertEqual(code, 2)
         self.assertIn("not found", err.getvalue())
@@ -292,7 +323,7 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()) as err:
             code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
                                      "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
-                                 "--agent-file", str(edited)])
+                                     "--transcripts", str(self.transcripts), "--agent-file", str(edited)])
         self.assertEqual(code, 2)
         self.assertIn("is not the vendored", err.getvalue())
         self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())

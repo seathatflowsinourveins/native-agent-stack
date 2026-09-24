@@ -57,6 +57,7 @@ for _path in (HERE, REPO_ROOT):
         sys.path.insert(0, str(_path))
 
 import codex_lane  # noqa: E402
+import transcript_audit  # noqa: E402
 from build_manifest import sanitize_value  # noqa: E402  (the sealed form record_verdicts.sealed_text writes)
 from scripts.landscape import (  # noqa: E402
     FAMILY_MODEL_PATTERNS, LANE_FAMILIES, judge_adjudication, lane_winner_components, model_family_issue,
@@ -727,6 +728,12 @@ def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None, entr
         issue = codex_events_issue(data, entry)
         if issue:
             return issue
+    if family == "anthropic":
+        # A Claude judgment counts only with a clean, bound audit of its agents' transcripts (Codex review of #145 at
+        # 68e74f2c): Read, Glob and Grep have no path limit, so the blind rule is checked in what they opened.
+        issue = claude_transcripts_issue(data, entry)
+        if issue:
+            return issue
     if valid_judge(data.get("judge")) is None:
         return data.get("failure") or "no valid judge object"
     if valid_refuter(data.get("refuter")) is None:
@@ -1088,6 +1095,35 @@ _LEAKS_LOCK = threading.Lock()
 TREE_CHANGED = "the evidence tree or adjudication code changed during the run; rerun on a fixed export"
 AUDIT_FLAGGED = "the blind audit flagged this judgment's calls (web, MCP or a read outside its input, packet and repository)"
 ROLE_CHANGED = "the blind-adjudicator definition the workflow loads changed after claude-args; rerun claude-args"
+TRANSCRIPT_AUDIT_NAME = "transcript-audit.json"
+# The labelled line adjudication-prompt.md gives each agent; it maps an agent's transcript to its input.
+INPUT_MARKER = "Input file: "
+
+
+def claude_audit_items(index: dict, repo, keys) -> dict:
+    """transcript_audit items for the Claude judgments ``keys`` ("<name>.<order>"): each agent's prompt names its
+    input's "Input file:" line, and it may read only that input, its layer's packet and the repository."""
+    packets = packet_paths(index)
+    return {f"{name}.{order}": {"marker": f"{INPUT_MARKER}{input_path}",
+                                "roots": [str(repo), str(input_path), str(packets.get(name, ""))]}
+            for name, order, input_path, _sha in pending_items(index) if f"{name}.{order}" in keys}
+
+
+def claude_transcripts_issue(data: dict, entry=None):
+    """None when a counted Claude judgment's recorded transcript audit holds (Codex review of #145 at 68e74f2c): it
+    was clean, the transcripts are unchanged, and re-auditing them for this judgment's input still finds nothing."""
+    recorded = data.get("transcripts") if isinstance(data.get("transcripts"), dict) else {}
+    if data.get("audit_clean") is not True or not isinstance(recorded.get("dir"), str):
+        return data.get("failure") or "no clean transcript audit recorded for this judgment"
+    if transcript_audit.transcripts_sha256(recorded["dir"]) != recorded.get("sha256"):
+        return "the audited agent transcripts changed or are missing"
+    roots = [str(data.get("repo")), str(data.get("input_path"))]
+    if entry is not None and entry.get("packet_path"):
+        roots.append(str(entry["packet_path"]))
+    key = f"{data.get('layer')}.{data.get('order')}"
+    report = transcript_audit.audit(recorded["dir"], {key: {"marker": f"{INPUT_MARKER}{data.get('input_path')}",
+                                                             "roots": roots}}, marker_prefix=INPUT_MARKER)
+    return AUDIT_FLAGGED if key in report["flagged_items"] else None
 LEAK_TEXT_LIMIT = 400
 
 
@@ -1215,6 +1251,8 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     # The input content each item is judged on and the provenance it runs under; claude-collect binds every
     # judgment to this snapshot through the snapshot_id the workflow echoes back.
     snapshot = {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
+                # The exact item list the workflow gets, each once (Codex review of #145 at 68e74f2c).
+                "items": [f"{item['name']}.{item['order']}" for item in items],
                 "provenance": adjudication_provenance(prompt_path, repo),
                 # claude-collect recomputes the provenance from these to catch a tree changed during the run.
                 "prompt_path": str(Path(prompt_path).resolve()), "repo": str(repo),
@@ -1240,8 +1278,9 @@ def packets_changed(items) -> list:
     return changed
 
 
-def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> list:
-    """Write the Claude family's judgment files from the workflow return; returns the missing (stem, reason)."""
+def collect_claude(work_dir: Path, result, model: str, repo_override=None, transcripts=None) -> list:
+    """Write the Claude family's judgment files from the workflow return; returns the missing (stem, reason).
+    ``transcripts`` is the workflow run's agent transcript directory, which transcript_audit checks per item."""
     work_dir = Path(work_dir).resolve()
     if not (isinstance(model, str) and FAMILY_MODEL_PATTERNS["anthropic"].fullmatch(model)):
         raise ValueError(f"--model {model!r} does not match the anthropic pattern "
@@ -1251,6 +1290,11 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     returned = {}
     for item in (result.get("items") if isinstance(result, dict) else None) or []:
         if isinstance(item, dict) and item.get("order") in ORDERS and isinstance(item.get("name"), str):
+            if (item["name"], item["order"]) in returned:
+                # One judge and refuter chain per item (Codex review of #145 at 68e74f2c): a duplicate would let an
+                # edited args or result pick one of several stochastic judgments.
+                raise ValueError(f"adjudicate: the workflow result returns {item['name']}.{item['order']} more than "
+                                 "once; rerun the workflow with the current claude-args output")
             returned[(item["name"], item["order"])] = item
     missing, leaks = [], []
     index = load_index(work_dir)
@@ -1282,6 +1326,15 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
             raise ValueError(f"adjudicate: {label} {str(value)!r} is not the claude-args repository {repo!r}")
     snapshot = snapshot_doc.get("inputs") or {}
     snapshot_provenance = snapshot_doc.get("provenance")
+    items_given = snapshot_doc.get("items")
+    if not (isinstance(items_given, list) and len(items_given) == len(set(items_given)) == len(snapshot)
+            and set(items_given) == set(snapshot)):
+        raise ValueError("adjudicate: the claude-args snapshot does not list each snapshotted input once; rerun "
+                         "claude-args and the workflow")
+    extra = sorted(f"{name}.{order}" for name, order in returned if f"{name}.{order}" not in snapshot)
+    if extra:
+        raise ValueError(f"adjudicate: the workflow result returns items claude-args did not give it: {extra}; rerun "
+                         "the workflow with the current claude-args output")
     # What the workflow actually consumed (Codex review of #145): the prompt it echoes must hash to the snapshot's
     # prompt_sha256 and its repo must be the snapshot's; each item's echoed paths are checked below.
     consumed_prompt = result.get("prompt") if isinstance(result, dict) else None
@@ -1301,6 +1354,13 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
     roles = snapshot_doc.get("roles")
     roles_changed = not (isinstance(roles, dict) and roles and all(
         Path(path).is_file() and sha256_file(Path(path)) == digest for path, digest in roles.items()))
+    if transcripts is None or not transcript_audit.transcript_files(transcripts):
+        raise ValueError("--transcripts must name the workflow run's agent transcript directory (~/.claude/projects/"
+                         "<export slug>/<session>/subagents/workflows/<run id>): every Claude judgment is audited on "
+                         "what its agents read")
+    transcripts = str(Path(transcripts).resolve())
+    transcript_report = transcript_audit.audit(transcripts, claude_audit_items(index, repo, snapshot))
+    write_json(work_dir / JUDGMENTS_DIR / "claude" / TRANSCRIPT_AUDIT_NAME, {"dir": transcripts, **transcript_report})
     for name, order, input_path, packet_sha256 in pending_items(index):
         if f"{name}.{order}" not in snapshot:
             # Only the items claude-args gave this workflow run are collected; other layers' judgment files
@@ -1323,6 +1383,7 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
             missing.append((f"{name}.{order}", LEAK))
             continue
         judge, refuter = valid_judge(item.get("judge")), valid_refuter(item.get("refuter"))
+        audit_flagged = f"{name}.{order}" in transcript_report["flagged_items"]
         leak = item.get("leak") if isinstance(item.get("leak"), dict) else None
         if leak is None:
             for stage in ("judge", "refuter"):
@@ -1332,7 +1393,8 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
         if leak is not None:
             leak = {"stage": leak.get("stage"), "text": redact_leak_text(leak.get("text"))}
             judge, refuter = None, None
-            if not (input_changed or packet_changed or tree_changed or roles_changed or consumed_other):
+            if not (input_changed or packet_changed or tree_changed or roles_changed or consumed_other
+                    or audit_flagged):
                 # A leak from a run whose bindings no longer hold (a rebuilt input, a changed packet, tree or
                 # role, or other consumed arguments) is discarded, so it cannot mark a valid input as leaked
                 # (Codex review of #145).
@@ -1365,9 +1427,14 @@ def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> li
             failure, judge, refuter, leak = TREE_CHANGED, None, None, None
         elif roles_changed:
             failure, judge, refuter, leak = ROLE_CHANGED, None, None, None
-        write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
+        elif audit_flagged:
+            failure, judge, refuter, leak = AUDIT_FLAGGED, None, None, None
+        record = judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
-            leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance))
+            leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance)
+        record["audit_clean"] = not audit_flagged
+        record["transcripts"] = {"dir": transcripts, "sha256": transcript_report["transcripts_sha256"]}
+        write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", record)
         if failure:
             missing.append((f"{name}.{order}", failure))
     record_leaks(work_dir / JUDGMENTS_DIR / "claude" / LEAKS_NAME, index, leaks)
@@ -1656,6 +1723,9 @@ def parse_args(argv=None):
     collect.add_argument("--result", required=True, type=Path)
     collect.add_argument("--model", required=True, help="The resolved child model, e.g. claude-opus-5-5.")
     collect.add_argument("--repo", default=None, type=Path, help="The repo the workflow judged (relativizes refs).")
+    collect.add_argument("--transcripts", required=True, type=Path,
+                         help="The workflow run's agent transcript directory (~/.claude/projects/<export slug>/<session>"
+                              "/subagents/workflows/<run id>); every judgment is audited on what its agents read.")
     assemble_parser = sub.add_parser("assemble", help="Build and validate one adjudication record per layer.")
     assemble_parser.add_argument("--work-dir", required=True, type=Path)
     assemble_parser.add_argument("--out", required=True, type=Path)
@@ -1729,7 +1799,7 @@ def main(argv=None) -> int:
     if args.command == "claude-collect":
         try:
             missing = collect_claude(args.work_dir, load_json(args.result), args.model,
-                                     str(args.repo.resolve()) if args.repo else None)
+                                     str(args.repo.resolve()) if args.repo else None, args.transcripts)
         except ValueError as error:
             print(f"adjudicate: {error}", file=sys.stderr)
             return 2

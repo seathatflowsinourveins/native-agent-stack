@@ -1392,6 +1392,13 @@ def main(argv=None) -> int:
             exposure_text = retained_exposure.read_text(encoding="utf-8")
         elif write_mode and args.lane_repo_root and packet_keys is not None:
             exposure_text = prose_exposure_text(root, work_dir, args.lane_repo_root[0], packet_keys)
+        elif write_mode and args.lane_repo_root:
+            pass  # without --packet-keys the sealed packets are refused below, with that reason
+        else:
+            # Every new wave discloses it (Codex review of #145 at 68e74f2c): a wave written without it could never
+            # gain it, since a later --check reads only what the first --write sealed.
+            raise SystemExit(f"a new wave records its prose exposure: --write needs --lane-repo-root (the export the "
+                             f"lanes read) and --packet-keys, and --check needs the wave's {PROSE_EXPOSURE_NAME}")
     exposure_doc = json.loads(exposure_text) if exposure_text is not None else None
 
     rejections: list = []

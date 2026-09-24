@@ -148,12 +148,13 @@ def containers(node, path="$"):
 
 
 def ledger_winners(root: Path) -> dict:
-    """layer -> [(repository slug, normalized component id)] of the ledger's recorded winners."""
+    """layer -> [(repository slug, normalized component id, exact component id)] of the ledger's recorded winners."""
     winners = {}
     for catalog, relative in LEDGERS.items():
         for row in json.loads((Path(root) / relative).read_text(encoding="utf-8")).get("layers") or []:
-            winners[f"{catalog}::{row['layer_id']}"] = [(slug(w.get("repository")), norm(w.get("component_id") or ""))
-                                                       for w in row.get("winners") or []]
+            winners[f"{catalog}::{row['layer_id']}"] = [
+                (slug(w.get("repository")), norm(w.get("component_id") or ""), w.get("component_id") or "")
+                for w in row.get("winners") or []]
     return winners
 
 
@@ -174,8 +175,14 @@ def load_packets(packets_dir: Path, packet_keys: dict = None) -> dict:
 def winner_keys(adopted: list, winners: list) -> set:
     """The keys of the adopted candidates that are the recorded winners (by slug, disambiguated by id)."""
     keys = set()
-    for winner_slug, winner_id in winners:
+    for winner in winners:
+        winner_slug, winner_id = winner[0], winner[1]
+        exact = winner[2] if len(winner) > 2 else ""
         found = [c for c in adopted if winner_slug and slug(c.get("repository")) == winner_slug]
+        if len(found) > 1 and exact:
+            # The exact component id first: normalizing strips data-/foundation-, so alpaca-py and data-alpaca-py
+            # (one repository) would both match (Codex review of #145 at 68e74f2c).
+            found = [c for c in found if c.get("component_id") == exact] or found
         if len(found) > 1:
             found = [c for c in found if winner_id in candidate_ids(c)] or found
         if not found:

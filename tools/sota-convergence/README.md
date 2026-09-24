@@ -1387,9 +1387,16 @@ What remains and how it is handled:
   lower bound: it reads only the command text. Known gaps include a path a program computes (a
   `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
   reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
-- **Claude lane:** it has no equivalent audit in these tools. Its agents run Read, Glob and Grep only, but
-  those have no path limit. A wave's coordinator audits the file paths in the lane's agent transcripts and
-  discloses the result.
+- **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
+  limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
+  keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py
+  locate` finds the one run of a session). Each agent is mapped to the item its prompt names: a lane packet's path,
+  or an adjudication input's "Input file:" line. Its reads must stay under the export and that item's packet (and
+  input), and it may use no other tool. `claude_lane.py --transcripts` voids a flagged layer (kept as
+  `.audit-flagged`, recorded as failed). `adjudicate.py claude-collect --transcripts` voids a flagged judgment,
+  and records the transcripts' digest with `audit_clean`; `usable_judgment` re-audits them, so an edited record
+  does not count. An item no agent served, or a flagged agent that names no item, flags every item. Like the Codex
+  audit, this is a lower bound: it sees the paths the tool calls name.
 
 `--prompt` and `--schema` override the default `lane-prompt.md` /
 `lane-return.schema.json` paths (both otherwise resolved next to
@@ -1707,6 +1714,16 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Codex review at 68e74f2c:**
+  - **Claude read boundary (P1).** A Claude judge or lane agent could open the sibling lane returns next to its
+    input. Both Claude-family surfaces are now audited on their agents' transcripts (see "Claude family" above).
+  - **Duplicated Claude items (P1).** The claude-args snapshot binds its exact item list, and `claude-collect`
+    refuses a result that returns an item twice or one the snapshot does not hold.
+  - **Prose exposure for every new wave (P1).** `record_verdicts.py` refuses a new wave's `--write` without
+    `--lane-repo-root` (and a `--check` without the sealed document), and `landscape.py` requires every new wave's
+    run manifest to bind `prose_exposure_sha256`.
+  - **Exact component ids (P2).** `export_isolation_check` matches a winner by its exact component id before the
+    normalized one, so `alpaca-py` no longer also selects `data-alpaca-py` on the same repository.
 - **Independent round-7 review of a4dfd99e (blindness, operability, regressions and isolation-integrity lenses),
   under the reviewer's convergence plan: no new detection features; fix the confirmed mediums with real-data tests;
   make the disclosure the resolution; take the lows where the code was open:**

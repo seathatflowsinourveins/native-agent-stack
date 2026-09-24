@@ -732,6 +732,9 @@ def verify_sealed_waves(root, wave_refs):
         require(isinstance(keys_packets, dict) and set(keys_packets) == set(retained_sha),
                 f"wave {wave}: {PACKET_KEYS_NAME} must seal exactly the retained packets")
         referenced.add(PACKET_KEYS_NAME)
+        # Every new wave seals its prose exposure (Codex review of #145 at 68e74f2c).
+        require(manifest.get("prose_exposure_sha256") is not None,
+                f"wave {wave}: a new wave's run manifest must bind its {PROSE_EXPOSURE_NAME} (prose_exposure_sha256)")
         if manifest.get("prose_exposure_sha256") is not None:
             exposure_file = folder / PROSE_EXPOSURE_NAME
             require(exposure_file.is_file() and hashlib.sha256(exposure_file.read_bytes()).hexdigest()

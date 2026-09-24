@@ -133,15 +133,18 @@ install -D -m 0644 adoption/agents/claude/blind-adjudicator.md ~/.claude/agents/
 #    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
 python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --agent-file ~/.claude/agents/blind-lane-reviewer.md --agentlab-root "$AL" > "$WORK_DIR/claude-args.json"
-(cd "$BLIND_DIR/export" && claude -p --settings '{"disableAllHooks": true}' "Use a workflow. Run the saved \
-workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the JSON \
-object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
-$WORK_DIR/claude-workflow-output.json.")
+(cd "$BLIND_DIR/export" && claude -p --settings '{"disableAllHooks": true}' --output-format json "Use a workflow. \
+Run the saved workflow at scriptPath $AL/.claude/workflows/layer-verdict-lane.js with the Workflow tool, passing the \
+JSON object in $WORK_DIR/claude-args.json exactly as args, then copy its task output file byte for byte to \
+$WORK_DIR/claude-workflow-output.json." > "$WORK_DIR/claude-session.json")
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("result", d), open(sys.argv[2], "w"))' \
   "$WORK_DIR/claude-workflow-output.json" "$WORK_DIR/claude-result.json"
+#    Each layer's return is audited on what its agents opened (the run's transcripts; a read outside the export and
+#    its packet voids the layer).
 python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.json" --work-dir "$WORK_DIR" \
   --agentlab-root "$AL" --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo "$BLIND_DIR/export" \
-  --resolved-model claude-opus-5-5
+  --transcripts "$(python3 tools/sota-convergence/transcript_audit.py locate --cwd "$BLIND_DIR/export" \
+    --session-json "$WORK_DIR/claude-session.json")" --resolved-model claude-opus-5-5
 #    The resolved child model, read from the session the lane ran in:
 #    (cd "$BLIND_DIR/export" && node "$AL/.claude/workflows/child-usage.mjs" --latest)
 
@@ -161,10 +164,13 @@ python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --run-dir "$BLIND_DIR/export" > "$WORK_DIR/adjudication-claude-args.json"
 #    Run $CATALOG/tools/sota-convergence/adjudication-lane.js (the export has no tools/) headless from the
-#    export root as in step 3, with adjudication-claude-args.json as args, and write the workflow's result to
-#    adjudication-claude-result.json.
+#    export root as in step 3 (its --output-format json to adjudication-session.json), with
+#    adjudication-claude-args.json as args, and write the workflow's result to adjudication-claude-result.json.
+#    claude-collect audits each judgment on what its agents opened, from that run's transcripts.
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir "$WORK_DIR" \
-  --result "$WORK_DIR/adjudication-claude-result.json" --model claude-opus-5-5
+  --result "$WORK_DIR/adjudication-claude-result.json" --model claude-opus-5-5 \
+  --transcripts "$(python3 tools/sota-convergence/transcript_audit.py locate --cwd "$BLIND_DIR/export" \
+    --session-json "$WORK_DIR/adjudication-session.json")"
 python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --out "$WORK_DIR/adjudications"
 
 # 6. Record: validate every lane file (a rejected file is reported and treated as absent, never aborts the

@@ -353,6 +353,9 @@ class RecordVerdictsFixture(unittest.TestCase):
         keys_path = self.work_dir / "sealed-keys" / "packet-keys.json"
         if "--packet-keys" not in extra and keys_path.is_file():
             args += ["--packet-keys", str(keys_path)]
+        if not lane_roots and getattr(self, "fixture_export", None) is not None \
+                and (run_id or record_verdicts.VERDICT_DATE) != record_verdicts.VERDICT_DATE:
+            lane_roots = (str(self.fixture_export),)
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
         args.append("--write" if write else "--check")
@@ -1461,7 +1464,17 @@ def prepare_new_wave_root(fixture):
     """The root files a new wave reads: the vendored workflow SHA256SUMS its Claude provenance
     must match, the codex lane code and lane-provenance.json registry its provenance must name, and
     the evidence manifest registering evidence/receipt.json in files[] (the only kind of evidence
-    scripts/platform_status.py counts; receipt.json and docs/guide.md stay unregistered there)."""
+    scripts/platform_status.py counts; receipt.json and docs/guide.md stay unregistered there).
+
+    Every new wave records its prose exposure over the export its lanes read (Codex review of #145 at 68e74f2c):
+    new-wave runs get a fixture export whose tree is the one the fixture lanes name."""
+    scratch = Path(tempfile.mkdtemp()).resolve()
+    fixture.addCleanup(shutil.rmtree, scratch)
+    fixture.fixture_export = scratch / "hosts" / "blind" / "export"
+    fixture.fixture_export.mkdir(parents=True)
+    tree = mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256)
+    tree.start()
+    fixture.addCleanup(tree.stop)
     sums = fixture.root / "examples/claude-native/workflows/SHA256SUMS"
     sums.parent.mkdir(parents=True, exist_ok=True)
     sums.write_text(f"{WORKFLOW_SHA256}  layer-verdict-lane.js\n", encoding="utf-8")
@@ -1619,6 +1632,18 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         (self.root / relative).write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
         with self.assertRaisesRegex(Exception, "prose_exposed"):
             build_landscape(self.root)
+
+    def test_a_new_wave_without_its_exposure_inputs_is_refused(self):
+        # Codex review of #145 at 68e74f2c: without --lane-repo-root a new wave sealed no prose exposure at all.
+        self.both_lanes("wave-same-layer")
+        args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22",
+                "--run-id", NEW_RUN, "--write"]
+        keys = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if keys.is_file():
+            args += ["--packet-keys", str(keys)]
+        with self.assertRaisesRegex(SystemExit, "records its prose exposure"):
+            record_verdicts.main(args)
+        self.assertFalse(self.sealed_base().exists())
 
     def test_a_lane_without_model_family_is_rejected(self):
         model = {"name": "claude-opus-5-5", "effort": "high"}
@@ -1838,7 +1863,8 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.both_lanes("wave-same-layer")
         with self.assertRaisesRegex(SystemExit, "contains \\.\\."):
             self.run_wave(lane_roots=(str(other / ".." / "other"),))
-        code, output = self.run_wave(lane_roots=(str(other),))
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value="8" * 64):
+            code, output = self.run_wave(lane_roots=(str(other),))
         self.assertEqual(code, 1)
         self.assertIn("does not hold the evidence tree", output)
 

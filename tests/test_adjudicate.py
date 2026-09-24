@@ -94,6 +94,16 @@ class AdjudicateFixture(unittest.TestCase):
         prefixes = mock.patch.object(adjudicate.codex_lane, "CHILD_ENV_EXTRA_PREFIXES", ("CODEX_FAKE_",))
         prefixes.start()
         self.addCleanup(prefixes.stop)
+        # claude-collect audits the workflow's agent transcripts (Codex review of #145 at 68e74f2c); a test that does
+        # not pass its own gets clean transcripts for the inputs claude-args gave the workflow.
+        real_collect = adjudicate.collect_claude
+        def collect(work_dir, result, model, repo_override=None, transcripts=None):
+            return real_collect(work_dir, result, model, repo_override,
+                                transcripts if transcripts is not None else self.clean_transcripts())
+        collect_patch = mock.patch.object(adjudicate, "collect_claude", collect)
+        collect_patch.start()
+        self.addCleanup(collect_patch.stop)
+        self.real_collect_claude = real_collect
         self.work = self.base / "work"
         # blind-adjudicator refuses a repository root with fewer than four path components.
         self.repo = self.base / "hosts" / "blind" / "repo"
@@ -137,6 +147,12 @@ class AdjudicateFixture(unittest.TestCase):
             {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []},
             input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None,
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
+        if lane == "claude":
+            # claude-collect records a clean, bound audit of the agents' transcripts (Codex review of #145 at 68e74f2c).
+            directory = self.write_transcripts({f"{NAME}.{order}": input_path})
+            record["audit_clean"] = True
+            record["transcripts"] = {"dir": str(directory),
+                                     "sha256": adjudicate.transcript_audit.transcripts_sha256(directory)}
         if lane == "codex":
             record["audit_clean"] = True  # the Codex runner records its calls' clean blind audit
             # ... and the events files it audited, by digest (independent review of #145, BIND-R4-6).
@@ -148,6 +164,30 @@ class AdjudicateFixture(unittest.TestCase):
                 path.write_text("", encoding="utf-8")
                 record["events"][stage] = {"path": str(path), "sha256": adjudicate.sha256_file(path)}
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
+
+    def write_transcripts(self, inputs: dict, extra_reads=()) -> Path:
+        """A workflow run's agent transcripts: one judge agent per input ("<name>.<order>" -> input path) whose
+        prompt names its Input file line and which reads that input, plus ``extra_reads``."""
+        directory = Path(tempfile.mkdtemp(dir=self.base))
+        for index, (key, input_path) in enumerate(sorted(inputs.items())):
+            calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": str(input_path)}},
+                     *({"type": "tool_use", "name": "Read", "input": {"file_path": str(path)}} for path in extra_reads),
+                     {"type": "tool_use", "name": "StructuredOutput", "input": {}}]
+            lines = [{"type": "user", "cwd": str(self.repo), "message": {"role": "user", "content":
+                      f"Input file: {input_path}\nPacket file: x\nRepository root: {self.repo}"}},
+                     {"type": "assistant", "cwd": str(self.repo), "message": {"role": "assistant", "content": calls}}]
+            (directory / f"agent-{index:04d}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
+                                                                 encoding="utf-8")
+        return directory
+
+    def clean_transcripts(self) -> Path:
+        """Clean transcripts for every input the current claude-args snapshot gave the workflow."""
+        path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
+        snapshot = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        index = adjudicate.load_index(self.work)
+        inputs = {f"{name}.{order}": input_path for name, order, input_path, _sha in adjudicate.pending_items(index)
+                  if f"{name}.{order}" in (snapshot.get("inputs") or {})}
+        return self.write_transcripts(inputs)
 
     def input_body(self, order="AB"):
         """The input with the Claude return as A, whichever position the index's secret map gave it (F3)."""
@@ -412,7 +452,8 @@ class AssembleTests(AdjudicateFixture):
         result_path = self.base / "result.json"
         result_path.write_text(json.dumps(self.as_workflow(result)), encoding="utf-8")
         code, err = quiet(adjudicate.main, ["claude-collect", "--work-dir", str(self.work), "--result",
-                                            str(result_path), "--model", "claude-opus-5-5"])
+                                            str(result_path), "--model", "claude-opus-5-5",
+                                            "--transcripts", str(self.clean_transcripts())])
         self.assertEqual(code, 1)
         self.assertIn("BA: missing", err)
         for order in adjudicate.ORDERS:
@@ -422,7 +463,8 @@ class AssembleTests(AdjudicateFixture):
         self.assertEqual(record["missing_families"], ["anthropic"])
         self.assert_valid(record)
         code, err = quiet(adjudicate.main, ["claude-collect", "--work-dir", str(self.work), "--result",
-                                            str(result_path), "--model", "unknown"])
+                                            str(result_path), "--model", "unknown",
+                                            "--transcripts", str(self.clean_transcripts())])
         self.assertEqual(code, 2)
 
 
@@ -643,6 +685,54 @@ class LeakTests(AdjudicateFixture):
                 item.update(judge=None, refuter=None, leak={"stage": "judge", "text": "gpt-6"})
             items.append(item)
         return {"snapshot_id": self.snapshot_id(), "items": items}
+
+    def test_claude_judgments_are_audited_on_their_agents_transcripts(self):
+        # Codex review of #145 at 68e74f2c: a Claude judge can Read the sibling lane returns; its transcript shows it.
+        adjudicate.claude_args(self.work, self.repo)
+        inputs = {f"{NAME}.{order}": str(self.work / "adjudication-inputs" / f"{NAME}.{order}.json")
+                  for order in adjudicate.ORDERS}
+        with self.assertRaisesRegex(ValueError, "--transcripts"):
+            self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5")
+        sibling = self.work / "claude" / f"{NAME}.json"
+        flagged = self.write_transcripts(inputs, extra_reads=[sibling])
+        missing = self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5",
+                                           transcripts=flagged)
+        self.assertEqual(sorted(reason for _stem, reason in missing), [adjudicate.AUDIT_FLAGGED] * 2)
+        record = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual((record["audit_clean"], record["judge"]), (False, None))
+        # A record edited to claim a clean audit is re-audited on the recorded transcripts and still does not count.
+        record.update(audit_clean=True, failure=None, judge=self.claude_result()["items"][0]["judge"],
+                      refuter=self.claude_result()["items"][0]["refuter"])
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        self.assertEqual(adjudicate.claude_transcripts_issue(record, entry), adjudicate.AUDIT_FLAGGED)
+        # Transcripts that cover one input only, or use another tool, flag too.
+        partial = self.write_transcripts({f"{NAME}.AB": inputs[f"{NAME}.AB"]})
+        self.assertEqual(adjudicate.transcript_audit.audit(partial, adjudicate.claude_audit_items(
+            adjudicate.load_index(self.work), self.repo, inputs))["flagged_items"], [f"{NAME}.BA"])
+        clean = self.write_transcripts(inputs)
+        missing = self.real_collect_claude(self.work, self.as_workflow(self.claude_result()), "claude-opus-5-5",
+                                           transcripts=clean)
+        self.assertEqual(missing, [])
+        record = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertIsNone(adjudicate.claude_transcripts_issue(record, entry))
+        (clean / "agent-0000.jsonl").write_text("", encoding="utf-8")
+        self.assertIn("changed", adjudicate.claude_transcripts_issue(record, entry))
+
+    def test_a_duplicated_or_extra_claude_item_is_refused(self):
+        # Codex review of #145 at 68e74f2c: an edited args or result could run several chains for one item and keep
+        # one stochastic judgment.
+        adjudicate.claude_args(self.work, self.repo)
+        duplicated = self.claude_result()
+        duplicated["items"].append(dict(duplicated["items"][0]))
+        with self.assertRaisesRegex(ValueError, "more than once"):
+            adjudicate.collect_claude(self.work, self.as_workflow(duplicated), "claude-opus-5-5")
+        extra = self.claude_result()
+        extra["items"].append(dict(extra["items"][0], name="foundation__other-layer"))
+        with self.assertRaisesRegex(ValueError, "did not give it"):
+            adjudicate.collect_claude(self.work, self.as_workflow(extra), "claude-opus-5-5")
+        snapshot = json.loads((self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT)
+                              .read_text(encoding="utf-8"))
+        self.assertEqual(sorted(snapshot["items"]), [f"{NAME}.AB", f"{NAME}.BA"])
 
     def test_a_claude_leak_is_sticky_until_the_input_changes(self):
         """Round-2 review (adjudication round 3): a second claude-collect overwrote the leaked judgment with a

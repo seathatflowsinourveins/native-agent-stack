@@ -498,6 +498,11 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             digest = hashlib.sha256(json.dumps(sealed).encode("utf-8")).hexdigest()
             lanes[lane] = {"run_id": run_id, "sealed_sha256": digest}
             manifest_entry_lanes[lane] = {"outcome": "sealed", "run_id": run_id, "sealed_sha256": digest}
+        # Every new wave seals its prose exposure (Codex review of #145 at 68e74f2c); this layer is not scored.
+        exposure = {"schema_version": 1, "layers": {f"foundation::{layer_id}": {
+            "scored": False, "cited_files": [], "export_files": []}}}
+        self.write(f"{NEW_WAVE_BASE}/prose-exposure.json", exposure)
+        lanes["prose_exposed"] = None
         self.write(f"{NEW_WAVE_BASE}/run-manifest.json", {
             "schema_version": 1, "run_id": NEW_WAVE, "sealed_base": NEW_WAVE_BASE,
             "packets_sha256sums": sums, "retained_packets": [{"name": name, "sha256": packet_sha256}],
@@ -505,6 +510,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                          "lanes": manifest_lanes or manifest_entry_lanes}],
             "rejections": [],
             "packet_keys_sha256": hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest(),
+            "prose_exposure_sha256": hashlib.sha256(json.dumps(exposure).encode("utf-8")).hexdigest(),
         })
         self.bind_manifest(lanes)
         self.write(NEW_WAVE_RECEIPT, {"exit_code": 0, "scope": "A registered local fixture receipt"})
@@ -898,6 +904,15 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "macos-arm64 declares 'conditional'.*at most 'untested'"):
             self.build()
 
+    def test_a_new_wave_without_its_prose_exposure_is_rejected(self):
+        # Codex review of #145 at 68e74f2c: every new wave binds its prose exposure.
+        lanes = self.seal_new_wave()
+        self.edit_manifest(lanes, lambda manifest: manifest.pop("prose_exposure_sha256"))
+        lanes.pop("prose_exposed")
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "prose_exposure_sha256"):
+            self.build()
+
     def test_a_hand_edited_new_wave_codex_absent_row_without_run_ids_is_rejected(self):
         # Re-review finding 2, case 1: the new-wave block ran only when some lane had a run_id.
         (self.root / "decisions").mkdir()
@@ -905,7 +920,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                                                                      encoding="utf-8")
         lanes = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""},
                  "agreement": "codex_absent", "sealed_base": NEW_WAVE_BASE,
-                 "single_lane_decision": "decisions/2026-09-23-single-lane.md"}
+                 "single_lane_decision": "decisions/2026-09-23-single-lane.md", "prose_exposed": None}
         # The wave's run manifest (both lanes missing for this layer) and registry exist.
         self.seal_new_wave(manifest_lanes={"claude": {"outcome": "missing"}, "codex": {"outcome": "missing"}})
         self.bind_manifest(lanes)

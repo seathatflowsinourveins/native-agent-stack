@@ -878,6 +878,18 @@ class RealExportIsolationTests(unittest.TestCase):
                                                        "export_files": ["docs/a.md", "docs/c.md"]})
         self.assertFalse(isolation.prose_exposure(export, packets, {})["foundation::layer"]["scored"])
 
+    def test_an_exact_component_id_picks_one_of_two_candidates_of_one_repository(self):
+        # Codex review of #145 at 68e74f2c: alpaca-py and data-alpaca-py share alpacahq/alpaca-py, and normalizing
+        # both to alpaca-py made a verdict for one match both.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        adopted = [{"key": "c1", "repository": "https://github.com/alpacahq/alpaca-py", "component_id": "alpaca-py"},
+                   {"key": "c2", "repository": "https://github.com/alpacahq/alpaca-py", "component_id": "data-alpaca-py"}]
+        for exact, expected in (("alpaca-py", {"c1"}), ("data-alpaca-py", {"c2"})):
+            winner = [("github.com/alpacahq/alpaca-py", isolation.norm(exact), exact)]
+            self.assertEqual(isolation.winner_keys(adopted, winner), expected, exact)
+        # A two-element winner (no exact id) keeps the earlier behaviour.
+        self.assertEqual(isolation.winner_keys(adopted, [("github.com/alpacahq/alpaca-py", "alpaca-py")]), {"c1", "c2"})
+
     def test_the_checker_refuses_bad_input_with_exit_2(self):
         # Round 6, OPR6-5: a missing or malformed --packet-keys, or none for sealed packets, is a usage error (2),
         # never the role-label exit (1).
