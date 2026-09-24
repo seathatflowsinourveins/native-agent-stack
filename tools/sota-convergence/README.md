@@ -1413,7 +1413,14 @@ What remains and how it is handled:
   written (kept only as `<name>.json.audit-flagged`), and a resume re-audits a kept return's events, rerunning it
   when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
-  - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
+  - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
+    (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
+    blind child without the network or a CLI it cannot resolve. Measured
+    2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
+    had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
+    not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
+    two non-literal operands (`p+'/'+k`), but not `'/'+'etc/passwd'` or `''+'/'+x`. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
     `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
     after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
@@ -1425,7 +1432,32 @@ What remains and how it is handled:
   - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
     `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget;
+  - name git, sqlite3, curl or wget anywhere in the command, or any audited CLI by an absolute path outside the
+    repository and packets (`/usr/local/bin/qmd`, which is otherwise an exempt system executable token).
+  - **PATH enforcement.** A blind child's PATH resolves none of ai-memory, agentsview, mcporter, qmd, socraticode,
+    jcodemunch, serena, codex or claude:
+    - `child_env` sets PATH to the system directories (`/usr/bin:/bin:/usr/sbin:/sbin`);
+    - codex runs by the absolute path the caller's PATH resolves, and an npm `#!/usr/bin/env node` launcher runs with
+      the interpreter the caller's PATH resolves;
+    - `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves on
+      any PATH a child's command can end up with. That is measured each run after a sentinel: the login shell's
+      (Codex runs commands with `bash -lc`; /etc/profile.d adds `/snap/bin` here, and macOS path_helper adds
+      /etc/paths), the default a shell sets when a command drops PATH (`/usr/local/bin` included), and
+      `os.defpath`.
+
+    **New hosts.** A host that installs one of them where a child's PATH reaches it is refused, and the refusal
+    names each directory. For example, Intel Homebrew or npm globals put them in `/usr/local/bin`, which macOS
+    path_helper and a PATH-less shell both add. On a Mac, zsh started with an empty environment takes HOME from
+    passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
+    child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
+    elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
+    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
+    (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
+
+    So their names alone are not flagged in a blind run, since they are also candidates a lane must search for; a
+    non-blind run still flags them. Measured 2026-09-24 with a real blind child: every one of them, and node, npx
+    and uvx, was missing, while python3, git and Codex's bundled rg resolved.
   - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
     literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
     name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
@@ -1768,6 +1800,28 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **The first 2026-09-24 re-record attempt (wave 20260924 at catalog 149940af), set aside:**
+  - **The Codex lane voided 15 of 32 layers with no read outside the export.** The reasons:
+    - 15 flags named a retrieval CLI that was only a search term or a Python list item (`rg -i 'qmd|...'`,
+      `for t in ['serena', ...]`);
+    - 8 were a quoted `'/'` joining path parts (`p+'/'+k`);
+    - 2 were `Path.cwd()/ref` and `'https://'` read as absolute paths;
+    - 1 was a backtick in a quoted heredoc (REG7-3, kept).
+  - **The fix is enforcement rather than a name heuristic** (the blind audit above). A blind child's PATH resolves
+    no retrieval CLI, which a real child confirmed, and a host where one would resolve is refused. So those names are
+    no longer flagged. The root and path rules skip the Python forms.
+  - **Replayed over that run's 420 commands, 1 of the 32 layers is still flagged** (the backtick). The same replay
+    over the `test_real_reaches_still_flag` cases still flags each.
+  - **The Claude lane was killed 20 minutes in.** `claude -p` ended its background workflow 600 s after its turn
+    ended. The recipe now sets `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`.
+  - **Review of the fix (#206):** Codex and the independent review found gaps, each fixed with a test that fails without it:
+    - an npm `#!/usr/bin/env node` launcher could not start under the child's PATH;
+    - a CLI named by an absolute system path was exempt;
+    - `file:///` passed as a URL;
+    - a `'/'` joined on one side only built `/etc/passwd`;
+    - a command dropping PATH got the shell's default, with `/usr/local/bin`;
+    - profile output could reach the measured PATH.
+  - **Nothing from the attempt is recorded:** codex_lane.py's hash changed, so both lanes rerun on a new wave.
 - **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
   - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text
     before its first `*?[{`, cut at the last `/`) through the same trimming path helper, so `<export>/.. /*` listed
