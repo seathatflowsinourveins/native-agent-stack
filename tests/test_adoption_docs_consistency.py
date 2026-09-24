@@ -20,10 +20,11 @@ cover. Each test below names the drift it stops:
 - every script path those documents mention exists and is tracked at HEAD;
 - a new-host page unit (a heading section or a top-level numbered step) that mentions a path the
   pinned release lacks (scripts/release_due.py's ``due`` list) says "added after `<release_tag>`";
-- a new-host page that mentions an install input (bootstrap script or pin file) whose content
-  differs between the pinned release and HEAD says "changed after `<release_tag>`" in a unit
-  that mentions it. release_due.py reports every changed new-machine file in its ``changed``
-  list; this check requires the per-page note for the install inputs;
+- a new-host page that mentions an install input (bootstrap script, pin file, or an asset the
+  Claude profile installer copies onto the host: the agent and hook directories and the MCP
+  template) whose content differs between the pinned release and HEAD says "changed after
+  `<release_tag>`" in a unit that mentions it. release_due.py reports every changed new-machine
+  file in its ``changed`` list; this check requires the per-page note for these install inputs;
 - bootstrap.md's plugin revision check quotes the same commits as the recipes/README.md rows
   it names, and its install commands are the recipe's own commands (nothing else binds those
   copies, and a marketplace source cannot enforce a commit);
@@ -68,7 +69,10 @@ MARKER_RE = re.compile(rf"\b(added|changed) after `?({TAG})`?", re.I)
 COVERAGE_RE = re.compile(rf"^(all \d+|none of \d+|\d+ of \d+)(?: \((all \d+|none of \d+|\d+ of \d+) at `?({TAG})`?\))?$")
 HISTORICAL_TAG_RE = re.compile(rf"(?:\b(?:added|changed) after|\d+\)? at) `?{TAG}`?", re.I)
 INSTALL_INPUTS = ("adoption/bootstrap-linux.sh", "adoption/bootstrap-macos.sh",
-                  "adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
+                  "adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json",
+                  # What tools/adoption/install_claude_profile.py copies onto the host. A directory
+                  # (trailing slash) changed when its tracked files or any one file's text differ.
+                  "adoption/agents/claude/", "adoption/hooks/claude/", "adoption/mcp/claude-user.json")
 # Independent store_true flags where one silently wins, so argparse cannot reject the pair.
 EXCLUSIVE_IN_EFFECT = {"component_matrix.py": [frozenset({"--write", "--check"})]}  # write_mode = write and not check
 
@@ -105,6 +109,25 @@ def units(text: str) -> list[str]:
 def show(commit: str, path: str) -> str | None:
     result = rd.git("show", f"{commit}:{path}")
     return result.stdout if result.returncode == 0 else None
+
+
+def changed_since(commit: str, path: str) -> bool:
+    """Whether an install input differs between ``commit`` and this checkout: a file's text, or for a
+    directory (trailing slash) the set of tracked files under it or any one file's text."""
+    if not path.endswith("/"):
+        return show(commit, path) != (ROOT / path).read_text(encoding="utf-8")
+    at_release = rd.git("ls-tree", "-r", "--name-only", commit, "--", path)
+    tracked = rd.git("ls-files", "--", path)
+    names = set(tracked.stdout.splitlines())
+    if at_release.returncode != 0 or tracked.returncode != 0 or set(at_release.stdout.splitlines()) != names:
+        return True
+    return any(show(commit, name) != (ROOT / name).read_text(encoding="utf-8") for name in names)
+
+
+def mention_names(path: str) -> tuple[str, ...]:
+    """A file input is mentioned by its path or file name; a directory only by its path, never by its
+    last component alone (``claude`` would match every page)."""
+    return (path, path.rstrip("/")) if path.endswith("/") else (path, Path(path).name)
 
 
 def resolve_commit(ref: str) -> str | None:
@@ -444,7 +467,7 @@ class UnreleasedStepMarkerTests(unittest.TestCase):
     def unmarked_changes(self, text: str, changed: list[str], label: str, tag: str) -> list[str]:
         errors = []
         for path in changed:
-            names = (path, Path(path).name)
+            names = mention_names(path)
             mentioning = [unit for unit in units(text) if any(name in unit for name in names)]
             if mentioning and not any(self.marked(unit, "changed", tag) for unit in mentioning):
                 errors.append(f"{label} mentions {path}, which changed after {tag}, but no unit that "
@@ -464,8 +487,7 @@ class UnreleasedStepMarkerTests(unittest.TestCase):
 
     def test_pages_mentioning_a_changed_install_input_say_so(self):
         self.require_release()
-        changed = [path for path in INSTALL_INPUTS
-                   if show(SOURCE["release_commit"], path) != (ROOT / path).read_text(encoding="utf-8")]
+        changed = [path for path in INSTALL_INPUTS if changed_since(SOURCE["release_commit"], path)]
         errors = [error for path in self.PAGES
                   for error in self.unmarked_changes(path.read_text(encoding="utf-8"), changed, rel(path),
                                                      SOURCE["release_tag"])]
@@ -494,6 +516,24 @@ class UnreleasedStepMarkerTests(unittest.TestCase):
         disclosed = text.replace("prints the pins.", "prints the pins (changed after `v2000.01.01`).")
         self.assertEqual(self.unmarked_changes(disclosed, changed, "ok", "v2000.01.01"), [])
         self.assertEqual(self.unmarked_changes("## Other\n\nNo mention.\n", changed, "ok", "v2000.01.01"), [])
+
+    def test_a_changed_directory_input_is_matched_by_its_path_not_its_last_component(self):
+        changed = ["adoption/agents/claude/"]
+        text = ("## Profile\n\nCopies the [`adoption/agents/claude/*.md`](agents/claude/) files.\n\n"
+                "## Other\n\nClaude Code signs in natively.\n")
+        self.assertEqual(len(self.unmarked_changes(text, changed, "mutant", "v2000.01.01")), 1)
+        disclosed = text.replace(" files.", " files (changed after `v2000.01.01`).")
+        self.assertEqual(self.unmarked_changes(disclosed, changed, "ok", "v2000.01.01"), [])
+        self.assertEqual(self.unmarked_changes("## Other\n\nClaude Code signs in natively.\n", changed, "ok",
+                                               "v2000.01.01"), [])
+
+    def test_the_directory_change_check_compares_tracked_files(self):
+        baseline = SOURCE["baseline_commit"]  # predates adoption/ entirely
+        if rd.git("cat-file", "-e", f"{baseline}^{{commit}}").returncode != 0:
+            self.skipTest(f"baseline commit {baseline} is not in this clone")
+        self.assertTrue(changed_since(baseline, "adoption/agents/claude/"))
+        if rd.git("diff", "--quiet", "HEAD", "--", "adoption/hooks/claude/").returncode == 0:
+            self.assertFalse(changed_since("HEAD", "adoption/hooks/claude/"))
 
 
 class PluginRevisionCheckTests(unittest.TestCase):

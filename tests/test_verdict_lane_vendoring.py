@@ -9,6 +9,7 @@ provenance.workflow_sha256 matches that SHA256SUMS entry.
 import hashlib
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -40,6 +41,23 @@ class VendoredLaneWorkflowTests(unittest.TestCase):
     def test_the_lane_prompt_it_fills_is_the_catalog_copy(self):
         # lane-prompt.md was already in the catalog; codex_lane.py and the packets read it from there.
         self.assertTrue((ROOT / "tools" / "sota-convergence" / "lane-prompt.md").is_file())
+
+    def test_every_agent_the_vendored_lane_names_is_vendored_and_pinned_beside_it(self):
+        # Since agent-lab 915e73e every lane stage names agentType 'blind-lane-reviewer'; a host holding
+        # only this catalog needs that definition too, byte for byte the agent-lab file the pin names.
+        pin = json.loads((WORKFLOWS / "vendored-lanes.json").read_text(encoding="utf-8"))
+        entry = next(item for item in pin["files"] if item["path"] == "layer-verdict-lane.js")
+        lane = (WORKFLOWS / "layer-verdict-lane.js").read_text(encoding="utf-8")
+        named = set(re.findall(r"agentType: '([^']+)'", lane))
+        required = {Path(item["path"]).stem: item for item in entry.get("required_agents", [])}
+        self.assertTrue(named)
+        self.assertEqual(set(required), named)
+        for name, item in required.items():
+            path = (WORKFLOWS / item["path"]).resolve()
+            self.assertEqual(path, (ROOT / "examples" / "claude-native" / "agents" / f"{name}.md").resolve())
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), item["sha256"])
+            self.assertEqual(item["source_path"], f".claude/agents/{name}.md")
+            self.assertRegex(item["agentlab_commit"], r"^[a-f0-9]{40}$")
 
 
 TOOLS = ROOT / "tools" / "sota-convergence"

@@ -3,7 +3,7 @@ name: source-scout
 description: Exact extraction and inventory from named files and commands, plus running the acceptance commands a task names; makes no edits of its own and returns source-cited facts, never judgments.
 tools: Read, Grep, Glob, Bash
 model: sonnet
-effort: medium
+effort: max
 maxTurns: 40
 omitClaudeMd: true
 ---

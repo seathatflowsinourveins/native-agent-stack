@@ -3185,8 +3185,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "87101a069cd70cefcde02fa05d1fbc1ef32851dd816e75508fd16a24e25e6431",
-      "bytes": 15085
+      "sha256": "6cc9c4a175073b3b87215214ee2f478fdd7a1f25db773dbeb42351352ae1e0bc",
+      "bytes": 15061
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -9256,8 +9256,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "0bab7062a1acaa2f2292ce467966e3c6134f5be013b7021d61fbc92934a3bb39",
-      "bytes": 139189
+      "sha256": "267bfb42c795b26b35907d48c283e55ed3f7b3ea108ed8b10ae9551569e0c2d2",
+      "bytes": 139699
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -28161,28 +28161,28 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "b4f083809afa233db0cd7bcc7e94f30d921de85cbc9a7d08a9b9d061a8b5bf9f",
-      "bytes": 5055
+      "sha256": "fdb21dc1aa910ff68f2b558a02cdf98c9d836307b85dc8ecdb57aedfa3de4291",
+      "bytes": 5324
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "75067deabb854902f680e2edbd24d975d055ef64552aa2a9dd514c20cd7f58b1",
-      "bytes": 2069
+      "sha256": "8ad444fdb16049eb7481e6c703250a0de887fbb537b259da6e72ebff7f3016cc",
+      "bytes": 2068
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "48938a39d10f33a2eef490d885da379cd63a03b7e42e53e4cb3ee3b8c80e1599",
-      "bytes": 2016
+      "sha256": "ca683553bcc9fb824f8b642e77c55be3c5d77115004f6aa57144f0d326b0ca2d",
+      "bytes": 2013
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "a8896d029beed2334215e3cc0990c937b385c43d64683580627f1e0f611ad216",
-      "bytes": 1563
+      "sha256": "52cdd8b58e9900ad43ea2195e4de0a11d95aa3b8c9a2ff6e4eabd149b68e96d9",
+      "bytes": 1561
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "2d5f5d9465a535d376a0c570a5d24105a939ad6771e504c8dde358469acbbad4",
-      "bytes": 1829
+      "sha256": "035251c0168cc17d66861605f402cfc98ed76bddc5177a4fe28ef3acd35d2534",
+      "bytes": 1826
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
@@ -28221,13 +28221,13 @@
     },
     {
       "path": "examples/claude-native/workflows/readiness-audit.js",
-      "sha256": "d0d5afb3f4f8d635d0a75e48b4c4cda4a074e842130d9c80eb6633a5bfe1701a",
-      "bytes": 13143
+      "sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb",
+      "bytes": 13135
     },
     {
       "path": "examples/claude-native/workflows/review-changes.js",
-      "sha256": "581300deaa95c6a2e097ec824cc01aca21ff17f87cb497327e4ddbc1cc37d65f",
-      "bytes": 18073
+      "sha256": "bb298f9ab63a6d43173d2c4f87ab31d00dd79184e961dc84d69cbef3966bce0b",
+      "bytes": 18059
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
@@ -28241,8 +28241,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "f418a9da354cb766cbab4f779be754359797b110ac4f3c28cdcda5e319d3c0a1",
-      "bytes": 9440
+      "sha256": "2c2626d76e2113e0b86b372864001e45766d118b12fc0bf9441d937fa555069a",
+      "bytes": 15529
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
@@ -28641,8 +28641,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "fa8ff1b5d35b8af7dfc8fd5e4c4bfd4617c21bbd665d67dd283fe2e7edd28024",
-      "bytes": 21050
+      "sha256": "338d149fc422372bf8f9784b3f02cc829e60b5cb303eee003a82ef9f7f7c1458",
+      "bytes": 24666
     },
     {
       "path": "recipes/native-upgrades-20260921.md",

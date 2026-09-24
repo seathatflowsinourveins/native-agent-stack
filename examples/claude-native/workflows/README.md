@@ -3,10 +3,17 @@
 These are project-authored saved scripts and agent definitions for the upstream
 Claude Workflow runtime. The saved workflow scripts and the three roles in the
 table below preserve the deployed agent-lab files from the retained portable
-qualification. These are local integration assets, not upstream tests. The
-separate `semantic-evidence-reviewer` example received a later explicit Opus/high
-declaration and reporting instruction to satisfy the combined portable contract;
-that change has local checks and no new native provider qualification.
+qualification, with one later change: since 2026-09-23 every stage and agent
+binds effort `max`, models unchanged
+([decision](../../../docs/decisions/2026-09-23-max-effort-default.md)).
+`review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are
+byte-identical to agent-lab commit `915e73e`, which made that change there. The
+qualification ran at the earlier efforts (Sonnet/medium, Opus/high); no native
+run at `max` is recorded yet. These are local integration assets, not upstream
+tests. The separate `semantic-evidence-reviewer` example received a later
+explicit Opus declaration and reporting instruction to satisfy the combined
+portable contract; that change has local checks and no new native provider
+qualification.
 ## Byte-identity check
 
 `SHA256SUMS` in this directory (`sha256sum -- *.mjs *.js *.json`, excluding
@@ -56,15 +63,18 @@ reads the inventoried files in full and marks diff-dependent claims unverifiable
 
 | Agent | Model, effort | Tools | Use |
 | --- | --- | --- | --- |
-| `source-scout` | Sonnet, medium | Read, Grep, Glob, Bash; no project instructions loaded | exact extraction, inventories, running the acceptance commands a task names (raw through `rtk proxy` where `rtk` is installed) |
-| `evidence-reviewer` | Opus, high | Read, Glob, Grep, ToolSearch and named read-only MCP tools; no Bash, Edit or Write | independent review from source and recorded evidence |
-| `isolated-builder` | Sonnet, medium, own worktree | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP tools | a bounded implementation from a clear contract |
+| `source-scout` | Sonnet, max | Read, Grep, Glob, Bash; no project instructions loaded | exact extraction, inventories, running the acceptance commands a task names (raw through `rtk proxy` where `rtk` is installed) |
+| `evidence-reviewer` | Opus, max | Read, Glob, Grep, ToolSearch and named read-only MCP tools; no Bash, Edit or Write | independent review from source and recorded evidence |
+| `isolated-builder` | Sonnet, max, own worktree | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP tools | a bounded implementation from a clear contract |
 
 Context Mode `ctx_execute*` can run commands, so the reviewer's read-only rule
-there is an instruction, not a sandbox; the same holds for the scout's Bash. A
-fourth definition, `semantic-evidence-reviewer` (Opus, high; Read, Glob, Grep; the
-`typesafe-ai` skill), is project-local to agent-lab and published separately; the
-contract suite covers every file in `agents/`.
+there is an instruction, not a sandbox; the same holds for the scout's Bash. Two
+more definitions ship here. `semantic-evidence-reviewer` (Opus, max; Read, Glob,
+Grep; the `typesafe-ai` skill) is project-local to agent-lab and published
+separately. `blind-lane-reviewer` (Opus, max; Read, Glob and Grep; no preloaded
+skill and no project instructions) is the agent every `layer-verdict-lane` stage
+names, vendored byte-identical from agent-lab commit `915e73e` and pinned in
+`vendored-lanes.json`. The contract suite covers every file in `agents/`.
 
 ## Workflows
 
@@ -118,7 +128,7 @@ lifecycle for a read-only cross-family review (lane C in the cooperation recipe)
 From this directory:
 
 ```sh
-node check-syntax.mjs review-changes.js readiness-audit.js
+node check-syntax.mjs review-changes.js readiness-audit.js layer-verdict-lane.js
 node test-envelope.mjs            # envelope semantics plus the static contract below
 node test-contract-mutations.mjs  # each listed defect must fail the suite on its named assertion
 node test-child-usage.mjs         # child-usage.mjs against synthetic transcript rows
@@ -132,10 +142,15 @@ binds the shipped receipts (run ids, figures, the builder commit) to this
 documentation; an adopting project keeps those receipts beside its own or drops
 that one file, it is evidence rather than a generic tool. The static contract fails
 a saved workflow whose worker packet drifts from the shared text, whose stage
-omits `model` or `effort`, whose routing differs from the reviewed table, or whose
-`agent(` is written where the scanner cannot see it, and an agent definition that
-omits model or effort, grants a bare `mcp__server` prefix, grants MCP tools
-without `ToolSearch`, or can edit files without `isolation: worktree`. Measured
+omits `model` or `effort` or binds an effort other than `max`, whose `MODEL`
+record differs from the model and effort its stages bind, whose routing differs
+from the reviewed table, or whose `agent(` is written where the scanner cannot
+see it; an agent definition that omits model or effort, carries an effort other
+than one `effort: max` line, grants a bare `mcp__server` prefix, grants MCP tools
+without `ToolSearch`, or can edit files without `isolation: worktree`; a routing
+table that restates an agent's model or effort differently from its file;
+project settings that set `CLAUDE_CODE_EFFORT_LEVEL` or cap effort below `max`;
+and project instructions that do not state the `effort: 'max'` literal. Measured
 native results and remaining boundaries are in
 [the dated guide](../../../docs/ultracode-token-routing-20260921.md).
 
@@ -147,7 +162,7 @@ Applies to the coordinator and every Workflow/Agent child (project agents and `.
 - **One context lane per artifact class.** Known source identifiers: focused `rg`/Serena read. Indexed Markdown: scoped QMD BM25. Unfamiliar or conceptual code: SocratiCode. Prior decisions: ai-memory. Large command output: Context Mode. Choose one lane per artifact; do not chain compressors, and verify original source before editing or judging retrieved text.
 - **Worker packet.** Bounded objective, explicit source paths, allowed effects (no writes except what an acceptance command named in the task itself produces, unless a worktree is owned), and a small return schema with source-cited fields. No word-count instructions; no whole-repository or transcript pastes.
 - **Stable policy prefix.** Keep the shared contract text byte-identical across saved workflows (asserted by `test-envelope.mjs`) and vary only the task packet. What the provider was observed to reuse across children is the agent type's system prompt and tool definitions, per model; identical packet text alone has no measured cache effect. Reuse one agent type and model for sibling workers, and preserve deferred tool discovery and compaction. Sibling stages share one prompt-cache prefix only when model, effort, agent type, tools, output schema and working directory all match (official workflows doc, fetched 2026-09-22); keep them identical and leave `CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS` at its 5,000 ms default.
-- **Task-matched models.** Set model and effort explicitly per stage (Sonnet/medium bounded work, Opus/high review, Fable coordinator at xhigh under `ultracode`); record requested and resolved child model, and treat nulls, schema retries, stub payloads and substitutions as incomplete results. The routing table below is the default; `test-envelope.mjs` fails a saved workflow or project agent that omits model or effort.
+- **Task-matched models at effort max.** Set model and effort explicitly per stage: Sonnet for bounded extraction, inventories, acceptance commands and implementation, Opus for review and judgment, and every saved stage and project agent at effort `max` (since 2026-09-23), with the coordinator at xhigh under `ultracode`, because a `max` session turns ultracode's orchestration off. A stage with no `effort` of its own inherits the coordinator's xhigh unless its agent's frontmatter sets one, and a stage's own effort overrides the frontmatter, so every `agent()` call, ad-hoc ones included, passes `effort: 'max'`. Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every child's frontmatter and stage effort, and any value other than `xhigh` also turns ultracode's orchestration off. These effort rules were probed on Claude Code 2.1.281 on 2026-09-23 (`docs/decisions/2026-09-23-max-effort-default.md` in this catalog). Record requested and resolved child model and effort, and treat nulls, schema retries, stub payloads and substitutions as incomplete results. The routing table below is the default; `test-envelope.mjs` fails a saved workflow or project agent that omits model or effort or binds an effort other than `max`.
 - **Usage accounting.** Count each client separately: native `/usage`, `claude agents`/`/workflows` journals, `ccusage` offline reports and `ecosystem-token-report refresh`. Never sum RTK, Context Mode, jCodeMunch, Headroom and provider counters, and never state a savings percentage from a fixture. After a Workflow run, `node .claude/workflows/child-usage.mjs <Transcript dir printed by the Workflow tool>` (or `--latest`) returns each child's requested and resolved model, effort, provider-returned usage and first-prompt size, and exits 1 when a child is null, substituted or inherited the coordinator model.
 - **Cross-family review.** Explicit `/codex:review` or `/codex:adversarial-review --background` at integration points (see `recipes/claude-codex-cooperation-lanes.md`); findings are verified against source, not accepted by agreement.
 - **Opt-in and limits.** The `ultracode` keyword starts a workflow only from a prompt typed in the session; it is inert from `-p`, an unstamped SDK prompt, a scheduled task or a relayed comment, so a headless run invokes a saved workflow by name under a settings source whose permission mode or allow rule (`Workflow` or `Workflow(<name>)`) covers the tool. Scripts take no mid-run user input, no `import()` and no `Date.now()`, `Math.random()` or argless `new Date()` (pass timestamps through `args`; run a stage that needs sign-off as its own workflow); one `parallel()`/`pipeline()` call takes at most 4,096 items and a run at most 1,000 agents.
@@ -169,14 +184,18 @@ Spawning a child has a fixed prompt cost before any work. Run ids, the extractio
 
 In real runs the adopted definitions, with their full grants and bodies plus the task packet, started at 17,535 (`evidence-reviewer`, packet including the inventory) and 17,864 (`isolated-builder`). Sibling children launched together each wrote their own cache (first-request cache read 0); a repeat spawn of the same agent type about two minutes later read 34,591 of 42,091 tokens from cache. Children use the 5-minute cache class, so `subagentPromptCacheTtl` stays at its five-minute default: the one-hour class only pays for a child that idles more than five minutes between requests.
 
+Effort column since 2026-09-23: every child role runs at `max` with its task-matched model, and the coordinator stays at xhigh under `ultracode`. The prompt-size figures above predate this change.
+
 | Task class | Agent / stage | Model, effort | Lanes |
 | --- | --- | --- | --- |
-| Requirements, decomposition, integration, hard judgments | coordinator | Fable, xhigh under `ultracode` | all, one per artifact |
-| Exact extraction, inventory, running acceptance commands | `source-scout` | Sonnet, medium | `rg`/focused Read, `qmd search`, `jq` pipelines, RTK-filtered Bash with `rtk proxy` recovery; acceptance commands run raw through `rtk proxy` where `rtk` is installed. Bash is granted, so its read-only rule is an instruction, not a sandbox |
-| Implementation from a clear contract | `isolated-builder` (own worktree) | Sonnet, medium | named Serena read and symbol-edit tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred |
-| Independent review from source and recorded evidence | `evidence-reviewer` | Opus, high | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
-| Verification that must re-run commands | default workflow subagent | Opus, high | full tools; pays the 42k prompt deliberately |
-| Web or documentation research | default workflow subagent | Sonnet, medium | Context Mode `ctx_fetch_and_index` then `ctx_search` (observed: 1 fetch, 5 searches, 8 requests) |
+| Requirements, decomposition, integration, hard judgments | coordinator | Opus 5.5, xhigh under `ultracode` (a `max` session turns its orchestration off); Fable 5.1 as an explicit escalation | all, one per artifact |
+| Exact extraction, inventory, running acceptance commands | `source-scout` | Sonnet, max | `rg`/focused Read, `qmd search`, `jq` pipelines, RTK-filtered Bash with `rtk proxy` recovery; acceptance commands run raw through `rtk proxy` where `rtk` is installed. Bash is granted, so its read-only rule is an instruction, not a sandbox |
+| Implementation from a clear contract | `isolated-builder` (own worktree) | Sonnet, max | named Serena read and symbol-edit tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred |
+| Independent review from source and recorded evidence | `evidence-reviewer` | Opus, max | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
+| Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` | Opus, max | Read, Glob, Grep and the `typesafe-ai` skill preloaded (first prompt 15,059 in the 2026-09-22 probe); no MCP grants, Bash or writes |
+| Layer-verdict lane stages: propose, refute and re-check one stripped packet from its repository root | `blind-lane-reviewer` | Opus, max | Read, Glob and Grep; no preloaded skill and no project instructions (`omitClaudeMd`); used by `layer-verdict-lane` |
+| Verification that must re-run commands | default workflow subagent | Opus, max | full tools; pays the 42k prompt deliberately |
+| Web or documentation research | default workflow subagent | Sonnet, max | Context Mode `ctx_fetch_and_index` then `ctx_search` (observed: 1 fetch, 5 searches, 8 requests) |
 | Cross-family review | `/codex:review` lanes | Codex | see `recipes/claude-codex-cooperation-lanes.md`; usage is not in the Claude journal |
 
 Haiku is not routed. In the same-packet trial the Opus verifier scored the Sonnet/medium inventory 14/14 lane rows and the Haiku inventory 9/14, including a quote attributed to a file that does not contain it; Haiku also ignored the requested effort and used more requests (22 vs 17). Overturn this with a repeat trial in which Haiku returns no unanchored citation on two distinct extraction packets. RTK and ai-memory hooks were observed firing inside workflow children (`rtk hook claude` rewrote child Bash calls); Context Mode has no child hook, so its use depends on the packet and agent text. Repomix, guarded Headroom and TOON stay coordinator-side: workers read focused ranges instead of packed sources, Context Mode already owns large worker output (no chained compressors), and a Workflow script has no filesystem or CLI access to run a TOON conversion on the packets it passes.

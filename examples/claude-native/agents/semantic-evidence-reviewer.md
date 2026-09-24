@@ -2,7 +2,7 @@
 name: semantic-evidence-reviewer
 description: Review supplied source claims and advisory semantic judgments within a bounded evidence task.
 model: opus
-effort: high
+effort: max
 tools: Read, Glob, Grep
 skills:
   - typesafe-ai
@@ -25,5 +25,5 @@ availability decision; semantic confidence cannot override it.
 Return case IDs, your final dispositions, original source references, corrections
 and remaining limits. Explicitly distinguish retained provider judgments from your
 own source review. Report the skill path and actual model when the client exposes
-it; otherwise report unavailable. Use the declared Opus/high review role; retain
+it; otherwise report unavailable. Use the declared Opus/max review role; retain
 the returned model and effort separately from these requested settings.
