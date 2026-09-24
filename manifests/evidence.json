@@ -6523,8 +6523,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
-      "sha256": "7bf3ae0204913c3e01b10973cfdc3bbc034778cbde239e2137574033060502a0",
-      "bytes": 19732
+      "sha256": "abffbbd075d6e7ab439a20f2210df24dc75fe7703f354415c1f395794063c60e",
+      "bytes": 20054
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
@@ -9383,8 +9383,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "0c0a433ddd03255a6ce53f4aaef19e8577130455a0954d71f97d1918eb06cfb0",
-      "bytes": 38776
+      "sha256": "59e69640fe65040ac7a44ebbdadeaccc615128d611a9a796a2a6b8f0bb1b5b68",
+      "bytes": 40954
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9458,8 +9458,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "c340afe8d398ac36f2212b9fa99f4cd0b8f1eea0a87dc2c69ef56f535a2f2a70",
-      "bytes": 12226
+      "sha256": "f215f4bca97beee3fbce03a102957b0ac435c4b3de3238e786ec34dbf2f81ba4",
+      "bytes": 12508
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",

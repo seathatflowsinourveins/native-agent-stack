@@ -71,7 +71,12 @@ candidate". The gate note adds that "native (non-synthetic) faults were actually
 exercised ... is qualified manually before the dated commit that flips this
 gate". `docs/acceptance-evidence-policy.md` says "Parsing a wrapper's own
 `passed` field is not independent confirmation", so the qualification uses the
-independent observation below. The flip itself is a separate dated commit.
+independent observation below. The gate was flipped to `established` (evidence
+class `native_proven`, the ladder's class for paper-run gates) in a separate
+dated commit on 2026-09-24, whose note cites the receipt, the independent
+observation and the Codex review of 8051464. The engine's handling of a 422
+cancel refusal stays offline-tested only, and the C04 422 is paper-endpoint
+evidence only.
 
 ## Independent observation of 2026-09-24
 
