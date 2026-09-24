@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+from decimal import Decimal
 import unittest
 from pathlib import Path
 
@@ -21,6 +22,24 @@ def gate(**overrides):
     }
     base.update(overrides)
     return base
+
+
+def ladder_receipt(rung, config_max_leverage, threshold, *, peak, seconds, needs_attention=0):
+    """A leverage-ladder rung receipt in the schema preregistered in the gate
+    notes: the certified run's paper-output "leverage" block, whose Decimal
+    fields runner.run_native writes as strings and whose duration is a float."""
+    return {
+        "schema_version": 1, "kind": "leverage_ladder_rung_receipt", "rung": rung,
+        "needs_attention": needs_attention,
+        "leverage": {
+            "policy_version": "leverage-schedule-v1-20260922",
+            "config_max_leverage": config_max_leverage,
+            "next_lower_rung_ceiling": threshold,
+            "peak_achieved_leverage": peak,
+            "ceiling_at_peak_achieved_leverage": config_max_leverage,
+            "seconds_above_next_lower_rung_ceiling": seconds,
+        },
+    }
 
 
 def document(*gates):
@@ -146,6 +165,69 @@ class TradingGatesTests(unittest.TestCase):
         with self.assertRaises(trading_gates.GateError):
             trading_gates.validate_document({"schema_version": 1, "rungs": ["sim"], "gates": [gate()]})
 
+    def test_greater_than_compares_numbers_and_decimal_strings_exactly(self):
+        condition = {"type": "greater_than", "pointer": "/v", "than": "1"}
+        cases = (
+            ("1.01", True), (1.5, True), (2, True),
+            ("1", False), ("1.00", False), (1, False), (0.99, False), ("0.5", False),
+            # Not numbers: a boolean, a non-numeric or non-finite string, null, a list.
+            (True, False), ("high", False), ("NaN", False), ("Infinity", False), (None, False), ([2], False),
+        )
+        for value, expected in cases:
+            with self.subTest(value=value):
+                self.write("r.json", {"v": value})
+                holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+                self.assertEqual(holds, expected, detail)
+        self.write("r.json", {"other": 5})
+        holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+        self.assertFalse(holds)
+        self.assertIn("pointer absent", detail)
+
+    def test_all_of_requires_every_member(self):
+        condition = {"type": "all_of", "conditions": [
+            {"type": "equals", "pointer": "/needs_attention", "equals": 0},
+            {"type": "greater_than", "pointer": "/peak", "than": "2"},
+            {"type": "array_contains_id", "pointer": "/items", "id": "a"},
+        ]}
+        good = {"needs_attention": 0, "peak": "2.4", "items": [{"id": "a"}]}
+        self.write("r.json", good)
+        holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+        self.assertTrue(holds, detail)
+        self.assertIn("3 of 3 hold", detail)
+        result = self.run_check(document(gate(status="not_established", evidence_class="none", flip_condition=condition)))
+        self.assertEqual([c["id"] for c in result["flip_candidates"]], ["g"])
+        for broken in ({"needs_attention": 1}, {"peak": "2"}, {"items": []}, {"needs_attention": False}):
+            with self.subTest(broken=broken):
+                self.write("r.json", {**good, **broken})
+                holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+                self.assertFalse(holds)
+                self.assertIn("1 of 3 failed", detail)
+                result = self.run_check(document(gate(status="not_established", evidence_class="none", flip_condition=condition)))
+                self.assertEqual(result["flip_candidates"], [])
+                self.assertEqual(self.run_check(document(gate(flip_condition=condition)))["status"], "failed")
+
+    def test_greater_than_and_all_of_shape_errors_are_rejected(self):
+        member = {"type": "equals", "pointer": "/ok", "equals": True}
+        for bad in (
+            {"type": "greater_than", "pointer": "/v"},
+            {"type": "greater_than", "pointer": "/v", "than": True},
+            {"type": "greater_than", "pointer": "/v", "than": "many"},
+            {"type": "greater_than", "pointer": "/v", "than": "Infinity"},
+            {"type": "greater_than", "pointer": "v", "than": 1},
+            {"type": "greater_than", "pointer": "/v", "than": 1, "or_equal": True},
+            {"type": "all_of"},
+            {"type": "all_of", "conditions": []},
+            {"type": "all_of", "conditions": member},
+            {"type": "all_of", "conditions": [member], "extra": 1},
+            {"type": "all_of", "conditions": [{"type": "exists"}]},
+            {"type": "all_of", "conditions": [{"type": "all_of", "conditions": [member]}]},
+            {"type": "all_of", "conditions": [member, {"type": "equals", "pointer": "/x"}]},
+        ):
+            with self.subTest(condition=bad), self.assertRaises(trading_gates.GateError):
+                trading_gates.validate_document(document(gate(flip_condition=bad)))
+        trading_gates.validate_document(document(gate(flip_condition={"type": "all_of", "conditions": [
+            member, {"type": "greater_than", "pointer": "/v", "than": 0}]})))
+
     def test_main_exit_codes(self):
         self.write("r.json", {"ok": True})
         self.write("gates.json", document(gate()))
@@ -218,6 +300,9 @@ class GatePointerContentTests(unittest.TestCase):
             "status": "passed",
             "broker": "ibkr",
         },
+        "leverage-ladder-1x": ladder_receipt("1x", "1", "0.5", peak="0.87", seconds=412.3),
+        "leverage-ladder-2x": ladder_receipt("2x", "2", "1", peak="1.62", seconds=95.0),
+        "leverage-ladder-4x": ladder_receipt("4x", "4", "2", peak="3.1", seconds=38.4),
     }
 
     # Gate id -> a well-formed receipt payload (same shape as GOOD_RECEIPTS)
@@ -232,6 +317,11 @@ class GatePointerContentTests(unittest.TestCase):
         "databento-arm-b": {**GOOD_RECEIPTS["databento-arm-b"], "status": "not_executed"},
         "native-fault-behaviour": {**GOOD_RECEIPTS["native-fault-behaviour"], "status": "bounded_alpaca_synthetic_cases_passed_native_faults_pending"},
         "ibkr-local-acceptance": {**GOOD_RECEIPTS["ibkr-local-acceptance"], "status": "failed"},
+        # Audit gap #5: zero needs_attention alone no longer flips a rung; a
+        # trial that never exceeded the next-lower cap is well formed but fails.
+        "leverage-ladder-1x": ladder_receipt("1x", "1", "0.5", peak="0.5", seconds=0.0),
+        "leverage-ladder-2x": ladder_receipt("2x", "2", "1", peak="1", seconds=0.0),
+        "leverage-ladder-4x": ladder_receipt("4x", "4", "2", peak="2", seconds=0.0),
     }
 
     @classmethod
@@ -320,6 +410,85 @@ class GatePointerContentTests(unittest.TestCase):
             with self.subTest(gate=gate_id):
                 self.assertNotEqual(condition["type"], "exists",
                                      f"{gate_id}: non-established gate uses a presence-only 'exists' condition")
+
+
+class LeverageLadderFlipConditionTests(unittest.TestCase):
+    """Audit gap #5 (2026-09-24): the leverage-ladder-1x/2x/4x rows used to flip
+    on needs_attention == 0 alone, so a rung could be established by a trial
+    whose achieved exposure never exceeded the next-lower rung's cap. Each row
+    now also requires the rung receipt's peak_achieved_leverage and
+    seconds_above_next_lower_rung_ceiling to exceed that threshold (0.5x for
+    the 1x rung, the documented minimum exposure)."""
+
+    RUNGS = {"leverage-ladder-1x": ("1x", "1", "0.5"),
+             "leverage-ladder-2x": ("2x", "2", "1"),
+             "leverage-ladder-4x": ("4x", "4", "2")}
+
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / trading_gates.GATES
+        if not path.exists():
+            raise unittest.SkipTest("gate ladder not yet recorded in this tree")
+        cls.gates_by_id = {gate["id"]: gate for gate in trading_gates.load_json(path)["gates"]}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def holds(self, gate_id, receipt):
+        gate = {**self.gates_by_id[gate_id], "status": "not_established", "evidence_class": "none"}
+        path = self.root / gate["receipt_path"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(receipt), encoding="utf-8")
+        return trading_gates.condition_holds(self.root, gate)
+
+    def test_each_rung_requires_needs_attention_and_both_achievement_fields(self):
+        for gate_id, (_, config_max, threshold) in self.RUNGS.items():
+            with self.subTest(gate=gate_id):
+                condition = self.gates_by_id[gate_id]["flip_condition"]
+                self.assertEqual(condition["type"], "all_of")
+                members = {(c["type"], c["pointer"]): c for c in condition["conditions"]}
+                self.assertEqual(members[("equals", "/needs_attention")]["equals"], 0)
+                self.assertEqual(members[("equals", "/leverage/config_max_leverage")]["equals"], config_max)
+                self.assertEqual(members[("equals", "/leverage/next_lower_rung_ceiling")]["equals"], threshold)
+                self.assertEqual(members[("greater_than", "/leverage/peak_achieved_leverage")]["than"], threshold)
+                self.assertEqual(members[("greater_than", "/leverage/seconds_above_next_lower_rung_ceiling")]["than"], 0)
+
+    def test_trial_that_never_exceeds_the_lower_cap_does_not_satisfy_the_rung(self):
+        for gate_id, (rung, config_max, threshold) in self.RUNGS.items():
+            below = str(Decimal(threshold) * Decimal("0.8"))
+            for peak in (below, threshold):
+                with self.subTest(gate=gate_id, peak=peak):
+                    # Zero needs_attention, a clean receipt, but exposure stayed at
+                    # or under the next-lower cap for the whole trial.
+                    holds, detail = self.holds(gate_id, ladder_receipt(rung, config_max, threshold, peak=peak, seconds=0.0))
+                    self.assertFalse(holds, detail)
+
+    def test_each_achievement_field_is_required_on_its_own(self):
+        for gate_id, (rung, config_max, threshold) in self.RUNGS.items():
+            good = ladder_receipt(rung, config_max, threshold, peak=str(Decimal(threshold) + 1), seconds=12.5)
+            with self.subTest(gate=gate_id, case="good"):
+                holds, detail = self.holds(gate_id, good)
+                self.assertTrue(holds, detail)
+            broken = {
+                "needs_attention": {**good, "needs_attention": 1},
+                "peak_not_above": {**good, "leverage": {**good["leverage"], "peak_achieved_leverage": threshold}},
+                "no_time_above": {**good, "leverage": {**good["leverage"], "seconds_above_next_lower_rung_ceiling": 0.0}},
+                "peak_missing": {**good, "leverage": {k: v for k, v in good["leverage"].items() if k != "peak_achieved_leverage"}},
+                "seconds_missing": {**good, "leverage": {k: v for k, v in good["leverage"].items()
+                                                         if k != "seconds_above_next_lower_rung_ceiling"}},
+                "no_leverage_block": {k: v for k, v in good.items() if k != "leverage"},
+                "pre_gap5_1x_threshold": {**good, "leverage": {**good["leverage"], "next_lower_rung_ceiling": None}},
+                "other_rung_config": {**good, "leverage": {**good["leverage"], "config_max_leverage": "3"}},
+                "boolean_seconds": {**good, "leverage": {**good["leverage"], "seconds_above_next_lower_rung_ceiling": True}},
+            }
+            for case, receipt in broken.items():
+                with self.subTest(gate=gate_id, case=case):
+                    holds, detail = self.holds(gate_id, receipt)
+                    self.assertFalse(holds, detail)
 
 
 if __name__ == "__main__":

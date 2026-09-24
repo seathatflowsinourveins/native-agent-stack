@@ -1803,9 +1803,10 @@ class AchievedLeverageReceiptStepTests(unittest.TestCase):
         self.assertEqual(state["seconds_above_next_lower_rung_ceiling"], 0.0)
 
     def test_no_next_lower_ceiling_never_accumulates(self):
-        """The 1x rung: leverage.next_lower_rung_ceiling(1) is None, so no
-        amount of dt/achieved leverage at this rung ever accumulates --
-        there is no lower rung to have shown 1x exceeded."""
+        """A None threshold (leverage.next_lower_rung_ceiling for a value
+        below the lowest rung; since audit gap #5 the 1x rung itself is
+        compared against leverage.ONE_X_MINIMUM_EXPOSURE, 0.5) never
+        accumulates, whatever dt/achieved leverage is observed."""
         state = self._initial()
         for _ in range(5):
             state = runner_module._leverage_achievement_step(
@@ -1838,6 +1839,83 @@ class AchievedLeverageReceiptStepTests(unittest.TestCase):
                 state, dt_seconds=bad_dt, achieved_leverage=Decimal("3"),
                 ceiling=Decimal("4"), next_lower_ceiling=Decimal("2"))
             self.assertEqual(state["seconds_above_next_lower_rung_ceiling"], before)
+
+
+class AchievedLeverageGateTraceTests(unittest.TestCase):
+    """Audit gap #5 (2026-09-24): per-tick achieved-leverage traces folded
+    through runner._leverage_achievement_step with each rung's
+    leverage.next_lower_rung_ceiling threshold, serialized the way
+    run_native's outcome["leverage"] block writes them, and judged by the
+    repository's leverage-ladder gate rows through scripts/trading_gates.py.
+    Pure and offline: no paper trial, no broker."""
+
+    @classmethod
+    def setUpClass(cls):
+        scripts = str(SOURCE.parents[2] / "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        import trading_gates
+        cls.gates = trading_gates
+        document = trading_gates.load_json(SOURCE.parents[2] / trading_gates.GATES)
+        cls.gates_by_id = {gate["id"]: gate for gate in document["gates"]}
+
+    def _receipt(self, rung, trace, tick_seconds=0.1):
+        import leverage
+        max_leverage = Decimal(rung)
+        threshold = leverage.next_lower_rung_ceiling(max_leverage)
+        state = dict(runner_module._INITIAL_LEVERAGE_ACHIEVEMENT_STATE)
+        for index, achieved in enumerate(trace):
+            state = runner_module._leverage_achievement_step(
+                state, dt_seconds=0.0 if index == 0 else tick_seconds, achieved_leverage=Decimal(achieved),
+                ceiling=max_leverage, next_lower_ceiling=threshold)
+        # Mirrors run_native's outcome["leverage"] serialization of these fields.
+        return {"schema_version": 1, "kind": "leverage_ladder_rung_receipt", "rung": f"{rung}x", "needs_attention": 0,
+                "leverage": {"config_max_leverage": str(max_leverage),
+                             "next_lower_rung_ceiling": str(threshold) if threshold is not None else None,
+                             "peak_achieved_leverage": str(state["peak_achieved_leverage"]),
+                             "ceiling_at_peak_achieved_leverage": str(state["ceiling_at_peak"]),
+                             "seconds_above_next_lower_rung_ceiling": state["seconds_above_next_lower_rung_ceiling"]}}
+
+    def _holds(self, rung, receipt):
+        gate = {**self.gates_by_id[f"leverage-ladder-{rung}x"], "status": "not_established", "evidence_class": "none"}
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / gate["receipt_path"]
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps(receipt), encoding="utf-8")
+            return self.gates.condition_holds(Path(root), gate)
+
+    def test_trial_that_never_exceeds_the_lower_cap_does_not_satisfy_the_rung(self):
+        # Clean (needs_attention 0) trials whose exposure rises to, but never
+        # past, the next-lower cap: 0.5x for 1x, 1x for 2x, 2x for 4x.
+        traces = {"1": ["0", "0.2", "0.45", "0.5", "0.5", "0.3"],
+                  "2": ["0", "0.6", "1", "1", "0.9"],
+                  "4": ["0", "1.5", "2", "2", "1.8"]}
+        for rung, trace in traces.items():
+            with self.subTest(rung=rung):
+                receipt = self._receipt(rung, trace)
+                self.assertEqual(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+                holds, detail = self._holds(rung, receipt)
+                self.assertFalse(holds, detail)
+
+    def test_trial_that_exceeds_the_lower_cap_satisfies_the_rung(self):
+        traces = {"1": ["0", "0.4", "0.62", "0.7", "0.4"],
+                  "2": ["0", "1.2", "1.6", "0.8"],
+                  "4": ["0", "2.5", "3.4", "1.9"]}
+        for rung, trace in traces.items():
+            with self.subTest(rung=rung):
+                receipt = self._receipt(rung, trace)
+                self.assertGreater(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+                holds, detail = self._holds(rung, receipt)
+                self.assertTrue(holds, detail)
+
+    def test_a_single_first_tick_above_the_cap_records_no_time_and_does_not_satisfy(self):
+        # The first tick has no preceding interval (dt 0), so a peak observed
+        # only there accrues no seconds_above; the peak alone is not enough.
+        receipt = self._receipt("2", ["1.5", "0.5"])
+        self.assertEqual(receipt["leverage"]["peak_achieved_leverage"], "1.5")
+        self.assertEqual(receipt["leverage"]["seconds_above_next_lower_rung_ceiling"], 0.0)
+        holds, detail = self._holds("2", receipt)
+        self.assertFalse(holds, detail)
 
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
@@ -1947,12 +2025,13 @@ class AchievedLeverageReceiptIntegrationTests(unittest.TestCase):
             for key in ("next_lower_rung_ceiling", "peak_achieved_leverage",
                        "ceiling_at_peak_achieved_leverage", "seconds_above_next_lower_rung_ceiling"):
                 self.assertIn(key, lev, lev)
-            # The 1x rung has no lower rung to compare against (F2 design:
-            # leverage.next_lower_rung_ceiling(D("1")) is None), so this
-            # metric can never accumulate at this rung regardless of what
-            # was achieved.
-            self.assertIsNone(lev["next_lower_rung_ceiling"])
-            self.assertEqual(lev["seconds_above_next_lower_rung_ceiling"], 0.0)
+            # The 1x rung has no lower rung; since audit gap #5 (2026-09-24)
+            # its threshold is the documented 0.5x minimum exposure
+            # (leverage.ONE_X_MINIMUM_EXPOSURE), which the leverage-ladder-1x
+            # gate's flip condition requires peak_achieved_leverage and
+            # seconds_above_next_lower_rung_ceiling to exceed.
+            self.assertEqual(lev["next_lower_rung_ceiling"], "0.5")
+            self.assertGreaterEqual(lev["seconds_above_next_lower_rung_ceiling"], 0.0)
             peak_achieved = Decimal(lev["peak_achieved_leverage"])
             ceiling_at_peak = Decimal(lev["ceiling_at_peak_achieved_leverage"])
             self.assertTrue(peak_achieved.is_finite())

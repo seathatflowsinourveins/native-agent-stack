@@ -8,6 +8,12 @@ recorded in any other status are reported; when their receipt already satisfies
 the flip condition they are listed as ``flip_candidates`` so a coordinator can
 flip the status with a dated commit (the checker never flips anything itself).
 
+Condition types: ``exists`` (non-empty file), ``equals`` (type-strict JSON value
+at a pointer), ``array_contains_id``, ``greater_than`` (the value at a pointer is
+a JSON number or a decimal string strictly greater than ``than``) and
+``all_of`` (every listed ``equals``/``array_contains_id``/``greater_than``
+sub-condition holds against the same receipt; no nesting and no ``exists``).
+
 Rung readiness is arithmetic: a rung is ready when every ``required`` gate of
 that rung and of every earlier rung is ``established``. Exit status 1 on any
 validation error or on an established gate whose evidence is missing or false.
@@ -17,13 +23,16 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 GATES = "catalogs/us-equities/gates-20260922.json"
 STATUSES = {"established", "blocked", "not_established", "paid_entitlement", "user_decision"}
 OWNERS = {"this-effort", "peer:sota-workflow-resolution", "user-decision"}
 EVIDENCE = {"native_proven", "local_integration", "synthetic", "source_review", "none"}
-CONDITIONS = {"exists", "equals", "array_contains_id"}
+CONDITIONS = {"exists", "equals", "array_contains_id", "greater_than", "all_of"}
+# Sub-conditions an all_of may list: pointer conditions judged against one parsed receipt.
+COMPOUND_MEMBERS = {"equals", "array_contains_id", "greater_than"}
 LAYERS = {
     "market-data-reference", "identity-provenance", "storage-compute", "data-quality-orchestration",
     "research-factors-ml", "backtesting-engine", "execution-broker", "portfolio-risk",
@@ -65,19 +74,22 @@ def load_json(path: Path):
         return json.load(handle)
 
 
-def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
-    receipt = root / gate["receipt_path"]
-    if not receipt.is_file():
-        return False, "receipt missing"
-    condition = gate["flip_condition"]
-    if condition is None or condition["type"] == "exists":
-        if receipt.stat().st_size == 0:
-            return False, "receipt present but empty"
-        return True, "receipt present (non-empty; content not judged)"
+def decimal_value(value) -> Decimal | None:
+    """A finite Decimal from a JSON number (not a boolean) or a decimal string;
+    None for anything else. The adaptive-paper runner records Decimal values as
+    strings (``str(Decimal)``) and durations as JSON numbers, so both forms are
+    compared exactly rather than through float."""
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        return None
     try:
-        document = load_json(receipt)
-    except (OSError, ValueError) as error:
-        return False, f"receipt unreadable: {error.__class__.__name__}"
+        result = Decimal(value.strip()) if isinstance(value, str) else Decimal(str(value))
+    except InvalidOperation:
+        return None
+    return result if result.is_finite() else None
+
+
+def pointer_condition_holds(document, condition: dict) -> tuple[bool, str]:
+    """Judge one equals/array_contains_id/greater_than condition against a parsed receipt."""
     try:
         value = pointer(document, condition["pointer"])
     except (KeyError, IndexError, ValueError):
@@ -92,7 +104,53 @@ def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
     if condition["type"] == "array_contains_id":
         ids = {item.get("id") for item in value if isinstance(item, dict)} if isinstance(value, list) else set()
         return (condition["id"] in ids), f"{condition['pointer']} contains id {condition['id']!r}: {condition['id'] in ids}"
+    if condition["type"] == "greater_than":
+        actual, bound = decimal_value(value), decimal_value(condition["than"])
+        if actual is None or bound is None:
+            return False, f"{condition['pointer']} not a finite number: {json.dumps(value)[:80]}"
+        return actual > bound, f"{condition['pointer']} = {json.dumps(value)[:80]} > {json.dumps(condition['than'])}: {actual > bound}"
     return False, "unknown condition"
+
+
+def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
+    receipt = root / gate["receipt_path"]
+    if not receipt.is_file():
+        return False, "receipt missing"
+    condition = gate["flip_condition"]
+    if condition is None or condition["type"] == "exists":
+        if receipt.stat().st_size == 0:
+            return False, "receipt present but empty"
+        return True, "receipt present (non-empty; content not judged)"
+    try:
+        document = load_json(receipt)
+    except (OSError, ValueError) as error:
+        return False, f"receipt unreadable: {error.__class__.__name__}"
+    if condition["type"] == "all_of":
+        results = [pointer_condition_holds(document, member) for member in condition["conditions"]]
+        failed = [detail for holds, detail in results if not holds]
+        if failed:
+            return False, f"all_of: {len(failed)} of {len(results)} failed: " + "; ".join(failed)
+        return True, f"all_of: {len(results)} of {len(results)} hold: " + "; ".join(detail for _, detail in results)
+    return pointer_condition_holds(document, condition)
+
+
+def validate_pointer_condition(gate_id: str, condition, allowed: set[str]) -> None:
+    require(isinstance(condition, dict) and condition.get("type") in allowed,
+            f"{gate_id}: flip_condition.type must be one of {sorted(allowed)}")
+    kind = condition["type"]
+    if kind == "equals":
+        require(set(condition) == {"type", "pointer", "equals"}, f"{gate_id}: equals condition needs pointer and equals")
+    elif kind == "array_contains_id":
+        require(set(condition) == {"type", "pointer", "id"}, f"{gate_id}: array_contains_id condition needs pointer and id")
+    elif kind == "greater_than":
+        require(set(condition) == {"type", "pointer", "than"}, f"{gate_id}: greater_than condition needs pointer and than")
+        require(decimal_value(condition["than"]) is not None,
+                f"{gate_id}: greater_than.than must be a finite JSON number or decimal string")
+    else:
+        require(set(condition) == {"type"}, f"{gate_id}: exists condition takes no other fields")
+    if kind != "exists":
+        require(isinstance(condition["pointer"], str) and condition["pointer"].startswith("/"),
+                f"{gate_id}: condition pointer must be a JSON pointer starting with '/'")
 
 
 def validate_document(document: dict) -> list[dict]:
@@ -124,12 +182,14 @@ def validate_document(document: dict) -> list[dict]:
         if condition is not None:
             require(isinstance(condition, dict) and condition.get("type") in CONDITIONS,
                     f"{gate['id']}: flip_condition.type must be one of {sorted(CONDITIONS)}")
-            if condition["type"] == "equals":
-                require(set(condition) == {"type", "pointer", "equals"}, f"{gate['id']}: equals condition needs pointer and equals")
-            elif condition["type"] == "array_contains_id":
-                require(set(condition) == {"type", "pointer", "id"}, f"{gate['id']}: array_contains_id condition needs pointer and id")
+            if condition["type"] == "all_of":
+                members = condition.get("conditions")
+                require(set(condition) == {"type", "conditions"} and isinstance(members, list) and members,
+                        f"{gate['id']}: all_of condition needs a non-empty conditions list")
+                for member in members:
+                    validate_pointer_condition(gate["id"], member, COMPOUND_MEMBERS)
             else:
-                require(set(condition) == {"type"}, f"{gate['id']}: exists condition takes no other fields")
+                validate_pointer_condition(gate["id"], condition, CONDITIONS - {"all_of"})
         if gate["status"] == "established":
             require(gate["evidence_class"] != "none", f"{gate['id']}: an established gate needs an evidence class")
     return gates

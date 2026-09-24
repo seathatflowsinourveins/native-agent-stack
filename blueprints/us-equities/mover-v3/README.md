@@ -243,7 +243,8 @@ Size = inverse-vol weight x liquidity cap x edge shrink, clipped to that ceiling
   and has not been pushed since 2020.
 
 **Promotion is automatic only inside the gates.** A strategy runs at 1x until it passes. It moves up one rung at a time
-(1x, then 2x, then 4x), and only after the rung below completes with `needs_attention == 0` in its row of
+(1x, then 2x, then 4x), and only after the rung below is established by its row's flip condition (`needs_attention == 0`
+plus recorded achieved leverage and time above the next-lower cap, 0.5x for 1x) in
 [`catalogs/us-equities/gates-20260922.json`](../../../catalogs/us-equities/gates-20260922.json)
 (`leverage-ladder-1x`, `-2x` and `-4x`, all `not_established` today). Any of these steps a strategy down one rung
 automatically:
