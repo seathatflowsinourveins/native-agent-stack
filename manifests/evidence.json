@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "894966b5a5f6f775a5e9764725b3644d9598cae0637ff8b6190be015a510e416",
-      "bytes": 8728
+      "sha256": "c8113295c0680308aab66d70ebd39e7e0f05a4356bfc75b21f8e2012f7551cd7",
+      "bytes": 9045
     },
     {
       "path": ".github/pull_request_template.md",
@@ -9137,6 +9137,31 @@
       "path": "blueprints/us-equities/security-identity/select.sql",
       "sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477",
       "bytes": 377
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
+      "sha256": "e82ccd673db67a5aeb2de97c0bd0d80e35f6f35dd871eb27d3dfa009f38e9d8b",
+      "bytes": 31049
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
+      "sha256": "6ce9ff6b3cd66d781ff15ec1fe4f343259231eddfc3d4ba44ce1d6198f4be22c",
+      "bytes": 48612
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
+      "sha256": "5c372a19f7f081f7d7158aada5900fb0b310cb7ebc20901063ee41a2e4d87791",
+      "bytes": 41739
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
+      "sha256": "d77598fdec53a553756633094d85efabe3901294bd73ebd91f20d4631e840cf2",
+      "bytes": 25
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+      "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
+      "bytes": 92438
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
@@ -29587,6 +29612,11 @@
       "path": "tests/test_service_reboot.py",
       "sha256": "0ed22915bc1f80d3a3bdcf6a51810bafd8161dd94640584a9e5a9ac2882d20f9",
       "bytes": 14063
+    },
+    {
+      "path": "tests/test_sim_crosscheck_hftbacktest.py",
+      "sha256": "0821717fb58e78424712c65b1c4e57ac71d12a97e7691da2e3be020dee9ef7cc",
+      "bytes": 17763
     },
     {
       "path": "tests/test_sim_paper_compare.py",

@@ -6,6 +6,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "adoption/sdk/accepted-constraints.txt",
       "parser": "requirements.txt"
     },
@@ -162,6 +166,10 @@
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
       "lockfile": "blueprints/us-equities/mover-v3/data-tools/requirements.lock"
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
+      "lockfile": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock"
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
