@@ -21,14 +21,20 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
   and the workflow contract configuration, so it is left to that recipe's owner.
 - **Agents that skip the user file.** The user-level file does not reach agents that set `omitClaudeMd: true`:
   `adoption/agents/claude/source-scout.md`, `blind-judge.md`, `blind-lane-reviewer.md` and `blind-adjudicator.md`.
-  For those four agents, the only persistent carrier of the StructuredOutput sentence is the agent body. A dispatching
-  brief can carry it for a single run, as the G4 treatment arm did. The agent-body change is on the rollout's contract
-  track for `adoption/agents/claude/`, and until it lands a new host's `source-scout` children get the rule only
-  through their brief.
+  For those four agents, the StructuredOutput sentence can reach them in three ways:
+  - persistently, in the agent body;
+  - persistently, through a `SubagentStart` hook that returns it as `additionalContext`. The hooks reference documents
+    this: such hooks "can inject context into the subagent", matched by agent type. This change adds no such hook.
+  - for a single run, in the dispatching brief, as the G4 treatment arm did.
+
+  The agent-body change is on the rollout's contract track for `adoption/agents/claude/`.
 - **Built-in agents.** Several of Claude Code's built-in agents also omit the user file, among them Explore and Plan.
-  Their bodies cannot be edited. The only persistent carrier for them is a custom agent of the same name, as agent-lab
-  has for Explore at project level; a dispatching brief can carry the sentence for a single run. The contract-track
-  change does not cover them.
+  Their bodies cannot be edited, but the sentence can still reach them:
+  - through a custom agent of the same name, as agent-lab has for Explore at project level;
+  - through a `SubagentStart` hook, which can match built-in agent names such as `Explore` and `Plan`;
+  - through the dispatching brief, for a single run.
+
+  The contract-track change does not cover them.
 
 ## Decision
 
