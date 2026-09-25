@@ -33,7 +33,8 @@ Four confirmatory items share a Holm family (details in the protocol):
 | `score.py` | `fetch` downloads the pinned checkpoints with sha256 checks; `run` scores events resumably and stores provenance for every label. |
 | `collect_auctions.py` | Official auction prints and entry-time SIP quotes from the Alpaca data API (read-only, rate-limited, guarded credentials). |
 | `evaluate.py` | Post-freeze evaluation; refuses unless the protocol is frozen and its sha256 matches `--protocol-sha256`. |
-| `receipts/` | Small committed receipts (counts and sha256 only). |
+| `receipts.py` | Regenerates `receipts/` from the private root (counts and sha256 only; refuses to write the home path). |
+| `receipts/` | Small committed receipts: prepare funnel, model downloads, collection coverage and HTTP tallies, scoring probes, scoring status. |
 
 Tests: `tests/test_sota_news_llm_{signal,prepare,score,collect,evaluate}.py` (synthetic fixtures only; no GPU, model
 files, network or private data).

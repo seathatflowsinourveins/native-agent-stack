@@ -446,9 +446,47 @@
    },
    "by_checkpoint": "see receipts/prepare-summary.json"
   },
-  "scoring_status": null,
-  "auctions_status": null,
-  "spreads_status": null
+  "scoring_status": {
+   "unit": "sota-news-score-20260925T0419Z (systemd --user transient, MemoryHigh=3G, MemoryMax=4G, RuntimeMaxSec=28800)",
+   "progress_file": "<private root>/scores/progress.json (progress-liquid.json and progress-small.json copied after each lane)",
+   "order": "liquid lane (352,767 events) then small lane (96,951)",
+   "settings": "variant hlmw_alpaca, float32, TF32 off, cached decoder, batch 32, 3,072 batch tokens, --check-batch1 16",
+   "throughput": "about 32-34 events/s, peak GPU 10.17 GiB",
+   "final": "fill from receipts/scoring-status.json (python3 receipts.py) when the unit finishes"
+  },
+  "auctions_status": {
+   "completed_at": "2026-09-25T04:52Z (00:52 ET)",
+   "symbol_sessions_wanted": 411313,
+   "rows": 411308,
+   "no_auction_record": 29,
+   "official_open": 409991,
+   "official_close": 410258,
+   "both": 409745,
+   "open_via_listing_print": 402027,
+   "close_via_listing_print": 401709,
+   "requests": 7890,
+   "http": "all 200 (5,347 in the first run per ledger, 2,543 in the top-up per tally)",
+   "max_rate_per_min": 1900,
+   "file": "auctions/auctions.jsonl.gz",
+   "sha256": "23e4784504c7e57e90ed0fcc4e7f2896d2139265b1386928698ecc368ec9d26c"
+  },
+  "spreads_status": {
+   "completed_at": "2026-09-25T04:52Z",
+   "rth_events": 121871,
+   "no_valid_quote": 242,
+   "half_spread_bps": {
+    "p10": 0.821,
+    "p25": 1.375,
+    "median": 2.713,
+    "p75": 5.149,
+    "p90": 8.732,
+    "p99": 21.753
+   },
+   "requests": 122763,
+   "http": "all 200",
+   "file": "spreads/quotes.jsonl",
+   "sha256": "0d8138b86a496c7f5626d5ae99dcfe9042b77cfaa6df60a2543230394d5cf553"
+  }
  },
  "frozen_inputs": {
   "events.jsonl.gz": null,

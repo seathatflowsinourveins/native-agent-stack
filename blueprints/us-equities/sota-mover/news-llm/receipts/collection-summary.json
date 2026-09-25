@@ -1,25 +1,82 @@
 {
  "auctions": {
   "coverage": {
-   "both_available": 408576,
-   "close_via_fallback_6": 8363,
-   "close_via_fallback_M": 101,
-   "close_via_listing_print": 400603,
-   "no_auction_record": 28,
-   "official_close_available": 409067,
-   "official_open_available": 408818,
-   "open_via_fallback_O": 7781,
-   "open_via_fallback_Q": 126,
-   "open_via_listing_print": 400911,
-   "symbol_sessions_wanted": 410140
+   "both_available": 409745,
+   "close_via_fallback_6": 8422,
+   "close_via_fallback_M": 127,
+   "close_via_listing_print": 401709,
+   "no_auction_record": 29,
+   "official_close_available": 410258,
+   "official_open_available": 409991,
+   "open_via_fallback_O": 7837,
+   "open_via_fallback_Q": 127,
+   "open_via_listing_print": 402027,
+   "symbol_sessions_wanted": 411313
   },
-  "ledger_requests_failed": 0,
-  "ledger_requests_ok": 5347,
-  "rows": 410112,
-  "sha256": "fe8ce248094dd88b7ab5788b5616cee5204ae42652acfbffb9a5412de3c112dd"
+  "ledger": {
+   "ok": 7890
+  },
+  "rows": 411308,
+  "sha256": "23e4784504c7e57e90ed0fcc4e7f2896d2139265b1386928698ecc368ec9d26c"
  },
  "evidence_label": "HIST",
- "http_tallies": [],
+ "http_tallies": [
+  {
+   "command": "auctions",
+   "finished_at": "20260925T045208Z",
+   "http": {
+    "http_200": 2543,
+    "requests": 2543
+   },
+   "rate_per_min_after_0330_et": 500,
+   "rate_per_min_before_0330_et": 1900,
+   "seconds": 110.3,
+   "x_ratelimit_limit": "10000"
+  },
+  {
+   "command": "spreads",
+   "finished_at": "20260925T045006Z",
+   "http": {
+    "http_200": 122362,
+    "requests": 122362
+   },
+   "rate_per_min_after_0330_et": 500,
+   "rate_per_min_before_0330_et": 1900,
+   "seconds": 3875.2,
+   "x_ratelimit_limit": "10000"
+  },
+  {
+   "command": "spreads",
+   "finished_at": "20260925T045226Z",
+   "http": {
+    "http_200": 401,
+    "requests": 401
+   },
+   "rate_per_min_after_0330_et": 500,
+   "rate_per_min_before_0330_et": 1900,
+   "seconds": 17.2,
+   "x_ratelimit_limit": "10000"
+  }
+ ],
  "kind": "collection",
- "schema": "sota-news-llm-receipt/1"
+ "note": "The first full auction run was stopped during materialization, before it wrote its HTTP tally; its 5,347 requests are recorded in auctions/ledger.jsonl (all status ok).",
+ "schema": "sota-news-llm-receipt/1",
+ "spreads": {
+  "counts": {
+   "events": 121871,
+   "no_valid_quote": 242
+  },
+  "half_spread_bps": {
+   "median": 2.713,
+   "p10": 0.821,
+   "p25": 1.375,
+   "p75": 5.149,
+   "p90": 8.732,
+   "p99": 21.753
+  },
+  "ledger": {
+   "ok": 122763
+  },
+  "quotes_sha256": "0d8138b86a496c7f5626d5ae99dcfe9042b77cfaa6df60a2543230394d5cf553"
+ }
 }

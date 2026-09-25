@@ -107,6 +107,41 @@ class ScanNews(unittest.TestCase):
         self.assertEqual(sig.first_per_window([dict(c, window=c["window"]) for c in candidates if c["symbol"] == "ACME" and c["window"] == "rth"])[0]["news_id"], "113")
 
 
+class Receipts(unittest.TestCase):
+    def test_receipts_from_a_synthetic_private_root(self):
+        rec = load("news_llm_receipts_under_test", "receipts.py")
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        priv, models, out = (Path(tmp.name) / d for d in ("priv", "models", "out"))
+        for d in (priv / "scores", priv / "probe" / "p1", priv / "auctions", priv / "spreads", models):
+            d.mkdir(parents=True, exist_ok=True)
+        prep = {k: {} for k in ("inputs", "asset_master", "funnel", "eligible_by_window_lane", "selected_by_window_lane",
+                                "selected_sessions_by_window_lane", "selected_by_session_year", "selected_by_checkpoint",
+                                "diagnostics", "events_file")}
+        prep.update(started_at="t0", finished_at="t1")
+        (priv / "prepare-receipt.json").write_text(json.dumps(prep))
+        progress = {"scored_this_run": 2, "by_checkpoint": {"2020": {"labels": {"FAVORABLE": 2}, "stops": {"eos": 2}, "load_seconds": 1.0,
+                                                                      "batch1_agreement": {"agree": 1, "checked": 1}}}}
+        (priv / "probe" / "p1" / "progress.json").write_text(json.dumps(progress))
+        (priv / "scores" / "progress.json").write_text(json.dumps(progress))
+        (priv / "scores" / "scores-20201231.jsonl").write_text('{"label": "FAVORABLE"}\n{"label": "UNFAVORABLE"}\n')
+        (priv / "auctions" / "auctions-summary.json").write_text(json.dumps({"rows": 1}))
+        (priv / "auctions" / "ledger.jsonl").write_text('{"status": "ok"}\n')
+        (models / "fetch-manifest-2020.json").write_text(json.dumps({"years": [2020], "finished_at": "t", "seconds": 1,
+                                                                     "bytes_downloaded": 5, "bytes_verified": 5,
+                                                                     "records": [{"year": 2020, "file": "f", "status": "downloaded", "bytes": 5}]}))
+        rec.main(["--private-root", str(priv), "--models-root", str(models), "--out", str(out)])
+        status = json.loads((out / "scoring-status.json").read_text())
+        self.assertEqual(status["labels_in_files"], {"FAVORABLE": 1, "UNFAVORABLE": 1})
+        self.assertEqual(status["runs"]["progress.json"]["batch1_agreement"], {"agree": 1, "checked": 1})
+        self.assertEqual(json.loads((out / "collection-summary.json").read_text())["auctions"]["ledger"], {"ok": 1})
+        self.assertEqual(json.loads((out / "models-fetch.json").read_text())["bytes_downloaded_total"], 5)
+        leaky = dict(prep, inputs={"path": str(Path.home() / "secret-place")})
+        (priv / "prepare-receipt.json").write_text(json.dumps(leaky))
+        with self.assertRaises(SystemExit):
+            rec.main(["--private-root", str(priv), "--models-root", str(models), "--out", str(out)])
+
+
 class Helpers(unittest.TestCase):
     def test_load_assets_prefers_active_and_flags_ambiguity(self):
         tmp = tempfile.TemporaryDirectory()

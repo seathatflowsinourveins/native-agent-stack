@@ -1,7 +1,5 @@
 {
- "evidence_label": "HIST",
- "kind": "scoring-probes",
- "numerics_diagnostics": {
+ "diagnostics": {
   "cached_decoder_vs_full_recompute": {
    "2016": {
     "cached_events_per_s": 35.4,
@@ -95,6 +93,40 @@
   },
   "measured_at": "2026-09-25"
  },
+ "evidence_label": "HIST",
+ "fp32_selection": {
+  "rule": "news_signal.select_variant v2",
+  "selected": "hlmw_alpaca",
+  "stats": {
+   "hlmw_alpaca": {
+    "labels": {
+     "FAVORABLE": 194,
+     "PARSE_FAIL": 21,
+     "UNCLEAR": 5,
+     "UNFAVORABLE": 280
+    },
+    "n": 500
+   },
+   "llt_alpaca": {
+    "labels": {
+     "NO": 16,
+     "PARSE_FAIL": 439,
+     "UNKNOWN": 5,
+     "YES": 40
+    },
+    "n": 500
+   },
+   "llt_upstream_wrapper": {
+    "labels": {
+     "NO": 29,
+     "PARSE_FAIL": 470,
+     "UNKNOWN": 1
+    },
+    "n": 500
+   }
+  }
+ },
+ "kind": "scoring-probes",
  "probes": {
   "fp32-hlmw_alpaca": {
    "batch1_agreement": {
@@ -102,6 +134,7 @@
     "checked": 0
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "float32",
    "elapsed_seconds": 144.5,
    "finished": true,
@@ -174,6 +207,7 @@
     "checked": 0
    },
    "batch_size": 32,
+   "decoder": "cached",
    "dtype": "float32",
    "elapsed_seconds": 122.1,
    "finished": true,
@@ -246,6 +280,7 @@
     "checked": 0
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "float32",
    "elapsed_seconds": 131.8,
    "finished": true,
@@ -304,6 +339,7 @@
     "checked": 80
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 132.1,
    "finished": true,
@@ -375,6 +411,7 @@
     "checked": 32
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 68.3,
    "finished": true,
@@ -405,6 +442,7 @@
     "checked": 80
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 133.5,
    "finished": true,
@@ -475,6 +513,7 @@
     "checked": 80
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 140.0,
    "finished": true,
@@ -533,6 +572,7 @@
     "checked": 0
    },
    "batch_size": 1,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 47.1,
    "finished": true,
@@ -564,6 +604,7 @@
     "checked": 0
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "bfloat16",
    "elapsed_seconds": 18.7,
    "finished": true,
@@ -595,6 +636,7 @@
     "checked": 40
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "float32",
    "elapsed_seconds": 42.2,
    "finished": true,
@@ -626,6 +668,7 @@
     "checked": 0
    },
    "batch_size": 32,
+   "decoder": "full",
    "dtype": "float32",
    "elapsed_seconds": 22.8,
    "finished": true,

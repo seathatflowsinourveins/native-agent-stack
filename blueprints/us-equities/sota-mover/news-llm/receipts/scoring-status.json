@@ -1,51 +1,141 @@
 {
- "by_checkpoint": {
-  "2015": {
-   "labels": {
-    "FAVORABLE": 1626,
-    "PARSE_FAIL": 10,
-    "UNFAVORABLE": 1903
-   },
-   "load_seconds": 12.7,
-   "overflow": 0,
-   "revision": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
-   "scored": 3539,
-   "stops": {
-    "eos": 3529,
-    "label_decided": 10
-   },
-   "to_score": 12398
-  }
- },
  "evidence_label": "HIST",
- "files": {
-  "scores-20151231.jsonl": {
-   "rows": 3539
+ "kind": "scoring-status",
+ "labels_in_files": {
+  "FAVORABLE": 34840,
+  "PARSE_FAIL": 313,
+  "UNCLEAR": 1,
+  "UNFAVORABLE": 28083
+ },
+ "rows_in_files": 63237,
+ "runs": {
+  "progress.json": {
+   "batch1_agreement": {
+    "agree": 48,
+    "checked": 48
+   },
+   "by_checkpoint": {
+    "2015": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 6502,
+      "PARSE_FAIL": 13,
+      "UNFAVORABLE": 5883
+     },
+     "load_seconds": 12.7,
+     "overflow": 0,
+     "revision": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
+     "scored": 12398,
+     "stops": {
+      "eos": 12385,
+      "label_decided": 13
+     },
+     "to_score": 12398
+    },
+    "2016": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 8340,
+      "PARSE_FAIL": 294,
+      "UNCLEAR": 1,
+      "UNFAVORABLE": 7704
+     },
+     "load_seconds": 14.1,
+     "overflow": 0,
+     "revision": "5aec0aacc696f9526e12abe22a3fc96348dfca1d",
+     "scored": 16339,
+     "stops": {
+      "eos": 16047,
+      "label_decided": 292
+     },
+     "to_score": 16339
+    },
+    "2017": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 10310,
+      "PARSE_FAIL": 6,
+      "UNFAVORABLE": 9729
+     },
+     "load_seconds": 12.7,
+     "overflow": 0,
+     "revision": "5f6b4ab1664bd5e658af44ad6b02183178b81b55",
+     "scored": 20045,
+     "stops": {
+      "eos": 20030,
+      "label_decided": 15
+     },
+     "to_score": 20045
+    },
+    "2018": {
+     "batch1_agreement": null,
+     "labels": {
+      "FAVORABLE": 9688,
+      "UNFAVORABLE": 4767
+     },
+     "load_seconds": 13.2,
+     "overflow": 0,
+     "revision": "331c03be137a1a80f1a371232d3d6a9636f6ad9a",
+     "scored": 14455,
+     "stops": {
+      "eos": 14455
+     },
+     "to_score": 21839
+    }
+   },
+   "labels": {
+    "FAVORABLE": 34840,
+    "PARSE_FAIL": 313,
+    "UNCLEAR": 1,
+    "UNFAVORABLE": 28083
+   },
+   "progress": {
+    "already_scored": 0,
+    "batch_size": 32,
+    "decoder": "cached",
+    "dtype": "float32",
+    "elapsed_seconds": 2000.2,
+    "eta_seconds": 9157.0,
+    "events_in_file": 449718,
+    "events_per_second": 31.62,
+    "finished_at": null,
+    "matmul": "highest",
+    "max_gpu_memory_allocated_gib": 10.17,
+    "scored_this_run": 63237,
+    "started_at": "2026-09-25T04:19:43+00:00",
+    "template_sha256": "9ee4590bbe7d71190864d1b0331ce95848bcfb7977f48b3a50a0b24478401c8a",
+    "to_score": 352767,
+    "updated_at": "2026-09-25T04:53:03+00:00",
+    "variant": "hlmw_alpaca"
+   },
+   "stops": {
+    "eos": 62917,
+    "label_decided": 320
+   }
   }
  },
- "kind": "scoring-status",
- "labels_total_this_run": {
-  "FAVORABLE": 1626,
-  "PARSE_FAIL": 10,
-  "UNFAVORABLE": 1903
- },
- "progress": {
-  "already_scored": 0,
-  "batch_size": 32,
-  "dtype": "float32",
-  "elapsed_seconds": 102.1,
-  "eta_seconds": 10076.0,
-  "events_in_file": 449718,
-  "events_per_second": 34.66,
-  "finished_at": null,
-  "matmul": "highest",
-  "max_gpu_memory_allocated_gib": 10.17,
-  "scored_this_run": 3539,
-  "started_at": "2026-09-25T04:19:43+00:00",
-  "template_sha256": "9ee4590bbe7d71190864d1b0331ce95848bcfb7977f48b3a50a0b24478401c8a",
-  "to_score": 352767,
-  "updated_at": "2026-09-25T04:21:25+00:00",
-  "variant": "hlmw_alpaca"
- },
- "schema": "sota-news-llm-receipt/1"
+ "schema": "sota-news-llm-receipt/1",
+ "score_files": {
+  "scores-20151231.jsonl": {
+   "rows": 12398
+  },
+  "scores-20161231.jsonl": {
+   "rows": 16339
+  },
+  "scores-20171231.jsonl": {
+   "rows": 20045
+  },
+  "scores-20181231.jsonl": {
+   "rows": 14455
+  }
+ }
 }
