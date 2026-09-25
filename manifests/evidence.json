@@ -8572,8 +8572,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "2f54419877841b64ea72c8738447ff34d360bc3619f662f005d9b81ab6669e15",
-      "bytes": 5877
+      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
+      "bytes": 7585
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -8611,14 +8611,14 @@
       "bytes": 441
     },
     {
+      "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
+      "sha256": "715f893dc329c40c6db6ffcbe23a308c5696e0ec791e49a4a38adfc627f0886d",
+      "bytes": 770
+    },
+    {
       "path": "blueprints/us-equities/hosting/receipt.json",
       "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc",
       "bytes": 4873
-    },
-    {
-      "path": "blueprints/us-equities/hosting/research-evidence.yaml",
-      "sha256": "12834f94024d25cfb9fcc423a640e7af8734182a30bc5ab57e06fa8a730be18c",
-      "bytes": 565
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
