@@ -108,6 +108,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points and re-ran all nine commands on this host: points 1, 2 and 4 hold (/version 0.25.0 equals the foundation winner pin with pin_matches true, unit active with 0 restarts, backup passage ranked first, model_card_check.py v2 4/4 within 0.0011 of the card and v1 4/4 within 0.0009 of the laptop scores, rotated-documents control 0/4 with its ranking assertion failing, hf cache verify 15 files at c0c9fea93ea4 with the one-byte tamper control exiting 1, served model directory unchanged), but catalog_revision 66fd7e96 is the pre-rebase copy of this branch's SPY/LEAN replay commit and no origin ref reaches it, so the catalog revision behind the pin record cannot be resolved by a reader (point 3) and CI host_receipts.py validate fails on exactly this receipt (run 36149652903); re-record as -3 from a worktree at an origin/main revision.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T14:51:57Z",
+      "reviewer": {
+        "identity_sha256": "291771731d442d0363957c57ff2c0f33ede168fb7c0d90e5bac12308bf3e592f",
+        "model": "claude headless reviewer"
+      }
     }
   ],
   "qualified_models": [
