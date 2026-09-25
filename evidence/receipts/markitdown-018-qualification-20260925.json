@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "markitdown-018-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-25T20:30:00Z",
+  "component_ids": [
+    "markitdown"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, markitdown 0.1.8 was qualified against the installed 0.1.7 and then switched into production. The PyPI wheel (sha256 de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab, 89,737 bytes) and sdist (sha256 17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed, 69,112 bytes) matched PyPI's JSON and Simple API digests before `uv tool install --python 3.13` put the base package into a new tools/markitdown-0.1.8 prefix (20 packages; 45 of 45 package files byte-identical to the verified wheel). The candidate passed all 10 legs of run_arm.py: `--version` 'markitdown 0.1.8', greeting.md, 8k.md and 8-K stdout hashes (the stdout equal to the retained a27f0f27...), the discriminator hashes, check_outputs.py 12 PASS, the PDF refusal naming markitdown[pdf], the 20-package set with no extras and the consumer document. 0.1.7 failed exactly the version leg, the four 0.1.8 discriminator checks (8 PASS / 4 FAIL) and the markitdown line of the package set; the fixture, 8-K and consumer outputs and all 19 committed HTML files at ae30f94b converted byte-identically under both, and the 19 other distributions were byte-identical. An independent verifier reproduced these and agreed. The coordinator then repointed bin/markitdown to the new prefix; `markitdown --version` printed 'markitdown 0.1.8' and run_arm.py against the production path passed 10 of 10 legs.",
+  "limitations": [
+    "Production runs the qualification prefix (a prefix flip), not install_pin's python-tools layout: its uv-receipt carries [tool.options] exclude-newer = \"2026-09-25T17:00:00Z\" and link-mode = \"copy\" and records python \"3.13\", which freezes `uv tool upgrade` inside that prefix. The refuter's primary promotion gate (install_pin's form without --exclude-newer, then production pip-list equality and an exclude-newer-free receipt) was not run. A new host's bootstrap runs `uv tool install --python 3.13 markitdown==0.1.8` without --exclude-newer, so its transitive set can differ from the qualified 20-package set once newer compatible dependency releases appear.",
+    "The 0.1.7 env python-tools/markitdown stays installed for rollback (re-point bin/markitdown), and its bookkeeping still reports 0.1.7. How a later install_pin run interacts with the flipped symlink was not tested.",
+    "0.1.8 changes output for <u> (kept as inline HTML), <strike> (~~text~~), %2F path escapes (preserved) and data-src images (preferred over a data: placeholder). These were shown only on the synthetic discriminator; the committed corpus has none of them in affected positions, real filings containing them were not tested, and a consumer that requires Markdown without raw HTML tags would now see <u>.",
+    "Local integration evidence (the reviewer-authored checker plus the refuter's legs), not the unchanged upstream suite: `hatch test` was not run on this host; the upstream CI pass on PR #2545 is research-reported. The [pdf]/[docx] extras were not exercised.",
+    "Integrity rests on PyPI's published digests and post-install byte equality with the verified wheel; uv does not enforce the digest during `uv tool install`, and PyPI publishes no PEP 740 attestation for 0.1.8.",
+    "The no-extras grep leg misses some extras (an [az-doc-intel] addition passed it in the verifier's mutation test); only the exact 20-package equality leg gates the package set. Importing onnxruntime 1.30.0 writes $TMPDIR/.ses and an empty mat-debug-<pid>.log on every call, in both versions; the qualification runs left such files in /tmp.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the document-retrieval winner pin markitdown 0.1.7 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.1.8 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json has no markitdown pin and is unchanged; nothing here is macOS evidence.",
+    "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25",
+    "previous_version": "0.1.7",
+    "version": "0.1.8",
+    "release": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+    "tag_commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+    "sdist": {
+      "url": "https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz",
+      "sha256": "17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed",
+      "bytes": 69112
+    },
+    "wheel": {
+      "url": "https://files.pythonhosted.org/packages/33/de/0b23cd8d8955221a39438ba8e4cf583e4f510fc79c6891fff88fb3e61198/markitdown-0.1.8-py3-none-any.whl",
+      "sha256": "de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab",
+      "bytes": 89737
+    },
+    "install": "uv 0.12.17 `uv tool install --python 3.13 --exclude-newer 2026-09-25T17:00:00Z 'markitdown==0.1.8'` (UV_LINK_MODE=copy) into tools/markitdown-0.1.8; CPython 3.13.15; 20 packages",
+    "acceptance_scripts": {
+      "run_arm.py": "2fd719b4072648f24d902afdddfcbb247bc3e295e0699f4d0ea3c2c2547d36f6",
+      "check_outputs.py": "fd24e9d1b774e7af5251970c5facd8c48e41a047f3df9a6d576dbb81a8b3620b"
+    },
+    "legs_passed": {
+      "0.1.8 qualification": "10/10",
+      "0.1.7 baseline": "7/10 (fails version, checker 8/4, package-set markitdown line)",
+      "0.1.8 post-switch production path": "10/10"
+    },
+    "hashes": {
+      "greeting.md": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "8k.md": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "8k_stdout": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "disc.md_0.1.8": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "disc.md_0.1.7": "177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d"
+    },
+    "corpus": "19 committed *.html at ae30f94b: 19 identical across versions",
+    "transitive_set": "19 distributions, 1,624 files each, 0 hash mismatches",
+    "rollback": "atomically re-point ~/.local/share/codex-ecosystem/bin/markitdown to python-tools/markitdown/bin/markitdown (0.1.7)",
+    "independent_review": "verdict agree, production_touched false, 4 minor defects (artifact results.json verifier section)",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/markitdown/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run_arm.py",
+      "sha256": "2fd719b4072648f24d902afdddfcbb247bc3e295e0699f4d0ea3c2c2547d36f6",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/check_outputs.py",
+      "sha256": "fd24e9d1b774e7af5251970c5facd8c48e41a047f3df9a6d576dbb81a8b3620b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/ab-compare.json",
+      "sha256": "2e1c587cdba41bcf55acdcfcfa255b0d8d580f6b1d7edd9580f5f9d18121d59d",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-baseline.json",
+      "sha256": "4811aa664f44d5fb74cf374b690ce98ca0ddff131642b994b1c1143d698b44f1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-candidate.json",
+      "sha256": "c6f510ae62b6fecd900e8338c599243cc8c1f6985f92337a3275fefae26ab1b2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/postswitch-out.json",
+      "sha256": "5d1de1a0c39eb90f4d70afef0995bbf09dceafeba499034c42058ee1c3a69bda",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/install.log",
+      "sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/postswitch.log",
+      "sha256": "8abcb49bd24fcde5504694e765035c16982640bffd2aebf9ee45cc7880bc85ec",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/postswitch-attempt1.log",
+      "sha256": "2a7b7e9c8caeb1f13c46f8e749d389de1113c9a00dc87bb786fcdcefcbdee58d",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/readback.out",
+      "sha256": "4f8297abbe4b468b1c53d79ed70274e9e40ff0e7510507764687db26ca6d7fd1",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
+      "sha256": "732b0a531807729ff0503b1367c67e4fe3cabb71281aee0d85f31331b60e4fc4",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

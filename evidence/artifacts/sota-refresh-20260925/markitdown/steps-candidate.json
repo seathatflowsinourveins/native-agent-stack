@@ -1,0 +1,96 @@
+{
+ "arm": "candidate-0.1.8",
+ "overall_pass": true,
+ "steps": [
+  {
+   "name": "L1 version == 'markitdown 0.1.8'",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" --version",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "stdout='markitdown 0.1.8'",
+   "seconds": 0.55
+  },
+  {
+   "name": "L2 greeting.html -o greeting.md",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"~/code/native-agent-stack-live/fixtures/greeting.html\" -o \"$IMPL/run-candidate/greeting.md\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "sha256=6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2 bytes=76 stderr=''",
+   "seconds": 0.65
+  },
+  {
+   "name": "L3 upstream-8k.html -o 8k.md",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html\" -o \"$IMPL/run-candidate/8k.md\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "sha256=b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977 bytes=5610 stderr=''",
+   "seconds": 0.63
+  },
+  {
+   "name": "L4 8-K stdout sha256 == a27f0f27 (retained at evidence/receipts/token-practice-artifacts-20260920.json:217)",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/us-equities/catalyst-provenance/upstream-8k.html\" | sha256sum",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "sha256=a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b bytes=5611",
+   "seconds": 0.69
+  },
+  {
+   "name": "L5 disc.html sha256 == 932d7f62",
+   "arm": "candidate-0.1.8",
+   "cmd": "printf '%s\\n' '<!doctype html><html><body>' '<p>First<u>word</u>Last</p>' '<p><a href=\"https://example.com/items/a%2Fb\">example</a></p>' '<p><strike>gone</strike></p>' '<p><img src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7\" data-src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>' '</body></html>' > \"$IMPL/run-candidate/disc.html\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "sha256=932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e bytes=314",
+   "seconds": 0.0
+  },
+  {
+   "name": "L6 disc.html -o disc.md",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"$IMPL/run-candidate/disc.html\" -o \"$IMPL/run-candidate/disc.md\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "sha256=66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629 content='First<u>word</u>Last\\n\\n[example](https://example.com/items/a%2Fb)\\n\\n~~gone~~\\n\\n![A photo](https://example.com/photo.jpg)'",
+   "seconds": 0.65
+  },
+  {
+   "name": "L7 PDF refused (exit!=0, stderr names markitdown[pdf])",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"~/code/native-agent-stack-live/blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf\" -o \"$IMPL/run-candidate/pdf.md\" 2>\"$IMPL/run-candidate/pdf.err\"",
+   "exit": 1,
+   "pass": true,
+   "output_excerpt": "stderr_tail=[\"* pip install 'markitdown[all]'\", \"* pip install 'markitdown[pdf, ...]'\", '* etc.'] pdf.md_exists=False",
+   "seconds": 0.66
+  },
+  {
+   "name": "L8 check_outputs.py: 12 PASS, exit 0",
+   "arm": "candidate-0.1.8",
+   "cmd": "python3 \"$IMPL/check_outputs.py\" \"$IMPL/run-candidate\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "PASS=12 FAIL=0 failed=[]",
+   "seconds": 0.02
+  },
+  {
+   "name": "L9 uv pip list == recorded 20-package set, no extras",
+   "arm": "candidate-0.1.8",
+   "cmd": "uv pip list --python \"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/bin/python\" > \"$IMPL/run-candidate/pip-list.txt\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "packages=20 extras_found=[] diff_vs_recorded={}",
+   "seconds": 0.05
+  },
+  {
+   "name": "L10 optional consumer leg: document.html has '# NativeStack evidence' and 'Scoped memory'",
+   "arm": "candidate-0.1.8",
+   "cmd": "\"~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown\" \"~/.local/state/nativestack/final-acceptance/document.html\"",
+   "exit": 0,
+   "pass": true,
+   "output_excerpt": "has_heading=True has_scoped_memory=True stdout_sha256=7bdfac14ff7a01f70a790edbcb5d522475b22aaa4f46ff95c10aa7da28f299fb bytes=70 input_sha256=f6f51dbb81d3a4c68334cb5ef2e4dfe2bfac3807e5508b0ad620c8a5c5967c2e",
+   "seconds": 0.68
+  }
+ ]
+}
