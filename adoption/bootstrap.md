@@ -160,7 +160,10 @@ GitHub-hosted macOS runner; see
    explicitly, or export `ADOPTION_PROJECT_ROOT` before running (see
    `tools/adoption/render_config.py --help`). `--check` prints a unified diff
    and exits 1 on any byte difference; a pure JSON-formatting difference is
-   called out explicitly in its output.
+   called out explicitly in its output. `project.codex.config.template.toml`
+   changed after `v2026.09.24.1`: its `serena` server runs
+   `${ECO_ROOT}/bin/serena` (installed in step 4a), where the tag's copy names
+   `${ECO_ROOT}/bin/serena-context`, a wrapper nothing in this catalog installs.
 
    **Trust-state warning.** The rendered `codex.config.toml` (user-level)
    carries this source host's accumulated Codex `[projects."..."]
@@ -182,7 +185,24 @@ GitHub-hosted macOS runner; see
    (this step is a no-op, not a failure, without it -- the MCP registration
    sub-step below needs a working `claude` binary), install this catalog's
    Claude Code user-scope assets with
-   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py):
+   [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py).
+   Its MCP sub-step registers the template's commands but installs none of
+   them, so install the two stdio servers first, at their pins, with the
+   uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
+   (`python-tools/` and `bin/` under the ecosystem prefix, on either
+   platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
+   where the template points (changed after `v2026.09.24.1`, whose template
+   names a `serena-context` wrapper instead of `serena`):
+   ```sh
+   eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+   UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+     uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
+   UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+     uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+   "$eco/bin/serena" --version           # Serena 2.0.0.dev0
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+   ```
+   Then run the installer:
    ```sh
    python3 tools/adoption/install_claude_profile.py            # guard + agents + MCP servers
    python3 tools/adoption/install_claude_profile.py --dry-run   # report only, write/register nothing
@@ -213,7 +233,17 @@ GitHub-hosted macOS runner; see
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
      them). A same-named server with a different config is reported and left
-     unchanged unless `--replace-mcp` is given.
+     unchanged unless `--replace-mcp` is given. That flag re-registers every
+     differing server, including an `ai-memory` entry that names this host's
+     own port. To change one server, remove it and rerun without the flag:
+     `claude mcp remove <name> -s user`, then
+     `python3 tools/adoption/install_claude_profile.py --only mcp`. The
+     template's `ai-memory` URL is this catalog's default, `127.0.0.1:49374`;
+     the registration must name the port this host's ai-memory unit binds
+     (`AI_MEMORY_URL` in step 4). `claude mcp add` refuses a name that already
+     exists, so for another port run `claude mcp remove ai-memory -s user`,
+     then
+     `claude mcp add --scope user --transport http ai-memory http://127.0.0.1:<port>/mcp`.
    Then apply the settings template itself (model, effort, ultracode,
    workflow env, hooks, and the credential deny rules plus the `PreToolUse`
    secret-guard hook from [`docs/secret-storage.md`](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)) into the live `~/.claude/settings.json` with
@@ -242,7 +272,14 @@ GitHub-hosted macOS runner; see
    hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
    `SHA256SUMS` gained the secret-path guard entry). The installer replaces a
    differing agent file, so rerunning its agents step from a checkout that has
-   the change installs the `max` definitions.
+   the change installs the `max` definitions. The MCP template
+   `adoption/mcp/claude-user.json` also changed after `v2026.09.24.1`: at that
+   tag its `serena` entry runs `${ECO_ROOT}/bin/serena-context`, a wrapper
+   nothing in this catalog installs, so a host at the tag registers a `serena`
+   server that cannot start. Here it runs `${ECO_ROOT}/bin/serena`, installed
+   above. On a host already registered from the tag the installer reports
+   `serena` as differing; run `claude mcp remove serena -s user`, then
+   `python3 tools/adoption/install_claude_profile.py --only mcp`.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude

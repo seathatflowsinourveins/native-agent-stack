@@ -139,11 +139,13 @@ upstream behavior behind each.
   upstream documentation before labelling it. On the WSL workstation on
   2026-09-25, `127.0.0.1:49374`, this repository's default ai-memory port, was
   held by another distribution, and that host's scoped `nativestack-memory`
-  unit binds `127.0.0.1:49474`. The user-scope MCP template
-  `adoption/mcp/claude-user.json` (changed after `v2026.09.24.1`: serena runs
-  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and its
-  comment records this port rule) and the rendered hook commands must name the
-  port the host's own ai-memory unit binds.
+  unit binds `127.0.0.1:49474`. The ai-memory MCP registration and the
+  rendered hook commands (`AI_MEMORY_URL` in the host's
+  `adoption/hosts/<host>.json`) must name the port the host's own ai-memory
+  unit binds. The user-scope template `adoption/mcp/claude-user.json` keeps
+  the default 49374, and its comment gives the remove-then-add sequence for
+  another port. That template changed after `v2026.09.24.1`: serena runs
+  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper.
 - With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
   reached from the local network
   ([mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking))

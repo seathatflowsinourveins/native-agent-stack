@@ -62,8 +62,10 @@ and treat the projection as superseded guidance rather than looking for it to ha
    `wsl --shutdown` and compact its `ext4.vhdx`
    ([location](https://learn.microsoft.com/en-us/windows/wsl/disk-space#how-to-locate-the-vhdx-file-and-disk-path-for-your-linux-distribution))
    offline from an elevated prompt: `diskpart` with `select vdisk file="<path>"`,
-   `attach vdisk readonly`, `compact vdisk` and `detach vdisk`, or Hyper-V's
-   `Optimize-VHD -Path <path> -Mode Full`. Both compact only a detached or read-only disk. WSL's
+   `attach vdisk readonly`, `compact vdisk` and `detach vdisk`, or, with the Hyper-V module,
+   `Mount-VHD -Path <path> -ReadOnly`, `Optimize-VHD -Path <path> -Mode Full` and
+   `Dismount-VHD -Path <path>`. `-Mode Full` on a VHDX that is not attached read-only falls back to
+   `Prezeroed` mode. Both tools compact only a detached or read-only disk. WSL's
    own disk-space page uses `diskpart` only to expand a VHD and warns that Windows tools on WSL's
    `AppData` files can corrupt a distribution, so export or back up the distribution first.
 

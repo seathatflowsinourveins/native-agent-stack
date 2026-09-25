@@ -3219,8 +3219,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "4e986b7552e1b957700def90e017102e7e28c00270348284ee000eb849a96dfa",
-      "bytes": 21331
+      "sha256": "295eb57d751f981e700cc8a8310a2a8d65a2cf55c696dd6e61b58e3d4480ea3c",
+      "bytes": 23864
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3319,13 +3319,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "36b3cfe309bfd6d53a80ef2cffe287e0a94ff26c00eb876e6bdc38af993058a2",
-      "bytes": 10593
+      "sha256": "6408e600375ae47e3909ac53c41b426f1cea8e907dbd6f9fee8f7e9da0c126f5",
+      "bytes": 10752
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "f6173cb23741f7d0422c509bb64d99bf6d77b2af39563013fe43ac8c90ccc07d",
-      "bytes": 37736
+      "sha256": "57d947ee970d7080f11415e9a0c4844fa326c2807ed54d0cc18963cbc183233c",
+      "bytes": 38069
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3379,8 +3379,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "d3f22f9e886bf99b032dc0b9e02b2c4c183e30836446efaa7db8c9e4157b9d04",
-      "bytes": 27484
+      "sha256": "c90b8fea15fd28e32a173e6c9d8b02e2b3fa810ebb6e26100a66cf17619d412b",
+      "bytes": 28471
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -9815,8 +9815,8 @@
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
-      "sha256": "0f788bb378728db787f162b1d14009c2033db7b8ce54c59a75ce2d0ebe461e02",
-      "bytes": 5365
+      "sha256": "38ddfb80673ae86cad110a65a9cc938bb974d65a34bb9638b7a0f96d3e2ef508",
+      "bytes": 5820
     },
     {
       "path": "docs/activation.md",
@@ -10210,13 +10210,13 @@
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
-      "sha256": "eb3f6fd97bdc294991edb2c73c125d934919252db9411eea031337e3267795a0",
-      "bytes": 17430
+      "sha256": "7f7d7b9c04d373419b665f7bf23a4cf503a8a1ef2635dd6a858304b0ada50576",
+      "bytes": 17466
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "15768bbcdbd2e3683a9c5c3e0c32c57d4932ed2153b76292220a2547255ec536",
-      "bytes": 12815
+      "sha256": "085647ec0789ff1083e5fcdfacef90bdb13177fdb8c195e916b31e0f2bfb4208",
+      "bytes": 12997
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -10245,8 +10245,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "2f5f6a23f696eacab67ef6a572fa2d001eb3f918efe31e269e762be8fbf24f5b",
-      "bytes": 28786
+      "sha256": "47fe87b8539aa62257fa277b3f08f8aaa9aefa8e60563fbf3fe7db1db1c009d6",
+      "bytes": 31079
     },
     {
       "path": "docs/stack.md",
@@ -28880,8 +28880,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "dd50ed2e69b074d5cd07795bd4230acafe37b31956877dc06d9db2c94202691a",
-      "bytes": 60035
+      "sha256": "017dc4a07a9052a50325ffa427df654826ba5b75490c34af33a3a6ad0dbf6b48",
+      "bytes": 60370
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",

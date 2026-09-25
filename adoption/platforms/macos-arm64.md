@@ -57,7 +57,12 @@ release, the note is history and the step is in your checkout (`test -e
    exits 3 here.
 3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
    steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
-   with this host's own `adoption/hosts/<host>.json`).
+   with this host's own `adoption/hosts/<host>.json`). Its step 4a installs
+   Serena and jcodemunch-mcp into the ecosystem prefix and registers the
+   user-scope MCP servers. The MCP template `adoption/mcp/claude-user.json`
+   changed after `v2026.09.24.1`: the tag's `serena` entry names a
+   `serena-context` wrapper that nothing installs, and main's runs
+   `${ECO_ROOT}/bin/serena`.
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`

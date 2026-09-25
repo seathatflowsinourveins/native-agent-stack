@@ -39,12 +39,18 @@ do not replace it with an easier custom demo and call the original requirement
 passed. Local fault injection and integration checks may cover behavior that an
 upstream suite does not exercise, but remain separately labelled.
 
-**Discriminating controls.** A passing check counts as evidence only after it
-has been run at least once with its condition absent (the guard disarmed, the
-input empty, the answer wrong) and failed. Reject a vacuous pass: zero files
-scanned, zero rows compared or zero tests selected, or a verdict computed from
-placeholder verifier output such as a stub, a template value or a verifier that
-never ran. Record such a check as untested, not passed.
+**Discriminating controls.** For a new acceptance claim, a passing check counts
+as evidence only after the same check has been run at least once with its
+condition absent (the guard disarmed, the input empty, the answer wrong) and
+failed. Record that failing run next to the passing one, in the same receipt or
+PR evidence. For example, the pre-commit gitleaks hook check in
+[`secret-storage.md`](secret-storage.md#setting-up-a-new-host-wsl2-or-macos)
+step 5b passes a clean staged file (exit 0) and fails a planted, generated
+AWS-style key (exit 1). Reject a vacuous pass: zero files scanned, zero rows
+compared or zero tests selected, or a verdict computed from placeholder
+verifier output such as a stub, a template value or a verifier that never ran.
+Record such a check as untested, not passed. Evidence already recorded from
+unchanged upstream tests keeps its class; this rule governs new claims.
 
 ## Preserve the returned result
 
