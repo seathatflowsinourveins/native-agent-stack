@@ -21,12 +21,14 @@ list stay open: `CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS`, `--safe-mode` and fal
   and the workflow contract configuration, so it is left to that recipe's owner.
 - **Agents that skip the user file.** The user-level file does not reach agents that set `omitClaudeMd: true`:
   `adoption/agents/claude/source-scout.md`, `blind-judge.md`, `blind-lane-reviewer.md` and `blind-adjudicator.md`.
-  For those four agents, the StructuredOutput sentence has to be in the agent body. That change is on the rollout's
-  contract track for `adoption/agents/claude/`, and until it lands a new host's `source-scout` children do not get the
-  rule.
+  For those four agents, the only persistent carrier of the StructuredOutput sentence is the agent body. A dispatching
+  brief can carry it for a single run, as the G4 treatment arm did. The agent-body change is on the rollout's contract
+  track for `adoption/agents/claude/`, and until it lands a new host's `source-scout` children get the rule only
+  through their brief.
 - **Built-in agents.** Several of Claude Code's built-in agents also omit the user file, among them Explore and Plan.
-  Their bodies cannot be edited. The rule reaches them only through a custom agent of the same name, as agent-lab does
-  for Explore at project level, and the contract-track change does not cover them.
+  Their bodies cannot be edited. The only persistent carrier for them is a custom agent of the same name, as agent-lab
+  has for Explore at project level; a dispatching brief can carry the sentence for a single run. The contract-track
+  change does not cover them.
 
 ## Decision
 
