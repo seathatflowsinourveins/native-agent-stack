@@ -9155,8 +9155,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/experiment.json",
-      "sha256": "278c64891e2a5c1f75f7da462237b44e56e534b9320e2d634eb977b663758216",
-      "bytes": 14958
+      "sha256": "e48361fba7d46bbc1fc2d9424382e12ba144ceb35e87791bb4712de765ef634f",
+      "bytes": 15533
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fee_model.py",
