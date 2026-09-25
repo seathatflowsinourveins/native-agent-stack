@@ -7912,6 +7912,96 @@
       "bytes": 3465
     },
     {
+      "path": "blueprints/memory-stack/longmemeval/.gitignore",
+      "sha256": "cf45ee658753072c0e197c98fc851f610e278ab01ed5dfb61b73e2e5854eb6ae",
+      "bytes": 85
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/PREREGISTRATION.md",
+      "sha256": "1f3ca9d554cff24dc785c35f275335027a831dd386f460890f8a3082a07c11c2",
+      "bytes": 33527
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/README.md",
+      "sha256": "c35df4a3a003d525b13d9b0228839a92753164b052659dcbc65e8321dd904c99",
+      "bytes": 22843
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/SHA256SUMS",
+      "sha256": "6fef483f39fe37d4c9cd4f5f0698d6e023d0c8f9f3fa45337158210eca2ad821",
+      "bytes": 1510
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/agentmemory/package-lock.json.frozen",
+      "sha256": "e45aa62e9a2b6897e7024d138945b5c5a3bcc50f2e0d1ba548ecc5b6a73c8a27",
+      "bytes": 114313
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/agentmemory/package.json.frozen",
+      "sha256": "f735eef9db3d00f08dcacf74d5057a5a662d620856fce836ca1ad07ac67ec76e",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/eligible-manifest.json",
+      "sha256": "871f5da108b2901204aa01315b87d91cdee8d4e61dea96f4499916cbc19a05b7",
+      "bytes": 13607
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/embed_cache_proxy.py",
+      "sha256": "13621039cfaf1a3865307083fbd0124c0617c7401169b729f66c022b2c21a202",
+      "bytes": 6751
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/lme_harness.py",
+      "sha256": "b59ee6f5ada7392e4c250ad54dd1ec75e2e30921bca8ae4265807f587716f751",
+      "bytes": 31991
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/lme_harness.v1.py",
+      "sha256": "1f9c4f5d48680410c602b1002c78e610c5c3893f210f4d647ceaacb8c668348b",
+      "bytes": 25976
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/lme_harness.v2.py",
+      "sha256": "38dbb42ff0403f76104d44d04b5cb30ec0cf753107a17799107bd876b157f7c3",
+      "bytes": 29897
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/lme_summarize.py",
+      "sha256": "244fa443a392d366a88890f5dc25a1004665af864a28260d6b018c7d55479d42",
+      "bytes": 18683
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/mac-drivers/run_c3_resume.sh",
+      "sha256": "01051987ddbdb3c870aab31bc7a3b20baf540f9625a309ac6f1dca26ddd07cdd",
+      "bytes": 2791
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/mac-drivers/run_d3.sh",
+      "sha256": "20e0dfdb3ab975f39a994b98d86f9da69282f15b080dd684a2baee9021ad9aaa",
+      "bytes": 1303
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/mac-drivers/run_queue.sh",
+      "sha256": "f73ea87b5b098e6075c2caa0aa8434eb6dfdd70b07ffbf9ba701afe8ae56c655",
+      "bytes": 5289
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/reconstructed/lme_harness.v1a.py",
+      "sha256": "09940d85d144d9b4bd58610dfb11f3d1c579ce544f9562fdc6ea137b5a4c9e57",
+      "bytes": 25416
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/reconstructed/lme_harness.v3pre.py",
+      "sha256": "15b4fe3e2d01ae990c7aabbce9b929ececae8dd0697c9207782816215c11d5ec",
+      "bytes": 31422
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/run_official_oracle.py",
+      "sha256": "fc2c4e2e88032412a37cabf1dadace1c0e4e54265e65fa0374f9545e60e1ad67",
+      "bytes": 472
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "013aa43f686b413287b5058c9a04689029b7d8421ae306cd7c6beb23eb0c5060",
       "bytes": 7960
@@ -13530,6 +13620,11 @@
       "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
       "sha256": "f509b770de5cc91b50952356d04faefff91fe01d9223e7a5ae19ff5785630fd2",
       "bytes": 32507
+    },
+    {
+      "path": "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md",
+      "sha256": "bd813f20f0ffaea1eed7d824af23eae80502cc0ea38ffe0206c17796954480b9",
+      "bytes": 5525
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
