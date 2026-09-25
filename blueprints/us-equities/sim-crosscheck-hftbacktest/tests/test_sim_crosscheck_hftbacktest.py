@@ -67,6 +67,28 @@ class L1FeasibilityTests(unittest.TestCase):
         self.assertGreater(result["with_side"]["exec_qty"], 0.0)
         self.assertAlmostEqual(result["without_side"]["exec_qty"], 0.0, places=6)
 
+    def test_l1_verdict_is_unchanged_under_partial_fill_exchange(self):
+        import hftbacktest.order as order_mod
+
+        result_a = self.mod.run_ioc_scenario(
+            self.mod.build_scenario_a, submit_at_ns=1 * self.mod.NS, exchange="partial_fill"
+        )
+        result_b = self.mod.run_ioc_scenario(
+            self.mod.build_scenario_b, submit_at_ns=50 * self.mod.MS, exchange="partial_fill"
+        )
+        result_c = self.mod.run_scenario_c(exchange="partial_fill")
+        self.assertEqual(result_a["order_status"], order_mod.FILLED)
+        self.assertEqual(result_b["order_status"], order_mod.EXPIRED)
+        self.assertEqual(result_c["with_side"]["order_status"], order_mod.FILLED)
+        self.assertEqual(result_c["without_side"]["order_status"], order_mod.NEW)
+
+    def test_lee_ready_inference_restores_queue_depletion(self):
+        import hftbacktest.order as order_mod
+
+        result = self.mod.run_scenario_c_lee_ready()
+        self.assertEqual(result["order_status"], order_mod.FILLED)
+        self.assertEqual(result["inferred_sides"], ["sell"] * 5)
+
     def test_feasibility_script_runs_end_to_end_and_matches_expectations(self):
         # Runs the script's own __main__ path via subprocess-free module import so any
         # regression in wiring (imports, argparse, JSON shape) is caught, not just the
@@ -79,19 +101,25 @@ class L1FeasibilityTests(unittest.TestCase):
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
         out = json.loads(proc.stdout)
+        for exchange in ("no_partial_fill", "partial_fill"):
+            block = out["by_exchange_model"][exchange]
+            self.assertEqual(
+                block["scenario_a_marketable_ioc_fill_from_l1_depth"]["order_status_name"], "FILLED"
+            )
+            self.assertEqual(
+                block["scenario_b_ioc_expiry_from_l1_depth"]["order_status_name"], "EXPIRED"
+            )
+            self.assertEqual(
+                block["scenario_c_queue_trade_depletion_needs_side"]["with_side"]["order_status_name"],
+                "FILLED",
+            )
+            self.assertEqual(
+                block["scenario_c_queue_trade_depletion_needs_side"]["without_side"]["order_status_name"],
+                "NEW",
+            )
+        self.assertFalse(out["l1_verdict_changes_with_partial_fill_exchange"])
         self.assertEqual(
-            out["scenario_a_marketable_ioc_fill_from_l1_depth"]["order_status_name"], "FILLED"
-        )
-        self.assertEqual(
-            out["scenario_b_ioc_expiry_from_l1_depth"]["order_status_name"], "EXPIRED"
-        )
-        self.assertEqual(
-            out["scenario_c_queue_trade_depletion_needs_side"]["with_side"]["order_status_name"],
-            "FILLED",
-        )
-        self.assertEqual(
-            out["scenario_c_queue_trade_depletion_needs_side"]["without_side"]["order_status_name"],
-            "NEW",
+            out["lee_ready_aggressor_side_inference"]["result"]["order_status_name"], "FILLED"
         )
 
 

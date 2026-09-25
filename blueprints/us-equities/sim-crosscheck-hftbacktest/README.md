@@ -55,9 +55,30 @@ class of each item (per `docs/acceptance-evidence-policy.md`).
 - **Rust**: the `hftbacktest` crate has `#[test]` functions in 8 files,
   including `hftbacktest/src/backtest/models/queue.rs` and the four
   `hftbacktest/src/depth/*.rs` market-depth implementations this cross-check
-  relies on. **Not run**: no Rust/cargo toolchain is installed on this host
-  (`cargo --version` -> command not found). This is an explicit, unresolved
-  gap (see `receipt.json`'s `unverified` list), not a silent skip.
+  relies on. A Rust toolchain was installed with the supported user-level
+  method (`rustup-init.sh -y --profile minimal --no-modify-path`, into
+  `~/.rustup`/`~/.cargo`, shell profile untouched) -- `rustc 1.98.1`,
+  `cargo 1.98.1`, `rustup 1.29.1`, satisfying the crate's pinned
+  `rust-version = "1.91.1"`.
+  - `cargo test -p hftbacktest` (default features `backtest`+`live`) fails to
+    **build**: the `live` feature (live-trading IPC, unrelated to
+    backtesting) pulls in `iceoryx2-pal-posix`, whose build script needs
+    `bindgen`/`libclang` plus reachable C standard headers; neither was
+    available on this host and there is no passwordless sudo to install
+    `libclang-dev`. Recorded as an environment gap for the `live` feature
+    specifically, not swept aside.
+  - `cargo test -p hftbacktest --no-default-features --features backtest --lib`
+    **passes: 22 passed, 0 failed, 0 ignored**, wall time 0.145s. This is the
+    crate's actual unit-test suite (`--lib`, excluding `examples/`, several of
+    which reference the `live` feature's API without an upstream
+    `required-features = ["live"]` guard and so fail to *compile* -- not
+    fail as tests -- without that feature; an upstream packaging gap, not
+    something introduced here). No workflow in `.github/workflows/` at this
+    tag runs `cargo test` at all, so there was no CI command to mirror; this
+    is the crate's own unmodified `#[test]` functions run directly.
+  - The recorded gap "upstream Rust tests never run" is now closed for the
+    crate's unit-test suite; the `live`-feature build gap remains open (see
+    `receipt.json`'s `unverified` list).
 
 ## L1 (top-of-book) feasibility
 
@@ -77,42 +98,69 @@ full reasoning, with source citations):
 - Each trade print is a bare `TRADE_EVENT` with **no** `BUY_EVENT`/`SELL_EVENT`
   bit, because the SIP tape carries no aggressor side.
 
-**Verdict: feasible-with-limits.**
+**Verdict: feasible-with-limits.** Checked under both exchange models
+hftbacktest exposes -- `no_partial_fill_exchange` and `partial_fill_exchange`
+-- with an identical result on this fixture (see below).
 
 Feasible (verified against hand-computed expectations, `l1_feasibility.py`,
-run via `tests/test_sim_crosscheck_hftbacktest.py`):
+run via `tests/test_sim_crosscheck_hftbacktest.py`, under both exchange models):
 
-- Marketable IOC/limit fills and IOC/FOK expiry are decided in
-  `hftbacktest/src/backtest/proc/nopartialfillexchange.rs`'s `ack_new` purely
-  from best-bid/best-ask depth at order-arrival time. Scenario A (order
-  crosses the touch, ask unchanged) fills at the prevailing ask; Scenario B
-  (ask re-quotes away during the order's 70ms entry latency) expires. Both
-  matched hand computation exactly.
+- Marketable IOC/limit fills and IOC/FOK expiry are decided in `ack_new`
+  (`nopartialfillexchange.rs` and `partialfillexchange.rs`) purely from
+  best-bid/best-ask depth at order-arrival time. Scenario A (order crosses
+  the touch, ask unchanged) fills at the prevailing ask; Scenario B (ask
+  re-quotes away during the order's 70ms entry latency) expires. Both
+  matched hand computation exactly under both exchange models.
 - Constant (and, separately, interpolated-from-recorded-data) latency models
   are independent of depth granularity and work unmodified on L1 data.
 - Fee/cost accounting (`FlatPerTradeFeeModel`/`TradingValueFeeModel`) applies
   to realized fills regardless of feed depth.
 
 Not feasible, or meaningless, on L1-only data (also verified empirically, not
-just asserted -- Scenario C):
+just asserted -- Scenario C, under both exchange models):
 
 - Probabilistic queue-position models (RiskAdverse/Power/Log) deplete a
   resting order's queue position from trade prints via
   `EXCH_BUY_TRADE_EVENT`/`EXCH_SELL_TRADE_EVENT` -- i.e. only when the trade
   event itself carries an aggressor side. A bare `TRADE_EVENT` (our L1/SIP
-  reality) matches neither branch in `nopartialfillexchange.rs` and is
+  reality) matches neither branch in either exchange model's source and is
   silently dropped: `queue_model.trade()` is never called. Scenario C ran the
   identical resting order and identical trade volume with and without a side
-  bit: `with_side` filled from queue depletion; `without_side` stayed `NEW`
-  for the entire run. Depth-quantity-change events (`on_bid_qty_chg`) still
-  drive the queue model's `depth()` callback either way, but that is a
-  materially different (coarser, level-quantity-only) signal than
-  trade-driven queue consumption.
+  bit, under both `no_partial_fill_exchange` and `partial_fill_exchange`:
+  `with_side` filled from queue depletion in both; `without_side` stayed
+  `NEW` in both for the entire run. Depth-quantity-change events
+  (`on_bid_qty_chg`) still drive the queue model's `depth()` callback either
+  way, but that is a materially different (coarser, level-quantity-only)
+  signal than trade-driven queue consumption.
 - The L3 FIFO queue model needs per-order add/cancel/execute events
   (`order_id`-level); categorically unavailable from L1 or even standard L2
   SIP quotes.
 - Any multi-level queue heuristic that reads levels beyond the touch: our L1
   feed only ever has one live level per side.
+
+**Does the verdict change under `PartialFillExchange`? No, not on this
+fixture.** All three scenarios produced byte-identical results
+(`order_status`/`exec_qty`/`leaves_qty`) under `no_partial_fill_exchange` and
+`partial_fill_exchange`. This is expected here: every scenario's single L1
+level has enough quantity (100) to fully satisfy the order (10 or 5), so
+`PartialFillExchange`'s distinguishing behavior (partial fills when the
+touch's quoted size is smaller than the order) never activates. A fixture
+where order size exceeds the touch's quoted size would be needed to actually
+exercise the divergence between the two models; that remains an open gap
+(see `receipt.json`'s `unverified` list), not claimed to be covered here.
+
+**Restoring trade-driven queue depletion from L1 data (proposed data
+preparation, not an hftbacktest feature).** `run_scenario_c_lee_ready` infers
+each trade's aggressor side with the Lee-Ready quote rule (trade price >=
+ask -> buy; <= bid -> sell; otherwise the tick test against the previous
+trade) before applying a `BUY_EVENT`/`SELL_EVENT` bit. In this fixture every
+trade prints at the bid (10.00 <= bid 10.00), so Lee-Ready classifies all 5
+as sell aggressors -- exactly matching Scenario C's `with_side=True` case,
+and restoring the `FILLED` result versus the side-less `NEW`. This is a
+classic market-microstructure heuristic (Lee & Ready, 1991), presented here
+as a proposed conversion step for real SIP data, not validated against real
+Alpaca SIP data's actual (unobserved) aggressor side -- that accuracy is
+unverified (see `receipt.json`).
 
 Run it yourself:
 
@@ -152,10 +200,20 @@ out of scope here). The plan, once it lands on `main`:
 
 ## Unverified / open risks
 
-- `cargo test` for the Rust crate at this tag (no Rust toolchain on this host).
+- `cargo test -p hftbacktest` with **default** features (`backtest`+`live`):
+  blocked by a missing libclang/C-header toolchain for the `live` feature's
+  `iceoryx2` dependency, with no passwordless sudo available to install it.
+  The crate's own unit tests (`--features backtest --lib`) were run instead
+  (22 passed, 0 failed) and are the ones this cross-check's conclusions
+  depend on; the `live` feature itself is irrelevant to backtesting.
 - `osv-scanner` CLI scan (binary absent on this host; `pip-audit` substituted
   and recorded as such, not silently swapped in).
 - The actual numeric cross-check against sim-capacity's output (that run does
   not exist yet in this worktree).
-- Whether the optional `PartialFillExchange` model (vs. the
-  `NoPartialFillExchange` exercised here) changes the L1 feasibility verdict.
+- Whether `PartialFillExchange` diverges from `NoPartialFillExchange` on a
+  fixture where order size exceeds the touch's quoted size (not constructed
+  here -- this fixture's orders never exceeded the touch's quoted quantity,
+  so the two exchange models could not diverge on it).
+- Real-world accuracy of the Lee-Ready aggressor-side inference on actual
+  Alpaca SIP data (only shown to work on this hand-constructed fixture, where
+  every trade prints exactly at the bid).

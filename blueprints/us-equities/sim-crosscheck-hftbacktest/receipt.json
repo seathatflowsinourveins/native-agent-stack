@@ -1,12 +1,14 @@
 {
   "task": "Phase-B prep: hftbacktest as the independent cross-check engine for the simulation lane",
   "date_utc": "2026-09-25",
+  "followup_date_utc": "2026-09-25",
   "upstream": {
     "project": "hftbacktest (nkaz001/hftbacktest)",
     "license": "MIT",
     "python_release_tag": "py-v2.4.4",
     "rust_release_tag": "rust-v0.9.4",
     "pinned_version": "2.4.4",
+    "pinned_commit": "a244a14250b42d97fc305569c93c4117cd5e1dff",
     "source_url": "https://github.com/nkaz001/hftbacktest",
     "pypi_url": "https://pypi.org/pypi/hftbacktest/json"
   },
@@ -17,7 +19,10 @@
     "numpy": "2.2.6",
     "numba": "0.67.0",
     "polars": "1.44.2",
-    "uv": "0.12.17"
+    "uv": "0.12.17",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
+    "rustup": "1.29.1 (d95a37b6a 2026-08-13)"
   },
   "wheel": {
     "filename": "hftbacktest-2.4.4-cp312-cp312-manylinux_2_28_x86_64.whl",
@@ -57,44 +62,81 @@
       "stdout_stderr_sha256": "b655df5181026937ee96e9b34fc7e1355ebaf8cf650dbe665c18b80e72977dac",
       "result": "1 test, 1 error: FileNotFoundError: 'tmp_20240501.npz' -- the sole upstream unittest (py-hftbacktest/tests/test_hftbacktest.py) requires a private/undistributed binary market-data fixture (tmp_20240501.npz) that is not present in the tagged source tree and is not fetched by any script or CI workflow in the repository.",
       "additional_finding": "The repository's own CI (.github/workflows/release-python.yml, codeql.yml, stale.yml at this tag) contains no workflow that runs this test file; maturin build/wheel jobs run, but no `pytest`/`unittest` step exists. This is recorded, not inferred: upstream currently has no CI-executed Python test suite for this release.",
-      "claim_boundary": "This exercises the actual upstream test file at the actual pinned tag with the actual upstream command; the result (a fixture-availability failure, not a code defect) is the accurate, unmodified outcome. It does not establish upstream's Rust core correctness, which is covered separately (or not) below."
+      "claim_boundary": "This exercises the actual upstream test file at the actual pinned tag with the actual upstream command; the result (a fixture-availability failure, not a code defect) is the accurate, unmodified outcome. It does not establish upstream's Rust core correctness, which is covered separately below (now resolved)."
     },
     {
-      "item": "upstream Rust test suite (hftbacktest crate) at the pinned tag",
-      "evidence_class": "unresolved",
-      "result": "NOT RUN: no Rust/cargo toolchain is installed on this host (`cargo --version` -> command not found). The pinned source tree has 8 files containing #[test] functions (connector/src/utils.rs, hftbacktest/src/types.rs, hftbacktest/src/backtest/mod.rs, hftbacktest/src/backtest/models/queue.rs, hftbacktest/src/depth/{roivectormarketdepth,fuse,hashmapmarketdepth,btreemarketdepth}.rs), including unit tests directly on the queue/depth models this cross-check relies on. This remains an unverified gap for this host; running `cargo test` (with a Rust toolchain installed) at commit a244a14250b42d97fc305569c93c4117cd5e1dff is the concrete follow-up.",
-      "claim_boundary": "Unresolved, explicitly recorded per docs/acceptance-evidence-policy.md -- not silently skipped or reported as passing."
+      "item": "Rust toolchain installation",
+      "evidence_class": "structural_validation",
+      "commands": [
+        {"cmd": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh", "exit_code": 0},
+        {"cmd": "sh rustup-init.sh -y --profile minimal --no-modify-path", "exit_code": 0}
+      ],
+      "result": "rustup 1.29.1, rustc 1.98.1, cargo 1.98.1 installed into ~/.rustup and ~/.cargo, shell profile untouched (--no-modify-path); invoked via $HOME/.cargo/bin/cargo. Satisfies the crate's pinned `rust-version = \"1.91.1\"` (hftbacktest/Cargo.toml at the tag)."
     },
     {
-      "item": "L1 top-of-book feasibility fixture",
+      "item": "upstream Rust test suite (hftbacktest crate) at the pinned tag -- default features attempt",
+      "evidence_class": "upstream_test",
+      "commands": [
+        {"cmd": "cargo test -p hftbacktest (CARGO_TARGET_DIR pointed at the scratchpad, not the repo; default features = backtest+live)", "exit_code": 101}
+      ],
+      "stdout_stderr_sha256": "b0cd5160f808137539bc86027d0b7d8109402366faca1d0bf498c026aba34e44",
+      "result": "Build failure, not a test failure: `iceoryx2-pal-posix`'s build script (pulled in only by the `live` feature, used for live-trading IPC, unrelated to backtesting) needs bindgen -> libclang. No libclang.so and no C standard headers reachable by clang were present on this host, and there is no passwordless sudo to install libclang-dev. This blocks the `live` feature specifically, not the crate's own logic.",
+      "claim_boundary": "Recorded as an environment gap for the `live` feature, not swept aside; the crate's own test-relevant code (backtest/depth/queue modules) does not require `live` and was exercised directly below."
+    },
+    {
+      "item": "upstream Rust test suite (hftbacktest crate) at the pinned tag -- backtest-feature run (actually executed)",
+      "evidence_class": "upstream_test",
+      "source": "git clone --depth 1 --branch py-v2.4.4 https://github.com/nkaz001/hftbacktest.git (commit a244a14250b42d97fc305569c93c4117cd5e1dff); no rust-toolchain.toml pin found in the tagged tree, and no repository workflow defines a `cargo test` invocation at this tag (checked .github/workflows/{release-python,codeql,stale}.yml -- none run cargo test), so there was no CI command to mirror.",
+      "commands": [
+        {"cmd": "cargo test -p hftbacktest --no-default-features --features backtest --lib", "exit_code": 0, "wall_time_seconds": 0.145}
+      ],
+      "stdout_sha256": "605cf5d19104d0971e3723088601f57bafadb651c4c90d19d36764a338eb7c65",
+      "result": "22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out. Covers backtest::models::queue::l3_tests::{fill_in_queue,fill_by_crossing}, backtest::test::skips_unseen_events, depth::{btreemarketdepth,hashmapmarketdepth,roivectormarketdepth}::tests::{test_l3_add_delete_buy_order,test_l3_add_delete_sell_order,test_l3_modify_buy_order,test_l3_modify_sell_order}, depth::fuse::tests::{test_bound_after_bbo_update,test_update_ask_depth,test_update_best_ask,test_update_best_bid,test_update_bid_depth,test_update_bid_ask_depth_cross}, types::tests::test_event_is -- i.e. the exact queue/depth-model unit tests this cross-check's L1 feasibility conclusions rely on.",
+      "scope_note": "Used `--lib` (unit tests inside hftbacktest/src only) instead of the bare `cargo test -p hftbacktest`, because the crate's own `examples/` directory contains files (gridtrading_live.rs, logging_order_latency.rs, gridtrading_live_bybit.rs, custom_evhandling.rs) that reference the `live` feature's API without declaring `required-features = [\"live\"]` in Cargo.toml -- an upstream packaging inconsistency, not something introduced here -- so `cargo test` without `--lib` tries to build them and fails to compile even with `--no-default-features --features backtest`. `--lib` isolates the crate's actual unit-test suite, which is unaffected by that packaging gap and is where every #[test] relevant to depth/queue models actually lives.",
+      "claim_boundary": "These are hftbacktest's own, unchanged #[test] functions, run at the pinned tag with the pinned toolchain. `--no-default-features --features backtest --lib` is a scope choice recorded above, not a modification of any test."
+    },
+    {
+      "item": "L1 top-of-book feasibility fixture (NoPartialFillExchange and PartialFillExchange)",
       "evidence_class": "synthetic_fixture",
       "constructed_by": "this task, blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
       "commands": [
-        {"cmd": "python3 l1_feasibility.py --out <path>", "exit_code": 0}
+        {"cmd": "python3 l1_feasibility.py", "exit_code": 0}
       ],
-      "stdout_sha256": "7c4230e9ed430226cc7c914e570df5099e055c02ce60b75e76a9481c12421fd7",
-      "script_sha256": "f197f1cc906daecf85c9c985f9d66f32ebb8ba83c6c02063de6815ddbbba4da5",
+      "stdout_sha256": "60d08e6570340fd487322d3000d4f508b1cc2f1cc0ab901097e77b4efdf9ce00",
+      "script_sha256": "c256e6f63f64a6b2d54b85b7806b216cd2db6ad0e7e843e902eb4645557be357",
       "scenarios": {
         "A_marketable_ioc_fill": {
-          "setup": "Static book (bid 10.00/100, ask 10.02/100); constant_order_latency(70ms,70ms); power_prob_queue_model(2.0); no_partial_fill_exchange. IOC buy limit submitted at ask+$0.01 collar.",
-          "hand_expectation": "FILLED at 10.02 (ack_new's price_tick>=best_ask_tick branch fires purely from L1 best-ask depth)",
-          "actual_result": "FILLED at 10.02, exec_qty=10.0, leaves_qty=0.0 -- matches"
+          "setup": "Static book (bid 10.00/100, ask 10.02/100); constant_order_latency(70ms,70ms); power_prob_queue_model(2.0). IOC buy limit submitted at ask+$0.01 collar. Run under both no_partial_fill_exchange and partial_fill_exchange.",
+          "hand_expectation": "FILLED at 10.02 under both exchange models (ack_new's price_tick>=best_ask_tick branch fires purely from L1 best-ask depth; the single L1 level's qty=100 fully covers the order's qty=10, so partial-fill semantics never trigger)",
+          "actual_result": "FILLED at 10.02, exec_qty=10.0, leaves_qty=0.0 under both no_partial_fill and partial_fill -- matches, identical"
         },
         "B_ioc_expiry": {
-          "setup": "Same book; order priced off ask=10.02 (limit 10.03) submitted at 50ms; ask re-quotes to 10.06 at 100ms, before the order's 70ms entry latency lands it at the exchange at 120ms.",
-          "hand_expectation": "EXPIRED (10.03 < prevailing ask 10.06 at arrival; IOC/FOK do not rest, per nopartialfillexchange.rs ack_new else-branch)",
-          "actual_result": "EXPIRED, exec_qty=0.0, leaves_qty=10.0 -- matches"
+          "setup": "Same book; order priced off ask=10.02 (limit 10.03) submitted at 50ms; ask re-quotes to 10.06 at 100ms, before the order's 70ms entry latency lands it at the exchange at 120ms. Run under both exchange models.",
+          "hand_expectation": "EXPIRED under both (10.03 < prevailing ask 10.06 at arrival; IOC/FOK do not rest, per both nopartialfillexchange.rs and partialfillexchange.rs ack_new else-branches)",
+          "actual_result": "EXPIRED, exec_qty=0.0, leaves_qty=10.0 under both no_partial_fill and partial_fill -- matches, identical"
         },
         "C_queue_trade_depletion_needs_side": {
-          "setup": "Resting GTC buy at bid=10.00 (qty 20 ahead); five TRADE_EVENT prints of qty 10 at 10.00, once with SELL_EVENT (aggressor hits the bid) and once with no side bit at all (our L1/SIP reality).",
-          "hand_expectation": "with_side: FILLED (queue_model.trade() consumes queue ahead via EXCH_SELL_TRADE_EVENT, matching the resting Side::Buy order). without_side: stays NEW (a bare TRADE_EVENT matches neither EXCH_BUY_TRADE_EVENT nor EXCH_SELL_TRADE_EVENT in nopartialfillexchange.rs, so it is silently dropped and queue_model.trade() is never called).",
-          "actual_result": "with_side: FILLED, exec_qty=5.0. without_side: NEW, exec_qty=0.0 -- matches"
+          "setup": "Resting GTC buy at bid=10.00 (qty 20 ahead); five TRADE_EVENT prints of qty 10 at 10.00, once with SELL_EVENT (aggressor hits the bid) and once with no side bit at all (our L1/SIP reality). Run under both exchange models.",
+          "hand_expectation": "with_side: FILLED under both (queue_model.trade() consumes queue ahead via EXCH_SELL_TRADE_EVENT, matching the resting Side::Buy order in both nopartialfillexchange.rs and partialfillexchange.rs). without_side: stays NEW under both (a bare TRADE_EVENT matches neither EXCH_BUY_TRADE_EVENT nor EXCH_SELL_TRADE_EVENT in either exchange model, so it is silently dropped and queue_model.trade() is never called).",
+          "actual_result": "with_side: FILLED, exec_qty=5.0 under both. without_side: NEW, exec_qty=0.0 under both -- matches, identical"
         }
       },
+      "l1_verdict_changes_with_partial_fill_exchange": false,
+      "l1_verdict_changes_with_partial_fill_exchange_reasoning": "All three scenarios produced byte-identical order_status/exec_qty/leaves_qty results under no_partial_fill_exchange and partial_fill_exchange. This is expected for this specific fixture: every scenario's single L1 level has enough quantity (100) to fully satisfy the order (10 or 5), so PartialFillExchange's extra behavior (partial fills across a level when quantity is insufficient) never activates. A fixture with an order quantity exceeding the touch's quoted size would be needed to actually exercise the divergence between the two exchange models; that is a documented remaining gap, not claimed to be covered here.",
       "source_citations": [
         "hftbacktest/src/backtest/proc/nopartialfillexchange.rs (ack_new IOC/FOK branches; EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT branches)",
+        "hftbacktest/src/backtest/proc/partialfillexchange.rs (same branches, present at similar line numbers)",
         "docs/data.rst (qty==0 at a DEPTH_EVENT price removes that level)"
       ]
+    },
+    {
+      "item": "Lee-Ready aggressor-side inference (proposed data-preparation step)",
+      "evidence_class": "synthetic_fixture",
+      "constructed_by": "this task, blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py (infer_side_lee_ready, run_scenario_c_lee_ready)",
+      "rule": "trade price >= ask -> buy aggressor; trade price <= bid -> sell aggressor; otherwise the tick test (compare to the previous trade price).",
+      "setup": "Identical resting order and trade-print setup to Scenario C, except the side bit fed to hftbacktest is not hard-coded: each trade prints at 10.00 with bid=10.00/ask=10.02, so trade_px <= bid classifies every print as a sell aggressor under Lee-Ready before the SELL_EVENT bit is applied.",
+      "result": "All 5 trades classified 'sell'; resulting order_status FILLED, exec_qty 5.0 -- matches Scenario C's with_side=True result exactly, restoring trade-driven queue depletion from L1/SIP-shaped data via a data-preparation step external to hftbacktest.",
+      "claim_boundary": "This is OUR proposed data-preparation step, explicitly presented as such -- Lee-Ready is a classic market-microstructure heuristic (Lee & Ready 1991), not an hftbacktest feature, and it is an imperfect proxy for the true (unobserved) aggressor side, not a substitute for real exchange-reported side data."
     }
   ],
   "l1_feasibility_verdict": {
@@ -103,28 +145,31 @@
       "Order acceptance/rejection logic driven by top-of-book crossing (marketable IOC/limit fills, GTX/limit rejection at the touch)",
       "IOC/FOK immediate-fill-or-expire semantics, decided purely from best-bid/best-ask depth",
       "Constant and per-symbol latency modelling (entry + response), independent of depth granularity",
-      "FlatPerTradeFeeModel / TradingValueFeeModel cost accounting on realized fills"
+      "FlatPerTradeFeeModel / TradingValueFeeModel cost accounting on realized fills",
+      "Both no_partial_fill_exchange and partial_fill_exchange for the crossing/expiry paths above -- verified identical on this fixture (see l1_verdict_changes_with_partial_fill_exchange=false, with the noted caveat about order size vs. touch size)"
     ],
     "not_feasible_or_meaningless_for": [
-      "Probabilistic queue-position models (RiskAdverse/Power/Log) that key off trade-print volume at the touch: hftbacktest's exchange models only apply a trade to queue depletion when the event carries a BUY_EVENT/SELL_EVENT aggressor bit (EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT). Alpaca's consolidated SIP tape has no aggressor side, so these models silently receive zero trade-driven queue depletion under L1 data -- demonstrated empirically in Scenario C, not just asserted.",
+      "Probabilistic queue-position models (RiskAdverse/Power/Log) that key off trade-print volume at the touch: hftbacktest's exchange models only apply a trade to queue depletion when the event carries a BUY_EVENT/SELL_EVENT aggressor bit (EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT), in both no_partial_fill_exchange and partial_fill_exchange. Alpaca's consolidated SIP tape has no aggressor side, so these models silently receive zero trade-driven queue depletion under raw L1 data -- demonstrated empirically in Scenario C under both exchange models, not just asserted.",
       "The L3 FIFO queue model, which needs individual order add/cancel/execute events (order_id-level), categorically unavailable from L1 or even standard L2 SIP quotes.",
       "Any depth-percentile / multi-level queue heuristic that reads levels beyond the touch (our L1 feed only ever has one level per side)."
     ],
-    "reasoning": "Confirmed by reading hftbacktest/src/backtest/proc/nopartialfillexchange.rs (the exchange model used) and reproducing both code paths (depth-crossing fill/expiry vs trade-driven queue depletion) with a hand-verified synthetic fixture; the L1-driven paths matched hand computation exactly, and the side-dependent path was empirically shown to be a no-op without an aggressor bit."
+    "mitigation": "A Lee-Ready (or similar) aggressor-side inference step, applied as data preparation before feeding hftbacktest, restores trade-driven queue depletion in this fixture (see the Lee-Ready evidence item). This makes the probabilistic queue models usable on SIP-derived data at the cost of introducing inference error the true exchange-reported side would not have; that error is not quantified here.",
+    "reasoning": "Confirmed by reading hftbacktest/src/backtest/proc/{nopartialfillexchange,partialfillexchange}.rs (both exchange models) and reproducing all code paths (depth-crossing fill/expiry, trade-driven queue depletion, and Lee-Ready-restored depletion) with a hand-verified synthetic fixture; every L1-driven path matched hand computation exactly under both exchange models, and the side-dependent path was empirically shown to be a no-op without an aggressor bit -- and restored by the proposed inference step."
   },
   "cross_check_plan": {
     "goal": "Cross-check the NautilusTrader sim-capacity run (blueprints/us-equities/sim-capacity/, built by a parallel worker, not touched by this task) against hftbacktest on the same bounded private SIP sample.",
     "sample": "A bounded 5-minute window of 2 symbols' Alpaca SIP quotes+trades, reused from whatever anchored sample sim-capacity/sim-paper-compare already retained (no new market-data acquisition here).",
-    "conversion": "Alpaca SIP best-bid/best-ask -> paired DEPTH_EVENT (qty=0 at old price, qty>0 at new price) per side, per this fixture's documented representation; trades -> bare TRADE_EVENT (no side).",
-    "exchange_model": "no_partial_fill_exchange with constant_order_latency (start at 69.2ms per blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json's measured flip; keep the queue model fixed to whichever one is 'feasible' above).",
+    "conversion": "Alpaca SIP best-bid/best-ask -> paired DEPTH_EVENT (qty=0 at old price, qty>0 at new price) per side, per this fixture's documented representation; trades -> bare TRADE_EVENT (no side), optionally with a Lee-Ready-inferred side applied per the proposed data-preparation step.",
+    "exchange_model": "no_partial_fill_exchange (or partial_fill_exchange -- shown equivalent on this fixture) with constant_order_latency (start at 69.2ms per blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json's measured flip; keep the queue model fixed to whichever one is 'feasible' above).",
     "comparison_metrics": ["fill_rate", "median_time_to_fill", "fill_share_at_touch", "cost (fees + realized slippage vs decision price)"],
-    "status": "not yet run -- this task delivers the engine, its pinned install, its upstream-test status and its L1 feasibility boundary; the actual side-by-side run against sim-capacity's output is the next bounded step once sim-capacity lands on main.",
+    "status": "not yet run -- this task delivers the engine, its pinned install, its upstream-test status (now including Rust) and its L1 feasibility boundary across both exchange models; the actual side-by-side run against sim-capacity's output is the next bounded step once sim-capacity lands on main.",
     "does_not_touch": "blueprints/us-equities/sim-capacity/ (owned by a parallel builder; not read or modified by this task)"
   },
   "unverified": [
-    "cargo test for the Rust crate at py-v2.4.4/rust-v0.9.4 (no Rust toolchain on this host)",
+    "cargo test -p hftbacktest with default features (backtest+live): blocked by a missing libclang/C-header toolchain for the `live` feature's iceoryx2 dependency on this host, with no passwordless sudo available to install it. The crate's own unit tests (--features backtest --lib) were run instead and are the ones this cross-check's conclusions depend on.",
     "osv-scanner CLI scan (binary not found on this host; pip-audit was run instead and is recorded as the substitute, not a silent replacement)",
     "Actual side-by-side numeric comparison against the NautilusTrader sim-capacity run (that run did not exist in this worktree at the time of this task; blueprints/us-equities/sim-capacity/ was explicitly out of scope)",
-    "Whether hftbacktest's optional partial-fill exchange model (PartialFillExchange) changes the L1 feasibility verdict; only NoPartialFillExchange was exercised here"
+    "Whether PartialFillExchange diverges from NoPartialFillExchange on a fixture where order size exceeds the touch's quoted size (not constructed here; this fixture's order sizes were always <= the touch's quoted quantity, so the two exchange models could not diverge on it)",
+    "Real-world accuracy of the Lee-Ready aggressor-side inference on actual Alpaca SIP data (only shown to work on this hand-constructed fixture where all trades print exactly at the bid)"
   ]
 }

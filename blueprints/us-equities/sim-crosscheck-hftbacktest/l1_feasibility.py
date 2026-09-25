@@ -53,6 +53,14 @@ Scenarios:
 
 Latency: constant_order_latency(70ms, 70ms), matching the 69.2ms flip
 recorded in blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json.
+
+All three scenarios are run under BOTH exchange models hftbacktest exposes
+(`no_partial_fill_exchange` and `partial_fill_exchange`) to check whether the
+L1 feasibility verdict depends on that choice; see `main()`'s
+`l1_verdict_changes_with_partial_fill_exchange` field. `run_scenario_c_lee_ready`
+additionally shows that inferring the trade aggressor side with the
+Lee-Ready quote rule (a proposed DATA-PREPARATION step, not an hftbacktest
+feature) restores trade-driven queue depletion in this fixture.
 """
 from __future__ import annotations
 
@@ -107,7 +115,15 @@ def build_scenario_b():
     return np.array(rows, dtype=h.event_dtype)
 
 
-def run_ioc_scenario(data_builder, submit_at_ns, collar=0.01, order_qty=10.0):
+def _apply_exchange_model(asset, exchange: str):
+    if exchange == "no_partial_fill":
+        return asset.no_partial_fill_exchange()
+    if exchange == "partial_fill":
+        return asset.partial_fill_exchange()
+    raise ValueError(exchange)
+
+
+def run_ioc_scenario(data_builder, submit_at_ns, collar=0.01, order_qty=10.0, exchange="no_partial_fill"):
     import hftbacktest as h
     from hftbacktest import BacktestAsset, HashMapMarketDepthBacktest
     from numba import njit
@@ -120,11 +136,11 @@ def run_ioc_scenario(data_builder, submit_at_ns, collar=0.01, order_qty=10.0):
         .linear_asset(1.0)
         .constant_order_latency(ENTRY_LATENCY, RESP_LATENCY)
         .power_prob_queue_model(2.0)
-        .no_partial_fill_exchange()
         .trading_value_fee_model(0.0, 0.0)
         .tick_size(TICK)
         .lot_size(LOT)
     )
+    asset = _apply_exchange_model(asset, exchange)
     hbt = HashMapMarketDepthBacktest([asset])
 
     @njit
@@ -158,47 +174,113 @@ def run_ioc_scenario(data_builder, submit_at_ns, collar=0.01, order_qty=10.0):
     return result
 
 
-def run_scenario_c():
-    """Resting GTC buy at the touch; compare trade-driven queue depletion
-    with vs without an aggressor side on otherwise-identical trade prints."""
+def build_scenario_c_data(with_side: bool, lee_ready: bool = False):
+    """Resting GTC buy at the touch; five trade prints of qty 10 at the bid.
+
+    with_side=True: trades carry an explicit SELL_EVENT aggressor bit (a
+      sell-side print hitting the bid), which is what hftbacktest's own
+      exchange models require to drive queue depletion.
+    with_side=False, lee_ready=False: bare TRADE_EVENT, no side bit at all
+      (our raw L1/SIP reality).
+    with_side=False, lee_ready=True: the caller has already inferred a side
+      via the Lee-Ready rule and applied it as a SELL_EVENT bit -- this
+      builds the *same* bare-looking trade stream but is used only to
+      document that "restoring the side" is data preparation, not an
+      hftbacktest feature; the actual side bit is applied by the caller
+      before this function is invoked (see infer_side_lee_ready()).
+    """
     import hftbacktest as h
+
+    exch_local = h.EXCH_EVENT | h.LOCAL_EVENT
+    side_bit = h.SELL_EVENT if with_side else 0
+    rows = [
+        (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 0, 0, 10.00, 20.0, 0, 0, 0.0),
+        (h.DEPTH_EVENT | h.SELL_EVENT | exch_local, 0, 0, 10.02, 100.0, 0, 0, 0.0),
+    ]
+    # 5 trade prints of qty 10 at the bid touch (10.00), well after the order
+    # is resting (order submitted at 100ms). With side, these should be
+    # visible to queue_model.trade(); without side, they are dropped by the
+    # exchange model's TRADE_EVENT branch entirely.
+    t = 500 * MS
+    for _ in range(5):
+        rows.append((h.TRADE_EVENT | side_bit | exch_local, t, t, 10.00, 10.0, 0, 0, 0.0))
+        t += 50 * MS
+    rows.append((h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 5 * NS, 5 * NS, 10.00, 20.0, 0, 0, 0.0))
+    return np.array(rows, dtype=h.event_dtype)
+
+
+def infer_side_lee_ready(trade_px, bid, ask, prev_trade_px):
+    """Lee-Ready quote rule: trade at/above the ask -> buy aggressor; at/below
+    the bid -> sell aggressor; otherwise fall back to the tick test (compare
+    to the previous trade price). Returns 'buy', 'sell', or None (flat tick,
+    no prior trade to compare against).
+
+    This is presented as a proposed DATA-PREPARATION step applied before
+    feeding hftbacktest, not a feature of hftbacktest itself, which has no
+    concept of aggressor-side inference.
+    """
+    if trade_px >= ask:
+        return "buy"
+    if trade_px <= bid:
+        return "sell"
+    if prev_trade_px is None:
+        return None
+    if trade_px > prev_trade_px:
+        return "buy"
+    if trade_px < prev_trade_px:
+        return "sell"
+    return None
+
+
+def build_scenario_c_lee_ready_data():
+    """Same resting-order setup as build_scenario_c_data, but the trade prints
+    are priced at/below the bid (10.00) with bid=10.00/ask=10.02, so the
+    Lee-Ready quote rule unambiguously classifies every one of them as a sell
+    aggressor (trade_px <= bid) -- exactly the SELL_EVENT bit
+    build_scenario_c_data(with_side=True) applies directly. This function
+    demonstrates the inference step explicitly instead of hard-coding the
+    side, then applies the inferred bit."""
+    import hftbacktest as h
+
+    exch_local = h.EXCH_EVENT | h.LOCAL_EVENT
+    bid, ask = 10.00, 10.02
+    rows = [
+        (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 0, 0, bid, 20.0, 0, 0, 0.0),
+        (h.DEPTH_EVENT | h.SELL_EVENT | exch_local, 0, 0, ask, 100.0, 0, 0, 0.0),
+    ]
+    t = 500 * MS
+    prev_px = None
+    inferred_sides = []
+    for _ in range(5):
+        trade_px = 10.00  # prints at the bid -- SIP gives us this price, nothing else
+        side = infer_side_lee_ready(trade_px, bid, ask, prev_px)
+        inferred_sides.append(side)
+        prev_px = trade_px
+        bit = h.SELL_EVENT if side == "sell" else (h.BUY_EVENT if side == "buy" else 0)
+        rows.append((h.TRADE_EVENT | bit | exch_local, t, t, trade_px, 10.0, 0, 0, 0.0))
+        t += 50 * MS
+    rows.append((h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 5 * NS, 5 * NS, bid, 20.0, 0, 0, 0.0))
+    return np.array(rows, dtype=h.event_dtype), inferred_sides
+
+
+def run_scenario_c(exchange="no_partial_fill"):
+    """Compare trade-driven queue depletion with vs without an aggressor
+    side on an otherwise-identical resting order and trade stream."""
     from hftbacktest import BacktestAsset, HashMapMarketDepthBacktest
     from numba import njit
 
-    def build(with_side: bool):
-        exch_local = h.EXCH_EVENT | h.LOCAL_EVENT
-        # A trade that hits the resting BID is a SELL-side aggressor print
-        # (EXCH_SELL_TRADE_EVENT consumes resting Side::Buy orders in
-        # nopartialfillexchange.rs). Our L1/SIP data has no aggressor side,
-        # so `without_side` uses a bare TRADE_EVENT (side_bit=0).
-        side_bit = h.SELL_EVENT if with_side else 0
-        rows = [
-            (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 0, 0, 10.00, 20.0, 0, 0, 0.0),
-            (h.DEPTH_EVENT | h.SELL_EVENT | exch_local, 0, 0, 10.02, 100.0, 0, 0, 0.0),
-        ]
-        # 5 trade prints of qty 10 at the bid touch (10.00), well after order
-        # is resting (order submitted at 100ms). With side, these should be
-        # visible to queue_model.trade(); without side, they are dropped by
-        # the exchange model's TRADE_EVENT branch entirely.
-        t = 500 * MS
-        for _ in range(5):
-            rows.append((h.TRADE_EVENT | side_bit | exch_local, t, t, 10.00, 10.0, 0, 0, 0.0))
-            t += 50 * MS
-        rows.append((h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 5 * NS, 5 * NS, 10.00, 20.0, 0, 0, 0.0))
-        return np.array(rows, dtype=h.event_dtype)
-
-    def run(with_side: bool):
+    def run(data):
         asset = (
             BacktestAsset()
-            .add_data(build(with_side))
+            .add_data(data)
             .linear_asset(1.0)
             .constant_order_latency(ENTRY_LATENCY, RESP_LATENCY)
             .power_prob_queue_model(2.0)
-            .no_partial_fill_exchange()
             .trading_value_fee_model(0.0, 0.0)
             .tick_size(TICK)
             .lot_size(LOT)
         )
+        asset = _apply_exchange_model(asset, exchange)
         hbt = HashMapMarketDepthBacktest([asset])
 
         @njit
@@ -224,7 +306,56 @@ def run_scenario_c():
         hbt.close()
         return result
 
-    return {"with_side": run(True), "without_side": run(False)}
+    return {
+        "with_side": run(build_scenario_c_data(with_side=True)),
+        "without_side": run(build_scenario_c_data(with_side=False)),
+    }
+
+
+def run_scenario_c_lee_ready():
+    """Proposed data-prep step: infer the aggressor side with Lee-Ready and
+    show it restores trade-driven queue depletion, matching with_side above."""
+    from hftbacktest import BacktestAsset, HashMapMarketDepthBacktest
+    from numba import njit
+
+    data, inferred_sides = build_scenario_c_lee_ready_data()
+
+    asset = (
+        BacktestAsset()
+        .add_data(data)
+        .linear_asset(1.0)
+        .constant_order_latency(ENTRY_LATENCY, RESP_LATENCY)
+        .power_prob_queue_model(2.0)
+        .no_partial_fill_exchange()
+        .trading_value_fee_model(0.0, 0.0)
+        .tick_size(TICK)
+        .lot_size(LOT)
+    )
+    hbt = HashMapMarketDepthBacktest([asset])
+
+    @njit
+    def _run(hbt):
+        asset_no = 0
+        order_id = 1
+        submitted = False
+        while hbt.elapse(10_000_000) == 0:
+            if not submitted and hbt.current_timestamp >= 100 * 1_000_000:
+                hbt.submit_buy_order(asset_no, order_id, 10.00, 5.0, 0, 0, False)
+                submitted = True
+                if hbt.wait_order_response(asset_no, order_id, 2_000_000_000) == 1:
+                    return -1
+        return 0
+
+    rc = _run(hbt)
+    order = hbt.orders(0).get(1)
+    result = {
+        "run_rc": int(rc),
+        "order_status": int(order.status) if order is not None else None,
+        "exec_qty": float(order.exec_qty) if order is not None else None,
+        "inferred_sides": inferred_sides,
+    }
+    hbt.close()
+    return result
 
 
 def main():
@@ -232,12 +363,7 @@ def main():
     parser.add_argument("--out", default=None, help="write JSON result to this path")
     args = parser.parse_args()
 
-    result_a = run_ioc_scenario(build_scenario_a, submit_at_ns=1 * NS)
-    result_b = run_ioc_scenario(build_scenario_b, submit_at_ns=50 * MS)
-    result_c = run_scenario_c()
-
-    # order.status constants (hftbacktest.order): NEW=0? check via import
-    import hftbacktest as h
+    # order.status constants (hftbacktest.order)
     from hftbacktest import order as order_mod
 
     status_names = {
@@ -255,20 +381,48 @@ def main():
         r["order_status_name"] = status_names.get(r["order_status"], "UNKNOWN")
         return r
 
+    by_exchange = {}
+    for exchange in ("no_partial_fill", "partial_fill"):
+        result_a = run_ioc_scenario(build_scenario_a, submit_at_ns=1 * NS, exchange=exchange)
+        result_b = run_ioc_scenario(build_scenario_b, submit_at_ns=50 * MS, exchange=exchange)
+        result_c = run_scenario_c(exchange=exchange)
+        by_exchange[exchange] = {
+            "scenario_a_marketable_ioc_fill_from_l1_depth": label(result_a),
+            "scenario_b_ioc_expiry_from_l1_depth": label(result_b),
+            "scenario_c_queue_trade_depletion_needs_side": {
+                "with_side": label(result_c["with_side"]),
+                "without_side": label(result_c["without_side"]),
+            },
+        }
+
+    lee_ready_result = label(run_scenario_c_lee_ready())
+
+    verdict_changes_with_partial_fill = (
+        by_exchange["no_partial_fill"] != by_exchange["partial_fill"]
+    )
+
     out = {
-        "scenario_a_marketable_ioc_fill_from_l1_depth": label(result_a),
-        "scenario_b_ioc_expiry_from_l1_depth": label(result_b),
-        "scenario_c_queue_trade_depletion_needs_side": {
-            "with_side": label(result_c["with_side"]),
-            "without_side": label(result_c["without_side"]),
+        "by_exchange_model": by_exchange,
+        "l1_verdict_changes_with_partial_fill_exchange": verdict_changes_with_partial_fill,
+        "lee_ready_aggressor_side_inference": {
+            "result": lee_ready_result,
+            "note": "Proposed DATA-PREPARATION step (not an hftbacktest feature): infer each trade's "
+                    "aggressor side with the Lee-Ready quote rule (>=ask -> buy, <=bid -> sell, else tick "
+                    "test) before emitting TRADE_EVENT, then apply that side as a BUY_EVENT/SELL_EVENT bit. "
+                    "In this fixture all 5 trades print at the bid (10.00 <= bid 10.00), so Lee-Ready "
+                    "classifies every one as a sell aggressor -- matching scenario_c's with_side=True case "
+                    "exactly, and restoring trade-driven queue depletion (FILLED) versus the side-less "
+                    "case (stays NEW).",
         },
         "expectations": {
-            "scenario_a": "FILLED at ask=10.02 (marketable IOC crosses touch; decided purely from L1 best-ask depth)",
-            "scenario_b": "EXPIRED (ask moved to 10.06 before order arrival; IOC does not rest)",
+            "scenario_a": "FILLED at ask=10.02 (marketable IOC crosses touch; decided purely from L1 best-ask depth); expected identical under no_partial_fill and partial_fill since the single L1 level fully covers the order quantity",
+            "scenario_b": "EXPIRED (ask moved to 10.06 before order arrival; IOC does not rest); expected identical under both exchange models",
             "scenario_c": "with_side: order should reflect queue-model trade-driven state differently than "
                           "without_side, because hftbacktest's EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT "
                           "branches require a side bit; a bare TRADE_EVENT (our L1/SIP reality) is dropped "
-                          "by nopartialfillexchange.rs entirely and never reaches queue_model.trade().",
+                          "by both nopartialfillexchange.rs and partialfillexchange.rs and never reaches "
+                          "queue_model.trade(). Expected identical under both exchange models for the same reason.",
+            "lee_ready": "with the inferred SELL side applied, order_status should be FILLED, matching scenario_c's with_side=True result",
         },
     }
 
