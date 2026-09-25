@@ -4,6 +4,16 @@
   "symbols_resolved": 33257
  },
  "diagnostics": {
+  "estimated_ingestion_minus_created": {
+   "buckets": {
+    "1h_1d": 94778,
+    "1min_1h": 273704,
+    "gt_1d": 1870,
+    "le_1min": 11846
+   },
+   "n_with_numeric_id": 2217341,
+   "rule": "max(created, p90 of 100 lower ids)"
+  },
   "file_day_differs_from_created_at_utc_date": 8173,
   "guard": {
    "overnight:ok": 624102,
@@ -11,11 +21,71 @@
    "rth:ok": 405120,
    "rth:updated_after_cutoff": 2347
   },
-  "id_order_consistency": {
-   "n_with_numeric_id": 2217341,
-   "vs_median_of_5_lower_ids": {
-    "created_1h_1d_before_predecessors": 22246,
-    "created_gt_1d_before_predecessors": 1643
+  "survivorship_single_symbol_not_in_asset_master_by_ny_year": {
+   "2014": {
+    "not_in_asset_master": 0,
+    "share": 0.0,
+    "single_symbol": 1
+   },
+   "2015": {
+    "not_in_asset_master": 33922,
+    "share": 0.3416,
+    "single_symbol": 99289
+   },
+   "2016": {
+    "not_in_asset_master": 31599,
+    "share": 0.3033,
+    "single_symbol": 104176
+   },
+   "2017": {
+    "not_in_asset_master": 23046,
+    "share": 0.2734,
+    "single_symbol": 84281
+   },
+   "2018": {
+    "not_in_asset_master": 22232,
+    "share": 0.2284,
+    "single_symbol": 97358
+   },
+   "2019": {
+    "not_in_asset_master": 20538,
+    "share": 0.2124,
+    "single_symbol": 96688
+   },
+   "2020": {
+    "not_in_asset_master": 27629,
+    "share": 0.2056,
+    "single_symbol": 134389
+   },
+   "2021": {
+    "not_in_asset_master": 40548,
+    "share": 0.2279,
+    "single_symbol": 177928
+   },
+   "2022": {
+    "not_in_asset_master": 45316,
+    "share": 0.231,
+    "single_symbol": 196185
+   },
+   "2023": {
+    "not_in_asset_master": 39249,
+    "share": 0.188,
+    "single_symbol": 208722
+   },
+   "2024": {
+    "not_in_asset_master": 29686,
+    "share": 0.1395,
+    "single_symbol": 212751
+   },
+   "2025": {
+    "not_in_asset_master": 16942,
+    "share": 0.0829,
+    "single_symbol": 204423
+   },
+   "2026": {
+    "not_in_asset_master": 6071,
+    "share": 0.0418,
+    "single_symbol": 145397
    }
   },
   "updated_minus_created_seconds": {
@@ -46,44 +116,47 @@
   }
  },
  "eligible_by_window_lane": {
-  "overnight:liquid": 354098,
-  "overnight:small": 132782,
-  "rth:liquid": 173239
+  "overnight:liquid": 351197,
+  "overnight:small": 132092,
+  "rth:liquid": 233806
  },
  "events_file": {
   "path": "events.jsonl.gz",
-  "rows": 449718,
-  "sha256": "103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb"
+  "rows": 499608,
+  "sha256": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781"
  },
  "evidence_label": "HIST",
- "finished_at": "2026-09-25T03:53:16+00:00",
+ "finished_at": "2026-09-25T05:20:07+00:00",
  "funnel": {
   "articles": 2217343,
   "drop_duplicate_24h": 1204,
   "drop_empty_headline": 3,
-  "drop_guard_id_order": 6114,
+  "drop_guard_ingested_after_cutoff": 55884,
   "drop_guard_updated_after_cutoff": 5060,
   "drop_headline_year_before_2016": 2,
-  "drop_movement_headline": 74542,
+  "drop_movement_headline": 72552,
   "drop_no_symbols": 100631,
-  "drop_not_eligible_lane": 142964,
-  "drop_not_first_in_window": 210401,
+  "drop_not_eligible_lane": 138327,
+  "drop_not_first_in_window": 217487,
   "drop_not_primary_operating_company": 254278,
   "drop_repeated_id": 2,
-  "drop_rth_no_minute_bars": 93618,
-  "drop_rth_not_liquid": 49719,
+  "drop_rth_not_liquid": 43265,
   "drop_session_outside_study": 15933,
   "drop_symbol_ambiguous_in_asset_master": 269,
   "drop_symbol_count_not_1": 355122,
   "drop_symbol_not_in_asset_master": 336778,
-  "drop_symbol_not_in_daily_dataset": 937,
+  "drop_symbol_not_in_daily_dataset": 890,
   "drop_window_excluded_0900_0930": 70500,
   "drop_window_excluded_last_30min": 13379,
   "drop_window_outside_calendar": 36169,
-  "eligible_before_first_per_window": 660119,
-  "pre_eligibility_candidates": 947357,
-  "selected_events": 449718,
+  "eligible_before_first_per_window": 717095,
+  "pre_eligibility_candidates": 899577,
+  "selected_events": 499608,
   "single_symbol": 1761588
+ },
+ "git": {
+  "head": "2b73c70ceef3df17fc0eaaf74a05ca74798c2728",
+  "study_dir_clean": true
  },
  "inputs": {
   "asset_files_sha256": {
@@ -94,66 +167,67 @@
   "daily_parquet_sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
   "news_manifest_sha256": "45e5ab7973d0b6b4eac8b232ecd74fd80f81230ba84943c6bab1db0cdfa9efb6",
   "news_run_header_sha256": "f5b5edd6a2018f302ad35b292b20bc08358cea99be3ae7a40d590a48a506c310",
-  "news_signal_py_sha256": "83d503c0ef46bd77b324769d9f33bf447aa2a2fe71e660de25fdc2859011209f",
-  "prepare_py_sha256": "ff7534249f975f817f5a431de3cd317ec24aa1e6588746bf65c3a168bf7feab5"
+  "news_signal_py_sha256": "d8453de13031e58af9fbc07e3e9f4e8d7f469ca30c2ccac622c06b515c19965f",
+  "prepare_py_sha256": "b19713ef574996bf337dd14539b67015e359266f84714e6a18fdfdb833da98bd"
  },
  "kind": "prepare",
  "schema": "sota-news-llm-receipt/1",
  "selected_by_checkpoint": {
-  "2015": 18437,
-  "2016": 22881,
-  "2017": 26750,
-  "2018": 29015,
-  "2019": 39197,
-  "2020": 45055,
-  "2021": 51923,
-  "2022": 53970,
-  "2023": 57880,
-  "2024": 104610
+  "2015": 24519,
+  "2016": 24163,
+  "2017": 27782,
+  "2018": 28272,
+  "2019": 42164,
+  "2020": 44693,
+  "2021": 52120,
+  "2022": 56654,
+  "2023": 69004,
+  "2024": 130237
  },
  "selected_by_session_year": {
-  "2016:overnight:liquid": 12395,
-  "2016:overnight:small": 6038,
-  "2017:overnight:liquid": 12269,
-  "2017:overnight:small": 6543,
-  "2017:rth:liquid": 4073,
-  "2018:overnight:liquid": 15351,
-  "2018:overnight:small": 6704,
-  "2018:rth:liquid": 4691,
-  "2019:overnight:liquid": 16135,
-  "2019:overnight:small": 7177,
-  "2019:rth:liquid": 5706,
-  "2020:overnight:liquid": 21068,
-  "2020:overnight:small": 8877,
-  "2020:rth:liquid": 9251,
-  "2021:overnight:liquid": 22303,
-  "2021:overnight:small": 9981,
-  "2021:rth:liquid": 12771,
-  "2022:overnight:liquid": 25371,
-  "2022:overnight:small": 10024,
-  "2022:rth:liquid": 16527,
-  "2023:overnight:liquid": 25965,
-  "2023:overnight:small": 10923,
-  "2023:rth:liquid": 17078,
-  "2024:overnight:liquid": 26194,
-  "2024:overnight:small": 11334,
-  "2024:rth:liquid": 20354,
-  "2025:overnight:liquid": 30663,
-  "2025:overnight:small": 11341,
-  "2025:rth:liquid": 20172,
-  "2026:overnight:liquid": 23182,
-  "2026:overnight:small": 8009,
-  "2026:rth:liquid": 11248
+  "2016:overnight:liquid": 12484,
+  "2016:overnight:small": 6058,
+  "2016:rth:liquid": 5973,
+  "2017:overnight:liquid": 12422,
+  "2017:overnight:small": 6624,
+  "2017:rth:liquid": 5121,
+  "2018:overnight:liquid": 15119,
+  "2018:overnight:small": 6626,
+  "2018:rth:liquid": 6033,
+  "2019:overnight:liquid": 14891,
+  "2019:overnight:small": 6762,
+  "2019:rth:liquid": 6622,
+  "2020:overnight:liquid": 20926,
+  "2020:overnight:small": 8832,
+  "2020:rth:liquid": 12405,
+  "2021:overnight:liquid": 22005,
+  "2021:overnight:small": 9883,
+  "2021:rth:liquid": 12805,
+  "2022:overnight:liquid": 24529,
+  "2022:overnight:small": 9770,
+  "2022:rth:liquid": 17820,
+  "2023:overnight:liquid": 25974,
+  "2023:overnight:small": 10947,
+  "2023:rth:liquid": 19729,
+  "2024:overnight:liquid": 26240,
+  "2024:overnight:small": 11378,
+  "2024:rth:liquid": 31388,
+  "2025:overnight:liquid": 30724,
+  "2025:overnight:small": 11382,
+  "2025:rth:liquid": 33982,
+  "2026:overnight:liquid": 23236,
+  "2026:overnight:small": 8066,
+  "2026:rth:liquid": 22852
  },
  "selected_by_window_lane": {
-  "overnight:liquid": 230896,
-  "overnight:small": 96951,
-  "rth:liquid": 121871
+  "overnight:liquid": 228550,
+  "overnight:small": 96328,
+  "rth:liquid": 174730
  },
  "selected_sessions_by_window_lane": {
-  "overnight:liquid": 2673,
-  "overnight:small": 2673,
-  "rth:liquid": 2417
+  "overnight:liquid": 2672,
+  "overnight:small": 2672,
+  "rth:liquid": 2673
  },
- "started_at": "2026-09-25T03:48:30+00:00"
+ "started_at": "2026-09-25T05:14:39+00:00"
 }

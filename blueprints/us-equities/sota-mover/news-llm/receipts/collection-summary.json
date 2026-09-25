@@ -1,23 +1,23 @@
 {
  "auctions": {
   "coverage": {
-   "both_available": 409745,
-   "close_via_fallback_6": 8422,
-   "close_via_fallback_M": 127,
-   "close_via_listing_print": 401709,
-   "no_auction_record": 29,
-   "official_close_available": 410258,
-   "official_open_available": 409991,
-   "open_via_fallback_O": 7837,
-   "open_via_fallback_Q": 127,
-   "open_via_listing_print": 402027,
-   "symbol_sessions_wanted": 411313
+   "both_available": 446144,
+   "close_via_fallback_6": 8761,
+   "close_via_fallback_M": 113,
+   "close_via_listing_print": 437760,
+   "no_auction_record": 31,
+   "official_close_available": 446634,
+   "official_open_available": 446381,
+   "open_via_fallback_O": 8193,
+   "open_via_fallback_Q": 130,
+   "open_via_listing_print": 438058,
+   "symbol_sessions_wanted": 447702
   },
   "ledger": {
-   "ok": 7890
+   "ok": 13609
   },
-  "rows": 411308,
-  "sha256": "23e4784504c7e57e90ed0fcc4e7f2896d2139265b1386928698ecc368ec9d26c"
+  "rows": 447671,
+  "sha256": "0b545e43358bb1508f35b0a1292d485f250af4382bca80e7ce31ebc3b7d6b3ce"
  },
  "evidence_label": "HIST",
  "http_tallies": [
@@ -31,6 +31,18 @@
    "rate_per_min_after_0330_et": 500,
    "rate_per_min_before_0330_et": 1900,
    "seconds": 110.3,
+   "x_ratelimit_limit": "10000"
+  },
+  {
+   "command": "auctions",
+   "finished_at": "20260925T052404Z",
+   "http": {
+    "http_200": 5719,
+    "requests": 5719
+   },
+   "rate_per_min_after_0330_et": 500,
+   "rate_per_min_before_0330_et": 1900,
+   "seconds": 222.0,
    "x_ratelimit_limit": "10000"
   },
   {
@@ -56,6 +68,19 @@
    "rate_per_min_before_0330_et": 1900,
    "seconds": 17.2,
    "x_ratelimit_limit": "10000"
+  },
+  {
+   "command": "spreads",
+   "finished_at": "20260925T060041Z",
+   "http": {
+    "error:URLError": 1,
+    "http_200": 68939,
+    "requests": 68939
+   },
+   "rate_per_min_after_0330_et": 500,
+   "rate_per_min_before_0330_et": 1900,
+   "seconds": 2196.7,
+   "x_ratelimit_limit": "10000"
   }
  ],
  "kind": "collection",
@@ -63,20 +88,20 @@
  "schema": "sota-news-llm-receipt/1",
  "spreads": {
   "counts": {
-   "events": 121871,
-   "no_valid_quote": 242
+   "events": 174730,
+   "no_valid_entry_quote": 878
   },
   "half_spread_bps": {
-   "median": 2.713,
-   "p10": 0.821,
-   "p25": 1.375,
-   "p75": 5.149,
-   "p90": 8.732,
-   "p99": 21.753
+   "median": 3.747,
+   "p10": 0.981,
+   "p25": 1.797,
+   "p75": 7.402,
+   "p90": 13.405,
+   "p99": 37.835
   },
   "ledger": {
-   "ok": 122763
+   "ok": 191702
   },
-  "quotes_sha256": "0d8138b86a496c7f5626d5ae99dcfe9042b77cfaa6df60a2543230394d5cf553"
+  "quotes_sha256": "d527b168d1306d10d1857eacf58bf77584802076adbd6c891a29097940a1fbd3"
  }
 }

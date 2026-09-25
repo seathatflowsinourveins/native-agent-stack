@@ -2,17 +2,17 @@
  "evidence_label": "HIST",
  "kind": "scoring-status",
  "labels_in_files": {
-  "FAVORABLE": 34840,
-  "PARSE_FAIL": 313,
-  "UNCLEAR": 1,
-  "UNFAVORABLE": 28083
+  "FAVORABLE": 82863,
+  "PARSE_FAIL": 3800,
+  "UNCLEAR": 24,
+  "UNFAVORABLE": 97883
  },
- "rows_in_files": 63237,
+ "rows_in_files": 184570,
  "runs": {
   "progress.json": {
    "batch1_agreement": {
-    "agree": 48,
-    "checked": 48
+    "agree": 112,
+    "checked": 112
    },
    "by_checkpoint": {
     "2015": {
@@ -77,49 +77,132 @@
      "to_score": 20045
     },
     "2018": {
-     "batch1_agreement": null,
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
      "labels": {
-      "FAVORABLE": 9688,
-      "UNFAVORABLE": 4767
+      "FAVORABLE": 16075,
+      "UNFAVORABLE": 5764
      },
      "load_seconds": 13.2,
      "overflow": 0,
      "revision": "331c03be137a1a80f1a371232d3d6a9636f6ad9a",
-     "scored": 14455,
+     "scored": 21839,
      "stops": {
-      "eos": 14455
+      "eos": 21839
      },
      "to_score": 21839
+    },
+    "2019": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 15400,
+      "PARSE_FAIL": 59,
+      "UNCLEAR": 1,
+      "UNFAVORABLE": 14859
+     },
+     "load_seconds": 13.3,
+     "overflow": 0,
+     "revision": "4dfb7817915d07d0ed99815877186f827ec3b88e",
+     "scored": 30319,
+     "stops": {
+      "eos": 30262,
+      "label_decided": 57
+     },
+     "to_score": 30319
+    },
+    "2020": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 18138,
+      "PARSE_FAIL": 5,
+      "UNFAVORABLE": 16931
+     },
+     "load_seconds": 12.6,
+     "overflow": 0,
+     "revision": "f8020c2c939645abbec9caf8a0cdd1d7806cb42a",
+     "scored": 35074,
+     "stops": {
+      "eos": 35070,
+      "label_decided": 4
+     },
+     "to_score": 35074
+    },
+    "2021": {
+     "batch1_agreement": {
+      "agree": 16,
+      "checked": 16
+     },
+     "labels": {
+      "FAVORABLE": 7871,
+      "PARSE_FAIL": 3415,
+      "UNCLEAR": 2,
+      "UNFAVORABLE": 30612
+     },
+     "load_seconds": 12.0,
+     "overflow": 0,
+     "revision": "7f3c7d0dccea060d96dfb89391ef830655b8dbaf",
+     "scored": 41900,
+     "stops": {
+      "eos": 38485,
+      "label_decided": 3415
+     },
+     "to_score": 41900
+    },
+    "2022": {
+     "batch1_agreement": null,
+     "labels": {
+      "FAVORABLE": 227,
+      "PARSE_FAIL": 8,
+      "UNCLEAR": 20,
+      "UNFAVORABLE": 6401
+     },
+     "load_seconds": 18.3,
+     "overflow": 0,
+     "revision": "f1b8c4eb806a9fe7c26b7e5d30cf003304ed9281",
+     "scored": 6656,
+     "stops": {
+      "eos": 6645,
+      "label_decided": 11
+     },
+     "to_score": 43045
     }
    },
    "labels": {
-    "FAVORABLE": 34840,
-    "PARSE_FAIL": 313,
-    "UNCLEAR": 1,
-    "UNFAVORABLE": 28083
+    "FAVORABLE": 82863,
+    "PARSE_FAIL": 3800,
+    "UNCLEAR": 24,
+    "UNFAVORABLE": 97883
    },
    "progress": {
     "already_scored": 0,
     "batch_size": 32,
     "decoder": "cached",
     "dtype": "float32",
-    "elapsed_seconds": 2000.2,
-    "eta_seconds": 9157.0,
+    "elapsed_seconds": 5845.9,
+    "eta_seconds": 5328.0,
     "events_in_file": 449718,
-    "events_per_second": 31.62,
+    "events_per_second": 31.57,
     "finished_at": null,
     "matmul": "highest",
     "max_gpu_memory_allocated_gib": 10.17,
-    "scored_this_run": 63237,
+    "scored_this_run": 184570,
     "started_at": "2026-09-25T04:19:43+00:00",
     "template_sha256": "9ee4590bbe7d71190864d1b0331ce95848bcfb7977f48b3a50a0b24478401c8a",
     "to_score": 352767,
-    "updated_at": "2026-09-25T04:53:03+00:00",
+    "updated_at": "2026-09-25T05:57:09+00:00",
     "variant": "hlmw_alpaca"
    },
    "stops": {
-    "eos": 62917,
-    "label_decided": 320
+    "eos": 180763,
+    "label_decided": 3807
    }
   }
  },
@@ -135,7 +218,19 @@
    "rows": 20045
   },
   "scores-20181231.jsonl": {
-   "rows": 14455
+   "rows": 21839
+  },
+  "scores-20191231.jsonl": {
+   "rows": 30319
+  },
+  "scores-20201231.jsonl": {
+   "rows": 35074
+  },
+  "scores-20211231.jsonl": {
+   "rows": 41900
+  },
+  "scores-20221231.jsonl": {
+   "rows": 6656
   }
  }
 }

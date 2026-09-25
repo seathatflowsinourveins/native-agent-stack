@@ -530,37 +530,30 @@
    "delta": "after the unit, one incremental pass for new or changed events (same settings), then --check-batch1 16"
   },
   "auctions_status": {
-   "completed_at": "2026-09-25T04:52Z (00:52 ET)",
-   "symbol_sessions_wanted": 411313,
-   "rows": 411308,
-   "no_auction_record": 29,
-   "official_open": 409991,
-   "official_close": 410258,
-   "both": 409745,
-   "open_via_listing_print": 402027,
-   "close_via_listing_print": 401709,
-   "requests": 7890,
-   "http": "all 200 (5,347 in the first run per ledger, 2,543 in the top-up per tally)",
-   "max_rate_per_min": 1900,
-   "file": "auctions/auctions.jsonl.gz",
-   "sha256": "23e4784504c7e57e90ed0fcc4e7f2896d2139265b1386928698ecc368ec9d26c"
+   "rows": 447671,
+   "sha256": "0b545e43358bb1508f35b0a1292d485f250af4382bca80e7ce31ebc3b7d6b3ce",
+   "symbol_sessions_wanted": 447702,
+   "no_auction_record": 31,
+   "official_open_available": 446381,
+   "official_close_available": 446634,
+   "both_available": 446144,
+   "requests": "5,347 (first run, ledger) + 2,543 (top-up) + 5,719 (rebuilt events), all HTTP 200",
+   "materialization": "one row per (symbol, trading date): late cross-midnight prints merged (279 duplicate rows in the previous materialization removed)"
   },
   "spreads_status": {
-   "completed_at": "2026-09-25T04:52Z",
-   "rth_events": 121871,
-   "no_valid_quote": 242,
+   "role": "RTH entry prices (ask for longs, bid for shorts) and the half-spread distribution",
+   "rth_events": 174730,
+   "no_valid_entry_quote": 878,
    "half_spread_bps": {
-    "p10": 0.821,
-    "p25": 1.375,
-    "median": 2.713,
-    "p75": 5.149,
-    "p90": 8.732,
-    "p99": 21.753
+    "median": 3.747,
+    "p10": 0.981,
+    "p25": 1.797,
+    "p75": 7.402,
+    "p90": 13.405,
+    "p99": 37.835
    },
-   "requests": 122763,
-   "http": "all 200",
-   "file": "spreads/quotes.jsonl",
-   "sha256": "0d8138b86a496c7f5626d5ae99dcfe9042b77cfaa6df60a2543230394d5cf553"
+   "sha256": "d527b168d1306d10d1857eacf58bf77584802076adbd6c891a29097940a1fbd3",
+   "requests": "122,362 + 401 + 68,939 (rebuilt events, 1 transient URLError retried), all HTTP 200, at most 1,900/min, finished 02:00 ET 2026-09-25"
   }
  },
  "freeze_procedure": [
