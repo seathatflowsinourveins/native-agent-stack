@@ -1425,6 +1425,7 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         symlinked_var.symlink_to(real_var, target_is_directory=True)
         return symlinked_var
 
+    @unittest.skipUnless(NPM, "native npm unavailable")
     def test_places_the_verified_tarball_correctly_when_the_prefix_is_reached_through_a_symlink(self):
         # Round 3b, Opus Medium M1 / hosted macos-15 run 35820422561: seven
         # PlatformDependencyInstallTests failed on a real Mac with "does not

@@ -29155,8 +29155,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "bac118f7144686ceadfb65879b1c88955ff87120ab3d6b1486470c36c7529e1c",
-      "bytes": 167233
+      "sha256": "207f6218d14e211155b6f55ec5f0775a347386fba5681e939b4d59875f790b64",
+      "bytes": 167289
     },
     {
       "path": "tests/test_adoption_contract.py",
