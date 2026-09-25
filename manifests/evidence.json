@@ -26720,28 +26720,43 @@
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/adaptive-paper.json",
-      "sha256": "250179df63f25e8fb06521ad2b84edfb805793c60ebdccfcc64c25608db05026",
-      "bytes": 12577
+      "sha256": "2863b1874daf9a25b0530dece346f6dfa911b254d3f7b95ef394a06b869b110c",
+      "bytes": 23497
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/economic_hash_recompute.py",
+      "sha256": "a9cc1f79e05873957caa86b7041b536f34dee80e22258c4a68b2e591c2ab0078",
+      "bytes": 3424
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json",
-      "sha256": "b8e6f38cd09f652bd9483915d3da2e257cc12b1ee7b4149353fd3e1d44ff5b68",
-      "bytes": 14387
+      "sha256": "7dbcb767afd838c32993393e66236d1592e0d4a75b15a306a63326013bcae779",
+      "bytes": 15934
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/historical-simulation.json",
-      "sha256": "0a1e3bc11106bbfd3566a3721ca0f0640322715401a9e53327feedb892e3d99a",
-      "bytes": 21463
+      "sha256": "e883f0e4019fe799c80a1ae8c92686fcc63c5ebabb72f8de05c1acafa9518d76",
+      "bytes": 23046
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/lean.json",
-      "sha256": "6037933893a40404d0a2bb41272c0e3b91db1f7f232a03eeaed1f91ccaa0bdce",
-      "bytes": 22628
+      "sha256": "08ccc134a6f89d9880b2f6865eb073212ad57b82ba04f4d50332fa3d5f367167",
+      "bytes": 29927
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/live_venv_ctime_report.py",
+      "sha256": "f96ba1f1fdeade112a0f65ff408ca9384d2a0dac58e23c40c393b2d610e3e85e",
+      "bytes": 2886
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",
-      "sha256": "2c2461f98405f4c403d4aff70bbcac4f43212e2c3e4c5739be2e7818ddc2accc",
-      "bytes": 7641
+      "sha256": "f6d8381009787b736aacdec1103250030bfea92c5f7becc1b50e234fe44f3c59",
+      "bytes": 11799
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/verify_live_venv_content.py",
+      "sha256": "959f4906296d72f035f498ff40961cbd1a0061500dd18e1ebb81276b2fcbcf86",
+      "bytes": 4419
     },
     {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
