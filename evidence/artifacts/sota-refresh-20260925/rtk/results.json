@@ -852,7 +852,7 @@
     "[pre-existing in both] `git status` outside a repository: rtk replaces 'fatal: not a git repository (or any of the parent directories): .git' with 'Not a git repository' (rc 128 kept). v3's case-sensitive key failed this on both versions; v3.1 matches case-insensitively, like upstream's own test.",
     "[pre-existing in both] `find g -type d` omits the starting directory and prints names relative to it ('sub' vs native 'g', 'g/sub').",
     "[pre-existing in both, no live effect] rtk treats a wildcard-free allow rule as a word-boundary prefix: Bash(git status) also gives permissionDecision 'allow' for 'git status --short'. Live settings have 0 Bash allow rules, so live rewrites carry no decision on either version.",
-    "[rollback hazard, 0.49.0 read path] 0.50.0 stores signed negative saved_tokens, and 0.49.0 casts them unchecked. With synthetic -500 rows, 0.49.0 rtk gain --history/--all/--format json|csv shows 18446744073709551116 or '18446744073709.6M', while 0.50.0 clamps to 0. The A2 corpus produced 0 negative rows of 66, and production has 0 negative rows today.",
+    "[rollback hazard, 0.49.0 read path] 0.50.0 stores signed negative saved_tokens, and 0.49.0 casts them unchecked. With synthetic -500 rows, 0.49.0 rtk gain --history and --all (including --all --format json|csv) show 18446744073709551116 or '18446744073709.6M', while plain rtk gain and rtk gain --format json show none (out/negrow.out lines 1-2) and 0.50.0 clamps to 0. The A2 corpus produced 0 negative rows of 66, and production has 0 negative rows today.",
     "[cosmetic, both] Failing rtk-wrapped commands print an extra blank line on stdout (make, systemctl status, wc, pytest, ruff). curl file:// output gains a trailing newline.",
     "[no difference] Hook exit status and response shape are the same, with no permissionDecision on any of 76 live-settings rewrites on either version. Deferrals ($(...), file redirect, heredoc, htop, uname, non-display pipe) are silent on both. rtk proxy is byte-identical to raw. Median hook latency is within about 1 ms."
   ],
@@ -864,8 +864,24 @@
       "content": "[hooks]\nexclude_commands = [\"^git show [^ ]*:\", \"diff\"]\n",
       "reason": "Excludes the 0.50.0 `git show <rev>:<path> | tail` blob-window defect and the pre-existing `diff` exit-code defect from hook rewriting."
     },
-    "rollback": "(1) `ln -sfn \"$HOME/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\" \"$HOME/.local/share/codex-ecosystem/bin/rtk\"`, then confirm that `rtk --version` prints rtk 0.49.0.\n\n(2) Before or right after rolling back, run the read-only query `SELECT COUNT(*) FROM commands WHERE saved_tokens<0` on a snapshot of ~/.local/share/rtk/history.db (0 today). If it is above 0, 0.49.0's rtk gain --history, --all and --format json|csv will show wrapped values of about 1.8e19; I verified this on synthetic scratch data. The effect is cosmetic, but tools/token-report ingests gain JSON, so clamp or exclude those rows in the report. Any change to the production rows needs its own approval.\n\n(3) Re-run `bash rtk-hook-acceptance-v3.1.sh $S/tools/rtk-0.49.0 0.49.0`. Expect 79 PASS / 9 FAIL / 4 NOTE, the known 0.49.0 defect set.\n\n(4) Keep any exclude_commands entries only if they are still wanted; they behave the same on 0.49.0.\n\n(5) No schema or config conversion is needed: SCHEMA_VERSION 1 in both, config changes are additive, and the hook command is unchanged. Delete tools/rtk-0.50.0 only after the rollback is confirmed, and keep tools/rtk-0.49.0 and the retained 0.49.0 archive (sha256 7278231d...)."
+    "rollback": "(1) `ln -sfn \"$HOME/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\" \"$HOME/.local/share/codex-ecosystem/bin/rtk\"`, then confirm that `rtk --version` prints rtk 0.49.0.\n\n(2) Before or right after rolling back, run the read-only query `SELECT COUNT(*) FROM commands WHERE saved_tokens<0` on a snapshot of ~/.local/share/rtk/history.db (0 today). If it is above 0, 0.49.0's `rtk gain --history` and `--all` (including `--all --format json|csv`) will show wrapped values of about 1.8e19, while plain `rtk gain` and `rtk gain --format json` showed none (out/negrow.out lines 1-2); this was verified on synthetic scratch data. The effect is cosmetic. tools/token-report runs plain `rtk gain --format json`, which showed none, but it also reads saved_tokens straight from history.db (tools/token-report/token_manifest.py), so check those rows there. Any change to the production rows needs its own approval.\n\n(3) Re-run `bash rtk-hook-acceptance-v3.1.sh $S/tools/rtk-0.49.0 0.49.0`. Expect 79 PASS / 9 FAIL / 4 NOTE, the known 0.49.0 defect set.\n\n(4) Keep any exclude_commands entries only if they are still wanted; they behave the same on 0.49.0.\n\n(5) No schema or config conversion is needed: SCHEMA_VERSION 1 in both, config changes are additive, and the hook command is unchanged. Delete tools/rtk-0.50.0 only after the rollback is confirmed, and keep tools/rtk-0.49.0 and the retained 0.49.0 archive (sha256 7278231d...)."
   },
+  "corrections": [
+    {
+      "field": "switch.rollback",
+      "original": "0.49.0's rtk gain --history, --all and --format json|csv will show wrapped values of about 1.8e19; I verified this on synthetic scratch data. The effect is cosmetic, but tools/token-report ingests gain JSON, so clamp or exclude those rows in the report.",
+      "corrected": "0.49.0's `rtk gain --history` and `--all` (including `--all --format json|csv`) will show wrapped values of about 1.8e19, while plain `rtk gain` and `rtk gain --format json` showed none (out/negrow.out lines 1-2); this was verified on synthetic scratch data. The effect is cosmetic. tools/token-report runs plain `rtk gain --format json`, which showed none, but it also reads saved_tokens straight from history.db (tools/token-report/token_manifest.py), so check those rows there.",
+      "by": "2026-09-25 repair round (independent review, needs_changes)",
+      "reason": "out/negrow.out shows no wrapped value for plain `rtk gain` or `rtk gain --format json`; only --history and --all (text, json and csv) wrap."
+    },
+    {
+      "field": "differences[13]",
+      "original": "0.49.0 rtk gain --history/--all/--format json|csv shows 18446744073709551116 or '18446744073709.6M', while 0.50.0 clamps to 0.",
+      "corrected": "0.49.0 rtk gain --history and --all (including --all --format json|csv) show 18446744073709551116 or '18446744073709.6M', while plain rtk gain and rtk gain --format json show none (out/negrow.out lines 1-2) and 0.50.0 clamps to 0.",
+      "by": "2026-09-25 repair round (independent review, needs_changes)",
+      "reason": "Same correction as switch.rollback."
+    }
+  ],
   "verifier": {
     "verdict": "agree",
     "production_touched": false,

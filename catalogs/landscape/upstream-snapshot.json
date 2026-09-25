@@ -41,7 +41,6 @@
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
       "agentsview",
-      "markitdown",
       "vllm",
       "dagu",
       "skfolio"

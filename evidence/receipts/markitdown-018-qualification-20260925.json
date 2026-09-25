@@ -12,7 +12,7 @@
     "The 0.1.7 env python-tools/markitdown stays installed for rollback (re-point bin/markitdown), and its bookkeeping still reports 0.1.7. How a later install_pin run interacts with the flipped symlink was not tested.",
     "0.1.8 changes output for <u> (kept as inline HTML), <strike> (~~text~~), %2F path escapes (preserved) and data-src images (preferred over a data: placeholder). These were shown only on the synthetic discriminator; the committed corpus has none of them in affected positions, real filings containing them were not tested, and a consumer that requires Markdown without raw HTML tags would now see <u>.",
     "Local integration evidence (the reviewer-authored checker plus the refuter's legs), not the unchanged upstream suite: `hatch test` was not run on this host; the upstream CI pass on PR #2545 is research-reported. The [pdf]/[docx] extras were not exercised.",
-    "Integrity rests on PyPI's published digests and post-install byte equality with the verified wheel; uv does not enforce the digest during `uv tool install`, and PyPI publishes no PEP 740 attestation for 0.1.8.",
+    "Integrity rests on PyPI's published digests and post-install byte equality with the verified wheel. The sha256 recorded in adoption/pins-linux-x86_64.json is not passed to uv (install_pin runs `uv tool install --python 3.13 markitdown==<version>`); whether uv verifies an index-provided digest itself was not established here. PyPI publishes no PEP 740 attestation for 0.1.8.",
     "The no-extras grep leg misses some extras (an [az-doc-intel] addition passed it in the verifier's mutation test); only the exact 20-package equality leg gates the package set. Importing onnxruntime 1.30.0 writes $TMPDIR/.ses and an empty mat-debug-<pid>.log on every call, in both versions; the qualification runs left such files in /tmp.",
     "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the document-retrieval winner pin markitdown 0.1.7 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.1.8 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
     "Linux x86_64 only: adoption/pins-macos-arm64.json has no markitdown pin and is unchanged; nothing here is macOS evidence.",
@@ -116,7 +116,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
-      "sha256": "732b0a531807729ff0503b1367c67e4fe3cabb71281aee0d85f31331b60e4fc4",
+      "sha256": "1d16fd89b90fd0798b2ab85f561a2a537567881b8cdd4849adba2bf330b4f84a",
       "byte_identical_to_run_copy": false
     }
   ]
