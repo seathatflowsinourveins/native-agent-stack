@@ -3150,6 +3150,11 @@
       "bytes": 95
     },
     {
+      "path": ".github/actions-permissions.json",
+      "sha256": "6136c77ffa84849ef0dc3d1a1267eef72b7e2921c05627e5f8b5ebd4eae3a74a",
+      "bytes": 750
+    },
+    {
       "path": ".github/dependabot.yml",
       "sha256": "fcc206e377a1dea01e31e34c43f3276600f89b0e6951c02891bc46e2a49910be",
       "bytes": 2355
@@ -10267,8 +10272,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "7629b5cd8b244e46e63e2dccf42b54a3b646e8f9208414650c5e01a14dfd9a3b",
-      "bytes": 107862
+      "sha256": "4be57ac60209955367de3b29e4adf719f75b4315e928457f9a08ab703859dc20",
+      "bytes": 120998
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -10397,8 +10402,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3e360c1f090aed5b29cdbd934158d0d66904ab958705ca681ec78f5321ab8692",
-      "bytes": 83034
+      "sha256": "54454cfed2aa62e70805eec6c21d556f871790e6cefbbbcb071d351c69cb8189",
+      "bytes": 84076
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -31722,8 +31727,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "8bd1dda0358511f55d02573fd772f3c6eff8cd6afabc5d83a8070a40dc535a0a",
-      "bytes": 56240
+      "sha256": "2116b699a2e9de5ad97b47978c773be12a657e6d852957eba8ab0c35e24fba3a",
+      "bytes": 58320
     },
     {
       "path": "tests/test_workflow_security.py",
