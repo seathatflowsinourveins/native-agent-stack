@@ -350,6 +350,26 @@ class LocalModifiedTests(InstallSkillsTestCase):
         self.assertEqual((self.home / ".agents" / "skills" / "hand-installed" / "SKILL.md").read_text(),
                          "# A locally hand-edited copy\n")
 
+    def test_unlocked_folder_without_skill_md_is_refused_as_local_modified(self):
+        # A canonical folder that exists but has no SKILL.md at all (e.g. an
+        # unrelated file dropped there by hand, or a partial install) must still
+        # be refused as (b), not fall through to "install": `skills add` recreates
+        # its target directory from scratch, so treating this like a fresh (c)
+        # install would silently discard whatever is actually in the folder.
+        skill = make_skill("no-skill-md", "# Would-be pinned content\n", tree_sha("no-skill-md"))
+        skill_dir = self.home / ".agents" / "skills" / "no-skill-md"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "OTHER_FILE.md").write_text("unrelated local content\n", encoding="utf-8")
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})  # must never be asked to add/remove
+        manifest = self.write_manifest([skill])
+        result = self.run_install(manifest, fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("local-modified", result.stderr)
+        self.assertEqual(calls_log(fake_bin), [["--version"]])
+        # The unrelated local file survives untouched, and no SKILL.md was fabricated.
+        self.assertEqual((skill_dir / "OTHER_FILE.md").read_text(), "unrelated local content\n")
+        self.assertFalse((skill_dir / "SKILL.md").exists())
+
     def test_an_unlocked_but_byte_identical_copy_is_not_local_modified(self):
         # Same setup, but the on-disk SKILL.md already matches the manifest exactly: (b) says this
         # is safe to bring under lock management, not a local edit to protect.

@@ -114,12 +114,18 @@ def classify_skill(skill: dict, home: Path) -> str:
     either a fresh install, a locked-but-mismatched entry, or an unlocked
     folder that already matches the manifest byte-for-byte)."""
     name = skill["name"]
-    skill_md = canonical_skill_dir(home, name) / "SKILL.md"
+    skill_dir = canonical_skill_dir(home, name)
+    skill_md = skill_dir / "SKILL.md"
     md_matches = skill_md.is_file() and sha256_of(skill_md) == skill["skill_md_sha256"]
     entry = read_lock_entry(home, name)
     if entry is not None:
         return "ok" if (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]) else "install"
-    if skill_md.is_file():
+    # An unlocked folder counts as (b) -- local content to protect -- as soon as it
+    # *exists*, not only once it happens to contain a SKILL.md: a folder with other
+    # files and no SKILL.md can never satisfy md_matches, so checking is_file() here
+    # instead of the folder itself would fall through to "install" and let `skills
+    # add` (which recreates the target directory from scratch) silently discard it.
+    if skill_dir.exists():
         return "install" if md_matches else "local-modified"
     return "install"
 
