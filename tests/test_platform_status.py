@@ -74,7 +74,9 @@ class _Root:
                      "architecture": architecture or ("arm64" if mac else "x86_64"),
                      "second_physical_machine": second_machine},
             "catalog_revision": "0" * 40, "recorded_by": recorder, "component_id": "widget", "stage": stage,
-            "commands": [{"cmd": "widget --version", "exit": 0 if result == "pass" else 1, "duration_s": 0.1,
+            # A use receipt exercises the component; a version call is an install check (#164 review, item 1).
+            "commands": [{"cmd": "widget run --input sample.json" if stage == "use" else "widget --version",
+                          "exit": 0 if result == "pass" else 1, "duration_s": 0.1,
                           "output_sha256": "0" * 64, "output_excerpt": "widget"}],
             "tool_versions": {"widget": version}, "observed_at_utc": observed_at, "result": result,
             "claim": "test", "limitations": ["test"], "evidence_class": evidence_class, "reviews": reviews,
@@ -178,6 +180,92 @@ class PlatformStatusTests(unittest.TestCase):
         self.r.receipt(result="fail", host="mac-a", observed_at="2026-09-23T01:00:00Z")
         self.r.receipt(result="not_runnable", host="mac-a", observed_at="2026-09-23T02:00:00Z")
         self.assertEqual(self.r.status().status, "conditional")
+
+    def test_a_reviewed_install_pass_alone_is_conditional_on_either_platform(self):
+        # 2026-09-24 decision: a version-only install receipt proves the binary resolves, not that the component
+        # works; accepted needs a reviewed use-stage pass.
+        # On Linux a source_review winner reaches the receipt route (a native winner has its own routes).
+        for platform_id, winner in (("macos-arm64", {}), ("linux-wsl2-x86_64", {"evidence_class": "source_review"})):
+            with self.subTest(platform_id):
+                self.setUp()
+                self.r.receipt(platform_id, stage="install", host="box-a")
+                derived = self.r.status(platform_id, **winner)
+                self.assertEqual(derived.status, "conditional")
+                self.assertIn("use-stage pass", derived.reason)
+                self.r.receipt(platform_id, stage="use", host="box-b")
+                self.assertEqual(self.r.status(platform_id, **winner).status, "accepted")
+
+    def test_a_reviewed_install_pass_never_lowers_a_winner_accepted_by_registered_evidence(self):
+        # Review of #164: the install-only cap ran ahead of the Linux winner-level route and demoted it, for both
+        # native classes (Codex cross-family lane).
+        for evidence_class in ("native_proven", "measured_comparison"):
+            with self.subTest(evidence_class):
+                self.setUp()
+                self.r.register("evidence/receipts/widget.json")
+                winner = {"evidence_refs": ["evidence/receipts/widget.json"], "evidence_class": evidence_class}
+                self.assertEqual(self.r.status("linux-wsl2-x86_64", **winner).status, "accepted")
+                self.r.receipt("linux-wsl2-x86_64", stage="install", host="box-a")
+                self.assertEqual(self.r.status("linux-wsl2-x86_64", **winner).status, "accepted")
+
+    def test_an_install_stage_fail_blocks_acceptance(self):
+        # #164 review, item 3 (mutation 3 survived): a native_proven install fail that is its host's latest blocks.
+        self.r.receipt(stage="use", host="mac-a")
+        self.assertEqual(self.r.status().status, "accepted")
+        self.r.receipt(result="fail", stage="install", host="mac-b")
+        derived = self.r.status()
+        self.assertEqual(derived.status, "conditional")
+        self.assertIn("failed", derived.reason)
+
+    def test_an_install_pass_with_an_unreviewed_or_dissented_use_pass_is_conditional(self):
+        # #164 review, item 3.
+        for reviewer, verdict in ((None, "agree"), ("other-session", "disagree")):
+            with self.subTest(verdict=verdict if reviewer else "unreviewed"):
+                self.setUp()
+                self.r.receipt(stage="install", host="mac-a")
+                self.r.receipt(stage="use", host="mac-b", reviewer=reviewer, verdict=verdict)
+                self.assertEqual(self.r.status().status, "conditional")
+
+    def test_an_install_only_pass_with_a_blocking_fail_is_conditional_on_either_platform(self):
+        # #164 review, item 3.
+        for platform_id, winner in (("macos-arm64", {}), ("linux-wsl2-x86_64", {"evidence_class": "source_review"})):
+            with self.subTest(platform_id):
+                self.setUp()
+                self.r.receipt(platform_id, stage="install", host="box-a")
+                self.r.receipt(platform_id, result="fail", stage="use", host="box-b")
+                derived = self.r.status(platform_id, **winner)
+                self.assertEqual(derived.status, "conditional")
+                self.assertIn("failed", derived.reason)
+
+    def test_a_use_fail_then_an_install_pass_on_its_host_still_blocks(self):
+        # Codex re-check of be09a5e2: the summary's reclassification turned a use fail into install, so a later
+        # install pass on that host cleared it and another reviewed use pass promoted to accepted. No command text
+        # changes a stage now, so the use fail blocks whatever it ran.
+        for command in ("widget run --input sample.json", "widget --version", "sh -c 'widget --version'"):
+            for platform_id, winner in (("macos-arm64", {}),
+                                        ("linux-wsl2-x86_64", {"evidence_class": "source_review"})):
+                with self.subTest(command=command, platform=platform_id):
+                    self.setUp()
+                    self.r.receipt(platform_id, stage="use", host="box-b")
+                    fail = self.r.root / self.r.receipt(platform_id, result="fail", stage="use", host="box-a",
+                                                        observed_at="2026-09-23T01:00:00Z")
+                    receipt = json.loads(fail.read_text(encoding="utf-8"))
+                    receipt["commands"][0]["cmd"] = command
+                    fail.write_text(json.dumps(receipt), encoding="utf-8")
+                    self.r.receipt(platform_id, stage="install", host="box-a", observed_at="2026-09-23T02:00:00Z")
+                    self.assertEqual(self.r.status(platform_id, **winner).status, "conditional")
+
+    def test_a_help_only_use_pass_is_withheld_by_review_not_by_its_text(self):
+        # The control is the independent review (contributing-evidence.md step 8): the text alone changes nothing,
+        # and a reviewer's needs_changes withholds accepted.
+        for verdict, expected in (("agree", "accepted"), ("needs_changes", "conditional")):
+            with self.subTest(verdict):
+                self.setUp()
+                path = self.r.root / self.r.receipt(stage="use", host="mac-a", verdict=verdict)
+                receipt = json.loads(path.read_text(encoding="utf-8"))
+                receipt["commands"][0]["cmd"] = "widget --help"
+                path.write_text(json.dumps(receipt), encoding="utf-8")
+                self.r.receipt(stage="install", host="mac-b")
+                self.assertEqual(self.r.status().status, expected)
 
     def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):
         self.r.receipt(result="fail", stage="use", host="mac-a", observed_at="2026-09-23T01:00:00Z")

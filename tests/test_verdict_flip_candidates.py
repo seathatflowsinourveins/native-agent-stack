@@ -78,7 +78,9 @@ class _Root:
                      "os": "macos" if mac else "linux", "architecture": "arm64" if mac else "x86_64",
                      "second_physical_machine": second_machine},
             "catalog_revision": "0" * 40, "recorded_by": recorder, "component_id": component_id, "stage": stage,
-            "commands": [{"cmd": f"{component_id} --version", "exit": 0 if result == "pass" else 1,
+            # A use receipt exercises the component; a version call is an install check (#164 review, item 1).
+            "commands": [{"cmd": f"{component_id} run --input sample.json" if stage == "use"
+                          else f"{component_id} --version", "exit": 0 if result == "pass" else 1,
                           "duration_s": 0.1, "output_sha256": "0" * 64, "output_excerpt": component_id}],
             "tool_versions": {component_id: version}, "observed_at_utc": observed_at, "result": result,
             "claim": "test", "limitations": ["test"], "evidence_class": evidence_class, "reviews": reviews,
@@ -112,7 +114,7 @@ class FindCandidatesTests(unittest.TestCase):
         self.assertEqual(row["platform"], "macos-arm64")
         self.assertEqual(row["declared_status"], "untested")
         self.assertEqual(row["derived_status"], "accepted")
-        self.assertTrue(row["qualifying_receipts"])
+        self.assertTrue(row["supporting_receipts"])
 
     def test_already_accepted_declaration_is_not_a_candidate(self):
         self.r.receipt(platform_id="macos-arm64")

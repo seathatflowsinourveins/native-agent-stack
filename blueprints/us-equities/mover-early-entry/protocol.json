@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "id": "mover-early-entry-v1-20260924",
+  "kind": "preregistered_event_study_protocol",
+  "frozen_before_outcomes": true,
+  "frozen_note": "Committed before evaluate.py or quotes.py computes any post-entry return or samples any quote. The collection gathers raw data only. An adversarial pre-freeze review (2026-09-24) produced the revisions in this version; its must-fix items are all adopted.",
+  "prior_exposure_disclosed": "Before this freeze the author had seen: (1) the research package's Wave H summary (premarket leadership 77%, rho 0.04) and its chapter headlines; (2) the price audit's per-event gains for the package's 957 events; (3) mover-day counts by degree (not returns). The gain thresholds, volume floors and exit brackets below are round design values and were not tuned on outcomes, but those exposures may have informed them.",
+  "question": "Can long-only rules that use only information available by an early time t select US-equity symbol-days whose post-entry return is positive net of realistic costs? For each degree of eventual move, what share of movers do they catch, and how early in the move?",
+  "user_scope": "2026-09-24 user instruction: no gate except a clean end-to-end test on historical and paper data, to pre-position or enter early in extreme movers of every degree, with auto leverage. Leverage stays a preregistered schedule, never an optimiser; deterministic risk stays in code.",
+  "direction": "long only",
+  "inputs": {
+    "daily_dataset": {"path": "broad-market-20260921/dataset/daily.parquet (private)", "sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105"},
+    "candidates": {"file": "candidates-provable-20260924.csv (private)", "sha256": "afe2255291e57596e84e1183ef04e11043b329fe3d690d8bd3e2034a7d6917e4", "symbol_days": 236538, "sessions": 1434},
+    "collections": ["collect-20260924 (the first 103,013 symbol-days)", "collect-delta-20260924 (the other 136,885)"],
+    "runtime": {"python": "3.12.3", "duckdb": "1.5.5", "numpy": "2.5.3"}
+  },
+  "universe": {
+    "candidates": "symbol-days from 2021-01-04 to 2026-09-18 whose fully adjusted daily-bar high reached at least 1.20 times the previous session's fully adjusted daily-bar low (both bars include extended-hours trades). Likely warrants, units and rights are excluded (140,721 counted). Days after a gap of more than 7 calendar days are kept and flagged (85).",
+    "completeness_argument": "The official close lies within the previous day's full-session range, so it is at least that day's low, and a price at time t is at most the day's high. A rule that fires therefore has high >= price_t >= 1.20 x official prev close >= 1.20 x prev low. Every firing symbol-day of every rule with G >= 0.20 is in the set, winners and faders alike, up to the split factor handled under definitions.ref.",
+    "known_gaps": [
+      "OTC names are excluded",
+      "symbols the provider never carried are absent",
+      "the daily dataset resolves reused tickers to the current holder, so a reused ticker's older mover days can be missing (measured by data_quality_gates.coverage)",
+      "the derivative-exclusion regex does not exclude preferred shares"
+    ]
+  },
+  "data": {
+    "minute_bars": "SIP 1-minute bars 04:00-20:00 ET, raw, asof = session",
+    "official_prices": "auction prints selected by the price audit's v2 rule. The listing exchange is the exchange of the largest-size condition-O print. The official open is that exchange's condition-O print. The official close is that exchange's largest condition-6 print, else a listing-exchange condition-M print, else another exchange's largest condition-6 print, else the bar close (each choice flagged).",
+    "split_factor": "from the daily dataset: (raw close / adjusted close) on prev_date divided by the same on the session. A split is present when this differs from 1 by more than 1e-2 (the audit's D2 tolerance).",
+    "news": "created_at timestamps and the current symbols tags of headlines from 16:00 ET on the previous session to 20:00 ET on the session (no content)",
+    "market": "SPY daily closes from the daily dataset, 2020-01-02 onward (the 252-session window starts before 2021)"
+  },
+  "definitions": {
+    "ref": "the previous session's official close divided by the split factor, so that it is on the session's raw price basis. Split days are flagged and counted. When no official close exists, the previous bar close is used (flagged), and results are also reported without such rows.",
+    "price_at_t": "the close of the last 1-minute bar starting before t (bars from 04:00 of the session); none if there is no such bar",
+    "dollar_volume_at_t": "the sum of vwap x volume over the session's bars starting before t",
+    "gain_at_t": "price_at_t / ref - 1",
+    "news_before_t": "at least one news item for the symbol with created_at <= t - 120 s and at or after 16:00 ET on the previous session. Symbol tags are the item's current tags, a recorded look-ahead. Sensitivity: created_at <= t - 600 s.",
+    "session_high_after_entry": "the maximum bar high from the entry bar through the last bar starting before 16:00",
+    "eventual_gain": "the session's official close divided by ref, minus 1"
+  },
+  "entry_rules": {
+    "times_et": ["07:00", "08:00", "09:00", "09:25", "09:30", "09:35", "09:45", "10:00"],
+    "gain_thresholds": [0.20, 0.30, 0.50, 1.00],
+    "min_dollar_volume": [250000, 1000000, 5000000],
+    "min_price": 1.00,
+    "news_variants": ["any", "news_before_t"],
+    "rule": "enter long at t when gain_at_t >= G, dollar_volume_at_t >= V and price_at_t >= 1.00, and news_before_t for the news variant; one entry per symbol-day per rule, only at the rule's time",
+    "signal_cutoff": "for the 09:30 rule the signal uses only bars starting before 09:28 (the opening-auction order cutoff); for other times, bars starting before t",
+    "entry_price": {
+      "before_09_30": "the open of the first bar starting at or after t and before 09:30, within 5 minutes of t; else no entry",
+      "at_09_30": "the official opening auction price; if the listing exchange has no condition-O print, no entry",
+      "after_09_30": "the open of the first bar starting at or after t, within 5 minutes; else no entry"
+    }
+  },
+  "exits": {
+    "X1_official_close": "the session's official close (bar-close fallback flagged)",
+    "X2_time_60m": "the open of the first bar starting at or after entry time + 60 minutes and before 16:00, else the official close",
+    "X3_trailing_15pct": "the trail level for bar k is 0.85 x the running high through bar k-1 (the running high starts at the entry price). Exit in bar k when its low is at or below the level, at min(level, bar k's open); bar k's high updates the running high afterwards. Else the official close.",
+    "X4_bracket_50_15": "stop at 0.85 x entry and take-profit at 1.50 x entry. In each bar after entry: if the open is at or beyond either level, exit at the open; else if the low reaches the stop, exit at the stop (the stop is assumed first when both levels fall in the bar); else if the high reaches the take-profit, exit at the take-profit. Else the official close.",
+    "gap_rule": "stop and trail fills are always min(level, bar open), for every gap between bars, pre-market included",
+    "halt_flag": "5 or more consecutive minutes without a bar during 09:30-16:00 after entry are counted and flagged per trade. The published halt history is not used in v1.",
+    "window": "exits consider bars from the entry bar through the last bar starting before 16:00; no overnight positions"
+  },
+  "costs": {
+    "quotes": "SIP NBBO from the historical quotes endpoint: the last quote at or before the timestamp and within 60 s; crossed, locked or zero-price quotes are dropped",
+    "sample": "a deterministic 1-in-20 sample of fired entries in DEVELOPMENT sessions only, keyed by sha256(symbol|session|time). For each sampled entry, quotes are read at the entry timestamp and at fixed, exit-agnostic timestamps (entry + 15 min, entry + 60 min, 15:55). No exit path is computed before the cost table is fixed.",
+    "table": "the 5%-trimmed mean quoted half-spread (in return terms) per bucket of time {04:00-08:00, 08:00-09:25, 09:30-10:00, 10:00-16:00} x price tier {<$2, $2-5, $5-20, >=$20} x dollar_volume_at_t {<$1M, $1-5M, >=$5M}. A bucket with fewer than 30 samples falls back to its time x price tier bucket; one still below 30 takes the table's 90th percentile (flagged).",
+    "per_trade": "cost per side = the half-spread for the side's bucket + slippage of 0.25 x that half-spread. The opening-auction entry carries no spread and slippage of 0.5 x the bucket half-spread.",
+    "fees": "Alpaca: no commission. IBKR Pro tiered: per-share commission with a 1% of trade value cap, as a broker variant. Both include the SEC fee and FINRA TAF on sells at the rate in force on the trade date.",
+    "stress": "twice the primary per-side cost",
+    "break_even": "for each rule-exit, the cost multiple at which the mean net return reaches 0 is reported"
+  },
+  "outcomes_and_metrics": {
+    "per_rule_exit": [
+      "trades",
+      "mean and median net return",
+      "1%-winsorised mean",
+      "mean without the top 5 sessions",
+      "mean of per-session equal-weight averages",
+      "win rate",
+      "P5 and P95",
+      "profit factor",
+      "top 1% of trades' share of total return",
+      "by year, price tier, V tier and concurrent-fire count",
+      "break-even cost multiple"
+    ],
+    "baselines": [
+      "the same trades' return minus IWM's return over the same holding window (IWM minute bars are not collected in v1, so this uses IWM's official open-to-close as a proxy, flagged)",
+      "placebo: the same fired symbol-days entered at t + 30 minutes under the same exit",
+      "the fired set's official open-to-close return"
+    ],
+    "degree_tiers": "eventual_gain: <0.30, 0.30-0.50, 0.50-1.00, 1.00-3.00, 3.00-10.00, >=10.00 (split-adjusted through ref)",
+    "capture": "for each degree tier and entry time, over development and validation only until the holdout step: the share of the tier's symbol-days on which the rule fired (recall, unconditional and among days meeting price and volume), the median gain_at_t when it fired, and the median return from entry to the official close and to session_high_after_entry",
+    "tier_use": "tiers are outcomes, reported for diagnosis only; no trading rule may use them"
+  },
+  "statistics": {
+    "bootstrap": "a session block bootstrap with 5-session blocks and B = 20,000; seed = the first 8 bytes of sha256('mover-early-entry-v1-20260924'), as an integer",
+    "p_value": "one-sided p = (1 + #{b : mean_b <= 0}) / (B + 1)",
+    "sensitivities": ["Benjamini-Yekutieli", "BH across all 768 rule-exits", "two-way (session and symbol) clustering"]
+  },
+  "selection_and_pass_criteria": {
+    "development": "a rule-exit passes when it has at least 200 trades and a p_value of at most 0.05 on the mean net return (primary cost)",
+    "validation": "a development pass is confirmed when, on validation, it has at least 100 trades, a Benjamini-Hochberg-adjusted p_value (across all development passes) of at most 0.10, and a mean net return above 0 on (i) the 1%-winsorised mean, (ii) the mean without the top 5 sessions and (iii) the mean of per-session averages",
+    "holdout": "at most 5 validated rule-exits (lowest validation p_value) are evaluated on the holdout, once, with at least 50 trades each; a holdout pass is a Holm-adjusted one-sided p_value of at most 0.05. Nothing in the holdout sessions is read before this step.",
+    "no_pass": "if nothing passes, that is the result: early entry on these rules has no demonstrated net edge"
+  },
+  "portfolio_and_leverage": {
+    "start_equity_usd": 100000,
+    "positions": "at most 5 open positions, long only. Each entry's notional = equity (marked at the last bar close before t) x gross leverage / 5. When more than 5 fire, rank by dollar_volume_at_t descending, then symbol.",
+    "capacity": "a position's notional is capped at 1% of dollar_volume_at_t and at 10% of the entry bar's dollar volume (the opening auction's for 09:30); the excess is not filled. Capacity is reported at $10k, $100k and $1M starting equity.",
+    "marginability": "leverage per position is capped at 1x when price_at_t < $5 (a design parameter for sub-$5 margin availability; verify each broker's schedule)",
+    "leverage_schedule": {
+      "rungs": [1, 2, 4],
+      "rule": "gross intraday leverage = rung x regime_factor x drawdown_factor, capped at 4. regime_factor is 1 when SPY's previous-session close is above its 20-session mean and its 20-session realised volatility is below its 252-session median, else 0.5. drawdown_factor is 1 while equity is within 10% of its peak and 0.5 within 10-20%. Below 20%, there are no new entries for 10 sessions, then trading resumes at 0.5; the peak resets only at a new equity high. No overnight positions.",
+      "reported_for": "each rung separately: CAGR, max drawdown, worst session, share of sessions with a loss over 5% of equity, and the pass statistics on the capped, portfolio-traded set"
+    }
+  },
+  "splits": {
+    "development": ["2021-01-04", "2023-12-29"],
+    "validation": ["2024-01-02", "2025-12-31"],
+    "holdout": ["2026-01-02", "2026-09-18"]
+  },
+  "data_quality_gates": {
+    "coverage": "the share of the price audit's package events with a verified official gain >= +20% (v2 match or recovered_match) that are present in the candidates, by tier; below 95% overall, results are labelled survivorship-limited",
+    "completeness": "counted and reported: session_incomplete sessions, symbol-days with zero bars, ref from the bar-close fallback, missing official opens and closes, split days"
+  },
+  "replications": [
+    {"claim": "the package's Wave H: premarket leadership is the norm for >=100% gainers (77%) and premarket magnitude is noise (rho = 0.04)",
+     "test": "on the >=1.00 tier (development and validation): the share whose gain_at_09:25 >= 0.20, and the Spearman correlation of gain_at_09:25 with eventual_gain; the package's own definition (premarket leader emergence) is quoted beside it for comparison, not assumed identical",
+     "expected_if_true": "share near 0.77 and rho near 0"}
+  ],
+  "paper_e2e": "The paper candidate is the validated rule-exit with the highest holdout lower bound, else the highest validation lower bound, else the most-traded development rule-exit, labelled mechanics-only. Its pieces are a premarket scanner, entry, the auto-leverage schedule at rung 1 for the first 20 paper sessions and rung 2 after, exits and reconciliation, under the engine's deterministic risk limits. Extended-hours stops are simulated by the engine with marketable limit orders (brokers do not accept stop orders outside regular hours), and paper fills are compared with the historical fill model. A mechanics-only run shows the pipeline works, not an edge.",
+  "not_tested_in_v1": [
+    "pre-positioning at the previous close from daily and corporate-action features (protocol v2)",
+    "news semantics and catalyst classes (a later TypeSafe classification with its own protocol)",
+    "float, short interest and borrow (no source in this data)",
+    "after-hours entries (16:00-20:00) and overnight holds",
+    "the published halt history (v1 uses a gap flag)",
+    "OTC names"
+  ],
+  "reproduction": "evaluate.py and quotes.py are deterministic given the inputs above and the runtime versions; a re-run on the same frozen inputs must reproduce the result files byte for byte",
+  "overturn": "Any headline result is overturned if a re-run on the same frozen inputs and runtime does not reproduce it byte for byte, or if the quote-measured cost table is shown to be off by more than 2x on an independent quote sample."
+}

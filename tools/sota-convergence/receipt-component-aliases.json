@@ -1,0 +1,10 @@
+{
+ "aliases": {
+  "duckdb": "data-duckdb",
+  "edgartools": "data-edgartools",
+  "exchange-calendars": "data-exchange-calendars",
+  "nautilus-trader": "nautilustrader"
+ },
+ "schema_version": 1,
+ "scope": "manifests/stack.json component id (the id space manifests/evidence.json receipts name) -> the sota manifest component id for the same component, where the two spellings differ. lane_packets.py --registered-receipts attaches such a receipt to the aliased id (matched_by alias); the index build fails if an alias's two ids do not share one repository. An explicit entry is needed where a repository serves several manifest ids (nautechsystems/nautilus_trader is both nautilustrader and nautilus-ibkr-adapter): a repository match cannot tell which component a receipt exercised. pandas has no sota manifest id, so its receipts attach nowhere."
+}

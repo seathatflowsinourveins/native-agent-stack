@@ -18,11 +18,13 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import fcntl
 import getpass
 import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import time
@@ -58,13 +60,36 @@ IDENTITY_ENV = "CLAUDE_CODE_SESSION_ID"
 IDENTITY_DOMAIN = "host-receipt-identity-v1:"
 DISSENT_VERDICTS = {"disagree", "needs_changes"}
 
+# A ``use`` receipt records the component doing its job. Whether it does is judged by the independent review
+# (contributing-evidence.md step 8), never by the command text: no classifier of shell text is both sound and complete
+# (#164 Codex re-check: ``sh -c 'rtk --version'`` and ``rtk help gain`` pass any such rule, ``du -h /dev/null`` fails
+# a broad one), so status derivation never reads it. ``record`` only refuses the unambiguous case, a whole command
+# that is exactly ``<program> <flag>`` with one of these, as a convenience that is knowingly incomplete. ``-h`` is
+# left out: ``df -h`` and ``du -h`` are functional.
+BARE_HELP_OR_VERSION = frozenset({"--help", "--version", "-V", "help", "version"})
+
+
+def bare_help_or_version(cmd: str) -> bool:
+    """Whether ``cmd`` is exactly one program and one help or version argument (BARE_HELP_OR_VERSION)."""
+    try:
+        argv = shlex.split(cmd)
+    except ValueError:
+        return False
+    return len(argv) == 2 and argv[1] in BARE_HELP_OR_VERSION
+
+
 HOST_ID_PATTERN = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 ISO_UTC_PATTERN = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
+# A generation suffix ('-2', '-3', ...) distinguishes a superseding receipt's id from the
+# id it supersedes without changing host/component/stage/date; see cmd_record's --supersedes
+# handling and next_free_superseding_id(). No leading zero and never '-0'/'-1': the bare id
+# with no suffix is generation 1.
 ID_PATTERN = re.compile(
     r"^(?P<host_id>[a-z0-9-]+-[0-9]{8})--(?P<component_id>[A-Za-z0-9][A-Za-z0-9._/:-]*)--"
-    r"(?P<stage>install|use|restart|recovery|persistence|cleanup)--(?P<date>[0-9]{8})$"
+    r"(?P<stage>install|use|restart|recovery|persistence|cleanup)--(?P<date>[0-9]{8})"
+    r"(?:-(?P<generation>[2-9]|[1-9][0-9]+))?$"
 )
 
 TOP_LEVEL_REQUIRED = [
@@ -82,6 +107,52 @@ DEFAULT_TIMEOUT_S = 120
 # could not be superseded, so validate refuses it.
 FUTURE_SKEW_S = 15 * 60
 MAX_EXCERPT_CHARS = 400
+
+# Receipts recorded under a manifests/stack.json id that is an alias of a landscape winner (see
+# winner_stack_aliases) before record refused such ids. Recorded evidence is immutable, so they keep
+# their bytes, id and registration; they never bind to the winner (scripts/platform_status.py joins by
+# the winner's own component_id) and scripts/component_matrix.py lists them as uncounted alias
+# receipts. Re-recording on the same host under the canonical id is the path to binding. validate
+# rejects every other alias receipt, and an entry here whose file is gone or is no longer an alias of
+# its canonical id, so the list cannot rot silently. Keys are paths relative to the validated root; the
+# exemption applies in any tree holding these files (another checkout or a copy of this one), and only
+# to the exact recorded claim: validate requires receipt_claim_sha256() of each file (the receipt without
+# its append-only ``reviews``, in canonical JSON) to equal the entry's ``claim_sha256`` (a digest as the
+# record's identity, as in-toto/SLSA subjects are named). ``review`` may still append reviews, while an
+# edited or replaced claim at a grandfathered path loses the exemption and fails validation.
+GRANDFATHERED_ALIAS_RECEIPTS = {
+    "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--alpaca-py--use--20260924.json": {
+        "claim_sha256": "623ba69a64bbf1f7e0919231c6d227f1bb182c98acd42794294e8d4899190126",
+        "canonical_component_id": "data-alpaca-py",
+        "date": "2026-09-24",
+        "reason": "recorded under the manifests/stack.json id before record refused stack aliases of "
+                  "winners; its version '0.44.0' is also not the winner pin in full",
+    },
+    "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--duckdb--use--20260924.json": {
+        "claim_sha256": "feb7d4592604ef92c0a6b0dfbe8a337c2a836db52fe8c6476c31ed8fcc0d77bf",
+        "canonical_component_id": "data-duckdb",
+        "date": "2026-09-24",
+        "reason": "recorded under the manifests/stack.json id before record refused stack aliases of "
+                  "winners; its version '1.5.5' is also not the winner pin in full",
+    },
+    "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json": {
+        "claim_sha256": "ae7b2d9b931c6ab1e05391ae0a44a987a0902c5efc2b183696dd6e4e700d109b",
+        "canonical_component_id": "nautilustrader",
+        "date": "2026-09-24",
+        "reason": "recorded under the manifests/stack.json id before record refused stack aliases of "
+                  "winners; its version '2.0.0rc5' is also not the winner pin in full",
+    },
+}
+
+# tools/sota-convergence/lane_packets.py reads this explicit table (manifests/stack.json id -> the
+# sota-convergence manifest id for the same component). validate checks it against the repository-inferred
+# winner_stack_aliases() in both directions, so neither table can drift from the other unnoticed.
+RECEIPT_ALIASES_RELATIVE_PATH = "tools/sota-convergence/receipt-component-aliases.json"
+# Inferred stack aliases of a landscape winner that are deliberately absent from that table, with the reason.
+ALIASES_ABSENT_FROM_RECEIPT_ALIAS_TABLE = {
+    "alpaca-py": "the sota-convergence manifest has its own alpaca-py component id, so lane_packets.py needs no "
+                 "respelling for it; only the landscape winner id for the same repository (data-alpaca-py) differs",
+}
 
 
 class InvalidHostReceipt(ValueError):
@@ -185,8 +256,22 @@ def git_head(root: Path) -> str:
     return revision
 
 
+# sanitize() redacts the user name only as a whole token, so a short name is not cut out of a longer word (user "ed"
+# in "recorded", "used" or "cached"): no letter, digit or underscore may touch it on either side. An escape just before
+# it (JSON "\n", "\r", "\t" or "\u002f", a "\x2f", a URL's "%2F") encodes a separator although it ends in a letter or
+# digit, so an encoded home path such as "%2FUsers%2F<name>" is still redacted.
+USER_NAME_START = "|".join((
+    r"(?<!\w)", r"(?<=\\[nrt])", r"(?<=\\u[0-9A-Fa-f]{4})", r"(?<=\\x[0-9A-Fa-f]{2})", r"(?<=%[0-9A-Fa-f]{2})",
+))
+
+
+def user_name_pattern(user: str) -> re.Pattern:
+    """``user`` as a whole token (USER_NAME_START), never as part of a longer word."""
+    return re.compile(f"(?:{USER_NAME_START}){re.escape(user)}" + r"(?!\w)")
+
+
 def sanitize(text: str) -> str:
-    """Replace $HOME with ~ and the current username with <user>; never raises."""
+    """Replace $HOME with ~ and the current username, as a whole token, with <user>; never raises."""
     home = str(Path.home())
     if home and home != "/":
         text = text.replace(home, "~")
@@ -195,7 +280,7 @@ def sanitize(text: str) -> str:
     except Exception:
         user = None
     if user:
-        text = re.sub(re.escape(user), "<user>", text)
+        text = user_name_pattern(user).sub("<user>", text)
     for _description, pattern in PRIVATE_CONTENT:
         text = pattern.sub("[redacted]", text)
     return text
@@ -324,12 +409,18 @@ def load_receipt_schema(root: Path) -> dict:
     return load_json(root, SCHEMA_RELATIVE_PATH)
 
 
-def stack_component_ids(root: Path) -> set[str]:
+def stack_components(root: Path) -> list[dict]:
+    """``manifests/stack.json`` ``components[]`` objects; empty when the file is absent or unreadable."""
     try:
         stack = load_json(root, "manifests/stack.json")
     except (OSError, UnicodeError, ValueError, InvalidDecisionIndex):
-        return set()
-    return {component.get("id") for component in stack.get("components", []) if isinstance(component, dict)}
+        return []
+    components = stack.get("components", []) if isinstance(stack, dict) else []
+    return [component for component in components or [] if isinstance(component, dict)]
+
+
+def stack_component_ids(root: Path) -> set[str]:
+    return {component.get("id") for component in stack_components(root)}
 
 
 def stack_component_version(root: Path, component_id: str) -> str | None:
@@ -355,28 +446,9 @@ def stack_component_string_commands(root: Path, component_id: str) -> list[str]:
     return []
 
 
-def landscape_component_ids(root: Path) -> set[str]:
-    ids: set[str] = set()
-    landscape_dir = root / "catalogs" / "landscape"
-    if not landscape_dir.is_dir():
-        return ids
-    for path in sorted(landscape_dir.glob("*.json")):
-        try:
-            document = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, ValueError):
-            continue
-        for layer in document.get("layers", []) if isinstance(document, dict) else []:
-            if not isinstance(layer, dict):
-                continue
-            for winner in layer.get("winners", []):
-                if isinstance(winner, dict) and isinstance(winner.get("component_id"), str):
-                    ids.add(winner["component_id"])
-    return ids
-
-
-def winner_pins(root: Path, component_id: str) -> set[str]:
-    """Every landscape winner pin recorded for ``component_id`` (one per selecting layer)."""
-    pins: set[str] = set()
+def landscape_winners(root: Path) -> list[dict]:
+    """Every ``layers[].winners[]`` object in ``catalogs/landscape/*.json``, in file order."""
+    winners: list[dict] = []
     landscape_dir = root / "catalogs" / "landscape"
     for path in sorted(landscape_dir.glob("*.json")) if landscape_dir.is_dir() else []:
         try:
@@ -384,11 +456,106 @@ def winner_pins(root: Path, component_id: str) -> set[str]:
         except (OSError, UnicodeError, ValueError):
             continue
         for layer in document.get("layers", []) if isinstance(document, dict) else []:
-            for winner in (layer.get("winners") or []) if isinstance(layer, dict) else []:
-                if isinstance(winner, dict) and winner.get("component_id") == component_id \
-                        and isinstance(winner.get("pin"), str) and winner["pin"].strip():
-                    pins.add(winner["pin"].strip())
-    return pins
+            layer_winners = layer.get("winners") if isinstance(layer, dict) else None
+            if isinstance(layer_winners, list):
+                winners.extend(winner for winner in layer_winners if isinstance(winner, dict))
+    return winners
+
+
+def landscape_component_ids(root: Path) -> set[str]:
+    return {winner["component_id"] for winner in landscape_winners(root)
+            if isinstance(winner.get("component_id"), str)}
+
+
+def winner_pins(root: Path, component_id: str) -> set[str]:
+    """Every landscape winner pin recorded for ``component_id`` (one per selecting layer)."""
+    return {winner["pin"].strip() for winner in landscape_winners(root)
+            if winner.get("component_id") == component_id
+            and isinstance(winner.get("pin"), str) and winner["pin"].strip()}
+
+
+GITHUB_REPOSITORY_PATTERN = re.compile(r"^(?:https?://)?(?:www\.)?github\.com/([^/\s#?]+)/([^/\s#?]+)", re.IGNORECASE)
+
+
+def normalize_repository(value) -> str | None:
+    """Comparable form of a repository URL, lower-cased with surrounding whitespace removed.
+
+    A GitHub URL reduces to ``github.com/<owner>/<repo>``: the scheme, a ``www.`` prefix, a trailing
+    ``.git`` and every path segment after owner/repo (``/releases/tag/v1``, ``/tree/v1``, ``/blob/...``,
+    a trailing ``/``) are dropped, the same owner/repo form as
+    ``tools/sota-convergence/build_manifest.py``'s ``github_repo_slug`` (manifests/stack.json records
+    some repositories as release or tree URLs). Any other URL keeps its path and only loses the
+    scheme, a ``www.`` prefix, trailing ``/`` and trailing ``.git``, since other forges nest groups.
+    ``None`` for a non-string or empty value, which never matches."""
+    if not isinstance(value, str):
+        return None
+    text = value.strip().lower()
+    match = GITHUB_REPOSITORY_PATTERN.match(text)
+    if match:
+        owner, repository = match.group(1), match.group(2)
+        repository = repository[:-len(".git")] if repository.endswith(".git") else repository
+        return f"github.com/{owner}/{repository}" if repository else None
+    text = re.sub(r"^[a-z][a-z0-9+.-]*://", "", text)
+    text = text[len("www."):] if text.startswith("www.") else text
+    previous = None
+    while text != previous:
+        previous = text
+        text = text.rstrip("/")
+        text = text[:-len(".git")] if text.endswith(".git") else text
+    return text or None
+
+
+def stack_aliases_of_winners(components, winners) -> dict[str, tuple[str, ...]]:
+    """Pure core of ``winner_stack_aliases``: each ``manifests/stack.json`` id whose repository
+    (after ``normalize_repository``, exact match) is a landscape winner's repository, mapped to
+    the sorted winner ``component_id``(s). An id that is itself a winner ``component_id`` is
+    not an alias: receipts recorded under it join that winner."""
+    winner_ids = {winner["component_id"] for winner in winners
+                  if isinstance(winner, dict) and isinstance(winner.get("component_id"), str)}
+    by_repository: dict[str, set[str]] = {}
+    for winner in winners:
+        if not isinstance(winner, dict) or not isinstance(winner.get("component_id"), str):
+            continue
+        repository = normalize_repository(winner.get("repository"))
+        if repository is not None:
+            by_repository.setdefault(repository, set()).add(winner["component_id"])
+    aliases: dict[str, set[str]] = {}
+    for component in components:
+        if not isinstance(component, dict):
+            continue
+        stack_id = component.get("id")
+        repository = normalize_repository(component.get("repository"))
+        if not isinstance(stack_id, str) or stack_id in winner_ids or repository not in by_repository:
+            continue
+        aliases.setdefault(stack_id, set()).update(by_repository[repository])
+    return {stack_id: tuple(sorted(ids)) for stack_id, ids in sorted(aliases.items())}
+
+
+def winner_stack_aliases(root: Path) -> dict[str, tuple[str, ...]]:
+    """``manifests/stack.json`` id -> the landscape winner component_id(s) it is an alias of.
+
+    ``scripts/platform_status.py`` joins a receipt to a winner only by the winner's own
+    ``component_id``, so a receipt recorded under an alias never binds: ``record`` refuses an
+    alias, ``validate`` rejects one outside ``GRANDFATHERED_ALIAS_RECEIPTS`` and
+    ``scripts/component_matrix.py`` lists such receipts without counting them."""
+    return stack_aliases_of_winners(stack_components(root), landscape_winners(root))
+
+
+def alias_refusal(root: Path, component_id: str, aliases: dict[str, tuple[str, ...]]) -> str | None:
+    """The message ``record`` refuses a stack alias of a winner with, else ``None``."""
+    canonical = aliases.get(component_id)
+    if not canonical:
+        return None
+    described = []
+    for winner_id in canonical:
+        pins = sorted(winner_pins(root, winner_id))
+        described.append(f"{winner_id!r} (current pin: {' | '.join(repr(pin) for pin in pins) or 'none'})")
+    return (f"--component-id {component_id!r} is the manifests/stack.json id of landscape winner "
+            f"{', '.join(described)} (same repository); a receipt recorded under it would never bind to "
+            "that winner's platform status, which joins receipts by the winner's own component_id only. "
+            "Record with the winner's component_id as listed in docs/component-evidence-matrix.md "
+            f"(--from-stack-commands still reuses the commands documented under {component_id!r}), and "
+            "give a multi-part pin in full as --component-version")
 
 
 def catalog_component_version(root: Path, component_id: str) -> str | None:
@@ -514,6 +681,77 @@ def run_command(cmd: str, cwd: Path, timeout: int) -> tuple[int, str, float]:
     return exit_code, output, duration
 
 
+def stack_commands_for_record(root: Path, component_id: str,
+                              aliases: dict[str, tuple[str, ...]]) -> tuple[list[str], str | None]:
+    """``--from-stack-commands``: the plain-string ``manifests/stack.json`` commands for
+    ``component_id``, else ``(commands, None)`` from the one stack id that is an alias of it (a
+    winner such as ``data-alpaca-py`` has no stack entry of its own; its documented commands sit
+    under ``alpaca-py``, which ``record`` refuses as a component id). ``([], message)`` when there
+    are none, or when several alias stack ids carry commands and the choice would be a guess."""
+    own = stack_component_string_commands(root, component_id)
+    if own:
+        return own, None
+    alias_ids = sorted(stack_id for stack_id, winner_ids in aliases.items() if component_id in winner_ids)
+    with_commands = [(stack_id, stack_component_string_commands(root, stack_id)) for stack_id in alias_ids]
+    with_commands = [(stack_id, commands) for stack_id, commands in with_commands if commands]
+    if len(with_commands) == 1:
+        return with_commands[0][1], None
+    if with_commands:
+        return [], (f"component {component_id!r} has no manifests/stack.json commands of its own and several "
+                    f"stack ids sharing its repository carry commands ({', '.join(i for i, _ in with_commands)}); "
+                    "pass the functional command(s) with --cmd")
+    searched = ", ".join(repr(stack_id) for stack_id in [component_id, *alias_ids])
+    return [], f"no plain-string commands found for component {searched} in manifests/stack.json; pass --cmd"
+
+
+def existing_review_summary(path: Path) -> str:
+    """``kind:verdict`` for each review already in the receipt at ``path``, joined by ', ',
+    so a refused overwrite names exactly what it would have erased (2026-09-25: a same-day
+    rerecord silently erased an independent_session ``needs_changes`` review). Never raises:
+    a receipt too damaged to parse still refuses the overwrite, it just cannot describe it."""
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError):
+        return "existing receipt is unreadable"
+    reviews = existing.get("reviews") if isinstance(existing, dict) and isinstance(existing.get("reviews"), list) else []
+    entries = [f"{review.get('kind')}:{review.get('verdict')}" for review in reviews if isinstance(review, dict)]
+    return ", ".join(entries) if entries else "no reviews"
+
+
+def refuse_overwrite_message(relative_path: str, target: Path, latest_id: str) -> str:
+    return (f"error: refusing to overwrite existing receipt {relative_path!r} (existing reviews: "
+            f"{existing_review_summary(target)}); receipts are never overwritten once written "
+            f"(docs/contributing-evidence.md) -- pass --supersedes {latest_id!r} to record a new receipt "
+            "that supersedes it without touching the original")
+
+
+def latest_generation_id(root: Path, host_id: str, base_id: str) -> str | None:
+    """The id of the highest-generation existing receipt in ``base_id``'s family: ``base_id``
+    itself (generation 1), or ``base_id-N`` for the largest existing N, or ``None`` if no
+    receipt in this family has been recorded yet. Generations are contiguous by construction
+    (``next_free_superseding_id`` always fills the lowest free slot), so a sequential scan
+    from N=2 stops at the first gap. ``record --supersedes`` requires naming exactly this id,
+    so an older generation can never be superseded while a newer one exists (which would hide
+    the newer one's own reviews)."""
+    host_dir = root / "evidence" / "hosts" / host_id
+    latest = base_id if (host_dir / f"{receipt_filename_stem(base_id)}.json").is_file() else None
+    generation = 2
+    while (host_dir / f"{receipt_filename_stem(f'{base_id}-{generation}')}.json").is_file():
+        latest = f"{base_id}-{generation}"
+        generation += 1
+    return latest
+
+
+def next_free_superseding_id(root: Path, host_id: str, base_id: str) -> str:
+    """Smallest ``<base_id>-N`` (N >= 2) with no existing receipt file under
+    ``evidence/hosts/<host_id>/``, for ``record --supersedes``."""
+    host_dir = root / "evidence" / "hosts" / host_id
+    generation = 2
+    while (host_dir / f"{receipt_filename_stem(f'{base_id}-{generation}')}.json").exists():
+        generation += 1
+    return f"{base_id}-{generation}"
+
+
 def cmd_record(args: argparse.Namespace) -> int:
     root = repo_root(args.root)
     host_id = args.host_id
@@ -530,6 +768,10 @@ def cmd_record(args: argparse.Namespace) -> int:
     known_platforms = platform_ids(root)
     if known_platforms and args.platform_id not in known_platforms:
         print(f"error: --platform-id {args.platform_id!r} is not a known adoption/manifest.json platform_profiles id")
+        return 2
+    refusal = alias_refusal(root, args.component_id, winner_stack_aliases(root))
+    if refusal:
+        print(f"error: {refusal}")
         return 2
 
     try:
@@ -602,19 +844,71 @@ def cmd_record(args: argparse.Namespace) -> int:
 
     commands_to_run: list[str] = []
     if args.from_stack_commands:
-        stack_commands = stack_component_string_commands(root, args.component_id)
-        if not stack_commands:
-            print(f"error: no plain-string commands found for component {args.component_id!r} in manifests/stack.json")
+        stack_commands, problem = stack_commands_for_record(root, args.component_id, winner_stack_aliases(root))
+        if problem:
+            print(f"error: {problem}")
             return 2
         commands_to_run.extend(stack_commands)
     commands_to_run.extend(args.cmd or [])
     if not commands_to_run:
         print("error: no commands provided; pass --cmd and/or --from-stack-commands")
         return 2
+    if args.stage == "use" and all(bare_help_or_version(cmd) for cmd in commands_to_run):
+        print("error: --stage use records the component doing its job, but every command here is only a help or "
+              "version call; pass a functional --cmd, or record these as --stage install")
+        return 2
 
     catalog_revision = git_head(root)
     observed_at = utc_now()
     date_stamp = observed_at[:10].replace("-", "")
+
+    # Compute the receipt id/path and refuse a collision *before* any command below runs, so a
+    # same-day rerun can never erase an existing file's appended independent reviews (the
+    # 2026-09-25 incident) -- receipts are never overwritten once written. --supersedes is the
+    # reviewable way to record a new receipt for the same host/component/stage/date instead.
+    base_id = f"{host_id}--{args.component_id}--{args.stage}--{date_stamp}"
+    if args.supersedes is None:
+        receipt_id = base_id
+    else:
+        supersedes_match = ID_PATTERN.fullmatch(args.supersedes)
+        if (supersedes_match is None or supersedes_match.group("host_id") != host_id
+                or supersedes_match.group("component_id") != args.component_id
+                or supersedes_match.group("stage") != args.stage
+                or supersedes_match.group("date") != date_stamp):
+            print(f"error: --supersedes {args.supersedes!r} must be an existing receipt id for this same "
+                  f"recording's host/component/stage/date ({base_id!r}, optionally with a '-N' generation "
+                  "suffix from an earlier supersede)")
+            return 2
+        superseded_relative = f"evidence/hosts/{host_id}/{receipt_filename_stem(args.supersedes)}.json"
+        try:
+            superseded_target = safe_file(root, superseded_relative)
+        except InvalidDecisionIndex as error:
+            print(f"error: --supersedes {args.supersedes!r} is not a valid receipt path: {error}")
+            return 2
+        if not superseded_target.is_file():
+            print(f"error: --supersedes names {superseded_relative!r}, which does not exist; --supersedes must "
+                  "name an already-recorded receipt")
+            return 2
+        # --supersedes must name the *latest* existing generation: superseding an older one
+        # while a newer generation already exists would silently drop the newer one's own
+        # reviews from the chain (nobody would ever be told to supersede it in turn).
+        latest = latest_generation_id(root, host_id, base_id)
+        if args.supersedes != latest:
+            print(f"error: --supersedes {args.supersedes!r} is not the latest receipt for this host/component/"
+                  f"stage/date; the latest is {latest!r} -- pass --supersedes {latest!r} instead (superseding an "
+                  "older generation while a newer one exists would hide the newer one's own reviews)")
+            return 2
+        receipt_id = next_free_superseding_id(root, host_id, base_id)
+
+    relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
+    try:
+        target = safe_file(root, relative_path)
+    except InvalidDecisionIndex as error:
+        print(f"error: cannot record a receipt at {relative_path!r}: {error}")
+        return 2
+    if target.exists():
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
+        return 2
 
     command_records = []
     for cmd in commands_to_run:
@@ -630,7 +924,6 @@ def cmd_record(args: argparse.Namespace) -> int:
 
     result = "pass" if all(record["exit"] == 0 for record in command_records) else "fail"
 
-    receipt_id = f"{host_id}--{args.component_id}--{args.stage}--{date_stamp}"
     limitations = args.limitation or [
         "Recorded receipt covers only the listed commands; it does not establish full "
         "component functional acceptance beyond what these commands exercise.",
@@ -673,13 +966,8 @@ def cmd_record(args: argparse.Namespace) -> int:
         receipt["qualified_models"] = qualified_models
     if args.hardware_profile_ref:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
-
-    relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
-    try:
-        target = safe_file(root, relative_path)
-    except InvalidDecisionIndex as error:
-        print(f"error: cannot record a receipt at {relative_path!r}: {error}")
-        return 2
+    if args.supersedes:
+        receipt["supersedes"] = args.supersedes
 
     # Check the receipt against the schema before writing anything (for example an overlong
     # --model), so a failed check never leaves a receipt that validate would reject.
@@ -689,11 +977,27 @@ def cmd_record(args: argparse.Namespace) -> int:
         print("error: the receipt would not validate: " + "; ".join(shape_errors))
         return 2
 
-    # Validate (and register) before/around the final write, rolling back the file on any
-    # registration failure, so a crash here can never leave a written-but-unregistered
+    # The write below is an exclusive create (FileExistsError is defense in depth alongside
+    # the target.exists() check earlier -- both mean this call never overwrites). Any other
+    # failure while writing, or a failure to register afterward, deletes the file this run
+    # created, so a crash here can never leave a written-but-unregistered (or truncated)
     # receipt behind (the receipt file and manifests/evidence.json stay coherent together).
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    try:
+        with target.open("x", encoding="utf-8") as handle:
+            handle.write(json.dumps(receipt, indent=2) + "\n")
+    except FileExistsError:
+        # Defense in depth: the target.exists() check above already refused this exact path
+        # once; this only catches a receipt another process created in the window since then.
+        print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
+        return 2
+    except Exception:
+        # The exclusive create above means this run, and only this run, could have created
+        # target; a failure partway through writing it (for example ENOSPC) is safe to delete
+        # rather than leaving a truncated or empty receipt behind. Re-raise so the underlying
+        # error is not hidden.
+        target.unlink(missing_ok=True)
+        raise
     try:
         register_file(root, relative_path)
     except Exception as error:
@@ -736,7 +1040,6 @@ def cmd_review(args: argparse.Namespace) -> int:
         print("error: --receipt must be inside the repository root")
         return 2
     path = safe_file(root, relative_path)
-    receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     if args.kind not in REVIEW_KINDS:
         print(f"error: --kind must be one of {sorted(REVIEW_KINDS)}")
         return 2
@@ -751,35 +1054,58 @@ def cmd_review(args: argparse.Namespace) -> int:
     if reviewer is None:
         print(f"error: no reviewer identity: pass --identity NAME (only a Claude Code session exports {IDENTITY_ENV})")
         return 2
-    recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") if isinstance(receipt.get("recorded_by"), dict) else None
-    if args.kind != "self":
-        if recorder is None:
-            print("error: this receipt has no recorded_by identity, so an independent review cannot be checked "
-                  "against its recorder; re-record it with the current scripts/host_receipts.py record")
+
+    # An exclusive lock on a stable file beside the receipt -- never the receipt path itself,
+    # which os.replace() swaps to a new inode below and so would stop protecting a second
+    # waiter still holding the old one -- serializes concurrent reviewers of the same receipt.
+    # Each re-reads the receipt only after acquiring the lock, so two reviews racing to append
+    # cannot silently lose one, and the write goes to a temp file that is os.replace()d into
+    # place, so a crash mid-write can never truncate the receipt that was there before.
+    lock_path = path.with_name(path.name + ".lock")
+    lock_handle = open(lock_path, "a+")
+    try:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        receipt = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+        recorder = (receipt.get("recorded_by") or {}).get("identity_sha256") \
+            if isinstance(receipt.get("recorded_by"), dict) else None
+        if args.kind != "self":
+            if recorder is None:
+                print("error: this receipt has no recorded_by identity, so an independent review cannot be "
+                      "checked against its recorder; re-record it with the current scripts/host_receipts.py record")
+                return 2
+            if reviewer == recorder:
+                print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review "
+                      "must come from a different session, lane or person")
+                return 2
+        now = utc_now()
+        observed_at = receipt.get("observed_at_utc")
+        if isinstance(observed_at, str) and now < observed_at:
+            print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a "
+                  "review dated before the observation is refused by validate, so fix the clock and rerun")
             return 2
-        if reviewer == recorder:
-            print(f"error: --kind {args.kind} review from the recorder's own identity; an independent review must "
-                  "come from a different session, lane or person")
+        receipt.setdefault("reviews", []).append({
+            "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
+            "reviewer": identity_record(reviewer, args.model),
+        })
+        shape_errors: list[str] = []
+        validate_receipt_shape(root, receipt, relative_path, shape_errors)
+        if shape_errors:
+            print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
             return 2
-    now = utc_now()
-    observed_at = receipt.get("observed_at_utc")
-    if isinstance(observed_at, str) and now < observed_at:
-        print(f"error: this host's clock ({now}) is behind the receipt's observed_at_utc ({observed_at}); a review "
-              "dated before the observation is refused by validate, so fix the clock and rerun")
-        return 2
-    receipt.setdefault("reviews", []).append({
-        "kind": args.kind, "ref": args.ref, "verdict": args.verdict, "at_utc": now,
-        "reviewer": identity_record(reviewer, args.model),
-    })
-    shape_errors: list[str] = []
-    validate_receipt_shape(root, receipt, relative_path, shape_errors)
-    if shape_errors:
-        print("error: the reviewed receipt would not validate: " + "; ".join(shape_errors))
-        return 2
-    path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    register_file(root, relative_path)
-    print(relative_path)
-    return 0
+        temp_path = path.with_name(f"{path.name}.tmp-{os.getpid()}")
+        try:
+            temp_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+            os.replace(temp_path, path)
+        except Exception:
+            # temp_path was created exclusively by this run, under the lock; safe to delete.
+            temp_path.unlink(missing_ok=True)
+            raise
+        register_file(root, relative_path)
+        print(relative_path)
+        return 0
+    finally:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+        lock_handle.close()
 
 
 # ----------------------------------------------------------------------- validate
@@ -862,6 +1188,54 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
             expected_date = observed_at[:10].replace("-", "")
             _require(id_date == expected_date, errors,
                       f"{label}: id date segment {id_date!r} does not match observed_at_utc date {expected_date!r}")
+
+    # The id pattern and supersedes' own pattern (adoption/host-receipt.schema.json) cannot
+    # express this cross-field rule, so it is enforced here: a '-N' generation suffix on this
+    # receipt's own id requires a supersedes field, and a bare id (generation 1) must not
+    # carry one -- a receipt's generation and its supersedes link cannot drift apart.
+    supersedes = receipt.get("supersedes")
+    supersedes_present = "supersedes" in receipt
+    id_generation = id_match.group("generation") if id_match is not None else None
+    if id_match is not None:
+        if id_generation is not None:
+            _require(supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has a '-{id_generation}' generation suffix, so it must carry "
+                      "a supersedes field naming the earlier receipt it supersedes")
+        else:
+            _require(not supersedes_present, errors,
+                      f"{label}: id {receipt_id!r} has no generation suffix (generation 1), so it must not carry "
+                      "a supersedes field")
+
+    if isinstance(supersedes, str) and supersedes:
+        supersedes_match = ID_PATTERN.fullmatch(supersedes)
+        if supersedes_match is None:
+            errors.append(f"{label}: supersedes {supersedes!r} is not a well-formed receipt id")
+        else:
+            _require(supersedes_match.group("host_id") == host_id, errors,
+                      f"{label}: supersedes host segment {supersedes_match.group('host_id')!r} does not match "
+                      f"host.host_id {host_id!r}")
+            _require(supersedes_match.group("component_id") == component_id, errors,
+                      f"{label}: supersedes component segment {supersedes_match.group('component_id')!r} does "
+                      f"not match component_id {component_id!r}")
+            _require(supersedes_match.group("stage") == receipt.get("stage"), errors,
+                      f"{label}: supersedes stage segment {supersedes_match.group('stage')!r} does not match "
+                      f"stage {receipt.get('stage')!r}")
+            _require(supersedes != receipt_id, errors, f"{label}: supersedes must not equal this receipt's own id")
+            if id_match is not None:
+                # 'same day' is the UTC date segment carried in the id, not any other clock.
+                _require(supersedes_match.group("date") == id_match.group("date"), errors,
+                          f"{label}: supersedes date segment {supersedes_match.group('date')!r} does not match "
+                          f"this receipt's own id date segment {id_match.group('date')!r} ('same day' is the UTC "
+                          "date in the id)")
+                own_generation = int(id_generation or "1")
+                superseded_generation = int(supersedes_match.group("generation") or "1")
+                _require(superseded_generation < own_generation, errors,
+                          f"{label}: supersedes {supersedes!r} (generation {superseded_generation}) must be a "
+                          f"lower generation than this receipt's own id {receipt_id!r} (generation {own_generation})")
+            superseded_relative = f"evidence/hosts/{host_id}/{receipt_filename_stem(supersedes)}.json"
+            _require(superseded_relative in known_files, errors,
+                      f"{label}: supersedes {supersedes!r} ({superseded_relative}) is not registered in "
+                      "manifests/evidence.json files[]")
 
     commands = receipt.get("commands") if isinstance(receipt.get("commands"), list) else []
     result = receipt.get("result")
@@ -946,6 +1320,150 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
                     errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 
 
+def grandfather_file_expected(root: Path, relative_path: str) -> bool:
+    """Whether a missing ``GRANDFATHERED_ALIAS_RECEIPTS`` file is a stale entry under ``root``: always
+    for the repository this script belongs to, and for any other tree (another checkout or copy)
+    that has the entry's host directory. A tree without that directory (a test fixture) does not
+    carry this repository's evidence, so the entry says nothing about it."""
+    return root.resolve() == repo_root(None) or (root / relative_path).parent.is_dir()
+
+
+SHA256_HEX_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+
+
+def receipt_claim_sha256(receipt: dict) -> str:
+    """sha256 of what was recorded: the receipt without its append-only ``reviews``, as canonical JSON
+    (sorted keys, no insignificant whitespace, UTF-8), so re-serialization and ``review`` leave it
+    unchanged and any edit to the recorded claim changes it."""
+    claim = {key: value for key, value in receipt.items() if key != "reviews"}
+    text = json.dumps(claim, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    # surrogatepass: a lone-surrogate escape in a hand-edited file still hashes (to a mismatch) instead of raising.
+    return hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
+
+
+def grandfather_digest_error(root: Path, label: str, entry: dict) -> str | None:
+    """``None`` when the receipt at ``label`` still carries the exact claim the
+    ``GRANDFATHERED_ALIAS_RECEIPTS`` entry names by ``claim_sha256``, else the error naming the path. The
+    exemption is by exact identity of the recorded claim; appended reviews do not change it."""
+    expected = entry.get("claim_sha256") if isinstance(entry, dict) else None
+    if not (isinstance(expected, str) and SHA256_HEX_PATTERN.fullmatch(expected)):
+        return (f"{label}: GRANDFATHERED_ALIAS_RECEIPTS entry has no lowercase hex 'claim_sha256'; the exemption "
+                "applies only to the exact recorded claim")
+    try:
+        receipt = json.loads((root / label).read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+    except (OSError, UnicodeError, ValueError, InvalidDecisionIndex) as error:
+        return (f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but is not a parseable JSON receipt "
+                f"(corrupt or unreadable: {type(error).__name__})")
+    if not isinstance(receipt, dict):
+        return f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but is not a receipt object"
+    actual = receipt_claim_sha256(receipt)
+    if actual != expected:
+        return (f"{label}: claim_sha256 {actual} is not the GRANDFATHERED_ALIAS_RECEIPTS claim_sha256 {expected}; "
+                "the exemption covers only the recorded claim (restore it, or re-record under the winner's "
+                "component_id)")
+    return None
+
+
+def grandfathered_alias_paths(root: Path, grandfathered: dict[str, dict] | None = None) -> set[str]:
+    """The ``GRANDFATHERED_ALIAS_RECEIPTS`` paths present under ``root`` whose recorded claim still matches
+    the entry's ``claim_sha256``."""
+    grandfathered = GRANDFATHERED_ALIAS_RECEIPTS if grandfathered is None else grandfathered
+    return {label for label, entry in grandfathered.items()
+            if (root / label).is_file() and grandfather_digest_error(root, label, entry) is None}
+
+
+def alias_receipt_errors(root: Path, recorded_ids: dict[str, object], aliases: dict[str, tuple[str, ...]],
+                         grandfathered: dict[str, dict]) -> list[str]:
+    """Errors for receipts recorded under a stack alias of a landscape winner (``recorded_ids``
+    maps each parsed receipt's repository-relative path to its ``component_id``; a path absent
+    from it did not parse), except the ``grandfathered`` paths whose recorded claim still matches the
+    entry's ``claim_sha256``, and for a grandfathered entry that no longer describes one."""
+    errors: list[str] = []
+    verified: dict[str, dict] = {}
+    for label, entry in sorted(grandfathered.items()):
+        if not (root / label).is_file():
+            if grandfather_file_expected(root, label):
+                errors.append(f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but no longer exists; remove the entry")
+            continue
+        if not isinstance(recorded_ids.get(label), str):
+            continue   # corrupt or not a receipt object: reported once below
+        problem = grandfather_digest_error(root, label, entry)
+        if problem:
+            errors.append(problem)
+        else:
+            verified[label] = entry
+    for label, component_id in sorted(recorded_ids.items()):
+        canonical = aliases.get(component_id) if isinstance(component_id, str) else None
+        if not canonical:
+            continue
+        entry = verified.get(label)
+        if entry is None:
+            errors.append(
+                f"{label}: component_id {component_id!r} is the manifests/stack.json id of landscape winner(s) "
+                f"{', '.join(canonical)} (same repository), so this receipt never binds to a winner's status; "
+                "re-record it under the winner's component_id (scripts/host_receipts.py record now refuses "
+                "the alias)")
+        elif entry.get("canonical_component_id") not in canonical:
+            errors.append(
+                f"{label}: GRANDFATHERED_ALIAS_RECEIPTS names canonical id "
+                f"{entry.get('canonical_component_id')!r}, but {component_id!r} is an alias of "
+                f"{', '.join(canonical)}")
+    for label in sorted(grandfathered):
+        if not (root / label).is_file():
+            continue
+        if label not in recorded_ids:
+            errors.append(f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but is not a parseable JSON receipt "
+                          "(corrupt or unreadable), so its alias exemption cannot be checked")
+        elif not isinstance(recorded_ids[label], str):
+            errors.append(f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but has no string component_id "
+                          "(not a receipt object), so its alias exemption cannot be checked")
+        elif label in verified and not aliases.get(recorded_ids[label]):
+            errors.append(
+                f"{label}: listed in GRANDFATHERED_ALIAS_RECEIPTS but its component_id "
+                f"{recorded_ids[label]!r} is no longer a manifests/stack.json alias of a landscape winner; "
+                "remove the entry")
+    return errors
+
+
+def receipt_alias_table_errors(root: Path, aliases: dict[str, tuple[str, ...]], winner_ids: set[str],
+                               absent: dict[str, str] | None = None) -> list[str]:
+    """Disagreements between ``RECEIPT_ALIASES_RELATIVE_PATH`` and the repository-inferred ``aliases``:
+    an explicit entry whose target is a landscape winner must be an inferred alias of that winner; an
+    inferred alias must be in the table with one of its winners as the target, or be listed in
+    ``ALIASES_ABSENT_FROM_RECEIPT_ALIAS_TABLE``, whose entries must in turn still be inferred aliases
+    missing from the table. Nothing to compare when the table is absent (a fixture tree)."""
+    absent = ALIASES_ABSENT_FROM_RECEIPT_ALIAS_TABLE if absent is None else absent
+    label = RECEIPT_ALIASES_RELATIVE_PATH
+    if not (root / label).is_file():
+        return []
+    try:
+        table = load_json(root, label).get("aliases")
+    except (OSError, UnicodeError, ValueError, InvalidDecisionIndex, AttributeError) as error:
+        return [f"{label}: unreadable ({type(error).__name__})"]
+    if not isinstance(table, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in table.items()):
+        return [f"{label}: 'aliases' must map manifests/stack.json ids to component id strings"]
+    errors: list[str] = []
+    for stack_id, target in sorted(table.items()):
+        if target in winner_ids and target not in aliases.get(stack_id, ()):
+            errors.append(f"{label}: maps {stack_id!r} to landscape winner {target!r}, but the repository-inferred "
+                          f"alias of {stack_id!r} is {', '.join(aliases.get(stack_id, ())) or 'nothing'}")
+    for stack_id, inferred in sorted(aliases.items()):
+        if stack_id in table:
+            if table[stack_id] not in inferred:
+                errors.append(f"{label}: maps {stack_id!r} to {table[stack_id]!r}, but it is the manifests/stack.json "
+                              f"alias of landscape winner(s) {', '.join(inferred)}")
+        elif stack_id not in absent:
+            errors.append(f"{label}: {stack_id!r} is the manifests/stack.json alias of landscape winner(s) "
+                          f"{', '.join(inferred)} but has no entry; add one, or list it with a reason in "
+                          "host_receipts.ALIASES_ABSENT_FROM_RECEIPT_ALIAS_TABLE")
+    for stack_id in sorted(absent):
+        if stack_id in table or stack_id not in aliases:
+            errors.append(f"{label}: host_receipts.ALIASES_ABSENT_FROM_RECEIPT_ALIAS_TABLE lists {stack_id!r}, but it "
+                          "is " + ("in the table" if stack_id in table else "no longer an inferred alias")
+                          + "; remove the exemption")
+    return errors
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     root = repo_root(args.root)
     known_platforms = platform_ids(root)
@@ -953,9 +1471,14 @@ def cmd_validate(args: argparse.Namespace) -> int:
     known_stack_ids = stack_component_ids(root)
     known_landscape_ids = landscape_component_ids(root)
     known_files = evidence_files(root)
+    aliases = winner_stack_aliases(root)
+    grandfathered = getattr(args, "grandfathered_alias_receipts", None)
+    if grandfathered is None:
+        grandfathered = GRANDFATHERED_ALIAS_RECEIPTS
 
     errors: list[str] = []
     count = 0
+    recorded_ids: dict[str, object] = {}
     for host_dir_name, path in _iter_receipt_files(root):
         count += 1
         label = path.relative_to(root).as_posix()
@@ -964,12 +1487,15 @@ def cmd_validate(args: argparse.Namespace) -> int:
         except (OSError, UnicodeError, ValueError, InvalidDecisionIndex) as error:
             errors.append(f"{label}: invalid JSON ({type(error).__name__})")
             continue
+        recorded_ids[label] = receipt.get("component_id") if isinstance(receipt, dict) else None
         validate_receipt_shape(root, receipt, label, errors)
         validate_receipt_cross_references(
             root, host_dir_name, path, receipt, errors,
             known_platforms, known_stack_ids, known_landscape_ids, known_files,
             known_platform_profiles,
         )
+    errors.extend(alias_receipt_errors(root, recorded_ids, aliases, grandfathered))
+    errors.extend(receipt_alias_table_errors(root, aliases, landscape_component_ids(root)))
 
     if errors:
         print(f"Host receipt validation failed ({len(errors)} error(s) across {count} receipt(s)):")
@@ -1191,10 +1717,20 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--platform-id", required=True)
     record_parser.add_argument("--component-id", required=True)
     record_parser.add_argument("--stage", required=True, choices=sorted(STAGES))
+    record_parser.add_argument("--supersedes", default=None,
+                               help="The LATEST existing receipt id for this same host/component/stage/date to "
+                                    "supersede (an older generation is refused, naming the actual latest): writes "
+                                    "a new receipt at the next free '-N' generation, records this in its "
+                                    "'supersedes' field, and leaves the original file untouched. Without this, "
+                                    "record refuses (exit 2) when today's receipt for this host/component/stage "
+                                    "already exists, instead of overwriting it.")
     record_parser.add_argument("--hardware-profile-ref", default=None)
     record_parser.add_argument("--second-physical-machine", action="store_true")
     record_parser.add_argument("--cmd", action="append", default=[])
-    record_parser.add_argument("--from-stack-commands", action="store_true")
+    record_parser.add_argument(
+        "--from-stack-commands", action="store_true",
+        help="run the component's plain-string manifests/stack.json commands; for a landscape winner with no "
+             "stack entry of its own, those of the one stack id sharing its repository")
     record_parser.add_argument("--claim", default=None)
     record_parser.add_argument("--limitation", action="append", default=[])
     record_parser.add_argument("--evidence-class", required=True, choices=sorted(EVIDENCE_CLASSES))

@@ -18,10 +18,13 @@ import re
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import (
-    build_landscape, lane_winner_components, verify_sealed_waves, withhold_policy_labels,
+    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, PROSE_EXPOSURE_NAME, build_landscape, expected_prose_exposed,
+    lane_winner_components, sealed_candidate_labels,
+    sealed_candidates_sha256, verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -149,18 +152,55 @@ class PacketWriter:
         self.packets_dir = work_dir / "packets"
         self.packets_dir.mkdir(parents=True, exist_ok=True)
         self.sums = {}
+        # lane_packets.py --keys-out: each candidate's sealed manifest fields, outside packets/ (review of #145).
+        self.keys_path = work_dir / "sealed-keys" / "packet-keys.json"
+        self.keys = {}
 
-    def write(self, catalog, layer_id, packet) -> str:
+    def write(self, catalog, layer_id, packet, seal=True) -> str:
+        """``seal=False`` writes the candidates' manifest fields into the packet itself, as a packet not built
+        with lane_packets.py --withhold-labels would carry them."""
         filename = f"{catalog}__{layer_id}.json"
+        packet = copy.deepcopy(packet)
+        sealed = {candidate["key"]: {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS
+                                     if seal and field in candidate}
+                  for candidate in packet.get("candidates") or [] if isinstance(candidate, dict) and "key" in candidate}
+        if seal:
+            for candidate in packet.get("candidates") or []:
+                if isinstance(candidate, dict):
+                    candidate.pop("evidence_kind", None)  # a withheld candidate label (round 5, N5)
+            packet["withheld"] = list(packet.get("withheld") or []) + [
+                label for label in sealed_candidate_labels() + withheld_candidate_label_labels()
+                if label not in (packet.get("withheld") or [])]
+            packet[SEALED_COMMITMENT_KEY] = sealed_candidates_sha256(sealed)
         text = json.dumps(packet, sort_keys=True, indent=1) + "\n"
         (self.packets_dir / filename).write_text(text, encoding="utf-8")
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
         # One line per packet, as lane_packets.py writes it: a rebuilt packet replaces its line.
         self.sums[filename] = f"{digest}  {filename}"
+        self.keys[filename] = {"packet_sha256": digest, "candidates": sealed}
         return digest
+
+    # The --root a new-wave fixture records under: flush writes there a manifest registering every sealed
+    # component id, and the keys document names it by path and sha256, as lane_packets.py --keys-out does.
+    ROOT = None
+    MANIFEST = "catalogs/sota-convergence/manifest-fixture.json"
 
     def flush(self):
         (self.packets_dir / "SHA256SUMS").write_text("\n".join(self.sums.values()) + "\n", encoding="utf-8")
+        document = {"schema_version": 1, "packets": self.keys}
+        if PacketWriter.ROOT is not None:
+            ids = sorted({fields["component_id"] for entry in self.keys.values()
+                          for fields in entry["candidates"].values() if fields.get("component_id")})
+            manifest = PacketWriter.ROOT / self.MANIFEST
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            existing = json.loads(manifest.read_text(encoding="utf-8")) if manifest.is_file() else {"foundation": []}
+            known = {item["id"] for layer in existing["foundation"] for item in layer["components"]}
+            existing["foundation"].append({"layer": "fixture", "components": [{"id": i} for i in ids if i not in known]})
+            manifest.write_text(json.dumps(existing), encoding="utf-8")
+            document["manifest"] = {"path": self.MANIFEST,
+                                    "sha256": hashlib.sha256(manifest.read_bytes()).hexdigest()}
+        self.keys_path.parent.mkdir(parents=True, exist_ok=True)
+        self.keys_path.write_text(json.dumps(document, sort_keys=True, indent=1) + "\n", encoding="utf-8")
 
 
 def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dict):
@@ -185,6 +225,17 @@ def counterbalanced(winner_lane, why="The retained receipt decides it.", evidenc
 
 
 def write_adjudication(adjudications_dir: Path, catalog: str, layer_id: str, data: dict):
+    """Like adjudicate.py assemble, the record names the lane return files it compared (their current bytes,
+    when both are already written under the work dir beside ``adjudications_dir``)."""
+    lanes = {lane: adjudications_dir.parent / lane / f"{catalog}__{layer_id}.json" for lane in ("claude", "codex")}
+    if "lane_returns_sha256" not in data and all(path.is_file() for path in lanes.values()):
+        # The sealed form of each return (what CI sees as lanes.<lane>.sealed_sha256).
+        data = dict(data, lane_returns_sha256={
+            lane: hashlib.sha256(record_verdicts.sealed_text(json.loads(path.read_text(encoding="utf-8")))
+                                 .encode("utf-8")).hexdigest() for lane, path in lanes.items()})
+    if "provenance" not in data:
+        # Registered adjudication code and the evidence tree both fixture lanes read.
+        data = dict(data, provenance={**ADJUDICATION_CODE, "repo_tree_sha256": REPO_TREE_SHA256})
     adjudications_dir.mkdir(parents=True, exist_ok=True)
     (adjudications_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
 
@@ -212,6 +263,7 @@ FOUNDATION_LAYERS = [
     "wave-badworkflow-layer", "wave-onefamily-layer", "wave-crossfamily-layer", "wave-nojudge-layer",
     "wave-rejected-layer", "wave-missing-layer", "wave-unregistered-layer", "wave-registered-layer",
     "wave-basename-layer", "wave-stalevendor-layer", "wave-forgedcodex-layer", "wave-stalecodex-layer",
+    "wave-staleaudit-layer",
     "wave-otherpacket-layer", "frozen-wave-layer", "wave-artifact-layer", "wave-mac-layer",
     "wave-refuted-layer", "wave-failed-layer", "wave-append-layer", "wave-withheld-layer",
 ]
@@ -227,6 +279,8 @@ class RecordVerdictsFixture(unittest.TestCase):
         self.addCleanup(work_temp.cleanup)
         self.work_dir = Path(work_temp.name).resolve()
         self.packets = PacketWriter(self.work_dir)
+        PacketWriter.ROOT = self.root
+        self.addCleanup(setattr, PacketWriter, "ROOT", None)
 
         manifest = {
             "schema_version": 1, "checked_at": "2026-09-22", "source_base": "a" * 40,
@@ -297,6 +351,12 @@ class RecordVerdictsFixture(unittest.TestCase):
                  checked_at="2026-09-22"):
         args = ["--root", str(self.root), "--work-dir", str(self.work_dir),
                 *(["--checked-at", checked_at] if checked_at is not None else []), *extra]
+        keys_path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if "--packet-keys" not in extra and keys_path.is_file():
+            args += ["--packet-keys", str(keys_path)]
+        if not lane_roots and getattr(self, "fixture_export", None) is not None \
+                and (run_id or record_verdicts.VERDICT_DATE) != record_verdicts.VERDICT_DATE:
+            lane_roots = (str(self.fixture_export),)
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
         args.append("--write" if write else "--check")
@@ -1352,13 +1412,28 @@ CODEX_LANE_BYTES = b"# fixture codex_lane.py\n"
 LANE_PROMPT_BYTES = b"# fixture lane-prompt.md\n"
 VENDORED_WORKFLOW = "examples/claude-native/workflows/layer-verdict-lane.js"
 SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
+AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
+REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not registered: it varies per run)
+# The fixture root's own transcript_audit.py: a Claude return's provenance must hash to it.
+TRANSCRIPT_AUDIT_BYTES = b"# fixture transcript_audit.py\n"
+TRANSCRIPT_AUDIT_SHA256 = hashlib.sha256(TRANSCRIPT_AUDIT_BYTES).hexdigest()
+# The fixture root's own adjudication code, registered as lane-provenance.json "adjudication": an adjudication's
+# provenance must hash to these files at record time (round 11, RR11-3).
+ADJUDICATION_BYTES = {relative: {"tools/sota-convergence/codex_lane.py": CODEX_LANE_BYTES,
+                                 "tools/sota-convergence/transcript_audit.py": TRANSCRIPT_AUDIT_BYTES}.get(
+                                     relative, f"# fixture {relative}\n".encode("utf-8"))
+                      for relative in record_verdicts.ADJUDICATION_FILES.values()}
+ADJUDICATION_CODE = {field: hashlib.sha256(ADJUDICATION_BYTES[relative]).hexdigest()
+                     for field, relative in record_verdicts.ADJUDICATION_FILES.items()}
 
 
 def lane_provenance(lane):
     if lane == "claude":
-        return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40}
+        return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40,
+                "agent_sha256": AGENT_SHA256, "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(),
+                "transcript_audit_py_sha256": TRANSCRIPT_AUDIT_SHA256, "repo_tree_sha256": REPO_TREE_SHA256}
     return {"codex_lane_py_sha256": hashlib.sha256(CODEX_LANE_BYTES).hexdigest(),
-            "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest()}
+            "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(), "repo_tree_sha256": REPO_TREE_SHA256}
 
 
 DROP = object()  # an override value that removes the field from the lane return
@@ -1397,7 +1472,17 @@ def prepare_new_wave_root(fixture):
     """The root files a new wave reads: the vendored workflow SHA256SUMS its Claude provenance
     must match, the codex lane code and lane-provenance.json registry its provenance must name, and
     the evidence manifest registering evidence/receipt.json in files[] (the only kind of evidence
-    scripts/platform_status.py counts; receipt.json and docs/guide.md stay unregistered there)."""
+    scripts/platform_status.py counts; receipt.json and docs/guide.md stay unregistered there).
+
+    Every new wave records its prose exposure over the export its lanes read (Codex review of #145 at 68e74f2c):
+    new-wave runs get a fixture export whose tree is the one the fixture lanes name."""
+    scratch = Path(tempfile.mkdtemp()).resolve()
+    fixture.addCleanup(shutil.rmtree, scratch)
+    fixture.fixture_export = scratch / "hosts" / "blind" / "export"
+    fixture.fixture_export.mkdir(parents=True)
+    tree = mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256)
+    tree.start()
+    fixture.addCleanup(tree.stop)
     sums = fixture.root / "examples/claude-native/workflows/SHA256SUMS"
     sums.parent.mkdir(parents=True, exist_ok=True)
     sums.write_text(f"{WORKFLOW_SHA256}  layer-verdict-lane.js\n", encoding="utf-8")
@@ -1405,11 +1490,18 @@ def prepare_new_wave_root(fixture):
     tools.mkdir(parents=True, exist_ok=True)
     (tools / "codex_lane.py").write_bytes(CODEX_LANE_BYTES)
     (tools / "lane-prompt.md").write_bytes(LANE_PROMPT_BYTES)
+    (tools / "transcript_audit.py").write_bytes(TRANSCRIPT_AUDIT_BYTES)
+    for relative, data in ADJUDICATION_BYTES.items():
+        (fixture.root / relative).parent.mkdir(parents=True, exist_ok=True)
+        (fixture.root / relative).write_bytes(data)
     fixture.write("tools/sota-convergence/lane-provenance.json", {
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
-                    "workflow_sha256": WORKFLOW_SHA256}],
-        "codex": [{key: value for key, value in lane_provenance("codex").items()}]})
+                    "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256,
+                    "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(),
+                    "transcript_audit_py_sha256": TRANSCRIPT_AUDIT_SHA256}],
+        "codex": [{key: value for key, value in lane_provenance("codex").items() if key != "repo_tree_sha256"}],
+        "adjudication": [dict(ADJUDICATION_CODE)]})
     fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})
     receipt_bytes = (fixture.root / "evidence/receipt.json").read_bytes()
     fixture.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
@@ -1518,6 +1610,91 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(sealed["provenance"], lane_provenance("codex"))
         build_landscape(self.root)
 
+    def test_a_wave_seals_its_prose_exposure_and_stamps_each_row(self):
+        # Round 7, BL7-2: measured at --write against the pre-wave ledger over the lanes' export, sealed and bound by
+        # the run manifest, stamped as lanes.prose_exposed; landscape.py rejects a stamp the document does not hold.
+        scratch = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, scratch)
+        export = scratch / "hosts" / "blind" / "export"
+        (export / "docs").mkdir(parents=True)
+        (export / "docs" / "notes.md").write_text("The selected engine is recorded elsewhere.\n", encoding="utf-8")
+        catalog = self.both_lanes("wave-same-layer")
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(lane_roots=(str(export),))
+        self.assertEqual(code, 0, output)
+        exposure_path = self.sealed_base() / PROSE_EXPOSURE_NAME
+        exposure = json.loads(exposure_path.read_text(encoding="utf-8"))
+        self.assertEqual(exposure["measured_against"], "the ledger before each layer's row was written")
+        # Each measure records what it was measured on (round 8, NEW-2).
+        entry = exposure["layers"][f"{catalog}::wave-same-layer"]
+        self.assertEqual(entry["lane_root_tree_sha256"], REPO_TREE_SHA256)
+        self.assertEqual(entry["packet_sha256"], self.run_manifest()["packets"][0]["packet_sha256"])
+        self.assertIn(f"{catalog}::wave-same-layer", exposure["layers"])
+        self.assertEqual(self.run_manifest()["prose_exposure_sha256"],
+                         hashlib.sha256(exposure_path.read_bytes()).hexdigest())
+        row = self.load_row(catalog, "wave-same-layer")
+        self.assertIn("prose_exposed", row["lanes"])
+        self.assertEqual(row["lanes"]["prose_exposed"],
+                         expected_prose_exposed(exposure, catalog, "wave-same-layer"))
+        build_landscape(self.root)
+        # --check reads the retained document rather than re-measuring against the now-written ledger.
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main(write=False, run_id=NEW_RUN, lane_roots=(str(export),)), 0)
+        relative = record_verdicts.LEDGER_FILES[catalog]
+        document = json.loads((self.root / relative).read_text(encoding="utf-8"))
+        for entry in document["layers"]:
+            if entry["layer_id"] == "wave-same-layer":
+                entry["lanes"]["prose_exposed"] = not entry["lanes"]["prose_exposed"]
+        (self.root / relative).write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+        with self.assertRaisesRegex(Exception, "prose_exposed"):
+            build_landscape(self.root)
+
+    def test_the_sealed_prose_exposure_is_bound_and_never_adopted(self):
+        # Round 8, NEW-2: a pre-placed document was adopted, an append laundered an edit, and an append without the
+        # export measured nothing.
+        catalog = self.both_lanes("wave-same-layer")
+        exposure = self.sealed_base() / PROSE_EXPOSURE_NAME
+        exposure.parent.mkdir(parents=True)
+        exposure.write_text(json.dumps({"schema_version": 1, "layers": {}}), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "exists before the wave's first --write"):
+            self.run_wave()
+        exposure.unlink()
+        self.assertEqual(self.run_wave()[0], 0)
+        exposure.write_text(exposure.read_text(encoding="utf-8").replace('"scored": false', '"scored": true'),
+                            encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "edited"):
+            self.run_main(write=False, run_id=NEW_RUN)
+        self.assertEqual(catalog, "foundation")
+
+    def test_an_append_without_the_export_is_refused(self):
+        self.both_lanes("wave-same-layer")
+        self.assertEqual(self.run_wave()[0], 0)
+        work_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp.cleanup)
+        self.work_dir = Path(work_temp.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        self.both_lanes("wave-append-layer")
+        args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22",
+                "--run-id", NEW_RUN, "--append-rows", "foundation/wave-append-layer", "--write"]
+        keys = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if keys.is_file():
+            args += ["--packet-keys", str(keys)]
+        with self.assertRaisesRegex(SystemExit, "measures its rows' prose exposure"):
+            record_verdicts.main(args)
+
+    def test_a_new_wave_without_its_exposure_inputs_is_refused(self):
+        # Codex review of #145 at 68e74f2c: without --lane-repo-root a new wave sealed no prose exposure at all.
+        self.both_lanes("wave-same-layer")
+        args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22",
+                "--run-id", NEW_RUN, "--write"]
+        keys = self.work_dir / "sealed-keys" / "packet-keys.json"
+        if keys.is_file():
+            args += ["--packet-keys", str(keys)]
+        with self.assertRaisesRegex(SystemExit, "records its prose exposure"):
+            record_verdicts.main(args)
+        self.assertFalse(self.sealed_base().exists())
+
     def test_a_lane_without_model_family_is_rejected(self):
         model = {"name": "claude-opus-5-5", "effort": "high"}
         catalog = self.both_lanes("wave-nofamily-layer", claude={"model": model})
@@ -1582,6 +1759,177 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(row["winners"][0]["component_id"], "wave-crossfamily-layer-c1")
         build_landscape(self.root)
 
+    def test_an_adjudication_of_other_lane_returns_is_rejected(self):
+        # Codex review of #145: a lane rerun after assemble must not inherit the old winner_lane.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        data = json.loads(codex_file.read_text(encoding="utf-8"))
+        data["why_selected"] = data.get("why_selected", "") + " (rerun after assemble)"
+        codex_file.write_text(json.dumps(data, indent=1), encoding="utf-8")
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
+        self.assertNotEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
+    def test_lanes_or_an_adjudication_on_another_evidence_tree_are_rejected(self):
+        # Codex review of #145: both lanes and the adjudication must have read one evidence tree.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), provenance={"repo_tree_sha256": "8" * 64}))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("the adjudication read evidence tree " + "8" * 64, output)
+
+    def test_lanes_on_different_evidence_trees_are_not_both_sealed(self):
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        data = json.loads(codex_file.read_text(encoding="utf-8"))
+        data["provenance"]["repo_tree_sha256"] = "9" * 64
+        codex_file.write_text(json.dumps(data, indent=1), encoding="utf-8")
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("the codex lane read evidence tree " + "9" * 64, output)
+
+    def test_the_sealed_lane_bytes_are_the_ones_hashed_against_the_adjudication(self):
+        # Codex review of #145: a lane rewritten between validation and the hash check must not pass with an
+        # adjudication of the new bytes while the old return is sealed.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        original = codex_file.read_bytes()
+        rerun = json.loads(original)
+        rerun["why_selected"] = rerun.get("why_selected", "") + " (rerun)"
+        rerun_bytes = json.dumps(rerun, indent=1).encode("utf-8")
+        codex_file.write_bytes(rerun_bytes)
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        codex_file.write_bytes(original)
+        real_read_bytes, real_load_json = Path.read_bytes, record_verdicts.load_json
+        state = {"rewritten": False}
+
+        def rewrite_after_first_read(path):
+            if Path(path) == codex_file and not state["rewritten"]:
+                state["rewritten"] = True
+                codex_file.write_bytes(rerun_bytes)
+
+        def read_bytes(path):
+            data = real_read_bytes(path)
+            rewrite_after_first_read(path)
+            return data
+
+        def load_json(path):
+            data = real_load_json(path)
+            rewrite_after_first_read(path)
+            return data
+
+        with mock.patch.object(Path, "read_bytes", read_bytes), \
+                mock.patch.object(record_verdicts, "load_json", load_json):
+            code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
+
+    def test_an_adjudication_from_unregistered_code_is_rejected(self):
+        # Independent review of #145, M2: a locally edited adjudication prompt or script must not seal a winner.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest),
+                                provenance={**ADJUDICATION_CODE, "prompt_sha256": "0" * 64,
+                                            "repo_tree_sha256": REPO_TREE_SHA256}))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("adjudication code not listed", output)
+
+    def test_an_adjudication_from_registered_but_superseded_code_is_rejected(self):
+        # Round 11, RR11-3: registered history stays valid for CI, but a new record comes from the current code.
+        (self.root / "tools/sota-convergence/adjudication-prompt.md").write_bytes(b"# edited after the judges ran\n")
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("foundation__wave-crossfamily-layer [adjudication]", output)
+        self.assertIn("tools/sota-convergence/adjudication-prompt.md", output)
+        self.assertNotEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
+    def test_a_lane_return_with_a_byte_order_mark_is_rejected(self):
+        # Independent review of #145, L2: lane returns are UTF-8 without a BOM, as load_json reads them.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        codex_file.write_bytes(b"\xef\xbb\xbf" + codex_file.read_bytes())
+        code, output = self.run_wave()
+        self.assertEqual(code, 1, output)
+        self.assertIn("unreadable or invalid JSON", output)
+
+    def test_an_adjudication_binds_the_relativized_sealed_form_ci_checks(self):
+        # Re-review R2: with --lane-repo-root the sealed returns relativize sources_read, so the adjudication
+        # must bind that form, or landscape.py fails the recorded row.
+        lane_root = "/x/hosts/blind/export"
+        self.assertTrue((self.root / "evidence" / "receipt.json").is_file())
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2",
+                                  claude={"sources_read": [f"{lane_root}/evidence/receipt.json"]})
+        lanes = {lane: json.loads((self.work_dir / lane / f"{catalog}__wave-crossfamily-layer.json")
+                                  .read_text(encoding="utf-8")) for lane in ("claude", "codex")}
+        relativized = {lane: hashlib.sha256(record_verdicts.sealed_text(record_verdicts.with_relative_sources(
+            data, self.root, (lane_root,))).encode("utf-8")).hexdigest() for lane, data in lanes.items()}
+        raw_form = {lane: hashlib.sha256(record_verdicts.sealed_text(data).encode("utf-8")).hexdigest()
+                    for lane, data in lanes.items()}
+        self.assertNotEqual(relativized["claude"], raw_form["claude"])
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), lane_returns_sha256=relativized))
+        # The fixture lanes read REPO_TREE_SHA256; the root stands for that export (BIND-R4-9).
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(adjudications=adjudications, lane_roots=(lane_root,))
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+        build_landscape(self.root)
+
+    def test_a_symlinked_lane_root_binds_like_its_resolved_path(self):
+        # Re-review L1: record_verdicts resolves --lane-repo-root as adjudicate records it.
+        scratch = Path(tempfile.mkdtemp()).resolve()  # macOS: /var/folders resolves to /private/var/folders
+        self.addCleanup(shutil.rmtree, scratch)
+        real = scratch / "hosts" / "blind" / "export"
+        real.mkdir(parents=True)
+        link = scratch / "export-link"
+        link.symlink_to(real)
+        # The lane may record either spelling (macOS: /tmp is /private/tmp); both relativize (validate-macos).
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2",
+                                  claude={"sources_read": [f"{real}/evidence/receipt.json",
+                                                           f"{link}/evidence/receipt.json (lines 1-2)"]})
+        lanes = {lane: json.loads((self.work_dir / lane / f"{catalog}__wave-crossfamily-layer.json")
+                                  .read_text(encoding="utf-8")) for lane in ("claude", "codex")}
+        relative = record_verdicts.with_relative_sources(lanes["claude"], self.root, (str(link), str(real)))
+        self.assertEqual(relative["sources_read"], ["evidence/receipt.json", "evidence/receipt.json (lines 1-2)"])
+        bound = {lane: hashlib.sha256(record_verdicts.sealed_text(record_verdicts.with_relative_sources(
+            data, self.root, (str(link), str(real)))).encode("utf-8")).hexdigest() for lane, data in lanes.items()}
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
+                           dict(cross_family("claude", self.digest), lane_returns_sha256=bound))
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(adjudications=adjudications, lane_roots=(str(link),))
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
+    def test_a_lane_root_that_does_not_hold_the_lanes_tree_rejects_them(self):
+        # Independent review of #145, round 4, BIND-R4-9: another checkout named as the root would have its paths
+        # relativized as the export's.
+        scratch = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, scratch)
+        other = scratch / "hosts" / "blind" / "other"
+        other.mkdir(parents=True)
+        (other / "x.json").write_text("{}", encoding="utf-8")
+        self.both_lanes("wave-same-layer")
+        with self.assertRaisesRegex(SystemExit, "contains \\.\\."):
+            self.run_wave(lane_roots=(str(other / ".." / "other"),))
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value="8" * 64):
+            code, output = self.run_wave(lane_roots=(str(other),))
+        self.assertEqual(code, 1)
+        self.assertIn("does not hold the evidence tree", output)
+
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")
         adjudications = self.work_dir / "adjudications"
@@ -1634,7 +1982,7 @@ class NewWaveProvenanceTests(NewWaveFixture):
 
     def test_codex_provenance_must_hash_to_this_checkouts_lane_code(self):
         # Before: any two well-formed hashes passed.
-        forged = {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}
+        forged = {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": REPO_TREE_SHA256}
         catalog = self.both_lanes("wave-forgedcodex-layer", codex={"provenance": forged})
         code, output = self.run_wave()
         self.assertEqual(code, 1, output)
@@ -1651,6 +1999,16 @@ class NewWaveProvenanceTests(NewWaveFixture):
         self.assertIn("foundation__wave-stalecodex-layer [codex]", output)
         self.assertIn("tools/sota-convergence/codex_lane.py", output)
         self.assertEqual(self.load_row(catalog, "wave-stalecodex-layer")["verdict_status"], "pending_lanes")
+
+    def test_registered_but_superseded_transcript_audit_is_rejected_at_record_time(self):
+        # Round-10 BR10-3: a Claude return naming a registered but superseded audit was recorded.
+        (self.root / "tools/sota-convergence/transcript_audit.py").write_bytes(b"# edited after the lane ran\n")
+        catalog = self.both_lanes("wave-staleaudit-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 1, output)
+        self.assertIn("foundation__wave-staleaudit-layer [claude]", output)
+        self.assertIn("tools/sota-convergence/transcript_audit.py", output)
+        self.assertEqual(self.load_row(catalog, "wave-staleaudit-layer")["verdict_status"], "pending_lanes")
 
     def test_a_judgment_must_name_the_layers_sealed_packet(self):
         # Before: stripped_packet_sha256 was format-checked only.
@@ -1794,7 +2152,7 @@ class NewWavePlatformStatusTests(NewWaveFixture):
             "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
                      "architecture": "arm64", "second_physical_machine": True},
             "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": component_id, "stage": "use",
-            "commands": [{"cmd": f"{component_id} --version", "exit": 0, "duration_s": 0.1,
+            "commands": [{"cmd": f"{component_id} run --input sample.json", "exit": 0, "duration_s": 0.1,
                           "output_sha256": "0" * 64, "output_excerpt": version}],
             "tool_versions": {component_id: version}, "observed_at_utc": "2026-09-23T01:00:00Z",
             "result": "pass", "claim": "Ran on a Mac", "limitations": ["One command"],
@@ -1926,8 +2284,22 @@ class ReviewOf122Tests(NewWaveFixture):
         held = next(entry for entry in manifest["packets"] if entry["layer_id"] == "wave-same-layer")
         self.assertEqual(held, first_manifest["packets"][0])
         for relative, data in first_sealed.items():
-            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS")):
+            if not relative.endswith(("run-manifest.json", "packets/SHA256SUMS", "packet-keys.json",
+                                      "prose-exposure.json")):
                 self.assertEqual((self.root / relative).read_bytes(), data, relative)
+        # The prose exposure is extended the same way: the held layer's measure is carried unchanged, and the appended
+        # layer is measured at the append, before its row (round 8, NEW-2).
+        first_exposure = json.loads(first_sealed[f"{NEW_SEALED_BASE}/prose-exposure.json"])
+        exposure = json.loads((self.sealed_base() / "prose-exposure.json").read_text(encoding="utf-8"))
+        self.assertEqual(exposure["layers"]["foundation::wave-same-layer"],
+                         first_exposure["layers"]["foundation::wave-same-layer"])
+        self.assertIn("foundation::wave-append-layer", exposure["layers"])
+        # The wave's packet-keys document is extended like SHA256SUMS: the held packet's entry is carried unchanged.
+        first_keys = json.loads(next(data for relative, data in first_sealed.items()
+                                     if relative.endswith("packet-keys.json")))["packets"]
+        keys = json.loads((self.sealed_base() / "packet-keys.json").read_text(encoding="utf-8"))["packets"]
+        self.assertEqual(sorted(keys), ["foundation__wave-append-layer.json", "foundation__wave-same-layer.json"])
+        self.assertEqual(keys["foundation__wave-same-layer.json"], first_keys["foundation__wave-same-layer.json"])
         digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
         for layer_id in ("wave-same-layer", "wave-append-layer"):
             self.assertEqual(self.load_row(catalog, layer_id)["lanes"]["run_manifest_sha256"], digest)
@@ -1998,11 +2370,28 @@ class ReviewOf122Tests(NewWaveFixture):
     def test_a_packet_carrying_withheld_keys_is_refused_for_a_new_wave(self):
         c1 = make_candidate("c1", "wave-withheld-layer", "c1")
         c2 = dict(make_candidate("c2", "wave-withheld-layer", "c2"), upstream={"latest": "2.0", "stars": 9})
-        self.packets.write("foundation", "wave-withheld-layer", make_packet("foundation", "wave-withheld-layer", [c1, c2]))
+        # Unsealed, so the upstream record (a sealed field of a --withhold-labels packet) reaches the packet.
+        self.packets.write("foundation", "wave-withheld-layer", make_packet("foundation", "wave-withheld-layer", [c1, c2]),
+                           seal=False)
         self.packets.flush()
         with self.assertRaisesRegex(SystemExit, "carries withheld keys .*upstream.latest"):
             self.run_wave()
         self.assertFalse(self.sealed_base().exists())
+
+    def test_a_packet_built_with_gap_receipts_is_refused_for_a_new_wave(self):
+        # Round-2 review: --gap-receipts lists the checks run against the previous winner.
+        for key, value in (("gap_receipts", ["evidence/artifacts/gap-wave2/x/7-winner-readiness-today.json"]),
+                           ("gap_receipts_note", "gap_receipts lists receipts")):
+            with self.subTest(key):
+                self.packets = PacketWriter(self.work_dir)
+                packet = make_packet("foundation", "wave-withheld-layer", [
+                    make_candidate("c1", "wave-withheld-layer", "c1"), make_candidate("c2", "wave-withheld-layer", "c2")])
+                packet[key] = value
+                self.packets.write("foundation", "wave-withheld-layer", packet)
+                self.packets.flush()
+                with self.assertRaisesRegex(SystemExit, "carries withheld keys \\['" + key + "'\\]"):
+                    self.run_wave()
+                self.assertFalse(self.sealed_base().exists())
 
     def test_a_packet_carrying_a_disposition_label_or_a_nested_withheld_key_is_refused(self):
         # Review of the #122 fix round: --write re-checked only the positions withhold_popularity
@@ -2018,8 +2407,10 @@ class ReviewOf122Tests(NewWaveFixture):
                 self.packets = PacketWriter(self.work_dir)
                 c2 = make_candidate("c2", "wave-withheld-layer", "c2")
                 change(c2)
+                # Unsealed, so a nested key inside a sealed field (upstream, decisions) reaches the packet.
                 self.packets.write("foundation", "wave-withheld-layer", make_packet(
-                    "foundation", "wave-withheld-layer", [make_candidate("c1", "wave-withheld-layer", "c1"), c2]))
+                    "foundation", "wave-withheld-layer", [make_candidate("c1", "wave-withheld-layer", "c1"), c2]),
+                    seal=False)
                 self.packets.flush()
                 with self.assertRaisesRegex(SystemExit, "carries withheld keys .*" + re.escape(label)):
                     self.run_wave()
@@ -2155,6 +2546,95 @@ class CheckedAtDefaultTests(NewWaveFixture):
                 record_verdicts.checked_at_for(run_id)
         with self.assertRaises(SystemExit):
             record_verdicts.checked_at_for("20260923", "23 Sep 2026")
+
+
+class SealedPacketKeysTests(NewWaveFixture):
+    """Review of #145 (F5): lanes judge packets whose candidates' manifest fields are sealed; the recorder restores
+    them from --packet-keys after checking each packet's sha256 and retains the keys with the wave."""
+
+    def test_the_winner_component_comes_from_the_sealed_keys_and_is_retained(self):
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-same-layer")["winners"][0]["component_id"], "wave-same-layer-c1")
+        retained = (self.sealed_base() / "packets" / "foundation__wave-same-layer.json").read_text(encoding="utf-8")
+        self.assertFalse(any("component_id" in candidate for candidate in json.loads(retained)["candidates"]))
+        keys = self.sealed_base() / "packet-keys.json"
+        manifest = json.loads((self.sealed_base() / "run-manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["packet_keys_sha256"], hashlib.sha256(keys.read_bytes()).hexdigest())
+        build_landscape(self.root)
+
+    def test_a_sealed_packet_without_its_keys_is_refused(self):
+        self.both_lanes("wave-same-layer")
+        (self.work_dir / "sealed-keys" / "packet-keys.json").unlink()
+        with self.assertRaisesRegex(SystemExit, "--packet-keys has no entry for the retained packet"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    def test_a_keys_document_with_other_sealed_values_is_refused(self):
+        # Codex review of #145 at a516c477: a stale or edited document whose candidate keys match could restore
+        # other component ids or pins; the packet commits to the sealed values (round 5, INT-R5-1).
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["pin"] = "9.9"
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "is not the sealed values the packet commits to"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    def test_sealed_ids_must_be_registered_in_the_named_manifest_and_unique(self):
+        # Round 6, INT-R6-2: the keys document is checked against the manifest it names.
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["component_id"] = "fabricated"
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "sealed component ids \\['fabricated'\\] are not registered"):
+            self.run_wave()
+        del keys["manifest"]
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "names no manifest"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+
+    def test_a_malformed_retained_entry_or_keys_file_is_refused_before_writing(self):
+        # Round 5, INT-R5-4 and R5-REG-8.
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        entry = keys["packets"]["foundation__wave-same-layer.json"]
+        entry["candidates"].pop("c2")
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "must seal exactly the packet's candidate keys"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
+        path.write_text("[1]", encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "is not a packet-keys document"):
+            self.run_wave()
+        path.unlink()
+        with self.assertRaisesRegex(SystemExit, "--packet-keys .*No such file"):
+            self.run_wave(extra=["--packet-keys", str(path)])
+
+    def test_keys_for_other_packet_bytes_reject_the_lanes(self):
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["packet_sha256"] = "0" * 64
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "--packet-keys has no entry for the retained packet"):
+            self.run_wave()
+        outcomes = {}
+        rejections = []
+        row = v2_row("foundation", "wave-same-layer", "Wave same layer")
+        record_verdicts.process_row(
+            row, self.root, "foundation", "wave-same-layer", self.work_dir, "2026-09-23", None, set(), {},
+            record_verdicts.parse_sha256sums(self.work_dir / "packets" / "SHA256SUMS"), rejections,
+            run_date=NEW_RUN, sealed_base=NEW_SEALED_BASE, outcomes=outcomes,
+            status_context=record_verdicts.load_context(self.root), lane_code=record_verdicts.load_lane_code(self.root),
+            packet_keys=keys)
+        self.assertEqual({item["lane"] for item in rejections}, {"claude", "codex"})
+        self.assertTrue(all("names packet_sha256" in item["reason"] for item in rejections), rejections)
 
 
 if __name__ == "__main__":

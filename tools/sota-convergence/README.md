@@ -16,7 +16,14 @@ default reconciliation file. No step here calls a model.
    `trading-catalog.json`, `trading-by-layer.json` (consolidated onto the
    12-layer taxonomy copied live from
    `catalogs/sota-convergence/manifest-20260922.json#/taxonomy`),
-   `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json`, `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json` holds the trading upstreams that a blueprint or runtime
+   record pins but that no selected (`default`/`conditional`) us-equities card
+   carries: hftbacktest, nautilus-ibapi and rust-ibapi. Each is declared in
+   `TRADING_PIN_SOURCES` as a JSON pointer into its source record, so the pin
+   is read from that record, not copied. A pointer that no longer resolves, a
+   non-taxonomy layer or an id that collides with a card id raises instead of
+   dropping the component.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -24,7 +31,8 @@ default reconciliation file. No step here calls a model.
 
 2. **`github_freshness.py`** -- a real network step (authenticated `gh api`
    calls; `gh auth status` must already pass). Reads the repository URLs out
-   of the three working files above and writes `github-freshness.json` with
+   of the working files above (`foundation-layers.json`, `trading-catalog.json`,
+   `trading-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository, plus every alias URL seen for that
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
@@ -87,6 +95,17 @@ default reconciliation file. No step here calls a model.
    `{"general": []}` when the flag is not given. Refuses to write if a host
    path, a bare session UUID, or a known secret-prefix marker survives
    sanitization.
+   `--trading-freshness-out PATH` also writes a report-only
+   `trading-freshness.json` (schema `trading-freshness/1`), separate from the
+   manifest. It has one row per pinned trading component: each selected card
+   (with every taxonomy layer it sits in) plus each `trading-pins.json` entry
+   (`--trading-pins`, default `<work-dir>/trading-pins.json`). Rows use the
+   manifest's own `compute_upstream`/`classify_pin` fields and add a
+   `dormancy` block from `compute_dormancy`. An upstream is dormant when its
+   newest GitHub release and default-branch head commit are both at least 180
+   days before `--checked-at`. `pushed_at` stands in only when the commit date
+   is unknown. `dormant` is `null`, never `false`, when the run has no data
+   for the repository. The manifest's key layout and rows are unchanged.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \
@@ -625,12 +644,114 @@ the packets alone does not blind a lane; see the handbook's label-exposure limit
 the ledger row, so a lane could not see a native receipt the row never named. Under Linux, `platform_status`
 accepts a `native_proven` or `measured_comparison` winner only when it cites a registered `evidence/` file.
 With the flag, every candidate and `sota_components_not_in_candidates` entry carries `registered_receipts`:
-the `{id, kind, path}` of each `manifests/evidence.json` receipt whose `component_ids` names it, sorted by
-path. A packet-level `registered_receipts_note` tells the lane that a receipt's kind and content, not its
-presence, decide the evidence class.
+the `manifests/evidence.json` receipts that name its component, sorted by path, each with `kind`, `path` and
+`matched_by`.
+- **`matched_by: "component_id"`:** the receipt's `component_ids` names the item's own id.
+- **`matched_by: "alias"`:** receipts name components in the `manifests/stack.json` id space, which differs
+  from the sota manifest's for some components. `receipt-component-aliases.json` maps each such stack id to
+  its sota id (`nautilus-trader` to `nautilustrader`; `duckdb`, `edgartools` and `exchange-calendars` to their
+  `data-` ids), and a receipt naming the stack id is attached to the sota id with `matched_by: "alias"`. The
+  index build fails when an alias's two ids do not share one repository (see "Receipt aliases" below).
+- **`matched_by: "repository"`:** a fallback for a respelling the alias map does not list. It is used only
+  when (a) the item's own id and aliases match no receipt,
+  (b) exactly one `manifests/stack.json` component uses the item's repository slug and the receipt names
+  that component, and (c) no other sota manifest component id, in either catalog, uses that slug.
+  Otherwise nothing is attached by repository (PR #142 re-review: an unconditional repository match gave
+  `nautilus-ibkr-adapter` all six NautilusTrader engine receipts and `codex-native-sdk` every Codex CLI
+  receipt).
+- **Receipt ids:** under `--withhold-labels` the receipt `id` is dropped, because ids such as
+  `native-session-defaults-20260920` can name the incumbent's role, and the packet's `withheld` list names
+  `candidates[].registered_receipts[].id` and `sota_components_not_in_candidates[].registered_receipts[].id`.
+  `matched_by` is dropped as well, because `component_id` and `alias` exist only for a manifest component
+  (review of #145). Paths and receipt contents are not stripped, and a receipt describing an adoption still
+  says so.
 
-On the 2026-09-23 tree with `manifest-20260923`, 88 of 286 candidates carry at least one receipt. The flag is
-off by default, so the 2026-09-22 packets reproduce.
+A packet-level `registered_receipts_note` says how each entry matched, that a receipt may name several
+components and that its `kind` is the registrant's label. The lane opens the receipt and judges what it ran
+for this component.
+
+Measured on the 2026-09-23 tree (round-2 review, rebuilt with
+`lane_packets.py --root . --out <dir> --manifest catalogs/sota-convergence/manifest-20260923.json
+--trading-candidates manifest --withhold-labels --registered-receipts`; since the round-4 review a blind build
+also needs `--keys-out <file outside --out>` and no longer writes `matched_by`):
+- 93 of 286 candidates carry at least one receipt.
+- Candidate entries by `matched_by`: `component_id` 1028, `alias` 32, `repository` 0, after label-bearing receipts are left out.
+- The alias entries: `data-edgartools` 14, `data-duckdb` 11, `nautilustrader` 6 and `data-exchange-calendars` 1.
+- `nautilus-ibkr-adapter`, `codex-native-sdk` and the trading `foundation-*` ids (for example
+  `foundation-ai-memory`) get no receipt by repository, because each shares its slug with another manifest id.
+
+**Limit: withholding receipt ids hides little.** 99 of the 142 registered receipt paths contain the receipt id
+(`evidence/receipts/<id>.json` and similar), and the path stays in the packet so the lane can open it.
+
+The flag is off by default, so the 2026-09-22 packets reproduce.
+
+**Gap-wave receipts** (`--gap-receipts`, 2026-09-23 re-record). The gap-resolution waves executed checks
+for the evidence gaps that the previous verdicts listed, but no ledger `evidence_refs` point to their
+receipts.
+
+With the flag, every packet carries `gap_receipts`: the sorted receipt paths that the gap-wave owner ledgers
+(`catalogs/landscape/gap-wave*--*.json`) list for its layer, with missing files dropped. A
+`gap_receipts_note` tells the lane to judge them like `evidence_refs`. The gap text and status are not
+carried. The flag is off by default.
+
+**`--gap-receipts` is not blind; a blind wave must not pass it** (round-2 review). Each layer's list is the
+set of checks run against the previous winner. Carrying only paths does not hide that:
+- 111 of the 249 joined receipt files repeat the ledger gap text word for word, and 13 of them name the
+  winner;
+- file names such as `7-winner-readiness-today.json` and `0-nautilus-frozen-selections.json` name it too.
+
+The flag and its code stay for non-blind runs, and `lane_packets.py` refuses it together with
+`--withhold-labels` (exit 2, nothing written). `scripts/landscape.py` also lists `gap_receipts` and
+`gap_receipts_note` in `TOP_LEVEL_WITHHELD_KEYS`, so `withheld_packet_keys` rejects a packet that carries
+either. As a result, `record_verdicts.py --write` refuses to seal a new wave whose packets were built with
+the flag, and CI rejects a sealed one. The grandfathered 2026-09-22 packets are not re-checked and do not
+carry the keys.
+
+**Limit: the blind export still carries the gap waves.** A lane that browses the repository can find the
+same receipts without the flag. The export keeps `evidence/artifacts/gap-wave2-20260923/` and
+`evidence/artifacts/gap-wave3-20260923/` (2,652 files) and the three owner ledgers
+`catalogs/landscape/gap-wave*--*.json` (40 layer entries, 327 gaps, each with its gap text).
+`catalogs/landscape/gap-resolution-20260922.json` and `gap-crosswalk-92bb279.json` also carry gap text.
+`blind_checkout.py` strips only label keys from them, not gap text. A coordinator discloses this with the
+wave.
+
+**Manifest newcomers** (`--manifest-newcomers`, 2026-09-23 landscape sweep). Before this flag, only
+manifest-mode trading packets carried the dated manifest's newcomer candidates. Foundation packets took their
+candidates from the frozen v1 ledger, so a repository discovered after the ledger never reached a foundation
+lane. With the flag:
+- **Foundation packets gain newcomers.** Each takes its manifest row's `candidates` and
+  `alternatives_keep_but_compare` whose repository is not already a candidate. They are shuffled together
+  with the ledger candidates, so a key's position does not tell them apart.
+- **Refuted discoveries are left out.** In both catalogs, a repository with a `refuted_*` disposition in any
+  of its entries is left out, even where another list repeats it. The refutation is of the discovery
+  proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
+  catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
+- **Registered evidence is attached.** A newcomer's `evidence_refs` hold the repository-relative
+  `evidence/` path each `evidence[]` entry leads with, when that path is listed in `manifests/evidence.json`
+  `files[]` and still has its listed sha256. A locator after the path (`items[3]`, `(lines 1-9)`) is dropped.
+  Command/result prose and an unregistered or edited file are not attached. The 2026-09-23 manifest names one
+  such file; the landscape-sweep source-review receipts supply the rest. Under `--withhold-labels`, a path that names a selection role or a manifest disposition (for
+  example `keep-but-compare`, `refuted`, `targeted-candidate` or `newcomer`) is not attached either; the same
+  wider vocabulary applies to registered receipts.
+
+The flag is off by default, so the 2026-09-22 packets reproduce. A non-GitHub https repository, such as a
+Hugging Face model, is identified by its lowercased URL rather than dropped. With `manifest-20260923.json`, the
+flag adds 35 foundation newcomers, 6 of them Hugging Face models, and removes 9 refuted trading newcomers
+across the 32 blind packets (312 candidates).
+
+A newcomer's name must not redact the packet's shared prose (Codex review of #151 at `cf82e689`). A name part
+unique to one candidate is a redaction term, so granite-embedding's "embedding" had turned semantic-rag's
+requirement "a compatible embedding service" into "a compatible <candidate> service". Capability and format words
+seen in newcomer names (`embedding`, `embed`, `reranker`, `multilingual`, `bench`, `https`, `typescript`,
+`parallel`, `orchestrator`, `group`, `brokerage` and their variants) are now generic name parts, as `retrieval` and
+`memory` already were. A test builds the real 2026-09-24 packets and requires that newcomers add no placeholder
+to any packet's requirement, limitations or overturn text. The same list restores "Brokerage model defaults ..."
+in LEAN's own card limitation in execution-broker, the only default-build packet it changes.
+
+A newcomer is never adopted, and the lane contract forbids a non-adopted winner
+(`scripts/landscape.py lane_winner_components`). A lane can prefer one as its challenger
+(`challenger_preferred`) with an overturn protocol. Promoting it takes the measured comparison that protocol
+names.
 
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
@@ -652,7 +773,8 @@ packet requirement names releases, versions or maintenance), together with
 `upstream.latest_flag`, the flagged tag-listing fallback (it can be
 date-shaped, such as `release/2025-11-28`). The strip reaches any depth of a
 copy, not only the copy and its `upstream` record. The pin
-itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
+and `upstream.renamed_to` of an unclaimed sota component stay; a candidate's pin and whole `upstream` record are
+sealed out of a blind packet since round 4 (below). The default mode is byte-identical, so the retained
 2026-09-22 packets still reproduce; they were built before this rule and carry
 those fields.
 
@@ -722,9 +844,11 @@ file, seals the accepted ones as retained evidence and derives the row's
 ```sh
 python3 tools/sota-convergence/record_verdicts.py \
   --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
-  [--adjudications /path/to/adjudications] --write
+  [--adjudications /path/to/adjudications] [--lane-repo-root /path/to/state/blind/export] --write
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] --check
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
+  [--adjudications /path/to/adjudications] [--lane-repo-root /path/to/state/blind/export] --check
+# --check needs the same --adjudications and --lane-repo-root the --write used.
 ```
 
 `--checked-at` (the date stamped on every re-recorded row) defaults to the
@@ -909,7 +1033,11 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   entry of the vendored copy the registry entry names (the lane workflow is
   vendored there, pinned in `vendored-lanes.json`), and the Codex hashes this
   checkout's `codex_lane.py` and `lane-prompt.md`. When any of those files
-  changes, append an entry (never edit one);
+  changes, append an entry (never edit one merged to `main`; one added inside
+  an unmerged PR may be amended before merge, since the verdict-review gate
+  fails a PR that changes this registry with a sealed verdict, so nothing
+  sealed names it yet, and `scripts/landscape.py` fails CI on any sealed
+  return an edit would orphan);
   `tests/test_verdict_lane_vendoring.py` fails until the current bytes are
   listed. `codex_lane.py` writes its provenance and the whole `model` field
   itself: `model.name` is the `--model` it passed to `codex exec -m`, else the
@@ -917,8 +1045,8 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   response text), `model.effort` is `--effort` and `model.family` is
   `"openai"`; the strict schema it passes to `codex exec` omits `provenance`
   and `model.family`. The
-  vendored Claude workflow returns only `model {name: "opus", effort: "high"}`
-  and writes no files; `claude_lane.py` is the step that writes
+  vendored Claude workflow returns `model {name: "opus", effort: "max"}` (with its echoed `launch`, `prompt` and
+  per-layer `packet_path`) and writes no files; `claude_lane.py` is the step that writes
   `<work-dir>/claude/<catalog>__<layer_id>.json` from the workflow result,
   adding `model.family: "anthropic"`, the resolved model name and
   `provenance`. It exits 2 when the agent-lab workflow file differs from that
@@ -927,6 +1055,7 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   ```sh
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
+    --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/state/blind/export \
     --resolved-model claude-opus-5-5
   ```
 
@@ -1043,14 +1172,10 @@ adjudication packets; the rule then moves to (or adds) that judge.
   evidence files. Re-running `--write` on an already-current work dir writes
   byte-identical output.
 
-After recording, refresh the generated join and narrative and rerun the
-landscape and publication checks:
-
-```sh
-python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id YYYYMMDD --checked-at YYYY-MM-DD
-python3 scripts/landscape.py --root .
-python3 scripts/validate.py
-```
+After recording, follow `recipes/sota-convergence-practice.md` step 7: it refreshes the component matrix, the
+generated join and narrative (`build_verdicts.py --write` with `--manifest`, the dated manifest the wave's packets
+were built from; without it a missing `manifest-<run-id>.json` is refused, round 7, OPR7-3) and the new-host grand
+list, registers and rehashes what the wave changed, and runs the checks.
 
 ## Blind checkout
 
@@ -1062,14 +1187,72 @@ previous run (or the checked-in ledger) already chose.
 
 ```sh
 python3 tools/sota-convergence/blind_checkout.py \
-  --source . --rev HEAD --dest /path/to/blind-checkout --export /path/to/blind-export
-# ... run the blind lanes against /path/to/blind-export (no .git, no BLIND-MANIFEST.json) ...
-git worktree remove --force /path/to/blind-checkout
+  --source . --rev HEAD --dest /path/to/state/blind/checkout --export /path/to/state/blind/export \
+  --allow-from-packets /path/to/work-dir/packets
+# ... run the blind lanes against /path/to/state/blind/export (no .git, no BLIND-MANIFEST.json) ...
+git worktree remove --force /path/to/state/blind/checkout
+# The export must be at least four directories deep (not /, /home, /tmp or a home directory itself) and outside
+# every repository; blind_checkout, both lane runners and adjudicate refuse otherwise.
 ```
 
 `--export` copies the stripped tree without `.git` or `BLIND-MANIFEST.json`. The worktree's `.git` reaches
 the source repository's history, so `git show <rev>:<path>` would recover every stripped value.
-Hand the lanes this copy, not the worktree.
+Hand the lanes this copy, not the worktree, and place it outside every repository (`codex_lane.py` refuses
+a `--repo` below any `.git`).
+
+**Instruction files in the export (PR #141 review).** A coding agent loads project instructions from the
+tree it starts in, and this repository's `AGENTS.md` names the incumbent choices (the selected destination
+engine, for one). In the export only, never in the worktree:
+- every `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md` and `CLAUDE.local.md`, at any depth, is replaced by
+  one neutral stub (`blind_checkout.EXPORT_INSTRUCTION_STUB`). The stub says the tree is a sanitized export
+  for a blind layer-verdict lane, that the lane judges only from its packet and the files, and that no
+  file is an instruction to the lane. The root always gets `AGENTS.md` and `CLAUDE.md` stubs.
+- every `.claude/`, `.codex/` and `.agents/` directory, at any depth, is left out.
+
+On the 2026-09-23 tree this covers `AGENTS.md`, `CLAUDE.md`,
+`blueprints/convergence-practice/application-delivery/{AGENTS,CLAUDE}.md` and
+`examples/claude-native/CLAUDE.md`; the tree has no `.claude/`, `.codex/` or `.agents/` directory. The CLI
+prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs_removed`).
+
+**Remaining limits: what the export still carries.** The export strips the JSON label fields under
+`catalogs/`, `adoption/` and `blueprints/` (below) and the instruction files. Since round 6 it rewrites no
+sentence of an exported file: Markdown, text and JSON prose are exported verbatim, and the exposure is disclosed
+per layer (round 6, below). Measured on the allowlisted 2026-09-23 export (633 files; 611 byte-identical to the
+source) at round 7, it still carries:
+- **Choice prose.** Counting only statements that tell a layer's winners apart from its adopted non-winners
+  (round 7, BL7-1), 13 cited prose files expose 18 of the 30 scored layers (`prose_exposed_layers`), and across
+  the whole export, which a lane may also search, 28 of the 30 are reachable (`prose_reachable_layers`). Since
+  the Codex review of 68e74f2c (P1) the measure also reads JSON and JSON Lines string values (a receipt's
+  `claim` named a git-github-automation winner among "selected components"). On a 2026-09-24 export of this
+  branch (639 files, 429 of them JSON) that raises the cited count to 19 files exposing 21 of the 30 layers
+  (git-github-automation, portfolio-risk and research-factors-ml added); 28 of 30 stay reachable, through 29
+  files instead of 20.
+  execution-broker and observability-hosting are not scored: their recorded winners are not among their adopted
+  candidates. `record_verdicts.py --write` seals each wave's own measure as `prose-exposure.json` and stamps
+  every row's `lanes.prose_exposed` (round 7, BL7-2).
+- **Label-stripped files.** 22 exported JSON files differ from the source only by stripped label keys. Five of
+  them have their original sha256 recorded in another exported file, so that hash no longer matches in the
+  export: `CLAUDE.md` (replaced, in `catalog-clean-install-20260921/source-manifest.json`),
+  `blueprints/convergence-practice/offhost-restore/upstream-source.json` (in `upstream-tests.json` and
+  `hosted-plan.json`), `blueprints/us-equities/adaptive-paper/receipt.json` (in two trials' `frozen-*.SHA256SUMS`),
+  `catalogs/foundation/community-practice-20260920.json` (in `native-review.json`) and
+  `evidence/artifacts/claude-upstream-checks-20260921/provenance.json` (in its receipt).
+- **Evidence prose in JSON.** String values are not redacted. 206 sentences in 102 JSON files name a winner (its
+  name, repository name or component id) with a selection word: 154 under `evidence/`, 35 under `blueprints/`,
+  13 under `catalogs/`, 3 under `observability/` and 1 under `adoption/`. Most use the words in their technical
+  sense ("selected-step retry", "retained checkpoint").
+- **Prior evidence artifacts.** JSON under `evidence/artifacts/` that a packet cites is kept, because packets
+  cite prior artifacts as evidence; earlier verdict fields are stripped from it. In the export, "selected"
+  (case-insensitive) occurs 387 times in 58 of those JSON files across 20 directories.
+- **Instruction files outside the export.** The export cannot neutralize instructions a client loads from
+  elsewhere: a parent directory's `AGENTS.md` or `CLAUDE.md` and the user-level files. Blind Codex children run
+  with a run-scoped `CODEX_HOME` and an empty `HOME` (below), so `~/.codex/AGENTS.md` and `~/.agents/skills` do
+  not load for them; a non-blind `codex_lane --allow-git-history` run inherits the native home. The Claude
+  lane's `blind-lane-reviewer` agents run with `omitClaudeMd`.
+
+None of these is stripped wholesale, because a lane also reads them as evidence. The controls are lane-prompt
+rule 1, placing the export outside every repository, and the post-run blind audit (a lower bound). A
+coordinator discloses these limits with the wave.
 
 It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
 `catalogs/sota-convergence/layer-verdicts-*.json`,
@@ -1148,8 +1331,13 @@ For every packet under `<work-dir>/packets/<catalog>__<layer_id>.json`
 (written by `lane_packets.py`) without an already-valid
 `<work-dir>/codex/<catalog>__<layer_id>.json` on disk -- valid meaning: the
 existing file parses as a JSON object with `lane == "codex"`, `catalog` and
-`layer_id` matching this packet, and, if it already has a `packet_sha256`,
-that hash still matching the packet file's current bytes -- it fills the
+`layer_id` matching this packet, if it already has a `packet_sha256`,
+that hash still matching the packet file's current bytes, and its `provenance`
+equal to the current `lane_provenance(--prompt)` (this `codex_lane.py`'s and the
+prompt template's sha256; a return from older lane code, an older prompt or
+without provenance is rerun, not skipped, because `record_verdicts.py` would
+reject it on every later run), and its `model.name` neither `"unknown"` nor, when `--model` is given,
+different from it (round-2 review) -- it fills the
 shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 `{REPO_ROOT}` `{LANE}`) and runs:
 
@@ -1157,8 +1345,13 @@ shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
   -C <repo> --output-schema <schema> -o <out.tmp> --json \
   -c model_reasoning_effort=<effort> \
-  --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <filled prompt>
+  --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
+  -c 'web_search="disabled"' -c 'cli_auth_credentials_store="file"' <filled prompt>
 ```
+
+The five isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/test_codex_lane.py` fails when
+this block or the module docstring leaves one out. A blind child runs this with only an allowlisted environment,
+a fresh run-scoped `CODEX_HOME`, an empty `HOME` and no stdin (below).
 
 capturing the full JSON event stream to
 `<work-dir>/codex/events/<catalog>__<layer_id>.jsonl` and appending one usage
@@ -1186,13 +1379,22 @@ immediately before each attempt is launched, not only after a failure is
 detected, so a stale file is never misread as the current attempt's own
 output.
 
+A blind wave gives the lane a `blind_checkout.py --export` copy placed outside every repository (`--repo .`
+exits 2, because the checkout has `.git`):
+
 ```sh
+python3 tools/sota-convergence/blind_checkout.py \
+  --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --effort high
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort high
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --layers native-clients,market-data-reference
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --dry-run   # prints the command per pending layer, writes nothing
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --dry-run   # prints the command per pending layer, writes nothing
+git worktree remove --force /path/outside/repos/blind-checkout
+# Not blind: a run against the checkout itself, whose git history recovers every stripped label.
+python3 tools/sota-convergence/codex_lane.py \
+  --work-dir /path/to/work-dir --repo . --allow-git-history
 ```
 
 **Blind children (2026-09-23 re-record).** Memory stores, code indexes, the web and git history can
@@ -1218,22 +1420,88 @@ Measured with codex-cli 0.155.1:
 What remains and how it is handled:
 - **Shell reads:** `--sandbox read-only` still lets a child read any host path and run CLIs such as
   ai-memory from `PATH`. Rule 1 of `lane-prompt.md` forbids it, and so does the Claude lane's blind rule.
-- **Global instructions:** a probe child quoted `$CODEX_HOME/AGENTS.md`, so that file still loads.
+- **Global instructions and user skills:** blind runs (`codex_lane` without `--allow-git-history`, `adjudicate
+  codex`) run each child with a run-scoped `CODEX_HOME` and an empty `HOME`, so neither `$CODEX_HOME/AGENTS.md`
+  nor `~/.agents/skills` loads (probe-measured, round 4). A non-blind `--allow-git-history` run inherits the
+  native home and both.
 - **Git history:** `codex_lane.py` refuses a `--repo` when it or any parent directory has `.git`, because git
   walks up from a subdirectory. Pass `--allow-git-history` only outside a blind wave. Run the lanes on a
   `blind_checkout.py --export` copy placed outside every repository.
-- **Blind audit:** after each run, `codex_lane.py` writes `<work-dir>/codex/blind-audit.json`, a
-  report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
+- **Blind audit:** `codex_lane.py` audits each layer's events as soon as its child finishes and records the
+  result in `<work-dir>/codex/blind-audit.json`. In a blind run a flagged layer is void before its return is
+  written (kept only as `<name>.json.audit-flagged`), and a resume re-audits a kept return's events, rerunning it
+  when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
-  - name an absolute path outside the repository and the packets directory;
-  - use a `~`, `$HOME` or `${HOME}` path;
+  - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
+    (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
+    blind child without the network or a CLI it cannot resolve. Measured
+    2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
+    had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
+    not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
+    two non-literal operands (`p+'/'+k`), but not `'/'+'etc/passwd'` or `''+'/'+x`. Only `/dev/null` and a
+    command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
+    `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
+    after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
+    `/usr/` or `/bin/` is flagged, so `/bin/cat /usr/local/share/prior-verdict.json` flags
+    `/usr/local/share/prior-verdict.json`, and so is an executable elsewhere under `/usr/`, such as
+    `bash -lc '/usr/local/share/verdicts/show'`;
+  - use a `~`, `$HOME` or `${HOME}` path, or any other `$VAR/...` or `${VAR}/...` path (for example
+    `$CODEX_HOME/AGENTS.md`), whose value the event does not show;
+  - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
+    `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget.
+  - name git, sqlite3, curl or wget anywhere in the command, or any audited CLI by an absolute path outside the
+    repository and packets (`/usr/local/bin/qmd`, which is otherwise an exempt system executable token).
+  - **PATH enforcement.** A blind child's PATH resolves none of ai-memory, agentsview, mcporter, qmd, socraticode,
+    jcodemunch, serena, codex or claude:
+    - `child_env` sets PATH to the system directories (`/usr/bin:/bin:/usr/sbin:/sbin`);
+    - codex runs by the absolute path the caller's PATH resolves, and an npm `#!/usr/bin/env node` launcher runs with
+      the interpreter the caller's PATH resolves;
+    - `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves on
+      any PATH a child's command can end up with. That is measured each run after a sentinel: the login shell's
+      (Codex runs commands with `bash -lc`; /etc/profile.d adds `/snap/bin` here, and macOS path_helper adds
+      /etc/paths), the default a shell sets when a command drops PATH (`/usr/local/bin` included), and
+      `os.defpath`.
 
-  A flag is evidence for the coordinator to review and disclose, not a verdict.
-- **Claude lane:** it has no equivalent audit in these tools. Its agents run Read, Glob and Grep only, but
-  those have no path limit. A wave's coordinator audits the file paths in the lane's agent transcripts and
-  discloses the result.
+    **New hosts.** A host that installs one of them where a child's PATH reaches it is refused, and the refusal
+    names each directory. For example, Intel Homebrew or npm globals put them in `/usr/local/bin`, which macOS
+    path_helper and a PATH-less shell both add. On a Mac, zsh started with an empty environment takes HOME from
+    passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
+    child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
+    elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
+    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
+    (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
+
+    So their names alone are not flagged in a blind run, since they are also candidates a lane must search for; a
+    non-blind run still flags them. Measured 2026-09-24 with a real blind child: every one of them, and node, npx
+    and uvx, was missing, while python3, git and Codex's bundled rg resolved.
+  - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
+    literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
+    name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
+
+  In a non-blind run a flag is evidence for the coordinator to review and disclose. The audit is a heuristic
+  lower bound: it reads only the command text. Known gaps include a path a program computes (a
+  `python3 -c` that joins path parts, a glob, a variable set in an earlier command) and anything a command
+  reads indirectly (a script's own reads, a config file it loads, a symlink under the repository).
+- **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
+  limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
+  keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py
+  locate` finds the one run of a session). The audit is bound to that run: its record
+  (`<session>/workflows/<run id>.json`) must be completed, list each agent's final attempt (whose transcript must
+  be present) and hold the very result being collected; any other transcript must be an earlier attempt of a
+  retried agent's item (at most attempt − 1 per item), audited against that item's boundary; every agent must
+  have run from the export; the recorded digest
+  covers the transcripts and the record. Each agent is mapped to the item its prompt names: a lane packet's path,
+  or an adjudication input's "Input file:" line. Its reads, compared as resolved paths, must stay under the export
+  and that item's packet (and input), and it may use no other tool, server-side and MCP tools included. An
+  unreadable transcript line, a relative path without a working directory, a glob that climbs with `..` or an
+  agent naming several items flags too. `claude_lane.py --transcripts` voids a flagged layer (kept as
+  `.audit-flagged`, recorded as failed). `adjudicate.py claude-collect --transcripts` voids a flagged judgment,
+  and records the transcripts' digest with `audit_clean`; `usable_judgment` re-audits them, so an edited record
+  does not count. An item no agent served, or a flagged agent that names no item, flags every item. Like the Codex
+  audit, this is a lower bound: it sees the paths the tool calls name.
 
 `--prompt` and `--schema` override the default `lane-prompt.md` /
 `lane-return.schema.json` paths (both otherwise resolved next to
@@ -1277,3 +1545,756 @@ datasets, kept separate here:
   ones the three non-taxonomy lane layers contributed. No selection, pin
   comparison or disposition changed; only where the non-taxonomy rows live in
   the manifest, and which count they are scoped to, changed.
+
+## Two-family adjudication
+
+`adjudicate.py` produces the adjudication records that `record_verdicts.py --adjudications` reads for layers
+where the two lanes chose different winner components (2026-09-23 re-record).
+- **The rule:** `scripts/landscape.py` `judge_adjudication` accepts a winner only when the judgments cover both
+  lane families (anthropic and openai), each in both presentation orders, all pick the same lane, and none is
+  refuted. Anything else is sealed as a split, and the row stays `pending_lanes` with an executed comparison
+  named.
+- **Blinding:** each judge and refuter is blind to which lane produced A or B, and reads only its input file,
+  the packet and the blind export.
+
+```sh
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir W --lane-repo-root <blind export> \
+  --packet-keys <keys>/packet-keys.json   # AB and BA inputs, adjudication-index.json
+python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
+python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> --run-dir <blind export> > args.json
+# run tools/sota-convergence/adjudication-lane.js with args.json (blind-adjudicator agents)
+python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir W --result <workflow result> --model <resolved>
+python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjudications
+```
+
+- **`inputs`:** finds the disagreeing layers with `landscape.lane_winner_components`, the function CI uses. It
+  writes each layer's two returns in both orders, scrubbed to the eleven verdict fields both lanes share.
+  Lane, model, provenance and refutation fields are removed. Prose that names a lane is reported in
+  `index.json` as `identity_mentions`, not removed.
+  Every evidence-path list is reduced to sorted, deduplicated bare paths (round-2 review). This covers
+  `sources_read`, `winner_evidence_refs`, every nested `evidence_refs` (`alternatives[]`,
+  `challenger_preferred`) and `overturn_protocol.fixture_paths`. Each entry keeps its leading path token and
+  any `#fragment`, loses a trailing `:line` reference and every note, and becomes repository-relative when it
+  is absolute under a `--lane-repo-root`. In the 2026-09-22 sealed returns, 263 of 423 Claude `sources_read`
+  entries carried notes such as "path (lines 60-104, prior round)", while all 558 Codex entries were bare
+  paths, so the notes alone showed which lane wrote A.
+  - **Host paths (adjudication round 3).** The blind-adjudicator role and `adjudication-prompt.md` count an
+    absolute host path outside the repository root as a leak, and both lanes record such paths (the packet's
+    absolute path in `sources_read`, for one). So every string in both returns, prose included, is scrubbed:
+    - a path under `<work-dir>/packets/` becomes `PACKET`;
+    - a path under a `--lane-repo-root` becomes repository-relative;
+    - any other absolute path, `~` or `$HOME` path, or `<host-path>` placeholder becomes
+      the bare `<outside-path>`: a kept basename could name a lane (a worktree folder, or a file only one lane's client reads).
+
+    http(s) URLs are left alone. `--lane-repo-root` is required and repeatable.
+  - **No packet path in an input.** An input is `{layer, packet_sha256, A, B}`. The judge's labelled
+    `Packet file:` line carries the packet path, which `claude-args` and `codex` take from `adjudication-index.json`.
+  - **Refusal on a surviving path.** If an absolute path, a `~` path, `$HOME` or `${HOME}`, or a `<host-path>`
+    placeholder still remains after scrubbing, `inputs` writes no input for that layer and removes a stale
+    one. It lists the offenders in `index.json` `skipped[].unscrubbed` and exits 1, so a known leak is never
+    sent to a judge.
+- **`codex`:** runs one judge and one refuter per input through `codex exec` with `codex_lane.ISOLATION_ARGS`
+  (no user config, hooks or web search) and the strict schemas `adjudication-judge.schema.json` and
+  `adjudication-refute.schema.json`. It refuses a repository under any `.git`, retries once, resumes, and
+  writes a blind audit. `--model` is required and must match the openai pattern in `scripts/landscape.py`
+  `FAMILY_MODEL_PATTERNS` (exit 2 otherwise). It is passed to `codex exec -m` and recorded on each judgment
+  ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
+  it is usable and was made with this `--model`.
+- **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as the
+  `blind-adjudicator` role, vendored from agent-lab e070125 as `examples/claude-native/agents/blind-adjudicator.md`
+  and installed user-level by the recipe's step-3 copy of `adoption/agents/claude/blind-adjudicator.md`.
+  `claude-collect` records its return; a lost judge or refuter makes that judgment missing, never unrefuted.
+- **Prompt and leak check (both families, round-2 review):**
+  - Every judge and refuter task starts with three labelled lines: `Input file: <path>`, `Packet file: <path>`
+    and `Repository root: <path>`. `adjudication-prompt.md` refers only to them and treats any other path as
+    data. `claude-args` gives each item its `packet_path` from `adjudication-index.json`.
+  - The judge and the refuter first check their input for reviewer identity: a lane, model, provenance or
+    refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that
+    attributes a return; or a host path outside the repository root. A candidate that shares a vendor name
+    is not a leak.
+  - On a leak they return `leak: true` with `leak_text` and stop. Both `adjudication-judge.schema.json` and
+    `adjudication-refute.schema.json` require `leak` and `leak_text`, because Codex strict mode requires
+    every property.
+  - `adjudicate.py` records a leak as a missing judgment with failure `leak`, never as a judgment or a vote.
+    A Codex leak is not retried, and a judge leak skips the refuter.
+  - **Leaks are sticky per input content (adjudication round 3).** `codex` and `claude-collect` append each
+    leak to `adjudication-judgments/<family>/leaks.json` and never overwrite or remove a record. A record is
+    keyed by the input file name and that input's sha256, and lists both of the layer's input files. While
+    an input's current sha256 has a leak record from either family:
+    - `usable_judgment` returns `leak` for any judgment of it, whatever the judgment file says;
+    - `codex` does not rerun it;
+    - `claude-args` leaves it out (listed under `leaked`);
+    - `claude-collect` records any returned judgment for it as `leak`.
+
+    It clears only when `inputs` rebuilds the file and its sha256 changes.
+  - **Leaked layers get no record.** `assemble` drops every judgment of a leaked input from both families.
+    The remaining judgments cannot cover both presentation orders, which `judge_adjudication` requires, so
+    no record is written. The layer is reported as a split, with its reason, in
+    `<work-dir>/adjudication-leaks.json` (`split_layers`, next to every leak record of both families), and
+    `assemble` exits 1. Without an adjudication record, a disagreeing row stays `pending_lanes`. The report is
+    not written into `--out`, which `record_verdicts.py` reads.
+- **Repository-root rule (adjudication round 3).** `blind-adjudicator` refuses a repository root that is
+  `/`, `/home`, a home directory (`/home/<name>`, `/Users/<name>`, `/root` or the current user's), `/tmp`, a
+  path with fewer than four components, or a path with a `.` or `..` segment, `~`, `$` or a wildcard. It also
+  refuses an input or packet file inside the root. `inputs` (each `--lane-repo-root`), `claude-args` and
+  `codex` (`--repo`) apply the same rule first and exit 2 with the reason, so the Claude family never refuses
+  alone while the Codex family judges. `claude-args` and `codex` also refuse a work dir inside `--repo`.
+- **`assemble`:** writes one record per layer. `claude_position` is the position the input contents show for
+  the Claude return (checked against the index's per-layer map), `refuting_votes` is 1 when
+  the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
+  packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a
+  split record naming it. A judgment whose model does not match its family's pattern (for example
+  `"unknown"`) does not count (`usable_judgment`), so a resumed run reruns it. Each written record carries a
+  top-level `provenance`: `adjudicate_py_sha256`, `prompt_sha256` (`adjudication-prompt.md`),
+  `judge_schema_sha256`, `refute_schema_sha256` and `workflow_sha256` (`adjudication-lane.js`).
+  `judge_adjudication` and `record_verdicts.load_adjudication` ignore extra top-level keys, so the key needs
+  no validator change. Nothing checks these hashes against a registry yet.
+
+**Binding.**
+- **Input content:** every judgment records the `input_sha256` of the input it judged. A resumed or
+  assembled judgment counts only while the input file still has that hash, so rebuilding an input after a
+  lane return changed invalidates its old judgments.
+- **Claude inputs:** `claude-args` snapshots each item's input hash, and `claude-collect` refuses a judgment
+  whose input changed after that snapshot.
+- **Stale records:** `assemble` deletes a layer's earlier record in `--out` whenever the layer is refused,
+  for a leak or for validation, so `record_verdicts.py --adjudications` never reads a stale winner.
+- **Paths:** a repository root or work dir containing whitespace is refused, because path scrubbing
+  tokenizes on whitespace.
+- **Resume:** a Codex judgment is reused only at the same `--model` and `--effort`. The Claude family's
+  effort is fixed at `max` by `adjudication-lane.js` (`CLAUDE_LANE_EFFORT` in `adjudicate.py`).
+- **Snapshot scope:** `claude-collect` touches only the items in the `claude-args` snapshot. It discards a
+  leak reported on an input rebuilt since that snapshot, so the stale leak cannot mark the new content.
+- **Assembly:** `assemble` first removes the earlier record of every layer `inputs` indexed or skipped.
+- **Missing returns:** a layer with a missing lane return is recorded as skipped, so its earlier record is
+  purged too.
+- **Provenance:** judgments carry the adjudication provenance captured when they ran: at the Codex run's
+  launch, or in the `claude-args` snapshot. `assemble` refuses a layer whose counted judgments ran under
+  different provenance.
+- **Codex leaks:** a Codex leak is bound to the input content hashed before the call.
+- **Paths:** roots and work dirs are limited to `[A-Za-z0-9._/-]`. Backticks are path delimiters, and the
+  residual check does not depend on the replacement boundary.
+- **Claude lane role:** its provenance includes `agent_sha256`, the hash of the `blind-lane-reviewer`
+  definition it loaded. `claude_lane.py` refuses a definition other than the vendored
+  `examples/claude-native/agents/blind-lane-reviewer.md`, and `lane-provenance.json` registers the hash.
+- **`codex_lane` resume:** a lane return is reused only at the same `--model` and `--effort`.
+- **Lane role file:** `claude_lane.py` requires `--agent-file`, naming the `blind-lane-reviewer` definition
+  the lane actually loaded. It refuses when a differing project-level copy exists under `--agentlab-root`.
+- **Adjudicator role:** adjudication provenance includes `adjudicator_role_sha256`, the hash of the vendored
+  `blind-adjudicator.md`. `claude-args --agent-file`, which defaults to the user-level copy, refuses an
+  installed role other than the vendored one.
+- **`..` paths:** paths are normalized before relativizing, so `<root>/../codex/x` becomes `<outside-path>`.
+  A `../` token in prose is scrubbed, or refused by the residual check.
+- **Label-bearing receipts:** under `--withhold-labels`, a registered receipt whose id or path names a
+  selection role (default, adopt, select, winner, incumbent, chosen, retain) is left out of the packet,
+  and the packet's `withheld` list says so. Examples are `native-session-defaults-20260920` and
+  `adoption/receipt.json`.
+- **Schema:** `lane-return.schema.json` includes `provenance.agent_sha256`.
+- **Prompt and evidence binding:** adjudication provenance hashes the prompt actually used, including a
+  `codex --prompt` override, and `repo_tree_sha256`, a digest of every file in the evidence export.
+  A resumed Codex judgment must match the run's provenance, and a layer is assembled only when every
+  counted judgment carries the same provenance.
+- **Symlinks:** `blind_checkout --export` removes any symlink that is absolute or resolves outside the
+  export, and reports it. The tree digest includes each kept link's text, so retargeting a link changes it.
+- **Snapshot binding:** `claude-args` gives each run a `snapshot_id`, which `adjudication-lane.js` echoes.
+  `claude-collect` refuses a result from another snapshot.
+- **Stale packets:** `claude-args` and `codex` refuse a packet whose bytes changed after `inputs`.
+- **Leaks cover both orders:** the AB and BA inputs hold the same two returns, so a leak recorded for one
+  order suppresses both.
+- **Git-backed roots:** `claude-args` also refuses a repository under any `.git`, as `codex` does.
+- **Packet snapshots (round 8):** judges never read the live packet. `inputs` copies each indexed packet to
+  `<work-dir>/adjudication-packets/<sha256>/packets/<name>.json`, and `index.json` names that copy.
+  `codex` rechecks the copy after each call and voids the judgment ("the packet snapshot changed during the
+  call") if it changed. `claude-collect` records a judgment as missing when the copy no longer matches.
+- **Selective rebuilds (round 8):** `inputs --layers` keeps every other layer's earlier index entry, so
+  `assemble` still purges or rebuilds their records. A selected layer whose packet is gone is listed as
+  skipped ("the packet is missing"), so its old record is purged.
+- **Exact lane provenance (round 8):** `codex_lane` resumes a return only when its `provenance` equals the
+  current one exactly; an extra or changed field reruns the layer.
+- **Evidence-tree binding (round 9):** both lanes' provenance names `repo_tree_sha256`, the
+  `codex_lane.tree_sha256` digest of the export they read (every file's path and sha256, and each kept
+  symlink's text); `scripts/landscape.py` requires it on new-wave returns.
+  - `codex_lane` hashes the tree at launch and again after its calls. If the tree changed, it sets that run's
+    returns aside as `<name>.json.tree-changed`, and a resume against another export reruns.
+  - `claude_lane.py` needs `--repo`. The workflow echoes the caller's `args.launch` (vendored bytes from
+    agent-lab #42), and the script refuses (exit 2) unless that launch is `{repo, repo_tree_sha256,
+    agent_sha256}` naming `--repo`, the tree's current digest and the vendored role (rounds 10 and 12).
+  - `adjudicate codex` recomputes its provenance after the calls and voids that run's judgments when it
+    changed. `claude-collect` recomputes it from the `claude-args` snapshot, which now records `prompt_path`
+    and `repo`.
+- **Bindings added in round 10:**
+  - `claude-collect` uses the repository the `claude-args` snapshot validated. A `--repo` override or a
+    returned `repo` must name it exactly.
+  - Each Codex worker rechecks the indexed input hash when it starts and after its calls.
+  - `inputs` records each lane return file's sha256. `assemble` refuses a layer whose lane return changed
+    since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
+    adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
+  - Leak records keep input basenames only.
+- **Independent review of #145 (four Opus lenses: blindness, binding, regressions, operability):**
+  - **Family position is a secret (F3).** `inputs` draws, per layer, which position (A or B) shows the Claude
+    return in `AB`, and `BA` shows the complement. The map is kept only in the adjudication index (outside the
+    work dir since the a2434e2e review; see below),
+    outside `adjudication-inputs/`. Each Codex judge call's audit allows only the repository, its own input file
+    and its packet snapshot.
+  - **Judgments are bound to this index (M3).** A judgment counts only when its layer, input path and input
+    sha256 are the index entry's.
+  - **`claude-args --run-dir` is required (M4),** so the project-level role in the directory the workflow runs
+    from is always checked. In the blind flow this is the export root.
+  - **Prompt binding for the Claude lane (M1).** The layer-verdict workflow (agent-lab #45; vendored here as #47's
+    merge e070125, sha256 fd77b749, which adds the per-layer packet path) refuses a real run
+    without `args.prompt` and echoes it. `claude_lane.py` requires the echoed prompt to be this catalog's
+    `lane-prompt.md` and records `prompt_sha256`, which `scripts/landscape.py` now requires and the registry keys.
+  - **Adjudication code is registered (M2).** `lane-provenance.json` has an `adjudication` list. A new-wave
+    adjudication must name registered code, the lanes' one evidence tree, and `lane_returns_sha256` equal to the
+    row's sealed `lanes.<lane>.sealed_sha256` (the sealed form, so CI recomputes it). `record_verdicts.py` and
+    `scripts/landscape.py` both check this, and CI also requires both sealed lane returns to name one tree.
+  - **UTF-8 only (L2).** Lane returns are decoded as UTF-8 before parsing, so a BOM or UTF-16/32 is refused.
+  - **Allowlisted export (F1, F2).** `blind_checkout.py --export … --allow-from-packets <work-dir>/packets` exports
+    only the following, and nothing else:
+    - the paths the lane packets reference (evidence refs and registered receipts; since round 4 a blind packet
+      carries no recipe ref, which is sealed, so a file cited only as a recipe_ref leaves the export; directories
+      recursively);
+    - one level of `evidence/` and `blueprints/` paths named inside those JSON files;
+    - the root instruction stubs.
+
+    Files that name every layer's winners are removed even when referenced (component-evidence-matrix,
+    new-host-grand-list, blind-convergence, the sota-convergence manifests and SDK coverage), and non-empty
+    winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
+    the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
+
+    On the 2026-09-23 packets the export holds 633 files at this head (604 after the round-4 removals below, 660
+    after sealing recipe_ref dropped six recipe-only files, 666 before them, 902
+    with the tests/, tools/ and scripts/ trees, 697 before the role-label removal). Before the allowlist it held the
+    whole repository.
+
+    **Role labels removed (final-round blindness review).** A per-layer subtraction check
+    (`tools/sota-convergence/export_isolation_check.py`, adapted from the reviewer's script) tests every
+    repository list in the export: does it isolate a layer's winner set among the layer's adopted candidates,
+    either by naming it alone or by leaving it over? The export therefore:
+    - removes membership lists and earlier verdict records: `manifests/stack.json`, the upstream snapshot,
+      star audit, automation interfaces and saturation audit, and the 2026-09-21 repository-evidence,
+      blind-catalog-convergence, upstream-check and full-stack coverage records;
+    - strips role keys under `catalogs/` and `adoption/`: since round 4 an explicit list (`selected_path`,
+      `selected_skills`, `default_profile`, `retained_comparison_engine`, ...) plus `challenger*`, `rationale`,
+      `disposition`, `why_not_default` and the like, never an object that records an observed run
+      (`observed_at`, `exit_code`, `sha256`); the earlier `selected_*`/`retained*`/`coordinator_*` prefixes also
+      removed retrieval data and exercised checks (round 4, R4-REG-1);
+    - strips earlier verdict fields (`sota_verdict`, `primary_stack`, `strongest_challengers`, ...) under
+      `evidence/`.
+
+    `tests/test_blind_checkout.py::RealExportIsolationTests` rebuilds the real export and fails on any isolating
+    container that is not evidence. Since round 4 the check is id-aware (below). The isolating containers that
+    remain sit in evidence records (receipts, experiments, `evidence/` artifacts) or under evidence keys in 13
+    layers: evidence-volume asymmetry, since what was exercised is cited, which is evidence, not a label.
+
+    **Prose in cited files.** A packet's evidence references name `docs/`, `catalogs/`, `recipes/` and `adoption/`
+    files whose prose called the current choice "selected" or "retain". This round's review measured 10 of 32
+    layers; round 4 found the disclosure understated (F3), and the round-4 export redacts such sentences (below).
+
+    **Codex global instructions.** `--ignore-user-config` skips `config.toml` but not `$CODEX_HOME/AGENTS.md`.
+    This host's global Codex instructions name nine catalog components (serena, jcodemunch, rtk, qmd, headroom,
+    beads, typesafe, zizmor, mcporter). So every blind Codex child, in `codex_lane` without `--allow-git-history`
+    and in `adjudicate codex`, runs with a run-scoped `CODEX_HOME` (since round 4 outside the work dir, see below).
+    That home, mode 0700, starts with only a symlink to the native `auth.json` (never a copy), an empty `home/` and
+    an empty `tmp/`. After a run it also holds what the child wrote (state and log databases, a models cache, the
+    bundled skills under `skills/.system`, `plugins/`, `cache/`); it is kept for inspection, with the link removed.
+    Measured 2026-09-24: a probe child without it quoted its `# AGENTS.md instructions` block, and with it answered
+    "none".
+
+    **Disclosed trade-off (re-review L3):** `lane-prompt.md` and the vendored lane's evidence lens still accept an
+    `overturn_when` naming a `tests/` path or a runnable command, and neither `tests/` nor `tools/` is exported
+    unless a packet references it. So a lane that cites such a path can be refuted as naming a missing file (9 of
+    the 30 current `verdict_overturn_when` rows cite `tests.` commands). The re-record measures how many
+    refutations cite a missing tests/ or tools/ path. Rewording the prompt and lens waits for their next
+    registered revision, because both are hash-bound.
+- **Codex review at 2a2ffb8d:**
+  - **Packet prose.** Under `--withhold-labels`, `requirement`, `limitations` and `existing_overturn_when` keep only
+    sentences that name no packet candidate and use no selection word. Candidate names count as their name and
+    repository name plus distinctive parts, so "NautilusTrader" also matches "Nautilus". A requirement left empty
+    becomes a neutral pointer to the layer title and `layer_scope_terms`. The shared ledger prose named the
+    incumbent ("Use the selected NautilusTrader destination…"). On the 2026-09-23 packets, none of the 32 keeps
+    such a sentence, and 13 requirements are fully withheld.
+  - **Codex home.** The run-scoped Codex home is recreated on every blind run, so a leftover `AGENTS.md` is never
+    loaded. A dry run creates none.
+  - **Claude lane accounting.** `claude_lane.py` accounts for every work-dir packet. One in neither `layers` nor
+    `lost` loses any earlier return and is listed as a failure.
+  - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
+    absorbed with its path.
+- **The first 2026-09-24 re-record attempt (wave 20260924 at catalog 149940af), set aside:**
+  - **The Codex lane voided 15 of 32 layers with no read outside the export.** The reasons:
+    - 15 flags named a retrieval CLI that was only a search term or a Python list item (`rg -i 'qmd|...'`,
+      `for t in ['serena', ...]`);
+    - 8 were a quoted `'/'` joining path parts (`p+'/'+k`);
+    - 2 were `Path.cwd()/ref` and `'https://'` read as absolute paths;
+    - 1 was a backtick in a quoted heredoc (REG7-3, kept).
+  - **The fix is enforcement rather than a name heuristic** (the blind audit above). A blind child's PATH resolves
+    no retrieval CLI, which a real child confirmed, and a host where one would resolve is refused. So those names are
+    no longer flagged. The root and path rules skip the Python forms.
+  - **Replayed over that run's 420 commands, 1 of the 32 layers is still flagged** (the backtick). The same replay
+    over the `test_real_reaches_still_flag` cases still flags each.
+  - **The Claude lane was killed 20 minutes in.** `claude -p` ended its background workflow 600 s after its turn
+    ended. The recipe now sets `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`.
+  - **Review of the fix (#206):** Codex and the independent review found gaps, each fixed with a test that fails without it:
+    - an npm `#!/usr/bin/env node` launcher could not start under the child's PATH;
+    - a CLI named by an absolute system path was exempt;
+    - `file:///` passed as a URL;
+    - a `'/'` joined on one side only built `/etc/passwd`;
+    - a command dropping PATH got the shell's default, with `/usr/local/bin`;
+    - profile output could reach the measured PATH.
+  - **Nothing from the attempt is recorded:** codex_lane.py's hash changed, so both lanes rerun on a new wave.
+- **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
+  - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text
+    before its first `*?[{`, cut at the last `/`) through the same trimming path helper, so `<export>/.. /*` listed
+    the export's parent while the whole value, starting with `/` and ending with `*`, was unchanged by `trim()` and
+    its `.. ` part was not `..`. Any `/`-separated component `trim()` would change now flags, in every Read path
+    and Glob or Grep path, pattern and glob. The review found no such component among 28,601 values in 289 real
+    workflow runs on this host. File-name listings only were exposed; contents stayed closed.
+  - **Each trimmed character is pinned (NORM11-2).** A test lists the 25 ECMA-262 code points independently and
+    requires each to flag, and three that `trim()` keeps (U+200B, U+200D, U+0085) not to; 18 of 18 targeted mutants
+    are killed.
+  - **Registry guards (RR11-1, RR11-2).** The registration test requires the current audit hash for both workflow
+    paths the lane may name, and the adjudication test requires every registered adjudication key. The Claude
+    uniqueness key includes `transcript_audit_py_sha256`, and adjudication entries are unique too, so an appended
+    registration that changes only the audit is accepted.
+  - **Adjudication code at record time (RR11-3).** A new-wave adjudication's provenance must hash to this
+    checkout's adjudication code (`record_verdicts.ADJUDICATION_FILES`, which a test pins to exactly what
+    `adjudicate.adjudication_provenance` hashes), as the Codex and Claude lanes' code must.
+  - **Registry edits (the local Codex review's P2).** Entries added inside an unmerged PR may be amended before
+    merge; the append-only rule above binds entries merged to `main`. Catalog issue #175 tracks enforcing it in CI.
+- **Independent round-10 review of 821c23cc (transcript audit and its binding), and its fixes:**
+  - **Whitespace around a path (TA10-1 = BR10-1, high).** Claude Code trims a Read, Glob or Grep path with
+    JavaScript's `trim()` before expanding a leading `~`, while the transcript keeps the raw value; " ~/.codex"
+    or "<export>/.. " audited clean and opened a path outside the export. A path, pattern or glob that `trim()`
+    would change (the ECMA-262 WhiteSpace and LineTerminator set) flags, before the `~` and `$` test; since round
+    11 (below) the test applies to each `/`-separated component, not only the whole value.
+  - **Mutation coverage (TA10-4).** Tests now cover each whitespace class, a bare `~` and `~user`, a mid-value
+    `$`, every per-item retry case and `locate`'s fallbacks; 13 of 13 targeted mutants are killed.
+  - **`locate` on a long project name (TA10-2)** treats an unreadable exact path (ENAMETOOLONG) as absent and falls
+    back to the session's unique id. **Record entries without an `agentId` (TA10-3)** are ignored, and a missing
+    agent list sorts safely.
+  - **Registration guard (TA10-5 = BR10-2).** A test requires the current `transcript_audit.py` hash in the
+    registry's current Claude entries, so an audit change cannot pass CI unregistered. **Record time (BR10-3)**
+    also requires a new-wave Claude return's `transcript_audit_py_sha256` to be this checkout's
+    `transcript_audit.py`, as the Codex lane's code is; `claude_lane.py` itself stays unbound (disclosed low).
+  - **Return schema (BR10-4).** `lane-return.schema.json`'s provenance lists `transcript_audit_py_sha256`, and a
+    test requires every lane's registered provenance fields to be in it. Nothing validated provenance against the
+    schema, so no return was rejected: `codex_lane.py` drops the runner-owned provenance from the copy it passes to
+    `codex exec --output-schema`, and record time checks provenance keys against the lane's provenance fields.
+- **Independent round-9 review of 014d046f (transcript audit, binding and resume, regressions and operability):**
+  - **Home and variable spellings (F1, high).** Claude Code expands a leading `~` in a Glob or Grep path when it
+    runs the tool, while the transcript keeps the raw text; `~/...` joined onto the working directory looked
+    inside the export. Any path, pattern or glob that starts with `~` or holds `$` now flags.
+  - **The audit's code is bound (BR9-1).** `transcript_audit.py` is a verdict-review-gate trust path, and its
+    sha256 is in the Claude lane's provenance (`transcript_audit_py_sha256`, registered in `lane-provenance.json`)
+    and in the adjudication provenance, as `codex_lane.py` and `adjudicate.py` are.
+  - **Retried agents (REG9-2).** The run record lists each agent's final attempt; an earlier attempt's transcript
+    must map to the item of an agent retried at least that often (at most attempt − 1 per item) and is audited
+    against that item's boundary. An extra on a non-retried item, beyond an item's retries, or naming no item
+    fails the run. Measured on a real run retried after a usage limit: each earlier attempt carries its final
+    attempt's prompt.
+  - **macOS and long project names (REG9-1, REG9-7).** The locate test derives the slug from the resolved path
+    (macOS resolves `/home` elsewhere), and `locate` finds a shortened project directory by the session's unique id.
+  - **Recorded, not read:** each exposure measure's `ledgers_sha256` names the ledger it was measured against; a
+    later check cannot recompute it, since the ledger then holds the wave's rows (BR9-2, disclosed).
+- **Independent round-8 review of 68e74f2c (regressions, binding and resume, operability, disclosure), and the
+  transcript-audit hardening ahead of round 9:**
+  - **Audit reads the raw command text again (REG8-1, REG8-3).** Round 7's reading of which spans bash expands
+    let double-quoted apostrophes, escaped quotes, heredocs and nested `sh -c` scripts hide reads; substitution,
+    `$CODEX_HOME` and inherited directories are matched in the raw text (a literal backtick in a single-quoted
+    search voids a layer again: REG7-3 is a known low). The bare word `CODEX_HOME` flags only in a command that
+    reads the environment (`printenv`, `env`, `export -p`, `declare -p`), so `rg -n CODEX_HOME docs` is benign.
+  - **Interrupted reruns (NEW-1).** A pending layer's old return is removed before its events are rewritten, and a
+    resume counts a kept return only beside a non-empty, clean event stream.
+  - **Prose exposure bound per layer (NEW-2).** Each layer's measure records its packet's sha256, the export's
+    tree and the ledgers' digest. It is taken when the layer's row is first written (a wave's first `--write`, or
+    the `--append-rows` that adds it, still before that row); a document present before the first write is
+    refused, and an append or `--check` reads the retained one only as the run manifest binds it. `landscape.py`
+    requires each row's measure to name its retained packet and its lanes' tree.
+  - **CI test scope and the step-7 remedy (OPR8-1, OPR8-2).** The real-export test asserts only the failing kinds,
+    with no winner-pinned prose assertion. A step-7 remedy edits a verdict-review-gate trust file, so it lands
+    first as a rules-only PR and the wave PR follows on the merged main.
+  - **Packet prose (REG8-4).** Another layer's proper nouns match next to `-` and `/` ("Nautilus-native",
+    "Codex/Claude"); only a path token keeps its segments. Prose placeholders are 186 spans, 76 in shared fields.
+  - **Lows taken where the code was open:** a symlink into a checkout is refused as `--out` or `--keys-out`
+    (REG8-5); `keys()` removes its rebuilt document on failure and step 7 and the resume note run `packets_args`
+    (OPR8-3, OPR8-4); step 7 follows CI's order (OPR8-6); `blind_checkout` imports `lane_packets` from its own
+    directory (OPR8-5).
+  - **Transcript audit, bound and fail-closed.** See "Claude family" above: the run record binds the transcripts to
+    the completed run, its agents and the collected result; agents must run from the export; paths compare
+    resolved; unmodelled, server-side and MCP tool calls, unreadable lines and climbing globs flag. Its tests cover
+    each evasion case, and nine mutants of its checks are all killed. The exact-id fix resolves `data-mlflow` to
+    one candidate in evaluation-experiments (the winner-change sweep then has 32 trips in 296 scenarios).
+  - **Not taken:** LOW-1 (pre-existing: a blind resume would count a clean return written by a non-blind run on the
+    same export) and R8-DIS-1/3/4 (exposure over-reporting through generic table headers, sentence-start capitals,
+    two OTel role strings) stay disclosed lows.
+- **Codex review at 68e74f2c:**
+  - **Claude read boundary (P1).** A Claude judge or lane agent could open the sibling lane returns next to its
+    input. Both Claude-family surfaces are now audited on their agents' transcripts (see "Claude family" above).
+  - **Duplicated Claude items (P1).** The claude-args snapshot binds its exact item list, and `claude-collect`
+    refuses a result that returns an item twice or one the snapshot does not hold.
+  - **Prose exposure for every new wave (P1).** `record_verdicts.py` refuses a new wave's `--write` without
+    `--lane-repo-root` (and a `--check` without the sealed document), and `landscape.py` requires every new wave's
+    run manifest to bind `prose_exposure_sha256`.
+  - **Exact component ids (P2).** `export_isolation_check` matches a winner by its exact component id before the
+    normalized one, so `alpaca-py` no longer also selects `data-alpaca-py` on the same repository.
+- **Independent round-7 review of a4dfd99e (blindness, operability, regressions and isolation-integrity lenses),
+  under the reviewer's convergence plan: no new detection features; fix the confirmed mediums with real-data tests;
+  make the disclosure the resolution; take the lows where the code was open:**
+  - **Interrupted and resumed Codex runs (REG7-1, ISO-R7-1..4, ISO-R7-8).** Each layer is audited before its
+    return is written, so a flagged layer is void even when the run is interrupted, and a resume re-audits a kept
+    return's events. A stop signal (SIGTERM, SIGHUP, SIGINT) sets a stop that starts no attempt, retry or refute
+    stage and promotes no return, terminates and waits for every child, and cannot be interrupted by a second
+    signal; the executors cancel queued work. Every run home holds an in-use lock its children inherit, so a
+    later run's sweep never removes a link a live orphan still uses, and the link is removed only after the
+    children are gone. Both runners hold the work dir's own lock (`.codex-run.lock`) before the homes' base lock,
+    so a second run of one work dir is refused whatever its `NAS_CODEX_HOME_DIR`. The base is created 0700.
+    Tests: an interrupt then a resume never keeps a flagged layer; a stop with `--jobs 2` writes no return and
+    starts no retry; a kept return with flagged or missing events reruns; a stop during adjudication writes no
+    record and starts no refute stage.
+  - **Audit and credentials (REG7-3, ISO-R7-5..7, ISO-R7-9).** Substitution, `CODEX_HOME` (the bare name too) and
+    inherited directory variables are matched in the shell-active text only. A proxy variable with inline
+    credentials is refused for a blind run, since every child variable reaches the model's shell; the dry-run
+    redaction handles a scheme-less value and a password containing `@`.
+  - **Checker scope (OPR7-2).** With round 6's rules, 96 of 288 single-layer winner changes failed step 7 and CI,
+    mostly on intrinsic card fields (license, a version) and on evidence lists such as `primary_references`. Only
+    role labels outside evidence records and packet fields on exactly the winners now fail; record-field hits
+    (three records at least, low-cardinality columns only, `evidence_ref` as evidence) and evidence-record role
+    words other than winner, incumbent and chosen are reported. The same sweep on this head: 32 of 297 changes in
+    18 layers fail (32 of 296 after the exact-id fix below, which leaves one scenario fewer), all on the older container and packet checks (28 of 288 at fe5143e2).
+  - **Prose exposure (BL7-1, BL7-2).** A table's body row is scored with its header, so "| Layer | Selected native
+    practice |" over the web-research row is an exposure. A statement counts only when it names a winner and no
+    adopted non-winner, and states a selection by a choice phrase, a status copula or label, or an imperative
+    choice ("Retain skfolio"), not by a selection word merely near a name. `record_verdicts.py --write` measures
+    this against the ledger before the wave's rows, over the export the lanes read, seals it as
+    `prose-exposure.json` (bound by the run manifest's `prose_exposure_sha256`) and stamps each row's
+    `lanes.prose_exposed`; `landscape.py` checks both. Step 7's check is the next wave's pre-check.
+  - **Packet prose (BL7-3, BL7-4, BL7-5).** Another layer's name parts match only as capitalized proper nouns
+    ("Nautilus", "Alpaca"), and a candidate name that is an ordinary word only as written ("Temporal"), never
+    inside a path: the dropped clause "retain scoped telemetry, failed attempts and recoverable state ..." is back
+    in 3 requirements, and shared-field placeholders fell from 125 to 74 (prose placeholders 331 to 172). In a
+    candidate's own fields a selection word next to its own name, or beside a result marker, no longer drops a
+    sentence; a choice phrase or status copula still does. Status needs a copula ("is this catalog's selected
+    live-primary broker path") or a labelling opening ("The selected GitHub CLI.", "Selected north-star engine");
+    "Default examples use model API credentials", "Failed-turn usage is retained." and the NautilusTrader
+    parity-gate record stay. The result marker is case-insensitive and also matches `failed`/`blocked` inside a
+    status token and a bare `*.json` name.
+  - **Operability (OPR7-1, OPR7-3..6, REG7-4, INT-R7-1).** The wave's date and manifest are fixed once in
+    `KEYS_DIR/wave.env`, so `keys()` rebuilds the same packets on any later day; it replaces the keys document
+    only after `cmp` passes, so a failed call leaves none, and step 6 chains it. `build_verdicts.py` refuses a
+    missing manifest with exit 2. Step 7 lists the validate job's offline steps, including the base commit's
+    verdict-review gate, and says to re-register after any later edit. `lane_packets.py` records an absolute
+    `--manifest` relative to `--root` and refuses an `--out` or `--keys-out` inside a repository. A sealed
+    `component_id` or `pin` of the wrong type is a clean refusal.
+- **Independent round-6 review of fe5143e2 (integrity, Codex-isolation, blindness, regressions and operability
+  lenses):**
+  - **Exported files are verbatim; the exposure is disclosed (design decision, 2026-09-24; B6-4, B6-2).** Six
+    rounds showed sentence redaction inside exported files to be a moving target, and at fe5143e2 it did harm: it
+    rewrote 60 of 87 exported prose files, removed 14,647 words, broke the sha256 of 30 hash-bound files and
+    dropped incumbents' own negative evidence. The export now rewrites no sentence or table. Reduction is limited
+    to what this catalog builds for a lane: the packets (below) and the label fields of catalog cards and ledger
+    rows. `export_isolation_check.py` reports `prose_exposed_layers`: 18 of 32 layers have a cited prose file
+    that states their winner's selection (26 of 89 exported prose files; superseded by round 7's measure, which
+    scores tables and counts only discriminating statements). A wave record discloses those layers as
+    not blind against cited prose. Alternatives measured: excluding every cited narrative document would drop
+    108 of 1,378 packet references and leave 9 adopted candidates without evidence; redaction is above.
+    Overturn: a redaction that a mutation test shows removes every seeded choice statement without changing a
+    hash-bound file, or a re-record in which the exposed layers' lanes side with the incumbent measurably more
+    often than the unexposed layers'.
+  - **Packet prose (B6-1, B6-5).** Each packet's matcher also carries every catalog candidate's whole names and
+    ids (both ledgers, the manifest's components and entries), so another layer's incumbent sentence no longer
+    passes. `CHOICE_PHRASE`
+    covers "implementation choice", "prior LEAN oracle", "use stage" and catalog membership words. A candidate's
+    own `role` and `card_limitations` lose a sentence only when it states that candidate's status, never one
+    carrying a result marker (PASS, FAIL, BLOCKED, an exit code, a count such as 3/5) or a repository path.
+  - **Card labels (B6-3).** The checker's `record_field_hits` tests every field of a list of candidate records:
+    present on exactly the winners, absent on exactly the winners, or a categorical scalar held by exactly the
+    winners. The export strips `evidence_level`, `installed_version` and a role status statement from cards. On
+    the real export: 0 record-label hits and 0 role-label hits.
+  - **Checker gaps (B6-6).** Key tokens split at camelCase and `-`. Inside evidence records, a key carrying a role
+    word (selected, selection, pick, recommended, preferred, default, primary, current, chosen, winner,
+    incumbent) is a label when it isolates the winners, unless its position is reviewed with a reason in
+    `REVIEWED_EVIDENCE_PATHS`; three such positions were reviewed as evidence (a client session's
+    `selected_checks`, two `primary_sources` lists). A packet field absent on exactly the winners is a hit, and a
+    selection word or an emptied "(selected)" is removed from a candidate's name.
+  - **Sealed keys (INT-R6-1..3).** Each packet commits to its sealed values (`sealed_candidates_sha256`, over the
+    sanitized values the document stores). The keys document names the manifest it was built from (path and
+    sha256); `record_verdicts.py` checks it and that every sealed component id is unique and registered there.
+    `adjudicate.py inputs` checks the document against every packet. The lane runners no longer read it, and the
+    recipe deletes it while any model worker runs, rebuilding it deterministically (byte-identical packets)
+    only for `adjudicate inputs` and `record_verdicts`.
+  - **Codex isolation (ISO-R6-1..5).** One lock per work dir under the homes' base, shared by `codex_lane` and
+    `adjudicate codex`; SIGTERM and SIGHUP remove the credential link, and the next run sweeps a link a SIGKILL
+    left. The audit flags `$CODEX_HOME`, command substitution and an inherited directory variable (`${TMPDIR}`,
+    `$SSL_CERT_DIR`) passed as an argument; a child's `TMPDIR` is an empty directory of its run home. A blind
+    child never gets an API key: the native `auth.json` is required (`codex login --with-api-key` makes one from
+    a key). Measured 2026-09-24 with `codex-cli 0.155.1`: `-c shell_environment_policy.inherit="core"`, `"none"`
+    and `include_only=["PATH"]` left the model's shell environment in `codex exec` unchanged (a planted non-core
+    `SSL_CERT_DIR` reached it every time), so that override is not used. Refusals run before the lock and the dry
+    run, and the dry run shows proxy credentials as `***`.
+  - **Adjudication regressions (REG6-1..5).** A long glued segment no longer raises (`os.path.isfile`); the whole
+    glued chain is walked; `inputs` records each lane root's tree digest, and `assemble` reports a changed tree
+    and asks for `inputs` to be rerun instead of silently dropping judgments; a leak found by a call whose own checks passed stands even when the
+    run end voids the run.
+  - **Operability (OPR6-1..5).** Step 7 regenerates what a wave changes (`component_matrix`, `build_verdicts`,
+    `new_host_grand_list`), rehashes only the registered files the wave changed, and runs every check
+    `validate.yml` runs. The isolation re-check builds into a new directory, and `lane_packets.py` refuses an
+    existing `--out` or `--keys-out`. Step 3 copies only the two blind roles. `export_isolation_check.py` exits 2
+    on a usage or input error (missing or malformed `--packet-keys`, or none for sealed packets), never the
+    label-hit exit 1.
+- **Independent round-5 review of a516c477 and the review of 52344da8:**
+  - **Fresh Codex homes, allowlisted children (INT-R5-2, ISO-R5-1..4).** Each blind run makes a fresh home with
+    `tempfile.mkdtemp` under the base; nothing is ever removed to make one (the round-4 home was recreated with
+    `rmtree`, which deleted a native home placed at that path). The base and the native Codex home may not be
+    one directory or nest either way, and the base may not overlap the work dir or export. A child's environment
+    is an allowlist (`PATH`, locale, `TMPDIR`, `TERM`, certificate and proxy variables), plus `CODEX_HOME`, the
+    empty `HOME`, and an API key variable only when no credential is linked: not the caller's, which carries the
+    coordinator's transcript pointer, cross-session socket and token, and broker variables. Children get no stdin,
+    and the file credential store is pinned (`-c cli_auth_credentials_store="file"`). Probe 2026-09-24,
+    `codex-cli 0.155.1`: a child with only `CODEX_HOME`, `HOME`, `LANG`, `PATH` and `TERM` signed in, listed
+    only the CLI's bundled skills and received no AGENTS.md; the native credential was intact and the link was
+    removed after.
+  - **Sealed values committed in the packet (INT-R5-1; Codex review at a516c477).** A blind packet carries
+    `sealed_candidates_sha256`, the digest of its candidates' sealed values. `packet_keys_issue` (used by
+    `record_verdicts.py`, `adjudicate.py inputs`, `scripts/landscape.py` and `scripts/verdict_review_gate.py`)
+    refuses an entry that does not hash to it. A stale, edited or other build's document therefore cannot restore
+    other component ids or pins, and every lane return, bound to the packet's sha256, is bound to the values too.
+    The lane runners need no keys. The commitment is deterministic; recovering the values from it would mean
+    guessing every candidate's exact pins, upstream records and decision prose, none of which a blind export
+    holds. `record_verdicts.py --write` also refuses a retained entry that does not seal exactly its packet's
+    candidates (INT-R5-4), and a bad `--packet-keys` file is a clean refusal (R5-REG-8).
+  - **No keys document while a worker runs (Codex review at a516c477).** A model worker runs as the operator's
+    user and can read any file it names, so a keys document placed outside `--out` was still reachable. The recipe
+    deletes it right after building the packets. For `adjudicate.py inputs` and `record_verdicts.py`, the only
+    steps that need it, it rebuilds it (the build is deterministic) and checks the rebuilt packets are
+    byte-identical. It deletes it again before the judges run. A blind `codex_lane` layer whose audit is flagged
+    (a read outside the export and packets, web search or an MCP tool) is now void, its return set aside, as a
+    flagged adjudication judgment already was.
+  - **Packet prose (N1, N2, N4; Codex review at a516c477).** A sentence is dropped only when it states the
+    catalog's choice: a choice phrase ("current choice", "selected destination", "implementation choice", "prior
+    LEAN oracle", "incumbent"), catalog membership or lifecycle status ("stack.json", "inventory entry", "use
+    stage", "qualified component"), or a selection word within 25 characters of a candidate name. Other names
+    are written `<candidate>`. Terms cover full names, parenthesized aliases ("GitHub CLI (gh)" gives `gh`),
+    repository names, component ids, owners and name parts unique to one candidate (outside the layer's own title
+    and scope words), with `-`/`_`/space variants. Short names such as `gh`, `uv` or `RTK` match as whole
+    case-sensitive tokens. Since the Codex review, every catalog candidate's whole names and distinctive parts
+    (round 7, BL7-3: parts only as capitalized proper nouns, ordinary words only as written)
+    count in every packet, so a factor layer's prose no longer names Nautilus, LEAN or Alpaca. A selection word is
+    never a term. On the 2026-09-23 packets, 4 requirements are emptied (13 before), all us-equities layers
+    sharing the group requirement that names the selected destination, and 363 names are written `<candidate>`
+    (125 in the shared requirement, limitations and overturn text; measured at round 6). A packet without `layer_scope_terms`
+    is no longer pointed at them. Candidates' `role` and `card_limitations` are reduced too (any selection word
+    there goes, since the text is about that candidate). Prose runs before the popularity strip, so the
+    archived/license gating reads the requirement the lanes see, and every blind packet is checked with
+    `withheld_packet_keys` before anything is written. The export gives the ledger rows and the quality review's
+    layer entries the packets' reduced text and drops the review's `evidence_gap`.
+  - **`evidence_kind` withheld (N5).** A selected candidate must carry a strong kind, so the kind held exactly the
+    winners in 7 layers; blind packets drop it and the export strips it from ledger candidates. The packet check
+    now also tests values: a categorical scalar, or a list element shared by two or more winners. At this head
+    only `registered_receipts` (11 layers) and `evidence_refs` (2) isolate winners, as evidence.
+  - **Export redaction as table units, stricter evidence classes (review of 52344da8).** (Superseded in round 6:
+    exported files are no longer redacted.) A Markdown table went whole when any row stated the choice, so no
+    single broken row marked the winner. Inside evidence records a
+    `selected_repositories`-style selection or an unambiguous role word (winner, incumbent, chosen) is a label,
+    and such selections are stripped under `evidence/`. Named role keys are never exempt as evidence objects.
+    Six complement lists remain in receipts (commands resolved, components covered) for code-navigation and
+    git-github-automation; they record what a session ran and are kept as evidence.
+  - **Smaller fixes.** A leak is recorded only when the call's full provenance (code, prompt, schemas, tree) is
+    unchanged. A glued segment naming a file under a lane root stays as repository evidence (R5-REG-5), and a host
+    path after a URL-closing `|` is scrubbed (R5-REG-6). The review gate accepts a documented `failed` lane
+    outcome with its reasons (ops N2). `${...}` is flagged only with an operator. A refused export also removes its
+    worktree. The lane prompt no longer promises upstream metadata (N6), and its hash is re-registered.
+- **Independent round-4 review of 2a2ffb8d (blindness, binding, regressions and operability lenses):**
+  - **Id-aware isolation check and removed selection records (F1).** `export_isolation_check.py` read only
+    github.com/huggingface.co URLs, so id-keyed lists passed. It now matches every list (its strings and its
+    objects' id fields) and every object's key set against each adopted candidate's slug, repository name,
+    component id and name, normalized (`data-`/`foundation-`/`candidate:` prefixes, `_` as `-`). The sealed ids
+    come from `--packet-keys`. A hit is evidence when it sits in an evidence record (under `evidence/`,
+    `blueprints/`, `observability/` or a `*receipt*.json`), in a names-alone list under an evidence key, or at a
+    reviewed position (`REVIEWED_EVIDENCE_PATHS`). A complement list elsewhere fails whatever its key (F6). The
+    first real run found `adoption/manifest.json` (profile `component_ids` and `recipe_map`, exact for 10
+    layers) and `catalogs/foundation/decisions.json` (decision `component_ids`, 6 layers). Both are now
+    removed from every blind export, with `catalogs/us-equities/runtime-target.json` (the selected destination,
+    F3) and `blueprints/us-equities/north-star.md` (its "Selected path" table). A `selected_component*` key
+    (the upstream-check provenance crosswalk) is stripped under `evidence/`. On the 2026-09-23 export, 0
+    role-label hits remain and evidence-record hits remain in 13 layers.
+  - **References to removed files (F4, OPS-1, R4-REG-2).** Under `--withhold-labels`, `lane_packets.py` drops
+    every evidence reference and registered receipt that names a file the blind export removes
+    (`blind_checkout.removed_from_blind_export`), and lists the drop in each packet's `withheld`: 57 references
+    in 21 packets. One adopted candidate is left with no evidence reference: web-research Crawl4AI, whose only
+    reference was a removed membership file. (Round 6: 69 adopted candidate entries cite only pinned
+    upstream sources, with no local receipt; among them web-research Cua Driver, whose only reference is a pinned
+    upstream README URL the review could not fetch.) `blind_checkout.py --export` now refuses, and removes the export, when a
+    packet references a path the export lacks, unless `--allow-missing-refs` is passed. The real-export test
+    asserts none.
+  - **Selection prose redacted (F3; superseded in round 6, which exports every file verbatim and discloses the
+    exposure instead).** The export dropped, from every exported Markdown or text file outside fenced
+    code, each sentence that uses a selection word and names a candidate of any packet. The unit is a paragraph,
+    list item or table row, so a sentence wrapped over lines is matched whole. The term set is the union over all
+    packets, so what is dropped does not depend on which candidate won. Measured independently (winner names,
+    component ids and repository names, word-bounded, against directly cited and one-level transitive files):
+    20 of 30 scored layers were exposed before and 0 after. The redaction changed 58 of the 85 exported prose
+    files and removed 6,246 words. JSON string prose is not redacted (see "Remaining limits").
+  - **Sealed manifest fields (F5).** Only a sota-manifest component carries `component_id`, `pin`, `upstream`,
+    `recipe_ref` and `decisions`, so their presence alone marked membership. On the 2026-09-23 packets they
+    were present on exactly the recorded winners among the adopted candidates in 6 layers (8 against the v1
+    selected/default candidates). Under `--withhold-labels`, `lane_packets.py` now moves them, by candidate key,
+    into a packet-keys document at `--keys-out`. That flag is required with `--withhold-labels` and must point
+    outside `--out`, which lanes read. `record_verdicts.py --packet-keys` and `adjudicate.py inputs
+    --packet-keys` restore the fields after checking the packet's sha256, so winner component ids and pins
+    resolve as before. A wave retains the document as `<sealed_base>/packet-keys.json`, bound by the run
+    manifest's `packet_keys_sha256`. `scripts/landscape.py` and `scripts/verdict_review_gate.py` restore from
+    it, and `withheld_packet_keys` refuses a new-wave packet whose candidates still carry a sealed field.
+    `export_isolation_check.packet_field_hits` measures the packet fields themselves and fails on a non-evidence
+    field. After the change it finds none. `registered_receipts` still sits on exactly the winners in 6 layers.
+    This is disclosed as evidence-volume asymmetry: the catalog ran what it chose.
+  - **Codex children's HOME (F2).** Codex also discovers user Agent Skills under `$HOME/.agents/skills`, and
+    their names are adopted tools. A blind child now runs with `HOME=<codex-home>/home`, an empty directory
+    of mode 0700. Measured 2026-09-24 with `codex-cli 0.155.1`: with the isolated `CODEX_HOME` and the
+    caller's `HOME`, a probe child listed qmd, tavily-* and typesafe-ai among its skills. With the empty
+    `HOME`, it listed only the CLI's bundled skills.
+  - **Codex home safety (BIND-R4-1, R4-REG-3, R4-REG-9, BIND-R4-7, OPS-4; current as of round 6).** Each blind run
+    creates a fresh home with `mkdtemp` under `$NAS_CODEX_HOME_DIR` (default
+    `~/.local/state/native-agent-stack/codex-home`), named `<sha256(work dir)[:16]>-<random>`, outside the work dir
+    and the export. `codex_home_issue` refuses, creating nothing (not even the lock), when the base is, holds or
+    sits inside the native Codex home (either spelling), when it overlaps the work dir or the export, and when there
+    is no native `auth.json`. A blind child is never given an API key (ISO-R6-4, below). The refusals run before the
+    dry run too, and the home is created only when something is pending. A dry run prints each child's whole
+    environment as `env -i PATH=... LANG=... TERM=... 'CODEX_HOME=<base>/<prefix>-<run>' 'HOME=<base>/<prefix>-<run>/home'
+    codex exec ...`, with proxy credentials shown as `***`. The credential link is removed when the run ends, on an
+    exception, on SIGINT, and on SIGTERM or SIGHUP (raised as `SystemExit`). A SIGKILLed run leaves the link; the
+    next run of the same work dir, under the same lock, removes every such leftover `auth.json` symlink first,
+    except in a home whose in-use lock a live child still holds (round 7, ISO-R7-2). The blind audit also flags
+    `${...}` parameter expansion.
+  - **Run lock and bound audits (BIND-R4-5, BIND-R4-6).** `codex_lane` and `adjudicate codex` hold an exclusive
+    `flock` for the run (since round 6 one shared lock per work dir, `<base>/<prefix>.lock`), so two runs cannot
+    recreate each other's home or
+    interleave events files. A Codex judgment records each stage's events file and sha256, and
+    `usable_judgment` re-audits them, so an edited `audit_clean` does not count.
+  - **Per-call binding (BIND-R4-3, BIND-R4-4, BIND-R4-2).** A call deletes its input's stale events first and is
+    audited on the stages it ran. A stage that ran but left no events is flagged. The evidence tree is checked
+    after each call, and a changed tree voids the judgment at once. A clean call's leak is recorded when the
+    call ends, so an interrupted run keeps it. The run-end tree check also catches `OSError`. The adjudication
+    provenance and registry now name `codex_lane.py`.
+  - **Bindings to the lanes' inputs (BIND-R4-8, BIND-R4-9, OPS-6).** `claude_lane.py` requires the agent-lab
+    workflow to be tracked, no uncommitted `.claude/`, `CLAUDE.md` or `AGENTS.md` changes, and HEAD at or
+    after the `vendored-lanes.json` commit. Each `--lane-repo-root` given to `record_verdicts.py` and
+    `adjudicate inputs` must hold the evidence tree the lanes read and must not contain `..`. `codex_lane` and
+    `claude_lane_args` refuse a work dir inside a git repository, and the refusal messages state the root
+    rule as `codex_lane.root_issue` applies it.
+  - **Smaller fixes.** A non-blind run hashes a looping symlink by its text on Python 3.12 (R4-REG-4).
+    Scrubbing absorbs a sentence after a spaced host path when that sentence holds a path separator, and a
+    name glued on by `,` or `;` (R4-REG-5); a following sentence citing a repository path is lost, by design.
+    `--export` may not overlap `--dest` or `--source` (R4-REG-8). The lane fixtures use a dummy credential
+    and fixture homes (R4-REG-7). `RealExportIsolationTests` sits above the `__main__` guard (F8, R4-REG-10).
+    The recipe registers and rehashes evidence after `build_verdicts --write`, and runs the isolation check
+    before the PR (OPS-2, OPS-3). It also names the agent-lab commit and the role install (OPS-7).
+- **Codex review at a2434e2e and the Codex cross-family review:**
+  - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
+    and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a
+    packet references it.
+  - **Escaping symlinks, loops and special files.** For a blind run, `codex_lane.tree_sha256` refuses a symlink
+    that is absolute or resolves outside the tree, a symlink loop (found by `os.stat` ELOOP, so on Python 3.12 and
+    3.13 alike), and a FIFO, socket or device. The blind lane and adjudication entry points exit 2 on any of them.
+    A deliberately non-blind `codex_lane --allow-git-history` run hashes such entries by their link text or
+    skips them, because a working checkout can hold a `.venv` link or git's fsmonitor socket.
+  - **Position map integrity and location.** `assemble` derives each order's Claude position from the input
+    contents, re-scrubbing the hash-bound lane returns, and refuses a judgment whose index map disagrees. The
+    index moves out of the work dir, to `$NAS_ADJUDICATION_STATE_DIR` or
+    `~/.local/state/native-agent-stack/adjudication/<sha256(work dir)[:16]>/adjudication-index.json`. One
+    directory accumulates per work dir. After a wave is recorded, remove it with
+    `rm -r "$(python3 -c 'import sys; sys.path.insert(0, "tools/sota-convergence"); import adjudicate; print(adjudicate.index_path(sys.argv[1]).parent)' <work-dir>)"`.
+  - **Audit and instruction boundaries.** Each Codex judge call is audited inside its worker, before its record is
+    written. A flagged call (web search, an MCP tool, or a command reaching outside its repository, input and
+    packet) voids the judgment, and a Codex judgment counts only when its record says `audit_clean`, so an
+    interrupted or resumed run cannot count a flagged call. Claude judges' reads are instruction-bound: the role
+    and prompt name only three paths, and no filesystem sandbox enforces that. That also covers the lane return
+    files in `<work-dir>/claude/` and `<work-dir>/codex/`, which would identify A and B.
+  - **One checkout.** `adjudicate` relativizes lane returns against the catalog checkout it runs from, and
+    `record_verdicts.py` against its `--root`. Run both from the same checkout; a mismatch fails closed (the
+    adjudication is rejected).
+  - **Packet paths.** The Claude lane layers echo `packet_path` (agent-lab #47), and `claude_lane.py` requires
+    it to be the work dir's packet with the layer's `packet_sha256`.
+  - **Unresolved path check.** `claude_lane_args.py` checks the `--repo` as given, not only resolved.
+- **Round 14:**
+  - `adjudication-lane.js` echoes the prompt it read and each item's consumed input and packet paths.
+    `claude-collect` requires the prompt to hash to the snapshot's `prompt_sha256` and the repo to be the
+    snapshot's exactly; an item whose echoed paths are not the ones `claude-args` gave is a missing judgment.
+  - A leak from a run whose input, packet, tree, role or consumed arguments no longer hold is discarded, not
+    recorded.
+  - A deleted input is recorded as a missing judgment rather than raising.
+  - A spaced final path segment ending in a file extension (`/srv/My Project/private key.json`) is scrubbed
+    whole. Since the 3d0943cc review, the rest of the sentence after any outside path is absorbed (up to a
+    delimiter, a line end, or the first token ending a sentence, whose punctuation is kept), so an
+    extension-less spaced segment cannot leave a word either. Text after that sentence end is kept.
+  - `codex` and `claude-args` check both the `--repo` as given (absolutized, symlinks kept) and its resolved
+    form: on macOS `/home` is a symlink whose target is deep enough to pass the depth rule.
+- **Round 13:**
+  - `claude-collect` recomputes the `claude-args` snapshot's digest and refuses a snapshot edited under an
+    unchanged `snapshot_id`.
+  - An outside host path that holds spaces is scrubbed whole: each following space-separated token that
+    continues it with a `/` or `\` is absorbed, so no suffix of it survives.
+  - `blind_checkout --export` replaces an instruction name that is a symlink to a directory, or a directory
+    itself, with the stub, root files included.
+- **Bindings added in round 12:**
+  - The Claude lane's echoed `launch` also carries `agent_sha256`, the role digest the launcher checked
+    before and after the run. `claude_lane.py` requires it to equal the vendored role digest.
+  - `claude-args` snapshots the sha256 of each effective blind-adjudicator definition (`--agent-file` and any
+    project-level copy under `--run-dir`). `claude-collect` records every judgment as missing when one of them
+    changed.
+  - `codex_lane.tree_sha256` refuses a path that is not an existing directory, and `codex_lane`,
+    `adjudicate codex`, `adjudicate claude-args` and `claude_lane.py` refuse (exit 2) a missing `--repo`.
+- **Bindings added in round 11:**
+  - `inputs` reads each packet and lane return once. The parsed object, its sha256 and the packet snapshot
+    all come from those bytes.
+  - `record_verdicts.py` also reads each lane file once, for validation, the `lane_returns_sha256` check and
+    sealing.
+  - A new-wave row needs both lanes' `repo_tree_sha256` equal (otherwise the Codex lane is rejected), and an
+    adjudication whose provenance names another tree is rejected.
+  - Windows host paths (`C:\x`, `C:/x`, `\Users\example\y`, `\\server\share\x`) are scrubbed and caught like
+    POSIX ones.
+- **Audit roots (round 9, narrowed in the independent review):** each Codex judge call's audit allows only the
+  repository, its own input file and its packet snapshot under `<work-dir>/adjudication-packets/`.
+- **Leak text (round 9):** a reported leak's text has every path form the input scrubbing removes replaced by
+  `<outside-path>`, and is capped at 400 characters, before it is stored in `leaks.json`,
+  `adjudication-leaks.json` or printed.
+- **Any leading character (round 9):** an absolute path is scrubbed whatever its first character. That covers
+  Unicode word characters (`/évidence/x`), and any other legal character when a later `/` follows
+  (`/-private/x`, `/@host/x`); prose such as `+/-` or `and/or` is left alone.
+- **Gap receipts in a blind build (round 8):** `lane_packets.py` refuses `--gap-receipts` together with
+  `--withhold-labels` (exit 2, nothing written).
+- **HTML delimiters:** `>` delimits a path, as backticks do.
+- **Edited inputs:** `claude-args` and `codex` refuse an input whose bytes differ from the sha256 `inputs`
+  indexed.
+- **URL bounds:** URLs end at markup and quote characters, so a host path right after a link is still
+  scrubbed.
+- **Leak hashes:** a leak records both orders' hashes as sampled before the judgment.
+- **Record prose:** the judges' prose and evidence refs are scrubbed before a record is written, and a
+  surviving host path refuses the layer.
+- **Role installation:** both blind roles are in `adoption/agents/claude/`; the recipe's step 3 copies only those
+  two into `~/.claude/agents/`. `tools/adoption/install_claude_profile.py --only agents` would replace all seven
+  catalog agents user-level (round 6, OPR6-4).
+- **Run directory:** `claude-args --run-dir`, which is required, also checks a project-level
+  `blind-adjudicator.md` in the directory the workflow runs from.
+- **`--agent-file`:** pass the `blind-lane-reviewer` file the lane loaded. That is the user-level copy when
+  the lane runs from the blind export, which has no `.claude/`.
+
+**Limits:**
+- Writing style can still reveal a lane.
+- The raw lane returns sit next to the adjudication inputs in the work directory
+  (`<work-dir>/{claude,codex}/`, beside `<work-dir>/adjudication-inputs/`). A judge that reads outside its
+  input file can read the unscrubbed returns, which name the lane, model and provenance. The Codex blind audit
+  allows the inputs directory and the packets but not the lane directories, so such a read is flagged there.
+- `provenance.prompt_sha256` is the default `adjudication-prompt.md`; a `codex --prompt` override is not
+  recorded.
+- One refuter per judgment, not two.
+- The judge may read the packet outside the repository root, which it needs for the requirement and
+  candidate keys.
+
+**Receipt aliases.** `receipt-component-aliases.json` maps a `manifests/stack.json` component id (the id space
+receipts name) to the sota manifest id for the same component where the spellings differ: `nautilus-trader`
+to `nautilustrader`, and `duckdb`, `edgartools` and `exchange-calendars` to their `data-` ids.
+- `lane_packets.py --registered-receipts` attaches such receipts with `matched_by: alias`.
+- The index build fails when an alias's two ids do not share one repository.
+- An explicit entry is required where one repository serves several manifest ids. nautechsystems/nautilus_trader
+  is both `nautilustrader` and `nautilus-ibkr-adapter`, and a repository match cannot tell which component a
+  receipt exercised.
+

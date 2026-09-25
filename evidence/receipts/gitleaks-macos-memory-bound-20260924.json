@@ -1,0 +1,1223 @@
+{
+  "schema_version": 1,
+  "id": "gitleaks-macos-memory-bound-20260924",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-24T15:30:00Z",
+  "component_ids": [
+    "gitleaks"
+  ],
+  "claim": "On one MacBook Pro (Apple M5 Pro, 24 GB, macOS 26.5.1) with gitleaks 8.30.1, the 2026-09-24 09:45 Jetsam events were reproduced: a staged generated explorer (one 12,889,851-byte line, 2,335 findings) drives the global pre-commit hook's `gitleaks git --pre-commit --staged --redact` past 6 GiB in about 17 s, and the recipe's all-refs `gitleaks git --redact=100` past 8 GiB in 36 s, because upstream redaction copies the whole line for every finding. Through adoption/tools/gitleaks-guarded-macos the same scans stop at the 6 GiB footprint cap with exit 137 (the hook then blocks the commit), concurrent scans run one at a time under the per-user lock, and dir scans, the CI-scope history scan and small hook scans keep their upstream results and exit codes.",
+  "limitations": [
+    "One host and one repository state (source 5af3581); a different history, staged content or Gitleaks release can change every peak.",
+    "The guard is a user-space watchdog that samples the process tree's physical footprint every 50 ms, not a kernel limit: measured overshoot was 0.04-0.20 GiB above the 6 GiB cap across the development and final passes, and a scan keeps running unwatched if the guard itself is SIGKILLed (it still holds the lock).",
+    "Measured with the lock at a scratch path (ECOSYSTEM_GITLEAKS_LOCK); the default per-user lock file, installation on PATH and the global hook change were not installed on this host by this unit and remain the agent-ecosystem owner's step.",
+    "No CPU or task cap on macOS: the killed history scan used about 16 cores for 37 s.",
+    "Scans that exceed the cap produce no result (exit 137). This is fail-closed, not coverage: the all-refs history of this repository still has no complete redacted Gitleaks pass on macOS.",
+    "The incident attribution (a test scratch commit through the global hook, before #181 made the tests hermetic) is inferred from process ages, coalitions and session records; the Jetsam reports carry no argv.",
+    "Raw stderr, reports and the Jetsam files stay on the host; published values are sanitized (paths replaced by placeholders, no process or session identifiers)."
+  ],
+  "host_scope": {
+    "profile": "macos-arm64",
+    "platform": "MacBook Pro Mac17,8, Apple M5 Pro, 24 GB unified memory, macOS 26.5.1 (25F80)",
+    "identity": "one personal Mac; every path is replaced by a placeholder",
+    "import_limit": "Evidence for this host only. Another Mac must measure its own peaks before relying on the cap."
+  },
+  "data": {
+    "source_revision": "5af35816f829b8e92e0b31f757aa5329350923de",
+    "tools": {
+      "gitleaks": "8.30.1 (mise install; binary sha256 ba52fb1bfabbcde42f032afad3d6e0b19dff8ed105229a16e7caa338bbc0e84f; source tag commit 83d9cd684c87d95d656c1458ef04895a7f1cbd8e)",
+      "git": "2.50.1 (Apple Git-155)",
+      "python": "3.14.7"
+    },
+    "guard": {
+      "path": "adoption/tools/gitleaks-guarded-macos",
+      "sha256": "fc76d3a11d076b02ad9878b2cc7cfd078058e84a86df285cf53da1ca82fd6ce5",
+      "memory_cap_gib": 6,
+      "runtime_cap_s": 600,
+      "poll_s": 0.05,
+      "lock_wait_default_s": 60,
+      "exit_codes": {
+        "lock_busy": 75,
+        "refused": 78,
+        "runtime_cap": 124,
+        "memory_cap": 137
+      }
+    },
+    "incident": {
+      "sources": "/Library/Logs/DiagnosticReports JetsamEvent 2026-09-24 094503 and 094613 (first JSON line skipped; memoryStatus, largestProcess, processes[])",
+      "age_unit": "mach ticks at 24 MHz; the two snapshots are 6.6 s apart by process age",
+      "reports": [
+        {
+          "report": "JetsamEvent-2026-09-24-094503.ips",
+          "date": "2026-09-24 09:45:02.81 -0400",
+          "build": "macOS 26.5.1 (25F80)",
+          "product": "Mac17,8",
+          "largestProcess": "gitleaks",
+          "gitleaks_count": 3,
+          "gitleaks_combined_footprint_gib": 52.8,
+          "git_combined_footprint_gib": 3.1,
+          "compressor_uncompressed_gib": 79.8,
+          "compressor_size_gib": 13.3,
+          "processes_killed": 405,
+          "kill_reasons": {
+            "jettisoned": 356,
+            "vm-compressor-space-shortage": 49
+          },
+          "scan_processes": [
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 221.9,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 5.74,
+              "lifetime_max_gib": 7.48,
+              "age_s": 221.9,
+              "cpu_s": 2933.8,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 3.08,
+              "lifetime_max_gib": 3.74,
+              "age_s": 221.7,
+              "cpu_s": 25.6,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 114.4,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 100.2,
+              "cpu_s": 0.3,
+              "killed": null
+            },
+            {
+              "name": "bash",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 99.8,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 28.25,
+              "lifetime_max_gib": 28.25,
+              "age_s": 99.8,
+              "cpu_s": 50.3,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 88.3,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 88.3,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 34.7,
+              "cpu_s": 0.3,
+              "killed": null
+            },
+            {
+              "name": "bash",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 34.4,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 18.78,
+              "lifetime_max_gib": 18.78,
+              "age_s": 34.4,
+              "cpu_s": 55.1,
+              "killed": null
+            }
+          ]
+        },
+        {
+          "report": "JetsamEvent-2026-09-24-094613.ips",
+          "date": "2026-09-24 09:46:13.21 -0400",
+          "build": "macOS 26.5.1 (25F80)",
+          "product": "Mac17,8",
+          "largestProcess": "gitleaks",
+          "gitleaks_count": 3,
+          "gitleaks_combined_footprint_gib": 58.2,
+          "git_combined_footprint_gib": 3.1,
+          "compressor_uncompressed_gib": 84.3,
+          "compressor_size_gib": 11.9,
+          "processes_killed": 4255,
+          "kill_reasons": {
+            "jettisoned": 4243,
+            "idle-exit": 11,
+            "vm-compressor-space-shortage": 1
+          },
+          "scan_processes": [
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 228.5,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 5.3,
+              "lifetime_max_gib": 7.48,
+              "age_s": 228.5,
+              "cpu_s": 2972.4,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 3.08,
+              "lifetime_max_gib": 3.74,
+              "age_s": 228.3,
+              "cpu_s": 26.1,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 121.0,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 106.8,
+              "cpu_s": 0.3,
+              "killed": null
+            },
+            {
+              "name": "bash",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 106.4,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "Claude Desktop app coalition",
+              "footprint_gib": 28.25,
+              "lifetime_max_gib": 28.25,
+              "age_s": 106.4,
+              "cpu_s": 50.4,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 94.9,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "zsh",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 94.9,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "git",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 41.3,
+              "cpu_s": 0.3,
+              "killed": null
+            },
+            {
+              "name": "bash",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 0.0,
+              "lifetime_max_gib": 0.0,
+              "age_s": 41.0,
+              "cpu_s": 0.0,
+              "killed": null
+            },
+            {
+              "name": "gitleaks",
+              "coalition": "terminal CLI coalition",
+              "footprint_gib": 24.64,
+              "lifetime_max_gib": 24.64,
+              "age_s": 41.0,
+              "cpu_s": 59.4,
+              "killed": null
+            }
+          ]
+        }
+      ],
+      "reading": "Two scans were each started by a short-lived git parent through bash, the shape of the global pre-commit hook: one in the Claude Desktop coalition at about 09:43:23 (28.25 GiB) and one in the terminal CLI coalition at about 09:44:28 (18.78 GiB, then 24.64 GiB 6.6 s later). The third, started from zsh at about 09:41:21 with a 3.08 GiB git child and 2,934 CPU-seconds, matches a full-history `gitleaks git --redact --log-opts=--all` over agent-ecosystem history mirrors recorded in a session at 09:41. At 09:42-09:43 two sessions recorded tests/test_catalog_freshness_propose.py scratch commits blocked by the global hook; TrackedExplorerSubprocessTests force-adds the generated explorer. PR #181 (merged 10:08 EDT) made test git config hermetic, and this pass confirmed no Gitleaks process starts from that test class now."
+    },
+    "root_cause": {
+      "mechanism": "gitleaks 8.30.1 detect/utils.go filter() calls report.Finding.Redact for every finding, and Redact runs strings.ReplaceAll over Finding.Line, allocating a full copy of the matched line per finding. In git mode a -U0 hunk holds whole lines, so 2,335 findings on the explorer's 12,889,851-byte line retain about 30 GB (28 GiB). dir mode reads files in bounded chunks, so its lines, and its memory, stay small.",
+      "probes": "HTML-only staged: --redact exceeded 6 GiB in 14 s; --max-decode-depth=0 still exceeded 6 GiB; without --redact the peak was 0.17 GiB with 2,335 findings; --max-target-megabytes=2 peaked at 0.17 GiB but reported no leaks found with exit 0.",
+      "rejected_options": {
+        "max_target_megabytes": "Fails open: detectRule skips the whole fragment at debug log level, so the 2,335 findings disappeared and the scan exited 0.",
+        "config_path_exclusions": "Not used: a top-level path allowlist skips whole files in both git and dir modes (.gitleaks.toml header), and dir-mode memory was already bounded at 0.13 GiB even for 714 MB with nested worktrees.",
+        "gomemlimit": "No effect on the blow-up: with GOMEMLIMIT=4GiB the history scan still crossed the 6 GiB cap (the growth is live findings, not garbage).",
+        "kernel_limit": "memorystatus_control(SET_JETSAM_TASK_LIMIT) returned EPERM for an unprivileged caller."
+      }
+    },
+    "method": {
+      "harness": {
+        "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
+        "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
+        "description": "Runs one command under /usr/bin/time -l and samples, every 50 ms through libproc, the phys_footprint sum of its process group; SIGKILLs the group's members above the measurement cap. max_rss_gib is /usr/bin/time's maximum resident set size (the largest reaped process); group_peak_footprint_gib is the sampled group sum."
+      },
+      "serial": "Every measurement ran alone; no other gitleaks process was running.",
+      "fixtures": {
+        "<scratch>/clone": "local clone of <main-checkout> at 5af3581 with one appended line staged",
+        "<scratch>/fulltree": "`git archive HEAD` of <worktree> in a fresh repository with all 5,666 files staged (104,296,914-byte -U0 diff); for the explorer cases docs/ecosystem/index.html built by scripts/build_ecosystem.py --write (12,993,272 bytes) and force-added",
+        "<scratch>/htmlonly": "only that explorer staged, with the repository .gitleaks.toml and .gitleaksignore",
+        "<scratch>/hooks/pre-commit": "copy of the installed global dispatcher whose gitleaks resolution line is replaced by ${GITLEAKS_GUARD:-}",
+        "<main-checkout>": "includes six nested worktrees under .claude/worktrees (714 MB scanned)",
+        "<paper-worktree>": "includes a 979 MB .runtime directory (196 MB scanned; default-config virtualenv path allowlists skip the rest)"
+      }
+    },
+    "before": [
+      {
+        "label": "before-hook-small",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/clone",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.068,
+        "group_peak_footprint_gib": 0.05,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.05
+        },
+        "real_s": 0.19,
+        "user_s": 0.19,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~23 bytes (23 bytes) in 73.4ms",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "before-hook-fulltree",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.296,
+        "group_peak_footprint_gib": 0.491,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.293,
+          "gitleaks": 0.197
+        },
+        "real_s": 5.09,
+        "user_s": 64.69,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~100437623 bytes (100.44 MB) in 4.97s",
+          "WRN leaks found: 71"
+        ]
+      },
+      {
+        "label": "before-hook-fulltree-html",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": "memory",
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 8.15,
+        "group_peak_footprint_gib": 8.027,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.318,
+          "gitleaks": 8.027
+        },
+        "real_s": 19.26,
+        "user_s": 80.72,
+        "output": [
+          "time: command terminated abnormally"
+        ]
+      },
+      {
+        "label": "before-recipe-git-history",
+        "invocation": "recipes/README.md: gitleaks git --redact=100 ... (all refs, full history)",
+        "cwd": "<worktree>",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/before-recipe-git.json",
+          "<worktree>"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": "memory",
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 7.702,
+        "group_peak_footprint_gib": 8.03,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.345,
+          "gitleaks": 7.687
+        },
+        "real_s": 35.94,
+        "user_s": 566.71,
+        "output": [
+          "time: command terminated abnormally"
+        ]
+      },
+      {
+        "label": "before-stack-dir-worktree",
+        "invocation": "manifests/stack.json: gitleaks dir --redact=100 ... \"${PROJECT_ROOT}\"",
+        "cwd": "<worktree>",
+        "argv": [
+          "gitleaks",
+          "dir",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/b-stack-wt.json",
+          "<worktree>"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.124,
+        "group_peak_footprint_gib": 0.107,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.107
+        },
+        "real_s": 3.79,
+        "user_s": 58.15,
+        "output": [
+          "INF scanned ~101100415 bytes (101.10 MB) in 3.61s",
+          "WRN leaks found: 219"
+        ]
+      },
+      {
+        "label": "before-receipt-dir-worktree",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<worktree>",
+        "argv": [
+          "gitleaks",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/b-receipt-wt.json"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.127,
+        "group_peak_footprint_gib": 0.11,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.11
+        },
+        "real_s": 3.77,
+        "user_s": 58.05,
+        "output": [
+          "INF scanned ~101100415 bytes (101.10 MB) in 3.59s",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "before-stack-dir-explorer",
+        "invocation": "manifests/stack.json: gitleaks dir --redact=100 ... \"${PROJECT_ROOT}\"",
+        "cwd": "<worktree>",
+        "argv": [
+          "gitleaks",
+          "dir",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/b-stack-explorer.json",
+          "<scratch>/fulltree"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.125,
+        "group_peak_footprint_gib": 0.109,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.109
+        },
+        "real_s": 4.37,
+        "user_s": 60.14,
+        "output": [
+          "INF scanned ~114369165 bytes (114.37 MB) in 4.19s",
+          "WRN leaks found: 232"
+        ]
+      },
+      {
+        "label": "before-receipt-dir-main",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<main-checkout>",
+        "argv": [
+          "gitleaks",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/b-receipt-main.json"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.132,
+        "group_peak_footprint_gib": 0.116,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.116
+        },
+        "real_s": 25.25,
+        "user_s": 421.88,
+        "output": [
+          "INF scanned ~714024841 bytes (714.02 MB) in 25.1s",
+          "WRN leaks found: 1314"
+        ]
+      },
+      {
+        "label": "before-receipt-dir-paper",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<paper-worktree>",
+        "argv": [
+          "gitleaks",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/b-receipt-paper.json"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.127,
+        "group_peak_footprint_gib": 0.111,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.111
+        },
+        "real_s": 6.29,
+        "user_s": 98.71,
+        "output": [
+          "INF scanned ~196421996 bytes (196.42 MB) in 6.11s",
+          "WRN leaks found: 18"
+        ]
+      },
+      {
+        "label": "before-test-tracked-explorer-hook",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<worktree>",
+        "argv": [
+          "python3",
+          "-m",
+          "unittest",
+          "tests.test_catalog_freshness_propose.TrackedExplorerSubprocessTests"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 0.431,
+        "group_peak_footprint_gib": 0.856,
+        "per_process_peak_footprint_gib": {
+          "git": 0.005,
+          "python3.14": 0.419
+        },
+        "real_s": 11.25,
+        "user_s": 6.39,
+        "output": []
+      },
+      {
+        "label": "before-e2e-global-hook-explorer",
+        "invocation": "the installed global pre-commit hook itself (git commit through core.hooksPath)",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "git",
+          "-c",
+          "user.email=scratch@example.invalid",
+          "-c",
+          "user.name=scratch",
+          "commit",
+          "-q",
+          "-m",
+          "scratch snapshot"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": "memory",
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 0.007,
+        "group_peak_footprint_gib": 6.03,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "bash": 0.001,
+          "git": 0.318,
+          "gitleaks": 6.025
+        },
+        "real_s": 17.25,
+        "user_s": 0.02,
+        "output": [
+          "time: command terminated abnormally"
+        ]
+      }
+    ],
+    "after": [
+      {
+        "label": "after-hook-small",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/clone",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.068,
+        "group_peak_footprint_gib": 0.063,
+        "per_process_peak_footprint_gib": {
+          "env": 0.0,
+          "gitleaks": 0.053,
+          "python3.14": 0.01
+        },
+        "real_s": 0.4,
+        "user_s": 0.2,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~23 bytes (23 bytes) in 73.7ms",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "after-hook-fulltree",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.296,
+        "group_peak_footprint_gib": 0.506,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.294,
+          "gitleaks": 0.203,
+          "python3.14": 0.01
+        },
+        "real_s": 5.1,
+        "user_s": 63.14,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~100437623 bytes (100.44 MB) in 4.93s",
+          "WRN leaks found: 71"
+        ]
+      },
+      {
+        "label": "after-hook-fulltree-html",
+        "invocation": "global pre-commit hook: gitleaks git --pre-commit --staged --redact --no-banner --verbose",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 137,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 6.245,
+        "group_peak_footprint_gib": 6.087,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.319,
+          "gitleaks": 6.077,
+          "python3.14": 0.01
+        },
+        "real_s": 18.06,
+        "user_s": 76.77,
+        "output": [
+          "gitleaks-guarded-macos: memory cap exceeded (scan footprint 6.10 GiB > 6.00 GiB); the scan was killed and produced no result"
+        ]
+      },
+      {
+        "label": "after-e2e-proposed-hook-explorer",
+        "invocation": "a scratch copy of the global hook whose only change calls the guard",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "git",
+          "-c",
+          "core.hooksPath=<scratch>/hooks",
+          "-c",
+          "user.email=scratch@example.invalid",
+          "-c",
+          "user.name=scratch",
+          "commit",
+          "-q",
+          "-m",
+          "scratch snapshot"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 6.207,
+        "group_peak_footprint_gib": 6.104,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "bash": 0.001,
+          "git": 0.318,
+          "gitleaks": 6.089,
+          "python3.14": 0.01
+        },
+        "real_s": 17.25,
+        "user_s": 79.81,
+        "output": [
+          "gitleaks-guarded-macos: memory cap exceeded (scan footprint 6.09 GiB > 6.00 GiB); the scan was killed and produced no result",
+          "agent-ecosystem pre-commit: gitleaks blocked this commit (or could not complete the scan)."
+        ]
+      },
+      {
+        "label": "after-concurrent-2x-hook-explorer",
+        "invocation": "two hook scans started together through the guard",
+        "cwd": "<scratch>/fulltree",
+        "argv": [
+          "/bin/sh",
+          "-c",
+          "for n in 1 2; do ( s=$(date +%s); \"$G\" git --pre-commit --staged --redact --no-banner >/dev/null 2>&1; rc=$?; e=$(date +%s); echo \"scan $n: start=$s end=$e exit=$rc\" >&2 ) & done; wait"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 6.224,
+        "group_peak_footprint_gib": 6.045,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "bash": 0.001,
+          "git": 0.319,
+          "gitleaks": 6.021,
+          "python3.14": 0.01
+        },
+        "real_s": 35.76,
+        "user_s": 157.75,
+        "output": [
+          "scan 2: start=1790263172 end=1790263190 exit=137",
+          "scan 1: start=1790263172 end=1790263208 exit=137"
+        ]
+      },
+      {
+        "label": "after-recipe-git-history",
+        "invocation": "recipes/README.md: gitleaks git --redact=100 ... (all refs, full history)",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-recipe-git.json",
+          "<worktree>"
+        ],
+        "exit_status": 137,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 5.708,
+        "group_peak_footprint_gib": 6.055,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.35,
+          "gitleaks": 5.696,
+          "python3.14": 0.01
+        },
+        "real_s": 36.9,
+        "user_s": 572.82,
+        "output": [
+          "gitleaks-guarded-macos: memory cap exceeded (scan footprint 6.04 GiB > 6.00 GiB); the scan was killed and produced no result"
+        ]
+      },
+      {
+        "label": "after-ci-history-head",
+        "invocation": "narrowed history scope used by validate.yml (--max-target-megabytes 2, --log-opts=HEAD)",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          ".",
+          "--config",
+          ".gitleaks.toml",
+          "--max-target-megabytes",
+          "2",
+          "--log-opts=HEAD",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-ci-head.json"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 2.575,
+        "group_peak_footprint_gib": 2.894,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.412,
+          "gitleaks": 2.547,
+          "python3.14": 0.01
+        },
+        "real_s": 32.35,
+        "user_s": 484.78,
+        "output": [
+          "INF 478 commits scanned.",
+          "INF scanned ~1112496275 bytes (1.11 GB) in 32.2s",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "after-stack-dir-worktree",
+        "invocation": "manifests/stack.json: gitleaks dir --redact=100 ... \"${PROJECT_ROOT}\"",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "dir",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-stack-wt.json",
+          "<worktree>"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.125,
+        "group_peak_footprint_gib": 0.119,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.109,
+          "python3.14": 0.01
+        },
+        "real_s": 3.78,
+        "user_s": 57.75,
+        "output": [
+          "INF scanned ~101432591 bytes (101.43 MB) in 3.58s",
+          "WRN leaks found: 219"
+        ]
+      },
+      {
+        "label": "after-receipt-dir-worktree",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-receipt-wt.json"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.127,
+        "group_peak_footprint_gib": 0.121,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "gitleaks": 0.111,
+          "python3.14": 0.01
+        },
+        "real_s": 3.87,
+        "user_s": 58.85,
+        "output": [
+          "INF scanned ~101432591 bytes (101.43 MB) in 3.62s",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "after-stack-dir-explorer",
+        "invocation": "manifests/stack.json: gitleaks dir --redact=100 ... \"${PROJECT_ROOT}\"",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "dir",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-stack-explorer.json",
+          "<scratch>/fulltree"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.123,
+        "group_peak_footprint_gib": 0.118,
+        "per_process_peak_footprint_gib": {
+          "gitleaks": 0.108,
+          "python3.14": 0.01
+        },
+        "real_s": 4.35,
+        "user_s": 59.46,
+        "output": [
+          "INF scanned ~114369165 bytes (114.37 MB) in 4.14s",
+          "WRN leaks found: 232"
+        ]
+      },
+      {
+        "label": "after-receipt-dir-main",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<main-checkout>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-receipt-main.json"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.133,
+        "group_peak_footprint_gib": 0.126,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "gitleaks": 0.116,
+          "python3.14": 0.01
+        },
+        "real_s": 25.51,
+        "user_s": 422.09,
+        "output": [
+          "INF scanned ~714567534 bytes (714.57 MB) in 25.3s",
+          "WRN leaks found: 1314"
+        ]
+      },
+      {
+        "label": "after-receipt-dir-paper",
+        "invocation": "observability/restart-receipt.json: gitleaks dir . --redact ...",
+        "cwd": "<paper-worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "dir",
+          ".",
+          "--redact",
+          "--no-banner",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/final-receipt-paper.json"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 0.13,
+        "group_peak_footprint_gib": 0.123,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "gitleaks": 0.112,
+          "python3.14": 0.01
+        },
+        "real_s": 6.33,
+        "user_s": 98.84,
+        "output": [
+          "INF scanned ~196648626 bytes (196.65 MB) in 6.09s",
+          "WRN leaks found: 18"
+        ]
+      }
+    ],
+    "probes": [
+      {
+        "label": "probe-html-base",
+        "invocation": null,
+        "cwd": "<scratch>/htmlonly",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": "memory",
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 6.041,
+        "group_peak_footprint_gib": 6.029,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.003,
+          "gitleaks": 6.029
+        },
+        "real_s": 14.28,
+        "user_s": 13.97,
+        "output": [
+          "time: command terminated abnormally"
+        ]
+      },
+      {
+        "label": "probe-html-nodecode",
+        "invocation": null,
+        "cwd": "<scratch>/htmlonly",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose",
+          "--max-decode-depth=0"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": "memory",
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 6.044,
+        "group_peak_footprint_gib": 6.032,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.005,
+          "gitleaks": 6.032
+        },
+        "real_s": 11.54,
+        "user_s": 11.24,
+        "output": [
+          "time: command terminated abnormally"
+        ]
+      },
+      {
+        "label": "probe-html-noredact",
+        "invocation": null,
+        "cwd": "<scratch>/htmlonly",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--no-banner",
+          "--verbose"
+        ],
+        "exit_status": 1,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 0.17,
+        "group_peak_footprint_gib": 0.155,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.027,
+          "gitleaks": 0.155
+        },
+        "real_s": 16.2,
+        "user_s": 16.07,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~12993272 bytes (12.99 MB) in 16.1s",
+          "WRN leaks found: 2335"
+        ]
+      },
+      {
+        "label": "probe-html-mt2",
+        "invocation": null,
+        "cwd": "<scratch>/htmlonly",
+        "argv": [
+          "gitleaks",
+          "git",
+          "--pre-commit",
+          "--staged",
+          "--redact",
+          "--no-banner",
+          "--verbose",
+          "--max-target-megabytes=2"
+        ],
+        "exit_status": 0,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 6.0,
+        "max_rss_gib": 0.171,
+        "group_peak_footprint_gib": 0.151,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.002,
+          "gitleaks": 0.151
+        },
+        "real_s": 1.28,
+        "user_s": 1.26,
+        "output": [
+          "INF 0 commits scanned.",
+          "INF scanned ~12993272 bytes (12.99 MB) in 1.16s",
+          "INF no leaks found"
+        ]
+      },
+      {
+        "label": "probe-recipe-gomemlimit-4gib",
+        "invocation": "recipes/README.md: gitleaks git --redact=100 ... (all refs, full history)",
+        "cwd": "<worktree>",
+        "argv": [
+          "adoption/tools/gitleaks-guarded-macos",
+          "git",
+          "--redact=100",
+          "--no-banner",
+          "--no-color",
+          "--report-format",
+          "json",
+          "--report-path",
+          "<scratch>/reports/probe-gomemlimit.json",
+          "<worktree>"
+        ],
+        "exit_status": 137,
+        "stopped_by_measurement_watchdog": null,
+        "measurement_cap_gib": 8.0,
+        "max_rss_gib": 6.43,
+        "group_peak_footprint_gib": 5.975,
+        "per_process_peak_footprint_gib": {
+          "(exited)": 0.0,
+          "git": 0.35,
+          "gitleaks": 5.689,
+          "python3.14": 0.01
+        },
+        "real_s": 38.18,
+        "user_s": 545.11,
+        "output": [
+          "gitleaks-guarded-macos: memory cap exceeded (scan footprint 6.05 GiB > 6.00 GiB); the scan was killed and produced no result"
+        ]
+      }
+    ],
+    "failed_attempts": [
+      "probe-html-* first run: zsh passed the gitleaks arguments as one word; gitleaks exited 1 with unknown command in 0.1 s. Rerun with an argument array.",
+      "before-recipe-git-history first run: the report directory did not exist; gitleaks exited 1 in 0.17 s before scanning. Rerun after creating it.",
+      "scripts/build_ecosystem.py under `timeout`: macOS has no timeout command (exit 127); rerun without it.",
+      "A development after-pass (earlier guard revisions, 0.1 s polling for the first four runs) gave the same outcomes; it is superseded by the final pass with the committed guard. Its first concurrency run printed the exit status of date instead of the scan; the corrected rerun showed exit 137 for both scans.",
+      "/usr/bin/time -l printed no rusage inside the Claude sandbox (sysctl kern.clockrate denied); all measurements ran outside it."
+    ],
+    "observed_but_out_of_scope": [
+      "The stack.json form with an absolute \"${PROJECT_ROOT}\" reports 219 findings in a clean worktree where `gitleaks dir .` reports none: the repository's path-scoped allowlists and .gitleaksignore fingerprints are relative paths.",
+      "`gitleaks dir .` from <main-checkout> scans the nested .claude/worktrees checkouts (ignored only through .git/info/exclude) and reports 1,314 findings."
+    ]
+  }
+}

@@ -11,6 +11,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -158,6 +159,38 @@ class SchemaSyncTests(unittest.TestCase):
         candidate = "host-20260101--weird%2Fname--use--20260101"
         self.assertIsNone(schema_pattern.fullmatch(candidate))
         self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate))
+
+    def test_id_pattern_accepts_a_supersede_generation_suffix(self):
+        # A receipt recorded with 'record --supersedes' gets a '-N' (N >= 2) generation
+        # suffix on the same host/component/stage/date id; both the schema and the code
+        # must accept it.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        for candidate in (
+            "host-20260101--widget--use--20260101-2",
+            "host-20260101--widget--use--20260101-10",
+            "host-20260101--widget--use--20260101-999",
+        ):
+            self.assertTrue(schema_pattern.fullmatch(candidate), candidate)
+            match = hr.ID_PATTERN.fullmatch(candidate)
+            self.assertIsNotNone(match, candidate)
+            self.assertEqual(match.group("date"), "20260101")
+
+    def test_id_pattern_rejects_a_malformed_generation_suffix(self):
+        # Generation 1 is the bare id with no suffix: '-0' and '-1' are never valid, and
+        # neither is a leading zero ('-02') or a dangling hyphen.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        for candidate in (
+            "host-20260101--widget--use--20260101-0",
+            "host-20260101--widget--use--20260101-1",
+            "host-20260101--widget--use--20260101-02",
+            "host-20260101--widget--use--20260101-",
+        ):
+            self.assertIsNone(schema_pattern.fullmatch(candidate), candidate)
+            self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate), candidate)
+
+    def test_supersedes_property_shares_the_id_pattern_and_is_optional(self):
+        self.assertEqual(self.schema["properties"]["supersedes"]["pattern"], self.schema["properties"]["id"]["pattern"])
+        self.assertNotIn("supersedes", self.schema["required"])
 
 
 class _ReceiptFixtureCase(unittest.TestCase):
@@ -313,6 +346,118 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
         exit_code, output = self._validate()
         self.assertEqual(exit_code, 1)
         self.assertIn("inconsistent with adoption/manifest.json platform_profiles", output)
+
+    def test_supersedes_component_mismatch_is_rejected(self):
+        # 'widget' appears exactly once in valid.json's id (the component segment); a
+        # supersedes pointing at a different component id is a nonsensical cross-link.
+        def substitute(data):
+            data["supersedes"] = data["id"].replace("widget", "not-widget", 1)
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes component segment", output)
+        self.assertIn("does not match component_id", output)
+
+    def test_supersedes_referencing_an_unregistered_receipt_is_rejected(self):
+        # supersedes must resolve to a receipt manifests/evidence.json actually knows about;
+        # a dangling reference (the named original was never placed/registered) is rejected.
+        def substitute(data):
+            original_id = data["id"]
+            data["supersedes"] = original_id
+            data["id"] = f"{original_id}-2"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("is not registered in manifests/evidence.json", output)
+
+    def test_supersedes_well_formed_and_registered_is_accepted(self):
+        # The happy path at the validate_receipt_cross_references level: supersedes names a
+        # real, registered receipt for the same host/component/stage/date.
+        original_path = self._place("valid.json")
+        original_id = json.loads(original_path.read_text(encoding="utf-8"))["id"]
+
+        def substitute(data):
+            data["supersedes"] = original_id
+            data["id"] = f"{original_id}-2"
+
+        self._place("valid.json", filename=f"{original_id}-2.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 0, output)
+
+    def test_supersedes_host_mismatch_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "other-host-20260101--widget--use--20260101"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes host segment", output)
+
+    def test_supersedes_stage_mismatch_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "fixture-host-20260101--widget--install--20260101"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes stage segment", output)
+
+    def test_supersedes_date_mismatch_is_rejected(self):
+        # 'same day' is the UTC date segment carried in the id itself.
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = "fixture-host-20260101--widget--use--20260102"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("supersedes date segment", output)
+
+    def test_supersedes_self_reference_is_rejected(self):
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+            data["supersedes"] = data["id"]
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must not equal this receipt's own id", output)
+
+    def test_supersedes_higher_generation_is_rejected(self):
+        # supersedes must be a *lower* generation than this receipt's own id.
+        def substitute(data):
+            original_id = data["id"]
+            data["id"] = f"{original_id}-2"
+            data["supersedes"] = f"{original_id}-3"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must be a lower generation", output)
+
+    def test_bare_id_with_supersedes_is_rejected(self):
+        # Generation 1 (no '-N' suffix) must not carry a supersedes field at all.
+        def substitute(data):
+            data["supersedes"] = "fixture-host-20260101--widget--use--20260100"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must not carry a supersedes field", output)
+
+    def test_generation_suffixed_id_without_supersedes_is_rejected(self):
+        # A '-N' id must carry a supersedes field naming what it supersedes.
+        def substitute(data):
+            data["id"] = f"{data['id']}-2"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("must carry a supersedes field", output)
 
     def test_json_escaped_personal_home_path_in_value_is_rejected(self):
         # A JSON / escape decodes to '/', hiding a personal home path from a scan of
@@ -871,16 +1016,26 @@ class RecorderRoundTripTests(unittest.TestCase):
         argv = ["record", "--root", str(self.root), "--host-id", "test-host-20260101",
                 "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
                 "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "2.0.0rc5"]
-        buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            self.assertEqual(self._run(argv), 2, buffer.getvalue())
-        self.assertIn("--allow-unbound-version", buffer.getvalue())
-        with contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0)
-        buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)"])
-        self.assertEqual(exit_code, 0, buffer.getvalue())
+        # This test records twice for the same host/component/stage; pin the clock so both
+        # calls land on the same UTC date regardless of when the test happens to run.
+        with mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z"):
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                self.assertEqual(self._run(argv), 2, buffer.getvalue())
+            self.assertIn("--allow-unbound-version", buffer.getvalue())
+            allow_buffer = io.StringIO()
+            with contextlib.redirect_stdout(allow_buffer):
+                self.assertEqual(self._run([*argv, "--allow-unbound-version"]), 0, allow_buffer.getvalue())
+            # Re-recording the same host/component/stage/date with the version written
+            # correctly (no --allow-unbound-version needed) must not silently overwrite the
+            # receipt just written above; --supersedes records it as the newer, corrected
+            # receipt instead.
+            superseded_id = json.loads(
+                (self.root / allow_buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                exit_code = self._run([*argv[:-1], "2.0.0rc5 (tag v2.0.0rc5)", "--supersedes", superseded_id])
+            self.assertEqual(exit_code, 0, buffer.getvalue())
 
     def test_overlong_model_is_refused_before_anything_is_written(self):
         # Codex review of #117: a --model over the schema's 100 characters used to write a receipt
@@ -955,6 +1110,295 @@ class RecorderRoundTripTests(unittest.TestCase):
             ])
         self.assertEqual(exit_code, 2, buffer.getvalue())
         self.assertIn("git is not on PATH", buffer.getvalue())
+
+
+class SupersedeRecordTests(unittest.TestCase):
+    """2026-09-25 incident: re-recording the same host/component/stage on the same day
+    silently overwrote the existing receipt file, erasing an appended independent_session
+    'needs_changes' review. record must now refuse (before running any command) instead of
+    overwriting, and --supersedes is the reviewable way to record a new receipt for that same
+    host/component/stage/date, leaving the original file byte-identical."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+        # Every test here records more than once and relies on the calls landing on the same
+        # UTC date; pin the clock so a run that happens to straddle midnight UTC cannot flake.
+        patcher = mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z")
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _run(self, argv: list[str]) -> int:
+        return _run_cli(argv)
+
+    def _record_argv(self, extra: list[str] | None = None) -> list[str]:
+        return [
+            "record", "--root", str(self.root),
+            "--host-id", "test-host-20260101",
+            "--platform-id", "linux-wsl2-x86_64",
+            "--os", "linux", "--architecture", "x86_64",
+            "--component-id", "widget",
+            "--stage", "use",
+            "--evidence-class", "synthetic",
+            "--from-stack-commands",
+            *(extra or []),
+        ]
+
+    def test_record_refuses_to_overwrite_an_existing_receipt(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        path = self.root / relative_path
+
+        # An independent review with a needs_changes verdict: exactly the kind of review the
+        # 2026-09-25 incident's silent overwrite erased.
+        review_buffer = io.StringIO()
+        with contextlib.redirect_stdout(review_buffer):
+            review_exit = self._run([
+                "review", "--root", str(self.root), "--receipt", relative_path,
+                "--kind", "independent_session", "--ref", "t", "--verdict", "needs_changes",
+                "--identity", "reviewer",
+            ])
+        self.assertEqual(review_exit, 0, review_buffer.getvalue())
+        before = path.read_bytes()
+
+        # A marker file a second record run must never touch if it refuses before running commands.
+        marker = self.root / "executed.marker"
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--cmd", f"touch {marker}"]))
+        second_output = second_buffer.getvalue()
+
+        self.assertEqual(second_exit, 2, second_output)
+        self.assertIn(relative_path, second_output)
+        self.assertIn("independent_session:needs_changes", second_output)
+        self.assertFalse(marker.exists(), "record ran a command before refusing to overwrite")
+        self.assertEqual(path.read_bytes(), before,
+                         "the existing receipt was not byte-identical after a refused overwrite")
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_supersedes_writes_a_distinct_receipt_and_leaves_the_original_untouched(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_relative = buffer.getvalue().strip()
+        original_path = self.root / original_relative
+        original_id = json.loads(original_path.read_text(encoding="utf-8"))["id"]
+        before = original_path.read_bytes()
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+        superseding_relative = second_buffer.getvalue().strip()
+        self.assertNotEqual(superseding_relative, original_relative)
+        self.assertTrue(superseding_relative.endswith(f"{original_id}-2.json"), superseding_relative)
+
+        self.assertEqual(original_path.read_bytes(), before, "supersedes touched the original receipt file")
+
+        superseding_receipt = json.loads((self.root / superseding_relative).read_text(encoding="utf-8"))
+        self.assertEqual(superseding_receipt["supersedes"], original_id)
+        self.assertEqual(superseding_receipt["id"], f"{original_id}-2")
+        # No reviews are inherited: the new receipt starts with only its own fresh 'self' entry.
+        self.assertEqual([review["kind"] for review in superseding_receipt["reviews"]], ["self"])
+
+        # A third recording must supersede the *latest* generation (the second, "-2"), not
+        # the original: --supersedes requires the latest, so it finds generation 3.
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv(["--supersedes", f"{original_id}-2"]))
+        self.assertEqual(third_exit, 0, third_buffer.getvalue())
+        self.assertTrue(third_buffer.getvalue().strip().endswith(f"{original_id}-3.json"))
+        third_receipt = json.loads((self.root / third_buffer.getvalue().strip()).read_text(encoding="utf-8"))
+        self.assertEqual(third_receipt["supersedes"], f"{original_id}-2")
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_refusal_names_the_latest_generation_to_supersede(self):
+        # Generations 1 and 2 both exist; a plain re-record (no --supersedes) must name
+        # generation 2 (the latest), not generation 1, as the receipt to supersede.
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv())
+        self.assertEqual(third_exit, 2, third_buffer.getvalue())
+        self.assertIn(f"{original_id}-2", third_buffer.getvalue())
+
+    def test_supersedes_an_older_generation_while_a_newer_one_exists_is_refused(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        original_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        # Generation 2 now exists; superseding generation 1 (no longer the latest) is refused,
+        # naming generation 2 as the one to supersede instead.
+        third_buffer = io.StringIO()
+        with contextlib.redirect_stdout(third_buffer):
+            third_exit = self._run(self._record_argv(["--supersedes", original_id]))
+        self.assertEqual(third_exit, 2, third_buffer.getvalue())
+        self.assertIn(f"{original_id}-2", third_buffer.getvalue())
+        self.assertFalse((self.root / "evidence" / "hosts" / "test-host-20260101" /
+                          f"{original_id}-3.json").exists())
+
+    def test_record_deletes_the_file_it_created_and_reraises_on_a_write_failure(self):
+        # The exclusive-create write only ever creates a file this run itself made; a failure
+        # partway through (mocked here as json.dumps raising) must delete it and propagate the
+        # original error rather than leaving a truncated receipt or swallowing the failure.
+        with mock.patch.object(hr.json, "dumps", side_effect=ValueError("simulated write failure")):
+            with self.assertRaises(ValueError):
+                self._run(self._record_argv())
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        leftover = list(host_dir.glob("*.json")) if host_dir.is_dir() else []
+        self.assertEqual(leftover, [], f"receipt file(s) left on disk after a failed write: {leftover}")
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        self.assertEqual(evidence["files"], [])
+
+    def test_supersedes_rejects_an_id_for_a_different_host_component_stage_or_date(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        real_id = json.loads((self.root / relative_path).read_text(encoding="utf-8"))["id"]
+        host_id, component_id, stage, date_stamp = real_id.split("--")
+
+        for bad_id in (
+            f"other-host-20260101--{component_id}--{stage}--{date_stamp}",
+            f"{host_id}--not-{component_id}--{stage}--{date_stamp}",
+            f"{host_id}--{component_id}--install--{date_stamp}",
+            f"{host_id}--{component_id}--{stage}--20200101",
+            "not-a-well-formed-id",
+        ):
+            bad_buffer = io.StringIO()
+            with contextlib.redirect_stdout(bad_buffer):
+                bad_exit = self._run(self._record_argv(["--supersedes", bad_id]))
+            self.assertEqual(bad_exit, 2, f"{bad_id}: {bad_buffer.getvalue()}")
+
+        # None of the rejected attempts touched the original receipt.
+        self.assertEqual(json.loads((self.root / relative_path).read_text(encoding="utf-8"))["id"], real_id)
+
+    def test_supersedes_rejects_a_nonexistent_receipt_id(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run(self._record_argv())
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        real_id = json.loads((self.root / buffer.getvalue().strip()).read_text(encoding="utf-8"))["id"]
+
+        # Well-formed and same-family, but generation 2 was never actually recorded.
+        missing_buffer = io.StringIO()
+        with contextlib.redirect_stdout(missing_buffer):
+            exit_code = self._run(self._record_argv(["--supersedes", f"{real_id}-2"]))
+        self.assertEqual(exit_code, 2, missing_buffer.getvalue())
+        self.assertIn("does not exist", missing_buffer.getvalue())
+
+
+class ReviewAppendSafetyTests(unittest.TestCase):
+    """review takes an exclusive flock on a lock file beside the receipt, re-reads under the
+    lock, and writes via a temp file + os.replace() so concurrent reviews cannot lose one and
+    a crash mid-write cannot truncate the receipt that was there before."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _run(self, argv: list[str]) -> int:
+        return _run_cli(argv)
+
+    def _record(self) -> str:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands",
+            ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        return buffer.getvalue().strip()
+
+    def test_two_sequential_reviews_both_persist(self):
+        relative_path = self._record()
+
+        first_buffer = io.StringIO()
+        with contextlib.redirect_stdout(first_buffer):
+            first_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                    "--kind", "independent_session", "--ref", "first", "--verdict", "agree",
+                                    "--identity", "reviewer-one"])
+        self.assertEqual(first_exit, 0, first_buffer.getvalue())
+
+        second_buffer = io.StringIO()
+        with contextlib.redirect_stdout(second_buffer):
+            second_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                     "--kind", "independent_session", "--ref", "second",
+                                     "--verdict", "needs_changes", "--identity", "reviewer-two"])
+        self.assertEqual(second_exit, 0, second_buffer.getvalue())
+
+        receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+        self.assertEqual([review["ref"] for review in receipt["reviews"]],
+                         ["scripts/host_receipts.py record", "first", "second"])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+        # No lock or temp artifacts were left in a state that would block a later review.
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        self.assertEqual(list(host_dir.glob("*.tmp-*")), [])
+
+    def test_a_write_failure_leaves_the_original_receipt_byte_identical(self):
+        relative_path = self._record()
+        path = self.root / relative_path
+        before = path.read_bytes()
+
+        with mock.patch.object(hr.os, "replace", side_effect=OSError("simulated replace failure")):
+            with self.assertRaises(OSError):
+                self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                          "--kind", "independent_session", "--ref", "t", "--verdict", "agree",
+                          "--identity", "reviewer"])
+
+        self.assertEqual(path.read_bytes(), before, "a failed atomic replace changed the original receipt")
+        leftover = list(path.parent.glob(f"{path.name}.tmp-*"))
+        self.assertEqual(leftover, [], f"temp file(s) left behind after a failed write: {leftover}")
+
+        # The lock was released despite the failure (via the finally block): a subsequent
+        # normal review still succeeds rather than deadlocking.
+        recover_buffer = io.StringIO()
+        with contextlib.redirect_stdout(recover_buffer):
+            recover_exit = self._run(["review", "--root", str(self.root), "--receipt", relative_path,
+                                      "--kind", "independent_session", "--ref", "t2", "--verdict", "agree",
+                                      "--identity", "reviewer"])
+        self.assertEqual(recover_exit, 0, recover_buffer.getvalue())
 
 
 class ReviewIndependenceTests(unittest.TestCase):
@@ -1145,6 +1589,69 @@ class JsonEqualityTests(unittest.TestCase):
         self.assertTrue(errors)
 
 
+class SanitizeUserNameTests(unittest.TestCase):
+    """sanitize() redacts the user name only as a whole token. A substring match cut a
+    two-letter account name such as "ed" out of "recorded", "used" or "cached": under it,
+    hardware_profile.py --record-host refused "recorded-host-20260101" and a recorded excerpt
+    read "cach<user>". Every case runs as that account, whatever the test host's own user is,
+    and home paths must stay redacted in every form. Home paths are spelled through variables
+    so that this file passes the repository's own home-path scan (scripts/validate.py)."""
+
+    USERS, HOME_DIR = "Users", "home"
+    HOME = f"/{USERS}/ed"
+
+    def _sanitize(self, text: str) -> str:
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed", "HOME": self.HOME}):
+            return hr.sanitize(text)
+
+    def test_words_that_contain_a_two_letter_name_are_kept(self):
+        for text in ("recorded-host-20260101", "used embedded cached shared edge",
+                     "ed2 edx ed_old ED", '{"hosts": ["cached-a"]}'):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), text)
+
+    def test_the_name_as_a_whole_token_is_redacted(self):
+        for text, expected in (("ed", "<user>"), ("ed@mbp:~", "<user>@mbp:~"), ('"ed"', '"<user>"'),
+                               ("owner ed staff", "owner <user> staff"), ("~ed/", "~<user>/")):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), expected)
+
+    def test_home_paths_stay_redacted_in_every_form(self):
+        # $HOME itself becomes ~. The name in any other home-path form (another OS's layout, a
+        # Windows path, a Claude project slug, URL-encoded, JSON-escaped) is still a token: an
+        # escape ending in a letter or digit ("%2F", "\u002f", "\n") is not part of its word.
+        # Another account whose name merely starts with it falls to the private-content pattern.
+        users, home = self.USERS, self.HOME_DIR
+        for text, expected in (
+                (f"/{users}/ed/code/x.py", "~/code/x.py"),
+                (f"/{home}/ed/x", f"/{home}/<user>/x"),
+                (f"C:\\{users}\\ed\\x", f"C:\\{users}\\<user>\\x"),
+                (f"-{users}-ed-src-app", f"-{users}-<user>-src-app"),
+                (f"file%3A%2F%2F%2F{users}%2Fed%2Fx", f"file%3A%2F%2F%2F{users}%2F<user>%2Fx"),
+                (f"\\u002f{users}\\u002fed\\u002fx", f"\\u002f{users}\\u002f<user>\\u002fx"),
+                (f"\\x2f{home}\\x2fed", f"\\x2f{home}\\x2f<user>"),
+                ('"line\\ned@mbp"', '"line\\n<user>@mbp"'),
+                (f"/{home}/ed_old/x", "[redacted]x")):
+            with self.subTest(text=text):
+                self.assertEqual(self._sanitize(text), expected)
+
+    def test_record_keeps_words_in_the_excerpt_and_redacts_the_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_support_tree(root)
+            buffer = io.StringIO()
+            with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}), contextlib.redirect_stdout(buffer):
+                exit_code = _run_cli([
+                    "record", "--root", str(root), "--host-id", "test-host-20260101",
+                    "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                    "--component-id", "widget", "--stage", "install", "--evidence-class", "synthetic",
+                    "--cmd", "printf '%s\\n' 'embedded model cached (used 2 GB)' 'owner: ed'"])
+            self.assertEqual(exit_code, 0, buffer.getvalue())
+            receipt = json.loads((root / buffer.getvalue().strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["commands"][0]["output_excerpt"],
+                         "embedded model cached (used 2 GB)\nowner: <user>\n")
+
+
 class RegisterFileSortTests(unittest.TestCase):
     """register_file() keeps manifests/evidence.json files[] sorted by path
     (bisect insert) instead of always appending, so record/review stay
@@ -1205,6 +1712,67 @@ class QualifiedModelSchemaSyncTests(unittest.TestCase):
     def test_qualified_models_is_not_in_top_level_required(self):
         # Optional field: a receipt with no local model qualification is still valid.
         self.assertNotIn("qualified_models", self.schema["required"])
+
+
+class UseStageLintTests(unittest.TestCase):
+    """#164: ``record`` refuses ``--stage use`` only when every command is exactly a program and one help or version
+    argument, a convenience that is knowingly incomplete; the independent review is the control, and no status is
+    derived from command text (Codex re-check of be09a5e2)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _record(self, stage: str, commands: list[str], extra: list[str] | None = None) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget", "--stage", stage, "--evidence-class", "synthetic",
+                *[argument for command in commands for argument in ("--cmd", command)],
+                *(extra or [])])
+        return exit_code, buffer.getvalue()
+
+    def test_only_an_exact_help_or_version_argv_matches(self):
+        for command in ("rtk --version", "ccusage --help", "uv version", "rtk -V", "git help"):
+            self.assertTrue(hr.bare_help_or_version(command), command)
+        # Functional commands are never refused, and wrapped help calls pass the lint (left to the review).
+        for command in ("du -h /dev/null", "df -h", "python3 -c 'print(6*7)' --version", "ccusage daily --json",
+                        "sh -c 'rtk --version'", "true && rtk -V", "rtk help gain", "echo hi"):
+            self.assertFalse(hr.bare_help_or_version(command), command)
+
+    def test_record_refuses_a_use_stage_of_only_bare_help_and_version_calls(self):
+        exit_code, output = self._record("use", ["true --help", "true --version"])
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("help or", output)
+        self.assertFalse((self.root / "evidence" / "hosts").exists()
+                         and list((self.root / "evidence" / "hosts").rglob("*.json")))
+
+    def test_help_calls_record_as_install_and_a_functional_command_as_use(self):
+        # This test records twice at stage 'use'; pin the clock so both land on the same UTC
+        # date regardless of when the test happens to run.
+        with mock.patch.object(hr, "utc_now", return_value="2026-01-01T00:00:00Z"):
+            self.assertEqual(self._record("install", ["true --help"])[0], 0)
+            use_exit, use_output = self._record("use", ["true --version", "echo hi"])
+            self.assertEqual(use_exit, 0, use_output)
+            # A second 'use' receipt for the same host/component/date must not silently
+            # overwrite the one just written; supersede it explicitly instead.
+            use_id = json.loads((self.root / use_output.strip()).read_text(encoding="utf-8"))["id"]
+            exit_code, output = self._record("use", ["du -h /dev/null"], extra=["--supersedes", use_id])
+            self.assertEqual(exit_code, 0, output)
+
+    def test_validate_derives_nothing_from_command_text(self):
+        self.assertEqual(self._record("use", ["echo hi"])[0], 0)
+        path = next((self.root / "evidence" / "hosts").rglob("*.json"))
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["commands"][0]["cmd"] = "widget --help"
+        errors: list[str] = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors, set(), set(), set(),
+                                             {})
+        self.assertFalse(any("help" in error for error in errors), errors)
 
 
 class QualifiedModelRecordTests(unittest.TestCase):
@@ -1337,6 +1905,496 @@ class QualifiedModelRecordTests(unittest.TestCase):
         exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
         self.assertEqual(exit_code, 2, output)
         self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
+
+
+ALIAS_REPOSITORY = "https://github.com/example/widget"
+ALIAS_PIN = "v2.0.0 (tag v2.0.0; source 0123456789abcdef0123456789abcdef01234567)"
+
+
+def _add_alias_catalog(root: Path) -> None:
+    """A stack id 'widget-alias' sharing its repository with landscape winner 'widget-winner'."""
+    stack_path = root / "manifests" / "stack.json"
+    stack = json.loads(stack_path.read_text(encoding="utf-8"))
+    stack["components"].append({"id": "widget-alias", "version": "2.0.0", "profile": "core",
+                                "repository": ALIAS_REPOSITORY, "commands": ["echo hi"]})
+    stack_path.write_text(json.dumps(stack), encoding="utf-8")
+    (root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+        {"winners": [{"component_id": "widget-winner", "repository": ALIAS_REPOSITORY + ".git/",
+                      "pin": ALIAS_PIN}]}]}), encoding="utf-8")
+
+
+class StackAliasResolverTests(unittest.TestCase):
+    """host_receipts.stack_aliases_of_winners: a manifests/stack.json id whose repository is a
+    landscape winner's repository, and which is not itself a winner id, is an alias."""
+
+    def test_same_repository_is_an_alias_of_the_winner(self):
+        aliases = hr.stack_aliases_of_winners(
+            [{"id": "alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py"}],
+            [{"component_id": "data-alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py"}])
+        self.assertEqual(aliases, {"alpaca-py": ("data-alpaca-py",)})
+
+    def test_different_repository_is_not_an_alias(self):
+        aliases = hr.stack_aliases_of_winners(
+            [{"id": "alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py"}],
+            [{"component_id": "data-alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py2"}])
+        self.assertEqual(aliases, {})
+
+    def test_repository_normalization_variants_match_exactly(self):
+        winner = [{"component_id": "data-alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py"}]
+        for variant in (" https://github.com/alpacahq/alpaca-py ", "https://github.com/alpacahq/alpaca-py/",
+                        "https://github.com/alpacahq/alpaca-py.git", "https://GitHub.com/AlpacaHQ/Alpaca-Py.git/",
+                        "http://github.com/alpacahq/alpaca-py", "HTTPS://www.github.com/alpacahq/alpaca-py",
+                        "github.com/alpacahq/alpaca-py",
+                        # manifests/stack.json records some repositories as release or tree URLs
+                        "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+                        "https://github.com/alpacahq/alpaca-py/tree/v0.44.0/alpaca",
+                        "https://github.com/alpacahq/alpaca-py/blob/master/README.md",
+                        "https://github.com/alpacahq/alpaca-py#readme", "https://github.com/alpacahq/alpaca-py?tab=x"):
+            with self.subTest(variant=variant):
+                self.assertEqual(
+                    hr.stack_aliases_of_winners([{"id": "alpaca-py", "repository": variant}], winner),
+                    {"alpaca-py": ("data-alpaca-py",)})
+        for other in ("https://github.com/alpacahq", "https://github.com/alpacahq/alpaca-py2",
+                      "https://gitlab.com/alpacahq/alpaca-py", "https://notgithub.com/alpacahq/alpaca-py",
+                      None, ""):
+            with self.subTest(other=other):
+                self.assertEqual(hr.stack_aliases_of_winners([{"id": "alpaca-py", "repository": other}], winner), {})
+        self.assertIsNone(hr.normalize_repository(" / "))
+        self.assertEqual(hr.normalize_repository("https://x/y.git/.git/"), "x/y")
+        # Another forge keeps its full path (groups nest there) and only loses scheme, www., '/' and '.git'.
+        self.assertEqual(hr.normalize_repository("https://www.GitLab.com/g/sub/r.git/"), "gitlab.com/g/sub/r")
+        self.assertNotEqual(hr.normalize_repository("https://gitlab.com/g/sub/r"),
+                            hr.normalize_repository("https://gitlab.com/g/sub"))
+
+    def test_real_stack_release_and_tree_urls_reduce_to_their_repository(self):
+        stack = json.loads((REPO_ROOT / "manifests" / "stack.json").read_text(encoding="utf-8"))
+        shaped = [component for component in stack["components"]
+                  if any(part in (component.get("repository") or "") for part in ("/releases/", "/tree/"))]
+        self.assertTrue(shaped, "expected release/tree repository URLs in manifests/stack.json")
+        for component in shaped:
+            with self.subTest(component=component["id"]):
+                self.assertEqual(hr.normalize_repository(component["repository"]).count("/"), 2)
+
+    def test_an_id_that_is_itself_a_winner_is_not_an_alias(self):
+        winners = [{"component_id": "codex", "repository": "https://github.com/openai/codex"},
+                   {"component_id": "codex-native-sdk", "repository": "https://github.com/openai/codex"}]
+        self.assertEqual(
+            hr.stack_aliases_of_winners([{"id": "codex", "repository": "https://github.com/openai/codex"}], winners),
+            {})
+
+    def test_multiple_winners_sharing_a_repository_are_all_named(self):
+        winners = [{"component_id": "tool-b", "repository": "https://github.com/example/tool"},
+                   {"component_id": "tool-a", "repository": "https://github.com/example/tool"},
+                   {"component_id": "tool-a", "repository": "https://github.com/example/tool"}]
+        self.assertEqual(
+            hr.stack_aliases_of_winners([{"id": "tool", "repository": "https://github.com/example/tool"}], winners),
+            {"tool": ("tool-a", "tool-b")})
+
+    def test_a_winner_without_a_repository_matches_nothing(self):
+        self.assertEqual(hr.stack_aliases_of_winners([{"id": "tool"}], [{"component_id": "tool-winner"}]), {})
+
+    def test_root_resolver_reads_stack_and_landscape(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_support_tree(root)
+            _add_alias_catalog(root)
+            self.assertEqual(hr.winner_stack_aliases(root), {"widget-alias": ("widget-winner",)})
+
+    def test_real_repository_alias_set(self):
+        # The exact set of stack ids that share a repository with a differently named landscape winner
+        # on 2026-09-24 (ai-memory, socraticode and codex are winners themselves, so not aliases). An
+        # added or dropped alias fails here and must be reviewed (record refuses every alias).
+        aliases = hr.winner_stack_aliases(REPO_ROOT)
+        self.assertEqual(aliases, {
+            "alpaca-py": ("data-alpaca-py",),
+            "duckdb": ("data-duckdb",),
+            "edgartools": ("data-edgartools",),
+            "exchange-calendars": ("data-exchange-calendars",),
+            "nautilus-trader": ("nautilustrader",),
+        })
+        for winner_id in ("ai-memory", "socraticode", "codex"):
+            self.assertNotIn(winner_id, aliases)
+
+
+class AliasRefusalMessageTests(unittest.TestCase):
+    """host_receipts.alias_refusal names every winner a stack id aliases, with its current pin(s)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        (self.root / "catalogs" / "landscape").mkdir(parents=True)
+
+    def _winners(self, winners):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(
+            json.dumps({"layers": [{"winners": winners}]}), encoding="utf-8")
+
+    def test_not_an_alias_is_not_refused(self):
+        self._winners([])
+        self.assertIsNone(hr.alias_refusal(self.root, "tool", {}))
+
+    def test_multi_winner_message_names_each_winner_and_pin(self):
+        self._winners([{"component_id": "tool-a", "pin": "1.0.0"}, {"component_id": "tool-b", "pin": "2.0.0"},
+                       {"component_id": "tool-b", "pin": "2.1.0"}])
+        message = hr.alias_refusal(self.root, "tool", {"tool": ("tool-a", "tool-b")})
+        self.assertIn("landscape winner 'tool-a' (current pin: '1.0.0'), 'tool-b' (current pin: '2.0.0' | '2.1.0') "
+                      "(same repository)", message)
+        self.assertIn("--component-id 'tool'", message)
+
+    def test_winner_without_a_pin_says_current_pin_none(self):
+        self._winners([{"component_id": "tool-a"}, {"component_id": "tool-b", "pin": "  "}])
+        message = hr.alias_refusal(self.root, "tool", {"tool": ("tool-a", "tool-b")})
+        self.assertIn("'tool-a' (current pin: none), 'tool-b' (current pin: none)", message)
+
+
+class StackAliasRecordTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+        _add_alias_catalog(self.root)
+
+    def _record(self, component_id: str, *extra: str) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli(["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                                  "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                                  "--component-id", component_id, "--stage", "use", "--evidence-class", "synthetic",
+                                  "--cmd", "echo hi", *extra])
+        return exit_code, buffer.getvalue()
+
+    def test_record_refuses_a_stack_alias_and_names_the_canonical_winner(self):
+        evidence_before = (self.root / "manifests" / "evidence.json").read_bytes()
+        for extra in ((), ("--component-version", ALIAS_PIN), ("--component-version", "2.0.0", "--allow-unbound-version")):
+            with self.subTest(extra=extra):
+                exit_code, output = self._record("widget-alias", *extra)
+                self.assertEqual(exit_code, 2, output)
+                self.assertIn("'widget-winner'", output)
+                self.assertIn(ALIAS_PIN, output)
+                self.assertIn("never bind", output)
+        self.assertEqual(list((self.root / "evidence" / "hosts").iterdir()), [])
+        self.assertEqual((self.root / "manifests" / "evidence.json").read_bytes(), evidence_before)
+
+    def test_record_under_the_canonical_winner_id_still_works(self):
+        exit_code, output = self._record("widget-winner")
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["tool_versions"], {"widget-winner": ALIAS_PIN})
+
+    def test_refusal_says_stack_commands_remain_reachable(self):
+        exit_code, output = self._record("widget-alias")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("--from-stack-commands still reuses the commands documented under 'widget-alias'", output)
+
+    def _record_from_stack(self, component_id: str) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli(["record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                                  "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                                  "--component-id", component_id, "--stage", "use", "--evidence-class", "synthetic",
+                                  "--from-stack-commands"])
+        return exit_code, buffer.getvalue()
+
+    def test_from_stack_commands_reuses_the_alias_commands_for_the_canonical_winner(self):
+        exit_code, output = self._record_from_stack("widget-winner")
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual([command["cmd"] for command in receipt["commands"]], ["echo hi"])
+        self.assertEqual(receipt["component_id"], "widget-winner")
+
+    def test_from_stack_commands_refuses_to_guess_between_several_alias_ids(self):
+        stack_path = self.root / "manifests" / "stack.json"
+        stack = json.loads(stack_path.read_text(encoding="utf-8"))
+        stack["components"].append({"id": "widget-alias-2", "version": "2.0.0", "profile": "core",
+                                    "repository": ALIAS_REPOSITORY + "/releases/tag/v2.0.0",
+                                    "commands": ["echo other"]})
+        stack_path.write_text(json.dumps(stack), encoding="utf-8")
+        exit_code, output = self._record_from_stack("widget-winner")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("several stack ids sharing its repository carry commands (widget-alias, widget-alias-2)", output)
+        self.assertEqual(list((self.root / "evidence" / "hosts").iterdir()), [])
+
+    def test_from_stack_commands_without_any_names_every_id_searched(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "lonely-winner", "repository": "https://github.com/example/lonely",
+                          "pin": "1.0.0"}]}]}), encoding="utf-8")
+        exit_code, output = self._record_from_stack("lonely-winner")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("no plain-string commands found for component 'lonely-winner'", output)
+        self.assertIn("pass --cmd", output)
+
+    def test_stack_commands_for_record_prefers_the_ids_own_commands(self):
+        aliases = {"widget-alias": ("widget",)}
+        self.assertEqual(hr.stack_commands_for_record(self.root, "widget", aliases), (["echo hi"], None))
+
+
+class StackAliasValidateTests(_ReceiptFixtureCase):
+    ALIAS_PATH = "evidence/hosts/fixture-host-20260101/fixture-host-20260101--widget-alias--use--20260101.json"
+    ENTRY = {"canonical_component_id": "widget-winner", "date": "2026-09-24", "reason": "test"}
+
+    def setUp(self):
+        super().setUp()
+        _add_alias_catalog(self.root)
+
+    @property
+    def GRANDFATHERED(self):
+        """The fixture entry, naming the current claim of ALIAS_PATH by claim_sha256 (or a placeholder)."""
+        path = self.root / self.ALIAS_PATH
+        try:
+            digest = hr.receipt_claim_sha256(json.loads(path.read_text(encoding="utf-8")))
+        except (OSError, ValueError):
+            digest = "0" * 64
+        return {self.ALIAS_PATH: {**self.ENTRY, "claim_sha256": digest}}
+
+    def _place_alias(self):
+        def substitute(data):
+            data["id"] = "fixture-host-20260101--widget-alias--use--20260101"
+            data["component_id"] = "widget-alias"
+            data["tool_versions"] = {"widget-alias": "2.0.0"}
+        return self._place("valid.json", patch=substitute)
+
+    def _validate_with(self, grandfathered):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = hr.cmd_validate(argparse.Namespace(root=self.root, grandfathered_alias_receipts=grandfathered))
+        return exit_code, buffer.getvalue()
+
+    def test_alias_receipt_outside_the_grandfather_list_is_rejected(self):
+        self._place_alias()
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("is the manifests/stack.json id of landscape winner(s) widget-winner", output)
+
+    def test_grandfathered_alias_receipt_passes(self):
+        self._place_alias()
+        exit_code, output = self._validate_with(self.GRANDFATHERED)
+        self.assertEqual(exit_code, 0, output)
+
+    def test_an_altered_claim_at_a_grandfathered_path_loses_the_exemption(self):
+        self._place_alias()
+        grandfathered = self.GRANDFATHERED
+        path = self.root / self.ALIAS_PATH
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["tool_versions"] = {"widget-alias": "2.0.1"}   # an edit to what was recorded
+        path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        exit_code, output = self._validate_with(grandfathered)
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn(f"{self.ALIAS_PATH}: claim_sha256 {hr.receipt_claim_sha256(receipt)} is not the "
+                      f"GRANDFATHERED_ALIAS_RECEIPTS claim_sha256 {grandfathered[self.ALIAS_PATH]['claim_sha256']}",
+                      output)
+        # The exemption is gone, so the alias rejection applies to the altered file as to any other.
+        self.assertIn(f"{self.ALIAS_PATH}: component_id 'widget-alias' is the manifests/stack.json id", output)
+
+    def test_an_appended_review_or_reformatting_keeps_the_exemption(self):
+        # review appends to reviews[] and rewrites the file (main's #209 did so on a grandfathered receipt);
+        # the recorded claim, and so the exemption, is unchanged.
+        self._place_alias()
+        grandfathered = self.GRANDFATHERED
+        path = self.root / self.ALIAS_PATH
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt.setdefault("reviews", []).append(dict(receipt["reviews"][0]))
+        path.write_text(json.dumps(receipt, indent=1, sort_keys=True), encoding="utf-8")
+        self.assertEqual(hr.grandfather_digest_error(self.root, self.ALIAS_PATH, grandfathered[self.ALIAS_PATH]),
+                         None)
+        self.assertEqual(hr.grandfathered_alias_paths(self.root, grandfathered), {self.ALIAS_PATH})
+
+    def test_review_command_on_a_grandfathered_receipt_keeps_validate_passing(self):
+        # End to end through the supported writer: review appends, rewrites and re-registers the file.
+        self._place_alias()
+        grandfathered = self.GRANDFATHERED
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = _run_cli(["review", "--root", str(self.root), "--receipt", self.ALIAS_PATH, "--kind",
+                             "self", "--ref", "test", "--verdict", "agree"],
+                            identity="an-independent-reviewer-token")
+        self.assertEqual(code, 0, buffer.getvalue())
+        self.assertEqual(len(json.loads((self.root / self.ALIAS_PATH).read_text(encoding="utf-8"))["reviews"]), 2)
+        exit_code, output = self._validate_with(grandfathered)
+        self.assertEqual(exit_code, 0, output)
+
+    def test_a_lone_surrogate_in_a_grandfathered_claim_is_a_mismatch_not_a_crash(self):
+        self._place_alias()
+        grandfathered = self.GRANDFATHERED
+        path = self.root / self.ALIAS_PATH
+        path.write_text(path.read_text(encoding="utf-8").replace('"claim": "', '"claim": "\\ud800', 1),
+                        encoding="utf-8")
+        problem = hr.grandfather_digest_error(self.root, self.ALIAS_PATH, grandfathered[self.ALIAS_PATH])
+        self.assertIn("is not the GRANDFATHERED_ALIAS_RECEIPTS claim_sha256", problem)
+
+    def test_claim_digest_ignores_reviews_and_formatting_only(self):
+        receipt = {"b": 1, "a": {"y": "é", "x": [1, 2]}, "reviews": [{"verdict": "agree"}]}
+        reordered = {"reviews": [], "a": {"x": [1, 2], "y": "é"}, "b": 1}
+        self.assertEqual(hr.receipt_claim_sha256(receipt), hr.receipt_claim_sha256(reordered))
+        self.assertNotEqual(hr.receipt_claim_sha256(receipt), hr.receipt_claim_sha256({**receipt, "b": 2}))
+
+    def test_grandfather_entry_without_a_claim_sha256_is_rejected(self):
+        self._place_alias()
+        exit_code, output = self._validate_with({self.ALIAS_PATH: dict(self.ENTRY)})
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("entry has no lowercase hex 'claim_sha256'", output)
+        self.assertIn("component_id 'widget-alias' is the manifests/stack.json id", output)
+
+    def test_corrupt_grandfathered_file_gets_an_accurate_error(self):
+        path = self.root / self.ALIAS_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{not json", encoding="utf-8")
+        grandfathered = self.GRANDFATHERED   # a corrupt file has no claim, so it cannot be exempt
+        exit_code, output = self._validate_with(grandfathered)
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn(f"{self.ALIAS_PATH}: listed in GRANDFATHERED_ALIAS_RECEIPTS but is not a parseable JSON "
+                      "receipt (corrupt or unreadable)", output)
+        self.assertNotIn("component_id None", output)
+        self.assertNotIn("no longer a manifests/stack.json alias", output)
+
+    def test_non_object_grandfathered_file_gets_an_accurate_error(self):
+        errors = hr.alias_receipt_errors(self.root, {self.ALIAS_PATH: None}, {"widget-alias": ("widget-winner",)},
+                                         {self.ALIAS_PATH: dict(self.ENTRY, claim_sha256="0" * 64)})
+        self.assertEqual(errors, [])   # file absent in a tree without that host: not judged
+        self._place_alias()
+        errors = hr.alias_receipt_errors(self.root, {self.ALIAS_PATH: None}, {"widget-alias": ("widget-winner",)},
+                                         self.GRANDFATHERED)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("has no string component_id (not a receipt object)", errors[0])
+
+    def test_grandfathered_entry_naming_the_wrong_canonical_id_is_rejected(self):
+        self._place_alias()
+        wrong = {self.ALIAS_PATH: {**self.GRANDFATHERED[self.ALIAS_PATH], "canonical_component_id": "other"}}
+        exit_code, output = self._validate_with(wrong)
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("names canonical id 'other'", output)
+
+    def test_stale_grandfather_entry_for_a_missing_file_is_rejected(self):
+        (self.root / self.ALIAS_PATH).parent.mkdir(parents=True)   # the tree carries that host's evidence
+        exit_code, output = self._validate_with(self.GRANDFATHERED)
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("no longer exists", output)
+
+    def test_grandfather_entry_for_a_host_the_tree_does_not_carry_is_not_judged(self):
+        exit_code, output = self._validate_with(self.GRANDFATHERED)
+        self.assertEqual(exit_code, 0, output)
+        self.assertTrue(hr.grandfather_file_expected(REPO_ROOT, "evidence/hosts/absent-host-20260101/x.json"))
+        self.assertFalse(hr.grandfather_file_expected(self.root, self.ALIAS_PATH))
+
+    def test_stale_grandfather_entry_that_is_no_longer_an_alias_is_rejected(self):
+        self._place_alias()
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(
+            json.dumps({"layers": []}), encoding="utf-8")
+        exit_code, output = self._validate_with(self.GRANDFATHERED)
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("no longer a manifests/stack.json alias", output)
+
+    def test_the_real_grandfather_list_applies_in_any_tree_holding_those_files(self):
+        # Another checkout or a copy of this one: the same paths are exempt whatever script validates it.
+        aliases = {"alpaca-py": ("data-alpaca-py",), "duckdb": ("data-duckdb",),
+                   "nautilus-trader": ("nautilustrader",)}
+        recorded = {}
+        for relative in hr.GRANDFATHERED_ALIAS_RECEIPTS:
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(REPO_ROOT / relative, target)   # the exact recorded bytes
+            recorded[relative] = json.loads((REPO_ROOT / relative).read_text(encoding="utf-8"))["component_id"]
+        self.assertEqual(hr.alias_receipt_errors(self.root, recorded, aliases, hr.GRANDFATHERED_ALIAS_RECEIPTS), [])
+        self.assertEqual(hr.grandfathered_alias_paths(self.root), set(hr.GRANDFATHERED_ALIAS_RECEIPTS))
+        # The default validate path applies the real list, which does not exempt this fixture's alias receipt.
+        for relative in hr.GRANDFATHERED_ALIAS_RECEIPTS:
+            shutil.rmtree((self.root / relative).parent, ignore_errors=True)
+        self._place_alias()
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn(self.ALIAS_PATH, output)
+        self.assertNotIn("no longer exists", output)
+
+    def test_every_real_grandfathered_receipt_is_a_live_alias_of_its_canonical_id(self):
+        aliases = hr.winner_stack_aliases(REPO_ROOT)
+        # The exact grandfathered set (path -> canonical id): adding or dropping an entry fails here.
+        host_dir = "evidence/hosts/macos-m5pro-20260924/"
+        self.assertEqual(
+            {relative: entry["canonical_component_id"] for relative, entry in hr.GRANDFATHERED_ALIAS_RECEIPTS.items()},
+            {f"{host_dir}macos-m5pro-20260924--alpaca-py--use--20260924.json": "data-alpaca-py",
+             f"{host_dir}macos-m5pro-20260924--duckdb--use--20260924.json": "data-duckdb",
+             f"{host_dir}macos-m5pro-20260924--nautilus-trader--use--20260924.json": "nautilustrader"})
+        for relative, entry in hr.GRANDFATHERED_ALIAS_RECEIPTS.items():
+            with self.subTest(relative=relative):
+                receipt = json.loads((REPO_ROOT / relative).read_text(encoding="utf-8"))
+                self.assertIn(entry["canonical_component_id"], aliases.get(receipt["component_id"], ()))
+                self.assertEqual(entry["date"], "2026-09-24")
+                self.assertTrue(entry["reason"])
+                self.assertEqual(entry["claim_sha256"], hr.receipt_claim_sha256(receipt))
+        self.assertEqual(hr.grandfathered_alias_paths(REPO_ROOT), set(hr.GRANDFATHERED_ALIAS_RECEIPTS))
+
+    def test_every_real_alias_receipt_is_grandfathered_and_validate_accepts_the_tree(self):
+        # A receipt recorded under a stack alias that is not grandfathered (for example one merged
+        # from main after the refusal landed) must fail this test, not only the CI validate step.
+        aliases = hr.winner_stack_aliases(REPO_ROOT)
+        alias_receipts = set()
+        for _host_dir, path in hr._iter_receipt_files(REPO_ROOT):
+            receipt = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(receipt, dict) and aliases.get(receipt.get("component_id")):
+                alias_receipts.add(path.relative_to(REPO_ROOT).as_posix())
+        self.assertEqual(alias_receipts, set(hr.GRANDFATHERED_ALIAS_RECEIPTS))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            exit_code = hr.main(["validate"])
+        self.assertEqual(exit_code, 0, out.getvalue())
+
+
+class ReceiptAliasTableTests(unittest.TestCase):
+    """host_receipts.receipt_alias_table_errors ties tools/sota-convergence/receipt-component-aliases.json
+    to the repository-inferred winner_stack_aliases() in both directions."""
+
+    ALIASES = {"duckdb": ("data-duckdb",), "alpaca-py": ("data-alpaca-py",)}
+    WINNERS = {"data-duckdb", "data-alpaca-py", "nautilustrader"}
+    ABSENT = {"alpaca-py": "sota manifest has its own id"}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+
+    def _errors(self, table, absent=None):
+        path = self.root / hr.RECEIPT_ALIASES_RELATIVE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"schema_version": 1, "aliases": table}), encoding="utf-8")
+        return hr.receipt_alias_table_errors(self.root, self.ALIASES, self.WINNERS,
+                                             self.ABSENT if absent is None else absent)
+
+    def test_consistent_tables_agree(self):
+        self.assertEqual(self._errors({"duckdb": "data-duckdb", "pandas-x": "sota-only-id"}), [])
+
+    def test_absent_table_is_not_compared(self):
+        self.assertEqual(hr.receipt_alias_table_errors(self.root, self.ALIASES, self.WINNERS, self.ABSENT), [])
+
+    def test_explicit_winner_target_the_repository_does_not_infer_is_an_error(self):
+        errors = self._errors({"duckdb": "data-duckdb", "nautilus-trader": "nautilustrader"})
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("maps 'nautilus-trader' to landscape winner 'nautilustrader'", errors[0])
+
+    def test_inferred_alias_missing_from_the_table_is_an_error(self):
+        errors = self._errors({})
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("'duckdb' is the manifests/stack.json alias of landscape winner(s) data-duckdb", errors[0])
+
+    def test_wrong_target_for_an_inferred_alias_is_an_error(self):
+        errors = self._errors({"duckdb": "some-other-id"})
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("maps 'duckdb' to 'some-other-id'", errors[0])
+
+    def test_stale_exemption_is_an_error(self):
+        errors = self._errors({"duckdb": "data-duckdb", "alpaca-py": "data-alpaca-py"})
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("lists 'alpaca-py', but it is in the table", errors[0])
+        errors = self._errors({"duckdb": "data-duckdb"}, absent={**self.ABSENT, "gone": "reason"})
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("lists 'gone', but it is no longer an inferred alias", errors[0])
+
+    def test_malformed_table_is_an_error(self):
+        self.assertIn("must map", self._errors(["duckdb"])[0])
+
+    def test_real_tables_agree(self):
+        self.assertEqual(hr.receipt_alias_table_errors(
+            REPO_ROOT, hr.winner_stack_aliases(REPO_ROOT), hr.landscape_component_ids(REPO_ROOT)), [])
 
 
 if __name__ == "__main__":

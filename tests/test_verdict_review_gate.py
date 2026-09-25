@@ -13,13 +13,13 @@ import contextlib
 import hashlib
 import io
 import json
-import os
 import subprocess
 import tempfile
 import unittest
 from unittest import mock
 from pathlib import Path
 
+import tests
 from scripts import landscape
 from scripts import verdict_review_gate as gate
 
@@ -30,11 +30,15 @@ RUN = "20260923"
 SEALED = f"evidence/artifacts/layer-verdicts-{RUN}"
 ANTHROPIC = {"name": "claude-opus-4-5", "family": "anthropic", "effort": "high"}
 OPENAI = {"name": "gpt-5.2", "family": "openai", "effort": "high"}
+# A --withhold-labels packet lists every policy label; its candidates' manifest fields are sealed in KEYS, which
+# the wave retains as packet-keys.json (review of #145).
 PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
-    {"key": "c1", "component_id": "comp-one", "repository": "https://github.com/example/one", "adopted": True,
-     "pin": "1.0"},
-    {"key": "c2", "component_id": "comp-two", "repository": "https://github.com/example/two", "adopted": True},
-], "withheld": landscape.withhold_policy_labels(None)}  # a --withhold-labels packet lists every policy label
+    {"key": "c1", "repository": "https://github.com/example/one", "adopted": True},
+    {"key": "c2", "repository": "https://github.com/example/two", "adopted": True},
+], "withheld": landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
+    + landscape.withheld_candidate_label_labels()}
+KEYS = {"c1": {"component_id": "comp-one", "pin": "1.0"}, "c2": {"component_id": "comp-two"}}
+PACKET["sealed_candidates_sha256"] = landscape.sealed_candidates_sha256(KEYS)  # the packet commits to its keys
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
 INDEX = "catalogs/us-equities/decision-index.json"
@@ -60,9 +64,10 @@ def winner(component_id, linux="not_established", macos="untested", evidence_cla
            evidence_refs=(), pin=None):
     """The winner record_verdicts.build_winners writes: the packet pin, else "unpinned" (the fixture
     rows carry no v1 candidates unless a test adds them)."""
-    candidate = next(c for c in PACKET["candidates"] if c["component_id"] == component_id)
+    key = next(key for key, fields in KEYS.items() if fields["component_id"] == component_id)
+    candidate = next(c for c in PACKET["candidates"] if c["key"] == key)
     return {"component_id": component_id, "repository": candidate["repository"],
-            "pin": pin or candidate.get("pin") or "unpinned", "evidence_class": evidence_class,
+            "pin": pin or KEYS[key].get("pin") or "unpinned", "evidence_class": evidence_class,
             "why_selected": "fixture", "evidence_refs": list(evidence_refs), "recipe_ref": LEDGERS["foundation"],
             "platform_status": {"linux-wsl2-x86_64": linux, "macos-arm64": macos}}
 
@@ -84,6 +89,12 @@ def adjudication(judgments=None, winner_lane="claude"):
 
 class GateFixture(unittest.TestCase):
     def setUp(self):
+        # The gate drops inherited GIT_* variables, as git() below does; both keep the test package's
+        # hermetic git configuration, so a global core.hooksPath (a gitleaks pre-commit or post-checkout
+        # hook) never runs in the scratch repository or the gate's head worktree (#179).
+        hermetic = mock.patch.object(gate, "git_environment", tests.hermetic_git_environment)
+        hermetic.start()
+        self.addCleanup(hermetic.stop)
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name).resolve()
@@ -93,6 +104,8 @@ class GateFixture(unittest.TestCase):
         # retained packet name -> sha256 (the run manifest's retained_packets); layer ids whose row is
         # not bound to the run manifest (lanes.run_manifest_sha256 left out); a run-manifest override.
         self.retained, self.unbound, self.manifest_overrides = {}, set(), {}
+        # retained packet name -> its packet-keys entry (lane_packets.py --keys-out, retained by record_verdicts.py)
+        self.keys = {}
         self.manifest = {"schema_version": 1, "catalogs": dict(LEDGERS), "sources": {"repository_index": INDEX}}
         self.write(INDEX, dump({"aliases": {}, "records": [
             {"repository": c["repository"]} for c in PACKET["candidates"]] + [{"repository": ALTERNATIVE["repository"]}]}))
@@ -103,10 +116,10 @@ class GateFixture(unittest.TestCase):
 
     # -- repository helpers -------------------------------------------------------------------
     def git(self, *args):
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
         return subprocess.run(["git", "-C", str(self.root), "-c", "user.name=fixture",
                                "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", *args],
-                              env=environment, check=True, capture_output=True, text=True).stdout.strip()
+                              env=tests.hermetic_git_environment(), check=True, capture_output=True,
+                              text=True).stdout.strip()
 
     def write(self, path, data: bytes):
         target = self.root / path
@@ -133,6 +146,10 @@ class GateFixture(unittest.TestCase):
                 "packets_sha256sums": "".join(f"{digest}  {name}\n" for name, digest in sorted(self.retained.items())),
                 "retained_packets": [{"name": name, "sha256": digest} for name, digest in sorted(self.retained.items())],
                 "packets": [self.manifest_entries[key] for key in sorted(self.manifest_entries)], "rejections": []}
+            keys_data = dump({"schema_version": 1, "packets": self.keys})
+            self.write(f"{SEALED}/packet-keys.json", keys_data)
+            self.register(f"{SEALED}/packet-keys.json")
+            manifest["packet_keys_sha256"] = sha(keys_data)
             manifest.update(self.manifest_overrides)
             data = dump(manifest)
             self.write(f"{SEALED}/run-manifest.json", data)
@@ -185,12 +202,20 @@ class GateFixture(unittest.TestCase):
     def record(self, layer_id="beta", *, claude_keys=("c1",), codex_keys=("c1",), codex=True, codex_model=OPENAI,
                codex_packet=None, agreement=None, winners=None, judged=None, packets=True, single_lane=None,
                register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded", packet=None,
-               evidence_class="source_review", evidence_refs=(), linux="not_established"):
+               evidence_class="source_review", evidence_refs=(), linux="not_established", keys=None):
         """Seal a new-wave (20260923) row the way record_verdicts.py would, then add it to the ledger."""
         self.new_wave = True
+        if keys is not None:
+            # Other sealed values are another build's packet, which commits to them.
+            packet = dict(packet if packet is not None else PACKET, sealed_candidates_sha256=landscape.sealed_candidates_sha256(
+                {candidate["key"]: keys.get(candidate["key"], {})
+                 for candidate in (packet if packet is not None else PACKET)["candidates"]}))
         packet_bytes = dump(packet if packet is not None else PACKET)
         packet_name = f"foundation__{layer_id}.json"
         self.retained[packet_name] = sha(packet_bytes)
+        self.keys[packet_name] = {"packet_sha256": sha(packet_bytes), "candidates": {
+            candidate["key"]: (KEYS if keys is None else keys).get(candidate["key"], {})
+            for candidate in (packet if packet is not None else PACKET).get("candidates") or []}}
         if packets:
             self.write(f"{SEALED}/packets/{packet_name}", packet_bytes)
             self.write(f"{SEALED}/packets/SHA256SUMS", "".join(
@@ -343,6 +368,21 @@ class EvidencedRowTests(GateFixture):
         self.rebase()
         self.record(codex=False, single_lane=DECISION)
         self.assertPasses(self.report())
+
+
+class FailedLaneOutcomeTests(GateFixture):
+    """Round 5, ops N2: a documented "failed" lane outcome (a Codex layer failed after retry, a Claude layer refuted
+    twice) carries its reasons in the run manifest, and the gate accepts it as landscape.py does."""
+
+    def test_a_failed_codex_lane_with_reasons_passes_and_without_reasons_fails(self):
+        self.decision("# Single lane\n\nsingle-lane-authorization: foundation/beta\n")
+        self.rebase()
+        self.record(codex=False, single_lane=DECISION)
+        self.manifest_entries["beta"]["lanes"]["codex"] = {"outcome": "failed",
+                                                            "reasons": ["failed after retry: timed out"]}
+        self.assertPasses(self.report())
+        self.manifest_entries["beta"]["lanes"]["codex"] = {"outcome": "failed", "reasons": []}
+        self.assertFails(self.report(), "failed codex lane of foundation/beta needs its reasons")
 
 
 class MissingEvidenceTests(GateFixture):
@@ -945,6 +985,17 @@ class ToolingAlignmentTests(GateFixture):
         self.write(f"{SEALED}/packets/foundation__beta.json", dump({**PACKET, "extra": 1}))
         self.assertFails(self.report(), "is not the run manifest's packet_sha256")
 
+    def test_sealed_candidate_keys_are_bound_by_the_run_manifest(self):
+        # Review of #145 (F5): winners resolve through the wave's packet-keys document, never an unbound one.
+        self.record()
+        self.manifest_overrides["packet_keys_sha256"] = "0" * 64
+        self.assertFails(self.report(), "packet-keys.json is not the run manifest's packet_keys_sha256")
+        del self.manifest_overrides["packet_keys_sha256"]
+        # Bound by the manifest, but naming another component for the winning key: not the sealed values the packet
+        # commits to (Codex review of #145 at a516c477).
+        self.keys["foundation__beta.json"]["candidates"]["c1"] = {"component_id": "comp-forged", "pin": "1.0"}
+        self.assertFails(self.report(), "is not the sealed values the packet commits to")
+
     def test_sha256sums_other_than_the_run_manifest_text_fails(self):
         self.record()
         path = self.root / f"{SEALED}/packets/SHA256SUMS"
@@ -953,11 +1004,12 @@ class ToolingAlignmentTests(GateFixture):
 
     def test_withheld_keys_in_the_sealed_packet_fail(self):
         for layer_id, packet, label in (
-                ("stars", {**PACKET, "candidates": [{**PACKET["candidates"][0], "upstream": {"stars": 5}},
-                                                    PACKET["candidates"][1]]}, "candidates[].upstream.stars"),
+                # upstream itself is a sealed field (review of #145), so nested keys are placed under evidence.
+                ("stars", {**PACKET, "candidates": [{**PACKET["candidates"][0], "evidence": {"stars": 5}},
+                                                    PACKET["candidates"][1]]}, "candidates[].evidence.stars"),
                 ("pushed", {**PACKET, "candidates": [{**PACKET["candidates"][0],
-                                                      "upstream": {"meta": [{"pushed_at": "2026"}]}},
-                                                     PACKET["candidates"][1]]}, "candidates[].upstream.meta[].pushed_at"),
+                                                      "evidence": {"meta": [{"pushed_at": "2026"}]}},
+                                                     PACKET["candidates"][1]]}, "candidates[].evidence.meta[].pushed_at"),
                 ("latest", {**PACKET, "latest": "2.0"}, "latest"),
                 ("prerelease", {**PACKET, "candidates": [{**PACKET["candidates"][0], "prerelease": True},
                                                          PACKET["candidates"][1]]}, "candidates[].prerelease"),
@@ -974,7 +1026,8 @@ class ToolingAlignmentTests(GateFixture):
     def test_packet_own_checked_at_is_not_withheld(self):
         self.record(packet={**PACKET, "checked_at": "2026-09-23"})
         self.assertPasses(self.report())
-        labels = landscape.withhold_policy_labels(None)
+        labels = (landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
+                  + landscape.withheld_candidate_label_labels())
         self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}], "withheld": labels}),
                          ["c[].checked_at"])
 
@@ -1195,12 +1248,13 @@ class SealedWinnerBindingTests(GateFixture):
 
     def with_receipt(self, component_id, version):
         """Patch platform_status's context with one qualifying linux receipt for ``component_id`` at
-        ``version`` (an independently reviewed native_proven install pass on a second machine), and
+        ``version`` (an independently reviewed native_proven use pass on a second machine), and
         write and register its file, so it is base-trusted when a rebase() follows (fifth review)."""
         real = gate.platform_evidence.load_context
         path = f"evidence/hosts/second-host/{component_id}.json"
         receipt = {"shape_ok": True, "platform_identity_ok": True, "component_version": version,
-                   "evidence_class": "native_proven", "stage": "install", "result": "pass",
+                   # A use-stage pass: only a use pass can make a winner accepted (2026-09-24 decision).
+                   "evidence_class": "native_proven", "stage": "use", "result": "pass",
                    "second_physical_machine": True, "review_state": "agree", "host_id": "second-host",
                    "observed_at_utc": "2026-09-23T00:00:00Z", "path": path}
         self.write(path, dump({"component_id": component_id, "tool_versions": {component_id: version}}))
@@ -1363,8 +1417,9 @@ class SealedWinnerBindingTests(GateFixture):
         row = self.record(winners=[winner("comp-one", linux="accepted")])
         self.rebase()
         self.ledger["foundation"] = [r for r in self.ledger["foundation"] if r is not row]
-        packet = {**PACKET, "candidates": [dict(PACKET["candidates"][0], pin="2.0"), PACKET["candidates"][1]]}
-        self.record(packet=packet, winners=[winner("comp-one", linux="accepted", pin="2.0")])
+        # The pin is a sealed candidate field (review of #145): the re-recorded wave's packet-keys moves it.
+        self.record(keys={**KEYS, "c1": dict(KEYS["c1"], pin="2.0")},
+                    winners=[winner("comp-one", linux="accepted", pin="2.0")])
         report = self.report()
         self.assertEqual(report["status"], "failed", self.messages(report))
         self.assertIn("derives 'not_established'", self.messages(report))
@@ -1667,10 +1722,9 @@ print(json.dumps({"code": code, "reads": sorted(reads), "modules": modules}))
 
     def trace(self, data_root, mode, *arguments):
         import sys
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
         result = subprocess.run([sys.executable, "-c", self.READ_TRACER, str(self.ROOT), str(data_root), mode,
-                                 *map(str, arguments)], capture_output=True, text=True, env=environment,
-                                cwd=str(self.ROOT))
+                                 *map(str, arguments)], capture_output=True, text=True,
+                                env=tests.hermetic_git_environment(), cwd=str(self.ROOT))
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout.strip().splitlines()[-1])
 

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--nautilus-trader--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true
+  },
+  "catalog_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+  "recorded_by": {
+    "identity_sha256": "465f6e5b081bc30590a2e335daf6619193359c7c36b080838038d9a317f7d25c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "nautilus-trader",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "system_profiler SPHardwareDataType | grep -E 'Model Identifier|Chip:|Total Number of Cores|Memory:' | sed 's/^ *//' && sw_vers -productVersion && sw_vers -buildVersion",
+      "exit": 0,
+      "duration_s": 0.219,
+      "output_sha256": "675626ed3c9ed4547e6955b53f6ac5717836728c0b594978e3d6ee01b3a30cbe",
+      "output_excerpt": "Model Identifier: Mac17,8\nChip: Apple M5 Pro\nTotal Number of Cores: 18 (6 Super and 12 Performance)\nMemory: 24 GB\n26.5.1\n25F80\n2026-09-24 09:12:27.471 system_profiler[40369:8206953] hw.cpufamily: 0xf76c5b1a\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python -c \"import re,sys,platform,importlib.metadata as m;n=lambda s:re.sub(r'[-_.]+','-',s).lower();L=dict(re.findall(r'^([a-z0-9][a-z0-9._-]*)==(\\S+)',open('evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock').read(),re.M));I={n(d.metadata['Name']):d.version for d in m.distributions()};bad=sorted(k for k in set(L)|set(I) if L.get(k)!=I.get(k));print(sys.version.split()[0],platform.machine(),'lock',len(L),'installed',len(I),'mismatch',bad);print(*[k+'=='+I[k] for k in ('nautilus-trader','alpaca-py','numpy','pandas')]);sys.exit(1 if bad else 0)\" && UV_NO_CONFIG=1 uv pip check --python .runtime/macos-syn-e2e/venv/bin/python",
+      "exit": 0,
+      "duration_s": 0.059,
+      "output_sha256": "87b94672cfe0e89dc1a60eb6fa3b6ba91155bc0bbb4160529fe9d54023909a8a",
+      "output_excerpt": "3.12.14 arm64 lock 20 installed 20 mismatch []\nnautilus-trader==2.0.0rc5 alpaca-py==0.44.0 numpy==2.5.3 pandas==3.0.6\nUsing Python 3.12.14 environment at: .runtime/macos-syn-e2e/venv\nChecked 20 packages in 3ms\nAll installed packages are compatible\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python -m unittest discover -s tests -p 'test_adaptive_paper_*.py' -v > .runtime/macos-syn-e2e/logs/receipt-adaptive-paper.log 2>&1; rc=$?; grep -E '^(Ran |OK|FAILED)' .runtime/macos-syn-e2e/logs/receipt-adaptive-paper.log; grep -o \"skipped '[^']*'\" .runtime/macos-syn-e2e/logs/receipt-adaptive-paper.log; exit $rc",
+      "exit": 0,
+      "duration_s": 112.269,
+      "output_sha256": "cf92e50c9e38ab96be4c4e677bd094c0e89b7467810f5dd96b88b305e410e319",
+      "output_excerpt": "Ran 732 tests in 111.982s\nOK (skipped=1)\nskipped 'exchange_calendars is not installed in this shared engine environment'\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python -m unittest discover -s tests -p 'test_native_faults_min.py' -v > .runtime/macos-syn-e2e/logs/receipt-native-faults.log 2>&1; rc=$?; grep -E '^(Ran |OK|FAILED)' .runtime/macos-syn-e2e/logs/receipt-native-faults.log; exit $rc",
+      "exit": 0,
+      "duration_s": 0.151,
+      "output_sha256": "94e2db3dd01d4e8de25a25f177bcbce7eccad0ff0ed2d350536d4a436e273e86",
+      "output_excerpt": "Ran 17 tests in 0.053s\nOK\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python -m unittest discover -s tests -p 'test_adaptive_market_research.py' -v > .runtime/macos-syn-e2e/logs/receipt-market-research.log 2>&1; rc=$?; grep -E '^(Ran |OK|FAILED)' .runtime/macos-syn-e2e/logs/receipt-market-research.log; exit $rc",
+      "exit": 0,
+      "duration_s": 0.295,
+      "output_sha256": "725811a1a68f545b771faa5cbdc92f3ff1479e97a09f241ce648a550990d3317",
+      "output_excerpt": "Ran 28 tests in 0.198s\nOK\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python blueprints/us-equities/adaptive-paper/mover_runner.py synthetic --scan evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-scan.json --output evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-receipt.json --allow-stale-scan && .runtime/macos-syn-e2e/venv/bin/python -c \"import json;r=json.load(open('evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-receipt.json'));t=r['totals'];print({k:t[k] for k in ('entries_submitted','entries_filled','exit_orders_submitted','native_fill_events','native_rejections','pnl_consistent')},'exits',[s['exit_reason'] for s in r['symbols']],'end',r['reconciliation']['end'],'handoff',r['handoff_to_recovery'])\"",
+      "exit": 0,
+      "duration_s": 4.647,
+      "output_sha256": "9554ac77996147b9e5cddc548613dd161e25e188a76e69d84a554b4912a1af27",
+      "output_excerpt": "{\"status\": \"passed\", \"flat\": true, \"evidence_class\": \"SYN\"}\n{'entries_submitted': 2, 'entries_filled': 2, 'exit_orders_submitted': 2, 'native_fill_events': 4, 'native_rejections': 0, 'pnl_consistent': True} exits ['x2_time', 'x2_time'] end {'cash_delta_usd': '-22.09', 'cash_match': True, 'open_orders': 0, 'positions': 0, 'positions_match': True} handoff None\n"
+    },
+    {
+      "cmd": ".runtime/macos-syn-e2e/venv/bin/python blueprints/us-equities/adaptive-paper/benchmark.py --output evidence/artifacts/macos-syn-e2e-20260924/synthetic-capacity.json && .runtime/macos-syn-e2e/venv/bin/python -c \"import json;r=json.load(open('evidence/artifacts/macos-syn-e2e-20260924/synthetic-capacity.json'));print({k:r[k] for k in ('broker_connections','paper_orders','completed_synthetic_roundtrips','peak_submissions_in_60_seconds','native_portfolio_flat')},'reconciliation',r['reconciliation'])\"",
+      "exit": 0,
+      "duration_s": 60.625,
+      "output_sha256": "687da862a0e0173e3d952a54a838a2b3c70b1c5ed8010f5a0036a777ae4913d5",
+      "output_excerpt": "{'status': 'passed', 'synthetic_submissions': 180, 'native_fill_events': 180, 'elapsed_seconds': 60.41080112499185}\n{'broker_connections': 0, 'paper_orders': 0, 'completed_synthetic_roundtrips': 90, 'peak_submissions_in_60_seconds': 179, 'native_portfolio_flat': True} reconciliation {'cash_delta_usd': '-5.40', 'cash_match': True, 'open_orders': 0, 'positions': 0, 'positions_match': True}\n"
+    },
+    {
+      "cmd": "test ! -e \"$HOME/.local/state/native-agent-stack\" && echo 'no engine host state (STOP, locks, ledgers) exists under ~/.local/state/native-agent-stack after the runs'",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "c9edd21722798204d538dfb0a257d0ee2e9b1baa49be350dd3d7e1d32fb27de0",
+      "output_excerpt": "no engine host state (STOP, locks, ledgers) exists under ~/.local/state/native-agent-stack after the runs\n"
+    }
+  ],
+  "tool_versions": {
+    "nautilus-trader": "2.0.0rc5"
+  },
+  "observed_at_utc": "2026-09-24T13:12:27Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, Mac17,8, 18 cores, 24 GB; macOS 26.5.1 build 25F80, arm64) the adaptive-paper lane ran in an isolated, hash-locked CPython 3.12.14 runtime (nautilus-trader 2.0.0rc5, alpaca-py 0.44.0, numpy 2.5.3, pandas 3.0.6; 20 packages from evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock). With the real NautilusTrader LiveNode engine it passed 732 adaptive-paper tests (one skip by design), 17 native-faults offline tests, 28 market-research tests, the mover synthetic trial (evidence class SYN: 2 entries, 2 X2 exits, 4 native fills, flat, cash reconciled) and the synthetic capacity fixture (180 submissions and native fills, flat, reconciled). Every run used local synthetic ports and zero broker connections.",
+  "limitations": [
+    "local_integration only: the real NautilusTrader 2.0.0rc5 engine ran against this repository's synthetic broker ports and fixtures. No Alpaca or IBKR connection, credential, market data or study data was used; this is not paper or live broker acceptance. The mover SYN fills and P&L come from mover_runner.synthetic_path's scripted prices on invented tickers (evidence/artifacts/macos-syn-e2e-20260924/mover-synthetic-scan.json) and are not outcomes.",
+    "Recorded outside Claude Code's Seatbelt sandbox, which denies the loopback bind (EPERM) that 3 test_adaptive_paper_metrics HTTP-server tests need. Inside the sandbox the same adaptive-paper command ran 732 tests with exactly those 3 errors and 1 skip, and the other suites and both synthetic runs passed there (evidence/artifacts/macos-syn-e2e-20260924/summary.json).",
+    "The one skip is by design: exchange_calendars is not in the pinned lane runtime (test_adaptive_paper_sessions). Not run here: the mover-early-entry study tests, the live native-faults harness, the full repository suite in this runtime and the 42 unchanged upstream adapter tests.",
+    "The trading-nautilus adoption profile lists bwrap, which macOS lacks, so the network-namespaced engine replay of blueprints/us-equities/engine-nautilus is not covered. No hardware_profile.py --record-host entry exists for this host (no hardware_profile_ref); it has 24 GB, not the 64 GB of the macOS host projected in docs/next-host-stages.md."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T13:12:27Z",
+      "reviewer": {
+        "identity_sha256": "465f6e5b081bc30590a2e335daf6619193359c7c36b080838038d9a317f7d25c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

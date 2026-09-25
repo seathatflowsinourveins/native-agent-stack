@@ -68,10 +68,15 @@ jobs:
           # foundation-layers.json/trading-by-layer.json/github-freshness.json, not
           # from lanes.json, so an empty lanes record adds zero lane-proposed
           # candidates while still recomputing the real baseline drift.
+          # --trading-freshness-out also writes the report-only input for the trading
+          # table in drift.md: every pinned trading component (selected us-equities
+          # cards plus extract_layers.py's TRADING_PIN_SOURCES) vs upstream, with a
+          # dormancy signal relative to --checked-at. The manifest itself is unchanged.
           printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
           python3 tools/sota-convergence/build_manifest.py \
             --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
+            --trading-freshness-out "$RUNNER_TEMP/freshness/trading-freshness.json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
@@ -91,7 +96,8 @@ jobs:
           result = build_drift_report(work_dir)
           print((work_dir / "drift.md").read_text())
           print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
-                f"no_release={len(result['no_release'])}")
+                f"no_release={len(result['no_release'])} trading={len(result['trading'])} "
+                f"dormant={len(result['dormant'])} archived={len(result['archived'])}")
           PYEOF
           {
             echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
@@ -161,6 +167,7 @@ jobs:
           path: |
             ${{ runner.temp }}/freshness/manifest-*.json
             ${{ runner.temp }}/freshness/github-freshness.json
+            ${{ runner.temp }}/freshness/trading-freshness.json
             ${{ runner.temp }}/freshness/drift.md
           if-no-files-found: error
           include-hidden-files: false
@@ -206,8 +213,8 @@ jobs:
       group: ${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}
       cancel-in-progress: false
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # push the automation/catalog-freshness evidence branch (--force-with-lease); this job only
+      pull-requests: write # open the human-reviewable proposal PR; this job only
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

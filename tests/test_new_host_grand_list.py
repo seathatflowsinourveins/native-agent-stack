@@ -8,6 +8,7 @@ import argparse
 import contextlib
 import io
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -108,6 +109,12 @@ class BuildTests(unittest.TestCase):
         s = self.data["summary"]
         self.assertEqual(s["winners"], sum(len(l["winners"]) for l in self.data["layers"]))
         self.assertEqual(s["layers"]["foundation"] + s["layers"]["us-equities"], len(self.data["layers"]))
+
+    def test_headline_pairs_add_up_to_the_winners(self):
+        # needs_host excludes both accepted and host_verified, so the three counts partition the pairs.
+        s = self.data["summary"]
+        for p in g.PLATFORMS:
+            self.assertEqual(s["e2e_accepted"][p] + s["e2e_host_verified"][p] + s["needs_host"][p], s["winners"], p)
 
     def test_rendered_markdown_has_every_layer(self):
         md = g.render_md(self.data)
@@ -221,6 +228,13 @@ class RecordHostToGrandListTests(unittest.TestCase):
             self.assertEqual(entry["measured"]["cores"], 12)
             self.assertEqual(entry["measured"]["effective_ram_gb"], 64.0)
 
+    def test_recorded_host_under_a_two_letter_user_name(self):
+        # The same round trip under a two-letter account name inside the id ("ed" in
+        # "recorded"): matched as a substring, the id was refused, which CI (user "runner")
+        # never saw.
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}):
+            self.test_recorded_host_gets_non_null_measured_in_the_grand_list()
+
 
 class MeasuredCellTests(unittest.TestCase):
     def test_none_measured_returns_none(self):
@@ -252,10 +266,19 @@ class QualifiedModelsRenderTests(unittest.TestCase):
             "summary": {
                 "layers": {"foundation": 0, "us-equities": 0}, "winners": 0, "distinct_components": 0,
                 "pins_behind_upstream": [], "e2e_accepted": {p: 0 for p in g.PLATFORMS},
+                "e2e_host_verified": {p: 0 for p in g.PLATFORMS},
                 "needs_host": {p: 0 for p in g.PLATFORMS}, "not_joined_to_manifest": [],
             },
             "setup_order": [], "hosts": [], "layers": [], "qualified_models": qualified_models,
         }
+
+    def test_headline_counts_host_verified_pairs_as_accepted(self):
+        data = self._minimal_data([])
+        data["summary"]["e2e_accepted"] = {"linux-wsl2-x86_64": 28, "macos-arm64": 0}
+        data["summary"]["e2e_host_verified"] = {"linux-wsl2-x86_64": 18, "macos-arm64": 6}
+        md = g.render_md(data)
+        self.assertIn("Pairs accepted end to end: 46 (18 of them `host_verified` on a host receipt) on WSL2, "
+                      "6 (6 of them `host_verified` on a host receipt) on macOS.", md)
 
     def test_empty_section_renders_a_placeholder_row(self):
         md = g.render_md(self._minimal_data([]))

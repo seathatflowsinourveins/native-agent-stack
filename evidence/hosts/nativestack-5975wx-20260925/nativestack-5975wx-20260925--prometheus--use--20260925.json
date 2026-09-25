@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--prometheus--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "prometheus",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "command -v prometheus promtool && curl -fsS http://127.0.0.1:19090/api/v1/status/buildinfo && echo && systemctl --user show -p ActiveState -p SubState -p NRestarts ecosystem-prometheus.service | awk '!seen[$0]++' | tr '\\n' ' ' && echo && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" prometheus",
+      "exit": 0,
+      "duration_s": 0.048,
+      "output_sha256": "51e0e7f135996a0eae16d897ba280a3f9d3a7cd96dfab809f1c58fd6101ac353",
+      "output_excerpt": "~/.local/share/codex-ecosystem/bin/prometheus\n{\"status\":\"success\",\"data\":{\"version\":\"3.14.0\",\"revision\":\"d7598b7141418fa35be2b5ec5d0fefb634199610\",\"branch\":\"HEAD\",\"buildUser\":\"root@f423027f4410\",\"buildDate\":\"20260817-16:49:19\",\"goVersion\":\"go1.26.6\"}}\nNRestarts=0 ActiveState=active SubState=running \nstack ['3.14.0'] winner pins ['3.14.0']\n"
+    },
+    {
+      "cmd": "out=$(promtool query instant http://127.0.0.1:19090 up) && printf '%s\\n' \"$out\" | sed -n 's/.*instance=\"\\([^\"]*\\)\", job=\"\\([^\"]*\\)\"} => \\([0-9]*\\) .*/\\2 \\1 up=\\3/p' ",
+      "exit": 0,
+      "duration_s": 0.033,
+      "output_sha256": "d6fb7e0617db28920e5f141ca7908a0df0e1a2cf4617eb58624de4f85f29b6fd",
+      "output_excerpt": "collector-health 127.0.0.1:28888 up=1\nalertmanager 127.0.0.1:19093 up=1\nprometheus 127.0.0.1:19090 up=1\nloki 127.0.0.1:13100 up=1\ncollector-native 127.0.0.1:28889 up=1\nqdrant 127.0.0.1:26333 up=1\nvllm 127.0.0.1:18231 up=1\n"
+    },
+    {
+      "cmd": "promtool query instant http://127.0.0.1:19090 'count_over_time(up{job=\"vllm\"}[1h])' && promtool query instant http://127.0.0.1:19090 'prometheus_tsdb_head_series' ",
+      "exit": 0,
+      "duration_s": 0.058,
+      "output_sha256": "edcbfe72e75106b80c598e3f77f8135bd91f6312e7d29d82dc55ff300f24c58b",
+      "output_excerpt": "{instance=\"127.0.0.1:18231\", job=\"vllm\"} => 240 @[1790314674.923]\nprometheus_tsdb_head_series{instance=\"127.0.0.1:19090\", job=\"prometheus\"} => 5309 @[1790314674.951]\n"
+    },
+    {
+      "cmd": "curl -fsS http://127.0.0.1:19090/api/v1/rules | python3 -c \"import json,sys;g=json.load(sys.stdin)['data']['groups'];r=[x for y in g for x in y['rules']];print(len(g),'rule groups,',len(r),'rules; evaluation health',sorted({x['health'] for x in r}),'; firing:',sorted(x['name'] for x in r if x.get('state')=='firing'))\" ",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_sha256": "52b69640ce395ee2610b9c04c43cb34c9328eff582608b0084a18d0bd29569be",
+      "output_excerpt": "2 rule groups, 14 rules; evaluation health ['ok'] ; firing: ['EcosystemCollectorHealthUnexpected', 'EcosystemDaguDashboardHealthUnexpected', 'EcosystemFreeLLMAPIHealthUnexpected', 'EcosystemOmniRouteHealthUnexpected', 'EquitiesPaperMetricsMissing']\n"
+    }
+  ],
+  "tool_versions": {
+    "prometheus": "3.14.0"
+  },
+  "observed_at_utc": "2026-09-25T05:37:54Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the running Prometheus server (buildinfo 3.14.0, revision d7598b7, the catalog pin; unit ecosystem-prometheus active and running) answered PromQL queries through promtool and its HTTP API: up listed its seven scrape targets on this host (Collector health and native exporters, Alertmanager, Prometheus, Loki, Qdrant and vLLM) with their current values; count_over_time(up{job=\"vllm\"}[1h]) returned the number of vLLM scrape samples stored over the last hour and prometheus_tsdb_head_series its in-memory series count; the rules API reported 2 rule groups and 14 rules with evaluation health ok and named the alerts firing at recording time. All commands exit 0.",
+  "limitations": [
+    "Queries only: alert delivery through Alertmanager and ntfy, remote write, retention enforcement and restart persistence were not exercised. Target values are reported, not asserted: a scrape target that is down is Prometheus reporting correctly, not a Prometheus failure.",
+    "Alerts firing when this receipt was rehearsed: four for local endpoints this host does not run (OmniRoute, FreeLLMAPI, the Dagu dashboard, paper-trial metrics) and EcosystemCollectorHealthUnexpected, whose rule (rendered from observability/backends/templates/ecosystem-prometheus-rules.yml.example) probes 127.0.0.1:14333 while this host's Collector health endpoint is 127.0.0.1:24333. That is a host configuration finding, not a Prometheus fault; it is left unchanged here.",
+    "The service was already running under its systemd user unit on this host (ActiveState, SubState and NRestarts are in the first command's output); this receipt did not start, stop or reconfigure it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:54Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (server observed answering PromQL over stored data and its rules API; a query server, so no planted-fault control is needed; buildinfo 3.14.0 and unit state are backed; bound to the observation-inference winner) and re-ran buildinfo, promtool up, the vllm count_over_time query and the rules summary on this host: the same seven targets up, 240 samples, 2 groups and 14 rules healthy, with EcosystemCollectorHealthUnexpected no longer firing.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

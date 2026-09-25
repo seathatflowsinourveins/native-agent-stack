@@ -1,0 +1,12 @@
+#!/bin/sh
+# Local secret gate for staged changes. Activate once per clone:
+#   git config core.hooksPath scripts/git-hooks
+# Fails closed when gitleaks is missing. `git commit --no-verify` is the
+# explicit, visible override. CI (validate.yml) still scans history and tree.
+set -eu
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks not on PATH; install the pinned gitleaks 8.30.1 (see docs/secret-storage.md). Commit refused." >&2
+  exit 1
+fi
+root=$(git rev-parse --show-toplevel)
+exec gitleaks git --pre-commit --staged --redact --no-banner --config "$root/.gitleaks.toml" "$root"

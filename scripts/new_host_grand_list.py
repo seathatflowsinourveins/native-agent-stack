@@ -268,6 +268,10 @@ def build() -> dict:
         "pins_behind_upstream": sorted({adoption_id(w["component_id"]) for w in winners_all if w["pin_behind_upstream"] is True}),
         "not_joined_to_manifest": sorted({w["component_id"] for w in winners_all if not w["manifest_joined"]}),
         "e2e_accepted": {p: sum(1 for w in winners_all if w["platforms"][p]["e2e_state"] == "accepted") for p in PLATFORMS},
+        # host_verified is accepted on the strength of a host receipt (scripts/component_matrix.py),
+        # and needs_host excludes it; count it separately so the headline pairs add up to the winners.
+        "e2e_host_verified": {p: sum(1 for w in winners_all if w["platforms"][p]["e2e_state"] == "host_verified")
+                              for p in PLATFORMS},
         "bootstrap_pinned": {p: sorted({w["component_id"] for w in winners_all if w["platforms"][p]["bootstrap_pinned"]}) for p in PLATFORMS},
         "needs_host": {p: len(matrix.get("summary", {}).get("needs_host", {}).get(p, [])) for p in PLATFORMS},
     }
@@ -364,6 +368,12 @@ def gap_cell(layer: dict) -> str:
 
 def render_md(data: dict) -> str:
     s = data["summary"]
+
+    def accepted_line(platform):
+        host_verified = s["e2e_host_verified"][platform]
+        return (f"{s['e2e_accepted'][platform] + host_verified} "
+                f"({host_verified} of them `host_verified` on a host receipt)")
+
     lines = [
         "# New-host grand list",
         "",
@@ -374,7 +384,7 @@ def render_md(data: dict) -> str:
         "",
         f"Layers: {s['layers']['foundation']} foundation, {s['layers']['us-equities']} trading. Winners: {s['winners']} "
         f"layer-winner pairs ({s['distinct_components']} distinct components). Pairs accepted end to end: "
-        f"{s['e2e_accepted']['linux-wsl2-x86_64']} on WSL2, {s['e2e_accepted']['macos-arm64']} on macOS. Distinct "
+        f"{accepted_line('linux-wsl2-x86_64')} on WSL2, {accepted_line('macos-arm64')} on macOS. Distinct "
         f"components pinned behind upstream: {len(s['pins_behind_upstream'])}. Pairs a new host still has to prove: "
         f"{s['needs_host']['linux-wsl2-x86_64']} on WSL2, {s['needs_host']['macos-arm64']} on macOS "
         "(the `needs_host` lists in `catalogs/landscape/component-evidence-matrix.json`).",

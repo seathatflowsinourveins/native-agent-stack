@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Install this catalog's Claude Code user-scope profile assets onto a host:
 
-  guard   -- sha256-checked copy of adoption/hooks/claude/effort-default-guard.py
-             to ~/.claude/hooks/effort-default-guard.py
+  guard   -- sha256-checked copies of the user-scope hooks to ~/.claude/hooks/:
+             adoption/hooks/claude/effort-default-guard.py (effort self-heal) and
+             scripts/hooks/secret_path_guard.py (PreToolUse Bash secret guard;
+             the same file the project .claude/settings.json runs)
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   mcp     -- `claude mcp add --scope user` for each server named in
              adoption/mcp/claude-user.json after rendering its ${HOME} and
@@ -11,8 +13,10 @@
              (reported) when it differs unless --replace-mcp is given
 
 Each step is independently runnable (`--only guard|agents|mcp`) and safe to
-re-run: the guard is only overwritten if its checksum in
-adoption/hooks/claude/SHA256SUMS differs from what's already installed, agent
+re-run: a hook is only overwritten if its checksum in
+adoption/hooks/claude/SHA256SUMS (paths relative to that file, so
+`sha256sum -c SHA256SUMS` works from its directory) differs from what's
+already installed, agent
 copies are always refreshed (they're catalog-owned files, not host edits),
 and MCP registration never replaces a differing entry without --replace-mcp.
 This never touches ~/.claude.json, credentials or any other account state.
@@ -34,7 +38,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 GUARD_SRC = ROOT / "adoption" / "hooks" / "claude" / "effort-default-guard.py"
+SECRET_GUARD_SRC = ROOT / "scripts" / "hooks" / "secret_path_guard.py"
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
+# Installed name under ~/.claude/hooks/ -> checked-in source. The settings template runs both.
+HOOKS = {
+    "effort-default-guard.py": GUARD_SRC,
+    "secret_path_guard.py": SECRET_GUARD_SRC,
+}
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"
 MCP_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-user.json"
 
@@ -43,31 +53,44 @@ class InstallError(ValueError):
     pass
 
 
-def expected_guard_sha256() -> str:
-    text = SHA256SUMS.read_text()
-    for line in text.splitlines():
+def sha256sums_entries() -> dict[Path, str]:
+    """SHA256SUMS entries as {resolved source path: sha256}; paths are relative to the file."""
+    entries = {}
+    for line in SHA256SUMS.read_text().splitlines():
         parts = line.split()
-        if len(parts) == 2 and parts[1].lstrip("*").endswith("effort-default-guard.py"):
-            return parts[0]
-    raise InstallError(f"no effort-default-guard.py entry in {SHA256SUMS}")
+        if len(parts) == 2:
+            entries[(SHA256SUMS.parent / parts[1].lstrip("*")).resolve()] = parts[0]
+    return entries
+
+
+def expected_sha256(source: Path) -> str:
+    digest = sha256sums_entries().get(source.resolve())
+    if digest is None:
+        raise InstallError(f"no {source.name} entry in {SHA256SUMS}")
+    return digest
+
+
+def expected_guard_sha256() -> str:
+    return expected_sha256(GUARD_SRC)
 
 
 def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def install_guard(home: Path, dry_run: bool) -> str:
-    if not GUARD_SRC.is_file():
-        raise InstallError(f"missing source: {GUARD_SRC}")
-    expected = expected_guard_sha256()
-    actual = sha256_of(GUARD_SRC)
+def install_guard(home: Path, dry_run: bool, name: str = "effort-default-guard.py") -> str:
+    source = HOOKS[name]
+    if not source.is_file():
+        raise InstallError(f"missing source: {source}")
+    expected = expected_sha256(source)
+    actual = sha256_of(source)
     if actual != expected:
         raise InstallError(
-            f"refusing to install {GUARD_SRC}: sha256 {actual} does not match "
+            f"refusing to install {source}: sha256 {actual} does not match "
             f"{SHA256SUMS} ({expected})"
         )
     dest_dir = home / ".claude" / "hooks"
-    dest = dest_dir / "effort-default-guard.py"
+    dest = dest_dir / name
     if dest.is_file() and sha256_of(dest) == expected:
         print(f"guard: {dest} already matches (sha256 {expected[:12]}...); skipped")
         return "skipped"
@@ -75,10 +98,18 @@ def install_guard(home: Path, dry_run: bool) -> str:
         print(f"guard: would install {dest} (sha256 {expected[:12]}...)")
         return "planned"
     dest_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(GUARD_SRC, dest)
+    shutil.copy2(source, dest)
     dest.chmod(0o755)
     print(f"guard: installed {dest}")
     return "installed"
+
+
+def install_guards(home: Path, dry_run: bool) -> dict[str, str]:
+    """Every user-scope hook in HOOKS; all are checked before any is copied."""
+    for source in HOOKS.values():
+        if sha256_of(source) != expected_sha256(source):
+            raise InstallError(f"refusing to install {source}: sha256 does not match {SHA256SUMS}")
+    return {name: install_guard(home, dry_run, name) for name in HOOKS}
 
 
 def install_agents(home: Path, dry_run: bool) -> list[str]:
@@ -257,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
     home = Path(args.home)
     try:
         if "guard" in steps:
-            install_guard(home, args.dry_run)
+            install_guards(home, args.dry_run)
         if "agents" in steps:
             install_agents(home, args.dry_run)
         if "mcp" in steps:

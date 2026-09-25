@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "vllm-030-switch-20260925",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "vllm",
+    "socraticode"
+  ],
+  "claim": "vLLM 0.30.0 now serves the production Nemotron-3-Embed-1B-BF16 embeddings on the NativeStack WSL2 RTX 4090 host. Qualified first on an owned instance against production 0.25.0 (identical model files, flags and route), then switched by a systemd drop-in that changes only the binary path; the live service returned identical embeddings and identical top-10 code-index results after the switch.",
+  "limitations": [
+    "One host (NativeStack, RTX 4090, WSL2 Windows driver 616.64) and one model/route (/v1/embeddings with Nemotron-3-Embed-1B-BF16); not a claim about other GPUs, models or the /v2/embed route. NVIDIA's model card still names vllm==0.25.0 for BF16 /v2/embed serving.",
+    "Retrieval equality covers 8 gate texts and 5 live code-index queries (top-10), not an aggregate retrieval-quality benchmark.",
+    "0.30.0 relies on its pinned-memory fallback for WSL (PR #56908); the 0.29.0 UVA failure recorded in vllm-compatibility remains true for 0.29.0.",
+    "The 0.25.0 prefix is kept for rollback; the base unit still names it and only the drop-in points at 0.30.0."
+  ],
+  "data": {
+    "host": "nativestack-5975wx-20260925",
+    "observed_at_utc": "2026-09-25",
+    "previous_version": "0.25.0",
+    "previous_source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+    "version": "0.30.0",
+    "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+    "release_date": "2026-09-22",
+    "wheel": "vllm-0.30.0-cp38-abi3-manylinux_2_28_x86_64.whl",
+    "wheel_sha256": "ef52ee58c410ead0b8afb190838fa4cbcb52075596f67862a03859d984966ac4",
+    "install": "uv 0.12.17 pip install vllm==0.30.0 --exclude-newer 2026-09-25T23:59:59Z into a new $ECO/tools/vllm-0.30.0 prefix (torch 2.13.0+cu130, triton 3.7.1, flashinfer-python 0.6.18.post1)",
+    "security_advisories_closed": {
+      "GHSA-25q3-v2hm-8vpf": "high; negative token id in /v1/embeddings or /pooling kills the engine; patched 0.28.0",
+      "GHSA-5fj9-pfhr-6j48": "medium; unbounded Prometheus label cardinality in the Rust frontend; patched 0.30.0"
+    },
+    "wsl_fix": "vllm-project/vllm PR #56908 (pinned-memory fallback), merged 2026-09-15; the owned instance logged the fallback warning and started cleanly",
+    "model_dir_sha256": "f94938c479795d0f47699179d37c27e8771704c82a9b3d1e2bd4e2a97928078b",
+    "qualification_owned_instance": {
+      "port": 38231,
+      "gpu_memory_utilization": 0.16,
+      "gate_set_texts": 28,
+      "gate_min_cosine_vs_prod": 0.9999999999999998,
+      "nvidia_example_top1_identical": true,
+      "mini_corpus_top10_overlap": "10/10 on each of 10 queries (10 x 50 corpus)",
+      "batch_invariance_min_cosine": 0.9999657391042198,
+      "latency_ms_p50_p95_prod_vs_test": "21.4/23.0 vs 23.8/26.1 (100 sequential requests; report only)"
+    },
+    "production_switch": {
+      "method": "systemd --user drop-in native-stack-embeddings.service.d/override.conf; ExecStart binary path only",
+      "healthy_after_seconds": 48.0,
+      "restarts": 0,
+      "live_version_before_after": [
+        "0.25.0",
+        "0.30.0"
+      ],
+      "gate_texts": 8,
+      "gate_min_cosine_before_vs_after": 1.0,
+      "code_index": {
+        "collection_points": 67492,
+        "vector": "dense"
+      },
+      "code_queries_identical_top10_order": "5/5",
+      "gpu_used_mib_before_after": [
+        13879,
+        13032
+      ],
+      "rollback": "rm the drop-in, systemctl --user daemon-reload, systemctl --user restart native-stack-embeddings"
+    },
+    "independent_review": "A separate reviewer agent re-ran the version/wheel, model-dir hash, advisory, production-health and gate-arithmetic checks and rated the qualification switch-ready."
+  },
+  "provenance": [
+    {
+      "name": "results.json",
+      "sha256": "9c892319ff7b994008a7e18fdae0dff6fe18321614ddd8f2ae556b8bd6909079",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    },
+    {
+      "name": "install.log",
+      "sha256": "89d2293bd7d03e0fa8f695bd3640938d8d385bad75402ec5ef1302f3697fb78c",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    },
+    {
+      "name": "test-server.log",
+      "sha256": "c43c1f3d1426630f696d80e3525771f113f83ccc51c999c89364fbca98790abd",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    },
+    {
+      "name": "pre.json",
+      "sha256": "6b87e826ee565145009172ce7aa7eb31d3143c7173d38b943e47fd6831ee5db8",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    },
+    {
+      "name": "post.json",
+      "sha256": "60d9db95835d070722a5491777b74f59823b0617b7aa8fd83936d266a4a10200",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    },
+    {
+      "name": "compare.json",
+      "sha256": "18042e92d0927b1a9d1752cc669a90d1e8d2fa8b8944313095c06dcc268acee7",
+      "disclosure": "Machine output retained privately on the host; only factual results exported."
+    }
+  ]
+}

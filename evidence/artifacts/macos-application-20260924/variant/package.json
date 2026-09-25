@@ -1,0 +1,30 @@
+{
+  "name": "scoped-run-ledger",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 18080",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 18080",
+    "types": "openapi-typescript openapi.json -o app/api.generated.ts",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "24.13.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@playwright/test": "1.63.0",
+    "openapi-typescript": "7.13.0"
+  }
+}

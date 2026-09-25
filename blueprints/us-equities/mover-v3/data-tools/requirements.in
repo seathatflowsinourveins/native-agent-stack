@@ -1,0 +1,13 @@
+# Generator runtime for ../data/session-calendar.json (protocol-core-draft.json
+# populations.session_calendar). exchange_calendars 4.13.2 is the protocol's pin.
+# The other pins match blueprints/us-equities/data/requirements.lock, so that
+# lock's venv is the same environment for every package the generator imports.
+exchange_calendars==4.13.2
+numpy==2.5.3
+pandas==3.0.6
+tzdata==2026.4
+korean_lunar_calendar==0.4.0
+pyluach==2.3.0
+toolz==1.1.0
+python-dateutil==2.9.0.post0
+six==1.17.0

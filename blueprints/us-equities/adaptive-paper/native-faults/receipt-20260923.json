@@ -1,0 +1,176 @@
+{
+  "broker": "alpaca",
+  "cases": [
+    {
+      "detail": {
+        "broker_status": "pending_new",
+        "client_order_id": "nf-20260923t142024-4b0bc9-c01",
+        "ledger": {
+          "broker_id_recorded": true,
+          "filled_qty": "0",
+          "status": "pending_new",
+          "submit_attempted": true
+        },
+        "limit_price": "384.58",
+        "reference_bid": "769.16"
+      },
+      "evidence_class": "native_paper",
+      "id": "C01",
+      "name": "accept_resting_buy",
+      "outcome": "passed",
+      "requests": [
+        {
+          "kind": "submit",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "detail": {
+        "broker_snapshot_status": "canceled",
+        "cancel_result_status": "canceled",
+        "client_order_id": "nf-20260923t142024-4b0bc9-c01",
+        "ledger": {
+          "broker_id_recorded": true,
+          "filled_qty": "0",
+          "status": "canceled",
+          "submit_attempted": true
+        }
+      },
+      "evidence_class": "native_paper",
+      "id": "C02",
+      "name": "cancel_resting",
+      "outcome": "passed",
+      "requests": [
+        {
+          "kind": "read",
+          "status": 200
+        },
+        {
+          "kind": "cancel",
+          "status": 204
+        },
+        {
+          "kind": "read",
+          "status": 200
+        },
+        {
+          "kind": "read",
+          "status": 200
+        },
+        {
+          "kind": "read",
+          "status": 200
+        },
+        {
+          "kind": "read",
+          "status": 200
+        },
+        {
+          "kind": "read",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "detail": {
+        "broker_refusal_observed": false,
+        "cancel_http_statuses": [],
+        "cancel_result_status": "canceled",
+        "client_order_id": "nf-20260923t142024-4b0bc9-c01",
+        "delete_sent": false,
+        "engine_path": "transport.cancel found the order terminal by client-id lookup; no DELETE sent",
+        "error": null,
+        "ledger_after": {
+          "broker_id_recorded": true,
+          "filled_qty": "0",
+          "status": "canceled",
+          "submit_attempted": true
+        },
+        "ledger_before": {
+          "broker_id_recorded": true,
+          "filled_qty": "0",
+          "status": "canceled",
+          "submit_attempted": true
+        },
+        "new_transport_freeze_reasons": []
+      },
+      "evidence_class": "engine_short_circuit",
+      "id": "C05",
+      "name": "cancel_again",
+      "outcome": "passed",
+      "requests": [
+        {
+          "kind": "read",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "detail": {
+        "client_order_id": "nf-20260923t142024-4b0bc9-c04",
+        "effect_after": {
+          "cash_delta_usd": "0",
+          "positions": {}
+        },
+        "effect_before": {
+          "cash_delta_usd": "0",
+          "positions": {}
+        },
+        "error": {
+          "reason": "invalid_price_increment",
+          "type": "NativeOrderRejected"
+        },
+        "ledger": null,
+        "limit_price": "307.6601",
+        "reference_bid": "769.16",
+        "submit_http_statuses": [],
+        "unobserved_reason": "engine_refused_before_send: invalid_price_increment"
+      },
+      "evidence_class": "none",
+      "id": "C04",
+      "name": "definitive_rejection",
+      "outcome": "unobserved",
+      "requests": []
+    }
+  ],
+  "cleanup": {
+    "broker_open_orders": 0,
+    "cancels": [],
+    "client_id_prefix": "nf-20260923t142024-4b0bc9-",
+    "flat": true,
+    "proof": "runner.reconcile over transport.snapshot",
+    "reconcile": {
+      "cash_delta_usd": "0.00",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    }
+  },
+  "client_id_prefix": "nf-20260923t142024-4b0bc9-",
+  "endpoint": "paper",
+  "engine_sources_sha256": {
+    "runner.py": "549a326fec0f7b88fac793b3c8f74b7acdba87fccb585370dd0cfc020d46617f",
+    "safety.py": "8cc67464ab55794b232cedb9988c264b86c8ec11ebe1734a94fb71480a269fa0",
+    "transport.py": "c75f7db3025200d55a166b8ec2811939d32518861118490ffc1a57eb7ba389fa"
+  },
+  "error": null,
+  "evidence_note": "native_paper marks a case only when the engine transport's request observer recorded a broker HTTP response inside that case and, for C05, only when the DELETE itself was sent; C05 without a DELETE is engine_short_circuit. unobserved and not_run cases made no qualifying broker request. Price reference is the engine's streamed quote bid, not a last-trade read. No credential, account id or account fingerprint is recorded.",
+  "finished_at": "2026-09-23T14:20:26.205394+00:00",
+  "gate": "native-fault-behaviour",
+  "harness_sha256": "742fb6664ec9d6789e4ab2e4a038d9b74678e1d23a931111af0e8a223b22013d",
+  "in_flight_marker_present": false,
+  "interrupted": null,
+  "kind": "native_fault_behaviour_receipt",
+  "max_posts": 4,
+  "plan_sha256": "2ce6f6be140826a107826e35e6aaef9f31c55fcf82c98e25ce7ffd1b894e5a84",
+  "posts_reserved": 1,
+  "schema_version": 1,
+  "started_at": "2026-09-23T14:20:24.964109+00:00",
+  "status": "native_faults_incomplete",
+  "stop_error": null,
+  "submit_responses": 1,
+  "symbol": "SPY",
+  "transport_builds": 1
+}

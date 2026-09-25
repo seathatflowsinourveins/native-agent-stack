@@ -50,7 +50,10 @@ If the default branch pins a different tag than the host's checkout, a re-pin
 has landed: move the host (steps 3 and 4). `release_due.py` printing
 `"status": "release_due"` means main documents steps that the pinned release
 lacks (a release is due, not yet cut); the pages that use them mark those steps "added
-after `<release_tag>`". A published release that main does not pin
+after `<release_tag>`". `"status": "content_changed"` means the release has every
+documented path but ships a different copy of some new-machine files (its
+`changed` list: a script, pin file, hook, step text or README's Start here
+section). A pinned host runs the release's copies, so a release is due then too. A published release that main does not pin
 yet is not a target; wait for its re-pin PR.
 
 **2. How the coordinator cuts and re-pins a release.** This is the maintainer
@@ -79,7 +82,12 @@ flow, recorded so a host can check what it receives.
 3. Open a re-pin PR that sets `source.release_tag` and `source.release_commit`
    (and `updated_at`) in `adoption/manifest.json` and re-registers its hash in
    `manifests/evidence.json`. `python3 scripts/release_due.py --strict` must
-   print `"status": "current"`; `validate.yml` runs
+   print `"status": "current"` (empty `due` and `changed`: tag the latest `main`
+   and open the re-pin PR before other new-machine changes land, or cut again;
+   update the PR branch from `main` right before merging, because the main
+   ruleset does not require an up-to-date branch and the post-merge push run of
+   `validate.yml` is not strict);
+   `validate.yml` runs
    `release_due.py --strict-if-repinned origin/main`, which is strict because
    the pinned commit changed, and `tests/test_release_pin_contents.py` checks
    that the tag resolves to the pinned commit and that the release's own
@@ -110,7 +118,7 @@ git checkout "$tag"
    ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
-3. Rerun `python3 scripts/adoption_status.py --profile <id> --json`.
+3. Rerun `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`.
 4. In the default-branch clone from step 1 (`cd "$RUN_DIR/catalog-main"`, on the
    branch step 4 creates), record a new receipt with
    `python3 scripts/host_receipts.py record` for every component whose pin changed (in the pin files, `manifests/stack.json`, or a
@@ -184,6 +192,10 @@ python3 scripts/validate_catalogs.py
 git diff --check
 gitleaks dir . --redact --no-banner
 ```
+
+On macOS, run the Gitleaks step through `adoption/tools/gitleaks-guarded-macos`
+so that it takes the per-user lock and the memory cap
+([adoption/tools/README.md](tools/README.md#macos-gitleaks-guarded-macos-2026-09-24)).
 
 CI validates public artifacts and code behavior. It does not log in, place broker orders, reproduce the GPU stack or consume model allowance. Local accepted runtime results retain their own receipts.
 

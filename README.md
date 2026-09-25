@@ -62,9 +62,9 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
-and its retained **342-star coverage ledger**. Its current combined index includes
-**844 repository identities**, including the 342 public stars and
-502 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
+and its retained **357-star coverage ledger**. Its current combined index includes
+**861 repository identities**, including the 357 public stars and
+504 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -208,7 +208,7 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-linux.sh --profile foundation-cpu
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
-python3 scripts/adoption_status.py --profile foundation-cpu --json
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
 codex login   # and/or: claude
 ```
 
@@ -230,7 +230,7 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation
 export PATH="$HOME/.local/share/codex-ecosystem/bin:$PATH"
-python3 scripts/adoption_status.py --profile macos-arm64-foundation --json
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json
 codex login   # and/or: claude
 ```
 

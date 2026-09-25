@@ -178,6 +178,23 @@ the five harness hashes against the run's `local_source_sha256`, and
 history is re-hashed at comparison time and may only have grown by appended
 entries since the run.
 
+On 2026-09-25 the README replay above ran on a second physical host,
+`nativestack-5975wx-20260925`, CPU only. Its interpreter and data roots were
+`nautilus-py312` and `lean/Lean/Data` under `~/.local/share/codex-ecosystem`
+rather than the `tools/` paths named above. `run.py` exited 0, and the economic
+ledger equals `receipt-v2.json`. `compare.py --lean-data` on `receipt-v2.json`
+there returned PASS. On that host's own receipt it returned FAIL: all 106
+execution checks pass, but two review preconditions fail.
+`no_prior_replay_ran_the_reviewed_harness` fails by design, because a retry of
+the reviewed harness cannot qualify. `retained_record_before_run` fails because
+the `run.py` command above omits `--review-record`, although
+`review-record-v2-cc4503f.json` exists. The `--bars` example under
+"Reproduce `verdict.json`" exits 1 on both v2 receipts there: `--bars` cannot
+re-hash the five inputs, and v2 counts that skipped check as `FAIL`. The replay
+is appended to
+`replay-history-v2.json`; the record, the receipt and the verdicts are in
+[`evidence/artifacts/workstation-lane-20260925/spy-parity/`](../../../../evidence/artifacts/workstation-lane-20260925/spy-parity/spy-parity-host-replay.json).
+
 ## Reproduce the probe transcripts
 
 ```sh

@@ -158,7 +158,11 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 raise SafetyError("recovery_price_not_positive")
             capacity = (ledger.limits.max_order_notional_usd / price).quantize(
                 Decimal("0.000000001"), rounding=ROUND_DOWN)
-            quantity = min(position.qty, ledger.limits.max_order_qty, capacity)
+            # The share cap reserve_intent applies to this sell at this bid. In "fixed" mode it
+            # is max_order_qty, exactly as before; in "notional" mode it is
+            # min(max_order_qty, floor(max_order_notional_usd / bid), 100), whole shares at or
+            # below the capacity, so an appreciated position exits in chunks the ledger admits.
+            quantity = min(position.qty, ledger.limits.effective_max_order_qty(price, quote_price=bid), capacity)
             if quantity <= 0 or quantity.as_tuple().exponent < -9:
                 raise SafetyError("recovery_quantity_not_representable")
             sequence += 1

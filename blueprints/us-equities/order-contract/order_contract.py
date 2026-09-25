@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Validate and serialize an offline basic-equity intent. No broker transport."""
+"""Validate and serialize an offline basic-equity intent. No broker transport.
+
+``build_envelope`` is the pre-submission validation boundary an owned adapter
+calls before it constructs an SDK request; it never constructs one itself."""
 from __future__ import annotations
 
 import argparse
@@ -18,7 +21,7 @@ class ContractError(ValueError):
     """Invalid or unsupported offline intent; values are not echoed."""
 
 
-def _number(value: object, field: str) -> str:
+def _number(value: object, field: str, fraction_digits: int = 4, whole_qty: bool = True) -> str:
     # Reject bool and Python float: a float may already have lost decimal intent.
     if type(value) is int:
         if not 0 < value <= 1000000000:
@@ -26,14 +29,14 @@ def _number(value: object, field: str) -> str:
         text = str(value)
     elif isinstance(value, Decimal):
         if (not value.is_finite() or not 0 < value <= MAX_NUMBER
-                or not -4 <= value.as_tuple().exponent <= 9):
+                or not -fraction_digits <= value.as_tuple().exponent <= 9):
             raise ContractError(f"{field}: finite bounded decimal required")
         text = format(value, "f")  # Exact; no context-sensitive normalize/quantize.
     elif isinstance(value, str):
         text = value
     else:
         raise ContractError(f"{field}: decimal text, Decimal or integer required")
-    if not re.fullmatch(r"[0-9]{1,10}(?:\.[0-9]{1,4})?", text):
+    if not re.fullmatch(r"[0-9]{1,10}(?:\.[0-9]{1,%d})?" % fraction_digits, text):
         raise ContractError(f"{field}: bounded unsigned decimal required")
     number = Decimal(text)
     if not number.is_finite() or not 0 < number <= MAX_NUMBER:
@@ -42,7 +45,7 @@ def _number(value: object, field: str) -> str:
     whole = whole.lstrip("0") or "0"
     fraction = fraction.rstrip("0")
     canonical = whole + ("." + fraction if fraction else "")
-    if field == "qty" and fraction:
+    if field == "qty" and fraction and whole_qty:
         raise ContractError("qty: only whole shares are supported")
     if field == "limit_price" and len(fraction) > (2 if number >= 1 else 4):
         raise ContractError("limit_price: unsupported price increment")
@@ -57,6 +60,19 @@ def _enum(value: object, allowed: tuple[str, ...], field: str) -> str:
 
 def canonicalize(value: object) -> dict:
     """Return a new offline envelope, never an SDK request or submit-ready client."""
+    return build_envelope(value)
+
+
+def build_envelope(value: object, *, fractional_sell_qty: bool = False,
+                   extended_hours_allowed: bool = False) -> dict:
+    """Pre-submission validation boundary; the envelope is never an SDK request.
+
+    With the defaults it is exactly ``canonicalize``. An owned adapter may widen
+    two policies explicitly: ``fractional_sell_qty`` admits a sell quantity with
+    up to nine fractional digits (exact residual exits; buys stay whole shares),
+    and ``extended_hours_allowed`` admits the literal boolean ``true``. Every
+    other rule, including the limit price increment, is unchanged.
+    """
     if type(value) is not dict:
         raise ContractError("intent: JSON object required")
     if any(type(key) is not str or key not in ALLOWED for key in value):
@@ -72,17 +88,20 @@ def canonicalize(value: object) -> dict:
     kind = _enum(value["type"], ("market", "limit"), "type")
     if (kind == "limit") != ("limit_price" in value):
         raise ContractError("limit_price: required exactly for limit intents")
-    if value.get("extended_hours", False) is not False:
+    extended_hours = value.get("extended_hours", False)
+    if extended_hours is not False and not (extended_hours_allowed and extended_hours is True):
         raise ContractError("extended_hours: only false is supported")
+    side = _enum(value["side"], ("buy", "sell"), "side")
+    fractional = fractional_sell_qty is True and side == "sell"
     intent = {
         "symbol": symbol,
-        "qty": _number(value["qty"], "qty"),
-        "side": _enum(value["side"], ("buy", "sell"), "side"),
+        "qty": _number(value["qty"], "qty", 9 if fractional else 4, not fractional),
+        "side": side,
         "type": kind,
         "time_in_force": _enum(value["time_in_force"], ("day",), "time_in_force"),
         "client_order_id": identifier,
         "order_class": _enum(value.get("order_class", "simple"), ("simple",), "order_class"),
-        "extended_hours": False,
+        "extended_hours": extended_hours,
     }
     if kind == "limit":
         intent["limit_price"] = _number(value["limit_price"], "limit_price")

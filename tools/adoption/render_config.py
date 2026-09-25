@@ -11,6 +11,13 @@ trust entries and hook trusted-hash state, is preserved byte-for-byte inside
 the template text (escaped as ``$$`` where the source already used a literal
 ``$`` for shell syntax such as ``$HOME`` inside a status-line script).
 
+One placeholder is an explicit opt-in instead of a host value:
+``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or
+``--set`` sets it to ``true``, which appends ai-memory's ``--capture-assistant``
+flag to the Claude ``Stop`` hook only (assistant/Stop capture; the ai-memory
+server's own ``capture_assistant`` setting must also be enabled). Absent, empty
+or ``false`` keeps automatic assistant capture off; any other value is an error.
+
 This script never edits a live client config. It only reads templates and a
 selected host's value file, then writes to an explicitly chosen ``--out``
 directory, or compares (``--check``) against explicitly chosen live paths, or
@@ -95,10 +102,22 @@ def parse_set_values(pairs: list[str]) -> dict[str, str]:
     return values
 
 
+CAPTURE_ASSISTANT = "AI_MEMORY_CAPTURE_ASSISTANT"
+
+
+def resolve_opt_ins(values: dict[str, str]) -> dict[str, str]:
+    """Replace the explicit opt-in's setting with the text it renders (see the module docstring)."""
+    setting = values.get(CAPTURE_ASSISTANT, "")
+    if setting not in ("", "false", "true"):
+        raise RenderError(f'{CAPTURE_ASSISTANT} must be "true" or "false", got {setting!r}')
+    return {**values, CAPTURE_ASSISTANT: " --capture-assistant" if setting == "true" else ""}
+
+
 def render_one(template_path: Path, values: dict[str, str]) -> str:
     text = template_path.read_text(encoding="utf-8")
+    resolved = resolve_opt_ins(values)
     try:
-        return string.Template(text).substitute(values)
+        return string.Template(text).substitute(resolved)
     except KeyError as error:
         raise RenderError(f"{template_path.name}: missing template value {error}") from None
 
@@ -201,7 +220,10 @@ def cmd_verify(_args: argparse.Namespace) -> int:
     overall = 0
     for command in commands:
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False)
+            # stdin closed like adoption's version probes: a CLI that falls
+            # back to reading stdin gets EOF instead of the caller's terminal.
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30, check=False,
+                                    stdin=subprocess.DEVNULL)
             code = result.returncode
             output = (result.stdout or result.stderr or "").strip().splitlines()
             first_line = output[0] if output else ""

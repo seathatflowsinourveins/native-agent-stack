@@ -5,6 +5,7 @@ Scope and base commit
 
 - What this PR changes, in one or two sentences:
 - Base commit: `<sha>`
+- Lane: exactly one of `lane:foundation`, `lane:trading` or `lane:shared`, matching the PR label; a `lane:shared` PR needs the other lane's acknowledgement before merge ([docs/lanes.md](../docs/lanes.md)):
 - Owned paths touched:
 
 ### Evidence-class table

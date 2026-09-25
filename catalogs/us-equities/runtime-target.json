@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "ibkr-nautilus-alpaca-20260920",
-  "reviewed_at": "2026-09-21",
+  "reviewed_at": "2026-09-24",
   "scope": "User-selected destination, bounded native equity replay and Alpaca paper smoke acceptance, plus native adaptive-engine integration and dated shadow market research. New adaptive broker execution and strategy merit remain separate gates.",
   "adaptive_practice": {
     "source": "blueprints/us-equities/adaptive-paper/README.md",
@@ -11,6 +11,8 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
+    "native_paper_capacity": "2026-09-24 order-throughput harness on Alpaca paper from the WSL2 workstation (harness 4911baf): 180 order actions in each of 5 full one-minute windows, 496 submits and 496 cancels, 0 HTTP 429, websocket completeness 1.0, reconciled with 0 open orders, at the account's observed 200/min trading limit. Self-reported by the harness; an independent alpaca-py listing matched the order counts only (not rates or latencies). Non-marketable probes cancelled individually, not strategy trades or fills. 1000/min was not measured; an earlier regular-session run froze on cancel confirmations of about 16 s and is retained as a non-pass.",
+    "native_paper_capacity_evidence": "blueprints/us-equities/order-throughput/evidence/index-20260924.json",
     "broker_status": "Adaptive 1x broker trial passed 2026-09-23 on main 843dc8f (adaptive-paper/receipt.json broker_readiness passed; trials/20260923g-main-passed: 300.5 s, 5 real paper orders, 4 native fills, reconciled flat); earlier one-SPY broker receipt retained",
     "market_research": "Bounded50-provider-news-item and24-IEX-snapshot collection observed; partial news coverage; no execution eligibility",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
@@ -31,7 +33,7 @@
     "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
     "supported_python": ">=3.12,<3.15; vanilla CPython",
     "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
-    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. SPY/LEAN parity, realistic liquidity and native broker adapter acceptance remain open.",
+    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. SPY/LEAN parity is established for the historical one_zero case only (gate spy-lean-parity, blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json; one case, and the open-fill proxy is not a general market-on-open equivalent). Realistic liquidity and rc5 native broker adapter acceptance remain open.",
     "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
     "sources": [
       "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
@@ -47,6 +49,30 @@
       "selected_path": "Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway",
       "upstream_supported": true,
       "local_broker_acceptance": "not_established",
+      "local_broker_acceptance_scope": "For the selected 2.0.0rc5 destination. The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run, and no dated version-selection record accepts 1.231.0 for this gate.",
+      "python_adapter_paper_evidence": {
+        "status": "passed",
+        "receipt": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+        "evidence_class": "native_paper",
+        "engine": "NautilusTrader 1.231.0 Python Interactive Brokers adapter on the official ibapi 10.45.1, paper IB Gateway port 4002",
+        "observed": "2026-09-23 regular session: C1 resting SPY limit buy accepted, C2 canceled, C3 marketable buy filled 768.56, C4 flatten sold 768.50; 3 of 6 orders, net -2.08 USD after 2.02 USD commissions; independent official-ibapi flat proof 0 positions and 0 open orders.",
+        "not_established": "The pinned 2.0.0rc5 Rust adapter path, reconnect/restart reconciliation, the kill switch, and the after-hours run (receipt-20260923-post-incomplete.json, incomplete on the C4 step timeout).",
+        "source": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md"
+      },
+      "rc5_blockers": [
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+          "state": "open",
+          "state_checked_at": "2026-09-24",
+          "effect": "The rc5 Rust adapter's execution client venue IB never matches the SMART instrument venue, so every stock order is denied locally."
+        }
+      ],
+      "upstream_ibapi_pin": {
+        "state_checked_at": "2026-09-24",
+        "rc5_pin": "Rust ibapi =3.3.0 (Cargo.toml at tag v2.0.0rc5)",
+        "notice_2188_issue": "wboayue/rust-ibapi#764 closed 2026-08-27 by merged PR #765 (in v4.0.0); not listed as a blocker",
+        "pin_update": "nautechsystems/nautilus_trader PR #5041 (open) changes the pin to =4.1.0"
+      },
       "paper_socket_defaults": {
         "tws": 7497,
         "gateway": 4002
@@ -59,10 +85,13 @@
         "risk/universe/session contract"
       ],
       "limitations": [
-        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation."
+        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation.",
+        "The passed paper receipt is on NautilusTrader 1.231.0's Python adapter, not the pinned 2.0.0rc5 destination; it covers accept, cancel, fill and flatten only."
       ],
       "sources": [
-        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+        "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+        "https://github.com/nautechsystems/nautilus_trader/pull/5041"
       ]
     },
     {
@@ -111,23 +140,26 @@
   "next_acceptance": [
     {
       "id": "retained-equity-replay",
-      "status": "reported_execution_blocked_review_incomplete",
-      "scope": "The September 22 source-host SPY/LEAN one_zero harness returned a completed BLOCKED comparison with four failed checks attributed to dividend cash posting and market-on-open mappings. This is recorded progress, not accepted parity; hardening and qualified rerun remain open. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and does not close this requirement.",
-      "executed_evidence_ref": "evidence/artifacts/comparison-progress-20260922/summary.json#/rows/6"
+      "status": "spy_lean_parity_passed_one_zero_case",
+      "scope": "Gate spy-lean-parity (catalogs/us-equities/gates-20260922.json) was established 2026-09-23 on the sealed v2 preregistration: verdict-v2.json reads PASS for the historical one_zero case with 136 checks, 0 failed and 0 skipped (106/106 execution checks) and preregistration_qualifying true, with dividend cash from a native rc5 SimulationModule and the open fill from native OCO-linked orders (gate dividend-sim-module, also established). The six earlier v2 replays ran before review and are disclosed in replay-history-v2.json with an accepted deviation. The September 22 v1 verdict.json (BLOCKED, four failed checks on the then-unsupported dividend-cash and market-on-open mappings) is retained. Limits: one case only; the open-fill proxy is not a general market-on-open equivalent when the open equals the prior close; parity is agreement with the frozen LEAN oracle, not strategy merit. The separately completed AAPL diagnostic deliberately avoids corporate-action dates and is not this gate.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+      "earlier_evidence_ref": "evidence/artifacts/comparison-progress-20260922/summary.json#/rows/6"
     },
     {
       "id": "broker-state-failures",
-      "status": "bounded_alpaca_synthetic_cases_passed_native_faults_pending",
-      "scope": "27 local Alpaca lifecycle tests cover bounded ambiguous submit, duplicate/restart, partial/cancel, stale/clock/risk, request budget, ownership and kill failures. Actual paper execution observed full fills and completed-trial recovery only; native in-flight fault behavior remains unqualified."
+      "status": "bounded_alpaca_synthetic_cases_passed_native_fault_behaviour_established_alpaca_paper",
+      "scope": "27 local Alpaca lifecycle tests cover bounded ambiguous submit, duplicate/restart, partial/cancel, stale/clock/risk, request budget, ownership and kill failures. Actual paper execution observed full fills and completed-trial recovery; native in-flight (ambiguous-submit) fault behaviour remains unqualified, while native definitive-rejection and repeat-cancel behaviour are qualified by the 2026-09-24 receipt. Native fault receipt 2026-09-24 (blueprints/us-equities/adaptive-paper/native-faults/receipt.json, native_faults_passed on Alpaca paper from the WSL2 workstation): resting submit and cancel, a repeat cancel whose DELETE was answered 204, and a documented sub-penny submit refused with 422 then a 404 lookup, cleanup flat. Gate native-fault-behaviour established 2026-09-24 by a dated flip commit after an independent alpaca-py observation (blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260924.json: c01 canceled with 0 filled, no order for c04, 0 open orders and positions, matching the receipt). Only the definitive-rejection class (one sub-penny 422) was exercised as a native fault; ambiguous submits, timeouts, 429/5xx and partial fills remain synthetic or offline-only. C05's DELETE was answered 204, so the engine's handling of a 422 cancel refusal remains offline-tested only; the C04 422 is one paper-endpoint observation, not live evidence; IBKR fault behaviour is not covered. Binding amendment 2026-09-24: receipt.json is now the 18:58Z re-run on the order-contract engine (main 3b7ae710; the 14:39Z receipt is retained as native-faults/receipt-20260924t143905.json and bound the engine of cbbd5894); both receipts' engine_sources_sha256 predate the 2026-09-24 adaptive-paper engine release (0b492619 and its review follow-up 1cf633e4), which, merged with main, changed runner.py, safety.py and transport.py, so the qualification covers the earlier engine until the native-faults plan is re-run on the release."
     },
     {
       "id": "separate-paper-adapters",
-      "status": "bounded_alpaca_paper_smoke_passed_ibkr_pending",
-      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. Continuous operation, native broker faults, Elite throughput and IBKR remain separate."
+      "status": "bounded_alpaca_paper_smoke_passed_ibkr_1231_python_paper_passed_rc5_pending",
+      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders remain blocked by nautilus_trader#4983 (open). Continuous operation, native in-flight broker faults (see broker-state-failures), Elite 1000/min throughput (200/min measured; see adaptive_practice native_paper_capacity) and IBKR reconnect/restart reconciliation remain separate.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+      "rc5_blocker": "https://github.com/nautechsystems/nautilus_trader/issues/4983"
     }
   ],
   "limitations": [
-    "September21 paper GETs observed200Trading requests/minute; advertised Elite1000/minute activation and IBKR account access remain unestablished.",
+    "September21 paper GETs observed200Trading requests/minute; advertised Elite1000/minute activation remains unestablished. IBKR paper account access and bounded paper orders were observed 2026-09-23 through NautilusTrader 1.231.0; IBKR acceptance on the rc5 destination remains unestablished.",
     "Native AAPL replay is a retrospective scheduled diagnostic with synthetic fills; it does not establish a profitable strategy, historical universe or SPY/LEAN parity.",
     "Paper fills omit market impact, realistic queue position and some costs; they cannot establish deployable profitability or execution capacity.",
     "No broker orders, paid hosting, purchases or live trading are authorized by catalog inclusion."
