@@ -98,7 +98,7 @@ The latest [architecture wave](architecture/README.md) reviews 40 finalist recor
 
 ## Read the layer you need
 
-Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker).
+Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker). It also lists under `warnings` any receipt whose bound source files no longer match the tree; this is report-only and never fails the check.
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |

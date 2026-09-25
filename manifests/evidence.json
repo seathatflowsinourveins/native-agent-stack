@@ -6662,8 +6662,88 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
-      "sha256": "8f4a6ba0708ddf918ab3abdf12dbd06030a906e09af0ff9e0c2fbb3ee195ade9",
-      "bytes": 35144
+      "sha256": "a7ad33fd573f46da43848bae5bce518ae0832b82b21f9445188f8001bc533673",
+      "bytes": 39720
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t182439z-before-run.txt",
+      "sha256": "6a5b39db0c87d55ce2ef7f7aa6afb48d45f9af8c683f47df83a132539fb7f31a",
+      "bytes": 454
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t184644z-observation-2.txt",
+      "sha256": "911024b76d7df648f37432eac873778fafcde7a3fc08d05dcb84daead3a6e8b7",
+      "bytes": 467
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t185504z-ladder-decision.txt",
+      "sha256": "ce0cbfdd5920625a7672bed4a99781ced0be2c890f15950a4134caf38a9ccac5",
+      "bytes": 489
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t185518z-ladder-decision.txt",
+      "sha256": "93798e4280c8d630b756c1affc1782c75336bf225a1dec922d44181e1687465a",
+      "bytes": 1538
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t185555z-series.txt",
+      "sha256": "52a77f3531831af7927876f09ab276f14acc5601c0ef4d665d7a3aa25012ab12",
+      "bytes": 3397
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/host-clock-diagnosis-20260925.txt",
+      "sha256": "25c2c6c9a797d6c4e43bb02c0f4b5e024d24e704ea2f0b0abb0b6afc8b61f619",
+      "bytes": 23359
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260924.json",
+      "sha256": "282824d9790917703570213a20b2f576e3e695028add9f97be7295fcb6bc5e88",
+      "bytes": 3774
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260924t185811.json",
+      "sha256": "0265d92e05d11f8deea31de054e6f3778d2fd10cedd367759410dcc38b1019e1",
+      "bytes": 3923
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20260925t182513.json",
+      "sha256": "c9976640a3eacd06eb61cdd0a2bd703ad5f736d31ef75131ebc4eb5103185056",
+      "bytes": 4496
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-fault-20260925t184220z.py",
+      "sha256": "6b9cf04569c16452c4b419e75dc1fd3a15267fc932bb027a535ea7fa386ba518",
+      "bytes": 29282
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-fault-20260925t184220z.stdout.json",
+      "sha256": "19ce56c3139510e449dd5dc6bb9e72395c314774044ed1ce0133457484a587fa",
+      "bytes": 12341
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260924.py",
+      "sha256": "6f4b1c192245c4df859d08c4b5b15196c54bd1b0533206a3969c7f6f8a5fe64c",
+      "bytes": 2304
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260924.stdout.json",
+      "sha256": "420d762c27f64204bd5eb65ddecaf31443cfc7da2ecfd90101f13376c691ccd8",
+      "bytes": 735
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260924t185811.stdout.json",
+      "sha256": "0c047ba015f609b0d56a5c90469b9f36c1111e7aff6a68c7fc3d6565f26bf04a",
+      "bytes": 735
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20260925t182513.stdout.json",
+      "sha256": "14d71155650cd2afe8a09a3da1ac6789f70f2d24c59d1914752e9b23dae84c6b",
+      "bytes": 735
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/run-20260925t182513.json",
+      "sha256": "3fe2e954ff3ea1ad63e9286eb55b018d8532b4bfd688c3dd8d584e0cafe28038",
+      "bytes": 15697
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
@@ -9732,8 +9812,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "4ab4b02c9b51746d5891b4aa322d1d2b6dec5fdd3e31512d504475d95c15988b",
-      "bytes": 16601
+      "sha256": "07bf68f79ea9940fc8f47cdf5c102608d6b3df5317ea87e339ca962c2ff87108",
+      "bytes": 16742
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -9907,8 +9987,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1c1ff6af316ce3f235bef095eef7de86eb64f523f41e23625618c271625ef6be",
-      "bytes": 66576
+      "sha256": "6a1033ca46675c5271d58a8e4712cfb090d4e8d2d01d4c71c62194e2d22bc25d",
+      "bytes": 67077
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -30347,8 +30427,8 @@
     },
     {
       "path": "scripts/trading_gates.py",
-      "sha256": "d45d107448f6aaa73c6c01963048fdae2694ca3ecb6d9a68355ac3911abdbdb1",
-      "bytes": 17749
+      "sha256": "726e50d8de67a1b28cb57eed859b3d73988ebd1e1cd5bd78f9c802fa84cb38b3",
+      "bytes": 24260
     },
     {
       "path": "scripts/validate.py",
@@ -31029,6 +31109,11 @@
       "path": "tests/test_trading_gates.py",
       "sha256": "10b1ce5b0cec4d3e68d792c83a9ad2b4fcbb70863305b0496961650deb34214f",
       "bytes": 35512
+    },
+    {
+      "path": "tests/test_trading_gates_bindings.py",
+      "sha256": "8c0a84621ca157e2c52361ee710badeece9b983414352d290b7cc4526a8e7e00",
+      "bytes": 12877
     },
     {
       "path": "tests/test_validate.py",

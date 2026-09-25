@@ -1,0 +1,29 @@
+2026-09-25T18:55:18.702887607Z
+Reference ID    : B97DBE39 (185.125.190.57)
+Stratum         : 3
+Ref time (UTC)  : Fri Sep 25 18:54:55 2026
+System time     : 0.000000000 seconds fast of NTP time
+Last offset     : +0.271597475 seconds
+RMS offset      : 0.255186796 seconds
+Frequency       : 8104.009 ppm fast
+Residual freq   : +3783.916 ppm
+Skew            : 89.622 ppm
+Root delay      : 0.083256520 seconds
+Root dispersion : 0.103999652 seconds
+Update interval : 65.0 seconds
+Leap status     : Normal
+
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+^+ 185.125.190.56                2   6   377    18   +676us[ +676us] +/-   42ms
+^* 185.125.190.57                2   6   377    22    +12ms[ +284ms] +/-   42ms
+^+ 91.189.91.157                 2   6   377    18  +2552us[+2552us] +/-   30ms
+^+ 185.125.190.58                2   6   377    17   +257us[ +257us] +/-   41ms
+^- 167.248.62.201                3   6   135    24    +12ms[ +283ms] +/-   30ms
+^- 23.150.41.122                 2   6   377    83   -256ms[  +16ms] +/-   27ms
+^- 38.28.93.135                  1   6   377    20  +1723us[+1723us] +/-   27ms
+^- 96.60.247.29                  2   6   277    19  +2098us[+2098us] +/-   30ms
+
+Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev
+==============================================================================
+PHC0                        6   3    43  -6876.784  23780.332    -27ms    75ms

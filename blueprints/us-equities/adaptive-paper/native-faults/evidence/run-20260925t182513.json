@@ -46,16 +46,77 @@
   },
   "host": {
     "class": "WSL2 workstation (Linux)",
+    "clock_summary": "Added 2026-09-25 after the independent review of PR #278. The host clock was 0.22 to 0.35 s ahead of Alpaca's clock during the run, and it was unstable that afternoon. Two chronyd daemons were steering the one kernel clock: one kept it on the PHC0 refclock (the Hyper-V PTP clock, which carries the Windows host's time, about 0.29 s fast), and this distribution's own daemon, restarted at 18:09:44Z with makestep 0.1 -1, kept stepping it back to internet NTP time, 45 times from then to 19:00Z. No step reached the engine during the run. The harness runs no host-clock preflight, and no case outcome depends on the offset. Time sync was not changed. It has to be made single-source before the next timed paper run on this host, because a backward step during a run raises request_clock_moved_backward (safety.py:1100-1101).",
     "chrony_tracking_before_run": {
-      "Stratum": "1",
-      "Ref time (UTC)": "Fri Sep 25 18:24:27 2026",
-      "System time": "0.000901912 seconds slow of NTP time",
-      "Last offset": "+0.008424971 seconds",
-      "RMS offset": "0.083404817 seconds",
-      "Skew": "0.586 ppm",
-      "Update interval": "8.0 seconds",
-      "Leap status": "Normal",
-      "Reference": "PHC0 (PTP hardware clock refclock)"
+      "captured_at": "2026-09-25T18:24:39.91Z (file time; chrony's Ref time 18:24:27Z)",
+      "committed_copy": "evidence/chrony-20260925t182439z-before-run.txt (byte-identical to the lane's private chrony-pre.txt)",
+      "sha256": "6a5b39db0c87d55ce2ef7f7aa6afb48d45f9af8c683f47df83a132539fb7f31a",
+      "lines": [
+        "Reference ID    : 50484330 (PHC0)",
+        "Stratum         : 1",
+        "Ref time (UTC)  : Fri Sep 25 18:24:27 2026",
+        "System time     : 0.000901912 seconds slow of NTP time",
+        "Last offset     : +0.008424971 seconds",
+        "RMS offset      : 0.083404817 seconds",
+        "Frequency       : 12.063 ppm slow",
+        "Residual freq   : -3087.581 ppm",
+        "Skew            : 0.586 ppm",
+        "Root delay      : 0.000000001 seconds",
+        "Root dispersion : 0.062333751 seconds",
+        "Update interval : 8.0 seconds",
+        "Leap status     : Normal"
+      ],
+      "reading": "The daemon that answered was referenced to PHC0 (stratum 1). Its 0.0009 s is the system clock's distance from PHC0, not from UTC. The same snapshot shows RMS offset 0.083 s, Frequency 12.063 ppm slow and Residual freq -3087.581 ppm, which are not the values of a settled clock."
+    },
+    "chrony_tracking_1822z": {
+      "captured_at": "2026-09-25T18:22:44Z",
+      "source": "transcribed from the run lane's notes; that chronyc output was not saved",
+      "values": "Reference 38.28.93.135 (NTP, stratum 2), Last offset +0.375 s, Frequency 4012 ppm fast",
+      "reading": "This answer came from the other daemon. This distribution's chronyd logged 'System clock was stepped by -0.375290 seconds' at 18:22:44.97Z (evidence/host-clock-diagnosis-20260925.txt, section 5). The 18:22:44Z and 18:24:39Z readings are two daemons answering in turn, not one daemon switching from NTP to PHC0."
+    },
+    "clock_vs_broker_during_run": {
+      "result": "host clock 0.22 to 0.35 s ahead of Alpaca's clock",
+      "evidence_class": "measured_local (engine ledger, GET probes) against native_paper broker timestamps",
+      "lower_bound_s": "0.2218",
+      "lower_bound_from": "The ledger reserved c01's submit at host 18:25:14.702052Z (requests row 7; the row is written before the POST is sent, safety.py:1116). Alpaca stamped submitted_at 18:25:14.480298Z (evidence/observe-native-fault-20260925t184220z.stdout.json).",
+      "upper_bound_s": "0.3456",
+      "upper_bound_from": "The GET probe 33 s before the run started at 18:24:40.287430Z and finished at 18:24:40.432684Z; Alpaca's clock read 18:24:40.087053Z between those times. The probe 27 s after the run gives 0.3506 s (18:25:41.989339Z, 18:25:42.123340Z, clock 18:25:41.772749Z). These bound the offset at those times, not inside the run.",
+      "conditional_upper_bound": "0.2545 s at c01's submit, if Alpaca stamps submitted_at before it answers the POST: the next ledger request, the C02 cancel reserved at 18:25:14.734782Z, came after that answer.",
+      "no_step_reached_the_run": "The ledger's 21 request times, 18:25:14.335Z to 18:25:15.061Z, increase monotonically. This distribution's chronyd logged steps at 18:24:55.454Z (-0.200 s) and 18:25:56.651Z (-0.194 s) and none between them. The harness ran from 18:25:13.24Z to 18:25:15.27Z."
+    },
+    "engine_clock_check": "The engine's 0.25 s clock check (runner.validate_preflight, runner.py:703-704, SafetyError clock_drift) is not part of this harness. harness.py:42 imports only Controller, credentials, reconcile and save from runner, and prepare() (harness.py:296-314) reads the broker clock only for is_open and next_close. So the run neither passed nor failed that check. An offset of 0.22 to 0.35 s straddles its tolerance.",
+    "outcome_dependence": "None found. The ledger's quote check refuses a quote more than 0.25 s in the future (safety.py:641, 1132). A host clock that runs ahead makes quotes look older, not newer, and C01's quote passed. Both observations compared broker timestamps with the receipt's host-stamped window, with at least 0.6 s of margin at either end: submitted_at is 1.15 s after started_at, and canceled_at is 0.60 s before finished_at.",
+    "later_readings": [
+      {
+        "file": "evidence/chrony-20260925t184644z-observation-2.txt",
+        "sha256": "911024b76d7df648f37432eac873778fafcde7a3fc08d05dcb84daead3a6e8b7",
+        "answered_by": "the NTP daemon (185.125.190.56, stratum 3)",
+        "shows": "Last offset -0.124 s, RMS offset 0.259 s, Frequency 8104.009 ppm fast, Residual freq +3225.483 ppm"
+      },
+      {
+        "file": "evidence/chrony-20260925t185504z-ladder-decision.txt",
+        "sha256": "ce0cbfdd5920625a7672bed4a99781ced0be2c890f15950a4134caf38a9ccac5",
+        "answered_by": "the NTP daemon (185.125.190.57, stratum 3)",
+        "shows": "Last offset +0.272 s (its step of -0.271597 s at 18:54:56.40Z), Frequency 8104.009 ppm fast"
+      },
+      {
+        "file": "evidence/chrony-20260925t185518z-ladder-decision.txt",
+        "sha256": "93798e4280c8d630b756c1affc1782c75336bf225a1dec922d44181e1687465a",
+        "answered_by": "tracking and sources: the NTP daemon; sourcestats: the PHC0 daemon",
+        "shows": "The NTP daemon's sources list eight NTP servers with 185.125.190.57 selected. Its two samples taken just before the 18:54:56Z step (185.125.190.57 and 167.248.62.201) measured the clock +0.284 s and +0.283 s ahead. The PHC0 daemon's sourcestats list only PHC0 (offset -27 ms, std dev 75 ms)."
+      },
+      {
+        "file": "evidence/chrony-20260925t185555z-series.txt",
+        "sha256": "52a77f3531831af7927876f09ab276f14acc5601c0ef4d665d7a3aa25012ab12",
+        "answered_by": "both daemons, alternating",
+        "shows": "The NTP daemon measured the clock +0.283 s and +0.286 s ahead of 167.248.62.201 (samples in the 18:56:25Z to 18:57:05Z blocks) and stepped it back by 0.259 s and 0.243 s. At 18:57:15Z the PHC0 daemon measured it 0.273 s behind PHC0. So through PHC0 the Windows host clock was about 0.27 to 0.29 s ahead of the NTP servers."
+      }
+    ],
+    "diagnosis": {
+      "file": "evidence/host-clock-diagnosis-20260925.txt",
+      "captured_at": "2026-09-25T21:37:01Z, after the run; read-only commands, host name redacted",
+      "shows": "PHC0 is the Hyper-V PTP clock (/sys/class/ptp/ptp0/clock_name: hyperv). This distribution's chronyd configures no refclock. It was restarted at 18:09:44Z with SYNC_IN_CONTAINER=yes (clock control on; the 18:09:11Z start had disabled it with -x) and makestep 0.1 -1 (step whenever the offset exceeds 0.1 s; before, makestep 1 3). From then to 19:00Z it logged 46 steps, 45 of them backward (0.10 to 0.50 s). Two chronyd command sockets are bound on each loopback address, and ten consecutive unprivileged chronyc queries alternated between a PHC0 daemon (stratum 1) and an NTP daemon (stratum 2).",
+      "inference": "The PHC0 daemon is not a process of this distribution: ps lists one chronyd and one child process it forked, and that daemon's journal never names PHC0. The PHC0 daemon keeps the kernel clock on the Hyper-V clock."
     }
   },
   "offline_tests": {
@@ -177,7 +238,8 @@
     "C05's repeat DELETE was answered 204 again, so a 404 or 422 cancel refusal remains offline-tested only.",
     "C04's 422 is one more paper-endpoint observation of the documented sub-penny body, not a general rule that 422 is definitive.",
     "Ambiguous or in-flight submit faults (timeouts, 429, 5xx, partial fills, restart during a submit) were not exercised.",
-    "The trading-gates checker verifies only /status of the receipt; the engine binding above is a separate hash comparison."
+    "The gate's flip condition checks only /status of the receipt. Since 2026-09-25 (the PR #278 review), scripts/trading_gates.py also compares the six sha256 values this receipt binds with the tree and source-hashes.json. It lists any difference under warnings, and it never fails the check.",
+    "Host clock, 2026-09-25 (added after review): the host clock was 0.22 to 0.35 s ahead of Alpaca during the run. Two chronyd daemons (PHC0 and NTP) kept stepping it by about 0.25 s outside the run. This is not material to C01, C02, C05 or C04. Before the next timed paper run on this host, time sync must be made single-source, because a backward step raises request_clock_moved_backward (safety.py:1100-1101)."
   ],
   "privacy": "No credential, account id, account fingerprint, balance or host path is recorded here."
 }

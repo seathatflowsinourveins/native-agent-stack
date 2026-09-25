@@ -9,8 +9,9 @@ the retained receipt of the 2026-09-24 18:58Z run on the order-contract engine,
 `receipt-20260924t143905.json` (2026-09-24 14:39Z), the retained receipt of the
 earlier incomplete run, `receipt-20260923.json`, and under `evidence/` the
 independent observations of the three passing runs' broker orders, a second,
-standard-library observation of the 2026-09-25 run by a separate session, and the
-sanitized run record of the 2026-09-25 run. The offline
+standard-library observation of the 2026-09-25 run by a separate session, the
+sanitized run record of the 2026-09-25 run, and that run's host-clock evidence
+(five `chrony-20260925t*.txt` snapshots and `host-clock-diagnosis-20260925.txt`). The offline
 suite `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
@@ -21,8 +22,11 @@ native-fault gate-lane worker of that day's live-gates workflow from a clean
 worktree at origin/main ae3d3d37, with the pinned runtime (Python 3.12.3,
 alpaca-py 0.44.0, nautilus_trader 2.0.0rc5), against the paper account assigned
 to that lane as its only order writer. No account id, credential or host path
-is recorded. Before the run, `chronyc tracking` showed the host clock 0.0009 s
-from its reference; the offline suite passed under the pinned runtime (its 24
+is recorded. Before the run, one `chronyc tracking` answer put the system clock
+0.0009 s from PHC0, the Hyper-V clock that carries the Windows host's time, which
+was itself about 0.29 s fast. During the run the host clock was in fact 0.22 to
+0.35 s ahead of Alpaca's (**Host clock** below). The offline suite passed under
+the pinned runtime (its 24
 tests, run together with the 7 of
 `tests/test_adaptive_paper_source_hashes_manifest.py`: 31 OK); and GET requests
 showed the account active, flat, with zero open orders and the market open.
@@ -43,6 +47,30 @@ re-run that the 2026-09-24 binding amendment below requires before the
 `native-fault-behaviour` gate is cited for the released engine.
 `c04_pre_send_exemption` names both exemptions for the single
 `nf-20260925t182513-9a1b9a-c04` client id.
+
+**Binding check (2026-09-25, after review).** `scripts/trading_gates.py` now
+compares the six sha256 values this receipt binds with the files in the tree:
+`engine_sources_sha256` for runner.py, safety.py, transport.py and
+`../order-contract/order_contract.py`, plus `harness_sha256` and `plan_sha256`.
+For the three files that `../source-hashes.json` lists, it also compares them with
+that manifest. The output gives `source_bindings` counts and lists each difference
+under `warnings`. The check is report-only: a stale binding never changes this
+gate's status, rung readiness, `errors` or the exit code, so a later engine change
+does not fail CI because of this receipt. The warning stays until a re-run
+rebinds the receipt. A dated amendment in the gate note does not clear it,
+because the receipt still binds the older bytes. `tests/test_trading_gates_bindings.py`
+covers the check with synthetic fixtures, and it prints any stale binding in this
+tree to stderr without failing.
+
+This is a keep-but-compare choice. Two alternatives were rejected:
+- A failing check (an error, or a binding member in the flip condition). Every
+  later engine change would then fail CI until a new paper run rebinds the
+  receipt.
+- A unit test alone. Nobody reads its output at a gate decision.
+
+Overturn condition: make a stale binding an error for this established gate if a
+gate decision cites this receipt while the checker lists its binding as stale, or
+if the user makes a current binding a rung requirement.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|
@@ -110,6 +138,48 @@ the harness; and its synthetic self-test (24 of 24 passed: a matching world
 exits 0, 12 injected mismatches exit 1, a wrong account exits 3, an unsafe env
 file exits 2 without a request, a redirect is refused, only GET is sent) stays
 in the lane's private scratch and is not committed.
+
+**Host clock (added 2026-09-25 after review).** During the run the host clock was
+0.22 to 0.35 s ahead of Alpaca's clock. The ledger reserved c01's submit at
+18:25:14.702Z, before the POST was sent, and Alpaca stamped that order
+`submitted_at` 18:25:14.480Z. The GET probes' broker-clock readings, 33 s before
+and 27 s after the run, cap the offset at 0.35 s at those times.
+
+The pre-run reading of 0.0009 s does not contradict this. Two chronyd daemons
+were steering the one kernel clock:
+- One follows PHC0, the Hyper-V PTP clock that carries the Windows host's time.
+  That clock was about 0.27 to 0.29 s fast. The 0.0009 s snapshot
+  (`evidence/chrony-20260925t182439z-before-run.txt`, all 13 lines) was this
+  daemon's answer. The same snapshot also shows RMS offset 0.083 s, Frequency
+  12.063 ppm slow and Residual freq -3087.581 ppm.
+- The other is this distribution's own chronyd, which follows internet NTP
+  servers. It was restarted at 18:09:44Z with clock control on and
+  `makestep 0.1 -1`. From then to 19:00Z it stepped the clock back 45 times by
+  0.10 to 0.50 s, about once a minute. The lane's unsaved 18:22:44Z reading
+  (38.28.93.135, last offset +0.375 s, 4012 ppm fast) was this daemon's answer,
+  at its -0.375 s step.
+
+No step reached the run. The last step before it was at 18:24:55Z and the next at
+18:25:56Z, and the ledger's 21 request times increase monotonically. The engine's
+0.25 s clock check (`validate_preflight`, `runner.py:703-704`) is not part of this
+harness (`harness.py:42`, `harness.py:296-314`), so the run neither passed nor
+failed it. No case outcome depends on the offset. A clock that runs ahead makes
+quotes look older, not future-dated. Both observations compared broker timestamps
+with the receipt window, with at least 0.6 s to spare at either end.
+
+The evidence is in these files:
+- The other four `evidence/chrony-20260925t*.txt` snapshots. Like the pre-run
+  snapshot, they are byte-identical copies of the lanes' private files under
+  `~/.local/state/native-agent-stack/live-gates-20260925/`, including
+  `ladder-1x/chrony-series.txt`.
+- `evidence/host-clock-diagnosis-20260925.txt`, captured at 21:37Z. It holds the
+  Hyper-V clock name, the configuration change, two command sockets per loopback
+  address, ten queries alternating between the two daemons, and the journal.
+- The `host` section of the run record.
+
+Time sync was not changed. Before the next timed paper run on this host, it must
+be made single-source, because a backward step during a run raises
+`request_clock_moved_backward` (`safety.py:1100-1101`).
 
 ## Run of 2026-09-24 18:58Z on the order-contract engine, retained as `receipt-20260924t185811.json`
 
@@ -256,9 +326,10 @@ cancel refusal stays offline-tested only, and the C04 422 is paper-endpoint
 evidence only. The 18:58Z run above re-established the same status on the
 order-contract engine, and the 2026-09-25 run on the released engine; the
 gate's `receipt_path` now resolves to the 2026-09-25 receipt, whose `/status`
-is also `native_faults_passed`. `scripts/trading_gates.py` checks only that
-`/status`; the binding to the released engine rests on the hash comparison in
-`evidence/run-20260925t182513.json`.
+is also `native_faults_passed`. The flip condition checks only that `/status`.
+The binding to the released engine rests on the hash comparison in
+`evidence/run-20260925t182513.json`, and `scripts/trading_gates.py` repeats that
+comparison on every run as a report-only warning (**Binding check** above).
 
 ## Independent observation of the 14:39Z run
 
@@ -349,7 +420,8 @@ older engine. The wired boundary was first exercised natively by the 18:58Z run
 safety.py and transport.py. The 2026-09-25 run (`receipt.json`, top of this
 note) binds the current harness, runner, transport, safety and order-contract
 files. Any later change to one of those files leaves that receipt binding the
-older file until a new run is recorded.
+older file until a new run is recorded, and until then `scripts/trading_gates.py`
+lists the difference under `warnings`.
 
 ## Run
 

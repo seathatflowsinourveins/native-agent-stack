@@ -22,6 +22,13 @@ sub-condition holds against the same receipt; no nesting and no ``exists``).
 Rung readiness is arithmetic: a rung is ready when every ``required`` gate of
 that rung and of every earlier rung is ``established``. Exit status 1 on any
 validation error or on an established gate whose evidence is missing or false.
+
+Source bindings are report-only. For a gate named in ``SOURCE_BINDINGS``, the
+sha256 values its receipt records for the source files it ran are compared with
+those files in the tree and, where the release manifest lists a file, with that
+manifest. Each difference is listed under ``warnings``, with per-gate counts
+under ``source_bindings``. A warning never changes a status, rung readiness,
+``errors`` or the exit code.
 """
 from __future__ import annotations
 
@@ -197,6 +204,120 @@ def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
     return pointer_condition_holds(root, document, condition)
 
 
+# Receipts that bind the source files they ran with, keyed by gate id; paths are
+# repository-relative. "maps" names a receipt object of {path relative to the
+# given directory: sha256}, "files" a receipt sha256 for one named file, and
+# "manifest" the release manifest ({repository path: sha256}) that lists some of
+# them. Report-only, added 2026-09-25 after the PR #278 review: the
+# native-fault-behaviour flip condition checks only /status, so without this a
+# later engine change leaves the established gate bound to older files while
+# --check keeps passing.
+SOURCE_BINDINGS = {
+    "native-fault-behaviour": {
+        "manifest": "blueprints/us-equities/adaptive-paper/source-hashes.json",
+        # native-faults/harness.py writes these keys relative to its ENGINE directory.
+        "maps": {"/engine_sources_sha256": "blueprints/us-equities/adaptive-paper"},
+        "files": {"/harness_sha256": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
+                  "/plan_sha256": "blueprints/us-equities/adaptive-paper/native-faults/plan.json"},
+    },
+}
+
+
+def bound_path(base: str, key) -> str | None:
+    """The repository path a binding key names relative to ``base``, or None
+    when the key is not a relative forward-slash path that stays in the tree."""
+    if not isinstance(key, str) or not key or key.startswith("/") or "\\" in key:
+        return None
+    parts: list[str] = []
+    for part in f"{base}/{key}".split("/"):
+        if part in ("", "."):
+            continue
+        if part == "..":
+            if not parts:
+                return None
+            parts.pop()
+        else:
+            parts.append(part)
+    path = "/".join(parts)
+    return path if in_tree_path(path) else None
+
+
+def source_binding(root: Path, gate: dict, spec: dict) -> tuple[dict, list[dict]]:
+    """Compare the sha256 values a gate's receipt binds with the tree and the
+    release manifest. Returns (counts, warnings); never raises, and nothing it
+    finds changes the gate's status, rung readiness, errors or the exit code."""
+    warnings: list[dict] = []
+
+    def warn(path, detail, recorded=None, tree=None, listed=None):
+        warnings.append({"id": gate["id"], "path": path, "receipt_sha256": recorded, "tree_sha256": tree,
+                         "manifest_sha256": listed, "detail": detail})
+
+    try:
+        receipt = load_json(root / gate["receipt_path"])
+    except (OSError, ValueError) as error:
+        warn(gate["receipt_path"], f"receipt unreadable ({error.__class__.__name__}); source binding not checked")
+        return {"bound": 0, "stale": 0, "checked": False}, warnings
+    manifest: dict = {}
+    try:
+        loaded = load_json(root / spec["manifest"])
+        if isinstance(loaded, dict):
+            manifest = loaded
+        else:
+            warn(spec["manifest"], "release manifest is not an object; bindings compared with the tree only")
+    except (OSError, ValueError) as error:
+        warn(spec["manifest"], f"release manifest unreadable ({error.__class__.__name__}); "
+                               "bindings compared with the tree only")
+    bound: list[tuple[str, str | None, object]] = []
+    for map_pointer, base in spec["maps"].items():
+        try:
+            mapping = pointer(receipt, map_pointer)
+        except (KeyError, IndexError, TypeError, ValueError, GateError):
+            mapping = None
+        if not isinstance(mapping, dict) or not mapping:
+            warn(map_pointer, f"receipt has no non-empty {map_pointer} object; its bindings are not checked")
+            continue
+        bound.extend((f"{map_pointer}: {key}", bound_path(base, key), recorded) for key, recorded in mapping.items())
+    for file_pointer, path in spec["files"].items():
+        try:
+            recorded = pointer(receipt, file_pointer)
+        except (KeyError, IndexError, TypeError, ValueError, GateError):
+            recorded = None
+        bound.append((file_pointer, path, recorded))
+    stale = 0
+    for label, path, recorded in bound:
+        if path is None:
+            stale += 1
+            warn(label, "binding key is not a relative in-tree path; nothing was read", recorded)
+            continue
+        if not (isinstance(recorded, str) and SHA256_HEX.fullmatch(recorded)):
+            stale += 1
+            warn(path, f"receipt value at {label} is absent or not a lowercase sha256 hex digest", recorded)
+            continue
+        try:
+            resolved = (root / path).resolve()
+            resolved.relative_to(root.resolve())
+        except (OSError, ValueError):
+            stale += 1
+            warn(path, "bound path resolves outside the tree; nothing was read", recorded)
+            continue
+        try:
+            actual = hashlib.sha256(resolved.read_bytes()).hexdigest() if resolved.is_file() else None
+        except OSError:
+            actual = None
+        listed = manifest.get(path)
+        listed = listed if isinstance(listed, str) else None
+        if actual == recorded and listed in (None, recorded):
+            continue
+        stale += 1
+        found = "the file is missing" if actual is None else (
+            "the tree still has those bytes" if actual == recorded else f"the tree has {actual[:12]}")
+        if listed is not None:
+            found += f", and {spec['manifest'].rsplit('/', 1)[-1]} lists {listed[:12]}"
+        warn(path, f"receipt binds {recorded[:12]}, but {found}; the receipt qualifies the recorded bytes "
+                   "until a re-run rebinds it", recorded, actual, listed)
+    return {"bound": len(bound), "stale": stale, "checked": True}, warnings
+
+
 def validate_pointer_condition(gate_id: str, condition, allowed: set[str]) -> None:
     require(isinstance(condition, dict) and condition.get("type") in allowed,
             f"{gate_id}: flip_condition.type must be one of {sorted(allowed)}")
@@ -297,6 +418,13 @@ def check(root: Path, path: Path) -> dict:
     for gate in gates:
         counts.setdefault(gate["rung"], {})
         counts[gate["rung"]][gate["status"]] = counts[gate["rung"]].get(gate["status"], 0) + 1
+    # Report-only (module docstring): computed after status, readiness and errors, and never feeds them.
+    warnings: list[dict] = []
+    source_bindings: dict[str, dict] = {}
+    for gate in gates:
+        if gate["id"] in SOURCE_BINDINGS:
+            source_bindings[gate["id"]], found = source_binding(root, gate, SOURCE_BINDINGS[gate["id"]])
+            warnings.extend(found)
     return {
         "status": "passed" if not errors else "failed",
         "gates": len(gates),
@@ -305,6 +433,8 @@ def check(root: Path, path: Path) -> dict:
         "blocking": blocking,
         "flip_candidates": flip_candidates,
         "errors": errors,
+        "warnings": warnings,
+        "source_bindings": source_bindings,
         "rows": rows,
         "scope": "Arithmetic over recorded receipts; no reviewer or model opinion; nothing is flipped by this checker.",
     }
@@ -325,7 +455,7 @@ def main(argv=None) -> int:
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:
-        print(json.dumps({key: result[key] for key in ("status", "gates", "counts", "rung_ready", "blocking", "flip_candidates", "errors")}, indent=2, sort_keys=True))
+        print(json.dumps({key: result[key] for key in ("status", "gates", "counts", "rung_ready", "blocking", "flip_candidates", "errors", "warnings", "source_bindings")}, indent=2, sort_keys=True))
     return 0 if result["status"] == "passed" else 1
 
 
