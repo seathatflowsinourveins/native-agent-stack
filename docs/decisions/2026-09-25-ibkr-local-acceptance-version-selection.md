@@ -128,3 +128,31 @@ Local evidence (label `native_paper` unless stated):
   nightly reset.
 - No fill occurs in steps 2-4 by design, so their execution-id mapping is not exercised there;
   fills rest on the 2026-09-23 C1-C4 receipt.
+
+## Update, 2026-09-25T21:23Z (first independent review of PR #280)
+
+Re-checked with `gh api`; source reading, not observed. The selection is unchanged.
+
+- #4983 is still open with 0 comments. The canonical records now carry it as a stale v1.227.0
+  report for rc5: `catalogs/us-equities/runtime-target.json` moves it from `rc5_blockers` to
+  `rc5_reclassified_reports`, and the `ibkr-local-acceptance` gate note opens with a dated
+  superseding paragraph. The rc5 stock-order probe (comparison 1) still confirms or overturns
+  that reading.
+- PR #5041 is unchanged: open, not merged, head `4b17ac3c`, body sha256 `050141af…`, and its
+  root `Cargo.toml` diff is `ibapi = "=3.3.0"` to `ibapi = "=4.2.0"`. Both records now say
+  `=4.2.0`.
+- #4946 is a fourth rc5 obstacle, on the risk path. For a broker-routed `SMART` instrument the
+  account registered under venue `IB` is not found, so the risk engine skips every
+  account-scoped pre-trade check (the fail-open branch is `crates/risk/src/engine/mod.rs:1218-1234`
+  at `v2.0.0rc5`). It was closed at 2026-09-25T11:03:11Z by `develop` commit `ed6fc8bf`
+  ("Apply pre-trade risk to the destination execution account"), which is in no release, and
+  #5041 lists it as covered. `runtime-target.json` `rc5_blockers` now lists #5007, #5057, #5060
+  and #4946 with their sources. Comparison 2 therefore needs a release that also carries the
+  #4946 fix, not only one that closes #4983, #5057 and #5060.
+- Releases are unchanged: the newest is `v2.0.0rc5` and the newest stable is `v1.231.0`.
+
+The runner was revised in the same review, before any run: the kill-switch latch and the run
+lock moved to one frozen per-account path, and the gate receipt is written only by its
+`gate-receipt` builder after an independent corroboration record passes (the Gateway API
+message log or the next-day IBKR activity statement; `ibkr-acceptance/README.md`, "Independent
+corroboration").

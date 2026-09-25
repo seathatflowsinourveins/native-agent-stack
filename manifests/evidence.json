@@ -9917,8 +9917,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1062310d9936150f2808929b83ae70e8111880e9e64637cb4e496de0f029e5c6",
-      "bytes": 63910
+      "sha256": "fd76d7fa6357188e1af15e0754baf14b637f12186ff7b4b5e8c1a5c79df462c4",
+      "bytes": 65817
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9997,8 +9997,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "31bb934437125d2582af7bb824b29ea0c9bf61e8cf0a8beaa39f705f7c101b54",
-      "bytes": 15137
+      "sha256": "b101400b12841c389fa1e5706ad2328fc64aeafe7d2274e9417a06fda192210c",
+      "bytes": 20468
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -10197,8 +10197,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-ibkr-local-acceptance-version-selection.md",
-      "sha256": "6c2cd09d1dabe1ecbf3857614b2070b6c81a40de783e1516b617d4c97b136aba",
-      "bytes": 8753
+      "sha256": "eec90233e17f2faf9e947df0746680f7b5551b9f19b62840353cb62c062ae42b",
+      "bytes": 10674
     },
     {
       "path": "docs/direct-results.md",
