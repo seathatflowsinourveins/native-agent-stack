@@ -766,9 +766,25 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
     memory_issue = memory_gate_issue()
     if memory_issue:
         raise SwitchError(f"unit-restart of {unit} refused: {memory_issue}")
-    before = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
+    # Minor finding: unlike the restart/post-restart-show timeouts below (both of which follow a
+    # real `systemctl ... restart` attempt, so a timeout there must still be ledgered via
+    # UnitRestartAttempted before re-raising), this pre-restart probe and the daemon-reload call
+    # right after it both run BEFORE systemctl is ever asked to restart anything -- nothing about
+    # what is actually running has changed yet, so a timeout here is a plain refusal (the same
+    # SwitchError shape as the denylist/window/memory gates above), not a side effect rollback_txn
+    # would ever need to find and re-apply.
+    try:
+        before = run_captured([*systemctl_argv(), "--user", "show", "--property=MainPID", "--value", unit])
+    except subprocess.TimeoutExpired as error:
+        raise SwitchError(f"pre-restart status check for {unit} timed out after {error.timeout}s; "
+                           "refusing rather than restarting without a known prior MainPID") from error
     before_fields = {"from": (before.stdout or "").strip(), "pre_sha256": sha256_text(before.stdout or "")}
-    run_captured([*systemctl_argv(), "--user", "daemon-reload"])
+    try:
+        run_captured([*systemctl_argv(), "--user", "daemon-reload"])
+    except subprocess.TimeoutExpired as error:
+        raise SwitchError(f"systemctl --user daemon-reload timed out after {error.timeout}s before "
+                           f"restarting {unit}; refusing rather than restarting against possibly "
+                           "stale unit definitions") from error
     try:
         restart = run_captured([*systemctl_argv(), "--user", "restart", unit])
     except subprocess.TimeoutExpired as error:
@@ -1087,7 +1103,24 @@ def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
     argv = [*systemd_run_argv(), "--user", f"--on-active={seconds}s",
             f"--unit=ecosystem-switch-revert-{txn}", *setenv_args, "--", sys.executable, self_path,
             "rollback", "--txn", txn, "--if-unconfirmed"]
-    result = run_captured(argv, env=dict(os.environ))
+    try:
+        result = run_captured(argv, env=dict(os.environ))
+    except subprocess.TimeoutExpired as error:
+        # Minor finding (round 4): unlike the clean non-zero-exit case just below (already
+        # handled by rolling back immediately rather than leaving a pending apply nothing will
+        # ever revert), a bare subprocess.TimeoutExpired here used to escape this function
+        # uncaught: cmd_apply's own try/except has already closed by the time this runs (its
+        # verify_pass was already ledgered), so main()'s generic timeout catch is the only thing
+        # that stops a raw traceback, and it neither rolls back nor mentions `recover`. Whether
+        # systemd-run itself actually scheduled the timer before its own client timed out is
+        # unknown either way -- treated the same as a confirmed scheduling failure, for the same
+        # reason: an apply nothing will ever revert is worse than reverting immediately (and if
+        # the timer WAS scheduled despite the timeout, its later `--if-unconfirmed` fire is a
+        # harmless no-op against an already-`rolled_back` txn).
+        rollback_txn(root, txn)
+        raise SwitchError(f"could not confirm the confirm-or-revert timer was scheduled (systemd-run "
+                           f"timed out after {error.timeout}s); rolled back immediately instead of "
+                           "leaving an unrevertable pending apply") from error
     if result.returncode != 0:
         rollback_txn(root, txn)
         raise SwitchError(f"could not schedule the confirm-or-revert timer ({result.stderr.strip()[:200]}); "

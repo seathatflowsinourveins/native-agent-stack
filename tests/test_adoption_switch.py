@@ -1001,6 +1001,32 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertEqual(json.loads(revert.stdout)["status"], "rolled_back")
         self.assertEqual(self.run_entrypoint(), "v1")
 
+    def test_a_systemd_run_timeout_rolls_back_immediately_like_a_clean_scheduling_failure(self):
+        # Minor finding (round 4): schedule_confirm_or_revert's own systemd-run call had no
+        # subprocess.TimeoutExpired handling, unlike the clean non-zero-exit case immediately
+        # below it in source (already handled by rolling back right away rather than leaving a
+        # pending apply nothing will ever revert) -- a scheduling attempt that timed out used to
+        # escape uncaught: cmd_apply's own try/except has already closed by the time this
+        # function runs (its verify_pass was already ledgered for this txn), so nothing rolled
+        # the apply back and no timer was ever confirmed scheduled either.
+        real_current = os.readlink(self.root / "current" / "foo")
+        ledger = switch.Ledger(self.root)
+        txn = "foo-9999-1"
+        ledger.append(txn=txn, op="txn_begin", component="foo", surface="_txn")
+        ledger.append(txn=txn, op="link", component="foo", surface="current/foo",
+                      **{"from": real_current, "to": real_current})
+        ledger.append(txn=txn, op="verify_pass", component="foo", surface="_txn", to="confirm_pending")
+        switch.save_state(self.root)
+
+        def fake_run_captured(argv, **_kwargs):
+            raise subprocess.TimeoutExpired(cmd=argv, timeout=60)
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.schedule_confirm_or_revert(self.root, txn, 300)
+        self.assertIn("timed out", str(ctx.exception))
+        state = switch.load_state(self.root)
+        self.assertEqual(state["txns"][txn]["status"], "rolled_back")
+
 
 @REQUIRES_PROCFS
 class UnitRestartTests(SwitchFixture):
@@ -1283,6 +1309,38 @@ class UnitRestartTimeoutTests(unittest.TestCase):
                                         side_effect=subprocess.TimeoutExpired(cmd=["x"], timeout=1)):
             code = switch.main(["status"])
         self.assertEqual(code, 1)
+
+    def test_a_pre_restart_status_check_timeout_is_a_plain_refusal_not_an_attempted_restart(self):
+        # Minor finding (round 4): unlike the restart/post-restart-show timeouts above (both of
+        # which follow a real `systemctl ... restart` attempt, so must still be ledgered via
+        # UnitRestartAttempted), this probe and daemon-reload run BEFORE systemctl is ever asked
+        # to restart anything -- a timeout here must be a plain SwitchError (a pre-flight refusal,
+        # the same shape as the denylist/window/memory gates before it), never
+        # UnitRestartAttempted, since nothing about what is actually running has changed yet.
+        def fake_run_captured(argv, **_kwargs):
+            if "show" in argv:
+                raise subprocess.TimeoutExpired(cmd=argv, timeout=60)
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertNotIsInstance(ctx.exception, switch.UnitRestartAttempted)
+        self.assertIn("pre-restart", str(ctx.exception))
+        self.assertIn("timed out", str(ctx.exception))
+
+    def test_a_daemon_reload_timeout_is_a_plain_refusal_not_an_attempted_restart(self):
+        # Same reasoning as the pre-restart-show timeout above: daemon-reload also runs before
+        # systemctl is asked to restart anything.
+        def fake_run_captured(argv, **_kwargs):
+            if "daemon-reload" in argv:
+                raise subprocess.TimeoutExpired(cmd=argv, timeout=60)
+            return subprocess.CompletedProcess(argv, 0, stdout="1111\n", stderr="")
+        with unittest.mock.patch.object(switch, "run_captured", side_effect=fake_run_captured):
+            with self.assertRaises(switch.SwitchError) as ctx:
+                switch.op_unit_restart("svc.service", window_component_ok=True, expected_root="/nonexistent")
+        self.assertNotIsInstance(ctx.exception, switch.UnitRestartAttempted)
+        self.assertIn("daemon-reload", str(ctx.exception))
+        self.assertIn("timed out", str(ctx.exception))
 
 
 class LockTests(SwitchFixture):
