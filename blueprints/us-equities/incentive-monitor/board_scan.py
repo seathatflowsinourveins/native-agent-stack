@@ -9,7 +9,11 @@ the untraded, gain-matched controls; both are limited to operating companies (SE
 funds and fund-like asset names). The ledger holds one decision record per session and decision time, created
 exclusively (a decision cannot be re-rolled) with the sha256 of the code, engine, protocol, config and scan, before
 the scan is written; every refusal gets its own record. Controls already used by the session's other decision are
-excluded. GET only; it never places an order. SEC_USER_AGENT must hold the declared SEC contact.
+excluded. A board whose board_version differs from the one this protocol runs on is refused (protocol v1 runs on
+board version 1: board.json, never board-v2.json). Protocol v1 is bound to its frozen code (monitor.py and
+board_scan.py of 05c28491, pinned in monitor.FROZEN_V1): any other code beside it refuses the decision
+(code_not_frozen) before the snapshot, since a code change starts a new protocol version. GET only; it never places an
+order. SEC_USER_AGENT must hold the declared SEC contact.
 Exit codes: 0 scan written, 3 nothing selected (record written, no scan), 4 refused (refusal record written).
 """
 from __future__ import annotations
@@ -29,6 +33,13 @@ import monitor as M  # noqa: E402
 
 PROTOCOL_PATH = HERE / "forward-protocol-v1.json"
 PROTOCOL = json.loads(PROTOCOL_PATH.read_text())
+# The board version the protocol runs on. Protocol v1 is frozen and predates the monitor's board_version field, so its pin
+# lives here (its selection components are exactly board version 1's); a later protocol states board_version itself, and
+# an unknown protocol without one fails at import.
+BOARD_VERSION = PROTOCOL["board_version"] if "board_version" in PROTOCOL else {"incentive-board-forward-v1-20260924": 1}[PROTOCOL["id"]]
+# The code each protocol is bound to. Protocol v1's stop rule makes any code change a new protocol version, so its
+# decisions run only on the frozen files; this bridge and this monitor are not them and refuse protocol v1 decisions.
+FROZEN_CODE = {"incentive-board-forward-v1-20260924": M.FROZEN_V1}
 ENGINE_PROTOCOL = "mover-early-entry-v1-20260924"
 SYMBOL = re.compile(PROTOCOL["selection"]["symbol_pattern"])
 GAIN_BUCKETS = ((0.0, 0.03), (0.03, 0.06), (0.06, 0.10))
@@ -205,11 +216,18 @@ def main(argv=None) -> int:
         rows = board["board"]
     except Exception as exc:  # unreadable, naive timestamp, wrong shape
         return refuse("board_unreadable", error=type(exc).__name__)
-    record.update({"board_sha256": sha(raw), "board_age_seconds": round(age, 1), "monitor": board.get("monitor")})
+    record.update({"board_sha256": sha(raw), "board_age_seconds": round(age, 1), "board_version": board.get("board_version"),
+                   "monitor": board.get("monitor")})
     if age > PROTOCOL["selection"]["board_max_age_seconds"]:
         return refuse("board_stale")
     if (board.get("monitor") or {}).get("code_sha256") != record["hashes"]["monitor.py"]:
         return refuse("monitor_code_mismatch")  # the board must come from the monitor code this record binds
+    version = board.get("board_version")
+    if type(version) is not int or version != BOARD_VERSION:  # a missing field, a bool or another version never passes
+        return refuse("board_version_mismatch", protocol_board_version=BOARD_VERSION)
+    frozen = FROZEN_CODE.get(PROTOCOL["id"])
+    if frozen is not None and any(record["hashes"][name] != digest for name, digest in frozen.items()):
+        return refuse("code_not_frozen", frozen=frozen)  # a v1-labelled decision under other code would breach the stop rule
     try:
         key, secret = M.credentials(a.env_file)
         http = M.Http({"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}, M.sec_identity())
