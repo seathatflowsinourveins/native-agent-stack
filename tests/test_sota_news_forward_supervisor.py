@@ -1,4 +1,12 @@
-"""SYN: news-forward GPU schedule gate and shadow snapshot scheduling (no GPU, no network)."""
+"""SYN: news-forward supervisor flows against a stateful paper-broker double.
+
+Covers the GPU schedule gate, shadow snapshots, the day's close-out (stale entries, CLS
+retries, the 15:55 market pass, after-hours flatten with the last-trade fallback,
+reconciliation), the kill switch (failed flatten then re-flatten, persistence across a
+restart, exits while killed, cancel before re-flatten), the OPG basket (pre-market gates,
+95% sizing, a rejected leg, an unfilled leg trimmed after the open), the restart rebuild,
+a cancel race, carry-over exits, exit-only mode and the arm entries. No GPU, no network.
+"""
 
 import os
 import shutil
@@ -8,6 +16,7 @@ import unittest
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 from zoneinfo import ZoneInfo
 
@@ -78,117 +87,417 @@ class ShadowSchedule(unittest.TestCase):
         self.assertEqual(times[2][1], ny(18))
 
 
+ex = supervisor.ex
+FRIDAY = date(2026, 9, 25)
+
+
 class Broker:
-    """Paper broker double: every order in one list; positions derive from fills."""
+    """Stateful paper-broker double: orders, fills, cancels; positions derive from fills.
 
-    LIVE = ("new", "accepted", "partially_filled")
+    reject(intent) -> reason or None refuses a submission; fill_on_submit(intent) -> price or
+    None fills it at once (a market order during RTH). Ids in cancel_race answer a cancel
+    with pending_cancel for one read, then fill instead (a fill that beats the cancel).
+    """
 
-    def __init__(self):
+    LIVE = ("new", "accepted", "partially_filled", "pending_new", "pending_cancel")
+
+    def __init__(self, equity="900000"):
         self.all = []
-        self.cash = "100000"
+        self.cash = "900000"
+        self.equity = equity
+        self.reject = lambda intent: None
+        self.fill_on_submit = lambda intent: None
+        self.cancel_race = set()
+        self.countdown = {}
+        self.now = ny(9, 0)
 
-    def add(self, cid, side, qty, filled, status="filled", at=None, price="10"):
+    def add(self, cid, side, qty, filled, status="filled", at_=None, price="50", limit=None, tif="day"):
         info = planner.parse_cid(cid)
-        order = {"id": f"o{len(self.all)}", "client_order_id": cid, "symbol": info["symbol"], "side": side, "qty": str(qty),
-                 "filled_qty": str(filled), "filled_avg_price": price if Decimal(str(filled)) else None,
-                 "status": status, "submitted_at": at or ny(9, 20)}
-        self.all.append(order)
-        return order
+        filled = Decimal(str(filled))
+        stamp = at_ or self.now
+        o = {"id": f"o{len(self.all)}", "client_order_id": cid, "symbol": info["symbol"] if info else cid, "side": side,
+             "qty": str(qty), "filled_qty": str(filled), "filled_avg_price": price if filled else None, "status": status,
+             "submitted_at": stamp, "filled_at": stamp if filled else None, "limit_price": limit, "time_in_force": tif,
+             "type": "limit" if limit else "market", "extended_hours": False}
+        self.all.append(o)
+        return o
 
-    def fill(self, cid, qty=None):
-        for o in self.all:
-            if o["client_order_id"] == cid:
-                o["filled_qty"], o["status"], o["filled_avg_price"] = str(qty or o["qty"]), "filled", "10"
+    def find(self, cid):
+        return next(o for o in self.all if o["client_order_id"] == cid)
+
+    def fill(self, cid, qty=None, price="50"):
+        o = self.find(cid)
+        o.update(filled_qty=str(qty or o["qty"]), status="filled", filled_avg_price=price, filled_at=self.now)
 
     def account(self):
-        return {"status": "ACTIVE", "equity": "100000", "cash": self.cash}
+        return {"status": "ACTIVE", "equity": self.equity, "cash": self.cash, "multiplier": "4",
+                "trading_blocked": False, "account_blocked": False}
 
     def positions(self):
         net = {}
-        for (arm, day, sym), q in planner.ledger(self.all).items():
-            net[sym] = net.get(sym, Decimal("0")) + q
+        for o in self.all:
+            q = Decimal(o["filled_qty"])
+            if q:
+                net[o["symbol"]] = net.get(o["symbol"], Decimal("0")) + (q if o["side"] == "buy" else -q)
         return [{"symbol": s, "qty": str(q), "market_value": "0"} for s, q in net.items() if q]
 
-    def orders(self, status="open", after=None, symbols=None, limit=500):
+    def orders(self, status="open", after=None, symbols=None, limit=500, direction=None):
+        for oid in list(self.countdown):
+            if self.countdown[oid] > 0:
+                self.countdown[oid] -= 1
+            else:
+                o = next(o for o in self.all if o["id"] == oid)
+                o.update(status="filled", filled_qty=o["qty"], filled_avg_price="50", filled_at=self.now)
+                del self.countdown[oid]
+        rows = self.all
         if status == "open":
-            return [o for o in self.all if o["status"] in self.LIVE]
-        if status == "closed":
-            return [o for o in self.all if o["status"] not in self.LIVE]
-        return list(self.all)
+            rows = [o for o in rows if o["status"] in self.LIVE]
+        elif status == "closed":
+            rows = [o for o in rows if o["status"] not in self.LIVE]
+        if symbols:
+            rows = [o for o in rows if o["symbol"] in symbols]
+        return [dict(o) for o in rows]
+
+    def all_orders(self, after):
+        return [dict(o) for o in self.all]
 
     def submit(self, intent):
-        o = self.add(intent["client_order_id"], intent["side"], intent["qty"], 0, status="accepted", at=ny(15, 40))
-        o.update(time_in_force=intent["time_in_force"], type=intent["type"], limit_price=intent.get("limit_price"),
-                 extended_hours=intent.get("extended_hours", False))
+        why = self.reject(intent)
+        if why:
+            raise RuntimeError(f"submit_failed:{why}")
+        o = self.add(intent["client_order_id"], intent["side"], intent["qty"], 0, status="accepted",
+                     limit=intent.get("limit_price"), tif=intent["time_in_force"])
+        o["extended_hours"] = intent.get("extended_hours", False)
+        price = self.fill_on_submit(intent)
+        if price is not None:
+            self.fill(intent["client_order_id"], price=price)
         return dict(o)
 
     def cancel(self, order_id):
         for o in self.all:
-            if o["id"] == order_id:
-                o["status"] = "canceled"
+            if o["id"] == order_id and o["status"] in self.LIVE:
+                if order_id in self.cancel_race:
+                    o["status"] = "pending_cancel"
+                    self.countdown[order_id] = 1
+                else:
+                    o["status"] = "canceled"
 
 
-class PaperCloseOut(unittest.TestCase):
+def make_sup(tmp, broker, day=FRIDAY, mode="paper", arms=None):
+    """A supervisor without network: the broker double, a fixed clock and mocked market data."""
+    cal = common.load_calendar()
+    sup = supervisor.Supervisor.__new__(supervisor.Supervisor)
+    sup._init_runtime()
+    sup.sleep = lambda seconds: None
+    clock = {"now": at(day, 9, 0)}
+    sup.clock = lambda: clock["now"]
+    sup.args = SimpleNamespace(preview_basket=False)
+    sup.cfg = {"arms": arms or {"pm": {"orders_from": "2026-09-28"}, "ah": {"orders_from": "2026-09-24"}}}
+    sup.mode, sup.state, sup.calendar, sup.trade_date = mode, tmp, cal, day
+    sup.requested_mode = mode
+    sup.schedule = planner.day_schedule(cal, day)
+    sup.prev_session = cal.previous(day)
+    sup.journal = common.Journal(tmp, day, clock=sup.clock)
+    sup.ledger_epoch = at(date(2026, 9, 24), 0)
+    sup.runstate = supervisor.RunState(os.path.join(tmp, "runstate", f"{day.isoformat()}-{mode}.json"))
+    sup.equity = Decimal("900000")
+    sup.sod = {"equity": "900000", "cash": "900000"}
+    sup.l_core = Decimal("1")
+    sup.limits = {a: planner.Limits.for_arm(a, sup.equity, 1, extra_cap=sup.equity) for a in planner.ARM_PREFIX}
+    sup.account_gross_cap = 4 * sup.equity
+    sup.executor = ex.Executor(mode, sup.journal, tmp, broker=broker if mode == "paper" else None, clock=sup.clock,
+                               gate=ex.RiskGate(sup.limits, sup.account_gross_cap))
+    sup.executor.killed = bool(sup.runstate.get("killed"))
+    sup.ref_path = os.path.join(tmp, "ref-prices.json")
+    sup.exposures = {a: planner.Exposure() for a in planner.ARM_PREFIX}
+    sup.data = mock.Mock()
+    sup.quotes = {}
+    sup.data.snapshots.side_effect = lambda syms: {s: {"latestQuote": sup.quotes.get(s, {"bp": 49.95, "ap": 50.05}),
+                                                       "latestTrade": {"p": 50.0, "t": common.iso(clock["now"])}} for s in syms}
+    sup.data.asset.return_value = {"tradable": True, "shortable": True, "easy_to_borrow": True}
+    sup._ca_keys = ("k", "s")
+    return sup, clock
+
+
+class Scenario(unittest.TestCase):
     def setUp(self):
-        self.dir = tempfile.mkdtemp(prefix="nf-close-")
-        b = self.broker = Broker()
-        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
-        b.add("nf1-20260925-opg-BBB-short", "sell", 15, 15)
-        b.add("nf1-20260925-rth-CCC-long", "buy", 9, 0, status="new", at=ny(15, 20))
-        b.add("nf1x-pm-20260925-ent-AAA-long", "buy", 5, 5)
-        b.add("nf1x-ah-20260924-ent-OLD-long", "buy", 8, 8)
-        b.add("nf1x-ah-20260924-opg-OLD-long", "sell", 8, 8)
-        journal = common.Journal(self.dir, date(2026, 9, 25))
-        sup = supervisor.Supervisor.__new__(supervisor.Supervisor)
-        sup.mode, sup.schedule, sup.trade_date, sup.journal, sup.state = "paper", SCHED, date(2026, 9, 25), journal, self.dir
-        sup.prev_session = common.load_calendar().previous(date(2026, 9, 25))
-        sup.cfg = {"arms": {"pm": {"orders_from": "2026-09-25"}, "ah": {"orders_from": "2026-09-25"}}}
-        sup.clock = lambda: ny(16, 30)
-        sup.executor = supervisor.ex.Executor("paper", journal, self.dir, broker=b)
-        sup.done_steps, sup.ext_round, sup.last_ext, sup.last_stale_check = set(), 0, None, None
-        sup.counts, sup.sod = supervisor.Counter(), {"cash": "100000", "equity": "100000"}
-        sup.data = mock.Mock()
-        sup.data.latest_quotes.return_value = {"AAA": {"bp": 10.0, "ap": 10.02}, "BBB": {"bp": 5.0, "ap": 5.02}}
-        self.sup = sup
+        self.dir = tempfile.mkdtemp(prefix="nf-sup-")
+        self.b = Broker()
 
     def tearDown(self):
         shutil.rmtree(self.dir, ignore_errors=True)
 
-    def ids(self, since):
-        return [o["client_order_id"] for o in self.broker.all[since:]]
+    def rows(self, sup, kind=None):
+        rows = common.read_jsonl(sup.journal.path)
+        return [r for r in rows if kind is None or r["kind"] == kind]
 
-    def test_sequence(self):
-        sup, b = self.sup, self.broker
-        sup.run_exits(ny(15, 24))  # the RTH entry is only 4 minutes old
-        self.assertEqual(b.all[2]["status"], "new")
-        sup.last_stale_check = None
-        sup.run_exits(ny(15, 26))  # stale after 5 minutes
-        self.assertEqual(b.all[2]["status"], "canceled")
+    def ids(self, since=0):
+        return [o["client_order_id"] for o in self.b.all[since:]]
+
+    def tick(self, sup, clock, when, *, exits=True, kill=False):
+        clock["now"] = self.b.now = when
+        sup.refresh(when)
+        if kill:
+            sup.kill_check(when)
+        if exits:
+            sup.run_exits(when)
+
+
+class PaperCloseOut(Scenario):
+    def test_day_close_out_sequence(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        b.add("nf1-20260925-opg-BBB-short", "sell", 15, 15)
+        b.add("nf1-20260925-rth-CCC-long", "buy", 9, 0, status="new", at_=ny(15, 20), limit="50.10")
+        b.add("nf1x-pm-20260925-ent-AAA-long", "buy", 5, 5)
+        b.add("nf1x-ah-20260924-ent-OLD-long", "buy", 8, 8, at_=at(date(2026, 9, 24), 16, 20))
+        b.add("nf1x-ah-20260924-xopg1-OLD-long", "sell", 8, 8, at_=ny(9, 20))
+        sup, clock = make_sup(self.dir, b)
+        self.tick(sup, clock, ny(15, 24))
+        self.assertEqual(b.find("nf1-20260925-rth-CCC-long")["status"], "new")  # 4 minutes old
+        self.tick(sup, clock, ny(15, 26))
+        self.assertEqual(b.find("nf1-20260925-rth-CCC-long")["status"], "canceled")  # stale after 5 minutes
         n = len(b.all)
-        sup.run_exits(ny(15, 40))
-        self.assertEqual(self.ids(n), ["nf1-20260925-cls-AAA-long", "nf1-20260925-cls-BBB-short", "nf1x-pm-20260925-cls-AAA-long"])
-        self.assertEqual([o["time_in_force"] for o in b.all[n:]], ["cls"] * 3)
-        b.add("nf1-20260925-rth-EEE-long", "buy", 7, 7)  # an entry filled after the CLS step
+        self.tick(sup, clock, ny(15, 40))
+        self.assertEqual(self.ids(n), ["nf1-20260925-cls1-AAA-long", "nf1-20260925-cls1-BBB-short", "nf1x-pm-20260925-cls1-AAA-long"])
+        self.assertEqual({o["time_in_force"] for o in b.all[n:]}, {"cls"})
+        b.add("nf1-20260925-rth-EEE-long", "buy", 7, 7, at_=ny(15, 40))  # a fill that arrived after the first pass
         n = len(b.all)
-        sup.run_exits(ny(15, 55))
-        self.assertEqual(self.ids(n), ["nf1-20260925-mkt-EEE-long"])
-        # at the close: AAA (both arms) and EEE fill; the BBB CLS order is left unfilled
-        for cid in ("nf1-20260925-cls-AAA-long", "nf1x-pm-20260925-cls-AAA-long", "nf1-20260925-mkt-EEE-long"):
+        self.tick(sup, clock, ny(15, 40) + timedelta(seconds=30))
+        self.assertEqual(self.ids(n), ["nf1-20260925-cls2-EEE-long"])  # M1: the CLS pass is re-planned
+        n = len(b.all)
+        self.tick(sup, clock, ny(15, 55))
+        self.assertEqual(self.ids(n), [])  # every holding is covered by a working CLS order
+        b.now = ny(16, 0)
+        for cid in ("nf1-20260925-cls1-AAA-long", "nf1x-pm-20260925-cls1-AAA-long", "nf1-20260925-cls2-EEE-long"):
             b.fill(cid)
-        b.add("nf1x-ah-20260925-ent-FFF-long", "buy", 3, 3)  # tonight's overnight hold (ah arm)
+        b.find("nf1-20260925-cls1-BBB-short")["status"] = "expired"  # the BBB auction exit did not fill
+        b.add("nf1x-ah-20260925-ent-FFF-long", "buy", 3, 3, at_=ny(16, 20))  # tonight's one-night ah hold
         n = len(b.all)
-        sup.run_exits(ny(16, 2))
+        self.tick(sup, clock, ny(16, 22))
         self.assertEqual(self.ids(n), ["nf1-20260925-ext1-BBB-short"])
         ext = b.all[n]
-        self.assertEqual((ext["side"], ext["limit_price"], ext["extended_hours"]), ("buy", "5.05", True))
-        self.assertEqual([o["status"] for o in b.all if o["client_order_id"] == "nf1-20260925-cls-BBB-short"], ["canceled"])
+        self.assertEqual((ext["side"], ext["limit_price"], ext["extended_hours"]), ("buy", "50.31", True))
         b.fill("nf1-20260925-ext1-BBB-short")
-        b.cash = "99970"  # fill cash flows: -200+150-50-80+80-70+200+50+70-30-150 = -30
+        b.cash = "900250"  # the day's fill cash flows net to +250 (the 09-24 OLD entry is not today's)
         rec = sup.reconcile()
         self.assertTrue(rec["ok"], rec)
         self.assertEqual(rec["overnight_holdings"], {"FFF": "3"})
         rows = common.read_jsonl(os.path.join(self.dir, "autolev-daily-paper.jsonl"))
-        self.assertEqual((rows[0]["evidence_label"], rows[0]["arm"], rows[0]["core_flat"]), ("pilot", "core", True))
+        self.assertEqual((len(rows), rows[0]["core_flat"], rows[0]["round_trips"]), (1, True, 3))
+        sup.reconcile()  # M8: a second reconciliation adds no second row for the session
+        self.assertEqual(len(common.read_jsonl(os.path.join(self.dir, "autolev-daily-paper.jsonl"))), 1)
+
+    def test_cls_retried_until_accepted_then_market_at_1555(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        attempts = []
+
+        def reject(intent):
+            if intent["time_in_force"] == "cls":
+                attempts.append(intent["client_order_id"])
+                return "cls_rejected"
+            return None
+
+        b.reject = reject
+        sup, clock = make_sup(self.dir, b)
+        when = ny(15, 40)
+        while when <= ny(15, 50):
+            self.tick(sup, clock, when)
+            when += timedelta(seconds=30)
+        self.assertEqual(attempts[:2], ["nf1-20260925-cls1-AAA-long", "nf1-20260925-cls2-AAA-long"])
+        self.assertEqual(len(attempts), 19)  # 15:40:00 .. 15:49:00 every 30 s; none after 15:49
+        self.tick(sup, clock, ny(15, 55))
+        self.assertEqual([(o["client_order_id"], o["time_in_force"], o["type"]) for o in b.all[1:]],
+                         [("nf1-20260925-mkt1-AAA-long", "day", "market")])
+
+    def test_cancel_race_fill_is_covered_by_the_close(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        racing = b.add("nf1-20260925-rth-RRR-long", "buy", 10, 0, status="new", at_=ny(15, 39), limit="50.10")
+        b.cancel_race = {racing["id"]}
+        sup, clock = make_sup(self.dir, b)
+        self.tick(sup, clock, ny(15, 40))
+        self.assertEqual(b.find("nf1-20260925-rth-RRR-long")["status"], "filled")  # the fill beat the cancel
+        cls = {o["client_order_id"]: o["qty"] for o in b.all if "-cls1-" in o["client_order_id"]}
+        self.assertEqual(cls, {"nf1-20260925-cls1-AAA-long": "20", "nf1-20260925-cls1-RRR-long": "10"})
+
+    def test_after_close_price_fallback_and_retry(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        sup, clock = make_sup(self.dir, b)
+        sup.quotes["AAA"] = {}  # no quote after the close: the last trade (50.0) prices the exit
+        self.tick(sup, clock, ny(16, 5))
+        self.assertEqual((b.all[-1]["client_order_id"], b.all[-1]["limit_price"]), ("nf1-20260925-ext1-AAA-long", "49.75"))
+        b.find("nf1-20260925-ext1-AAA-long")["status"] = "canceled"
+        sup.data.snapshots.side_effect = lambda syms: {s: {} for s in syms}  # no quote and no trade
+        self.tick(sup, clock, ny(16, 16))
+        self.assertIn("exit_no_price", [r.get("event") for r in self.rows(sup, "risk")])
+        sup.data.snapshots.side_effect = lambda syms: {s: {"latestQuote": {"bp": 49.0, "ap": 49.1}} for s in syms}
+        self.tick(sup, clock, ny(16, 27))
+        self.assertEqual((b.all[-1]["client_order_id"], b.all[-1]["limit_price"]), ("nf1-20260925-ext3-AAA-long", "48.75"))
+
+
+class KillSwitch(Scenario):
+    def test_failed_flatten_is_retried_and_the_kill_survives_a_restart(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        b.add("nf1-20260925-opg-BBB-short", "sell", 15, 15)
+        b.equity = "881000"  # below 98% of the 900,000 start-of-day equity
+        b.fill_on_submit = lambda intent: "50" if intent["type"] == "market" else None
+        b.reject = lambda intent: "rejected" if intent["client_order_id"] == "nf1-20260925-kill1-AAA-long" else None
+        sup, clock = make_sup(self.dir, b)
+        self.tick(sup, clock, ny(10, 0), exits=False, kill=True)
+        self.assertTrue(sup.executor.killed)
+        self.assertEqual(self.ids(2), ["nf1-20260925-kill1-BBB-short"])  # AAA's first flatten was rejected
+        self.tick(sup, clock, ny(10, 0) + timedelta(seconds=25), exits=False, kill=True)
+        self.assertEqual(self.ids(3), ["nf1-20260925-kill2-AAA-long"])
+        self.assertEqual(b.positions(), [])
+        self.tick(sup, clock, ny(10, 1), exits=False, kill=True)
+        self.assertIn("kill_flat", [r.get("event") for r in self.rows(sup, "risk")])
+        entry = planner.entry_intent(FRIDAY, "rth", "NEW", "long", 1, "day", "10.00")
+        self.assertIsNone(sup.executor.send(entry, {"purpose": "entry", "arm": "core", "session_label": "rth", "leg": "long",
+                                                    "ref_price": "10.00"}))
+        # restart: a new supervisor reads the persisted kill and continues its rounds
+        b.add("nf1-20260925-rth-LATE-long", "buy", 4, 4, at_=ny(10, 2))  # e.g. a fill that landed during the restart
+        sup2, clock2 = make_sup(self.dir, b)
+        self.assertTrue(sup2.executor.killed)
+        self.assertEqual(sup2.runstate.get("kill_round"), 2)
+        self.tick(sup2, clock2, ny(10, 3), exits=False, kill=True)
+        self.assertEqual(self.ids()[-1], "nf1-20260925-kill3-LATE-long")
+
+    def test_exits_keep_running_while_the_kill_flatten_fails(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        b.reject = lambda intent: "rejected" if "-kill" in intent["client_order_id"] else None
+        sup, clock = make_sup(self.dir, b)
+        sup.runstate.update(killed=True)
+        sup.executor.killed = True
+        self.tick(sup, clock, ny(15, 40), kill=True)
+        self.assertEqual(self.ids(1), ["nf1-20260925-cls1-AAA-long"])  # B1: the kill never skips the close
+
+    def test_kill_waits_for_cancels_before_reflattening(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        working = b.add("nf1-20260925-cls1-AAA-long", "sell", 20, 0, status="accepted", tif="cls")
+        b.cancel_race = {working["id"]}  # the pending cancel is overtaken by a fill
+        sup, clock = make_sup(self.dir, b)
+        sup.runstate.update(killed=True)
+        sup.executor.killed = True
+        self.tick(sup, clock, ny(15, 45), exits=False, kill=True)
+        self.assertEqual(b.positions(), [])
+        self.assertFalse(any("-kill" in c for c in self.ids()))  # nothing left to flatten: no oversell
+
+
+class OpenBasket(Scenario):
+    def pool(self, sup, symbols):
+        for i, (sym, label) in enumerate(symbols):
+            c = {"event_id": f"{i}:{sym}", "news_id": str(i), "symbol": sym, "label": label, "lane": "liquid",
+                 "created_at": common.iso(at(date(2026, 9, 24), 17, i)), "session": "2026-09-25",
+                 "session_label": planner.OPEN_AUCTION, "sigma": 0.02, "prior_median_dollar_volume_20": 50_000_000.0,
+                 "prior_close": 50.0}
+            prior = common.load_calendar().prior_sessions(FRIDAY, 2)
+            sup.bars[(sym, "2026-09-25")] = [{"t": common.iso(datetime(d.year, d.month, d.day, tzinfo=NY)), "c": 50.0, "v": 1e6,
+                                             "l": 49.0} for d in prior]
+            sup.candidates[c["event_id"]] = sup.open_pool[c["event_id"]] = c
+            sup.scores[c["event_id"]] = {"label": label}
+
+    def test_gates_95pct_sizing_and_a_rejected_leg(self):
+        b = self.b
+        sup, clock = make_sup(self.dir, b)
+        self.pool(sup, [("LA", "FAVORABLE"), ("SA", "UNFAVORABLE"), ("LB", "FAVORABLE"), ("SB", "UNFAVORABLE"),
+                        ("LC", "FAVORABLE"), ("SC", "UNFAVORABLE"), ("WID", "FAVORABLE"), ("GAP", "FAVORABLE")])
+        sup.quotes.update({"WID": {"bp": 49.0, "ap": 51.0}, "GAP": {"bp": 59.99, "ap": 60.01}})
+        b.reject = lambda intent: "short_rejected" if intent["side"] == "sell" else None
+        clock["now"] = b.now = ny(9, 15)
+        sup.run_open_basket(ny(9, 15))
+        reasons = {r["symbol"]: r["reason"] for r in self.rows(sup, "decision")}
+        self.assertEqual((reasons["WID"], reasons["GAP"]), ("premarket_spread_above_100bps", "mid_outside_15pct_of_prior_close"))
+        enter = [r for r in self.rows(sup, "decision") if r["action"] == "enter"]
+        # min(0.0015 x 900k / 0.02, 0.5% x 50M, 5% x 900k) = 45,000 -> 95% = 42,750 -> 855 shares at the 50.00 mid
+        self.assertEqual({(r["qty"], r["est_notional"]) for r in enter}, {(855, "42750.00")})
+        refused = {r["intent"]["symbol"]: r["reason"] for r in self.rows(sup, "order_refused")}
+        # shorts are rejected; the gate then keeps the long book inside the 90k net cap: L3 is skipped
+        self.assertEqual(refused["LC"], "executor_cap:net_cap")
+        self.assertTrue(all(refused[s].startswith("submit_failed:short_rejected") for s in ("SA", "SB", "SC")))
+        self.assertEqual(sorted(self.ids()), ["nf1-20260925-opg-LA-long", "nf1-20260925-opg-LB-long"])
+        net = self.rows(sup, "net_cap")[0]
+        self.assertEqual((net["pre_cap"]["net"], net["post_cap"]["net"], net["net_cap"]), ("0.00", "0.00", "85500.0000"))
+
+    def test_unfilled_leg_is_trimmed_after_the_open(self):
+        b = self.b
+        sup, clock = make_sup(self.dir, b)
+        self.pool(sup, [("LA", "FAVORABLE"), ("SA", "UNFAVORABLE"), ("LB", "FAVORABLE"), ("SB", "UNFAVORABLE"),
+                        ("LC", "FAVORABLE"), ("SC", "UNFAVORABLE")])
+        clock["now"] = b.now = ny(9, 15)
+        sup.run_open_basket(ny(9, 15))
+        self.assertEqual(len(b.all), 6)  # interleaved legs keep every running net inside the cap
+        b.now = ny(9, 30)
+        for o in b.all:
+            if o["side"] == "buy":
+                b.fill(o["client_order_id"])
+            else:
+                o["status"] = "expired"  # the short leg did not fill in the auction
+        self.tick(sup, clock, ny(9, 31))
+        trims = [o for o in b.all if "-trim1-" in o["client_order_id"]]
+        # filled 128,250 long vs 0 short: trim to 85,500 -> 42,750 pro rata = 14,250 each -> 285 shares at 49.70
+        self.assertEqual({(o["qty"], o["limit_price"], o["side"]) for o in trims}, {("285", "49.7", "sell")})  # the contract canonicalizes 49.70
+        self.assertEqual(len(trims), 3)
+        actual = self.rows(sup, "net_actual")[-1]["windows"]["core:open_auction"]
+        self.assertEqual((actual["long"], actual["short"]), ("128250", "0"))
+
+
+class Restart(Scenario):
+    def test_exposure_rebuilt_from_fills_and_reference_prices(self):
+        b = self.b
+        b.add("nf1-20260925-opg-P1-long", "buy", 800, 0, status="accepted", tif="opg")
+        b.add("nf1-20260925-opg-P2-short", "sell", 700, 0, status="accepted", tif="opg")  # no reference price saved
+        b.add("nf1-20260925-rth-R1-long", "buy", 100, 40, status="partially_filled", limit="50.20")
+        b.add("nf1-20260925-opg-X1-long", "buy", 500, 0, status="rejected", tif="opg")
+        sup, clock = make_sup(self.dir, b)
+        sup.executor.ref_prices = {"nf1-20260925-opg-P1-long": "50.00"}
+        sup.save_ref_prices()
+        sup.executor.ref_prices = supervisor._json_file(sup.ref_path)  # as __init__ reloads it
+        sup.refresh(ny(9, 20), force=True)
+        core = sup.exposures["core"]
+        # P1 800 x 50 + P2 at the 45,000 per-order cap + R1 40 x 50 + 60 x 50.20; X1 rejected: released
+        self.assertEqual(core.gross, Decimal("40000.00") + Decimal("45000.00") + Decimal("2000") + Decimal("3012.00"))
+        self.assertEqual(core.symbols, {"P1", "P2", "R1", "X1"})
+        self.assertEqual(sup.executor.gate.exposures["core"].gross, core.gross)
+        self.assertEqual(sup.executor.gate.check("core", planner.RTH, "long", "X1", Decimal("100")), "per_name_repeat")
+
+
+class ExitOnly(Scenario):
+    def open(self, sup):
+        with mock.patch.object(ex, "trading_credentials", return_value=("k", "s")), \
+             mock.patch.object(ex, "make_trading_client", return_value=object()), \
+             mock.patch.object(ex, "AlpacaBroker", return_value=self.b):
+            return sup.open_account()
+
+    def test_failed_account_check_with_positions_runs_exit_only(self):
+        b = self.b
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        b.all.append({"id": "f1", "client_order_id": "manual-1", "symbol": "ZZZ", "side": "buy", "qty": "1",
+                      "filled_qty": "0", "status": "new", "submitted_at": ny(9, 0)})
+        sup, clock = make_sup(self.dir, b)
+        broker, account, exit_only, mode, verdict = self.open(sup)
+        self.assertEqual((exit_only, mode, verdict), (True, "paper", "exit_only:foreign_orders_or_positions"))
+        e = ex.Executor(mode, sup.journal, self.dir, broker=broker, gate=ex.RiskGate(sup.limits, sup.account_gross_cap),
+                        exit_only=exit_only, clock=sup.clock)
+        sup.executor = e
+        self.assertIsNone(e.send(planner.entry_intent(FRIDAY, "rth", "NEW", "long", 1, "day", "10.00"),
+                                 {"purpose": "entry", "arm": "core", "session_label": "rth", "leg": "long", "ref_price": "10.00"}))
+        self.tick(sup, clock, ny(15, 40))
+        self.assertIn("nf1-20260925-cls1-AAA-long", self.ids())  # exits stay active
+        self.assertEqual(b.find("manual-1")["status"], "new")  # a foreign order is never touched
+
+    def test_failed_account_check_without_positions_falls_back_to_dry_run(self):
+        b = self.b
+        b.all.append({"id": "f1", "client_order_id": "manual-1", "symbol": "ZZZ", "side": "buy", "qty": "1",
+                      "filled_qty": "0", "status": "new", "submitted_at": ny(9, 0)})
+        sup, clock = make_sup(self.dir, b)
+        self.assertEqual(self.open(sup)[2:], (False, "dry-run", "refused:foreign_orders_or_positions"))
+        self.assertIn("paper_refused_no_positions", [r.get("event") for r in self.rows(sup, "risk")])
 
 
 def bars_for(days, close=50.0):
@@ -196,110 +505,97 @@ def bars_for(days, close=50.0):
             for d in days]
 
 
-class ArmFlows(unittest.TestCase):
-    """Arm entries through the supervisor with a paper broker double (no network)."""
-
-    def setUp(self):
-        self.dir = tempfile.mkdtemp(prefix="nf-arms-")
-        self.broker = Broker()
-        cal = common.load_calendar()
-        journal = common.Journal(self.dir, date(2026, 9, 25))
-        sup = supervisor.Supervisor.__new__(supervisor.Supervisor)
-        sup.mode, sup.schedule, sup.trade_date, sup.journal, sup.state = "paper", SCHED, date(2026, 9, 25), journal, self.dir
-        sup.calendar, sup.prev_session = cal, cal.previous(date(2026, 9, 25))
-        sup.cfg = {"arms": {"pm": {"orders_from": "2026-09-28"}, "ah": {"orders_from": "2026-09-25"}}}
-        sup.executor = supervisor.ex.Executor("paper", journal, self.dir, broker=self.broker)
-        sup.counts, sup.equity = supervisor.Counter(), Decimal("900000")
-        sup.exposures = {a: planner.Exposure() for a in planner.ARM_PREFIX}
-        sup.limits = {a: planner.Limits.for_arm(a, sup.equity, 1, extra_cap=sup.equity) for a in planner.ARM_PREFIX}
-        sup.account_gross_cap = 4 * sup.equity
-        sup.candidates, sup.bars, sup.done_steps = {}, {}, set()
-        sup.arm_pending = {planner.PM: {}, planner.AH: {}}
-        sup.data = mock.Mock()
-        sup.data.snapshots.side_effect = lambda syms: {s: {"latestQuote": {"bp": 49.95, "ap": 50.05}} for s in syms}
-        sup.data.asset.return_value = {"tradable": True, "shortable": True, "easy_to_borrow": True}
-        self.sup = sup
-
-    def tearDown(self):
-        shutil.rmtree(self.dir, ignore_errors=True)
-
-    def event(self, sym, created, session, label="FAVORABLE", nid=1):
+class ArmFlows(Scenario):
+    def event(self, sup, sym, created, session, label="FAVORABLE", nid=1):
         ev = {"event_id": f"{nid}:{sym}", "news_id": str(nid), "symbol": sym, "label": label, "lane": "liquid",
               "created_at": common.iso(created), "session": session, "session_label": planner.OPEN_AUCTION,
-              "sigma": 0.02, "prior_median_dollar_volume_20": 50_000_000.0,
+              "sigma": 0.02, "prior_median_dollar_volume_20": 50_000_000.0, "prior_close": 50.0,
               "entry_utc": common.iso(created + timedelta(minutes=15))}
-        self.sup.bars[(sym, session)] = bars_for(common.load_calendar().prior_sessions(date.fromisoformat(session), 2))
-        self.sup.candidates[ev["event_id"]] = ev
+        sup.bars[(sym, session)] = bars_for(common.load_calendar().prior_sessions(date.fromisoformat(session), 2))
+        sup.candidates[ev["event_id"]] = ev
         return ev
-
-    def decisions(self):
-        return [r for r in common.read_jsonl(self.sup.journal.path) if r["kind"] == "decision"]
 
     def test_ah_entry_with_corporate_action_guard(self):
         ca = common.load_by_path("adaptive_paper_corporate_actions",
                                  os.path.join(common.REPO, "blueprints/us-equities/adaptive-paper/corporate_actions.py"))
         thursday = date(2026, 9, 24)  # the next session (Friday) is the next day: one night only
-        self.sup.trade_date = thursday
-        self.sup.cfg["arms"]["ah"]["orders_from"] = "2026-09-24"
+        sup, clock = make_sup(self.dir, self.b, day=thursday)
         for i, sym in enumerate(("AAA", "BBB", "CCC")):
-            ev = self.event(sym, at(thursday, 16, 5 + i), "2026-09-25", nid=10 + i)
-            self.sup.arm_pending[planner.AH][ev["event_id"]] = ev
+            ev = self.event(sup, sym, at(thursday, 16, 5 + i), "2026-09-25", nid=10 + i)
+            sup.arm_pending[planner.AH][ev["event_id"]] = ev
         guard = {"AAA": ca.GuardDecision("AAA", False, False, False, None),
                  "BBB": ca.GuardDecision("BBB", True, False, False, "corporate_action_split")}
-        with mock.patch.object(self.sup, "corporate_action_block", return_value=guard):
-            self.sup.run_arm_entries(at(thursday, 16, 25), planner.AH)
-        reasons = {d["symbol"]: d["reason"] for d in self.decisions()}
+        clock["now"] = at(thursday, 16, 25)
+        with mock.patch.object(sup, "corporate_action_block", return_value=guard):
+            sup.run_arm_entries(at(thursday, 16, 25), planner.AH)
+        reasons = {d["symbol"]: d["reason"] for d in self.rows(sup, "decision")}
         self.assertEqual(reasons, {"AAA": "ok", "BBB": "corporate_action_split", "CCC": "corporate_action_lookup_failed"})
-        sent = self.broker.all
-        self.assertEqual(len(sent), 1)
-        # 25% of min(0.0015 * 900k / 0.02, 0.5% * 50M, 5% * 900k) = 25% of 45,000 = 11,250 -> 224 shares at 50.21
-        self.assertEqual((sent[0]["client_order_id"], sent[0]["extended_hours"], sent[0]["time_in_force"], sent[0]["limit_price"], sent[0]["qty"]),
+        self.assertEqual(len(self.b.all), 1)
+        sent = self.b.all[0]
+        # 25% of min(0.0015 x 900k / 0.02, 0.5% x 50M, 5% x 900k) = 11,250 -> 224 shares at 50.21
+        self.assertEqual((sent["client_order_id"], sent["extended_hours"], sent["time_in_force"], sent["limit_price"], sent["qty"]),
                          ("nf1x-ah-20260924-ent-AAA-long", True, "day", "50.21", "224"))
 
     def test_ah_skips_friday_and_pre_holiday_before_any_lookup(self):
-        cases = ((date(2026, 9, 25), "2026-09-28"),   # Friday -> Monday
-                 (date(2026, 11, 25), "2026-11-27"))  # Wednesday before Thanksgiving -> Friday
-        for n, (day, session) in enumerate(cases):
-            self.sup.trade_date = day
-            ev = self.event(f"X{n}", at(day, 16, 5), session, nid=20 + n)
-            self.sup.arm_pending[planner.AH] = {ev["event_id"]: ev}
-            with mock.patch.object(self.sup, "corporate_action_block") as ca_block:
-                self.sup.run_arm_entries(at(day, 16, 25), planner.AH)
+        for n, (day, session) in enumerate(((FRIDAY, "2026-09-28"), (date(2026, 11, 25), "2026-11-27"))):
+            sup, clock = make_sup(self.dir, self.b, day=day)
+            ev = self.event(sup, f"X{n}", at(day, 16, 5), session, nid=20 + n)
+            sup.arm_pending[planner.AH] = {ev["event_id"]: ev}
+            clock["now"] = at(day, 16, 25)
+            with mock.patch.object(sup, "corporate_action_block") as ca_block:
+                sup.run_arm_entries(at(day, 16, 25), planner.AH)
             ca_block.assert_not_called()
-            self.assertEqual(self.sup.arm_pending[planner.AH], {})
-        self.sup.data.snapshots.assert_not_called()
-        self.assertEqual([(d["symbol"], d["reason"]) for d in self.decisions()],
-                         [("X0", "ah_next_session_not_next_day"), ("X1", "ah_next_session_not_next_day")])
-        self.assertEqual(self.broker.all, [])
+            sup.data.snapshots.assert_not_called()
+            self.assertEqual(sup.arm_pending[planner.AH], {})
+            self.assertEqual([(d["symbol"], d["reason"]) for d in self.rows(sup, "decision")],
+                             [(f"X{n}", "ah_next_session_not_next_day")])
+        self.assertEqual(self.b.all, [])
 
     def test_pm_is_gated_and_follows_core_first_event(self):
-        first = self.event("AAA", ny(6, 0), "2026-09-25", nid=1)
-        self.event("BBB", ny(3, 0), "2026-09-25", nid=2)  # the core's first BBB event is overnight
-        second = self.event("BBB", ny(6, 0), "2026-09-25", nid=3)
-        for ev in (first, second):
-            self.sup.arm_pending[planner.PM][ev["event_id"]] = ev
-        self.sup.run_arm_entries(ny(6, 16), planner.PM)
-        reasons = {d["symbol"]: d["reason"] for d in self.decisions()}
+        sup, clock = make_sup(self.dir, self.b)
+        first = self.event(sup, "AAA", ny(6, 0), "2026-09-25", nid=1)
+        self.event(sup, "BBB", ny(3, 0), "2026-09-25", nid=2)  # the core's first BBB event is overnight
+        second = self.event(sup, "BBB", ny(6, 0), "2026-09-25", nid=3)
+        for e in (first, second):
+            sup.arm_pending[planner.PM][e["event_id"]] = e
+        clock["now"] = ny(6, 16)
+        sup.run_arm_entries(ny(6, 16), planner.PM)
+        reasons = {d["symbol"]: d["reason"] for d in self.rows(sup, "decision")}
         self.assertEqual(reasons, {"AAA": "ok", "BBB": "pm_event_not_core_first_in_window"})
-        self.assertEqual(self.broker.all, [])  # pm orders start 2026-09-28: intent journaled, nothing sent
-        intents = [r for r in common.read_jsonl(self.sup.journal.path) if r["kind"] == "order_intent"]
+        self.assertEqual(self.b.all, [])  # pm orders start 2026-09-28: intent journaled, nothing sent
+        intents = self.rows(sup, "order_intent")
         self.assertEqual([(r["mode"], r["arm"], r["envelope"]["intent"]["extended_hours"]) for r in intents], [("dry-run", "pm", True)])
 
-    def test_ah_opg_exit_precedes_and_blocks_the_core_basket(self):
-        self.broker.add("nf1x-ah-20260924-ent-AAA-long", "buy", 8, 8)
-        blocked = self.sup.run_ah_opg_exits()
-        self.assertEqual(blocked, {"AAA"})
-        self.assertEqual([(o["client_order_id"], o["time_in_force"]) for o in self.broker.all[1:]],
-                         [("nf1x-ah-20260924-opg-AAA-long", "opg")])
-
     def test_first_order_time_is_enforced(self):
-        self.sup.executor.not_before = ny(9, 15)
-        self.sup.executor.clock = lambda: ny(9, 14)
-        intent = planner.entry_intent(date(2026, 9, 25), "opg", "AAA", "long", 5, "opg")
-        self.assertIsNone(self.sup.send(intent, {"purpose": "entry", "session_label": planner.OPEN_AUCTION}))
-        self.sup.executor.clock = lambda: ny(9, 15)
-        self.assertIsNotNone(self.sup.send(intent, {"purpose": "entry", "session_label": planner.OPEN_AUCTION}))
-        self.assertEqual(len(self.broker.all), 1)
+        sup, clock = make_sup(self.dir, self.b)
+        sup.executor.not_before = ny(9, 15)
+        intent = planner.entry_intent(FRIDAY, "opg", "AAA", "long", 5, "opg")
+        ctx = {"purpose": "entry", "session_label": planner.OPEN_AUCTION, "leg": "long", "ref_price": "50"}
+        clock["now"] = ny(9, 14)
+        self.assertIsNone(sup.send(intent, ctx))
+        clock["now"] = ny(9, 15)
+        self.assertIsNotNone(sup.send(intent, ctx))
+        self.assertEqual(len(self.b.all), 1)
+
+    def test_carry_over_exits_at_the_open_then_falls_back(self):
+        b = self.b
+        b.add("nf1x-ah-20260924-ent-OLD-long", "buy", 8, 8, at_=at(date(2026, 9, 24), 16, 20))
+        b.add("nf1-20260923-opg-STALE-short", "sell", 6, 6, at_=at(date(2026, 9, 23), 9, 20))  # a missed close-out
+        sup, clock = make_sup(self.dir, b)
+        self.tick(sup, clock, ny(9, 15))
+        self.assertEqual([(o["client_order_id"], o["time_in_force"]) for o in b.all[2:]],
+                         [("nf1-20260923-xopg1-STALE-short", "opg"), ("nf1x-ah-20260924-xopg1-OLD-long", "opg")])
+        OpenBasket.pool(self, sup, [("OLD", "FAVORABLE"), ("NEW", "UNFAVORABLE")])
+        sup.run_open_basket(ny(9, 15))
+        reasons = {r["symbol"]: r["reason"] for r in self.rows(sup, "decision")}
+        self.assertEqual(reasons["OLD"], "symbol_exiting_carry_over_position")
+        b.now = ny(9, 30)
+        b.find("nf1-20260923-xopg1-STALE-short")["status"] = "expired"  # unfilled in the auction
+        b.fill("nf1x-ah-20260924-xopg1-OLD-long")
+        n = len(b.all)
+        self.tick(sup, clock, ny(9, 31))
+        self.assertEqual([(o["client_order_id"], o["side"], o["limit_price"]) for o in b.all[n:]
+                          if "-cof" in o["client_order_id"]], [("nf1-20260923-cof1-STALE-short", "buy", "50.31")])
 
 
 if __name__ == "__main__":

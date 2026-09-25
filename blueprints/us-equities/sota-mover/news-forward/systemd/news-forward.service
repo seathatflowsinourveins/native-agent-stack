@@ -1,6 +1,9 @@
 [Unit]
 Description=News-LLM forward pilot supervisor (pilot label; dry-run unless config.json mode=paper and alpaca-paper-3.env verifies; never live)
 After=network-online.target
+# A crash loop stops after 5 starts within 10 minutes (restart on failure is otherwise 30 s apart).
+StartLimitIntervalSec=600
+StartLimitBurst=5
 
 [Service]
 Type=simple

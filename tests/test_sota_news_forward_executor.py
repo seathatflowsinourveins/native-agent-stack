@@ -11,7 +11,8 @@ import shutil
 import sys
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -140,6 +141,18 @@ class StartChecks(unittest.TestCase):
             ex.start_check(broker)
 
 
+E = Decimal("900000")
+LIMITS = {arm: planner.Limits.for_arm(arm, E, 1) for arm in planner.ARM_PREFIX}
+
+
+def gate():
+    return ex.RiskGate(LIMITS, 4 * E)
+
+
+def entry_ctx(leg="long", ref="10.00", window=planner.RTH, arm=planner.CORE):
+    return {"purpose": "entry", "arm": arm, "session_label": window, "leg": leg, "ref_price": ref}
+
+
 class Submission(PrivateDir):
     def journal(self):
         return common.Journal(self.dir, date(2026, 9, 25))
@@ -149,45 +162,98 @@ class Submission(PrivateDir):
 
     def test_dry_run_sends_nothing_and_is_idempotent(self):
         j = self.journal()
-        e = ex.Executor("dry-run", j, self.dir)
+        e = ex.Executor("dry-run", j, self.dir, gate=gate())
         self.assertIsNone(e.broker)
         intent = planner.entry_intent(date(2026, 9, 25), "opg", "ACME", "long", 20, "opg")
-        first = e.send(intent, {"purpose": "entry"})
-        second = e.send(intent, {"purpose": "entry"})
+        first = e.send(intent, entry_ctx(ref="50", window=planner.OPEN_AUCTION))
+        second = e.send(intent, entry_ctx(ref="50", window=planner.OPEN_AUCTION))
         self.assertIs(first, second)
+        self.assertEqual((first["status"], first["simulated"], first["filled_avg_price"]), ("filled", True, "50"))
         kinds = [r["kind"] for r in self.rows(j)]
         self.assertEqual(kinds, ["order_intent"])
         self.assertEqual(self.rows(j)[0]["envelope"]["intent"]["time_in_force"], "opg")
 
-    def test_paper_submission_goes_through_the_contract(self):
+    def test_paper_submission_goes_through_the_contract_and_the_gate(self):
         j = self.journal()
         broker = FakeBroker()
-        e = ex.Executor("paper", j, self.dir, broker=broker)
-        e.send(planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "long", 19, "day", "100.26"), {"purpose": "entry"})
+        e = ex.Executor("paper", j, self.dir, broker=broker, gate=gate())
+        e.send(planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "long", 19, "day", "100.26"), entry_ctx(ref="100.26"))
         self.assertEqual(broker.submitted[0]["limit_price"], "100.26")
-        bad = planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "short", 19, "day", "100.261")
-        bad["client_order_id"] = "nf1-20260925-rth-ACME-short"
-        self.assertIsNone(e.send(bad, {"purpose": "entry"}))
+        bad = planner.entry_intent(date(2026, 9, 25), "rth", "BETA", "short", 19, "day", "100.261")
+        self.assertIsNone(e.send(bad, entry_ctx("short", ref="100.261")))
         foreign = dict(planner.entry_intent(date(2026, 9, 25), "rth", "BETA", "long", 1, "day", "10.00"), client_order_id="x-1")
-        self.assertIsNone(e.send(foreign, {"purpose": "entry"}))
+        self.assertIsNone(e.send(foreign, entry_ctx()))
+        repeat = planner.entry_intent(date(2026, 9, 25), "opg", "ACME", "long", 1, "opg")
+        self.assertIsNone(e.send(repeat, entry_ctx(ref="100", window=planner.OPEN_AUCTION)))  # one name per arm and day
+        huge = planner.entry_intent(date(2026, 9, 25), "rth", "HUGE", "long", 500, "day", "100.00")
+        self.assertIsNone(e.send(huge, entry_ctx(ref="100.00")))  # 50,000 > the 45,000 per-order cap
+        no_ref = planner.entry_intent(date(2026, 9, 25), "opg", "NOREF", "long", 5, "opg")
+        self.assertIsNone(e.send(no_ref, {"purpose": "entry", "arm": "core", "session_label": planner.OPEN_AUCTION, "leg": "long"}))
         self.assertEqual(len(broker.submitted), 1)
         reasons = [r.get("reason") for r in self.rows(j) if r["kind"] == "order_refused"]
         self.assertTrue(reasons[0].startswith("contract:"))
-        self.assertEqual(reasons[1], "client_order_id_prefix")
+        self.assertEqual(reasons[1:], ["client_order_id_prefix", "executor_cap:per_name_repeat", "executor_cap:per_order_cap",
+                                       "executor_cap:no_gate_or_reference_price"])
+        self.assertEqual(e.ref_prices, {"nf1-20260925-rth-ACME-long": "100.26"})
 
     def test_stop_file_and_kill_switch(self):
         j = self.journal()
         broker = FakeBroker()
-        e = ex.Executor("paper", j, self.dir, broker=broker)
+        e = ex.Executor("paper", j, self.dir, broker=broker, gate=gate())
         e.killed = True
         entry = planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "long", 1, "day", "10.00")
-        self.assertIsNone(e.send(entry, {"purpose": "entry"}))
-        flat = planner.exit_intent(date(2026, 9, 25), "kill", "ACME", "1")
+        self.assertIsNone(e.send(entry, entry_ctx()))
+        flat = planner.exit_intent(date(2026, 9, 25), "kill1", "ACME", "1")
         self.assertIsNotNone(e.send(flat, {"purpose": "kill_flatten"}))
+        close = planner.exit_intent(date(2026, 9, 25), "cls1", "OTHER", "1")
+        self.assertIsNotNone(e.send(close, {"purpose": "exit"}))  # B1: exits are never refused for the kill
         Path(self.dir, "STOP").touch()
-        flat2 = planner.exit_intent(date(2026, 9, 25), "kill", "BETA", "1")
+        flat2 = planner.exit_intent(date(2026, 9, 25), "kill2", "BETA", "1")
         self.assertIsNone(e.send(flat2, {"purpose": "kill_flatten"}))
-        self.assertEqual([i["symbol"] for i in broker.submitted], ["ACME"])
+        self.assertEqual([i["symbol"] for i in broker.submitted], ["ACME", "OTHER"])
+
+    def test_exit_only_deadline_and_first_order_time(self):
+        j = self.journal()
+        broker = FakeBroker()
+        now = {"t": datetime(2026, 9, 25, 13, 20, tzinfo=timezone.utc)}
+        e = ex.Executor("paper", j, self.dir, broker=broker, gate=gate(), exit_only=True, clock=lambda: now["t"],
+                        not_before=datetime(2026, 9, 25, 13, 15, tzinfo=timezone.utc))
+        self.assertIsNone(e.send(planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "long", 1, "day", "10.00"), entry_ctx()))
+        cutoff = datetime(2026, 9, 25, 13, 27, tzinfo=timezone.utc)
+        self.assertIsNotNone(e.send(planner.exit_intent(date(2026, 9, 24), "xopg1", "OLD", "5"), {"purpose": "exit"}, deadline=cutoff))
+        now["t"] = datetime(2026, 9, 25, 13, 27, 1, tzinfo=timezone.utc)
+        self.assertIsNone(e.send(planner.exit_intent(date(2026, 9, 24), "xopg2", "OLD", "5"), {"purpose": "exit"}, deadline=cutoff))
+        now["t"] = datetime(2026, 9, 25, 13, 14, tzinfo=timezone.utc)
+        self.assertIsNone(e.send(planner.exit_intent(date(2026, 9, 24), "xopg3", "OLD", "5"), {"purpose": "exit"}))
+        reasons = [r.get("reason") for r in self.rows(j) if r["kind"] == "order_refused"]
+        self.assertEqual(reasons, ["exit_only_mode", "deadline_passed", "before_first_order_time"])
+
+    def test_idempotent_existing_is_journaled_separately(self):
+        j = self.journal()
+        broker = FakeBroker()
+        broker.submit = lambda intent: {"id": "old", "client_order_id": intent["client_order_id"], "status": "filled",
+                                        "idempotent_existing": True}
+        e = ex.Executor("paper", j, self.dir, broker=broker, gate=gate())
+        e.send(planner.exit_intent(date(2026, 9, 25), "cls1", "ACME", "5"), {"purpose": "exit"})
+        self.assertEqual([r["kind"] for r in self.rows(j)], ["order_intent", "order_idempotent_existing"])
+
+
+class Gate(unittest.TestCase):
+    def test_every_cap_at_100pct(self):
+        g = ex.RiskGate({planner.CORE: planner.Limits(E, Decimal("100000"), Decimal("45000"), Decimal("90000"))}, Decimal("120000"))
+        self.assertEqual(g.check("core", "rth", "long", "A", Decimal("45000.01")), "per_order_cap")
+        self.assertIsNone(g.check("core", "rth", "long", "A", Decimal("45000")))
+        g.commit("core", "rth", "long", "A", Decimal("45000"))
+        self.assertEqual(g.check("core", "rth", "short", "A", Decimal("100")), "per_name_repeat")
+        g.commit("core", "rth", "long", "B", Decimal("40000"))
+        self.assertEqual(g.check("core", "rth", "long", "C", Decimal("10000")), "net_cap")    # 95k long, 0 short
+        self.assertEqual(g.check("core", "rth", "short", "C", Decimal("20000")), "gross_cap")  # 105k > 100k
+        self.assertIsNone(g.check("core", "rth", "short", "C", Decimal("15000")))
+        g.exposures["pm"] = planner.Exposure(gross=Decimal("30000"))
+        self.assertEqual(g.check("core", "rth", "short", "C", Decimal("15000")), "account_gross_cap")  # 115k + 15k > 120k
+        g.sync({"core": planner.Exposure()})
+        self.assertIsNone(g.check("core", "rth", "long", "A", Decimal("45000")))  # synced to the broker's state
+        self.assertEqual(g.check("zz", "rth", "long", "A", Decimal("1")), "no_limits_for_arm")
 
 
 @unittest.skipUnless(HAS_ALPACA, "alpaca-py not installed in this interpreter")
@@ -244,6 +310,26 @@ class AlpacaWrapper(unittest.TestCase):
         self.assertEqual(rec["realized_pnl"], "10.0")
         rec = planner.reconcile("100000", broker.account()["cash"], fills, broker.positions(), [])
         self.assertIn("positions_open", rec["problems"])
+
+    def test_all_orders_paginates_without_gaps(self):
+        base = datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
+        orders = [SimpleNamespace(id=str(i), client_order_id=f"nf1-20260925-rth-S{i}-long", symbol=f"S{i}", side="buy", qty="1",
+                                  filled_qty="0", filled_avg_price=None, status="new", type="limit", time_in_force="day",
+                                  limit_price="1", submitted_at=base + timedelta(seconds=i), filled_at=None, extended_hours=False)
+                  for i in range(7)]
+        calls = []
+
+        class Client:
+            _base_url = "https://paper-api.alpaca.markets"
+
+            def get_orders(self, filter=None):
+                calls.append((filter.after, filter.direction.value, filter.limit))
+                return [o for o in orders if o.submitted_at > filter.after][: filter.limit]
+
+        got = ex.AlpacaBroker(Client()).all_orders(base - timedelta(seconds=1), page=3)
+        self.assertEqual([o["id"] for o in got], [str(i) for i in range(7)])
+        self.assertEqual(len(calls), 4)
+        self.assertEqual({c[1] for c in calls}, {"asc"})
 
     def test_duplicate_client_id_is_idempotent(self):
         client, calls = self.client()

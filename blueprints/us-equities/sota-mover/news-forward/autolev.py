@@ -43,8 +43,16 @@ Z_95_ONE_SIDED = 1.645
 
 
 def counted(rows):
-    """Daily rows that count as evidence: every label except pilot, in session order."""
-    return sorted((r for r in rows if r.get("evidence_label") != "pilot"), key=lambda r: r["session"])
+    """Daily rows that count as evidence, one per session in session order (M8).
+
+    The last row written for a session wins (a restart can reconcile twice); rows labelled
+    pilot and days whose core arm was not flat at the reconciliation are excluded.
+    """
+    by_session = {}
+    for r in rows:
+        by_session[r["session"]] = r
+    return [r for _, r in sorted(by_session.items())
+            if r.get("evidence_label") != "pilot" and r.get("core_flat", False) is True]
 
 
 def shrunk_mean(xs):

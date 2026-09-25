@@ -17,9 +17,9 @@ import autolev  # noqa: E402
 E = Decimal("900000")
 
 
-def rows(values, trips=10, label="confirmatory"):
+def rows(values, trips=10, label="confirmatory", flat=True):
     return [{"session": f"2026-10-{i + 1:02d}" if i < 31 else f"2026-11-{i - 30:02d}", "evidence_label": label,
-             "net_return_on_gross": v, "round_trips": trips} for i, v in enumerate(values)]
+             "net_return_on_gross": v, "round_trips": trips, "core_flat": flat} for i, v in enumerate(values)]
 
 
 def cap(**kw):
@@ -53,6 +53,17 @@ class Statistics(unittest.TestCase):
 
 class Gate(unittest.TestCase):
     GOOD = [0.004, 0.006] * 20  # 40 sessions, mean 0.005, sd ~0.001
+
+    def test_one_row_per_session_and_flat_days_only(self):
+        base = rows(self.GOOD, trips=10)
+        duplicated = base + [dict(base[0], net_return_on_gross=-0.5)]  # a second reconciliation of day 1
+        kept = autolev.counted(duplicated)
+        self.assertEqual(len(kept), 40)
+        self.assertEqual(kept[0]["net_return_on_gross"], -0.5)  # the last row written for a session wins
+        not_flat = rows(self.GOOD, trips=10)
+        not_flat[5]["core_flat"] = False
+        self.assertEqual(len(autolev.counted(not_flat)), 39)
+        self.assertEqual(autolev.counted(rows([0.01] * 3, flat=False)), [])
 
     def test_pilot_rows_are_excluded(self):
         level, inputs = autolev.kelly_leverage(rows(self.GOOD, trips=10, label="pilot"))

@@ -43,6 +43,10 @@ MIN_NAME_NOTIONAL = Decimal("1000")
 ARM_SIZE_FRACTION = Decimal("0.25")   # exploratory arms trade 25% of the section-A size
 ARM_GROSS_FRACTION = Decimal("0.25")  # and each has its own gross cap of 0.25 E
 NET_CAP_FRACTION = Decimal("0.10")    # per arm and window: |long - short notional| <= 0.10 E
+PLAN_FRACTION = Decimal("0.95")       # OPG baskets are planned at 95% of every cap (M3)
+OPG_MAX_SPREAD_BPS = Decimal("100")   # pre-market spread gate for OPG entries (M3)
+OPG_BAND = Decimal("0.15")            # OPG reference mid must be within 15% of the prior close (M3)
+TRIM_TARGET_FRACTION = Decimal("0.95")  # a net-cap trim brings |net| to 95% of the cap (M4)
 KILL_LOSS_FRACTION = Decimal("0.02")
 MAX_SPREAD_BPS = Decimal("50")
 EXT_MAX_SPREAD_BPS = Decimal("100")
@@ -100,12 +104,14 @@ class DaySchedule:
     basket_at: datetime        # open - 15 min (09:15)
     opg_submit_by: datetime    # open - 3 min (09:27), our cutoff
     opg_broker_cutoff: datetime  # open - 2 min (09:28), Alpaca's OPG cutoff
-    cls_start: datetime        # close - 20 min (15:40)
-    cls_end: datetime          # close - 15 min (15:45)
+    cls_start: datetime        # close - 20 min (15:40): RTH entries stop, CLS exits start
+    cls_end: datetime          # close - 15 min (15:45): the study's last RTH entry time
+    cls_retry_end: datetime    # close - 11 min (15:49): last CLS (re)submission; Alpaca's cutoff is 15:50
     market_flatten_at: datetime  # close - 5 min (15:55)
     ext_flatten_at: datetime   # close + 2 min
     ext_end: datetime          # 20:00 ET (17:00 on early-close days)
     service_end: datetime      # ext_end + 5 min
+    fallback_start: datetime   # open + 1 min: carry-over fallback exits and net-cap trims
 
 
 def day_schedule(calendar, session_date):
@@ -122,10 +128,12 @@ def day_schedule(calendar, session_date):
         opg_broker_cutoff=s.open_utc - timedelta(minutes=2),
         cls_start=s.close_utc - timedelta(minutes=20),
         cls_end=s.close_utc - timedelta(minutes=15),
+        cls_retry_end=s.close_utc - timedelta(minutes=11),
         market_flatten_at=s.close_utc - timedelta(minutes=5),
         ext_flatten_at=s.close_utc + timedelta(minutes=2),
         ext_end=ext_end,
         service_end=ext_end + timedelta(minutes=5),
+        fallback_start=s.open_utc + timedelta(minutes=1),
     )
 
 
@@ -165,7 +173,8 @@ def opg_submission_allowed(schedule, now):
 
 
 def cls_submission_allowed(schedule, now):
-    return schedule.cls_start <= now <= schedule.cls_end
+    """CLS exits are (re)submitted from 15:40 until 15:49 (M1: retried until they are accepted)."""
+    return schedule.cls_start <= now <= schedule.cls_retry_end
 
 
 # ---------------------------------------------------------------------------------------
@@ -393,6 +402,7 @@ def parse_cid(client_id):
 
 
 ENTRY_STAGES = ("opg", "rth", "ent")
+TERMINAL_STATUSES = ("filled", "canceled", "expired", "replaced", "rejected", "done_for_day", "calculated")
 
 
 def ledger(orders):
@@ -406,6 +416,81 @@ def ledger(orders):
         key = (info["arm"], info["date"], info["symbol"])
         out[key] = out.get(key, Decimal("0")) + (qty if o.get("side") == "buy" else -qty)
     return {k: v for k, v in out.items() if v != 0}
+
+
+def is_live(order):
+    """True while the broker may still fill the order (any status that is not final)."""
+    return str(order.get("status") or "").lower() not in TERMINAL_STATUSES
+
+
+def is_entry(info, side):
+    """Entries buy a long leg or sell a short leg; exits do the opposite (an exit id names the leg it closes)."""
+    return (info["leg"] == LEG_LONG) == (side == "buy")
+
+
+def window_of(arm, stage):
+    if arm == CORE:
+        return {"opg": OPEN_AUCTION, "rth": RTH}.get(stage)
+    return EXT_PRE if arm == PM else EXT_POST
+
+
+def holdings(orders, ref_prices=None):
+    """Per (arm, entry_date, symbol) state from our orders (paper: the broker's; dry-run: simulated).
+
+    qty: signed net filled quantity of entries and exits; leg/window: from the entry order;
+    entry_qty/entry_notional: filled entry quantity and notional (their ratio is the entry
+    price); pending_qty/pending_notional: the unfilled remainder of live entry orders,
+    priced at the limit or, for market and OPG orders, at the reference price recorded at
+    submission (ref_prices by client_order_id; remainders without a price are counted in
+    pending_unpriced); exit_live_qty: the unfilled remainder of live exit orders.
+    Rejected, cancelled and expired remainders count nowhere: their notional is released.
+    """
+    ref_prices = ref_prices or {}
+    out = {}
+    for o in orders:
+        info = parse_cid(o.get("client_order_id"))
+        side = o.get("side")
+        if info is None or side not in ("buy", "sell"):
+            continue
+        key = (info["arm"], info["date"], info["symbol"])
+        h = out.setdefault(key, {"qty": Decimal("0"), "leg": None, "window": None, "entry_qty": Decimal("0"),
+                                 "entry_notional": Decimal("0"), "pending_qty": Decimal("0"),
+                                 "pending_notional": Decimal("0"), "pending_unpriced": 0,
+                                 "exit_live_qty": Decimal("0"), "entry_orders": 0})
+        filled = dec(o.get("filled_qty") or 0)
+        h["qty"] += filled if side == "buy" else -filled
+        remaining = max(Decimal("0"), dec(o.get("qty") or 0) - filled) if is_live(o) else Decimal("0")
+        if is_entry(info, side):
+            h["leg"] = info["leg"]
+            h["window"] = window_of(info["arm"], info["stage"])
+            h["entry_orders"] += 1
+            if filled:
+                h["entry_qty"] += filled
+                h["entry_notional"] += filled * dec(o.get("filled_avg_price") or 0)
+            if remaining:
+                price = o.get("limit_price") or ref_prices.get(o.get("client_order_id"))
+                h["pending_qty"] += remaining
+                if price:
+                    h["pending_notional"] += remaining * dec(price)
+                else:
+                    h["pending_unpriced"] += 1
+        else:
+            h["exit_live_qty"] += remaining
+            if h["leg"] is None:
+                h["leg"] = info["leg"]
+    return out
+
+
+def entry_price(h):
+    return h["entry_notional"] / h["entry_qty"] if h["entry_qty"] else None
+
+
+def simulated_positions(hs):
+    """Broker-style positions (net qty per symbol) from holdings (dry-run)."""
+    net = {}
+    for (_arm, _day, sym), h in hs.items():
+        net[sym] = net.get(sym, Decimal("0")) + h["qty"]
+    return [{"symbol": s, "qty": str(q)} for s, q in sorted(net.items()) if q]
 
 
 def whole_qty(notional, price):
@@ -432,10 +517,15 @@ def entry_intent(session_date, stage, symbol, leg, qty, tif, limit_price=None, a
 
 
 def exit_intent(entry_date, stage, symbol, position_qty, limit_price=None, extended=False, arm=CORE, tif=None):
-    """Close an arm's holding: stage cls, mkt, ext<n>, kill or opg; the leg is the side being closed."""
+    """Close (part of) an arm's holding; the id's leg is the side being closed.
+
+    Stages carry a round number when they can repeat (cls<n>, mkt<n>, ext<n>, kill<n>,
+    xopg<n> for carry-over auction exits, cof<n> for their post-open fallback, trim<n>,
+    xca<n>); the default TIF is cls for cls*, opg for xopg*, else day.
+    """
     qty = dec(position_qty)
     leg = LEG_LONG if qty > 0 else LEG_SHORT
-    tif = tif or ("cls" if stage == "cls" else "opg" if stage == "opg" else "day")
+    tif = tif or ("cls" if stage.startswith("cls") else "opg" if stage.startswith("xopg") else "day")
     intent = {
         "symbol": symbol,
         "qty": format(abs(qty).normalize(), "f"),
@@ -503,6 +593,11 @@ class Limits:
             gross = min(gross, dec(extra_cap))
         return cls(e, gross, MAX_NAME_FRACTION * e, NET_CAP_FRACTION * e)
 
+    def scaled(self, fraction):
+        """Planning limits: every cap times `fraction` (M3: OPG baskets are sized to 95% of every cap)."""
+        f = dec(fraction)
+        return Limits(self.equity, self.gross_cap * f, self.per_order_cap * f, self.net_cap * f)
+
 
 @dataclass
 class Exposure:
@@ -522,6 +617,34 @@ def net_headroom(exposure, window_label, leg, limits):
     """Largest new entry on `leg` that keeps |long - short| <= net_cap in this window."""
     net = window_net(exposure, window_label)
     return limits.net_cap - net if leg == LEG_LONG else limits.net_cap + net
+
+
+def exposure_from(hs, arm, day, unpriced_notional):
+    """Fill-based exposure of one arm's entries on `day` (M4).
+
+    Each holding counts its current filled quantity at its entry price plus its working
+    entry remainder (limit or reference price; an unpriced remainder counts at
+    `unpriced_notional`, the per-order cap). Rejected, cancelled or expired entries
+    without a fill release their notional; their symbol still blocks a repeat entry.
+    """
+    x = Exposure()
+    for (a, d, sym), h in hs.items():
+        if a != arm or d != day or h["window"] is None:
+            continue
+        x.symbols.add(sym)
+        avg = entry_price(h) or Decimal("0")
+        notional = abs(h["qty"]) * avg + h["pending_notional"] + dec(unpriced_notional) * h["pending_unpriced"]
+        if h["entry_qty"] == 0 and notional == 0:
+            continue
+        key = (h["window"], h["leg"])
+        x.gross += notional
+        x.names[key] = x.names.get(key, 0) + 1
+        x.notional[key] = x.notional.get(key, Decimal("0")) + notional
+    return x
+
+
+def copy_exposure(x):
+    return Exposure(x.gross, dict(x.names), set(x.symbols), dict(x.notional))
 
 
 def entry_cap_violation(notional, window_label, leg, symbol, exposure, limits, account=None):
@@ -644,18 +767,22 @@ def sized_qty(target_notional, price):
 def build_open_basket(events, session_date, exposure, limits, account_gross=None, blocked=frozenset()):
     """(decisions, OPG intents, net-cap record) for scored overnight events of one session.
 
-    events: dicts with symbol, created_at, news_id, lane, label, ref_price, asset, ssr and
-    target_notional (section A size). Only the liquid lane trades; FAVORABLE goes long;
-    UNFAVORABLE goes short only when shortable, easy to borrow and not under Rule 201.
-    Each leg takes its first 12 names by (created_at, news_id); gross is filled in
-    release order across both legs up to the arm's cap; then the net cap
-    (|long - short| <= 0.10 E, apply_net_cap) scales the larger leg down pro rata. A leg
-    with fewer than 2 names may trade alone, but only inside the net cap (coordinator
-    amendment 2026-09-25; it replaces the study's 2-name leg minimum for execution).
-    ``blocked``: symbols another arm holds (e.g. an overnight ah position exiting in the
-    same auction). account_gross: optional [total gross of all arms, account cap],
-    updated in place.
+    events: dicts with symbol, created_at, news_id, lane, label, quote (pre-market SIP
+    bp/ap), prior_close, asset, ssr and target_notional (section A size). Only the liquid
+    lane trades; FAVORABLE goes long; UNFAVORABLE goes short only when shortable, easy to
+    borrow and not under Rule 201. Pre-market gates (M3): a two-sided quote, spread at most
+    100 bps and a mid within 15% of the prior close; the mid is the reference price. Each
+    leg takes its first 12 names by (created_at, news_id); every cap is applied at 95%
+    (M3: an auction fill may differ from the reference): names are sized to at most 95% of
+    the per-order cap and gross is filled in release order up to 95% of the arm's and the
+    account's caps; then the net cap (95% of 0.10 E, apply_net_cap) scales the larger leg
+    down pro rata. A leg with fewer than 2 names may trade alone, but only inside the net
+    cap (coordinator amendment 2026-09-25; it replaces the study's 2-name leg minimum for
+    execution). ``blocked``: symbols with a carry-over position exiting in the same
+    auction. account_gross: optional [total gross of all arms, account cap], updated in
+    place.
     """
+    plan = limits.scaled(PLAN_FRACTION)
     decisions, legs = [], {LEG_LONG: [], LEG_SHORT: []}
     ordered = sorted(events, key=lambda e: (e["created_at"], int(e["news_id"]) if str(e["news_id"]).isdigit() else 0))
     seen = set()
@@ -674,7 +801,7 @@ def build_open_basket(events, session_date, exposure, limits, account_gross=None
             decisions.append({**base, "action": "skip", "reason": f"label_{str(ev.get('label')).lower()}"})
             continue
         if ev["symbol"] in blocked:
-            decisions.append({**base, "leg": leg, "action": "skip", "reason": "symbol_held_by_other_arm"})
+            decisions.append({**base, "leg": leg, "action": "skip", "reason": "symbol_exiting_carry_over_position"})
             continue
         if leg == LEG_SHORT:
             ok, why = short_allowed(ev.get("asset"), ev.get("ssr", True))
@@ -684,25 +811,38 @@ def build_open_basket(events, session_date, exposure, limits, account_gross=None
         if not (ev.get("asset") or {}).get("tradable", False):
             decisions.append({**base, "leg": leg, "action": "skip", "reason": "not_tradable"})
             continue
-        price = ev.get("ref_price")
-        if not price or dec(price) <= 0:
-            decisions.append({**base, "leg": leg, "action": "skip", "reason": "no_reference_price"})
+        quote = ev.get("quote") or {}
+        bps = spread_bps(quote["bp"], quote["ap"]) if quote.get("bp") and quote.get("ap") else None
+        if bps is None:
+            decisions.append({**base, "leg": leg, "action": "skip", "reason": "no_premarket_quote"})
+            continue
+        if bps > OPG_MAX_SPREAD_BPS:
+            decisions.append({**base, "leg": leg, "action": "skip", "reason": "premarket_spread_above_100bps",
+                              "spread_bps": str(bps.quantize(Decimal("0.1")))})
+            continue
+        mid = (dec(quote["bp"]) + dec(quote["ap"])) / 2
+        prior = ev.get("prior_close")
+        if not prior or dec(prior) <= 0 or abs(mid / dec(prior) - 1) > OPG_BAND:
+            decisions.append({**base, "leg": leg, "action": "skip", "reason": "mid_outside_15pct_of_prior_close",
+                              "mid": str(mid), "prior_close": str(prior)})
             continue
         if len(legs[leg]) >= MAX_NAMES_PER_LEG:
             decisions.append({**base, "leg": leg, "action": "skip", "reason": "names_per_leg_cap"})
             continue
-        legs[leg].append((ev, base))
+        legs[leg].append(({**ev, "ref_price": mid, "spread_bps": str(bps.quantize(Decimal("0.1")))}, base))
     chosen = {LEG_LONG: [], LEG_SHORT: []}
     queue = sorted([(ev["created_at"], leg, ev, base) for leg in legs for ev, base in legs[leg]], key=lambda x: x[0])
-    trial = Exposure(exposure.gross, dict(exposure.names), set(exposure.symbols))
-    trial_account = list(account_gross) if account_gross is not None else None
+    trial = copy_exposure(exposure)
+    trial_account = [account_gross[0], dec(account_gross[1]) * PLAN_FRACTION] if account_gross is not None else None
     for _, leg, ev, base in queue:
-        qty, notional, why = sized_qty(ev.get("target_notional"), ev["ref_price"])
+        target = ev.get("target_notional")
+        target = None if target is None else min(dec(target), plan.per_order_cap)
+        qty, notional, why = sized_qty(target, ev["ref_price"])
         if why:
             decisions.append({**base, "leg": leg, "action": "skip", "reason": why,
                               "target_notional": str(ev.get("target_notional"))})
             continue
-        why = entry_cap_violation(notional, OPEN_AUCTION, leg, ev["symbol"], trial, limits, trial_account)
+        why = entry_cap_violation(notional, OPEN_AUCTION, leg, ev["symbol"], trial, plan, trial_account)
         if why:
             decisions.append({**base, "leg": leg, "action": "skip", "reason": why})
             continue
@@ -715,10 +855,11 @@ def build_open_basket(events, session_date, exposure, limits, account_gross=None
             for leg in (LEG_LONG, LEG_SHORT) for ev, base, qty, notional in chosen[leg]]
     # the window's already-committed entries (e.g. after a restart) count, unscaled, toward the net cap
     kept, dropped, record = apply_net_cap(
-        rows, limits.net_cap,
+        rows, plan.net_cap,
         fixed_long=exposure.notional.get((OPEN_AUCTION, LEG_LONG), Decimal("0")),
         fixed_short=exposure.notional.get((OPEN_AUCTION, LEG_SHORT), Decimal("0")))
-    record = {**record, "arm": CORE, "window": OPEN_AUCTION}
+    record = {**record, "arm": CORE, "window": OPEN_AUCTION, "hard_net_cap": str(limits.net_cap),
+              "plan_fraction": str(PLAN_FRACTION)}
     for r, why in dropped:
         decisions.append({**r["base"], "leg": r["leg"], "action": "skip", "reason": why,
                           "pre_cap_notional": str(r["pre_cap_notional"])})
@@ -727,10 +868,10 @@ def build_open_basket(events, session_date, exposure, limits, account_gross=None
         ev, base, leg, qty, notional = r["ev"], r["base"], r["leg"], r["qty"], r["notional"]
         intent = entry_intent(session_date, SESSION_CODE[OPEN_AUCTION], ev["symbol"], leg, qty, "opg")
         decisions.append({**base, "leg": leg, "action": "enter", "reason": "ok", "qty": qty,
-                          "ref_price": str(ev["ref_price"]), "pre_cap_qty": r["pre_cap_qty"],
-                          "pre_cap_notional": str(r["pre_cap_notional"]), "est_notional": str(notional),
-                          "target_notional": str(ev.get("target_notional")), "sigma": ev.get("sigma"),
-                          "client_order_id": intent["client_order_id"]})
+                          "ref_price": str(ev["ref_price"]), "spread_bps": ev.get("spread_bps"),
+                          "pre_cap_qty": r["pre_cap_qty"], "pre_cap_notional": str(r["pre_cap_notional"]),
+                          "est_notional": str(notional), "target_notional": str(ev.get("target_notional")),
+                          "sigma": ev.get("sigma"), "client_order_id": intent["client_order_id"]})
         intents.append(intent)
         commit_entry(exposure, notional, OPEN_AUCTION, leg, ev["symbol"])
         if account_gross is not None:
@@ -854,49 +995,129 @@ def arm_for_release(calendar, created_at):
 
 
 # ---------------------------------------------------------------------------------------
-# Close-out from per-arm ledgers
+# Close-out: exits from per-holding state, capped at the broker position (M5, m3)
 # ---------------------------------------------------------------------------------------
 
 
-def _holdings(book, arms, entry_date=None):
-    return [(arm, day, sym, qty) for (arm, day, sym), qty in sorted(book.items(), key=lambda kv: (kv[0][0], kv[0][2]))
-            if arm in arms and qty != 0 and (entry_date is None or day == entry_date)]
+def exit_availability(hs, positions):
+    """{symbol: broker net qty left after the unfilled remainder of our working exits}."""
+    avail = {p["symbol"]: dec(p["qty"]) for p in positions}
+    for (_arm, _day, sym), h in hs.items():
+        if h["exit_live_qty"]:
+            sign = 1 if h["leg"] == LEG_LONG else -1
+            avail[sym] = avail.get(sym, Decimal("0")) - sign * h["exit_live_qty"]
+    return avail
 
 
-def plan_cls_exits(book, session_date, covered, arms=(CORE, PM)):
-    """CLS market exits for today's core/pm holdings not already covered by a live exit."""
-    return [exit_intent(day, "cls", sym, qty, arm=arm) for arm, day, sym, qty in _holdings(book, arms, session_date)
-            if (arm, sym) not in covered]
+def cap_exits(requests, hs, positions):
+    """Cap requested exits [(key, signed qty)] so no exit can oversell into a new position.
 
-
-def plan_market_flatten(book, session_date, covered, arms=(CORE, PM)):
-    """15:55: a day market order for any core/pm holding without a live exit."""
-    return [exit_intent(day, "mkt", sym, qty, arm=arm) for arm, day, sym, qty in _holdings(book, arms, session_date)
-            if (arm, sym) not in covered]
-
-
-def plan_ext_flatten(book, quotes, session_date, stage="ext", arms=(CORE, PM)):
-    """After the close: extended-hours limit exits at bid -0.5% (sell) or ask +0.5% (buy)."""
-    out, missing = [], []
-    for arm, day, sym, qty in _holdings(book, arms, session_date):
-        q = quotes.get(sym) or {}
-        if qty > 0 and q.get("bp"):
-            price = floor_cent(dec(q["bp"]) * (1 - EXT_FLATTEN_OFFSET))
-        elif qty < 0 and q.get("ap"):
-            price = ceil_cent(dec(q["ap"]) * (1 + EXT_FLATTEN_OFFSET))
-        else:
-            missing.append(sym)
+    Each exit is limited to the holding's part not already covered by a working exit and
+    to the broker's position left after all working exits (m3). Returns (exits, notes);
+    a note records every cap and every holding the broker no longer shows.
+    """
+    avail = exit_availability(hs, positions)
+    out, notes = [], []
+    for key, want in requests:
+        h = hs[key]
+        want = dec(want)
+        if want == 0:
             continue
-        out.append(exit_intent(day, stage, sym, qty, limit_price=price, extended=True, arm=arm))
-    return out, missing
+        sign = 1 if want > 0 else -1
+        uncovered = abs(h["qty"]) - h["exit_live_qty"]
+        room = avail.get(key[2], Decimal("0")) * sign
+        x = min(abs(want), uncovered, room)
+        if x <= 0:
+            if room <= 0 and uncovered > 0:
+                notes.append({"arm": key[0], "entry_date": key[1].isoformat(), "symbol": key[2], "ledger_qty": str(h["qty"]),
+                              "available": str(avail.get(key[2], Decimal("0"))), "note": "broker_position_missing"})
+            continue
+        if x < abs(want):
+            notes.append({"arm": key[0], "entry_date": key[1].isoformat(), "symbol": key[2], "wanted": str(want),
+                          "capped_to": str(sign * x), "note": "capped_at_broker_position"})
+        out.append((key, sign * x))
+        avail[key[2]] = avail.get(key[2], Decimal("0")) - sign * x
+    return out, notes
 
 
-def plan_ah_opg_exits(book, session_date, calendar):
-    """OPG exits in session_date's auction for AH holdings entered on the previous session."""
-    prev = calendar.previous(session_date)
-    if prev is None:
-        return []
-    return [exit_intent(day, "opg", sym, qty, arm=AH) for arm, day, sym, qty in _holdings(book, (AH,), prev.session)]
+def nf1_positions(hs, positions):
+    """[(key, signed qty)] of our holdings the broker still shows (working exits ignored)."""
+    broker = {p["symbol"]: dec(p["qty"]) for p in positions}
+    out = []
+    for key, h in sorted(hs.items(), key=lambda kv: (kv[0][1], kv[0][0], kv[0][2])):
+        q, b = h["qty"], broker.get(key[2], Decimal("0"))
+        if q == 0 or b == 0 or (q > 0) != (b > 0):
+            continue
+        sign = 1 if q > 0 else -1
+        x = min(abs(q), abs(b))
+        out.append((key, sign * x))
+        broker[key[2]] = b - sign * x
+    return out
+
+
+def exit_plan(hs, positions, include):
+    """Exits for every holding selected by include(key, h), whatever its entry date (M5):
+    the uncovered part of each, oldest entry first, capped at the broker position."""
+    requests = [(key, h["qty"]) for key, h in sorted(hs.items(), key=lambda kv: (kv[0][1], kv[0][0], kv[0][2]))
+                if h["qty"] != 0 and include(key, h)]
+    return cap_exits(requests, hs, positions)
+
+
+def marketable_exit_price(qty, quote=None, last_trade=None, offset=EXT_FLATTEN_OFFSET):
+    """Limit that closes `qty` (a signed holding) at once: sell a long at bid - offset, buy a
+    short back at ask + offset. A missing side falls back to the last trade price (B1);
+    None when neither exists (the caller retries at its next round)."""
+    q = quote or {}
+    if dec(qty) > 0:
+        ref = q.get("bp") or last_trade
+        return floor_cent(dec(ref) * (1 - offset)) if ref else None
+    ref = q.get("ap") or last_trade
+    return ceil_cent(dec(ref) * (1 + offset)) if ref else None
+
+
+def window_net_filled(hs, arm, day, window):
+    """(long, short, pending entries) of one arm-window's current filled holdings at entry prices."""
+    long_n = short_n = Decimal("0")
+    pending = 0
+    for (a, d, _sym), h in hs.items():
+        if a != arm or d != day or h["window"] != window:
+            continue
+        pending += 1 if (h["pending_qty"] or h["pending_unpriced"]) else 0
+        avg = entry_price(h) or Decimal("0")
+        if h["qty"] > 0:
+            long_n += h["qty"] * avg
+        elif h["qty"] < 0:
+            short_n += -h["qty"] * avg
+    return long_n, short_n, pending
+
+
+def plan_net_trim(hs, arm, day, window, net_cap):
+    """Trims [(key, signed qty)] that bring an arm-window's filled |long - short| to 95% of
+    the net cap, taken pro rata from the larger leg (M4: e.g. after an OPG leg was
+    rejected or unfilled). Nothing while entries in the window are still working."""
+    long_n, short_n, pending = window_net_filled(hs, arm, day, window)
+    net = long_n - short_n
+    record = {"arm": arm, "window": window, "long": str(long_n), "short": str(short_n), "net": str(net),
+              "net_cap": str(net_cap), "pending_entries": pending}
+    if pending:
+        return [], {**record, "status": "entries_pending"}
+    if any(h["exit_live_qty"] for k, h in hs.items() if k[0] == arm and k[1] == day and h["window"] == window):
+        return [], {**record, "status": "exits_working"}
+    if abs(net) <= net_cap:
+        return [], {**record, "status": "within_cap"}
+    sign = 1 if net > 0 else -1
+    big = [(k, h) for k, h in sorted(hs.items()) if k[0] == arm and k[1] == day and h["window"] == window
+           and h["qty"] * sign > 0]
+    big_total = sum((abs(h["qty"]) * entry_price(h) for _, h in big), Decimal("0"))
+    excess = abs(net) - dec(net_cap) * TRIM_TARGET_FRACTION
+    out = []
+    for key, h in big:
+        avg = entry_price(h)
+        share = excess * abs(h["qty"]) * avg / big_total
+        qty = min(abs(h["qty"]), (share / avg).to_integral_value(rounding=ROUND_UP))
+        if qty > 0:
+            out.append((key, sign * qty))
+    return out, {**record, "status": "trim", "excess": str(excess)}
 
 
 # ---------------------------------------------------------------------------------------

@@ -40,9 +40,9 @@ events. The GPU path uses `score.Scorer` unchanged.
 
 | Headline release | Label | Action |
 |---|---|---|
-| previous close – 09:00 | `open_auction` | liquid lane: basket at 09:15, OPG market by 09:27, CLS exit 15:40–15:45 |
+| previous close – 09:00 | `open_auction` | liquid lane: basket at 09:15, OPG market by 09:27, CLS exit from 15:40 (retried to 15:49) |
 | 09:00 – 09:30 | `excluded_0900_0930` | none, as in the study |
-| 09:30 – 15:30 | `rth` | liquid lane: marketable limit at release+15 (ask×1.002 / bid×0.998, skip >50 bps), CLS exit |
+| 09:30 – 15:25 | `rth` | liquid lane: marketable limit at release+15 (ask×1.002 / bid×0.998, skip >50 bps) until 15:40, CLS exit; later entry times are skipped |
 | 15:30 – 16:00 | `excluded_last_30min` | none |
 | 04:00–09:30, 16:00–20:00 | `ext_pre` / `ext_post` | shadow quotes only (also the small-cap lane in every session) |
 
@@ -84,16 +84,59 @@ replaced as follows.
   - Pre-cap and post-cap notionals are journaled: a `net_cap` record for the
     basket, and `pre_cap_notional`, `est_notional` and `net_before`/`net_after`
     on each decision.
-- **Kill switch at 2% of E.** It cancels our orders, flattens every arm and
-  stops. `<state>/STOP` refuses every order.
-- **Exits** (core and pm):
-  - CLS at 15:40–15:45;
-  - a day market order at 15:55 for any holding without a live exit;
-  - after 16:02, extended-hours limits at bid−0.5% / ask+0.5% every
-    10 minutes until 20:00.
+- **OPG sizing (review M3).**
+  - The basket requires a two-sided pre-market quote with a spread of at most
+    100 bps, and a mid within ±15% of the prior close. The mid is the reference
+    price.
+  - Every cap is planned at 95%: per-name size, arm and account gross, and the
+    net cap.
+  - Before every entry, `executor.RiskGate` re-checks the per-order and
+    per-name notional, one symbol per arm and day, names per leg, arm gross,
+    account gross and the window's net cap, at 100% of each.
+  - Basket orders are submitted in a leg order that pulls the running net
+    toward zero.
+- **Fill-based exposure (M4).** Every 30 s, exposure is rebuilt from the
+  broker's full order history, paginated since `ledger_epoch`:
+  - filled quantity at its entry price;
+  - working entries at their limit or recorded reference price;
+  - rejected, cancelled or expired remainders are released.
 
-  Exits come from per-arm ledgers built from our own fills. An arm never
-  closes another arm's shares.
+  The result is synced into the gate and journaled as `net_actual`. After the
+  open, a window whose filled net exceeds its cap is trimmed pro rata back to
+  95% of the cap with marketable limits (`net_trim`, stage `trim<n>`). A
+  rejected leg at submission is limited by the gate itself.
+- **Kill switch at 2% of E (B1).** The kill is persisted per date in
+  `runstate/<date>-<mode>.json`, so a restart stays killed. Every kill cycle
+  (20 s in RTH, 45 s outside):
+  1. cancels our orders and waits for their final states;
+  2. re-flattens with a new round id (`kill<n>`): market orders in RTH,
+     extended-hours limits otherwise, priced from the quote with a
+     last-trade fallback;
+  3. repeats until the broker shows none of our positions.
+
+  Entries are refused while killed; exits never are, and every exit path
+  keeps running. `<state>/STOP` refuses every order.
+- **Exits.** Every exit comes from per-holding state built from our own fills,
+  whatever the entry date (M5). It is capped at the broker's position after
+  working exits (no oversell), and working orders are cancelled and final
+  before the book is re-read (m3).
+  - Carry-over holdings from earlier dates exit in the opening auction
+    (`xopg<n>`). From 09:31, marketable limits replace any that did not fill
+    (`cof<n>`, every 60 s).
+  - RTH entries stop at 15:40 (M2). CLS exits (`cls<n>`) are re-planned
+    every 30 s until 15:49 until every holding is covered (M1).
+  - From 15:55, a day market order (`mkt<n>`) goes to any holding still
+    uncovered.
+  - After 16:02, extended-hours limits at bid−0.5% / ask+0.5% (`ext<n>`,
+    last-trade fallback) go out every 10 minutes until 20:00.
+
+  Tonight's ah holds are excepted from these closes. Round counters persist
+  across restarts. An order that already existed under its id is journaled as
+  `order_idempotent_existing` (m2), not as a new submission.
+- **Exit-only mode (M6).** If a paper start's account check fails while any of
+  our positions is open, or the positions cannot be read, the run stays in
+  paper mode for exits and the kill, and refuses entries. Without our
+  positions it runs as dry-run, journaled.
 
 ## Arms
 
@@ -141,11 +184,22 @@ is not allowed, the CPU scorer runs.
 
 ## State (`~/.local/state/native-agent-stack/research/sota-mover/news-forward/`)
 
-`journal/<date>.jsonl` (news, eligibility, candidate, score, decision,
-order_intent/submitted/refused, fill, shadow_quote, risk, reconciliation,
-lifecycle), `score-queue.jsonl`, `scores.jsonl`, `status.json`,
-`scorer-status.json` and `receipts/<date>-summary.json` with a `.sha256`
-sidecar.
+- `journal/<date>.jsonl`, with these record kinds:
+  - news, eligibility, candidate, score and decision;
+  - order_intent, order_submitted, order_idempotent_existing, order_refused
+    and order_cancel;
+  - fill, shadow_quote, net_cap, net_actual, net_trim and risk;
+  - leverage_decision, reconciliation, autolev_daily_row and lifecycle.
+- Persisted per date and mode: `runstate/<date>-<mode>.json` (kill and
+  round counters), `sod/<date>-<mode>.json` (E) and
+  `ref-prices/<date>-<mode>.json` (entry reference prices).
+- `score-queue.jsonl` and `scores.jsonl`.
+- `status.json`: running `git_head`, `git_dirty` and per-file `code_sha256`.
+- `scorer-status.json`.
+- `receipts/<date>-summary.json`, with a `.sha256` sidecar.
+
+The unit stops restarting after 5 failed starts within 10 minutes
+(`StartLimitIntervalSec=600`, `StartLimitBurst=5`).
 
 ## Switching from dry-run to paper
 

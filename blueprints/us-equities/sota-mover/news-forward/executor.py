@@ -23,6 +23,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import timedelta
 from decimal import Decimal
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -113,12 +114,35 @@ class AlpacaBroker:
             out.append(row)
         return out
 
-    def orders(self, status="open", after=None, symbols=None, limit=500):
+    def orders(self, status="open", after=None, symbols=None, limit=500, direction=None):
+        from alpaca.common.enums import Sort  # noqa: PLC0415
         from alpaca.trading.enums import QueryOrderStatus  # noqa: PLC0415
         from alpaca.trading.requests import GetOrdersRequest  # noqa: PLC0415
 
-        request = GetOrdersRequest(status=QueryOrderStatus(status), after=after, symbols=symbols, limit=limit)
+        request = GetOrdersRequest(status=QueryOrderStatus(status), after=after, symbols=symbols, limit=limit,
+                                   direction=Sort(direction) if direction else None)
         return [as_dict(o, ORDER_FIELDS) for o in self.client.get_orders(filter=request)]
+
+    def all_orders(self, after, page=500, max_pages=40):
+        """Every order submitted after `after`, oldest first, across pages (m5).
+
+        `after` is exclusive, so each next page starts one microsecond before the last
+        page's newest submission time and ids remove the overlap. A page that adds
+        nothing new, or more than max_pages pages, raises rather than truncating.
+        """
+        out, seen, cursor = [], set(), after
+        for _ in range(max_pages):
+            batch = self.orders("all", after=cursor, limit=page, direction="asc")
+            fresh = [o for o in batch if o.get("id") not in seen]
+            out.extend(fresh)
+            seen.update(o.get("id") for o in fresh)
+            if len(batch) < page:
+                return out
+            if not fresh:
+                raise RuntimeError("order_history_pagination_stalled")
+            stamps = [o["submitted_at"] for o in batch if o.get("submitted_at")]
+            cursor = max(stamps) - timedelta(microseconds=1)
+        raise RuntimeError("order_history_pagination_limit")
 
     def order_by_client_id(self, client_id):
         try:
@@ -181,10 +205,62 @@ def start_check(broker):
     return account
 
 
-class Executor:
-    """Validates, caps and journals every order; submits only in paper mode."""
+class RiskGate:
+    """Independent pre-submit check of every entry against the hard caps (M3).
 
-    def __init__(self, mode, journal, state_root, broker=None, clock=common.utc_now, not_before=None):
+    The gate keeps its own per-arm exposure: synced from the broker's fill-based state by
+    the supervisor, then raised by each entry it passes. At 100% of each cap it checks the
+    order's notional against the per-order and per-name cap (5% E), one symbol per arm and
+    day, the names per leg, the arm's gross cap, the account's gross cap across arms and
+    the window's net cap. Planners size below these caps; the gate is the second line.
+    """
+
+    def __init__(self, limits, account_cap):
+        self.limits = dict(limits)
+        self.account_cap = Decimal(str(account_cap))
+        self.exposures = {arm: planner.Exposure() for arm in self.limits}
+
+    def sync(self, exposures):
+        self.exposures = {arm: planner.copy_exposure(x) for arm, x in exposures.items()}
+
+    def check(self, arm, window, leg, symbol, notional):
+        lim = self.limits.get(arm)
+        if lim is None:
+            return "no_limits_for_arm"
+        x = self.exposures.setdefault(arm, planner.Exposure())
+        notional = Decimal(str(notional))
+        if notional <= 0:
+            return "zero_notional"
+        if notional > lim.per_order_cap:
+            return "per_order_cap"
+        if symbol in x.symbols:
+            return "per_name_repeat"
+        if x.names.get((window, leg), 0) >= planner.MAX_NAMES_PER_LEG:
+            return "names_per_leg_cap"
+        if x.gross + notional > lim.gross_cap:
+            return "gross_cap"
+        if sum((e.gross for e in self.exposures.values()), Decimal("0")) + notional > self.account_cap:
+            return "account_gross_cap"
+        net = planner.window_net(x, window) + (notional if leg == planner.LEG_LONG else -notional)
+        if abs(net) > lim.net_cap:
+            return "net_cap"
+        return None
+
+    def commit(self, arm, window, leg, symbol, notional):
+        planner.commit_entry(self.exposures.setdefault(arm, planner.Exposure()), Decimal(str(notional)), window, leg, symbol)
+
+
+class Executor:
+    """Validates, caps and journals every order; submits only in paper mode.
+
+    Entries (context purpose "entry") must carry arm, session_label (the window), leg and
+    ref_price; they are refused while killed or in exit-only mode and must pass the
+    RiskGate. Exits and kill flattens are never refused for the kill (B1); only the STOP
+    file, the order contract, the first-order time and a passed deadline stop them.
+    """
+
+    def __init__(self, mode, journal, state_root, broker=None, clock=common.utc_now, not_before=None,
+                 gate=None, exit_only=False):
         if mode not in ("dry-run", "paper"):
             raise ValueError("mode must be dry-run or paper")
         if mode == "paper" and broker is None:
@@ -195,53 +271,78 @@ class Executor:
         self.broker = broker if mode == "paper" else None
         self.clock = clock
         self.not_before = not_before  # no order is sent before this instant (UTC)
+        self.gate = gate
+        self.exit_only = exit_only
         self.killed = False
-        self.submitted = {}  # client_order_id -> order dict (or dry-run record)
+        self.submitted = {}   # client_order_id -> order dict (or dry-run record)
+        self.ref_prices = {}  # client_order_id -> reference price of each entry (pending exposure, m4)
 
     def halted(self):
         return os.path.exists(os.path.join(self.state_root, "STOP")) or self.killed
 
-    def send(self, intent, context, dry_run=False):
+    def _refuse(self, reason, intent, context):
+        self.journal.write("order_refused", reason=reason, intent=intent, **context)
+        return None
+
+    def send(self, intent, context, dry_run=False, deadline=None):
         """Validate with the order contract, then submit (paper) or journal (dry-run).
 
         dry_run=True journals the validated intent without sending it, in any mode (an
-        arm that is not yet enabled for orders).
+        arm that is not yet enabled for orders). deadline: refuse if the clock has passed
+        it at the moment of sending (m1).
         """
         cid = intent["client_order_id"]
+        entry = context.get("purpose") == "entry"
         if not planner.is_nf1(cid):
-            self.journal.write("order_refused", reason="client_order_id_prefix", intent=intent, **context)
-            return None
+            return self._refuse("client_order_id_prefix", intent, context)
         if os.path.exists(os.path.join(self.state_root, "STOP")):
-            self.journal.write("order_refused", reason="stop_file", intent=intent, **context)
-            return None
-        if self.killed and context.get("purpose") != "kill_flatten":
-            self.journal.write("order_refused", reason="kill_switch", intent=intent, **context)
-            return None
+            return self._refuse("stop_file", intent, context)
+        if entry and self.killed:
+            return self._refuse("kill_switch", intent, context)
+        if entry and self.exit_only:
+            return self._refuse("exit_only_mode", intent, context)
         if cid in self.submitted:
             return self.submitted[cid]
         try:
             envelope = planner.contract_envelope(intent)
         except ValueError as error:
-            self.journal.write("order_refused", reason=f"contract:{error}", intent=intent, **context)
-            return None
+            return self._refuse(f"contract:{error}", intent, context)
         mode = "dry-run" if dry_run else self.mode
-        if mode == "paper" and self.not_before is not None and self.clock() < self.not_before:
-            self.journal.write("order_refused", reason="before_first_order_time", intent=intent,
-                               not_before=common.iso(self.not_before), **context)
-            return None
+        now = self.clock()
+        if mode == "paper" and self.not_before is not None and now < self.not_before:
+            return self._refuse("before_first_order_time", intent, {**context, "not_before": common.iso(self.not_before)})
+        if deadline is not None and now > deadline:
+            return self._refuse("deadline_passed", intent, {**context, "deadline": common.iso(deadline)})
+        price = context.get("ref_price") or intent.get("limit_price")
+        notional = Decimal(intent["qty"]) * Decimal(str(price)) if price else None
+        if entry:
+            if self.gate is None or notional is None:
+                return self._refuse("executor_cap:no_gate_or_reference_price", intent, context)
+            why = self.gate.check(context.get("arm"), context.get("session_label"), context.get("leg"), intent["symbol"], notional)
+            if why:
+                return self._refuse(f"executor_cap:{why}", intent, {**context, "notional": str(notional)})
         self.journal.write("order_intent", mode=mode, envelope=envelope, **context)
         if mode == "dry-run":
-            record = {"client_order_id": cid, "status": "dry_run_not_sent", "symbol": intent["symbol"],
-                      "side": intent["side"], "filled_qty": intent["qty"]}
+            record = {"id": f"dry-{cid}", "client_order_id": cid, "status": "filled", "simulated": True,
+                      "symbol": intent["symbol"], "side": intent["side"], "qty": intent["qty"], "filled_qty": intent["qty"],
+                      "filled_avg_price": str(price) if price else None, "limit_price": intent.get("limit_price"),
+                      "submitted_at": now}
             self.submitted[cid] = record
+            if entry:
+                self.gate.commit(context.get("arm"), context.get("session_label"), context.get("leg"), intent["symbol"], notional)
+                self.ref_prices[cid] = str(price)
             return record
         try:
             order = self.broker.submit(envelope["intent"])
         except Exception as error:  # noqa: BLE001
-            self.journal.write("order_refused", reason=str(error)[:300], client_order_id=cid, **context)
-            return None
+            return self._refuse(str(error)[:300], intent, context)
         self.submitted[cid] = order
-        self.journal.write("order_submitted", order=order, **context)
+        if entry:
+            self.gate.commit(context.get("arm"), context.get("session_label"), context.get("leg"), intent["symbol"], notional)
+            self.ref_prices[cid] = str(price)
+        # m2: an order that already existed under this id is not a new submission
+        self.journal.write("order_idempotent_existing" if order.get("idempotent_existing") else "order_submitted",
+                           order=order, **context)
         return order
 
 
