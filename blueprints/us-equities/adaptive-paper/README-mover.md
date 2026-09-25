@@ -99,7 +99,8 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   instrument is registered at 4 decimals: a symbol scanned above 1 USD can fall below it
   (X4's stop does for any entry up to about 1.17 USD), and a 2-decimal instrument can
   neither price a marketable limit under a sub-penny bid nor carry the sub-penny fill
-  (the native adapter refuses it as `cumulative_fill_precision_requires_reconciliation`).
+  (the native adapter refuses such an execution price as
+  `execution_price_precision_requires_reconciliation`).
 - **Two caps.** `mover.max_entry_notional_usd` (200 USD) sizes and bounds each buy;
   `MoverController` also refuses a larger buy before the ledger reserves it
   (`mover_entry_notional_cap_exceeded`). The ledger's `max_order_notional_usd` (2000
@@ -112,8 +113,16 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   about a twentyfold rise. A sell is never sent while that symbol's buy is open, because a
   wash-trade refusal would stop the run.
 - **Exit budget.** Each leg may send `exit_orders.max_orders_per_symbol` exits, counted
-  from the latest grant. No exit is sent on a halted quote (it could not fill; the leg
-  waits). A sell refused before any broker request (the ledger or NautilusTrader
+  from the latest grant. No exit is sent while the symbol is halted (a trading halt,
+  LULD pause or quotation-only period, from the SIP status stream or an unexpired
+  startup halt seed; `Controller.is_halted`): it could not fill, so the leg waits. A
+  resting exit is not cancelled for re-pricing then either: one re-price per exit
+  timeout would spend the 20-order budget in about 200 s against 5-10 minute pauses. It
+  rests, and re-pricing resumes once the symbol trades; a force reason or hard flatten
+  inside a halt hands the leg to recovery after the no-progress bound. The quote's own
+  best-effort condition flag waits entries only, never an exit, and a halt only the
+  seed asserts expires (at its resumption time, or 12 minutes after a LULD pause
+  began). A sell refused before any broker request (the ledger or NautilusTrader
   refused it, so the ledger holds no sent intent) is not charged; it is retried after
   1 s and has its own bound of the same size. A latched force reason grants each leg one
   fresh budget. A leg that exhausts its budget before any force latches the book-wide
@@ -270,9 +279,10 @@ credential.
   retry are code constants (`mover.HANDOFF_EXIT_TIMEOUTS`, `PRE_WIRE_RETRY_SECONDS`)
   chosen without a paper measurement; a broker run that shows slower fills is the
   comparison that would change them.
-- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. A cumulative
-  average finer than that (several partial fills at different prices) still stops the
-  native adapter, as it does for the adaptive lane.
+- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. Each execution
+  is booked at its own price, so a cumulative average finer than that (several partial
+  fills at different prices) no longer stops the native adapter; an execution price
+  finer than the instrument's precision still does, in both lanes.
 - **Evidence.** Everything here is SYN until an actual broker run: unit tests, the
   native end-to-end tests with `mover_simulation.py` and `synthetic`. Alpaca paper
   fills are the broker's simulation, not exchange executions.

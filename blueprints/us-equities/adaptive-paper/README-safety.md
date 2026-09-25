@@ -91,10 +91,17 @@ limit-order mechanism guarantees a flat finish.
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,
-  timestamp=None)` applies owned broker observations and returns whether state
-  changed. Cumulative quantity decreases are stale and ignored. Duplicate fills
-  are idempotent; contradictory identity, average price or terminal state fails.
-  Later partial fills cannot reverse an observed pending-cancel status.
+  timestamp=None, execution=None)` applies owned broker observations and returns
+  whether state changed. Cumulative quantity decreases are stale and ignored. Duplicate
+  fills are idempotent; contradictory identity, average price or terminal state fails.
+  Later partial fills cannot reverse an observed pending-cancel status. `execution`
+  (`execution_from_observation`: the one execution a stream fill carries, its
+  `execution_id`, `qty` and `price`) is recorded durably in the `executions` table,
+  keyed by the cumulative quantity after it, even when a REST read already advanced the
+  cumulative quantity. A repeat is a no-op; the same key or id with other values, an
+  overlapping execution, or an execution price beyond the order's limit fails
+  (`execution_conflict_requires_reconciliation`, `execution_overlap_requires_reconciliation`,
+  `incremental_fill_violates_limit`).
 - `request_budget(now, kind, client_id=None)` supports `submit`, `read`, `cancel`
   and `data_read`. Zero means an attempt was durably reserved. A positive delay
   means nothing was reserved: wait within the caller's remaining deadline, then
@@ -130,8 +137,15 @@ are created privately; journal directory metadata is fsynced at initialization.
 No account IDs, keys or secret headers are stored. Retain the account database
 across process restarts; a new database would lose budget and risk continuity.
 
-Fill cost uses `new cumulative quantity * new average - old cumulative quantity *
-old average`, not the latest average multiplied by the fill delta. Cost basis uses weighted
+Fill cost uses the recorded executions' own prices whenever they tile the cumulative
+advance (`booking: executions` on the `order_observed` event), each checked against
+the limit. Otherwise (a REST read ahead of the stream, a missing or reordered
+execution) it uses `new cumulative quantity * new average - old cumulative quantity *
+old average` (`booking: cumulative_average`), not the latest average multiplied by the
+fill delta; that derived notional is checked against the limit only beyond Alpaca's
+6-decimal average rounding (0.5e-6 USD per share of both quantities), so a rounded
+average at the limit no longer freezes, and the booked notional then differs from the
+executions' by at most that rounding. Cost basis uses weighted
 average inventory accounting. `cash_delta_usd` is the exact sum of observed gross
 buy/sell cash flows; broker fees and other account activity require independent
 reconciliation. `cumulative_realized_loss_usd` accumulates losing realized deltas;
