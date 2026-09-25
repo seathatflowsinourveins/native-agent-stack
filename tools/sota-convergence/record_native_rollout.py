@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+"""Validate native-rollout receipts and, only when one qualifies, update a landscape
+winner's pin/evidence_class/evidence_refs/platform_status.
+
+Implements tools/sota-convergence/native-rollout-receipt.schema.json directly in
+stdlib Python (no external JSON Schema library), the same convention as
+adoption/host-receipt.schema.json's sibling scripts/host_receipts.py; kept in sync
+with the schema file by tests/test_record_native_rollout.py.
+
+This script never runs a command, contacts a network or reads a credential value:
+it only reads a receipt file already written by whatever process actually did the
+rollout, checks it, and (only with --write, and only when the receipt qualifies)
+edits one already-selected catalogs/landscape/<catalog>.json winner in place.
+
+Qualification for evidence_class "native_proven" (switch.md): tiers T2 (a real
+workload, not a --version/--help probe) and T4 both "passed", and T5 "passed", and
+-- when the target is a live service, not a bare CLI -- T6 also "passed". A
+receipt's own evidence_class_claimed is never trusted directly; this script derives
+the qualifying class itself from the tiers and refuses to write a stronger claim
+than the tiers actually support.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+SCHEMA_VERSION = 1
+TIERS = ("T0", "T1", "T2", "T3", "T4", "T5", "T6")
+RESULTS = {"passed", "failed", "unavailable"}
+STATUSES = {"passed", "failed", "partial"}
+INSTALL_CLASSES = {"tarball", "npm", "pip", "uv-tool", "native"}
+DECISIONS = {"retain", "adjust", "keep_but_compare"}
+EVIDENCE_CLASSES = {"native_proven", "local_integration", "synthetic", "source_review", "measured_comparison"}
+SIGNATURE_KINDS = {"slsa_provenance", "gpg", "sigstore", "none"}
+AGREEMENTS = {"same_result", "different_result", "not_rerun"}
+
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
+SHA1 = re.compile(r"^[0-9a-f]{40}$")
+HOST_ID = re.compile(r"^[a-z0-9-]+-[0-9]{8}$")
+ISO_UTC = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
+ENV_NAME = re.compile(r"^[A-Z_][A-Z0-9_]*$")
+STACK_HOME_PLACEHOLDER = "${STACK_HOME}"
+
+# T2 (a real workload) and T4 (independent agreement) gate qualification for every
+# component; T5 as well; T6 only when the rollout also touched a live service.
+QUALIFYING_TIERS = ("T2", "T4", "T5")
+SERVICE_QUALIFYING_TIER = "T6"
+
+
+class ReceiptError(ValueError):
+    """A receipt fails schema/business validation; carries every collected reason."""
+
+
+def _require(condition: bool, errors: list[str], message: str) -> None:
+    if not condition:
+        errors.append(message)
+
+
+def _is_str(value) -> bool:
+    return isinstance(value, str) and bool(value)
+
+
+def validate_receipt(document) -> list[str]:
+    """Every reason ``document`` does not satisfy native-rollout-receipt.schema.json;
+    empty means valid. Never raises; always returns a list."""
+    errors: list[str] = []
+    if not isinstance(document, dict):
+        return ["receipt must be a JSON object"]
+
+    _require(document.get("schema_version") == SCHEMA_VERSION and not isinstance(document.get("schema_version"), bool),
+              errors, "schema_version must be 1")
+    _require(_is_str(document.get("id")), errors, "id must be nonempty text")
+    _require(document.get("kind") == "native_rollout", errors, 'kind must be "native_rollout"')
+    _require(document.get("status") in STATUSES, errors, f"status must be one of {sorted(STATUSES)}")
+
+    identity = document.get("identity")
+    if not isinstance(identity, dict):
+        errors.append("identity must be an object")
+    else:
+        _require(_is_str(identity.get("component_id")), errors, "identity.component_id must be nonempty text")
+        _require(_is_str(identity.get("version")), errors, "identity.version must be nonempty text")
+        _require(isinstance(identity.get("host_id"), str) and bool(HOST_ID.fullmatch(identity["host_id"])),
+                  errors, "identity.host_id must match <platform-id>-<yyyymmdd>")
+
+    upstream = document.get("upstream")
+    if not isinstance(upstream, dict):
+        errors.append("upstream must be an object")
+    else:
+        _require(_is_str(upstream.get("repo")), errors, "upstream.repo must be nonempty text")
+        _require(_is_str(upstream.get("artifact_url")), errors, "upstream.artifact_url must be nonempty text")
+        _require(isinstance(upstream.get("sha256"), str) and bool(SHA256.fullmatch(upstream["sha256"])),
+                  errors, "upstream.sha256 must be 64 lowercase hex digits")
+        has_tag, has_commit = "tag" in upstream, "commit" in upstream
+        _require(has_tag or has_commit, errors, "upstream needs tag or commit (at least one)")
+        if has_commit:
+            _require(isinstance(upstream.get("commit"), str) and bool(SHA1.fullmatch(upstream["commit"])),
+                      errors, "upstream.commit must be a full 40-hex-digit SHA")
+        signature = upstream.get("signature")
+        if signature is not None:
+            if not isinstance(signature, dict) or signature.get("kind") not in SIGNATURE_KINDS:
+                errors.append(f"upstream.signature.kind must be one of {sorted(SIGNATURE_KINDS)}")
+            elif signature["kind"] != "none" and not _is_str(signature.get("ref")):
+                errors.append('upstream.signature.ref is required unless kind is "none"')
+
+    install = document.get("install")
+    if not isinstance(install, dict):
+        errors.append("install must be an object")
+    else:
+        _require(install.get("class") in INSTALL_CLASSES, errors, f"install.class must be one of {sorted(INSTALL_CLASSES)}")
+        root = install.get("root")
+        _require(isinstance(root, str) and STACK_HOME_PLACEHOLDER in root, errors,
+                  f"install.root must contain the literal placeholder {STACK_HOME_PLACEHOLDER}, never a real host path")
+        _require(isinstance(install.get("marker_sha256"), str) and bool(SHA256.fullmatch(install["marker_sha256"])),
+                  errors, "install.marker_sha256 must be 64 lowercase hex digits")
+        argv = install.get("argv")
+        _require(isinstance(argv, list) and all(isinstance(item, str) for item in argv), errors,
+                  "install.argv must be a list of strings")
+        names = install.get("private_env_names")
+        _require(isinstance(names, list) and all(isinstance(item, str) and ENV_NAME.fullmatch(item) for item in names),
+                  errors, "install.private_env_names must be a list of ENV_VAR names, never values")
+
+    tiers = document.get("tiers")
+    tier_results: dict[str, str] = {}
+    if not isinstance(tiers, list) or not tiers:
+        errors.append("tiers must be a nonempty list")
+    else:
+        seen = set()
+        for index, tier in enumerate(tiers):
+            label = f"tiers[{index}]"
+            if not isinstance(tier, dict):
+                errors.append(f"{label} must be an object")
+                continue
+            tier_id = tier.get("tier")
+            if tier_id not in TIERS:
+                errors.append(f"{label}.tier must be one of {TIERS}")
+            elif tier_id in seen:
+                errors.append(f"tiers: duplicate tier {tier_id}")
+            else:
+                seen.add(tier_id)
+                tier_results[tier_id] = tier.get("result")
+            result = tier.get("result")
+            _require(result in RESULTS, errors, f"{label}.result must be one of {sorted(RESULTS)}")
+            reason = tier.get("unavailable_reason")
+            if result == "unavailable":
+                _require(_is_str(reason), errors, f"{label}.unavailable_reason is required when result is \"unavailable\"")
+            else:
+                _require(reason is None, errors, f"{label}.unavailable_reason must be absent unless result is \"unavailable\"")
+            commands = tier.get("commands")
+            if not isinstance(commands, list):
+                errors.append(f"{label}.commands must be a list")
+                continue
+            if result == "passed" and not commands:
+                errors.append(f"{label}.commands must be nonempty when result is \"passed\"")
+            for command_index, command in enumerate(commands):
+                clabel = f"{label}.commands[{command_index}]"
+                if not isinstance(command, dict):
+                    errors.append(f"{clabel} must be an object")
+                    continue
+                _require(isinstance(command.get("argv"), list) and command["argv"]
+                          and all(isinstance(item, str) for item in command["argv"]), errors,
+                          f"{clabel}.argv must be a nonempty list of strings")
+                _require(_is_str(command.get("cwd")), errors, f"{clabel}.cwd must be nonempty text")
+                env_names = command.get("env_names")
+                _require(isinstance(env_names, list) and all(isinstance(item, str) and ENV_NAME.fullmatch(item)
+                          for item in env_names), errors, f"{clabel}.env_names must be a list of ENV_VAR names")
+                _require(isinstance(command.get("started_utc"), str) and bool(ISO_UTC.fullmatch(command["started_utc"])),
+                          errors, f"{clabel}.started_utc must be an ISO UTC timestamp")
+                elapsed = command.get("elapsed_s")
+                _require(isinstance(elapsed, (int, float)) and not isinstance(elapsed, bool) and elapsed >= 0,
+                          errors, f"{clabel}.elapsed_s must be a nonnegative number")
+                _require(isinstance(command.get("exit"), int) and not isinstance(command.get("exit"), bool),
+                          errors, f"{clabel}.exit must be an integer")
+                _require(isinstance(command.get("stdout_sha256"), str) and bool(SHA256.fullmatch(command["stdout_sha256"])),
+                          errors, f"{clabel}.stdout_sha256 must be 64 lowercase hex digits")
+                _require(isinstance(command.get("stderr_sha256"), str) and bool(SHA256.fullmatch(command["stderr_sha256"])),
+                          errors, f"{clabel}.stderr_sha256 must be 64 lowercase hex digits")
+                _require(_is_str(command.get("assertion")), errors, f"{clabel}.assertion must be nonempty text")
+
+    independent = document.get("independent")
+    if not isinstance(independent, dict):
+        errors.append("independent must be an object")
+    else:
+        _require(_is_str(independent.get("rerun_label")), errors, "independent.rerun_label must be nonempty text")
+        _require(independent.get("agreement") in AGREEMENTS, errors, f"independent.agreement must be one of {sorted(AGREEMENTS)}")
+
+    switch = document.get("switch")
+    if switch is not None:
+        if not isinstance(switch, dict):
+            errors.append("switch must be an object when present")
+        else:
+            _require(_is_str(switch.get("txn")), errors, "switch.txn must be nonempty text")
+            _require(isinstance(switch.get("ledger_seq"), list)
+                      and all(isinstance(item, int) and not isinstance(item, bool) and item >= 1 for item in switch.get("ledger_seq", [])),
+                      errors, "switch.ledger_seq must be a list of positive integers")
+            _require(isinstance(switch.get("surfaces"), list), errors, "switch.surfaces must be a list")
+            _require(_is_str(switch.get("window")), errors, "switch.window must be nonempty text")
+
+    _require(document.get("decision") in DECISIONS, errors, f"decision must be one of {sorted(DECISIONS)}")
+    _require(document.get("evidence_class_claimed") in EVIDENCE_CLASSES, errors,
+              f"evidence_class_claimed must be one of {sorted(EVIDENCE_CLASSES)}")
+    limitations = document.get("limitations")
+    _require(isinstance(limitations, list) and limitations and all(_is_str(item) for item in limitations),
+              errors, "limitations must be a nonempty list of nonempty text")
+    failures = document.get("retained_native_failures")
+    if not isinstance(failures, list):
+        errors.append("retained_native_failures must be a list (may be empty)")
+    else:
+        for index, failure in enumerate(failures):
+            if not (isinstance(failure, dict) and failure.get("tier") in TIERS and _is_str(failure.get("note"))):
+                errors.append(f"retained_native_failures[{index}] must be an object with tier and note")
+    return errors
+
+
+def tier_results_of(document: dict) -> dict[str, str]:
+    return {tier["tier"]: tier.get("result") for tier in document.get("tiers", []) if isinstance(tier, dict)}
+
+
+def qualifying_evidence_class(document: dict, *, service: bool) -> tuple[str | None, str]:
+    """(evidence_class, reason). evidence_class is "native_proven" when every
+    QUALIFYING_TIERS entry (T2, T4, T5), plus T6 when ``service``, is "passed" in
+    ``document``; otherwise None and a reason naming the first unmet tier. The
+    receipt's own status must also be "passed" -- an unavailable or failed overall
+    receipt never qualifies regardless of individual tier results."""
+    if document.get("status") != "passed":
+        return None, f'receipt status is {document.get("status")!r}, not "passed"'
+    results = tier_results_of(document)
+    required = QUALIFYING_TIERS + ((SERVICE_QUALIFYING_TIER,) if service else ())
+    for tier in required:
+        if results.get(tier) != "passed":
+            return None, f"tier {tier} is {results.get(tier)!r}, not \"passed\" (required: {', '.join(required)})"
+    return "native_proven", "every required tier passed"
+
+
+def find_winner(landscape: dict, catalog: str, layer_id: str, component_id: str):
+    for layer in landscape.get("layers") or []:
+        if not isinstance(layer, dict) or layer.get("catalog") != catalog or layer.get("layer_id") != layer_id:
+            continue
+        for winner in layer.get("winners") or []:
+            if isinstance(winner, dict) and winner.get("component_id") == component_id:
+                return layer, winner
+    return None, None
+
+
+def record(receipt: dict, landscape: dict, *, catalog: str, layer_id: str, receipt_ref: str,
+           service: bool, platform: str) -> dict:
+    """Report {qualifies, evidence_class, reason, changed[]} of updating the matching
+    winner in ``landscape`` (mutated in place only when it qualifies); the caller
+    decides whether to write ``landscape`` back to disk."""
+    component_id = (receipt.get("identity") or {}).get("component_id")
+    version = (receipt.get("identity") or {}).get("version")
+    layer, winner = find_winner(landscape, catalog, layer_id, component_id)
+    if winner is None:
+        return {"qualifies": False, "evidence_class": None,
+                "reason": f"no winner {component_id!r} in {catalog}/{layer_id}", "changed": []}
+    if winner.get("pin") != version:
+        return {"qualifies": False, "evidence_class": None,
+                "reason": f"receipt is for version {version!r}, but the winner's current pin is {winner.get('pin')!r}",
+                "changed": []}
+    evidence_class, reason = qualifying_evidence_class(receipt, service=service)
+    if evidence_class is None:
+        return {"qualifies": False, "evidence_class": None, "reason": reason, "changed": []}
+    changed = []
+    if winner.get("evidence_class") != evidence_class:
+        winner["evidence_class"] = evidence_class
+        changed.append("evidence_class")
+    refs = winner.setdefault("evidence_refs", [])
+    if receipt_ref not in refs:
+        refs.append(receipt_ref)
+        changed.append("evidence_refs")
+    platform_status = winner.setdefault("platform_status", {})
+    if platform_status.get(platform) != "accepted":
+        platform_status[platform] = "accepted"
+        changed.append(f"platform_status.{platform}")
+    return {"qualifies": True, "evidence_class": evidence_class, "reason": reason, "changed": changed}
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def cmd_validate(args) -> int:
+    document = load_json(args.receipt)
+    errors = validate_receipt(document)
+    if errors:
+        print("Receipt validation failed:\n" + "\n".join(f"- {error}" for error in errors))
+        return 1
+    print(json.dumps({"status": "passed", "id": document.get("id")}, sort_keys=True))
+    return 0
+
+
+def cmd_record(args) -> int:
+    document = load_json(args.receipt)
+    errors = validate_receipt(document)
+    if errors:
+        print("Refusing to record an invalid receipt:\n" + "\n".join(f"- {error}" for error in errors))
+        return 1
+    landscape = load_json(args.landscape)
+    receipt_ref = args.receipt_ref or str(args.receipt)
+    report = record(document, landscape, catalog=args.catalog, layer_id=args.layer_id,
+                    receipt_ref=receipt_ref, service=args.service, platform=args.platform)
+    if not report["qualifies"]:
+        print(json.dumps({"status": "not_qualified", **report}, sort_keys=True))
+        return 3
+    if args.write:
+        args.landscape.write_text(json.dumps(landscape, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    print(json.dumps({"status": "qualified", "wrote": bool(args.write), **report}, sort_keys=True))
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    validate_parser = sub.add_parser("validate", help="Check a receipt against native-rollout-receipt.schema.json")
+    validate_parser.add_argument("receipt", type=Path)
+    validate_parser.set_defaults(handler=cmd_validate)
+
+    record_parser = sub.add_parser("record", help="Validate a receipt, then update a landscape winner if it qualifies")
+    record_parser.add_argument("receipt", type=Path)
+    record_parser.add_argument("--landscape", required=True, type=Path)
+    record_parser.add_argument("--catalog", required=True)
+    record_parser.add_argument("--layer-id", required=True)
+    record_parser.add_argument("--receipt-ref", help="Path recorded in evidence_refs (default: the receipt's own --receipt path)")
+    record_parser.add_argument("--service", action="store_true",
+                                help="This component runs as a live service (systemd unit); also require tier T6")
+    record_parser.add_argument("--platform", required=True,
+                                help="The winner's platform_status key to accept, e.g. linux-wsl2-x86_64 or "
+                                     "macos-arm64 (scripts/landscape.py PLATFORM_KEYS); a receipt's host_id is a "
+                                     "host nickname (evidence/hosts/<host_id>/), not a platform key, so it is "
+                                     "never guessed from it")
+    record_parser.add_argument("--write", action="store_true", help="Write the landscape file back; default is report-only")
+    record_parser.set_defaults(handler=cmd_record)
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        return args.handler(args)
+    except (OSError, ValueError) as error:
+        print(f"record_native_rollout: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

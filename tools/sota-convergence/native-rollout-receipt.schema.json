@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/sota-convergence/native-rollout-receipt.schema.json",
+  "title": "Native rollout receipt",
+  "description": "One receipt records one component's rollout to one pinned version through one host's real install/upstream path (not a synthetic fixture), tiered T0-T6. It is a sibling of adoption/host-receipt.schema.json (per-host lifecycle acceptance) and of the layer-verdict schema catalogs/landscape/*.json winners use (scripts/landscape.py's VERDICT_STATUSES etc.), not a replacement for either. tools/sota-convergence/record_native_rollout.py implements this schema's rules directly in stdlib Python (no external JSON Schema library, matching adoption/host-receipt.schema.json's own sibling scripts/host_receipts.py) and is kept in sync with it by tests/test_record_native_rollout.py. adoption/tools/ecosystem-switch's own receipt gate (switch.md: 'tiers T0,T2,T4 and T1 passed or declared unavailable') and record_native_rollout.py's native_proven qualification rule (switch.md: 'T2 real workload + T4 + T5 (+T6 for services)') are two independent consumers of the SAME receipt shape with two DIFFERENT tier requirements; neither implies the other. Tier meanings fixed by an actual consumer: T0 install/version presence; T1 a GPU- or model-loading-dependent check that may be legitimately declared unavailable per host; T2 a real workload, not a --version/--help probe (adoption/host_receipts.py's BARE_HELP_OR_VERSION distinction applies here too); T4 an independent rerun's agreement with the first result (see the sibling 'independent' object below); T6 a live-service-specific check (a systemd unit actually restarted and health-probed under the new root, matching adoption/tools/ecosystem-switch's unit-restart operation kind). T3 and T5 are reserved ordering slots with no fixed meaning yet -- a future qualify wave should give each a concrete, testable definition rather than this schema guessing one; record_native_rollout.py and this file both treat an unknown-meaning tier as ordinary structural data, never a reason to reject a receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "id", "kind", "status", "identity", "upstream", "install", "tiers",
+    "independent", "decision", "evidence_class_claimed", "limitations", "retained_native_failures"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "<component_id>--<version>--<rid>, e.g. qmd--2.8.4--rollout-20260925a; record_native_rollout.py does not enforce an exact pattern beyond non-empty, unlike adoption/host-receipt.schema.json's stricter id (this schema has no host_id/date segments to bind)."
+    },
+    "kind": {"const": "native_rollout"},
+    "status": {
+      "enum": ["passed", "failed", "partial"],
+      "description": "Overall receipt outcome. adoption/tools/ecosystem-switch's receipt gate requires exactly \"passed\" here before any tier is even inspected."
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component_id", "version", "host_id"],
+      "properties": {
+        "component_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A manifests/stack.json components[].id or a catalogs/landscape/*.json layers[].winners[].component_id, as adoption/host-receipt.schema.json's own component_id field documents."
+        },
+        "version": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "pattern": "^[a-z0-9-]+-[0-9]{8}$"}
+      }
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "artifact_url", "sha256"],
+      "properties": {
+        "repo": {"type": "string", "format": "uri"},
+        "tag": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "artifact_url": {"type": "string", "format": "uri"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "signature": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {"enum": ["slsa_provenance", "gpg", "sigstore", "none"]},
+            "ref": {"type": "string", "description": "e.g. a gh attestation run id or a detached .sig path; required unless kind is \"none\"."}
+          }
+        }
+      },
+      "description": "Exactly one of tag or commit is required (\"tag|commit\"); both may be present."
+    },
+    "install": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "root", "marker_sha256", "argv", "private_env_names"],
+      "properties": {
+        "class": {"enum": ["tarball", "npm", "pip", "uv-tool", "native"], "description": "Matches a pins-v2 tools[].kind value."},
+        "root": {
+          "type": "string",
+          "pattern": "\\$\\{STACK_HOME\\}",
+          "description": "The install root with the literal placeholder ${STACK_HOME} in place of any real host path (e.g. \"${STACK_HOME}/tools/qmd-2.8.4\"), so a receipt never carries a personal absolute path."
+        },
+        "marker_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256 of a stable file inside root that identifies this exact install (e.g. its own lockfile or a --version marker file)."},
+        "argv": {"type": "array", "items": {"type": "string"}, "description": "The literal install command, with every path already using ${STACK_HOME}."},
+        "private_env_names": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[A-Z_][A-Z0-9_]*$"},
+          "description": "Names only, never values, of any environment variable the install read (docs/secret-storage.md)."
+        }
+      }
+    },
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tier", "commands", "result"],
+        "properties": {
+          "tier": {"enum": ["T0", "T1", "T2", "T3", "T4", "T5", "T6"]},
+          "commands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["argv", "cwd", "env_names", "started_utc", "elapsed_s", "exit", "stdout_sha256", "stderr_sha256", "assertion"],
+              "properties": {
+                "argv": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                "cwd": {"type": "string", "pattern": "\\$\\{STACK_HOME\\}|^/tmp|^\\.$"},
+                "env_names": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z_][A-Z0-9_]*$"}},
+                "started_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+                "elapsed_s": {"type": "number", "minimum": 0},
+                "exit": {"type": "integer"},
+                "stdout_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "stderr_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "assertion": {"type": "string", "minLength": 1, "description": "What this command's exit/output was checked against, in words (e.g. \"exit 0 and stdout contains the pinned version\")."}
+              }
+            }
+          },
+          "result": {"enum": ["passed", "failed", "unavailable"]},
+          "unavailable_reason": {"type": "string", "minLength": 1, "description": "Required exactly when result is \"unavailable\" (e.g. \"no GPU on this host\"); refused otherwise."}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"result": {"const": "unavailable"}}}, "then": {"required": ["unavailable_reason"]}
+          },
+          {
+            "if": {"properties": {"result": {"not": {"const": "unavailable"}}}}, "then": {"not": {"required": ["unavailable_reason"]}}
+          },
+          {
+            "if": {"properties": {"result": {"const": "passed"}}}, "then": {"properties": {"commands": {"minItems": 1}}}
+          }
+        ]
+      }
+    },
+    "independent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rerun_label", "agreement"],
+      "properties": {
+        "rerun_label": {"type": "string", "minLength": 1, "description": "Free-text identifying the independent rerun (a different host, session identity, or time), or \"not_rerun\" text explaining why none exists yet."},
+        "agreement": {"enum": ["same_result", "different_result", "not_rerun"]},
+        "loki": {"type": "array", "items": {"type": "string"}, "description": "Optional Loki query refs or log line hashes corroborating the rerun; observability/README.md's local-only scope applies."}
+      }
+    },
+    "switch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txn", "ledger_seq", "surfaces", "window"],
+      "properties": {
+        "txn": {"type": "string", "minLength": 1, "description": "adoption/tools/ecosystem-switch ledger txn id this receipt's rollout ran under, when the receipt documents an actual switch (not required for a receipt written before ecosystem-switch adopted the component)."},
+        "ledger_seq": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "surfaces": {"type": "array", "items": {"type": "string"}},
+        "window": {"type": "string", "minLength": 1}
+      },
+      "description": "Present only when this receipt corroborates an actual ecosystem-switch apply; absent for a receipt recorded before the component was switch-adopted."
+    },
+    "decision": {"enum": ["retain", "adjust", "keep_but_compare"], "description": "Matches scripts/landscape.py's DECISIONS vocabulary."},
+    "evidence_class_claimed": {
+      "enum": ["native_proven", "local_integration", "synthetic", "source_review", "measured_comparison"],
+      "description": "Matches scripts/landscape.py's WINNER_EVIDENCE_CLASSES. This is the receipt AUTHOR's claim; record_native_rollout.py independently derives whether the claim is actually justified (T2+T4+T5, +T6 for a service, all passed => native_proven) rather than trusting it, and refuses to write an unjustified claim onto a winner."
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "description": "Matches adoption/host-receipt.schema.json's limitations field: always at least one, e.g. what this rollout does not establish."
+    },
+    "retained_native_failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tier", "note"],
+        "properties": {
+          "tier": {"enum": ["T0", "T1", "T2", "T3", "T4", "T5", "T6"]},
+          "note": {"type": "string", "minLength": 1}
+        }
+      },
+      "description": "May be empty (a clean rollout retains none), but the key itself is always present: a failed attempt is kept for transparency, never silently dropped from the receipt that superseded it."
+    }
+  }
+}
