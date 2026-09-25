@@ -26720,28 +26720,28 @@
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/adaptive-paper.json",
-      "sha256": "1589c0b6fd2dd093fcfeabe94989436c05d768f5d43f0c65c67eb0ce20f6f984",
-      "bytes": 4772
+      "sha256": "250179df63f25e8fb06521ad2b84edfb805793c60ebdccfcc64c25608db05026",
+      "bytes": 12577
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json",
-      "sha256": "4493edb858b458d3466ba6b7fbefce1ced6f9d2553c667a54138b0c811abfb5a",
-      "bytes": 8726
+      "sha256": "b8e6f38cd09f652bd9483915d3da2e257cc12b1ee7b4149353fd3e1d44ff5b68",
+      "bytes": 14387
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/historical-simulation.json",
-      "sha256": "b15eb8b6927c2a74e2773e0a800d08da81c6b5b198c0026f4083367046555ef9",
-      "bytes": 12391
+      "sha256": "0a1e3bc11106bbfd3566a3721ca0f0640322715401a9e53327feedb892e3d99a",
+      "bytes": 21463
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/lean.json",
-      "sha256": "e4398e36e45f116af75dda724288904f26f1a9453a569e49c469097ec2e49e05",
-      "bytes": 13182
+      "sha256": "6037933893a40404d0a2bb41272c0e3b91db1f7f232a03eeaed1f91ccaa0bdce",
+      "bytes": 22628
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",
-      "sha256": "ba7d74de51afddc88fb33b81ac22028b4b932ca77d3bd7a10a0803c8fc8b7788",
-      "bytes": 3097
+      "sha256": "2c2461f98405f4c403d4aff70bbcac4f43212e2c3e4c5739be2e7818ddc2accc",
+      "bytes": 7641
     },
     {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
