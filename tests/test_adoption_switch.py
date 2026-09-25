@@ -540,6 +540,35 @@ class ApplyGateTests(SwitchFixture):
         self.assertEqual(self.run_entrypoint(), "v1")
         self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root / "current" / "foo" / "bin" / "foo"))
 
+    def test_verify_detects_an_entrypoint_that_bypasses_current_link(self):
+        # Minor finding: neither apply's post-verify nor a standalone `verify` checked that
+        # bin/* entrypoints still route THROUGH current/<id> at all -- only that current/<id>
+        # itself still matched the ledger. A plain bootstrap-linux.sh re-run (without --no-link/
+        # --link-dir) or a manual ln -sfn repoints bin/* straight at tools/<name>-<version>
+        # again, silently undoing adopt --relink's indirection: current/<id> still flips
+        # correctly on the next apply, and status/verify both used to report "ok" throughout
+        # while bin/* kept running whatever build it was last pointed at directly.
+        bypass_target = self.root_v1 / "bin" / "foo"
+        (self.root / "bin" / "foo").unlink()
+        (self.root / "bin" / "foo").symlink_to(bypass_target)
+        result = run(self.env, "verify", "--json")
+        self.assertNotEqual(result.returncode, 0)
+        report = json.loads(result.stdout)
+        self.assertFalse(report["foo"]["ok"])
+        self.assertIn("current/foo", report["foo"]["issue"])
+
+    def test_apply_post_verify_also_catches_a_bypassed_entrypoint_and_rolls_back(self):
+        # The same check, exercised through apply's own automatic post-verify: bin/foo is
+        # bypassed BEFORE the apply that would otherwise succeed, so the post-apply verify must
+        # still catch it and trigger the usual automatic rollback -- not report "applied" while
+        # bin/foo silently keeps running a build unrelated to current/foo.
+        (self.root / "bin" / "foo").unlink()
+        (self.root / "bin" / "foo").symlink_to(self.root_v1 / "bin" / "foo")
+        self.write_receipt("R1", "foo", "2.0.0")
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolled back", (result.stderr + result.stdout).lower())
+
     def test_reapply_after_rollback_does_not_false_positive_drift(self):
         self.write_receipt("R1", "foo", "2.0.0")
         self.apply("foo", self.root_v2, "R1")

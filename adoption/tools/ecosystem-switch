@@ -1235,7 +1235,14 @@ def verify_component(root: Path, component_id: str, spec: dict) -> str | None:
     """None when the component's live current_link target resolves and still matches what the
     ledger last recorded for it (the same comparison ``drift_issue`` makes before an ``apply``):
     a live root that no longer matches the ledger is exactly the case this must report. Used
-    both by apply's automatic post-check and by the standalone `verify` command."""
+    both by apply's automatic post-check and by the standalone `verify` command.
+
+    Also checks every entrypoints[] symlink still routes THROUGH current/<id>, not merely that
+    current/<id> itself still matches the ledger (minor finding): a plain (no --no-link/--link-dir)
+    bootstrap-linux.sh re-run, or a manual `ln -sfn`, repoints bin/* straight back at
+    tools/<name>-<version> and silently undoes adopt --relink's indirection -- current/<id> still
+    flips correctly on the next apply and this function used to report "ok" throughout, while
+    bin/* kept running whatever build it was last pointed at directly, unrelated to current/<id>."""
     entry = component_entry(spec, component_id)
     current_link = entry.get("current_link")
     if current_link:
@@ -1245,6 +1252,18 @@ def verify_component(root: Path, component_id: str, spec: dict) -> str | None:
         drift = drift_issue(root, component_id, entry)
         if drift:
             return drift
+        current_link_prefix = str(target) + os.sep
+        for entrypoint in entry.get("entrypoints") or []:
+            if not (isinstance(entrypoint, dict) and entrypoint.get("bin")):
+                continue
+            bin_surface = entrypoint["bin"]
+            live_target = read_link_target(root / bin_surface)
+            if live_target is None:
+                return f"{bin_surface} is not a symlink (expected it to route through {current_link})"
+            if not (live_target == str(target) or live_target.startswith(current_link_prefix)):
+                return (f"{bin_surface} resolves to {live_target!r}, not through {current_link} -- "
+                        "adopt --relink's indirection was undone (e.g. by a plain bootstrap-linux.sh "
+                        "re-run without --no-link/--link-dir, or a manual ln -sfn)")
     return None
 
 
