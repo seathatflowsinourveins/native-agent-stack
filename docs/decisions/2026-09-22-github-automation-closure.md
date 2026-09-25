@@ -1456,17 +1456,19 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
     already `true` (section 1; today's live GET confirms it is still `true`);
     `allowed_actions` moves from `all` to `selected` below.
   - CodeQL default setup keeps analyzing under a restrictive Actions policy
-    (GitHub changelog 2025-11-25): default setup is a repository setting with
+    ([changelog, 2025-11-25](https://github.blog/changelog/2025-11-25-code-scanning-default-setup-bypasses-github-actions-policy-blocks/)):
+    only "Disable actions" still stops it; default setup is a repository setting with
     no `uses:` of its own, so tightening `allowed_actions` cannot block it --
     the fact that makes adopting the allow-list safe without reopening
     section 2's CodeQL-vs-zizmor comparison.
-  - Dependabot's new default cooldown is 3 days (GitHub changelog
-    2026-07-14); this repository's `github-actions` cooldown is already 7
+  - Dependabot's new default cooldown is 3 days
+    ([changelog, 2026-07-14](https://github.blog/changelog/2026-07-14-dependabot-version-updates-introduce-default-package-cooldown/));
+    this repository's `github-actions` cooldown is already 7
     days (section 8), stricter than the new default. No change needed.
   - GitHub Code Quality is GA
     ([changelog, 2026-07-20](https://github.blog/changelog/2026-07-20-github-code-quality-is-now-generally-available/)):
     a paid product; non-adopted below.
-  - Blocking pull requests with exposed secrets is GA
+  - Blocking pull requests with exposed secrets is in public preview
     ([changelog, 2026-09-09](https://github.blog/changelog/2026-09-09-block-pull-requests-with-exposed-secrets-from-merging/)):
     a ruleset-native alternative to this repository's own required
     `secret-scan` (gitleaks) job; non-adopted below (GitHub Secret Protection
@@ -1526,6 +1528,14 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   run URLs and conclusions are in this record's PR. **Rollback:** the same
   first PUT with `allowed_actions=all`:
   `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions -f allowed_actions=all -F enabled=true -F sha_pinning_required=true`.
+- **Open drift found by the independent review (2026-09-25).** The committed
+  `.github/main-ruleset.json` on `main` lists eight required checks, including
+  `sota-sources` (added by #294, `docs/decisions/2026-09-25-top-rule-sota-sources.md`).
+  A live GET of ruleset 23739774 on 2026-09-25 lists seven: `sota-sources` is not
+  yet required live. This re-check does not apply it: requiring it now would block
+  every open pull request whose branch predates the job until it is rebased, so the
+  owner of #294 applies it when those branches are rebased or merged. Close it with
+  the section-10 PUT of the committed file and a dated after-GET here.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of

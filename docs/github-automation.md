@@ -440,7 +440,8 @@ untracked files.
 predates several fields the target file has gained since. The current
 committed target is [`.github/main-ruleset.json`](../.github/main-ruleset.json)
 (required checks also add `dependency-review`, `osv-scanner`,
-`verdict-review-gate` and `validate-macos`; `allowed_merge_methods:
+`verdict-review-gate`, `validate-macos` and `sota-sources`, the last not yet
+live on 2026-09-25; `allowed_merge_methods:
 ["squash"]` only), compared field by field against the live ruleset in
 [`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
 section 10 ("Rulesets"). This section is kept as history and is not
