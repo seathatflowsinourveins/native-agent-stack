@@ -9622,7 +9622,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "065d7d44d5e78824326fbe7cd02a1174fd3bdbba1cb3166f3709fb46a0345f10",
+      "sha256": "8bd30d107d0c6405d02b9f6e02e133f208a905511dde089dfa0bc1653d6d1faf",
       "bytes": 189511
     },
     {
@@ -10122,8 +10122,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "89138c031c92249de6a3123286a5e61ec67bfc987a6cd67a2ae304e734fb037c",
-      "bytes": 18962
+      "sha256": "fd7fa53af2a50ebeb3d693f7b028e39f681505ba1ab601b428676085fdf015fc",
+      "bytes": 18974
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -29106,14 +29106,54 @@
       "bytes": 3875
     },
     {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--context-mode--use--20260925-2.json",
+      "sha256": "6ea1abfb5646358937d6a7f552a593ffe66264d57851158f31ba7d33b171def3",
+      "bytes": 11964
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--context-mode--use--20260925.json",
+      "sha256": "b880da92cf7d25c0eac676c2561635376c48a886874ea7069e646d9accd010cb",
+      "bytes": 6106
+    },
+    {
       "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--difftastic--use--20260923.json",
       "sha256": "14c16d2fe0aabba2d953c2901b871253017bcd4626856b6a34792be269471f35",
       "bytes": 2116
     },
     {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--headroom--use--20260925-2.json",
+      "sha256": "7a438026e72816d6ed3bcaeddeded0fbe8b112af8135bb2c8f3a86ab719986ed",
+      "bytes": 11144
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--headroom--use--20260925.json",
+      "sha256": "799bb6b6a5e6a1e4fef4011a56ba48bcf25f749c4d0673d575004dfde974b941",
+      "bytes": 5494
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--jcodemunch-mcp--use--20260925-2.json",
+      "sha256": "bc025bbc5cf45d198060a0733b35c8b0a9e5d5160e764c8fbc1bca7e53d73ccf",
+      "bytes": 6667
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--jcodemunch-mcp--use--20260925.json",
+      "sha256": "bccc1ea59a3d0b43f9acc5801ccf81b27cef828b50432241c67ee0b06c3434c4",
+      "bytes": 4398
+    },
+    {
       "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--rtk--use--20260923.json",
       "sha256": "2a0525ce9efbf9939166429115035a57d039255add089ed7d4503047d4f3f9fb",
       "bytes": 1326
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--rtk--use--20260925-2.json",
+      "sha256": "7966438175952c2a08149173462c39961a6fc8bec98aec2245fc67b5abee93c1",
+      "bytes": 9467
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--rtk--use--20260925.json",
+      "sha256": "1393ffb21e8c779136d4ca7035ad94abafb365499d251ff89fecb0e7aa5fa3c8",
+      "bytes": 8209
     },
     {
       "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--shellcheck--use--20260923.json",
