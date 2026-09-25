@@ -421,3 +421,67 @@ opened at line 22 (line 21 before the 2026-09-24 re-sync) survives the final `ex
 observation, not a suite assertion.
 
 The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept faithful to their recorded provenance (only the divergences listed above) rather than annotated for that finding.
+
+## `codex-broker-reaper` (2026-09-25)
+
+Python 3 stdlib, no third-party dependencies. Stops the openai-codex Claude
+Code plugin's leaked `app-server-broker.mjs` processes: a crashed session or
+an abandoned workflow-child worktree leaves its broker (and the `codex
+app-server` child it owns) running indefinitely, because only the main
+session's own `SessionEnd` hook ever shuts one down. See
+[`../../docs/decisions/2026-09-25-codex-broker-reaper.md`](../../docs/decisions/2026-09-25-codex-broker-reaper.md)
+for the upstream issue/PR evidence and the alternatives this rejected.
+
+```
+adoption/tools/codex-broker-reaper --list                       # dry run (default); changes nothing
+adoption/tools/codex-broker-reaper --apply --receipt out.json   # stop every eligible broker
+adoption/tools/codex-broker-reaper --apply --escalate           # + SIGTERM the process group if the RPC alone doesn't work
+```
+
+A broker is only ever eligible when **all** of these hold, each checked live
+rather than assumed:
+
+| Guard | Check |
+| --- | --- |
+| (a) pid/cmdline | `/proc/<pid>/cmdline` still names `app-server-broker.mjs serve` with the exact recorded `--endpoint` (guards pid reuse, upstream #743) |
+| (b) no active jobs | no job in the workspace's `state.json` has a status outside `{completed, failed, cancelled}`; an unrecognized status blocks reaping rather than being treated as safe |
+| (c) workspace unused | the workspace directory (read from the broker's own live `/proc/<pid>/cwd`) no longer exists, or no live `claude`/`codex` process has a cwd equal to or under it |
+| (d) old enough | the broker process (from `/proc/<pid>/stat`'s `starttime`, not a file mtime) is older than `--min-age` (default 1800s) |
+
+Action on an eligible broker is the `broker/shutdown` JSON-RPC over its unix
+socket (5s), then up to 15s waiting for the broker and the OS children it had
+at that moment to exit. **No SIGKILL, ever.** `--escalate` only adds a
+process-group `SIGTERM` after that wait fails, and only after re-checking
+guard (a) again first (the pid could have been reused in those 15s). `--list`
+is the default and changes nothing; `--receipt PATH` writes the same JSON
+report `--list`/`--apply` print to a file. Exit 0 normally, 2 if an eligible
+broker was not confirmed stopped.
+
+Plugin data directories are discovered at
+`~/.claude/plugins/data/*codex*/state`; `--state-root PATH` (repeatable)
+replaces that discovery with an explicit `state` directory, which is how the
+tests point it at a synthetic tree instead of a real host's plugin data.
+
+**Evidence class: local integration, synthetic fixtures.**
+`tests/test_codex_broker_reaper.py` runs every guard against a real spawned
+process: a small Python stand-in plays the broker (a real unix-socket server,
+started from a script file literally named `app-server-broker.mjs` so its
+real `/proc/<pid>/cmdline` matches guard (a), answering `broker/shutdown`
+exactly like the plugin's own broker) and, separately, a live `claude`/`codex`
+look-alike (`comm` forced with `prctl(PR_SET_NAME)`, since a Python-shebang
+script's own `comm` is the interpreter's, not the script's — checked by hand
+against the real `claude` binary before writing the suite). No real broker, no
+real Claude Code or Codex session, and no plugin state directory on any host
+is read or touched by the tests. `--list` was run against this host's real
+`~/.claude/plugins/data/codex-openai-codex/state` on 2026-09-25 (read-only):
+every broker present had already exited (dead pid; guard (a) alone already
+refuses it), so 0 were eligible — consistent with the facts recorded in the
+decision doc.
+
+The systemd user templates
+([`../templates/systemd/codex-broker-reaper.service`](../templates/systemd/codex-broker-reaper.service),
+[`.timer`](../templates/systemd/codex-broker-reaper.timer)) are drafted, not
+installed: no host has loaded, started or enabled them. `@REPOSITORY@` is a
+placeholder for this repository's checkout path and must be substituted
+before installing either unit; `%h` is systemd's own home-directory specifier
+and needs no substitution.
