@@ -43,8 +43,11 @@ events (`on_bid_qty_chg`/`on_ask_qty_chg`) still update the queue model's
 internal position estimate via `queue_model.depth()`, but that function only
 adjusts book-keeping state; nothing in that call path invokes `is_filled()`
 or otherwise changes `order.status`. So on raw L1 data, a passive (resting)
-order can be filled ONLY by the opposite quote crossing through its price
-(`on_best_bid_update`/`on_best_ask_update`, Scenario D3) -- never by trade
+order can be filled ONLY by the opposite quote REACHING OR crossing its
+price (`on_best_bid_update`/`on_best_ask_update` fire on `order.price_tick
+>= new_best_tick` for a resting buy -- equality, a quote landing exactly on
+the order's price, is enough; it does not need to cross past it. Scenario
+D3) -- never by trade
 prints or by its own side's depth going to zero (Scenario D1/D2 show the
 side-bearing and side-less contrast directly; the withdrawn-liquidity-with-
 no-trade case in D2 confirms depth alone never fills anything by itself).
@@ -64,25 +67,46 @@ Scenarios:
         `Ordering::Greater` arm -- unconditional fill, still side-gated);
      D2 the order's own quoted depth driven to zero with NO trade at all
         (must NOT fill -- `on_bid_qty_chg` never checks `is_filled`);
-     D3 the opposite quote (best ask) crossing down through the resting
-        buy's price (`on_best_ask_update` -- fills with no trade data at all).
+     D3 the opposite quote (best ask) reaching or crossing down through the
+        resting buy's price (`on_best_ask_update` -- fills with no trade
+        data at all; the ask does not need to cross past the order's price,
+        landing exactly on it is enough, since the condition is `>=`).
   E. Optimistic new-order queue-position bias: a buy resting away from the
      touch (at a price L1 has never quoted) starts with zero quantity ahead
      of it; once the market quotes that price, even a tiny trade can fill it
-     immediately. Measured, not hand-verified against independent ground
-     truth (the underlying ProbQueueModel probability math is not re-derived
-     here) -- reported as an observed run, flagged as such.
+     immediately. HAND-VERIFIED (see run_scenario_e_optimistic_queue_bias's
+     docstring for the full trace): ProbQueueModel.depth() has an early-
+     return path for a quantity increase that never touches its probability
+     formula at all, so this fixture's outcome is exactly hand-computable,
+     not merely observed.
   F. NoPartialFillExchange vs PartialFillExchange genuinely diverge once
      order size exceeds the touch's quoted size (not true for Scenarios
-     A-C, whose orders were always <= the touch's quoted size).
+     A-D, whose orders were always <= the touch's quoted size). For IOC,
+     the PartialFillExchange side executes what it can (exec_qty > 0) and
+     THEN sets status=Expired for the unfilled remainder -- reading
+     `order.status` alone understates what happened; for FOK (Scenario G2)
+     PartialFillExchange is genuinely all-or-none and expires with exec_qty
+     exactly 0, so that "status understates" caveat does NOT apply to FOK.
   G. Time-in-force coverage beyond IOC/GTC: FOK (all-or-none; expires with
      ZERO execution under PartialFillExchange when depth is insufficient,
      unlike IOC's partial-then-expire) and GTX (Expired -- never a distinct
      "Rejected" status -- when it would cross; New/accepted like GTC
-     otherwise).
+     otherwise). G2 (oversized FOK) is the one Scenario-G case that diverges
+     between exchange models; G1/G3/G4 coincide, same as A-D.
   H. Nonzero fee accounting: `trading_value_fee_model` with a nonzero taker
      fee, confirming `state_values(...).fee` reflects the traded value, not
      merely that a zero-fee call didn't error.
+  I. PartialFillExchange's own no-depletion bias: three back-to-back
+     100-share IOCs against a touch that always shows exactly 100 shares
+     (never re-quoted) all FILL IN FULL under PartialFillExchange, for a
+     cumulative position of 300 -- because executing against `self.depth`
+     does not mutate `self.depth` itself (only an explicit DEPTH_EVENT
+     does; upstream's own doc comment on PartialFillExchange says this
+     explicitly: fills happen "even though the best price and quantity do
+     not change due to your execution"). This is a DIFFERENT bias from
+     Scenario E's (which is about queue POSITION on a fresh price); this one
+     is about the exchange model never depleting quoted SIZE across orders
+     at all, at any price.
 
 Latency: constant_order_latency(70ms, 70ms) is a SENSITIVITY point carried
 over from blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json,
@@ -115,10 +139,19 @@ MS = 1_000_000
 ENTRY_LATENCY = 70 * MS
 RESP_LATENCY = 70 * MS
 
-# TimeInForce / OrdType raw integers (hftbacktest.order exposes GTC=0, GTX=1 as
-# named constants; FOK=2 and IOC=3 are not exported as names but are stable
-# values from hftbacktest::types::TimeInForce, hftbacktest/src/types.rs).
-GTC, GTX, FOK, IOC = 0, 1, 2, 3
+try:
+    # hftbacktest.order DOES export GTC/GTX/FOK/IOC as named constants (an
+    # earlier version of this file said FOK/IOC "are not exported as names"
+    # -- that was wrong; use the real module's values when it is installed).
+    from hftbacktest.order import FOK, GTC, GTX, IOC
+except ImportError:
+    # hftbacktest is not installed on this interpreter (e.g. the system
+    # Python running only the pure-Python EMO/Lee-Ready classification
+    # tests, which need neither hftbacktest nor numpy). These are
+    # hftbacktest::types::TimeInForce's stable integer values
+    # (hftbacktest/src/types.rs) used only as a fallback when the package
+    # itself is entirely absent.
+    GTC, GTX, FOK, IOC = 0, 1, 2, 3
 LIMIT = 0
 
 
@@ -355,6 +388,47 @@ def run_scenario_d_passive_fill_paths(exchange="no_partial_fill"):
     }
 
 
+def build_scenario_d1_emo_data():
+    """Same book and trade-through price as build_scenario_d1_data, but the
+    side bit is not hard-coded: an unambiguous seed trade at the ask (400ms,
+    classified 'buy' directly by EMO's exact-quote rule) is added before the
+    9.99 trade-through print (500ms), so the tick test has a genuine prior
+    price to compare against. Without a seed, the 9.99 print would be the
+    FIRST trade in the tape and EMO's tick-test fallback would return
+    undetermined (no history) -- run_scenario_d1_with_inferred_side()
+    reports whichever of these two outcomes this tape actually produces,
+    rather than assuming inference "just works"."""
+    import hftbacktest as h
+    import numpy as np
+
+    exch_local = h.EXCH_EVENT | h.LOCAL_EVENT
+    bid, ask = 10.00, 10.02
+    tick_state = {}
+    prices = [ask, 9.99]  # seed at the ask (unambiguous 'buy'), then the test print
+    sides = [infer_side_emo(px, bid, ask, tick_state) for px in prices]
+    rows = [
+        (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 0, 0, bid, 20.0, 0, 0, 0.0),
+        (h.DEPTH_EVENT | h.SELL_EVENT | exch_local, 0, 0, ask, 100.0, 0, 0, 0.0),
+    ]
+    for t_ms, px, side in zip((400, 500), prices, sides):
+        bit = h.SELL_EVENT if side == "sell" else (h.BUY_EVENT if side == "buy" else 0)
+        rows.append((h.TRADE_EVENT | bit | exch_local, t_ms * MS, t_ms * MS, px, 3.0, 0, 0, 0.0))
+    rows.append((h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 5 * NS, 5 * NS, bid, 20.0, 0, 0, 0.0))
+    return np.array(rows, dtype=h.event_dtype), sides
+
+
+def run_scenario_d1_with_inferred_side(exchange="no_partial_fill"):
+    """Actually runs EMO inference on the D1 trade-through tape (an earlier
+    version of this fixture's receipt claimed inference "restores trade-
+    through fills in this fixture" without ever running this -- that claim
+    is now either substantiated or corrected by this function's actual
+    output, not assumed)."""
+    data, inferred_sides = build_scenario_d1_emo_data()
+    result = _run_resting_buy(data, 10.00, 5.0, exchange=exchange)
+    result["inferred_sides"] = inferred_sides
+    return result
+
+
 def build_scenario_e_data():
     """Book quotes only bid=10.00/ask=10.02 (never 9.99) until 500ms, when the
     bid re-quotes to 9.99 showing size 50; a single 5-share sell-aggressor
@@ -378,10 +452,27 @@ def build_scenario_e_data():
 
 
 def run_scenario_e_optimistic_queue_bias(exchange="no_partial_fill"):
-    """MEASURED, not hand-derived: the ProbQueueModel probability math behind
-    is_filled() is not independently re-implemented here. This reports the
-    actual observed outcome of the probe described in build_scenario_e_data,
-    labeled as an observation, not a verified-against-ground-truth result."""
+    """HAND-VERIFIED (corrected from an earlier version of this function,
+    which called this "measured, not hand-derived" -- that undersold it).
+    ProbQueueModel.depth() (queue.rs) has an early-return path for a quantity
+    INCREASE (`chg = prev_qty - new_qty`; `if chg < 0.0 { front_q_qty =
+    front_q_qty.min(new_qty); return; }`) that never touches the probability
+    formula at all. Tracing this fixture by hand:
+      1. new_order() at acceptance: front_q_qty = bid_qty_at_tick(9.99) = 0
+         (nothing was ever quoted at 9.99 yet).
+      2. The bid re-quotes to 9.99/50: on_bid_qty_chg -> depth(prev_qty=0,
+         new_qty=50) -> chg = 0-50 = -50 < 0 -> early return with
+         front_q_qty = min(0, 50) = 0. Still 0, exactly.
+      3. The 5-share sell-aggressor print at 9.99: trade() ->
+         front_q_qty -= 5 = -5; is_filled() -> exec =
+         round(-(-5)/1.0) = 5 > 0 -> returns 5.0 shares filled.
+      4. NoPartialFillExchange/PartialFillExchange's fill() then executes the
+         order's full remaining leaves_qty (5.0) at the order's own price
+         (9.99), maker=True.
+    This traces to FILLED, exec_qty=5.0, exec_price=9.99 -- exactly the
+    observed result below, with no probabilistic/random step ever actually
+    invoked (the `prob()` formula is only reached when chg >= 0, i.e. when
+    displayed quantity DECREASES, not when it appears fresh)."""
     return _run_resting_buy(build_scenario_e_data(), 9.99, 5.0, exchange=exchange, submit_at_ns=50 * MS)
 
 
@@ -418,6 +509,67 @@ def run_scenario_f_exchange_model_divergence():
             build_scenario_f_data, submit_at_ns=1 * NS, order_qty=order_qty, exchange=exchange
         )
     return result
+
+
+def build_scenario_i_data():
+    """Static book, bid=10.00/100, ask=10.02/100, NEVER re-quoted for the
+    whole 10s run -- deliberately: PartialFillExchange's own execution
+    against `self.depth` does not mutate the depth structure itself (only an
+    explicit DEPTH_EVENT does), so the touch keeps reporting 100 shares
+    available no matter how many prior orders already executed against it."""
+    import hftbacktest as h
+    import numpy as np
+
+    exch_local = h.EXCH_EVENT | h.LOCAL_EVENT
+    rows = [
+        (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 0, 0, 10.00, 100.0, 0, 0, 0.0),
+        (h.DEPTH_EVENT | h.SELL_EVENT | exch_local, 0, 0, 10.02, 100.0, 0, 0, 0.0),
+        (h.DEPTH_EVENT | h.BUY_EVENT | exch_local, 10 * NS, 10 * NS, 10.00, 100.0, 0, 0, 0.0),
+    ]
+    return np.array(rows, dtype=h.event_dtype)
+
+
+def run_scenario_i_no_depletion_bias(exchange="partial_fill"):
+    """Reproduces the reviewer's probe: three back-to-back 100-share IOC
+    buys against a touch that always shows exactly 100 shares. Upstream's
+    own doc comment on PartialFillExchange says exactly this: 'Liquidity-
+    taking orders will be executed based on the quantity of the order book,
+    EVEN THOUGH THE BEST PRICE AND QUANTITY DO NOT CHANGE DUE TO YOUR
+    EXECUTION. Be aware that this may cause unrealistic fill simulations if
+    you attempt to execute a large quantity' (partialfillexchange.rs
+    ~lines 66-69). PartialFillExchange caps EACH order at the touch's
+    displayed size, but never actually depletes that displayed size for the
+    NEXT order -- so at a high enough submission rate it over-fills exactly
+    like NoPartialFillExchange does for a single oversized order (Scenario
+    F), just spread across multiple orders instead of one."""
+    from hftbacktest import HashMapMarketDepthBacktest
+    from numba import njit
+
+    data = build_scenario_i_data()
+    asset = _base_asset(data, exchange=exchange)
+    hbt = HashMapMarketDepthBacktest([asset])
+
+    @njit
+    def _run(hbt):
+        asset_no = 0
+        submit_times = (1_000_000_000, 2_000_000_000, 3_000_000_000)
+        submitted = (False, False, False)
+        idx = 0
+        while hbt.elapse(10_000_000) == 0:
+            if idx < 3 and hbt.current_timestamp >= submit_times[idx]:
+                order_id = idx + 1
+                depth = hbt.depth(asset_no)
+                hbt.submit_buy_order(asset_no, order_id, depth.best_ask + 0.01, 100.0, IOC, LIMIT, False)
+                if hbt.wait_order_response(asset_no, order_id, 2_000_000_000) == 1:
+                    return -1
+                idx += 1
+        return 0
+
+    rc = _run(hbt)
+    orders = [_order_result(hbt.orders(0).get(i)) for i in (1, 2, 3)]
+    position = float(hbt.state_values(0).position)
+    hbt.close()
+    return {"run_rc": int(rc), "orders": orders, "final_position": position}
 
 
 def build_scenario_g_data():
@@ -530,11 +682,24 @@ def infer_side_emo(trade_px, bid, ask, tick_state):
     """The Ellis-Michaely-O'Hara (EMO) "at-quote" rule (Ellis, Michaely &
     O'Hara, 2000, Journal of Financial and Quantitative Analysis, "The
     Accuracy of Trade Classification Rules: Evidence from Nasdaq"): a trade
-    at or above the ask is a buy; at or below the bid is a sell; otherwise
-    (strictly inside the spread) fall back to the tick test. Compared against
-    Lee-Ready and the plain tick test in the trade-classification literature
-    review at NBER Working Paper No. 14158 (Diether, Lee & Werner, "Short
-    Sales and Trade Classification Algorithms").
+    priced EXACTLY at the ask is a buy; EXACTLY at the bid is a sell;
+    everything else -- including a print strictly inside the spread AND a
+    print outside the quotes entirely (above the ask or below the bid, which
+    can happen with stale/late quotes or off-exchange prints) -- falls back
+    to the tick test. An earlier version of this function used `>=`/`<=`
+    (at-or-through the quote), which is wrong: EMO's own at-quote condition
+    is equality, not a threshold; a print beyond the quote is exactly the
+    kind of ambiguous case the tick-test fallback exists for.
+
+    EMO, Lee-Ready and the plain tick test are all applied (to classify
+    short-sale trades specifically, not as a general method survey) in
+    Asquith, Oman & Safaya, 2008, NBER Working Paper No. 14158, "Short Sales
+    and Trade Classification Algorithms" -- an earlier version of this
+    docstring cited this paper as "Diether, Lee & Werner" and described it as
+    a literature review; both were wrong (verified against the paper's own
+    NBER page metadata: authors Paul Asquith, Rebecca Oman, Christopher
+    Safaya; it is a study of trade-classification accuracy specifically for
+    short sales).
 
     NOTE: this is NOT the Lee-Ready (1991) rule below, which compares to the
     bid-ask MIDPOINT rather than the raw quotes -- an earlier version of this
@@ -542,9 +707,9 @@ def infer_side_emo(trade_px, bid, ask, tick_state):
     wrong and is corrected here by naming (and separately implementing) both.
     """
     tick_direction = _tick_test(trade_px, tick_state)
-    if trade_px >= ask:
+    if trade_px == ask:
         return "buy"
-    if trade_px <= bid:
+    if trade_px == bid:
         return "sell"
     return tick_direction
 
@@ -572,12 +737,12 @@ def classify_trade_tape(prices, bid, ask, rule):
 
 def build_scenario_c_emo_data():
     """Same resting-order setup as Scenario C, but the trade prints are
-    priced at/below the bid (10.00) with bid=10.00/ask=10.02, so the EMO
-    at-quote rule unambiguously classifies every one as a sell aggressor
-    (trade_px <= bid) -- exactly the SELL_EVENT bit Scenario C's
-    with_side=True applies directly. Demonstrates the inference step
-    explicitly instead of hard-coding the side, then applies the inferred
-    bit."""
+    priced EXACTLY at the bid (10.00) with bid=10.00/ask=10.02, so the EMO
+    at-quote rule's direct `trade_px == bid` condition unambiguously
+    classifies every one as a sell aggressor -- exactly the SELL_EVENT bit
+    Scenario C's with_side=True applies directly. Demonstrates the inference
+    step explicitly instead of hard-coding the side, then applies the
+    inferred bit."""
     import hftbacktest as h
     import numpy as np
 
@@ -628,6 +793,13 @@ TICK_TEST_TRIGGER_PRICES = [10.02, 10.015, 10.01, 10.01, 10.005, 10.00]
   index 4 (10.005): strictly inside the spread and below the midpoint -- EMO
     via tick test, Lee-Ready directly from the midpoint; both agree ('sell').
   index 5 (10.00, at the bid): both rules agree directly ('sell').
+
+This tape's outcomes are UNCHANGED by the EMO exact-quote fix (`==` instead
+of `>=`/`<=`): indices 0 and 5 are exactly at the ask/bid either way, and
+indices 1-4 already relied on the tick test (they were always strictly
+inside the spread, never beyond a quote). The exact-quote fix only changes
+behavior for prints ABOVE the ask or BELOW the bid, exercised separately by
+EMO_BOUNDARY_TEST_PRICES below.
 """
 
 
@@ -638,6 +810,26 @@ def run_tick_test_coverage_demo():
         "emo": classify_trade_tape(TICK_TEST_TRIGGER_PRICES, bid, ask, infer_side_emo),
         "lee_ready": classify_trade_tape(TICK_TEST_TRIGGER_PRICES, bid, ask, infer_side_lee_ready),
     }
+
+
+EMO_BOUNDARY_TEST_PRICES = [10.00, 10.02, 10.03, 9.98]
+"""Exercises EMO's exact-quote boundary specifically (bid=10.00/ask=10.02):
+  index 0 (10.00, exactly at the bid): direct 'sell', no tick test needed.
+  index 1 (10.02, exactly at the ask): direct 'buy', no tick test needed;
+    also seeds tick history at 10.02 for the next two prints.
+  index 2 (10.03, ABOVE the ask -- not equal to it): under the corrected
+    `==`-only rule this is NOT a direct 'buy' -- it falls to the tick test
+    (an uptick from 10.02 -> 'buy' here, but via the fallback, not the
+    at-quote condition; an earlier `>=`-based version would have classified
+    this directly as 'buy' without ever exercising the fallback).
+  index 3 (9.98, BELOW the bid -- not equal to it): likewise falls to the
+    tick test (a downtick from 10.03 -> 'sell'), not a direct classification.
+"""
+
+
+def run_emo_boundary_demo():
+    bid, ask = 10.00, 10.02
+    return {"prices": EMO_BOUNDARY_TEST_PRICES, "emo": classify_trade_tape(EMO_BOUNDARY_TEST_PRICES, bid, ask, infer_side_emo)}
 
 
 def main():
@@ -685,34 +877,65 @@ def main():
     scenario_e = label(run_scenario_e_optimistic_queue_bias())
     scenario_f = label(run_scenario_f_exchange_model_divergence())
     scenario_h = label(run_scenario_h_fee_accounting())
+    scenario_i = label(run_scenario_i_no_depletion_bias())
     emo_result = label(run_scenario_c_emo())
+    d1_emo_result = label(run_scenario_d1_with_inferred_side())
     tick_test_demo = run_tick_test_coverage_demo()
+    emo_boundary_demo = run_emo_boundary_demo()
 
-    l1_verdict_changes_with_partial_fill = (
-        by_exchange["no_partial_fill"] != by_exchange["partial_fill"]
+    # A-D and G1/G3/G4 coincide between the two exchange models on THIS
+    # fixture's order sizes; G2 (oversized FOK) is the scenario in this group
+    # that actually diverges (see scenario_g2_diverges below) -- an earlier
+    # version of this script's single combined flag, and the surrounding
+    # prose, wrongly implied ALL of Scenario G coincided.
+    def _without_g2(block):
+        block = dict(block)
+        g = dict(block["scenario_g_time_in_force"])
+        g.pop("g2_fok_insufficient_depth", None)
+        block["scenario_g_time_in_force"] = g
+        return block
+
+    identical_a_to_d_and_g1_g3_g4 = (
+        _without_g2(by_exchange["no_partial_fill"]) == _without_g2(by_exchange["partial_fill"])
+    )
+    scenario_g2_diverges = (
+        by_exchange["no_partial_fill"]["scenario_g_time_in_force"]["g2_fok_insufficient_depth"]
+        != by_exchange["partial_fill"]["scenario_g_time_in_force"]["g2_fok_insufficient_depth"]
     )
     scenario_f_diverges = scenario_f["no_partial_fill"] != scenario_f["partial_fill"]
 
     out = {
         "by_exchange_model": by_exchange,
-        "l1_verdict_changes_with_partial_fill_exchange_on_scenarios_a_to_d_and_g": l1_verdict_changes_with_partial_fill,
-        "scenario_e_optimistic_queue_bias_MEASURED_NOT_HAND_VERIFIED": scenario_e,
+        "identical_under_both_exchange_models_for_scenarios_a_to_d_and_g1_g3_g4": identical_a_to_d_and_g1_g3_g4,
+        "scenario_g2_fok_insufficient_diverges_between_exchange_models": scenario_g2_diverges,
+        "scenario_e_optimistic_queue_bias_HAND_VERIFIED": scenario_e,
         "scenario_f_exchange_models_diverge_on_oversized_order": scenario_f,
         "scenario_f_models_actually_diverge": scenario_f_diverges,
         "scenario_h_fee_accounting": scenario_h,
+        "scenario_i_partial_fill_no_depletion_bias": scenario_i,
         "emo_aggressor_side_inference": {
             "result": emo_result,
             "note": "Proposed DATA-PREPARATION step (not an hftbacktest feature): infer each trade's "
-                    "aggressor side with the EMO at-quote rule (>=ask -> buy, <=bid -> sell, else tick "
-                    "test) before emitting TRADE_EVENT, then apply that side as a BUY_EVENT/SELL_EVENT "
-                    "bit. This rule is NOT Lee-Ready (see infer_side_lee_ready, and "
-                    "tick_test_coverage_demo for a case where the two rules could diverge on a "
-                    "strictly-inside-the-spread print). All 5 trades in this fixture print at the bid "
-                    "(10.00 <= bid 10.00), so both rules would classify every one as a sell aggressor "
-                    "here -- restoring trade-driven queue depletion (FILLED) versus the side-less "
-                    "case (stays NEW).",
+                    "aggressor side with the EMO at-quote rule (==ask -> buy, ==bid -> sell, else tick "
+                    "test -- including prints strictly above the ask or below the bid) before emitting "
+                    "TRADE_EVENT, then apply that side as a BUY_EVENT/SELL_EVENT bit. This rule is NOT "
+                    "Lee-Ready (see infer_side_lee_ready, and tick_test_coverage_demo for a case where "
+                    "the two rules disagree on a strictly-inside-the-spread print). All 5 trades in "
+                    "this fixture print exactly at the bid (10.00 == bid 10.00), so both rules classify "
+                    "every one as a sell aggressor here -- restoring trade-driven queue depletion "
+                    "(FILLED) versus the side-less case (stays NEW).",
+        },
+        "d1_trade_through_with_inferred_side": {
+            "result": d1_emo_result,
+            "note": "Runs EMO inference on the D1 trade-through tape (an earlier version of this "
+                    "fixture's receipt claimed inference restores trade-through fills here WITHOUT "
+                    "ever running it -- this is that actual run). The 9.99 print is OUTSIDE the "
+                    "quotes (below the bid, not at it), so EMO needs the tick test; a seed trade at "
+                    "the ask is added first so the tick test has a genuine prior price, and "
+                    "inferred_sides in the result shows what each of the two trades was classified as.",
         },
         "tick_test_coverage_demo": tick_test_demo,
+        "emo_boundary_demo": emo_boundary_demo,
         "expectations": {
             "scenario_a": "FILLED at ask=10.02 (marketable IOC crosses touch; decided purely from L1 best-ask depth)",
             "scenario_b": "EXPIRED (ask moved to 10.06 before order arrival; IOC does not rest)",
@@ -722,10 +945,11 @@ def main():
             "scenario_d3_ask_crosses_down": "FILLED (opposite-quote crossing fills with no trade data at all)",
             "scenario_f": "no_partial_fill fills the full 150 regardless of the 100-share touch; partial_fill executes only 100 and marks the remainder Expired (with exec_qty=100 already applied to state) -- these should NOT be equal",
             "scenario_g1_fok_sufficient": "FILLED under both exchange models",
-            "scenario_g2_fok_insufficient": "no_partial_fill: FILLED IN FULL regardless of quoted size (FOK is bundled with GTC/IOC in that model's single unconditional-fill arm); partial_fill: EXPIRED with ZERO exec_qty (all-or-none, unlike IOC's partial-then-expire in scenario F)",
+            "scenario_g2_fok_insufficient": "no_partial_fill: FILLED IN FULL regardless of quoted size (FOK is bundled with GTC/IOC in that model's single unconditional-fill arm); partial_fill: EXPIRED with ZERO exec_qty (all-or-none, unlike IOC's partial-then-expire in scenario F) -- G2 is the one Scenario-G case that diverges between exchange models",
             "scenario_g3_gtx_crossing": "EXPIRED under both exchange models (never a distinct Rejected status)",
             "scenario_g4_gtx_resting": "NEW/accepted under both exchange models, like GTC",
             "scenario_h": "fee should equal exec_price * exec_qty * taker_fee, not zero",
+            "scenario_i": "all three 100-share IOCs FILLED in full under partial_fill_exchange, final_position=300.0, despite the touch never showing more than 100 shares at any point -- PartialFillExchange caps a single order's fill at the displayed size but never depletes that display for the next order",
         },
     }
 

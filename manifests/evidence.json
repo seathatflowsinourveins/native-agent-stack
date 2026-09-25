@@ -9140,18 +9140,18 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
-      "sha256": "924529c3ed832377a2757130fc573929940259b9b872ec0c7c4ebf9f9edb09f6",
-      "bytes": 21956
+      "sha256": "fef9f546cdae76f37ece09c4dc6eafb374a6a01ac65e5b3327e1b279cdbca367",
+      "bytes": 29992
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
-      "sha256": "caaeedd1df47a6c8b714b76cf798450879e9e55319ce50103df765f9dda6615c",
-      "bytes": 35763
+      "sha256": "6ce9ff6b3cd66d781ff15ec1fe4f343259231eddfc3d4ba44ce1d6198f4be22c",
+      "bytes": 48612
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
-      "sha256": "d9e3713e8452f2a9bfb1ab5c07c6eb7373d21d86c75260bf461ba68d70a09681",
-      "bytes": 42347
+      "sha256": "de22ccf555e1a7dad3960cefd88f16dfc3805262d619f6398ffb1fe472206181",
+      "bytes": 41393
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
@@ -29615,8 +29615,8 @@
     },
     {
       "path": "tests/test_sim_crosscheck_hftbacktest.py",
-      "sha256": "1071614561371acc6fe89f11a2ec43a7bd47960438627543dcf6ff89c54225ba",
-      "bytes": 12568
+      "sha256": "0821717fb58e78424712c65b1c4e57ac71d12a97e7691da2e3be020dee9ef7cc",
+      "bytes": 17763
     },
     {
       "path": "tests/test_sim_paper_compare.py",

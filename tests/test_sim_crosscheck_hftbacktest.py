@@ -12,12 +12,15 @@ hftbacktest engine) run unconditionally.
 
 Lives at the repository's top-level tests/ directory, not inside the
 blueprint, so that `python3 -m unittest`'s bare discovery from the repo root
-actually collects it: no other blueprint in this repository keeps its own
-`tests/` subdirectory, and a directory literally named `tests` nested under
-a blueprint collides with the top-level `tests` package name during
-unittest's discovery, which is why an earlier version of this file (at
+actually collects it. An earlier version of this file (at
 blueprints/us-equities/sim-crosscheck-hftbacktest/tests/) never actually ran
-in CI.
+in CI; the cause, verified with a minimal reproduction, is that `blueprints/`
+(and every directory under it) has no `__init__.py`, so unittest's
+package-based discovery never descended into that path at all -- it is
+silently invisible to discovery, not a dotted-name collision with the
+top-level `tests` package (which does have an `__init__.py`; an earlier
+version of this docstring gave that wrong explanation). No other blueprint
+in this repository keeps its own `tests/` subdirectory either way.
 """
 from __future__ import annotations
 
@@ -55,6 +58,16 @@ class L1FeasibilityTests(unittest.TestCase):
         cls.mod = _load_feasibility_module()
         import hftbacktest.order as order_mod
         cls.order_mod = order_mod
+
+    def test_time_in_force_constants_come_from_hftbacktest_order(self):
+        # An earlier version of this module hardcoded FOK/IOC as bare
+        # integers with a comment claiming they "are not exported as names"
+        # from hftbacktest.order -- they are; this locks in importing them
+        # for real instead of hardcoding.
+        self.assertEqual(self.mod.GTC, self.order_mod.GTC)
+        self.assertEqual(self.mod.GTX, self.order_mod.GTX)
+        self.assertEqual(self.mod.FOK, self.order_mod.FOK)
+        self.assertEqual(self.mod.IOC, self.order_mod.IOC)
 
     def test_marketable_ioc_fills_from_l1_depth_alone(self):
         result = self.mod.run_ioc_scenario(self.mod.build_scenario_a, submit_at_ns=1 * self.mod.NS)
@@ -111,9 +124,11 @@ class L1FeasibilityTests(unittest.TestCase):
             self.assertEqual(result["d3_ask_crosses_down"]["order_status"], self.order_mod.FILLED, exchange)
             self.assertAlmostEqual(result["d3_ask_crosses_down"]["exec_qty"], 5.0, places=6)
 
-    def test_scenario_e_optimistic_queue_bias_is_observed(self):
-        # MEASURED, not independently re-derived from ProbQueueModel's probability
-        # formula -- this asserts the actually-observed outcome of the probe.
+    def test_scenario_e_optimistic_queue_bias_is_hand_verified(self):
+        # HAND-VERIFIED: ProbQueueModel.depth()'s early-return path for a
+        # quantity increase never touches the probability formula (see
+        # run_scenario_e_optimistic_queue_bias's docstring for the full
+        # trace), so this asserts the exactly hand-computed outcome.
         result = self.mod.run_scenario_e_optimistic_queue_bias()
         self.assertEqual(result["order_status"], self.order_mod.FILLED)
         self.assertAlmostEqual(result["exec_qty"], 5.0, places=6)
@@ -156,6 +171,42 @@ class L1FeasibilityTests(unittest.TestCase):
         self.assertEqual(result["order_status"], self.order_mod.FILLED)
         self.assertEqual(result["inferred_sides"], ["sell"] * 5)
 
+    def test_emo_inferred_side_restores_d1_trade_through_fill(self):
+        # An earlier version of this fixture's receipt claimed inference
+        # "restores trade-through fills" on the D1 tape without ever running
+        # it. This actually runs it: a seed trade at the ask gives the tick
+        # test a genuine prior price, so the 9.99 print (outside the quotes,
+        # below the bid) is classified via the tick test as a downtick/sell.
+        result = self.mod.run_scenario_d1_with_inferred_side()
+        self.assertEqual(result["inferred_sides"], ["buy", "sell"])
+        self.assertEqual(result["order_status"], self.order_mod.FILLED)
+        self.assertAlmostEqual(result["exec_qty"], 5.0, places=6)
+
+    def test_scenario_i_partial_fill_never_depletes_displayed_liquidity(self):
+        # Reproduces the reviewer's probe: three back-to-back 100-share IOCs
+        # against a touch that always shows exactly 100 shares all fill in
+        # full under partial_fill_exchange, because executing against
+        # self.depth does not mutate self.depth (upstream's own doc comment
+        # on PartialFillExchange says this explicitly).
+        result = self.mod.run_scenario_i_no_depletion_bias()
+        self.assertEqual(len(result["orders"]), 3)
+        for order in result["orders"]:
+            self.assertEqual(order["order_status"], self.order_mod.FILLED)
+            self.assertAlmostEqual(order["exec_qty"], 100.0, places=6)
+        self.assertAlmostEqual(result["final_position"], 300.0, places=6)
+
+    def test_scenario_g2_diverges_but_g1_g3_g4_coincide(self):
+        # An earlier version of this fixture said Scenarios A-D and G
+        # "coincide" between exchange models; that was wrong for G2
+        # (oversized FOK), which genuinely diverges.
+        out = self.mod.run_scenario_g_time_in_force()
+        no_partial = out["no_partial_fill"]
+        partial = out["partial_fill"]
+        self.assertEqual(no_partial["g1_fok_sufficient_depth"], partial["g1_fok_sufficient_depth"])
+        self.assertEqual(no_partial["g3_gtx_crossing"], partial["g3_gtx_crossing"])
+        self.assertEqual(no_partial["g4_gtx_resting"], partial["g4_gtx_resting"])
+        self.assertNotEqual(no_partial["g2_fok_insufficient_depth"], partial["g2_fok_insufficient_depth"])
+
     def test_feasibility_script_runs_end_to_end_via_subprocess(self):
         # Runs the script's own __main__ path via an actual subprocess (not
         # "subprocess-free" -- an earlier version of this comment was wrong)
@@ -177,6 +228,9 @@ class L1FeasibilityTests(unittest.TestCase):
                 block["scenario_b_ioc_expiry_from_l1_depth"]["order_status_name"], "EXPIRED"
             )
         self.assertTrue(out["scenario_f_models_actually_diverge"])
+        self.assertTrue(out["identical_under_both_exchange_models_for_scenarios_a_to_d_and_g1_g3_g4"])
+        self.assertTrue(out["scenario_g2_fok_insufficient_diverges_between_exchange_models"])
+        self.assertAlmostEqual(out["scenario_i_partial_fill_no_depletion_bias"]["final_position"], 300.0, places=6)
 
 
 class TickTestClassificationTests(unittest.TestCase):
@@ -195,6 +249,31 @@ class TickTestClassificationTests(unittest.TestCase):
         # disagreement point.
         self.assertEqual(demo["emo"][1], "sell")
         self.assertEqual(demo["lee_ready"][1], "buy")
+
+    def test_emo_applies_exact_quote_rule_only_at_the_bid_or_ask(self):
+        # An earlier version of infer_side_emo used >=/<= (at-or-through the
+        # quote); EMO's own at-quote condition is equality. A print above
+        # the ask, or below the bid, must fall to the tick test instead of
+        # being classified directly.
+        demo = self.mod.run_emo_boundary_demo()
+        prices, sides = demo["prices"], demo["emo"]
+        self.assertEqual(prices[0], 10.00)
+        self.assertEqual(sides[0], "sell")  # exactly at the bid: direct
+        self.assertEqual(prices[1], 10.02)
+        self.assertEqual(sides[1], "buy")  # exactly at the ask: direct
+        self.assertEqual(prices[2], 10.03)  # strictly ABOVE the ask
+        self.assertEqual(sides[2], "buy")  # via the tick test (uptick from 10.02), not the at-quote rule
+        self.assertEqual(prices[3], 9.98)  # strictly BELOW the bid
+        self.assertEqual(sides[3], "sell")  # via the tick test (downtick from 10.03), not the at-quote rule
+
+        # Confirm directly (independent of the demo tape) that an
+        # above-ask/below-bid print is NOT classified by the at-quote
+        # condition itself: with no prior trade at all, the tick test has
+        # nothing to fall back on and must return an undetermined result --
+        # if EMO still returned a definite side here, it would prove the
+        # at-quote condition (not the tick test) produced it.
+        self.assertIsNone(self.mod.infer_side_emo(10.05, bid=10.00, ask=10.02, tick_state={}))
+        self.assertIsNone(self.mod.infer_side_emo(9.90, bid=10.00, ask=10.02, tick_state={}))
 
     def test_flat_tick_reuses_last_known_direction(self):
         state = {}
