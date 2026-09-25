@@ -16,6 +16,7 @@ import time
 import types
 import unittest
 import urllib.error
+import urllib.parse
 from datetime import date, datetime, timezone
 from pathlib import Path
 from unittest import mock
@@ -23,6 +24,13 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "blueprints/us-equities/incentive-monitor"))
 import monitor as M  # noqa: E402
+
+
+def host_is(url: str, domain: str) -> bool:
+    """True when url's parsed hostname is domain or one of its subdomains. A substring test ("sec.gov" in url) would
+    also match a lookalike host or a query string, and CodeQL flags it as incomplete URL sanitization."""
+    host = urllib.parse.urlsplit(url).hostname or ""
+    return host == domain or host.endswith("." + domain)
 
 EDGAR = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -238,7 +246,7 @@ class Halts(unittest.TestCase):
                 self.payload = payload
 
             def get(self, url, kind, headers, timeout=20):
-                assert "sec.gov" not in url and "@" not in headers["User-Agent"]
+                assert not host_is(url, "sec.gov") and "@" not in headers["User-Agent"]
                 return self.payload
         state = M.State()
         state.today = date(2026, 9, 24)
@@ -902,7 +910,7 @@ class Market:
             return {"AAA": self.snap(11.0), "BBB": self.snap(10.0)}
         if "browse-edgar" in url:
             return EDGAR
-        if "nasdaqtrader.com" in url:
+        if host_is(url, "nasdaqtrader.com"):
             return self.halts
         if "most-actives" in url:
             return {"most_actives": [{"symbol": "AAA", "volume": 5, "trade_count": 2}], "last_updated": "x"}
@@ -1140,7 +1148,7 @@ class Coexistence(unittest.TestCase):
             v1_listing = sorted(p.name for p in v1_day.iterdir())
         self.assertEqual(rc, 0)
         self.assertEqual(streams.connects, [])   # no news, OPRA or IEX connection
-        self.assertEqual([u for u in market.opened if "sec.gov" in u or "nasdaqtrader.com" in u], [])
+        self.assertEqual([u for u in market.opened if host_is(u, "sec.gov") or host_is(u, "nasdaqtrader.com")], [])
         monitor = files["monitor.jsonl"]
         start, budget = monitor[0], next(m for m in monitor if m.get("event") == "budget")
         sweep = next(m for m in monitor if m.get("event") == "sweep")
@@ -1771,7 +1779,7 @@ class RunLoop(unittest.TestCase):
                                  "--no-corporate-actions", "--no-screener", "--no-option-chains", "--no-finra"], tmp)
             sweeps = [m for m in day_files(out)["monitor.jsonl"] if m.get("event") == "sweep"]
         self.assertEqual((rc, len(sweeps)), (0, 2))
-        self.assertEqual((sum("nasdaqtrader.com" in u for u in market.opened), sum("browse-edgar" in u for u in market.opened)), (1, 7))
+        self.assertEqual((sum(host_is(u, "nasdaqtrader.com") for u in market.opened), sum("browse-edgar" in u for u in market.opened)), (1, 7))
         self.assertEqual([("halt_changes" in s, "edgar_new" in s) for s in sweeps], [(True, True), (False, False)])
         self.assertEqual(sorted(streams.connects), sorted([M.NEWS_WS, M.OPRA_WS]))
 
