@@ -1,0 +1,123 @@
+{
+ "decision": "no_evidence_underpowered",
+ "descriptive_keys_in_private_file": [
+  "descriptive"
+ ],
+ "evaluation_file": {
+  "bytes": 109270,
+  "private_path": "~/.local/state/native-agent-stack/research/sota-mover/eap/receipts/evaluation-frozen-c00ca2cd.json",
+  "sha256": "af0e6b5e030f3767140be5eb3cc27780044b13cc40d74b8be58dbcbfe414597a"
+ },
+ "evidence_class": "HIST",
+ "git_head": "7d37e1821daa9af31ff224a17ef0f39e0dc087c1",
+ "items": {
+  "EAP-1": {
+   "family": "secondary",
+   "mean_monthly": 0.002023346790355323,
+   "n_valid_months": 116,
+   "nw_lags": 4,
+   "p_one_sided": 0.1638037215217275,
+   "realized_mde_80": 0.005151279375469578,
+   "rejected": false,
+   "report": "not rejected at the preregistered level; the design had 80% power only above \u22480.52%/month, so an effect of the published size is not ruled out",
+   "sensitivity": {
+    "nw12": {
+     "p_one_sided": 0.14813026379939714,
+     "se": 0.0019283639152186732,
+     "t": 1.049255679587781
+    },
+    "nw3": {
+     "p_one_sided": 0.16856674730448323,
+     "se": 0.0020991902167582237,
+     "t": 0.9638701505954874
+    }
+   },
+   "status": "tested",
+   "t": 0.9831297366980835,
+   "upper_bound_95_one_sided": 0.0054360577061000484
+  },
+  "EAP-2": {
+   "family": "primary",
+   "mean_monthly": 0.0010484884550181505,
+   "n_valid_months": 116,
+   "nw_lags": 4,
+   "p_one_sided": 0.3103888959476957,
+   "realized_mde_80": 0.005290038799122986,
+   "rejected": false,
+   "report": "not rejected at the preregistered level; the design had 80% power only above \u22480.53%/month, so an effect of the published size is not ruled out",
+   "sensitivity": {
+    "nw12": {
+     "p_one_sided": 0.28279920561464655,
+     "se": 0.0018196250725090388,
+     "t": 0.576211259593392
+    },
+    "nw3": {
+     "p_one_sided": 0.3140037128530184,
+     "se": 0.0021581091547417633,
+     "t": 0.4858366189283931
+    }
+   },
+   "status": "tested",
+   "t": 0.49608992506548316,
+   "upper_bound_95_one_sided": 0.00455312717456623
+  },
+  "EAP-3": {
+   "family": "secondary",
+   "mean_monthly": 0.0012066274595996308,
+   "n_valid_months": 116,
+   "nw_lags": 4,
+   "p_one_sided": 0.3963020499633966,
+   "realized_mde_80": 0.011459828836539997,
+   "rejected": false,
+   "report": "not rejected at the preregistered level; the design had 80% power only above \u22481.15%/month, so an effect of the published size is not ruled out",
+   "sensitivity": {
+    "nw12": {
+     "p_one_sided": 0.4042750054687334,
+     "se": 0.004968500838047794,
+     "t": 0.24285544049012067
+    },
+    "nw3": {
+     "p_one_sided": 0.39902759625059836,
+     "se": 0.004704965299805423,
+     "t": 0.25645831216853643
+    }
+   },
+   "status": "tested",
+   "t": 0.2635425143903048,
+   "upper_bound_95_one_sided": 0.008798738100941256
+  },
+  "EAP-4": {
+   "family": "primary",
+   "mean_monthly": 0.0006008555848599867,
+   "n_valid_months": 116,
+   "nw_lags": 4,
+   "p_one_sided": 0.38828622147848496,
+   "realized_mde_80": 0.005287013863169424,
+   "rejected": false,
+   "report": "not rejected at the preregistered level; the design had 80% power only above \u22480.53%/month, so an effect of the published size is not ruled out",
+   "sensitivity": {
+    "nw12": {
+     "p_one_sided": 0.37077669416971515,
+     "se": 0.001817507809697427,
+     "t": 0.3305931240867764
+    },
+    "nw3": {
+     "p_one_sided": 0.3905496936082881,
+     "se": 0.0021571739581218038,
+     "t": 0.27853830823321096
+    }
+   },
+   "status": "tested",
+   "t": 0.28445610875548877,
+   "upper_bound_95_one_sided": 0.0041034902911919885
+  }
+ },
+ "label": "HIST",
+ "protocol_id": "sota-mover-eap-v1-20260925",
+ "protocol_sha256": "c00ca2cdc1028bc7468c8690359411f4a640baec6045f12ad599dc3ef05c272a",
+ "run": {
+  "command": "ecosystem-bounded-run (3G/4G, 3600 s) adaptive-paper-20260921 python evaluate.py --root <private root> --daily <daily.parquet> --protocol-sha256 c00ca2cd... --out <private>/receipts/evaluation-frozen-c00ca2cd.json",
+  "exit": 0,
+  "ran_at_utc": "2026-09-25T03:5x"
+ }
+}

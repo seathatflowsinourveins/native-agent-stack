@@ -114,3 +114,21 @@ These are recorded in `protocol.json#/deviations`:
 - Item 2.02 filings are noisier than earnings dates.
 - A quoted closing spread overstates closing-auction costs.
 - 116 months give 80% power only above about 0.56%/month even at the optimistic SD assumption, against an expected adoption effect near 0.4%/month.
+
+## Result of the frozen run (2026-09-25, protocol sha256 `c00ca2cd…`, freeze commit `0332a94e`)
+
+One evaluation, run once after the pushed freeze, HIST evidence, 116 valid months (2017-01..2026-08). Summary in
+`receipts/evaluation-summary.json`; the full private file is hashed there.
+
+| Item | Family | Mean per month | t (NW 4) | p one-sided | 95% upper bound |
+|---|---|---|---|---|---|
+| EAP-2 long leg minus SPY | primary | +0.105% | 0.50 | 0.31 | 0.455% |
+| EAP-4 EAP-2 net of measured costs | primary | +0.060% | 0.28 | 0.39 | 0.410% |
+| EAP-1 long-short | secondary | +0.202% | 0.98 | 0.16 | 0.544% |
+| EAP-3 high past-reaction subset minus SPY | secondary | +0.121% | 0.26 | 0.40 | 0.880% |
+
+Decision: `no_evidence_underpowered`. The fixed sequence stops at EAP-2, so the pre-positioning rule is not adopted.
+For EAP-1 the one-sided 95% upper bound (0.544%) lies below Frazzini-Lamont's 0.61% per month (a comparison stated
+after the result, not a preregistered item). Descriptive only: the uncapped dollar-volume-weighted long leg minus SPY
+is +0.52% per month (t 1.85), but those weights put up to 59% in one name, which is why the 2% cap was preregistered;
+it is a candidate hypothesis for a new protocol, not a finding. The equal-weighted long leg minus SPY is -0.20%.
