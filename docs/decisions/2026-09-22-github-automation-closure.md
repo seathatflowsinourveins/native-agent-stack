@@ -269,6 +269,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   installed tool) uploads it, per the "Token split" evidence above.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.
+- **Superseded (2026-09-25).** The rejected "online PR gate" alternative is now
+  adopted in `validate.yml` without waiting for that trigger, which could only
+  fire after a merge. See "GitHub hardening follow-up (2026-09-25)" below. The
+  two-job SARIF split above is unchanged.
 
 ## 5. Scorecard SARIF
 
@@ -420,6 +424,70 @@ locally with `GH_TOKEN` set and no `--offline`, using
   a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
+- **CI lock renamed (2026-09-25); pip version updates stay off.** A read-only
+  `gh api repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom`
+  on 2026-09-25 listed no `zizmor` package: the dependency graph does not parse
+  `.github/requirements-ci.lock`, so neither alerts nor security updates covered
+  the analyzer the required `validate` job installs. The file is now
+  `.github/requirements-ci.txt`, byte-identical (SHA-256 `e4759645...`, 283
+  bytes). The graph lists pip `requirements.txt` files
+  ([supported ecosystems](https://docs.github.com/en/code-security/reference/supply-chain-security/dependency-graph-supported-package-ecosystems)),
+  and Dependabot pip "supports updates to any `.txt` file"
+  ([supported ecosystems and repositories](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories)).
+  No pip version-update entry is added, so "pip stays off" holds. Expected cost:
+  a zizmor security-update PR fails `test_zizmor_pin_matches_requirements_lock`
+  and the evidence-hash check; the maintainer does the reviewed relock and closes
+  the bot PR, as with #97/#98 -> #99. The dated mentions of the old name in
+  sections 3 and 4 and in `qualified-workflow.yml.txt` (a hash-bound experiment
+  input) stay as history. Side effect: Scorecard's embedded OSV scan matches
+  `*requirements*.txt`, so it now scans this file too.
+  **Post-merge acceptance:**
+  `gh api repos/seathatflowsinourveins/native-agent-stack/dependency-graph/sbom --jq '[.sbom.packages[]|select(.name=="zizmor")|.versionInfo]'`
+  returns `["1.30.1"]`, and a `dynamic/dependabot/update-graph` run named
+  `Graph Update: pip in /.github` appears. **Fallback:** if it does not appear,
+  add a `package-ecosystem: pip` entry for `directory: /.github` with
+  `open-pull-requests-limit: 0` (version updates only; security updates are not
+  subject to the limit, per the options reference) and record it here.
+- **Ecosystems without a version-update entry (2026-09-25).** `.github/dependabot.yml`
+  keeps one version-update entry, `github-actions`. The others are left out on
+  purpose, and the file's header now says why:
+  - *npm/pnpm and uv.* The only manifests are
+    `blueprints/convergence-practice/application-delivery` (`package.json`,
+    `pnpm-lock.yaml`, `pyproject.toml`, `uv.lock`),
+    `blueprints/convergence-practice/wsl-retrieval` (`package.json`,
+    `package-lock.json`) and `evidence/artifacts/macos-application-20260924/variant`.
+    All are frozen experiment or evidence artifacts: their lock hashes are
+    registered in `manifests/evidence.json` (`scripts/validate.py` fails on a
+    changed hash) and cited by receipts, so a version bump would break `validate`
+    and detach the receipts. `application-delivery` also pins `pnpm@12.4.2`,
+    outside the pnpm versions Dependabot lists. Security updates stay on for
+    them; a security PR against a frozen lock gets a reviewed relock or is
+    closed, as with #97/#98.
+  - *NuGet.* The 23 `packages.lock.json` files
+    (`blueprints/us-equities/engine/patches/alpaca.packages.lock.json` and 22
+    under `patches/lean-locks`) are overlays copied into an upstream LEAN checkout
+    (`blueprints/us-equities/engine/resolution.md`); the repository has no
+    `.csproj` or `.sln`. The dependency graph's NuGet formats do not include
+    `packages.lock.json`, so neither version nor security updates can see them.
+  - *OSV-Scanner is the only alert path* for files outside the dependency graph:
+    the NuGet locks above and the `.lock`-named pip locks
+    (`adoption/sdk/requirements-linux-x86_64-py313.lock`,
+    `adoption/sdk/accepted-constraints.txt`, the us-equities
+    `requirements.lock` files, gap-wave2's `requirements-libs.lock` and the
+    macos-syn-e2e lock). They pin reproducible installs, and a single-package
+    security PR against a uv-compiled lock fails the relock diff (#97/#98).
+    `security-scan.yml`'s `osv-scanner` job is a required PR check with a weekly
+    run and a SARIF upload (category `osv-scanner`).
+  - This closes the open finding in
+    `evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json`
+    that no audited manifest has an updater: the omission is now a recorded
+    decision (the artifact itself stays as retained evidence).
+  - **Overturn.** An actively maintained, non-frozen npm, uv or .NET project
+    with a Dependabot-discoverable manifest is added. It gets an entry like
+    `github-actions`: `cooldown: default-days: 7`, one minor/patch group and
+    `open-pull-requests-limit: 2`. For a graph-invisible lock that needs
+    Dependabot alerts, rename it to `*requirements*.txt` or submit it through
+    the dependency submission API.
 
 - **Stale lane text, recorded here only.** The lane-sourced Dependabot
   alternative in `catalogs/landscape/foundation.json` (rendered into
@@ -1245,3 +1313,123 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   `PATH`) and zizmor's offline strict pass report no findings on the changed workflow. The full
   pre-existing hardening, security-coverage, adoption-bootstrap and adoption-docs-consistency
   suites still pass unchanged.
+
+## GitHub hardening follow-up (2026-09-25)
+
+**Decided by:** branch `claude/gh-hardening-20260925`, cut from `origin/main`
+`6568f47`, implementing the verified gaps of the 2026-09-25 GitHub audit for this
+repository. This unit changed files only; it changed no live repository setting.
+Read-only `gh api` GETs are dated below.
+
+- **Online zizmor PR gate (overturns section 4's rejected alternative).**
+  - *Evidence.* The required `validate` job ran `zizmor --offline`, and
+    `security-scan.yml`'s `zizmor-online` skips pull requests and runs with
+    `--no-exit-codes`. Ruleset 23739774's `code_scanning` rule lists only CodeQL
+    (GET 2026-09-25, no bypass actors). So impostor-commit, known-vulnerable-actions,
+    ref-confusion and ref-version-mismatch never blocked a merge: a PR pinning a SHA
+    that exists only in a fork, with a matching `# vX.Y.Z` comment, passed both
+    actionlint and the offline gate, and was found only after the push-triggered
+    workflows on `main` had already run it. zizmor 1.30.1 with `--offline -v` logs
+    that it skips those audits without a token, and in a local probe a pin with a
+    wrong version comment exited 0. Section 4's overturn trigger could only fire
+    after a merge. The noise concern has evidence against it: `gh api
+    'repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?tool_name=zizmor'`
+    on 2026-09-25 returned 90 analyses, all on `refs/heads/main`
+    (2026-09-23T05:41:56Z to 2026-09-25T06:15:53Z), with 0 results in total; the
+    online analyzer step takes about 2 s. GitHub's
+    [secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+    says to verify that a pinned SHA "is from the action's repository and not a
+    repository fork".
+  - *Decision.* `validate.yml`'s zizmor step now has
+    `GH_TOKEN: ${{ github.token }}`, drops `--offline`, and keeps `--no-config
+    --no-ignores --persona regular --strict-collection` with the default exit codes,
+    so findings exit 11-14 and fail the required `validate` check
+    ([usage](https://docs.zizmor.sh/usage/)). No scope is added: the workflow stays
+    `contents: read`, and fork and Dependabot PRs get a read-only token
+    ([events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
+    which is all zizmor's API reads need. The gate adds impostor-commit,
+    known-vulnerable-actions and ref-confusion (online-only in the `regular`
+    persona, [audits](https://docs.zizmor.sh/audits/)) and ref-version-mismatch
+    (documented as offline-capable, but skipped offline by 1.30.1).
+    stale-action-refs is pedantic-only and is not added. The SARIF split in
+    section 4 is unchanged.
+  - *Fail-open guard.* With no token, zizmor 1.30.1 silently falls back to offline
+    mode and exits 0. `tests/test_workflow_hardening.py`'s `ValidateZizmorGateTests`
+    requires the token line and forbids `--offline`, `--no-exit-codes`, SARIF output
+    and `continue-on-error` in that step. An empty `GH_TOKEN` exits 2 (fails closed).
+  - *Residuals.* A PR can edit its own `validate.yml` and re-add `--offline`; as
+    with `verdict-review-gate`, the admin's diff review stays the last line.
+    `GITHUB_TOKEN` is limited to 1,000 requests per hour per repository
+    ([rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api));
+    a rate-limit error fails `validate` closed and a rerun fixes it. A new advisory
+    against a pinned action turns every PR red until the pin is bumped, as
+    `osv-scanner` already does. An impostor action still runs in the PR's own CI;
+    the gate blocks only the merge.
+  - *Overturn.* Online-audit infrastructure failures (rate limits, API errors),
+    not findings, fail more than 2 of any 20 consecutive `validate` runs. Then move
+    the online audits to a separate non-required job and restore the offline gate.
+- **zizmor audits the repository root.** Both CI zizmor runs passed
+  `.github/workflows`, which never collects `.github/dependabot.yml`, so the
+  dependabot-cooldown and dependabot-execution audits
+  ([audits](https://docs.zizmor.sh/audits/#dependabot-cooldown)) never ran in CI
+  and a change that dropped `cooldown` or added
+  `insecure-external-code-execution: allow` passed the required gate. Both runs now
+  pass `.`, as zizmor's documented CI setup does
+  ([integrations](https://docs.zizmor.sh/integrations/)). Local zizmor 1.30.1
+  (`--offline --no-config --no-ignores --persona regular --strict-collection .`) on
+  this branch collected the 18 workflows and `dependabot.yml`, exit 0, no findings.
+  A copy with `cooldown` removed exits 13 with `dependabot-cooldown`; that pass and
+  that control are now `DependabotConfigSecurityCoverageTests` in
+  `tests/test_workflow_security_coverage.py`. Collection honors `.gitignore`, and
+  the repository has no `action.yml`. **Overturn:** root collection picks up an
+  input that is not this repository's own configuration (such as a vendored
+  `action.yml` fixture); then pass `.github/workflows .github/dependabot.yml`.
+- **Fork PR workflow approval (decided; the owner applies it).** The repository is
+  public and allows forking. A read-only GET of
+  `repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval`
+  at 2026-09-25T06:34:07Z returned `{"approval_policy":"first_time_contributors"}`.
+  GitHub's
+  [Actions settings page](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#controlling-changes-from-forks-to-workflows-in-public-repositories)
+  warns that under the first-time options "a malicious user could meet this
+  requirement by getting a simple typo or other innocuous change accepted". After
+  that, their fork PRs run every `pull_request` workflow here (`validate`, the
+  tests, node scripts, `macos-15` jobs) with no approval. Those runs get a read-only
+  token and no secrets, so the exposure is untrusted compute and noise, not a
+  credential. **Decision:** require approval for all external contributors
+  (`all_external_contributors`, [REST](https://docs.github.com/en/rest/actions/permissions)).
+  This repository's settings are not managed as code (agent-ecosystem's
+  `config/github-settings.json` lists it in `observe` mode, with no Actions
+  approval key), so the owner applies it:
+  `gh api -X PUT repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval -f approval_policy=all_external_contributors`
+  (HTTP 204), then
+  `gh api repos/seathatflowsinourveins/native-agent-stack/actions/permissions/fork-pr-contributor-approval --jq .approval_policy`
+  (expect `all_external_contributors`); record the dated after-GET here.
+  Unaffected: owner, same-repository and Dependabot PRs; the catalog-freshness bot
+  PR already needs approval because `GITHUB_TOKEN` opens it. **Rollback:** the same
+  PUT with `approval_policy=first_time_contributors`. **Overturn:** regular outside
+  contributors make approval toil outweigh the risk.
+- **Job-level permission comments.** zizmor 1.30.1 at `--persona pedantic` reported
+  `undocumented-permissions` for 5 grants in 4 job blocks: `catalog-freshness.yml`
+  `propose` (`contents: write`, `pull-requests: write`, from #95) and
+  `saturation-tracking.yml` `report` (`actions: read`), `plan` (`issues: read`) and
+  `issue` (`issues: write`, from #166). The scopes were already least privilege;
+  the gap was this repository's own comment convention ("Workflow review,
+  2026-09-21" in `docs/github-automation.md`). Each grant now carries a same-line
+  `# why` comment, and `tests/test_saturation_ledger.py` compares scopes through
+  `scopes()`, which strips the comment. Pedantic `undocumented-permissions`: 4
+  findings on `6568f47`, 0 on this branch; the remaining pedantic findings
+  (`anonymous-definition`, `concurrency-limits`) are unchanged.
+- **Workflows cannot approve PRs, but the setting stays on.** See "Approval guard
+  (2026-09-25)" in
+  [`2026-09-23-bot-pr-dispatch.md`](2026-09-23-bot-pr-dispatch.md).
+- **CI lock rename and Dependabot ecosystem coverage.** Section 8, "CI lock renamed
+  (2026-09-25)" and "Ecosystems without a version-update entry (2026-09-25)".
+- **Kept as history.** `blueprints/convergence-practice/ci-security/qualified-workflow.yml.txt`
+  keeps `requirements-ci.lock` and the offline command: it is a hash-bound input of
+  that experiment (`experiment.json`). The recorded commands in
+  `docs/github-automation-evidence.json` stay as run. Sealed lane text in
+  `catalogs/landscape/foundation.json`,
+  `catalogs/sota-convergence/layer-verdicts-20260922.json` and
+  `docs/grand-catalog-handbook.md` still says `requirements-ci.lock` is a name
+  Dependabot does not discover; lane outputs are not edited by hand, so this bullet
+  corrects it until the next recorded lane run for that layer.

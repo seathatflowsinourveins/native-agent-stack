@@ -3074,8 +3074,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "bd9bfc4debd1e7463e3ebc40f799402b53da36402a5ce9e2d48dd8e7faa7b6fc",
-      "bytes": 1130
+      "sha256": "fcc206e377a1dea01e31e34c43f3276600f89b0e6951c02891bc46e2a49910be",
+      "bytes": 2355
     },
     {
       "path": ".github/main-ruleset.json",
@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "c8113295c0680308aab66d70ebd39e7e0f05a4356bfc75b21f8e2012f7551cd7",
-      "bytes": 9045
+      "sha256": "a46c942a1e1b32c61ca2393e22daa607103ba182c0a43cfcd2d822deda7c59a9",
+      "bytes": 9044
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3093,7 +3093,7 @@
       "bytes": 1818
     },
     {
-      "path": ".github/requirements-ci.lock",
+      "path": ".github/requirements-ci.txt",
       "sha256": "e475964596b4439d069891ef3f194efe7f8eea9fe1c9478d944001644fcab083",
       "bytes": 283
     },
@@ -3114,8 +3114,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "473e24d15ca8c2d991ad25667251d18632514386cfd03c6fbf05f549aa81375a",
-      "bytes": 20376
+      "sha256": "cf7d756ca57d049dd0f341911d9e7c276cff99a5e4519189a8033812c4869be6",
+      "bytes": 20523
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3159,8 +3159,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "d7c8c95c9725859263c2b2677484b33e00a97ffacaac4087869d2efc3be528da",
-      "bytes": 17464
+      "sha256": "fc67d96ca3fb4ff8d6a6f399676aa2d09cb1a1d12500bbe9d93dc1f744fd57fb",
+      "bytes": 18132
     },
     {
       "path": ".gitignore",
@@ -3709,8 +3709,8 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/README.md",
-      "sha256": "6c55dbee18d6f1df0c1c9637cb1daa10a726719cbb115604d47e209886308b06",
-      "bytes": 3868
+      "sha256": "75af84c57c86f3ad5e42360613da7eef75debfbe47a19b90df1c4395f1e7a5ef",
+      "bytes": 4141
     },
     {
       "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
@@ -9380,8 +9380,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "8717e898134b366a93f7e5060673637192f07598369f384a9997cff65acec9d7",
-      "bytes": 32191
+      "sha256": "5c71a32796613ab69da55260c396f426f26fc910d84a29a9419cf4d48347b94a",
+      "bytes": 32277
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -9975,8 +9975,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "9dafb830932b4dea8af51d367952cd3211e4eeaa1417b4ed63633eff22545429",
-      "bytes": 93884
+      "sha256": "7629b5cd8b244e46e63e2dccf42b54a3b646e8f9208414650c5e01a14dfd9a3b",
+      "bytes": 107862
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -10105,8 +10105,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "fa108ea72ff72c26b5a183404b67270dfecb5a603c4f17cbf7f45c106f9dfd22",
-      "bytes": 79676
+      "sha256": "0dd5e4be0115ca2f48f09c4595c6d32d11dd6cc68beb54321316c48ebe00fd8c",
+      "bytes": 82313
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -28660,8 +28660,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163",
-      "bytes": 87705
+      "sha256": "6c089730f992ebafe3fe9b9bbdf3544d8b488e51001d568c81160777a7ada17c",
+      "bytes": 87746
     },
     {
       "path": "observability/README.md",
@@ -29660,8 +29660,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "51a699673378a9da4924b9bac612f8669da43f85d994d4960545ffa2bfb1e4d8",
-      "bytes": 50481
+      "sha256": "e2ff7a4ae6afe2cf0042fc5e71bd13b403cb03b65b77f75d242d2e0a5d237529",
+      "bytes": 56172
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -29670,8 +29670,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "c675855277d15f6ebcf656aeef5de2560cf392e13a5ec4171b8eca7f6cb57648",
-      "bytes": 4755
+      "sha256": "101f1a45b5b9ae59e96aa63dbf8ec5d673730b68bdb55d75ffac09ad74cc3de8",
+      "bytes": 6671
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",

@@ -115,7 +115,7 @@ Run the download in an empty owned temporary directory. From the repository,
 invoke that binary on the selected workflow files, then use the existing check:
 
 ```sh
-zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows
+zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .
 python3 scripts/validate.py
 ```
 
@@ -226,7 +226,13 @@ positive-control fixture at `blueprints/gap-wave2-20260923/grype-known-cve-fixtu
 is named `requirements.txt.fixture`, so Dependabot's pip manifest discovery
 never finds it there and `.github/dependabot.yml` needs no dedicated `pip`
 entry or `ignore: urllib3` rule for it (removed 2026-09-25); Dependabot owns
-no real Python or binary pin.
+no real Python, npm, NuGet or binary pin. Its security updates may propose a fix
+for the renamed CI lock `.github/requirements-ci.txt` or a frozen npm/uv lock; the
+maintainer still owns the reviewed relock and closes the bot PR. The 23 NuGet
+`packages.lock.json` overlays and the `.lock`-named pip locks are outside the
+dependency graph, so `security-scan.yml`'s `osv-scanner` job is their only
+vulnerability-alert path (closure record, section 8,
+"Ecosystems without a version-update entry (2026-09-25)").
 
 [Native artifact attestations](catalog-provenance.md) identify the producing
 workflow and revision for a manually published catalog/evidence archive. The
@@ -264,7 +270,12 @@ an edit would detach the file from its dated run evidence. A cosmetic comment do
 justify re-freezing a plan or detaching a receipt, so those six comments wait for the
 next functional change. The
 publication job's two write permissions now carry explanatory comments. No SHA,
-permission, trigger or step changed.
+permission, trigger or step changed. Convention since then (restored 2026-09-25 for
+`catalog-freshness.yml:propose` and the three `saturation-tracking.yml` jobs): every
+job-level grant other than `contents: read` carries a same-line `# why` comment.
+Only zizmor's `pedantic` persona (`undocumented-permissions`) reports a missing
+comment, so the `regular` CI gate does not catch this regression; tests compare
+scopes with the comment stripped (`scopes()` in `tests/test_workflow_hardening.py`).
 
 Findings that appear only at zizmor's stricter personas are retained with reasons in
 [github-automation-evidence.json](github-automation-evidence.json) under
@@ -472,9 +483,15 @@ upstream release (see "Secret and supply-chain scanning" above for why
 grype's own pin is fixed like the others whatever `sbom-vuln`'s gating
 role), so the gap is covered by a different, already-built lane
 rather than by Dependabot.
-Precondition to revisit: rename `.github/requirements-ci.lock` to a
-Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
-`--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
+**Revisited 2026-09-25: renamed, version updates still off.** The lock is now
+`.github/requirements-ci.txt` (byte-identical, SHA-256 `e4759645...`), a name
+the dependency graph parses, so Dependabot alerts and security updates can cover
+zizmor. No pip version-update entry is added. Expected cost: a zizmor
+security-update PR fails `test_zizmor_pin_matches_requirements_lock` and the
+evidence-hash check; the maintainer does the reviewed relock and closes the bot
+PR, as with #97/#98 -> #99. Post-merge acceptance and the fallback (a
+`package-ecosystem: pip` entry for `/.github` with `open-pull-requests-limit: 0`)
+are in the closure record, section 8.
 Security updates, enabled 2026-09-22, did open pip PRs: #97 (mlx 0.29.3 ->
 0.29.4) and #98 (transformers 5.0.0rc1 -> 5.10.1) against
 `tools/mlx-smoke/requirements.lock.txt`. `gh pr checks 97` and `98` show every
@@ -760,7 +777,15 @@ setting **"Allow GitHub Actions to create and approve pull requests"**
 before `propose`'s `gh pr create` step can succeed, matching
 [GitHub's own documentation for this restriction](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 This is a coordinator-only, one-time action, the same way the ruleset
-application above is.
+application above is. The same toggle also lets any workflow's `GITHUB_TOKEN`
+approve a pull request, so it stays on only with a guard (2026-09-25):
+`tests/test_workflow_hardening.py`'s `NoWorkflowApprovesPullRequestsTests`
+allows `pull-requests: write` only on `catalog-freshness.yml:propose`, no
+`actions: write` anywhere, and no `gh pr review`, `--approve`, `pulls/<n>/reviews`,
+`APPROVE` or auto-approve action in any workflow. Before the ruleset requires
+approving reviews, move `propose` to a GitHub App installation token and then turn
+the setting off ([record](decisions/2026-09-23-bot-pr-dispatch.md),
+"Approval guard (2026-09-25)").
 
 **What the bot PR actually contains.** `propose` downloads `freshness`'s own
 artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
@@ -1171,7 +1196,12 @@ holds the evidence, alternatives and overturn comparison for each item.
   [`docs/decisions/2026-09-22-codeql-first-analysis.md`](decisions/2026-09-22-codeql-first-analysis.md)); Dependabot security
   updates on; Actions `sha_pinning_required: true`; squash-only merges with
   auto-merge allowed and branches deleted on merge; immutable releases on;
-  private vulnerability reporting on.
+  private vulnerability reporting on. Fork PR workflow approval: decided
+  2026-09-25 to move from `first_time_contributors` (GET at
+  2026-09-25T06:34:07Z) to all external contributors
+  (`all_external_contributors`); the owner applies it with the PUT in the
+  record's "GitHub hardening follow-up (2026-09-25)" section, and until then
+  the live value is unchanged.
 - **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
@@ -1193,8 +1223,12 @@ holds the evidence, alternatives and overturn comparison for each item.
   before invoking grype, never into the repository tree). The `zizmor-online` job
   (push/schedule/dispatch) reuses the hash-locked zizmor with its online
   audits in a `contents: read` job; the tool-free `zizmor-sarif-upload` job
-  uploads its SARIF (category `zizmor`); findings do not fail it. The
-  offline zizmor PR gate in `validate.yml` is unchanged.
+  uploads its SARIF (category `zizmor`); findings do not fail it. Since
+  2026-09-25 the required `validate` job's zizmor step also runs the online
+  audits (impostor-commit, known-vulnerable-actions, ref-confusion,
+  ref-version-mismatch) with the read-only job token and fails on findings,
+  and both zizmor runs audit the repository root, so `.github/dependabot.yml`
+  is collected too (closure record, "GitHub hardening follow-up (2026-09-25)").
 - **Gates.** `dependency-review.yml` fails on high advisories;
   `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed
   `.grype.yaml`; Scorecard SARIF goes to code scanning.

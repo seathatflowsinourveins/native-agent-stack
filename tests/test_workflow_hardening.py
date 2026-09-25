@@ -257,7 +257,7 @@ class SecurityScanTests(unittest.TestCase):
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]
         self.assertIn("if: github.event_name != 'pull_request'", job)
-        self.assertIn("-r .github/requirements-ci.lock", job)
+        self.assertIn("-r .github/requirements-ci.txt", job)
         self.assertIn("--require-hashes", job)
         self.assertIn("GH_TOKEN: ${{ github.token }}", job)
         self.assertIn("--no-exit-codes", job)
@@ -313,6 +313,66 @@ class SecurityScanTests(unittest.TestCase):
         self.assertNotRegex(job_if, r"\b(always|cancelled)\s*\(\)",
                              "zizmor-sarif-upload's if: must not add always()/!cancelled(); it "
                              "should only run after zizmor-online actually produced an artifact")
+
+
+def zizmor_step(job_text):
+    """The one step of a job whose ``run:`` invokes zizmor."""
+    lines = job_text.splitlines()
+    hits = [i for i, line in enumerate(lines) if re.search(r"(^|\s)zizmor\s+--", line) and not line.lstrip().startswith("#")]
+    if len(hits) != 1:
+        raise AssertionError(f"expected one zizmor invocation, found {len(hits)}")
+    start = next(i for i in range(hits[0], -1, -1) if re.match(r"^      - ", lines[i]))
+    end = next((i for i in range(hits[0] + 1, len(lines)) if re.match(r"^      - ", lines[i])), len(lines))
+    return "\n".join(lines[start:end])
+
+
+def uncommented(text):
+    return "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+
+
+def zizmor_inputs(step):
+    """The positional inputs of a step's zizmor invocation (backslash continuations joined,
+    option values and any shell redirection dropped)."""
+    command = re.sub(r"\\\n\s*", " ", uncommented(step))
+    invocation = re.search(r"(?:^|\s)zizmor\s+([^\n>|;&]*)", command).group(1).split()
+    inputs, skip = [], False
+    for token in invocation:
+        if skip:
+            skip = False
+        elif token in {"--persona", "--format", "--cache-dir", "--min-severity", "--min-confidence", "--config"}:
+            skip = True
+        elif not token.startswith("-"):
+            inputs.append(token)
+    return inputs
+
+
+class ValidateZizmorGateTests(unittest.TestCase):
+    """The required validate check runs zizmor's online audits and fails on findings
+    (docs/decisions/2026-09-22-github-automation-closure.md, "GitHub hardening follow-up
+    (2026-09-25)"). zizmor 1.30.1 with no token silently falls back to offline mode and
+    exits 0, so the token line is what keeps the online audits in the gate."""
+
+    step = zizmor_step(jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"])
+
+    def test_online_audits_get_the_read_only_job_token(self):
+        self.assertIn("GH_TOKEN: ${{ github.token }}", self.step)
+        self.assertEqual(scopes((WORKFLOWS / "validate.yml").read_text(encoding="utf-8").split("\njobs:\n", 1)[0]),
+                         [{"contents": "read"}])
+        self.assertIsNone(re.search(r"(?m)^    permissions:", jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"]),
+                          "the validate job adds no job-level scope")
+
+    def test_findings_fail_the_required_check(self):
+        command = uncommented(self.step)
+        for forbidden in ("--offline", "--no-exit-codes", "--format sarif", "--format=sarif", "continue-on-error"):
+            self.assertNotIn(forbidden, command)
+        self.assertIn("--persona regular", command)
+        self.assertIn("--no-config --no-ignores", command)
+        self.assertIn("--strict-collection", command)
+
+    def test_both_ci_runs_audit_the_repository_root_so_dependabot_yml_is_collected(self):
+        online = zizmor_step(jobs((WORKFLOWS / "security-scan.yml").read_text(encoding="utf-8"))["zizmor-online"])
+        for label, step in (("validate", self.step), ("zizmor-online", online)):
+            self.assertEqual(zizmor_inputs(step), ["."], label)
 
 
 class PublishReleaseTests(unittest.TestCase):
@@ -836,6 +896,50 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         self.assertIn('echo "bootstrap=true"', diff_failure_block)
         self.assertIn("exit 0", diff_failure_block)
         self.assertIn("read -r -d ''", script)
+
+
+class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
+    """`can_approve_pull_request_reviews` stays on because one toggle also lets GITHUB_TOKEN
+    create the catalog-freshness `propose` PR (docs/decisions/2026-09-23-bot-pr-dispatch.md,
+    "Approval guard (2026-09-25)"). Since the setting also lets any workflow approve a PR, these
+    cross-workflow checks keep the approve capability unused: `pull-requests: write` only on
+    `catalog-freshness.yml:propose` (whose exact scopes tests/test_catalog_freshness_propose.py
+    pins), no `actions: write` (the scope `POST /actions/runs/{run_id}/approve` needs), and no
+    review/approve call anywhere."""
+
+    texts = {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.y*ml"))}
+
+    def test_every_permissions_key_is_a_parsed_block(self):
+        # permission_blocks() only parses block-form mappings; any other form would slip past the
+        # scope checks below, so every non-comment `permissions:` key must be one it parsed.
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            self.assertNotIn("write-all", body, name)
+            self.assertNotRegex(body, r"(?m)^\s*permissions:[ \t]*[^\s#]", f"{name}: inline permissions form")
+            keys = len(re.findall(r"(?m)^\s*permissions:", body))
+            self.assertEqual(keys, len(permission_blocks(body)), f"{name}: unparsed permissions key")
+
+    def test_pull_requests_write_is_granted_only_to_the_propose_job(self):
+        grants = set()
+        for name, text in self.texts.items():
+            sections = {"<top-level>": text.split("\njobs:\n", 1)[0], **jobs(text)}
+            for section, section_text in sections.items():
+                if any(block.get("pull-requests") == "write" for block in scopes(section_text)):
+                    grants.add(f"{name}:{section}")
+        self.assertEqual(grants, {"catalog-freshness.yml:propose"})
+
+    def test_no_workflow_holds_actions_write(self):
+        for name, text in self.texts.items():
+            for block in scopes(text):
+                self.assertNotEqual(block.get("actions"), "write", name)
+
+    def test_no_workflow_reviews_or_approves_a_pull_request(self):
+        patterns = (r"gh\s+pr\s+review", r"--approve\b", r"pulls/[^/\s]+/reviews", r"\bAPPROVE\b",
+                    r"(?mi)^\s*(?:- )?uses:\s*\S*approve")
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            for pattern in patterns:
+                self.assertNotRegex(body, pattern, name)
 
 
 if __name__ == "__main__":
