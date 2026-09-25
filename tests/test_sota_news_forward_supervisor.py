@@ -841,6 +841,14 @@ class ReversalFlow(Scenario):
                          ["nf1r-20260925-rth-FREE-long"])
         self.assertEqual(len([d for d in self.rows(sup, "decision") if d["arm"] == supervisor.SHADOW_ARM]), 3)  # descriptive
 
+    def test_the_name_cap_must_clear_the_minimum_notional(self):
+        sup, clock = self.reversal_sup()
+        self.assertTrue(sup.check_rev_name_cap())  # E 900k: 7,500 per name
+        sup.limits["rev"] = planner.Limits.for_arm("rev", Decimal("100000"), 1)  # a default-funded paper account
+        self.assertFalse(sup.check_rev_name_cap())  # 833.33 < 1,000: every entry would skip
+        warn = [r for r in self.rows(sup, "risk") if r.get("event") == "rev_name_cap"]
+        self.assertEqual((warn[0]["name_cap"], warn[0]["ok"]), ("833.33", False))
+
     def race_at_the_last_entry_second(self, cancel_race):
         sup, clock = self.reversal_sup()
         t0 = ny(15, 29) + timedelta(seconds=59)  # release 15:29:59 -> entry 15:44:59, last decision second 15:45:59

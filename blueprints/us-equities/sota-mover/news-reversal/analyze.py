@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Guarded group-sequential analysis of the preregistered rth_reversal forward paper test.
 
-  python analyze.py design [--out PATH]            # design numbers only: boundaries, error rates, power; no data
+  python analyze.py design [--harm-simulation] [--out PATH]  # boundaries, error rates, power (and the drawdown
+                                                             # trigger simulation); no data
   python analyze.py pins                           # sha256 of every file forward-protocol.json#/pins names
   python analyze.py look [--state ROOT]            # the next due look (receipts/look-<k>.json); guarded
   python analyze.py monitor [--state ROOT] [--apply]   # harm stops only; --apply writes <state>/HALT-rth_reversal
+  python analyze.py resume --finding F --note N --after-session D   # the pre-stated resume after a harm halt
 
-look and monitor refuse (exit 2) before they open any journal unless all of these hold (the
+look, monitor and resume refuse (exit 2) before they open any journal unless all of these hold (the
 standard of ../news-llm/evaluate.py):
 * receipts/freeze-record.json names the sha256 of forward-protocol.json and the full commit
   that froze it (--protocol-sha256, when given, must equal the record);
@@ -23,10 +25,12 @@ Only authorize() runs that chain and issues the Authorization every loader requi
 
 Counted sessions (protocol counted_sessions): XNYS sessions from the first one whose open is
 after both frozen_at and deployed_at. Journals of earlier sessions (pilot and pre-freeze
-shakedown days) are never opened. A later session counts only when its first start record
-shows paper mode, the rth_reversal arm active, the reversal run label, the frozen protocol's
-sha256 and the pinned runner and study code; otherwise it is excluded with its reason and
-nothing is computed from it except the exit fills of earlier counted positions.
+shakedown days) are never opened. A later session counts only when every start record of the
+day (restarts included) shows paper mode on the dedicated paper-4 account, the rth_reversal arm
+active, the reversal run label, the frozen protocol's sha256 and the pinned runner and study
+code; otherwise it is excluded with its reason and nothing is computed from it except the exit
+fills of earlier counted positions. Boundaries follow the Lan-DeMets O'Brien-Fleming spending
+function at the actual information, with a final look at the protocol's calendar end date.
 """
 import argparse
 import hashlib
@@ -34,6 +38,7 @@ import importlib.util
 import json
 import math
 import os
+import random
 import subprocess
 import sys
 from collections import Counter, defaultdict
@@ -64,7 +69,7 @@ DEFAULT_STATE = Path(os.path.expanduser("~/.local/state/native-agent-stack/resea
 RUNNER_CODE = ("autolev.py", "common.py", "executor.py", "live_news.py", "live_score.py", "planner.py", "shadow.py",
                "supervisor.py")
 STUDY_CODE = ("news_signal.py", "score.py")
-ANALYSIS_CODE = ("analyze.py",)
+ANALYSIS_CODE = ("analyze.py", "measure_s.py")
 REFERENCE = {
     "fees-v3.json": "blueprints/us-equities/mover-v3/data/fees-v3.json",
     "session-calendar.json": "blueprints/us-equities/mover-v3/data/session-calendar.json",
@@ -72,6 +77,7 @@ REFERENCE = {
 }
 REV_ARM, REV_PREFIX = "rev", "nf1r-"
 RUN_LABEL = "reversal_forward"  # common.REVERSAL_RUN_LABEL of the runner
+RUNTIME_ACCOUNT = "paper-4"  # forward-protocol.json#/runtime: the dedicated, rev-only account
 HALT_FILE = "HALT-rth_reversal"
 Z95 = 1.6448536269514722
 Z80 = 0.8416212335729143
@@ -220,6 +226,43 @@ def obf_boundaries(fractions, alpha, m=32, tol=1e-7):
     return c, [c / math.sqrt(t) for t in fractions]
 
 
+def ld_obf_spending(t, alpha):
+    """Lan-DeMets O'Brien-Fleming-type alpha spending (one-sided): alpha(t) = 2 - 2 Phi(z_{1-alpha/2} / sqrt(t)),
+    0 at t = 0 and alpha at t >= 1 (Lan & DeMets 1983)."""
+    if t <= 0:
+        return 0.0
+    if t >= 1:
+        return alpha
+    return 2.0 * (1.0 - norm_cdf(norm_ppf(1.0 - alpha / 2.0) / math.sqrt(t)))
+
+
+def ld_boundaries(fractions, alpha, m=32, final=False, tol=1e-9):
+    """Efficacy boundaries (Z) for looks at information `fractions`, spending ld_obf_spending cumulatively:
+    c_k solves P(no earlier crossing, Z_k >= c_k) = alpha(t_k) - alpha(t_{k-1}) given the earlier c's (no
+    futility bound: non-binding). With final=True the last look spends all remaining alpha, as the
+    calendar-end look does when it comes before full information."""
+    bounds, spent = [], 0.0
+    for k, t in enumerate(fractions):
+        target = alpha if (final and k == len(fractions) - 1) else ld_obf_spending(t, alpha)
+        increment = target - spent
+        if increment <= 1e-15:
+            bounds.append(math.inf)
+            continue
+        lo, hi = -2.0, 15.0
+        for _ in range(200):
+            mid = (lo + hi) / 2.0
+            up, _ = crossing_probs(fractions[:k + 1], bounds + [mid], None, 0.0, m)
+            if up[k] > increment:
+                lo = mid
+            else:
+                hi = mid
+            if hi - lo < tol:
+                break
+        bounds.append((lo + hi) / 2.0)
+        spent = target
+    return bounds
+
+
 def fixed_sample_sessions(delta, sigma, alpha=0.05, power=0.80):
     """Sessions for a one-sided fixed-sample z test: ((z_{1-alpha} + z_power) sigma / delta)^2."""
     if delta <= 0:
@@ -227,8 +270,16 @@ def fixed_sample_sessions(delta, sigma, alpha=0.05, power=0.80):
     return ((norm_ppf(1.0 - alpha) + norm_ppf(power)) * sigma / delta) ** 2
 
 
+def futility_bounds(plan):
+    """Planned futility bounds (Z) per look: the plan's z_at_or_below at its futility looks, else -inf."""
+    return [plan["futility"]["z_at_or_below"] if (k + 1) in plan["futility"]["looks"] else -math.inf
+            for k in range(len(plan["looks_sessions"]))]
+
+
 def design(protocol):
-    """Every design number in the protocol, from the sequential plan and the power inputs only."""
+    """Every design number in the protocol, from the sequential plan and the power inputs only:
+    Lan-DeMets O'Brien-Fleming boundaries at the planned information fractions, error rates and power
+    at the forward sd for each planning effect."""
     plan = protocol["sequential_plan"]
     power = protocol["power"]
     looks = plan["looks_sessions"]
@@ -236,12 +287,12 @@ def design(protocol):
     fractions = [n / n_max for n in looks]
     alpha = plan["alpha_one_sided"]
     m = plan["grid_points_m"]
-    c, upper = obf_boundaries(fractions, alpha, m)
-    futility = [plan["futility"]["z_at_or_below"] if (k + 1) in plan["futility"]["looks"] else -math.inf
-                for k in range(len(looks))]
-    sigma = power["daily_sd_bps_nw_effective"]
-    out = {"information_fractions": fractions, "obf_constant": c, "efficacy_z": upper,
-           "futility_z": [None if f == -math.inf else f for f in futility]}
+    upper = ld_boundaries(fractions, alpha, m)
+    futility = futility_bounds(plan)
+    sigma = power["forward_daily_sd_bps_nw_effective"]
+    out = {"spending": "Lan-DeMets O'Brien-Fleming", "information_fractions": fractions,
+           "alpha_spent_cumulative": [ld_obf_spending(t, alpha) for t in fractions], "efficacy_z": upper,
+           "futility_z": [None if f == -math.inf else f for f in futility], "sd_bps": sigma}
     up0, _ = crossing_probs(fractions, upper, None, 0.0, m)
     up0f, lo0f = crossing_probs(fractions, upper, futility, 0.0, m)
     out["type_i_error"] = {"without_futility": sum(up0), "if_futility_followed": sum(up0f),
@@ -259,10 +310,44 @@ def design(protocol):
                            "expected_sessions_if_futility_followed": expected,
                            "fixed_sample_sessions_80pct": None if fixed is None else math.ceil(fixed)}
     out["scenarios"] = scenarios
-    out["fixed_sample_80pct_by_sd"] = {
-        str(sd): math.ceil(fixed_sample_sessions(power["in_sample_gross_bps"], sd, alpha, 0.80))
-        for sd in (power["daily_sd_bps_sample"], power["daily_sd_bps_nw_effective"], power["daily_sd_bps_rounded"])}
     return out
+
+
+def simulate_drawdown(mu_bps, sd_bps, n_sessions, threshold_bps, sims=4000, seed=20260925, checkpoints=(60, 125, 250, 375)):
+    """How often the drawdown harm trigger fires: daily long-short net returns N(mu, sd) in bps, cumulative
+    peak-to-trough drawdown >= threshold (bps of the long-short sum; 2,000 bps is 10% of gross for balanced
+    legs, since a balanced book's dollar P&L over its gross is half the long-short return). Each trigger is
+    followed by the pre-stated resume (a review finding no execution fault) and the drawdown is re-based."""
+    rng = random.Random(seed)
+    firsts, counts = [], []
+    for _ in range(sims):
+        cum = peak = 0.0
+        first, n = None, 0
+        for t in range(1, n_sessions + 1):
+            cum += rng.gauss(mu_bps, sd_bps)
+            if cum > peak:
+                peak = cum
+            if peak - cum >= threshold_bps:
+                n += 1
+                first = first or t
+                peak = cum
+        firsts.append(first)
+        counts.append(n)
+    hit = sorted(f for f in firsts if f is not None)
+    return {"p_first_trigger_by_session": {str(c): sum(1 for f in hit if f <= c) / sims for c in checkpoints},
+            "mean_triggers_in_horizon": sum(counts) / sims,
+            "median_first_trigger_session": hit[len(hit) // 2] if len(hit) * 2 > sims else None}
+
+
+def harm_simulation(protocol, sims=4000, seed=20260925):
+    """simulate_drawdown for every planning effect, net of the modelled cost, at the forward sd."""
+    power, harm = protocol["power"], protocol["harm_stops"]
+    n = protocol["sequential_plan"]["looks_sessions"][-1]
+    threshold = 2.0 * harm["drawdown_fraction_of_average_gross"] * 1e4
+    return {name: {"gross_bps": delta, "net_bps": delta - power["modelled_cost_bps_per_day"],
+                   **simulate_drawdown(delta - power["modelled_cost_bps_per_day"], power["forward_daily_sd_bps_nw_effective"],
+                                       n, threshold, sims, seed)}
+            for name, delta in power["effect_scenarios_bps"].items()}
 
 
 # --------------------------------------------------------------------------------------
@@ -464,10 +549,20 @@ def counted_start(calendar, frozen_at, deployed_at):
     return None
 
 
-def session_qualifies(start, protocol_sha256, pins):
-    """(ok, reasons) for a session's first start record (outcome-independent conditions only)."""
-    if start is None:
+def session_qualifies(starts, protocol_sha256, pins):
+    """(ok, reasons) over EVERY start record of a session (review minor: restarts included). A session counts
+    only when each start shows the qualifying runtime; reasons of later starts are prefixed restart:. The
+    conditions are about the running code and mode, never about outcomes. A single record is accepted too."""
+    if starts is None or starts == []:
         return False, ["no_start_record"]
+    reasons = []
+    for i, start in enumerate([starts] if isinstance(starts, dict) else starts):
+        found = _start_reasons(start, protocol_sha256, pins)
+        reasons += found if i == 0 else [f"restart:{r}" for r in found]
+    return not reasons, reasons
+
+
+def _start_reasons(start, protocol_sha256, pins):
     reasons = []
     if start.get("evidence_label") != RUN_LABEL:
         reasons.append(f"run_label:{start.get('evidence_label')}")
@@ -487,7 +582,9 @@ def session_qualifies(start, protocol_sha256, pins):
         reasons.append("study_code_pin:news_signal.py")
     if start.get("score_py_sha256") != study.get("score.py"):
         reasons.append("study_code_pin:score.py")
-    return not reasons, reasons
+    if start.get("account") != RUNTIME_ACCOUNT:
+        reasons.append(f"account:{start.get('account')}")
+    return reasons
 
 
 def read_jsonl(path):
@@ -527,8 +624,8 @@ def load_sessions(auth, calendar, until=None):
             out.append((s.session, [], False, ["no_journal"]))
             continue
         rows = read_jsonl(path)
-        first = next((r for r in rows if r.get("kind") == "lifecycle" and r.get("event") == "start"), None)
-        ok, reasons = session_qualifies(first, auth.frozen.sha256, pins)
+        starts = [r for r in rows if r.get("kind") == "lifecycle" and r.get("event") == "start"]
+        ok, reasons = session_qualifies(starts, auth.frozen.sha256, pins)
         out.append((s.session, rows, ok, reasons))
     while out and out[-1][3] == ["no_journal"]:
         out.pop()  # sessions after the last journal have not run yet: neither counted nor excluded
@@ -655,6 +752,65 @@ def session_positions(session, session_rows, holdings, fees, costs):
     return positions, unresolved
 
 
+def close_marks(session_rows):
+    return {r["symbol"]: float(r["official_close"]) for r in session_rows
+            if r.get("kind") == "close_mark" and r.get("official_close")}
+
+
+def itt_positions(session, session_rows):
+    """Intent to treat (secondary): every rth_reversal entry decision, filled or not, from the decision
+    quote's touch (ask for a long, bid for a short) and from its mid to the official close mark."""
+    marks = close_marks(session_rows)
+    out = []
+    for r in session_rows:
+        if r.get("kind") != "decision" or r.get("arm") != REV_ARM or r.get("action") != "enter":
+            continue
+        close, touch, mid = marks.get(r["symbol"]), r.get("limit_price"), r.get("quote_mid")
+        if close is None or not touch or not mid:
+            continue
+        side = 1 if r.get("leg") == "long" else -1
+        out.append({"session": session.isoformat(), "symbol": r["symbol"], "side": side, "leg": r.get("leg"),
+                    "intended_qty": float(r.get("qty") or 0), "client_order_id": r.get("client_order_id"),
+                    "gross_touch": sig.gross_return(side, float(touch), close),
+                    "gross_mid": sig.gross_return(side, float(mid), close)})
+    return out
+
+
+def benchmark_mean(session_rows):
+    """The news-day benchmark (secondary; NEWS-2B's analogue): the mean return of every first-in-window liquid RTH
+    event held long from its entry-minute quote's ask to the official close, whatever its label; None if none."""
+    marks = close_marks(session_rows)
+    vals = [marks[r["symbol"]] / float(r["quote_ask"]) - 1.0 for r in session_rows
+            if r.get("kind") == "benchmark_quote" and r.get("quote_ask") and r["symbol"] in marks]
+    return sum(vals) / len(vals) if vals else None
+
+
+def intended_entries(session_rows):
+    """Every rth_reversal entry decision of a session (the fill-rate denominator), close mark or not."""
+    return [{"symbol": r["symbol"], "leg": r.get("leg"), "intended_qty": float(r.get("qty") or 0),
+             "client_order_id": r.get("client_order_id")}
+            for r in session_rows if r.get("kind") == "decision" and r.get("arm") == REV_ARM and r.get("action") == "enter"]
+
+
+def fill_rates(intended_all, holdings):
+    """Per leg: intended entries, filled names and the filled share of intended quantity."""
+    out = {}
+    for leg in ("long", "short"):
+        intended = [p for p in intended_all if p["leg"] == leg]
+        filled_names = qty_in = qty_want = 0.0
+        for p in intended:
+            info = parse_rev_cid(p["client_order_id"]) or {}
+            fl = holdings.get((info.get("date"), p["symbol"], leg)) if info else None
+            got = vwap(fl["entry"])[0] if fl else 0.0
+            filled_names += 1 if got > 0 else 0
+            qty_in += min(got, p["intended_qty"]) if p["intended_qty"] else got
+            qty_want += p["intended_qty"]
+        out[leg] = {"intended": len(intended), "filled_names": int(filled_names),
+                    "name_fill_rate": filled_names / len(intended) if intended else None,
+                    "quantity_fill_rate": qty_in / qty_want if qty_want else None}
+    return out
+
+
 def shadow_positions(session, session_rows):
     """Descriptive only: the momentum shadow's hypothetical round trips (no order was sent), entered
     at the decision quote's touch (ask long, bid short) and exited at the official close mark."""
@@ -687,7 +843,12 @@ def names_per_leg(holdings, session):
 def information_sessions(sessions, holdings):
     """Counted sessions, in order, that carry a primary value (both legs with >= 2 filled names),
     decided from fill counts only (no return is computed). Stops at the first unresolved or
-    unreconciled session, since the order of the first n values is not known beyond it."""
+    unreconciled session, since the order of the first n values is not known beyond it.
+
+    Pre-stated backfill (forward-protocol.json#/counted_sessions/reconciliation_backfill): a session whose
+    reconciliation never ran is completed by `supervisor.py --reconcile-only --date D` from the paper
+    broker's order history (read-only); its reconciliation row carries backfill true and counts like any
+    other, so a missed reconciliation delays the sequence but never removes a session."""
     out = []
     for day, rows, ok, _ in sessions:
         if not ok:
@@ -764,20 +925,30 @@ def cost_summary(positions, days):
             "historical_assumption_bps_per_long_short_day": 8.4}
 
 
-def harm_check(sessions_positions, harm):
+def _iso(day):
+    return day.isoformat() if hasattr(day, "isoformat") else str(day)
+
+
+def harm_check(sessions_positions, harm, resumes=()):
     """Harm stops over counted sessions in order: cumulative net drawdown against 10% of the
     average gross deployed, and (from the configured session count) the measured execution cost
-    per round trip against twice the frozen model's cost for the same positions."""
+    per round trip against twice the frozen model's cost for the same positions.
+
+    The drawdown is measured since the last pre-stated resume (harm_stops.resume_rule): after a resume
+    recorded with after_session d, the peak is re-based to the cumulative net P&L at d."""
+    rebase_after = {r["after_session"] for r in resumes}
     cum = peak = 0.0
     drawdown = 0.0
     gross_by_day = []
     positions = []
-    for _day, ps in sessions_positions:
+    for day, ps in sessions_positions:
         gross_by_day.append(sum(p["notional"] for p in ps))
         cum += sum(p["net"] * p["notional"] for p in ps)
         peak = max(peak, cum)
         drawdown = max(drawdown, peak - cum)
         positions.extend(ps)
+        if _iso(day) in rebase_after:
+            peak, drawdown = cum, 0.0
     deployed = [g for g in gross_by_day if g > 0]
     avg_gross = sum(deployed) / len(deployed) if deployed else 0.0
     threshold = harm["drawdown_fraction_of_average_gross"] * avg_gross
@@ -839,11 +1010,44 @@ def recorded_looks(auth):
     return looks
 
 
+def sequence_break(sessions, holdings):
+    """The first counted session that is not yet reconciled or resolved (where information_sessions stops), or None."""
+    for day, rows, ok, _ in sessions:
+        if not ok:
+            continue
+        if not any(r.get("kind") == "reconciliation" and r.get("mode") == "paper" for r in rows):
+            return day
+        if [k for k, fl in holdings.items() if k[0] == day and fl["entry"]
+                and abs(vwap(fl["exit"])[0] - vwap(fl["entry"])[0]) > 1e-9]:
+            return day
+    return None
+
+
+def look_plan(plan, k, info_days, today, brk):
+    """(sessions used, final?) for look k: its planned session count when reached; at or after the calendar end
+    date, a final look with every complete counted long-short session up to that date (spending all remaining
+    alpha); otherwise a Refusal."""
+    looks = plan["looks_sessions"]
+    end = date.fromisoformat(plan["calendar_end"])
+    within = [d for d in info_days if d <= end]
+    n_k = looks[k - 1]
+    if len(within) >= n_k:
+        return n_k, k == len(looks)
+    if today >= end:
+        if brk is not None and brk <= end:
+            raise Refusal(f"the calendar-end look waits for session {brk.isoformat()} to be reconciled and resolved")
+        if len(within) < 2:
+            raise Refusal("the calendar-end look needs at least 2 counted long-short sessions")
+        return len(within), True
+    raise Refusal(f"look {k} needs {n_k} counted long-short sessions; {len(within)} are complete")
+
+
 def run_look(auth, until=None):
     require(auth)
     protocol = auth.frozen.protocol
     plan = protocol["sequential_plan"]
     looks = plan["looks_sessions"]
+    n_max, alpha, m = looks[-1], plan["alpha_one_sided"], plan["grid_points_m"]
     done = recorded_looks(auth)
     if done and done[-1]["look_decision"] != "continue":
         raise Refusal(f"the trial stopped at look {done[-1]['look']} ({done[-1]['look_decision']}); no further look")
@@ -852,10 +1056,9 @@ def run_look(auth, until=None):
         raise Refusal("every planned look is recorded")
     start, sessions, holdings, excluded = collect(auth, until)
     info_days = information_sessions(sessions, holdings)
-    n_k = looks[k - 1]
-    if len(info_days) < n_k:
-        raise Refusal(f"look {k} needs {n_k} counted long-short sessions; {len(info_days)} are complete")
-    days = set(info_days[:n_k])
+    today = until or datetime.now(timezone.utc).astimezone(sig.NY).date()
+    n_use, final = look_plan(plan, k, info_days, today, sequence_break(sessions, holdings))
+    days = set(info_days[:n_use])
     per_day = positions_for(auth, sessions, holdings, days)
     positions = [p for _, ps in per_day for p in ps]
     gross = daily_values(positions, "gross")
@@ -866,12 +1069,21 @@ def run_look(auth, until=None):
     stats = series_stats(primary, lags)
     if stats["t_nw"] is None:
         raise Refusal("the primary series is degenerate (no Newey-West t)")
-    d = design(protocol)
-    decision = look_decision(k, stats["t_nw"], d["efficacy_z"], d["futility_z"], len(looks))
-    shadow = [p for day, rows, ok, _ in sessions if ok and day in days for p in shadow_positions(day, rows)]
+    fractions = [n / n_max for n in looks[:k - 1]] + [min(1.0, n_use / n_max)]
+    efficacy = ld_boundaries(fractions, alpha, m, final=final)
+    futility = [None if f == -math.inf else f for f in futility_bounds(plan)][:k]
+    decision = look_decision(k, stats["t_nw"], efficacy, futility, k if final else len(looks))
+    looked = [(day, rows) for day, rows, ok, _ in sessions if ok and day in days]
+    shadow = [p for day, rows in looked for p in shadow_positions(day, rows)]
     shadow_daily = daily_values(shadow, "gross")
+    itt = [p for day, rows in looked for p in itt_positions(day, rows)]
+    itt_touch, itt_mid = daily_values(itt, "gross_touch"), daily_values(itt, "gross_mid")
+    bench = {day.isoformat(): benchmark_mean(rows) for day, rows in looked}
     receipt = {
-        "schema": "news-reversal-look/1", "look": k, "planned_sessions": n_k, "information_fraction": n_k / looks[-1],
+        "schema": "news-reversal-look/2", "look": k, "planned_sessions": looks[k - 1], "sessions_used_count": n_use,
+        "final_look": final, "calendar_end_look": final and n_use < looks[k - 1],
+        "information_fraction": fractions[-1], "alpha_spent_cumulative": alpha if final else ld_obf_spending(fractions[-1], alpha),
+        "test_label": protocol["planning_measurement"]["result"]["label"],
         "protocol_id": protocol["id"], "protocol_sha256": auth.frozen.sha256, "freeze_commit": auth.freeze_commit,
         "deployed_commit": auth.deployed_commit, "deployed_at": auth.deployed_at.isoformat(), "head": auth.head,
         "counted_start": start.isoformat(), "sessions_used": {"first": order[0], "last": order[-1], "count": len(order)},
@@ -879,14 +1091,25 @@ def run_look(auth, until=None):
         # key look_decision, not decision: blueprint JSON values under a "decision" key must be classified labels
         # (tests/test_blind_checkout.py)
         "primary": {"series": "gross long-short, equal-weight legs of >= 2 names (news_signal.daily_portfolios)",
-                    **stats, "efficacy_boundary_z": d["efficacy_z"][k - 1], "futility_boundary_z": d["futility_z"][k - 1]},
+                    **stats, "efficacy_boundary_z": efficacy[-1], "futility_boundary_z": futility[-1] if not final else None,
+                    "spending": "Lan-DeMets O'Brien-Fleming, one-sided"},
         "look_decision": decision,
         "secondary_reported_not_tested": {
             "net_long_short": series_stats([net[x]["long_short"] for x in order], lags),
             "gross_long_leg": series_stats([gross[x]["long"] for x in order], lags),
             "gross_short_leg": series_stats([gross[x]["short"] for x in order], lags),
             "net_long_leg": series_stats([net[x]["long"] for x in order], lags),
-            "net_short_leg": series_stats([net[x]["short"] for x in order], lags)},
+            "net_short_leg": series_stats([net[x]["short"] for x in order], lags),
+            "intent_to_treat_touch_to_close_long_short": series_stats(
+                [itt_touch[x]["long_short"] for x in order if x in itt_touch and itt_touch[x]["long_short"] is not None], lags),
+            "intent_to_treat_mid_to_close_long_short": series_stats(
+                [itt_mid[x]["long_short"] for x in order if x in itt_mid and itt_mid[x]["long_short"] is not None], lags),
+            "long_leg_minus_news_day_benchmark_intent_to_treat": series_stats(
+                [itt_touch[x]["long"] - bench[x] for x in order
+                 if x in itt_touch and itt_touch[x]["long"] is not None and bench.get(x) is not None], lags),
+            "long_leg_minus_news_day_benchmark_fills": series_stats(
+                [gross[x]["long"] - bench[x] for x in order if gross[x]["long"] is not None and bench.get(x) is not None], lags),
+            "fill_rate_by_leg": fill_rates([p for day, rows in looked for p in intended_entries(rows)], holdings)},
         "execution_cost": cost_summary(positions, set(order)),
         "momentum_shadow_descriptive": series_stats(
             [v["long_short"] for x, v in sorted(shadow_daily.items()) if v["long_short"] is not None], lags),
@@ -912,9 +1135,10 @@ def run_monitor(auth, apply=False, until=None):
             break
         days.add(day)
     per_day = positions_for(auth, sessions, holdings, days)
-    result = harm_check(per_day, protocol["harm_stops"])
-    result.update(schema="news-reversal-monitor/1", protocol_sha256=auth.frozen.sha256, head=auth.head,
+    result = harm_check(per_day, protocol["harm_stops"], read_jsonl(resumes_path(auth)))
+    result.update(schema="news-reversal-monitor/2", protocol_sha256=auth.frozen.sha256, head=auth.head,
                   counted_start=start.isoformat() if start else None, excluded_sessions=dict(excluded),
+                  last_counted_session=max(days).isoformat() if days else None,
                   computed_at=datetime.now(timezone.utc).isoformat(timespec="seconds"))
     out_dir = auth.state_root / "reversal-monitor"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -925,14 +1149,44 @@ def run_monitor(auth, apply=False, until=None):
     return result
 
 
+def resumes_path(auth):
+    return auth.state_root / "reversal-monitor" / "resumes.jsonl"
+
+
+RESUME_FINDINGS = ("no_execution_fault", "execution_fault_fixed")
+
+
+def run_resume(auth, finding, note, after_session):
+    """The pre-stated resume (harm_stops.resume_rule): after a harm halt, a review that finds no execution
+    fault (or an execution fault that has been fixed and recorded as a deviation) resumes rth_reversal entries.
+    Records the review, re-bases the drawdown after `after_session` and removes the halt file."""
+    require(auth)
+    if finding not in RESUME_FINDINGS:
+        raise Refusal(f"finding must be one of {RESUME_FINDINGS}")
+    if not note or len(note.strip()) < 10:
+        raise Refusal("a resume needs the review's note")
+    halt = auth.state_root / HALT_FILE
+    if not halt.exists():
+        raise Refusal("no harm halt is in force")
+    row = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "finding": finding, "note": note.strip(),
+           "after_session": date.fromisoformat(after_session).isoformat(), "halt": halt.read_text().strip()}
+    path = resumes_path(auth)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row, sort_keys=True) + "\n")
+    halt.unlink()
+    return row
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     d = sub.add_parser("design")
     d.add_argument("--protocol", type=Path, default=PROTOCOL_PATH)
     d.add_argument("--out", type=Path)
+    d.add_argument("--harm-simulation", action="store_true", help="also simulate the drawdown trigger (seeded, a few seconds)")
     sub.add_parser("pins")
-    for name in ("look", "monitor"):
+    for name in ("look", "monitor", "resume"):
         p = sub.add_parser(name)
         p.add_argument("--state", type=Path, default=DEFAULT_STATE)
         p.add_argument("--freeze-record", type=Path, default=FREEZE_RECORD_PATH)
@@ -940,9 +1194,16 @@ def main(argv=None):
         p.add_argument("--protocol-sha256")
         if name == "monitor":
             p.add_argument("--apply", action="store_true", help=f"write <state>/{HALT_FILE} when a harm stop fires")
+        if name == "resume":
+            p.add_argument("--finding", required=True, choices=RESUME_FINDINGS)
+            p.add_argument("--note", required=True, help="the review's summary (what was checked, what was found)")
+            p.add_argument("--after-session", required=True, help="last completed session before the resume (YYYY-MM-DD)")
     a = parser.parse_args(argv)
     if a.command == "design":
-        result = design(json.loads(a.protocol.read_text()))
+        protocol = json.loads(a.protocol.read_text())
+        result = design(protocol)
+        if a.harm_simulation:
+            result["harm_simulation"] = harm_simulation(protocol)
         text = json.dumps(result, indent=1, sort_keys=True)
         if a.out:
             a.out.write_text(text + "\n")
@@ -953,7 +1214,12 @@ def main(argv=None):
         return 0
     try:
         auth = authorize(a)
-        result = run_look(auth) if a.command == "look" else run_monitor(auth, apply=a.apply)
+        if a.command == "look":
+            result = run_look(auth)
+        elif a.command == "monitor":
+            result = run_monitor(auth, apply=a.apply)
+        else:
+            result = run_resume(auth, a.finding, a.note, a.after_session)
     except Refusal as r:
         print(f"REFUSED: {r.reason}", file=sys.stderr)
         return 2

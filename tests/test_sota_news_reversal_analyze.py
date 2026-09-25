@@ -85,6 +85,27 @@ class ObrienFleming(unittest.TestCase):
         c, b = an.obf_boundaries([1.0], 0.05)
         self.assertAlmostEqual(c, 1.6448536, places=5)
 
+    def test_lan_demets_spending_matches_published_boundaries(self):
+        # Lan-DeMets O'Brien-Fleming spending, K = 4 equally spaced, one-sided 0.025 (gsDesign sfLDOF):
+        # 4.3326, 2.9631, 2.3590, 2.0141
+        for got, ref in zip(an.ld_boundaries([0.25, 0.5, 0.75, 1.0], 0.025), (4.3326, 2.9631, 2.3590, 2.0141)):
+            self.assertAlmostEqual(got, ref, delta=0.0006)
+        self.assertAlmostEqual(an.ld_obf_spending(1.0, 0.05), 0.05)
+        self.assertAlmostEqual(an.ld_obf_spending(0.25, 0.025), 2 * (1 - an.norm_cdf(an.norm_ppf(1 - 0.0125) / 0.5)))
+        self.assertEqual(an.ld_obf_spending(0.0, 0.05), 0.0)
+        fr = [0.16, 125 / 375, 250 / 375, 1.0]
+        up, _ = an.crossing_probs(fr, an.ld_boundaries(fr, 0.05), None, 0.0, 32)
+        self.assertAlmostEqual(sum(up), 0.05, places=7)
+
+    def test_a_calendar_end_look_spends_all_remaining_alpha(self):
+        fr = [0.16, 125 / 375, 250 / 375, 300 / 375]  # the end date arrives at 300 of 375 sessions
+        planned = an.ld_boundaries(fr, 0.05)
+        final = an.ld_boundaries(fr, 0.05, final=True)
+        self.assertEqual([round(x, 6) for x in planned[:3]], [round(x, 6) for x in final[:3]])
+        self.assertLess(final[3], planned[3])  # the last look spends everything left
+        up, _ = an.crossing_probs(fr, final, None, 0.0, 32)
+        self.assertAlmostEqual(sum(up), 0.05, places=7)
+
     def test_grid_integrates_the_normal_density(self):
         z, w = an.grid(32, 0.3, -math.inf, math.inf)
         self.assertAlmostEqual(sum(wi * an.norm_pdf(zi - 0.3) for zi, wi in zip(z, w)), 1.0, places=7)
@@ -96,10 +117,11 @@ class ObrienFleming(unittest.TestCase):
         fr, up, fut = d["information_fractions"], d["efficacy_z"], [-math.inf if f is None else f for f in d["futility_z"]]
         alpha, _ = monte_carlo(fr, up, None, 0.0, 60000, 20260925)
         self.assertAlmostEqual(alpha, 0.05, delta=0.004)
-        theta = d["scenarios"]["in_sample_11bps_spread_ignored"]["drift_theta"]
-        power, stop_low = monte_carlo(fr, up, fut, theta, 60000, 20260926)
-        self.assertAlmostEqual(power, d["scenarios"]["in_sample_11bps_spread_ignored"]["power_if_futility_followed"], delta=0.008)
-        self.assertAlmostEqual(stop_low, d["scenarios"]["in_sample_11bps_spread_ignored"]["futility_stop_probability"], delta=0.006)
+        for name, seed in (("in_sample_spread_ignored", 20260926), ("planning_effect_touch", 20260927)):
+            s = d["scenarios"][name]
+            power, stop_low = monte_carlo(fr, up, fut, s["drift_theta"], 60000, seed)
+            self.assertAlmostEqual(power, s["power_if_futility_followed"], delta=0.008, msg=name)
+            self.assertAlmostEqual(stop_low, s["futility_stop_probability"], delta=0.008, msg=name)
 
     def test_fixed_sample_sessions(self):
         # the brief: sd ~79 bps, +11 bps/day gross, 80% power one-sided 0.05 -> about 320 sessions
@@ -129,9 +151,21 @@ class FutilityAndDecisions(unittest.TestCase):
         d = an.design(DRAFT)
         self.assertAlmostEqual(d["type_i_error"]["without_futility"], 0.05, places=6)
         self.assertLess(d["type_i_error"]["if_futility_followed"], 0.05)
-        s = d["scenarios"]["in_sample_11bps_spread_ignored"]
+        s = d["scenarios"]["in_sample_spread_ignored"]
         self.assertLess(s["power_if_futility_followed"], s["power_without_futility"])
         self.assertEqual(d["futility_z"], [None, 0.0, 0.0, None])
+
+    def test_look_plan_scheduled_and_calendar_end(self):
+        plan = DRAFT["sequential_plan"]
+        days = [date(2026, 10, 1) + timedelta(days=i) for i in range(70)]
+        self.assertEqual(an.look_plan(plan, 1, days, date(2026, 12, 31), None), (60, False))
+        with self.assertRaises(an.Refusal):
+            an.look_plan(plan, 2, days, date(2026, 12, 31), None)  # 125 needed, before the end date
+        end = date.fromisoformat(plan["calendar_end"])
+        self.assertEqual(an.look_plan(plan, 2, days, end, None), (70, True))  # the end date: a final look with all 70
+        with self.assertRaises(an.Refusal):
+            an.look_plan(plan, 2, days, end, date(2027, 1, 5))  # an unresolved session before the end date: wait
+        self.assertEqual(an.look_plan(plan, 4, [end - timedelta(days=500 - i) for i in range(400)], end, None), (375, True))
 
 
 class CountedSessions(unittest.TestCase):
@@ -140,11 +174,21 @@ class CountedSessions(unittest.TestCase):
     SHA = "d" * 64
 
     def start(self, **over):
-        row = {"kind": "lifecycle", "event": "start", "evidence_label": an.RUN_LABEL, "mode": "paper",
+        row = {"kind": "lifecycle", "event": "start", "evidence_label": an.RUN_LABEL, "mode": "paper", "account": "paper-4",
                "rth_reversal_active": True, "reversal_protocol_sha256": self.SHA, "code_sha256": dict(self.PINS["runner_code"]),
                "news_signal_sha256": "b" * 64, "score_py_sha256": "c" * 64}
         row.update(over)
         return row
+
+    def test_every_start_row_must_qualify(self):
+        self.assertEqual(an.session_qualifies([self.start(), self.start()], self.SHA, self.PINS), (True, []))
+        ok, reasons = an.session_qualifies([self.start(), self.start(mode="dry-run")], self.SHA, self.PINS)
+        self.assertEqual((ok, reasons), (False, ["restart:mode:dry-run"]))
+        ok, reasons = an.session_qualifies([self.start(), self.start(code_sha256={**self.PINS["runner_code"], "planner.py": "9" * 64})],
+                                           self.SHA, self.PINS)
+        self.assertEqual(reasons, ["restart:runner_code_pin:planner.py"])
+        self.assertIn("account:paper-3", an.session_qualifies(self.start(account="paper-3"), self.SHA, self.PINS)[1])
+        self.assertEqual(an.session_qualifies([], self.SHA, self.PINS), (False, ["no_start_record"]))
 
     def test_start_is_the_first_session_after_freeze_and_deployment(self):
         self.assertEqual(an.counted_start(CAL, "2026-09-26T12:00:00Z", "2026-09-25T20:30:00Z"), date(2026, 9, 28))
@@ -277,6 +321,22 @@ class HarmStops(unittest.TestCase):
         r = an.harm_check(days[:2], self.HARM)  # 15k so far: below the stop
         self.assertFalse(r["harm_stop"])
 
+    def test_the_drawdown_is_rebased_after_a_resume(self):
+        days = [(date(2026, 10, i), [self.pos(x), self.pos(x)]) for i, x in ((1, 0.05), (2, -0.075), (5, -0.03))]
+        self.assertTrue(an.harm_check(days, self.HARM)["harm_stop"])  # 21k against 20k
+        r = an.harm_check(days, self.HARM, resumes=[{"after_session": "2026-10-02"}])
+        # after the resume the peak is the cumulative P&L at 10-02 (-5k): only the 6k fall of 10-05 counts
+        self.assertEqual((r["harm_stop"], r["max_net_drawdown_usd"]), (False, 6000.0))
+
+    def test_drawdown_simulation_is_deterministic_and_sensible(self):
+        a = an.simulate_drawdown(-20.0, 85.0, 200, 2000.0, sims=300, seed=7)
+        self.assertEqual(a, an.simulate_drawdown(-20.0, 85.0, 200, 2000.0, sims=300, seed=7))
+        b = an.simulate_drawdown(5.0, 85.0, 200, 2000.0, sims=300, seed=7)
+        self.assertGreater(a["mean_triggers_in_horizon"], b["mean_triggers_in_horizon"])
+        c = an.simulate_drawdown(-100.0, 0.0, 60, 2000.0, sims=3, seed=1)  # no noise: a trigger every 20 sessions
+        self.assertEqual((c["p_first_trigger_by_session"]["60"], c["mean_triggers_in_horizon"], c["median_first_trigger_session"]),
+                         (1.0, 3.0, 20))
+
     def test_cost_stop_only_from_the_60th_session(self):
         days = [(i, [self.pos(0.0, measured=20.0, assumed=9.0)]) for i in range(59)]
         self.assertFalse(an.harm_check(days, self.HARM)["cost_checked"])
@@ -284,6 +344,48 @@ class HarmStops(unittest.TestCase):
         self.assertEqual((r["cost_checked"], r["reasons"]), (True, ["execution_cost_above_twice_assumed"]))
         r = an.harm_check([(i, [self.pos(0.0, measured=18.0, assumed=9.0)]) for i in range(60)], self.HARM)
         self.assertFalse(r["harm_stop"])  # exactly twice the assumption: not above it
+
+
+class Secondaries(unittest.TestCase):
+    DAY = date(2026, 10, 1)
+
+    def rows(self):
+        out = []
+        for sym, leg, bid, ask, close in (("L1", "long", 49.99, 50.01, 50.5), ("L2", "long", 19.99, 20.01, 19.9),
+                                          ("S1", "short", 29.98, 30.02, 29.7), ("S2", "short", 9.99, 10.01, 10.1)):
+            touch = ask if leg == "long" else bid
+            out.append({"kind": "decision", "arm": "rev", "action": "enter", "symbol": sym, "leg": leg, "qty": 10,
+                        "limit_price": str(touch), "quote_mid": str((bid + ask) / 2),
+                        "client_order_id": f"nf1r-20261001-rth-{sym}-{leg}"})
+            out.append({"kind": "close_mark", "symbol": sym, "official_close": close})
+        for sym, ask, close in (("L1", 50.01, 50.5), ("B1", 10.0, 10.2), ("NOMARK", 5.0, None)):
+            out.append({"kind": "benchmark_quote", "symbol": sym, "label": "UNCLEAR", "quote_ask": str(ask), "quote_bid": "1"})
+            if close and sym != "L1":
+                out.append({"kind": "close_mark", "symbol": sym, "official_close": close})
+        return out
+
+    def test_intent_to_treat_mid_and_benchmark(self):
+        rows = self.rows()
+        itt = an.itt_positions(self.DAY, rows)
+        by = {p["symbol"]: p for p in itt}
+        self.assertAlmostEqual(by["L1"]["gross_touch"], 50.5 / 50.01 - 1)
+        self.assertAlmostEqual(by["S1"]["gross_touch"], -(29.7 / 29.98 - 1))
+        self.assertAlmostEqual(by["S1"]["gross_mid"], -(29.7 / 30.0 - 1))
+        daily = an.daily_values(itt, "gross_touch")["2026-10-01"]
+        self.assertAlmostEqual(daily["long_short"], (by["L1"]["gross_touch"] + by["L2"]["gross_touch"]) / 2
+                               + (by["S1"]["gross_touch"] + by["S2"]["gross_touch"]) / 2)
+        # the benchmark holds every quoted event long from its ask; NOMARK has no close mark and is left out
+        self.assertAlmostEqual(an.benchmark_mean(rows), ((50.5 / 50.01 - 1) + (10.2 / 10.0 - 1)) / 2)
+        self.assertIsNone(an.benchmark_mean([]))
+
+    def test_fill_rate_by_leg(self):
+        rows = self.rows()
+        fills = [f for f in fill_pair(self.DAY, "L1", "long", 50.01, 50.5, 10) if "-rth-" in f["client_order_id"]]
+        fills += [dict(f, filled_qty="4") for f in fill_pair(self.DAY, "S1", "short", 29.98, 29.7, 10) if "-rth-" in f["client_order_id"]]
+        rates = an.fill_rates(an.intended_entries(rows), an.fills_by_holding(fills))
+        self.assertEqual((rates["long"]["intended"], rates["long"]["filled_names"], rates["long"]["name_fill_rate"]), (2, 1, 0.5))
+        self.assertAlmostEqual(rates["long"]["quantity_fill_rate"], 10 / 20)
+        self.assertAlmostEqual(rates["short"]["quantity_fill_rate"], 4 / 20)
 
 
 class ProtocolDraft(unittest.TestCase):
@@ -301,16 +403,39 @@ class ProtocolDraft(unittest.TestCase):
 
     def test_design_numbers_are_reproduced(self):
         d, pd = an.design(DRAFT), DRAFT["design_numbers"]
-        self.assertAlmostEqual(d["obf_constant"], pd["obf_constant"], places=4)
         for got, want in zip(d["efficacy_z"], pd["efficacy_z"]):
             self.assertAlmostEqual(got, want, places=4)
-        self.assertEqual(d["futility_z"], pd["futility_z"])
+        for got, want in zip(d["alpha_spent_cumulative"], pd["alpha_spent_cumulative"]):
+            self.assertAlmostEqual(got, want, places=6)
+        self.assertEqual((d["futility_z"], d["sd_bps"]), (pd["futility_z"], pd["sd_bps"]))
         for name, s in pd["power_at_375_max"].items():
             for key in ("power_without_futility", "power_if_futility_followed", "futility_stop_probability"):
                 self.assertAlmostEqual(d["scenarios"][name][key], s[key], delta=0.0006, msg=(name, key))
             self.assertEqual(round(d["scenarios"][name]["expected_sessions_if_futility_followed"]),
                              s["expected_sessions_if_futility_followed"])
         self.assertAlmostEqual(d["type_i_error"]["if_futility_followed"], pd["type_i_error"]["if_futility_followed"], places=4)
+
+    def test_drawdown_simulation_is_reproduced(self):
+        sim, pd = an.harm_simulation(DRAFT), DRAFT["design_numbers"]["drawdown_trigger_simulation"]
+        for name, s in sim.items():
+            self.assertAlmostEqual(s["net_bps"], pd[name]["net_bps"], places=2)
+            for n, p in pd[name]["p_first_trigger_by_session"].items():
+                self.assertAlmostEqual(s["p_first_trigger_by_session"][n], p, delta=0.0006, msg=(name, n))
+            self.assertAlmostEqual(s["mean_triggers_in_horizon"], pd[name]["mean_triggers_in_375"], delta=0.006)
+            self.assertEqual(s["median_first_trigger_session"], pd[name]["median_first_trigger_session"])
+
+    def test_planning_measurement_result_is_the_receipt(self):
+        receipt = json.loads((STUDY / "receipts" / "s-measurement.json").read_text())
+        result = DRAFT["planning_measurement"]["result"]
+        self.assertEqual(result["label"], receipt["planning"]["label"])
+        self.assertEqual(result["label"], "exploratory")
+        self.assertAlmostEqual(result["S_bps"], receipt["planning"]["S_bps"], places=4)
+        self.assertAlmostEqual(result["planning_effect_bps"], receipt["planning"]["planning_effect_bps"], places=4)
+        self.assertAlmostEqual(DRAFT["power"]["forward_daily_sd_bps_nw_effective"],
+                               receipt["sd_scaling"]["forward_sd_bps_nw_effective"], places=2)
+        self.assertTrue(receipt["news3"]["matches_frozen_news3_days"])
+        study_pins = json.loads((ROOT / "blueprints/us-equities/sota-mover/news-llm/protocol.json").read_text())["pins"]
+        self.assertEqual(receipt["inputs"]["sha256"], study_pins["private_inputs"])  # measured on the frozen inputs
 
     def test_origin_matches_the_frozen_study_receipt(self):
         summary = json.loads((ROOT / "blueprints/us-equities/sota-mover/news-llm/receipts/evaluation-summary.json").read_text())
@@ -483,7 +608,7 @@ class GuardedRunInGit(unittest.TestCase):
         return an.authorize(self.args(), study_dir=self.study, repo_root=self.repo)
 
     def start_row(self, **over):
-        row = {"kind": "lifecycle", "event": "start", "evidence_label": an.RUN_LABEL, "mode": "paper",
+        row = {"kind": "lifecycle", "event": "start", "evidence_label": an.RUN_LABEL, "mode": "paper", "account": "paper-4",
                "rth_reversal_active": True, "reversal_protocol_sha256": self.sha, "code_sha256": self.pins["runner_code"],
                "news_signal_sha256": self.pins["study_code"]["news_signal.py"], "score_py_sha256": self.pins["study_code"]["score.py"]}
         row.update(over)
@@ -495,9 +620,10 @@ class GuardedRunInGit(unittest.TestCase):
             sym, entry = f"{leg[0].upper()}{i}", 50.0
             exit_ = entry * (1 + g) if leg == "long" else entry * (1 - g)
             cid = f"nf1r-{day.strftime('%Y%m%d')}-rth-{sym}-{leg}"
+            bid, ask = ("49.99", "50.0") if leg == "long" else ("50.0", "50.01")
             rows.append({"kind": "decision", "arm": "rev", "action": "enter", "client_order_id": cid, "symbol": sym,
-                         "event_id": f"{i}:{sym}", "quote_bid": "49.99" if leg == "long" else "50.0",
-                         "quote_ask": "50.0" if leg == "long" else "50.01"})
+                         "event_id": f"{i}:{sym}", "leg": leg, "qty": 100, "limit_price": "50.0", "quote_bid": bid,
+                         "quote_ask": ask, "quote_mid": str((float(bid) + float(ask)) / 2)})
             rows.append({"kind": "close_mark", "symbol": sym, "official_close": exit_})
             rows += fill_pair(day, sym, leg, entry, exit_, 100)
         if reconciled:
@@ -527,7 +653,12 @@ class GuardedRunInGit(unittest.TestCase):
         self.assertEqual(receipt["look_decision"], "efficacy")
         self.assertNotIn("decision", json.dumps(receipt).replace("look_decision", ""))  # no blueprint label key
         self.assertAlmostEqual(receipt["primary"]["mean_bps"], 2 * sum(legs[:60]) / 60 * 1e4, places=6)  # long + short leg
-        self.assertAlmostEqual(receipt["primary"]["efficacy_boundary_z"], 4.27407, places=4)
+        self.assertAlmostEqual(receipt["primary"]["efficacy_boundary_z"], 4.76192, places=4)  # Lan-DeMets at t = 0.16
+        self.assertEqual((receipt["test_label"], receipt["final_look"]), ("exploratory", False))
+        sec = receipt["secondary_reported_not_tested"]
+        # the synthetic world fills every intended entry at the touch and exits at the close mark
+        self.assertEqual(sec["fill_rate_by_leg"]["long"]["name_fill_rate"], 1.0)
+        self.assertAlmostEqual(sec["intent_to_treat_touch_to_close_long_short"]["mean_bps"], receipt["primary"]["mean_bps"], places=6)
         self.assertEqual(receipt["execution_cost"]["round_trips"], 240)
         written = self.study / "receipts" / "look-1.json"
         self.assertTrue(written.exists() and Path(str(written) + ".sha256").exists())
@@ -566,6 +697,20 @@ class GuardedRunInGit(unittest.TestCase):
         self.assertNotIn("t_nw", json.dumps(result))  # never the primary statistic
         self.assertTrue((self.state / an.HALT_FILE).exists())
         self.assertTrue(any((self.state / "reversal-monitor").iterdir()))
+        # the pre-stated resume: a review that found no execution fault resumes entries and re-bases the drawdown
+        with self.assertRaises(an.Refusal):
+            an.run_resume(self.authorize(), "returns_look_better", "a review note of some length", days[-1].isoformat())
+        with self.assertRaises(an.Refusal):
+            an.run_resume(self.authorize(), "no_execution_fault", "short", days[-1].isoformat())
+        row = an.run_resume(self.authorize(), "no_execution_fault", "fills at the touch, no rejects, reconciled",
+                            days[-1].isoformat())
+        self.assertEqual((row["finding"], row["after_session"]), ("no_execution_fault", days[-1].isoformat()))
+        self.assertFalse((self.state / an.HALT_FILE).exists())
+        with self.assertRaises(an.Refusal):  # nothing to resume any more
+            an.run_resume(self.authorize(), "no_execution_fault", "fills at the touch, no rejects", days[-1].isoformat())
+        again = an.run_monitor(self.authorize(), apply=True, until=date(2027, 12, 31))
+        self.assertFalse(again["harm_stop"])  # re-based after the last session
+        self.assertFalse((self.state / an.HALT_FILE).exists())
 
     def test_refusals_in_git(self):
         with self.assertRaises(an.Refusal):

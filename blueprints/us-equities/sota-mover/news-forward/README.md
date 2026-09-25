@@ -43,6 +43,27 @@ Measured on 2026-09-25: its labels and raw outputs matched the study's GPU
 float32 probe (`probe/fp32-hlmw_alpaca/scores-20241231.jsonl`) on 50 of 50
 events. The GPU path uses `score.Scorer` unchanged.
 
+## Runtime options (review of 2026-09-25)
+
+- **Account.** Config `account` selects the one tradable paper account (`common.ACCOUNTS`):
+  - `paper-3` is the default for this runner;
+  - `paper-4` belongs to the rev-only rth_reversal runtime
+    (`../news-reversal/runtime-config.json`) and refuses paper-2 and paper-3, by file name and by
+    a copied key id.
+
+  `executor.py check-account --config <file>` checks the configured account, read-only.
+- **Arms.** Config `arms_enabled` lists the arms a runtime plans at all; the default is every arm.
+  `["rev"]` means core, pm and ah plan and send nothing. The momentum shadow is journal-only.
+- **Cross-arm guard.** Rev skips any symbol another arm holds or has working
+  (`symbol_held_by_other_arm`) and journals a `deviation` row.
+- **Benchmark quotes.** Every first-in-window liquid RTH event gets a `benchmark_quote` row and a
+  close mark, whatever its label.
+- **Receipt time.** `received_at` is stamped when the news response is in hand, after all pages.
+- **Backfill.** `supervisor.py --reconcile-only --date D` (paper only, after D's close + 10 min)
+  rebuilds a missed reconciliation from the broker's order history, read-only, and exits without
+  trading. Its rows carry `backfill: true`.
+- **Dry-run-only options.** `--scores-from` and `--data-env` apply to dry runs only.
+
 ## Files
 
 | File | Purpose |

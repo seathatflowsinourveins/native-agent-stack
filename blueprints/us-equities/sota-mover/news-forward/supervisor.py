@@ -375,6 +375,8 @@ class Supervisor:
         self.sod = self.start_of_day(account)
         self.equity = Decimal(str(self.sod["equity"]))
         self.leverage_decisions()
+        if self.reversal:
+            self.check_rev_name_cap()
         not_before = cfg.get("first_order_not_before")
         not_before = sig.as_utc(not_before) if not_before else None
         gate = ex.RiskGate(self.limits, self.account_gross_cap)
@@ -569,6 +571,17 @@ class Supervisor:
                            limits={a: {"gross_cap": str(v.gross_cap), "per_order_cap": str(v.per_order_cap),
                                        "net_cap": str(v.net_cap)} for a, v in self.limits.items()},
                            kill_loss_fraction=str(planner.KILL_LOSS_FRACTION))
+
+    def check_rev_name_cap(self):
+        """The leg-balanced per-name cap (0.10 E / 12) must clear the $1,000 minimum, or every rth_reversal entry
+        skips below_min_notional (E >= $120,000; about $600,000 keeps whole-share rounding from skipping names
+        priced near the cap). Journaled at start; the protocol makes paper-4's funding a deployment precondition."""
+        cap = planner.leg_balanced_target(Decimal("1e15"), self.limits[REV])
+        ok = cap >= planner.MIN_NAME_NOTIONAL
+        self.journal.write("risk" if not ok else "lifecycle", event="rev_name_cap", name_cap=str(cap), equity=str(self.equity),
+                           min_name_notional=str(planner.MIN_NAME_NOTIONAL), ok=ok,
+                           note=None if ok else "every rth_reversal entry will skip below_min_notional at this equity")
+        return ok
 
     def account_gross(self):
         return [sum((e.gross for e in self.exposures.values()), Decimal("0")), self.account_gross_cap]
