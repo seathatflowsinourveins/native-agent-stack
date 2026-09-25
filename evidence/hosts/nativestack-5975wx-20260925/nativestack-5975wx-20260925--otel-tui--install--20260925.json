@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--otel-tui--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "otel-tui",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v otel-tui) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && otel-tui --version",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "c7079147084b8b0ff21583d3e99a18528f57e6564cb49d6080c4067427ebadba",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/otel-tui -> ~/.local/share/codex-ecosystem/tools/otel-tui-0.7.5/bin/otel-tui\notel-tui version 0.7.5\n"
+    },
+    {
+      "cmd": "cd ~/.local/share/codex-ecosystem/tools/otel-tui-0.7.5/downloads && sha256sum --ignore-missing --check otel-tui_0.7.5_checksums.txt",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "a4404599e4415d47a9bc80b303b337f01d415079f95f501f0eaab30d222a2e37",
+      "output_excerpt": "otel-tui_Linux_x86_64.tar.gz: OK\n"
+    }
+  ],
+  "tool_versions": {
+    "otel-tui": "0.7.5"
+  },
+  "observed_at_utc": "2026-09-25T21:27:17Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 2 command(s) were run for component 'otel-tui' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:27:17Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    }
+  ]
+}

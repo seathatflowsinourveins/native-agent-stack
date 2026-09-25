@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codebase-memory-mcp--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "codebase-memory-mcp",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v codebase-memory-mcp) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && codebase-memory-mcp --version",
+      "exit": 0,
+      "duration_s": 0.006,
+      "output_sha256": "d52dee79617a4ad30c66cfc2107c117567954898c1168e9444d209d91910bee9",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/codebase-memory-mcp -> ~/.local/share/codex-ecosystem/tools/codebase-memory-mcp-0.11.0/bin/codebase-memory-mcp\ncodebase-memory-mcp 0.11.0\n"
+    },
+    {
+      "cmd": "cd ~/.local/share/codex-ecosystem/tools/codebase-memory-mcp-0.11.0/downloads && sha256sum --ignore-missing --check checksums.txt",
+      "exit": 0,
+      "duration_s": 0.027,
+      "output_sha256": "5967eb1f9a04369f7656ac4afea013bc9e02ddbb94704c5a5322c9483be160ff",
+      "output_excerpt": "codebase-memory-mcp-linux-amd64.tar.gz: OK\n"
+    }
+  ],
+  "tool_versions": {
+    "codebase-memory-mcp": "0.11.0"
+  },
+  "observed_at_utc": "2026-09-25T21:27:08Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 2 command(s) were run for component 'codebase-memory-mcp' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:27:08Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    }
+  ]
+}

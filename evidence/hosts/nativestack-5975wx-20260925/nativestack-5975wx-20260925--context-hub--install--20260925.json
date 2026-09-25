@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--context-hub--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "context-hub",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v chub) && echo \"resolves: $p -> $(readlink -f \"$p\")\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "571a4eaf0d890de7f93d11abdfca48f06e3a457fbc3c9d21123c908ff4294a85",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/chub -> ~/.local/share/codex-ecosystem/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/bin/chub\n"
+    },
+    {
+      "cmd": "grep -m1 version \"$HOME/.local/share/codex-ecosystem/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/package.json\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "5630dc2c218af533b37fe01fd1c6cb936331c955dcbffea624dd5d3262d6d2af",
+      "output_excerpt": "  \"version\": \"0.1.4\",\n"
+    }
+  ],
+  "tool_versions": {
+    "context-hub": "0.1.4"
+  },
+  "observed_at_utc": "2026-09-25T21:27:11Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 2 command(s) were run for component 'context-hub' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:27:11Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    }
+  ]
+}

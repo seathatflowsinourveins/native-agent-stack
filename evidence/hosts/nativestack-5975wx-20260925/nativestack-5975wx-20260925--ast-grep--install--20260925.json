@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--ast-grep--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "ast-grep",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ast-grep) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ast-grep --version",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "186db6704e90910bcfaef937e204b4357c3d5def2e3abb3907e4e09380ed7b96",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ast-grep -> ~/.local/share/codex-ecosystem/tools/ast-grep-0.45.3/lib/node_modules/@ast-grep/cli/ast-grep\nast-grep 0.45.3\n"
+    }
+  ],
+  "tool_versions": {
+    "ast-grep": "0.45.3"
+  },
+  "observed_at_utc": "2026-09-25T21:26:25Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'ast-grep' at stage 'install'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:26:25Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    }
+  ]
+}

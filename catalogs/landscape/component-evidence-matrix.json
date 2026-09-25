@@ -280,7 +280,7 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "ast-grep",
           "repository": "https://github.com/ast-grep/ast-grep"
@@ -301,7 +301,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "codebase-memory-mcp",
           "repository": "https://github.com/DeusData/codebase-memory-mcp"
@@ -368,7 +368,7 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
           "name": "Context Hub",
           "repository": "https://github.com/andrewyng/context-hub"
@@ -1716,14 +1716,14 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "AgentsView",
           "repository": "https://github.com/kenn-io/agentsview"
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "synthetic",
           "name": "otel-tui",
           "repository": "https://github.com/ymtdzzz/otel-tui"
@@ -3345,7 +3345,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-codebase-memory-mcp",
           "repository": "https://github.com/DeusData/codebase-memory-mcp"

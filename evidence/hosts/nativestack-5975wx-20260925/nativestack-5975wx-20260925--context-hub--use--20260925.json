@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--context-hub--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "context-hub",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "r=$(chub search stripe --json) && echo \"$r\" | grep -q \"\\\"id\\\": \\\"stripe/api\\\"\" && echo \"POSITIVE ASSERTION PASS: search found stripe/api in registry\" && d=$(chub get stripe/api --lang js) && echo \"$d\" | grep -qi \"idempotency\" && echo \"ASSERTION PASS: fetched doc contains known string idempotency\" && n=$(chub search zzznonexistentregistrytermzzz --json) && echo \"$n\" | grep -q \"\\\"total\\\": 0\" && echo \"NEGATIVE CONTROL PASS: nonsense query returns 0 results\"",
+      "exit": 0,
+      "duration_s": 0.986,
+      "output_sha256": "b7b95c092b4faafdca32ece575aacaec5540411d1b8252c65cb57963be306364",
+      "output_excerpt": "POSITIVE ASSERTION PASS: search found stripe/api in registry\nASSERTION PASS: fetched doc contains known string idempotency\nNEGATIVE CONTROL PASS: nonsense query returns 0 results\n"
+    }
+  ],
+  "tool_versions": {
+    "context-hub": "0.1.4"
+  },
+  "observed_at_utc": "2026-09-25T21:40:55Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'context-hub' at stage 'use'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:40:55Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    }
+  ]
+}
