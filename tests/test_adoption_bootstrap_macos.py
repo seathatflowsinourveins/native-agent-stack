@@ -2699,12 +2699,23 @@ class CIRecordingToolingSmokeTests(unittest.TestCase):
 
 
 class CIWorkflowTriggerPathsTests(unittest.TestCase):
-    """Round 3j (Codex P2 thread 6): the push/pull_request paths triggers
-    must include every input the macOS jobs actually consume, not just
-    adoption/** and tools/adoption/** -- a change to, say,
-    scripts/host_receipts.py would otherwise never re-run this workflow
-    at all, even though validate-macos's recording-tooling gate and
-    recording smoke both depend on it directly."""
+    """Round 3j (Codex P2 thread 6): the push paths trigger must include every
+    input the macOS jobs actually consume, not just adoption/** and
+    tools/adoption/** -- a change to, say, scripts/host_receipts.py would
+    otherwise never re-run this workflow at all on push, even though
+    validate-macos's recording-tooling gate and recording smoke both depend
+    on it directly.
+
+    2026-09-25 (validate-macos required-check readiness,
+    docs/decisions/2026-09-22-github-automation-closure.md, "validate-macos
+    required (2026-09-25)"): pull_request no longer has its own `paths:`
+    filter at all -- a required check must report a status on every PR, and
+    a path-filtered one cannot. The `changes` job now reproduces the same
+    path membership test for pull_request with plain git, and its own
+    pattern list is asserted to match `push`'s `paths:` list in
+    tests.test_workflow_hardening.AdoptionBootstrapMacosRequiredTests
+    (that assertion lives there, not duplicated here, since it needs the
+    text parser for the job's embedded shell script, not YAML)."""
 
     def setUp(self):
         try:
@@ -2717,7 +2728,7 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
         # the bare "on:" key as the Python value True, not the string "on".
         self.triggers = self.workflow[True]
 
-    def test_every_macos_job_input_is_a_trigger_path(self):
+    def test_every_macos_job_input_is_a_push_trigger_path(self):
         for expected in (
             "evidence/artifacts/macos-embed-reference-20260923/**",
             "scripts/host_receipts.py",
@@ -2731,15 +2742,12 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
             "manifests/evidence.json",
         ):
             self.assertIn(expected, self.triggers["push"]["paths"], expected)
-            self.assertIn(expected, self.triggers["pull_request"]["paths"], expected)
 
-    def test_push_and_pull_request_trigger_on_the_same_paths(self):
-        # Both lists are maintained by hand, in parallel, right next to
-        # each other in the workflow file; asserting they stay identical
-        # means an edit to one path list that misses the other (a PR that
-        # never re-runs this workflow, or a push trigger with a stale
-        # list) is caught here rather than discovered as a silent gap.
-        self.assertEqual(self.triggers["push"]["paths"], self.triggers["pull_request"]["paths"])
+    def test_pull_request_trigger_has_no_path_filter(self):
+        # A bare `pull_request:` key with no mapping parses as None; that
+        # emptiness is exactly what makes validate-macos reachable on every
+        # pull request (the required-check readiness this change makes).
+        self.assertIsNone(self.triggers["pull_request"])
 
 
 class EmbedAcceptanceScriptTests(unittest.TestCase):
