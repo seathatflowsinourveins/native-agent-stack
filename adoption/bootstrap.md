@@ -187,12 +187,14 @@ GitHub-hosted macOS runner; see
    Claude Code user-scope assets with
    [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py).
    Its MCP sub-step registers the template's commands but installs none of
-   them, so install the two stdio servers first, at their pins, with the
+   them, so first install Serena, the template's one stdio server, and
+   jCodeMunch, which the per-project opt-in below uses, at their pins, with the
    uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
    (`python-tools/` and `bin/` under the ecosystem prefix, on either
    platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
-   where the template points (changed after `v2026.09.24.1`, whose template
-   names a `serena-context` wrapper instead of `serena`):
+   where the template and the opt-in point (changed after `v2026.09.24.1`,
+   whose template names a `serena-context` wrapper instead of `serena` and
+   also registers `jcodemunch` at user scope):
    ```sh
    eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
@@ -226,7 +228,7 @@ GitHub-hosted macOS runner; see
      byte-identical.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     http, `jcodemunch` and `serena` stdio), renders its `${HOME}` and
+     http and `serena` stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
@@ -244,6 +246,36 @@ GitHub-hosted macOS runner; see
      exists, so for another port run `claude mcp remove ai-memory -s user`,
      then
      `claude mcp add --scope user --transport http ai-memory http://127.0.0.1:<port>/mcp`.
+
+   **jCodeMunch, per project.** The template leaves `jcodemunch` out (changed
+   after `v2026.09.24.1`). At user scope its server instruction ("Prefer it
+   over Read/Grep/Glob/Bash for code navigation") loaded into every session
+   and contradicted agent-lab's routing (`rg` for discovery, Serena for
+   symbols). On 2026-09-25 the recording host's 5,076 retained Claude Code
+   transcripts, the oldest from 2026-09-18, held 15 jCodeMunch tool calls
+   (Serena 33, SocratiCode 7), and in a retrieval comparison it scored hit@5
+   0.25 against SocratiCode's 0.85
+   ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)).
+   A project that wants it registers it from the project root, privately:
+   ```sh
+   claude mcp add --scope local jcodemunch \
+     -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 \
+     -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
+   ```
+   or for everyone who opens it, with this entry in the project's checked-in
+   `.mcp.json`. Claude Code expands `${HOME}` in it, and starts the server
+   only after the workspace is trusted and the server approved:
+   ```json
+   {"mcpServers": {"jcodemunch": {"type": "stdio",
+     "command": "${HOME}/.local/share/codex-ecosystem/bin/jcodemunch-mcp", "args": [],
+     "env": {"CODE_INDEX_PATH": "${HOME}/.code-index", "JCODEMUNCH_SHARE_SAVINGS": "0"}}}}
+   ```
+   A nested default such as `${ECO_INSTALL_ROOT:-${HOME}/...}` does not
+   expand there, so a host with another ecosystem prefix uses the local form,
+   which takes precedence over the project entry. The
+   [jCodeMunch recipe](../recipes/README.md#focused-jcodemunch-retrieval)
+   covers indexing and the native statistics.
+
    Then apply the settings template itself (model, effort, ultracode,
    workflow env, hooks, and the credential deny rules plus the `PreToolUse`
    secret-guard hook from [`docs/secret-storage.md`](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)) into the live `~/.claude/settings.json` with
@@ -279,7 +311,12 @@ GitHub-hosted macOS runner; see
    server that cannot start. Here it runs `${ECO_ROOT}/bin/serena`, installed
    above. On a host already registered from the tag the installer reports
    `serena` as differing; run `claude mcp remove serena -s user`, then
-   `python3 tools/adoption/install_claude_profile.py --only mcp`.
+   `python3 tools/adoption/install_claude_profile.py --only mcp`. The tag's
+   template also registers `jcodemunch` at user scope. This one has no
+   `jcodemunch` entry, and the installer only visits the servers the template
+   names, so it neither adds nor removes one: a host registered from the tag
+   runs `claude mcp remove jcodemunch -s user` and opts in per project as
+   above.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude

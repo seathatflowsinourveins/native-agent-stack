@@ -145,7 +145,9 @@ upstream behavior behind each.
   unit binds. The user-scope template `adoption/mcp/claude-user.json` keeps
   the default 49374, and its comment gives the remove-then-add sequence for
   another port. That template changed after `v2026.09.24.1`: serena runs
-  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper.
+  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and
+  jcodemunch is no longer registered at user scope (a per-project opt-in in
+  `adoption/bootstrap.md` step 4a).
 - With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
   reached from the local network
   ([mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking))
