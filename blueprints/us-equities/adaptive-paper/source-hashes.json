@@ -41,7 +41,7 @@
   "tests/test_adaptive_market_research.py": "772b4fd467d4405bd098a440c54de4bfd61f91bbb80693c052077b867f9e2fd6",
   "tests/test_adaptive_paper_corporate_actions.py": "460599fcce943a949af4dbfd4bc818463e95a6e85e7e0aea1f573b55724ffd3b",
   "tests/test_adaptive_paper_credential_race.py": "1b0b6521045858fc9c974fc9e50e390ac888c7091f5f92606feb1bf49f7ef022",
-  "tests/test_adaptive_paper_credential_source.py": "d9284e0b1e07231fe945d59f4bc9d065f9d0543388b2d2c57df66d5d3e907ba0",
+  "tests/test_adaptive_paper_credential_source.py": "32c3aa93e40392a2af60078dd4ba6c222e195a9a47b22a0bfc0f52a92814382a",
   "tests/test_adaptive_paper_exits.py": "13a82d65ad1b2e72a8ca0fbb8bbb178a01ded1301399604c9e304ae213456764",
   "tests/test_adaptive_paper_financing.py": "8d9f1f21f9d53c9ed120281409bdcb97b8c9ddacc615d0cdfa392cfcf111fa90",
   "tests/test_adaptive_paper_live_manifest.py": "4596f301ac44effefee5b787c5e3627a9cd38f8ff0cf436ef778b7378a0667c2",

@@ -251,9 +251,14 @@ class SelectCredentials(_NoLeakMixin, unittest.TestCase):
         self.assertRefusedWithoutLeak(caught.exception, cs.REASON_UNKNOWN_SOURCE)
 
 
+# Env-file fixture text, written as a literal (the same stand-ins as KEY and
+# SECRET above) the way the other adaptive-paper credential tests write theirs.
+ENV_BODY = "APCA_API_KEY_ID=fixture-key-id\nAPCA_API_SECRET_KEY=fixture-secret-key\n"
+
+
 def write_env(directory, *extra_lines):
     path = directory / "paper.env"
-    path.write_text("\n".join([f"APCA_API_KEY_ID={KEY}", f"APCA_API_SECRET_KEY={SECRET}", *extra_lines]) + "\n")
+    path.write_text(ENV_BODY + "".join(line + "\n" for line in extra_lines))
     os.chmod(path, 0o600)
     return path
 
@@ -261,6 +266,9 @@ def write_env(directory, *extra_lines):
 class EnvFilePaperOnly(_NoLeakMixin, unittest.TestCase):
     """Both loaders' `credentials(path, paper_only=True)` refuse a non-paper
     APCA_API_BASE_URL line; the default keeps the earlier behavior."""
+
+    def test_fixture_text_carries_the_stand_ins(self):
+        self.assertEqual(ENV_BODY.splitlines(), [f"APCA_API_KEY_ID={KEY}", f"APCA_API_SECRET_KEY={SECRET}"])
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
