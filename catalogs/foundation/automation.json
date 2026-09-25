@@ -262,7 +262,7 @@
       "workflow": ".github/workflows/security-scan.yml",
       "job": "osv-scanner",
       "schedule": "37 5 * * 3",
-      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names the deliberately vulnerable grype fixture); off PRs it also uploads SARIF (category osv-scanner).",
+      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names gap-wave-2 DVC-lock evidence fixtures; the deliberately vulnerable grype positive-control fixture is retained as requirements.txt.fixture, a name this scanner and Scorecard's embedded scan do not recognize, so it needs no exclusion here); off PRs it also uploads SARIF (category osv-scanner).",
       "required_check": false,
       "target_required_check": true,
       "required_check_context": "osv-scanner"

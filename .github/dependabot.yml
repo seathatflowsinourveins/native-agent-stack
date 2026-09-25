@@ -3,9 +3,9 @@ version: 2
 # every manifest in the dependency graph are a repository setting (on since
 # 2026-09-22); pip version updates for the hash-locked, cutoff-reproducible locks stay
 # off (docs/decisions/2026-09-22-github-automation-closure.md, section 8).
-# The pip entry below exists only to keep security-update PRs off the deliberately
-# vulnerable grype positive-control fixture: `ignore` also applies to security
-# updates, and open-pull-requests-limit: 0 disables its version updates.
+# The grype positive-control fixture at blueprints/gap-wave2-20260923/grype-known-cve-fixture
+# is named requirements.txt.fixture (not requirements.txt), so Dependabot's pip manifest
+# discovery never finds it there and needs no dedicated pip entry or ignore rule.
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -25,14 +25,3 @@ updates:
     # option; security updates are exempt). Matches agent-lab's setting.
     cooldown:
       default-days: 7
-  # Deliberately vulnerable positive-control fixture (urllib3 1.26.4, gap
-  # ci-supply-chain[13], tests/test_grype_known_cve_fixture.py). `ignore` also
-  # applies to security updates (exclude-paths and the PR limit do not), so no
-  # PR bumps the pin; alerts still appear and are dismissed as not_used.
-  - package-ecosystem: pip
-    directory: /blueprints/gap-wave2-20260923/grype-known-cve-fixture
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 0
-    ignore:
-      - dependency-name: urllib3

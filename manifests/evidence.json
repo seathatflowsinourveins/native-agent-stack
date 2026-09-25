@@ -3074,8 +3074,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "a42818ebdf0eceb6167453cbce129e8b1653a4dca2cf8a54b20440aa053c2e77",
-      "bytes": 1616
+      "sha256": "bd9bfc4debd1e7463e3ebc40f799402b53da36402a5ce9e2d48dd8e7faa7b6fc",
+      "bytes": 1130
     },
     {
       "path": ".github/main-ruleset.json",
@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "8f86ba2318a55fe16b461f05af53d07d4a7976f2bdb481cd969d6b12fc5f75a0",
-      "bytes": 9305
+      "sha256": "894966b5a5f6f775a5e9764725b3644d9598cae0637ff8b6190be015a510e416",
+      "bytes": 8728
     },
     {
       "path": ".github/pull_request_template.md",
@@ -5949,7 +5949,7 @@
       "bytes": 309
     },
     {
-      "path": "blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt",
+      "path": "blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt.fixture",
       "sha256": "d3b3b59405b2e7919cc5045aa238932c0e3cc593d1d6896f75a41c37b6f45bd6",
       "bytes": 276
     },
@@ -9355,8 +9355,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "f26e1da357e8ef10226e91cf81265cf5ec56d9b60311b5c34c6fee230246538a",
-      "bytes": 31996
+      "sha256": "8717e898134b366a93f7e5060673637192f07598369f384a9997cff65acec9d7",
+      "bytes": 32191
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -9950,8 +9950,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "1ff69367583254257bb66b10a407095378e39e6aabdc2a55be309bf712de8e20",
-      "bytes": 81210
+      "sha256": "82f20005cb56e97cab4ef36e7c521e7892642e4f9c1bb603e0f5df8d8c5e948d",
+      "bytes": 84235
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -10080,8 +10080,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "26f6519cd72f376f2e21d4159d62c05be1a3fab1c8fa746904629f89cd5f9f2e",
-      "bytes": 78428
+      "sha256": "29c4bb47a021a313a85c0efdef9335f877c7a1c465ce8c3a11da4570c01a8d2a",
+      "bytes": 78773
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -29345,8 +29345,8 @@
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
-      "sha256": "9d8d907c96f6549607af6ed1403aa044afefce6baa08bca93b439717922a2377",
-      "bytes": 4283
+      "sha256": "049395b4926374199da4c95d047d4359e9e5174c2be078b59388019bc0d6daf9",
+      "bytes": 6657
     },
     {
       "path": "tests/test_historical_comparison.py",
