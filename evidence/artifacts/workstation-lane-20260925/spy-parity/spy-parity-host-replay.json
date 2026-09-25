@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "workstation-lane-20260925/spy-parity-host-replay-nativestack-5975wx-20260925",
+  "date": "2026-09-25",
+  "host_id": "nativestack-5975wx-20260925",
+  "platform_id": "linux-wsl2-x86_64",
+  "hardware_profile_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json",
+  "evidence_class": "HIST local historical replay on retained bundled LEAN sample bytes, run on a second physical host (CPU only); a reproduction of the published v2 result, not a qualifying replay, an unchanged upstream test, a point-in-time dataset or broker execution",
+  "question": "Does the SPY/LEAN parity harness (gate G-a, case one_zero), run on this workstation as its README documents, reproduce the published v2 economic ledger and comparator verdict?",
+  "harness": {
+    "checkout": "worktree at 156d9cc7 (origin/main 720e294b plus one host-receipt commit that touches no spy-parity file)",
+    "reviewed_harness_files_equal_cc4503f": true,
+    "local_source_sha256": {
+      "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2"
+    },
+    "engine": "nautilus_trader 2.0.0rc5, CPython 3.12.3, _libnautilus extension sha256 a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021 (equal to the pin run.py checks)"
+  },
+  "preregistration": {
+    "file": "raw/preregistration.txt",
+    "written_utc": "2026-09-25T14:27:07Z",
+    "note": "Written before command A. The amendment in the same file was appended after commands B and C ran and before C2 and B2; the C prediction (PASS under --bars) was wrong and is kept as written."
+  },
+  "deviations_from_the_readme": [
+    "Interpreter root: this host's NautilusTrader 2.0.0rc5 environment is ~/.local/share/codex-ecosystem/nautilus-py312, not the README's ~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5. It was bound read-only at its own path, as the README's command does.",
+    "Data root: ~/.local/share/codex-ecosystem/lean/Lean/Data, not the README's ~/.local/share/codex-ecosystem/tools/lean-985ef30/Data. run.py hash-checked the five frozen inputs and accepted them.",
+    "Verdict paths: compare.py wrote its verdicts to the private scratch directory, not over the committed verdict files the README's example names.",
+    "The README's example compares the v1 receipt.json. The acceptance here is the v2 result, so compare.py was run on this host's fresh v2 receipt and on the committed receipt-v2.json."
+  ],
+  "commands": [
+    {
+      "label": "A: replay (README lines 86-103)",
+      "argv": "NENV=~/.local/share/codex-ecosystem/nautilus-py312; REPO=<this worktree>; LEAN=~/.local/share/codex-ecosystem/lean/Lean/Data; OUT=<scratch>/spy-parity-run; bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$NENV\" \"$NENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 \"$NENV/bin/python\" -I /repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py --lean-data /data --out /out/native",
+      "started_utc": "2026-09-25T14:27:36.027298787Z",
+      "ended_utc": "2026-09-25T14:27:36.941430794Z",
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "stdout": "raw/run.stdout.txt",
+      "receipt": "raw/fresh-receipt.json"
+    },
+    {
+      "label": "B: compare.py --receipt <fresh receipt> --bars <fresh converted rows>",
+      "exit_code": 1,
+      "verdict": "raw/compare-bars-fresh-receipt.verdict.json"
+    },
+    {
+      "label": "C: compare.py --receipt receipt-v2.json --bars <fresh converted rows>",
+      "exit_code": 1,
+      "verdict": "raw/compare-bars-committed-receipt.verdict.json"
+    },
+    {
+      "label": "C2: compare.py --receipt receipt-v2.json --lean-data <data root>",
+      "exit_code": 0,
+      "verdict": "raw/compare-lean-data-committed-receipt.verdict.json"
+    },
+    {
+      "label": "B2: compare.py --receipt <fresh receipt> --lean-data <data root>",
+      "exit_code": 1,
+      "verdict": "raw/compare-lean-data-fresh-receipt.verdict.json"
+    },
+    {
+      "label": "E: negative control, compare.py --receipt receipt-v2.json --bars <fresh rows with the first close 313.0900 changed to 313.0901>",
+      "exit_code": 1,
+      "stderr": "raw/negative-tampered-bars.stderr.txt"
+    },
+    {
+      "label": "F: negative control, command A against a copy of the five frozen inputs with one byte of equity/usa/map_files/spy.csv changed",
+      "exit_code": 1,
+      "stderr": "raw/negative-altered-input.stderr.txt"
+    }
+  ],
+  "results": {
+    "replay": {
+      "run_py_exit": 0,
+      "frozen_inputs": "all five accepted by run.py; sha256 equal to receipt-v2.json inputs.sha256",
+      "fills": "+304 @ 323.5800 (1577977200) and -304 @ 291.6900 (1588255200), native OCO legs",
+      "distributions": "0.00 at 1576818000 and 428.64 at 1584676800, engine-posted by the DistributionModule",
+      "native_end_cash_usd": "90734.08",
+      "reconciled_end_cash_usd": "90734.0800",
+      "engine_error_lines": [0, 0],
+      "two_run_records_equal": true,
+      "converted_rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc (equal to receipt-v2.json attribution_evidence)",
+      "fresh_receipt_sha256": "ba724497881ba21702c15ca623b6f634a875953c2e02977fba59b708f8772a91"
+    },
+    "economic_ledger_vs_receipt_v2": {
+      "equal_fields": ["intents", "fills", "cash_ledger", "distribution_ledger", "dividend_cash_usd", "fees_usd", "final_quantity", "native_end_cash_usd", "reconciled_end_cash_usd", "native_account_event_rows", "oco_pairs", "order_events", "alerts_registered", "alerts_fired", "buying_power_events", "latch_events", "external_distribution_cross_check", "derived_distributions_v1_rule", "distribution_module", "conversion", "inputs", "case_configuration", "frozen_plan", "mapping_manifest", "superseded_manifest", "preregistration", "tolerances", "local_source_sha256", "engine", "unsupported_mappings", "preregistered_mappings", "attribution_evidence"],
+      "normalized_economic_sha256": "c9678337e9cc6a6b53410f1c63a220c0f51311907caf7998f5c5a5755638ab8a for both runs, equal to both runs of receipt-v2.json",
+      "differing_fields": {
+        "started_utc, observed_utc": "this run's times",
+        "harness_commit": "null: not passed, as in the README command",
+        "isolation": "argv without --review-record and --harness-commit; namespace ids of this run",
+        "preconditions": "review absent (no --review-record); replay history as committed now (7 entries)",
+        "runs[].raw_report_sha256, raw_reports_json_sha256": "generated UUID4 identities, declared and normalized",
+        "runs[].engine_log_sha256, engine_log_scan": "228 lines (224 INFO) here against 227 (223 INFO) in receipt-v2.json, 0 ERROR lines in both; the engine's start-up banner prints host specification lines (CPU, memory, swap, OS). The authoring host's log is private, so the one extra line was not identified"
+      }
+    },
+    "comparator": {
+      "C2_committed_receipt_lean_data": "exit 0, PASS, complete true, failed 0, 0 skipped, case one_zero, 136 checks, execution 106/106, preregistration_qualifying true; verdict bytes equal verdict-v2.json except one check value: replay_history_at_comparison observed 'extended by 1' instead of the history sha256, because the qualifying run's own entry was appended after it ran (the check accepts an append-only extension and passes)",
+      "B2_fresh_receipt_lean_data": "exit 1, FAIL, complete true, 132 checks, execution 106/106, failed 2, 0 skipped, preregistration_qualifying false. The two failures are precondition_review.retained_record_before_run (no review preceded this run) and precondition_review.no_prior_replay_ran_the_reviewed_harness (observed ['bwrap-cc4503f-qualifying']). These are by design: the accepted deviation lets only the first replay of the reviewed harness qualify, and no retry from cc4503f can.",
+      "C_committed_receipt_bars": "exit 1, FAIL, complete false, failed 0, 1 skipped (precondition_hashes.inputs_at_comparison: only --lean-data re-hashes the five inputs at comparison time); v2 counts a skipped check as FAIL (the harness's declared deviation bars_mode_cannot_rehash_inputs). Predicted PASS; the prediction was wrong.",
+      "B_fresh_receipt_bars": "exit 1, FAIL, complete false, failed 2 (the same two precondition_review checks as B2) and the same 1 skipped",
+      "E_tampered_bars": "exit 1, ValueError converted_rows_sha256_mismatch, no verdict written",
+      "F_altered_input": "exit 1, ValueError input_hash_mismatch:equity/usa/map_files/spy.csv, no receipt written"
+    }
+  },
+  "acceptance": {
+    "run_py_exit_0_with_frozen_input_hashes": "met (negative control F refused an altered input)",
+    "compare_exit_0_complete_failed_0_case_one_zero": "met for the committed receipt-v2.json re-derived from this host's frozen inputs (C2). Not met for this host's own fresh receipt (B2, exit 1): its execution checks all pass, and its two failed checks are the harness's by-design refusal to let a retry of the reviewed harness qualify.",
+    "economic_ledger_equals_receipt_v2": "met: every economic field and both normalized economic hashes are equal"
+  },
+  "recording_decision": "Recorded the blueprint's way: the fresh receipt and verdicts in this directory, and an appended entry in blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json, whose note requires every v2 execution on the frozen inputs to be listed. No host receipt was recorded: the nautilustrader use receipt for this host (evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--nautilustrader--use--20260925.json, the upstream quickstart) has an independent agree and makes a different claim, so it is not superseded.",
+  "limitations": [
+    "One case (one_zero), one replay pair, one host; CPU only.",
+    "A reproduction of a published result, not a new qualification: gate G-a and every catalog status are unchanged, and receipt-v2.json and verdict-v2.json stay the published v2 result.",
+    "The converted rows and the raw engine reports and logs stay private in the scratch run directory, as the README directs; their sha256 values are in the fresh receipt.",
+    "Only one input was altered for the negative control; each of the five inputs is checked by the same verify_inputs loop in convert.py.",
+    "Sanitization: in preregistration.txt and negative-tampered-bars.stderr.txt the scratch directory is written as <scratch>/spy-parity-run and the home directory as ~. The other raw files are byte-identical to the run outputs."
+  ]
+}
