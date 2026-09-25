@@ -3539,8 +3539,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment.json",
-      "sha256": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
-      "bytes": 11078
+      "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+      "bytes": 11094
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/freeze.json",
@@ -3551,6 +3551,11 @@
       "path": "blueprints/convergence-practice/application-delivery/history/Makefile.cabbe2c",
       "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011",
       "bytes": 2609
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/experiment.json.0472177",
+      "sha256": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+      "bytes": 11078
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/package.0472177.json",
@@ -3564,8 +3569,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "8070b79c9771d3f46b2705b47b265313ada7f5ec2932f96d0f4bc233080a7b42",
-      "bytes": 6569
+      "sha256": "9e830d6a5f61110d5e1549a359966bcbd26dff4d6ca4ebd6c5504c1dda1dace7",
+      "bytes": 7675
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
@@ -3649,8 +3654,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/test_portability.py",
-      "sha256": "f36b9561325821310d11ac3c4bae9b8b2f14a75573d60466eac5bea58b4b1901",
-      "bytes": 5776
+      "sha256": "13b18b0a4e29e41338778852dae877952f92df26fbfe56fbfb496dce1eb54947",
+      "bytes": 6802
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/tsconfig.json",

@@ -80,7 +80,7 @@
   ],
   "unchanged_historical_evidence": {
     "receipt.json": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7",
-    "experiment.json": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+    "history/experiment.json.0472177": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
     "freeze.json": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
   },
   "qualification": {
@@ -117,5 +117,23 @@
       "status": "passed",
       "retained_baseline_note": "serve.py already had a shebang with non-executable mode at cabbe2c and is invoked explicitly with python3; its mode is unchanged. EXE001 is excluded only from this focused lint invocation."
     }
-  }
+  },
+  "relocated_frozen_inputs": [
+    {
+      "record": "experiment.json",
+      "original": {
+        "revision": "047217793fdc7c0d9bcefb15d1915ab580bb5eed",
+        "sha256": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+        "retained_path": "history/experiment.json.0472177"
+      },
+      "current_sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+      "relocated": {
+        "pointer": "/frozen_inputs/sources/4",
+        "from_path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+        "to_path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
+        "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+      },
+      "change": "The 2026-09-25 Next.js 16.3.6 lock replaced pnpm-lock.yaml. The recorded convergence experiment still binds the exact 16.3.5 lock it ran with, now at its byte-identical retained path; the frozen hash and every other byte of the record are unchanged. The experiment does not qualify the 16.3.6 lock."
+    }
+  ]
 }
