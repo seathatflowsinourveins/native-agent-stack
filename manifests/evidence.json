@@ -10081,8 +10081,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "0a62cc90b087baf1dfac27dfad70220d56caa7cc35a8cb6ec2409ed8d5a0e52b",
-      "bytes": 28111
+      "sha256": "f20bda7c773cbb47036e5017a74cdf32e4e1e0e638804348f6c82133e61790d5",
+      "bytes": 28201
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -29415,14 +29415,19 @@
       "bytes": 608
     },
     {
+      "path": "scripts/hardware_profile.py",
+      "sha256": "4b1201497c2afc17cb9932902cebf33cdc18b19d02c49ee10d66c99f36589973",
+      "bytes": 25054
+    },
+    {
       "path": "scripts/hooks/secret_path_guard.py",
       "sha256": "653a990deef23cfcda736a35079df079e420c34e5efd669dcd325be85f82e460",
       "bytes": 16239
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "ad9e23a23e46300ddd9eae720266be6f1e4349c1657aa2c731d1c46b7e8c4a92",
-      "bytes": 74822
+      "sha256": "f236b6885dc0f6d4f2c09734e8eadf08125c22d73a96f205e47aa36b515d242b",
+      "bytes": 75640
     },
     {
       "path": "scripts/landscape.py",
@@ -29835,6 +29840,11 @@
       "bytes": 6657
     },
     {
+      "path": "tests/test_hardware_profile.py",
+      "sha256": "1c6d4b28c0f61c825e9cf761b2e486b7dff9cb37190830fb93b0d77204811d5d",
+      "bytes": 32779
+    },
+    {
       "path": "tests/test_historical_comparison.py",
       "sha256": "ea6d395520931585a58928f083b4276919ff9d162a59867292b532f5316c426e",
       "bytes": 3985
@@ -29846,8 +29856,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "d3898e35ca32895b11a60aa6a7506a60c54dfe5d7a6f81537e141bd95489a772",
-      "bytes": 97178
+      "sha256": "8a0cc4d8450600986606ae9ad0af83a6b611f7755a38dfc8de63260bf7be748d",
+      "bytes": 101033
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -29968,6 +29978,11 @@
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
+    },
+    {
+      "path": "tests/test_new_host_grand_list.py",
+      "sha256": "161eb27cf4a9ffc065e670e4589a2f3d0c23fcc2e2bebcfe07b958f40d882b8a",
+      "bytes": 15982
     },
     {
       "path": "tests/test_observability.py",
