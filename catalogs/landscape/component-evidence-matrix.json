@@ -426,16 +426,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '2.8.3'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:23Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -669,8 +669,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:18:05Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2153,16 +2153,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.19.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:24Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2530,16 +2530,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '1.14.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:34Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2592,16 +2592,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '1.19.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:20Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -3976,7 +3976,7 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode"
