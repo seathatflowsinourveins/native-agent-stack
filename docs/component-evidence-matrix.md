@@ -46,12 +46,12 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `us-equities/evaluation-experiments` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json`) | foundation-agent-retrieval-bench (not_established [0/0/0/0] / untested [0/0/0/0]); inspect-ai (not_established [0/0/0/0] / untested [0/0/0/0]); data-mlflow (not_established [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/execution-broker` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json`) | - |
 | `us-equities/identity-provenance` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json`) | data-dvc (not_established [0/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/market-data-reference` | dual_lane_same_winner | data-alpaca-py (accepted [1/0/0/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); data-edgartools (accepted [1/0/0/0] / untested [0/0/0/0]); data-exchange-calendars (accepted [1/0/0/0] / untested [0/0/0/0]) |
+| `us-equities/market-data-reference` | dual_lane_same_winner | data-alpaca-py (accepted [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); data-edgartools (host_verified [1/0/1/0] / untested [0/0/0/0]); data-exchange-calendars (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `us-equities/observability-hosting` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json`) | - |
-| `us-equities/portfolio-risk` | dual_lane_same_winner | skfolio (accepted [1/0/0/0] / untested [0/0/0/0]) |
-| `us-equities/research-factors-ml` | dual_lane_same_winner | skfolio (accepted [1/0/0/0] / untested [0/0/0/0]); data-edgartools (accepted [1/0/0/0] / untested [0/0/0/0]) |
+| `us-equities/portfolio-risk` | dual_lane_same_winner | skfolio (host_verified [1/0/1/0] / untested [0/0/0/0]) |
+| `us-equities/research-factors-ml` | dual_lane_same_winner | skfolio (host_verified [1/0/1/0] / untested [0/0/0/0]); data-edgartools (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `us-equities/security-supply-chain` | dual_lane_same_winner | grype (accepted [0/0/0/0] / untested [0/0/0/0]); syft (host_verified [2/0/2/0] / untested [0/0/0/0]); gitleaks (host_verified [2/0/2/0] / host_verified [1/0/1/0]) |
-| `us-equities/storage-compute` | dual_lane_same_winner | data-duckdb (accepted [1/0/0/0] / untested [0/0/0/0] +1 alias receipt(s), not counted) |
+| `us-equities/storage-compute` | dual_lane_same_winner | data-duckdb (accepted [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted) |
 
 ## Alias receipts (listed, never counted)
 

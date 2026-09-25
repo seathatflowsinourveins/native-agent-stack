@@ -4182,7 +4182,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:18Z",
                 "pass": 1
               },
@@ -4231,14 +4231,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:36Z",
                 "pass": 1
               },
@@ -4272,14 +4272,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:46Z",
                 "pass": 1
               },
@@ -4360,14 +4360,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:37:11Z",
                 "pass": 1
               },
@@ -4555,14 +4555,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:37:11Z",
                 "pass": 1
               },
@@ -4596,14 +4596,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:36Z",
                 "pass": 1
               },
@@ -4889,7 +4889,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:28Z",
                 "pass": 1
               },

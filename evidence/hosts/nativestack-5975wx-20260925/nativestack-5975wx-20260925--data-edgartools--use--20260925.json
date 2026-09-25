@@ -77,6 +77,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduced on this host from a clean detached checkout of main at cd17bda2: every recorded command re-ran with the recorded exit code; all outputs byte-identical except uv's self-reported timing line in cmd 1, and the network tag check (cmd 0) byte-identical. Adequacy-checked all four points: (1) layer role: the native edgar.documents HTMLParser parsed a real 2021 Form 8-K fixture offline in a no-network namespace, and cmd 3 verified the Markdown content (Item 8.01 and 9.01 headings, both merger parties, the agreement) with 0 SEC requests; (2) positive control not required: the parser output is checked against expected content, and native_document.py raises on a fixture hash mismatch (lines 19-23); (3) version, lock match and tag-to-commit claims are backed by retained commands; (4) bound to the layer winner data-edgartools (pin_matches true).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T20:24:41Z",
+      "reviewer": {
+        "identity_sha256": "ebc869dd1e67d16a8d46b08a45900ac439b2f0de4b27f34c4cba532be5a529b3",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }
