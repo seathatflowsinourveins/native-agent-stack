@@ -1014,7 +1014,7 @@
     {
       "id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
-      "version": "0.25.0",
+      "version": "0.30.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native GPU serving for pinned recent local embeddings",
@@ -1032,13 +1032,14 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "vllm-030-switch-20260925"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
       ],
-      "source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
-      "freshness": "Latest upstream0.29.0 tested but WSL GPU startup failed; supported0.25.0 retained with explicit compatibility evidence."
+      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "freshness": "0.30.0 serves production embeddings on the WSL2 RTX 4090 host since 2026-09-25 after an owned-instance qualification against 0.25.0 (identical embeddings and code-index results); 0.30.0 carries the WSL pinned-memory fallback that 0.29.0 lacked and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. 0.25.0 is kept for rollback."
     },
     {
       "id": "worktrunk",
