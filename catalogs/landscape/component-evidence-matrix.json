@@ -2351,9 +2351,9 @@
                 "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T05:38:17Z",
-                "pass": 1
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T14:22:45Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -2629,9 +2629,9 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:37:56Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:19:50Z",
+                "pass": 3
               },
               "qualified_models": [
                 {
@@ -2643,6 +2643,16 @@
                   "revision": "4da05a8e",
                   "runtime": "vllm",
                   "runtime_version": "0.29.0"
+                },
+                {
+                  "bars": "Model-card retrieval example, RTX 4090, vLLM 0.25.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+                  "host_id": "nativestack-5975wx-20260925",
+                  "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+                  "receipt_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json",
+                  "result": "pass",
+                  "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+                  "runtime": "vllm",
+                  "runtime_version": "0.25.0"
                 },
                 {
                   "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",

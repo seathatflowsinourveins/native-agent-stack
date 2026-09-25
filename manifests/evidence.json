@@ -8056,8 +8056,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "b7b9135fd94d052231d2774cb851c34abef10ff31df0400d83068c25fe32f3b7",
-      "bytes": 12771
+      "sha256": "da89a1f33349bbc6c88a051d04c52f5bb9558a75e8a46a6b15a79b9116e9e3e5",
+      "bytes": 13979
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
@@ -8246,8 +8246,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
-      "sha256": "02f1be40b05520f783d050fedc2778e54ae1118509b587d39b1a05d7616eeb83",
-      "bytes": 8036
+      "sha256": "ca08721fe7f197151cb2f061794a2064809b8a88e9b865d1c62c2279a4af740c",
+      "bytes": 10844
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
@@ -9606,8 +9606,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "cb2b5547f57bc39d3eb45c63ea43bd77327d10d4d4d6085cda9679173549afee",
-      "bytes": 186611
+      "sha256": "32401a07dfc90540329a4d3ed57b0800c8b335bee79a5b87fa274703c6205945",
+      "bytes": 187516
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9661,8 +9661,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "0085c1d35d3df3a0c1917db2bd55990827a005f1b5b00401c67043093ef3c5fe",
-      "bytes": 79126
+      "sha256": "fa21bd9c2f56762bb9040e8720677080d9be3e8d7c9abdf48bbf80d0fa6affa8",
+      "bytes": 80045
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10106,7 +10106,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "1bce3009636ca57fbbaed3c515a6c08950d6580dc387e4d9bc5262141d28fff4",
+      "sha256": "10109357ced814d5c13327b6f8d89291287b9a7691bcf8068f27320d402962e8",
       "bytes": 19028
     },
     {
@@ -10416,8 +10416,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "31df99b3efb9eb8cd6be8267ab7be152bcba9794c6b41094a447a973442a9efb",
-      "bytes": 15643
+      "sha256": "867613afd9c7f445f726bc9485683d038ec4c93471cefabd7a33f942f0388827",
+      "bytes": 15896
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -28155,6 +28155,126 @@
       "bytes": 11763
     },
     {
+      "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
+      "sha256": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3",
+      "bytes": 8384
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/preregistration.txt",
+      "sha256": "70aca9ee6daf99f893cfec7c1aa86084d6bb1312442fcc632e6735310cb08619",
+      "bytes": 1768
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/withdrawn/README.md",
+      "sha256": "b32e0cdd9b9f427305ad5b46dd74ffd42b82c1b200611901e45358fd2a12b251",
+      "bytes": 3630
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/withdrawn/nativestack-5975wx-20260925--vllm--use--20260925-2.withdrawn.json",
+      "sha256": "fc3ad55896561322694eefdce4cf98eba76f22aff242501ca26992d3af5a0e37",
+      "bytes": 14665
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-bars-committed-receipt.exit.txt",
+      "sha256": "8345ef4b08fa6209afd0ae41b78f320b9a9bb16550904ce4266e5202b8ead68f",
+      "bytes": 9
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-bars-committed-receipt.verdict.json",
+      "sha256": "60c50275962d5f2b2d328908560fe8a6fd4ae145e0e6ce234311f3f857a970c2",
+      "bytes": 49380
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-bars-fresh-receipt.exit.txt",
+      "sha256": "834bd9c2a571a76950df43591e6e19c700e436939cabb63052a282ba73c171d0",
+      "bytes": 9
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-bars-fresh-receipt.verdict.json",
+      "sha256": "e117074b74387f6f4e42bb7008a0b05d6e9b6d03be9d6b3f888d24583c67c7fc",
+      "bytes": 47892
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-lean-data-committed-receipt.exit.txt",
+      "sha256": "e8b9cd2097d67fd69e01d175e208a16e46c3fc66cc9c7dbbe1cd0a4424a69b0c",
+      "bytes": 10
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-lean-data-committed-receipt.verdict.json",
+      "sha256": "9decd95641cab0c021752828f57c45d36e8f8ad0865889d686f302db22d6ee14",
+      "bytes": 49245
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-lean-data-fresh-receipt.exit.txt",
+      "sha256": "6c45a9e3dd987ecc160ebb949bc5ec704e90652733d126e635397d594aeab48b",
+      "bytes": 10
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/compare-lean-data-fresh-receipt.verdict.json",
+      "sha256": "a12fcddbce73ec68aee7d2ca9fa30d775cfc49bef10a786cc5af07ac308646b7",
+      "bytes": 47758
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/fresh-receipt.json",
+      "sha256": "ba724497881ba21702c15ca623b6f634a875953c2e02977fba59b708f8772a91",
+      "bytes": 48568
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/negative-altered-input.exit.txt",
+      "sha256": "cdbd1f7ea47f616366fbd6653c78c5176c16976d9072cc2982340dbcaf1f8b5d",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/negative-altered-input.stderr.txt",
+      "sha256": "c9b05ebb36beaa1bfc04d8b6a37774bdcf322aab5723b4f9b48e0d8405b491ef",
+      "bytes": 836
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/negative-tampered-bars.exit.txt",
+      "sha256": "a0a566e0cdc346768a4d0b6b639f7175f5274fd82551bed1cabc6bb7da3d5d90",
+      "bytes": 9
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/negative-tampered-bars.stderr.txt",
+      "sha256": "9255fa743ba29a8dff83743ff58450f84aab011a0208592922ffe49e3dd7245c",
+      "bytes": 750
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/preregistration.txt",
+      "sha256": "baad2051e79f6a2439c409f736282dc869733f4837ee260a03fdd4cfe08bd36a",
+      "bytes": 2769
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/run.ended_utc.txt",
+      "sha256": "675e534c41f3d50f2d3e64bd7fde542671988428c365316d1232de758c9745f7",
+      "bytes": 31
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/run.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/run.started_utc.txt",
+      "sha256": "8b3af811c80a8e96691ce0719187c108f2cc35c763f3209a8834952b09d8c6f1",
+      "bytes": 31
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/run.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/raw/run.stdout.txt",
+      "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9",
+      "bytes": 317
+    },
+    {
+      "path": "evidence/artifacts/workstation-lane-20260925/spy-parity/spy-parity-host-replay.json",
+      "sha256": "e0702904c21f7ad253f4ccff12bb27a82a59f1620408cdb0b65d5532176717dd",
+      "bytes": 12602
+    },
+    {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--ai-memory--use--20260925.json",
       "sha256": "491a43789016027cd144f38a0bc9fc30f6d305a32025a9dc8972e542f96fd8c4",
       "bytes": 7687
@@ -28330,9 +28450,19 @@
       "bytes": 7192
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--install--20260925-2.json",
+      "sha256": "7a7a0facd2ead068d56cd66b1284b7b198678aee5521c642850626981d46a38b",
+      "bytes": 6416
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--install--20260925.json",
       "sha256": "c403b071f9396d4840bb6fcea72e3a2d35f3f066bbb9c0f09dfb1311eeb9c8d0",
       "bytes": 4916
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json",
+      "sha256": "2934bd6cba89eed3ac5d3cf28a801d10a8a73b031e9635b2fb9c2f6c683814a8",
+      "bytes": 17090
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925.json",
