@@ -114,7 +114,7 @@
     "observer_retry_delay_seconds": 5,
     "ibapi_cancel_attempts": 2,
     "ibapi_cancel_wait_seconds": 10,
-    "overall_deadline_seconds": 1500
+    "overall_deadline_seconds": 1620
   },
   "exec_engine": {
     "inflight_check_interval_ms": 2000,

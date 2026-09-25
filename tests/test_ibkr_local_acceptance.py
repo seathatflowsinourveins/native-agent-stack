@@ -306,9 +306,10 @@ class FakeBroker:
     (order_id, client_id, perm_id, order_ref, status). A cancel removes the order only when sent
     by its own client id, as IB allows."""
 
-    def __init__(self, orders, accounts=FAKE_ACCOUNT, own_listing_ok=True, all_listing_ok=True):
+    def __init__(self, orders, accounts=FAKE_ACCOUNT, own_listing_ok=True, all_listing_ok=True, failed_observations=0):
         self.orders, self.accounts = list(orders), accounts
         self.own_listing_ok, self.all_listing_ok = own_listing_ok, all_listing_ok
+        self.failed_observations = failed_observations
         self.connections, self.cancels = [], []
 
     def client(self):
@@ -322,6 +323,9 @@ class BrokerClient(FakeObserver):
 
     def connect(self, host, port, client_id):
         self.broker.connections.append(client_id)
+        if client_id == 98 and self.broker.failed_observations > 0:
+            self.broker.failed_observations -= 1
+            self.connect_ok = False
         super().connect(host, port, client_id)
 
     def _list(self, only_own):
@@ -431,6 +435,22 @@ class Observer(unittest.TestCase):
         broker = FakeBroker([(12, 93, 555, "NTA-X-R2:12", "Submitted")], all_listing_ok=False)
         res = self._cleanup(broker)
         self.assertEqual((res["status"], broker.cancels), ("cancel_unconfirmed", []))
+
+    def test_a_failed_observation_does_not_use_up_a_cancel_round(self):
+        broker = FakeBroker([(12, 93, 555, "NTA-X-R2:12", "Submitted")], failed_observations=2)
+        res = self._cleanup(broker)
+        self.assertEqual((res["status"], broker.cancels), ("cancelled", [(93, 12)]))
+        self.assertEqual([a["status"] for a in res["attempts"]][:2], ["observer_not_connected"] * 2)
+
+    def test_cleanup_takes_the_observer_by_keyword(self):
+        seen = []
+
+        def observe_fn(plan, port, *, include):
+            seen.append(include)
+            return {"status": "passed", "observed": {"open_orders": []}}
+
+        res = LA.ibapi_cancel_run_orders(PLAN, 4002, "NTA-X", observe_fn=observe_fn, sleep_fn=lambda s: None)
+        self.assertEqual((res["status"], seen), ("none_open", [("open_orders",)]))
 
     def test_ibapi_cleanup_none_open_and_refusals(self):
         broker = FakeBroker([(14, 5, 557, "manual:14", "Submitted")])
@@ -547,6 +567,9 @@ class Verdicts(unittest.TestCase):
         self.assertTrue(final["passed"] and final["flat"])
         self.assertIn("executions_of_the_run",
                       LA.final_verdict(PLAN, _snap(completed=done, executions=[R1 + ":11"]), "NTA-X", IDS)["reasons"])
+        # Before any probe was attempted (a run stopped in phase A) nothing depends on the list.
+        early = LA.final_verdict(PLAN, _snap(completed=done[:1]), "NTA-X", IDS, probes=())
+        self.assertTrue(early["passed"] and early["flat"])
         not_flat = LA.final_verdict(PLAN, _snap([(12, 93, 555, R2 + ":12", "Submitted")]), "NTA-X", IDS)
         self.assertFalse(not_flat["flat"])
         self.assertFalse(LA.final_verdict(PLAN, _snap(status="not_connected"), "NTA-X", IDS)["flat"])
@@ -625,8 +648,9 @@ class Scenario:
     """Fakes for check/contender/observer/phase/cancel that behave like a clean paper account."""
 
     def __init__(self, tmp, check="passed", contender="connected", phase_status=None, after_a=None, final_open=(),
-                 interrupt_in=None, liquid=TODAY_HOURS):
+                 interrupt_in=None, liquid=TODAY_HOURS, completed=("R1", "R2")):
         self.tmp, self.check, self.contender, self.liquid = tmp, check, contender, liquid
+        self.completed = completed
         self.phase_status = phase_status or {}
         self.after_a, self.final_open, self.interrupt_in = after_a, final_open, interrupt_in
         self.calls, self.manifests, self.envs, self.prefix, self.cancels = [], [], [], None, []
@@ -668,7 +692,7 @@ class Scenario:
     def observe_fn(self, plan, port, include):
         self.calls.append("observe:" + ",".join(include))
         p = self.prefix
-        done = [(11, 93, 554, f"{p}-R1:11", "Cancelled"), (12, 93, 555, f"{p}-R2:12", "Cancelled")]
+        done = [(11 + i, 93, 554 + i, f"{p}-{s}:{11 + i}", "Cancelled") for i, s in enumerate(self.completed)]
         if include == ("positions", "open_orders"):
             return self.after_a or _snap([(12, 93, 555, f"{p}-R2:12", "Submitted")])
         return _snap(list(self.final_open), completed=done)
@@ -690,6 +714,12 @@ class RunCommand(unittest.TestCase):
         self.receipt = self.d / "steps.json"
         self.gate = self.d / "gate.json"
         self.state = self.d / "state"
+        # The temporary directory stands in for the repository root: the prerequisites are read
+        # from it, and a steps receipt inside it counts as in the repository.
+        for rel in [p["path"] for p in PLAN["receipt"]["gate_receipt"]["prerequisites"]] + [PLAN["version_selection_record"]]:
+            target = self.d / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((ROOT / rel).read_bytes())
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -846,18 +876,24 @@ class RunCommand(unittest.TestCase):
         self.assertFalse(r["gate_receipt"]["eligible"])
         self.assertFalse(self.gate.exists())
 
-    def test_a_steps_receipt_outside_the_repository_gets_no_gate_receipt(self):
-        code, r, _ = self.run_cli(repo_root=None)  # the temporary receipt is outside the real repository
-        self.assertEqual((code, r["status"]), (0, "passed"))
-        self.assertEqual(r["gate_receipt"], {"eligible": False, "reason": "steps_receipt_outside_repository"})
+    def test_a_steps_receipt_outside_the_repository_is_refused_before_connecting(self):
+        code, r, sc = self.run_cli(repo_root=None)  # the temporary receipt is outside the real repository
+        self.assertEqual((code, r["status"], sc.calls), (3, "refused_receipt_outside_repository", []))
         self.assertFalse(self.gate.exists())
+
+    def test_a_run_stopped_before_any_probe_is_incomplete_not_failed(self):
+        code, r, sc = self.run_cli(sc=Scenario(self.d, phase_status={"A": "incomplete"}, completed=("R1",)))
+        self.assertEqual((code, r["status"]), (1, "incomplete"))
+        self.assertEqual(r["final"]["probes_checked"], [])
+        self.assertTrue(r["final"]["passed"])
 
     def test_a_failed_gate_write_is_recorded_in_the_steps_receipt(self):
         self.gate.mkdir()  # writing the gate receipt there fails
         code, r, _ = self.run_cli()
         self.assertEqual(r["status"], "passed")
-        self.assertEqual((r["gate_receipt"]["eligible"], r["gate_receipt"]["written"]), (True, False))
+        self.assertEqual((r["gate_receipt"]["eligible"], r["gate_receipt"]["reason"]), (False, "gate_receipt_write_failed"))
         self.assertIn("error", r["gate_receipt"])
+        self.assertNotIn("gate_receipt_error", r)
 
     def test_a_plan_edited_during_the_run_stops_before_the_next_phase(self):
         real = LA.PO.sha256_file
@@ -880,6 +916,29 @@ class RunCommand(unittest.TestCase):
         with mock.patch.object(LA.PO, "sha256_file", sha):
             code, r, sc = self.run_cli(sc=sc)
         self.assertEqual([c for c in sc.calls if c.startswith("phase-")], ["phase-A"])
+        self.assertTrue(r["plan_changed_during_run"])
+        self.assertEqual((r["status"], sc.cancels), ("incomplete", [sc.prefix]))
+
+    def test_a_plan_unreadable_during_the_run_still_cleans_up(self):
+        real = LA.PO.sha256_file
+        gone = {"now": False}
+
+        def sha(path):
+            if gone["now"] and Path(path).name == "local-acceptance-plan.json":
+                raise FileNotFoundError(path)
+            return real(path)
+
+        sc = Scenario(self.d)
+        original = sc.phase_fn
+
+        def phase_fn(phase, *args):
+            out = original(phase, *args)
+            gone["now"] = True
+            return out
+
+        sc.phase_fn = phase_fn
+        with mock.patch.object(LA.PO, "sha256_file", sha):
+            code, r, sc = self.run_cli(sc=sc)
         self.assertTrue(r["plan_changed_during_run"])
         self.assertEqual((r["status"], sc.cancels), ("incomplete", [sc.prefix]))
 

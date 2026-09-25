@@ -92,7 +92,8 @@ BudgetError = PO.BudgetError
 _dec = PO._dec
 # The shared harness names the same flip receipt; one definition keeps the refusal in step.
 is_gate_receipt = PO.is_gate_receipt
-assert PO.GATE_RECEIPT.resolve() == GATE_RECEIPT.resolve()
+if PO.GATE_RECEIPT.resolve() != GATE_RECEIPT.resolve():
+    raise RuntimeError("ibkr-paper-orders/run.py names a different gate receipt path")
 
 
 def utc_now_iso() -> str:
@@ -226,11 +227,15 @@ def worst_case_seconds(plan: dict) -> int:
     phases = sum(t["phase_deadline_seconds"].values()) + len(PHASES) * (PHASE_GRACE_SECONDS + TERMINATE_GRACE_SECONDS)
     observer = (t["check_seconds"] * t["observer_attempts"]
                 + t["observer_retry_delay_seconds"] * (t["observer_attempts"] - 1))
-    # ibapi_cancel_run_orders: one observation per round plus a final one; per cancel round up to
-    # one holder id per phase (connect, listing, cancel wait) and the pause before the next round.
+    # ibapi_cancel_run_orders: every observation it may make (one per cancel round, the final
+    # one and the tolerated failures), the pauses between them, and per cancel round one
+    # connection per holder id: at most one per order the run can create, inside the band.
+    lo, hi = plan["client_ids"]["adapter_fallback_band"]
+    holders = min(hi - lo + 1, plan["bounds"]["max_orders"])
     holder = IBAPI_CONNECT_SECONDS + IBAPI_LISTING_SECONDS + t["ibapi_cancel_wait_seconds"]
     rounds = t["ibapi_cancel_attempts"]
-    cleanup = (rounds + 1) * t["check_seconds"] + rounds * (len(PHASES) * holder + t["recancel_interval_seconds"])
+    looks = rounds + 1 + t["observer_attempts"]
+    cleanup = looks * t["check_seconds"] + (looks - 1) * t["recancel_interval_seconds"] + rounds * holders * holder
     return pre + phases + 3 * observer + cleanup
 
 
@@ -376,12 +381,13 @@ def acquire_lock(state_dir):
 OBSERVER_KEYS = ("accounts", "next_id", "positions", "open_orders", "completed", "executions", "refused")
 
 
-class ObserverState:
+class ObserverState(PO.CheckState):
     """Official-ibapi callbacks kept free of ibapi so they test offline; mixed into
-    EWrapper/EClient by build_observer_client. No order method is called on it except
-    cancelOrder in ibapi_cancel_run_orders. Account ids stay in memory only."""
+    EWrapper/EClient by build_observer_client. It inherits the shared check's latched
+    paper-account rule (managedAccounts) and replaces the rest. No order method is called on it
+    except cancelOrder in the cleanup. Account ids stay in memory only."""
 
-    def __init__(self):
+    def __init__(self):  # noqa: D107 - replaces CheckState's state with the observer's
         self.done = {k: threading.Event() for k in OBSERVER_KEYS}
         self._accounts: list[str] = []
         self._open_keys: set = set()
@@ -390,11 +396,6 @@ class ObserverState:
         self.order_status: dict = {}
         self.r = {"account_count": 0, "paper_accounts": None, "positions": [], "open_orders": [],
                   "completed_orders": [], "executions": [], "errors": [], "info": []}
-
-    def managedAccounts(self, accountsList):
-        # The shared check's latched paper-account rule: once any callback reports a non-paper
-        # account the observer stays refused.
-        PO.CheckState.managedAccounts(self, accountsList)
 
     def nextValidId(self, orderId):
         self.done["next_id"].set()
@@ -667,13 +668,15 @@ def ibapi_cancel_run_orders(plan: dict, port: int, prefix: str, *, client_factor
     if refusal:
         out["status"] = refusal
         return out
-    observe_fn = observe_fn or (lambda plan_, port_, include: observe(plan_, port_, include=include,
-                                                                       client_factory=client_factory))
-    rounds = t["ibapi_cancel_attempts"]
-    for attempt in range(rounds + 1):  # the last round only observes, after the last cancels
-        if attempt:
+    observe_fn = observe_fn or (lambda plan_, port_, *, include: observe(plan_, port_, include=include,
+                                                                          client_factory=client_factory))
+    rounds, sent_rounds = t["ibapi_cancel_attempts"], 0
+    # A failed observation does not use up a cancel round: up to observer_attempts of them are
+    # tolerated on top of one observation per round and the final confirming one.
+    for looked in range(rounds + 1 + t["observer_attempts"]):
+        if looked:
             sleep_fn(t["recancel_interval_seconds"])
-        snap = observe_fn(plan, port, ("open_orders",))
+        snap = observe_fn(plan, port, include=("open_orders",))
         if snap.get("status") != "passed":
             out["attempts"].append({"status": f"observer_{snap.get('status')}"})
             if str(snap.get("status", "")).startswith("refused_"):
@@ -688,10 +691,12 @@ def ibapi_cancel_run_orders(plan: dict, port: int, prefix: str, *, client_factor
         holders = sorted({o.get("client_id") for o in ours if o.get("client_id") is not None})
         entry = {"status": "open", "orders": len(ours), "client_ids": holders,
                  "outside_band": [c for c in holders if not lo <= c <= hi]}
-        if attempt < rounds:
-            entry["confirmed"] = sum(_cancel_as(plan, port, c, prefix, out, attempt, client_factory)
-                                     for c in holders if lo <= c <= hi)
         out["attempts"].append(entry)
+        if sent_rounds >= rounds:
+            break
+        sent_rounds += 1
+        entry["confirmed"] = sum(_cancel_as(plan, port, c, prefix, out, sent_rounds - 1, client_factory)
+                                 for c in holders if lo <= c <= hi)
     out["status"] = "cancel_unconfirmed"
     return out
 
@@ -863,13 +868,14 @@ def after_a_verdict(plan: dict, snapshot: dict | None, prefix: str, carry: dict)
 
 
 def _completed_facts(snapshot: dict | None, prefix: str, ids: dict, probes) -> tuple[dict, list]:
-    """IB's own completed-orders list must show R1 and R2 cancelled. That makes the list evidence
-    that it covers this run, so a probe order missing from it (and from the open orders and the
-    executions) never reached IB; an empty or partial list fails instead of passing vacuously."""
+    """Once a probe order (P1, P2) was attempted, IB's own completed-orders list must show R1 and
+    R2 cancelled. That makes the list evidence that it covers this run, so a probe missing from it
+    (and from the open orders and the executions) never reached IB; an empty or partial list fails
+    instead of passing vacuously. Before any probe was attempted nothing depends on the list."""
     completed = _listed(snapshot, "completed_orders")
     ours = {order_ref_client_id(o.get("order_ref")): o.get("status") for o in completed if is_run_order(o, prefix)}
     listed_r = all(ours.get(ids[s]) in CANCELLED_STATUSES for s in ("R1", "R2"))
-    reasons = [] if listed_r else ["completed_orders_do_not_show_r1_r2_cancelled"]
+    reasons = [] if listed_r or not probes else ["completed_orders_do_not_show_r1_r2_cancelled"]
     for s in probes:
         if ids[s] in ours:
             reasons.append(f"{s.lower()}_reached_ib")
@@ -889,8 +895,8 @@ def after_b_verdict(plan: dict, snapshot: dict | None, prefix: str, ids: dict) -
     return {"passed": not reasons, "reasons": reasons, **facts}
 
 
-def final_verdict(plan: dict, snapshot: dict | None, prefix: str, ids: dict) -> dict:
-    """End of run: flat, no open order, no execution of this run, and neither probe order at IB."""
+def final_verdict(plan: dict, snapshot: dict | None, prefix: str, ids: dict, probes=("P1", "P2")) -> dict:
+    """End of run: flat, no open order, no execution of this run, and no attempted probe at IB."""
     facts = _state_facts(snapshot, prefix)
     status_ok = facts["observer_status"] == "passed"
     reasons = [] if status_ok else [f"observer_{facts['observer_status']}"]
@@ -902,8 +908,8 @@ def final_verdict(plan: dict, snapshot: dict | None, prefix: str, ids: dict) -> 
     facts["run_executions"] = len(run_execs)
     if run_execs:
         reasons.append("executions_of_the_run")
-    extra, more = _completed_facts(snapshot, prefix, ids, ("P1", "P2"))
-    facts.update(extra)
+    extra, more = _completed_facts(snapshot, prefix, ids, tuple(probes))
+    facts.update(extra, probes_checked=list(probes))
     reasons += more
     facts["flat"] = status_ok and not facts["open_orders"] and not facts["positions"]
     return {"passed": not reasons, "reasons": reasons, **facts}
@@ -1931,7 +1937,7 @@ def _checks_before_orders(a, plan: dict, receipt: dict, *, check_fn, contender_f
     return "ready", account, (window[1] if window else None)
 
 
-def _static_refusal(a, plan_path: Path, plan: dict | None, versions_fn) -> tuple[str | None, dict]:
+def _static_refusal(a, plan_path: Path, plan: dict | None, versions_fn, repo=None) -> tuple[str | None, dict]:
     """Refusals that need no connection: plan, port, runtime pins, prerequisites."""
     if plan is None:
         return "refused_plan_invalid", {"plan_errors": ["plan unreadable"]}
@@ -1944,7 +1950,7 @@ def _static_refusal(a, plan_path: Path, plan: dict | None, versions_fn) -> tuple
     observed = (versions_fn or PO.versions)()
     if not PO.pinned_runtime(plan, observed):
         return "refused_unpinned_runtime", {"runtime": observed}
-    ok, entries = gate_prerequisites(plan)
+    ok, entries = gate_prerequisites(plan, repo)
     if not ok:
         return "refused_gate_prerequisites_missing", {"prerequisites": entries}
     return None, {"prerequisites": entries}
@@ -1995,8 +2001,12 @@ def cmd_run(a, *, check_fn=None, contender_fn=None, observe_fn=None, cancel_fn=N
     if not a.enable_paper_orders:
         return _refuse(receipt, receipt_path, "refused_orders_not_enabled",
                        note="run places paper orders only with --enable-paper-orders; nothing was connected")
+    if rel(receipt_path, repo_root) == "<private>":
+        # Only a steps receipt inside the repository can back the gate receipt; refuse before any
+        # order rather than spend the session on a run that could not be qualified.
+        return _refuse(receipt, receipt_path, "refused_receipt_outside_repository")
     plan = _load_plan_or_none(plan_path)
-    status, fields = _static_refusal(a, plan_path, plan, versions_fn)
+    status, fields = _static_refusal(a, plan_path, plan, versions_fn, repo_root)
     receipt.update(fields)
     if status:
         return _refuse(receipt, receipt_path, status)
@@ -2062,7 +2072,11 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
         if signals.interrupted:
             receipt["interrupted"] = signals.received
             break
-        if PO.sha256_file(HERE / a.plan) != receipt["plan_sha256"]:
+        try:
+            unchanged = PO.sha256_file(HERE / a.plan) == receipt["plan_sha256"]
+        except OSError:
+            unchanged = False  # a plan that cannot be read counts as changed; cleanup still runs
+        if not unchanged:
             # The plan is bound at run start; each phase process re-checks the same hash.
             receipt["plan_changed_during_run"] = True
             break
@@ -2107,7 +2121,9 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
         receipt["cleanup"] = cancel_fn(plan, a.port, prefix)
         persist()
     snap = observe_with_retry(observe_fn, plan, a.port, ("positions", "open_orders", "completed", "executions"), sleep_fn)
-    receipt["final"] = final_verdict(plan, snap, prefix, ids)
+    # A probe was attempted only in a phase that ran: P1 in B, P2 in C.
+    ran = {p["phase"] for p in phases}
+    receipt["final"] = final_verdict(plan, snap, prefix, ids, probes=[s for s, ph in (("P1", "B"), ("P2", "C")) if ph in ran])
     receipt["kill_switch"] = kill.status()
     status = run_status(phases, checkpoints, receipt["final"])
     if status == "passed" and signals.interrupted:
@@ -2117,7 +2133,7 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
     receipt.pop("provisional", None)
     entries = None
     if status == "passed":
-        ok, entries = gate_prerequisites(plan)
+        ok, entries = gate_prerequisites(plan, repo)
         # The steps receipt is final before the gate receipt binds its sha256, so it names the
         # gate receipt path only; the gate receipt carries the hash. A steps receipt outside the
         # repository could not be checked by anyone qualifying the flip, so it makes none.
@@ -2140,15 +2156,15 @@ def _run_phases(a, plan, receipt, receipt_path, account, prefix, ids, run_dir, t
             write_json(gate_path, gate_receipt(plan, receipt, receipt_path, entries, repo), [account], quiet=True)
             written = True
         except OSError as exc:
-            # Nothing binds the steps receipt yet, so it can record that the gate receipt is missing.
-            receipt["gate_receipt"].update(written=False, error=redact(f"{type(exc).__name__}: {exc}")[:200])
-            receipt["gate_receipt_error"] = receipt["gate_receipt"]["error"]
+            # Nothing binds the steps receipt yet, so it can record that there is no gate receipt.
+            receipt["gate_receipt"] = {"eligible": False, "reason": "gate_receipt_write_failed",
+                                       "error": redact(f"{type(exc).__name__}: {exc}")[:200]}
             try:
                 write_json(receipt_path, receipt, [account], quiet=True)
             except OSError:
                 pass
     print(json.dumps({"status": status, "exit_code": code, "run_prefix": prefix, "gate_receipt_written": written,
-                      "gate_receipt_error": receipt.get("gate_receipt_error"),
+                      "gate_receipt": receipt["gate_receipt"],
                       "kill_switch_engaged": receipt["kill_switch"].get("engaged")}))
     return code
 

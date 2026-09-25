@@ -224,15 +224,16 @@ RUNNER=blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.p
 ```
 
 Run these from the repository root. `preflight` is read-only and prints
-`"status": "ready"` when `run` would start. A typical run takes a few minutes,
-but the whole worst case (1,500 s, `worst_case_seconds` in the runner) must fit
-the session window, so a regular-session run starts by about 15:25 ET. After
-16:00 add `--plan local-acceptance-plan-post.json` to both commands; the latest
-start is then about 19:25 ET.
+`"status": "ready"` when `run` would start. A typical run takes a few minutes.
+The session-window check uses the plan's `overall_deadline_seconds` (1,620 s),
+which covers the computed worst case (`worst_case_seconds`, 1,575 s). So a
+regular-session run starts by about 15:23 ET. After 16:00 add
+`--plan local-acceptance-plan-post.json` to both commands; the latest start is
+then about 19:23 ET.
 
-Keep `--receipt` inside the repository, as above. A steps receipt elsewhere
-still records the run, but no gate receipt is written for it, because nobody
-qualifying the flip could check it.
+Keep `--receipt` inside the repository, as above. `run` refuses a steps receipt
+elsewhere (`refused_receipt_outside_repository`) before connecting, because
+nobody qualifying the flip could check it.
 
 `--state-dir` (default `~/.local/state/native-agent-stack/ibkr-local-acceptance`,
 created 0700) holds the run lock, the phase files and the kill-switch latch.
