@@ -156,6 +156,72 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(out["years"]["2020"]["counts"]["distinct_unreached_symbols"], 1 if unreached else 0)
 
 
+class FetchBudget(unittest.TestCase):
+    """Review round 15, F12: at e7529b47 the margin divided the request count by the rate ceiling. The estimate now
+    prices pages at the slower of the pinned rate and the dry run's measured throughput, the trading API at its own
+    limit, and adds the pinned retry and evaluation-and-merge allowances, all pinned before the count-only run."""
+
+    def _budget(self, **allow):
+        from tests import fixture_repo as FR
+        a = json.loads(json.dumps(FR.ALLOWANCE))
+        a.update(allow)
+        return {"rate": dict(FR.RATE_LIMIT), "allowance": a}
+
+    def test_pages_throughput_and_allowances_are_priced(self):
+        cal = synth.calendar()
+        k = {y: 100 for y in range(2016, 2021)}
+        pages = {kk: 1 for kk in CO.PAGE_KINDS}
+        pages["event_minute"] = 4
+        cheap = CO.fetch_estimate(cal, 12_000, k, self._budget(seconds_per_page=0.001, pages_per_request=pages,
+                                                               retry_seconds=0.0, evaluation_and_merge_seconds=0.0))
+        # with one page per request, a fast measurement and no allowances this is e7529b47's request estimate plus
+        # the extra minute-bar pages
+        sessions = len(cal.range(*CO.PART1_RANGE))
+        requests = sessions * 4 * 120 + 58 * sum(CO.candidate_bound(v) for v in k.values()) + 3
+        self.assertEqual(cheap["requests"], requests)
+        self.assertEqual(cheap["pages"], requests + 3 * 5 * CO.candidate_bound(100))
+        slow = CO.fetch_estimate(cal, 12_000, k, self._budget(seconds_per_page=1.5, pages_per_request=pages,
+                                                              retry_seconds=7_200.0,
+                                                              evaluation_and_merge_seconds=86_400.0))
+        self.assertAlmostEqual(slow["data_seconds_per_page"], 1.5)       # a measured 1.5 s per page, not 0.006 s
+        self.assertGreater(slow["estimate_seconds"], cheap["estimate_seconds"] * 40)
+        th = coverage_rule.checked_thresholds(PROTOCOL)
+        old = requests / FR_RATE() * 60.0                          # e7529b47's estimate at the rate ceiling
+        self.assertTrue(coverage_rule.fetch_margin(old, th)["passes"])
+        self.assertFalse(coverage_rule.fetch_margin(slow["estimate_seconds"], th)["passes"])
+
+    def test_unpinned_budgets_are_refused_before_the_run(self):
+        bad = json.loads(json.dumps(PROTOCOL))
+        with self.assertRaisesRegex(ValueError, "pipeline_allowance"):
+            CO.pinned_pipeline_allowance(bad)                      # the draft pins none
+        bad["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update({"per_minute": 10000, "source": "x"})
+        with self.assertRaisesRegex(ValueError, "trading_per_minute"):
+            CO.pinned_rate_limit(bad)
+        from tests import fixture_repo as FR
+        pa = bad["exposure_registry"]["pre_freeze_access_path"]["pipeline_allowance"]
+        pa.update(json.loads(json.dumps(FR.ALLOWANCE)))
+        self.assertEqual(CO.pinned_pipeline_allowance(bad)["seconds_per_page"], FR.ALLOWANCE["seconds_per_page"])
+        del pa["pages_per_request"]["quote_backward"]
+        with self.assertRaises(ValueError):                        # every priced kind needs its page bound
+            CO.pinned_pipeline_allowance(bad)
+
+    def test_the_dry_run_measures_pages_and_throughput_from_its_seal(self):
+        cal = synth.calendar()
+        store = Store()
+        req = plan.screen_requests(cal, "2020-06-02", ["AAA"])[0]
+        store.put(req, True, [b"{}", b"{}", b"{}"], "2026-09-25T10:00:00Z")
+        store.put(plan.quote_request("quote_exit", "AAA", "2020-06-01", 1.6e9, 1.6e9 + 60), True, [b"{}"],
+                  "2026-09-25T10:00:08Z")
+        m = CO.dry_run_measured(store)
+        self.assertEqual(m["pages_per_request_max"], {"quote_exit": 1, "screen_daily_raw": 3})
+        self.assertEqual((m["pages"], m["elapsed_seconds"], m["seconds_per_page"]), (4, 8.0, 2.0))
+
+
+def FR_RATE():
+    from tests import fixture_repo as FR
+    return FR.RATE_LIMIT["per_minute"]
+
+
 class SelectiveFailures(unittest.TestCase):
     """Review round 15, N03: a failed endpoint no longer removes its batch from every rate. Four sessions, each with
     its own sampled pairs, every pair with a raw close >= $1, an accepted official close, quotes at both stamps and
@@ -254,7 +320,8 @@ class Round9(unittest.TestCase):
         from tests import fixture_repo as FR
         self.assertEqual(transport_proc.worker_apis()["trading"].host, TRADING_HOST)
         self.assertEqual(sorted(run.transports({"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {
-            "per_minute": 200, "source": "synthetic"}}}})), ["data", "trading"])
+            "per_minute": 200, "source": "synthetic", "trading_per_minute": 100, "trading_source": "synthetic"}}}})),
+            ["data", "trading"])
         self.assertTrue(all(r["api"] == "trading" for r in CO.part0_requests("2026-09-25") if r["kind"] == "assets"))
         cal = synth.calendar()
         m = synth.FakeMarket(cal)
@@ -277,8 +344,7 @@ class Round9(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "rate_limit"):   # review round 10, L1: pinned before the run
                     run.main(argv)
                 proto = json.loads((repo / PROTOCOL_PATH).read_text())
-                proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(
-                    {"per_minute": 10000, "source": "synthetic"})
+                proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(FR.RATE_LIMIT)
                 # review round 11, C4: a committed parameters mismatch stops the run before any fetch
                 bad = json.loads(json.dumps(proto))
                 bad["run_discipline"]["study_code"]["parameters"]["sampling"] = {"changed": True}
@@ -319,11 +385,12 @@ class Round9(unittest.TestCase):
                 self.assertEqual(line["results_sha256"], sha256_file(repo / COUNT_ONLY_OUTPUT))
                 self.assertEqual(logs.read_lines(repo / RUN_LOG)[line["start_index"]]["purpose"], "count_only_start")
                 self.assertEqual(line["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
-                self.assertEqual(out["rate_limit"], {"per_minute": 10000.0, "source": "synthetic"})
+                self.assertEqual(out["rate_limit"], FR.RATE_LIMIT)
                 self.assertEqual((out["study_tree"], out["code_revision"]), (fx["tree"], FR.sh(repo, "rev-parse", "HEAD")))
                 self.assertEqual(set(out["snapshots"]), {"part0", "part1", "part3"})
                 self.assertEqual(out["part0"]["enumeration_sha256"], sha256_file(Path(root) / "enumeration.json"))
-                self.assertEqual(out["fetch_estimate"]["screen_requests"], 5 * 4 * 1)
+                self.assertEqual(out["fetch_estimate"]["requests_by_kind"]["screen_daily_raw"], 5 * 1)
+                self.assertEqual(out["pipeline_allowance"], FR.ALLOWANCE)
                 self.assertEqual(out["part0"]["actions_by_year"], {"2020": {"cash_dividend": 1}})
                 self.assertFalse(any(f'"{x}"' in json.dumps(out) for x in syms))
                 self.assertIn(("/v2/assets", {"status": "active", "asset_class": "us_equity"}), m.calls)

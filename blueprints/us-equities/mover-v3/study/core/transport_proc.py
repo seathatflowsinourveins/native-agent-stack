@@ -94,12 +94,15 @@ class ApiTransport:
         return self.proc.get(self.api, endpoint, params)
 
 
-def transports(cmd=None, per_minute=None) -> dict:
-    """The data and trading hosts, served by one child process started at the first request. per_minute is the
-    pinned rate limit (review round 11, C2), passed to the child that paces every request at it."""
+def transports(cmd=None, per_minute=None, trading_per_minute=None) -> dict:
+    """The data and trading hosts, served by one child process started at the first request. per_minute and
+    trading_per_minute are the pinned rate limits (review round 11, C2; review round 15, F12: one per API), passed to
+    the child, which paces each host's requests at its own."""
     import atexit
     if cmd is None and per_minute is not None:
         cmd = [*WORKER, "--per-minute", repr(float(per_minute))]
+        if trading_per_minute is not None:
+            cmd += ["--trading-per-minute", repr(float(trading_per_minute))]
     proc = TransportProcess(cmd)
     atexit.register(proc.close)
     return {"data": ApiTransport(proc, "data"), "trading": ApiTransport(proc, "trading")}
@@ -115,20 +118,22 @@ def serve(apis: dict, stdin, stdout) -> None:
         stdout.flush()
 
 
-def worker_apis(per_minute=None) -> dict:
-    """The child's transports: the data host and the trading host (the asset master is a trading-API endpoint),
-    sharing one pacer at the pinned per-minute rate (review round 11, C2)."""
+def worker_apis(per_minute=None, trading_per_minute=None) -> dict:
+    """The child's transports: the data host and the trading host (the asset master is a trading-API endpoint), each
+    paced at its own pinned rate (review round 15, F12; review round 11, C2 shared one pacer). Without a trading
+    rate both share the data pacer, as before."""
     from fetch.transport import TRADING_HOST, Pacer, Transport
     pacer = Pacer(per_minute)
-    return {"data": Transport(pacer=pacer), "trading": Transport(host=TRADING_HOST, pacer=pacer)}
+    trading = Pacer(trading_per_minute) if trading_per_minute is not None else pacer
+    return {"data": Transport(pacer=pacer), "trading": Transport(host=TRADING_HOST, pacer=trading)}
 
 
-def per_minute_arg(argv: list):
-    if "--per-minute" not in argv:
+def per_minute_arg(argv: list, flag: str = "--per-minute"):
+    if flag not in argv:
         return None
-    v = float(argv[argv.index("--per-minute") + 1])
+    v = float(argv[argv.index(flag) + 1])
     if not v > 0:
-        raise SystemExit("--per-minute must be positive")
+        raise SystemExit(f"{flag} must be positive")
     return v
 
 
@@ -137,7 +142,8 @@ def main() -> None:
     sys.dont_write_bytecode = True
     sys.pycache_prefix = tempfile.mkdtemp(prefix="mover-v3-transport-pycache-")
     sys.path.insert(0, str(STUDY))
-    serve(worker_apis(per_minute_arg(sys.argv[1:])), sys.stdin, sys.stdout)
+    serve(worker_apis(per_minute_arg(sys.argv[1:]), per_minute_arg(sys.argv[1:], "--trading-per-minute")), sys.stdin,
+          sys.stdout)
 
 
 if __name__ == "__main__":

@@ -88,4 +88,4 @@ COST_TABLE = PARAMETERS["cost_table"]
 # The sha256 of coverage_rule (canonical JSON) that this count-only code was written against
 # (coverage_rule.decided_by_code). tests/test_params.py (test_coverage_rule_hash_is_recorded) recomputes it from
 # the protocol.
-COVERAGE_RULE_SHA256 = "946958e69589c83df4e19698a57ea7fe1ed29e6c70fddcc2eb6c96adf3351c77"
+COVERAGE_RULE_SHA256 = "22077d62b9f40272999c404e3069d79916b9a89960eb793722427f0187c301dc"

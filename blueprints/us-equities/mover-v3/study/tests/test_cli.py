@@ -78,15 +78,15 @@ class StageRunsOnce(unittest.TestCase):
                 # review round 11, F4: the first run appends only its start line; nothing is fetched before it is
                 # committed and pushed
                 self.assertEqual(run.main(fetch), 0)
-                # line 0 is the fixture's governing count-only line (review round 15, F04)
-                self.assertEqual(logs.read_lines(repo / RUN_LOG)[1]["purpose"], "fetch_start")
+                # lines 0 and 1 are the fixture's dry-run and count-only lines (review round 15, F04 and F12)
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[2]["purpose"], "fetch_start")
                 self.assertEqual(market.calls, [])
                 with self.assertRaises(guards.Refused):
                     run.main(fetch)
                 FR.commit_push(repo, "2026-11-30T01:00:00+00:00")
                 self.assertEqual(run.main(fetch), 0)
                 line = logs.read_lines(repo / RUN_LOG)[-1]
-                self.assertEqual(line["start_index"], 1)
+                self.assertEqual(line["start_index"], 2)
                 self.assertEqual((line["purpose"], line["status"], line["study_tree"]), ("fetch", "complete", fx["tree"]))
                 sha = line["input_snapshot_sha256s"][0]
                 # F2: the next run refuses until the fetch line is committed and pushed
@@ -120,7 +120,7 @@ class StageRunsOnce(unittest.TestCase):
                         run.main(evaluate)
                 self.assertFalse(results.exists())
                 self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["status"], "failed")
-                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["start_index"], 3)
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["start_index"], 4)
                 FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
                 self.assertEqual(run.main(evaluate), 0)        # the retry's own start line
                 FR.commit_push(repo, "2026-12-01T02:30:00+00:00")
@@ -457,6 +457,28 @@ class ContextRefusals(unittest.TestCase):
                 repo = FR.build(tmp, output_overrides={"dependencies": {**deps, key: value}})["repo"]
                 with self.assertRaisesRegex(guards.Refused, "dependencies differ from the frozen protocol's"):
                     self.ctx(repo)
+
+    def test_the_frozen_allowance_is_bounded_by_the_committed_dry_run(self):
+        """Review round 15, F12: every frozen run refuses unless the native dry run is committed with its complete line
+        from the frozen tree and its measurement is within the pinned pipeline allowance."""
+        from core.params import DRY_RUN_OUTPUT
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            body = json.loads((repo / DRY_RUN_OUTPUT).read_text())
+            body["measured"]["seconds_per_page"] = 0.5               # slower than the pinned 0.02 s per page
+            FR.write(repo / DRY_RUN_OUTPUT, json.dumps(body))
+            FR.commit_push(repo, "2026-10-03T00:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "no complete 'dry_run' run-log line"):   # other bytes
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            ctx = self.ctx(repo)
+            allowance = dict(FR.ALLOWANCE, pages_per_request={**FR.ALLOWANCE["pages_per_request"], "quote_exit": 1})
+            with self.assertRaisesRegex(guards.Refused, "below the dry run's measurement"):
+                runner.check_dry_run_bound(repo, ctx["protocol"], ctx["run_log"], allowance)
+            (repo / DRY_RUN_OUTPUT).unlink()
+            with self.assertRaisesRegex(guards.Refused, "not committed"):
+                runner.check_dry_run_bound(repo, ctx["protocol"], ctx["run_log"], FR.ALLOWANCE)
 
     def test_the_pre_freeze_runs_read_only_the_pinned_data_files(self):
         """Review round 15, F04: the count-only and dry-run context refuses a data file that differs from its

@@ -20,8 +20,8 @@ from unittest import mock
 from core.calendar import build_calendar
 from core.canon import dumps, sha256_bytes, sha256_file, sha256_obj
 from core.coverage_rule import rule_sha256
-from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, DATA_PINS, PARAMETERS, PROTOCOL_PATH,
-                         RESULTS_DIR, RUN_LOG, STUDY_PATH)
+from core.params import (ACCESS_LOG, COST_TABLE, COUNT_ONLY_OUTPUT, DATA_DIR, DATA_PINS, DRY_RUN_OUTPUT, PARAMETERS,
+                         PROTOCOL_PATH, RESULTS_DIR, RUN_LOG, STUDY_PATH)
 
 REAL = Path(__file__).resolve().parents[5]
 # review round 15, N01: the fixture's fee file has data/fees-v3.json's schema (an open-ended last row included)
@@ -120,7 +120,16 @@ def write(path: Path, data) -> Path:
     return path
 
 
-RATE_LIMIT = {"per_minute": 10000.0, "source": "synthetic"}
+RATE_LIMIT = {"per_minute": 10000.0, "source": "synthetic", "trading_per_minute": 200.0, "trading_source": "synthetic"}
+# review round 15, F12: a synthetic pinned pipeline allowance (every request kind priced) and the dry-run measurement
+# the frozen fixture's committed dry-run output reports, which the allowance bounds
+ALLOWANCE = {"seconds_per_page": 0.02, "pages_per_request": {k: 2 for k in (
+    "assets", "corporate_actions", "screen_daily_raw", "screen_daily_split", "screen_daily_all", "screen_auctions",
+    "event_daily_raw", "event_daily_split", "event_daily_all", "event_auctions", "event_minute", "quote_entry",
+    "quote_exit", "quote_rename", "quote_backward")}, "retry_seconds": 3600.0, "evaluation_and_merge_seconds": 86400.0,
+    "source": "synthetic"}
+MEASURED = {"pages_per_request_max": {"screen_daily_raw": 1, "quote_exit": 2}, "pages": 40, "elapsed_seconds": 0.4,
+            "seconds_per_page": 0.01}
 
 
 DATA_FILES = ("session-calendar.json", "fees-v3.json")
@@ -134,6 +143,7 @@ def count_only_output(protocol: dict, enumeration_sha256: str, dropped=(), teste
             "years": {"2020": {"rates": {"identity_unreached_rate": rate}}},
             "part0": {"enumeration_sha256": enumeration_sha256},
             "identity_probe": {"passes": True}, "fetch_margin": {"passes": True}, "rate_limit": dict(RATE_LIMIT),
+            "pipeline_allowance": json.loads(json.dumps(ALLOWANCE)),
             **({"study_tree": deps["study_tree"], "dependencies": deps} if deps else {})}
 
 
@@ -168,6 +178,8 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
     enum = enumeration or {"symbols": [], "actions": [], "active": [], "counts": {}}
     enum_path = write(Path(tmp) / "enumeration.json", dumps(enum) + "\n")
     protocol = json.loads((REAL / PROTOCOL_PATH).read_text())
+    protocol["exposure_registry"]["pre_freeze_access_path"]["pipeline_allowance"].update(
+        json.loads(json.dumps(ALLOWANCE)))
     data = {n: sha256_file(repo / DATA_DIR / n) for n in DATA_FILES}
     write(repo / DATA_PINS, json.dumps({"base_files": [{"path": f"{DATA_DIR}/{n}", "sha256": data[n]}
                                                       for n in DATA_FILES]}, indent=1) + "\n")
@@ -178,12 +190,21 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
     # it; both are bound to the tree, the data files and the specification the freeze pins
     deps = {"study_tree": tree, "runtime_lock_sha256": sha256_file(study / "runtime.lock"),
             "data_file_sha256s": dict(sorted(data.items())), "parameters_sha256": sha256_obj(PARAMETERS),
-            "coverage_rule_sha256": rule_sha256(protocol), "rate_limit": {**RATE_LIMIT}}
+            "coverage_rule_sha256": rule_sha256(protocol), "rate_limit": {**RATE_LIMIT},
+            "pipeline_allowance": json.loads(json.dumps(ALLOWANCE))}
     out = count_only_output(protocol, sha256_file(enum_path), deps=deps)
     out.update(output_overrides or {})
     write(repo / COUNT_ONLY_OUTPUT, json.dumps(out, sort_keys=True, indent=1) + "\n")
-    if frozen and with_count_only_line:    # a draft fixture keeps an empty run log (pre-freeze command tests)
-        write(repo / RUN_LOG, dumps(count_only_line(deps, sha256_file(repo / COUNT_ONLY_OUTPUT), protocol)) + "\n")
+    if frozen:            # a draft fixture keeps an empty run log (the pre-freeze command tests start from it)
+        # review round 15, F12: the native dry run (from the tree the freeze pins) comes first; its measurement
+        # bounds the pinned allowance
+        write(repo / DRY_RUN_OUTPUT, json.dumps({"kind": "mover_v3_dry_run_output", "measured": MEASURED,
+                                                "study_tree": tree}, sort_keys=True, indent=1) + "\n")
+        dry = dict(count_only_line(deps, sha256_file(repo / DRY_RUN_OUTPUT), protocol), purpose="dry_run",
+                   output_path=DRY_RUN_OUTPUT)
+        lines = [dry] + ([count_only_line(deps, sha256_file(repo / COUNT_ONLY_OUTPUT), protocol)]
+                         if with_count_only_line else [])
+        write(repo / RUN_LOG, "".join(dumps(x) + "\n" for x in lines))
     commit_push(repo, "2026-09-30T13:00:00+00:00", "count-only output")
     if frozen:
         protocol["status"] = "frozen"

@@ -57,7 +57,8 @@ class TransportRetry(unittest.TestCase):
         self.assertEqual(len(res["pages"]), 11)
 
 
-RATED = {"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {"per_minute": 200, "source": "synthetic"}}}}
+RATED = {"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {
+    "per_minute": 200, "source": "synthetic", "trading_per_minute": 100, "trading_source": "synthetic"}}}}
 
 
 class TransportPacing(unittest.TestCase):
@@ -87,6 +88,13 @@ class TransportPacing(unittest.TestCase):
         self.assertEqual(transport_proc.per_minute_arg(["--per-minute", "200.0"]), 200.0)
         tr = transport_proc.transports(per_minute=200)
         self.assertEqual(tr["data"].proc.cmd[-2:], ["--per-minute", "200.0"])
+        # review round 15, F12: with a pinned trading limit each host has its own pacer
+        apis = transport_proc.worker_apis(9000, 150)
+        self.assertIsNot(apis["data"].pacer, apis["trading"].pacer)
+        self.assertAlmostEqual(apis["trading"].pacer.gap, 60 / 150)
+        tr = transport_proc.transports(per_minute=9000, trading_per_minute=150)
+        self.assertEqual(tr["data"].proc.cmd[-4:], ["--per-minute", "9000.0", "--trading-per-minute", "150.0"])
+        self.assertEqual(transport_proc.per_minute_arg(tr["data"].proc.cmd, "--trading-per-minute"), 150.0)
 
     def test_http_429_waits_a_full_rate_window(self):
         from fetch.transport import RATE_WINDOW_S

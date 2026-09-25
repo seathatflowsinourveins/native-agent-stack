@@ -487,7 +487,28 @@ def dry_run_output(snapshot_root, sha: str, sessions: list, symbols: list) -> di
     sealed = Store.read(Path(snapshot_root) / "dry-run", sha)
     return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha, "sessions": list(sessions),
             "symbols_count": len(symbols), "counts": dry_run_counts(sealed),
-            "incomplete_by_kind": sealed.incomplete_by_kind()}
+            "incomplete_by_kind": sealed.incomplete_by_kind(), "measured": dry_run_measured(sealed)}
+
+
+def dry_run_measured(sealed) -> dict:
+    """Review round 15, F12: what the native dry run measured for the fetch-time budget, from its seal alone (so an
+    adopted output reproduces): the largest page count of one request per kind, and the achieved serial seconds per
+    page, the span from the first to the last page vintage over every page fetched. No price or row."""
+    from core.calendar import parse_utc
+    pages_max, total, stamps = {}, 0, []
+    for key, st in sealed.state.items():
+        kind = sealed.req[key]["kind"]
+        n = len(st["pages"])
+        pages_max[kind] = max(pages_max.get(kind, 0), n)
+        total += n
+        stamps.append(parse_utc(st["vintage"]))
+    for h in sealed.history.values():
+        for st in h:
+            total += len(st["pages"])
+            stamps.append(parse_utc(st["vintage"]))
+    elapsed = (max(stamps) - min(stamps)) if stamps else 0.0
+    return {"pages_per_request_max": dict(sorted(pages_max.items())), "pages": total, "elapsed_seconds": elapsed,
+            "seconds_per_page": (elapsed / total) if total else None}
 
 
 def dry_run_counts(store) -> dict:
@@ -558,31 +579,92 @@ def part1_planner(cal, sessions: list, symbols: list):
 
 
 def pinned_rate_limit(protocol: dict) -> dict:
-    """exposure_registry.pre_freeze_access_path.rate_limit: the provider's documented rate limit and its source,
+    """exposure_registry.pre_freeze_access_path.rate_limit: the provider's documented rate limits and their sources,
     committed in the protocol before the count-only run (review round 10, L1). It decides fetch_margin, so it is not a
-    command-line input."""
+    command-line input. Review round 15, F12: the market-data and trading APIs have separate limits (the asset master
+    is a trading endpoint), so each is pinned with its source and each API is paced at its own
+    (core.transport_proc)."""
     rl = ((protocol.get("exposure_registry") or {}).get("pre_freeze_access_path") or {}).get("rate_limit") or {}
-    per, src = rl.get("per_minute"), rl.get("source")
-    if isinstance(per, bool) or not isinstance(per, (int, float)) or per <= 0 or not isinstance(src, str) or not src:
-        raise ValueError("pre_freeze_access_path.rate_limit needs a positive per_minute and its source before the "
+    out = {}
+    for per_key, src_key in (("per_minute", "source"), ("trading_per_minute", "trading_source")):
+        per, src = rl.get(per_key), rl.get(src_key)
+        if isinstance(per, bool) or not isinstance(per, (int, float)) or per <= 0 or not isinstance(src, str) or \
+                not src:
+            raise ValueError(f"pre_freeze_access_path.rate_limit needs a positive {per_key} and its {src_key} before "
+                             "the count-only run")
+        out.update({per_key: float(per), src_key: src})
+    return out
+
+
+# review round 15, F12: every request kind the fetch estimate prices, each with a pinned pages-per-request bound
+PAGE_KINDS = ("assets", "corporate_actions", "screen_daily_raw", "screen_daily_split", "screen_daily_all",
+              "screen_auctions", "event_daily_raw", "event_daily_split", "event_daily_all", "event_auctions",
+              "event_minute", "quote_entry", "quote_exit", "quote_rename", "quote_backward")
+
+
+def _number(v, positive=True) -> bool:
+    return not isinstance(v, bool) and isinstance(v, (int, float)) and math.isfinite(v) and (v > 0 if positive
+                                                                                             else v >= 0)
+
+
+def pinned_pipeline_allowance(protocol: dict) -> dict:
+    """exposure_registry.pre_freeze_access_path.pipeline_allowance (review round 15, F12), committed before the
+    count-only run: seconds_per_page (the achieved serial seconds per page, at least the native dry run's measurement),
+    pages_per_request for every PAGE_KINDS kind (at least the dry run's largest observed), retry_seconds and
+    evaluation_and_merge_seconds (the committed-step and evaluation time between the freeze and N0), and their
+    source. The freeze binds seconds_per_page and pages_per_request to the dry run (core.runner.check_dry_run_bound)."""
+    pa = ((protocol.get("exposure_registry") or {}).get("pre_freeze_access_path") or {}).get("pipeline_allowance") \
+        or {}
+    pages = pa.get("pages_per_request")
+    if not _number(pa.get("seconds_per_page")) or not isinstance(pages, dict) or \
+            any(not isinstance(pages.get(k), int) or isinstance(pages.get(k), bool) or pages[k] < 1
+                for k in PAGE_KINDS) or \
+            not _number(pa.get("retry_seconds"), positive=False) or \
+            not _number(pa.get("evaluation_and_merge_seconds"), positive=False) or \
+            not isinstance(pa.get("source"), str) or not pa.get("source"):
+        raise ValueError("pre_freeze_access_path.pipeline_allowance needs seconds_per_page, pages_per_request for "
+                         "every request kind, retry_seconds, evaluation_and_merge_seconds and its source before the "
                          "count-only run")
-    return {"per_minute": float(per), "source": src}
+    return {"seconds_per_page": float(pa["seconds_per_page"]), "pages_per_request": {k: pages[k] for k in PAGE_KINDS},
+            "retry_seconds": float(pa["retry_seconds"]),
+            "evaluation_and_merge_seconds": float(pa["evaluation_and_merge_seconds"]), "source": pa["source"]}
 
 
-def fetch_estimate(cal, n_symbols: int, k_by_year: dict, rate_per_minute: float) -> dict:
-    """coverage_rule.thresholds.fetch_estimate.rule: the full 2016-2020 screen requests plus, per year,
-    candidate_bound(k) candidates times the per-event request count (core.plan.per_event_requests_max), at the
-    documented rate limit."""
-    screen = len(cal.range(*PART1_RANGE)) * 4 * math.ceil(n_symbols / FETCH["screen_symbols_per_request"])
-    per_event = plan.per_event_requests_max()
+def fetch_estimate(cal, n_symbols: int, k_by_year: dict, budget: dict) -> dict:
+    """coverage_rule.thresholds.fetch_estimate.rule. Review round 15, F12: pages, not requests, at the slower of the
+    pinned rate and the measured serial throughput, plus the pinned retry and evaluation-and-merge allowances.
+    Requests per kind: the enumeration (2 asset-master requests on the trading API, 1 corporate-action request), the
+    full 2016-2020 screen (sessions x ceil(enumerated symbols / 100) per screen kind) and, per year, candidate_bound(k)
+    candidates each with core.plan.per_event_requests_max()'s 58 requests (5 per-event requests; per arm one entry
+    window and at most 7 forward exit and 7 rename-sensitivity windows; 8 backward windows). Each kind's requests
+    count pages_per_request[kind] pages; a data page takes max(60 / per_minute, seconds_per_page) seconds and a
+    trading page 60 / trading_per_minute. budget: {"rate": pinned_rate_limit, "allowance": pinned_pipeline_allowance}."""
+    rate, allow = budget["rate"], budget["allowance"]
+    screen_each = len(cal.range(*PART1_RANGE)) * math.ceil(n_symbols / FETCH["screen_symbols_per_request"])
+    forward = 2 + T["search_sessions"]
+    per_candidate = {"event_daily_raw": 1, "event_daily_split": 1, "event_daily_all": 1, "event_auctions": 1,
+                     "event_minute": 1, "quote_entry": 3, "quote_exit": 3 * forward, "quote_rename": 3 * forward,
+                     "quote_backward": T["holding_sessions_b_lane"] + 1 + 2}
+    if sum(per_candidate.values()) != plan.per_event_requests_max():
+        raise AssertionError("the per-kind breakdown differs from core.plan.per_event_requests_max")
     bounds = {str(y): candidate_bound(k) for y, k in sorted(k_by_year.items())}
-    requests = screen + per_event * sum(bounds.values())
-    return {"screen_requests": screen, "per_event_requests": per_event, "candidate_bounds": bounds,
-            "requests": requests, "rate_per_minute": rate_per_minute,
-            "estimate_seconds": requests / rate_per_minute * 60.0}
+    candidates = sum(bounds.values())
+    requests = {"assets": 2, "corporate_actions": 1,
+                **{k: screen_each for k in ("screen_daily_raw", "screen_daily_split", "screen_daily_all",
+                                            "screen_auctions")},
+                **{k: n * candidates for k, n in per_candidate.items()}}
+    pages = {k: requests[k] * allow["pages_per_request"][k] for k in PAGE_KINDS}
+    data_page_s = max(60.0 / rate["per_minute"], allow["seconds_per_page"])
+    fetch_s = (sum(pages.values()) - pages["assets"]) * data_page_s + pages["assets"] * 60.0 / rate["trading_per_minute"]
+    estimate = fetch_s + allow["retry_seconds"] + allow["evaluation_and_merge_seconds"]
+    return {"requests_by_kind": requests, "pages_by_kind": pages, "requests": sum(requests.values()),
+            "pages": sum(pages.values()), "candidate_bounds": bounds, "per_event_requests": plan.per_event_requests_max(),
+            "data_seconds_per_page": data_page_s, "fetch_seconds": fetch_s, "retry_seconds": allow["retry_seconds"],
+            "evaluation_and_merge_seconds": allow["evaluation_and_merge_seconds"], "rate_limit": dict(rate),
+            "estimate_seconds": estimate}
 
 
-def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, rate_per_minute: float,
+def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, budget: dict,
         clock=driver.utc_now, sessions: list | None = None, progress: dict | None = None) -> dict:
     """Parts 0, 1 (with its second phase) and 3, each fetched through core.driver.stage_fetch, sealed, re-read from
     the seal and counted. coverage_rule's hash is checked before any fetch or read (coverage_rule.decided_by_code;
@@ -608,11 +690,10 @@ def run(protocol: dict, cal, transports: dict, snapshot_root, fetch_date: str, r
     _, sha1 = sealed("part1", part1_planner(cal, sessions, enum["symbols"]))
     probes = probe_list(cal, enum["actions"])
     _, sha3 = sealed("part3", lambda st: probe_requests(cal, probes))
-    return output_from_sealed(protocol, cal, root, {"part0": sha0, "part1": sha1, "part3": sha3},
-                              rate_per_minute, sessions)
+    return output_from_sealed(protocol, cal, root, {"part0": sha0, "part1": sha1, "part3": sha3}, budget, sessions)
 
 
-def output_from_sealed(protocol: dict, cal, snapshot_root, shas: dict, rate_per_minute: float,
+def output_from_sealed(protocol: dict, cal, snapshot_root, shas: dict, budget: dict,
                        sessions: list | None = None) -> dict:
     """The count-only output (counts, rates and decisions only) from the sealed parts alone, each read back from
     <root>/<part> and checked against its sha256 (review round 15, N02 / R14-open-2): run() computes it this way after
@@ -632,8 +713,9 @@ def output_from_sealed(protocol: dict, cal, snapshot_root, shas: dict, rate_per_
     phase2_counts(s1, cal, sessions, enum["symbols"], c)
     part0 = {**part0_counts(enum), "enumeration_sha256": sha256_bytes(enum_bytes)}
     est = fetch_estimate(cal, len(enum["symbols"]), {y: candidates_for_bound(c.get(y, Counter()))
-                                                     for y in range(2016, 2021)}, rate_per_minute)
+                                                     for y in range(2016, 2021)}, budget)
     out = outputs(protocol, c, probe_counts(s3, cal, probes), part0, est["estimate_seconds"])
     out["fetch_estimate"] = est
+    out["pipeline_allowance"] = dict(budget["allowance"])
     out["snapshots"] = {name: shas[name] for name in ("part0", "part1", "part3")}
     return out

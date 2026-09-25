@@ -47,7 +47,8 @@ def transports(protocol: dict) -> dict:
     imports study/fetch/ (review round 10, H1), paced at the protocol's pinned rate limit (review round 11, C2; the
     command refuses while it is not pinned)."""
     from core import count_only, transport_proc
-    return transport_proc.transports(per_minute=count_only.pinned_rate_limit(protocol)["per_minute"])
+    rate = count_only.pinned_rate_limit(protocol)
+    return transport_proc.transports(per_minute=rate["per_minute"], trading_per_minute=rate["trading_per_minute"])
 
 
 def now() -> float:
@@ -105,6 +106,7 @@ def cmd_count_only(a) -> int:
     ctx = runner.count_only_context(REPO)
     checked_thresholds(ctx["protocol"])       # before any fetch or read
     rate = count_only.pinned_rate_limit(ctx["protocol"])   # review round 10, L1: pinned before the run
+    budget = {"rate": rate, "allowance": count_only.pinned_pipeline_allowance(ctx["protocol"])}   # round 15, F12
     if any(x.get("purpose") == "count_only" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the count-only code runs once; a rerun follows only a failed or incomplete run")
     out_path = REPO / COUNT_ONLY_OUTPUT
@@ -118,7 +120,7 @@ def cmd_count_only(a) -> int:
                 x.get("coverage_rule_sha256") != rule_sha256(ctx["protocol"]):
             raise runner.RunRefused("an earlier count-only run sealed part 1 under another coverage_rule; the rule "
                                     "cannot change after its rates could have been read")
-    deps = runner.count_only_dependencies(ctx, ctx["protocol"], rate)
+    deps = runner.count_only_dependencies(ctx, ctx["protocol"], rate, budget["allowance"])
     identity = {"coverage_rule_sha256": rule_sha256(ctx["protocol"]),       # review round 11, F4
                 "data_file_sha256s": deps["data_file_sha256s"]}               # review round 15, F04
     si = runner.begin_or_resume(ctx, "pre_freeze", "count_only", identity, clock)
@@ -130,7 +132,7 @@ def cmd_count_only(a) -> int:
         body = json.loads(out_path.read_text(encoding="utf-8"))
         shas = body.get("snapshots") or {}
         start = clock()
-        expected = count_only.output_from_sealed(ctx["protocol"], cal, a.snapshot_root, shas, rate["per_minute"])
+        expected = count_only.output_from_sealed(ctx["protocol"], cal, a.snapshot_root, shas, budget)
         expected.update({"study_tree": ctx["tree"], "code_revision": body.get("code_revision"), "rate_limit": rate,
                          "dependencies": deps})
         digest = runner.adopt_uncited_output(out_path, expected)
@@ -143,7 +145,7 @@ def cmd_count_only(a) -> int:
     tr = transports(ctx["protocol"])
     start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
-        out = count_only.run(ctx["protocol"], cal, tr, a.snapshot_root, start[:10], rate["per_minute"],
+        out = count_only.run(ctx["protocol"], cal, tr, a.snapshot_root, start[:10], budget,
                              clock=clock, progress=progress)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate,
                     "dependencies": deps})

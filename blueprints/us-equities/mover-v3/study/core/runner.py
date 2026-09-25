@@ -42,14 +42,14 @@ class RunRefused(Exception):
 
 # ---------------------------------------------------------------- context
 
-def count_only_dependencies(ctx: dict, protocol: dict, rate: dict) -> dict:
+def count_only_dependencies(ctx: dict, protocol: dict, rate: dict, allowance: dict | None = None) -> dict:
     """Review round 15, F04: the dependency manifest the count-only output records: the study tree that computed it,
     its runtime lock, the data files it ran against, the parameters, the coverage_rule and the rate limit. The freeze
     binds each to the frozen protocol (check_coverage_decision)."""
     return {"study_tree": ctx["tree"], "runtime_lock_sha256": ctx["runtime_lock_sha256"],
             "data_file_sha256s": dict(sorted(ctx["data_file_sha256s"].items())),
             "parameters_sha256": sha256_obj(PARAMETERS), "coverage_rule_sha256": rule_sha256(protocol),
-            "rate_limit": dict(rate)}
+            "rate_limit": dict(rate), "pipeline_allowance": dict(allowance) if allowance is not None else None}
 
 
 def adopt_uncited_output(out_path, expected: dict, ignore=("code_revision",)) -> str:
@@ -76,6 +76,32 @@ def governing_count_only_line(run_log: list, output_sha256: str) -> dict:
     if lines[0]["results_sha256"] != output_sha256:
         raise guards.Refused("the governing 'count_only' run-log line cites another output")
     return lines[0]
+
+
+def check_dry_run_bound(repo, protocol: dict, run_log: list, allowance: dict) -> dict:
+    """Review round 15, F12: the native dry run the freeze needs (freeze_preconditions[8]) is committed with its first
+    complete 'dry_run' line, ran from the tree the freeze pins, and bounds the pinned pipeline allowance: the pinned
+    seconds per page is at least the measured one, and the pinned pages per request of every kind the dry run fetched
+    is at least the largest it observed. Returns the dry-run output."""
+    from core.params import DRY_RUN_OUTPUT
+    path = Path(repo) / DRY_RUN_OUTPUT
+    if not path.exists():
+        raise guards.Refused(f"the native dry run's output {DRY_RUN_OUTPUT} is not committed")
+    raw = path.read_bytes()
+    lines = [x for x in run_log if x.get("stage") == "pre_freeze" and x.get("purpose") == "dry_run"
+             and x.get("status") == "complete" and x.get("results_sha256")]
+    if not lines or lines[0]["results_sha256"] != sha256_bytes(raw):
+        raise guards.Refused("the native dry run's output has no complete 'dry_run' run-log line citing it")
+    tree = (protocol.get("run_discipline", {}).get("study_code") or {}).get("tree")
+    if lines[0].get("study_tree") != tree:
+        raise guards.Refused("the native dry run ran from a tree other than the frozen study tree")
+    measured = json.loads(raw).get("measured") or {}
+    short = sorted(k for k, n in (measured.get("pages_per_request_max") or {}).items()
+                   if n > allowance["pages_per_request"].get(k, 0))
+    if short or (measured.get("seconds_per_page") or 0.0) > allowance["seconds_per_page"]:
+        raise guards.Refused(f"the pinned pipeline allowance is below the dry run's measurement: pages per request of "
+                             f"{short}, or the seconds per page")
+    return json.loads(raw)
 
 
 def check_coverage_decision(repo, protocol: dict, run_log: list | None = None) -> dict:
@@ -114,23 +140,28 @@ def check_coverage_decision(repo, protocol: dict, run_log: list | None = None) -
     for key in ("identity_probe", "fetch_margin"):
         if (out.get(key) or {}).get("passes") is not True:
             raise guards.Refused(f"the governing count-only output's {key} does not pass")
-    from core.count_only import pinned_rate_limit
+    from core.count_only import pinned_pipeline_allowance, pinned_rate_limit
     try:
         rate = pinned_rate_limit(protocol)
+        allowance = pinned_pipeline_allowance(protocol)
     except ValueError as exc:
         raise guards.Refused(str(exc)) from exc
     if out.get("rate_limit") != rate:
         raise guards.Refused("the count-only output was decided at a rate limit other than the frozen protocol's "
                              "pre_freeze_access_path.rate_limit")
+    if out.get("pipeline_allowance") != allowance:        # review round 15, F12
+        raise guards.Refused("the count-only output was decided under a pipeline allowance other than the frozen "
+                             "protocol's pre_freeze_access_path.pipeline_allowance")
+    check_dry_run_bound(repo, protocol, run_log or [], allowance)
     line = governing_count_only_line(run_log or [], sha256_bytes(raw))
     sc = protocol.get("run_discipline", {}).get("study_code") or {}
     deps = out.get("dependencies") or {}
     frozen = {"study_tree": sc.get("tree"), "data_file_sha256s": sc.get("data_file_sha256s"),
               "parameters_sha256": sha256_obj(sc.get("parameters")), "coverage_rule_sha256": rule_sha256(protocol),
-              "rate_limit": rate}
+              "rate_limit": rate, "pipeline_allowance": allowance}
     got = {"study_tree": deps.get("study_tree"), "data_file_sha256s": deps.get("data_file_sha256s"),
            "parameters_sha256": deps.get("parameters_sha256"), "coverage_rule_sha256": deps.get("coverage_rule_sha256"),
-           "rate_limit": deps.get("rate_limit")}
+           "rate_limit": deps.get("rate_limit"), "pipeline_allowance": deps.get("pipeline_allowance")}
     differ = sorted(k for k in frozen if got[k] != frozen[k])
     if differ:
         raise guards.Refused(f"the count-only output's dependencies differ from the frozen protocol's: {differ}")
