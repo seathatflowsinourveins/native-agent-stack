@@ -1558,12 +1558,55 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
             "url": file_url(manifest_path), "freshness_url": file_url(sources["freshness_snapshot"])}
 
 
+def native_rollout_receipt_gap_warnings(root: Path, layers) -> list[str]:
+    """Warn-level only, never raised: for each winner whose evidence_refs cite a
+    tools/sota-convergence/native-rollout-receipt.schema.json-shaped receipt (kind
+    "native_rollout"), that receipt's identity should name the winner's CURRENT pin. A
+    winner citing an older receipt (its pin moved on since that rollout was recorded, or the
+    receipt names a different component) is reported here, never failed by build_landscape's
+    own strict checks: 'a winner claiming a native-rollout receipt has one for its current pin
+    (do not fail existing rows)' (switch.md). A missing or unparsable referenced file is
+    silently skipped -- build_landscape's own evidence()/track() machinery already enforces
+    that every evidence_refs path resolves and is git-tracked; this is an additive, softer
+    cross-check layered on top of already-valid rows, not a replacement for it."""
+    warnings: list[str] = []
+    for layer in layers:
+        label = f"{layer.get('catalog')}/{layer.get('layer_id')}"
+        for winner in layer.get("winners") or []:
+            if not isinstance(winner, dict):
+                continue
+            component_id, pin = winner.get("component_id"), winner.get("pin")
+            for ref in winner.get("evidence_refs") or []:
+                if not isinstance(ref, str) or not ref.endswith(".json"):
+                    continue
+                try:
+                    receipt_path = safe_file(Path(root), ref)
+                    if not receipt_path.is_file():
+                        continue
+                    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                if not isinstance(receipt, dict) or receipt.get("kind") != "native_rollout":
+                    continue
+                claimed = receipt.get("identity") if isinstance(receipt.get("identity"), dict) else {}
+                if claimed.get("component_id") != component_id:
+                    continue
+                if claimed.get("version") != pin:
+                    warnings.append(
+                        f"{label}: winner {component_id!r} cites native-rollout receipt {ref} recorded for "
+                        f"version {claimed.get('version')!r}, but its current pin is {pin!r}"
+                    )
+    return warnings
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args(argv)
     try:
         data = build_landscape(args.root)
+        for warning in native_rollout_receipt_gap_warnings(args.root, data["layers"]):
+            print(f"native-rollout receipt (report-only): {warning}")
         print(json.dumps({"status": "passed", "counts": data["counts"],
                           "scope": "Coverage and reference integrity; no new runtime or ranking acceptance."}, sort_keys=True))
     except (OSError, ValueError, KeyError, TypeError) as error:

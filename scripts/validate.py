@@ -462,6 +462,104 @@ class Validator:
         return {"components": len(components), "profiles": len(profiles), "receipts": len(receipts), "hashed_files": len(files)}
 
 
+def validate_pins_v2(root: Path) -> tuple[list[str], list[str]]:
+    """(errors, warnings) cross-checking adoption/pins-linux-x86_64.json's schema_version 2
+    tools[] against manifests/stack.json components[].version and every
+    catalogs/landscape/*.json winners[].pin, honouring a matching divergence[] entry (report-only)
+    and never treating a pending candidate as a mismatch. Independent of Validator.validate(): a
+    missing pins file, a pins file still at schema_version 1 (e.g. a macOS host not yet migrated),
+    or a missing manifests/stack.json/catalogs/landscape all return no errors, because this check
+    is a v2-specific parity rule, not a general publication-integrity rule (tests/test_pins_v2.py
+    and tests/test_validate.py both exercise it; main() below is the only caller, so the exact
+    dict validate() itself returns is unaffected)."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    pins_path = root / "adoption" / "pins-linux-x86_64.json"
+    if not pins_path.is_file():
+        return errors, warnings
+    try:
+        pins = json.loads(pins_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"adoption/pins-linux-x86_64.json: invalid JSON ({type(error).__name__})"], warnings
+    if not isinstance(pins, dict) or pins.get("schema_version") != 2:
+        return errors, warnings
+    tools = pins.get("tools")
+    if not isinstance(tools, list):
+        return ["adoption/pins-linux-x86_64.json: schema_version 2 requires tools to be a list"], warnings
+
+    divergence_by_id = {
+        entry["id"]: entry for entry in pins.get("divergence") or []
+        if isinstance(entry, dict) and isinstance(entry.get("id"), str)
+    }
+
+    stack_versions: dict[str, str] = {}
+    stack_path = root / "manifests" / "stack.json"
+    if stack_path.is_file():
+        try:
+            stack = json.loads(stack_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            errors.append("manifests/stack.json: invalid JSON; cannot cross-check pins v2")
+        else:
+            for component in (stack or {}).get("components") or []:
+                if isinstance(component, dict) and isinstance(component.get("id"), str) and isinstance(component.get("version"), str):
+                    stack_versions[component["id"]] = component["version"]
+
+    # component_id -> [(pin, "<catalog>/<layer_id>"), ...]; a component can be a winner in more
+    # than one layer (rare) so every citing layer is checked, not just the first found.
+    landscape_pins: dict[str, list[tuple[str, str]]] = {}
+    landscape_dir = root / "catalogs" / "landscape"
+    if landscape_dir.is_dir():
+        for landscape_file in sorted(landscape_dir.glob("*.json")):
+            try:
+                document = json.loads(landscape_file.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            for layer in (document or {}).get("layers") or []:
+                if not isinstance(layer, dict):
+                    continue
+                label = f"{landscape_file.stem}/{layer.get('layer_id')}"
+                for winner in layer.get("winners") or []:
+                    if (isinstance(winner, dict) and isinstance(winner.get("component_id"), str)
+                            and isinstance(winner.get("pin"), str)):
+                        landscape_pins.setdefault(winner["component_id"], []).append((winner["pin"], label))
+
+    def check(tool_id: str, version, source_label: str, source_version: str) -> None:
+        if source_version == version:
+            return
+        divergent = divergence_by_id.get(tool_id)
+        message = (f"{tool_id}: pins v2 version {version!r} differs from {source_label} version "
+                    f"{source_version!r}")
+        if divergent is not None:
+            warnings.append(f"{message} (declared divergence {divergent.get('kind')!r}; report-only)")
+        else:
+            errors.append(f"{message} (add a divergence[] entry if intentional, else make them agree)")
+
+    for tool in tools:
+        if not isinstance(tool, dict):
+            errors.append("adoption/pins-linux-x86_64.json: every tools[] entry must be an object")
+            continue
+        tool_id, version = tool.get("id"), tool.get("version")
+        if not isinstance(tool_id, str) or not tool_id or not isinstance(version, str) or not version:
+            errors.append("adoption/pins-linux-x86_64.json: a tools[] entry is missing id or version")
+            continue
+        if tool_id in stack_versions:
+            check(tool_id, version, "manifests/stack.json", stack_versions[tool_id])
+        for pin, label in landscape_pins.get(tool_id, []):
+            check(tool_id, version, label, pin)
+
+    for divergence_id in divergence_by_id:
+        if divergence_id not in {tool.get("id") for tool in tools if isinstance(tool, dict)}:
+            errors.append(f"adoption/pins-linux-x86_64.json: divergence[] names {divergence_id!r}, which is not a tools[].id")
+
+    for candidate in pins.get("candidates") or []:
+        if isinstance(candidate, dict) and candidate.get("status") == "pending":
+            warnings.append(f"candidate {candidate.get('id')!r} is pending (no installable pin yet); report-only")
+        elif isinstance(candidate, dict):
+            errors.append(f"candidate {candidate.get('id')!r}: candidates[] entries must currently be status \"pending\"")
+
+    return errors, warnings
+
+
 def validate(root: Path) -> dict[str, int]:
     return Validator(root).validate()
 
@@ -489,6 +587,12 @@ def main() -> int:
         summary = validate(args.root)
     except InvalidPublication as error:
         print(f"Publication validation failed:\n{error}")
+        return 1
+    pins_errors, pins_warnings = validate_pins_v2(args.root)
+    for warning in pins_warnings:
+        print(f"pins-v2 (report-only): {warning}")
+    if pins_errors:
+        print("Pins v2 parity check failed:\n" + "\n".join(pins_errors))
         return 1
     print(json.dumps({"status": "passed", **summary}, sort_keys=True))
     print("Integrity and scope checks only; no live provider or GPU execution.")
