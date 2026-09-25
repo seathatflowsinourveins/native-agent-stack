@@ -1,0 +1,64 @@
+{
+ "schema": "news-reversal-dryrun-receipt/2",
+ "evidence_class": "local integration checks against the live data feed (dry-run; nothing sent); pre-freeze, never evidence",
+ "trade_date": "2026-09-25",
+ "setup": "one-off processes from the news-reversal worktree with the rev-only runtime config (account paper-4 named, arms_enabled [\"rev\"]) switched to dry-run for today in a scratch copy: --dry-run (no trading client is built; paper-4 does not exist yet), --no-scorer (no systemd unit touched), a fresh state root per run, score rows read-only from the running incentive engine's news-forward scores.jsonl (--scores-from), market data read-only through --data-env alpaca-paper-3.env at 30 requests/min. The incentive engine, its worktree and its state were not modified.",
+ "runs": [
+  {
+   "run": 2,
+   "started_at": "2026-09-25T14:43:19Z",
+   "stopped_at": "2026-09-25T14:57:00Z",
+   "git_head": "f66073416a71d35e5fafb2920ec8caecb97b4389",
+   "git_dirty": false,
+   "dry_run_equity": "100000",
+   "journal_sha256": "ad9c13cd736a27d81db66fd5b77718fd9af88567ad9d198397d466bc1f872f7b",
+   "news": 1243, "candidates": 5, "benchmark_quotes": 1, "deviations": 0, "step_errors": 0,
+   "decisions": {"rev|skip|spread_above_50bps": 1, "core_shadow|skip|spread_above_50bps": 1},
+   "order_intents": 0, "orders_submitted": 0,
+   "notes": "NKTR skipped at a 52.4 bps spread; the other four entries fell after the stop"
+  },
+  {
+   "run": 3,
+   "started_at": "2026-09-25T14:57:37Z",
+   "stopped_at": "2026-09-25T15:12:00Z",
+   "git_head": "f66073416a71d35e5fafb2920ec8caecb97b4389",
+   "git_dirty": false,
+   "dry_run_equity": "100000",
+   "journal_sha256": "44a16096ba58e320617f5e8a5ffd50b1a93296e907c42b03873cd008a26f492d",
+   "news": 1251, "candidates": 7, "benchmark_quotes": 3, "deviations": 0, "step_errors": 0,
+   "decisions": {"rev|skip|below_min_notional": 2, "rev|skip|spread_above_50bps": 1, "core_shadow|skip|below_min_notional": 1,
+                 "core_shadow|skip|spread_above_50bps": 1, "core_shadow|skip|ssr_rule_201": 1},
+   "order_intents": 0, "orders_submitted": 0,
+   "finding": "At E = $100,000 the leg-balanced per-name cap 0.10 E / 12 is $833.33, under the runner's $1,000 minimum, so ACAD and IBP (and every other entry) skip below_min_notional. Fixed in b3167cb9: the runner journals the cap at every start (rev_name_cap) and the protocol makes E >= $600,000 on paper-4 a deployment precondition (runtime.funding_precondition); runtime-config.json's dry_run_equity became 1,000,000."
+  },
+  {
+   "run": 4,
+   "started_at": "2026-09-25T15:19:05Z",
+   "stopped_at": "2026-09-25T15:33:00Z",
+   "git_head": "b3167cb94b7abaa26309dbef888857288ab2434f",
+   "git_dirty": false,
+   "dry_run_equity": "1000000",
+   "rev_name_cap": {"name_cap": "8333.33", "ok": true},
+   "journal_sha256": "e776d0e75571a9fefa0c97f722c64212b75e46c301de8eb2c09317466f6d8bbc",
+   "news": 1266, "candidates": 9, "benchmark_quotes": 3, "deviations": 0, "step_errors": 0,
+   "decisions": {"rev|enter|ok": 3, "rev|shadow|lane_small_shadow_only": 1, "core_shadow|shadow_enter|ok": 3,
+                 "core_shadow|shadow|lane_small_shadow_only": 1},
+   "order_intents": {"dry-run|rev|entry": 3},
+   "orders_submitted": 0,
+   "intended_rth_reversal_entries": [
+    {"symbol": "MTH", "label": "UNFAVORABLE", "label_rule": "exact", "leg": "long", "entry_utc": "2026-09-25T15:22:32Z",
+     "quote_bid": "64.53", "quote_ask": "64.64", "spread_bps": "17.0", "limit_price": "64.64", "qty": 128, "est_notional": "8273.92"},
+    {"symbol": "BB", "label": "UNFAVORABLE", "label_rule": "prefix", "leg": "long", "entry_utc": "2026-09-25T15:30:31Z",
+     "quote_bid": "8.24", "quote_ask": "8.25", "spread_bps": "12.1", "limit_price": "8.25", "qty": 1010, "est_notional": "8332.50"},
+    {"symbol": "META", "label": "UNFAVORABLE", "label_rule": "exact", "leg": "long", "entry_utc": "2026-09-25T15:32:16Z",
+     "quote_bid": "750.62", "quote_ask": "750.97", "spread_bps": "4.7", "limit_price": "750.97", "qty": 11, "est_notional": "8260.67"}
+   ],
+   "notes": "each entry at the touch and at most the $8,333.33 name cap; the window's net after three longs was $24,867 against the $100,000 cap, which cannot bind with 12 names per leg"
+  }
+ ],
+ "paper4_check_account": {
+  "command": "news-forward/executor.py check-account --config ../news-reversal/runtime-config.json (read-only)",
+  "verdict": "refused:trading_env_missing",
+  "reading": "alpaca-paper-4.env does not exist yet; the check refuses before any network call"
+ }
+}
