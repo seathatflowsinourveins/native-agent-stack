@@ -38,6 +38,9 @@ def main():
         (parent/name).write_text(text)
     fixture=a.config_root/'acceptance-targets.json'
     if not fixture.exists(): fixture.write_text('[]\n')
+    # adaptive-paper exporters (metrics.py --file-sd) add and remove their own targets; keep what they wrote.
+    paper_targets=a.config_root/'adaptive-paper-targets.json'
+    if not paper_targets.exists(): paper_targets.write_text('[]\n')
     env=a.config_root/'ecosystem-grafana.env'
     if not env.exists():
         fd=os.open(env,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)

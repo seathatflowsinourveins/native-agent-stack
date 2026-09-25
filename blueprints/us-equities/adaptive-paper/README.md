@@ -214,10 +214,14 @@ writes), never reads an env file or broker credentials, and never talks to
 Alpaca. It binds loopback-only and serves `/metrics`:
 
 ```sh
-python metrics.py --ledger "$STATE_ROOT/<account-fingerprint>/adaptive/ledger.sqlite3"
+python metrics.py --ledger "$STATE_ROOT/<account-fingerprint>/adaptive/ledger.sqlite3" \
+  --file-sd "$CONFIG_ROOT/adaptive-paper-targets.json"
 ```
 
-`--port` overrides the default `18890`; the host is always `127.0.0.1`.
+`--file-sd` is required to serve: the backend scrapes only registered
+exporters. `--no-file-sd` serves without registering, which means the exporter
+is never scraped or alerted on, so use it only for local inspection. `--port`
+overrides the default `18890`; the host is always `127.0.0.1`.
 `--trial-json` overrides the default sibling `trial.json` path if state is
 laid out differently. See the module docstring for the exact source of every
 metric and the two gaps documented below.
@@ -236,16 +240,31 @@ absent on a bad `--ledger` path or a permissions problem). **Not exported**
 `paper_reconciliation_last_success_timestamp_seconds` and
 `paper_request_budget_wait_exceeded_total`.
 
-The observability backend profile's Prometheus scrapes `127.0.0.1:18890` as
-job `adaptive-paper`, and its rules add the `equities-broker-path` alert
-group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
+The observability backend profile's Prometheus scrapes job `adaptive-paper`
+only at exporters registered in its `file_sd` list,
+`<config-root>/adaptive-paper-targets.json`. `configure.py` ships that list
+as `[]`.
+
+Start the exporter with `--file-sd` pointing at that list:
+
+- It registers its own `127.0.0.1:<port>` target once it serves.
+- It removes that target only on a clean stop (SIGTERM or SIGINT) of a trial
+  that finished with a passing status: phase `finished` with `passed` or
+  `completed_no_signals`.
+- Any other state stays registered, so `EquitiesPaperMetricsMissing` fires:
+  a crashed or killed exporter, an unfinished trial, or a finished trial with
+  any other, missing or unknown status. After recovering that
+  trial, remove the target with `metrics.py --deregister --port <port>
+  --file-sd <list>`.
+
+With nothing registered, the alert is silent. The profile's rules add the
+`equities-broker-path` alert group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
 `EquitiesRequestBudgetExhausted`, `EquitiesLedgerFrozen`,
 `EquitiesPaperMetricsMissing`, `EquitiesLedgerUnreadable`), routed to the
 existing local ntfy receiver by `scope: equities-broker`. It also excludes
-this job from the pre-existing `EcosystemServiceUnavailable` rule, since this
-exporter is a separate process not started by `install.py`/`configure.py`
-and would otherwise leave that generic rule firing permanently whenever no
-paper trial is running. See
+this job from the generic `EcosystemServiceUnavailable` rule. A registered
+exporter that is down therefore alerts once, as `EquitiesPaperMetricsMissing`,
+with wording matched to the trial lifecycle. See
 [`observability/backends/README.md`](../../../observability/backends/README.md#adaptive-paper-broker-path-alerts)
 and the templates under `observability/backends/templates/`. Run `metrics.py`
 as its own process alongside a trial; it is not started by `runner.py` and

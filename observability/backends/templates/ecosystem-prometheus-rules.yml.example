@@ -9,7 +9,7 @@ groups:
           scope: local-ecosystem
         annotations:
           summary: 'Local service {{ $labels.job }} is unavailable'
-          description: 'Prometheus could not scrape {{ $labels.instance }} for two minutes. The adaptive-paper job is excluded here: that exporter is a separate process not started by install.py/configure.py, so it is down (and this job would otherwise fire permanently) outside an active paper trial. EquitiesPaperMetricsMissing (scope=equities-broker) covers its unavailability instead, with wording matched to that expected lifecycle.'
+          description: 'Prometheus could not scrape {{ $labels.instance }} for two minutes. The adaptive-paper job is excluded here: its targets are the paper-trial exporters that metrics.py --file-sd registers in adaptive-paper-targets.json, separate processes not started by install.py/configure.py. EquitiesPaperMetricsMissing (scope=equities-broker) alerts on a registered exporter that is not answering, with wording matched to that trial lifecycle, so this rule does not duplicate it.'
       - alert: EcosystemOmniRouteHealthUnexpected
         expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:20128/api/health",http_status_class="2xx"}) or vector(0)) < 1'
         for: 2m
@@ -121,14 +121,14 @@ groups:
           summary: 'Adaptive-paper ledger {{ $labels.reason }} is frozen'
           description: 'The durable ledger persisted a halted_reason ({{ $labels.reason }}); safety.Ledger blocks new buy entries until an explicit recovery run or a fresh qualified next trial clears it. This does not stop confirmed owned exits.'
       - alert: EquitiesPaperMetricsMissing
-        expr: 'absent(paper_trial_active)'
+        expr: 'up{job="adaptive-paper"} unless on(job, instance) paper_trial_active'
         for: 2m
         labels:
           severity: warning
           scope: equities-broker
         annotations:
-          summary: 'Adaptive-paper metrics exporter is not being scraped'
-          description: 'paper_trial_active has been absent from Prometheus for two minutes: the read-only exporter process (metrics.py, loopback 127.0.0.1:18890) is down, unreachable, or its HTTP listener is misconfigured. paper_trial_active/paper_needs_attention/paper_ledger_readable are always exported by a running exporter regardless of ledger state, so this specifically means the exporter itself is not answering scrapes -- it does not cover an unreadable ledger path (see EquitiesLedgerUnreadable for that case). Missing data is unknown state, not proof of no active trial.'
+          summary: 'Registered adaptive-paper exporter {{ $labels.instance }} is not answering with paper metrics'
+          description: 'An adaptive-paper exporter registered in adaptive-paper-targets.json (the file_sd list that metrics.py --file-sd writes) has returned no paper_trial_active for two minutes: the exporter is down or unreachable, or another process answers on its port. A running exporter always exports paper_trial_active whatever the ledger state, so this does not cover an unreadable ledger path (see EquitiesLedgerUnreadable). The exporter serves only when registered (--file-sd), and removes its own target only on a clean stop of a trial that finished with a passing status (passed or completed_no_signals); a crashed or killed exporter, or any other trial state, stays registered and keeps this alert firing until the trial is recovered and metrics.py --deregister runs. No registered target means no series and no alert: missing data is unknown state, not proof of no active trial.'
       - alert: EquitiesLedgerUnreadable
         expr: 'paper_ledger_readable == 0'
         for: 2m

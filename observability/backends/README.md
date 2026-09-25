@@ -198,12 +198,40 @@ six backend restart checks retain their earlier scope.
 
 ## Adaptive-paper broker-path alerts
 
-`ecosystem-prometheus.yml.example` adds scrape job `adaptive-paper` at
-`127.0.0.1:18890`, the loopback address of the separate, read-only
+`ecosystem-prometheus.yml.example` adds scrape job `adaptive-paper`. It
+scrapes only the targets listed in `adaptive-paper-targets.json`, a `file_sd`
+list that Prometheus re-reads on every change and every 30 s. `configure.py`
+ships the list as `[]` and never overwrites an existing one.
+
+Each target is a separate, read-only
 [`blueprints/us-equities/adaptive-paper/metrics.py`](../../blueprints/us-equities/adaptive-paper/metrics.py#L1)
-exporter for that lane's durable ledger. That exporter is a distinct process
-from this profile; it is not installed or started by `install.py`/`configure.py`
-and must be run explicitly alongside a paper trial.
+exporter for that lane's durable ledger. It is not installed or started by
+`install.py`/`configure.py`. Run it explicitly alongside a paper trial with
+`--file-sd <config-root>/adaptive-paper-targets.json`.
+
+The registration lifecycle:
+
+- Registration. The exporter adds its own `127.0.0.1:<port>` target once its
+  listener binds. The write goes through a lock and an atomic replace. The
+  exporter refuses to start if the list is not a `file_sd` target list.
+- Required. The exporter serves only with `--file-sd`. The explicit
+  `--no-file-sd` opts into an unscraped exporter for local inspection.
+- Clean removal. The exporter removes its target only on a clean stop
+  (SIGTERM or SIGINT) of a trial that finished with a passing status: phase
+  `finished` with `passed` or `completed_no_signals`.
+- Kept registered. A target stays registered in every other case: its
+  exporter crashes or is killed, its trial was left at `starting`,
+  `needs_attention` or `held_overnight`, or its trial finished with any
+  other, missing or unknown status.
+- Recovery. After recovering such a trial, remove the target with
+  `metrics.py --deregister --port <port> --file-sd <list>`.
+
+`EquitiesPaperMetricsMissing` uses the expression
+`up{job="adaptive-paper"} unless on(job, instance) paper_trial_active`, held
+for 2m. It fires when a registered exporter is down or unreachable, or when
+another process answers on its port. With nothing registered it stays silent.
+It replaced `absent(paper_trial_active)` on 2026-09-25, which fired
+permanently on every host with no trial running.
 
 `ecosystem-prometheus-rules.yml.example` adds an `equities-broker-path` group
 (bringing the rendered total from 8 to 14 rules): `EquitiesOrderStateDivergence`,
@@ -232,10 +260,12 @@ unreadable. `EquitiesReconciliationFailed` now also fires on
 `runner.py` can end a trial at `phase=finished`/`status=needs_attention` (a
 failed run that was then recovered flat), which the original
 `paper_needs_attention`-only clause missed. A hard-killed runner whose
-`trial.json` stays stuck at `phase=starting` remains an unguarded gap: the
-only clause that would catch it needs
+`trial.json` stays stuck at `phase=starting` remains an unguarded gap while
+its exporter keeps running: the only clause that would catch it needs
 `paper_reconciliation_last_success_timestamp_seconds`, which is not currently
-exportable (see the schema-gap note below).
+exportable (see the schema-gap note below). Since 2026-09-25, stopping that
+exporter no longer hides the stuck trial: the unfinished trial keeps its
+target registered, so `EquitiesPaperMetricsMissing` fires.
 
 [`broker-path-rules-receipt.json`](broker-path-rules-receipt.json) records the
 `promtool check rules`/`promtool check config`/`amtool check-config` runs
@@ -249,4 +279,10 @@ see its module docstring for the exact schema gap -- so the corresponding
 `or` clauses in `EquitiesReconciliationFailed` and
 `EquitiesRequestBudgetExhausted` are syntactically valid but currently
 dormant; each alert still fires from its other clause
-(`paper_needs_attention` / `paper_request_budget_remaining`).
+(`paper_needs_attention` / `paper_request_budget_remaining`). That receipt
+predates the 2026-09-25 `file_sd` change: it records the static
+`127.0.0.1:18890` target and the earlier `absent()` rule. The current rule and
+registration are checked by `tests/test_observability_backends_alerts.py`,
+which runs `promtool test rules` over the rendered rule, and by
+`tests/test_adaptive_paper_metrics.py`, whose `FileSdRegistrationTests` run
+real exporter processes.
