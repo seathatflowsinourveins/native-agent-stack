@@ -85,6 +85,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked points 3 and 4 for this install receipt and re-ran all six commands on this host with byte-identical output hashes (command -v systemctl gives /usr/bin/systemctl, dpkg-query -S attributes it to package systemd, systemctl --version and dpkg-query -W give 255.4-1ubuntu8.17, cgroup v2 with cpu memory pids delegated, stack and foundation winner pin 255.4-1ubuntu8.17 with pin_matches true), so every install, version and pin claim is backed, the superseded receipt's contradicted ecosystem-prefix install claim is corrected, and catalog_revision 720e294b is on origin/main.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:51:57Z",
+      "reviewer": {
+        "identity_sha256": "291771731d442d0363957c57ff2c0f33ede168fb7c0d90e5bac12308bf3e592f",
+        "model": "claude headless reviewer"
+      }
     }
   ],
   "supersedes": "nativestack-5975wx-20260925--systemd--install--20260925"
