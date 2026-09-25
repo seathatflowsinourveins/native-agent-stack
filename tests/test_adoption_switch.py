@@ -195,6 +195,37 @@ class RelinkTests(SwitchFixture):
         self.relink("foo")
         self.assertEqual(os.readlink(self.root / "bin" / "foo"), first)
 
+    def test_recover_rolls_back_a_second_relink_that_fails_after_current_link_already_exists(self):
+        # Minor finding: rollback_txn's (and cmd_rollback's own duplicate) superseded refusal
+        # used to fire whenever exactly one component was touched, even when THIS txn never
+        # itself became the component's current-link setter. A second relink -- current/foo
+        # already exists from the first one, so relink links it only when absent (1540-1543) --
+        # that fails partway (here: a surface added after the first relink, the finding's own
+        # example) only ever ledgers entrypoint/surface ops, never a current/-prefixed "link". Its
+        # updated_txn therefore still names the FIRST relink's txn, which the old unconditional
+        # check misread as "a later txn already moved it on" and refused every recover forever.
+        self.relink("foo")
+        first_current_target = os.readlink(self.root / "current" / "foo")
+        frozen = self.root / "frozen" / "thing.txt"
+        frozen.parent.mkdir()
+        frozen.write_text("do not touch")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}],
+            "surfaces": [{"kind": "text-replace", "path": str(frozen), "expected_count": 1}],
+            "state_dirs": [], "window": "default", "rollback_class": "safe",
+        }})
+        second = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(second.returncode, 0)
+        self.assertIn("frozen", second.stderr)
+
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(len(json.loads(recover_result.stdout)["recovered_txns"]), 1)
+        self.assertEqual(json.loads(recover_result.stdout)["rollback_problems"], [])
+        self.assertEqual(os.readlink(self.root / "current" / "foo"), first_current_target,
+                         "current/foo must still name the original relink's real root, untouched")
+
     def test_relink_skips_a_component_with_no_switch_managed_root(self):
         self.write_components({"native-thing": {
             "version": "1.0.0", "kind": "native", "root_name": None, "current_link": None,

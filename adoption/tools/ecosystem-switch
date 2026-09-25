@@ -1058,6 +1058,18 @@ def cmd_confirm(args) -> int:
         return 0
 
 
+def _txn_sets_current_link(entries: list[dict]) -> bool:
+    """Whether any of ``entries`` (a txn's own OPERATION_KINDS-filtered ledger entries) is a
+    ``link`` whose surface names a component's ``current/<id>`` switch point -- the same
+    predicate ``recompute_state`` uses to decide whether an entry updates a component's
+    ``updated_txn``. The single source of truth both ``rollback_txn`` and ``cmd_rollback``'s own
+    pre-check gate their "superseded" refusal on: a txn that never became its component's own
+    current-link setter cannot have been superseded by one, whatever ``updated_txn`` currently
+    names (minor finding; see rollback_txn's comment)."""
+    return any(entry.get("op") == "link" and (entry.get("surface") or "").startswith("current/")
+              for entry in entries)
+
+
 def rollback_txn(root: Path, txn: str) -> list[str]:
     """Reverse every operation ``txn`` recorded, in reverse-chronological order, and return a
     list of problems encountered (empty means a clean rollback). ``unit-restart`` entries are
@@ -1080,7 +1092,19 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     # time a post-apply verify can fail, this txn is necessarily still its component's own
     # updated_txn.
     component_ids = {entry.get("component") for entry in entries if entry.get("component")}
-    if len(component_ids) == 1:
+    # Minor finding: this used to run whenever exactly one component was touched, even when this
+    # txn itself never became that component's own "current" setter (recompute_state only updates
+    # updated_txn from a link/resync/baseline entry whose surface starts with "current/"). Two
+    # concrete cases: a relink that fails partway *after* current/<id> already existed (so this
+    # txn only links entrypoints/surfaces, never current/<id> itself -- relink links it only when
+    # absent), and an apply that fails at a data-backup step before its own link step ever runs.
+    # In both, updated_txn still names whatever EARLIER txn last set current/<id>, and the old
+    # unconditional check misread that as "a later txn already moved it on", permanently refusing
+    # recover/rollback and leaving the txn in_progress forever. Gated on whether this txn's own
+    # entries actually include a current/<id>-setting "link" (the only OPERATION_KINDS member that
+    # can be one; resync/baseline are not reversible and never reach `entries`): only then can a
+    # different current updated_txn mean a genuinely later change this rollback would clobber.
+    if len(component_ids) == 1 and _txn_sets_current_link(entries):
         (component_id,) = component_ids
         current_component_state = load_state(root)["components"].get(component_id) or {}
         superseding_txn = current_component_state.get("updated_txn")
@@ -1162,11 +1186,18 @@ def cmd_rollback(args) -> int:
         if record.get("status") == "rolled_back":
             print(json.dumps({"status": "already_rolled_back", "txn": txn}))
             return 0
-        if not any(entry.get("op") in OPERATION_KINDS for entry in ledger.for_txn(txn)):
+        txn_entries = [entry for entry in ledger.for_txn(txn) if entry.get("op") in OPERATION_KINDS]
+        if not txn_entries:
             raise SwitchError(f"txn {txn!r} has no reversible operations (e.g. a baseline/resync/prune "
                                "record); nothing to roll back")
         component_id = record.get("component")
-        if component_id:
+        # Minor finding: this used to fire whenever *any* other txn had since become the
+        # component's updated_txn, even one this txn never was itself (e.g. a relink that fails
+        # partway after current/<id> already existed, or an apply that fails before its own link
+        # step) -- see rollback_txn's matching gate and _txn_sets_current_link for the full
+        # reasoning; both pre-checks must agree, since cmd_recover calls rollback_txn directly and
+        # never goes through this one.
+        if component_id and _txn_sets_current_link(txn_entries):
             current_component_state = state["components"].get(component_id) or {}
             if current_component_state.get("updated_txn") not in (None, txn):
                 raise SwitchError(f"txn {txn!r} is no longer the latest change to component {component_id!r} "
@@ -1478,7 +1509,13 @@ def cmd_adopt(args) -> int:
                 if not entry.get("root_name") or not entry.get("current_link"):
                     results[component_id] = "skipped (no switch-managed root; see divergence)"
                     continue
-                txn = f"relink-{component_id}-{int(time.time())}"
+                # os.getpid(), the same as apply's own txn id (cmd_apply above): two separate
+                # `adopt --relink` invocations for the same component within the same wall-clock
+                # second (int(time.time())'s own resolution) would otherwise collide onto one
+                # ledger txn id, silently merging a second relink's entries into the first's
+                # already-"applied" record instead of starting a distinct, independently
+                # recoverable transaction (found while testing the superseded-refusal fix below).
+                txn = f"relink-{component_id}-{int(time.time())}-{os.getpid()}"
                 real_root_path = root / "tools" / entry["root_name"]
                 if not real_root_path.is_dir():
                     raise SwitchError(f"relink refuses component {component_id!r}: its pinned root_name "
