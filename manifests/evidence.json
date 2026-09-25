@@ -3219,8 +3219,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b6e772ba2f5f52601e78a25f04d90266e5faa2e99b3f8ccb9c44f58147716a46",
-      "bytes": 21005
+      "sha256": "4e986b7552e1b957700def90e017102e7e28c00270348284ee000eb849a96dfa",
+      "bytes": 21331
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3324,8 +3324,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1d77596f63b7af5022e2d29df3fb3fc83726c4b41e56225b9c0f6ad8c1a707ed",
-      "bytes": 37605
+      "sha256": "f6173cb23741f7d0422c509bb64d99bf6d77b2af39563013fe43ac8c90ccc07d",
+      "bytes": 37736
     },
     {
       "path": "adoption/pre-login-observation.json",

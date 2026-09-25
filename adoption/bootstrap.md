@@ -119,6 +119,11 @@ GitHub-hosted macOS runner; see
    its `recipe_map` page (the SDK lock for `research-runtime`). A profile with
    "none of N" pinned installs none of its own components through the script
    (only the `node`, `uv` and `gh` every run installs); use the recipes.
+   `pins-linux-x86_64.json` changed after `v2026.09.24.1` in `install_note`
+   text only: the markitdown, tavily-cli, orx and agent-browser notes
+   attribute their installed-state observations to the 2026-09-23 recording
+   host. Versions, URLs and hashes are unchanged, so a host at that tag
+   installs the same artifacts.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
