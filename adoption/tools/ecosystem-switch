@@ -805,7 +805,15 @@ def apply_inverse(root: Path, entry: dict, spec_inverse: dict, *, backup_dir: Pa
     if kind == "link":
         op_link(root, spec_inverse["surface"], spec_inverse["to"])
     elif kind == "text-replace":
-        target = root / spec_inverse["surface"]
+        # Major finding: this used to build the rollback target as root / spec_inverse["surface"],
+        # never expanding a "~" surface the forward path (op_text_replace, via resolve_surface_path)
+        # already handles. A ~-rooted surface (e.g. a user unit or ~/codex-ecosystem/bin wrapper,
+        # the only way such a consumer can be committed at all -- validate.py's personal-home-path
+        # scan rejects a literal /home/<user> path in a tracked file) would then have its pre-image
+        # written to $ECO_INSTALL_ROOT/~/..., leaving the real file untouched while current/<id> was
+        # already unlinked: the real consumer is left pointing at nothing, and a relink re-run on
+        # that surface fails since the real file was never actually rolled back.
+        target = resolve_surface_path(root, spec_inverse["surface"])
         _refuse_if_drifted_since_write(target, entry)
         backup_path = spec_inverse.get("restore_from_backup")
         if backup_path and Path(backup_path).is_file():
@@ -814,7 +822,7 @@ def apply_inverse(root: Path, entry: dict, spec_inverse: dict, *, backup_dir: Pa
             op_text_replace(root, spec_inverse["surface"], spec_inverse["old"], spec_inverse["new"],
                              backup_dir=backup_dir, expected_count=spec_inverse.get("expected_count", 1))
     elif kind == "file-write":
-        target = root / spec_inverse["surface"]
+        target = resolve_surface_path(root, spec_inverse["surface"])
         _refuse_if_drifted_since_write(target, entry)
         backup_path = spec_inverse.get("restore_from_backup")
         if backup_path and Path(backup_path).is_file():
@@ -1565,7 +1573,12 @@ def cmd_adopt(args) -> int:
                     if surface.get("kind") == "text-replace":
                         old_text = surface.get("old", real_root)
                         expected_count = surface.get("expected_count", 1)
-                        target_path = root / surface["path"] if not surface["path"].startswith("/") else Path(surface["path"])
+                        # Major finding: this duplicated the pre-resolve_surface_path ternary
+                        # (absolute-or-under-root only, never "~"), so a ~ surface's already-
+                        # migrated probe read the wrong (nonexistent) path, always found 0 bytes,
+                        # and fell through to op_text_replace's own "expected 1, found 0" refusal
+                        # on every re-run, even once the real file was already migrated.
+                        target_path = resolve_surface_path(root, surface["path"])
                         already_migrated = False
                         with contextlib.suppress(OSError):
                             current_bytes = target_path.read_bytes()

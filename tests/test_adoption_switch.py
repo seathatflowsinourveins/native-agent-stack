@@ -406,6 +406,78 @@ class TextReplaceAndFrozenTests(SwitchFixture):
         self.assertEqual(self.unit_path.read_text(), self.original_unit_text)
 
 
+class TildeSurfaceRollbackTests(SwitchFixture):
+    """Major finding: resolve_surface_path's own "~" expansion (op_text_replace/op_file_write,
+    the forward path) was never applied on the rollback/re-run side: apply_inverse built its
+    text-replace/file-write targets as root / surface, and relink's own already-migrated probe
+    built its target the same unexpanded way. A ~-rooted surface is the only way a consumer
+    outside $ECO_INSTALL_ROOT (a user systemd unit, or a ~/codex-ecosystem/bin wrapper) can be
+    named at all -- validate.py's personal-home-path scan rejects a literal /home/<user> path in
+    a tracked file -- so this exercises exactly that shape with a real ~-relative surface path
+    resolved against a fake HOME, the same technique
+    OperationUnitTests.test_op_data_backup_expands_a_tilde_state_dir_path already uses for
+    state_dirs[], but through the CLI end to end (relink, then rollback/a second relink) instead
+    of calling the operation function directly."""
+
+    def setUp(self):
+        super().setUp()
+        self.fake_home = Path(self.tmp.name) / "fake-home"
+        (self.fake_home / ".config" / "bar").mkdir(parents=True)
+        self.env = {**self.env, "HOME": str(self.fake_home)}
+        self.tool_root = self.make_tool_root("bar-1.0.0", "barv1")
+        self.link_entrypoint("bar", self.tool_root / "bin" / "bar")
+        self.home_unit = self.fake_home / ".config" / "bar" / "bar.service"
+        real_root = str(self.tool_root.resolve())
+        self.home_unit.write_text(f"[Service]\nExecStart={real_root}/bin/bar\n")
+        self.original_text = self.home_unit.read_text()
+        self.write_components({"bar": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "bar-1.0.0", "current_link": "current/bar",
+            "entrypoints": [{"bin": "bin/bar", "in_root": "bin/bar"}],
+            "surfaces": [{"kind": "text-replace", "path": "~/.config/bar/bar.service", "expected_count": 1}],
+            "state_dirs": [], "window": "default", "rollback_class": "safe",
+        }})
+
+    def test_relink_then_rollback_restores_a_tilde_surface_in_place(self):
+        self.relink("bar")
+        updated = self.home_unit.read_text()
+        self.assertIn(str(self.root / "current" / "bar"), updated)
+        self.assertNotEqual(updated, self.original_text)
+        # Nothing was ever written under a literal "~" directory inside ECO_INSTALL_ROOT: the
+        # bug this guards against wrote a rollback pre-image to $ECO_INSTALL_ROOT/~/... instead
+        # of the real ~-expanded file.
+        self.assertFalse((self.root / "~").exists())
+
+        result = run(self.env, "rollback", "bar")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.home_unit.read_text(), self.original_text,
+                         "rollback must restore the real ~-expanded file in place")
+        self.assertFalse((self.root / "~").exists(), "rollback must never write under a literal ~ directory")
+        # The real consumer must still resolve, not be left pointing at an unlinked current/bar.
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], [])
+
+    def test_a_second_relink_recognizes_an_already_migrated_tilde_surface(self):
+        self.relink("bar")
+        after_first = self.home_unit.read_text()
+        text_replace_ops_after_first = sum(1 for e in switch.Ledger(self.root).all() if e["op"] == "text-replace")
+        # Second run must be a no-op (idempotent), not a failed re-search for text that is
+        # already gone -- the same guarantee TextReplaceAndFrozenTests proves for a non-~
+        # surface (test_relink_is_idempotent_for_a_component_with_a_text_replace_surface). The
+        # bug this guards against built the probe path without expansion, so it always looked at
+        # $ECO_INSTALL_ROOT/~/.config/bar/bar.service (never exists), never found the "already
+        # migrated" state, and fell through to op_text_replace's own "expected 1, found 0" refusal
+        # against the REAL file on every re-run.
+        self.relink("bar")
+        self.assertEqual(self.home_unit.read_text(), after_first)
+        text_replace_ops_after_second = sum(1 for e in switch.Ledger(self.root).all() if e["op"] == "text-replace")
+        self.assertEqual(text_replace_ops_after_second, text_replace_ops_after_first,
+                         "an already-migrated ~ surface must not add a new ledger entry")
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], [])
+
+
 class ApplyGateTests(SwitchFixture):
     def setUp(self):
         super().setUp()
