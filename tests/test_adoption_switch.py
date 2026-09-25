@@ -986,6 +986,30 @@ class ApplyGateTests(SwitchFixture):
         state = json.loads(run(self.env, "status", "--json").stdout)
         self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
 
+    def test_rollback_refuses_a_link_whose_live_target_drifted_since_this_operation_set_it(self):
+        # Minor finding (round 5): a link's reversal had no compare-and-swap precondition --
+        # unlike text-replace/file-write (_refuse_if_drifted_since_write) -- so rollback_txn used
+        # to silently overwrite an out-of-band repoint made after the forward op, rather than
+        # refusing the way the brief's "drift => refuse" rule requires for every operation kind.
+        self.write_receipt("R1", "foo", "2.0.0")
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        # Out-of-band repoint after the apply, bypassing the tool entirely (e.g. a manual
+        # `ln -sfn`, or a plain unguarded bootstrap re-run) -- current/foo now names neither the
+        # pre- nor the post-apply root the ledger itself recorded for this txn.
+        other_root = self.make_tool_root("foo-9.9.9", "v9")
+        current = self.root / "current" / "foo"
+        current.unlink()
+        current.symlink_to(other_root.resolve())
+
+        rollback = run(self.env, "rollback", "--txn", txn)
+        self.assertNotEqual(rollback.returncode, 0)
+        self.assertIn("no longer matches", rollback.stderr)
+        self.assertEqual(os.readlink(current), str(other_root.resolve()),
+                         "the out-of-band repoint must be left untouched, never silently overwritten")
+
 
 class ConfirmAndRevertTests(SwitchFixture):
     STUB_SYSTEMD_RUN = textwrap.dedent("""\
@@ -1071,8 +1095,11 @@ class ConfirmAndRevertTests(SwitchFixture):
         # or interrupted apply never completes after the fact".
         ledger = switch.Ledger(self.root)
         ledger.append(txn="crashed-1", op="txn_begin", component="synthetic", surface="_txn")
-        ledger.append(**{"txn": "crashed-1", "op": "link", "component": "synthetic",
-                         "surface": "current/synthetic", "from": None, "to": "/does/not/matter"})
+        # Really create the symlink (not just a ledger claim) so rollback_txn's compare-and-swap
+        # precondition on a link reversal (round 5 minor finding) sees live state agreeing with
+        # what this entry records, the same as a real crashed apply's own on-disk state would.
+        fields, _inverse = switch.op_link(self.root, "current/synthetic", "/does/not/matter")
+        ledger.append(txn="crashed-1", op="link", component="synthetic", surface="current/synthetic", **fields)
         result = run(self.env, "confirm", "--txn", "crashed-1")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("in_progress", result.stderr)

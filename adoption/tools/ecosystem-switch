@@ -1305,6 +1305,22 @@ def rollback_txn(root: Path, txn: str) -> list[str]:
     for entry in reversed(non_restart_entries):
         component = entry.get("component")
         if entry.get("op") == "link":
+            # Minor finding (round 5): every other reversible kind has a compare-and-swap
+            # precondition before rollback overwrites it -- text-replace/file-write's
+            # _refuse_if_drifted_since_write above, apply's own forward-path drift_issue -- but a
+            # link's reversal used to re-point current/<id> or bin/* straight to the recorded
+            # "from" with no check that the live target still equals what this same entry last set
+            # it to. An out-of-band repoint since (e.g. a plain, unguarded bootstrap-linux.sh
+            # re-run's bare `ln -sfn`, before a stale relink/apply txn is recovered) would then be
+            # silently overwritten rather than refused, the "drift ⇒ refuse" rule the brief
+            # requires for every operation kind, unaddressed for links specifically until now.
+            live_target = read_link_target(root / entry["surface"])
+            if live_target != entry.get("to"):
+                raise SwitchError(
+                    f"refusing to roll back {entry['surface']}: its current target ({live_target!r}) "
+                    f"no longer matches what this operation last set it to ({entry.get('to')!r}); "
+                    "something else changed it since (e.g. an out-of-band relink/bootstrap) -- "
+                    "investigate and resync/fix it by hand before rolling back")
             if entry.get("from") is not None:
                 fields, _inverse = op_link(root, entry["surface"], entry["from"])
             else:
