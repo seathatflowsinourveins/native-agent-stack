@@ -262,7 +262,7 @@ existing claude-code step. There is no more nested platform package, no
 native binary manages its own version directory and launcher and keeps
 auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
 changed after `v2026.09.24.1` in `install_note` text only; its `claude-code`
-pin is unchanged. It changed after `v2026.09.25.1` again, in its `rtk` and
+pin is unchanged. It changed after `v2026.09.25.2` again, in its `rtk` and
 `markitdown` entries only; neither tool has an entry in
 `adoption/pins-macos-arm64.json`, which is unchanged.)
 

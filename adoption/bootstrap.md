@@ -144,7 +144,7 @@ GitHub-hosted macOS runner; see
    text only: the markitdown, tavily-cli, orx and agent-browser notes
    attribute their installed-state observations to the 2026-09-23 recording
    host. Versions, URLs and hashes are unchanged, so a host at that tag
-   installs the same artifacts. It changed after `v2026.09.25.1` again: rtk
+   installs the same artifacts. It changed after `v2026.09.25.2` again: rtk
    moves from 0.49.0 to 0.50.0 and markitdown from 0.1.7 to 0.1.8 (URLs,
    hashes and notes), so a host at that tag installs the earlier two. A host
    that runs the Claude RTK hook at 0.50.0 also needs the `exclude_commands`
@@ -330,6 +330,7 @@ GitHub-hosted macOS runner; see
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store.
+   The template registers the `rtk hook claude` Bash hook, so with the rtk 0.50.0 pin also create `~/.config/rtk/config.toml` with `[hooks]` and `exclude_commands = ["^git show [^ ]*:", "diff"]`: 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks)); `adoption/bootstrap-linux.sh` only prints a reminder when the key is missing (changed after `v2026.09.25.2`).
    The agent definitions in `adoption/agents/claude/` changed after `v2026.09.24.1`:
    at that tag `source-scout` and `isolated-builder` declare `effort: medium`
    (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,

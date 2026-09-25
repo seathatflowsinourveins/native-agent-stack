@@ -691,5 +691,118 @@ class NativeInstallFloorTests(unittest.TestCase):
                          shell_functions((ROOT / "adoption/bootstrap-macos.sh").read_text(), "install_native"))
 
 
+class RtkConfigReminderTests(unittest.TestCase):
+    """2026-09-25: rtk 0.50.0's Claude hook needs `[hooks] exclude_commands = ["^git show [^ ]*:",
+    "diff"]` in rtk's own config (recipes/README.md#native-context-mode-and-hooks), which the
+    bootstrap does not write. After a successful rtk install, install_pin prints a one-line reminder
+    unless that config already carries the key. install_pin, fetch, install_single_binary_tarball
+    and rtk_config_reminder are extracted verbatim from bootstrap-linux.sh and run against a one-pin
+    fixture whose synthetic tarball is pre-seeded in the download cache with its real sha256, so
+    fetch() verifies it and never downloads. HOME is a temporary directory; the reminder must never
+    create or change the config."""
+
+    CONFIGURED = '[hooks]\nexclude_commands = ["^git show [^ ]*:", "diff"]\n'
+
+    def _run(self, tmp_path: Path, tool_id="rtk", xdg_config_home=None):
+        for tool in ["jq"] if sha256sum_checks_like_gnu() else ["jq", "shasum"]:
+            if shutil.which(tool) is None:
+                self.skipTest(f"{tool} is not on PATH")
+        home = tmp_path / "home"
+        home.mkdir(exist_ok=True)
+        eco = tmp_path / "eco"
+        cache = eco / "downloads"
+        cache.mkdir(parents=True, exist_ok=True)
+        build = tmp_path / "build"
+        build.mkdir(exist_ok=True)
+        (build / tool_id).write_text(f"#!/bin/sh\necho '{tool_id} 0.50.0'\n")
+        (build / tool_id).chmod(0o755)
+        asset = f"{tool_id}-x86_64-unknown-linux-musl.tar.gz"
+        subprocess.run(["tar", "-czf", str(cache / asset), "-C", str(build), tool_id], check=True)
+        pins_path = tmp_path / "pins.json"
+        pins_path.write_text(json.dumps({"tools": [{
+            "id": tool_id, "version": "0.50.0", "kind": "tarball",
+            "url": f"https://example.invalid/v0.50.0/{asset}",
+            "sha256": hashlib.sha256((cache / asset).read_bytes()).hexdigest(), "install_note": "fixture",
+        }]}))
+        shim = tmp_path / "shim"
+        shim.mkdir(exist_ok=True)
+        (shim / "curl").write_text("#!/bin/sh\necho 'curl must not run: the cached archive verifies' >&2\nexit 97\n")
+        if not sha256sum_checks_like_gnu():
+            (shim / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n')
+        for tool in shim.iterdir():
+            tool.chmod(0o755)
+        harness = tmp_path / "rtk-reminder-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + shell_functions(SCRIPT_PATH.read_text(), "fetch", "install_single_binary_tarball",
+                              "rtk_config_reminder", "install_pin")
+            + f"pins_path={shlex.quote(str(pins_path))}\n"
+            + f"ecosystem_root={shlex.quote(str(eco))}\n"
+            + f"bin_dir={shlex.quote(str(eco / 'bin'))}\n"
+            + f"cache_dir={shlex.quote(str(cache))}\n"
+            + f"stage_dir={shlex.quote(str(eco / 'staging'))}\n"
+            + "mkdir -p \"$bin_dir\" \"$stage_dir\"\ninstalled_pin_ids=()\n"
+            + f"install_pin {tool_id}\n"
+        )
+        env = {key: value for key, value in os.environ.items() if key != "XDG_CONFIG_HOME"}
+        env.update(HOME=str(home), PATH=f"{shim}{os.pathsep}{os.environ['PATH']}")
+        if xdg_config_home is not None:
+            env["XDG_CONFIG_HOME"] = str(xdg_config_home)
+        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60, env=env)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(f"Installed {tool_id} 0.50.0 (tarball)", result.stdout)
+        return result, home
+
+    @staticmethod
+    def reminders(stdout: str) -> list[str]:
+        return [line for line in stdout.splitlines() if line.startswith("Reminder:")]
+
+    def test_a_missing_config_gets_one_reminder_and_is_never_created(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for attempt in (1, 2):  # idempotent: a rerun reminds again and still writes nothing
+                with self.subTest(attempt=attempt):
+                    result, home = self._run(Path(tmp))
+                    config = home / ".config/rtk/config.toml"
+                    self.assertEqual(self.reminders(result.stdout), [
+                        f"Reminder: for the Claude hook, {config} needs [hooks] exclude_commands = "
+                        '["^git show [^ ]*:", "diff"] (recipes/README.md#native-context-mode-and-hooks); '
+                        "this script does not write it."])
+                    self.assertFalse((home / ".config").exists(), "the reminder must not create the config")
+
+    def test_a_config_with_the_exclusions_gets_no_reminder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / "home/.config/rtk/config.toml"
+            config.parent.mkdir(parents=True)
+            config.write_text(self.CONFIGURED)
+            result, _home = self._run(Path(tmp))
+            self.assertEqual(self.reminders(result.stdout), [])
+            self.assertEqual(config.read_text(), self.CONFIGURED)
+
+    def test_a_config_without_the_key_is_reminded_and_left_unchanged(self):
+        for text in ("[hooks]\n", '[hooks]\nexclude_commands = ["diff"]\n', "# exclude_commands\n"):
+            with self.subTest(text=text), tempfile.TemporaryDirectory() as tmp:
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_bytes(text.encode())
+                result, _home = self._run(Path(tmp))
+                self.assertEqual(len(self.reminders(result.stdout)), 1, result.stdout)
+                self.assertEqual(config.read_bytes(), text.encode(), "the reminder must never write the config")
+
+    def test_xdg_config_home_selects_the_config_rtk_reads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            xdg = Path(tmp) / "xdg"
+            result, _home = self._run(Path(tmp), xdg_config_home=xdg)
+            self.assertIn(f"{xdg}/rtk/config.toml needs", self.reminders(result.stdout)[0])
+            (xdg / "rtk").mkdir(parents=True)
+            (xdg / "rtk/config.toml").write_text(self.CONFIGURED)
+            result, _home = self._run(Path(tmp), xdg_config_home=xdg)
+            self.assertEqual(self.reminders(result.stdout), [])
+
+    def test_other_pins_get_no_reminder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, _home = self._run(Path(tmp), tool_id="qdrant")
+            self.assertEqual(self.reminders(result.stdout), [])
+
+
 if __name__ == "__main__":
     unittest.main()
