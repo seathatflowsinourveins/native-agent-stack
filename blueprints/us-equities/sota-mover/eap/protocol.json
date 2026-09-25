@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "id": "sota-mover-eap-v1-20260925",
-  "status": "draft_pending_independent_pre_outcome_review",
-  "frozen_before_outcomes": false,
-  "frozen_at": null,
+  "status": "frozen_pre_outcome",
+  "frozen_before_outcomes": true,
+  "frozen_at": "2026-09-25T03:50:01Z",
   "freeze_procedure": "An independent reviewer inspects this file, the code and the pre-freeze receipts before any outcome exists; the coordinator sets status to 'frozen_pre_outcome', frozen_before_outcomes to true and frozen_at, commits, and then writes receipts/freeze-record.json (template: receipts/freeze-record.template.json) with the sha256 of the committed protocol.json bytes and commits it. evaluate.py takes the expected sha256 only from that record, verifies every pin and a clean git tree for this directory, and refuses otherwise before it reads a price.",
   "question": "Does the Frazzini-Lamont earnings announcement premium, with announcement dates from SEC 8-K Item 2.02 acceptance times, exist in US common stocks from 2017-01 to 2026-08, and does its tradable long leg beat SPY after measured costs?",
   "evidence_label": "HIST (real SEC metadata and daily bars); SYN for tests",
