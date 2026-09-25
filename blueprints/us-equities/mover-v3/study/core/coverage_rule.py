@@ -56,15 +56,24 @@ def identity_limited(rate_2020, th: dict) -> bool:
 
 
 def probe_decision(probe: dict, th: dict) -> dict:
+    """The identity-probe freeze decision (coverage_rule.thresholds.identity_probe). Review round 15, N07: an observed
+    ticker-reuse failure (a case whose late asof returned the old issuer's identical bar, count_only.probe_counts)
+    fails the gate once the failed cases exceed ticker_reuse_failed_cases_max (0); at e7529b47 'failed' was only
+    reported and passes depended on the rename rates alone. Zero-case policy: with no conclusive reuse case (none
+    listed, or every case inconclusive: a fetch-incomplete request or no bar of the old issuer) ticker reuse is
+    'unverified for 2016-2020', which does not fail the gate and is recorded with the count-only output."""
     p = th["identity_probe"]
     n = probe["rename_probes"]
     rate = lambda k: (probe[f"{k}_match"] / n) if n else None  # noqa: E731
+    failed, verified = probe.get("reuse_failed", 0), probe.get("reuse_differ", 0)
+    reuse = "failed" if failed else ("verified" if verified else "unverified for 2016-2020")
     ok = (n >= p["min_rename_probes"] and rate("bars") is not None and rate("bars") >= p["bars_match_min"]
-          and rate("auctions") >= p["auctions_match_min"] and rate("quotes") >= p["quotes_match_min"])
+          and rate("auctions") >= p["auctions_match_min"] and rate("quotes") >= p["quotes_match_min"]
+          and failed <= p["ticker_reuse_failed_cases_max"])
     return {"passes": bool(ok), "rename_probes": n, "bars_rate": rate("bars"), "auctions_rate": rate("auctions"),
-            "quotes_rate": rate("quotes"),
-            "ticker_reuse": "verified" if probe["reuse_cases"] and probe["reuse_differ"] == probe["reuse_cases"]
-            else ("unverified for 2016-2020" if not probe["reuse_cases"] else "failed")}
+            "quotes_rate": rate("quotes"), "ticker_reuse": reuse,
+            "reuse_cases": {"listed": probe.get("reuse_cases", 0), "verified": verified, "failed": failed,
+                            "inconclusive": probe.get("reuse_inconclusive", 0)}}
 
 
 def fetch_margin(estimate_seconds: float, th: dict) -> dict:

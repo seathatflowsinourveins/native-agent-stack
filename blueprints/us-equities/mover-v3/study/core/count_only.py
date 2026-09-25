@@ -346,37 +346,67 @@ def outputs(protocol: dict, c: dict, probe: dict, part0: dict, fetch_estimate_se
             "fetch_margin": fetch_margin(fetch_estimate_seconds, th)}
 
 
+def _spans_the_rename(by_session, other, d: str, same) -> bool:
+    """Review round 15, F09: a rename probe matches on a daily endpoint only when both responses are complete, hold
+    exactly the same sessions, with at least one before the rename session d and one on or after it (so the history
+    is reached across the rename from both tickers), and every session's record is identical (same())."""
+    if by_session is None or other is None or set(by_session) != set(other):
+        return False
+    days = sorted(by_session)
+    return any(s < d for s in days) and any(s >= d for s in days) and all(same(by_session[s], other[s]) for s in days)
+
+
+def _quote_rows(rows) -> list:
+    return [(q["ns"], q["bp"], q["ap"], q["bs"], q["as"]) for q in rows]
+
+
+PROBE_KEYS = ("rename_probes", "bars_match", "auctions_match", "quotes_match", "reuse_cases", "reuse_differ",
+              "reuse_failed", "reuse_inconclusive")
+
+
 def probe_counts(store, cal, probes: dict) -> dict:
+    """exposure_registry.pre_freeze_access_path.identity_probe. Review round 15, F09: a daily or auction endpoint
+    matches only over the same sessions on both sides, spanning the rename (_spans_the_rename), and the quote endpoint
+    only when both windows are complete, non-empty and identical update for update; at e7529b47 one common session and
+    two merely non-empty quote responses were a match. N07: each ticker-reuse case is 'reuse_differ' (verified: the
+    old issuer's bar at s is there under the early asof and absent or different under the late one), 'reuse_failed'
+    (observed failure: the late asof returns the old issuer's identical bar) or 'reuse_inconclusive' (a request is
+    fetch-incomplete or the old issuer has no bar at s)."""
     out = Counter()
     k = SAMPLING["probe_offset_sessions"]
     for o, n, d in probes["renames"]:
         out["rename_probes"] += 1
-        lo, hi = cal.offset(d, -k), cal.offset(d, k)
         got = {}
-        for sym, asof in ((o, lo), (n, hi)):
+        for sym in (o, n):
             reqs = [r for r in probe_requests(cal, {"renames": [(o, n, d)], "reuse": []})
                     if r["params"]["symbols"] == sym]
             got[sym] = {r["kind"] + (r["params"].get("end") if r["kind"] == "probe_quotes" else ""): r for r in reqs}
+
         def data(sym, kind):
             r = got[sym][kind]
-            return store.parsed(r["key"]).get(sym, {}) if store.status(r["key"]) == "complete" else None
-        b_o, b_n = data(o, "probe_daily_raw"), data(n, "probe_daily_raw")
-        common = sorted(set(b_o or {}) & set(b_n or {}))
-        out["bars_match"] += bool(common) and all(_ohlcv(b_o[s]) == _ohlcv(b_n[s]) for s in common)
-        a_o, a_n = data(o, "probe_auctions"), data(n, "probe_auctions")
-        common = sorted(set(a_o or {}) & set(a_n or {}))
-        out["auctions_match"] += bool(common) and all(a_o[s] == a_n[s] for s in common)
-        qk = [kk for kk in got[o] if kk.startswith("probe_quotes")]
-        out["quotes_match"] += all(bool(data(o, kk)) and bool(data(n, kk)) for kk in qk)
+            return store.parsed(r["key"]).get(sym, [] if kind.startswith("probe_quotes") else {}) \
+                if store.status(r["key"]) == "complete" else None
+        out["bars_match"] += _spans_the_rename(data(o, "probe_daily_raw"), data(n, "probe_daily_raw"), d,
+                                               lambda a, b: _ohlcv(a) == _ohlcv(b))
+        out["auctions_match"] += _spans_the_rename(data(o, "probe_auctions"), data(n, "probe_auctions"), d,
+                                                   lambda a, b: a == b)
+        qk = sorted(kk for kk in got[o] if kk.startswith("probe_quotes"))
+        qo = {kk: data(o, kk) for kk in qk}
+        qn = {kk: data(n, kk) for kk in qk}
+        out["quotes_match"] += bool(qk) and all(qo[kk] and qn[kk] and _quote_rows(qo[kk]) == _quote_rows(qn[kk])
+                                                for kk in qk)
     for x, d1, d2 in probes["reuse"]:
         out["reuse_cases"] += 1
         reqs = [r for r in probe_requests(cal, {"renames": [], "reuse": [(x, d1, d2)]})]
         vals = [store.parsed(r["key"]).get(x, {}) if store.status(r["key"]) == "complete" else None for r in reqs]
-        if vals[0] is not None and vals[1] is not None:
-            s = cal.offset(d1, -k)
-            out["reuse_differ"] += _ohlcv(vals[0].get(s)) != _ohlcv(vals[1].get(s))
-    return {k: int(out[k]) for k in ("rename_probes", "bars_match", "auctions_match", "quotes_match",
-                                      "reuse_cases", "reuse_differ")}
+        s = cal.offset(d1, -k)
+        if vals[0] is None or vals[1] is None or vals[0].get(s) is None:
+            out["reuse_inconclusive"] += 1
+        elif vals[1].get(s) is not None and _ohlcv(vals[0][s]) == _ohlcv(vals[1][s]):
+            out["reuse_failed"] += 1
+        else:
+            out["reuse_differ"] += 1
+    return {key: int(out[key]) for key in PROBE_KEYS}
 
 
 # ---------------------------------------------------------------- native dry run (freeze_preconditions, E4)

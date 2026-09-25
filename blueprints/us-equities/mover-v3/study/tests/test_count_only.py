@@ -75,7 +75,7 @@ class Decisions(unittest.TestCase):
 
     def test_probe_identity_limited_and_margin_decisions(self):
         ok = {"rename_probes": 40, "bars_match": 39, "auctions_match": 38, "quotes_match": 36, "reuse_cases": 0,
-              "reuse_differ": 0}
+              "reuse_differ": 0, "reuse_failed": 0, "reuse_inconclusive": 0}
         d = coverage_rule.probe_decision(ok, self.th)
         self.assertTrue(d["passes"])
         self.assertEqual(d["ticker_reuse"], "unverified for 2016-2020")
@@ -148,8 +148,7 @@ class Pipeline(unittest.TestCase):
             self.assertEqual(sum(split.values()), cy[name], name)
             if cy[name]:
                 self.assertTrue(split, name)
-        out = CO.outputs(PROTOCOL, c, {"rename_probes": 0, "bars_match": 0, "auctions_match": 0, "quotes_match": 0,
-                                       "reuse_cases": 0, "reuse_differ": 0}, {"counts": {"union": 120}}, 1000.0)
+        out = CO.outputs(PROTOCOL, c, {k: 0 for k in CO.PROBE_KEYS}, {"counts": {"union": 120}}, 1000.0)
         text = json.dumps(out)
         self.assertNotIn("S0", text)
         self.assertEqual(out["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
@@ -401,7 +400,58 @@ class Probe(unittest.TestCase):
         driver.stage_fetch(lambda st: CO.probe_requests(cal, only), transports(m), store, "2026-09-25", clock=fixed_clock)
         counts = CO.probe_counts(store, cal, only)
         self.assertEqual(counts, {"rename_probes": 1, "bars_match": 1, "auctions_match": 1, "quotes_match": 1,
-                                  "reuse_cases": 1, "reuse_differ": 1})
+                                  "reuse_cases": 1, "reuse_differ": 1, "reuse_failed": 0, "reuse_inconclusive": 0})
+
+    def test_a_rename_probe_needs_the_same_sessions_across_the_rename_and_identical_quotes(self):
+        """Review round 15, F09: at e7529b47 one common session made a bars (or auctions) match, and two non-empty
+        quote responses made a quotes match, whatever their content. Here the new ticker's asof = d+3 response holds
+        only the sessions from d on (the old ticker's history is not reached through it) and its quotes differ, so
+        no endpoint matches; the old-ticker response is complete and the two histories agree where they overlap."""
+        cal = synth.calendar()
+        d = "2019-06-12"
+        daily, prints = issuer_data(cal, "2016-01-04", "2019-12-31", lambda x: 4.0)
+        tail_daily = {adj: {s: b for s, b in rows.items() if s >= d} for adj, rows in daily.items()}
+        tail_prints = {s: v for s, v in prints.items() if s >= d}
+        q_old = [synth.quote(cal.at(cal.offset(d, k), "12:16"), 4.0, 4.01) for k in (-1, 1)]
+        q_new = [synth.quote(cal.at(cal.offset(d, k), "12:16") + 1, 4.0, 4.02) for k in (-1, 1)]
+        m = synth.FakeMarket(cal)
+        m.add("old", [("2015-01-01", "OLDA"), (d, "OLDA-GONE")], daily=daily, auctions=prints, quotes=q_old)
+        m.add("new", [("2015-01-01", "NEWA-PRE"), (d, "NEWA")], daily=tail_daily, auctions=tail_prints, quotes=q_new)
+        probes = {"renames": [("OLDA", "NEWA", d)], "reuse": []}
+        store = Store()
+        driver.stage_fetch(lambda st: CO.probe_requests(cal, probes), transports(m), store, "2026-09-25",
+                           clock=fixed_clock)
+        counts = CO.probe_counts(store, cal, probes)
+        self.assertEqual((counts["bars_match"], counts["auctions_match"], counts["quotes_match"]), (0, 0, 0))
+
+    def test_an_observed_ticker_reuse_failure_fails_the_gate(self):
+        """Review round 15, N07: at e7529b47 'ticker_reuse: failed' was only reported and the gate passed on the
+        rename rates. A provider that serves the old issuer's bars under RU whatever the asof is an observed failure;
+        a case whose early response has no bar is inconclusive, never a failure."""
+        cal = synth.calendar()
+        th = coverage_rule.checked_thresholds(PROTOCOL)
+        probes = {"renames": [], "reuse": [("RU", "2017-03-01", "2018-05-01")]}
+        ru_old, _ = issuer_data(cal, "2016-01-04", "2017-02-28", lambda x: 9.0)
+        m = synth.FakeMarket(cal)
+        m.add("ru_old", [("2015-01-01", "RU"), ("2017-03-01", "RUX")], daily=ru_old)
+        m.aliases_any_asof["RU"] = "ru_old"                      # asof is ignored for RU
+        store = Store()
+        driver.stage_fetch(lambda st: CO.probe_requests(cal, probes), transports(m), store, "2026-09-25",
+                           clock=fixed_clock)
+        counts = CO.probe_counts(store, cal, probes)
+        self.assertEqual((counts["reuse_failed"], counts["reuse_differ"], counts["reuse_inconclusive"]), (1, 0, 0))
+        renames_ok = {"rename_probes": 40, "bars_match": 40, "auctions_match": 40, "quotes_match": 40}
+        d = coverage_rule.probe_decision({**counts, **renames_ok}, th)
+        self.assertEqual(d["ticker_reuse"], "failed")
+        self.assertFalse(d["passes"])
+        empty = synth.FakeMarket(cal)                             # no bar of the old issuer at all
+        store = Store()
+        driver.stage_fetch(lambda st: CO.probe_requests(cal, probes), transports(empty), store, "2026-09-25",
+                           clock=fixed_clock)
+        counts = CO.probe_counts(store, cal, probes)
+        self.assertEqual((counts["reuse_failed"], counts["reuse_inconclusive"]), (0, 1))
+        d = coverage_rule.probe_decision({**counts, **renames_ok}, th)
+        self.assertEqual((d["ticker_reuse"], d["passes"]), ("unverified for 2016-2020", True))
 
 
 
