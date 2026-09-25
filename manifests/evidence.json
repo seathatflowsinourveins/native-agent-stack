@@ -3110,8 +3110,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "74da954045c961a0867f77dc4e7a1315c82ab34b4f061a54f70e351dbf4b827e",
-      "bytes": 1818
+      "sha256": "414a6890b079dde81f3ba595eabb6727907bd9bea223d310015e901a34424262",
+      "bytes": 2024
     },
     {
       "path": ".github/requirements-ci.txt",
@@ -3200,8 +3200,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9b56cee5d4b2a98a2bd6b2a84fdbd272b035f006ee5ef5b92b355e1a6d0f5305",
-      "bytes": 10844
+      "sha256": "90318145bbe7c91931729138e6e540b180783997183466049f06e9ab87802c15",
+      "bytes": 11142
     },
     {
       "path": "CLAUDE.md",
@@ -10308,6 +10308,11 @@
       "path": "docs/landscape.md",
       "sha256": "3d6595b91ec6a935b0d7222399248ae1165b4e196e5a1ad3d6a778d0ce162d41",
       "bytes": 9506
+    },
+    {
+      "path": "docs/lanes.md",
+      "sha256": "3530be892dbffb678c1895180ca3e4bc610457afe88f60c4082147a464173866",
+      "bytes": 9668
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
