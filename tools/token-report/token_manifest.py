@@ -18,6 +18,11 @@ import uuid
 import shutil
 from urllib.parse import urlsplit
 
+# Claude Code 2.1.282 defaults: bashOutputMaxChars shows up to 30000 characters of a Bash result inline;
+# longer output is saved to a file and shown as a preview of at most 2000 characters (Rwe=2000).
+CLIENT_INLINE_CHARS=30000
+CLIENT_PREVIEW_CHARS=2000
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -158,6 +163,48 @@ def count_files(config,paths):
     out=subprocess.run([config["node"],"-e",code,config["tokenizer_module"]]+[str(p) for p in paths],capture_output=True,text=True,timeout=30,check=True)
     values=json.loads(out.stdout)
     return [artifact(p,n) for p,n in zip(paths,values)]
+
+def client_limit(config,key,default,low,high):
+    """Return a configured client character limit, or the default when unset; out-of-range values fail."""
+    value=config.get(key)
+    if value is None:
+        return default
+    if type(value) is not int or not low<=value<=high:
+        raise ValueError(key+" must be an integer from "+str(low)+" to "+str(high))
+    return value
+
+def rtk_client_visible(db,inline_chars=CLIENT_INLINE_CHARS,preview_chars=CLIENT_PREVIEW_CHARS):
+    """Re-count RTK's retained rows as a client first shows each output; None when there are no rows.
+
+    RTK stores ceil(bytes/4) of the raw and of the filtered output with no cap, and saves max(0, raw - filtered),
+    so rows where filtering expanded the output count as 0 in its total. This view shows an output whole up to
+    inline_chars, otherwise as a preview of at most preview_chars, and keeps the sign, so an expansion or a
+    filtered output longer than the raw output's preview counts as added. It is a model: bytes stand in for
+    characters (exact only for ASCII), the preview's wrapper text and later reads of saved output files are not
+    counted, rows from scripts no client displayed are included, and other clients' limits differ.
+    """
+    with closing(sqlite3.connect(Path(db).as_uri()+"?mode=ro",uri=True)) as source:
+        rows=source.execute("SELECT input_tokens,output_tokens,saved_tokens FROM commands").fetchall()
+    if not rows:
+        return None
+    cap=-(-inline_chars//4);pre=-(-preview_chars//4)
+    def seen(tokens):return tokens if tokens<=cap else pre
+    diffs=[seen(raw)-seen(filtered) for raw,filtered,_ in rows]
+    saved=sorted((s for _,_,s in rows),reverse=True);total=sum(saved)
+    avoided=sum(d for d in diffs if d>0);added=-sum(d for d in diffs if d<0)
+    return dict(rows=len(rows),saved=total,top10_share=(sum(saved[:10])/total if total else None),
+                inline_chars=inline_chars,preview_chars=preview_chars,inline_tokens=cap,preview_tokens=pre,
+                avoided=avoided,added=added,net=avoided-added,net_share=((avoided-added)/total if total else None))
+
+def rtk_visible_boundary(view):
+    share=lambda value:"n/a" if value is None else "{:.2%}".format(value)
+    shown=("as Claude Code 2.1.282 first shows it by default" if (view["inline_chars"],view["preview_chars"])==
+           (CLIENT_INLINE_CHARS,CLIENT_PREVIEW_CHARS) else "with the configured client limits")
+    return (" Each row saves max(0, raw - filtered) in ceil(bytes/4), with no cap; the ten largest commands hold {} of"
+            " the retained total. Counting each output "+shown+" ({:,} characters"
+            " inline, otherwise a preview of at most {:,}), the net is {:,} estimated tokens ({} of the total). This is"
+            " a model, not a bound: later reads of saved output files are not counted, and Codex has its own output limits."
+            ).format(share(view["top10_share"]),view["inline_chars"],view["preview_chars"],view["net"],share(view["net_share"]))
 
 def archive_native_events(config,ledger,issues):
     db=Path(config["rtk_database"]) if config.get("rtk_database") else None
@@ -469,9 +516,9 @@ def coverage_matrix(stack,audit,gaps,fresh,comparisons):
     gap={c["id"]:c for c in (gaps or {}).get("components",[])}
     recent={c["id"]:c for c in (fresh or {}).get("components",[])}
     ops=audit.get("operations",[])+(gaps or {}).get("operations",[])+(fresh or {}).get("operations",[])
-    native={"rtk":("retained estimate","rtk gain --format json; rtk gain --project --format json","90-day configured retention; global includes project views"),
-            "context-mode":("retained estimate","ctx_stats({})","Runtime-specific byte/event estimates; 7-day startup cleanup and 1000 events/session cap"),
-            "headroom":("retained estimate","headroom savings --json","Native lifetime field covers last 30 days; offline artifact guards do not add events"),
+    native={"rtk":("retained estimate","rtk gain --format json; rtk gain --project --format json","90-day configured retention; global includes project views; each row saves max(0, raw - filtered) in bytes/4 with no cap, so a few very large outputs can dominate"),
+            "context-mode":("retained estimate","ctx_stats({})","Runtime-specific byte/event estimates; lifetime = retained events x 256; 7-day startup cleanup and 1000 events/session cap"),
+            "headroom":("retained estimate","headroom savings --json","Native lifetime field covers at most 30 days; a missing ledger file also reads as zero; offline artifact guards do not add events"),
             "jcodemunch":("cumulative estimate","order(action=\"get_session_stats\", args={})","Persistent bytes/4 whole-file retrieval estimate; repeated calls count again; default index root keeps retrieval accounting and stats aligned"),
             "toon":("per conversion","toon INPUT.json --stats --output OUTPUT.toon","No upstream lifetime ledger; compact JSON can be smaller")}
     usage={"codex","claude-code","ccusage","claude-hud","codex-for-claude","promptfoo","vllm","opentelemetry-collector-contrib","prometheus","loki","grafana","alertmanager","ntfy"}
@@ -647,6 +694,29 @@ def refresh(config,context_file=None):
                 value=parsed["summary"]["total_saved"] if tool=="rtk" else parsed["lifetime"]["tokens_saved"]
                 if type(value) is not int or value<0: raise ValueError("Native saved counter missing or invalid")
                 metrics.update(saved=value,raw=parsed,kind="upstream estimate")
+                if label=="rtk-global" and config.get("rtk_database") and Path(config["rtk_database"]).exists():
+                    # A failure here is the view's own issue; the rtk gain counter read above stays successful.
+                    try:
+                        inline_chars=client_limit(config,"client_inline_chars",CLIENT_INLINE_CHARS,4000,128000)
+                        preview_chars=client_limit(config,"client_preview_chars",CLIENT_PREVIEW_CHARS,1,inline_chars-1)
+                        view=rtk_client_visible(config["rtk_database"],inline_chars,preview_chars)
+                        gain_rows=parsed["summary"].get("total_commands")
+                        # Allow 1% fewer rows than rtk gain counted, for retention pruning between the two reads.
+                        # Only a database with more than 1% fewer rows is flagged; a larger database is not detected.
+                        if view and type(gain_rows) is int and view["rows"]*100<gain_rows*99:
+                            issues.append("RTK client-visible view: the configured rtk_database holds "+str(view["rows"])+
+                                          " rows but rtk gain reported "+str(gain_rows)+" commands, so the view was omitted")
+                        elif view:
+                            metrics.update(client_visible=view,boundary=boundary+rtk_visible_boundary(view))
+                    except (sqlite3.Error,ValueError,TypeError,OSError) as exc:
+                        issues.append("RTK client-visible view: "+str(exc))
+                if tool=="headroom" and isinstance(parsed.get("path"),str) and parsed["path"]:
+                    # Headroom resolves a relative ledger path from its own working directory, the configured project.
+                    present=(Path(config["project"])/Path(parsed["path"]).expanduser()).exists()
+                    metrics["ledger_present"]=present
+                    if not present and value==0:
+                        metrics["boundary"]=boundary+(" The ledger file the report names is absent, so this zero means no"
+                                                      " compression has been recorded, not a measured zero saving.")
             except (ValueError,KeyError,TypeError) as exc:
                 success=False;metrics["error"]=str(exc)
             if not success:
