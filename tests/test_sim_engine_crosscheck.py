@@ -28,8 +28,13 @@ import sys  # noqa: E402
 if str(BLUEPRINT) not in sys.path:
     sys.path.insert(0, str(BLUEPRINT))
 
-import metrics  # noqa: E402
-import oracle  # noqa: E402
+# blueprints/us-equities/adaptive-paper/metrics.py shares the bare name "metrics": in a full
+# `python3 -m unittest` run whichever was imported first would win sys.modules["metrics"]. Load
+# this blueprint's copy under its own name so neither suite can see the other's module.
+_METRICS_SPEC = importlib.util.spec_from_file_location("sim_engine_crosscheck_metrics", BLUEPRINT / "metrics.py")
+metrics = importlib.util.module_from_spec(_METRICS_SPEC)
+_METRICS_SPEC.loader.exec_module(metrics)
+import oracle  # noqa: E402  (unique names repo-wide; OrderIntent must stay one class)
 import order_stream  # noqa: E402
 
 NAUTILUS_AVAILABLE = importlib.util.find_spec("nautilus_trader") is not None
