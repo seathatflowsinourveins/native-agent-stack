@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-historical-simulation",
+  "kind": "native_cli_e2e",
+  "component_ids": ["lean"],
+  "status": "not_run_blocked_on_lean_build",
+  "claim": "The six-scenario LEAN historical-simulation replay could not be run on lean-985ef30-r20260925: the solution build blocked (see evidence/artifacts/native-rollout-20260925/sim/lean.json). This receipt records the frozen oracle verified directly from the source files, so the comparison this track was asked to make is on record even though it could not be executed.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "frozen_oracle_source": "blueprints/us-equities/historical-simulation/{README.md,plan.json,receipt.json} (2026-09-19)",
+  "frozen_oracle_correction": {
+    "brief_claim": "six SPY scenarios vs nine oracle hashes",
+    "verified_from_file": "Six scenarios confirmed. Each scenario's receipt.json entry carries exactly four artifact hashes (summary_sha256, events_sha256, audit_sha256, native_result_sha256): 6 x 4 = 24 recorded hashes, not nine. Reported as a correction, not assumed from the brief's paraphrase."
+  },
+  "frozen_oracle_verified_fields": {
+    "one_zero": {"native_end_equity_usd": "90734.08", "fees_usd": "0", "dividends_usd": "428.64", "drawdown_pct": "33.98", "fills": 2, "margin_liquidations": 0},
+    "one_stress": {"native_end_equity_usd": "90358.00", "fees_usd": "2", "dividends_usd": "428.64", "drawdown_pct": "34.04", "fills": 2, "margin_liquidations": 0},
+    "two_zero": {"native_end_equity_usd": "76310.34", "fees_usd": "0", "dividends_usd": "613.35", "drawdown_pct": "58.52", "fills": 5, "margin_liquidations": 3},
+    "two_stress": {"native_end_equity_usd": "75607.75", "fees_usd": "5", "dividends_usd": "610.53", "drawdown_pct": "58.65", "fills": 5, "margin_liquidations": 3},
+    "adaptive_stress": {"native_end_equity_usd": "95324.10", "fees_usd": "3", "dividends_usd": "211.50", "drawdown_pct": "19.40", "fills": 3, "margin_liquidations": 0},
+    "over_limit": {"native_end_equity_usd": "100000.00", "fees_usd": "0", "dividends_usd": "0", "drawdown_pct": "0", "fills": 0, "margin_liquidations": 0}
+  },
+  "planned_method": {
+    "commands": [
+      {"argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-1"], "status": "not_executed"},
+      {"argv": ["python3", "blueprints/us-equities/historical-simulation/run.py", "--lean-source", "${LEAN_SOURCE}", "--dotnet", "${DOTNET_ROOT}/dotnet", "--out", "${PRIVATE_RUN_DIR}/sim/historical-simulation-run-2"], "status": "not_executed", "note": "Independent fresh-process re-run per brief step 3, to be compared with a local comparator that excludes wall-clock-only fields, the same approach validated on the equity-replay track's economic-only hash."}
+    ],
+    "comparator_prepared": "identity-preserving hash + economic-field comparison script prepared (not yet run): checks native_end_equity_usd, fees_usd, dividends_usd, fill_count, margin_calls length against both the oracle table above and between the two runs, plus the four per-case artifact hashes for run-to-run equality."
+  },
+  "blocker": {
+    "cause": "lean-985ef30-r20260925's dotnet build did not complete (see lean.json in this directory for the full attempt log and diagnostic evidence)",
+    "market_data_or_orders_involved": false,
+    "note": "Bundled upstream LEAN sample data only; no new data acquisition was attempted or needed for this step."
+  },
+  "limitations": [
+    "No E2E execution occurred on the new root for this component; every field in this receipt outside frozen_oracle_verified_fields describes what was planned, not what was measured.",
+    "This receipt exists so the required oracle verification and planned method are on record, per brief step 4, rather than omitting the file for the blocked component."
+  ],
+  "sanitization": "Host paths use ${LEAN_SOURCE}, ${DOTNET_ROOT}, ${PRIVATE_RUN_DIR} placeholders. No credential values or session identifiers appear in this receipt."
+}

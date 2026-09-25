@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-lean",
+  "kind": "native_cli_e2e",
+  "component_ids": ["lean"],
+  "status": "blocked_on_build",
+  "claim": "Cloned QuantConnect/Lean, checked out the pinned commit, and applied the recorded three-package-reference remediation cleanly and verifiably. The dotnet build of the full solution (needed before the historical-simulation replay can run) did not complete: it reproducibly hangs while compiling QuantConnect.Common across four independent attempts and four different mitigations, with no OOM, cgroup throttling, or disk-wait state observed. Historical-simulation could not be run on this root; reported as a blocker, not silently skipped or worked around.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/lean-985ef30-r20260925",
+  "existing_roots_untouched": ["${STACK_HOME}/lean-985ef30", "${STACK_HOME}/lean-985ef30-remediation"],
+  "clone_and_remediation": {
+    "commands": [
+      {"argv": ["git", "clone", "https://github.com/QuantConnect/Lean.git", "${LEAN_SOURCE}"], "exit_code": 0},
+      {"argv": ["git", "-C", "${LEAN_SOURCE}", "checkout", "--detach", "985ef30ad3ac774218c5ac516b4cb0aa2655730f"], "exit_code": 0},
+      {"argv": ["git", "-C", "${LEAN_SOURCE}", "apply", "blueprints/us-equities/engine/patches/lean-dependencies.patch"], "exit_code": 0},
+      {"argv": ["cp", "-R", "blueprints/us-equities/engine/patches/lean-locks/.", "${LEAN_SOURCE}/"], "exit_code": 0},
+      {"argv": ["${DOTNET_ROOT}/dotnet", "restore", "${LEAN_SOURCE}/QuantConnect.Lean.sln", "--locked-mode", "--disable-parallel", "-p:NuGetAuditMode=all", "-m:1"], "exit_code": 0, "note": "-m:1 added beyond the recorded recipe: the recipe's unbounded restore tried to start 21 MSBuild nodes and hit an OutOfMemoryException under the bounded-run 6G cgroup on the first attempt; this targeted fix (not a memory-limit increase) let restore complete."}
+    ],
+    "verified_head": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "patch_applied_cleanly": true,
+    "post_patch_diff_matches_recorded_remediation": true,
+    "diff_stat": "Compression/QuantConnect.Compression.csproj | 2 +-, Messaging/QuantConnect.Messaging.csproj | 2 +-, Tests/QuantConnect.Tests.csproj | 2 +-",
+    "lock_files_copied": 22,
+    "restored_projects": 22
+  },
+  "build_attempts": [
+    {"id": 1, "flags": "-m:1 for build (restore already fixed with -m:1)", "result": "hang on QuantConnect.Common", "evidence": "no obj/ filesystem write for 16+ minutes; ~6s total cgroup CPU time over 8+ minutes wall time; one thread R (running) among 56, no OOM/throttle/D-state; killed by operator"},
+    {"id": 2, "flags": "-m:2 (reverted to the original recorded recipe's own build flag; only restore needed -m:1)", "result": "hang on QuantConnect.Common", "evidence": "same signature; killed by operator after confirming via find -newer that no Common/obj file had been touched in 16+ minutes"},
+    {"id": 3, "flags": "-m:2, dedicated TMPDIR inside the new root (never shared with earlier attempts' /tmp cruft), -p:RunAnalyzersDuringBuild=false, wrapped in `timeout 1500`", "result": "hang on QuantConnect.Common (same signature); killed by operator before the timeout fired, to try one more targeted mitigation", "ruled_out": ["shared stale /tmp state from earlier attempts", "CA analyzer cost as the sole cause"]},
+    {"id": 4, "flags": "dotnet build Common/QuantConnect.csproj directly (isolated from the rest of the solution graph), -tl:off (terminal logger explicitly disabled), stdin redirected from /dev/null, -m:2, dedicated TMPDIR, analyzers off, wrapped in `timeout --signal=TERM --kill-after=15 600`", "result": "timed out at 600s (exit code 124, from GNU coreutils timeout, not an operator kill)", "evidence": "one ~24s CPU burst around the 4-4.5 minute mark (the only attempt to show any CPU accumulation at all), then flat at 24s total CPU for the remaining ~5 minutes with no new output DLL; ruled out both remaining hypotheses since the hang recurred with each fix applied", "ruled_out": ["terminal-logger non-TTY misdetection", "a blocking stdin read"]}
+  ],
+  "conclusion": "Four attempts, four independent mitigations, one fully automated (non-operator-judged) timeout confirmation. Stopping here rather than continuing an open-ended diagnostic campaign; reporting LEAN historical-simulation as blocked on this host for this session.",
+  "diagnostic_evidence": {
+    "referenced_package_dlls_valid": "Spot-checked cloneextensions/fasterflect/sharpziplib/mathnet.numerics/mcmaster.extensions.commandlineutils DLLs referenced by Common's compile response file: all valid PE32 .NET assemblies, plausible sizes, not truncated/corrupt.",
+    "memory": "MemAvailable stayed >= 8 GiB before every attempt; cgroup memory.current never exceeded ~1.1 GiB of a 6 GiB memory.max; memory.events high/max/oom all stayed 0.",
+    "cpu": "cgroup cpu.max ~2200000/100000 (about 22 cores, unthrottled); cpu.stat nr_throttled stayed 0 across the whole job.",
+    "disk": "No process observed in D (uninterruptible disk sleep) state during any attempt.",
+    "consistent_reproduction_point": "All four attempts reached the identical point: the three small, fast projects (Logging, Configuration, Compression) always complete in seconds; the hang begins immediately after QuantConnect.Common's CoreCompile writes its MSBuild cache files and starts csc."
+  },
+  "limitations": [
+    "This is an environment/tooling blocker report, not a completed native LEAN historical-simulation E2E on the new root.",
+    "The existing tools/lean-985ef30-remediation root (untouched by this track) already has a working build from a prior wave; this receipt does not reuse or copy that root's output, since doing so would misrepresent this track's own build as having succeeded.",
+    "Root cause is not conclusively isolated to a single mechanism; four plausible causes (uncapped MSBuild node fan-out, shared /tmp state, CA analyzer cost, terminal-logger/stdin interaction) were tested and, where the attempt also hung, ruled out one at a time. A fifth attempt without the ecosystem-bounded-run systemd scope wrapper, to isolate whether the cgroup/scope itself contributes, was not run to keep this within a bounded number of attempts."
+  ],
+  "sanitization": "Host paths use ${STACK_HOME}, ${LEAN_SOURCE}, ${DOTNET_ROOT} placeholders. No credential values or session identifiers appear in this receipt."
+}

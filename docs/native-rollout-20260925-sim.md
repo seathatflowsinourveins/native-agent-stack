@@ -38,9 +38,30 @@ runs, exactly as the source blueprint documents; an identity-excluded economic
 hash (fills/cash/position-PnL fields only) was byte-identical between the two
 runs for both cases. See `evidence/artifacts/native-rollout-20260925/sim/equity-replay.json`.
 
-## LEAN historical simulation (new root)
+## LEAN historical simulation (new root) — blocked
 
-<!-- filled in after the lean-985ef30-r20260925 build and the six-scenario replay complete -->
+`lean-985ef30-r20260925` was cloned from `QuantConnect/Lean`, checked out at the
+pinned commit, and had the recorded three-package-reference remediation
+applied and verified (`git diff` matches the recorded patch exactly; locked
+NuGet restore completed). The solution's `dotnet build` did not complete:
+across four independent attempts with four different mitigations (capping
+MSBuild's restore node fan-out that had triggered an `OutOfMemoryException`
+under the bounded-run cgroup; a dedicated `TMPDIR` with analyzers disabled;
+isolating `Common/QuantConnect.csproj` alone with the terminal logger
+explicitly disabled and stdin closed), the build reproducibly stalls
+compiling `QuantConnect.Common` — near-zero cgroup CPU time over many minutes
+of wall time, with no OOM, no cgroup CPU throttling, and no disk-wait state.
+The existing `tools/lean-985ef30` and `tools/lean-985ef30-remediation` roots
+(left untouched by this track) already have a working build from a prior wave
+(2026-09-19), before this host's most recent reboot (2026-09-22) — consistent
+with an environment/kernel-level regression on this host rather than a defect
+in the pinned source or the recorded remediation. The six-scenario replay
+could not be run on the new root; see
+`evidence/artifacts/native-rollout-20260925/sim/{lean,historical-simulation}.json`
+for the full attempt log, diagnostic evidence, and the frozen oracle verified
+directly from `blueprints/us-equities/historical-simulation/receipt.json`
+(six scenarios, four artifact hashes each — 24 recorded hashes, not the nine
+the task brief's paraphrase named; corrected here from the file itself).
 
 ## Scope and limitations
 

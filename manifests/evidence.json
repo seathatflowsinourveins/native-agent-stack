@@ -26725,8 +26725,18 @@
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json",
-      "sha256": "91aaf113ccfacbbb20653547ac410b80defa44618d8b649372e3090d2711273b",
-      "bytes": 6958
+      "sha256": "2af45a22d77ba306c18a401529505b8dfe57d44308c15cc979285597969c8f89",
+      "bytes": 7301
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/historical-simulation.json",
+      "sha256": "e3b3ada44bf77e9cf4b8449a931784e3025acd8b5129595da60fd8fdf99e8d7b",
+      "bytes": 4146
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/lean.json",
+      "sha256": "275038d434defee1dd4c9e5abdc62b78f5ced715fd3f0dc70bd7b663c42071ac",
+      "bytes": 6463
     },
     {
       "path": "evidence/artifacts/native-rollout-20260925/sim/nautilus.json",

@@ -67,6 +67,7 @@
     "fills_csv_and_positions_csv_hash_differ_across_runs": true,
     "fills_positions_hash_difference_explained": "Expected and documented by the source blueprint (README.md: 'Generated identities are not claimed to repeat'); only generated identity fields differ, verified by the economic-only hash matching exactly."
   },
+  "procedural_note": "The two launch.py runs were executed directly rather than explicitly prefixed with `rtk proxy`; their JSON output was short and complete (not condensed/truncated), so no information was lost, but this is noted for exact compliance with the brief's 'acceptance and debugging commands run raw via rtk proxy' instruction.",
   "oracle_comparison": {"result": "exact match on every oracle field for both cases, both runs, and against the original 2026-09-21 receipt", "mismatches": 0},
   "isolation": {
     "mechanism": "existing launch.py Bubblewrap sandbox: --unshare-all --clearenv, mandatory new network namespace, read-only runtime/repository/data, only the run's own output directory writable",
