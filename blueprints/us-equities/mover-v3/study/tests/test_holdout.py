@@ -306,7 +306,9 @@ class NotRead(unittest.TestCase):
             body = json.loads((repo / RESULTS_DIR / "holdout-read.json").read_text())
             self.assertEqual(body["labels"]["H3-a"], "not supported (holdout not read)")
             self.assertEqual(body["labels"]["H3-c"], "not carried")
-            self.assertEqual(body["verdicts"]["H3"]["verdict"], "not supported (holdout not read)")
+            # review round 15, F07: H3-c was not carried, so H3 has no verdict; the cell is reported apart
+            self.assertNotIn("H3", body["verdicts"])
+            self.assertEqual(body["profitability"]["H3-a"]["label"], "not supported (holdout not read)")
             self.assertEqual(logs.read_lines(repo / ACCESS_LOG)[-1]["record_kind"], "completion")
 
     def test_carried_items_must_equal_the_validated_items_at_the_read(self):

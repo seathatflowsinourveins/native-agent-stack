@@ -734,7 +734,8 @@ def not_read_results(ctx: dict, carried, reason: str) -> dict:
     if not carried:
         return {**base, "no_holdout": "nothing validated: the holdout is never labelled or read (holdout_gate.no_pass)"}
     labels = {i: ("not supported (holdout not read)" if i in carried else "not carried") for i in ITEM_IDS}
-    return {**base, "labels": labels, "verdicts": ST.hypothesis_verdict("holdout", labels)}
+    return {**base, "labels": labels, "verdicts": ST.hypothesis_verdict("holdout", labels),
+            "profitability": ST.profitability("holdout", labels)}
 
 
 def holdout_label(ctx: dict, items: dict) -> object:

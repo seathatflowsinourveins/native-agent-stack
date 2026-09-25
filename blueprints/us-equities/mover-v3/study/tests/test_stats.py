@@ -285,39 +285,44 @@ class Labels(unittest.TestCase):
         self.assertEqual(ST.qualifiers("holdout", "supported (confirmatory)", True), [])
         self.assertEqual(ST.qualifiers("validation", "screened", False, ("transport-deviation",)),
                          ["transport-deviation"])
-        labels = {"H1-D": "underpowered", "H1-D-b_lane-low": "underpowered", "H3-a": "supported (confirmatory)",
-                  "H3-b": "underpowered", "H3-c": "not carried"}
-        v = ST.hypothesis_verdict("holdout", labels, {"H3-a": ["lineage-unconfirmed", "transport-deviation"]})
+        labels = {"H1-D": "underpowered", "H1-D-b_lane-low": "underpowered", "H3-a": "underpowered",
+                  "H3-b": "underpowered", "H3-c": "supported (confirmatory)"}
+        v = ST.hypothesis_verdict("holdout", labels, {"H3-c": ["lineage-unconfirmed", "transport-deviation"]})
         self.assertEqual(v["H3"]["qualifiers"], ["lineage-unconfirmed", "transport-deviation"])
 
-    def test_verdicts(self):
-        labels = {"H1-D": "not_supported_mde_excluded", "H1-D-b_lane-low": "underpowered", "H3-a": "screened",
+    def test_verdicts_come_from_the_primary_contrasts_and_cells_are_reported_apart(self):
+        """Review round 15, F07: at e7529b47 H3 was 'screened' on H3-a alone (and H1 on H1-D-b_lane-low alone); a
+        verdict now comes from H1-D or H3-c only, and a passing tradable cell is reported under profitability."""
+        labels = {"H1-D": "not_supported_mde_excluded", "H1-D-b_lane-low": "screened", "H3-a": "screened",
                   "H3-b": "underpowered", "H3-c": "underpowered"}
         v = ST.hypothesis_verdict("validation", labels)
-        self.assertEqual(v["H1"]["verdict"], "not supported")
-        self.assertEqual(v["H3"], {"verdict": "screened", "items": ["H3-a"], "qualifiers": []})
+        self.assertEqual(v["H1"], {"verdict": "not supported", "items": ["H1-D"]})
+        self.assertEqual(v["H3"], {"verdict": "inconclusive", "items": ["H3-c"]})
+        prof = ST.profitability("validation", labels, {"H3-a": ["transport-deviation"]})
+        self.assertEqual(prof["H3-a"], {"hypothesis": "H3", "label": "screened", "passes": True,
+                                        "qualifiers": ["transport-deviation"]})
+        self.assertEqual((prof["H1-D-b_lane-low"]["passes"], prof["H3-b"]["passes"]), (True, False))
+        labels["H3-c"] = "screened"
+        self.assertEqual(ST.hypothesis_verdict("validation", labels)["H3"]["verdict"], "screened")
+
+    def test_verdicts_at_the_holdout(self):
         labels = {i: "not supported (holdout not read)" for i in ("H3-a", "H3-c")}
         labels.update({"H1-D": "not carried", "H1-D-b_lane-low": "not carried", "H3-b": "not carried"})
         v = ST.hypothesis_verdict("holdout", labels)
         self.assertEqual(v["H3"]["verdict"], "not supported (holdout not read)")
-        # review round 10, F8: at the holdout a hypothesis with no carried item gets no verdict
-        self.assertNotIn("H1", v)
+        self.assertNotIn("H1", v)               # review round 10, F8: a primary contrast that was not carried
+        self.assertEqual(sorted(ST.profitability("holdout", labels)), ["H3-a"])
+        labels["H3-c"] = "not carried"         # H3-a alone carried: no H3 verdict, the cell is reported apart
+        self.assertEqual(ST.hypothesis_verdict("holdout", labels), {})
+        self.assertEqual(ST.profitability("holdout", labels)["H3-a"]["label"], "not supported (holdout not read)")
 
     def test_a_contaminated_pass_is_inconclusive(self):
-        # review round 10, F1: 'screened (contaminated holdout)' met the pass rule, so rule (2) cannot apply
+        # review round 10, F1: 'screened (contaminated holdout)' met the pass rule but supports no claim
         contaminated = "screened (contaminated holdout)"
-        labels = {"H1-D": "not_supported_mde_excluded", "H1-D-b_lane-low": contaminated, "H3-a": "not carried",
-                  "H3-b": "not carried", "H3-c": "not carried"}
+        labels = {"H1-D": contaminated, "H1-D-b_lane-low": "not carried", "H3-a": "not carried",
+                  "H3-b": "not carried", "H3-c": "not_supported_mde_excluded"}
         v = ST.hypothesis_verdict("holdout", labels)
-        self.assertEqual(v["H1"]["verdict"], "inconclusive")
-        labels["H1-D-b_lane-low"] = "underpowered"
-        self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H1"]["verdict"], "not supported")
-        for passing in ("H3-a", "H3-b"):
-            labels = {"H1-D": "not carried", "H1-D-b_lane-low": "not carried", "H3-a": "underpowered",
-                      "H3-b": "underpowered", "H3-c": "not_supported_mde_excluded"}
-            self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H3"]["verdict"], "not supported")
-            labels[passing] = contaminated
-            self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H3"]["verdict"], "inconclusive", passing)
+        self.assertEqual((v["H1"]["verdict"], v["H3"]["verdict"]), ("inconclusive", "not supported"))
 
 
 class Diagnostics(unittest.TestCase):

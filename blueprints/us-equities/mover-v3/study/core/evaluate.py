@@ -378,4 +378,5 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
     return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
             "stage_labels": stage_labels, "holm_order": holm_order,
             "verdicts": ST.hypothesis_verdict(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
+            "profitability": ST.profitability(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
             "descriptive": desc, "counts": counts}

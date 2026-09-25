@@ -311,37 +311,51 @@ def qualifiers(stage: str, label: str, lineage_ok: bool, stage_qualifiers=()) ->
 CONTAMINATED = "screened (contaminated holdout)"
 
 
+PRIMARY = {"H1": "H1-D", "H3": "H3-c"}
+CELLS_OF = {"H1": ("H1-D-b_lane-low",), "H3": ("H3-a", "H3-b")}
+NOT_READ = "not supported (holdout not read)"
+
+
 def hypothesis_verdict(stage: str, labels: dict, item_qualifiers: dict | None = None) -> dict:
-    """outcome_reporting.hypothesis_verdict for H1 (H1-D, H1-D-b_lane-low) and H3 (H3-a, H3-b, H3-c). A pass
-    verdict carries the qualifiers of its passing items. A holdout item labelled 'screened (contaminated holdout)'
-    met the pass rule, so rule (2)'s 'does not pass' excludes it and the verdict is 'inconclusive' (review round 10,
-    F1). At the holdout a hypothesis with no carried item gets no verdict (F8)."""
+    """outcome_reporting.hypothesis_verdict. Review round 15, F07: each hypothesis's verdict comes from its primary
+    contrast alone, H1-D for H1 and H3-c for H3 (item_set: 'the direct test of H1', 'the direct test of H3's
+    versus'); the tradable cells answer whether a leg is profitable after costs and are reported separately
+    (profitability). At e7529b47 any passing item of a hypothesis, a cell included, promoted it to a pass verdict, so
+    H3 was 'screened' on H3-a alone. Rules: (1) the primary contrast has the stage's pass name: that verdict, with its
+    qualifiers; (2) it is 'not_supported_mde_excluded': 'not supported'; at the holdout 'not supported (holdout not
+    read)' when it has that label; (3) otherwise 'inconclusive', a 'screened (contaminated holdout)' contrast
+    included (review round 10, F1). At the holdout a hypothesis whose primary contrast was not carried gets no
+    verdict (review round 10, F8)."""
     out = {}
     item_qualifiers = item_qualifiers or {}
-    groups = {"H1": ("H1-D", "H1-D-b_lane-low"), "H3": ("H3-a", "H3-b", "H3-c")}
-
-    def met_pass_rule(i):
-        return labels.get(i) in (PASS_NAME[stage], CONTAMINATED)
-
-    for h, items in groups.items():
-        passing = [i for i in items if labels.get(i) == PASS_NAME[stage]]
-        if passing:
-            quals = sorted({q for i in passing for q in item_qualifiers.get(i, ())})
-            out[h] = {"verdict": PASS_NAME[stage], "items": passing, "qualifiers": quals}
+    for h, item in PRIMARY.items():
+        label = labels.get(item)
+        if stage == "holdout" and label in (None, "not carried"):
             continue
-        if stage == "holdout":
-            carried = [i for i in items if labels.get(i) not in (None, "not carried")]
-            if not carried:
-                continue
-            if all(labels[i] == "not supported (holdout not read)" for i in carried):
-                out[h] = {"verdict": "not supported (holdout not read)", "items": carried}
-                continue
-        if h == "H1":
-            ns = labels.get("H1-D") == "not_supported_mde_excluded" and not met_pass_rule("H1-D-b_lane-low")
+        if label == PASS_NAME[stage]:
+            out[h] = {"verdict": PASS_NAME[stage], "items": [item], "qualifiers": sorted(item_qualifiers.get(item, ()))}
+        elif stage == "holdout" and label == NOT_READ:
+            out[h] = {"verdict": NOT_READ, "items": [item]}
+        elif label == "not_supported_mde_excluded":
+            out[h] = {"verdict": "not supported", "items": [item]}
         else:
-            ns = labels.get("H3-c") == "not_supported_mde_excluded" and not any(
-                met_pass_rule(i) for i in ("H3-a", "H3-b"))
-        out[h] = {"verdict": "not supported" if ns else "inconclusive", "items": list(items)}
+            out[h] = {"verdict": "inconclusive", "items": [item]}
+    return out
+
+
+def profitability(stage: str, labels: dict, item_qualifiers: dict | None = None) -> dict:
+    """Review round 15, F07: the tradable cells, reported beside the hypothesis verdicts and never merged into them:
+    per cell its hypothesis, its label, whether it passed the stage (tradable after costs at that stage, with the
+    robustness means) and its qualifiers. At the holdout a cell that was not carried is omitted."""
+    item_qualifiers = item_qualifiers or {}
+    out = {}
+    for h, cells in CELLS_OF.items():
+        for c in cells:
+            label = labels.get(c)
+            if stage == "holdout" and label in (None, "not carried"):
+                continue
+            out[c] = {"hypothesis": h, "label": label, "passes": label == PASS_NAME[stage],
+                      "qualifiers": sorted(item_qualifiers.get(c, ()))}
     return out
 
 
