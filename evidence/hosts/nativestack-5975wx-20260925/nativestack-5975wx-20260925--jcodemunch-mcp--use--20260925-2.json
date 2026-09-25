@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && jcodemunch-mcp --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" jcodemunch-mcp && J() { mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args \"$1\" --output json --no-oauth --timeout 60000; }; J '{\"action\":\"list_repos\",\"args\":{}}' | python3 -c \"import json,sys;d=json.load(sys.stdin);print('list_repos count',d['count'],[(r['repo'],'files',r['file_count'],'symbols',r['symbol_count'],'indexed',r['indexed_at'][:10],r['status']) for r in d['repos']])\"",
+      "exit": 0,
+      "duration_s": 1.575,
+      "output_sha256": "34c20debfc9ca3d2e42dea270410a0dec0d27922ba5bee99e20003be961d3915",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp\njcodemunch-mcp 1.108.319\nstack ['1.108.319'] winner pins []\nlist_repos count 1 [('seathatflowsinourveins/native-agent-stack', 'files', 6, 'symbols', 7, 'indexed', '2026-09-23', 'loadable')]\n"
+    },
+    {
+      "cmd": "J() { mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args \"$1\" --output json --no-oauth --timeout 60000; }; r=seathatflowsinourveins/native-agent-stack; s=$(J \"{\\\"action\\\":\\\"search_symbols\\\",\\\"args\\\":{\\\"repo\\\":\\\"$r\\\",\\\"query\\\":\\\"greeting\\\",\\\"kind\\\":\\\"function\\\",\\\"max_results\\\":5}}\") || exit 1; ids=$(printf '%s' \"$s\" | python3 -c \"import json,sys;t=json.load(sys.stdin)['content'][0]['text'];print(' '.join(l.split(',')[1] for l in t.splitlines() if l.startswith('s,')))\") || exit 1; echo \"search_symbols greeting -> $ids\"; id=$(printf '%s\\n' $ids | sed -n '/^fixtures\\/after\\.py::/p' | head -1); test -n \"$id\" || exit 1; g=$(J \"{\\\"action\\\":\\\"get_symbol_source\\\",\\\"args\\\":{\\\"repo\\\":\\\"$r\\\",\\\"symbol_id\\\":\\\"$id\\\"}}\") || exit 1; printf '%s' \"$g\" | python3 -c \"import json,sys;g=json.load(sys.stdin);src=open(g['file']).read().splitlines();want='\\n'.join(src[g['line']-1:g['end_line']]);print('get_symbol_source',g['id'],'lines',g['line'],'-',g['end_line'],'freshness',g.get('_freshness'));print(g['source']);ok=g['source']==want;print('equals those lines of fixtures/after.py in this checkout:',ok);raise SystemExit(0 if ok else 1)\"",
+      "exit": 0,
+      "duration_s": 2.224,
+      "output_sha256": "ef1e5c079756218dafaf5cd6cc4a63fce7378a206fed3a4b72458915dca95828",
+      "output_excerpt": "search_symbols greeting -> fixtures/after.py::greeting#function fixtures/before.py::greeting#function\nget_symbol_source fixtures/after.py::greeting#function lines 1 - 2 freshness fresh\ndef greeting(name):\n    return \"Hello, \" + name + \"!\"\nequals those lines of fixtures/after.py in this checkout: True\n"
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.319"
+  },
+  "observed_at_utc": "2026-09-25T16:35:10Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), jcodemunch-mcp 1.108.319 (the manifests/stack.json pin, resolved and version-checked by the first command) served its order surface through MCPorter's documented ad-hoc stdio form (default ~/.code-index root, JCODEMUNCH_SHARE_SAVINGS=0). list_repos showed the one existing index, seathatflowsinourveins/native-agent-stack (6 files, 7 symbols, indexed 2026-09-23, loadable); no folder was indexed. search_symbols for the function greeting returned fixtures/after.py::greeting#function and fixtures/before.py::greeting#function. get_symbol_source for the after.py id, taken from the search result rather than hard-coded, returned lines 1-2 with freshness 'fresh': def greeting(name): return \"Hello, \" + name + \"!\". That text equals those lines of fixtures/after.py in this checkout (asserted). All commands exit 0.",
+  "limitations": [
+    "The index is the host's existing default index of this repository's fixtures, made on 2026-09-23 from the main checkout, not this worktree; retrieval was checked against this checkout's unchanged fixture. No indexing, larger repository, other action or reference query was exercised.",
+    "The calls used MCPorter's ad-hoc stdio bridge, not a native Claude or Codex MCP registration or a model session. They ran against the default ~/.code-index root, where jcodemunch keeps its own session and savings files; no savings counter was read, and its bytes/4 estimates are not provider tokens. The upstream license terms are not assessed here.",
+    "Supersedes nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925. That receipt ran the same two commands but was recorded as native_proven, although its workload is this repository's fixtures, which docs/contributing-evidence.md Section 2 classes as local_integration. That file stays byte-identical. scripts/platform_status.py and scripts/component_matrix.py do not read supersedes, so an independent agree on it would still count it as a native_proven use pass (for an alternative, host_verified). It needs needs_changes, not agree.",
+    "Recorded from a Claude Code session in a git worktree of this repository whose HEAD was detached at 3f267b5c (the catalog_revision; origin/main when this branch started), with this branch's earlier 2026-09-25 receipts present in the working tree, not in a pinned install checkout. Those receipts are the only difference from 3f267b5c. The tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:35:10Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:10:09Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925"
+}

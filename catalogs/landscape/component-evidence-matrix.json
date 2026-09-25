@@ -294,7 +294,7 @@
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "jCodeMunch",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp"
@@ -329,16 +329,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T16:35:14Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -2692,21 +2692,21 @@
       "alternatives": [
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
           "name": "Repomix",
           "repository": "https://github.com/yamadashy/repomix"
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "TOON",
           "repository": "https://github.com/toon-format/toon"
@@ -2745,12 +2745,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:21Z",
-                "pass": 3
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T16:35:07Z",
+                "pass": 5
               },
               "qualified_models": []
             },
@@ -3255,7 +3255,7 @@
       "alternatives": [
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-toon",
           "repository": "https://github.com/toon-format/toon"
@@ -3290,14 +3290,14 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-repomix",
           "repository": "https://github.com/yamadashy/repomix"
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "Serena",
           "repository": "https://github.com/oraios/serena"
@@ -3311,7 +3311,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
@@ -4825,7 +4825,7 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-toon",
           "repository": "https://github.com/toon-format/toon"

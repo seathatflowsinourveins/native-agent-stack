@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--toon--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "toon",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v toon) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && toon --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" toon",
+      "exit": 0,
+      "duration_s": 0.09,
+      "output_sha256": "224f261f41416e5db230d48925c5e341085c24c8673187fcc018c66fa3e18c41",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/toon -> ~/.local/share/codex-ecosystem/tools/toon-4.1.1/lib/node_modules/@toon-format/cli/bin/toon.mjs\n4.1.1\nstack ['4.1.1'] winner pins []\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; enc=$(toon fixtures/records.json --stats -o \"$d/records.toon\" 2>&1); e=$?; dec=$(toon \"$d/records.toon\" --decode --strict -o \"$d/recovered.json\" 2>&1); s=$?; echo \"encode --stats exit $e: $(printf '%s\\n' \"$enc\" | sed -n '2,3p' | tr '\\n' ' ')\"; echo \"TOON:\"; cat \"$d/records.toon\"; echo; echo \"decode --strict exit $s\"; python3 -c \"import json,sys;a=json.load(open(sys.argv[1]));b=json.load(open(sys.argv[2]));print('decoded JSON == fixtures/records.json:',a==b);raise SystemExit(0 if a==b else 1)\" fixtures/records.json \"$d/recovered.json\"; rc=$?; rm -rf \"$d\"; test \"$e\" -eq 0 && test \"$s\" -eq 0 && test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.153,
+      "output_sha256": "9c8135551a66ee7d568acd3ae81f8be22567eda9beccf98f5cb89849702a1549",
+      "output_excerpt": "encode --stats exit 0: \u25cf Token estimates: ~33 (JSON) \u2192 ~21 (TOON) \u2714 Saved ~12 tokens (-36.4%) \nTOON:\nitems[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3\n\ndecode --strict exit 0\ndecoded JSON == fixtures/records.json: True\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; toon fixtures/records.json -o \"$d/r.toon\" >/dev/null 2>&1 && sed 's/^  beta,false,3$/  beta,false/' \"$d/r.toon\" > \"$d/bad.toon\" && ! cmp -s \"$d/r.toon\" \"$d/bad.toon\" || { echo \"corruption setup failed\"; rm -rf \"$d\"; exit 1; }; echo \"corrupted line 3: [$(sed -n 3p \"$d/bad.toon\")]\"; err=$(toon \"$d/bad.toon\" --decode --strict -o \"$d/strict.json\" 2>&1); s=$?; echo \"decode --strict exit $s: $(printf '%s\\n' \"$err\" | sed -n 1p)\"; left=no; valid=no; [ -f \"$d/strict.json\" ] && left=yes && python3 -m json.tool \"$d/strict.json\" >/dev/null 2>&1 && valid=yes; echo \"output file left by the failed decode: $left, valid JSON: $valid\"; toon \"$d/bad.toon\" --decode --no-strict -o \"$d/lenient.json\" >/dev/null 2>&1; l=$?; beta=$(python3 -c \"import json,sys;b=json.load(open(sys.argv[1]))['items'][1];print(b);raise SystemExit(0 if 'count' not in b else 1)\" \"$d/lenient.json\" 2>&1); b=$?; echo \"decode --no-strict exit $l, beta row: $beta\"; rm -rf \"$d\"; test \"$s\" -ne 0 && test \"$l\" -eq 0 && test \"$b\" -eq 0 && test \"$valid\" = no",
+      "exit": 0,
+      "duration_s": 0.236,
+      "output_sha256": "3076a81438e48d67229646f3cc35234b594e3e6a1205cfea8a95de537db587b0",
+      "output_excerpt": "corrupted line 3: [  beta,false]\ndecode --strict exit 1: \u2716 Failed to decode TOON at line 3: Expected 3 tabular row values, but got 2\noutput file left by the failed decode: yes, valid JSON: no\ndecode --no-strict exit 0, beta row: {'name': 'beta', 'enabled': False}\n"
+    }
+  ],
+  "tool_versions": {
+    "toon": "4.1.1"
+  },
+  "observed_at_utc": "2026-09-25T16:00:53Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), toon 4.1.1 (@toon-format/cli, the manifests/stack.json pin, resolved and version-checked by the first command) encoded fixtures/records.json to TOON with --stats. Its own estimate was ~33 JSON tokens to ~21 TOON tokens, and it wrote the tabular form items[2]{name,enabled,count} with rows alpha,true,2 and beta,false,3. decode --strict turned that back into JSON equal to the fixture (asserted by a Python comparison). As a negative control, deleting the count value from line 3 made decode --strict exit 1 with 'Expected 3 tabular row values, but got 2', while decode --no-strict exited 0 and silently dropped beta's count (asserted). The failed strict decode still left an output file that is not valid JSON, so a caller must check the exit status, not the file's presence. All commands exit 0.",
+  "limitations": [
+    "One 96-byte fixture: the token counts are the CLI's own heuristic estimate, not provider tokens. Custom delimiters, indentation, nested or non-tabular data and large inputs were not exercised. The leftover-file observation covers -o output only.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main 3f267b5c (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:00:53Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T17:10:09Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}
