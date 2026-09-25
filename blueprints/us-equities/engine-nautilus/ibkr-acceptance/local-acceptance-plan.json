@@ -81,12 +81,12 @@
     "recancel_interval_seconds": 5,
     "node_stop_allowance_seconds": 15,
     "post_stop_cancel_grace_seconds": 5,
-    "phase_deadline_seconds": {"A": 360, "B": 210, "C": 180},
+    "phase_deadline_seconds": {"A": 375, "B": 225, "C": 180},
     "observer_attempts": 2,
     "observer_retry_delay_seconds": 5,
-    "ibapi_cancel_attempts": 3,
+    "ibapi_cancel_attempts": 2,
     "ibapi_cancel_wait_seconds": 10,
-    "overall_deadline_seconds": 1080
+    "overall_deadline_seconds": 1500
   },
   "exec_engine": {
     "inflight_check_interval_ms": 2000,

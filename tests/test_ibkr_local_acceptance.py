@@ -114,6 +114,16 @@ class PlanValidation(unittest.TestCase):
         del plan["bounds"]
         self.assertTrue(any("missing" in e for e in LA.validate_plan(plan)))
 
+    def test_worst_case_covers_graces_cleanup_and_checkpoints(self):
+        t = PLAN["timeouts"]
+        floor = (sum(t["phase_deadline_seconds"].values())
+                 + 3 * (LA.PHASE_GRACE_SECONDS + LA.TERMINATE_GRACE_SECONDS) + 3 * t["check_seconds"])
+        self.assertGreater(LA.worst_case_seconds(PLAN), floor)
+        self.assertLessEqual(LA.worst_case_seconds(PLAN), t["overall_deadline_seconds"])
+        plan = copy.deepcopy(PLAN)
+        plan["timeouts"]["overall_deadline_seconds"] = LA.worst_case_seconds(PLAN) - 1
+        self.assertTrue(any("worst-case" in e for e in LA.validate_plan(plan)))
+
     def test_session_and_outside_rth_must_agree(self):
         for plan, change in [(POST, {"outside_rth": False}), (PLAN, {"outside_rth": True}),
                              (POST, {"contract_hours_field": "liquidHours"}), (PLAN, {"use_contract_liquid_hours": False})]:
@@ -291,6 +301,53 @@ class FakeObserver(LA.ObserverState):
         self.orderStatus(order_id, "Cancelled", 0, 1, 0.0, 0, 0, 0.0, 93, "", 0.0)
 
 
+class FakeBroker:
+    """Shared IB state behind fake official-ibapi clients: open orders as
+    (order_id, client_id, perm_id, order_ref, status). A cancel removes the order only when sent
+    by its own client id, as IB allows."""
+
+    def __init__(self, orders, accounts=FAKE_ACCOUNT, own_listing_ok=True, all_listing_ok=True):
+        self.orders, self.accounts = list(orders), accounts
+        self.own_listing_ok, self.all_listing_ok = own_listing_ok, all_listing_ok
+        self.connections, self.cancels = [], []
+
+    def client(self):
+        return BrokerClient(self)
+
+
+class BrokerClient(FakeObserver):
+    def __init__(self, broker):
+        super().__init__(accounts=broker.accounts)
+        self.broker = broker
+
+    def connect(self, host, port, client_id):
+        self.broker.connections.append(client_id)
+        super().connect(host, port, client_id)
+
+    def _list(self, only_own):
+        for oid, cid, perm, ref, status in self.broker.orders:
+            if not only_own or cid == self.connected_as:
+                order, state = _order(oid, cid, perm, ref, status)
+                self.openOrder(oid, SimpleNamespace(symbol="SPY"), order, state)
+
+    def reqAllOpenOrders(self):
+        self.requests.append("all_open")
+        self._list(False)
+        if self.broker.all_listing_ok:
+            self.openOrderEnd()
+
+    def reqOpenOrders(self):
+        self.requests.append("own_open")
+        self._list(True)
+        if self.broker.own_listing_ok:
+            self.openOrderEnd()
+
+    def cancelOrder(self, order_id, order_cancel):
+        self.broker.cancels.append((self.connected_as, order_id))
+        self.broker.orders = [o for o in self.broker.orders if not (o[0] == order_id and o[1] == self.connected_as)]
+        self.orderStatus(order_id, "Cancelled", 0, 1, 0.0, 0, 0, 0.0, self.connected_as, "", 0.0)
+
+
 class Observer(unittest.TestCase):
     def test_observe_reads_every_requested_list_on_the_check_id(self):
         fake = FakeObserver(open_orders=[(12, 93, 555, "NTA-X-R2:12", "Submitted")], positions=[("SPY", 0)],
@@ -341,22 +398,46 @@ class Observer(unittest.TestCase):
                                             wait_s=0.2)["outcome"], "not_connected")
         self.assertEqual(LA.contender_probe(PLAN, 7496)["outcome"], "refused_live_port")
 
-    def test_ibapi_cleanup_cancels_only_this_runs_orders_on_the_node_id(self):
-        fake = FakeObserver(open_orders=[(12, 93, 555, "NTA-X-R2:12", "Submitted"),
-                                         (13, 93, 556, "NTA-OTHER-R2:13", "Submitted"),
-                                         (14, 5, 557, "NTA-X-R1:14", "Submitted")])
-        with mock.patch.object(LA, "_order_cancel", lambda: object()):
-            res = LA.ibapi_cancel_run_orders(PLAN, 4002, "NTA-X", client_factory=lambda: fake, sleep_fn=lambda s: None)
+    def _cleanup(self, broker):
+        plan = copy.deepcopy(PLAN)
+        plan["timeouts"]["check_seconds"] = 0.2  # an incomplete fake listing never answers
+        with mock.patch.object(LA, "_order_cancel", lambda: object()), mock.patch.object(LA, "IBAPI_LISTING_SECONDS", 0.2):
+            return LA.ibapi_cancel_run_orders(plan, 4002, "NTA-X", client_factory=broker.client, sleep_fn=lambda s: None)
+
+    def test_ibapi_cleanup_cancels_only_this_runs_orders_on_their_own_client_id(self):
+        broker = FakeBroker([(12, 93, 555, "NTA-X-R2:12", "Submitted"), (13, 93, 556, "NTA-OTHER-R2:13", "Submitted"),
+                             (14, 5, 557, "manual:14", "Submitted")])
+        res = self._cleanup(broker)
         self.assertEqual(res["status"], "cancelled")
-        self.assertEqual(fake.cancelled, [12])
-        self.assertEqual(fake.connected_as, 93)
-        with mock.patch.object(LA, "_order_cancel", lambda: object()):
-            res = LA.ibapi_cancel_run_orders(PLAN, 4002, "NTA-X", client_factory=lambda: FakeObserver(),
-                                             sleep_fn=lambda s: None)
-        self.assertEqual(res["status"], "none_open")
-        res = LA.ibapi_cancel_run_orders(PLAN, 4002, "NTA-X", client_factory=lambda: FakeObserver(accounts="U1"),
-                                         sleep_fn=lambda s: None)
-        self.assertEqual(res["status"], "refused_not_paper_account")
+        self.assertEqual(broker.cancels, [(93, 12)])
+        self.assertEqual(broker.connections, [98, 93, 98])  # observe, cancel as the holder, observe again
+
+    def test_ibapi_cleanup_follows_the_adapters_fallback_id(self):
+        broker = FakeBroker([(20, 94, 600, "NTA-X-R1:20", "Submitted")])
+        self.assertEqual(self._cleanup(broker)["status"], "cancelled")
+        self.assertEqual(broker.cancels, [(94, 20)])
+
+    def test_ibapi_cleanup_never_touches_ids_outside_the_band(self):
+        broker = FakeBroker([(30, 5, 700, "NTA-X-R2:30", "Submitted")])
+        res = self._cleanup(broker)
+        self.assertEqual((res["status"], broker.cancels), ("cancel_unconfirmed", []))
+        self.assertEqual(res["attempts"][0]["outside_band"], [5])
+
+    def test_ibapi_cleanup_is_never_clean_on_an_incomplete_listing(self):
+        broker = FakeBroker([(12, 93, 555, "NTA-X-R2:12", "Submitted")], own_listing_ok=False)
+        res = self._cleanup(broker)
+        self.assertEqual((res["status"], broker.cancels), ("cancel_unconfirmed", []))
+        self.assertTrue(any("listing incomplete" in n for n in res["notes"]))
+        broker = FakeBroker([(12, 93, 555, "NTA-X-R2:12", "Submitted")], all_listing_ok=False)
+        res = self._cleanup(broker)
+        self.assertEqual((res["status"], broker.cancels), ("cancel_unconfirmed", []))
+
+    def test_ibapi_cleanup_none_open_and_refusals(self):
+        broker = FakeBroker([(14, 5, 557, "manual:14", "Submitted")])
+        self.assertEqual(self._cleanup(broker)["status"], "none_open")
+        self.assertEqual(broker.connections, [98])
+        self.assertEqual(self._cleanup(FakeBroker([], accounts="U1234567"))["status"], "refused_not_paper_account")
+        self.assertEqual(LA.ibapi_cancel_run_orders(PLAN, 4001, "NTA-X")["status"], "refused_live_port")
 
     def test_error_text_is_redacted(self):
         s = LA.ObserverState()
@@ -452,6 +533,13 @@ class Verdicts(unittest.TestCase):
         done = [(11, 93, 554, R1 + ":11", "Cancelled"), (12, 93, 555, R2 + ":12", "Cancelled")]
         b = LA.after_b_verdict(PLAN, _snap(completed=done), "NTA-X", IDS)
         self.assertTrue(b["passed"] and b["r1_r2_listed_cancelled"])
+        # An empty or partial completed-orders list proves nothing about P1: it fails.
+        for completed in ([], done[:1]):
+            with self.subTest(completed=len(completed)):
+                v = LA.after_b_verdict(PLAN, _snap(completed=completed), "NTA-X", IDS)
+                self.assertIn("completed_orders_do_not_show_r1_r2_cancelled", v["reasons"])
+                self.assertIn("completed_orders_do_not_show_r1_r2_cancelled",
+                              LA.final_verdict(PLAN, _snap(completed=completed), "NTA-X", IDS)["reasons"])
         self.assertIn("p1_reached_ib",
                       LA.after_b_verdict(PLAN, _snap(completed=done + [(13, 93, 556, P1 + ":13", "Cancelled")]),
                                          "NTA-X", IDS)["reasons"])
@@ -607,7 +695,7 @@ class RunCommand(unittest.TestCase):
         self.tmp.cleanup()
 
     def run_cli(self, sc=None, extra=(), enable=True, port=4002, now=WEDNESDAY_10AM, versions=PINNED, plan=None,
-                signals=None):
+                signals=None, repo_root="tmp"):
         sc = sc or Scenario(self.d)
         sc.receipt_path = self.receipt
         argv = ["run", "--port", str(port), "--receipt", str(self.receipt), "--state-dir", str(self.state)]
@@ -618,7 +706,8 @@ class RunCommand(unittest.TestCase):
             code = LA.main(argv, check_fn=sc.check_fn, contender_fn=sc.contender_fn, observe_fn=sc.observe_fn,
                            cancel_fn=sc.cancel_fn, phase_fn=sc.phase_fn, now_fn=lambda: now,
                            versions_fn=lambda: dict(versions), sleep_fn=lambda s: None,
-                           signals=signals or QuietSignals(), gate_path=str(self.gate))
+                           signals=signals or QuietSignals(), gate_path=str(self.gate),
+                           repo_root=self.d if repo_root == "tmp" else repo_root)
         receipt = json.loads(self.receipt.read_text()) if self.receipt.exists() else None
         return code, receipt, sc
 
@@ -756,6 +845,43 @@ class RunCommand(unittest.TestCase):
         self.assertEqual(r["status"], "passed")
         self.assertFalse(r["gate_receipt"]["eligible"])
         self.assertFalse(self.gate.exists())
+
+    def test_a_steps_receipt_outside_the_repository_gets_no_gate_receipt(self):
+        code, r, _ = self.run_cli(repo_root=None)  # the temporary receipt is outside the real repository
+        self.assertEqual((code, r["status"]), (0, "passed"))
+        self.assertEqual(r["gate_receipt"], {"eligible": False, "reason": "steps_receipt_outside_repository"})
+        self.assertFalse(self.gate.exists())
+
+    def test_a_failed_gate_write_is_recorded_in_the_steps_receipt(self):
+        self.gate.mkdir()  # writing the gate receipt there fails
+        code, r, _ = self.run_cli()
+        self.assertEqual(r["status"], "passed")
+        self.assertEqual((r["gate_receipt"]["eligible"], r["gate_receipt"]["written"]), (True, False))
+        self.assertIn("error", r["gate_receipt"])
+
+    def test_a_plan_edited_during_the_run_stops_before_the_next_phase(self):
+        real = LA.PO.sha256_file
+        changed = {"now": False}
+
+        def sha(path):
+            if changed["now"] and Path(path).name == "local-acceptance-plan.json":
+                return "0" * 64
+            return real(path)
+
+        sc = Scenario(self.d)
+        original = sc.phase_fn
+
+        def phase_fn(phase, *args):
+            out = original(phase, *args)
+            changed["now"] = True
+            return out
+
+        sc.phase_fn = phase_fn
+        with mock.patch.object(LA.PO, "sha256_file", sha):
+            code, r, sc = self.run_cli(sc=sc)
+        self.assertEqual([c for c in sc.calls if c.startswith("phase-")], ["phase-A"])
+        self.assertTrue(r["plan_changed_during_run"])
+        self.assertEqual((r["status"], sc.cancels), ("incomplete", [sc.prefix]))
 
     def test_after_hours_plan_runs_after_16(self):
         code, r, sc = self.run_cli(plan="local-acceptance-plan-post.json", now=ny(2026, 9, 23, 17, 0))
@@ -900,7 +1026,10 @@ class SourceSafety(unittest.TestCase):
     def test_order_affecting_call_sites(self):
         self.assertEqual([self._enclosing(c) for c in self._calls("submit_order")], ["_submit"])
         self.assertEqual([self._enclosing(c) for c in self._calls("cancel_order")], ["_send_cancel"])
-        self.assertEqual([self._enclosing(c) for c in self._calls("cancelOrder")], ["ibapi_cancel_run_orders"])
+        self.assertEqual([self._enclosing(c) for c in self._calls("cancelOrder")], ["_cancel_as"])
+        callers = [self._enclosing(n) for n in ast.walk(self.tree)
+                   if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "_cancel_as"]
+        self.assertEqual(callers, ["ibapi_cancel_run_orders"])
         halts = self._calls("set_trading_state")
         self.assertEqual(sorted(self._enclosing(c) for c in halts), ["engage_kill_switch", "run_phase_node"])
         self.assertTrue(all(ast.unparse(c.args[0]) == "TradingState.HALTED" for c in halts))
@@ -959,15 +1088,17 @@ class FakeHooks:
     """Stand-ins for the IB adapter, the ibapi probes and the stop request. The kill switch
     uses the real latch and the backtest engine's real RiskEngine."""
 
-    def __init__(self, engine, state_dir, down_polls=1, halt=True):
+    def __init__(self, engine, state_dir, down_polls=1, halt=True, records_disconnection=True):
         self.engine, self.kill = engine, LA.KillSwitch(state_dir)
-        self.down_polls, self.halt = down_polls, halt
+        self.down_polls, self.halt, self.records = down_polls, halt, records_disconnection
         self.stops, self.injected, self.probes = [], 0, []
 
     def adapter_state(self):
         state = {"present": True, "client_id": 93, "configured_client_id": 93, "ready": True, "ib_connected": True,
                  "socket_connected": True, "fetch_all_open_orders": False, "client_id_collisions": 0,
                  "last_disconnection_ns": None}
+        if self.injected and self.records:
+            state["last_disconnection_ns"] = 2 ** 62  # after any backtest fault time
         if self.injected and self.down_polls > 0:
             self.down_polls -= 1
             state.update(ready=False, ib_connected=False, socket_connected=False)
@@ -1094,6 +1225,14 @@ class NautilusBacktestFlow(unittest.TestCase):
             ctx, hooks, statuses, _ = self.simulate("A", hooks_kwargs={"down_polls": 10_000})
         self.assertEqual(ctx.cases["A3"]["outcome"], "incomplete")
         self.assertIn("A3_reconnect_timeout", ctx.cases["A3"]["reason"])
+        self.assertEqual(statuses, {"NTA-SIM-R1": "CANCELED"})
+
+    def test_a_reconnect_the_adapter_never_recorded_is_not_a_pass(self):
+        with mock.patch.object(LA, "ownership_verdict", lambda *a: dict(PASS)), \
+                mock.patch.object(LA, "still_open_verdict", lambda *a: dict(PASS)):
+            ctx, hooks, statuses, _ = self.simulate("A", hooks_kwargs={"records_disconnection": False})
+        self.assertEqual(ctx.cases["A3"]["outcome"], "incomplete")
+        self.assertIn("A3_disconnect_not_recorded", ctx.cases["A3"]["reason"])
         self.assertEqual(statuses, {"NTA-SIM-R1": "CANCELED"})
 
     def test_an_unexpected_fill_is_cleanup_required_and_never_flattened(self):

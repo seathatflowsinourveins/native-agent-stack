@@ -149,8 +149,11 @@ Checkpoints with the observer:
 - **Before the run:** a paper account (every managed account `DU`, exactly one),
   zero positions, zero open orders, today's contract hours, and client id 93 free.
 - **After A:** only R2 works.
-- **After B:** nothing is open, and R1 and R2 are listed as cancelled.
-- **Final:** flat, no execution of the run, and neither probe order at IB.
+- **After B:** nothing is open, and IB's completed orders show R1 and R2
+  cancelled. That shows the list covers this run, so P1 missing from it means
+  P1 never reached IB.
+- **Final:** flat, no execution of the run, R1 and R2 listed cancelled, and
+  neither probe order at IB.
 
 It refuses by default:
 
@@ -168,8 +171,12 @@ A fill would end the run `cleanup_required`, with the position left for a
 manual flatten.
 
 On any failure the phase cancels its own orders. After the phase process has
-exited, the runner cancels leftovers of this run through ibapi on client 93: only
-orders whose `orderRef` carries the run prefix.
+exited, the runner cancels leftovers of this run through ibapi:
+
+- The observer (client 98) lists which client ids hold orders whose `orderRef`
+  carries the run prefix.
+- Each holder inside the adapter's fallback band (93-97) cancels its own orders.
+- Only a complete listing without an order of the run counts as clean.
 
 The gate receipt `receipt.json` (preregistered schema
 `{"schema_version": 1, "kind": "native_ibkr_local_acceptance", "status": "passed", "broker": "ibkr"}`)
@@ -217,10 +224,15 @@ RUNNER=blueprints/us-equities/engine-nautilus/ibkr-acceptance/local_acceptance.p
 ```
 
 Run these from the repository root. `preflight` is read-only and prints
-`"status": "ready"` when `run` would start. The whole run must fit the session
-window, 1,080 s in the worst case, so a regular-session run starts by about
-15:32 ET. After 16:00 add `--plan local-acceptance-plan-post.json` to both
-commands; the window then ends at 19:50 ET.
+`"status": "ready"` when `run` would start. A typical run takes a few minutes,
+but the whole worst case (1,500 s, `worst_case_seconds` in the runner) must fit
+the session window, so a regular-session run starts by about 15:25 ET. After
+16:00 add `--plan local-acceptance-plan-post.json` to both commands; the latest
+start is then about 19:25 ET.
+
+Keep `--receipt` inside the repository, as above. A steps receipt elsewhere
+still records the run, but no gate receipt is written for it, because nobody
+qualifying the flip could check it.
 
 `--state-dir` (default `~/.local/state/native-agent-stack/ibkr-local-acceptance`,
 created 0700) holds the run lock, the phase files and the kill-switch latch.
