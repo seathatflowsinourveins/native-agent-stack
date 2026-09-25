@@ -470,8 +470,8 @@ def validate_pins_v2(root: Path) -> tuple[list[str], list[str]]:
     missing pins file, a pins file still at schema_version 1 (e.g. a macOS host not yet migrated),
     or a missing manifests/stack.json/catalogs/landscape all return no errors, because this check
     is a v2-specific parity rule, not a general publication-integrity rule (tests/test_pins_v2.py
-    and tests/test_validate.py both exercise it; main() below is the only caller, so the exact
-    dict validate() itself returns is unaffected)."""
+    exercises it directly; tests/test_validate.py does not reference it at all, and main() below
+    is the only caller, so the exact dict validate() itself returns is unaffected)."""
     errors: list[str] = []
     warnings: list[str] = []
     pins_path = root / "adoption" / "pins-linux-x86_64.json"

@@ -3,7 +3,7 @@
   "reviewed_at": "2026-09-25",
   "platform": "linux-x86_64",
   "source": "Ported from agent-lab .devcontainer/bootstrap-linux.sh (node, uv, gh, codex, claude) plus fresh 2026-09-22 fetches for qmd, mcporter, rtk, ai-memory, context-mode. Each archive was downloaded into a disposable worktree temp directory and hashed with sha256sum; npm entries were additionally cross-checked against `npm view <pkg> dist.integrity` (sha512, base64) computed with `openssl dgst -sha512 -binary | base64` over the same downloaded tarball -- all five matched exactly.",
-  "schema_v2_note": "2026-09-25 (W1 track switch, docs/tasks/sota-rollout-20260925): migrated in place from schema_version 1. Every id/version/kind/url/sha256/install_note value below is byte-for-byte unchanged from the v1 record reviewed_at 2026-09-22; only new fields (root_name, current_link, entrypoints, surfaces, state_dirs, window, rollback_class) and the new top-level candidates/supersedes/divergence sections were added. adoption/pins-schema-v2.json documents every new field; adoption/tools/ecosystem-switch reads root_name/current_link/entrypoints/surfaces/state_dirs/window/rollback_class as its component spec (adopt --baseline/--relink). A field whose value could not be verified from this checkout's own primary sources (the bootstrap script that installs it, and this pin's own install_note) carries a nested {\"status\": \"pending\"} marker instead of a fabricated value; scripts/validate.py's pins-v2 parity check treats those report-only, per switch.md: 'unknown fields for other winners can be filled later by the qualify wave (mark pending)'.",
+  "schema_v2_note": "2026-09-25 (W1 track switch, docs/tasks/sota-rollout-20260925): migrated in place from schema_version 1. Every id/version/kind/url/sha256/install_note value below is byte-for-byte unchanged from the v1 record reviewed_at 2026-09-22 except for the corrections dated 2026-09-25 in this fix round's own install_note amendments (root_name/entrypoints[].in_root, checked read-only against the live ECO_INSTALL_ROOT: see each amended entry's own note); only new fields (root_name, current_link, entrypoints, surfaces, state_dirs, window, rollback_class) and the new top-level candidates/supersedes/divergence sections were added otherwise. adoption/pins-schema-v2.json documents every new field; adoption/tools/ecosystem-switch reads root_name/current_link/entrypoints/surfaces/state_dirs/window/rollback_class as its component spec (adopt --baseline/--relink). A field whose value could not be verified from this checkout's own primary sources (the bootstrap script that installs it, and this pin's own install_note) carries a nested {\"status\": \"pending\"} marker instead of a fabricated value, per switch.md: 'unknown fields for other winners can be filled later by the qualify wave (mark pending)'. scripts/validate.py's pins-v2 parity check itself never inspects entrypoints[]/state_dirs[]/surfaces[] at all (nested or otherwise) -- it only compares each tools[].id/version against manifests/stack.json and catalogs/landscape/*.json winners[].pin, and separately requires every top-level candidates[] entry's own status to be exactly \"pending\" (report-only there too); a nested pending marker inside a tools[] entry's own sub-fields is informational for ecosystem-switch's own readers (e.g. adopt --relink already skips an entrypoint whose in_root is null) and is not itself re-validated by that parity check.",
   "tools": [
     {
       "id": "node",
@@ -11,8 +11,8 @@
       "kind": "tarball",
       "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
       "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
-      "install_note": "Verified against https://nodejs.org/dist/v24.21.0/SHASUMS256.txt fetched 2026-09-22; also matches the pin already carried in agent-lab .devcontainer/bootstrap-linux.sh. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}.",
-      "root_name": "node-24.21.0",
+      "install_note": "Verified against https://nodejs.org/dist/v24.21.0/SHASUMS256.txt fetched 2026-09-22; also matches the pin already carried in agent-lab .devcontainer/bootstrap-linux.sh. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}. root_name corrected 2026-09-25 (W1 track switch fix round): a read-only check of the live ECO_INSTALL_ROOT found bin/node resolving into tools/node-v24.21.0, not tools/node-24.21.0 (this repo's own adoption/bootstrap-linux.sh install_node would create the unprefixed name; the live root was evidently created by a different bootstrap run, exactly the kind of 'version records disagree' divergence switch.md's Facts section already names). ecosystem-switch's adopt --relink reads root_name against the live root it must indirect through, so this field now matches what is actually on disk; a future bootstrap-linux.sh run should be checked for which convention it produces before this is treated as settled.",
+      "root_name": "node-v24.21.0",
       "current_link": "current/node",
       "entrypoints": [
         {"bin": "bin/node", "in_root": "bin/node"},
@@ -66,8 +66,8 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1.tgz",
       "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
-      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified.",
-      "root_name": "codex-0.155.1",
+      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified. root_name corrected 2026-09-25 (W1 track switch fix round): the live ECO_INSTALL_ROOT has bin/codex resolving into tools/codex-package-0.155.1 (a separate tools/codex-0.155.0 root also exists on this host and is not the one bin/codex uses), not tools/codex-0.155.1; the prior value came from the catalog bootstrap's layout, not the live root.",
+      "root_name": "codex-package-0.155.1",
       "current_link": "current/codex",
       "entrypoints": [
         {"bin": "bin/codex", "in_root": "bin/codex"}
@@ -102,11 +102,11 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
       "sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
-      "install_note": "npm dist.integrity sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA== matched. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md.",
+      "install_note": "npm dist.integrity sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA== matched. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md. entrypoints[].in_root corrected 2026-09-25 (W1 track switch fix round): npm's own bin dispatch puts the live root's real target at node_modules/@tobilu/qmd/bin/qmd, not a top-level bin/qmd (that path does not exist in tools/qmd-2.8.3 at all); the prior value guessed the generic install_npm bin/* convention rather than this scoped package's actual layout.",
       "root_name": "qmd-2.8.3",
       "current_link": "current/qmd",
       "entrypoints": [
-        {"bin": "bin/qmd", "in_root": "bin/qmd"}
+        {"bin": "bin/qmd", "in_root": "node_modules/@tobilu/qmd/bin/qmd"}
       ],
       "surfaces": [],
       "state_dirs": [
@@ -157,11 +157,11 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
       "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
-      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24.",
+      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24. entrypoints[].in_root corrected 2026-09-25 (W1 track switch fix round): the live root's real target is node_modules/.bin/mcporter (npm's generic .bin dispatch symlink), not a top-level bin/mcporter; the prior value guessed the generic install_npm bin/* convention rather than this package's actual layout.",
       "root_name": "mcporter-0.13.13",
       "current_link": "current/mcporter",
       "entrypoints": [
-        {"bin": "bin/mcporter", "in_root": "bin/mcporter"}
+        {"bin": "bin/mcporter", "in_root": "node_modules/.bin/mcporter"}
       ],
       "surfaces": [],
       "state_dirs": [],
@@ -174,11 +174,11 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
       "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
-      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
+      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog. entrypoints[].in_root corrected 2026-09-25 (W1 track switch fix round): the live root's real target is node_modules/.bin/context-mode (npm's generic .bin dispatch symlink), not a top-level bin/context-mode; the prior value guessed the generic install_npm bin/* convention rather than this package's actual layout.",
       "root_name": "context-mode-1.0.169",
       "current_link": "current/context-mode",
       "entrypoints": [
-        {"bin": "bin/context-mode", "in_root": "bin/context-mode"}
+        {"bin": "bin/context-mode", "in_root": "node_modules/.bin/context-mode"}
       ],
       "surfaces": [
         {"kind": "native-cli", "status": "pending", "note": "the separate client-native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b, installed via `claude plugin marketplace add` / `codex plugin marketplace add`) is a distinct surface this npm-CLI pin does not cover; left pending rather than guessed, per this pin's own install_note."}
@@ -227,8 +227,8 @@
       "kind": "tarball",
       "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.7/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
       "sha256": "c0f8c7488cc3ff028e6757ee54957911f754ea3cd80e239e12f7a47a88884d63",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has OpenResearch's `orx` CLI 0.2.7 installed (confirmed with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree.",
-      "root_name": "orx-0.2.7",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has OpenResearch's `orx` CLI 0.2.7 installed (confirmed with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree. root_name corrected 2026-09-25 (W1 track switch fix round): install_single_binary_tarball's own naming convention (tools/$id-$version, keyed by pin id \"orx\") would produce tools/orx-0.2.7, but the live ECO_INSTALL_ROOT actually has bin/orx resolving into tools/openresearch-0.2.7 (the upstream repository's own name, not the binary's); the prior value followed the id-based convention rather than the live root.",
+      "root_name": "openresearch-0.2.7",
       "current_link": "current/orx",
       "entrypoints": [
         {"bin": "bin/orx", "in_root": "orx"}
@@ -244,11 +244,11 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.1.tgz",
       "sha256": "89a7df4761ff335e4dd5367e4cf04cecb9ba4e2cc130a0220f798d188414dc6c",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has agent-browser 0.38.1 installed (confirmed with `agent-browser --version`). npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. The host's actual installed copy places its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here.",
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: this host already has agent-browser 0.38.1 installed (confirmed with `agent-browser --version`). npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. The host's actual installed copy places its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here. entrypoints[].in_root corrected 2026-09-25 (W1 track switch fix round): to match that actual layout -- a read-only check of the live ECO_INSTALL_ROOT found bin/agent-browser resolving into node_modules/agent-browser/bin/agent-browser-linux-x64, not a top-level bin/agent-browser (which does not exist in this root).",
       "root_name": "agent-browser-0.38.1",
       "current_link": "current/agent-browser",
       "entrypoints": [
-        {"bin": "bin/agent-browser", "in_root": "bin/agent-browser"}
+        {"bin": "bin/agent-browser", "in_root": "node_modules/agent-browser/bin/agent-browser-linux-x64"}
       ],
       "surfaces": [],
       "state_dirs": [],
@@ -286,6 +286,201 @@
       "id": "adaptive-paper-runtime",
       "status": "pending",
       "note": "switch.md Facts: four paper launchers hard-code tools/adaptive-paper-20260921/bin/python, and */frozen/* copies of them must never change. ecosystem-switch's unit-restart operation kind refuses this component's known units by name (adaptive-paper-rung1x-20260923-ladder2, ibkr-paper-post-20260923, incentive-forward@1330, mover-daily-scan-0925, mover-rth-trial-20260924) whether or not a formal pin exists; no installable pin authored yet in this file."
+    },
+    {
+      "id": "affaan-m/ECC",
+      "status": "pending",
+      "note": "Landscape winner (foundation/instructions-skills, new-host-grand-list/instructions-skills) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A skills/instructions repository (affaan-m/ECC), not a host CLI binary; bootstrap-linux.sh/ecosystem-switch manage tools/<id>-<version> host installs, and no such root applies here. Deferred; no host tools/ root exists for it."
+    },
+    {
+      "id": "ccusage",
+      "status": "pending",
+      "note": "Landscape winner (foundation/token-efficiency, new-host-grand-list/token-efficiency) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/ccusage-20.0.24 (and an older tools/ccusage-20.0.23) already exist on this host. No pins-v2 tools[] entry authored yet (url/sha256 not independently re-verified for this migration); deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "codex-native-sdk",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/agents-models-workers, us-equities/agents-models-workers) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Distinct from this file's own \"codex\" pin (the codex CLI, root_name codex-package-0.155.1): this winner is the Rust CLI plus the separate Python openai-codex SDK package, not a single standalone host install. The CLI overlaps with the existing \"codex\" tools[] entry; the Python SDK package has no tools/ root on this host. Deferred rather than duplicated or fabricated."
+    },
+    {
+      "id": "data-alpaca-py",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/market-data-reference, us-equities/market-data-reference) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (alpaca-py) used inside a project virtualenv, not a standalone tools/<id>-<version> host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "data-duckdb",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/storage-compute, us-equities/storage-compute) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python/embedded library dependency (duckdb), not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "data-dvc",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/identity-provenance, us-equities/identity-provenance) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/dvc-3.67.1-20260922 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "data-edgartools",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/market-data-reference, new-host-grand-list/research-factors-ml) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (edgartools), not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "data-exchange-calendars",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/market-data-reference, us-equities/market-data-reference) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (exchange_calendars); this host's tools/pandas-market-calendars-5.4.0 is a related but distinct package (pandas_market_calendars, not exchange_calendars) and is not treated as the same install. No host tools/ root applies to this winner. Deferred."
+    },
+    {
+      "id": "data-mlflow",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/evaluation-experiments, us-equities/evaluation-experiments) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library/service dependency (mlflow), not a standalone tools/<id>-<version> host CLI install on this host; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "data-pandera",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/data-quality-orchestration, us-equities/data-quality-orchestration) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (pandera), not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "difftastic",
+      "status": "pending",
+      "note": "Landscape winner (foundation/git-github-automation, new-host-grand-list/git-github-automation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/difftastic-0.71.0 (and an older tools/difftastic-0.70.0) already exist on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "fastapi",
+      "status": "pending",
+      "note": "Landscape winner (foundation/hosting-services, new-host-grand-list/hosting-services) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (fastapi) used inside a hosted application's virtualenv, not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "foundation-agent-retrieval-bench",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/evaluation-experiments, us-equities/evaluation-experiments) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). An evaluation-benchmark repository (agent-retrieval-bench) run from a project checkout/virtualenv, not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "foundation-ai-memory",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/agents-models-workers, us-equities/agents-models-workers) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). The same upstream as this file's own \"ai-memory\" pin (root_name ai-memory-2.3.2), tracked under a second component_id in the new-host-grand-list/us-equities catalogs at a different cited pin (v2.3.1). Not a second host install; cross-referenced rather than duplicated. scripts/validate.py's pins-v2 parity check does not itself cross-check this alias (see the id-alias gap noted separately for validate_pins_v2)."
+    },
+    {
+      "id": "foundation-socraticode",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/agents-models-workers, us-equities/agents-models-workers) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). The same upstream as the \"socraticode\" candidate below (host root tools/socraticode-1.14.0), tracked under a second component_id in the new-host-grand-list/us-equities catalogs. Not a second host install; cross-referenced rather than duplicated."
+    },
+    {
+      "id": "grype",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/security-supply-chain, us-equities/security-supply-chain) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/grype-0.119.0 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "headroom",
+      "status": "pending",
+      "note": "Landscape winner (foundation/token-efficiency, new-host-grand-list/token-efficiency) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/headroom-ai-0.38.0 already exists on this host (installed under the \"headroom-ai\" root name, not a bare \"headroom-<version>\"). No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "inspect-ai",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/evaluation-experiments, us-equities/evaluation-experiments) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (inspect_ai) used inside an evaluation virtualenv, not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "lean",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/backtesting-engine, us-equities/backtesting-engine) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): several versioned roots already exist on this host (tools/lean-985ef30, tools/lean-985ef30-r20260925, tools/lean-985ef30-remediation, tools/lean-alpaca-1973f61, tools/lean-alpaca-1973f61-remediated). Which of these is the canonical live root is not resolved here; no pins-v2 tools[] entry authored yet, deferred to the qualify wave rather than guessed."
+    },
+    {
+      "id": "loki",
+      "status": "pending",
+      "note": "Landscape winner (foundation/observation-inference, new-host-grand-list/observation-inference) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/ecosystem-loki-3.7.8 already exists on this host (installed under an \"ecosystem-\"-prefixed root name, not a bare \"loki-<version>\"). No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "nautilustrader",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/backtesting-engine, us-equities/backtesting-engine) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): several versioned roots already exist on this host (tools/nautilus-2.0.0rc5, tools/nautilus-2.0.0rc5-r20260925, tools/nautilus-1.231.0-ib, tools/nautilus-1231-ib). Which of these is the canonical live root is not resolved here; no pins-v2 tools[] entry authored yet, deferred to the qualify wave rather than guessed."
+    },
+    {
+      "id": "nextjs",
+      "status": "pending",
+      "note": "Landscape winner (foundation/hosting-services, new-host-grand-list/hosting-services) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A JS framework dependency (next.js) used inside a hosted application's own node_modules, not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "openresearch",
+      "status": "pending",
+      "note": "Landscape winner (foundation/web-research, new-host-grand-list/web-research) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). The same upstream (alphaXiv/OpenResearch) as this file's own \"orx\" pin (root_name openresearch-0.2.7, the corrected value as of this fix round), tracked under a second component_id (naming the repository rather than the CLI binary) in the foundation/new-host-grand-list catalogs. Not a second host install; cross-referenced rather than duplicated."
+    },
+    {
+      "id": "opentelemetry-collector-contrib",
+      "status": "pending",
+      "note": "Landscape winner (foundation/observation-inference, new-host-grand-list/observation-inference) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/otelcol-contrib-0.161.0 already exists on this host (installed under the upstream binary's own short name, not \"opentelemetry-collector-contrib-<version>\"). No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "playwright-test",
+      "status": "pending",
+      "note": "Landscape winner (foundation/quality-evaluation, new-host-grand-list/quality-evaluation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). This winner is the @playwright/test framework; tools/playwright-cli-0.1.21 on this host is a related but distinct package (a standalone browser-automation CLI, not the @playwright/test framework) and is not treated as the same install. No host tools/ root applies to this winner specifically. Deferred."
+    },
+    {
+      "id": "poppler",
+      "status": "pending",
+      "note": "Landscape winner (foundation/document-retrieval, new-host-grand-list/document-retrieval) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Typically an apt system package (poppler-utils) rather than a tools/<id>-<version> host install bootstrap-linux.sh manages; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "postgresql",
+      "status": "pending",
+      "note": "Landscape winner (foundation/hosting-services, new-host-grand-list/hosting-services) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A system database service, not a tools/<id>-<version> host CLI install bootstrap-linux.sh manages; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "prometheus",
+      "status": "pending",
+      "note": "Landscape winner (foundation/observation-inference, new-host-grand-list/observation-inference) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/ecosystem-prometheus-3.14.0 already exists on this host (installed under an \"ecosystem-\"-prefixed root name, not a bare \"prometheus-<version>\"). No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "promptfoo",
+      "status": "pending",
+      "note": "Landscape winner (foundation/quality-evaluation, new-host-grand-list/quality-evaluation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/promptfoo-0.123.1 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "qdrant",
+      "status": "pending",
+      "note": "Landscape winner (foundation/semantic-rag, new-host-grand-list/semantic-rag) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/qdrant-1.19.1 already exists on this host (a separate tools/qdrant-web-ui-0.2.18 root is a different, UI-only package). No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "restic",
+      "status": "pending",
+      "note": "Landscape winner (foundation/recovery-portability, new-host-grand-list/recovery-portability) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/restic-0.19.1 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "sandbox-runtime",
+      "status": "pending",
+      "note": "Landscape winner (foundation/isolation, new-host-grand-list/isolation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/sandbox-runtime-0.0.77 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "serena",
+      "status": "pending",
+      "note": "Landscape winner (foundation/code-navigation, new-host-grand-list/code-navigation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Related to the existing \"serena-context\" candidate above (the wrapper hard-coding a root inside adoption/tools/serena-context), but a distinct component_id for the underlying oraios/serena tool itself. No \"serena-<version>\"-named tools/ root was found under this read-only host check (it may run from a uv/pip environment rather than a tools/<id>-<version> prefix); deferred rather than guessed."
+    },
+    {
+      "id": "skfolio",
+      "status": "pending",
+      "note": "Landscape winner (new-host-grand-list/portfolio-risk, new-host-grand-list/research-factors-ml) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). A Python library dependency (skfolio), not a standalone host CLI install; no host tools/ root applies. Deferred."
+    },
+    {
+      "id": "socraticode",
+      "status": "pending",
+      "note": "Landscape winner (foundation/semantic-rag, new-host-grand-list/semantic-rag) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/socraticode-1.14.0 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated. See also \"foundation-socraticode\" above, the same upstream under a second component_id."
+    },
+    {
+      "id": "syft",
+      "status": "pending",
+      "note": "Landscape winner (foundation/ci-supply-chain, new-host-grand-list/ci-supply-chain) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/syft-1.52.0 already exists on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "systemd",
+      "status": "pending",
+      "note": "Landscape winner (foundation/scheduling-supervision, new-host-grand-list/scheduling-supervision) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). The OS-provided init/service manager (this host's own systemd, version 255.4-1ubuntu8.17 per apt), not something bootstrap-linux.sh installs into tools/; no host tools/ root applies or would be meaningful here. Deferred."
+    },
+    {
+      "id": "worktrunk",
+      "status": "pending",
+      "note": "Landscape winner (foundation/workers, foundation/isolation) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). Read-only host check (2026-09-25): tools/worktrunk-0.79.0 (and an older tools/worktrunk-0.78.0) already exist on this host. No pins-v2 tools[] entry authored yet; deferred to the qualify wave rather than fabricated."
+    },
+    {
+      "id": "zizmor",
+      "status": "pending",
+      "note": "Landscape winner (foundation/ci-supply-chain, new-host-grand-list/ci-supply-chain) with no pins-v2 tools[] or candidates[] entry until this fix round (switch.md: 'one entry per installable winner ... mark pending'). No \"zizmor-<version>\"-named tools/ root was found under a read-only check of this host's ECO_INSTALL_ROOT (docs/native-upstream-additions.md documents it as an installed workflow checker, but not necessarily under this tools/ convention); deferred rather than guessed at."
     }
   ],
   "supersedes": [
@@ -317,7 +512,7 @@
       "kind": "native-auto-update",
       "pinned_floor": "2.1.280",
       "current_evidence_pin": "2.1.278",
-      "note": "This file's claude-code pin (2.1.280) is a verified installation floor for the self-updating native binary, not the version manifests/stack.json and catalogs/landscape/foundation.json's native-clients winner cite as evidence (2.1.278, the version the recorded native tasks actually ran against). The two are expected to diverge over time because the installed binary auto-updates on the latest channel with no DISABLE_AUTOUPDATER opt-out (see this pin's own install_note); scripts/validate.py's pins-v2 parity check reads this array and does not flag the claude-code mismatch as an error while it stays exactly this shape (id, pinned_floor >= current_evidence_pin)."
+      "note": "This file's claude-code pin (2.1.280) is a verified installation floor for the self-updating native binary, not the version manifests/stack.json and catalogs/landscape/foundation.json's native-clients winner cite as evidence (2.1.278, the version the recorded native tasks actually ran against). The two are expected to diverge over time because the installed binary auto-updates on the latest channel with no DISABLE_AUTOUPDATER opt-out (see this pin's own install_note). Actual current behaviour of scripts/validate.py's pins-v2 parity check (corrected 2026-09-25, W1 track switch fix round -- the previous wording claimed a pinned_floor >= current_evidence_pin shape check that the code has never implemented): any divergence[] entry present for an id downgrades every version mismatch for that id from an error to a report-only warning, unconditionally; pinned_floor and current_evidence_pin are carried here for a human reader's own comparison and are not themselves read or validated by that check."
     }
   ]
 }

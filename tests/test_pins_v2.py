@@ -97,6 +97,24 @@ class ShippedFileShapeTests(unittest.TestCase):
         document = json.loads(SCHEMA_PATH.read_text())
         self.assertEqual(document["properties"]["schema_version"]["const"], 2)
 
+    def test_every_landscape_winner_has_a_tools_or_candidates_entry(self):
+        # switch.md: "pins v2 has one entry per installable winner ... unknown fields for other
+        # winners can be filled later by the qualify wave (mark pending)" -- every real winner
+        # component_id (excluding the landscape's own "candidate:"-prefixed alternative rows,
+        # which are unpinned by construction and not adopted winners) must appear somewhere in
+        # this file, even if only as a pending candidates[] stub.
+        have = {tool["id"] for tool in self.pins["tools"]} | {c["id"] for c in self.pins.get("candidates", [])}
+        landscape_dir = ROOT / "catalogs" / "landscape"
+        missing = set()
+        for landscape_file in sorted(landscape_dir.glob("*.json")):
+            document = json.loads(landscape_file.read_text())
+            for layer in document.get("layers") or []:
+                for winner in layer.get("winners") or []:
+                    component_id = winner.get("component_id")
+                    if isinstance(component_id, str) and not component_id.startswith("candidate:") and component_id not in have:
+                        missing.add(component_id)
+        self.assertEqual(missing, set(), f"{len(missing)} landscape winner(s) have no pins-v2 entry at all")
+
 
 class ShippedFileParityTests(unittest.TestCase):
     """The real, committed pins v2 file cross-checked against the real, committed
