@@ -3361,8 +3361,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "d05d07701afd8deedbd58576468ba0f5341279d6a5c23f6efe075ce772a7484e",
-      "bytes": 12312
+      "sha256": "83de16c5621ea08ec5d4ab32b24798e958055b1998278d8548a0f1003f24da80",
+      "bytes": 12677
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -29972,8 +29972,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "a7e5a75756ad10ca2493c91c746c848fe477ac43953f8ae29f29d0dad53af639",
-      "bytes": 17942
+      "sha256": "c5e14d0a3c4f5061a4be3a5516d14f2d02a3d8af2e3f7f2c5e577f4d4672079c",
+      "bytes": 19239
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -29987,8 +29987,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "c6c1d341724ea4330422b405d2f3703d3196bd0d5b42796cc68dd946ce07a4ac",
-      "bytes": 4289
+      "sha256": "784bca3a228b34d830377b207ed122071c0870122153c52e4a9eb26dad5155ad",
+      "bytes": 7877
     },
     {
       "path": "observability/backends/install.py",

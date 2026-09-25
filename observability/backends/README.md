@@ -52,6 +52,26 @@ expand these placeholders themselves. Paths with spaces, quotes, percent signs,
 or line breaks are deliberately rejected. Re-running this renderer replaces its
 owned configuration and unit files; preserve deliberate local edits first.
 
+A host that moved a loopback service off its template port declares that with
+`--port-overrides FILE`, a JSON object of template port to host port. All WSL 2
+distributions share one network namespace, so a second distribution's services
+can hold the template ports. The WSL workstation's map is
+`{"18889": 28889, "18888": 28888, "16333": 26333, "8231": 18231, "14333": 24333}`.
+The renderer rewrites every `127.0.0.1:<template port>` address in the configs
+and units in a single pass, so a swap such as `{"19090": 19093, "19093": 19090}`
+works. It keeps the map as `$STACK_CONFIG_ROOT/port-overrides.json`, which later
+renders reuse without the flag; delete that file to render the template ports
+again. It refuses the whole render (exit 2, nothing written) in three cases:
+- an override matches no rendered address;
+- the port also appears outside a `127.0.0.1:<port>` address, as Grafana's
+  `http_port` and Loki's listen ports do, which the override does not rewrite;
+- the host port is already a rendered address that is not itself overridden.
+
+On 2026-09-25 that workstation map was rendered from main into a scratch root
+and compared with the live files. 14 of the 15 files were byte-identical, and
+`ecosystem-prometheus.yml` was equal as parsed YAML: the live file has its own
+formatting.
+
 The renderer generates a random Grafana administrator password and secret key in
 `$STACK_CONFIG_ROOT/ecosystem-grafana.env`, mode `0600`, if absent. It preserves an
 existing credential file. Read it privately for sign-in; never paste it into a

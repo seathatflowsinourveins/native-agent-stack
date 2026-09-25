@@ -178,6 +178,11 @@ upstream behavior behind each.
   and the mirrored-mode page opens inbound connections only by changing the
   firewall's settings or adding a firewall rule. Bind services to `127.0.0.1`
   and check `ss -ltnp` after each start.
+- The observability backend renders fixed loopback ports. When another
+  distribution holds one, run `observability/backends/configure.py` with
+  `--port-overrides` (changed after `v2026.09.25.2`, which lacks the option).
+  The renderer keeps the map, so a later re-render does not reset the moved ports; see
+  [its README](../../observability/backends/README.md).
 - vLLM listens on a wildcard port even with `--host 127.0.0.1`. vLLM 0.25.0
   initializes `torch.distributed` over TCP on a single GPU too (its
   `UniProcExecutor` passes a `tcp://` init method), and PyTorch's `TCPStore`
