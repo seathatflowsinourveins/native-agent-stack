@@ -3241,8 +3241,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "efdaf45e29fc42d3765c2b6347a76059dd222f1e7f3dfa7941efa81527a316de",
-      "bytes": 16733
+      "sha256": "d8268a9e26e5eb443812f02e95f75d1d34b6b35ccd1ab0f81a4867805369097c",
+      "bytes": 16729
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -10537,8 +10537,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "a6ecf2e70b25b01ddfd07f414d42d066f4bb0ea1e53ed95fb700fb6ee73ff290",
-      "bytes": 17268
+      "sha256": "68b39ce586974ceaca816d7bc49ec4d950056910056071b4292fa40ce791795e",
+      "bytes": 17264
     },
     {
       "path": "docs/token-native-saturation.md",

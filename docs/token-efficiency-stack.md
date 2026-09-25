@@ -138,7 +138,7 @@ The manifest supports Python 3.13 only. A `python3` of another version (Ubuntu
 `prerequisites_missing` with exit 2, and one older than 3.11 cannot parse the Codex
 TOML. This check changed after `v2026.09.25.1`: that release's `adoption_status.py`
 has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run it
-from a default-branch clone until the next release. The command runs none of the
+from a later release or a default-branch clone. The command runs none of the
 selected tools. It parses the client files named below whole and in-process, emits no
 value from them, and opens no credential store (`~/.claude.json`,
 `~/.claude/.credentials.json`, `~/.codex/auth.json`). It prints command presence plus
