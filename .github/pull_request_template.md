@@ -8,6 +8,10 @@ Scope and base commit
 - Lane: exactly one of `lane:foundation`, `lane:trading` or `lane:shared`, matching the PR label; a `lane:shared` PR needs the other lane's acknowledgement before merge ([docs/lanes.md](../docs/lanes.md)):
 - Owned paths touched:
 
+### SOTA sources
+
+<!-- Required (AGENTS.md top rule; the sota-sources check fails without it). For every change: the maintained repository or published reference it installs or follows, with the repository URL, the pin (tag or commit), and the file, section or paper. A change without a SOTA source is not mergeable. -->
+
 ### Evidence-class table
 
 List each material claim with its evidence class. Classes: `native_proven`

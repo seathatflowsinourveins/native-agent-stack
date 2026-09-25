@@ -309,3 +309,30 @@ jobs:
           if-no-files-found: warn
           include-hidden-files: false
           retention-days: 30
+
+  sota-sources:
+    # Top rule (AGENTS.md): every change names the maintained repository or published reference it
+    # installs or follows. This job fails a PR whose description lacks a non-empty "SOTA sources" section
+    # (## or ###). It reads the body from the pull_request payload through the official
+    # actions/github-script (github.com/actions/github-script, v9.0.0; payload fields per
+    # docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request); no body text reaches a shell.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Require a non-empty "SOTA sources" section in the PR description
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const body = (context.payload.pull_request && context.payload.pull_request.body) || '';
+            const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
+            const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+            if (!content) {
+              core.setFailed('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
+            } else {
+              core.info(`SOTA sources section present (${content.length} characters).`);
+            }
