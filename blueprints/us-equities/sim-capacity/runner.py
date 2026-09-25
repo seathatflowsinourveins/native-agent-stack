@@ -93,7 +93,8 @@ def save(path: Path, data) -> None:
 # ---------------------------------------------------------------------------
 _SENSITIVE_ARG_NAMES = ("env_file", "pages", "catalog", "out")
 _PATH_TRIMMED_ARG_NAMES = ("receipt",)
-_ARG_ORDER = ("command", "env_file", "pages", "catalog", "out", "replay", "receipt", "profile", "latency_ms")
+_ARG_ORDER = ("command", "env_file", "pages", "catalog", "out", "replay", "receipt", "profile",
+              "release_timing", "latency_ms")
 
 
 def _repo_relative_or_basename(value: str) -> str:
@@ -230,7 +231,7 @@ def dataframe_to_rows(df) -> list[dict]:
 
 
 def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str, latency_ms: int,
-            run_seconds: float = RUN_SECONDS) -> dict:
+            run_seconds: float = RUN_SECONDS, exact_release: bool = True) -> dict:
     """Run one profile x latency combination.
 
     `trades_by_symbol` is accepted for interface/signature stability (and is
@@ -244,7 +245,18 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
     arrives. Measured directly: with trade ticks included, 41.2% of elite-tier
     fills beat the NBBO touch in force (8,923 of 21,652); quotes-only puts
     every one of them at the touch. The exerciser is taker-only (marketable
-    IOC), so quotes-only is the realistic engine feed for this lane."""
+    IOC), so quotes-only is the realistic engine feed for this lane.
+
+    `exact_release` (default True) is the default, fixed release timing: it
+    sets `CapacityExerciserParams.release_alert_latency_ns` to the same
+    nanosecond value given to `StaticLatencyModel`, so every latency-delayed
+    order resolves at EXACTLY submit + latency. On the pinned rc5 engine, a
+    deferred order is otherwise released only when its own instrument's next
+    quote, or any due clock timer from any source, is processed at or after
+    submit + latency -- not exactly at that instant (see README.md's Latency
+    section; measured in sim-engine-crosscheck: extra delay of median 28ms
+    SPY / 53ms NVDA, p90 135ms/263ms). Pass `exact_release=False` (the CLI's
+    `--release-timing legacy`) to reproduce that pre-fix behavior."""
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogLevel
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig, RiskEngineConfig
@@ -290,10 +302,12 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
         for instrument in instruments.values():
             engine.add_instrument(instrument)
         engine.add_data(ticks)
+        release_alert_latency_ns = int(latency_ms * 1_000_000) if (exact_release and latency_ms) else 0
         params = CapacityExerciserParams(symbols=tuple(symbols), venue=fetcher.VENUE_NAME,
                                           submits_per_sec=profile["submits_per_sec"], position_cap=POSITION_CAP,
                                           qty_min=1, qty_max=5, collar="0.01", run_seconds=run_seconds,
-                                          flatten_buffer_seconds=FLATTEN_BUFFER_SECONDS)
+                                          flatten_buffer_seconds=FLATTEN_BUFFER_SECONDS,
+                                          release_alert_latency_ns=release_alert_latency_ns)
         strategy = CapacityExerciser(params)
         engine.add_strategy(strategy)
         engine.run()
@@ -320,7 +334,8 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
             "fills_report_rows": fill_rows, "order_fills_report_rows": order_fill_rows,
             "n_ticks": len(ticks), "wall_seconds": wall_seconds, "tif_counts": tif_counts,
             "net_positions_at_end": net_positions, "flat_at_end": all(v == 0 for v in net_positions.values()),
-            "run_seconds": run_seconds,
+            "run_seconds": run_seconds, "exact_release": exact_release,
+            "release_alert_latency_ns": release_alert_latency_ns,
         }
     finally:
         engine.dispose()
@@ -460,6 +475,40 @@ def submit_to_fill_latency_ms(events: list[dict]) -> dict:
     return {"n": n, "min_ms": deltas_ms[0], "p50_ms": pct(0.5), "p90_ms": pct(0.9), "max_ms": deltas_ms[-1]}
 
 
+def check_release_timing(events: list[dict], latency_ms: int, release_alert_latency_ns: int = 0) -> dict:
+    """For every exerciser fill, the delta between its own order's submit
+    timestamp and this fill's timestamp, checked against the configured
+    latency.
+
+    A fill must never precede submit + latency, in either release mode (the
+    latency model itself gates when an order can first be matched). When
+    `release_alert_latency_ns` is positive -- the exact-release alert from
+    `CapacityExerciserParams.release_alert_latency_ns` was actually active
+    for this run, see exerciser.py and README.md's Latency section -- every
+    fill must additionally resolve at EXACTLY submit + latency; this is not
+    enforced when the alert was inactive (`release_alert_latency_ns == 0`:
+    either legacy on-next-event mode, or an unlatencied 0ms run with nothing
+    to make exact), where the measured release-on-next-event slack is
+    expected, not a violation."""
+    latency_ns = int(latency_ms * 1_000_000)
+    exact_release_expected = release_alert_latency_ns > 0
+    submits_by_id = {ev["client_order_id"]: ev["ts_ns"] for ev in events if ev["kind"] == "submit"}
+    checked = 0
+    early, inexact = [], []
+    for ev in events:
+        if ev["kind"] != "fill" or ev["client_order_id"] not in submits_by_id:
+            continue
+        checked += 1
+        delta_ns = ev["ts_ns"] - submits_by_id[ev["client_order_id"]]
+        if delta_ns < latency_ns:
+            early.append({"client_order_id": ev["client_order_id"], "delta_ns": delta_ns})
+        elif exact_release_expected and delta_ns != latency_ns:
+            inexact.append({"client_order_id": ev["client_order_id"], "delta_ns": delta_ns})
+    return {"checked": checked, "latency_ns": latency_ns, "exact_release_expected": exact_release_expected,
+            "early_violation_count": len(early), "early_violations": early[:20],
+            "inexact_violation_count": len(inexact), "inexact_violations": inexact[:20]}
+
+
 def alpaca_rounding_delta(fills: list[dict], commission_plan: str) -> dict:
     """Measured difference between this model's per-fill, half-up rounding and
     Alpaca's actual documented method: aggregate each fee TYPE separately
@@ -523,6 +572,7 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
 
     nbbo_touch_check = check_no_fill_beats_nbbo_touch(events, quotes_by_symbol)
     latency_dist = submit_to_fill_latency_ms(events)
+    release_timing_check = check_release_timing(events, result["latency_ms"], result.get("release_alert_latency_ns", 0))
 
     reject_reasons: dict[str, int] = {}
     denied_reasons: dict[str, int] = {}
@@ -558,6 +608,9 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
                     "strategy_fill_counter": result["counters"].get("fills", 0)},
         "fill_vs_nbbo_touch": nbbo_touch_check,
         "submit_to_fill_latency_ms": latency_dist,
+        "release_timing": {"exact_release": result.get("exact_release", False),
+                            "release_alert_latency_ns": result.get("release_alert_latency_ns", 0),
+                            "check": release_timing_check},
     }
 
 
@@ -576,13 +629,16 @@ def cmd_run(args) -> int:
         return {"latency_ms": latency_ms, "fills_per_minute_stats": summary["fills_per_minute_stats"],
                 "recount_agrees": summary["recount"]["agrees"],
                 "fill_vs_nbbo_touch_violations": summary["fill_vs_nbbo_touch"]["violation_count"],
-                "reject_reasons": summary["reject_reasons"], "denied_reasons": summary["denied_reasons"]}
+                "reject_reasons": summary["reject_reasons"], "denied_reasons": summary["denied_reasons"],
+                "release_timing": summary["release_timing"]}
 
+    exact_release = getattr(args, "release_timing", "exact") != "legacy"
     profiles = list(PROFILES) if args.profile == "all" else [args.profile]
     summaries = []
     latency_sensitivity = []
     for profile_name in profiles:
-        primary = run_one(quotes, trades, profile_name=profile_name, latency_ms=PRIMARY_LATENCY_MS)
+        primary = run_one(quotes, trades, profile_name=profile_name, latency_ms=PRIMARY_LATENCY_MS,
+                           exact_release=exact_release)
         primary_summary = summarize_run(primary, quotes)
         summaries.append(primary_summary)
         if profile_name != "elite-tier":
@@ -595,7 +651,8 @@ def cmd_run(args) -> int:
             if latency_ms == PRIMARY_LATENCY_MS:
                 latency_sensitivity.append(_sweep_entry(latency_ms, primary_summary))
                 continue
-            result = run_one(quotes, trades, profile_name=profile_name, latency_ms=latency_ms)
+            result = run_one(quotes, trades, profile_name=profile_name, latency_ms=latency_ms,
+                              exact_release=exact_release)
             summary = summarize_run(result, quotes)
             latency_sensitivity.append(_sweep_entry(latency_ms, summary))
 
@@ -611,12 +668,28 @@ def cmd_run(args) -> int:
         if s["fill_vs_nbbo_touch"]["violation_count"] != 0:
             raise RuntimeError(f"{s['fill_vs_nbbo_touch']['violation_count']} exerciser fill(s) beat the "
                                f"NBBO touch in profile {s['profile']} (see H1 in README.md)")
+        rt = s["release_timing"]["check"]
+        if rt["early_violation_count"] != 0:
+            raise RuntimeError(f"{rt['early_violation_count']} exerciser fill(s) resolved before submit + "
+                               f"latency in profile {s['profile']}")
+        if rt["exact_release_expected"] and rt["inexact_violation_count"] != 0:
+            raise RuntimeError(f"{rt['inexact_violation_count']} exerciser fill(s) did not resolve at exactly "
+                               f"submit + latency in profile {s['profile']} (release_alert_latency_ns="
+                               f"{s['release_timing']['release_alert_latency_ns']})")
     for row in latency_sensitivity:
         if not row["recount_agrees"]:
             raise RuntimeError(f"recount disagreement at latency {row['latency_ms']}ms")
         if row["fill_vs_nbbo_touch_violations"] != 0:
             raise RuntimeError(f"{row['fill_vs_nbbo_touch_violations']} exerciser fill(s) beat the NBBO "
                                f"touch at latency {row['latency_ms']}ms (see H1 in README.md)")
+        rt = row["release_timing"]["check"]
+        if rt["early_violation_count"] != 0:
+            raise RuntimeError(f"{rt['early_violation_count']} exerciser fill(s) resolved before submit + "
+                               f"latency at latency {row['latency_ms']}ms")
+        if rt["exact_release_expected"] and rt["inexact_violation_count"] != 0:
+            raise RuntimeError(f"{rt['inexact_violation_count']} exerciser fill(s) did not resolve at exactly "
+                               f"submit + latency at latency {row['latency_ms']}ms (release_alert_latency_ns="
+                               f"{row['release_timing']['release_alert_latency_ns']})")
 
     runner_sha256 = fetcher.rc.digest_bytes(Path(__file__).read_bytes())
     engine_versions = {"nautilus_trader": importlib.metadata.version("nautilus_trader"),
@@ -657,6 +730,7 @@ def cmd_run(args) -> int:
         "profiles": {name: PROFILES[name] for name in profiles},
         "runs": summaries,
         "latency_sensitivity_elite_tier": latency_sensitivity,
+        "release_timing_mode": "exact" if exact_release else "legacy",
         "latency_note": ("PRIMARY_LATENCY_MS=70 is a primary-reference point, chosen near the retained "
                          "sim-to-paper receipt's own sensitivity-check flip point (~69.2ms) -- it is far "
                          "BELOW that receipt's observed paper submit-to-fill range (0.65-1.09s), not "
@@ -664,11 +738,17 @@ def cmd_run(args) -> int:
                          "closest to that observed range. It is explicitly NOT a calibration (that "
                          "receipt itself says 'Sensitivity check, not a calibration'). "
                          "On rc5 a deferred order is released at the first of its own next quote or ANY "
-                         "due clock timer, so the exerciser's own tick cadence mixes into the measured "
-                         "submit-to-fill distribution alongside the configured latency; the sweep below "
-                         "therefore varies configured latency together with that timer-cadence effect, "
-                         "not latency alone. See each run's submit_to_fill_latency_ms for the measured "
-                         "distribution."),
+                         "due clock timer, not exactly at submit+latency (measured directly in "
+                         "sim-engine-crosscheck: extra delay of median 28ms SPY / 53ms NVDA, p90 "
+                         "135ms/263ms). "
+                         f"This receipt uses release_timing_mode={'exact' if exact_release else 'legacy'} "
+                         "(CapacityExerciserParams.release_alert_latency_ns; --release-timing on the CLI, "
+                         "default exact): 'exact' registers one otherwise-inert per-order release alert at "
+                         "submit+latency, so every fill resolves at EXACTLY submit+latency (see each run's "
+                         "release_timing.check, asserted below); 'legacy' reproduces the pre-fix "
+                         "on-next-event behavior, where the exerciser's own tick cadence mixes into the "
+                         "measured submit-to-fill distribution alongside the configured latency. See each "
+                         "run's submit_to_fill_latency_ms for the measured distribution."),
         "fee_model": {
             "alpaca_commission_usd": "0 (retail routing)",
             "sec_section31_usd_per_dollar": "20.60/1000000 (effective 2026-04-04, open-ended at retrieval)",
@@ -722,6 +802,13 @@ def main(argv=None) -> int:
     run_p.add_argument("--catalog", type=Path, required=True)
     run_p.add_argument("--receipt", type=Path, required=True)
     run_p.add_argument("--profile", choices=["all", *PROFILES], default="all")
+    run_p.add_argument("--release-timing", choices=["exact", "legacy"], default="exact",
+                        help="exact (default): register a per-order no-op release alert at "
+                             "submit+latency so every latency-delayed order resolves at exactly "
+                             "that instant (CapacityExerciserParams.release_alert_latency_ns). "
+                             "legacy: reproduce the pre-fix release-on-next-quote-or-timer "
+                             "behavior -- see README.md's Latency section for the measured slack "
+                             "(median 28ms SPY / 53ms NVDA, p90 135ms/263ms) exact removes.")
     run_p.set_defaults(func=cmd_run)
 
     args = ap.parse_args(argv)

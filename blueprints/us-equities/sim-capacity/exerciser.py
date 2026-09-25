@@ -65,6 +65,20 @@ class CapacityExerciserParams:
     collar: str = "0.01"
     run_seconds: float = 1800.0
     flatten_buffer_seconds: float = 5.0
+    release_alert_latency_ns: int = 0
+    # 0 disables (legacy behavior: a latency-delayed order is released only
+    # when its own instrument's next quote, or any due clock timer from any
+    # source, is processed at or after submit + latency -- see README.md's
+    # Latency section). A positive value registers one additional,
+    # otherwise-inert `set_time_alert_ns` per order, at exactly
+    # submit_ts + release_alert_latency_ns, with a no-op callback that
+    # touches no order state -- this makes every order resolve at exactly
+    # submit + latency instead, matching
+    # sim-engine-crosscheck/run_nautilus.py's `exact_latency` fix (measured
+    # there: extra release-on-next-event delay of median 28ms SPY / 53ms
+    # NVDA, p90 135ms/263ms, fully removed by the alert). `runner.run_one`
+    # sets this from its own `exact_release` parameter, using the same
+    # latency value passed to `StaticLatencyModel`.
 
     def __post_init__(self):
         if not self.symbols:
@@ -172,10 +186,23 @@ class CapacityExerciser(Strategy):
             self._reserved_sell_qty[symbol] += qty
             self._sell_reservations[str(client_order_id)] = (symbol, qty)
         self.counters["submits"] += 1
-        self.events.append({"ts_ns": self.clock.timestamp_ns(), "kind": "submit", "symbol": symbol,
+        submit_ts_ns = self.clock.timestamp_ns()
+        self.events.append({"ts_ns": submit_ts_ns, "kind": "submit", "symbol": symbol,
                              "side": side, "qty": qty, "client_order_id": str(client_order_id),
                              "limit_price": str(limit_price.as_decimal())})
         self.submit_order(order)
+        if self.params.release_alert_latency_ns > 0:
+            # See CapacityExerciserParams.release_alert_latency_ns: an
+            # otherwise-inert per-order alert that forces this order's
+            # deferred-release processing to reach exactly
+            # submit_ts_ns + release_alert_latency_ns, instead of waiting on
+            # whichever quote or timer happens to be next.
+            self.clock.set_time_alert_ns(name=f"release-{client_order_id}",
+                                          alert_time_ns=submit_ts_ns + self.params.release_alert_latency_ns,
+                                          callback=self._on_release_alert)
+
+    def _on_release_alert(self, event):
+        pass
 
     def _release_sell_reservation(self, client_order_id) -> None:
         """Release a SELL order's reserved quantity exactly once (pop-based,

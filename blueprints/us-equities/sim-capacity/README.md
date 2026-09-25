@@ -238,22 +238,58 @@ That receipt explicitly says of its own sweep, "Sensitivity check, not a
 calibration" (`sim-paper-compare/receipts/20260923g-main-passed.json`). This
 lane inherits that caveat rather than upgrading it to "calibrated."
 
-On the pinned rc5 engine, a deferred (latency-delayed) order is released at
-the first of: (a) the next quote tick on its own instrument, or (b) **any**
-due clock timer processed by the engine, from any source (see
+**Exact-latency release (default since 2026-09-25).** On the pinned rc5
+engine, a deferred (latency-delayed) order is released at the first of:
+(a) the next quote tick on its own instrument, or (b) **any** due clock
+timer processed by the engine, from any source (see
 `sim-paper-compare/replay_compare.py`'s module docstring for the underlying
-source citations). The exerciser's own submit-schedule timer fires
-frequently, so it is very often *itself* the timer that releases a deferred
-fill -- meaning the measured submit-to-fill distribution mixes the configured
-`StaticLatencyModel` delay together with the exerciser's own tick cadence,
-not latency alone. Measured directly in the current run
-(`submit_to_fill_latency_ms` in each receipt): elite-tier fills cluster at
-p50=120ms, p90=120ms (min 70.0ms, max 120ms) at a ~60ms tick interval and
-70ms configured latency -- consistent with "release at the first tick at or
-after submit + latency," which lands most fills at the *second* tick after
-submit; paper-parity (200ms tick interval) shows p50=138.6ms, p90=200ms (min
-70.0ms, max 200ms). The latency sweep (0/70/250/1000ms) below therefore
-varies configured latency together with this timer-cadence effect.
+source citations) -- not exactly at submit + latency. The exerciser's own
+submit-schedule timer fires frequently, so it is very often *itself* the
+timer that releases a deferred fill, mixing the configured
+`StaticLatencyModel` delay together with the exerciser's own tick cadence.
+Measured directly (isolated in `sim-engine-crosscheck`, on a shared
+deterministic order stream, so it is not itself confounded by this
+exerciser's own tick cadence): extra delay of **median 28ms (SPY) / 53ms
+(NVDA), p90 135ms/263ms** -- see
+`sim-engine-crosscheck/README.md`'s "A real, minor, separate NautilusTrader
+finding" and `run_nautilus.py`'s `exact_latency` docstring.
+
+**The fix, applied here as the default**: `CapacityExerciserParams.
+release_alert_latency_ns` (`exerciser.py`), wired from `runner.run_one`'s
+`exact_release` parameter (default `True`) using the same nanosecond value
+given to `StaticLatencyModel`. It registers one additional, otherwise-inert
+`self.clock.set_time_alert_ns(...)` per order, at exactly
+`submit_ts + release_alert_latency_ns`, with a no-op callback that touches
+no order state -- this forces every latency-delayed order to resolve at
+EXACTLY submit + latency. Measured on the committed 2026-09-25 receipts
+(`submit_to_fill_latency_ms` in each run): min/p50/p90/max are all exactly
+**70.0ms** for both profiles at the 70ms primary latency, and
+`release_timing.check` (asserted by `cmd_run`, not just reported) shows zero
+early violations and zero inexact violations across every profile and every
+latency-sweep point. This is the same mechanism, and the same measured
+effect, as `sim-engine-crosscheck/run_nautilus.py`'s `exact_latency=True`
+variant (median time-to-fill exactly 70.00ms/250.00ms there too).
+
+**Legacy mode is still available**, for comparison or reproduction of the
+pre-fix numbers: `runner.py run --release-timing legacy` (or
+`run_one(..., exact_release=False)`), which sets
+`release_alert_latency_ns=0` and reproduces the release-on-next-event
+behavior described above. On this lane's own real-data fills prior to the
+fix (previous committed receipts, superseded 2026-09-25 -- see
+`receipts/20260924-elite-tier-superseded.json` /
+`receipts/20260924-paper-parity-superseded.json`): elite-tier fills
+clustered at p50=120ms, p90=120ms (min 70.0ms, max 120ms) at a ~60ms tick
+interval and 70ms configured latency -- consistent with "release at the
+first tick at or after submit + latency," which lands most fills at the
+*second* tick after submit; paper-parity (200ms tick interval) showed
+p50=138.6ms, p90=200ms (min 70.0ms, max 200ms). Legacy mode's own
+`tests.test_sim_capacity.ExactReleaseTimingTests.
+test_legacy_release_resolves_some_fills_later_than_exact` reproduces this
+behavior directly against a small, sparse, synthetic quote set (never before
+submit + latency, but not always exactly at it either). The latency sweep
+(0/70/250/1000ms) below uses the default exact-release mode, so it varies
+configured latency alone; under legacy mode it would still vary configured
+latency together with the timer-cadence effect above.
 
 ## Independent recount and the NBBO-touch check
 
@@ -279,15 +315,24 @@ only the retained normalized quote rows, never the engine's internal book
 state, and asserts no fill is strictly better than the touch. This is the H1
 guard: 0 violations in both profiles after the fix (see above).
 
-## Results (2026-09-24 fetch, real Alpaca SIP data, post-fix)
+## Results (2026-09-25 rerun, real Alpaca SIP data cache, exact-release default)
+
+Re-run 2026-09-25 from the same retained, cached Alpaca SIP pages (`--replay`,
+no network fetch) after making exact-latency release the default; numbers
+shifted slightly from the 2026-09-24 fetch because release timing now changes
+which fills actually land inside vs. outside a given simulated minute and
+which orders see liquidity already consumed by an earlier order -- not
+because of new or different market data. The prior (legacy-timing) receipts
+are kept, unmodified, as superseded evidence -- see "Superseded receipts"
+below.
 
 | Profile | min/min | median/min | max/min | full minutes >=180 | sim cost/min (USD) | wall-clock | recount |
 |---|---|---|---|---|---|---|---|
-| paper-parity (70ms) | 171 | 175.0 | 180 | 1/30 (by design: capped by the 180/min limiter) | ~45.33 | ~3.1s | agrees |
-| elite-tier (70ms, primary) | 859 | 873.0 | 882 | **30/30** | ~243.45 | ~5.2s | agrees |
+| paper-parity (70ms) | 170 | 176.0 | 180 | 2/30 (by design: capped by the 180/min limiter) | ~46.10 | ~2.8s | agrees |
+| elite-tier (70ms, primary) | 866 | 873.0 | 884 | **30/30** | ~245.76 | ~5.3s | agrees |
 
-Latency sensitivity (elite-tier, full 30-min run at each latency). **This
-table is sourced from `receipts/20260924-elite-tier.json`'s
+Latency sensitivity (elite-tier, full 30-min run at each latency, exact
+release). **This table is sourced from `receipts/20260925-elite-tier.json`'s
 `latency_sensitivity_elite_tier`** -- read the numbers from that file when
 regenerating this table, rather than retyping them, so it cannot silently
 drift from the committed receipt (a stale copy of this exact table was
@@ -297,9 +342,27 @@ caught by review once already); `tests.test_sim_capacity`'s
 | latency (ms) | min/min | median/min | max/min | full minutes >=180 |
 |---|---|---|---|---|
 | 0 | 889 | 898.5 | 900 | 30/30 |
-| 70 (primary) | 859 | 873.0 | 882 | 30/30 |
-| 250 | 801 | 829.0 | 852 | 30/30 |
-| 1000 | 670 | 728.0 | 757 | 30/30 |
+| 70 (primary) | 866 | 873.0 | 884 | 30/30 |
+| 250 | 807 | 830.0 | 854 | 30/30 |
+| 1000 | 672 | 727.5 | 761 | 30/30 |
+
+At every nonzero latency point, `release_timing.check` confirms zero early
+violations (no fill before submit + latency) and zero inexact violations (no
+fill after submit + latency either -- every fill is at exactly submit +
+latency); the 0ms row has nothing to make exact (no `StaticLatencyModel` is
+even attached) and is unaffected by the release-timing default.
+
+### Superseded receipts (legacy release timing)
+
+`receipts/20260924-elite-tier-superseded.json` and
+`receipts/20260924-paper-parity-superseded.json` are the original 2026-09-24
+receipts, kept unmodified (not deleted, matching
+`sim-engine-crosscheck/receipts/20260925-crosscheck-superseded.json`'s
+convention) -- they were produced before the exact-release fix existed, so
+their `runs[].submit_to_fill_latency_ms` mixes configured latency with the
+release-on-next-event timer-cadence effect described above. They remain
+valid infrastructure evidence for the legacy release mode specifically, not
+a data or engine-configuration error.
 
 ### Quotes-only vs with-trades (H1 evidence)
 
@@ -309,21 +372,25 @@ same profiles, mirroring `run_one`'s configuration:
 | variant | fills/min (min/median/max) | fills beating touch | cost/min (USD) |
 |---|---|---|---|
 | elite, with trades | 657 / 716.5 / 832 | 8,990 / 21,924 = 41.0% | 59.09 |
-| elite, **quotes-only** (this lane) | 859 / 873.0 / 882 | **0 / 26,145 = 0.0%** | 225.97 |
+| elite, **quotes-only** (this lane) | 866 / 873.0 / 884 | **0 / 26,230 = 0.0%** | 225.97 |
 | paper, with trades | 138 / 154.0 / 171 | 2,072 / 4,664 = 44.4% | 11.95 |
-| paper, **quotes-only** (this lane) | 171 / 175.0 / 180 | **0 / 5,255 = 0.0%** | 45.33 |
+| paper, **quotes-only** (this lane) | 170 / 176.0 / 180 | **0 / 5,278 = 0.0%** | 45.33 |
 
 (The harness's own cost/min differs slightly from this lane's committed
 receipts because it uses `commission_plan="none"` for both profiles, i.e. no
 elite commission; it is included here only as H1 comparison evidence, not as
-this lane's cost claim.)
+this lane's cost claim. The "quotes-only (this lane)" fills/min and
+touch-check columns are re-read from the 2026-09-25 exact-release receipts;
+the independent reviewer's own with-trades harness run is unaffected by this
+lane's release-timing default and is not re-run here.)
 
 Both profiles flatten fully at the end (`flat_at_end: true`), and net P&L is
 negative in both -- expected, since the exerciser pays the spread (collar) on
 every round trip plus fees with no offsetting signal. See
-`receipts/20260924-paper-parity.json` and `receipts/20260924-elite-tier.json`
-for full per-minute breakdowns, page hashes, engine/runtime versions and the
-redacted argv.
+`receipts/20260925-paper-parity.json` and `receipts/20260925-elite-tier.json`
+for full per-minute breakdowns, page hashes, engine/runtime versions, the
+redacted argv and the `release_timing`/`release_timing_mode` fields; see
+"Superseded receipts" above for the prior legacy-timing versions.
 
 ## Limitations
 
@@ -381,15 +448,22 @@ python3 blueprints/us-equities/sim-capacity/runner.py fetch \
     --pages ~/.local/state/native-agent-stack/sim-capacity/pages \
     --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog
 
-# Both profiles, latency sweep and recount:
+# Both profiles, latency sweep and recount (exact-release default):
 python3 blueprints/us-equities/sim-capacity/runner.py run \
     --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog \
-    --receipt blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json \
+    --receipt blueprints/us-equities/sim-capacity/receipts/20260925-paper-parity.json \
     --profile paper-parity
 python3 blueprints/us-equities/sim-capacity/runner.py run \
     --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog \
-    --receipt blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json \
+    --receipt blueprints/us-equities/sim-capacity/receipts/20260925-elite-tier.json \
     --profile elite-tier
+
+# Same, but reproducing the pre-fix release-on-next-event timing (legacy;
+# see the Latency section above):
+python3 blueprints/us-equities/sim-capacity/runner.py run \
+    --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog \
+    --receipt PRIVATE/legacy-elite-tier.json \
+    --profile elite-tier --release-timing legacy
 
 # Replay from retained pages only (no network, no credential file opened):
 python3 blueprints/us-equities/sim-capacity/runner.py fetch --replay \
@@ -398,9 +472,9 @@ python3 blueprints/us-equities/sim-capacity/runner.py fetch --replay \
 ```
 
 Tests: `python3 -m unittest -v tests.test_sim_capacity`. Nautilus-requiring
-tests (`PinnedRuntimeEngineTests`, `RealVenueRunOneTests`) and the
-pandas-requiring datetime-recovery tests skip cleanly on system Python and
-run on the pinned runtime
+tests (`PinnedRuntimeEngineTests`, `RealVenueRunOneTests`,
+`ExactReleaseTimingTests`) and the pandas-requiring datetime-recovery tests
+skip cleanly on system Python and run on the pinned runtime
 (`~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python`).
 `RealVenueRunOneTests` calls `runner.run_one` directly (the real production
 function, with its real venue/risk/fee configuration) on a small synthetic
@@ -408,4 +482,9 @@ quote set, and asserts: fill qty never exceeds displayed size; fill timestamp
 never precedes submit + latency; no fill beats the NBBO touch; fees land on
 sells only at `commission_plan="none"`; the independent recount agrees; every
 exerciser order's actual time-in-force is IOC; and the configured budget
-values match.
+values match. `ExactReleaseTimingTests` calls `runner.run_one` on its own
+deliberately sparse synthetic quote set and asserts the release-timing fix
+directly: with the (default) exact-release mode, every fill resolves at
+EXACTLY submit + latency; with legacy mode on the same fixture, fills never
+precede submit + latency but at least one resolves strictly later --
+reproducing, at unit-test scale, the slack measured in `sim-engine-crosscheck`.
