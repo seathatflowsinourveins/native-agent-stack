@@ -441,8 +441,12 @@ Install once with the upstream MCP extra:
 
 ```sh
 uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'
-headroom mcp serve --proxy-url http://127.0.0.1:1
+HEADROOM_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1
+# native registration (the name comes before -e, which takes several values):
+claude mcp add --scope user headroom -e HEADROOM_OFFLINE=1 -e DO_NOT_TRACK=1 -- "$(command -v headroom)" mcp serve --proxy-url http://127.0.0.1:1
 ```
+
+Headroom 0.37.0 uploads an anonymous usage beacon by default: `telemetry/beacon.py` sets `BEACON_DEFAULT_ON = True`, and the MCP compress path calls it. `HEADROOM_OFFLINE=1` is its master no-egress switch (`offline.py`). It turns off the beacon, the update check, the license and usage reporter, and Hugging Face downloads. `DO_NOT_TRACK=1` also turns off the beacon if a later version renames that switch. Set both wherever Headroom runs: the MCP registration for each client, and any service that calls `headroom savings`. On 2026-09-25, with both variables set, `headroom_compress` still returned compressed output, because the compression model is local.
 
 The tested direct MCP fixture used that unreachable loopback proxy address and
 the server's local compression path. Within one live MCP session, call

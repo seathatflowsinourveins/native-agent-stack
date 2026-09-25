@@ -10627,8 +10627,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "3d3a58da731d57e6ad3c990c860f25e2365353c4d51fe873db830e1a66464c58",
-      "bytes": 157406
+      "sha256": "bd560e9cae461823d2b1ed7f5beb56c437768de8f746e776e16baf12b3ec1577",
+      "bytes": 157440
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -28927,8 +28927,8 @@
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
-      "sha256": "e105d1d2178057c86f300b29f55ba2891249f20eee815a3e5993b7053545bd7e",
-      "bytes": 8590
+      "sha256": "7fa8f43808ecbbc1e412c306d21a532b24999def7edbd88ba2de91a5e9f98b58",
+      "bytes": 8997
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
@@ -30902,8 +30902,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "989d474c5ebc96fd5b82749b4ce3c67bb3490534a379ecbed9de89a3e7d8ddf5",
-      "bytes": 64863
+      "sha256": "7f7d65858a4e35ab3729c2d7decdd516dcd8a6866b7cedae6dd30cc50ebc822e",
+      "bytes": 65781
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
