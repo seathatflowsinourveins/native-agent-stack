@@ -8,9 +8,10 @@ behaviour); exit 0 lets it continue.
 
 This is a deterministic text heuristic that stops accidental exposure:
 naming a credential store, dumping the environment, echoing a secret
-variable, tracing a process, printing a native token (including through a
-git credential helper), reading or searching
-credential files or secret variable names, tracing a shell while it sources a
+variable, tracing a process, printing a native token (`gh auth token`,
+`hf auth token`, or through a git credential helper), reading or searching
+credential files or secret variable names, reading or copying the whole
+Hugging Face home, tracing a shell while it sources a
 credential file, and dumping the environment after sourcing one. It is not a
 security boundary. A process that imports a loader, or a renamed or
 obfuscated path, passes; see docs/secret-storage.md "Threat model" for the
@@ -35,10 +36,16 @@ STORE_PATHS = (
     (re.compile(r"\.claude/\.credentials\.json"), "native_store_path"),
     (re.compile(r"(?:\.codex|CODEX_HOME\}?)/auth\.json"), "native_store_path"),
     (re.compile(r"gh/hosts\.yml"), "native_store_path"),
+    # Hugging Face token files: the default home, $XDG_CACHE_HOME/huggingface, $HF_HOME or a
+    # ${HF_HOME:-...} form, a closing quote allowed before the slash; tokenizers/ and hub/ pass.
+    (re.compile(r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])"),
+     "native_store_path"),
     (re.compile(r"ecosystem-grafana\.env"), "service_secret_path"),
     (re.compile(r"nativestack/generation\.key"), "service_secret_path"),
     (re.compile(r"/proc/(?:[^/\s]+/)*environ\b"), "process_environment"),
     (re.compile(r"\bgh\s+auth\s+token\b"), "native_token_print"),
+    (re.compile(r"\bhf\s+auth\s+token\b"), "native_token_print"),
+    (re.compile(r"\bhuggingface-cli\s+(?:auth\s+)?token\b"), "native_token_print"),
     (re.compile(r"--show-token\b"), "native_token_print"),
     (re.compile(r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b"), "native_token_print"),
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
@@ -51,7 +58,8 @@ SECRET_NAMES = (
     "APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ALPACA_API_KEY", "ALPACA_SECRET_KEY",
     "DATABENTO_API_KEY", "TYPESAFE_API_KEY", "OMNIROUTE_API_KEY", "MASSIVE_API_KEY",
     "GF_SECURITY_ADMIN_PASSWORD", "GF_SECURITY_SECRET_KEY",
-    "GH_TOKEN", "GITHUB_TOKEN", "HF_TOKEN", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+    "GH_TOKEN", "GITHUB_TOKEN", "HF_TOKEN", "HUGGING_FACE_HUB_TOKEN", "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
     "CODEX_API_KEY", "OPENROUTER_API_KEY", "MISTRAL_API_KEY", "QDRANT_API_KEY",
     "PREFECT_API_KEY", "MC_API_KEY", "MSB_API_KEY", "PAPERCLIP_API_KEY",
     "TWS_USERNAME", "TWS_PASSWORD", "TWS_ACCOUNT", "IBKR_ACCOUNT_ID",
@@ -60,7 +68,11 @@ _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
 SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
-POINTER_VARIABLE = re.compile(r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH)\b")
+POINTER_VARIABLE = re.compile(
+    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)\b")
+# The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
+# copy of it includes both token files. Its subdirectories such as hub/ stay readable.
+HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
 # A .env-style credential file: `.env`, `.env.local`, `.envrc`, `alpaca-paper.env`, `*.env`,
 # also as the value of `--include=`/`-g` style options. `*.example` templates stay readable.
 ENV_FILE_WORD = re.compile(r"(?:^|[/=])(?:\.env[^/=]*|[^/=]*\.env)$")
@@ -345,6 +357,8 @@ def segment_reason(words: list[str]) -> str | None:
         return None
     if any(POINTER_VARIABLE.search(w) for w in arguments):
         return "credential_file_read"
+    if any(HF_HOME_ROOT.search(w) for w in arguments):
+        return "native_store_path"
     if any(is_env_file_word(w) for w in arguments):
         return "dotenv_read"
     if any(SECRET_NAME.search(w) for w in arguments):

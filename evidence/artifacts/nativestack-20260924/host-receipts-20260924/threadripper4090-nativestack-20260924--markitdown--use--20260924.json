@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--markitdown--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "markitdown",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py markitdown",
+      "exit": 0,
+      "duration_s": 0.525,
+      "output_sha256": "8400e8b216f267062f3b0529dc853e4d3ebc8ca434267a9676ecabd0c6823195",
+      "output_excerpt": "Native HTML conversion preserved the heading and list item.\n"
+    }
+  ],
+  "tool_versions": {
+    "markitdown": "0.1.7"
+  },
+  "observed_at_utc": "2026-09-24T04:18:52Z",
+  "result": "pass",
+  "claim": "Bounded native component check passed its explicit content assertion; see the checked-in check source and retained execution ledger.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:52Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

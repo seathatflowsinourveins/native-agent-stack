@@ -548,6 +548,9 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         self.write("catalogs/landscape/component-evidence-matrix.json",
                    {"rows": [{"layer": "x", "winners": ["codex"]}]})
         self.write("catalogs/landscape/new-host-grand-list.json", {"layers": [{"winners": ["codex"]}]})
+        (self.source / "docs").mkdir(parents=True, exist_ok=True)
+        (self.source / "docs" / "new-host-grand-list.md").write_text("| Workers | retain | `codex` |\n", encoding="utf-8")
+        (self.source / "docs" / "component-evidence-matrix.md").write_text("| workers | codex |\n", encoding="utf-8")
         self.write("catalogs/landscape/blind-convergence.json", {"rows": [{"coordinator_disposition": "codex"}]})
         self.write("catalogs/sota-convergence/manifest-20260923.json",
                    {"components": [{"id": "codex", "why_selected": "incumbent"}]})
@@ -566,9 +569,12 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
         for removed in ("catalogs/landscape/component-evidence-matrix.json",
                         "catalogs/landscape/new-host-grand-list.json", "catalogs/landscape/blind-convergence.json",
+                        "docs/component-evidence-matrix.md", "docs/new-host-grand-list.md",
                         "catalogs/sota-convergence/manifest-20260923.json",
                         "catalogs/sota-convergence/sdk-runtime-coverage-20260923.json"):
             self.assertFalse((export / removed).exists(), removed)
+        for removed in ("docs/component-evidence-matrix.md", "docs/new-host-grand-list.md"):
+            self.assertFalse((self.dest / removed).exists(), removed)
         pattern = re.compile(r"winners|incumbent|disposition|why_selected|current_selection_record", re.IGNORECASE)
         offending = []
 

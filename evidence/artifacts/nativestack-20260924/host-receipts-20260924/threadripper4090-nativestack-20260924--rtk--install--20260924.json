@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--rtk--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "rtk",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py rtk --version-only",
+      "exit": 0,
+      "duration_s": 0.055,
+      "output_sha256": "f2a713437e74ad67139d6170cd655cd2c697e5ff9a82dab6ce5d8a03a86ccfdb",
+      "output_excerpt": "rtk 0.49.0\n\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-24T04:18:30Z",
+  "result": "pass",
+  "claim": "Installed native command executed and reported its version. Functional acceptance is a separate observation.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:30Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

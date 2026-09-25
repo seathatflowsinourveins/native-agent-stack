@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--skfolio--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "skfolio",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" skfolio && V=\"$HOME/.local/share/codex-ecosystem/research-evaluation/venv\"; \"$V/bin/python\" -s -c \"import importlib.metadata as m;print(*[k+'=='+m.version(k) for k in ('skfolio','numpy','pandas','scikit-learn')])\" && out=$(uv pip sync --dry-run --offline --python \"$HOME/.local/share/codex-ecosystem/research-evaluation/venv/bin/python\" blueprints/us-equities/research-evaluation/requirements.lock 2>&1) && printf '%s\\n' \"$out\" | tail -2 && printf '%s' \"$out\" | grep -q 'Would make no changes' && grep -A1 \"^skfolio==\" blueprints/us-equities/research-evaluation/requirements.lock | head -2 && echo \"the environment matches blueprints/us-equities/research-evaluation/requirements.lock exactly (uv pip sync --dry-run --offline would make no changes)\"",
+      "exit": 0,
+      "duration_s": 0.108,
+      "output_sha256": "574354250c5d1a19328a18cf82a92dbb6ef332e87383236a6569f2479e397a8a",
+      "output_excerpt": "stack ['1.2.9'] winner pins ['1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee']\nskfolio==1.2.9 numpy==2.5.3 pandas==3.0.6 scikit-learn==1.9.1\nChecked 19 packages in 0.18ms\nWould make no changes\nskfolio==1.2.9 \\\n    --hash=sha256:06c419e6f460aa9eb99d9f48dcd2ea53988afafdac70cec71b466a5e28e2b2f6 \\\nthe environment matches blueprints/us-equities/research-evaluation/requirements.lock "
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/research-evaluation/venv\"; w=$(sha256sum < \"$V/lib/python3.13/site-packages/skfolio/model_selection/_walk_forward.py\" | cut -c1-64) && r=$(python3 -c \"import json;print(json.load(open('blueprints/us-equities/research-evaluation/receipt.json'))['runtime']['walkforward_source_sha256'])\") && echo \"installed skfolio/model_selection/_walk_forward.py $(echo $w | cut -c1-16)... | research-evaluation receipt walkforward_source_sha256 $(echo $r | cut -c1-16)...\" && test \"$w\" = \"$r\" && c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" skfolio) && t=$(git ls-remote https://github.com/skfolio/skfolio 'refs/tags/v1.2.9' 'refs/tags/v1.2.9^{}' | tail -1 | cut -f1) && echo \"upstream skfolio/skfolio tag v1.2.9 -> $t | winner pin commit $c\" && test \"$t\" = \"$c\"",
+      "exit": 0,
+      "duration_s": 0.279,
+      "output_sha256": "7352072f6bd8736a9db14f1f19fd45c36cd5f8417cf1a2d803248d7cc2c3d60f",
+      "output_excerpt": "installed skfolio/model_selection/_walk_forward.py f85cbe8b5a3ff470... | research-evaluation receipt walkforward_source_sha256 f85cbe8b5a3ff470...\nupstream skfolio/skfolio tag v1.2.9 -> c99fcf71349e2df4a7a1033ee85ca2e9ced9abee | winner pin commit c99fcf71349e2df4a7a1033ee85ca2e9ced9abee\n"
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/research-evaluation/venv\"; O=\"${RR:?}/skfolio-use\"; mkdir \"$O\" && PYTHONDONTWRITEBYTECODE=1 \"$V/bin/python\" -s blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$HOME/.local/share/codex-ecosystem/lean/Lean\" --out \"$O/run-1\" > \"$O/stdout.json\" 2> \"$O/stderr.txt\" && python3 -c \"\nimport hashlib,json,sys\nb=open(sys.argv[1],'rb').read();s=json.loads(b);r=json.load(open(sys.argv[2]))\nref=[c for c in r['commands'] if c['id']=='run-1'][0]['stdout']['sha256'];h=hashlib.sha256(b).hexdigest()\nprint('frozen chronological study: folds',s['folds'],'| ledger records',s['ledger_records'],'| reserved selection',s['reserved_selection'],'| inputs unchanged',s['inputs_unchanged'],'| stdout sha256',h[:16],'equals the recorded authoring run:',h==ref)\nraise SystemExit(0 if h==ref and s['inputs_unchanged'] else 1)\n\" \"$O/stdout.json\" blueprints/us-equities/research-evaluation/receipt.json",
+      "exit": 0,
+      "duration_s": 1.533,
+      "output_sha256": "0906e8bc6e35ba251c9bbce92f007695ede2d4387486b9853d3676db9ca228ea",
+      "output_excerpt": "frozen chronological study: folds 20 | ledger records 6605 | reserved selection momentum20 | inputs unchanged True | stdout sha256 524801ce4afdaef5 equals the recorded authoring run: True\n"
+    },
+    {
+      "cmd": "V=\"$HOME/.local/share/codex-ecosystem/research-evaluation/venv\"; /usr/bin/timeout 180 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$V/bin/python\" -s -c \"\nfrom skfolio import RiskMeasure\nfrom skfolio.datasets import load_sp500_dataset\nfrom skfolio.model_selection import WalkForward,cross_val_predict\nfrom skfolio.optimization import EqualWeighted,MeanRisk\nfrom skfolio.preprocessing import prices_to_returns\nX=prices_to_returns(load_sp500_dataset())\nmv=MeanRisk(risk_measure=RiskMeasure.VARIANCE).fit(X);w=mv.weights_\nv_mv=mv.predict(X).variance;v_ew=EqualWeighted().fit(X).predict(X).variance\ncv=cross_val_predict(MeanRisk(risk_measure=RiskMeasure.VARIANCE),X,cv=WalkForward(train_size=252,test_size=63))\ntry:\n    MeanRisk(min_weights=0.2).fit(X);ctrl='accepted'\nexcept Exception as e: ctrl=type(e).__name__\nok=abs(w.sum()-1)<1e-6 and w.min()>-1e-8 and v_mv<v_ew and len(cv.portfolios)==(len(X)-252)//63 and ctrl!='accepted'\nprint('bundled S&P 500 sample:',X.shape[1],'assets x',X.shape[0],'days | min-variance weights sum',round(float(w.sum()),6),'min',round(float(w.min()),9),'| in-sample variance',round(float(v_mv),8),'< equal weight',round(float(v_ew),8),'| walk-forward test folds',len(cv.portfolios),'| infeasible min_weights=0.2 over 20 assets refused:',ctrl)\nraise SystemExit(0 if ok else 1)\"",
+      "exit": 0,
+      "duration_s": 3.496,
+      "output_sha256": "cb209cbd12dc90f05d7925c5eac26b72496fa52aeb1592d90e0abc19c97fdb7c",
+      "output_excerpt": "bundled S&P 500 sample: 20 assets x 8312 days | min-variance weights sum 1.0 min 9.3e-08 | in-sample variance 0.00010134 < equal weight 0.00014227 | walk-forward test folds 127 | infeasible min_weights=0.2 over 20 assets refused: SolverError\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/skfolio-use\" && test ! -e \"${RR:?}/skfolio-use\" && echo \"study outputs removed\"",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "93e57c85cf3f2c4223e55492fc6eb9a13402e639c32312ecfa5982319ff20ca3",
+      "output_excerpt": "study outputs removed\n"
+    }
+  ],
+  "tool_versions": {
+    "skfolio": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+  },
+  "observed_at_utc": "2026-09-25T15:37:11Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), skfolio 1.2.9 (the catalog pin '1.2.9; WalkForward source c99fcf71...': the installed _walk_forward.py has the sha256 recorded in blueprints/us-equities/research-evaluation/receipt.json, upstream tag v1.2.9 peels to c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, and the venv matches the study's hash-locked requirements.lock exactly) did portfolio-research work. The frozen research-evaluation study (skfolio WalkForward folds over LEAN's bundled SPY/QQQ/IWM daily data) reproduced 20 folds and printed stdout byte-identical (sha256) to the recorded authoring run. On skfolio's bundled S&P 500 sample, offline: a minimum-variance MeanRisk portfolio has weights summing to 1, none negative, and lower in-sample variance than equal weight; walk-forward cross_val_predict produced the expected number of test folds; and an infeasible min_weights=0.2 over 20 assets was refused by the solver. All commands exit 0.",
+  "limitations": [
+    "Research evaluation only: a chronological price-label study and an in-sample optimizer check, not P&L, out-of-sample performance or a strategy selection; the study reads LEAN's bundled sample data.",
+    "The byte-identical stdout comparison is against the authoring run recorded in the same repository.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; skfolio is this host's existing ~/.local/share/codex-ecosystem/research-evaluation/venv.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:37:11Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

@@ -9,7 +9,8 @@ cover. Each test below names the drift it stops:
   ``source.release_commit`` / ``source.release_tag`` (and the checkout pages derive both from
   the manifest instead of quoting them);
 - every relative Markdown link (and ``#anchor`` into a Markdown file) in adoption/**/*.md,
-  docs/next-host-stages.md and docs/contributing-evidence.md resolves;
+  docs/next-host-stages.md, docs/contributing-evidence.md and recipes/host-request-lane.md
+  resolves;
 - every ``adoption/manifest.json`` profile id is a row of adoption/README.md's profile table,
   and the row's pin columns equal the coverage computed from the pin files; where the pinned
   release's own pin files give a different coverage, the cell says so ("all 8 (7 of 8 at
@@ -60,7 +61,7 @@ SOURCE = MANIFEST["source"]
 
 PIN_DOCS = sorted([*ROOT.glob("adoption/*.md"), *ROOT.glob("adoption/platforms/*.md")])
 LINK_DOCS = sorted([*ROOT.glob("adoption/**/*.md"), ROOT / "docs/next-host-stages.md",
-                    ROOT / "docs/contributing-evidence.md"])
+                    ROOT / "docs/contributing-evidence.md", ROOT / "recipes/host-request-lane.md"])
 COMMAND_DOCS = LINK_DOCS
 CHECKOUT_PAGES = [ROOT / "adoption/bootstrap.md", ROOT / "adoption/platforms/linux-wsl2.md",
                   ROOT / "adoption/platforms/macos-arm64.md"]

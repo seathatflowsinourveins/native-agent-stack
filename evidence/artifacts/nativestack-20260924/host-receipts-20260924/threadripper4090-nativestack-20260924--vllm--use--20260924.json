@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--vllm--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "vllm",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py vllm",
+      "exit": 0,
+      "duration_s": 0.089,
+      "output_sha256": "57b0ba143de5db1907b4e30aac040c1bed5d56620c2a69019c2a5a23008fb8f1",
+      "output_excerpt": "Native CUDA vLLM generated 2048 finite embedding values; Nemotron-3-Embed-1B-BF16.\n"
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.25.0"
+  },
+  "observed_at_utc": "2026-09-24T04:18:52Z",
+  "result": "pass",
+  "claim": "Bounded native component check passed its explicit content assertion; see the checked-in check source and retained execution ledger.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:52Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm CUDA; 4096 context; 2048 dimensions",
+      "runtime_version": "0.25.0",
+      "bars": "Finite 2048-dimensional embeddings and real repository fixture semantic search passed.",
+      "result": "pass"
+    }
+  ]
+}

@@ -20,7 +20,8 @@ What is stripped, and how each strip is recorded in
   ``docs/grand-catalog-handbook.md``, ``docs/ecosystem/index.html``,
   ``docs/ecosystem/manifest.json``, and the files that name each layer's
   current winners throughout: ``catalogs/landscape/{component-evidence-matrix,
-  new-host-grand-list,blind-convergence}.json``,
+  new-host-grand-list,blind-convergence}.json`` and their rendered twins
+  ``docs/{component-evidence-matrix,new-host-grand-list}.md``,
   ``catalogs/sota-convergence/manifest-*.json`` and
   ``catalogs/sota-convergence/sdk-runtime-coverage-*``.
 - **Ledger candidate order**: each ledger row's ``candidates`` list is sorted
@@ -176,6 +177,9 @@ REMOVE_GLOBS = (
     "catalogs/landscape/component-evidence-matrix.json",
     "catalogs/landscape/new-host-grand-list.json",
     "catalogs/landscape/blind-convergence.json",
+    # Their rendered Markdown twins name the same winners in every row.
+    "docs/component-evidence-matrix.md",
+    "docs/new-host-grand-list.md",
     "catalogs/sota-convergence/manifest-*.json",
     "catalogs/sota-convergence/sdk-runtime-coverage-*",
     # Code and data that assert or name the incumbents, removed even if a packet referenced them (binding

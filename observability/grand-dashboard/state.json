@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-25T13:38:02Z",
+  "recorded_at_utc": "2026-09-25T16:27:19Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -26,6 +26,13 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "memory-scheduled-learning",
+      "title": "Native scheduled memory lifecycle",
+      "state": "two learned pages applied / later decode failure retained / quality unqualified",
+      "evidence_ref": "observability/memory-scheduled-20260923.json"
+    },
     {
       "kind": "gate",
       "id": "alpaca-paper-operational",
@@ -107,7 +114,7 @@
       "kind": "gate",
       "id": "wsl-workstation-host",
       "title": "WSL2 workstation host record (nativestack-5975wx-20260925)",
-      "state": "recorded 2026-09-25 / 21 receipts / 20 independent-session agree / systemd install withheld (needs_changes)",
+      "state": "recorded 2026-09-25 / 23 current receipts all independent-session agree / 3 superseded kept / systemd install re-recorded / Nemotron qualified on vllm 0.25.0",
       "evidence_ref": "evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json"
     },
     {
