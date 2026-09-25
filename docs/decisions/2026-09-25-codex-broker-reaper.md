@@ -308,6 +308,23 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   indefinitely, which is the intended effect, not a bug, but is worth
   stating plainly: guard (e) is not a cap on how long a broker may live
   while genuinely in periodic use.
+- **Guard (c), the keying-root hash match assumes no symlink in the
+  workspace path (sixth fix round, 2026-09-25).** `hash_workspace_root`
+  computes `sha256(os.path.realpath(path))` without requiring `path` to
+  exist, reproducing the plugin's own `fs.realpathSync.native` hash (taken
+  when the path DID exist, at broker-start time) as long as no component of
+  the path was ever a symlink — true for every workspace root exercised on
+  this host (`/home/example/code/...` checkouts, `tempfile`-based test
+  fixtures, `.claude/worktrees/<name>` layouts), but not proven for every
+  host or layout. If a workspace's real path passes through a symlink that
+  changed between the plugin's own hash computation and this tool's
+  re-hash (created, removed, or repointed), `find_keying_root`'s hash match
+  can silently miss. The miss is not unsafe: it degrades to the same
+  `find_git_toplevel(workspace_root) or workspace_root` heuristic guard (c)
+  already used before this round, never to an unbounded or unverified
+  root — but an operator on a host where workspace paths are symlinked
+  should not assume this round's specific removed-worktree coverage
+  applies there without checking.
 
 ## Evidence that would overturn this decision
 
