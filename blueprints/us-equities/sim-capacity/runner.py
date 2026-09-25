@@ -4,16 +4,19 @@ on NautilusTrader 2.0.0rc5.
 
 This is INFRASTRUCTURE EVIDENCE ONLY (evidence_class `sim_capacity_infrastructure`):
 it measures how many fills/minute the pinned engine, a native rate limiter, a
-calibrated latency model, realistic L1 execution (trade_execution,
-liquidity_consumption, queue_position all on) and a cited fee model can sustain.
-No strategy manufactures a trade to hit a throughput target (see
-blueprints/us-equities/adaptive-paper/README.md L40 and
-blueprints/us-equities/mover-v3/README.md's "A high-rate capacity replay is an
-infrastructure test, never strategy evidence").
+primary-reference (not "calibrated") latency setting, quotes-only L1 execution
+(see H1 in README.md for why trade ticks are excluded from the engine feed)
+and a cited fee model can sustain. Of the three realism flags this lane sets
+on `add_venue` (`trade_execution`, `liquidity_consumption`, `queue_position`),
+only `liquidity_consumption` was measured to change results in this quotes-
+only, IOC-only setup; the other two are documented, not claimed as active
+realism features here (see README.md). No strategy manufactures a trade to hit
+a throughput target (see blueprints/us-equities/adaptive-paper/README.md L41
+and blueprints/us-equities/mover-v3/README.md's "A high-rate capacity replay
+is an infrastructure test, never strategy evidence").
 
-  python3 runner.py fetch --pages PRIVATE/pages --catalog PRIVATE/catalog \
-      --env-file "$PAPER_ENV_FILE" [--replay]
-  python3 runner.py run --catalog PRIVATE/catalog --out PRIVATE/run \
+  python3 runner.py fetch --pages PRIVATE/pages --catalog PRIVATE/catalog [--replay]
+  python3 runner.py run --catalog PRIVATE/catalog \
       --receipt receipts/20260924-sim-capacity.json
 """
 from __future__ import annotations
@@ -57,12 +60,18 @@ POSITION_CAP = 300  # generous per-symbol inventory cap: random-walk drift from 
 # as the venue's throughput ceiling.
 LATENCY_SWEEP_MS = (0, 70, 250, 1000)
 PROFILES = {
-    "paper-parity": {"max_order_submit_rate": "180/00:01:00", "submits_per_sec": 5.0,
+    "paper-parity": {"max_order_submit_rate": "180/00:01:00", "submits_per_sec": 5.0, "commission_plan": "none",
                       "note": "Mirrors Alpaca standard tier: 200 req/min x 0.9 = 180/min. "
-                              "Fills cannot exceed 180/min here by construction of the limiter."},
-    "elite-tier": {"max_order_submit_rate": "900/00:01:00", "submits_per_sec": 15.0,
+                              "Fills cannot exceed 180/min here by construction of the limiter. "
+                              "300 submits/min attempted against a 180/min budget: the limiter binds "
+                              "and denials are expected and counted."},
+    "elite-tier": {"max_order_submit_rate": "900/00:01:00", "submits_per_sec": 1000.0 / 60.0,
+                    "commission_plan": "all_in",
                     "note": "Alpaca Elite / non-retail tier: 1000 req/min x 0.9 = 900/min. "
-                            "Must sustain >=180 fills/min in every full simulated minute."},
+                            "Must sustain >=180 fills/min in every full simulated minute. "
+                            "~1000 submits/min attempted against a 900/min budget so the native "
+                            "limiter actually binds here too (a prior cadence of exactly 15/s = "
+                            "900/min never triggered a single denial); denials are counted."},
 }
 
 
@@ -126,6 +135,14 @@ def redact_args(args: argparse.Namespace) -> list[str]:
 # Fetch + catalog
 # ---------------------------------------------------------------------------
 
+def _window_bounded_counts(rows_by_symbol: dict, window_end_ns: int) -> dict[str, int]:
+    """Count only rows at or before the reported analysis window's end, even
+    though the fetch itself pulls a few extra minutes of pad data past it (for
+    the exerciser's end-of-window flatten -- see fetcher.py's FETCH_END_ISO).
+    The receipt's counts must describe the analysis window, not the pad."""
+    return {s: sum(1 for r in rows if r["ts_ns"] <= window_end_ns) for s, rows in rows_by_symbol.items()}
+
+
 def cmd_fetch(args) -> int:
     if importlib.metadata.version("nautilus_trader") != "2.0.0rc5":
         raise ValueError("native_version_mismatch")
@@ -138,17 +155,29 @@ def cmd_fetch(args) -> int:
     trades, trade_drops = fetcher.normalize_trades(raw_trades)
     catalog_stats = fetcher.build_catalog(args.catalog, quotes, trades)
 
+    # Exactly this run's served pages (from pf.page_events, populated only by
+    # the .get() calls this process actually made), not the whole cumulative
+    # ledger.jsonl on disk (which can carry pages from earlier, unrelated
+    # fetches/re-fetches against the same private cache directory).
+    this_run_hashes = sorted({pf.ledger[e["request_digest"]]["sha256"] for e in pf.page_events})
+    this_run_hashes_digest = fetcher.rc.digest_bytes(json.dumps(this_run_hashes).encode())
+    window_end_ns = fetcher.rc.ts_ns(fetcher.WINDOW_END_ISO)
+
     manifest = {
         "fetched_at_utc": utcnow_iso(),
         "window": {"start": fetcher.WINDOW_START_ISO, "end": fetcher.WINDOW_END_ISO},
+        "fetch_window_end_with_flatten_pad": fetcher.FETCH_END_ISO,
         "symbols": list(fetcher.SYMBOLS),
-        "quote_counts": {s: len(v) for s, v in quotes.items()},
-        "trade_counts": {s: len(v) for s, v in trades.items()},
+        "quote_counts": _window_bounded_counts(quotes, window_end_ns),
+        "trade_counts": _window_bounded_counts(trades, window_end_ns),
         "quote_drop_counts": quote_drops,
         "trade_drop_counts": trade_drops,
         "catalog_stats": catalog_stats,
         "page_events": {"from_cache": pf.from_cache, "from_network": pf.from_network,
-                        "page_hashes": sorted({rec["sha256"] for rec in pf.ledger.values()})},
+                        "this_run_page_count": len(pf.page_events),
+                        "this_run_page_hashes": this_run_hashes,
+                        "this_run_page_hashes_digest": this_run_hashes_digest,
+                        "cumulative_ledger_page_count": len(pf.ledger)},
     }
     save(args.catalog / "fetch-manifest.json", manifest)
     # Also keep the normalized rows privately (not committed) for `run` to consume
@@ -165,33 +194,61 @@ def cmd_fetch(args) -> int:
 
 def dataframe_to_rows(df) -> list[dict]:
     """Convert a NautilusTrader pandas report to plain dict rows, converting any
-    `datetime64[ns, UTC]` column to a true integer nanosecond epoch via
-    `.astype('int64')` first. `DataFrame.to_json`'s default 'epoch' date format
-    does NOT round-trip to raw event-time nanoseconds for these tz-aware
-    columns (verified directly on the pinned runtime: a `ts_event` of
-    `1970-01-21 20:00:00.500000+00:00`, i.e. 1,800,000,500,000 ns, serializes
-    through `to_json(date_format='epoch')` as `1800000500` -- three orders of
-    magnitude off, not a units mismatch alone). This is exactly the pandas
-    report trap `sim-paper-compare/replay_compare.py`'s module docstring
-    warns about ("no tz-aware-column-to-int64 conversion in between"); this
-    helper does that conversion explicitly and is unit-tested directly against
-    that reproduced case."""
+    `datetime*` column to a true integer **nanosecond** epoch.
+    `DataFrame.to_json`'s default 'epoch' date format does not preserve raw
+    event-time nanoseconds for a tz-aware `datetime64[ns, UTC]` column: it is a
+    plain units mismatch (milliseconds, not nanoseconds) -- verified directly
+    on the pinned runtime: a `ts_event` of `1970-01-21 20:00:00.500000+00:00`,
+    i.e. exactly 1,800,000,500,000,000 ns, serializes through
+    `to_json(date_format='epoch')` as `1800000500`, which is
+    1,800,000,500,000,000 // 1_000_000 -- epoch milliseconds. This is exactly
+    the pandas report trap `sim-paper-compare/replay_compare.py`'s module
+    docstring warns about ("no tz-aware-column-to-int64 conversion in
+    between"); this helper does that conversion explicitly.
+
+    Calling `.astype('int64')` directly on a datetime column is not itself
+    safe against every possible source unit: on a `datetime64[us, UTC]`
+    column (microseconds), `.astype('int64')` returns microseconds, not
+    nanoseconds, silently (verified directly: casting the same instant to
+    `datetime64[us, UTC]` first, then `.astype('int64')`, yields
+    1,800,000,500,000 -- microseconds, 1000x too small for a caller assuming
+    ns). This helper therefore always normalizes to `datetime64[ns]` first,
+    so the unit of the extracted integer cannot silently depend on whatever
+    unit pandas happened to store the column in."""
     out = df.reset_index()
     for column in out.columns:
-        if str(out[column].dtype).startswith("datetime64"):
-            out[column] = out[column].astype("int64")
+        dtype = str(out[column].dtype)
+        if dtype.startswith("datetime64"):
+            # Force ns precision before extracting the integer, tz-aware or
+            # not (a plain `.astype("datetime64[ns]")` raises on a tz-aware
+            # column; a tz-aware target dtype instead just re-precisions it).
+            target = "datetime64[ns, UTC]" if ", " in dtype else "datetime64[ns]"
+            out[column] = out[column].astype(target).astype("int64")
     return out.to_dict(orient="records")
 
 
 def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str, latency_ms: int,
             run_seconds: float = RUN_SECONDS) -> dict:
+    """Run one profile x latency combination.
+
+    `trades_by_symbol` is accepted for interface/signature stability (and is
+    still what `fetcher.build_catalog` writes to the private
+    `ParquetDataCatalog` for future passive-order work) but is **not** fed
+    into the engine here -- see README.md's H1 finding: on the pinned rc5
+    engine, an L1 book overwrites *both* sides with a trade print's price and
+    size, and nothing restores the prior quote after a NO_AGGRESSOR trade
+    (Alpaca's historical trade data carries no aggressor-side field at all),
+    so an IOC order can match a stale, trade-locked book until the next quote
+    arrives. Measured directly: with trade ticks included, 41.2% of elite-tier
+    fills beat the NBBO touch in force (8,923 of 21,652); quotes-only puts
+    every one of them at the touch. The exerciser is taker-only (marketable
+    IOC), so quotes-only is the realistic engine feed for this lane."""
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogLevel
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig, RiskEngineConfig
     from nautilus_trader.execution import StaticLatencyModel
-    from nautilus_trader.model import (AccountType, AggressorSide, BookType, Currency, Equity, InstrumentId,
-                                        Money, OmsType, Price, Quantity, QuoteTick, Symbol, TradeId, TradeTick,
-                                        Venue)
+    from nautilus_trader.model import (AccountType, BookType, Currency, Equity, InstrumentId,
+                                        Money, OmsType, Price, Quantity, QuoteTick, Symbol, Venue)
 
     from exerciser import CapacityExerciser, CapacityExerciserParams
     from fee_model import build_nautilus_fee_model
@@ -205,6 +262,8 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
         instruments[symbol] = Equity(iid, Symbol(symbol), usd, 2, Price.from_str("0.01"), 0, 0,
                                       lot_size=Quantity.from_int(1))
 
+    # Quotes only -- see the H1 note in this function's docstring and in
+    # README.md. `trades_by_symbol` is deliberately not read here.
     ticks = []
     start_ns = min(row["ts_ns"] for rows in quotes_by_symbol.values() for row in rows)
     for symbol, rows in quotes_by_symbol.items():
@@ -213,18 +272,12 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
             ticks.append(QuoteTick(iid, Price.from_str(row["bid"]), Price.from_str(row["ask"]),
                                     Quantity.from_int(row["bid_size"]), Quantity.from_int(row["ask_size"]),
                                     row["ts_ns"], row["ts_ns"]))
-    for symbol, rows in trades_by_symbol.items():
-        iid = instruments[symbol].id
-        for row in rows:
-            ticks.append(TradeTick(iid, Price(Decimal(row["price"]), 2), Quantity.from_int(row["size"]),
-                                    AggressorSide.NO_AGGRESSOR, TradeId(row["trade_id"]),
-                                    row["ts_ns"], row["ts_ns"]))
     ticks.sort(key=lambda t: t.ts_event)
 
     engine_cfg = BacktestEngineConfig(logging=LoggerConfig(stdout_level=LogLevel.ERROR),
                                        risk_engine=RiskEngineConfig(max_order_submit_rate=profile["max_order_submit_rate"]))
     engine = BacktestEngine(engine_cfg)
-    fee_model = build_nautilus_fee_model()
+    fee_model = build_nautilus_fee_model(commission_plan=profile.get("commission_plan", "none"))
     latency_model = StaticLatencyModel(base_latency_nanos=int(latency_ms * 1_000_000)) if latency_ms else None
     wall_start = time.monotonic()
     try:
@@ -249,13 +302,21 @@ def run_one(quotes_by_symbol: dict, trades_by_symbol: dict, *, profile_name: str
         fill_rows = dataframe_to_rows(fills_report)
         order_fill_rows = dataframe_to_rows(order_fills_report)
         net_positions = {symbol: float(strategy.portfolio.net_position(instruments[symbol].id)) for symbol in symbols}
+        # Every exerciser order's actual time-in-force, straight off the live
+        # order object (not re-derived): lets a test independently confirm the
+        # exerciser really only ever submits IOC through the real engine path.
+        tif_counts: dict[str, int] = {}
+        for order in strategy.cache.orders():
+            if str(order.client_order_id).startswith("CAP-"):
+                key = str(order.time_in_force)
+                tif_counts[key] = tif_counts.get(key, 0) + 1
 
         return {
             "profile": profile_name, "latency_ms": latency_ms, "start_ns": start_ns,
             "counters": dict(strategy.counters), "events": strategy.events,
             "filled_qty": strategy.filled_qty, "filled_notional": str(strategy.filled_notional),
             "fills_report_rows": fill_rows, "order_fills_report_rows": order_fill_rows,
-            "n_ticks": len(ticks), "wall_seconds": wall_seconds,
+            "n_ticks": len(ticks), "wall_seconds": wall_seconds, "tif_counts": tif_counts,
             "net_positions_at_end": net_positions, "flat_at_end": all(v == 0 for v in net_positions.values()),
             "run_seconds": run_seconds,
         }
@@ -310,43 +371,71 @@ def fills_per_minute_stats(bucket_fill_counts: dict[int, int], total_full_minute
             "total_full_minutes": total_full_minutes, "per_minute": values}
 
 
-def naive_l1_marketability_sample(events: list[dict], quotes_by_symbol: dict, latency_ns: int, sample_size: int = 200) -> dict:
-    """For a sample of fills, independently re-derive whether the order was
-    marketable against the quote in force at its modelled arrival time
-    (submit_ts + latency), using only the retained normalized quote rows (never
-    the engine's own internal book state) -- an offline cross-check of the
-    engine's own fill decision, not a re-statement of it."""
-    submits_by_id = {ev["client_order_id"]: ev for ev in events if ev["kind"] == "submit"}
-    fills = [ev for ev in events if ev["kind"] == "fill"]
-    sample = fills[:sample_size]
-    checked, agree = 0, 0
-    disagreements = []
-    for fill in sample:
-        submit = submits_by_id.get(fill["client_order_id"])
-        if submit is None:
+def _quote_in_force(rows: list[dict], ts_ns: int) -> dict | None:
+    """Last quote row at or before `ts_ns`, via bisection (rows are already
+    time-sorted)."""
+    import bisect
+    ts_list = [r["ts_ns"] for r in rows]
+    i = bisect.bisect_right(ts_list, ts_ns) - 1
+    return rows[i] if i >= 0 else None
+
+
+def check_no_fill_beats_nbbo_touch(events: list[dict], quotes_by_symbol: dict) -> dict:
+    """H1 guard: independently re-derive, for every exerciser fill, the NBBO
+    touch in force *at fill time* (not at submit or modeled-arrival time --
+    the engine's own matching instant), using only the retained normalized
+    quote rows, never the engine's internal book state. A BUY fill must never
+    be strictly better than the ask in force, and a SELL fill must never be
+    strictly better than the bid in force ("through the touch" -- i.e. paying
+    more / receiving less than the touch, from a marketable IOC's collar over-
+    crossing the market a little -- is expected and fine; the opposite,
+    "better than the touch", is exactly the on-rc5-only artifact from a trade
+    print locking the L1 book that motivated excluding trade ticks from the
+    engine feed (see run_one's H1 docstring))."""
+    quote_ts = {s: [r["ts_ns"] for r in rows] for s, rows in quotes_by_symbol.items()}
+    violations = []
+    checked = 0
+    for ev in events:
+        if ev["kind"] != "fill" or not ev["client_order_id"].startswith("CAP-"):
             continue
-        symbol = submit["symbol"]
-        arrival_ns = submit["ts_ns"] + latency_ns
+        symbol = ev["instrument_id"].split(".")[0]
         rows = quotes_by_symbol.get(symbol, [])
-        # last quote at or before arrival_ns
-        in_force = None
-        for row in rows:
-            if row["ts_ns"] <= arrival_ns:
-                in_force = row
-            else:
-                break
-        if in_force is None:
+        ts_list = quote_ts.get(symbol, [])
+        if not ts_list:
             continue
+        import bisect
+        i = bisect.bisect_right(ts_list, ev["ts_ns"]) - 1
+        if i < 0:
+            continue
+        q = rows[i]
         checked += 1
-        limit_price = Decimal(submit["limit_price"])  # the order's actual submitted limit, not the fill price
-        side = submit["side"]
-        marketable = (limit_price >= Decimal(in_force["ask"])) if side == "BUY" else (limit_price <= Decimal(in_force["bid"]))
-        if marketable:
-            agree += 1
-        else:
-            disagreements.append({"client_order_id": fill["client_order_id"], "symbol": symbol})
-    return {"checked": checked, "agree": agree, "disagreements": disagreements[:20],
-            "sample_size_requested": sample_size}
+        bid, ask, px = Decimal(q["bid"]), Decimal(q["ask"]), Decimal(ev["price"])
+        beats_touch = (px < ask) if ev["side"] == "BUY" else (px > bid)
+        if beats_touch:
+            violations.append({"client_order_id": ev["client_order_id"], "symbol": symbol, "side": ev["side"],
+                                "fill_price": ev["price"], "touch": str(ask if ev["side"] == "BUY" else bid)})
+    return {"checked": checked, "violations": violations[:20], "violation_count": len(violations)}
+
+
+def submit_to_fill_latency_ms(events: list[dict]) -> dict:
+    """Submit -> fill latency distribution (ms), from the exerciser's own
+    submit/fill event log. This is a measured distribution, not a claim that
+    `latency_ms`/`PRIMARY_LATENCY_MS` is a calibrated broker latency: on rc5 a
+    deferred order is released at the first of its own next quote or *any* due
+    clock timer (see README.md's latency note), so the exerciser's own tick
+    cadence mixes into this measured distribution alongside the configured
+    StaticLatencyModel delay."""
+    submits_by_id = {ev["client_order_id"]: ev["ts_ns"] for ev in events if ev["kind"] == "submit"}
+    deltas_ms = sorted((ev["ts_ns"] - submits_by_id[ev["client_order_id"]]) / 1e6
+                        for ev in events if ev["kind"] == "fill" and ev["client_order_id"] in submits_by_id)
+    if not deltas_ms:
+        return {"n": 0, "min_ms": None, "p50_ms": None, "p90_ms": None, "max_ms": None}
+    n = len(deltas_ms)
+
+    def pct(q):
+        return deltas_ms[min(n - 1, int(q * (n - 1)))]
+
+    return {"n": n, "min_ms": deltas_ms[0], "p50_ms": pct(0.5), "p90_ms": pct(0.9), "max_ms": deltas_ms[-1]}
 
 
 # ---------------------------------------------------------------------------
@@ -382,8 +471,16 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
     minutes_elapsed = result["run_seconds"] / 60.0
     simulated_cost_per_minute = float((total_fees + execution_cost_vs_mid) / Decimal(str(minutes_elapsed)))
 
-    latency_ns = result["latency_ms"] * 1_000_000
-    naive_check = naive_l1_marketability_sample(events, quotes_by_symbol, latency_ns)
+    nbbo_touch_check = check_no_fill_beats_nbbo_touch(events, quotes_by_symbol)
+    latency_dist = submit_to_fill_latency_ms(events)
+
+    reject_reasons: dict[str, int] = {}
+    denied_reasons: dict[str, int] = {}
+    for ev in events:
+        if ev["kind"] == "reject":
+            reject_reasons[ev["reason"]] = reject_reasons.get(ev["reason"], 0) + 1
+        elif ev["kind"] == "denied":
+            denied_reasons[ev["reason"]] = denied_reasons.get(ev["reason"], 0) + 1
 
     return {
         "profile": result["profile"], "latency_ms": result["latency_ms"],
@@ -393,6 +490,7 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
                         "rate_limit_denied": {m: buckets[m].get("denied", 0) for m in sorted(buckets)}},
         "fills_per_minute_stats": strategy_stats,
         "counters": result["counters"],
+        "reject_reasons": reject_reasons, "denied_reasons": denied_reasons,
         "filled_qty": result["filled_qty"], "filled_notional_usd": result["filled_notional"],
         "fees_usd": str(total_fees), "execution_cost_vs_mid_usd": str(execution_cost_vs_mid),
         "simulated_cost_per_minute_usd": simulated_cost_per_minute,
@@ -404,7 +502,8 @@ def summarize_run(result: dict, quotes_by_symbol: dict) -> dict:
                     "strategy_own_counter_stats": strategy_stats,
                     "fills_report_row_count": len(result["fills_report_rows"]),
                     "strategy_fill_counter": result["counters"].get("fills", 0)},
-        "naive_l1_marketability_sample": naive_check,
+        "fill_vs_nbbo_touch": nbbo_touch_check,
+        "submit_to_fill_latency_ms": latency_dist,
     }
 
 
@@ -444,6 +543,19 @@ def cmd_run(args) -> int:
                                          "fills_per_minute_stats": summary["fills_per_minute_stats"],
                                          "recount_agrees": summary["recount"]["agrees"]})
 
+    # cmd_run asserts the recount, rather than merely computing and reporting
+    # it: an unhandled AssertionError here is the intended failure mode if a
+    # future change ever makes NautilusTrader's own fills report disagree with
+    # the strategy's own counters.
+    for s in summaries:
+        assert s["recount"]["agrees"], f"recount disagreement in profile {s['profile']}"
+    for row in latency_sensitivity:
+        assert row["recount_agrees"], f"recount disagreement at latency {row['latency_ms']}ms"
+    for s in summaries:
+        assert s["fill_vs_nbbo_touch"]["violation_count"] == 0, (
+            f"{s['fill_vs_nbbo_touch']['violation_count']} exerciser fill(s) beat the NBBO touch "
+            f"in profile {s['profile']} (see H1 in README.md)")
+
     runner_sha256 = fetcher.rc.digest_bytes(Path(__file__).read_bytes())
     engine_versions = {"nautilus_trader": importlib.metadata.version("nautilus_trader"),
                         "alpaca_py": importlib.metadata.version("alpaca-py"),
@@ -451,33 +563,67 @@ def cmd_run(args) -> int:
     receipt = {
         "evidence_class": "sim_capacity_infrastructure",
         "claim_boundary": ("This receipt measures simulation-lane fill throughput under a native rate "
-                            "limiter, calibrated latency and a cited fee model. It is a synthetic fixture "
-                            "for infrastructure capacity only and must never be cited as broker throughput "
-                            "or strategy performance (docs/harness-rules-convergence-20260922.md NS-06); no "
-                            "order here reacts to a signal, and no strategy manufactures a trade to hit a "
-                            "throughput target (blueprints/us-equities/adaptive-paper/README.md L40)."),
+                            "limiter, a primary-reference (not calibrated) latency setting and a cited "
+                            "fee model. It is a synthetic fixture for infrastructure capacity only and "
+                            "must never be cited as broker throughput or strategy performance "
+                            "(docs/harness-rules-convergence-20260922.md NS-06); no order here reacts to "
+                            "a signal, and no strategy manufactures a trade to hit a throughput target "
+                            "(blueprints/us-equities/adaptive-paper/README.md L41). The elite-tier "
+                            "limiter is deliberately made to bind (submits attempted above its budget) "
+                            "so a non-binding limiter cannot be misread as broker throughput either."),
         "generated_at_utc": utcnow_iso(),
         "window": fetch_manifest["window"], "symbols": fetch_manifest["symbols"],
+        "engine_feed_note": ("The engine is fed QuoteTicks only (quotes-only); trade ticks are fetched "
+                             "and written to the private ParquetDataCatalog for future passive-order "
+                             "work, but are not replayed into this engine run -- see H1 in README.md and "
+                             "run_one's docstring. The catalog itself is not read back by this run "
+                             "(quotes/trades are read from the private normalized JSON instead); a future "
+                             "BacktestNode-based run could read from it directly."),
         "data": {"quote_counts": fetch_manifest["quote_counts"], "trade_counts": fetch_manifest["trade_counts"],
                   "quote_drop_counts": fetch_manifest["quote_drop_counts"],
                   "trade_drop_counts": fetch_manifest["trade_drop_counts"],
-                  "page_hashes": fetch_manifest["page_events"]["page_hashes"],
-                  "no_aggressor_note": ("Alpaca historical trades carry no aggressor-side field; every "
-                                        "TradeTick built here is tagged AggressorSide.NO_AGGRESSOR. A "
-                                        "queue-depletion fill model that relies on aggressor side to remove "
-                                        "resting liquidity therefore never actually depletes a known side "
-                                        "from this trade data, which makes queue-position-based fill "
-                                        "estimates from these trade ticks optimistic.")},
+                  "counts_exclude_flatten_pad": True,
+                  "this_run_page_count": fetch_manifest["page_events"]["this_run_page_count"],
+                  "this_run_page_hashes": fetch_manifest["page_events"]["this_run_page_hashes"],
+                  "this_run_page_hashes_digest": fetch_manifest["page_events"]["this_run_page_hashes_digest"],
+                  "no_aggressor_note": ("Alpaca historical trades carry no aggressor-side field. This is "
+                                        "moot for this run's engine feed (trades are not replayed into "
+                                        "the engine at all -- see engine_feed_note/H1); it still matters "
+                                        "for the catalog's trade ticks, tagged AggressorSide.NO_AGGRESSOR, "
+                                        "which is why they are kept for future passive-order work only, "
+                                        "not replayed as taker-side liquidity here.")},
         "profiles": {name: PROFILES[name] for name in profiles},
         "runs": summaries,
         "latency_sensitivity_elite_tier": latency_sensitivity,
+        "latency_note": ("PRIMARY_LATENCY_MS=70 is a primary-reference point (inside the retained "
+                         "sim-to-paper receipt's observed 0.65-1.09s paper submit-to-fill range and near "
+                         "its own sensitivity-check flip point, ~69.2ms) -- it is explicitly NOT a "
+                         "calibration (that receipt itself says 'Sensitivity check, not a calibration'). "
+                         "On rc5 a deferred order is released at the first of its own next quote or ANY "
+                         "due clock timer, so the exerciser's own tick cadence mixes into the measured "
+                         "submit-to-fill distribution alongside the configured latency; the sweep below "
+                         "therefore varies configured latency together with that timer-cadence effect, "
+                         "not latency alone. See each run's submit_to_fill_latency_ms for the measured "
+                         "distribution."),
         "fee_model": {
-            "alpaca_commission_usd": "0",
+            "alpaca_commission_usd": "0 (retail routing)",
             "sec_section31_usd_per_dollar": "20.60/1000000 (effective 2026-04-04, open-ended at retrieval)",
             "finra_taf_usd_per_share": "0.000195", "finra_taf_cap_usd_per_trade": "9.79",
-            "source": "blueprints/us-equities/mover-v3/data/fees-v3.json (retrieved_at 2026-09-24)",
+            "finra_cat_usd_per_share": "0.000003 (buys and sells)",
+            "elite_commission_all_in_usd_per_share": "0.0040 (elite-tier profile only, both sides)",
+            "elite_commission_cost_plus_usd_per_share": "0.0025 (partial: excludes exchange fee/rebate pass-through)",
+            "source_sec_taf": "blueprints/us-equities/mover-v3/data/fees-v3.json (retrieved_at 2026-09-24)",
+            "source_cat_and_elite": ("https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf "
+                                     "(Revised on September 17, 2026; retrieved 2026-09-25; sha256 "
+                                     "7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12)"),
             "unverified": ["Whether the FINRA TAF cap applies per order or per execution/fill; this model "
-                           "applies it per fill (see fee_model.py module docstring)."],
+                           "applies it per fill (see fee_model.py module docstring).",
+                           "The cost_plus commission plan's exchange-fee/rebate pass-through component "
+                           "is not modeled (partial)."],
+            "rounding_note": ("Alpaca aggregates each fee type per day, per account, and rounds the "
+                              "day's total UP to the cent. This model instead rounds each fill's total "
+                              "fee half-up. The difference is small at this run's scale (well under a "
+                              "dollar across a 30-minute run) and is reported, not hidden."),
         },
         "engine_and_runtime": engine_versions,
         "runner_sha256": runner_sha256,

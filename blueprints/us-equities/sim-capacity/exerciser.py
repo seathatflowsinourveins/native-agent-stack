@@ -3,6 +3,13 @@ it round-robins a fixed symbol list on a clock-timer schedule and submits
 marketable LIMIT IOC orders (buy at ask+collar, sell at bid-collar) purely to
 load the venue/risk-engine pipeline, alternating side per symbol to stay near
 flat inventory under a hard per-symbol position cap, and flattening at the end.
+Side selection is inventory-aware (`schedule.RoundRobin.next_side`): it never
+proposes a sell from a flat or short position, and a sell's quantity is
+additionally clamped to the currently held long, because the exerciser trades
+a plain Alpaca CASH account, which rejects any short sale outright ("Short
+selling not permitted on a CASH account" -- measured directly before this
+fix: 162/163 elite rejects and 112/113 paper rejects in one run were exactly
+this reason, consuming rate-limit budget and understating true throughput).
 Its only purpose is to measure sustained fills/minute under a native rate
 limiter and realistic latency/fee/queue models -- infrastructure evidence
 (`evidence_class: sim_capacity_infrastructure`), never strategy evidence. No
@@ -115,10 +122,7 @@ class CapacityExerciser(Strategy):
             self.counters["skipped_no_quote"] += 1
             return
         position = int(self.portfolio.net_position(iid))
-        side = self.rr.next_side(symbol, position)
-        if side is None:
-            self.counters["skipped_position_cap"] += 1
-            return
+        side = self.rr.next_side(symbol, position)  # always BUY or SELL now; never None
         collar = Decimal(self.params.collar)
         if side == "BUY":
             limit_price = Price(quote.ask_price.as_decimal() + collar, quote.ask_price.precision)
@@ -127,6 +131,11 @@ class CapacityExerciser(Strategy):
             limit_price = Price(max(quote.bid_price.as_decimal() - collar, Decimal("0.01")), quote.bid_price.precision)
             available = int(quote.bid_size)
         qty = max(self.params.qty_min, min(self.params.qty_max, available))
+        if side == "SELL":
+            # Never ask to sell more than is actually held: a CASH account has
+            # no short-selling capacity at all, so this clamp (not a skip) is
+            # what actually keeps every SELL legal.
+            qty = min(qty, position)
         if qty <= 0:
             self.counters["skipped_no_size"] += 1
             return
@@ -151,7 +160,6 @@ class CapacityExerciser(Strategy):
     # -- order/fill event hooks --------------------------------------------
     def on_order_filled(self, event):
         self.counters["fills"] += 1
-        self.counters["filled_orders_seen"] += 1  # counted per fill event; distinct-order dedup done at receipt time
         qty = int(event.last_qty)
         px = event.last_px.as_decimal()
         side = "SELL" if event.is_sell else "BUY"
@@ -177,21 +185,38 @@ class CapacityExerciser(Strategy):
         # The RiskEngine's max_order_submit_rate denies *before* the venue ever
         # sees the order (a client-side/pre-trade denial, distinct from
         # OrderRejected which is the venue's own decision) -- this is where a
-        # RATE_LIMIT budget breach actually surfaces in this engine.
+        # RATE_LIMIT budget breach actually surfaces in this engine. This
+        # config sets no other pre-trade check (no max_notional_per_order,
+        # etc.), so the rate limiter is the only denial reason expected in
+        # practice, but the reason is still checked rather than assumed, so a
+        # future added risk check would be counted correctly instead of
+        # silently folded into "rate_limit_denied".
         reason = str(getattr(event, "reason", ""))
-        self.counters["rate_limit_denied"] += 1
+        if any(marker.lower() in reason.lower() for marker in RATE_LIMIT_REASON_MARKERS):
+            self.counters["rate_limit_denied"] += 1
+        else:
+            self.counters["other_denied"] += 1
         self.events.append({"ts_ns": int(event.ts_event), "kind": "denied", "reason": reason})
+
+    def _order_filled_qty(self, client_order_id) -> int:
+        order = self.cache.order(client_order_id)
+        return int(order.filled_qty) if order is not None else 0
 
     def on_order_canceled(self, event):
         # This strategy only submits IOC orders and never cancels one itself
         # outside on_stop's open-order sweep; a cancel seen during the run is
         # the matching engine's own auto-cancel of an IOC order's unfilled
-        # remainder, i.e. an "IOC expiry" in this exerciser's counting scheme.
-        self.counters["ioc_expiries"] += 1
-        self.events.append({"ts_ns": int(event.ts_event), "kind": "ioc_expiry",
+        # remainder. Separated from a clean, fully-unfilled IOC expiry: if the
+        # order's cache record shows a nonzero filled_qty, part of it did fill
+        # before the rest was canceled, which is a materially different
+        # outcome (partial execution) from "nothing filled at all."
+        kind = "ioc_partial_then_canceled" if self._order_filled_qty(event.client_order_id) > 0 else "ioc_expiry"
+        self.counters[kind] += 1
+        self.events.append({"ts_ns": int(event.ts_event), "kind": kind,
                              "client_order_id": str(event.client_order_id)})
 
     def on_order_expired(self, event):
-        self.counters["ioc_expiries"] += 1
-        self.events.append({"ts_ns": int(event.ts_event), "kind": "ioc_expiry",
+        kind = "ioc_partial_then_canceled" if self._order_filled_qty(event.client_order_id) > 0 else "ioc_expiry"
+        self.counters[kind] += 1
+        self.events.append({"ts_ns": int(event.ts_event), "kind": kind,
                              "client_order_id": str(event.client_order_id)})

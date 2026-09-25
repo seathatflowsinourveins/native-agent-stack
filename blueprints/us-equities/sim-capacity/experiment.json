@@ -34,7 +34,7 @@
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
-         "sha256": "e0156a4589ac17eb2f2850b0a0ce18b59c38d93b3993ff39271930b6076f69e6"}
+         "sha256": "0782a20038f04b7d2eef9f1f708c76063c9e5e5d3ce87e1e70fa1f0ba3019353"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -53,7 +53,7 @@
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
-         "sha256": "55b67b10c57b4aea174f282804ffffa10ed6eaff8f95c951aa4eb3d45726155b"}
+         "sha256": "498c5d67f30ee091f14bdb6770cc4bd4dcb837da621acc3c85e2fb8c6602bcbf"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -72,7 +72,7 @@
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "tests/test_sim_capacity.py",
-         "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9"}
+         "sha256": "f5b845fb31cdb6d784e7de022f5644ec220215902029ede10c0cbb2f6750f5c7"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -80,7 +80,7 @@
   ],
   "failures_and_skips": [],
   "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": [], "coverage_artifact": null},
-  "task_and_failure": "The simulation lane needed evidence that the pinned NautilusTrader 2.0.0rc5 BacktestEngine, under a native per-account rate limiter, a calibrated latency model and realistic L1 execution (trade_execution, liquidity_consumption, queue_position all on), can sustain the fill rate an elite-tier Alpaca account's request budget implies (>=180 fills/simulated-minute), without any strategy manufacturing a trade to hit that number -- infrastructure capacity evidence, never strategy performance.",
+  "task_and_failure": "The simulation lane needed evidence of a synthetic infrastructure capacity ceiling under a native per-account rate limiter (deliberately made to bind, not left non-binding, so it cannot be misread as a broker-throughput statement), a primary-reference (not calibrated) latency setting, and quotes-only L1 execution -- specifically, whether >=180 fills/simulated-minute is achievable in a fixture with no strategy manufacturing a trade to hit that number. This is infrastructure capacity evidence, never strategy performance and never a broker-throughput claim (see NS-06 in limitations).",
   "primary_sources_and_pins": [
     {"url": "https://github.com/nautechsystems/nautilus_trader", "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"},
     {"url": "https://github.com/nkaz001/hftbacktest", "revision": "5f3ec40b2afb764e0fea112f941ed85523ef4e88"}
@@ -103,17 +103,17 @@
       {"path": "blueprints/us-equities/sim-capacity/fetcher.py",
        "sha256": "fe2b97913f252a852bdf386587ccc6811eddeb182fe62a6dea2915cd801b18c0"},
       {"path": "blueprints/us-equities/sim-capacity/exerciser.py",
-       "sha256": "88950a01d64dd40d43fcc4211e0240a062592fbf7c03a0e28cfb11c17e8675ca"},
+       "sha256": "c51e839a325e4c7dc6c7062a2036db4fdbe97cb6b132d9fe2b8779ade76b3257"},
       {"path": "blueprints/us-equities/sim-capacity/fee_model.py",
-       "sha256": "ad118a529b4429be909c477892178519eca1081aa81ca9667e364ae114118f21"},
+       "sha256": "b045aeb7f07c88da7f71b865aac3e04260af10b02df13b35844f6d3c10871f8e"},
       {"path": "blueprints/us-equities/sim-capacity/schedule.py",
-       "sha256": "942db6ee2ccaf7604a55fe703250ec732173713a58432f2a0957a1af77ddb074"}
+       "sha256": "03bb20f4eb3278195b6b8666b0660a27e215e1b125aa9d79091559a45fc03928"}
     ],
     "evaluation": [
       {"path": "blueprints/us-equities/sim-capacity/runner.py",
-       "sha256": "8b5b9053c649429993fd0332a58656633a052ce740725ffec9771b4ef55ae4f6"},
+       "sha256": "f1e400395e85b2a0b652161fb11a0e2dc52bac708b1373ceb32de72c8ee3ff80"},
       {"path": "tests/test_sim_capacity.py",
-       "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9"}
+       "sha256": "f5b845fb31cdb6d784e7de022f5644ec220215902029ede10c0cbb2f6750f5c7"}
     ]
   },
   "runtime_and_platform": {
@@ -134,7 +134,9 @@
     "hummingbot and freqtrade are crypto-market execution frameworks; their fee/queue/latency assumptions do not match US equities or Alpaca's REST rate-limit semantics.",
     "MarS is GPU-hosted and trained on Chinese-market data; out of scope for a US-equities Alpaca capacity test with no GPU dependency in this lane.",
     "hftbacktest was not run as a cross-check in this record (next-phase item; see next_decision_changing_test) -- it remains a comparison harness on a tick subset only per mover-v3/README.md.",
-    "This is infrastructure capacity evidence only: no order reacts to a signal, and no strategy manufactures a trade to hit a throughput target (docs/harness-rules-convergence-20260922.md NS-06; blueprints/us-equities/adaptive-paper/README.md L40).",
+    "This is infrastructure capacity evidence only: no order reacts to a signal, and no strategy manufactures a trade to hit a throughput target (docs/harness-rules-convergence-20260922.md NS-06; blueprints/us-equities/adaptive-paper/README.md L41).",
+    "An independent review found 41.2% of elite-tier fills beat the NBBO touch when trade ticks were fed into the engine alongside quotes (an rc5 L1-book artifact: a trade print overwrites both sides of the book and nothing restores the prior quote for a NO_AGGRESSOR trade). Fixed by feeding quotes only into the engine (trade ticks are still fetched and cataloged for future passive-order work, just not replayed here); measured 0 touch violations after the fix, asserted by cmd_run and independently re-verified with the reviewer's own harness.",
+    "An independent review found 162/163 elite and 112/113 paper order rejects were 'Short selling not permitted on a CASH account', consuming rate-limit budget and driving position-cap skips. Fixed with inventory-aware side selection (never sell from a flat or short position; a sell's quantity is clamped to the current long); measured 0 short-sale rejects after the fix.",
     "Alpaca's historical trade data carries no aggressor-side field; every TradeTick is tagged NO_AGGRESSOR, which makes any queue-depletion-based fill estimate derived from these trade ticks optimistic (documented in fetcher.py).",
     "The FINRA TAF cap's per-order-vs-per-execution scope is UNVERIFIED; this fee model applies it per fill (documented in fee_model.py)."
   ],
@@ -144,5 +146,5 @@
     "qualification_run_ids": ["elite-tier-capacity-run"]
   },
   "rollback": "Remove blueprints/us-equities/sim-capacity/ and its manifests/evidence.json entries; no other blueprint imports this one, and it makes no live/paper trading claim to unwind.",
-  "next_decision_changing_test": "Cross-check the same fetched data through hftbacktest 2.4.4/rust 0.9.4 (MIT, catalogued at 5f3ec40b2afb764e0fea112f941ed85523ef4e88) and compare fill rate / median time-to-fill; overturn if it diverges from this record's NautilusTrader results by more than 20% or 2x with no attributable Nautilus matching bug. Also overturn if: replaying one 6.5h session at 1000 fills/min takes more than 1h on this host; cost per fill at 50k fills in one position is more than 2x that at 1k (the upstream v2 position-copy regression); or NautilusTrader 2.0 final changes queue or latency semantics (upstream issue #4942)."
+  "next_decision_changing_test": "Cross-check the same fetched data through hftbacktest 2.4.4/rust 0.9.4 (MIT, catalogued at 5f3ec40b2afb764e0fea112f941ed85523ef4e88) and compare fill rate / median time-to-fill; overturn if it diverges from this record's NautilusTrader results by more than 20% or 2x with no attributable Nautilus matching bug. Also overturn if: replaying one 6.5h session at 1000 fills/min takes more than 1h on this host; cost per fill at 50k fills in one position is more than 2x that at 1k (the upstream v2 position-copy regression); or NautilusTrader 2.0 final changes queue or latency semantics (merged PR #4942, not an open issue)."
 }

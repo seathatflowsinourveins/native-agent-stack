@@ -32,9 +32,16 @@ def full_minutes(window_ns: int) -> int:
 
 class RoundRobin:
     """Deterministic round-robin symbol/side picker with a per-symbol position
-    cap. `next_order` never mutates state on a skip (cap reached and the
-    opposite side is also capped, or no quote yet) -- it just returns None,
-    leaving the caller's counters to record the skip."""
+    cap, inventory-aware so it never proposes a short sale.
+
+    The exerciser trades a plain Alpaca CASH account, which rejects any sell
+    that would take a position negative ("Short selling not permitted on a
+    CASH account" -- measured directly: 162/163 elite rejects and 112/113
+    paper rejects in an earlier run were exactly this, before this fix).
+    `next_side` therefore never returns SELL when `current_position <= 0`; it
+    always returns a legal side (never None), and the caller is responsible
+    for additionally clamping a SELL's quantity to `min(qty, current_position)`
+    so a sell can never ask for more shares than are actually held."""
 
     def __init__(self, symbols: list[str], position_cap: int):
         if not symbols:
@@ -51,18 +58,16 @@ class RoundRobin:
         self._index += 1
         return symbol
 
-    def next_side(self, symbol: str, current_position: int) -> str | None:
-        """Alternates BUY/SELL per symbol to keep inventory near flat, refusing
-        a side that would push |position| past `position_cap`. Returns None if
-        both sides are blocked (e.g. cap == 0, or a position exactly at +cap
-        that the alternation would push further in the same direction twice in
-        a row -- this cannot happen under normal alternation but is guarded
-        defensively)."""
-        preferred = "BUY" if self._last_side[symbol] == "SELL" else "SELL"
-        other = "SELL" if preferred == "BUY" else "BUY"
-        for side in (preferred, other):
-            projected = current_position + (1 if side == "BUY" else -1)
-            if abs(projected) <= self.position_cap:
-                self._last_side[symbol] = side
-                return side
-        return None
+    def next_side(self, symbol: str, current_position: int) -> str:
+        """Flat or short (<=0): always BUY (a CASH account cannot cover a sell
+        from a non-positive position). At or above the cap: always SELL (never
+        grow the position further). Otherwise, alternate BUY/SELL per symbol
+        to keep inventory oscillating near flat, exactly as before."""
+        if current_position <= 0:
+            side = "BUY"
+        elif current_position >= self.position_cap:
+            side = "SELL"
+        else:
+            side = "BUY" if self._last_side[symbol] == "SELL" else "SELL"
+        self._last_side[symbol] = side
+        return side

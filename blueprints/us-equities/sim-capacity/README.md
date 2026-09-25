@@ -10,38 +10,87 @@ purely to load the venue/risk-engine pipeline. Every artifact here is tagged
 - `docs/harness-rules-convergence-20260922.md` NS-06 (~L221): a synthetic
   throughput figure is "fixture evidence only and must never be cited as
   broker throughput or strategy performance".
-- `blueprints/us-equities/adaptive-paper/README.md` L40: "No strategy
+- `blueprints/us-equities/adaptive-paper/README.md` L41: "No strategy
   manufactures trades to hit a throughput target."
 - `blueprints/us-equities/mover-v3/README.md` (~L294-374) and
   `catalogs/us-equities/mover-v3-sweep-20260924.json` (~L255): throughput is
   capacity, not a trading target, and high rates are cost-bound; "a high-rate
   capacity replay is an infrastructure test, never strategy evidence."
 
+## H1 -- why the engine is fed quotes only (no trade ticks)
+
+**An independent review found that 41.2% of elite-tier fills (8,923 of
+21,652) beat the NBBO touch** when the engine's tick feed included trade
+prints alongside quotes. Mechanism (verified against the pinned rc5 source,
+commit `1b0a49d2792a9432a3aca3fcb617ce7a630d905e` of
+[nautilus_trader](https://github.com/nautechsystems/nautilus_trader)):
+
+- An L1 book (`book_type=L1_MBP`) overwrites **both** sides with a trade
+  print's price and size (`crates/model/src/orderbook/book.rs:1255-1300`).
+- For a `NoAggressor` trade, nothing restores the prior quote afterward
+  (`matching_engine/mod.rs:2363-2367,2395-2408`); the book stays locked to the
+  trade print until the next actual quote tick
+  (`matching_engine/mod.rs:4254-4265`).
+- This happens even with `trade_execution=False`, because the book update
+  happens before that flag is ever consulted (`matching_engine/mod.rs:2272-2288`).
+- 58.8% of the affected trades are sub-penny prints, rounded to the cent at
+  fill-tick construction time, which is exactly what let an IOC order match a
+  stale, better-than-NBBO price.
+
+Alpaca's historical trade record also carries **no aggressor-side field**, so
+every `TradeTick` `fetcher.py` builds is tagged `AggressorSide.NO_AGGRESSOR` --
+which is precisely the condition under which rc5 never restores the quote
+above. This is not a queue-realism bonus; it is a data artifact that
+corrupts the touch. (A side-bearing trade tick was not attempted, since
+verifying from source that it does not *also* corrupt the L1 book would be
+its own separate investigation; quotes-only sidesteps the question entirely
+for a taker-only exerciser.)
+
+**Fix.** The exerciser is taker-only (marketable IOC only; it never rests a
+passive order), so the realistic engine feed for this lane is QuoteTicks
+only -- `run_one` does not build or add `TradeTick`s to the engine at all.
+Trade ticks are still fetched, normalized and written to the private
+`ParquetDataCatalog` (see fetcher.py) for future passive-order work, where
+queue position against real trade prints would matter; they are simply never
+replayed into *this* engine. Measured after the fix: **0 of 26,145** (elite)
+and **0 of 5,255** (paper) exerciser fills beat the NBBO touch in force at
+fill time (`fill_vs_nbbo_touch.violation_count`, asserted by `cmd_run`, and
+independently re-verified with the reviewer's own harness). See
+"Quotes-only vs with-trades" below for the side-by-side comparison.
+
+**`queue_position` and `trade_execution` have no measured effect in this
+setup.** With trade ticks excluded and every order an all-or-nothing IOC,
+turning `queue_position` or `trade_execution` off independently was measured
+to produce byte-identical results to leaving them on (the reviewer's
+`analyze.py elite_no_queue_position` / `elite_no_trade_execution` variants
+against `elite_base`). Both are still left on in `run_one`'s `add_venue` call
+(a plain, harmless default), but they are not claimed as active realism
+features of this lane -- only `liquidity_consumption` was measured to change
+results (it governs whether a fill can actually deplete the available
+displayed size within a tick).
+
 ## What this measures
 
-A NautilusTrader 2.0.0rc5 `BacktestEngine` fed with real Alpaca SIP quotes and
-trades for SPY, QQQ, IWM, AAPL, MSFT, NVDA, AMD and TSLA over
-`2026-09-24T14:00:00Z`-`14:30:00Z` (30 minutes of the regular session,
-avoiding the open), under two venue/risk profiles that both keep
-`trade_execution`, `liquidity_consumption` and `queue_position` on, a
-`StaticLatencyModel` calibrated from the retained sim-to-paper receipt
-(`blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json`:
-the order-4 flip is at ~69.2ms, and paper submit-to-fill intervals were
-0.65-1.09s -- the 70ms primary latency sits inside that observed flip/fill
-range), and a cited US-equity sell-side fee model (`fee_model.py`).
+A NautilusTrader 2.0.0rc5 `BacktestEngine` fed with real Alpaca SIP quotes
+(and, separately, trades -- see H1) for SPY, QQQ, IWM, AAPL, MSFT, NVDA, AMD
+and TSLA over `2026-09-24T14:00:00Z`-`14:30:00Z` (30 minutes of the regular
+session, avoiding the open), under two venue/risk profiles, a
+`StaticLatencyModel`, and a cited US-equity fee model (`fee_model.py`).
 
 - **paper-parity**: `RiskEngineConfig(max_order_submit_rate="180/00:01:00")`,
   mirroring Alpaca's 200 req/min x 0.9. Fills cannot exceed 180/min here by
   construction of the limiter; that is the expected, reported result, not a
-  failure.
-- **elite-tier**: `max_order_submit_rate="900/00:01:00")`, the Alpaca Elite /
+  failure. Cadence: 5 submits/sec (300/min attempted) against the 180/min
+  budget, so the limiter binds and denials are counted.
+- **elite-tier**: `max_order_submit_rate="900/00:01:00"`, the Alpaca Elite /
   non-retail rate (1000 req/min x 0.9). This is the profile that must sustain
-  >=180 fills/min in every full simulated minute, and does (see Results).
-
-Exerciser cadence is set per profile so the native limiter is actually
-exercised: 5 submits/sec (300/min attempted) for paper-parity against its
-180/min budget, and 15 submits/sec (900/min attempted) for elite-tier against
-its 900/min budget.
+  >=180 fills/min in every full simulated minute, and does. Cadence:
+  1000/60 ~= 16.67 submits/sec (~1000/min attempted) against the 900/min
+  budget -- **not** exactly 15/s (900/min): an earlier cadence of exactly
+  900/min attempted never triggered a single denial, since it never actually
+  exceeded the budget, which would let a non-binding limiter be misread as
+  "sustained 900/min of real capacity" rather than "we never asked for more
+  than the budget." Denials are now measured (2,995 in the current run).
 
 ## Data
 
@@ -59,37 +108,52 @@ The actual fetch window is padded 5 minutes past the reported/analysis window
 (`14:30:00Z` -> `14:35:00Z`, `FETCH_END_ISO` in `fetcher.py`) purely so the
 exerciser's end-of-window flatten has quotes to execute its close orders
 against and the shared rate-limit budget has room to refill first, without
-eating into the 30 reported minutes' own submit schedule. Every reported
-number (`window`, per-minute stats) still covers only the original 30 minutes.
+eating into the 30 reported minutes' own submit schedule. **The receipt's
+`quote_counts`/`trade_counts` exclude this pad** (`_window_bounded_counts` in
+runner.py) -- they describe only the 30-minute analysis window, not the
+35-minute fetch.
 
 Pages are cached under `~/.local/state/native-agent-stack/sim-capacity/pages`
 (0700), never committed. `--replay` reuses only retained pages: no network
 request, and the credential loader is never even imported (see
-`tests.test_sim_capacity.ReplayNeverOpensCredentialsTests`).
-
-Alpaca's historical trade record carries **no aggressor-side field**. Every
-`TradeTick` built from it is tagged `AggressorSide.NO_AGGRESSOR`
-(`fetcher.normalize_trades`). Consequence: a queue-depletion model that relies
-on aggressor side to remove resting liquidity from a known side of the book
-never actually does so from this trade data, which makes any queue-position-
-based fill estimate derived from these trade ticks **optimistic**.
+`tests.test_sim_capacity.ReplayNeverOpensCredentialsTests`). The receipt
+records exactly this run's served pages (`this_run_page_hashes`, from
+`PageFetcher.page_events`) and a digest of that list, separately from the
+private cache directory's whole cumulative `ledger.jsonl` (which can carry
+pages from earlier, unrelated fetches against the same cache directory --
+201 pages served this run, out of 372 cumulative in the ledger at the time
+of writing).
 
 Crossed quotes (`bid > ask`) are dropped and counted per symbol
 (`fetcher.normalize_quotes`); locked quotes (`bid == ask`) are kept. A
 NautilusTrader `ParquetDataCatalog` is written under the private catalog dir
-(`fetcher.build_catalog`); the runner also keeps normalized quote/trade rows
-privately for the engine run, never committed.
+(`fetcher.build_catalog`) from the fetched quotes and trades. **This catalog
+is not read back by the engine run** -- `run_one` reads quotes (and, for the
+catalog only, trades) from the private normalized JSON directly, for exact
+control over tick construction and the H1 quotes-only exclusion. A future
+`BacktestNode`-based run could read from the catalog directly; this lane does
+not currently do so, and does not claim to.
 
 ## Exerciser mechanics
 
 - Buy orders: limit = ask + $0.01; sell orders: limit = bid - $0.01 (both IOC),
   quantity 1-5 shares, capped by displayed top-of-book size.
-- Sides alternate per symbol (`schedule.RoundRobin`) so inventory stays near
-  flat, under a hard per-symbol position cap (300 shares -- a tighter 20-share
-  cap was tried and measured to throttle the exerciser on its own inventory
-  bookkeeping rather than on the rate limiter or the market data, which would
-  misattribute a scheduling artifact as the venue's throughput ceiling; see
-  `runner.py`'s `POSITION_CAP` comment).
+- **Side selection is inventory-aware** (`schedule.RoundRobin.next_side`): it
+  never proposes a sell from a flat or short position (always BUY when
+  `position <= 0`), and a sell's quantity is additionally clamped to the
+  currently held long in `exerciser.py`. This exists because the exerciser
+  trades a plain Alpaca **CASH account**, which rejects any short sale
+  outright. Measured *before* this fix: 162 of 163 elite rejects and 112 of
+  113 paper rejects in one run were exactly "Short selling not permitted on a
+  CASH account" -- consuming rate-limit budget, understating true throughput,
+  and driving spurious position-cap skips (a prior 20-share cap, and even the
+  current 300-share cap under the old alternation logic, could still walk
+  into a long-only drift with no way back down). Measured *after* the fix:
+  zero short-sale rejects in either profile.
+- A hard per-symbol position cap (300 shares; see `runner.POSITION_CAP`'s
+  comment for why a tighter cap was tried and rejected) forces a SELL once
+  reached, alongside the inventory-aware BUY-when-flat rule above -- together
+  these keep the exerciser's own bookkeeping from ever being the bottleneck.
 - At the end of the analysis window the exerciser flattens every open
   position with several spaced retry attempts (a single flatten attempt can
   transiently fail per-instrument -- measured directly as an `OrderRejected`
@@ -97,76 +161,143 @@ privately for the engine run, never committed.
   with no fresh book update yet for that instrument -- with no automatic
   retry otherwise).
 - Counts submits, fills (`OrderFilled` events), IOC expiries (auto-canceled/
-  expired unfilled IOC remainder), rejects and RATE_LIMIT denials
+  expired with nothing filled) separately from partial-fill-then-canceled
+  orders (`ioc_partial_then_canceled`, checked against the order's own
+  `filled_qty` at cancel/expiry time), rejects and RATE_LIMIT denials
   (`OrderDenied`, the RiskEngine's pre-trade rate-limit refusal, distinct from
-  a venue-side `OrderRejected`).
+  a venue-side `OrderRejected`; the reason string is checked before counting a
+  denial as rate-limit, in case a future added risk check ever fires here
+  too).
 
 ## Fee model
 
-`fee_model.py`: Alpaca commission $0 (documented, no commission schedule),
-plus on **sells only**:
+`fee_model.py` charges, per fill:
 
-- SEC Section 31: $20.60 per $1,000,000 of proceeds, effective 2026-04-04,
-  open-ended at retrieval (SEC Release No. 34-104909, corrected by
-  34-104909A; SEC Fee Rate Advisory for FY2026, 2026-02-27).
-- FINRA TAF: $0.000195/share sold, capped at $9.79/trade, in force
-  2026-01-01 through 2026-09-30 (covers the 2026-09-24 session date).
+- **FINRA CAT**: $0.000003 per executed-equivalent share, on **both buys and
+  sells**.
+- On **sells only**: SEC Section 31 ($20.60 per $1,000,000 of proceeds,
+  effective 2026-04-04) and FINRA TAF ($0.000195/share, capped at $9.79/trade,
+  in force through 2026-09-30 -- covers the session date).
+- **Elite Smart Router commission** (elite-tier profile only, both sides):
+  the `all_in` plan by default, $0.0040/share (<=200,000 monthly shares
+  tier). The `cost_plus` plan ($0.0025/share at the same tier) is also
+  implemented but not the default, since it additionally passes through
+  actual per-venue exchange fees/rebates that this model does not have data
+  for (**partial/UNVERIFIED**). paper-parity always uses `commission_plan="none"`
+  (retail routing: $0 commission, CAT/SEC/TAF only).
 
-Both rates are cited from the pinned, dated, primary-sourced
-`blueprints/us-equities/mover-v3/data/fees-v3.json` (retrieved_at
-2026-09-24), not re-derived. **UNVERIFIED**: whether the FINRA TAF cap applies
-per order or per execution/fill; this model applies it per fill (documented
-in `fee_model.py`'s module docstring as the conservative choice for a
-high-fill-rate run).
+Sources:
 
-## Independent recount and naive L1 check
+- SEC Section 31 / FINRA TAF: pinned, dated
+  `blueprints/us-equities/mover-v3/data/fees-v3.json` (retrieved_at
+  2026-09-24; SEC Release No. 34-104909, corrected by 34-104909A; SEC Fee
+  Rate Advisory for FY2026, 2026-02-27).
+- FINRA CAT and the Elite Smart Router commission: Alpaca Securities LLC's
+  own [Brokerage Fee Schedule PDF](https://alpaca.markets/disclosures)
+  (`https://files.alpaca.markets/disclosures/library/BrokFeeSched.pdf`),
+  "Revised on September 17, 2026", retrieved 2026-09-25, sha256
+  `7bc75e3cd86f5c1950f8ce1292049965280340a3cebe727ca7aee4a7d2d71b12`.
+
+**UNVERIFIED**: whether the FINRA TAF cap applies per order or per execution
+(fill); this model applies it per fill. **Partial**: the `cost_plus`
+commission plan excludes its exchange-fee/rebate pass-through component.
+
+**Rounding.** Alpaca aggregates each fee type per day, per account, and
+rounds the day's total **up** to the cent. This model instead rounds each
+fill's total fee **half-up**. The difference is small at this run's scale
+(well under a dollar across a 30-minute run) and is reported in the receipt's
+`fee_model.rounding_note`, not hidden.
+
+## Latency -- a primary reference point, not a calibration
+
+`PRIMARY_LATENCY_MS = 70` is **not calibrated**. It is a primary-reference
+point chosen because it sits inside the retained sim-to-paper receipt's
+observed paper submit-to-fill range (0.65-1.09s) and near that receipt's own
+latency-sensitivity flip point (~69.2ms) -- and that receipt explicitly says
+of its own sweep, "Sensitivity check, not a calibration"
+(`sim-paper-compare/receipts/20260923g-main-passed.json`). This lane inherits
+that caveat rather than upgrading it to "calibrated."
+
+On the pinned rc5 engine, a deferred (latency-delayed) order is released at
+the first of: (a) the next quote tick on its own instrument, or (b) **any**
+due clock timer processed by the engine, from any source (see
+`sim-paper-compare/replay_compare.py`'s module docstring for the underlying
+source citations). The exerciser's own submit-schedule timer fires
+frequently, so it is very often *itself* the timer that releases a deferred
+fill -- meaning the measured submit-to-fill distribution mixes the configured
+`StaticLatencyModel` delay together with the exerciser's own tick cadence,
+not latency alone. Measured directly in the current run
+(`submit_to_fill_latency_ms` in each receipt): elite-tier fills cluster at
+p50=120ms, p90=120ms (min 70.0ms, max 120ms) at a ~60ms tick interval and
+70ms configured latency -- consistent with "release at the first tick at or
+after submit + latency," which lands most fills at the *second* tick after
+submit; paper-parity (200ms tick interval) shows p50=138.6ms, p90=200ms (min
+70.0ms, max 200ms). The latency sweep (0/70/250/1000ms) below therefore
+varies configured latency together with this timer-cadence effect.
+
+## Independent recount and the NBBO-touch check
 
 `runner.summarize_run` recounts fills per minute from NautilusTrader's own
 `generate_fills_report()`, separately from the strategy's own counters, and
-`cmd_run` asserts they are equal for every run (`recount.agrees` in every
-receipt is `true`). Extracting timestamps required a fix documented in
-`runner.dataframe_to_rows`'s docstring: `DataFrame.to_json(date_format=
-'epoch')` on a tz-aware `datetime64[ns, UTC]` column does **not** round-trip
-to the true nanosecond epoch (verified directly: a `ts_event` of
-1,800,000,500,000,000 ns serializes to `1800000500`, three orders of
-magnitude off) -- exactly the trap `sim-paper-compare/replay_compare.py`'s
-module docstring already warns about; `dataframe_to_rows` converts via
-`.astype('int64')` on the raw dtype instead, and this is unit-tested directly
-(`tests.test_sim_capacity.RunnerPureLogicTests.
-test_dataframe_to_rows_recovers_true_ns_epoch`).
+**`cmd_run` asserts they are equal** for every profile and every latency-sweep
+point (an unhandled `AssertionError` is the intended failure mode if this
+ever regresses -- this is a real `assert`, not just a reported boolean).
+Extracting timestamps required a fix documented in `runner.dataframe_to_rows`:
+`DataFrame.to_json(date_format='epoch')` on a tz-aware `datetime64[ns, UTC]`
+column is a plain units mismatch (it reports epoch **milliseconds**, not
+nanoseconds -- verified directly: 1,800,000,500,000,000 ns serializes as
+`1800000500`, which is exactly `true_ns // 1_000_000`). `dataframe_to_rows`
+instead forces `datetime64[ns, ...]` precision before extracting the integer
+(so a `datetime64[us, UTC]` source column, which a raw `.astype("int64")`
+would report as microseconds, cannot silently slip through as ns either),
+and this is unit-tested directly for both cases.
 
-`runner.naive_l1_marketability_sample` independently re-derives, for a sample
-of up to 200 fills, whether the order's actual submitted limit price was
-marketable against the quote in force at its modelled arrival time (submit +
-latency), using only the retained normalized quote rows -- never the engine's
-internal book state. A small disagreement rate (1-2% in the observed runs) is
-expected and not a bug: the market can move between submit and the modelled
-arrival instant, and (per `sim-paper-compare/replay_compare.py`'s module
-docstring) the engine's actual settlement instant is not guaranteed to equal
-submit + latency exactly.
+`runner.check_no_fill_beats_nbbo_touch` independently re-derives, for every
+exerciser fill, the NBBO touch in force **at fill time** (not submit time,
+not modeled-arrival time -- the engine's own actual matching instant), using
+only the retained normalized quote rows, never the engine's internal book
+state, and asserts no fill is strictly better than the touch. This is the H1
+guard: 0 violations in both profiles after the fix (see above).
 
-## Results (2026-09-24 fetch, real Alpaca SIP data)
+## Results (2026-09-24 fetch, real Alpaca SIP data, post-fix)
 
 | Profile | min/min | median/min | max/min | full minutes >=180 | sim cost/min (USD) | wall-clock | recount |
 |---|---|---|---|---|---|---|---|
-| paper-parity (70ms) | 133 | 153.0 | 170 | 0/30 (by design: capped by the 180/min limiter) | ~12.32 | ~5.2s | agrees |
-| elite-tier (70ms, primary) | 614 | 702.5 | 812 | **30/30** | ~57.67 | ~6.5s | agrees |
+| paper-parity (70ms) | 171 | 175.0 | 180 | 1/30 (by design: capped by the 180/min limiter) | ~45.33 | ~3.1s | agrees |
+| elite-tier (70ms, primary) | 859 | 873.0 | 882 | **30/30** | ~243.45 | ~5.2s | agrees |
 
 Latency sensitivity (elite-tier, full 30-min run at each latency):
 
 | latency (ms) | min/min | median/min | max/min | full minutes >=180 |
 |---|---|---|---|---|
-| 0 | 622 | 741.5 | 845 | 30/30 |
-| 70 (primary) | 614 | 702.5 | 812 | 30/30 |
-| 250 | 572 | 676.5 | 772 | 30/30 |
-| 1000 | 560 | 628.0 | 694 | 30/30 |
+| 0 | 889 | 898.5 | 900 | 30/30 |
+| 70 (primary) | 859 | 873.0 | 882 | 30/30 |
+| 250 | 801 | 829.0 | 852 | 30/30 |
+| 1000 | 655 | 724.5 | 758 | 30/30 |
+
+### Quotes-only vs with-trades (H1 evidence)
+
+Measured with the independent reviewer's harness (`analyze.py`), same data,
+same profiles, mirroring `run_one`'s configuration:
+
+| variant | fills/min (min/median/max) | fills beating touch | cost/min (USD) |
+|---|---|---|---|
+| elite, with trades | 657 / 716.5 / 832 | 8,990 / 21,924 = 41.0% | 59.09 |
+| elite, **quotes-only** (this lane) | 859 / 873.0 / 882 | **0 / 26,145 = 0.0%** | 225.97 |
+| paper, with trades | 138 / 154.0 / 171 | 2,072 / 4,664 = 44.4% | 11.95 |
+| paper, **quotes-only** (this lane) | 171 / 175.0 / 180 | **0 / 5,255 = 0.0%** | 45.33 |
+
+(The harness's own cost/min differs slightly from this lane's committed
+receipts because it uses `commission_plan="none"` for both profiles, i.e. no
+elite commission; it is included here only as H1 comparison evidence, not as
+this lane's cost claim.)
 
 Both profiles flatten fully at the end (`flat_at_end: true`), and net P&L is
-negative in both (paper-parity ~-$431.56, elite-tier ~-$2083.23) -- expected,
-since the exerciser pays the spread (collar) on every round trip plus fees
-with no offsetting signal. See `receipts/20260924-paper-parity.json` and
-`receipts/20260924-elite-tier.json` for full per-minute breakdowns, page
-hashes, engine/runtime versions and the redacted argv.
+negative in both -- expected, since the exerciser pays the spread (collar) on
+every round trip plus fees with no offsetting signal. See
+`receipts/20260924-paper-parity.json` and `receipts/20260924-elite-tier.json`
+for full per-minute breakdowns, page hashes, engine/runtime versions and the
+redacted argv.
 
 ## Convergence record
 
@@ -203,6 +334,14 @@ python3 blueprints/us-equities/sim-capacity/runner.py fetch --replay \
 ```
 
 Tests: `python3 -m unittest -v tests.test_sim_capacity`. Nautilus-requiring
-tests (`PinnedRuntimeEngineTests`) and the pandas-requiring datetime-recovery
-test skip cleanly on system Python and run on the pinned runtime
+tests (`PinnedRuntimeEngineTests`, `RealVenueRunOneTests`) and the
+pandas-requiring datetime-recovery tests skip cleanly on system Python and
+run on the pinned runtime
 (`~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python`).
+`RealVenueRunOneTests` calls `runner.run_one` directly (the real production
+function, with its real venue/risk/fee configuration) on a small synthetic
+quote set, and asserts: fill qty never exceeds displayed size; fill timestamp
+never precedes submit + latency; no fill beats the NBBO touch; fees land on
+sells only at `commission_plan="none"`; the independent recount agrees; every
+exerciser order's actual time-in-force is IOC; and the configured budget
+values match.

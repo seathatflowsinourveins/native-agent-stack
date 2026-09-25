@@ -9140,23 +9140,23 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/README.md",
-      "sha256": "3edcce2f8e1950119e68f2b7f1f9088e5e1630fa3bfc93285d62fe432cbe7e65",
-      "bytes": 11413
+      "sha256": "621d445498246eaff633cbce6f5f5753c6aa6022bb0860d760da4ddb929776d7",
+      "bytes": 20078
     },
     {
       "path": "blueprints/us-equities/sim-capacity/exerciser.py",
-      "sha256": "88950a01d64dd40d43fcc4211e0240a062592fbf7c03a0e28cfb11c17e8675ca",
-      "bytes": 10524
+      "sha256": "c51e839a325e4c7dc6c7062a2036db4fdbe97cb6b132d9fe2b8779ade76b3257",
+      "bytes": 12244
     },
     {
       "path": "blueprints/us-equities/sim-capacity/experiment.json",
-      "sha256": "c4854c4e2841d039cc1b3cdcecadeeb201983d0c1cd88efeec0d752f5564a205",
-      "bytes": 12166
+      "sha256": "bb3cb8b1df53563b8c1c4ab9e7d726d6e1c2bc179d55e762d76d9af93133b9a1",
+      "bytes": 13203
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fee_model.py",
-      "sha256": "ad118a529b4429be909c477892178519eca1081aa81ca9667e364ae114118f21",
-      "bytes": 4114
+      "sha256": "b045aeb7f07c88da7f71b865aac3e04260af10b02df13b35844f6d3c10871f8e",
+      "bytes": 8127
     },
     {
       "path": "blueprints/us-equities/sim-capacity/fetcher.py",
@@ -9165,23 +9165,23 @@
     },
     {
       "path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
-      "sha256": "e0156a4589ac17eb2f2850b0a0ce18b59c38d93b3993ff39271930b6076f69e6",
-      "bytes": 40076
+      "sha256": "0782a20038f04b7d2eef9f1f708c76063c9e5e5d3ce87e1e70fa1f0ba3019353",
+      "bytes": 30872
     },
     {
       "path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
-      "sha256": "55b67b10c57b4aea174f282804ffffa10ed6eaff8f95c951aa4eb3d45726155b",
-      "bytes": 36961
+      "sha256": "498c5d67f30ee091f14bdb6770cc4bd4dcb837da621acc3c85e2fb8c6602bcbf",
+      "bytes": 27765
     },
     {
       "path": "blueprints/us-equities/sim-capacity/runner.py",
-      "sha256": "8b5b9053c649429993fd0332a58656633a052ce740725ffec9771b4ef55ae4f6",
-      "bytes": 26463
+      "sha256": "f1e400395e85b2a0b652161fb11a0e2dc52bac708b1373ceb32de72c8ee3ff80",
+      "bytes": 37052
     },
     {
       "path": "blueprints/us-equities/sim-capacity/schedule.py",
-      "sha256": "942db6ee2ccaf7604a55fe703250ec732173713a58432f2a0957a1af77ddb074",
-      "bytes": 2744
+      "sha256": "03bb20f4eb3278195b6b8666b0660a27e215e1b125aa9d79091559a45fc03928",
+      "bytes": 2980
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
@@ -29635,8 +29635,8 @@
     },
     {
       "path": "tests/test_sim_capacity.py",
-      "sha256": "730525a0149c36b3aa24b8ab3be9905ac1fa92e1504786fb57a46139fb4f01d9",
-      "bytes": 15686
+      "sha256": "f5b845fb31cdb6d784e7de022f5644ec220215902029ede10c0cbb2f6750f5c7",
+      "bytes": 28594
     },
     {
       "path": "tests/test_sim_paper_compare.py",
