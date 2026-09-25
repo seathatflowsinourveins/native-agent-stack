@@ -28,6 +28,25 @@ import re
 import sys
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+# scripts/platform_status.py owns the one platform-status derivation rule scripts/landscape.py
+# enforces as a ceiling (macos-arm64 always, linux-wsl2-x86_64 on a non-grandfathered row): a
+# native-rollout receipt alone is not the host-receipt evidence that module actually requires,
+# so record() below derives through it rather than assuming "accepted" from this receipt's own
+# qualifying tiers, the same way tools/sota-convergence/record_verdicts.py's own
+# platform_status_for helper does for the layer-verdict pipeline.
+from scripts.platform_status import PLATFORMS, load_context  # noqa: E402
+from scripts.platform_status import platform_status as derive_platform_status  # noqa: E402
+
+# Same rule, same excluded set (df -h/du -h are functional, so -h is deliberately not here), as
+# scripts/host_receipts.py's BARE_HELP_OR_VERSION: a T2 tier made only of `<program> <flag>`
+# probes is not "a real workload" (switch.md), whatever its pass/fail result.
+BARE_HELP_OR_VERSION = frozenset({"--help", "--version", "-V", "help", "version"})
+
 SCHEMA_VERSION = 1
 TIERS = ("T0", "T1", "T2", "T3", "T4", "T5", "T6")
 RESULTS = {"passed", "failed", "unavailable"}
@@ -219,12 +238,42 @@ def tier_results_of(document: dict) -> dict[str, str]:
     return {tier["tier"]: tier.get("result") for tier in document.get("tiers", []) if isinstance(tier, dict)}
 
 
+def tier_by_id(document: dict, tier_id: str) -> dict | None:
+    for tier in document.get("tiers") or []:
+        if isinstance(tier, dict) and tier.get("tier") == tier_id:
+            return tier
+    return None
+
+
+def is_bare_help_or_version(argv) -> bool:
+    """Whether ``argv`` (a receipt command's own argv list) is exactly one program and one help
+    or version argument -- the same distinction scripts/host_receipts.py's
+    BARE_HELP_OR_VERSION/bare_help_or_version already draws for host receipts, applied here to a
+    native-rollout receipt's T2 commands."""
+    return isinstance(argv, list) and len(argv) == 2 and argv[1] in BARE_HELP_OR_VERSION
+
+
+def bare_t2_issue(document: dict) -> str | None:
+    """None unless T2's own commands (when it is present and its result is "passed") are *all*
+    bare --version/--help probes: switch.md requires T2 to be "a real workload", not a version
+    check, so a T2 that never ran more than that must not qualify a rollout regardless of its
+    recorded result."""
+    t2 = tier_by_id(document, "T2")
+    if t2 is None or t2.get("result") != "passed":
+        return None
+    commands = [c for c in (t2.get("commands") or []) if isinstance(c, dict)]
+    if commands and all(is_bare_help_or_version(c.get("argv")) for c in commands):
+        return "tier T2 is made only of bare --version/--help probes, not a real workload"
+    return None
+
+
 def qualifying_evidence_class(document: dict, *, service: bool) -> tuple[str | None, str]:
     """(evidence_class, reason). evidence_class is "native_proven" when every
     QUALIFYING_TIERS entry (T2, T4, T5), plus T6 when ``service``, is "passed" in
-    ``document``; otherwise None and a reason naming the first unmet tier. The
-    receipt's own status must also be "passed" -- an unavailable or failed overall
-    receipt never qualifies regardless of individual tier results."""
+    ``document``, T2 is not made only of bare --version/--help probes, and
+    ``independent.agreement`` is "same_result"; otherwise None and a reason naming the first
+    unmet condition. The receipt's own status must also be "passed" -- an unavailable or failed
+    overall receipt never qualifies regardless of individual tier results."""
     if document.get("status") != "passed":
         return None, f'receipt status is {document.get("status")!r}, not "passed"'
     results = tier_results_of(document)
@@ -232,6 +281,12 @@ def qualifying_evidence_class(document: dict, *, service: bool) -> tuple[str | N
     for tier in required:
         if results.get(tier) != "passed":
             return None, f"tier {tier} is {results.get(tier)!r}, not \"passed\" (required: {', '.join(required)})"
+    t2_issue = bare_t2_issue(document)
+    if t2_issue:
+        return None, t2_issue
+    agreement = (document.get("independent") or {}).get("agreement")
+    if agreement != "same_result":
+        return None, f"independent.agreement is {agreement!r}, not \"same_result\""
     return "native_proven", "every required tier passed"
 
 
@@ -246,24 +301,40 @@ def find_winner(landscape: dict, catalog: str, layer_id: str, component_id: str)
 
 
 def record(receipt: dict, landscape: dict, *, catalog: str, layer_id: str, receipt_ref: str,
-           service: bool, platform: str) -> dict:
+           service: bool, platform: str, status_context=None) -> dict:
     """Report {qualifies, evidence_class, reason, changed[]} of updating the matching
     winner in ``landscape`` (mutated in place only when it qualifies); the caller
-    decides whether to write ``landscape`` back to disk."""
+    decides whether to write ``landscape`` back to disk.
+
+    A qualifying receipt updates the winner's ``pin`` to the receipt's own version (switch.md
+    lists ``pin`` among the fields this tool updates) rather than requiring it to already equal
+    the current pin: a receipt is exactly the authorization to move the pin to the version it
+    tested, not merely more evidence for a version already pinned. The only identity check that
+    gates this is ``component_id`` resolving to a real winner (``find_winner``) plus the tiers
+    themselves qualifying (``qualifying_evidence_class``); this tool never runs a command or
+    re-executes the receipt's own claims, so those two checks are the whole trust boundary.
+
+    ``platform_status`` is updated only when ``status_context`` (a
+    ``scripts.platform_status.StatusContext``, built once per run by the caller from real host
+    receipts) is given, and only to what ``scripts.platform_status.platform_status`` itself
+    derives for that platform -- never assumed "accepted" from this receipt's own qualifying
+    tiers, which is a different, weaker evidence class than the reviewed host receipts that
+    function actually requires (macos-arm64 always, and a non-grandfathered linux row). Without
+    a status_context (e.g. a direct call in isolation, with no repository evidence available),
+    platform_status is left untouched rather than guessed."""
     component_id = (receipt.get("identity") or {}).get("component_id")
     version = (receipt.get("identity") or {}).get("version")
     layer, winner = find_winner(landscape, catalog, layer_id, component_id)
     if winner is None:
         return {"qualifies": False, "evidence_class": None,
                 "reason": f"no winner {component_id!r} in {catalog}/{layer_id}", "changed": []}
-    if winner.get("pin") != version:
-        return {"qualifies": False, "evidence_class": None,
-                "reason": f"receipt is for version {version!r}, but the winner's current pin is {winner.get('pin')!r}",
-                "changed": []}
     evidence_class, reason = qualifying_evidence_class(receipt, service=service)
     if evidence_class is None:
         return {"qualifies": False, "evidence_class": None, "reason": reason, "changed": []}
     changed = []
+    if winner.get("pin") != version:
+        winner["pin"] = version
+        changed.append("pin")
     if winner.get("evidence_class") != evidence_class:
         winner["evidence_class"] = evidence_class
         changed.append("evidence_class")
@@ -271,10 +342,12 @@ def record(receipt: dict, landscape: dict, *, catalog: str, layer_id: str, recei
     if receipt_ref not in refs:
         refs.append(receipt_ref)
         changed.append("evidence_refs")
-    platform_status = winner.setdefault("platform_status", {})
-    if platform_status.get(platform) != "accepted":
-        platform_status[platform] = "accepted"
-        changed.append(f"platform_status.{platform}")
+    if status_context is not None:
+        platform_status = winner.setdefault("platform_status", {})
+        derived = derive_platform_status(platform, winner, status_context).status
+        if platform_status.get(platform) != derived:
+            platform_status[platform] = derived
+            changed.append(f"platform_status.{platform}")
     return {"qualifies": True, "evidence_class": evidence_class, "reason": reason, "changed": changed}
 
 
@@ -300,8 +373,10 @@ def cmd_record(args) -> int:
         return 1
     landscape = load_json(args.landscape)
     receipt_ref = args.receipt_ref or str(args.receipt)
+    status_context = load_context(args.root)
     report = record(document, landscape, catalog=args.catalog, layer_id=args.layer_id,
-                    receipt_ref=receipt_ref, service=args.service, platform=args.platform)
+                    receipt_ref=receipt_ref, service=args.service, platform=args.platform,
+                    status_context=status_context)
     if not report["qualifies"]:
         print(json.dumps({"status": "not_qualified", **report}, sort_keys=True))
         return 3
@@ -327,11 +402,15 @@ def build_parser() -> argparse.ArgumentParser:
     record_parser.add_argument("--receipt-ref", help="Path recorded in evidence_refs (default: the receipt's own --receipt path)")
     record_parser.add_argument("--service", action="store_true",
                                 help="This component runs as a live service (systemd unit); also require tier T6")
-    record_parser.add_argument("--platform", required=True,
+    record_parser.add_argument("--platform", required=True, choices=sorted(PLATFORMS),
                                 help="The winner's platform_status key to accept, e.g. linux-wsl2-x86_64 or "
                                      "macos-arm64 (scripts/landscape.py PLATFORM_KEYS); a receipt's host_id is a "
                                      "host nickname (evidence/hosts/<host_id>/), not a platform key, so it is "
                                      "never guessed from it")
+    record_parser.add_argument("--root", type=Path, default=REPO_ROOT,
+                                help="Repository checkout scripts/platform_status.py reads host receipts and "
+                                     "manifests/evidence.json from (default: this script's own checkout, not "
+                                     "--landscape's directory, which may be a fixture elsewhere in tests)")
     record_parser.add_argument("--write", action="store_true", help="Write the landscape file back; default is report-only")
     record_parser.set_defaults(handler=cmd_record)
 

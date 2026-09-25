@@ -21,6 +21,10 @@ TOOL_DIR = ROOT / "tools" / "sota-convergence"
 TOOL_PATH = TOOL_DIR / "record_native_rollout.py"
 SCHEMA_PATH = TOOL_DIR / "native-rollout-receipt.schema.json"
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts.platform_status import StatusContext  # noqa: E402
+
 
 def load_module(name, filename):
     path = TOOL_DIR / filename
@@ -190,6 +194,38 @@ class QualificationTests(unittest.TestCase):
         evidence_class, reason = record_native_rollout.qualifying_evidence_class(receipt, service=False)
         self.assertIsNone(evidence_class)
 
+    def test_a_bare_version_probe_t2_does_not_qualify_even_when_passed(self):
+        # switch.md requires T2 to be a real workload; scripts/host_receipts.py already draws
+        # this same "exactly <program> <flag>" distinction (BARE_HELP_OR_VERSION) for host
+        # receipts, and this tool must apply it too rather than accepting a version check as T2.
+        receipt = valid_receipt(tiers=[
+            {"tier": "T0", "commands": [], "result": "passed"},
+            {"tier": "T1", "commands": [], "result": "unavailable", "unavailable_reason": "no GPU"},
+            {"tier": "T2", "commands": [valid_command(argv=["qmd", "--version"])], "result": "passed"},
+            valid_tier("T4"), valid_tier("T5"),
+        ])
+        evidence_class, reason = record_native_rollout.qualifying_evidence_class(receipt, service=False)
+        self.assertIsNone(evidence_class)
+        self.assertIn("bare", reason)
+
+    def test_a_t2_with_at_least_one_real_command_alongside_a_probe_still_qualifies(self):
+        receipt = valid_receipt(tiers=[
+            valid_tier("T0"), valid_tier("T1", "unavailable", unavailable_reason="no GPU"),
+            {"tier": "T2", "result": "passed", "commands": [
+                valid_command(argv=["qmd", "--version"]), valid_command(argv=["qmd", "search", "example"])]},
+            valid_tier("T4"), valid_tier("T5"),
+        ])
+        evidence_class, _reason = record_native_rollout.qualifying_evidence_class(receipt, service=False)
+        self.assertEqual(evidence_class, "native_proven")
+
+    def test_independent_agreement_other_than_same_result_does_not_qualify(self):
+        for agreement in ("different_result", "not_rerun"):
+            receipt = valid_receipt()
+            receipt["independent"]["agreement"] = agreement
+            evidence_class, reason = record_native_rollout.qualifying_evidence_class(receipt, service=False)
+            self.assertIsNone(evidence_class, agreement)
+            self.assertIn("agreement", reason)
+
 
 def sample_landscape(*, component_id="qmd", pin="2.8.3"):
     return {
@@ -217,7 +253,55 @@ class RecordTests(unittest.TestCase):
         winner = landscape["layers"][0]["winners"][0]
         self.assertEqual(winner["evidence_class"], "native_proven")
         self.assertIn("evidence/receipts/qmd-rollout.json", winner["evidence_refs"])
+        # Without a status_context (no repository evidence supplied), platform_status is left
+        # untouched rather than assumed "accepted" from this receipt's own qualifying tiers --
+        # see test_platform_status_is_derived_through_scripts_platform_status_not_assumed below
+        # for the case where a status_context is given.
+        self.assertFalse([c for c in report["changed"] if c.startswith("platform_status")])
+        self.assertEqual(winner["platform_status"]["linux-wsl2-x86_64"], "conditional", "left at its original value")
+
+    def test_platform_status_is_derived_through_scripts_platform_status_not_assumed(self):
+        # Major finding: record() used to set platform_status[platform] = "accepted" directly,
+        # bypassing scripts/platform_status.py, which scripts/landscape.py enforces as a ceiling
+        # (macos-arm64 always; a non-grandfathered linux row needs a registered evidence/ ref).
+        # A native-rollout receipt alone is not the independently-reviewed host-receipt evidence
+        # that ceiling actually requires, so the derivation must run for real, not be skipped.
+        receipt = valid_receipt(version="2.8.4")
+        landscape = sample_landscape(pin="2.8.4")
+        # No bound host receipts at all (empty summary): linux becomes "accepted" only because
+        # the evidence_refs entry this call adds is itself a *registered* evidence/ path (the
+        # one route record_verdicts.py/platform_status.py already recognise); macos-arm64 has no
+        # such route and must stay "untested" even though the receipt qualifies as native_proven.
+        context = StatusContext(summary={}, registered_paths=frozenset({"evidence/receipts/qmd-rollout.json"}))
+        report = record_native_rollout.record(receipt, landscape, catalog="foundation", layer_id="retrieval",
+                                              receipt_ref="evidence/receipts/qmd-rollout.json", service=False,
+                                              platform="linux-wsl2-x86_64", status_context=context)
+        self.assertTrue(report["qualifies"])
+        winner = landscape["layers"][0]["winners"][0]
         self.assertEqual(winner["platform_status"]["linux-wsl2-x86_64"], "accepted")
+        self.assertIn("platform_status.linux-wsl2-x86_64", report["changed"])
+
+        landscape2 = sample_landscape(pin="2.8.4")
+        report2 = record_native_rollout.record(receipt, landscape2, catalog="foundation", layer_id="retrieval",
+                                               receipt_ref="evidence/receipts/qmd-rollout.json", service=False,
+                                               platform="macos-arm64", status_context=context)
+        self.assertTrue(report2["qualifies"])
+        winner2 = landscape2["layers"][0]["winners"][0]
+        self.assertEqual(winner2.get("platform_status", {}).get("macos-arm64"), "untested",
+                         "a native-rollout receipt alone must never grant macos-arm64 'accepted'")
+
+    def test_a_qualifying_receipt_for_a_new_version_moves_the_pin(self):
+        # Brief: record_native_rollout.py "updates a landscape winner's pin[...]". A receipt is
+        # the authorization to move the pin to the version it tested, not merely more evidence
+        # for whatever the winner's pin already says.
+        receipt = valid_receipt(version="2.8.4")
+        landscape = sample_landscape(pin="2.8.3")  # winner's current pin is still the old version
+        report = record_native_rollout.record(receipt, landscape, catalog="foundation", layer_id="retrieval",
+                                              receipt_ref="r.json", service=False, platform="linux-wsl2-x86_64")
+        self.assertTrue(report["qualifies"])
+        winner = landscape["layers"][0]["winners"][0]
+        self.assertEqual(winner["pin"], "2.8.4")
+        self.assertIn("pin", report["changed"])
 
     def test_recording_twice_does_not_duplicate_the_evidence_ref(self):
         receipt = valid_receipt(version="2.8.4")
@@ -231,15 +315,6 @@ class RecordTests(unittest.TestCase):
         winner = landscape["layers"][0]["winners"][0]
         self.assertEqual(winner["evidence_refs"].count("evidence/receipts/qmd-rollout.json"), 1)
         self.assertEqual(second["changed"], [])  # already applied; idempotent no-op the second time
-
-    def test_pin_mismatch_refuses_to_update(self):
-        receipt = valid_receipt(version="2.8.4")
-        landscape = sample_landscape(pin="2.8.3")  # winner's current pin is still the old version
-        report = record_native_rollout.record(receipt, landscape, catalog="foundation", layer_id="retrieval",
-                                              receipt_ref="r.json", service=False, platform="linux-wsl2-x86_64")
-        self.assertFalse(report["qualifies"])
-        self.assertIn("pin", report["reason"])
-        self.assertEqual(landscape["layers"][0]["winners"][0]["evidence_class"], "local_integration")
 
     def test_unknown_winner_refuses(self):
         receipt = valid_receipt(component_id="does-not-exist", version="2.8.4")

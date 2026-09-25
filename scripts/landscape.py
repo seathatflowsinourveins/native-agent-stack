@@ -1590,6 +1590,10 @@ def native_rollout_receipt_gap_warnings(root: Path, layers) -> list[str]:
                     continue
                 claimed = receipt.get("identity") if isinstance(receipt.get("identity"), dict) else {}
                 if claimed.get("component_id") != component_id:
+                    warnings.append(
+                        f"{label}: winner {component_id!r} cites native-rollout receipt {ref}, but that "
+                        f"receipt's identity.component_id is {claimed.get('component_id')!r}, not {component_id!r}"
+                    )
                     continue
                 if claimed.get("version") != pin:
                     warnings.append(
