@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "host_id": "macos-m5pro-20260924",
+  "platform_id": "macos-arm64",
+  "source_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+  "blueprint": "blueprints/convergence-practice/application-delivery",
+  "variant": {
+    "files": [
+      "evidence/artifacts/macos-application-20260924/variant/package.json",
+      "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+    ],
+    "package_json_changed_keys": [
+      "packageManager"
+    ],
+    "package_manager": {
+      "frozen": "pnpm@12.4.2",
+      "variant": "pnpm@12.6.0"
+    },
+    "lockfile_package_manager_section_sha256": {
+      "frozen": "48789f2be5fe836ed233c6680945fcf4592a8eac3a68ed8e3055a8e38dfa8b19",
+      "variant": "0a17d23bd52d5b607c3c3aa4b1a9dc59ba65c9c4a80f47621c53964c59138f8e"
+    },
+    "lockfile_project_section_sha256": "9029399c15dee99ced06069b0bb0c0ad23b3f3f655d07070e9f9e50f374c2201",
+    "lockfile_project_section_identical": true,
+    "method": "pnpm install --lockfile-only with pnpm 12.6.0 after raising packageManager"
+  },
+  "scopes": {
+    "sandbox": "commands inside the Claude Code Bash sandbox (Desktop Code-tab session)",
+    "native": "the same commands in the native user shell (unsandboxed retry)"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "scope": "sandbox",
+      "step": "make setup with only packageManager raised",
+      "sandbox": "sandboxed",
+      "exit_code": 2,
+      "commands": [
+        {
+          "exit_code": 2,
+          "seconds": 0.45,
+          "private_log_sha256": "fe22d43ea50c816df355abcdaaff9de6d4bc7f5c53c7b4b31be701040c5a5e5a"
+        }
+      ],
+      "seconds": 0.45,
+      "started_at_utc": "2026-09-24T13:50:02.649436+00:00",
+      "failure": "ERR_PNPM_FROZEN_LOCKFILE_WITH_OUTDATED_LOCKFILE: pnpm 12 records its own version in the lockfile, so raising packageManager alone leaves the frozen lockfile outdated (uv half passed)."
+    },
+    {
+      "attempt": 2,
+      "scope": "sandbox",
+      "step": "pnpm install --lockfile-only",
+      "sandbox": "sandboxed",
+      "exit_code": 1,
+      "commands": [
+        {
+          "exit_code": 1,
+          "seconds": 70.15,
+          "private_log_sha256": "e1ed8d270286729890e78d7d9be3f0b120103767480481f464bdc39a12f534ef"
+        }
+      ],
+      "seconds": 70.15,
+      "started_at_utc": "2026-09-24T13:50:31.304319+00:00",
+      "failure": "pnpm 12 registry fetch failed TLS verification under the sandbox (invalid peer certificate, OSStatus -26276) after about 70 s of retries."
+    },
+    {
+      "attempt": 3,
+      "scope": "native",
+      "step": "pnpm install --lockfile-only",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 0.87,
+          "private_log_sha256": "261f50fee360ba1dba035fea443db3be9d2c75ca48cfed7e1192f6e33e70d0eb"
+        }
+      ],
+      "seconds": 0.87,
+      "started_at_utc": "2026-09-24T13:53:45.495545+00:00"
+    },
+    {
+      "attempt": 4,
+      "scope": "native",
+      "step": "make setup",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 3.31,
+          "private_log_sha256": "46605b76471b48be3b9cdfa8bce0bd7bbd10679602e280669278d48548c9b0ba"
+        }
+      ],
+      "seconds": 3.31,
+      "started_at_utc": "2026-09-24T13:54:00.282501+00:00"
+    },
+    {
+      "attempt": 5,
+      "scope": "sandbox",
+      "step": "make postgres-install",
+      "sandbox": "sandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 50.77,
+          "private_log_sha256": "cc24cc8da599b179f2e172810f56826ebfde6ba27a9daaa451d493701ba58f0d"
+        }
+      ],
+      "seconds": 50.77,
+      "started_at_utc": "2026-09-24T13:54:10.550372+00:00"
+    },
+    {
+      "attempt": 6,
+      "scope": "sandbox",
+      "step": "make postgres-init",
+      "sandbox": "sandboxed",
+      "exit_code": 2,
+      "commands": [
+        {
+          "exit_code": 2,
+          "seconds": 0.37,
+          "private_log_sha256": "b003617f31274f399e8f587ec86c0e019b4df12ace7124410362b7225f764816"
+        }
+      ],
+      "seconds": 0.37,
+      "started_at_utc": "2026-09-24T13:55:08.482425+00:00",
+      "failure": "initdb could not create System V shared memory under the sandbox (shmget: Operation not permitted)."
+    },
+    {
+      "attempt": 7,
+      "scope": "native",
+      "step": "make postgres-init, postgres-start, postgres-databases",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 0.55,
+          "private_log_sha256": "06256400df2f3610cf0a5dfdfd6735eab467412ecea8b775948e6dd5e6bf271e"
+        },
+        {
+          "exit_code": 0,
+          "seconds": 0.22,
+          "private_log_sha256": "bb09fcba8032ef77332a120c8ba1e513ce13627950514d1327b17405c974c81b"
+        },
+        {
+          "exit_code": 0,
+          "seconds": 0.19,
+          "private_log_sha256": "3e1954bd22924c1590cfda6ffa2f0d8221a5bddf2df0cae40cc83e42f2e4ad62"
+        }
+      ],
+      "seconds": 0.96,
+      "started_at_utc": "2026-09-24T13:55:16.324883+00:00"
+    },
+    {
+      "attempt": 8,
+      "scope": "sandbox",
+      "step": "make migrate, migrate, migrate-test",
+      "sandbox": "sandboxed",
+      "exit_code": 2,
+      "commands": [
+        {
+          "exit_code": 2,
+          "seconds": 3.1,
+          "private_log_sha256": "33dab5930f221f8e5f7a8e098d0512f5758e7dfd619551feecb82222ecb08f9b"
+        },
+        {
+          "exit_code": 2,
+          "seconds": 0.3,
+          "private_log_sha256": "33dab5930f221f8e5f7a8e098d0512f5758e7dfd619551feecb82222ecb08f9b"
+        },
+        {
+          "exit_code": 2,
+          "seconds": 0.3,
+          "private_log_sha256": "6afc2f88145e162cbcb46941961cac0b2ee9c69abce3604bbc8bc5e004c1b25d"
+        }
+      ],
+      "seconds": 3.7,
+      "started_at_utc": "2026-09-24T13:55:22.849090+00:00",
+      "failure": "Sandboxed psycopg clients could not connect to the loopback PostgreSQL (connect: Operation not permitted)."
+    },
+    {
+      "attempt": 9,
+      "scope": "native",
+      "step": "make migrate, migrate, migrate-test",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 0.29,
+          "private_log_sha256": "0870e0096c46581b5228a06c176fdaa78522b364491ebd18a0e9f37d478d5e4a"
+        },
+        {
+          "exit_code": 0,
+          "seconds": 0.29,
+          "private_log_sha256": "0870e0096c46581b5228a06c176fdaa78522b364491ebd18a0e9f37d478d5e4a"
+        },
+        {
+          "exit_code": 0,
+          "seconds": 0.29,
+          "private_log_sha256": "7728b7279001ceda3bdc18afa8fc2e1bceb72277fe0a9ac93f9f7ef4e24c4c8e"
+        }
+      ],
+      "seconds": 0.87,
+      "started_at_utc": "2026-09-24T13:55:34.489194+00:00"
+    },
+    {
+      "attempt": 10,
+      "scope": "native",
+      "step": "make verify",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 8.64,
+          "private_log_sha256": "598bcd22c47bacd54e0ded12e4190f68d47d164e2b8a3870410ad7fb5a53e2d7"
+        }
+      ],
+      "seconds": 8.64,
+      "started_at_utc": "2026-09-24T13:55:47.813408+00:00"
+    },
+    {
+      "attempt": 11,
+      "scope": "native",
+      "step": "restart persistence and migration rollback",
+      "sandbox": "unsandboxed",
+      "exit_code": 1,
+      "commands": [
+        {
+          "exit_code": 1,
+          "seconds": 2.35,
+          "private_log_sha256": "30ff2b7aaca6d4dc8c8f3e9dbafc1478e86b82fd0fc759f9d9c24ff756f692a7"
+        }
+      ],
+      "seconds": 2.35,
+      "started_at_utc": "2026-09-24T13:56:59.562907+00:00",
+      "failure": "Every functional check passed, but the script's own post-SIGTERM bind probe found port 18081 busy: one TIME_WAIT socket remained. lsof then showed no listener and no application process."
+    },
+    {
+      "attempt": 12,
+      "scope": "sandbox",
+      "step": "make setup (repeat)",
+      "sandbox": "sandboxed",
+      "exit_code": 2,
+      "commands": [
+        {
+          "exit_code": 2,
+          "seconds": 0.02,
+          "private_log_sha256": "bb4d5dd2edb62ef491a22fa2e12076cc2485aa37976069cbcd432f980fe69015"
+        }
+      ],
+      "seconds": 0.02,
+      "started_at_utc": "2026-09-24T13:57:21.430719+00:00",
+      "failure": "pnpm 12 could not open its store operation lock under the sandbox (Operation not permitted), even with a populated store and no network need."
+    },
+    {
+      "attempt": 13,
+      "scope": "native",
+      "step": "make setup (repeat)",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "commands": [
+        {
+          "exit_code": 0,
+          "seconds": 0.04,
+          "private_log_sha256": "d8e9fd933f631ac9e154e120cb0f9e9ea64072d1841fec3e52fc2c45dc0490e4"
+        }
+      ],
+      "seconds": 0.04,
+      "started_at_utc": "2026-09-24T13:57:29.488546+00:00"
+    },
+    {
+      "attempt": 14,
+      "scope": "native",
+      "step": "playwright-cli isolated create/update",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "started_at_utc": "2026-09-24T13:58:08Z",
+      "observation": {
+        "browser": "Chrome 153.0.8010.53, in-memory profile, isolated named session",
+        "restart_carry_over": "The make verify record showed Revision 2 \u00b7 2 recorded changes and status passed after the attempt-11 PostgreSQL and server restarts.",
+        "created": "Revision 1 \u00b7 1 recorded changes",
+        "updated": "Revision 2 \u00b7 2 recorded changes",
+        "database_row": "status passed, revision 2, 2 events",
+        "console": {
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "attempt": 15,
+      "scope": "native",
+      "step": "stop owned cluster and confirm release",
+      "sandbox": "unsandboxed",
+      "exit_code": 0,
+      "seconds": 0.12,
+      "started_at_utc": "2026-09-24T13:58:42.823049+00:00",
+      "private_log_sha256": "01046c6d052127e20567c1b393b34aacffde1d083d70b71d8e494d0194036242",
+      "observation": {
+        "listeners_on_15432_18080_18081": 0,
+        "owned_processes_remaining": 0
+      }
+    }
+  ],
+  "results": {
+    "setup": "pnpm v12.6.0; uv checked 27 packages; repeat setup skipped resolution",
+    "postgresql": "18.6 source archive SHA-256 verified by the Makefile, built in 50.8 s",
+    "alembic": {
+      "revision": "0001",
+      "repeat_upgrade": "idempotent"
+    },
+    "verify": {
+      "peer_dependencies": "No peer dependency issues found",
+      "schema_and_generated_types": "Native API schema and generated TypeScript agree.",
+      "typecheck": "passed",
+      "production_build": "passed",
+      "api_tests": {
+        "passed": 12,
+        "failed": 0,
+        "warnings": 1,
+        "warning": "upstream Starlette/AnyIO BlockingPortal alias deprecation"
+      },
+      "browser": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      }
+    },
+    "restart_persistence": {
+      "database_stop_start": true,
+      "api_and_next_restart": true,
+      "api_same_title_status_revision": true,
+      "same_exact_record": true,
+      "before_sha256": "f2920f6aad5b6974760d719d0dc1d5c81b68a1b7a2ecdf9bc3dfb5a8a1971ee5",
+      "after_db_restart_sha256": "f2920f6aad5b6974760d719d0dc1d5c81b68a1b7a2ecdf9bc3dfb5a8a1971ee5"
+    },
+    "migration_rollback": {
+      "up_tables": [
+        "alembic_version",
+        "run_events",
+        "runs"
+      ],
+      "down_tables": [
+        "alembic_version"
+      ],
+      "restored_tables": [
+        "alembic_version",
+        "run_events",
+        "runs"
+      ],
+      "application_tables_removed_on_downgrade": true,
+      "exact_schema_restored": true,
+      "restored_schema_sha256": "d79129ce23f16617363ccf41f39593a21f5aa9ddb7544c6537ebf1c953c65401"
+    }
+  },
+  "catalog_record": "seathatflowsinourveins/agent-ecosystem#33 (merge 97f1455) recorded the same run as the mac-coordinator application-slice gate.",
+  "model_calls": 0
+}

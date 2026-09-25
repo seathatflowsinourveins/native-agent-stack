@@ -8,6 +8,7 @@ import argparse
 import contextlib
 import io
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -220,6 +221,13 @@ class RecordHostToGrandListTests(unittest.TestCase):
             self.assertIsNotNone(entry["measured"])
             self.assertEqual(entry["measured"]["cores"], 12)
             self.assertEqual(entry["measured"]["effective_ram_gb"], 64.0)
+
+    def test_recorded_host_under_a_two_letter_user_name(self):
+        # The same round trip under a two-letter account name inside the id ("ed" in
+        # "recorded"): matched as a substring, the id was refused, which CI (user "runner")
+        # never saw.
+        with mock.patch.dict(os.environ, {"USER": "ed", "LOGNAME": "ed"}):
+            self.test_recorded_host_gets_non_null_measured_in_the_grand_list()
 
 
 class MeasuredCellTests(unittest.TestCase):

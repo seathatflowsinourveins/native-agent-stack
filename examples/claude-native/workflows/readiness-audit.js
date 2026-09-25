@@ -3,8 +3,8 @@ export const meta = {
   description: 'Extract source-cited claims from named documents and commands with Sonnet readers, then adversarially verify them with an Opus verifier',
   whenToUse: 'Status or readiness questions over project records: args = {docs: ["path", ...], commands: ["read-only command", ...], question: "what to judge"}',
   phases: [
-    { title: 'Read', detail: 'Sonnet/medium readers, one per document group', model: 'sonnet' },
-    { title: 'Verify', detail: 'Opus/high verifier refutes or confirms every claim', model: 'opus' },
+    { title: 'Read', detail: 'Sonnet/max readers, one per document group', model: 'sonnet' },
+    { title: 'Verify', detail: 'Opus/max verifier refutes or confirms every claim', model: 'opus' },
   ],
 }
 
@@ -81,7 +81,7 @@ const readers = await parallel(groups.map((g, i) => () => agent(
     ? 'Read these documents fully and extract every claim relevant to the question: ' + g.items.join(', ')
     : 'Run these read-only commands exactly and report their returned results as claims: ' + g.items.join(' ; ')) +
   '\nReturn exactly one sources entry for each listed document or command, copying its identifier exactly into source. Mark observed only after reading the document or receiving the command result, with nonblank returned evidence; observed command failures are evidence and must retain their integer exit_code. Use null exit_code for documents or commands not executed. Record unavailable documents as not_found and commands you did not run as not_executed. Never silently omit a requested source.',
-  { label: 'read:' + g.kind + '-' + (i + 1), phase: 'Read', schema: claimsForPacket(g.items), agentType: 'source-scout', model: 'sonnet', effort: 'medium' },
+  { label: 'read:' + g.kind + '-' + (i + 1), phase: 'Read', schema: claimsForPacket(g.items), agentType: 'source-scout', model: 'sonnet', effort: 'max' },
 )))
 // Preserve every packet identity, including failed/null readers, so an unread
 // source cannot vanish from the verdict.
@@ -94,7 +94,7 @@ log('claims extracted: ' + claims.length + ' from ' + (packets.length - unread.l
 phase('Verify')
 const verify = await agent(
   PACKET + '\nYou are an adversarial verifier. Open every cited source yourself and try to REFUTE each claim; default to unverifiable when you cannot. Return exactly one verdict for every reader claim, copying its claim string exactly, with nonblank evidence. Include a nonblank correction for corrected claims. Also return one source_verdicts entry for each requested packet item, copying packet_id and source exactly: independently confirm the returned source evidence and command outcome, including nonzero exits; use unverifiable if you cannot establish it. Emit only the exact (packet.id, item) pairs listed in each packet.items; never copy extra result.sources entries or combine one packet id with another packet\'s item. Packets whose result is null were NOT read: list their sources under missing and do not treat the audit as complete. The missing field is only for exact requested source identifiers that are unavailable or unverified. Put independently established additional facts the readers missed, with their evidence, in readiness_verdict; these are not missing sources. Then answer the question in readiness_verdict with the single most blocking gate and its evidence. A complete audit may conclude that the project is not ready.\nQuestion: ' + question + '\nReader packets (result null = unread): ' + JSON.stringify(packets),
-  { label: 'verify', phase: 'Verify', schema: VERIFY, model: 'opus', effort: 'high' },
+  { label: 'verify', phase: 'Verify', schema: VERIFY, model: 'opus', effort: 'max' },
 )
 if (!verify) log('verifier returned null; claims are unverified')
 const evidenceIssues = []

@@ -1,0 +1,16 @@
+{
+ "kind": "adaptive_paper_stop_release",
+ "stop_file": "~/.local/state/native-agent-stack/alpaca-paper/STOP",
+ "stop_created_at": "2026-09-24T14:31:02.605107+00:00",
+ "stop_content_sha256": "4b94b90e69c3fea9581c5000b153d5cf0f5da5d9e03af6a7456bf5d18c384dfb",
+ "released_at": "2026-09-24T14:31:54.246661+00:00",
+ "method": "moved out of the kill-switch path into the drill's private output directory (archived, not edited)",
+ "conditions": {
+  "drill_run_ended_flat_and_reconciled": true,
+  "explicit_recover_passed_flat": true
+ },
+ "evidence": {
+  "drill_run": "paper-output.json (status completed_no_signals, rc 0)",
+  "recover": "recover-output.json (status passed)"
+ }
+}

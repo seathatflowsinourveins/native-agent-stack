@@ -1,0 +1,88 @@
+{
+  "broker_orders_with_prefix": {
+    "by_status": {
+      "canceled": 10
+    },
+    "listing_complete": true
+  },
+  "cleanup": {
+    "cancel_all_decision": "not_enabled",
+    "cancel_all_used": false,
+    "ceiling_seconds": 240.0,
+    "individual_cancels": 0,
+    "open_harness_orders_after": 0,
+    "open_listing_complete": true,
+    "rest_sweep_cancels": 0,
+    "seconds": 0.407,
+    "step_errors": [],
+    "verification_rounds": 1,
+    "verified_zero_open": true
+  },
+  "client_order_id_prefix": "cap-20260924t133130-5719c2-",
+  "counts_as_strategy_trades": false,
+  "error_type": null,
+  "evidence_class": "native_paper",
+  "harness": "order-throughput/1",
+  "journal": {
+    "end_record_present": true,
+    "intents": 10
+  },
+  "mode": "recover",
+  "policy": "Execution-capacity qualification only. Harness orders are non-marketable probes that are cancelled individually; they are not strategy trades and must never be counted as strategy trades, fills, signals or performance.",
+  "provenance": {
+    "alpaca_py_version": "0.44.0",
+    "argv": [
+      "recover",
+      "--env-file",
+      "<path>",
+      "--journal",
+      "<path>",
+      "--output",
+      "<path>"
+    ],
+    "ended_at": "2026-09-24T13:32:13.297868+00:00",
+    "exit_code": 0,
+    "git_revision": "4911baf411370517b1c5e0e83ca4d49c14e36db3",
+    "python_version": "3.12.3",
+    "source_sha256": {
+      "adaptive-paper/runner.py": "03427aa9bf65c2d0863ae147fd1daa135dc1f7379bafcd82aa2ba3b1c19de73a",
+      "adaptive-paper/safety.py": "8cc67464ab55794b232cedb9988c264b86c8ec11ebe1734a94fb71480a269fa0",
+      "adaptive-paper/sessions.py": "1920952ac8219caf09e622fe517179e2766652fc7f987f7a11258481aa881998",
+      "adaptive-paper/transport.py": "59ffbb35726b0909c9b9db9043f993242e9beb29329c0d851359617244b06934",
+      "order-throughput/alpaca_capacity_port.py": "e4c7bd0b834b4e851b6b2fede43bbc7aff3cf62e106ab59f1dee63ac1c61f02e",
+      "order-throughput/capacity.py": "70947e8e43a0c98eb84fb48f9fce336d39cb7e5ba5615b2fadfcb237f5feeb41",
+      "order-throughput/capacity_fixture.py": "553d3ec76cfb48c3e51fb6dbf5589375743226b0018b454779e043a369a849fa",
+      "order-throughput/rate_governor.py": "f6ce579a20072d640bebbbd396ac9fff562f60b8453c55343ef513aee8489ed5"
+    }
+  },
+  "rate": {
+    "admitted": {
+      "cancel": 0,
+      "read": 3,
+      "submit": 0
+    },
+    "backoff_seconds": 0.0,
+    "backoffs": [],
+    "backoffs_over_max": 0,
+    "bucket_capacity": 9.0,
+    "budget_per_minute": 180,
+    "configured_cap_per_minute": 200,
+    "denied": {
+      "frozen": 0,
+      "server_remaining": 0,
+      "tokens": 4,
+      "window": 0
+    },
+    "effective_limit": 200,
+    "external_calls_noted": 1,
+    "headroom": 0.9,
+    "http_429": 0,
+    "observed_limit": 200,
+    "reserve_per_minute": 20
+  },
+  "refusal_reason": null,
+  "schema_version": 1,
+  "stage": "listing",
+  "status": "completed",
+  "strategy_trades": 0
+}

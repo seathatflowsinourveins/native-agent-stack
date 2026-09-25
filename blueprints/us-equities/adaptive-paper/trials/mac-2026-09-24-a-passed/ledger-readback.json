@@ -1,0 +1,1253 @@
+{
+ "kind": "adaptive_paper_ledger_readback",
+ "source": "durable ledger.sqlite3 opened read-only (mode=ro); no broker request",
+ "trial_id": "mac-20260924a",
+ "trial_started_at": "2026-09-24T14:23:44.868+00:00",
+ "next_trial_started_at": "2026-09-24T14:30:11.477+00:00",
+ "intents": [
+  {
+   "client_id": "adp-mac-20260924a-0000001",
+   "symbol": "IWM",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "280.59",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "280.57",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:24:17.828+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:24:17.851+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:17.855+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:18.468+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "280.57"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000002",
+   "symbol": "IWM",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "280.52",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "280.54",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:24:23.909+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:24:23.933+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:23.937+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:24.365+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "280.54"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000003",
+   "symbol": "TSLA",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "378.22",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "378.18",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:24:40.238+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:24:40.292+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:40.304+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:24:48.319+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "378.18"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000004",
+   "symbol": "TSLA",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "378.06",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "378.08",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:02.449+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:02.477+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:02.484+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:02.925+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "378.08"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000005",
+   "symbol": "NVDA",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "222.29",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "222.23",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:14.587+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:14.621+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:14.674+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:15.843+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "222.23"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000006",
+   "symbol": "QQQ",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "737.53",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "737.45",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:14.624+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:14.646+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:14.680+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:15.699+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "737.45"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000007",
+   "symbol": "META",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "766.77",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "766.5",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:16.616+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:16.642+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:16.652+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:17.553+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "766.5"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000008",
+   "symbol": "QQQ",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "737.22",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "737.25",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:22.787+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:22.806+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:22.811+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:23.443+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "737.25"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000009",
+   "symbol": "NVDA",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "222.14",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "222.17",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:22.816+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:22.836+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:22.840+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:23.621+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "222.17"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000010",
+   "symbol": "META",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "765.65",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "765.98",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:25:24.809+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:25:24.837+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:24.848+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:25:25.914+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "765.98"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000011",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "124.12",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.1",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:07.259+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:07.284+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:07.290+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:07.786+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.1"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000012",
+   "symbol": "CRWV",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "87.67",
+   "status": "canceled",
+   "filled_qty": "0",
+   "average_price": null,
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:09.279+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:09.302+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:09.311+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:19.324+00:00",
+     "status": "pending_cancel",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:19.348+00:00",
+     "status": "canceled",
+     "filled_qty": "0",
+     "average_price": null
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000013",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "124.02",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.05",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:21.416+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:21.436+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:21.441+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:25.087+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.05"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000014",
+   "symbol": "CRWV",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "87.76",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "87.76",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:21.439+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:21.461+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:21.471+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:22.039+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "87.76"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000015",
+   "symbol": "CRWV",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "87.7",
+   "status": "canceled",
+   "filled_qty": "0",
+   "average_price": null,
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:29.502+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:29.525+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:29.548+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:39.560+00:00",
+     "status": "canceled",
+     "filled_qty": "0",
+     "average_price": null
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000016",
+   "symbol": "META",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "767.59",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "767.57",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:37.589+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:37.610+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:37.620+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:38.338+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "767.57"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000017",
+   "symbol": "CRWV",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "87.56",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "87.58",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:39.610+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:39.628+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:39.636+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:40.349+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "87.58"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000018",
+   "symbol": "META",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "766.98",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "767.04",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:45.679+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:45.697+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:45.710+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:47.909+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "767.04"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000019",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "124.12",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.11",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:26:55.864+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:26:55.888+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:55.894+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:26:56.509+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.11"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000020",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "124.08",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.09",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:01.926+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:01.947+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:02.094+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:03.371+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.09"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000021",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "124.19",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.16",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:16.085+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:16.112+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:16.119+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:16.724+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.16"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000022",
+   "symbol": "META",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "767.74",
+   "status": "canceled",
+   "filled_qty": "0",
+   "average_price": null,
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:18.117+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:18.137+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:18.141+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:28.241+00:00",
+     "status": "canceled",
+     "filled_qty": "0",
+     "average_price": null
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000023",
+   "symbol": "META",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "768.58",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "768.42",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:30.325+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:30.355+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:30.372+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:31.103+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "768.42"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000024",
+   "symbol": "META",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "768.36",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "768.38",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:44.540+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:44.562+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:44.566+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:45.211+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "768.38"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000025",
+   "symbol": "META",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "768.38",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "768.28",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:48.597+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:48.619+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:48.626+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:50.283+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "768.28"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000026",
+   "symbol": "META",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "768.27",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "768.29",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:27:56.740+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:27:56.762+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:56.766+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:27:57.546+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "768.29"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000027",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "124.32",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.34",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:04.911+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:04.943+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:04.952+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:05.212+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.34"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000028",
+   "symbol": "GOOGL",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "339.76",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "339.74",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:13.059+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:13.078+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:13.114+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:13.810+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "339.74"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000029",
+   "symbol": "GOOGL",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "339.66",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "339.68",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:19.180+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:19.201+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:19.219+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:19.477+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "339.68"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000030",
+   "symbol": "CRWV",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "87.88",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "87.86",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:27.280+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:27.301+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:27.329+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:27.871+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "87.86"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000031",
+   "symbol": "CRWV",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "87.91",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "87.93",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:33.335+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:33.355+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:33.365+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:34.026+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "87.93"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000032",
+   "symbol": "INTC",
+   "side": "buy",
+   "qty": "1",
+   "limit_price": "124.45",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.44",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:37.380+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:37.401+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:37.412+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:38.322+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.44"
+    }
+   ]
+  },
+  {
+   "client_id": "adp-mac-20260924a-0000033",
+   "symbol": "INTC",
+   "side": "sell",
+   "qty": "1",
+   "limit_price": "124.44",
+   "status": "filled",
+   "filled_qty": "1",
+   "average_price": "124.46",
+   "submit_attempted": true,
+   "reserved_at": "2026-09-24T14:28:43.443+00:00",
+   "observed": [
+    {
+     "at": "2026-09-24T14:28:43.463+00:00",
+     "status": "pending_new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:43.494+00:00",
+     "status": "new",
+     "filled_qty": "0",
+     "average_price": null
+    },
+    {
+     "at": "2026-09-24T14:28:43.981+00:00",
+     "status": "filled",
+     "filled_qty": "1",
+     "average_price": "124.46"
+    }
+   ]
+  }
+ ],
+ "request_reservations": {
+  "cancel": {
+   "count": 3,
+   "at": [
+    "2026-09-24T14:26:19.305+00:00",
+    "2026-09-24T14:26:39.530+00:00",
+    "2026-09-24T14:27:28.217+00:00"
+   ]
+  },
+  "submit": {
+   "count": 33,
+   "at": [
+    "2026-09-24T14:24:17.830+00:00",
+    "2026-09-24T14:24:23.910+00:00",
+    "2026-09-24T14:24:40.238+00:00",
+    "2026-09-24T14:25:02.449+00:00",
+    "2026-09-24T14:25:14.588+00:00",
+    "2026-09-24T14:25:14.625+00:00",
+    "2026-09-24T14:25:16.618+00:00",
+    "2026-09-24T14:25:22.788+00:00",
+    "2026-09-24T14:25:22.817+00:00",
+    "2026-09-24T14:25:24.810+00:00",
+    "2026-09-24T14:26:07.260+00:00",
+    "2026-09-24T14:26:09.280+00:00",
+    "2026-09-24T14:26:21.417+00:00",
+    "2026-09-24T14:26:21.439+00:00",
+    "2026-09-24T14:26:29.503+00:00",
+    "2026-09-24T14:26:37.590+00:00",
+    "2026-09-24T14:26:39.611+00:00",
+    "2026-09-24T14:26:45.679+00:00",
+    "2026-09-24T14:26:55.864+00:00",
+    "2026-09-24T14:27:01.927+00:00",
+    "2026-09-24T14:27:16.085+00:00",
+    "2026-09-24T14:27:18.118+00:00",
+    "2026-09-24T14:27:30.326+00:00",
+    "2026-09-24T14:27:44.542+00:00",
+    "2026-09-24T14:27:48.598+00:00",
+    "2026-09-24T14:27:56.741+00:00",
+    "2026-09-24T14:28:04.912+00:00",
+    "2026-09-24T14:28:13.059+00:00",
+    "2026-09-24T14:28:19.182+00:00",
+    "2026-09-24T14:28:27.281+00:00",
+    "2026-09-24T14:28:33.335+00:00",
+    "2026-09-24T14:28:37.380+00:00",
+    "2026-09-24T14:28:43.444+00:00"
+   ]
+  }
+ },
+ "round_trips": [
+  {
+   "symbol": "IWM",
+   "buy": "adp-mac-20260924a-0000001",
+   "sell": "adp-mac-20260924a-0000002",
+   "buy_price": "280.57",
+   "sell_price": "280.54",
+   "pnl_usd": "-0.03"
+  },
+  {
+   "symbol": "TSLA",
+   "buy": "adp-mac-20260924a-0000003",
+   "sell": "adp-mac-20260924a-0000004",
+   "buy_price": "378.18",
+   "sell_price": "378.08",
+   "pnl_usd": "-0.10"
+  },
+  {
+   "symbol": "QQQ",
+   "buy": "adp-mac-20260924a-0000006",
+   "sell": "adp-mac-20260924a-0000008",
+   "buy_price": "737.45",
+   "sell_price": "737.25",
+   "pnl_usd": "-0.20"
+  },
+  {
+   "symbol": "NVDA",
+   "buy": "adp-mac-20260924a-0000005",
+   "sell": "adp-mac-20260924a-0000009",
+   "buy_price": "222.23",
+   "sell_price": "222.17",
+   "pnl_usd": "-0.06"
+  },
+  {
+   "symbol": "META",
+   "buy": "adp-mac-20260924a-0000007",
+   "sell": "adp-mac-20260924a-0000010",
+   "buy_price": "766.5",
+   "sell_price": "765.98",
+   "pnl_usd": "-0.52"
+  },
+  {
+   "symbol": "INTC",
+   "buy": "adp-mac-20260924a-0000011",
+   "sell": "adp-mac-20260924a-0000013",
+   "buy_price": "124.1",
+   "sell_price": "124.05",
+   "pnl_usd": "-0.05"
+  },
+  {
+   "symbol": "CRWV",
+   "buy": "adp-mac-20260924a-0000014",
+   "sell": "adp-mac-20260924a-0000017",
+   "buy_price": "87.76",
+   "sell_price": "87.58",
+   "pnl_usd": "-0.18"
+  },
+  {
+   "symbol": "META",
+   "buy": "adp-mac-20260924a-0000016",
+   "sell": "adp-mac-20260924a-0000018",
+   "buy_price": "767.57",
+   "sell_price": "767.04",
+   "pnl_usd": "-0.53"
+  },
+  {
+   "symbol": "INTC",
+   "buy": "adp-mac-20260924a-0000019",
+   "sell": "adp-mac-20260924a-0000020",
+   "buy_price": "124.11",
+   "sell_price": "124.09",
+   "pnl_usd": "-0.02"
+  },
+  {
+   "symbol": "META",
+   "buy": "adp-mac-20260924a-0000023",
+   "sell": "adp-mac-20260924a-0000024",
+   "buy_price": "768.42",
+   "sell_price": "768.38",
+   "pnl_usd": "-0.04"
+  },
+  {
+   "symbol": "META",
+   "buy": "adp-mac-20260924a-0000025",
+   "sell": "adp-mac-20260924a-0000026",
+   "buy_price": "768.28",
+   "sell_price": "768.29",
+   "pnl_usd": "0.01"
+  },
+  {
+   "symbol": "INTC",
+   "buy": "adp-mac-20260924a-0000021",
+   "sell": "adp-mac-20260924a-0000027",
+   "buy_price": "124.16",
+   "sell_price": "124.34",
+   "pnl_usd": "0.18"
+  },
+  {
+   "symbol": "GOOGL",
+   "buy": "adp-mac-20260924a-0000028",
+   "sell": "adp-mac-20260924a-0000029",
+   "buy_price": "339.74",
+   "sell_price": "339.68",
+   "pnl_usd": "-0.06"
+  },
+  {
+   "symbol": "CRWV",
+   "buy": "adp-mac-20260924a-0000030",
+   "sell": "adp-mac-20260924a-0000031",
+   "buy_price": "87.86",
+   "sell_price": "87.93",
+   "pnl_usd": "0.07"
+  },
+  {
+   "symbol": "INTC",
+   "buy": "adp-mac-20260924a-0000032",
+   "sell": "adp-mac-20260924a-0000033",
+   "buy_price": "124.44",
+   "sell_price": "124.46",
+   "pnl_usd": "0.02"
+  }
+ ],
+ "totals": {
+  "intents": 33,
+  "by_status": {
+   "canceled": 3,
+   "filled": 30
+  },
+  "filled_buys": 15,
+  "filled_sells": 15,
+  "round_trips": 15,
+  "unpaired_filled_buys": 0,
+  "round_trip_pnl_usd": "-1.51"
+ }
+}

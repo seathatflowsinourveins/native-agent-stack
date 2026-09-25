@@ -29,7 +29,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import saturation_ledger as sl  # noqa: E402
 
-from tests.test_workflow_hardening import first_step, jobs, permission_blocks  # noqa: E402
+from tests.test_workflow_hardening import first_step, jobs, permission_blocks, scopes  # noqa: E402
 
 REQ = "a" * 64
 PLAT = "b" * 64
@@ -970,9 +970,10 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(len(blocks), 4)
         job_map = jobs(self.text)
         self.assertEqual(list(job_map), ["report", "plan", "issue"])
-        self.assertEqual(permission_blocks(job_map["report"]), [{"contents": "read", "actions": "read"}])
-        self.assertEqual(permission_blocks(job_map["plan"]), [{"issues": "read"}])
-        self.assertEqual(permission_blocks(job_map["issue"]), [{"issues": "write"}])
+        # scopes() strips the same-line `# reason` comment zizmor's undocumented-permissions audit asks for.
+        self.assertEqual(scopes(job_map["report"]), [{"contents": "read", "actions": "read"}])
+        self.assertEqual(scopes(job_map["plan"]), [{"issues": "read"}])
+        self.assertEqual(scopes(job_map["issue"]), [{"issues": "write"}])
         self.assertEqual(self.text.count("issues: write"), 1)
         self.assertNotRegex(self.text, r"(?m)(contents|pull-requests|actions|id-token): write")
         for job_id in ("plan", "issue"):

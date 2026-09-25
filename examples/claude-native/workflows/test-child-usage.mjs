@@ -2,8 +2,10 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir } from './child-usage.mjs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel } from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 let passed = 0, failed = 0
@@ -29,6 +31,27 @@ const noModel = summarizeChild(started, done, { model: 'sonnet' }, [{ ...msg('m1
 expect('usage without a resolved model is incomplete, not vacuously matching', !noModel.complete && noModel.issues.some((i) => i.includes('without a resolved model')))
 expect('no assistant usage is incomplete', !summarizeChild(started, done, { model: 'opus' }, [{ type: 'user' }]).complete)
 
+// Classifier fallback (model-config doc, "Automatic model fallback"): a flagged request re-runs on an
+// older model and the child continues there. Rows carry the client version that wrote them.
+const vmsg = (id, model, version) => ({ ...msg(id, model, 5, 0, 0, 'max'), version })
+const synthetic = (id, version) => ({ type: 'assistant', version, isApiErrorMessage: true, effort: null, message: { id, model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } })
+const has = (child, text) => child.issues.some((i) => i.includes(text))
+const switched = summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5-5', '2.1.281'), vmsg('m2', 'claude-opus-4-8', '2.1.281'), vmsg('m3', 'claude-opus-4-8', '2.1.281')])
+expect('fallback: a resolved model that changes within the child is incomplete and names the change once', !switched.complete && switched.issues.some((i) => i.endsWith('changed within the child: claude-opus-5-5 -> claude-opus-4-8')))
+expect('fallback: the substring family check alone would have accepted claude-opus-4-8 for opus', !has(switched, 'outside requested family'))
+const wholeChild = summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5', '2.1.281'), vmsg('m2', 'claude-opus-5', '2.1.281')])
+expect('fallback: a child that ran entirely on an older model than its version documents is incomplete', !wholeChild.complete && !has(wholeChild, 'changed within') && has(wholeChild, 'claude-opus-5 on 2.1.281 (documented opus: claude-opus-5-5)'))
+expect('fallback: opus on claude-opus-5 under 2.1.278 is the documented resolution, not a fallback', summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5', '2.1.278'), vmsg('m2', 'claude-opus-5', '2.1.278')]).complete)
+expect('fallback: opus on claude-opus-5-5 under 2.1.280 and 2.1.281 is complete', summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5-5', '2.1.280'), vmsg('m2', 'claude-opus-5-5', '2.1.281')]).complete)
+expect('fallback: a cybersecurity fallback to claude-opus-4-8 under 2.1.278 is older than claude-opus-5', has(summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-4-8', '2.1.278')]), 'older than the documented alias resolution'))
+const withError = summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5-5', '2.1.281'), synthetic('s1', '2.1.281'), vmsg('m2', 'claude-opus-5-5', '2.1.281')])
+expect('fallback: a <synthetic> API-error row is not a model change or an older model; the family check still reports it', !has(withError, 'changed within') && !has(withError, 'older than') && has(withError, 'outside requested family: claude-opus-5-5,<synthetic>'))
+expect('fallback: an entry older than the first documented row has no expectation', summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-4-8', '2.1.100')]).complete)
+expect('fallback: an alias without documented rows (sonnet) is checked for changes only', summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.281')]).complete && !summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.281'), vmsg('m2', 'claude-haiku-4-5-20251001', '2.1.281')]).complete)
+expect('fallback: an opus model name that cannot be compared fails closed', has(summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-3-opus-20240229', '2.1.281')]), 'older than the documented alias resolution'))
+expect('fallback: model names parse to family and version, ignoring date and [1m] suffixes', JSON.stringify([modelGeneration('claude-opus-5-5'), modelGeneration('claude-opus-5'), modelGeneration('claude-haiku-4-5-20251001'), modelGeneration('claude-opus-5-5[1m]'), modelGeneration('claude-3-opus-20240229')]) === JSON.stringify([{ family: 'opus', version: [5, 5] }, { family: 'opus', version: [5] }, { family: 'haiku', version: [4, 5] }, { family: 'opus', version: [5, 5] }, null]))
+expect('fallback: the opus version table matches the documented boundaries', JSON.stringify(['2.1.153', '2.1.154', '2.1.218', '2.1.219', '2.1.279', '2.1.280', '2.1.281'].map((v) => expectedModel('opus', v))) === JSON.stringify([null, 'claude-opus-4-8', 'claude-opus-4-8', 'claude-opus-5', 'claude-opus-5', 'claude-opus-5-5', 'claude-opus-5-5']) && expectedModel('sonnet', '2.1.281') === null && expectedModel('opus', undefined) === null)
+
 const dir = mkdtempSync(join(tmpdir(), 'child-usage-'))
 try {
   expect('missing journal fails closed', summarizeRun(dir).status === 'incomplete')
@@ -37,7 +60,25 @@ try {
   writeFileSync(join(dir, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100)) + '\n')
   const run = summarizeRun(dir)
   expect('run keeps every started child and is incomplete when one has no result, meta or transcript', run.status === 'incomplete' && run.children.length === 2 && run.children[0].complete && !run.children[1].complete)
+  const efforts = { children: [{ label: 'max', efforts: ['max'] }, { label: 'inherit', efforts: ['xhigh'] }, { label: 'mixed', efforts: ['max', 'high'] }, { label: 'none', efforts: [] }] }
+  expect('require-effort flags every child not exactly at the level, including none recorded', JSON.stringify(effortMismatches(efforts, 'max').map((m) => m.child)) === '["inherit","mixed","none"]')
+  expect('require-effort passes a run whose children all ran at the level', effortMismatches({ children: [{ label: 'a', efforts: ['max'] }] }, 'max').length === 0)
   expect('per-model totals come from returned usage only', run.by_resolved_model['claude-sonnet-5'].output_tokens === 9 && run.by_resolved_model['claude-sonnet-5'].children === 1)
+  // CLI: --require-effort on a complete one-child run (either argument order), and bad levels exit 2
+  const cli = (...a) => spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), ...a], { encoding: 'utf8' }).status
+  const one = join(dir, 'one'); mkdirSync(one)
+  writeFileSync(join(one, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(one, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(one, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100, 0, 'max')) + '\n')
+  expect('cli: a max-only run passes --require-effort max in either argument order', cli(one, '--require-effort', 'max') === 0 && cli('--require-effort', 'max', one) === 0)
+  expect('cli: the same run fails --require-effort high', cli(one, '--require-effort', 'high') === 1)
+  expect('cli: a missing, flag-like, unknown or repeated level exits 2', cli(one, '--require-effort') === 2 && cli('--require-effort', '--latest', one) === 2 && cli(one, '--require-effort', 'MAX') === 2 && cli('--require-effort', 'max', '--require-effort', 'max', one) === 2)
+  // A run whose one opus child fell back mid-child exits 1 even when every row is at the required effort.
+  const fell = join(dir, 'fell'); mkdirSync(fell)
+  writeFileSync(join(fell, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(fell, 'agent-a1.meta.json'), JSON.stringify({ model: 'opus', agentType: 'evidence-reviewer' }))
+  writeFileSync(join(fell, 'agent-a1.jsonl'), [vmsg('m1', 'claude-opus-5-5', '2.1.281'), vmsg('m2', 'claude-opus-4-8', '2.1.281')].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  expect('cli: a run with a fallback child exits 1 and reports the run incomplete', cli(fell, '--require-effort', 'max') === 1 && summarizeRun(fell).status === 'incomplete')
   // --latest: newest journal under <config>/projects/<slug>/<session>/subagents/workflows/
   const cfg = join(dir, 'cfg'), cwd = '/work/agent-lab.x'
   expect('latest: unknown working directory returns null', latestRunDir(cwd, cfg) === null)

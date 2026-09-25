@@ -4,12 +4,16 @@ The Claude lane workflow returns its layers without writing files; claude_lane.p
 that writes <work-dir>/claude/<catalog>__<layer_id>.json with the runner-owned model.family and
 provenance a new-wave return needs, refusing workflow bytes that are uncommitted or not vendored.
 """
+import contextlib
+import hashlib
+import io
 import importlib.util
 import json
 import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import lane_model_issue, lane_provenance_issue
@@ -44,7 +48,19 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         git(self.agentlab, "init", "-q")
         git(self.agentlab, "add", ".")
         git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "lane")
+        # The fixture checkout stands for the vendored agent-lab commit (BIND-R4-8 binds HEAD to descend from it).
+        head = subprocess.run(["git", "-C", str(self.agentlab), "rev-parse", "HEAD"], capture_output=True, text=True,
+                              check=True).stdout.strip()
+        vendored = mock.patch.object(claude_lane, "vendored_agentlab_commit", return_value=head)
+        vendored.start()
+        self.addCleanup(vendored.stop)
         self.work = self.tmp / "work"
+        # The blind export the lane read, and its digest taken before launch (Codex review of #145).
+        self.export = self.tmp / "hosts" / "blind" / "export"
+        self.export.mkdir(parents=True)
+        (self.export / "evidence.json").write_text("{}", encoding="utf-8")
+        self.tree = claude_lane.tree_sha256(self.export)
+        self.role = hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest()
         final = {"schema_version": 1, "lane": "claude", "catalog": "foundation", "layer_id": "l1",
                  "packet_sha256": "0" * 64, "model": {"name": "opus", "effort": "high"}}
         self.unrefuted = {"status": "unrefuted", "final_source": "proposal", "proposal_status": "unrefuted",
@@ -54,17 +70,83 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         refuted = {"status": "refuted", "final_source": None, "proposal_status": "refuted", "revision_status": None,
                    "votes": [{"lens": "evidence", "round": "proposal", "refuted": True, "reason": "A cited path is missing."},
                              {"lens": "challenger", "round": "proposal", "refuted": None, "reason": "no vote returned"}]}
+        # The packets the lane ran on: each layer echoes its path and sha256 (agent-lab #47).
+        packets = self.work / "packets"
+        packets.mkdir(parents=True)
+        self.packet = {}
+        for layer_id in ("l1", "l2"):
+            path = packets / f"foundation__{layer_id}.json"
+            path.write_text(json.dumps({"layer_id": layer_id}), encoding="utf-8")
+            self.packet[layer_id] = {"packet_path": str(path.resolve()),
+                                     "packet_sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
         self.result = self.tmp / "result.json"
         self.result.write_text(json.dumps({
-            "lane": "claude", "layers": [
-                {"catalog": "foundation", "layer_id": "l1", "final": final, "refutation": self.unrefuted},
-                {"catalog": "foundation", "layer_id": "l2", "proposal": {"x": 1}, "final": None,
+            "lane": "claude", "prompt": (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"),
+            "launch": {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                         "agent_sha256": self.role},
+            "layers": [
+                {"catalog": "foundation", "layer_id": "l1", **self.packet["l1"], "final": final,
+                 "refutation": self.unrefuted},
+                {"catalog": "foundation", "layer_id": "l2", **self.packet["l2"], "proposal": {"x": 1}, "final": None,
                  "refutation": refuted}],
             "lost": ["us-equities/l3"]}), encoding="utf-8")
+        # The workflow run's agent transcripts (Codex review of #145 at 68e74f2c): l1's agent read its packet and the
+        # export only.
+        # As Claude Code keeps a workflow run: <session>/workflows/<run>.json (status, result, agents) and
+        # <session>/subagents/workflows/<run>/agent-<id>.jsonl.
+        self.transcripts = self.tmp / "session" / "subagents" / "workflows" / "wf_test"
+        self.write_transcript("l1", [str(self.export / "evidence.json")])
+
+    def write_transcript(self, layer_id, reads):
+        self.transcripts.mkdir(parents=True, exist_ok=True)
+        packet = self.packet[layer_id]["packet_path"]
+        calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": path}} for path in [packet, *reads]]
+        lines = [{"type": "user", "cwd": str(self.export), "message": {"content": f"Read the packet at {packet}"}},
+                 {"type": "assistant", "cwd": str(self.export), "message": {"content": calls}}]
+        (self.transcripts / f"agent-{layer_id}.jsonl").write_text("".join(json.dumps(line) + "\n" for line in lines),
+                                                                   encoding="utf-8")
+        record = self.transcripts.parents[2] / "workflows" / "wf_test.json"
+        record.parent.mkdir(parents=True, exist_ok=True)
+        agents = sorted(path.name[len("agent-"):-len(".jsonl")] for path in self.transcripts.glob("agent-*.jsonl"))
+        record.write_text(json.dumps({"status": "completed", "result": json.loads(self.result.read_text(encoding="utf-8")),
+                                      "workflowProgress": [{"type": "workflow_agent", "agentId": agent}
+                                                           for agent in agents]}), encoding="utf-8")
 
     def run_main(self, *extra):
+        # The vendored role stands in for the host's installed copy, which CI does not have.
         return claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
-                                 "--agentlab-root", str(self.agentlab), *extra])
+                                 "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                 "--transcripts", str(self.transcripts), "--agent-file",
+                                 str(claude_lane.VENDORED_AGENT), *extra])
+
+    def test_a_layer_whose_agents_read_outside_the_export_is_void(self):
+        # Codex review of #145 at 68e74f2c: Read, Glob and Grep have no path limit; the transcripts show each read.
+        self.write_transcript("l1", [str(self.work / "codex" / "foundation__l1.json")])
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        claude = self.work / "claude"
+        self.assertFalse((claude / "foundation__l1.json").exists())
+        self.assertTrue((claude / "foundation__l1.json.audit-flagged").exists())
+        failures = json.loads((claude / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertIn("transcript audit flagged", next(f["reason"] for f in failures if f["layer_id"] == "l1"))
+
+    def test_another_runs_transcripts_void_every_layer(self):
+        # Round 9 focus: transcripts are bound to the run that returned the collected result.
+        record = self.transcripts.parents[2] / "workflows" / "wf_test.json"
+        data = json.loads(record.read_text(encoding="utf-8"))
+        record.write_text(json.dumps(dict(data, result={"layers": []})), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+        audit = json.loads((self.work / "claude" / "transcript-audit.json").read_text(encoding="utf-8"))
+        self.assertIn("another result", audit["run_issue"])
+
+    def test_missing_transcripts_are_refused(self):
+        self.transcripts = self.tmp / "no-transcripts"
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 2)
+        self.assertIn("no agent transcripts", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
     def test_written_return_carries_family_and_vendored_provenance(self):
         self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
@@ -74,7 +156,196 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertIsNone(lane_provenance_issue("claude", data["provenance"]))
         self.assertEqual(data["provenance"]["workflow_path"], ".claude/workflows/layer-verdict-lane.js")
         self.assertEqual(data["provenance"]["workflow_sha256"], claude_lane.vendored_sums()["layer-verdict-lane.js"])
+        self.assertEqual(data["provenance"]["agent_sha256"],
+                         hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest())
+        self.assertEqual(data["provenance"]["repo_tree_sha256"], self.tree)
         self.assertFalse((self.work / "claude" / "foundation__l2.json").exists())
+
+    def rewrite_launch(self, launch):
+        data = json.loads(self.result.read_text(encoding="utf-8"))
+        if launch is None:
+            data.pop("launch", None)
+        else:
+            data["launch"] = launch
+        self.result.write_text(json.dumps(data), encoding="utf-8")
+
+    def test_a_result_without_or_with_another_launch_is_refused(self):
+        # Codex review of #145: the result itself must name the export it was launched on.
+        for launch, message in ((None, "carries no launch"),
+                                ({"repo": "/elsewhere/blind/export/x", "repo_tree_sha256": self.tree,
+                                  "agent_sha256": self.role}, "was launched on"),
+                                ({"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                  "agent_sha256": "f" * 64}, "was launched with role")):
+            self.rewrite_launch(launch)
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_main(), 2)
+            self.assertIn(message, err.getvalue())
+            self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+
+    def test_a_result_without_or_with_another_prompt_is_refused(self):
+        # Independent review of #145, M1: the Claude lane's returns are bound to this catalog's lane-prompt.md.
+        for prompt, message in ((None, "carries no prompt"), ("You are the {LANE} lane.", "not this catalog's")):
+            data = json.loads(self.result.read_text(encoding="utf-8"))
+            if prompt is None:
+                data.pop("prompt")
+            else:
+                data["prompt"] = prompt
+            self.result.write_text(json.dumps(data), encoding="utf-8")
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_main(), 2)
+            self.assertIn(message, err.getvalue())
+            self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+
+    def test_an_export_inside_a_git_repository_is_refused(self):
+        # Independent review of #145, O4: git history recovers every stripped label, as codex_lane refuses.
+        inside = self.agentlab / "hosts" / "blind" / "export"
+        inside.mkdir(parents=True)
+        self.assertIn("inside the git repository", claude_lane.repo_issue(inside.resolve()))
+        self.assertIsNone(claude_lane.repo_issue(self.export.resolve()))
+        self.assertIn("path components", claude_lane.repo_issue(Path("/srv/export")))
+
+    def test_claude_lane_args_builds_the_launch_the_collector_requires(self):
+        # Independent review of #145, O1: the documented flow needs a command that writes launch and prompt.
+        spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        vendored = mock.patch.object(module.claude_lane, "vendored_agentlab_commit",
+                                     side_effect=claude_lane.vendored_agentlab_commit)
+        vendored.start()
+        self.addCleanup(vendored.stop)
+        args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
+        self.assertEqual(args["launch"], {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
+                                          "agent_sha256": self.role})
+        self.assertEqual(args["prompt"], (claude_lane.HERE / "lane-prompt.md").read_text(encoding="utf-8"))
+        self.assertEqual([(p["catalog"], p["layer_id"], p["path"], p["sha256"]) for p in args["packets"]],
+                         [("foundation", layer_id, self.packet[layer_id]["packet_path"], self.packet[layer_id]["packet_sha256"])
+                          for layer_id in ("l1", "l2")])
+        with self.assertRaises(module.claude_lane.ProvenanceError):
+            module.lane_args(self.work, self.agentlab, claude_lane.VENDORED_AGENT)
+        # Re-review N1: a project-level role in the agent-lab checkout that differs from the vendored one fails
+        # before launch, not after the run.
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_text("---\nname: blind-lane-reviewer\neffort: high\n---\n",
+                                                          encoding="utf-8")
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
+        with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "name the definition the lane loaded"):
+            module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
+
+    def test_a_packet_missing_from_the_result_loses_its_earlier_return(self):
+        # Codex review of #145: a packet dropped from the args before launch is in neither layers nor lost.
+        (self.work / "packets" / "foundation__l9.json").write_text("{}", encoding="utf-8")
+        stale = self.work / "claude" / "foundation__l9.json"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("{}", encoding="utf-8")
+        self.assertEqual(self.run_main(), 0)
+        self.assertFalse(stale.exists())
+        failures = json.loads((self.work / "claude" / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertIn(("foundation", "l9"), [(item["catalog"], item["layer_id"]) for item in failures])
+
+    def test_a_layer_run_on_another_packet_path_is_refused(self):
+        # Codex review of #145: edited args could run another packet under the same hash.
+        data = json.loads(self.result.read_text(encoding="utf-8"))
+        other = self.tmp / "elsewhere" / "foundation__l1.json"
+        other.parent.mkdir()
+        other.write_bytes((self.work / "packets" / "foundation__l1.json").read_bytes())
+        data["layers"][0]["packet_path"] = str(other)
+        self.result.write_text(json.dumps(data), encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("was run on packet", err.getvalue())
+
+    def test_a_missing_evidence_repository_is_refused(self):
+        # Codex review of #145: an empty walk must not yield a valid-looking tree digest.
+        shutil.rmtree(self.export)
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("is not an existing directory", err.getvalue())
+        with self.assertRaises(NotADirectoryError):
+            claude_lane.tree_sha256(self.export)
+
+    def test_an_evidence_tree_changed_since_launch_is_refused(self):
+        # Codex review of #145: a return must be bound to the evidence bytes the lane read.
+        (self.export / "evidence.json").write_text('{"changed": true}', encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("changed after launch", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+
+    def test_a_missing_agent_file_is_a_diagnostic_not_a_traceback(self):
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_bytes(claude_lane.VENDORED_AGENT.read_bytes())
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
+                                     "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                     "--transcripts", str(self.transcripts), "--agent-file",
+                                     str(self.result.parent / "missing.md")])
+        self.assertEqual(code, 2)
+        self.assertIn("not found", err.getvalue())
+
+    def test_a_differing_project_level_role_is_refused(self):
+        # Codex review of #145: a project-level copy wins over the user-level one when the lane runs there.
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_text("---\nname: blind-lane-reviewer\n---\nbroader\n",
+                                                          encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("uncommitted .claude/", err.getvalue())  # BIND-R4-8: refused before the comparison
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("name the definition the lane loaded", err.getvalue())
+
+    def test_the_agentlab_checkout_must_be_clean_tracked_and_at_the_vendored_commit(self):
+        # Independent review of #145, round 4, BIND-R4-8.
+        settings = self.agentlab / ".claude" / "settings.local.json"
+        settings.write_text("{}", encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("uncommitted .claude/", err.getvalue())
+        settings.unlink()
+        git(self.agentlab, "rm", "-q", "--cached", str(self.workflow.relative_to(self.agentlab)))
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("is not tracked", err.getvalue())
+        git(self.agentlab, "add", ".")
+        with mock.patch.object(claude_lane, "vendored_agentlab_commit", return_value="e070125dae03b4e44484ccb78d2d65057ad38f40"):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_main(), 2)
+        self.assertIn("does not descend from the vendored agent-lab commit", err.getvalue())
+
+    def test_lane_args_refuse_a_work_dir_inside_a_repository(self):
+        # Independent review of #145, round 4, OPS-6.
+        spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        (self.work / ".git").mkdir(parents=True, exist_ok=True)
+        with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "is inside the git repository"):
+            module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT)
+
+    def test_the_vendored_commit_is_read_from_the_manifest(self):
+        self.addCleanup(mock.patch.stopall)
+        mock.patch.stopall()
+        self.assertEqual(claude_lane.vendored_agentlab_commit(claude_lane.DEFAULT_WORKFLOW),
+                         "e070125dae03b4e44484ccb78d2d65057ad38f40")
+
+    def test_a_role_definition_other_than_the_vendored_one_is_refused(self):
+        # Codex review of #145: a stale or edited same-named role could load labels or broader tools.
+        edited = self.result.parent / "blind-lane-reviewer.md"
+        edited.write_text(claude_lane.VENDORED_AGENT.read_text(encoding="utf-8") + "\nextra rule\n", encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
+                                     "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                     "--transcripts", str(self.transcripts), "--agent-file", str(edited)])
+        self.assertEqual(code, 2)
+        self.assertIn("is not the vendored", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
     def test_the_refutation_summary_is_copied_and_layers_without_a_final_are_listed_as_failures(self):
         # Review of catalog #122, findings 5 and 7: the lane's votes were dropped, and a layer without

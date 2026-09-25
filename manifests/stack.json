@@ -1552,7 +1552,7 @@
       "profile": "supporting",
       "role": "Offline GitHub workflow security analysis with failing fixtures",
       "commands": [
-        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\" \"$PROJECT_ROOT/.github/dependabot.yml\"",
         "python3 -m unittest -v tests.test_workflow_security"
       ],
       "evidence_ids": [

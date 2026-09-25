@@ -193,6 +193,10 @@ git diff --check
 gitleaks dir . --redact --no-banner
 ```
 
+On macOS, run the Gitleaks step through `adoption/tools/gitleaks-guarded-macos`
+so that it takes the per-user lock and the memory cap
+([adoption/tools/README.md](tools/README.md#macos-gitleaks-guarded-macos-2026-09-24)).
+
 CI validates public artifacts and code behavior. It does not log in, place broker orders, reproduce the GPU stack or consume model allowance. Local accepted runtime results retain their own receipts.
 
 ## Refresh only adopted retrieval

@@ -16,7 +16,7 @@ moving a set-up host to a later release is
 | --- | --- | --- |
 | 128 GB WSL workstation (RTX 4090, 24 GB) | Primary always-on host for the shared local services (embedder, Qdrant, ai-memory, observability) and the north-star engine and paper lanes | Same CUDA/vLLM software stack as the measured host, but a different GPU generation: requalify each model there before pinning (as [`new-workstation-runtime-profile-20260922.md`](new-workstation-runtime-profile-20260922.md) says); projected tiers `large-32b-q4` generation, `headroom` semantic RAG, concurrency cap 16 |
 | RTX 5090 Laptop, 48 GB WSL (measured host) | Development host; stays the reference for measured evidence | `native_proven` profile; the tiers above were measured here |
-| macOS arm64, 64 GB | Portable host and the macOS acceptance lane (MLX / llama.cpp Metal) | Projected `large-32b-q4` from about 38 GB of shared memory; no macOS workstation run exists, so acceptance is the open item |
+| macOS arm64: Apple M5 Pro, 24 GB in service (measured); a 64 GB replacement is recommended | Cockpit and coordinator: native Claude and Codex clients, review and integration, light local work, second-machine paper trials and the macOS acceptance lane (MLX / llama.cpp Metal) | Measured on 2026-09-24: the 24 GB host is RAM-limited for its current load and cannot hold the 27B local model ([evidence](../evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json)); heavy agent sessions and the always-on lanes stay on the workstation |
 
 The workstation and macOS tiers are labelled projections in
 [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json) until
@@ -50,6 +50,31 @@ and treat the projection as superseded guidance rather than looking for it to ha
    if Windows keeps more than 12 GB free. This replaces the 96 GB proposal in the
    [workstation runtime profile](new-workstation-runtime-profile-20260922.md), which under the
    profiles' own arithmetic would just miss the `headroom` tier.
+
+   Note added 2026-09-25: `sparseVhd=true` has no effect on current WSL. WSL 2.7.14 creates every
+   new VHD non-sparse "while data corruption is being debugged" and prints "Sparse VHD support is
+   currently disabled due to potential data corruption"
+   ([`WslCoreFilesystem.cpp`](https://github.com/microsoft/WSL/blob/2.7.14/src/windows/common/WslCoreFilesystem.cpp#L35-L39)).
+   Making an existing distribution sparse needs
+   `wsl --manage <distro> --set-sparse true --allow-unsafe`
+   ([microsoft/WSL#13075](https://github.com/microsoft/WSL/issues/13075)); this page does not
+   recommend it. To reclaim VHD space instead, run `sudo fstrim -v /` in the distribution, then
+   `wsl --shutdown` and compact its `ext4.vhdx`
+   ([location](https://learn.microsoft.com/en-us/windows/wsl/disk-space#how-to-locate-the-vhdx-file-and-disk-path-for-your-linux-distribution))
+   offline from an elevated prompt: `diskpart` with `select vdisk file="<path>"`,
+   `attach vdisk readonly`, `compact vdisk` and `detach vdisk`, or, with the Hyper-V module,
+   `Mount-VHD -Path <path> -ReadOnly`, `Optimize-VHD -Path <path> -Mode Full` and
+   `Dismount-VHD -Path <path>`. `-Mode Full` on a VHDX that is not attached read-only falls back to
+   `Prezeroed` mode. Both tools compact only a detached or read-only disk. WSL's
+   own disk-space page uses `diskpart` only to expand a VHD and warns that Windows tools on WSL's
+   `AppData` files can corrupt a distribution, so export or back up the distribution first.
+
+   The workstation's live `%UserProfile%\.wslconfig`, read on 2026-09-25, differs from the
+   projection above: `memory=104GB`, `processors=48`, `swap=24GB`, `networkingMode=mirrored` and
+   `[experimental] autoMemoryReclaim=dropCache`, with no `sparseVhd` (that file records removing it
+   on 2026-09-08 as inert), plus host-specific swap-file, crash-dump and idle-timeout keys. Inside
+   WSL, `nproc` returned 48 and `free -g` 102 GiB of memory and 24 GiB of swap. The projection and
+   its 2026-09-23 decision are left as recorded.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
 3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
    `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
@@ -64,15 +89,20 @@ and treat the projection as superseded guidance rather than looking for it to ha
    ([`catalogs/us-equities/gates-20260922.json`](../catalogs/us-equities/gates-20260922.json)) allows.
    Paper only; nothing here authorizes live orders.
 
-## macOS (64 GB) next steps
+## macOS next steps (replacement Mac)
 
-1. Pinned clone, then `adoption/bootstrap-macos.sh`. The Homebrew prerequisite install, the
-   `socraticode`, darwin-binary and embedding-model pins, the launchd agents and the embedding
-   acceptance script all came in #94, after `v2026.09.23`: at that tag the script brews only `jq`
-   and installs 7 of the 8 `macos-arm64-foundation` components, and the launchd and embedding steps
-   run from a default-branch clone, as the [macOS page](../adoption/platforms/macos-arm64.md) marks.
-   A release cut after #94 and re-pinned ([moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release))
-   removes these differences.
+The 24 GB Mac is being replaced (see the upgrade table below). On the replacement:
+
+0. Sign in natively to Claude, Codex and `gh`; never copy another host's credential stores or memory
+   database. The shared foundation services (ai-memory, Ollama, Qdrant, the user-scope MCP servers,
+   the QMD and SocratiCode indexes, mise tools) come from agent-ecosystem through its single writer
+   ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). Where
+   those services exist, skip the launchd agents of `adoption/bootstrap-macos.sh` in step 1: they
+   would start a second Qdrant and a second ai-memory store.
+1. Pinned clone, then `adoption/bootstrap-macos.sh`. The pinned release contains #94 (the Homebrew
+   prerequisite install, the `socraticode`, darwin-binary and embedding-model pins, the launchd
+   agents and the embedding acceptance script), so every step on the
+   [macOS page](../adoption/platforms/macos-arm64.md) runs from the pinned checkout.
 2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
@@ -80,11 +110,21 @@ and treat the projection as superseded guidance rather than looking for it to ha
    `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`.
 4. Record receipts as above. The first real macOS run is what moves the `macos-arm64` column of the
    grand list off `untested`.
+5. Run the RAM-fit matrix and the embedder and reranker comparisons listed as open items in
+   [`foundation-alignment.json`](../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json),
+   as scratch processes, and hand the numbers to the foundation-lane owner.
+6. Send heavy sessions to the workstation: run `sshd` inside WSL, add the workstation as an SSH
+   connection in Claude desktop (an SSH session reads MCP servers, hooks, settings and skills from the
+   remote's own `~/.claude`), and check the Claude Code version Desktop installs there against the
+   pinned floor. For runs that must outlive the laptop session, start Claude Code in `tmux` on the
+   workstation and use Remote Control.
 
 ## Upgrades: only what the measurement supports
 
 The manifest is
 [`evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json`](../evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json).
+The macOS host's measured follow-up, which supersedes that manifest's projected-64 GB MacBook item,
+is [`evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json`](../evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json).
 
 | Item | Verdict | Evidence in one line |
 | --- | --- | --- |
@@ -93,7 +133,8 @@ The manifest is
 | Retention for per-wave state and caches | Needed now (software) | About 65 GiB of wave caches and state with no retention rule |
 | GPU memory above 24 GB | Not needed now | Median GPU use 6.5%; embedder plus 8B worker peaked at 20,217 of 24,463 MiB |
 | 256 GB RAM on the workstation | Not needed now | No selected model needs RAM offload; candidates are unverified here |
-| Laptop RAM, disk, MacBook | Not needed | 24-26 GiB RAM free under full load; 827 GB disk free |
+| Laptop RAM, disk | Not needed | 24-26 GiB RAM free under full load; 827 GB disk free |
+| MacBook memory: 24 GB in service | Needed (measured 2026-09-24) | 26.84 GiB of process footprint on 24 GiB, 357.8 GiB of swap writes in 4.8 days; the RAG embedder leaves 2.1 GiB free; the 27B model exceeds the 17.76 GiB Metal limit. Recommended: 64 GB (M5 Pro) |
 
 Status on 2026-09-24:
 - **CPU limit.** It is implemented in
@@ -105,6 +146,12 @@ Status on 2026-09-24:
   deletes nothing, and on 2026-09-24 it found no eligible candidate, because committed evidence cites wave
   paths. Archiving when a wave's record closes still needs a wave-closure marker and the export of cited
   raw files.
+- **macOS memory.** The 24 GB Mac is RAM-limited by measurement, and the user decided to switch once
+  that was shown. The recommended replacement is a 64 GB M5 Pro used as the cockpit and coordinator
+  ([upgrade evidence](../evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json)). The two
+  memory-kill events on 2026-09-24 came from an unbounded gitleaks scan, which #193 bounds separately.
+  Memory, RAG and foundation alignment on the Mac, with the model candidates and open items, is in
+  [`foundation-alignment.json`](../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json).
 
 If a selected local model later outgrows 24 GB, buy GPU memory first (a 48 or 96 GB workstation card
 or a second GPU); system RAM only helps mixture-of-experts models served partly from RAM.

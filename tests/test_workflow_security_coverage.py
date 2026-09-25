@@ -111,5 +111,43 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
         self.assertEqual(findings, [])
 
 
+DEPENDABOT = ROOT / ".github/dependabot.yml"
+COOLDOWN = "    cooldown:\n      default-days: 7\n"
+
+
+@unittest.skipUnless(ZIZMOR, "native zizmor unavailable; CI installs the pinned analyzer")
+class DependabotConfigSecurityCoverageTests(unittest.TestCase):
+    """zizmor's dependabot-cooldown and dependabot-execution audits only run when
+    .github/dependabot.yml is collected, which a `.github/workflows` input never does
+    (docs/decisions/2026-09-22-github-automation-closure.md, "GitHub hardening follow-up
+    (2026-09-25)"). The CI gates now audit the repository root; this keeps the file's own
+    pass and a failing control in `python3 -m unittest` as well."""
+
+    def analyze_copy(self, text):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            config = directory / "dependabot.yml"
+            config.write_text(text, encoding="utf-8")
+            result = _analyze(config, directory)
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        return result, findings
+
+    def test_dependabot_config_has_no_offline_findings(self):
+        result, findings = self.analyze_copy(DEPENDABOT.read_text(encoding="utf-8"))
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
+
+    def test_dropping_the_cooldown_is_a_finding(self):
+        text = DEPENDABOT.read_text(encoding="utf-8")
+        self.assertEqual(text.count(COOLDOWN), 1, "the github-actions entry's cooldown block moved")
+        result, findings = self.analyze_copy(text.replace(COOLDOWN, ""))
+        self.assertEqual(result.returncode, 13, result.stderr[:2000])
+        self.assertIn("dependabot-cooldown", {finding["ident"] for finding in findings})
+
+
 if __name__ == "__main__":
     unittest.main()
