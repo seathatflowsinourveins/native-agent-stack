@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "native_fault_run_record",
+  "subject_gate": "native-fault-behaviour",
+  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "receipt_sha256": "31c112e3f1ff4471543b5ca034ef879561467a85e6d456000971f075d605e90d",
+  "client_order_id_prefix": "nf-20260925t182513-9a1b9a-",
+  "purpose": "Re-run of the frozen native-faults plan (C01, C02, C05, C04) on the released adaptive-paper engine, which the gate's 2026-09-24 binding amendment requires before the gate is cited for that engine.",
+  "operator": "native-fault gate-lane worker session of the 2026-09-25 live-gates workflow (Claude Code subagent), under the project's standing paper authorization; paper endpoint only",
+  "evidence_classes": {
+    "harness_run_and_get_checks": "native_paper",
+    "independent_observation": "independent_observation (evidence/independent-observation-20260925t182513.json)",
+    "offline_tests_and_hash_checks": "measured_local (the native-faults suite is a local synthetic fixture with a fake transport)"
+  },
+  "tree": {
+    "commit": "ae3d3d37377022fe63112dcb10c93c765d6d2601",
+    "worktree_clean_at_launch": true,
+    "source_hashes_json_sha256": "d14c8d7262357e39a562fe519b41ecc64ec555845f1107c28f1614908d3537b6",
+    "source_hashes_entries": 57,
+    "source_hashes_mismatches": 0,
+    "receipt_harness_sha256_equals_tree": true,
+    "receipt_plan_sha256_equals_tree": true,
+    "receipt_engine_sources_sha256": {
+      "../order-contract/order_contract.py": "57405f752fc933a6f09a5b2f0eb46482f94a780aa818dd0b73d7149a1fe58025",
+      "runner.py": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
+      "safety.py": "7e00d5bb60db2f214ffab5966d086e1d2c705ef40489fa147ec24884b802d3ed",
+      "transport.py": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc"
+    },
+    "receipt_engine_sources_equal_tree": {
+      "../order-contract/order_contract.py": true,
+      "runner.py": true,
+      "safety.py": true,
+      "transport.py": true
+    },
+    "receipt_engine_sources_equal_source_hashes_json": {
+      "runner.py": true,
+      "safety.py": true,
+      "transport.py": true
+    },
+    "note": "source-hashes.json has no entry for ../order-contract/order_contract.py; its receipt value equals the tree file and the value bound by the 2026-09-24 18:58Z receipt."
+  },
+  "runtime": {
+    "python": "3.12.3 (pinned adaptive-paper runtime venv)",
+    "alpaca_py": "0.44.0",
+    "nautilus_trader": "2.0.0rc5"
+  },
+  "host": {
+    "class": "WSL2 workstation (Linux)",
+    "chrony_tracking_before_run": {
+      "Stratum": "1",
+      "Ref time (UTC)": "Fri Sep 25 18:24:27 2026",
+      "System time": "0.000901912 seconds slow of NTP time",
+      "Last offset": "+0.008424971 seconds",
+      "RMS offset": "0.083404817 seconds",
+      "Skew": "0.586 ppm",
+      "Update interval": "8.0 seconds",
+      "Leap status": "Normal",
+      "Reference": "PHC0 (PTP hardware clock refclock)"
+    }
+  },
+  "offline_tests": {
+    "command": "<pinned runtime python> -m unittest tests.test_native_faults_min tests.test_adaptive_paper_source_hashes_manifest -v",
+    "ran": 31,
+    "seconds": 21.212,
+    "result": "OK",
+    "exit_code": 0,
+    "per_module": {
+      "test_native_faults_min": 24,
+      "test_adaptive_paper_source_hashes_manifest": 7
+    }
+  },
+  "get_checks": {
+    "method": "alpaca-py TradingClient(paper=True) GETs of account, clock, positions and open orders, credentials loaded through runner.credentials(); no request while the harness ran",
+    "before_run": {
+      "started_at": "2026-09-25T18:24:40.287430+00:00",
+      "finished_at": "2026-09-25T18:24:40.432684+00:00",
+      "lane_account_identity_matched": true,
+      "account_status": "ACTIVE",
+      "trading_blocked": "False",
+      "account_blocked": "False",
+      "multiplier": "4",
+      "market_open": true,
+      "broker_clock": "2026-09-25T14:24:40.087053-04:00",
+      "positions": 0,
+      "open_orders": 0,
+      "flat": true
+    },
+    "after_run": {
+      "started_at": "2026-09-25T18:25:41.989339+00:00",
+      "finished_at": "2026-09-25T18:25:42.123340+00:00",
+      "lane_account_identity_matched": true,
+      "account_status": "ACTIVE",
+      "trading_blocked": "False",
+      "account_blocked": "False",
+      "multiplier": "4",
+      "market_open": true,
+      "broker_clock": "2026-09-25T14:25:41.772749-04:00",
+      "positions": 0,
+      "open_orders": 0,
+      "flat": true
+    },
+    "cash_and_equity_unchanged": true
+  },
+  "harness": {
+    "argv_redacted": "<pinned runtime python> blueprints/us-equities/adaptive-paper/native-faults/harness.py run --env-file <lane's private paper env file> --state-root <private dedicated root under ~/.local/state/native-agent-stack/> --out <private receipt path>",
+    "launched_at": "2026-09-25T18:25:13.238501076Z",
+    "exited_by": "2026-09-25T18:25:15.271128568Z",
+    "exit_code": 0,
+    "stdout": {
+      "sha256": "27ca2ff19e7e9eaa5310d49b2f41d1542764186fbf60daa75a0e470a405f1f68",
+      "bytes": 135,
+      "text": "{\"status\": \"native_faults_passed\", \"posts_reserved\": 2, \"cases\": {\"C01\": \"passed\", \"C02\": \"passed\", \"C05\": \"passed\", \"C04\": \"passed\"}}"
+    },
+    "stderr": {
+      "sha256": "9a43dcadc0982d3dc83ac097e3bc89a8dbfedba707c50a9f86c6395736e8d830",
+      "bytes": 181,
+      "lines": [
+        "trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)",
+        "data websocket error, restarting connection: sent 1000 (OK); no close frame received"
+      ],
+      "source": "alpaca-py stream warnings (alpaca/trading/stream.py and alpaca/data/live/websocket.py) logged when a stream socket closed with code 1000; the lines carry no timestamps, and their timing at transport stop is an inference; the receipt records no stop error"
+    },
+    "receipt_copy": "written to private output by --out, copied byte-identical into the tree",
+    "run_state_markers_after_run": {
+      "IN_FLIGHT": false,
+      "CLEANUP_REQUIRED": false
+    }
+  },
+  "ledger_readback": {
+    "method": "read-only sqlite query of the run's private ledger events after the run",
+    "event_sequence": [
+      [
+        "trial_start",
+        ""
+      ],
+      [
+        "intent_reserved",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "intent_reserved",
+        "c04"
+      ],
+      [
+        "broker_refused",
+        "c04"
+      ]
+    ],
+    "event_kind_counts": {
+      "broker_refused": 1,
+      "intent_reserved": 2,
+      "order_observed": 3,
+      "trial_start": 1
+    },
+    "broker_refused": [
+      {
+        "http_status": 422,
+        "refusal": "sub_penny_minimum_price_variance"
+      }
+    ],
+    "foreign_client_ids": 0
+  },
+  "limits": [
+    "One paper run, one host, one paper account; not live-endpoint evidence and no live order.",
+    "C05's repeat DELETE was answered 204 again, so a 404 or 422 cancel refusal remains offline-tested only.",
+    "C04's 422 is one more paper-endpoint observation of the documented sub-penny body, not a general rule that 422 is definitive.",
+    "Ambiguous or in-flight submit faults (timeouts, 429, 5xx, partial fills, restart during a submit) were not exercised.",
+    "The trading-gates checker verifies only /status of the receipt; the engine binding above is a separate hash comparison."
+  ],
+  "privacy": "No credential, account id, account fingerprint, balance or host path is recorded here."
+}
