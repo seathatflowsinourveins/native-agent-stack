@@ -532,6 +532,22 @@
       "run_copy": "<impl>/out/a2/raw/python-m-pytest.050.err"
     },
     {
+      "path": "native_token_ci_rtk_only.py",
+      "sha256": "4ade0a773af3bdac2da8ad67082adf187075b6169c7db9af1b831e0d4a4f7b5c",
+      "bytes": 840,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/pins-worker/nci_rtk.py"
+    },
+    {
+      "path": "out/native-token-ci-rtk-only.json",
+      "sha256": "70753126a9e66dc489ead9ef478ffebdba7e26b5da7581bc7d0ff8b416cb0975",
+      "bytes": 14874,
+      "byte_identical_to_run_copy": false,
+      "run_copy": "scripts/native_token_ci.py's own sanitized report from native_token_ci_rtk_only.py",
+      "run_copy_sha256": "e80922f25548f9679f78f8bac5607c54927d4ef222ab11f6faa80d529d385673",
+      "publication_edit": "source_sha256 is re-expressed from a {path: sha256} map to a list of {path, sha256} objects, because path keys containing 'token' trip gitleaks' generic-api-key rule; values unchanged."
+    },
+    {
       "path": "out/readback.out",
       "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
       "bytes": 973,
@@ -800,6 +816,16 @@
       "pass": true,
       "observed_by": "coordinator",
       "output_file": "out/post-switch-v31-noconfig.txt"
+    },
+    {
+      "name": "CI fixture path at the new pin: scripts/native_token_ci.py rtk install and rtk_fixture",
+      "arm": "candidate",
+      "command": "python3 native_token_ci_rtk_only.py <new output dir>   (from the worktree root, with PINS rtk = 0.50.0)",
+      "exit": 0,
+      "output_excerpt": "Fresh curl download of the v0.50.0 asset and checksums.txt into an owned temporary prefix; verify_archive and `sha256sum --check --ignore-missing` passed; archive sha256 bc2b8902...; `rtk --version` rtk 0.50.0; all 6 rtk_fixture checks passed (ledger starts empty, both commit subjects kept, `rtk proxy git log -2` equals raw stdout, fixture database retained, statistics returned, 3-command counter increment); failures []. The report's status stays 'running' because the harness calls only the rtk steps, not main().",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/native-token-ci-rtk-only.json"
     },
     {
       "name": "read-back of the switched state",

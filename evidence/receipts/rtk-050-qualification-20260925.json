@@ -105,6 +105,7 @@
     },
     "rollback": "ln -sfn ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk ~/.local/share/codex-ecosystem/bin/rtk after the read-only negative-row count; config.toml entries behave the same on 0.49.0",
     "independent_review": "verdict agree, production_touched false, 3 minor defects (artifact results.json verifier section)",
+    "native_token_ci_rtk_fixture": "scripts/native_token_ci.py's rtk install path and rtk_fixture at PINS rtk 0.50.0, run locally by the writing worker: fresh release download, checksum verification and all 6 fixture checks passed (out/native-token-ci-rtk-only.json); the hosted native-token-e2e workflow has not run at 0.50.0",
     "artifacts": "evidence/artifacts/sota-refresh-20260925/rtk/"
   },
   "provenance": [
@@ -429,13 +430,23 @@
       "byte_identical_to_run_copy": true
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py",
+      "sha256": "4ade0a773af3bdac2da8ad67082adf187075b6169c7db9af1b831e0d4a4f7b5c",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/native-token-ci-rtk-only.json",
+      "sha256": "70753126a9e66dc489ead9ef478ffebdba7e26b5da7581bc7d0ff8b416cb0975",
+      "byte_identical_to_run_copy": false
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback.out",
       "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
       "byte_identical_to_run_copy": false
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
-      "sha256": "b80afb5de46763bb9422b39de4df171df38f08d8d2f30a836b98bddaa14efccf",
+      "sha256": "79b494282d0e604c58ae24ff79d99840c58ff543d2330cbeb1ed9e559d9f66bb",
       "byte_identical_to_run_copy": false
     }
   ]

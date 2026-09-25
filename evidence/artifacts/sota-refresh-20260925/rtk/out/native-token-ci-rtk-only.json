@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "captured_at": "2026-09-25T20:31:41.884914+00:00",
+  "pins": {
+    "rtk": "0.50.0",
+    "qmd": "2.8.3",
+    "repomix": "1.18.1",
+    "toon": "4.1.1"
+  },
+  "status": "running",
+  "commands": [
+    {
+      "label": "download-rtk-x86_64-unknown-linux-musl.tar.gz",
+      "argv": [
+        "curl",
+        "--disable",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "<WORK>/install/rtk/rtk-x86_64-unknown-linux-musl.tar.gz",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.308,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "download-checksums.txt",
+      "argv": [
+        "curl",
+        "--disable",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "<WORK>/install/rtk/checksums.txt",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/checksums.txt"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.184,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-publisher-checksum",
+      "argv": [
+        "sha256sum",
+        "--check",
+        "--ignore-missing",
+        "checksums.txt"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.006,
+      "stdout_raw_sha256": "dd9378eeefcb494bd4becdafa151a3c4f247bc1ced286c7a2a8a9cf3bdcabd2e",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk-x86_64-unknown-linux-musl.tar.gz: OK\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-archive-members",
+      "argv": [
+        "tar",
+        "-tf",
+        "rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.067,
+      "stdout_raw_sha256": "9804f062bef8c3b58e915ee0b1f28698c7561fefea62c2538feb0607c47a6fcd",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-extract",
+      "argv": [
+        "tar",
+        "-xf",
+        "rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.068,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "version-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "--version"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "46f7775514198d33a9a9f7b1a8cab6e6e02af8f7e75b43520d93ea077bf72181",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk 0.50.0\n",
+      "stderr": ""
+    },
+    {
+      "label": "git-init",
+      "argv": [
+        "git",
+        "init",
+        "--quiet"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.006,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-user.name",
+      "argv": [
+        "git",
+        "config",
+        "user.name",
+        "Native CI Fixture"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-user.email",
+      "argv": [
+        "git",
+        "config",
+        "user.email",
+        "ci@example.invalid"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.001,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-add-0",
+      "argv": [
+        "git",
+        "add",
+        "selected.txt"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-commit-0",
+      "argv": [
+        "git",
+        "commit",
+        "--quiet",
+        "-m",
+        "CI_BASELINE_FIXED"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.006,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-add-1",
+      "argv": [
+        "git",
+        "add",
+        "selected.txt"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "git-commit-1",
+      "argv": [
+        "git",
+        "commit",
+        "--quiet",
+        "-m",
+        "CI_FOLLOWUP_FIXED"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.005,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-gain-before",
+      "argv": [
+        "<TOOL:rtk>",
+        "gain",
+        "--format",
+        "json"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.101,
+      "stdout_raw_sha256": "f20d39dd79bddab4c8c2096a0c28dd3668329768e5400bc40e51dcf1bd20b74b",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\n  \"summary\": {\n    \"total_commands\": 0,\n    \"total_input\": 0,\n    \"total_output\": 0,\n    \"total_saved\": 0,\n    \"avg_savings_pct\": 0.0,\n    \"total_time_ms\": 0,\n    \"avg_time_ms\": 0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "git-log-baseline",
+      "argv": [
+        "git",
+        "log",
+        "-2"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "cf79d2f28019e148a1fac3cb7f8c1d506c6f9d512c9266aa8bbedf8535dafa0e",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "commit c7c2e3a94e28ea6fc69c99f4acc1585d217d6644\nAuthor: Native CI Fixture <ci@example.invalid>\nDate:   Fri Sep 25 20:31:42 2026 +0000\n\n    CI_FOLLOWUP_FIXED\n\ncommit a6539c00bbc4a4ef6cb30e34b3ab887fe2dea7a0\nAuthor: Native CI Fixture <ci@example.invalid>\nDate:   Fri Sep 25 20:31:42 2026 +0000\n\n    CI_BASELINE_FIXED\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-git-log",
+      "argv": [
+        "<TOOL:rtk>",
+        "git",
+        "log",
+        "-2"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.024,
+      "stdout_raw_sha256": "2f88fb68eba3dfa8748596aca03ad6470c781abbc916fd82ed43b5505639775b",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "c7c2e3a CI_FOLLOWUP_FIXED (0 seconds ago) <Native CI Fixture>\na6539c0 CI_BASELINE_FIXED (0 seconds ago) <Native CI Fixture>\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-raw-recovery",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "git",
+        "log",
+        "-2"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.023,
+      "stdout_raw_sha256": "cf79d2f28019e148a1fac3cb7f8c1d506c6f9d512c9266aa8bbedf8535dafa0e",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "commit c7c2e3a94e28ea6fc69c99f4acc1585d217d6644\nAuthor: Native CI Fixture <ci@example.invalid>\nDate:   Fri Sep 25 20:31:42 2026 +0000\n\n    CI_FOLLOWUP_FIXED\n\ncommit a6539c00bbc4a4ef6cb30e34b3ab887fe2dea7a0\nAuthor: Native CI Fixture <ci@example.invalid>\nDate:   Fri Sep 25 20:31:42 2026 +0000\n\n    CI_BASELINE_FIXED\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-upstream-error",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "git",
+        "rev-parse",
+        "--verify",
+        "refs/heads/ci-missing-ref"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 128,
+      "expected_exit": "nonzero",
+      "timed_out": false,
+      "elapsed_seconds": 0.024,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "9b3fab22fc89a33cf7f4e9d08072e43f29c2999ed2af63b6e8417b2ce9d534b4",
+      "stdout": "",
+      "stderr": "fatal: Needed a single revision\n"
+    },
+    {
+      "label": "rtk-gain-after",
+      "argv": [
+        "<TOOL:rtk>",
+        "gain",
+        "--format",
+        "json"
+      ],
+      "cwd": "<WORK>/git-fixture",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.003,
+      "stdout_raw_sha256": "662f651ca57f97a5c9994c9367c815768fa72965ab82f0c1999b573e377acd4d",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\n  \"summary\": {\n    \"total_commands\": 3,\n    \"total_input\": 124,\n    \"total_output\": 118,\n    \"total_saved\": 6,\n    \"avg_savings_pct\": 4.838709677419355,\n    \"total_time_ms\": 4,\n    \"avg_time_ms\": 1\n  }\n}\n",
+      "stderr": ""
+    }
+  ],
+  "checks": [
+    {
+      "label": "rtk-fixture-ledger-starts-empty",
+      "passed": true
+    },
+    {
+      "label": "rtk-preserves-both-commit-subjects",
+      "passed": true
+    },
+    {
+      "label": "rtk-proxy-exact-stdout",
+      "passed": true
+    },
+    {
+      "label": "rtk-retained-fixture-database",
+      "passed": true
+    },
+    {
+      "label": "rtk-native-statistics-returned",
+      "passed": true
+    },
+    {
+      "label": "rtk-three-command-counter-increment",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "artifacts": {},
+  "scope": "Fresh Linux fixture state; selected upstream CLIs, no native model task",
+  "limits": [
+    "Not a new-PC, native Codex/Claude, GPU or provider acceptance",
+    "Top-level package pins; npm transitive ranges resolve at installation",
+    "RTK counters are fixture-local estimates, not provider savings",
+    "No token-saving requirement: fidelity may need the larger representation",
+    "Retained text replaces local paths; raw byte hashes precede sanitization"
+  ],
+  "environment": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "TZ": "UTC",
+    "TERM": "dumb",
+    "CI": "true",
+    "NO_COLOR": "1",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_SYSTEM": "/dev/null",
+    "XDG_CONFIG_HOME": "<WORK>/config",
+    "XDG_CACHE_HOME": "<WORK>/cache",
+    "XDG_DATA_HOME": "<WORK>/data",
+    "XDG_STATE_HOME": "<WORK>/state",
+    "TMPDIR": "<WORK>/tmp",
+    "RTK_DB_PATH": "<WORK>/data/rtk/history.db",
+    "RTK_TELEMETRY_DISABLED": "1",
+    "QMD_CONFIG_DIR": "<WORK>/config/qmd",
+    "QMD_FORCE_CPU": "1",
+    "INDEX_PATH": "<WORK>/cache/qmd/native-ci-docs.sqlite",
+    "NODE_LLAMA_CPP_SKIP_DOWNLOAD": "true",
+    "NPM_CONFIG_CACHE": "<WORK>/npm-cache",
+    "NPM_CONFIG_USERCONFIG": "<WORK>/empty.npmrc",
+    "NPM_CONFIG_GLOBALCONFIG": "<WORK>/empty-global.npmrc"
+  },
+  "native_home_preserved": true,
+  "source_sha256": [
+    {
+      "path": "scripts/native_token_ci.py",
+      "sha256": "0d5616afcf3fd97c7e1baaa55ff994e4c02c9eabf282b6b989679cc06c885504"
+    },
+    {
+      "path": ".github/workflows/native-token-e2e.yml",
+      "sha256": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f"
+    },
+    {
+      "path": "manifests/stack.json",
+      "sha256": "f85c6c7435939a3dc7f9a26207db154c05201a201831fe68ae3bbee5818b8522"
+    },
+    {
+      "path": "fixtures/rag-note.md",
+      "sha256": "27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc"
+    },
+    {
+      "path": "fixtures/records.json",
+      "sha256": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c"
+    },
+    {
+      "path": "fixtures/before.py",
+      "sha256": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60"
+    },
+    {
+      "path": "fixtures/after.py",
+      "sha256": "7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54"
+    }
+  ],
+  "rtk_archive_sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89"
+}
