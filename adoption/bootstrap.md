@@ -332,7 +332,9 @@ GitHub-hosted macOS runner; see
    two blind lane roles are absent; here all seven declare `effort: max`
    ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The guard
    hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
-   `SHA256SUMS` gained the secret-path guard entry). The installer replaces a
+   `SHA256SUMS` gained the secret-path guard entry), and it changed after `v2026.09.25.1` again:
+   its secret-path guard hash now covers the Hugging Face store rules (#268), so
+   rerun the guard step from a checkout that has them. The installer replaces a
    differing agent file, so rerunning its agents step from a checkout that has
    the change installs the `max` definitions. The MCP template
    `adoption/mcp/claude-user.json` also changed after `v2026.09.24.1`: at that

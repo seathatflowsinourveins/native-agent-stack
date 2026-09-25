@@ -3256,8 +3256,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "93176ef4cc81babd4ecf7bf18356888db5e502d5ec890698ebc9c8ad611250ac",
-      "bytes": 28078
+      "sha256": "e070c2d847e19b4cfeca7fab0f8544b797573343cfc25b8fb83119b0975e1d29",
+      "bytes": 28258
     },
     {
       "path": "adoption/credential-inventory.json",
