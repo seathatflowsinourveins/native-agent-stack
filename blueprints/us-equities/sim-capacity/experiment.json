@@ -19,7 +19,9 @@
     "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json --profile elite-tier",
     "python3 -m unittest -v tests.test_sim_capacity",
     "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --stream PRIVATE/stream.json --runs PRIVATE/runs.json --commission-plan none --out PRIVATE/report.json",
-    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --stream PRIVATE/stream.json --runs PRIVATE/runs_v2.json --commission-plan none --out PRIVATE/report_v2.json (repair round: fixed run_hftbacktest.py use-after-free, added oracle.py and a hard better-than-touch check; the committed receipt is hand-assembled from this report's numbers, not written by this command directly)"
+    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py report --stream PRIVATE/stream.json --runs PRIVATE/runs_v2.json --commission-plan none --out PRIVATE/report_v2.json (repair round: fixed run_hftbacktest.py use-after-free, added oracle.py and a hard better-than-touch check; the committed receipt is hand-assembled from this report's numbers, not written by this command directly)",
+    "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260925-paper-parity.json --profile paper-parity (2026-09-25 rerun on retained --replay data; exact-release default, --release-timing exact)",
+    "python3 blueprints/us-equities/sim-capacity/runner.py run --catalog ~/.local/state/native-agent-stack/sim-capacity/catalog --receipt blueprints/us-equities/sim-capacity/receipts/20260925-elite-tier.json --profile elite-tier (2026-09-25 rerun on retained --replay data; exact-release default, --release-timing exact; includes the latency sweep)"
   ],
   "observations": [
     {
@@ -35,7 +37,7 @@
       "exit_code": 0,
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
-        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier.json",
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-elite-tier-superseded.json",
          "sha256": "a465e38dadc9f6444cbd529ff5ef45923b9c04dc3b4c055acdfdefca17ea777c"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
@@ -54,7 +56,7 @@
       "exit_code": 0,
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
-        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity.json",
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260924-paper-parity-superseded.json",
          "sha256": "62c2da144a534eb4c992baf2438cdf3f3df8f1eb9eba22aa22e67450a7372be7"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
@@ -74,7 +76,7 @@
       "quality": {"semantic": true, "contract": true},
       "artifacts": [
         {"path": "tests/test_sim_capacity.py",
-         "sha256": "a8c2778e500d5b9a501fece644033aba5448eef73bfe284944fe9f0be783e1b5"}
+         "sha256": "312c6f6fb88f37bcce9707d1aa30fb98129c564af6d081e9cf48e55b69d5b362"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
@@ -116,6 +118,63 @@
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
                 "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "elite-tier-capacity-run-20260925-exact-release",
+      "task": "sim-capacity-throughput",
+      "role": "capacity-exerciser",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260925-elite-tier.json",
+         "sha256": "9669949d9078f8a1ce7469c9f1ff5e56019f4475687a6d2bbede6794b0cfa36e"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "paper-parity-capacity-run-20260925-exact-release",
+      "task": "sim-capacity-throughput",
+      "role": "capacity-exerciser",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Paper-parity venue/risk profile (180/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms latency",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "blueprints/us-equities/sim-capacity/receipts/20260925-paper-parity.json",
+         "sha256": "807c36fe0a701f7088f5e823ef433805373df9631877bba5fdec5ac97bba46d2"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
+    },
+    {
+      "id": "hermetic-unit-tests-20260925-exact-release",
+      "task": "sim-capacity-throughput",
+      "role": "test-verifier",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Fee model, schedule/budget math, recount logic, crossed-quote dropping, argv redaction, the pinned-runtime engine smoke tests (native limiter denial, IOC collar fill) and the new release-timing tests (ExactReleaseTimingTests: exact-release exactness and legacy-mode slack on a sparse synthetic quote set, shown failing with the release alert disabled and passing restored), on both system Python and the pinned adaptive-paper-20260921 runtime",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [
+        {"path": "tests/test_sim_capacity.py",
+         "sha256": "312c6f6fb88f37bcce9707d1aa30fb98129c564af6d081e9cf48e55b69d5b362"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null,
+                "reasoning_in_output": null, "total": null, "native_retries": 0}
     }
   ],
   "failures_and_skips": [
@@ -146,7 +205,7 @@
       {"path": "blueprints/us-equities/sim-capacity/fetcher.py",
        "sha256": "fe2b97913f252a852bdf386587ccc6811eddeb182fe62a6dea2915cd801b18c0"},
       {"path": "blueprints/us-equities/sim-capacity/exerciser.py",
-       "sha256": "81835d6e21ff1cace1d15b7c71bfb34722015d2fa2afb16402c1ad61cbee468a"},
+       "sha256": "8a36492b5db9ab4afed853a243e046f817a045d83c6a3ec5381d4eabc28727eb"},
       {"path": "blueprints/us-equities/sim-capacity/fee_model.py",
        "sha256": "164ce06f67ce71eeec91848f0551f61a7f121eb2a9764500f499c96a4dc636aa"},
       {"path": "blueprints/us-equities/sim-capacity/schedule.py",
@@ -154,9 +213,9 @@
     ],
     "evaluation": [
       {"path": "blueprints/us-equities/sim-capacity/runner.py",
-       "sha256": "a9a32e690397e6e3ab872e1f0f16311b0c3adf0448ae6480cb4bbaa6b54401e8"},
+       "sha256": "32ce14841f372d42a1891a3cc570758afb3b568258a425a6a642d7d286f6eea7"},
       {"path": "tests/test_sim_capacity.py",
-       "sha256": "a8c2778e500d5b9a501fece644033aba5448eef73bfe284944fe9f0be783e1b5"}
+       "sha256": "312c6f6fb88f37bcce9707d1aa30fb98129c564af6d081e9cf48e55b69d5b362"}
     ]
   },
   "runtime_and_platform": {
@@ -185,12 +244,13 @@
     "Undocumented rc5 behavior: a book level's consumed-quantity tally under liquidity_consumption=True resets only when that price's displayed size actually changes (matching_engine/mod.rs:371-375), clearing otherwise only on a book reset or instrument precision change (:297-298,:1338-1339) -- an identical repeated (price, size) quote never replenishes liquidity between them. Measured on the committed elite-tier@70ms receipt: 66 of 855 IOC expiries (~0.25% of the 26,155 total fills) are marketable-at-cancel with nonzero displayed size, already consumed by an earlier fill at that same (symbol, side, price) since the quote instance in force first appeared. This makes the lane's throughput/cost figures pessimistic (fewer fills), not inflated. It also broke an early, unmodified-quote test fixture (4 fills, then 95-99% expiry for the rest of the run); the shared fixture now varies displayed size tick-to-tick so liquidity keeps replenishing.",
     "2026-09-25 dated cross-check result (blueprints/us-equities/sim-engine-crosscheck/, evidence_class sim_engine_crosscheck): hftbacktest 2.4.4 diverges from this experiment's NautilusTrader fill rate by more than 20% (28.55% at 70ms, 27.20% at 250ms, on a shared deterministic order stream over a bounded SPY+NVDA sample), triggering this record's overturn condition -- but median time-to-fill stays within the 2x threshold at both latencies, and the fill-rate divergence is attributed to a documented model-semantics difference (NautilusTrader's latency-release-on-next-quote-or-timer semantics vs hftbacktest's literal constant order latency, interacting with NVDA's sparser/gappier quotes -- SPY alone is within -0.28% at 70ms), not a matching bug, so the NautilusTrader destination is NOT overturned by this result. A separate, smaller effect (hftbacktest's own PartialFillExchange vs NoPartialFillExchange disagreeing on NVDA at 70ms only, vanishing at 250ms) is flagged in that receipt as a suspected hftbacktest-internal inconsistency, not filed upstream, and is too small to itself explain the >20% divergence.",
     "2026-09-25 repair-round correction of the entry immediately above: an independent adversarial review found and this task independently reproduced a use-after-free in the cross-check's own run_hftbacktest.py driver (a per-symbol numpy feed array losing its only Python reference mid-loop while hftbacktest held a raw, non-owning pointer into it), which had corrupted every hftbacktest result the prior entry described. Both withdrawn findings (F1's ~82% NVDA fill-rate divergence and F2's PartialFillExchange/NoPartialFillExchange disagreement) were artifacts of that corruption, not real engine behavior. With the driver fixed (verified via a determinism rerun and a two-symbol-vs-single-symbol isolation check, both hash-identical; see blueprints/us-equities/sim-engine-crosscheck/receipts/20260925-crosscheck.json), NautilusTrader and hftbacktest agree within 0.30-0.36% fill rate and 1.16-1.59x median time-to-fill (1.0x on a NautilusTrader exact-latency variant added this round) -- the >20%/2x overturn condition is NOT triggered, and the NautilusTrader destination is NOT overturned. A separate, minor, real NautilusTrader timing property was also found and reported (a deferred order releases only at its own instrument's next quote or any due timer, not exactly at submit+latency; measured extra delay median ~29ms SPY / ~58ms NVDA, p90 ~136/263ms), with a fix for sim-capacity's own exerciser recommended as a separate follow-up PR, not made here.",
-    "2026-09-25 re-pin of the frozen source sim-paper-compare/replay_compare.py from fab6a7c49082 to 3d5b4e9d1188 (PR #242, cancel identity: named-cancel exact pairing and clock_provenance counts). The five names sim-capacity uses from it (DATA, PageFetcher, chmod_private_dir, digest_bytes, ts_ns) and every module-level definition they reference (8 in all) are byte-identical between the two revisions, checked by an AST source comparison, and tests.test_sim_capacity passes on both runtimes. The committed sim-capacity receipts were produced with revision fab6a7c49082."
+    "2026-09-25 re-pin of the frozen source sim-paper-compare/replay_compare.py from fab6a7c49082 to 3d5b4e9d1188 (PR #242, cancel identity: named-cancel exact pairing and clock_provenance counts). The five names sim-capacity uses from it (DATA, PageFetcher, chmod_private_dir, digest_bytes, ts_ns) and every module-level definition they reference (8 in all) are byte-identical between the two revisions, checked by an AST source comparison, and tests.test_sim_capacity passes on both runtimes. The committed sim-capacity receipts were produced with revision fab6a7c49082.",
+    "2026-09-25 RESOLUTION of the release-timing property noted in the entry two above (the 'separate, minor, real NautilusTrader timing property... with a fix for sim-capacity's own exerciser recommended as a separate follow-up PR, not made here'): that follow-up is made here. `CapacityExerciserParams.release_alert_latency_ns` (exerciser.py) registers one otherwise-inert `set_time_alert_ns` per order at exactly submit_ts + latency, wired as the DEFAULT from `runner.run_one`'s new `exact_release` parameter (True by default) using the same nanosecond value given to `StaticLatencyModel`; a `--release-timing {exact,legacy}` CLI switch (default exact) reproduces the pre-fix on-next-event behavior on demand. Re-ran the paper-parity and elite-tier receipts (including the elite-tier latency sweep) on 2026-09-25 from the same retained --replay data (no new fetch): `receipts/20260925-paper-parity.json` and `receipts/20260925-elite-tier.json`. Measured directly on the new receipts (`runs[].submit_to_fill_latency_ms` and the new `runs[].release_timing.check`, asserted by cmd_run, not just reported): min/p50/p90/max submit-to-fill are all exactly 70.0ms for both profiles at the 70ms primary latency, and every latency-sweep point (0/70/250/1000ms) has zero early violations and zero inexact violations (0ms has nothing to make exact, since no StaticLatencyModel is attached at 0ms latency). fills/min, NBBO-touch (0 violations), independent-recount-agrees and flat-at-end all still hold on the new receipts (fills/min shifted by low single-digit percentages from the 2026-09-24 receipts -- e.g. elite-tier min 859->866, paper-parity min 171->170 -- because release timing changes which fills land in which simulated minute and which orders see liquidity an earlier order already consumed, not because of new or different market data). The prior 2026-09-24 receipts are kept, unmodified and still valid as legacy-release-mode evidence, renamed to `receipts/20260924-elite-tier-superseded.json` and `receipts/20260924-paper-parity-superseded.json` (matching sim-engine-crosscheck/receipts/20260925-crosscheck-superseded.json's convention). New direct unit coverage: tests.test_sim_capacity.ExactReleaseTimingTests, on its own sparse synthetic quote set, asserting exact-mode exactness and legacy-mode slack; both new assertions were verified failing with the release alert temporarily disabled and passing once restored (mutation check, not committed). All 65 tests.test_sim_capacity tests pass on both system Python (28 pinned-runtime/pandas tests skip cleanly) and the pinned runtime (all 65 run, 0 skipped)."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",
     "scope": "Elite-tier venue/risk profile (900/min submit budget), 8 symbols, real Alpaca SIP quotes only (trades fetched and cataloged but not fed into the engine; see H1), 2026-09-24T14:00-14:30Z, NautilusTrader 2.0.0rc5 BacktestEngine, 70ms primary latency plus 0/250/1000ms sensitivity",
-    "qualification_run_ids": ["elite-tier-capacity-run"]
+    "qualification_run_ids": ["elite-tier-capacity-run-20260925-exact-release"]
   },
   "rollback": "Remove blueprints/us-equities/sim-capacity/ and its manifests/evidence.json entries; no other blueprint imports this one, and it makes no live/paper trading claim to unwind.",
   "next_decision_changing_test": "Cross-check the same fetched data through hftbacktest 2.4.4/rust 0.9.4 (MIT, catalogued at 5f3ec40b2afb764e0fea112f941ed85523ef4e88) and compare fill rate / median time-to-fill; overturn if it diverges from this record's NautilusTrader results by more than 20% or 2x with no attributable Nautilus matching bug. Also overturn if: replaying one 6.5h session at 1000 fills/min takes more than 1h on this host; cost per fill at 50k fills in one position is more than 2x that at 1k (the upstream v2 position-copy regression); or NautilusTrader 2.0 final changes queue or latency semantics (merged PR #4942, not an open issue)."
