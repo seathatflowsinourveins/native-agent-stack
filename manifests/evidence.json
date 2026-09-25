@@ -3084,8 +3084,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "eb4d2d3347b90dd1f584e40896d7e957410d7eb406217be8ff18732260637e23",
-      "bytes": 8861
+      "sha256": "c8113295c0680308aab66d70ebd39e7e0f05a4356bfc75b21f8e2012f7551cd7",
+      "bytes": 9045
     },
     {
       "path": ".github/pull_request_template.md",
@@ -9140,18 +9140,18 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
-      "sha256": "51259a54a7f2a09cb5ce4c1ee10043621fd6b926f27292d6f56ef691514eac26",
-      "bytes": 12820
+      "sha256": "924529c3ed832377a2757130fc573929940259b9b872ec0c7c4ebf9f9edb09f6",
+      "bytes": 21956
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
-      "sha256": "c256e6f63f64a6b2d54b85b7806b216cd2db6ad0e7e843e902eb4645557be357",
-      "bytes": 19346
+      "sha256": "caaeedd1df47a6c8b714b76cf798450879e9e55319ce50103df765f9dda6615c",
+      "bytes": 35763
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/receipt.json",
-      "sha256": "8290dee440e61bfec3a2ff79b8869a4b6e5fc6e40c50942cedd68fff2f0ae839",
-      "bytes": 19591
+      "sha256": "d9e3713e8452f2a9bfb1ab5c07c6eb7373d21d86c75260bf461ba68d70a09681",
+      "bytes": 42347
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
@@ -9162,11 +9162,6 @@
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
       "bytes": 92438
-    },
-    {
-      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/tests/test_sim_crosscheck_hftbacktest.py",
-      "sha256": "ca04a6e647b1f275470ba86fde028808871c3d4f07f9adb501d7571e07a4a9d1",
-      "bytes": 6196
     },
     {
       "path": "blueprints/us-equities/sim-paper-compare/README.md",
@@ -29617,6 +29612,11 @@
       "path": "tests/test_service_reboot.py",
       "sha256": "0ed22915bc1f80d3a3bdcf6a51810bafd8161dd94640584a9e5a9ac2882d20f9",
       "bytes": 14063
+    },
+    {
+      "path": "tests/test_sim_crosscheck_hftbacktest.py",
+      "sha256": "1071614561371acc6fe89f11a2ec43a7bd47960438627543dcf6ff89c54225ba",
+      "bytes": 12568
     },
     {
       "path": "tests/test_sim_paper_compare.py",

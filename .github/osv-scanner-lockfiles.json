@@ -168,6 +168,10 @@
       "lockfile": "blueprints/us-equities/mover-v3/data-tools/requirements.lock"
     },
     {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
+      "lockfile": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock"
+    },
+    {
       "path": "evidence/artifacts/macos-application-20260924/variant/package.json",
       "lockfile": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
     },
