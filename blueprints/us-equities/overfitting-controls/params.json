@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "overfitting-controls-research-evaluation-v1",
+  "frozen_before_computation": true,
+  "purpose": "Deflated Sharpe ratio and CSCV probability of backtest overfitting over the retained multi-candidate research-evaluation ledger. Diagnostic only; no selection, tuning or promotion follows from the result.",
+  "source": {
+    "ledger_path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json",
+    "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+    "ledger_records": 6605,
+    "research_receipt_path": "blueprints/us-equities/research-evaluation/receipt.json",
+    "research_receipt_ledger_pointer": "/results/ledger_sha256",
+    "provenance": "Byte-identical regeneration of the private run-1 ledger whose SHA-256 the research-evaluation receipt records; the regeneration comparison is the gap-wave2 portfolio-risk raw/3 compare.json."
+  },
+  "series": {
+    "development_end": "2020-12-31",
+    "segment": "development only: observed labels whose decision date is on or before 2020-12-31; reserved 2021Q1 labels are excluded",
+    "value": "net_proxy (five-session open-to-open raw-price label less the fixed 20bp cost proxy), parsed from its decimal string",
+    "deduplication": "One value per (candidate, decision). Training and evaluation copies of the same episode must be identical; any conflict is an error.",
+    "alignment": "Every trial must have an observed value at every retained decision date; otherwise an error."
+  },
+  "trial_sets": {
+    "primary": [
+      "momentum20",
+      "momentum60",
+      "momentum120",
+      "cash"
+    ],
+    "with_equalweight_control": [
+      "momentum20",
+      "momentum60",
+      "momentum120",
+      "cash",
+      "equalweight"
+    ],
+    "momentum_only": [
+      "momentum20",
+      "momentum60",
+      "momentum120"
+    ]
+  },
+  "dsr": {
+    "sharpe": "Per-episode (five-session) mean divided by population standard deviation; not annualized. A zero-variance series with zero mean (cash) has Sharpe 0.",
+    "moments": "Population skewness and non-excess kurtosis of the selected trial's series (Bailey and Lopez de Prado 2014 gamma3, gamma4).",
+    "selected_trial": "Highest full-development Sharpe within the trial set; ties by trial-set order.",
+    "trial_count": "Number of trials in the set (no effective-N clustering).",
+    "trial_variance": "Sample variance (ddof=1) of the trial Sharpe estimates.",
+    "benchmark": "Expected maximum Sharpe under the null, SR0 = sqrt(V) * ((1-gamma) * Phi^-1(1-1/N) + gamma * Phi^-1(1-1/(N e)))."
+  },
+  "pbo": {
+    "method": "CSCV (Bailey, Borwein, Lopez de Prado and Zhu 2017)",
+    "partitions_primary": 16,
+    "partitions_sensitivity": [
+      8,
+      10,
+      12
+    ],
+    "metric_primary": "mean",
+    "metric_sensitivity": [
+      "sharpe"
+    ],
+    "truncation": "Drop the earliest T mod S rows so that S contiguous blocks have equal size.",
+    "in_sample_tie_break": "Trial-set order (the frozen plan's tie rule).",
+    "out_of_sample_rank": "Ascending rank among the N trials with average ranks for ties; omega = rank / (N + 1); lambda = ln(omega / (1 - omega)).",
+    "pbo_rule": "Share of combinations with lambda <= 0 (primary). The strict lambda < 0 share and the count of lambda == 0 are reported alongside."
+  },
+  "walk_forward": {
+    "series": "Development evaluation labels of each development fold's frozen chosen candidate (from the research-evaluation receipt), observed only.",
+    "statistic": "Probabilistic Sharpe ratio against a zero benchmark; the walk-forward selector is one pre-registered procedure, so no additional trial deflation is applied to it."
+  }
+}

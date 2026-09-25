@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--rtk--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" rtk && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" rtk && grep -A1 -- \"-- rtk --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed 's/^/bootstrap verified-versions record: /' ",
+      "exit": 0,
+      "duration_s": 0.054,
+      "output_sha256": "4421f231bbf7c1c75172ad0bdf40cb87feee6acad6ba8e1283b3715234b89ce5",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.49.0']\nstack ['0.49.0'] winner pins ['0.49.0']\nbootstrap verified-versions record: rtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk --version",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "edaa9940d1075ff9ed8f007410d63b7d9de8fd70f7450b29c9566a01288b1c77",
+      "output_excerpt": "rtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk git status",
+      "exit": 0,
+      "duration_s": 0.053,
+      "output_sha256": "d741a06d2cab5b740117187fd82d25876b2c12a5857ab640e880845ce56e6037",
+      "output_excerpt": "* claude/nativestack-host-record-20260925...origin/main\n M adoption/hardware-profiles.json\n M manifests/evidence.json\n?? evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/\n?? evidence/hosts/nativestack-5975wx-20260925/\n"
+    },
+    {
+      "cmd": "raw=$(git status | wc -c); filtered=$(rtk git status | wc -c); echo \"git status: $raw bytes; rtk git status: $filtered bytes\"; test \"$filtered\" -lt \"$raw\"",
+      "exit": 0,
+      "duration_s": 0.069,
+      "output_sha256": "56e48e1f5dc65f7ee0ebd5f754861a01910fafa8dda9ad442f959f3cf02a0ef2",
+      "output_excerpt": "git status: 599 bytes; rtk git status: 228 bytes\n"
+    },
+    {
+      "cmd": "a=$(git status | sha256sum); b=$(rtk proxy git status | sha256sum); if [ \"$a\" = \"$b\" ]; then echo \"rtk proxy git status is byte-identical to git status\"; else echo \"rtk proxy git status differs from git status\"; exit 1; fi",
+      "exit": 0,
+      "duration_s": 0.056,
+      "output_sha256": "005802a5ecee953bb9f4b2ea43d2eb638c7779bed4afd31e6b867f45b558a958",
+      "output_excerpt": "rtk proxy git status is byte-identical to git status\n"
+    },
+    {
+      "cmd": "rtk git log -1 nsr-no-such-ref; rc=$?; echo \"rtk git log on a missing ref: exit=$rc (expected git's 128)\"; test \"$rc\" -eq 128",
+      "exit": 0,
+      "duration_s": 0.005,
+      "output_sha256": "0cff33af59bc591c26a833770fb5e2da0d0ded6c895f5db7a3621f75da2f0cb1",
+      "output_excerpt": "rtk git log on a missing ref: exit=128 (expected git's 128)\nfatal: ambiguous argument 'nsr-no-such-ref': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-25T05:37:53Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), rtk 0.49.0 (the catalog and bootstrap pin; the bootstrap's verified-versions record also reads rtk 0.49.0) ran as a CLI proxy in this checkout: rtk git status returned the compacted branch and working-tree status; a byte count showed rtk git status shorter than raw git status (that command asserts it); rtk proxy git status returned output byte-identical to git status, the raw-output path (asserted); and rtk git log on a missing ref returned git's own exit code 128 with git's error message, so a failing underlying command is not masked (asserted). All commands exit 0.",
+  "limitations": [
+    "CLI use only: this receipt does not cover the Claude Code hook that rewrites commands through rtk on this host, rtk gain or tracking reports, client attribution or token savings. The byte comparison is one command's output, not a token measurement.",
+    "The status output reflects this worktree at recording time: clean origin/main plus this change's uncommitted evidence files.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:53Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (compacted git status shorter than raw, rtk proxy output byte-identical to raw, and a failing git log passing exit 128 through unmasked as the control; rtk 0.49.0 and the bootstrap record are backed; bound to the token-efficiency winner) and re-ran all six commands on this host: 119 against 170 bytes on the now-clean tree, proxy identical, exit 128.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:51Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

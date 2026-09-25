@@ -7,6 +7,7 @@ validate.yml); record_verdicts.py accepts a new-wave Claude return only when its
 provenance.workflow_sha256 matches that SHA256SUMS entry.
 """
 import hashlib
+import importlib.util
 import json
 import unittest
 from pathlib import Path
@@ -64,6 +65,69 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         self.assertIn(current, listed, "append the current codex_lane.py/lane-prompt.md hashes to "
                                        "tools/sota-convergence/lane-provenance.json")
 
+    def test_the_vendored_lane_echoes_what_the_collector_requires(self):
+        """Re-review R1: claude_lane.py requires the result's prompt and launch, so the vendored workflow must
+        return both and refuse a promptless real run (agent-lab #42 and #45)."""
+        source = (ROOT / "examples" / "claude-native" / "workflows" / "layer-verdict-lane.js").read_text(encoding="utf-8")
+        self.assertIn("return { lane: 'claude', launch: LAUNCH, prompt: PROMPT,", source)
+        self.assertIn("packet_sha256: p.sha256, packet_path: p.path,", source)
+        self.assertIn("prompt must be the lane-prompt.md text when packets are given", source)
+        self.assertIn("launch must be an object whose repo equals repo", source)
+
+    def test_the_current_transcript_audit_code_is_registered_for_the_claude_lane(self):
+        """Round 10, TA10-5/BR10-2: a Claude return names the transcript_audit.py that audited its agents, and
+        record_verdicts.py and scripts/landscape.py refuse one whose code is not listed, so the current bytes must be,
+        with the current vendored workflow."""
+        current = sha256(TOOLS / "transcript_audit.py")
+        workflow = sha256(ROOT / "examples" / "claude-native" / "workflows" / "layer-verdict-lane.js")
+        entries = [entry for entry in self.registry()["claude"] if entry.get("workflow_sha256") == workflow]
+        # Every workflow_path the lane may name for these bytes, the source and the vendored copy (round 11, RR11-1).
+        paths = {entry.get("workflow_path") for entry in entries}
+        self.assertTrue(paths, "register the current vendored workflow")
+        for path in sorted(paths, key=str):
+            with self.subTest(workflow_path=path):
+                self.assertTrue([entry for entry in entries if entry.get("workflow_path") == path
+                                 and entry.get("transcript_audit_py_sha256") == current],
+                                "register the current transcript_audit.py hash in tools/sota-convergence/"
+                                "lane-provenance.json's claude entries")
+
+    def test_the_lane_return_schema_admits_every_provenance_field(self):
+        """Round 10, BR10-4: the provenance object sets additionalProperties false, so it must list every field a
+        new-wave return carries."""
+        schema = json.loads((TOOLS / "lane-return.schema.json").read_text(encoding="utf-8"))
+        properties = set(schema["properties"]["provenance"]["properties"])
+        from scripts.landscape import LANE_PROVENANCE_FIELDS
+        for lane, fields in LANE_PROVENANCE_FIELDS.items():
+            self.assertLessEqual(set(fields), properties, lane)
+
+    def test_the_current_adjudication_code_is_registered(self):
+        """Independent review of #145, M2: record_verdicts.py and scripts/landscape.py refuse a new-wave
+        adjudication whose code is not listed, so the current adjudicate.py, prompt, schemas, workflow and
+        vendored blind-adjudicator role must be (append an entry whenever one of them changes)."""
+        spec = importlib.util.spec_from_file_location("adjudicate_for_registry", TOOLS / "adjudicate.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        provenance = module.adjudication_provenance()
+        # Every registered key, the audit of the Claude judges' reads included (round 11, RR11-1).
+        from scripts.landscape import ADJUDICATION_PROVENANCE_KEYS
+        self.assertTrue(any(all(entry.get(key) == provenance[key] for key in ADJUDICATION_PROVENANCE_KEYS)
+                            for entry in self.registry().get("adjudication") or []),
+                        "append the current adjudication provenance to tools/sota-convergence/lane-provenance.json")
+
+    def test_the_record_time_adjudication_files_are_what_adjudicate_hashes(self):
+        """Round 11, RR11-3: record_verdicts.py requires a new-wave adjudication's provenance to hash to this
+        checkout's files, so its file map must name exactly what adjudicate.adjudication_provenance hashes."""
+        loaded = {}
+        for name in ("adjudicate", "record_verdicts"):
+            spec = importlib.util.spec_from_file_location(f"{name}_for_files", TOOLS / f"{name}.py")
+            loaded[name] = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(loaded[name])
+        from scripts.landscape import ADJUDICATION_PROVENANCE_KEYS
+        files = loaded["record_verdicts"].ADJUDICATION_FILES
+        self.assertEqual(set(files), set(ADJUDICATION_PROVENANCE_KEYS))
+        self.assertEqual(loaded["record_verdicts"].current_hashes(ROOT, files),
+                         loaded["adjudicate"].adjudication_provenance())
+
     def test_every_vendored_lane_workflow_is_registered_under_its_source_and_vendored_paths(self):
         pin = json.loads((WORKFLOWS / "vendored-lanes.json").read_text(encoding="utf-8"))
         claude = self.registry()["claude"]
@@ -77,14 +141,31 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
 
     def test_registry_entries_are_well_formed_and_unique(self):
         registry = self.registry()
-        for lane, fields in (("claude", ("workflow_path", "workflow_sha256")),
-                             ("codex", ("codex_lane_py_sha256", "prompt_sha256"))):
-            keys = [tuple(entry[field] for field in fields) for entry in registry[lane]]
+        # agent_sha256 (the blind-lane-reviewer role hash) is part of the Claude key from 2026-09-23; entries
+        # registered before it simply lack it (the registry is append-only).
+        # An appended registration that changes only the audit code is a new key (round 11, RR11-2).
+        from scripts.landscape import ADJUDICATION_PROVENANCE_KEYS
+        for lane, fields in (("claude", ("workflow_path", "workflow_sha256", "agent_sha256",
+                                         "transcript_audit_py_sha256")),
+                             ("codex", ("codex_lane_py_sha256", "prompt_sha256")),
+                             ("adjudication", ADJUDICATION_PROVENANCE_KEYS)):
+            keys = [tuple(entry.get(field) for field in fields) for entry in registry[lane]]
             self.assertEqual(len(keys), len(set(keys)), lane)
             for entry in registry[lane]:
                 for field in fields:
-                    if field.endswith("sha256"):
+                    if field.endswith("sha256") and field in entry:
                         self.assertRegex(entry[field], r"^[a-f0-9]{64}$")
+
+    def test_the_blind_roles_are_in_the_maintained_adoption_source(self):
+        # Codex review of #145: tools/adoption/install_claude_profile.py installs adoption/agents/claude/*.md,
+        # so a fresh host gets exactly the vendored blind roles.
+        for role in ("blind-lane-reviewer", "blind-adjudicator"):
+            self.assertEqual((ROOT / "adoption/agents/claude" / f"{role}.md").read_bytes(),
+                             (ROOT / "examples/claude-native/agents" / f"{role}.md").read_bytes(), role)
+
+    def test_the_vendored_lane_role_is_registered(self):
+        agent = hashlib.sha256((ROOT / "examples/claude-native/agents/blind-lane-reviewer.md").read_bytes()).hexdigest()
+        self.assertIn(agent, [entry.get("agent_sha256") for entry in self.registry()["claude"]])
 
 
 if __name__ == "__main__":

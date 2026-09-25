@@ -76,6 +76,15 @@ Independent review verified all 42 retained artifact hashes, exact public/native
 result equality, all 21 selection hashes, the pre-scoring plan/source/lock freeze,
 the complete ledger counts and 12 focused tests without rerunning scoring.
 
+## Overfitting controls — September 24, 2026
+
+The [overfitting-controls lane](../overfitting-controls/README.md) computed two
+diagnostics offline from this run's retained 6,605-record ledger over 301
+development episodes. For the four selection candidates, the deflated Sharpe
+ratio is **0.552** and the CSCV probability of backtest overfitting is
+**0.776**. The diagnostics add no skill evidence and change no selection. The
+reserved segment was not re-scored.
+
 ## Native adoption and execution
 
 Keep the working SDK unchanged. Choose a fresh private `WAVE_DIR`, an installed

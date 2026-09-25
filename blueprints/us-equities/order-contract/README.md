@@ -6,10 +6,23 @@ decimal text and produces a deterministic **offline envelope**. It has no SDK
 dependency, client, endpoint, credentials, order submission, retry loop or broker
 state. Passing this check establishes local input validity only.
 
-The existing research harness does not automatically route through this example.
-A future adapter must explicitly call this boundary and separately pass risk,
-asset/account, serialization, order-state and provider acceptance. The envelope
-must not be treated as a submit-ready broker request.
+The adaptive-paper `AlpacaPaperTransport` and the order-throughput
+`AlpacaCapacityPort` now call `build_envelope()` before every alpaca-py submit
+(see `../adaptive-paper/README-transport.md`, "Pre-submission order-contract
+boundary"): the SDK request is built only from a validated envelope, and the
+guarded HTTP session admits an order POST only when its serialized body equals
+that envelope. Other adapters must call the boundary explicitly. Passing it is
+still local input validity only; risk, asset/account, order-state and provider
+acceptance remain separate. The envelope itself is never a submit-ready request.
+
+`build_envelope(value, *, fractional_sell_qty=False, extended_hours_allowed=False)`
+equals `canonicalize` with its defaults. An owned adapter may widen exactly two
+policies: a sell quantity with up to nine fractional digits (exact residual
+exits; buys stay whole shares) and the literal boolean `extended_hours: true`.
+The envelope shape, `mode: offline` and `submission_enabled: false` are
+unchanged. The [receipt](receipt.json) (2026-09-19) predates `build_envelope`;
+its nine-test count is historical, and the widened policies have only local
+synthetic test coverage.
 
 ## Supported local policy
 

@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--rtk--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "2d11464c5ec1564846bb4a8f81e8cce5a3d7d1bb",
+  "recorded_by": {
+    "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "command -v rtk && grep -E '^rtk = ' \"$HOME/.config/mise/config.toml\"",
+      "exit": 0,
+      "duration_s": 0.005,
+      "output_sha256": "ce5d95cf5e87e8fabb2314ad6f6bba59066923fdd2187de953121f0bb9e0f333",
+      "output_excerpt": "~/.local/share/mise/installs/rtk/0.49.0/rtk\nrtk = \"0.49.0\"\n"
+    },
+    {
+      "cmd": "rtk --version",
+      "exit": 0,
+      "duration_s": 0.006,
+      "output_sha256": "edaa9940d1075ff9ed8f007410d63b7d9de8fd70f7450b29c9566a01288b1c77",
+      "output_excerpt": "rtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk git status",
+      "exit": 0,
+      "duration_s": 0.056,
+      "output_sha256": "23a23aabd313cfc11ec6d231a666de1902970b11ca1a2df73cfbc8bfed24996b",
+      "output_excerpt": "* HEAD detached at origin/main\nclean \u2014 nothing to commit\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-24T15:50:12Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), rtk 0.49.0 (the catalog pin) reported its version, then ran as a CLI proxy: rtk git status in a scratch clone of this repository returned the compacted branch and working-tree status (all commands exit 0). rtk is installed through mise and pinned outside this repository: command -v rtk resolves to mise's rtk 0.49.0 install, and the host's mise global config pins rtk = \"0.49.0\" (both in the first command's output).",
+  "limitations": [
+    "CLI-only use: rtk is not wired into Claude Code hooks on this host, so this receipt does not cover hook-based command rewriting, client attribution or token savings, and no rtk gain report was read.",
+    "One read-only git status in a scratch clone; other rtk filters and a size comparison against raw git output were not exercised.",
+    "Raw-output and failure-recovery behavior were not exercised: there was no unfiltered rtk run or rtk proxy call and no failing underlying command, so this receipt does not show what rtk returns or keeps when a command fails.",
+    "This receipt replaces an earlier recording from the same day under the same id; the recorder derives the id from host, component, stage and UTC date. That version and its independent agree review are preserved at commit cef7a74 on PR #185. The reviewer asked for this re-record so that the install and pin evidence is retained in the commands. This copy was re-recorded from main commit 2d11464 so that its catalog_revision stays reachable after a squash merge; the previous copy, recorded at 3772eb5 and given independent agree reviews in cfa7574 and aebc492, remains in PR #185's history.",
+    "Recorded outside Claude Code's Seatbelt sandbox, in a scratch clone of this repository (adoption/update.md), not in the host's pinned install checkout. adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T15:50:12Z",
+      "reviewer": {
+        "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#185 re-review at d5c93c4: catalog_revision 2d11464 verified on origin/main; commands and claim identical to the ea31d6f copy reproduced by this session; gitleaks positive control re-run (exit 1, leaks found: 1)",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T15:54:59Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "native-agent-stack#185 independent review by agent-lab-e9 (WSL authoring host): wf_b3b5c3b4-c85 at bc8cee52, fixes re-checked at cfa7574f, main-bound re-record at 6f24cd0e diffed against the reviewed copy (commands, exits, claim, class, host identical; one history limitation sentence added)",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:09:35Z",
+      "reviewer": {
+        "identity_sha256": "a8c58742b9c83b2a9f3b226bcdf09fd461d938ed3c4f2ef62e0bc1949e3ed771",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

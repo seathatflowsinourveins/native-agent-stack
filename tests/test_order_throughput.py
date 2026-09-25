@@ -16,6 +16,7 @@ import signal
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/order-throughput"
@@ -600,6 +601,57 @@ class NativePortLogicTests(unittest.TestCase):
         with self.assertRaises(Exception):
             port.cancel_all()
 
+    def test_contract_refused_submit_never_reaches_a_client(self):
+        class Client:
+            def __getattr__(self, name):
+                raise AssertionError("client touched: " + name)
+
+        port, native = self.port(Client())
+        for args in (("cap-x-000001", "SPY", 1, "100.001", False),   # sub-penny limit price
+                     ("cap-x-000002", "BRK-B", 1, "100.01", False),  # outside the contract's symbol syntax
+                     ("cap-x-000003", "SPY", "0.5", "100.01", False),  # fractional buy
+                     ("_cap-x-000004", "SPY", 1, "100.01", False)):  # identifier syntax
+            with self.subTest(args=args):
+                response = port.submit(*args)
+                self.assertEqual((response.status, response.not_sent, response.error),
+                                 (None, True, "OrderContractRefused"))
+        self.assertEqual(port._pool.qsize(), 1)
+
+    def test_submit_posts_only_its_validated_envelope(self):
+        try:
+            import requests
+            from alpaca.trading.requests import LimitOrderRequest  # noqa: F401
+        except ImportError:
+            self.skipTest("requires isolated reviewed alpaca-py runtime")
+        import threading
+        import uuid
+        port, native = self.port(object())
+        client = native.transport._sdk_client("k", "s", port._before_request, port._observe, lock=threading.Lock())
+        self.addCleanup(client._session.close)
+        port._pool = __import__("queue").Queue()
+        port._pool.put(client)
+        bodies = []
+
+        def request(method, url, **kwargs):
+            bodies.append(kwargs["json"])
+            raw = requests.Response()
+            raw.status_code = 200
+            raw._content = json.dumps({"id": str(uuid.UUID(int=1)), "client_order_id": kwargs["json"]["client_order_id"],
+                                       "status": "new", "symbol": "SPY", "side": "buy", "qty": "1",
+                                       "filled_qty": "0"}).encode()
+            return raw
+        with patch.object(client._session._session, "request", side_effect=request) as http:
+            response = port.submit("cap-x-000001", "SPY", 1, Decimal("100.01"), True)
+            self.assertEqual((response.status, response.not_sent), (200, False))
+            refused = port.submit("cap-x-000002", "SPY", 1, "100.001", False)
+        self.assertEqual((refused.not_sent, refused.error), (True, "OrderContractRefused"))
+        self.assertEqual(http.call_count, 1)
+        envelope = native.transport.order_envelope(
+            {"client_order_id": "cap-x-000001", "symbol": "SPY", "side": "buy", "qty": "1", "limit_price": "100.01",
+             "extended_hours": True}, extended_hours_allowed=True)
+        self.assertTrue(native.transport.wire_matches_envelope(bodies[0], envelope))
+        self.assertEqual(client._session._envelopes, {})
+
     def test_stream_owner_callbacks_drive_health(self):
         port, _ = self.port(object())
         self.assertFalse(port.stream_health()["ready"])
@@ -1032,7 +1084,7 @@ class EvidenceFileTests(unittest.TestCase):
     def test_rate_limit_evidence_is_current_and_matches_brief(self):
         data = evidence.build()
         totals = data["repository_observations"]["totals_by_origin_and_limit"]
-        self.assertEqual(totals, {"data:10000": 9, "trading:200": 419})
+        self.assertEqual(totals, {"data:10000": 14, "trading:200": 705})
         self.assertEqual(len(data["sources"]["items"]), 4)
         committed = json.loads((SOURCE / "rate-limit-evidence-20260924.json").read_text())
         self.assertEqual(committed, data)
@@ -1238,6 +1290,128 @@ class PullRequestReviewTests(unittest.TestCase):
         rejected = broker.call_log[24]["t"]
         self.assertGreaterEqual(broker.call_log[25]["t"] - rejected, 90.0 - 0.05)
         self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+
+
+class TimerClock(fx.FakeClock):
+    """A fake clock that fires scheduled callbacks as time passes (delayed stream events)."""
+
+    def __init__(self):
+        super().__init__()
+        self.timers = []
+
+    def _fire(self):
+        due = sorted((t for t in self.timers if t[0] <= self.now), key=lambda t: t[0])
+        self.timers = [t for t in self.timers if t[0] > self.now]
+        for _, callback in due:
+            callback()
+
+    def sleep(self, seconds):
+        super().sleep(seconds)
+        self._fire()
+
+    def advance(self, seconds):
+        super().advance(seconds)
+        self._fire()
+
+
+class SlowCancelConfirmBroker(fx.FakeBroker):
+    """Accepts a cancel (204) at once but confirms it on trade_updates only after
+    ``confirm_delay`` seconds, as the paper endpoint did in the 2026-09-24
+    opening auction (submit-to-terminal p50 about 16.1 s). A repeat cancel of a
+    pending_cancel order is refused with 422, as seen in that run."""
+
+    confirm_delay = 16.0
+
+    def cancel(self, order_id):
+        self.clock.advance(self.cancel_latency)
+        ok, headers = self._admit("cancel")
+        if not ok:
+            return c.Response(429, headers)
+        order = self._by_id(order_id)
+        if order is None:
+            return c.Response(404, headers)
+        if order["status"] in {"filled", "canceled", "expired", "rejected", "pending_cancel"}:
+            return c.Response(422, headers)
+        order["status"] = "pending_cancel"
+
+        def confirm():
+            order["status"] = "canceled"
+            self._emit("canceled", order)
+
+        self.clock.timers.append((self.clock.monotonic() + self.confirm_delay, confirm))
+        return c.Response(204, headers)
+
+
+class StreamTimeoutTests(unittest.TestCase):
+    """--stream-timeout / stream_timeout_seconds (finding: opening-auction cancel lag)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_cli_flag_sets_config_with_unchanged_default(self):
+        parser = c.build_parser()
+        default = c.config_from_args(parser.parse_args(["offline", "--output", "x.json"]))
+        self.assertEqual(default.stream_timeout_seconds, 10.0)
+        self.assertEqual(c.CapacityConfig().stream_timeout_seconds, 10.0)
+        raised = c.config_from_args(parser.parse_args(["paper", "--output", "x.json", "--stream-timeout", "30"]))
+        self.assertEqual(raised.stream_timeout_seconds, 30.0)
+        raised.validate()
+
+    def test_bounds_are_half_a_second_to_two_minutes(self):
+        for ok in (0.5, 10.0, 30, 120.0):
+            c.CapacityConfig(stream_timeout_seconds=ok).validate()
+        for bad in (0.49, 0.0, -1.0, 120.01, float("nan"), float("inf")):
+            with self.assertRaises(c.HarnessRefusal) as raised:
+                c.CapacityConfig(stream_timeout_seconds=bad).validate()
+            self.assertEqual(str(raised.exception), "stream_timeout_seconds_out_of_bounds")
+
+    def _main(self, *extra):
+        with tempfile.TemporaryDirectory(dir="/tmp") as private:
+            out = Path(private) / "receipt.json"
+            handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    code = c.main(["offline", "--output", str(out), "--duration", "70",
+                                   "--required-windows", "1", *extra])
+            finally:
+                for sig, handler in handlers.items():
+                    signal.signal(sig, handler)
+            return code, json.loads(out.read_text())
+
+    def test_cli_records_the_flag_and_refuses_out_of_bounds_before_any_order(self):
+        code, receipt = self._main("--stream-timeout", "30")
+        self.assertEqual(receipt["config"]["stream_timeout_seconds"], 30.0)
+        self.assertEqual(receipt["provenance"]["argv"][-2:], ["--stream-timeout", "30"])
+        self.assertEqual(code, receipt["provenance"]["exit_code"])
+        code, receipt = self._main("--stream-timeout", "121")
+        self.assertEqual(code, 2)
+        self.assertEqual(receipt["status"], "refused")
+        self.assertEqual(receipt["refusal_reason"], "stream_timeout_seconds_out_of_bounds")
+        self.assertEqual(receipt["orders"]["submit_attempts"], 0)
+
+    def test_sixteen_second_cancel_confirmation_freezes_at_default_timeout(self):
+        clock = TimerClock()
+        receipt, _, _ = run(self.tmp.name, broker=SlowCancelConfirmBroker(clock), clock=clock)
+        self.assertIn("stream_terminal_missing", receipt["health_freezes"])
+        self.assertEqual(receipt["stop_reason"], "frozen:stream_terminal_missing")
+        self.assertFalse(receipt["acceptance"]["passed"])
+
+    def test_raised_timeout_rides_out_sixteen_second_confirmations(self):
+        clock = TimerClock()
+        receipt, _, broker = run(self.tmp.name, broker=SlowCancelConfirmBroker(clock), clock=clock,
+                                 stream_timeout_seconds=30.0)
+        self.assertEqual(receipt["health_freezes"], [])
+        self.assertEqual(receipt["config"]["stream_timeout_seconds"], 30.0)
+        self.assertEqual(receipt["websocket"]["completeness"], 1.0)
+        self.assertGreaterEqual(receipt["latency"]["submit_to_stream_terminal"]["p50_ms"], 16000.0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertTrue(receipt["reconciliation"]["clean"])
+        self.assertEqual(broker.open_orders_with_prefix(receipt["probe_plan"]["client_order_id_prefix"]), [])
+        # The lag caps throughput through max_open_orders; the flag avoids the freeze,
+        # it does not make an opening-auction run reach the capacity target.
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
 
 
 if __name__ == "__main__":

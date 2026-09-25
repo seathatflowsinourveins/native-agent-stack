@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "kind": "discovery_provenance",
+  "run_date": "2026-09-24",
+  "timezone_note": "Times are the input files' modification times on the coordinator host, US Eastern (EDT, UTC-4).",
+  "base_revision": "e94fb5b2cbdf330d59cf3c593ff2dab729bcea80",
+  "inputs_location": "~/.local/share/agent-ecosystem/bench/lanes/ on the coordinator host (not committed)",
+  "timeline": [
+    {
+      "file": "local-uses-packet.md",
+      "modified": "19:07:49"
+    },
+    {
+      "file": "local-uses-codex.stderr (codex lane start)",
+      "modified": "19:08:01"
+    },
+    {
+      "file": "local-uses-codex.md and its event stream",
+      "modified": "19:11:25"
+    },
+    {
+      "file": "local-uses-claude.md",
+      "modified": "19:35:35"
+    },
+    {
+      "file": "adjudication/tabular-question.md and tabular-question-swapped.md",
+      "modified": "19:37:15"
+    },
+    {
+      "file": "adjudication/tabular-question.verdict.md",
+      "modified": "19:37:57"
+    },
+    {
+      "file": "adjudication/tabular-question-swapped.verdict.md",
+      "modified": "19:38:06"
+    },
+    {
+      "file": "local-uses-convergence.md",
+      "modified": "19:38:27"
+    },
+    {
+      "file": "adjudication/tabular-question-reversed.md",
+      "modified": "20:45:19"
+    },
+    {
+      "file": "adjudication/tabular-question-reversed.verdict.md",
+      "modified": "20:46:34"
+    }
+  ],
+  "files": [
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/packet.json",
+      "sources": [
+        {
+          "file": "local-uses-packet.md",
+          "original_sha256": "38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7"
+        }
+      ],
+      "public_sha256": "c72fc158ae8f74a1fb33dc606bd94ba16159a75c7cb111d71c47effa01435a02",
+      "transformation": "verbatim text embedded as a JSON string"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json",
+      "sources": [
+        {
+          "file": "local-uses-claude.md",
+          "original_sha256": "e2c859abce553857ca3acd1e0cc754b9959644ef9c6acc4ff858805724b6f0b4"
+        }
+      ],
+      "public_sha256": "b30696c8e8720ae2d3bc04ca850304098f603874c8f2e79516b7f655185f6196",
+      "transformation": "verbatim return_text plus a substring-checked transcription"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json",
+      "sources": [
+        {
+          "file": "local-uses-codex.md",
+          "original_sha256": "7b91aec490960d3734c34b8eed5f2c72a348b3701c2126d4bd68862915fd32e0"
+        }
+      ],
+      "public_sha256": "5122de310479d12d674aaa49bbab09d7a61c4624fbce2a66b36405a50df21f77",
+      "transformation": "verbatim return_text plus a substring-checked transcription; event-stream counts and page opens from the not-committed JSONL"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+      "sources": [
+        {
+          "file": "adjudication/tabular-question.md",
+          "original_sha256": "e48d77db14a6e8062498fa252d0a74c9e4a891c32e0e2a07bf1b611a592ead0b"
+        }
+      ],
+      "public_sha256": "43487581f6d0dc5f7e9b093121d16cc6c74aae473dd43071e333a0193c3ea5bc",
+      "transformation": "verbatim input_text plus parsed question and returns; prompt from the run log"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+      "sources": [
+        {
+          "file": "adjudication/tabular-question-swapped.md",
+          "original_sha256": "ac382709be36a34225e5dee1fa7e9a60d35b6ecb002f927faff622557df7b23f"
+        }
+      ],
+      "public_sha256": "dc1afd18b206521fa578d51c5d9f72f803d05eb3ff677f6575a1e9eab89d8058",
+      "transformation": "verbatim input_text plus parsed question and returns; prompt from the run log"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+      "sources": [
+        {
+          "file": "adjudication/tabular-question-reversed.md",
+          "original_sha256": "4b21cc4f0c2a808c165b0e6ada943fb0a44e0da8a1b6c7747a41d05aa5bc74a5"
+        }
+      ],
+      "public_sha256": "5ada31de5eeb9058ec79424a1df29f656f2c6fbd1cc0d77001daf22364e790f2",
+      "transformation": "verbatim input_text plus parsed question and returns; prompt from the run log"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/adjudication-key.json",
+      "sources": [],
+      "public_sha256": "631fdb341681d10cc139a8b888a032dcc2775e27fd15bbdba1c68b5f94f8ce0f",
+      "transformation": "written by the recorder from the two inputs and the lane returns"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+      "sources": [
+        {
+          "file": "adjudication/tabular-question.verdict.md",
+          "original_sha256": "bc9d19d8b268915b7e298890f4e472376a3b1c95adfa386919378e13b42c0a15"
+        },
+        {
+          "file": "adjudication/tabular-question-swapped.verdict.md",
+          "original_sha256": "d9ad27c203b999f44796da38ce3947ea47efdff501cc73a0b58f51c6cc3f5dd9"
+        },
+        {
+          "file": "adjudication/tabular-question-reversed.verdict.md",
+          "original_sha256": "7c8d443a13adc191258e1fc6aa7929f532bc27b70836bc3b508e541756432865"
+        }
+      ],
+      "public_sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546",
+      "transformation": "each verdict embedded verbatim as returned_text; why is its text after the first line"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/convergence.json",
+      "sources": [
+        {
+          "file": "local-uses-convergence.md",
+          "original_sha256": "78c79af25b46614abe0ea9aadfadbbfe296efefcc8493546ff3f21151e9553d2"
+        }
+      ],
+      "public_sha256": "18768da848d2b5c114a0fc0922703d542298ab0a67a0a4c324900c14616d5675",
+      "transformation": "verbatim text plus the tables parsed cell by cell"
+    },
+    {
+      "public_path": "evidence/artifacts/local-model-workloads-20260924/usage.json",
+      "sources": [
+        {
+          "file": "local-uses-codex.events.jsonl",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication/tabular-question.log",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication/tabular-question-swapped.log",
+          "original_sha256": null
+        },
+        {
+          "file": "adjudication/tabular-question-reversed.log",
+          "original_sha256": null
+        }
+      ],
+      "public_sha256": "eea0ecfdfd6c022208f0c812dd634c7ba6fff4b0455e875dce017d051ba4ab73",
+      "transformation": "native counters extracted; the stream and logs are not committed and their hashes were not recorded because they are not published"
+    }
+  ],
+  "runs": [
+    {
+      "run_label": "claude-lane",
+      "lane": "claude",
+      "role": "blind discovery lane",
+      "client": "Claude Code general-purpose research subagent with web search",
+      "requested": {
+        "model": "claude-opus-5-5",
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The completion report gave usage, tool uses and duration, not a resolved model or effort.",
+      "input": "evidence/artifacts/local-model-workloads-20260924/packet.json",
+      "output": "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json"
+    },
+    {
+      "run_label": "codex-lane",
+      "lane": "codex",
+      "role": "blind discovery lane",
+      "client": "codex exec, read-only sandbox, --ignore-user-config, hooks disabled, live web search",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "The retained JSON event stream does not repeat the session header, so the resolved model and effort are not recorded; the Codex CLI version of this run is not recorded either.",
+      "input": "evidence/artifacts/local-model-workloads-20260924/packet.json",
+      "output": "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json"
+    },
+    {
+      "run_label": "adjudicator-original",
+      "lane": null,
+      "role": "blind adjudicator, original order (trial listed first as Return A)",
+      "client": "codex exec (Codex CLI v0.155.0-alpha.16.4), read-only sandbox, approval never, live web search; --ignore-user-config and hooks disabled per the coordinator",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved_note": "From the run log's session header (provider openai).",
+      "account": "the coordinator's first ChatGPT account (no identifier recorded)",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+      "output": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json"
+    },
+    {
+      "run_label": "adjudicator-swapped",
+      "lane": null,
+      "role": "blind adjudicator, label-swapped order (trial still listed first, as Return B)",
+      "client": "codex exec (Codex CLI v0.155.0-alpha.16.4), read-only sandbox, approval never, live web search; --ignore-user-config and hooks disabled per the coordinator",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved_note": "From the run log's session header (provider openai).",
+      "account": "the coordinator's first ChatGPT account (no identifier recorded)",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+      "output": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json"
+    },
+    {
+      "run_label": "adjudicator-reversed",
+      "lane": null,
+      "role": "blind adjudicator, reversed listing (skip listed first as Return A)",
+      "client": "codex exec (Codex CLI v0.155.0-alpha.16.4), read-only sandbox, approval never, live web search; --ignore-user-config and hooks disabled per the coordinator",
+      "requested": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved": {
+        "model": "gpt-6-sol",
+        "effort": "high"
+      },
+      "resolved_note": "From the run log's session header (provider openai).",
+      "account": "Ran on a different ChatGPT account from the first two judgments because the first account's weekly limit was exhausted (reported by the coordinator); model, effort and settings were unchanged. No account identifier is recorded.",
+      "input": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+      "output": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json"
+    },
+    {
+      "run_label": "coordinator-convergence",
+      "lane": null,
+      "role": "coordinator synthesis",
+      "client": "coordinator session",
+      "requested": {
+        "model": null,
+        "effort": null
+      },
+      "resolved": {
+        "model": null,
+        "effort": null
+      },
+      "resolved_note": "Not recorded.",
+      "input": "both lane returns and the first two judgments (the reversed-listing judgment came later)",
+      "output": "evidence/artifacts/local-model-workloads-20260924/convergence.json"
+    }
+  ],
+  "blindness": [
+    "Neither lane was given the other lane's output or the repository catalogs; the packet excluded seathatflowsinourveins/native-agent-stack and seathatflowsinourveins/agent-ecosystem.",
+    "Codex lane: its event stream shows no query or page open naming the excluded repositories, and it finished (19:11:25) before the Claude return existed (19:35:35).",
+    "Claude lane: its tool log was not retained, so its blindness rests on the packet instruction. The Codex return existed in the lanes directory from 19:11:25, while the Claude lane was still running.",
+    "Adjudicator: lane, model and file identities were scrubbed from all three inputs. Each run log shows a single local command, a read of its own input. When the reversed run started, its directory also held the first two runs' inputs, verdicts and logs; its log shows it opened none of them."
+  ],
+  "not_copied": [
+    "local-uses-codex.events.jsonl and local-uses-codex.stderr: raw event stream and stderr; counts, usage and page opens are extracted into usage.json and codex/lane-return-1.json.",
+    "adjudication/*.log: raw run logs holding a local working directory and session identifiers; CLI version, model, effort, sandbox, prompt and 'tokens used' are extracted."
+  ],
+  "run_labels_note": "Runs are named by label only; no session, thread or task identifiers are published."
+}

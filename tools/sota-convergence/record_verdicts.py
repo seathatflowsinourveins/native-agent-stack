@@ -67,6 +67,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import date
@@ -97,7 +98,8 @@ from scripts.landscape import (  # noqa: E402
     lane_model_issue, lane_provenance_issue, load_lane_provenance_registry,
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
-    withheld_packet_keys,
+    withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
+    packet_keys_issue, packet_seals_candidates, unseal_packet, PROSE_EXPOSURE_NAME, expected_prose_exposed,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -159,18 +161,35 @@ VENDORED_WORKFLOW_DIR = "examples/claude-native/workflows/"
 # The Codex lane code a new-wave return's provenance must hash to, in the checkout being recorded.
 CODEX_LANE_FILES = {"codex_lane_py_sha256": "tools/sota-convergence/codex_lane.py",
                     "prompt_sha256": "tools/sota-convergence/lane-prompt.md"}
+# The transcript audit a new-wave Claude return's provenance must hash to, in the checkout being recorded.
+CLAUDE_LANE_FILES = {"transcript_audit_py_sha256": "tools/sota-convergence/transcript_audit.py"}
+# The adjudication code a new-wave adjudication's provenance must hash to, in the checkout being recorded
+# (adjudicate.adjudication_provenance's files; round 11, RR11-3).
+ADJUDICATION_FILES = {"adjudicate_py_sha256": "tools/sota-convergence/adjudicate.py",
+                      "codex_lane_py_sha256": "tools/sota-convergence/codex_lane.py",
+                      "prompt_sha256": "tools/sota-convergence/adjudication-prompt.md",
+                      "judge_schema_sha256": "tools/sota-convergence/adjudication-judge.schema.json",
+                      "refute_schema_sha256": "tools/sota-convergence/adjudication-refute.schema.json",
+                      "workflow_sha256": "tools/sota-convergence/adjudication-lane.js",
+                      "adjudicator_role_sha256": "examples/claude-native/agents/blind-adjudicator.md",
+                      "transcript_audit_py_sha256": "tools/sota-convergence/transcript_audit.py"}
+
+
+def current_hashes(root: Path, files: dict) -> dict:
+    return {field: hashlib.sha256((root / relative).read_bytes()).hexdigest()
+            if (root / relative).is_file() else None for field, relative in files.items()}
 
 
 def load_lane_code(root: Path) -> dict:
     """What a new-wave return's provenance is checked against at record time: the registered
     lane code (scripts/landscape.py LANE_PROVENANCE_REGISTRY, which CI re-checks), the vendored
-    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md hashes."""
-    current = {}
-    for field, relative in CODEX_LANE_FILES.items():
-        path = root / relative
-        current[field] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md,
+    transcript_audit.py and adjudication code hashes."""
     return {"registry": load_lane_provenance_registry(root),
-            "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS), "codex_current": current}
+            "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS),
+            "codex_current": current_hashes(root, CODEX_LANE_FILES),
+            "claude_current": current_hashes(root, CLAUDE_LANE_FILES),
+            "adjudication_current": current_hashes(root, ADJUDICATION_FILES)}
 
 
 def _schema_properties():
@@ -268,7 +287,7 @@ def load_packet(packet_path: Path):
         return None
 
 
-def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_key,
+def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_key, raw: bytes = None,
                           packet_sha256sums, packet_filename, grandfathered=True,
                           lane_code=None) -> dict:
     """Full structural + "rules beyond the JSON schema" validation of one
@@ -282,7 +301,10 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
     workflow_sha256) a registry entry whose vendored file's current SHA256SUMS entry is that
     hash; a Codex return the current codex_lane.py and lane-prompt.md hashes of this checkout."""
     try:
-        data = load_json(path)
+        # ``raw``: the bytes the caller captured once, so validation, hashing and sealing share one snapshot.
+        # UTF-8 only, as load_json reads (independent review of #145, L2): json.loads on bytes would accept a
+        # BOM or UTF-16/32.
+        data = json.loads(raw.decode("utf-8")) if raw is not None else load_json(path)
     except (OSError, UnicodeError, ValueError) as error:
         raise LaneRejected(f"unreadable or invalid JSON: {error}") from error
 
@@ -310,7 +332,7 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
         provenance = data.get("provenance")
         issue = lane_provenance_issue(lane, provenance)
         require_lane(issue is None, str(issue))
-        code = lane_code or {"registry": {}, "vendored_sums": {}, "codex_current": {}}
+        code = lane_code or {"registry": {}, "vendored_sums": {}, "codex_current": {}, "claude_current": {}}
         issue = lane_provenance_registry_issue(lane, provenance, code["registry"])
         require_lane(issue is None, str(issue))
         if lane == "claude":
@@ -322,11 +344,12 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
                          f"provenance.workflow_sha256 is not the {VENDORED_WORKFLOW_SUMS} entry of the vendored "
                          f"copy the registry names for {provenance['workflow_path']}: the lane must run the "
                          "currently vendored workflow bytes")
-        else:
-            for field, relative in CODEX_LANE_FILES.items():
-                require_lane(code["codex_current"].get(field) == provenance[field],
-                             f"provenance.{field} is not the sha256 of this checkout's {relative}: the return "
-                             "was produced by other codex lane code")
+        current, files = ((code.get("claude_current", {}), CLAUDE_LANE_FILES) if lane == "claude"
+                          else (code["codex_current"], CODEX_LANE_FILES))
+        for field, relative in files.items():
+            require_lane(current.get(field) == provenance[field],
+                         f"provenance.{field} is not the sha256 of this checkout's {relative}: the return "
+                         f"was produced by other {lane} lane code")
         if lane == "claude":
             # The lane seals only a final both lenses left unrefuted (layer-verdict-lane.js); a
             # return whose summary shows a refuted or unknown final, or none, is never recorded.
@@ -650,6 +673,12 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None,
     return {"raw": raw, **result}
 
 
+def lane_root_tree(root: str) -> str:
+    """The evidence-tree digest of a --lane-repo-root, as the lanes recorded theirs (codex_lane.tree_sha256)."""
+    from codex_lane import tree_sha256
+    return tree_sha256(Path(root).resolve())
+
+
 def relativize_source(entry: str, root: Path, lane_roots=()) -> str:
     """A lane records the absolute paths it opened. Only a path under one of the
     checkouts the lane was given as its repository root (``--lane-repo-root``) is
@@ -691,7 +720,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
                  lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE,
                  outcomes: dict = None, single_lane_decision: str = None, status_context=None,
-                 lane_code=None, failures: dict = None) -> list:
+                 lane_code=None, failures: dict = None, packet_keys: dict = None, lane_root_trees=None) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -724,12 +753,26 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             packet_mismatch = f"packets/SHA256SUMS has no entry for {packet_filename}"
         elif sha256sums[packet_filename] != actual:
             packet_mismatch = f"packet file packets/{packet_filename} does not match packets/SHA256SUMS"
+        elif packet_seals_candidates(packet):
+            # Winner component ids and pins come from the sealed manifest fields (review of #145).
+            packet_mismatch = (packet_keys_issue(packet_keys, packet_filename, actual, packet) if packet_keys is not None
+                               else "the packet seals its candidates' manifest fields: pass --packet-keys "
+                                    "(the lane_packets.py --keys-out file of this run)")
+            if packet_mismatch is None:
+                packet = unseal_packet(packet, packet_keys, packet_filename)
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
 
-    valid = {}
+    valid, lane_bytes = {}, {}
     for lane, path in lane_paths.items():
         if not path.is_file():
+            continue
+        try:
+            # One read per lane file (Codex review of #145): validation, the adjudication's
+            # lane_returns_sha256 check and sealing all use these bytes.
+            lane_bytes[lane] = path.read_bytes()
+        except OSError as error:
+            reject_lane(lane, f"unreadable: {error}")
             continue
         try:
             if packet is None:
@@ -738,7 +781,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                 raise LaneRejected(packet_mismatch)
             valid[lane] = validate_lane_return(
                 path, lane=lane, catalog=catalog, layer_id=layer_id, candidates_by_key=candidates_by_key,
-                packet_sha256sums=sha256sums, packet_filename=packet_filename, grandfathered=grandfathered,
+                raw=lane_bytes[lane], packet_sha256sums=sha256sums, packet_filename=packet_filename, grandfathered=grandfathered,
                 lane_code=lane_code)
         except LaneRejected as error:
             reject_lane(lane, str(error))
@@ -747,6 +790,24 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         # Unreachable while each lane's family is fixed, kept so the two-family rule cannot lapse.
         reject_lane("codex", "the codex lane must come from a different model family than the claude lane")
         del valid["codex"]
+    if (not grandfathered and len(valid) == 2 and valid["claude"]["provenance"].get("repo_tree_sha256")
+            != valid["codex"]["provenance"].get("repo_tree_sha256")):
+        # Both lanes must have judged one evidence tree (Codex review of #145); the Claude lane is kept and the
+        # layer stays pending until the Codex lane is rerun on the same export.
+        reject_lane("codex", "the codex lane read evidence tree "
+                             f"{valid['codex']['provenance'].get('repo_tree_sha256')}, not the claude lane's "
+                             f"{valid['claude']['provenance'].get('repo_tree_sha256')}; rerun it on the same export")
+        del valid["codex"]
+    if not grandfathered and lane_root_trees:
+        # Each --lane-repo-root must hold the tree the lanes read (independent review of #145, BIND-R4-9): sources
+        # under another checkout would be relativized as if they were the export's.
+        for lane in list(valid):
+            tree = valid[lane]["provenance"].get("repo_tree_sha256")
+            others = sorted(root for root, digest in lane_root_trees.items() if digest != tree)
+            if others:
+                reject_lane(lane, f"--lane-repo-root {', '.join(others)} does not hold the evidence tree {tree} this "
+                                  "lane read; name the export the lanes were given")
+                del valid[lane]
 
     if not valid:
         return []
@@ -835,6 +896,52 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                                          grandfathered=grandfathered,
                                          packet_sha256=sha256sums.get(packet_filename))
         adjudication_text = None
+        if adjudication is not None and not grandfathered:
+            # The adjudication must have compared exactly the lane returns sealed here (Codex review of #145):
+            # a lane rerun after assemble would otherwise inherit a winner_lane its judges never saw.
+            # The sealed form of each lane return (what CI sees as lanes.<lane>.sealed_sha256), from the one
+            # snapshot of its bytes (independent review of #145, M2).
+            current = {}
+            for lane in LANES:
+                try:
+                    # The same relativized form the lane is sealed in below (re-review R2), so the binding is
+                    # to the row's lanes.<lane>.sealed_sha256 that CI compares.
+                    current[lane] = hashlib.sha256(sealed_text(with_relative_sources(valid[lane], root, lane_roots))
+                                                   .encode("utf-8")).hexdigest()
+                except ValueError:  # LeakDetected: the return cannot be sealed, so nothing binds to it
+                    current[lane] = None
+            lanes_tree = valid["claude"]["provenance"].get("repo_tree_sha256")
+            adjudication_tree = (adjudication["raw"].get("provenance") or {}).get("repo_tree_sha256")
+            binding = adjudication_binding_issue(
+                adjudication["raw"], current, {lane: valid[lane]["provenance"].get("repo_tree_sha256") for lane in LANES},
+                load_lane_provenance_registry(root))
+            if adjudication["raw"].get("lane_returns_sha256") != current:
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": "the adjudication's lane_returns_sha256 does not name the lane "
+                                             "returns being sealed; rerun adjudicate inputs and assemble"})
+                adjudication = None
+            elif adjudication_tree != lanes_tree:
+                # The judges must have read the evidence tree both lanes read (Codex review of #145).
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": f"the adjudication read evidence tree {adjudication_tree}, not the "
+                                             f"lanes' {lanes_tree}; adjudicate against the lanes' export"})
+                adjudication = None
+            elif binding is not None:
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": f"the adjudication {binding}"})
+                adjudication = None
+            else:
+                # Registered history stays valid for CI; a new record comes from this checkout's code (RR11-3).
+                provenance = adjudication["raw"].get("provenance") or {}
+                current_code = (lane_code or {}).get("adjudication_current", {})
+                stale = [relative for field, relative in ADJUDICATION_FILES.items()
+                         if current_code.get(field) != provenance.get(field)]
+                if stale:
+                    rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                       "reason": "the adjudication's provenance is not the sha256 of this "
+                                                 f"checkout's {', '.join(stale)}: it was produced by other "
+                                                 "adjudication code"})
+                    adjudication = None
         if adjudication is not None:
             try:
                 adjudication_text = sealed_text(adjudication["raw"])
@@ -1091,6 +1198,100 @@ def run_manifest_document(work_dir: Path, run_date: str, sealed_base: str, outco
     }
 
 
+def load_packet_keys(path) -> dict:
+    """The --packet-keys document, or SystemExit with a message (round 5, R5-REG-8)."""
+    try:
+        document = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise SystemExit(f"--packet-keys {path}: {error}")
+    if not (isinstance(document, dict) and document.get("schema_version") == PACKET_KEYS_SCHEMA_VERSION
+            and isinstance(document.get("packets"), dict)):
+        raise SystemExit(f"--packet-keys {path} is not a packet-keys document (schema_version "
+                         f"{PACKET_KEYS_SCHEMA_VERSION}, packets object); pass the lane_packets.py --keys-out file")
+    return document
+
+
+def prose_exposure_layers(root: Path, work_dir: Path, lane_root, packet_keys: dict, only=None) -> dict:
+    """The wave's prose exposure by layer (independent review of #145, round 7, BL7-2): which exported prose files
+    state each layer's winner, measured with export_isolation_check.prose_exposure against the ledger as it stands
+    before these rows are written, over the export the lanes read (``lane_root``) and this run's packets. Each entry
+    records what it was measured on (round 8, NEW-2): its packet's sha256, the export's tree and the ledgers'
+    digest. ``only`` (packet names) limits it to an append's rows."""
+    import export_isolation_check
+    report = export_isolation_check.prose_exposure(Path(lane_root), work_dir / "packets",
+                                                   export_isolation_check.ledger_winners(root), packet_keys)
+    ledgers = hashlib.sha256()
+    for relative in sorted(LEDGER_FILES.values()):
+        ledgers.update(f"{relative}\0{hashlib.sha256((root / relative).read_bytes()).hexdigest()}\n".encode("utf-8"))
+    tree = lane_root_tree(lane_root)
+    layers = {}
+    for layer, entry in report.items():
+        name = layer.replace("::", "__", 1) + ".json"
+        if only is not None and name not in only:
+            continue
+        layers[layer] = dict(entry, packet_sha256=hashlib.sha256((work_dir / "packets" / name).read_bytes()).hexdigest(),
+                             lane_root_tree_sha256=tree, ledgers_sha256=ledgers.hexdigest())
+    return layers
+
+
+def manifest_component_ids(manifest: dict) -> set:
+    """Every component id a sota manifest registers: its foundation components and trading entries."""
+    ids = set()
+    for catalog, field in (("foundation", "components"), ("trading", "entries")):
+        for layer in manifest.get(catalog) or []:
+            for item in (layer.get(field) or []) if isinstance(layer, dict) else []:
+                if isinstance(item, dict) and isinstance(item.get("id"), str):
+                    ids.add(item["id"])
+    return ids
+
+
+def packet_keys_manifest_issue(root: Path, packet_keys: dict):
+    """None when the packet-keys document names the manifest it was built from (path and sha256, unchanged under
+    --root) and every sealed component_id is registered there (independent review of #145, round 6, INT-R6-2)."""
+    manifest = packet_keys.get("manifest")
+    if not (isinstance(manifest, dict) and isinstance(manifest.get("path"), str)):
+        return "the packet-keys document names no manifest; rebuild it with lane_packets.py --keys-out"
+    path = safe_file(root, manifest["path"]) if ".." not in Path(manifest["path"]).parts else None
+    if path is None or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != manifest.get("sha256"):
+        return f"the packet-keys document's manifest {manifest['path']} is missing under --root or changed"
+    registered = manifest_component_ids(json.loads(path.read_text(encoding="utf-8")))
+    unknown = sorted({str(fields.get("component_id")) for entry in (packet_keys.get("packets") or {}).values()
+                      if isinstance(entry, dict) for fields in (entry.get("candidates") or {}).values()
+                      if isinstance(fields, dict) and fields.get("component_id")
+                      and not (isinstance(fields["component_id"], str) and fields["component_id"] in registered)},
+                     key=str)
+    if unknown:
+        return f"sealed component ids {unknown[:5]} are not registered in {manifest['path']}"
+    return None
+
+
+def retained_packet_keys_text(root: Path, sealed_base: str, retained: list, packet_keys, only,
+                              work_dir: Path = None) -> str:
+    """The wave's packet-keys document (<sealed_base>/packet-keys.json): the --packet-keys entry of every packet
+    retained now and, under --append-rows, the sealed document's entry of every carried-over packet."""
+    existing_path = root / sealed_base / PACKET_KEYS_NAME
+    existing = {}
+    if only is not None and existing_path.is_file():
+        existing = load_packet_keys(existing_path).get("packets") or {}
+    current = (packet_keys or {}).get("packets") or {}
+    entries = {}
+    for item in retained:
+        name = item["name"]
+        entry = (existing if only is not None and name not in only else current).get(name)
+        if not isinstance(entry, dict) or entry.get("packet_sha256") != item["sha256"]:
+            raise SystemExit(f"--packet-keys has no entry for the retained packet {name} with its sha256; pass the "
+                             "lane_packets.py --keys-out file of this run")
+        packet_path = (work_dir / "packets" / name) if work_dir is not None else None
+        if packet_path is not None and packet_path.is_file() and not (only is not None and name not in only):
+            # The entry must seal exactly this packet's candidates, as CI checks (round 5, INT-R5-4).
+            issue = packet_keys_issue({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": {name: entry}}, name,
+                                      item["sha256"], json.loads(packet_path.read_text(encoding="utf-8")))
+            if issue:
+                raise SystemExit(f"--packet-keys: {issue}")
+        entries[name] = entry
+    return sealed_text({"schema_version": PACKET_KEYS_SCHEMA_VERSION, "packets": entries})
+
+
 def run_manifest_text(work_dir: Path, run_date: str, sealed_base: str, outcomes: dict, rejections: list,
                       **kwargs) -> str:
     return sealed_text(run_manifest_document(work_dir, run_date, sealed_base, outcomes, rejections, **kwargs))
@@ -1124,6 +1325,10 @@ def parse_args(argv=None):
                              "--write refuses it once --root holds that wave (its sealed directory or a "
                              "registered wave document). Pass the same value to --check as was used for --write.")
     parser.add_argument("--adjudications", type=Path, default=None)
+    parser.add_argument("--packet-keys", type=Path, default=None,
+                        help="The lane_packets.py --keys-out file of this run: restores each candidate's sealed "
+                             "manifest fields (component_id, pin, upstream, recipe_ref, decisions) after checking "
+                             "its packet's sha256; retained as <sealed_base>/packet-keys.json.")
     parser.add_argument("--allow-single-lane", default=None, metavar="PATH",
                         help="Dated decision record under docs/decisions/ (YYYY-MM-DD or YYYYMMDD in its file "
                              "name) that authorizes recording a codex_absent layer from the Claude lane alone; "
@@ -1200,6 +1405,74 @@ def main(argv=None) -> int:
     status_context = load_context(root)
     lane_code = load_lane_code(root)
     failures = load_lane_failures(work_dir)
+    packet_keys = load_packet_keys(args.packet_keys) if args.packet_keys else None
+    if packet_keys is not None and not grandfathered:
+        issue = packet_keys_manifest_issue(root, packet_keys)
+        if issue:
+            raise SystemExit(f"--packet-keys: {issue}")
+    lane_root_trees = {}
+    if not grandfathered:
+        for lane_root in args.lane_repo_root:
+            if ".." in Path(lane_root).parts:
+                # abspath would resolve it lexically, not physically (BIND-R4-9).
+                raise SystemExit(f"--lane-repo-root {lane_root} contains ..; name the export directly")
+            try:
+                lane_root_trees[str(lane_root)] = lane_root_tree(lane_root)
+            except (OSError, ValueError) as error:
+                raise SystemExit(f"--lane-repo-root {lane_root}: {error}")
+
+    # Measured before any row changes, against the incumbents the lanes' export showed (round 7, BL7-2). A wave keeps
+    # the exposure of its first --write: an append or a --check reads the retained document.
+    exposure_text = None
+    if not grandfathered:
+        retained_exposure = root / sealed_base / PROSE_EXPOSURE_NAME
+        if manifest_path.is_file():
+            # An append or a --check reads the exposure the wave's earlier --write measured, only as its run manifest
+            # binds it (round 8, NEW-2: a retained document was adopted unverified, so an append laundered an edit).
+            bound = json.loads(manifest_path.read_text(encoding="utf-8")).get("prose_exposure_sha256")
+            if not (bound and retained_exposure.is_file()
+                    and hashlib.sha256(retained_exposure.read_bytes()).hexdigest() == bound):
+                raise SystemExit(f"{sealed_base}/{PROSE_EXPOSURE_NAME} is missing, not bound by the run manifest or "
+                                 "edited; a sealed layer's prose exposure is measured once, when its row is written")
+            exposure_text = retained_exposure.read_text(encoding="utf-8")
+            if write_mode and only is not None:
+                # An append measures its own rows now, before they are written: for them the ledger is still pre-wave.
+                if not args.lane_repo_root or packet_keys is None:
+                    raise SystemExit("an --append-rows --write measures its rows' prose exposure: pass --lane-repo-root "
+                                     "and --packet-keys")
+                held = json.loads(exposure_text)
+                measured = prose_exposure_layers(root, work_dir, args.lane_repo_root[0], packet_keys, only)
+                again = sorted(set(measured) & set(held.get("layers") or {}))
+                if again:
+                    raise SystemExit(f"{PROSE_EXPOSURE_NAME} already measured {again}")
+                exposure_text = sealed_text(dict(held, layers={**(held.get("layers") or {}), **measured}))
+        elif retained_exposure.exists():
+            raise SystemExit(f"{sealed_base}/{PROSE_EXPOSURE_NAME} exists before the wave's first --write; this recorder "
+                             "did not measure it: remove it")
+        elif not (write_mode and args.lane_repo_root):
+            # Every new wave discloses it (Codex review of #145 at 68e74f2c): a wave written without it could never
+            # gain it, since a later --check reads only what the first --write sealed.
+            raise SystemExit(f"a new wave records its prose exposure: --write needs --lane-repo-root (the export the "
+                             f"lanes read) and --packet-keys, and --check needs the wave's {PROSE_EXPOSURE_NAME}")
+        elif packet_keys is not None:
+            # Measured now, before any row is written: the incumbents are those the lanes' export showed.
+            exposure_text = sealed_text({"schema_version": 1,
+                                         "measured_against": "the ledger before each layer's row was written",
+                                         "layers": prose_exposure_layers(root, work_dir, args.lane_repo_root[0],
+                                                                         packet_keys, only)})
+        # (Without --packet-keys the sealed packets are refused below, with that reason.)
+    exposure_doc = json.loads(exposure_text) if exposure_text is not None else None
+    if exposure_doc is not None:
+        # Each of this run's layers was measured over its packet here and the export these lanes read (round 8,
+        # NEW-2).
+        for packet in sorted((work_dir / "packets").glob("*__*.json")):
+            if only is not None and packet.name not in only:
+                continue
+            entry = (exposure_doc.get("layers") or {}).get(packet.stem.replace("__", "::", 1))
+            if not isinstance(entry, dict) or entry.get("packet_sha256") != hashlib.sha256(packet.read_bytes()).hexdigest():
+                raise SystemExit(f"{PROSE_EXPOSURE_NAME} holds no measure of {packet.name} as this run holds it")
+            if lane_root_trees and entry.get("lane_root_tree_sha256") not in lane_root_trees.values():
+                raise SystemExit(f"{PROSE_EXPOSURE_NAME} measured {packet.name} over another tree than --lane-repo-root")
 
     rejections: list = []
     sealed_writes: list = []
@@ -1221,10 +1494,15 @@ def main(argv=None) -> int:
                 continue
             sealed_writes.extend(process_row(
                 row, root, catalog, row["layer_id"], work_dir, checked_at, args.adjudications,
-                identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root),
+                identities, aliases, sha256sums, rejections,
+                # Both spellings of each root, as adjudicate records them (re-review L1; validate-macos): a lane's
+                # recorded paths match whichever spelling it was given, and relativizing either way gives the same
+                # repository-relative form, so both sides of the lane_returns_sha256 binding agree.
+                tuple(dict.fromkeys(spelling for root in args.lane_repo_root
+                                    for spelling in (os.path.abspath(root), str(Path(root).resolve())))),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
-                lane_code=lane_code, failures=failures))
+                lane_code=lane_code, failures=failures, packet_keys=packet_keys, lane_root_trees=lane_root_trees))
 
     # Survivorship: every packet of the run and each lane's outcome (sealed, rejected with its
     # reasons, failed with its runner's reason, or missing) is sealed next to the returns, with the
@@ -1257,16 +1535,26 @@ def main(argv=None) -> int:
                                  "judge packets built with lane_packets.py --withhold-labels")
             sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / item["name"], text))
         sealed_writes.append((root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS", manifest["packets_sha256sums"]))
+        keys_text = retained_packet_keys_text(root, sealed_base, manifest["retained_packets"], packet_keys, only,
+                                              work_dir)
+        manifest["packet_keys_sha256"] = hashlib.sha256(keys_text.encode("utf-8")).hexdigest()
+        sealed_writes.append((root / sealed_base / PACKET_KEYS_NAME, keys_text))
+        if exposure_text is not None:
+            manifest["prose_exposure_sha256"] = hashlib.sha256(exposure_text.encode("utf-8")).hexdigest()
+            sealed_writes.append((root / sealed_base / PROSE_EXPOSURE_NAME, exposure_text))
         manifest_text = sealed_text(manifest)
         sealed_writes.append((manifest_path, manifest_text))
         manifest_sha256 = hashlib.sha256(manifest_text.encode("utf-8")).hexdigest()
         # Every row of this wave is bound to the manifest it is recorded with (an append re-binds the
         # wave's earlier rows to the extended manifest, whose earlier entries it carries unchanged).
-        for _path, _text, document in documents.values():
+        for catalog, (_path, _text, document) in documents.items():
             for row in document.get("layers", []):
                 lanes = row.get("lanes")
                 if isinstance(lanes, dict) and lanes.get("sealed_base") == sealed_base:
                     lanes["run_manifest_sha256"] = manifest_sha256
+                    if exposure_doc is not None:
+                        # Disclosed per row: its layer's cited prose states a winner's selection (round 7, BL7-2).
+                        lanes["prose_exposed"] = expected_prose_exposed(exposure_doc, catalog, row["layer_id"])
 
     ledger_outputs = {}
     for catalog, (path, original_text, document) in documents.items():
@@ -1278,7 +1566,8 @@ def main(argv=None) -> int:
         if not grandfathered:
             # Never overwrite a sealed file with other bytes; only the manifest and the retained
             # SHA256SUMS are extended by an append.
-            replaceable = {manifest_path, root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS"}
+            replaceable = {manifest_path, root / sealed_base / RETAINED_PACKETS_DIR / "SHA256SUMS",
+                           root / sealed_base / PACKET_KEYS_NAME, root / sealed_base / PROSE_EXPOSURE_NAME}
             conflicts = sorted(sealed_path.relative_to(root).as_posix() for sealed_path, text in sealed_writes
                                if sealed_path not in replaceable and sealed_path.is_file()
                                and sealed_path.read_text(encoding="utf-8") != text)

@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 69,
-    "catalog_identities": 844,
-    "nonselected_catalog_identities": 775,
+    "catalog_identities": 861,
+    "nonselected_catalog_identities": 792,
     "exclusive_identity_groups": {
-      "star_review": 275,
+      "star_review": 281,
       "component_record": 69,
       "catalog_card": 114,
-      "research_supplement": 384,
+      "research_supplement": 395,
       "legacy_candidate": 2
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
