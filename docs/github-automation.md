@@ -1169,9 +1169,13 @@ holds the evidence, alternatives and overturn comparison for each item.
   `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
   a deliberately vulnerable test fixture, with a reason and an evidence path;
-  it is currently empty, because the grype positive control for gap
-  ci-supply-chain[13] (urllib3 1.26.4, `tests/test_grype_known_cve_fixture.py`)
-  is retained as `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt.fixture`
+  today it lists three gap-wave-2 DVC-lock evidence fixtures under
+  `evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/`
+  (captured dependency lists from an isolated probe environment, not a shipped
+  dependency). It no longer lists the grype positive control for gap
+  ci-supply-chain[13] (urllib3 1.26.4, `tests/test_grype_known_cve_fixture.py`):
+  that fixture is retained as
+  `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt.fixture`
   -- a name no manifest/lockfile scanner recognizes, so it needs no exclusion
   (the test copies it into a fresh temp dir as `requirements.txt` immediately
   before invoking grype, never into the repository tree). The `zizmor-online` job

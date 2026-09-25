@@ -9355,8 +9355,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "f26e1da357e8ef10226e91cf81265cf5ec56d9b60311b5c34c6fee230246538a",
-      "bytes": 31996
+      "sha256": "8717e898134b366a93f7e5060673637192f07598369f384a9997cff65acec9d7",
+      "bytes": 32191
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -9950,8 +9950,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "b1431bca3eb5e1d39ab5839d2510502ecc406a0a49e0c50ca138a5e8c2bb644d",
-      "bytes": 82030
+      "sha256": "82f20005cb56e97cab4ef36e7c521e7892642e4f9c1bb603e0f5df8d8c5e948d",
+      "bytes": 84235
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -10080,8 +10080,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "63055bf1c1ff354ac13383136fc9d1436c646f1e9803047ab60b727558a9151f",
-      "bytes": 78530
+      "sha256": "29c4bb47a021a313a85c0efdef9335f877c7a1c465ce8c3a11da4570c01a8d2a",
+      "bytes": 78773
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -29345,8 +29345,8 @@
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
-      "sha256": "82ebf58ea398d39f38938eac244f236256785774b308ef45e4ec1766d777fbec",
-      "bytes": 5196
+      "sha256": "049395b4926374199da4c95d047d4359e9e5174c2be078b59388019bc0d6daf9",
+      "bytes": 6657
     },
     {
       "path": "tests/test_historical_comparison.py",

@@ -144,11 +144,28 @@ locally with `GH_TOKEN` set and no `--offline`, using
   test. **Overturn:** the fixture becomes an installed dependency, or a second
   exclusion is proposed for a file that is not a test fixture.
   **Superseded (2026-09-25):** the fixture was renamed to
-  `requirements.txt.fixture` to stop it feeding GitHub's dependency graph
-  (Scorecard's vulnerability check followed those alerts, not this repo's own
-  scanner exclusions), so it is no longer a tracked manifest name and this
-  `excluded` entry was removed rather than kept; the test's exclusion path
-  itself is unchanged.
+  `requirements.txt.fixture` because Scorecard v5.5.0's own vulnerabilities
+  check runs OSV-Scanner (osv-scalibr) directly over repository files
+  (`clients/osv.go:73-87`, `checks/raw/vulnerabilities.go:32-36`), and
+  osv-scalibr's Python cataloger matches any `*requirements*.txt` name
+  (`requirements.go:113`) -- it never reads GitHub's dependency graph and does
+  not honor this repo's own `osv-scanner-lockfiles.json`/`dependabot.yml`
+  exclusions, which is why alert #19 stayed open despite them. Renaming past
+  that `*.txt` match makes the fixture invisible to Scorecard's scan too, so
+  it is no longer a tracked manifest name and this `excluded` entry was
+  removed rather than kept; the test's exclusion path itself is unchanged.
+  **Alternatives considered:** an `osv-scanner.toml` ignore scoped to the
+  fixture directory (rejected: Scorecard's embedded OSV-Scanner run does not
+  read this repo's config, so it would not stop the alert); generating the
+  fixture at test time instead of committing it (matches the pattern in
+  `blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh:47`,
+  which writes its positive-control `requirements.txt` into an output
+  directory at run time; not taken here to keep the retained file
+  byte-identical and hash-registered for reproducibility). **Overturn:**
+  Scorecard or OSV-Scanner starts matching `.fixture`-suffixed files, or
+  alert #19 does not close after the next main-branch Scorecard run (verify
+  with `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/alerts/19 --jq .state`,
+  expected `fixed`).
 - **`--no-resolve` (measured).** With transitive resolution, three unlocked
   manifests reported versions that no lockfile installs. OSV's resolver picked
   `httpx2`/`httpcore2` 2.9.1 (PyPI latest 2.13.0) and `six` 1.9.0 (latest
@@ -376,11 +393,24 @@ locally with `GH_TOKEN` set and no `--offline`, using
   alerts on the fixture; those are dismissed `not_used`. Requested by the
   gap-resolution session that owns the fixture.
   **Superseded (2026-09-25):** the fixture was renamed to
-  `requirements.txt.fixture`, so Dependabot's pip manifest discovery no
-  longer finds it in that directory at all; this dedicated `pip` entry was
-  removed from `.github/dependabot.yml` rather than kept, closing code-scanning
-  alert #19 (Scorecard's "Vulnerabilities" check, which reads the dependency
-  graph directly and does not honor either scanner's own exclusion lists).
+  `requirements.txt.fixture`; that rename, not this Dependabot entry, is what
+  is expected to close code-scanning alert #19, because alert #19 comes from
+  Scorecard v5.5.0's own vulnerabilities check running OSV-Scanner
+  (osv-scalibr) directly over repository files -- it matches any
+  `*requirements*.txt` name and does not read GitHub's dependency graph or
+  honor either scanner's own exclusion lists (see the section-3 note for the
+  source references). With the fixture no longer named `requirements.txt`,
+  Dependabot's pip manifest discovery also no longer finds it in that
+  directory, so this dedicated `pip` entry was removed from
+  `.github/dependabot.yml` as redundant rather than kept.
+  **Alternatives and overturn:** same as the section-3 superseded note (an
+  `osv-scanner.toml` ignore does not reach Scorecard's embedded scan;
+  generating the fixture at test time was not taken, to keep the retained
+  file hash-registered). **Overturn:** verify with
+  `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/alerts/19 --jq .state`
+  (expected `fixed` after the next main-branch Scorecard run); if it is not,
+  or Dependabot/Scorecard begins reading `.fixture` files, this rename does
+  not resolve the alert and the dedicated `pip` entry should be restored.
 - **Security updates stay on.** Dependabot security updates are free, gave the
   fastest signal here (#97/#98 within minutes of enabling), and auto-close
   their alerts when a fix lands (alerts 1-6 closed on #99's merge). The cost is
