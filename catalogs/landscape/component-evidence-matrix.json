@@ -66,8 +66,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:16Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -407,8 +407,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:54Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -451,8 +451,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -495,8 +495,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:10Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -636,8 +636,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -693,16 +693,16 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
-              "derived_reason": "source_review winner with no passing host receipt",
-              "derived_status": "not_established",
+              "derived_reason": "pin-bound passing host receipt(s)",
+              "derived_status": "conditional",
               "e2e_state": "not_established",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -776,16 +776,16 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
-              "derived_reason": "source_review winner with no passing host receipt",
-              "derived_status": "not_established",
+              "derived_reason": "pin-bound passing host receipt(s)",
+              "derived_status": "conditional",
               "e2e_state": "not_established",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 1,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T01:05:55Z",
-                "pass": 0
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1312,8 +1312,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1421,8 +1421,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1610,8 +1610,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:16Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1738,8 +1738,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:55Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1782,8 +1782,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:54Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1826,8 +1826,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:55Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2086,8 +2086,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:01Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2227,8 +2227,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:08Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2287,8 +2287,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2352,8 +2352,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:51Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2513,8 +2513,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:57Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2557,8 +2557,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T17:14:16Z",
-                "pass": 1
+                "latest": "2026-09-25T05:37:56Z",
+                "pass": 2
               },
               "qualified_models": [
                 {
@@ -2664,8 +2664,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T01:05:22Z",
-                "pass": 1
+                "latest": "2026-09-25T05:37:53Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -2724,8 +2724,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2768,8 +2768,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -2979,7 +2979,7 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "Codex native workers",
           "repository": "https://github.com/openai/codex"
@@ -3125,8 +3125,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -3239,7 +3239,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "Qdrant",
           "repository": "https://github.com/qdrant/qdrant"
@@ -3470,8 +3470,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:10Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -3597,8 +3597,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:38:08Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -4576,8 +4576,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T05:37:51Z",
+                "pass": 1
               },
               "qualified_models": []
             },

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--worktrunk--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "worktrunk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v wt) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && wt --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" worktrunk && test ! -e \"$HOME/.config/worktrunk/config.toml\" && echo \"no worktrunk user config (default worktree-path template, no user hooks)\"",
+      "exit": 0,
+      "duration_s": 0.043,
+      "output_sha256": "1b6e87828717bd6e064e1e0c9745739db30f2a55cf745603c98ff33889ab04b3",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/wt -> ~/.local/share/codex-ecosystem/tools/worktrunk-0.79.0/payload/worktrunk-x86_64-unknown-linux-musl/wt\nwt v0.79.0\nstack ['0.79.0'] winner pins ['0.79.0']\nno worktrunk user config (default worktree-path template, no user hooks)\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-wt && git init -q -b main /tmp/nsr-wt/repo && cd /tmp/nsr-wt/repo && printf 'worktrunk probe\\n' > README.md && git add README.md && git -c core.hooksPath=/dev/null -c commit.gpgsign=false -c user.name=wt-probe -c user.email=wt-probe@example.invalid commit -q -m 'probe: initial commit' && test ! -e .config/wt.toml && echo \"no project config\" && git worktree list",
+      "exit": 0,
+      "duration_s": 0.019,
+      "output_sha256": "0e162f29191419be93e40d850d30affb804f125ba04cefbda0520e458a16e4c9",
+      "output_excerpt": "no project config\n/tmp/nsr-wt/repo  935f774 [main]\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-wt/repo && wt switch --create wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "db96a1e7b12111fb832c7239555b4faff1db945600f926621fe05b1a1e4ddee3",
+      "output_excerpt": "\u2713 Created branch wt-probe from main and worktree @ /tmp/nsr-wt/repo.wt-probe\n\u21b3 To customize worktree locations, run wt config create\n\u25b2 Cannot change directory \u2014 shell integration not installed\n\u21b3 To enable automatic cd, run wt config shell install\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-wt/repo && wt list </dev/null",
+      "exit": 0,
+      "duration_s": 0.035,
+      "output_sha256": "89c08fb51c94966131fd9cde899958696b52f9274f1d57aaf6f09a2d969309a4",
+      "output_excerpt": "  Branch    Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path              Commit    Age  Message\n@ main          ^                                             .                 935f774   now  probe: initial commit\n+ wt-probe      _                                             ../repo.wt-probe  935f774   now  probe: initial commit\n\n\u25cb Showing 2 worktrees\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-wt/repo && wt remove --foreground wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.043,
+      "output_sha256": "fcda4f64fa46a8527bf90e5e3c0be2ea7e274d3524b4825dffdc50a10173eee4",
+      "output_excerpt": "\u25ce Removing wt-probe worktree...\n\u2713 Removed wt-probe worktree & branch (same commit as main, _) (2 files \u00b7 70 B)\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-wt/repo && wt list </dev/null && git worktree list && git branch --list && ls /tmp/nsr-wt",
+      "exit": 0,
+      "duration_s": 0.032,
+      "output_sha256": "fb2b1a1a3bf90c6ba811c2adeaeaa5d6eaeff94aa8f6e66087ad3781884c14a3",
+      "output_excerpt": "  Branch  Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ main        ^                                             .     935f774   now  probe: initial commit\n/tmp/nsr-wt/repo  935f774 [main]\n* main\nrepo\n\n\u25cb Showing 1 worktree\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-wt && test ! -e /tmp/nsr-wt && echo \"throwaway probe directory removed\"",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "1cb6ed90a8a9c13b1532f0441d3bf2acc3495ef6c14a1766644122bba5a2c271",
+      "output_excerpt": "throwaway probe directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "worktrunk": "0.79.0"
+  },
+  "observed_at_utc": "2026-09-25T05:38:09Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), worktrunk 0.79.0 (the catalog pin; wt v0.79.0) ran its worktree lifecycle in a throwaway git repository under /tmp with stdin from /dev/null: wt switch --create wt-probe created the branch and a sibling worktree, wt list showed both worktrees, wt remove --foreground wt-probe removed the worktree and its branch, and wt list, git worktree list and git branch --list then showed only main. The throwaway directory is removed; all commands exit 0.",
+  "limitations": [
+    "Hooks were checked before any wt command: no ~/.config/worktrunk/config.toml exists (first command) and the throwaway repository has no .config/wt.toml, so no user or project hooks applied and the default worktree-path template was used. Every wt command ran with stdin from /dev/null, so an approval prompt would have failed closed; none appeared.",
+    "worktrunk's shell integration is not installed on this host (wt reported it cannot change directory), so automatic cd was not exercised; merge, push, PR and LLM commit-message features were not exercised.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:09Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

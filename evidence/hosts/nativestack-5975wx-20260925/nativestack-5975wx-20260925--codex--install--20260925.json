@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--codex--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "codex",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v codex) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" codex && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" codex && grep -A1 -- \"-- codex --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed 's/^/bootstrap verified-versions record: /' ",
+      "exit": 0,
+      "duration_s": 0.053,
+      "output_sha256": "12d1367296a0688c09fbc65c43e4bc7f815f3ca3c27a21d350c7923204574b78",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/codex -> ~/.local/share/codex-ecosystem/tools/codex-0.155.1/lib/node_modules/@openai/codex/bin/codex.js\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.155.1']\nstack ['0.155.1'] winner pins ['0.155.1']\nbootstrap verified-versions record: codex-cli 0.155.1\n"
+    },
+    {
+      "cmd": "codex --version",
+      "exit": 0,
+      "duration_s": 0.044,
+      "output_sha256": "556478dd38e6185a3ceef8e5237286acd48d89da460cdbbc054ce7230b0caced",
+      "output_excerpt": "codex-cli 0.155.1\n"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.155.1"
+  },
+  "observed_at_utc": "2026-09-25T05:38:16Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), codex is installed at the pinned version (the catalog and bootstrap pin; the bootstrap's verified-versions record reads codex-cli 0.155.1): the command resolves to this host's install under ~/.local/share/codex-ecosystem, and its version call reports the pin. Readiness only; a version call is not functional acceptance. All commands exit 0.",
+  "limitations": [
+    "Install stage: a resolved path, a pin record and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "No codex exec or model turn ran for this receipt.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:16Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

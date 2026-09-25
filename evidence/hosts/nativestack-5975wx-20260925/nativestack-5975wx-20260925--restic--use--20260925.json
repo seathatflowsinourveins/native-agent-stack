@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--restic--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "restic",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v restic) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && restic version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" restic",
+      "exit": 0,
+      "duration_s": 0.046,
+      "output_sha256": "d6d064f99c653d005f1af8742ab9b9a6495c43d72badaf7df53265af02b99d52",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/restic -> ~/.local/share/codex-ecosystem/recovery/restic/0.19.1/restic\nrestic 0.19.1 compiled with go1.26.4 on linux/amd64\nstack ['0.19.1'] winner pins ['0.19.1']\n"
+    },
+    {
+      "cmd": "mkdir -m 700 /tmp/nsr-restic && umask 077 && python3 -c \"import secrets;print(secrets.token_hex(24))\" > /tmp/nsr-restic/pw && RESTIC_PASSWORD_FILE=/tmp/nsr-restic/pw restic --repo /tmp/nsr-restic/repo init 2>&1 | grep -o 'created restic repository [0-9a-f]* at /tmp/nsr-restic/repo' ",
+      "exit": 0,
+      "duration_s": 3.029,
+      "output_sha256": "b2256b973cd7e18b9b1ceb6531ea838c57c474a12ba9c08ba529bc180755c37c",
+      "output_excerpt": "created restic repository d029889d1e at /tmp/nsr-restic/repo\n"
+    },
+    {
+      "cmd": "RESTIC_PASSWORD_FILE=/tmp/nsr-restic/pw restic --repo /tmp/nsr-restic/repo backup adoption --json --quiet | tail -1 | python3 -c \"import json,sys;s=json.load(sys.stdin);print({k:s[k] for k in ('message_type','files_new','dirs_new','total_files_processed','total_bytes_processed')},'snapshot',s['snapshot_id'][:8])\" ",
+      "exit": 0,
+      "duration_s": 0.836,
+      "output_sha256": "48d856df64737c375a1c574f5781724a1d8daa49d0d7cf1eac675699df52eee1",
+      "output_excerpt": "{'message_type': 'summary', 'files_new': 51, 'dirs_new': 13, 'total_files_processed': 51, 'total_bytes_processed': 572979} snapshot 96b85021\n"
+    },
+    {
+      "cmd": "RESTIC_PASSWORD_FILE=/tmp/nsr-restic/pw restic --repo /tmp/nsr-restic/repo check --read-data 2>&1 | tail -2",
+      "exit": 0,
+      "duration_s": 0.772,
+      "output_sha256": "5e62e91eccca509cf58a928680550af946c89636a65cfa4285e813819532317b",
+      "output_excerpt": "[0:00] 100.00%  2 / 2 packs\nno errors were found\n"
+    },
+    {
+      "cmd": "RESTIC_PASSWORD_FILE=/tmp/nsr-restic/pw restic --repo /tmp/nsr-restic/repo restore latest --target /tmp/nsr-restic/restore --verify 2>&1 | tail -3 && test -d /tmp/nsr-restic/restore/adoption && diff -r adoption /tmp/nsr-restic/restore/adoption && echo \"restored adoption/ is identical to the source tree (diff -r)\" ",
+      "exit": 0,
+      "duration_s": 0.765,
+      "output_sha256": "7f069fc75da1ddc6b2c16c2e211f681d30d32a3ec10ac3f826a2dced62d68312",
+      "output_excerpt": "Summary: Restored 64 files/dirs (559.550 KiB) in 0:00\nverifying files in /tmp/nsr-restic/restore\nfinished verifying 51 files in /tmp/nsr-restic/restore (took 1ms)\nrestored adoption/ is identical to the source tree (diff -r)\n"
+    },
+    {
+      "cmd": "f=$(find /tmp/nsr-restic/repo/data -type f | sort | head -1) && test -n \"$f\" && chmod u+w \"$f\" && printf 'nsr-corruption' | dd of=\"$f\" bs=1 seek=64 conv=notrunc 2>/dev/null && echo \"overwrote 14 bytes inside pack $(basename \"$f\" | cut -c1-12)\" || { echo \"could not corrupt a pack file; positive control not run\"; exit 2; }; RESTIC_PASSWORD_FILE=/tmp/nsr-restic/pw restic --repo /tmp/nsr-restic/repo check --read-data > /tmp/nsr-restic/check.log 2>&1; rc=$?; echo \"restic check --read-data exit=$rc (expected 1 after corrupting one pack)\"; grep -iE 'error|fail' /tmp/nsr-restic/check.log | head -3 | cut -c1-160; test \"$rc\" -eq 1 && grep -qi 'error' /tmp/nsr-restic/check.log",
+      "exit": 0,
+      "duration_s": 0.793,
+      "output_sha256": "42bc0d3dd8a8837c718cc9d44c14bc6562e24a7420702320b1b784c39e317e90",
+      "output_excerpt": "overwrote 14 bytes inside pack 87970bc07419\nrestic check --read-data exit=1 (expected 1 after corrupting one pack)\npack 87970bc07419086c9e4ab1c4efdc40d0a26d803955db07c16afc44c250f64fc5 contains 2 errors: [blob ab34afa6df84881b19e35e168fb3bb6deabebd8e4f8f81f3c8cfa7929b9003fe:\nFatal: repository contains errors\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-restic && test ! -e /tmp/nsr-restic && echo \"throwaway repository, password file and restore directory removed\"",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_sha256": "1cf51b4dc81033f216dfcebcdc34a992980afe8d4231779a925a706e9936f761",
+      "output_excerpt": "throwaway repository, password file and restore directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "restic": "0.19.1"
+  },
+  "observed_at_utc": "2026-09-25T05:38:01Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), restic 0.19.1 (the catalog pin) backed up, verified and restored real files and detected corruption. In a new throwaway repository under /tmp with a password generated at run time, it backed up this checkout's adoption/ directory (51 files); restic check --read-data found no errors; restore latest --verify restored and verified the files, and diff -r found the restored adoption/ identical to the source. After 14 bytes inside one pack file were overwritten, restic check --read-data exited 1, reporting that the pack contains 2 errors and 'Fatal: repository contains errors'. That command exits 0 only when the overwrite succeeded and check exits 1 with an error. The throwaway repository, password file and restore directory are removed; all commands exit 0.",
+  "limitations": [
+    "A throwaway local repository with a run-time password, not this host's configured recovery repository: that repository and its credential were not read or used, and no ai-memory or Qdrant application state was backed up or restored. No remote backend, forget/prune retention, scheduling or large-data behavior was exercised.",
+    "The backed-up adoption/ is this worktree at recording time, including this change's uncommitted adoption/hardware-profiles.json edit.",
+    "A first rehearsal exposed a false pass in the positive control: restic writes pack files read-only, the overwrite failed, and the stale exit status satisfied the check without restic check running. The recorded command makes the pack writable, exits 2 when the overwrite fails, and also requires an error in the check log.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:01Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

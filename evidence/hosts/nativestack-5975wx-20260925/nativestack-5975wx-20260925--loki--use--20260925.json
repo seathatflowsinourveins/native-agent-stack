@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--loki--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "loki",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "command -v loki && curl -fsS http://127.0.0.1:13100/loki/api/v1/status/buildinfo && echo && curl -fsS -o /dev/null -w 'ready http %{http_code}\\n' http://127.0.0.1:13100/ready && systemctl --user show -p ActiveState -p SubState -p NRestarts ecosystem-loki.service | awk '!seen[$0]++' | tr '\\n' ' ' && echo && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" loki",
+      "exit": 0,
+      "duration_s": 0.053,
+      "output_sha256": "a15070739aa85e29328f98094eee8c2c3c8baf8b558f7266f3cdcb65baa0fb54",
+      "output_excerpt": "~/.local/share/codex-ecosystem/bin/loki\n{\"version\":\"3.7.8\",\"revision\":\"09e6ce2f\",\"branch\":\"release-3.7.x\",\"buildUser\":\"root@a72310b1e091\",\"buildDate\":\"2026-09-17T13:46:13Z\",\"goVersion\":\"\"}\n\nready http 200\nNRestarts=0 ActiveState=active SubState=running \nstack ['3.7.8'] winner pins ['3.7.8']\n"
+    },
+    {
+      "cmd": "curl -fsS -G http://127.0.0.1:13100/loki/api/v1/label/service_name/values --data-urlencode since=72h && echo && curl -fsS -G http://127.0.0.1:13100/loki/api/v1/query --data-urlencode 'query=sum(count_over_time({service_name=~\".+\"}[24h]))' | python3 -c \"import json,sys;r=json.load(sys.stdin)['data']['result'];print('log lines stored in the last 24h:',r[0]['value'][1] if r else 0)\" ",
+      "exit": 0,
+      "duration_s": 0.181,
+      "output_sha256": "f57913ba5a65908190477390b8f27b08c4fdf6c68dc5ce55b71ac99fe8d16f50",
+      "output_excerpt": "{\"status\":\"success\",\"data\":[\"claude-code\",\"codex-app-server\",\"codex_cli_rs\",\"codex_exec\",\"ecosystem-persistence-fixture\",\"host-receipt-probe\"]}\n\nlog lines stored in the last 24h: 131557\n"
+    },
+    {
+      "cmd": "id=nsr-loki-$(date +%s)-$$; ns=$(date +%s%N); curl -fsS -o /dev/null -w \"push http %{http_code}\\n\" -H 'Content-Type: application/json' -X POST http://127.0.0.1:13100/loki/api/v1/push --data \"{\\\"streams\\\":[{\\\"stream\\\":{\\\"job\\\":\\\"host-receipt-probe\\\",\\\"host_id\\\":\\\"nativestack-5975wx-20260925\\\"},\\\"values\\\":[[\\\"$ns\\\",\\\"$id synthetic host-receipt probe line\\\"]]}]}\" || exit 1; n=0; for i in 1 2 3 4 5 6 7 8 9 10; do n=$(curl -fsS -G http://127.0.0.1:13100/loki/api/v1/query_range --data-urlencode \"query={job=\\\"host-receipt-probe\\\"} |= \\\"$id\\\"\" --data-urlencode since=10m --data-urlencode limit=5 | python3 -c \"import json,sys;r=json.load(sys.stdin)['data']['result'];v=[x[1] for s in r for x in s['values']];print(len(v));print(v[0] if v else '',file=sys.stderr)\" 2>/tmp/nsr-loki-line); [ \"$n\" = 1 ] && break; sleep 1; done; echo \"LogQL returned $n line(s) for $id: $(cat /tmp/nsr-loki-line)\"; rm -f /tmp/nsr-loki-line; [ \"$n\" = 1 ]",
+      "exit": 0,
+      "duration_s": 0.031,
+      "output_sha256": "fc302699e192efa2f6e0c613feb5e80ffaab702739658d03e3097f6d034ad851",
+      "output_excerpt": "push http 204\nLogQL returned 1 line(s) for nsr-loki-1790314675-1989205: nsr-loki-1790314675-1989205 synthetic host-receipt probe line\n"
+    }
+  ],
+  "tool_versions": {
+    "loki": "3.7.8"
+  },
+  "observed_at_utc": "2026-09-25T05:37:55Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the running Loki server (buildinfo 3.7.8, revision 09e6ce2f, the catalog pin; /ready HTTP 200; unit ecosystem-loki active and running) served this host's stored logs and ingested a new line: its label API returned the service_name values stored over the last 72 hours and a LogQL metric query the number of log lines stored over the last 24 hours; a synthetic line with a unique probe id, pushed through Loki's native push API (HTTP 204), was returned by a LogQL query_range line filter within the polling window. That command exits 0 only when exactly one matching line comes back. All commands exit 0.",
+  "limitations": [
+    "The pushed probe line (labels job=host-receipt-probe, host_id=nativestack-5975wx-20260925) stays in this host's Loki until its 72-hour retention removes it; the rehearsal pushed one more such line. No other data was written.",
+    "Queries and one push only: retention, compaction, restart persistence and Grafana views were not exercised.",
+    "The service was already running under its systemd user unit on this host (ActiveState, SubState and NRestarts are in the first command's output); this receipt did not start, stop or reconfigure it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:55Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--opentelemetry-collector-contrib--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "opentelemetry-collector-contrib",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "command -v otelcol-contrib && otelcol-contrib --version && systemctl --user show -p ActiveState -p SubState -p NRestarts -p ExecStart ecosystem-otelcol.service | grep -o 'ActiveState=[a-z]*\\|SubState=[a-z]*\\|NRestarts=[0-9]*\\|tools/otelcol-[0-9.]*/otelcol-contrib' | awk '!seen[$0]++' | tr '\\n' ' ' && echo && curl -fsS http://127.0.0.1:28888/metrics | grep -m1 -o 'service_version=\"[^\"]*\"' && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" opentelemetry-collector-contrib",
+      "exit": 0,
+      "duration_s": 0.158,
+      "output_sha256": "1aa15f5a7c3054039d639f2fc065d72c737a3f00beb28bc954defb53c45bdc27",
+      "output_excerpt": "~/.local/share/codex-ecosystem/bin/otelcol-contrib\notelcol-contrib version 0.161.0\nNRestarts=0 tools/otelcol-0.161.0/otelcol-contrib ActiveState=active SubState=running \nservice_version=\"0.161.0\"\nstack ['0.161.0'] winner pins ['0.161.0']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-otel && id=nsr-otel-$(date +%s)-$$ && echo \"$id\" > /tmp/nsr-otel/id && ns=$(date +%s%N) && curl -fsS -X POST -H 'Content-Type: application/json' -w ' (http %{http_code})\\n' http://127.0.0.1:24318/v1/logs --data \"{\\\"resourceLogs\\\":[{\\\"resource\\\":{\\\"attributes\\\":[{\\\"key\\\":\\\"service.name\\\",\\\"value\\\":{\\\"stringValue\\\":\\\"host-receipt-probe\\\"}},{\\\"key\\\":\\\"probe.resource_extra\\\",\\\"value\\\":{\\\"stringValue\\\":\\\"must-be-dropped\\\"}}]},\\\"scopeLogs\\\":[{\\\"scope\\\":{\\\"name\\\":\\\"nsr-probe\\\"},\\\"logRecords\\\":[{\\\"timeUnixNano\\\":\\\"$ns\\\",\\\"body\\\":{\\\"stringValue\\\":\\\"raw probe body that the privacy transform must replace\\\"},\\\"attributes\\\":[{\\\"key\\\":\\\"observation_id\\\",\\\"value\\\":{\\\"stringValue\\\":\\\"$id\\\"}},{\\\"key\\\":\\\"probe_extra\\\",\\\"value\\\":{\\\"stringValue\\\":\\\"must-be-dropped\\\"}}]}]}]}]}\" && echo \"sent OTLP/HTTP log $id with one allowlisted and two non-allowlisted attributes\"",
+      "exit": 0,
+      "duration_s": 0.012,
+      "output_sha256": "5fa8769197ce177a21fa44dabc7225f9f8ed1d5118cf29b8356f44ef637722fd",
+      "output_excerpt": "{\"partialSuccess\":{}} (http 200)\nsent OTLP/HTTP log nsr-otel-1790314675-1989360 with one allowlisted and two non-allowlisted attributes\n"
+    },
+    {
+      "cmd": "id=$(cat /tmp/nsr-otel/id) || exit 2; rc=3; for i in $(seq 1 30); do curl -fsS -G http://127.0.0.1:13100/loki/api/v1/query_range --data-urlencode \"query={service_name=\\\"host-receipt-probe\\\"} | observation_id=\\\"$id\\\"\" --data-urlencode since=10m --data-urlencode limit=5 > /tmp/nsr-otel/q.json && python3 -c \"import json,sys\ni=sys.argv[1];d=json.load(open(sys.argv[2]))['data']['result']\nrows=[(s['stream'],v[1]) for s in d for v in s['values']]\nif not rows: sys.exit(3)\nlabels,line=rows[0];extra=sorted(k for k in labels if 'extra' in k)\nprint('lines',len(rows),'| body',repr(line),'| observation_id matches',labels.get('observation_id')==i,'| service_name',labels.get('service_name'),'| non-allowlisted attributes present',extra)\nsys.exit(0 if len(rows)==1 and line=='[content omitted]' and labels.get('observation_id')==i and not extra else 1)\" \"$id\" /tmp/nsr-otel/q.json; rc=$?; [ \"$rc\" -ne 3 ] && break; sleep 1; done; echo \"check exit=$rc after $i poll(s)\"; exit $rc",
+      "exit": 0,
+      "duration_s": 1.063,
+      "output_sha256": "7bf53d81c65e4865b33b7094e2341679fdf45e07bf01b368b120fab235219d97",
+      "output_excerpt": "lines 1 | body '[content omitted]' | observation_id matches True | service_name host-receipt-probe | non-allowlisted attributes present []\ncheck exit=0 after 2 poll(s)\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-otel && test ! -e /tmp/nsr-otel && echo \"probe state directory removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "052c173c42faccf17ec3a30196aeb6e2964888ef41fea3d7216b9726bd05f65b",
+      "output_excerpt": "probe state directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "opentelemetry-collector-contrib": "0.161.0"
+  },
+  "observed_at_utc": "2026-09-25T05:37:55Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the running OpenTelemetry Collector contrib 0.161.0 (the catalog pin; unit ecosystem-otelcol active and running from tools/otelcol-0.161.0; its self-metrics report service_version 0.161.0) carried one OTLP/HTTP log record through its logs pipeline into Loki and applied its privacy transform. The record, sent to 127.0.0.1:24318 with body text, one allowlisted attribute (observation_id) and two non-allowlisted attributes (one resource, one log), was accepted (HTTP 200, empty partialSuccess). A Loki query on its service_name and observation_id then returned it with body '[content omitted]' and without either non-allowlisted attribute. The checking command exits 0 only when exactly one line meets all three conditions. All commands exit 0.",
+  "limitations": [
+    "One log record through the logs pipeline only: the metrics, health-check and sdk_receipts file pipelines, batching limits, the persistent sending queue, retries and restart persistence were not exercised.",
+    "The probe record stays in Loki under service_name host-receipt-probe until retention removes it, and the Collector's file/events exporter also appended it, with the body already replaced, to its local events file; the rehearsal sent one more such record. Loki is the observed sink here; its own serving is recorded in the separate loki receipt.",
+    "The service was already running under its systemd user unit on this host (ActiveState, SubState and NRestarts are in the first command's output); this receipt did not start, stop or reconfigure it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:55Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

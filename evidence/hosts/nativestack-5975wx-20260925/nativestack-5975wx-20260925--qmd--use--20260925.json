@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--qmd--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "qmd",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v qmd) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && qmd --version && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" qmd && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" qmd",
+      "exit": 0,
+      "duration_s": 0.179,
+      "output_sha256": "d0f8ea5bb4226775260740ce676c8c8f550b789690827d0d2e2222413de185ac",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/qmd -> ~/.local/share/codex-ecosystem/tools/qmd-2.8.3/lib/node_modules/@tobilu/qmd/bin/qmd\nqmd 2.8.3 (facd35e)\nbootstrap pin (adoption/pins-linux-x86_64.json) ['2.8.3']\nstack ['2.8.3'] winner pins ['2.8.3']\n"
+    },
+    {
+      "cmd": "qmd --index nativestack-catalog status | grep -E 'Index:|Total:|Vectors:|Pending:|Updated:|[(]qmd://|Pattern:|Files:' ",
+      "exit": 0,
+      "duration_s": 0.218,
+      "output_sha256": "44937a7c20030c58a3ba5c78500b8c737dd4e126f22fec1b83f8e335f1ec98e7",
+      "output_excerpt": "Index: ~/.cache/qmd/nativestack-catalog.sqlite\n  Total:    15 files indexed\n  Vectors:  0 embedded\n  Pending:  15 need embedding (run 'qmd embed')\n  Updated:  1d ago\n  adoption (qmd://adoption/)\n    Pattern:  **/*.md\n    Files:    15 (updated 1d ago)\n"
+    },
+    {
+      "cmd": "qmd --index nativestack-catalog search 'ecosystem-bounded-run cgroup scope' -c adoption -n 3 --json | python3 -c \"import json,sys;r=json.load(sys.stdin);print(len(r),'hit(s):',[(x['file'].split('?')[0],x['score'],x['title']) for x in r]);raise SystemExit(0 if r and r[0]['file'].startswith('qmd://adoption/tools/README.md') else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.155,
+      "output_sha256": "321a77572560ab6cb44f25c0cc283d089bdfe0cb63ecb791f2e3605d41d82393",
+      "output_excerpt": "1 hit(s): [('qmd://adoption/tools/README.md', 0.9, 'Portable guarded runners')]\n"
+    },
+    {
+      "cmd": "out=$(qmd --index nativestack-catalog search 'zqxjv-nsr-no-such-token' -c adoption -n 3 --json) && echo \"absent-term search returned: $out\" && test \"$(printf '%s' \"$out\" | tr -d '[:space:]')\" = \"[]\"",
+      "exit": 0,
+      "duration_s": 0.147,
+      "output_sha256": "45f309b6e238f6659b9da708859335e864e8fa4c9182d3656dfcadf05acf30c6",
+      "output_excerpt": "absent-term search returned: []\n"
+    }
+  ],
+  "tool_versions": {
+    "qmd": "2.8.3"
+  },
+  "observed_at_utc": "2026-09-25T05:37:54Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), qmd 2.8.3 (the catalog and bootstrap pin) answered BM25 searches against this host's existing nativestack-catalog index (~/.cache/qmd/nativestack-catalog.sqlite: one collection, adoption, with 15 Markdown files indexed and 0 vectors embedded). A search for 'ecosystem-bounded-run cgroup scope' returned adoption/tools/README.md ('Portable guarded runners') as its top hit, and a search for an absent token returned an empty JSON array; each command asserts its outcome. All commands exit 0.",
+  "limitations": [
+    "Lexical BM25 search only: the index has no embeddings (qmd status: 0 vectors, 15 pending), so vector search, hybrid query, reranking and the local embedding and generation models were not exercised, and no index update or embed ran.",
+    "The index was built on this host about a day before recording from an adoption/ collection; the receipt does not show which checkout's adoption/ it indexed or that the indexed files match the catalog_revision.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:54Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--nautilustrader--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "nautilustrader",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "E=\"$HOME/.local/share/codex-ecosystem/nautilus-py312\"; \"$E/bin/python\" -c \"import importlib.metadata as m,sys;print(*[k+'=='+m.version(k) for k in ('nautilus_trader','numpy','pandas')],'python',sys.version.split()[0])\" && c=$(uv pip check --python \"$E/bin/python\" 2>&1) && echo \"uv pip check: $(echo \"$c\" | tail -1)\" && bwrap --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" nautilustrader",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_sha256": "b4322fd15b3479d9cf1121ebde32543f13af385455566f7461cf369160788ab3",
+      "output_excerpt": "nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6 python 3.12.3\nuv pip check: All installed packages are compatible\nbubblewrap 0.9.0\nstack [] winner pins ['2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-nautilus && mkdir /tmp/nsr-nautilus/run-1 && curl -fsSL https://raw.githubusercontent.com/nautechsystems/nautilus_trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py -o /tmp/nsr-nautilus/quickstart.py && sha256sum /tmp/nsr-nautilus/quickstart.py blueprints/us-equities/engine-nautilus/observe_quickstart.py && echo \"487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53  /tmp/nsr-nautilus/quickstart.py\" | sha256sum -c -",
+      "exit": 0,
+      "duration_s": 0.098,
+      "output_sha256": "0a18fa261d73056d93506a779b755c47c894b91607065f59a83ef994e5b76dc8",
+      "output_excerpt": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53  /tmp/nsr-nautilus/quickstart.py\nb5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30  blueprints/us-equities/engine-nautilus/observe_quickstart.py\n/tmp/nsr-nautilus/quickstart.py: OK\n"
+    },
+    {
+      "cmd": "E=\"$HOME/.local/share/codex-ecosystem/nautilus-py312\"; /usr/bin/timeout --signal=TERM --kill-after=5 120 /usr/bin/bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$E\" /opt/nautilus-env --ro-bind /tmp/nsr-nautilus/quickstart.py /input/quickstart.py --ro-bind \"$PWD/blueprints/us-equities/engine-nautilus/observe_quickstart.py\" /input/observe_quickstart.py --bind /tmp/nsr-nautilus/run-1 /out --chdir /out --setenv HOME /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONHASHSEED 0 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 /opt/nautilus-env/bin/python -I /input/observe_quickstart.py > /tmp/nsr-nautilus/run-1.stdout 2> /tmp/nsr-nautilus/run-1.stderr; rc=$?; echo \"isolated upstream quickstart exit=$rc; stdout $(wc -c < /tmp/nsr-nautilus/run-1.stdout) bytes; stderr $(wc -c < /tmp/nsr-nautilus/run-1.stderr) bytes\"; exit $rc",
+      "exit": 0,
+      "duration_s": 1.989,
+      "output_sha256": "7ba35203d269c1e21b6953290d3c4ace9d4f9d17b4759194bd1857923a97c9ce",
+      "output_excerpt": "isolated upstream quickstart exit=0; stdout 5115 bytes; stderr 0 bytes\n"
+    },
+    {
+      "cmd": "python3 -c \"import csv,hashlib,json\no='/tmp/nsr-nautilus/run-1/'\ns=json.load(open(o+'summary.json'));r=s['native_result'];iso=json.load(open(o+'isolation.json'));cl=json.load(open(o+'cleanup.json'))\nrows=list(csv.DictReader(open(o+'account.csv')));h=hashlib.sha256(open(o+'account.csv','rb').read()).hexdigest()\ngot={'iterations':r['iterations'],'events':r['total_events'],'orders':r['total_orders'],'positions':r['total_positions'],'account_rows':s['reports']['account']['rows'],'position_rows':s['reports']['positions']['rows'],'fill_rows':s['reports']['fills']['rows']}\nwant={'iterations':10000,'events':1804,'orders':902,'positions':451,'account_rows':903,'position_rows':451,'fill_rows':902}\nref='2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751'\nprint(s['version'],got,'| ending total',rows[-1].get('total'),'| account.csv sha256',h[:16],'equals authoring runs',h==ref,'| interfaces',iso['interfaces'],'| /home visible',iso['home_exists'],'| cleanup',cl['upstream_script_completed_after_dispose'])\nraise SystemExit(0 if got==want and rows[-1].get('total')=='1000431.00' and h==ref and iso['interfaces']==[[1,'lo']] and not iso['home_exists'] and cl['upstream_script_completed_after_dispose'] else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "b93b8b23235132062136af2d3ee8599ad21e3de64dbad4f64acb307f06c0c36d",
+      "output_excerpt": "2.0.0rc5 {'iterations': 10000, 'events': 1804, 'orders': 902, 'positions': 451, 'account_rows': 903, 'position_rows': 451, 'fill_rows': 902} | ending total 1000431.00 | account.csv sha256 2237e2b39391f2a3 equals authoring runs True | interfaces [[1, 'lo']] | /home visible False | cleanup True\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-nautilus && test ! -e /tmp/nsr-nautilus && echo \"scratch quickstart and outputs removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "886bdc807674127b36596b646ec174c6f364bd44efc547617021eb7fd52bdd57",
+      "output_excerpt": "scratch quickstart and outputs removed\n"
+    }
+  ],
+  "tool_versions": {
+    "nautilustrader": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)"
+  },
+  "observed_at_utc": "2026-09-25T05:38:10Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), NautilusTrader 2.0.0rc5 (the catalog pin) ran the unchanged upstream quickstart. The environment ~/.local/share/codex-ecosystem/nautilus-py312 holds nautilus_trader 2.0.0rc5, numpy 2.5.3 and pandas 3.0.6 on Python 3.12.3, and uv pip check reports all packages compatible. The quickstart at upstream commit 1b0a49d2 was downloaded and its sha256 (487e6807...) verified, then run through this repository's published observer (sha256 b5cb9447...) in Bubblewrap 0.9.0 with a cleared environment, only a loopback interface and no /home: exit 0 with empty stderr, 10,000 iterations, 1,804 events, 902 orders and fills, 451 positions, 903 account rows and an ending account total of 1000431.00. Its account.csv is byte-identical (sha256 2237e2b3...) to both accepted runs on the authoring host (evidence/receipts/native-nautilus-v2-20260920.json). The checking command exits 0 only when all of these hold. The scratch files are removed; all commands exit 0.",
+  "limitations": [
+    "The unchanged upstream synthetic EUR/USD quickstart (generated bars, seed 42): not equity data, strategy performance, broker connectivity or paper execution. The IBKR environments installed on this host were not exercised.",
+    "One isolation difference from the accepted argv: the environment is bound read-only at /opt/nautilus-env inside the sandbox instead of at its host path, because on this host it lives under the home directory and a same-path bind would create a /home skeleton inside the sandbox. The other mounts, the cleared environment, the network namespace and the 120-second timeout follow the accepted argv.",
+    "Fill and position CSVs contain generated UUIDs and were not compared across hosts; account.csv bytes and the native result counts were. Downloading the quickstart used the network outside the sandbox; the run itself had only a loopback interface.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:10Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
