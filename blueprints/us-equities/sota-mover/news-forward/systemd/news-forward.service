@@ -1,9 +1,9 @@
 [Unit]
 Description=News-LLM forward pilot supervisor (pilot label; dry-run unless config.json mode=paper and alpaca-paper-3.env verifies; never live)
 After=network-online.target
-# A crash loop stops after 5 starts within 10 minutes (restart on failure is otherwise 30 s apart).
-StartLimitIntervalSec=600
-StartLimitBurst=5
+# Never stop restarting: a failed unit would leave open paper positions without exits or the kill switch
+# (independent re-check 2026-09-25). Restarts back off from 30 s to 5 min instead; restarts never resend orders.
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -13,6 +13,8 @@ ExecStart=%h/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/pyth
 ExecStopPost=-/usr/bin/systemctl --user stop news-forward-scorer.service
 Restart=on-failure
 RestartSec=30
+RestartSteps=6
+RestartMaxDelaySec=300
 MemoryHigh=6G
 MemoryMax=9G
 MemorySwapMax=0
