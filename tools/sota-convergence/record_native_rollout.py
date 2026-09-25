@@ -83,12 +83,32 @@ def _is_str(value) -> bool:
     return isinstance(value, str) and bool(value)
 
 
+def _no_extra_keys(document, allowed: frozenset[str], errors: list[str], label: str) -> None:
+    """Minor finding: the schema declares ``additionalProperties: false`` on every object below
+    (top-level and every nested one), but this hand-written validator never enforced it, so a
+    receipt with an extra (typo'd, or worse, disclosive) key still validated. Silently no-ops on
+    a non-dict ``document``: the caller already records its own "must be an object" error."""
+    if not isinstance(document, dict):
+        return
+    extra = sorted(set(document) - allowed)
+    if extra:
+        errors.append(f"{label}: unexpected field(s) {extra} (additionalProperties: false)")
+
+
+CWD_PATTERN = re.compile(r"\$\{STACK_HOME\}|^/tmp|^\.$")
+
+
 def validate_receipt(document) -> list[str]:
     """Every reason ``document`` does not satisfy native-rollout-receipt.schema.json;
     empty means valid. Never raises; always returns a list."""
     errors: list[str] = []
     if not isinstance(document, dict):
         return ["receipt must be a JSON object"]
+    _no_extra_keys(document, frozenset({
+        "schema_version", "id", "kind", "status", "identity", "upstream", "install", "tiers",
+        "independent", "switch", "decision", "evidence_class_claimed", "limitations",
+        "retained_native_failures",
+    }), errors, "receipt")
 
     _require(document.get("schema_version") == SCHEMA_VERSION and not isinstance(document.get("schema_version"), bool),
               errors, "schema_version must be 1")
@@ -100,6 +120,7 @@ def validate_receipt(document) -> list[str]:
     if not isinstance(identity, dict):
         errors.append("identity must be an object")
     else:
+        _no_extra_keys(identity, frozenset({"component_id", "version", "host_id"}), errors, "identity")
         _require(_is_str(identity.get("component_id")), errors, "identity.component_id must be nonempty text")
         _require(_is_str(identity.get("version")), errors, "identity.version must be nonempty text")
         _require(isinstance(identity.get("host_id"), str) and bool(HOST_ID.fullmatch(identity["host_id"])),
@@ -109,6 +130,8 @@ def validate_receipt(document) -> list[str]:
     if not isinstance(upstream, dict):
         errors.append("upstream must be an object")
     else:
+        _no_extra_keys(upstream, frozenset({"repo", "tag", "commit", "artifact_url", "sha256", "signature"}),
+                        errors, "upstream")
         _require(_is_str(upstream.get("repo")), errors, "upstream.repo must be nonempty text")
         _require(_is_str(upstream.get("artifact_url")), errors, "upstream.artifact_url must be nonempty text")
         _require(isinstance(upstream.get("sha256"), str) and bool(SHA256.fullmatch(upstream["sha256"])),
@@ -122,13 +145,17 @@ def validate_receipt(document) -> list[str]:
         if signature is not None:
             if not isinstance(signature, dict) or signature.get("kind") not in SIGNATURE_KINDS:
                 errors.append(f"upstream.signature.kind must be one of {sorted(SIGNATURE_KINDS)}")
-            elif signature["kind"] != "none" and not _is_str(signature.get("ref")):
-                errors.append('upstream.signature.ref is required unless kind is "none"')
+            else:
+                _no_extra_keys(signature, frozenset({"kind", "ref"}), errors, "upstream.signature")
+                if signature["kind"] != "none" and not _is_str(signature.get("ref")):
+                    errors.append('upstream.signature.ref is required unless kind is "none"')
 
     install = document.get("install")
     if not isinstance(install, dict):
         errors.append("install must be an object")
     else:
+        _no_extra_keys(install, frozenset({"class", "root", "marker_sha256", "argv", "private_env_names"}),
+                        errors, "install")
         _require(install.get("class") in INSTALL_CLASSES, errors, f"install.class must be one of {sorted(INSTALL_CLASSES)}")
         root = install.get("root")
         _require(isinstance(root, str) and STACK_HOME_PLACEHOLDER in root, errors,
@@ -153,6 +180,7 @@ def validate_receipt(document) -> list[str]:
             if not isinstance(tier, dict):
                 errors.append(f"{label} must be an object")
                 continue
+            _no_extra_keys(tier, frozenset({"tier", "commands", "result", "unavailable_reason"}), errors, label)
             tier_id = tier.get("tier")
             if tier_id not in TIERS:
                 errors.append(f"{label}.tier must be one of {TIERS}")
@@ -179,10 +207,16 @@ def validate_receipt(document) -> list[str]:
                 if not isinstance(command, dict):
                     errors.append(f"{clabel} must be an object")
                     continue
+                _no_extra_keys(command, frozenset({
+                    "argv", "cwd", "env_names", "started_utc", "elapsed_s", "exit",
+                    "stdout_sha256", "stderr_sha256", "assertion",
+                }), errors, clabel)
                 _require(isinstance(command.get("argv"), list) and command["argv"]
                           and all(isinstance(item, str) for item in command["argv"]), errors,
                           f"{clabel}.argv must be a nonempty list of strings")
-                _require(_is_str(command.get("cwd")), errors, f"{clabel}.cwd must be nonempty text")
+                _require(_is_str(command.get("cwd")) and bool(CWD_PATTERN.search(command["cwd"])), errors,
+                          f"{clabel}.cwd must be nonempty text matching {CWD_PATTERN.pattern!r} "
+                          "(${STACK_HOME}, /tmp, or exactly '.')")
                 env_names = command.get("env_names")
                 _require(isinstance(env_names, list) and all(isinstance(item, str) and ENV_NAME.fullmatch(item)
                           for item in env_names), errors, f"{clabel}.env_names must be a list of ENV_VAR names")
@@ -203,6 +237,7 @@ def validate_receipt(document) -> list[str]:
     if not isinstance(independent, dict):
         errors.append("independent must be an object")
     else:
+        _no_extra_keys(independent, frozenset({"rerun_label", "agreement", "loki"}), errors, "independent")
         _require(_is_str(independent.get("rerun_label")), errors, "independent.rerun_label must be nonempty text")
         _require(independent.get("agreement") in AGREEMENTS, errors, f"independent.agreement must be one of {sorted(AGREEMENTS)}")
 
@@ -211,6 +246,7 @@ def validate_receipt(document) -> list[str]:
         if not isinstance(switch, dict):
             errors.append("switch must be an object when present")
         else:
+            _no_extra_keys(switch, frozenset({"txn", "ledger_seq", "surfaces", "window"}), errors, "switch")
             _require(_is_str(switch.get("txn")), errors, "switch.txn must be nonempty text")
             _require(isinstance(switch.get("ledger_seq"), list)
                       and all(isinstance(item, int) and not isinstance(item, bool) and item >= 1 for item in switch.get("ledger_seq", [])),
@@ -229,8 +265,11 @@ def validate_receipt(document) -> list[str]:
         errors.append("retained_native_failures must be a list (may be empty)")
     else:
         for index, failure in enumerate(failures):
+            flabel = f"retained_native_failures[{index}]"
             if not (isinstance(failure, dict) and failure.get("tier") in TIERS and _is_str(failure.get("note"))):
-                errors.append(f"retained_native_failures[{index}] must be an object with tier and note")
+                errors.append(f"{flabel} must be an object with tier and note")
+                continue
+            _no_extra_keys(failure, frozenset({"tier", "note"}), errors, flabel)
     return errors
 
 
@@ -381,7 +420,17 @@ def cmd_record(args) -> int:
         print(json.dumps({"status": "not_qualified", **report}, sort_keys=True))
         return 3
     if args.write:
-        args.landscape.write_text(json.dumps(landscape, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+        # Minor finding: matches record_verdicts.py's own documented serialization
+        # (json.dumps(..., ensure_ascii=False) + a trailing newline) -- the default
+        # ensure_ascii=True would \u-escape any non-ASCII character already present in a
+        # landscape file (e.g. us-equities.json, new-host-grand-list.json) on the very next
+        # unrelated field this tool touches, a needless diff-noise regression on every write.
+        args.landscape.write_text(json.dumps(landscape, indent=2, sort_keys=False, ensure_ascii=False) + "\n",
+                                  encoding="utf-8")
+        print(f"Reminder: {args.landscape} changed and is likely hash-listed in manifests/evidence.json "
+              "(scripts/validate.py); re-pin it (e.g. python3 scripts/evidence_manifest.py and a manual "
+              "sha256/bytes update, or the project's own re-pin helper) before that check passes again.",
+              file=sys.stderr)
     print(json.dumps({"status": "qualified", "wrote": bool(args.write), **report}, sort_keys=True))
     return 0
 

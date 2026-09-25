@@ -154,6 +154,39 @@ class ValidateReceiptTests(unittest.TestCase):
         errors = record_native_rollout.validate_receipt(receipt)
         self.assertTrue(any("retained_native_failures" in e for e in errors))
 
+    def test_extra_top_level_field_is_rejected(self):
+        # Minor finding: the schema declares additionalProperties: false everywhere, but this
+        # hand-written validator never enforced it, so a receipt with an extra (typo'd, or
+        # worse, disclosive) key still validated.
+        receipt = valid_receipt()
+        receipt["unexpected_field"] = "x"
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("unexpected_field" in e for e in errors), errors)
+
+    def test_extra_nested_field_is_rejected(self):
+        receipt = valid_receipt()
+        receipt["identity"]["extra"] = "x"
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("extra" in e for e in errors), errors)
+
+    def test_extra_command_field_is_rejected(self):
+        receipt = valid_receipt()
+        receipt["tiers"][2]["commands"][0]["extra"] = "x"
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("extra" in e for e in errors), errors)
+
+    def test_cwd_must_match_the_declared_pattern(self):
+        # Minor finding: the schema's cwd pattern (${STACK_HOME}|^/tmp|^.$) was never checked;
+        # only non-empty text was, so a receipt could record a real host cwd.
+        receipt = valid_receipt()
+        receipt["tiers"][2]["commands"][0]["cwd"] = "/home/example/some-real-checkout"
+        errors = record_native_rollout.validate_receipt(receipt)
+        self.assertTrue(any("cwd" in e for e in errors), errors)
+        for good_cwd in ("${STACK_HOME}", "/tmp", "/tmp/x", "."):
+            receipt2 = valid_receipt()
+            receipt2["tiers"][2]["commands"][0]["cwd"] = good_cwd
+            self.assertEqual(record_native_rollout.validate_receipt(receipt2), [], good_cwd)
+
     def test_switch_block_is_optional_but_checked_when_present(self):
         receipt = valid_receipt()
         receipt["switch"] = {"txn": "t1", "ledger_seq": [1, 2], "surfaces": ["current/qmd"], "window": "default"}
@@ -371,6 +404,28 @@ class CLITests(unittest.TestCase):
             self.assertEqual(result_write.returncode, 0, result_write.stderr)
             updated = json.loads(landscape_path.read_text())
             self.assertEqual(updated["layers"][0]["winners"][0]["evidence_class"], "native_proven")
+
+    def test_write_uses_ensure_ascii_false_and_prints_a_re_pin_reminder(self):
+        # Minor finding: --write used to use the default ensure_ascii=True, not
+        # record_verdicts.py's documented ensure_ascii=False, and never reminded the operator
+        # that the landscape file it just changed is likely hash-listed in
+        # manifests/evidence.json (scripts/validate.py fails until someone re-pins it by hand).
+        with tempfile.TemporaryDirectory() as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(valid_receipt(version="2.8.4")))
+            landscape_path = Path(tmp) / "landscape.json"
+            landscape = sample_landscape(pin="2.8.4")
+            landscape["layers"][0]["winners"][0]["evidence_refs"] = ["docs/nonascii-é.md"]
+            landscape_path.write_text(json.dumps(landscape))
+
+            result = self.run_cli("record", str(receipt_path), "--landscape", str(landscape_path),
+                                  "--catalog", "foundation", "--layer-id", "retrieval",
+                                  "--platform", "linux-wsl2-x86_64", "--write")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("manifests/evidence.json", result.stderr)
+            updated_text = landscape_path.read_text(encoding="utf-8")
+            self.assertIn("é", updated_text)
+            self.assertNotIn("\\u00e9", updated_text)
 
     def test_record_subcommand_exits_3_when_not_qualified(self):
         with tempfile.TemporaryDirectory() as tmp:
