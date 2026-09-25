@@ -360,6 +360,11 @@ install_native() {
   fetch "$url" "$sha256" "$download"
   chmod 0755 "$download"
   "$download" install "$version"
+  # --no-link means never create or update a bin/ entrypoint for this pin, the same as every
+  # other install_* function's own no_link guard; a native pin has no tools/<id>-<version>
+  # prefix of its own to isolate under --tools-suffix (the installer manages its own versions
+  # directory), so only the redirecting bin_dir/$bin_name script is skipped here.
+  [[ "$no_link" != 1 ]] || return 0
   # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
   # into ~/.local/share/claude/versions) already provides the command; writing
   # ours there would replace it with a script that execs itself.
@@ -397,7 +402,19 @@ install_pip() {
 install_uv_tool() {
   local id="$1" version="$2"
   command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
-  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+  # --tools-suffix isolates this pin's own uv-managed prefix the same way every other install_*
+  # function isolates tools/<id>-<version><suffix>, so a staged run never shares (and cannot
+  # silently upgrade) an already-installed uv tool's environment. --no-link keeps uv's own shim
+  # inside that isolated prefix instead of the shared bin_dir, so it never creates or updates a
+  # bin/ entrypoint there either -- uv still "manages its own shim directory" (usage text above),
+  # just not one on the shared PATH when --no-link asked for no bin/ entrypoint at all.
+  local uv_tool_dir="$ecosystem_root/python-tools$tools_suffix"
+  local uv_tool_bin_dir="$bin_dir"
+  if [[ "$no_link" == 1 ]]; then
+    uv_tool_bin_dir="$uv_tool_dir/bin"
+    mkdir -p "$uv_tool_bin_dir"
+  fi
+  UV_TOOL_DIR="$uv_tool_dir" UV_TOOL_BIN_DIR="$uv_tool_bin_dir" \
     uv tool install --python 3.13 "${id}==${version}"
 }
 
@@ -445,6 +462,13 @@ for id in "${component_ids[@]}"; do
   install_pin "$id"
 done
 
+versions_log="$ecosystem_root/installed-versions.txt"
+# A staged run (--tools-suffix, --no-link and/or --link-dir) must never clobber the canonical,
+# already-adopted installed-versions.txt with a report about the staging area instead; only a
+# plain, unflagged run (the one that actually updates the live bin/) writes the canonical file.
+if [[ -n "$tools_suffix" || "$no_link" == 1 || -n "$link_dir_override" ]]; then
+  versions_log="$ecosystem_root/installed-versions${tools_suffix}.txt"
+fi
 {
   printf 'Verified executable versions at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
   git --version
@@ -458,7 +482,7 @@ done
     printf -- '-- %s --\n' "$installed_name"
     "$installed_executable" --version 2>&1 || printf '%s --version exited %s\n' "$installed_name" "$?"
   done
-} | tee "$ecosystem_root/installed-versions.txt"
+} | tee "$versions_log"
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \
