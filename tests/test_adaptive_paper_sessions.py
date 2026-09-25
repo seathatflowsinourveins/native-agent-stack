@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import time
 import unittest
+from unittest import mock
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -145,18 +146,49 @@ class SessionClockTests(unittest.TestCase):
             self.skipTest("exchange_calendars is not installed in this shared engine environment")
         self.assertTrue(result)
 
+    def test_exchange_calendars_agreement_2027_or_absent(self):
+        # The 2027 table (NYSE hours-calendars page, fetched 2026-09-24) must
+        # match XNYS session by session, including the 13:00 early close.
+        result = sess.exchange_calendars_agrees(2027)
+        if result is None:
+            self.skipTest("exchange_calendars is not installed in this shared engine environment")
+        self.assertTrue(result)
+
     def test_year_outside_calendar_refused(self):
-        # D7: dates outside the frozen table's year(s) must not be silently
-        # classified against the 2026 table. exchange_calendars is not
-        # installed in this environment, so both raise.
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2025, 12, 25, 12, 0))
-        with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
-            sess.session_at(ny(2027, 1, 1, 12, 0))
+        # D7/finding-6 (2026-09-24 fix round): dates outside the frozen
+        # table's year(s) must not be silently classified against another
+        # year's table. The exchange_calendars fallback is disabled here so
+        # the result does not depend on whether exchange_calendars is
+        # installed (fix round 3, item 10: CI only installs the lockfile
+        # into the separate promotion-gate venv, not this test interpreter,
+        # so that package is not reliably present here either way).
+        # 2027 is covered by HOLIDAYS_2027 (see test_2027_calendar_covered
+        # below); 2025 and 2028 are not.
+        with mock.patch.object(sess, "_exchange_calendars_day", return_value=None):
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2025, 12, 25, 12, 0))
+            with self.assertRaisesRegex(ValueError, "session_calendar_out_of_range"):
+                sess.session_at(ny(2028, 1, 1, 12, 0))
 
     def test_year_inside_calendar_still_works(self):
         info = sess.session_at(ny(2026, 12, 31, 12, 0))
         self.assertEqual(info.kind, sess.SessionKind.RTH)
+
+    def test_2027_calendar_covered(self):
+        # finding 6: next_trading_day(2026-12-31) used to raise because the
+        # calendar covered only 2026 -- a session-calendar failure at a
+        # year boundary must no longer happen for 2026 -> 2027. New Year's
+        # Day 2027 (a Friday) is a full-closure holiday; the next trading
+        # day after it is Monday 2027-01-04.
+        self.assertEqual(sess.next_trading_day(date(2026, 12, 31)), date(2027, 1, 4))
+        info = sess.session_at(ny(2027, 1, 4, 12, 0))
+        self.assertEqual(info.kind, sess.SessionKind.RTH)
+        self.assertFalse(sess.is_trading_session(ny(2027, 1, 1, 12, 0)))  # New Year's Day holiday
+        # Friday after Thanksgiving 2027 is a scheduled 13:00 ET early close.
+        early = sess.session_at(ny(2027, 11, 26, 12, 0))
+        self.assertTrue(early.is_early_close)
+        self.assertEqual(early.kind, sess.SessionKind.RTH)
+        self.assertEqual(sess.session_at(ny(2027, 11, 26, 13, 30)).kind, sess.SessionKind.POST)
 
     def test_extended_session_close_spans_pre_rth_post(self):
         # D4: PRE's own .close (09:30) is only the RTH-open boundary, not the
