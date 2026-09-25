@@ -3,7 +3,12 @@
 **Scope:** stopping leaked `app-server-broker.mjs` processes the openai-codex
 Claude Code plugin (installed under `~/.claude/plugins/cache/openai-codex/`)
 leaves running after a crashed session or an abandoned workflow-child
-worktree, without touching any broker a live session still owns. The tool is
+worktree. This is not an unconditional guarantee that no broker a live
+session owns is ever touched: "Known limitations" below discloses one
+residual gap (a worktree broker that has never yet run a single job, whose
+only live coordinator is a separate driver repository with no git
+relationship to the worktree at all, is protected only by guard (d)'s plain
+process age). The tool is
 [`../../adoption/tools/codex-broker-reaper`](../../adoption/tools/codex-broker-reaper),
 its tests are
 [`../../tests/test_codex_broker_reaper.py`](../../tests/test_codex_broker_reaper.py),
@@ -54,7 +59,10 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   was already dead (no live process at that pid at all) at review time,
   which is why `--list` against this host's real state (read-only; see
   `adoption/tools/README.md`) reports 0 eligible: guard (a) alone already
-  refuses all 17, before guards (b)–(d) are even evaluated.
+  refuses all 17, before guards (b)–(e) are even evaluated (five guards as
+  of the second fix round below; this bullet said "(b)–(d)" through the
+  second fix round, stale from when there were only four -- corrected in
+  the third fix round below).
 - A live `claude`/`codex` process is detected by `comm` (both are native
   binaries on this host, not wrapper scripts, so `comm` is their own name),
   with cmdline `argv[0]`'s basename as a second signal. This was checked by
@@ -78,20 +86,32 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
 1. Ship `adoption/tools/codex-broker-reaper` (Python 3 stdlib): `--list`
    (default, read-only) and `--apply` evaluate every broker under
    `~/.claude/plugins/data/*codex*/state` (or an explicit `--state-root`)
-   against four guards, all required: (a) `/proc/<pid>/cmdline` still names
-   `app-server-broker.mjs serve` with the exact recorded endpoint; (b) no
-   job in `state.json` has a non-terminal status, and an unrecognized status
-   blocks reaping rather than being assumed safe; (c) the workspace
-   directory (from the broker's own live `/proc/<pid>/cwd`) no longer
-   exists, or no live `claude`/`codex` process has a cwd equal to or under
-   it; (d) the broker is older than `--min-age` (default 1800s), measured
-   from `/proc/<pid>/stat`'s `starttime`. Action is the `broker/shutdown`
-   RPC (5s), then up to 15s waiting for the broker and its OS children to
-   exit; `--escalate` only adds a process-group `SIGTERM` after that wait
-   fails and after re-checking guard (a) again (the pid could have been
-   reused during the wait). The tool never sends SIGKILL. `--receipt PATH`
-   writes the same JSON report to a file. Exit 0 normally, 2 if an eligible
-   broker was not confirmed stopped.
+   against five guards, all required (four through the first fix round;
+   guard (e) added in the second fix round below): (a) `/proc/<pid>/cmdline`
+   still names `app-server-broker.mjs serve` with the exact recorded
+   endpoint; (b) no job in `state.json` has a non-terminal status, and an
+   unrecognized status blocks reaping rather than being assumed safe; (c)
+   the workspace directory (from the broker's own live `/proc/<pid>/cwd`)
+   no longer exists, or no live `claude`/`codex` process has a cwd equal to
+   or under it, under its nearest git checkout root, or under the *other*
+   checkout a `git worktree` workspace belongs to (fix rounds below) --
+   excluding every live broker's own descendant processes, not just the one
+   being evaluated (third fix round below); (d) the broker is older than
+   `--min-age` (default 1800s), measured from `/proc/<pid>/stat`'s
+   `starttime`; (e) the workspace's most recent recorded job activity
+   (`state.json` jobs[]' timestamps) is also at least `--min-age` in the
+   past, independent of the broker process's own age (second fix round
+   below). Action is the `broker/shutdown` RPC (5s), then up to 15s waiting
+   for the broker and its OS children to exit; `--escalate` only adds a
+   process-group `SIGTERM` after that wait fails and after re-checking
+   guard (a) again (the pid could have been reused during the wait). The
+   tool never sends SIGKILL. Once an exit is confirmed, `broker.json` is
+   removed if it still names the exact pid/endpoint just stopped (second
+   fix round below), re-read just before deleting so a new broker started
+   for the same workspace during the wait is never touched. `--receipt
+   PATH` writes the same JSON report to a file. Exit 0 normally; 2 if an
+   eligible broker was not confirmed stopped, or for invalid command-line
+   usage; 3 if this host has no `/proc` at all (second fix round below).
 2. Ship drafted, not-installed systemd user templates
    (`adoption/templates/systemd/codex-broker-reaper.{service,timer}`):
    hourly via `OnCalendar=hourly` (plus `OnBootSec=10min` for an early run
@@ -186,6 +206,21 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   git-unrelated to it is not reliably protected by any guard here beyond
   guard (d)'s plain process age — this is the same shape of gap as the
   subdirectory case above, disclosed rather than guessed at a further fix.
+- **Guard (c), one live session in a main checkout blocks every worktree
+  broker of that repository.** The worktree-to-parent check
+  (`read_worktree_parent_root`, above) resolves every worktree of a
+  repository back to the *same* main checkout, so a single live
+  `claude`/`codex` session with a cwd at or under that main checkout blocks
+  eligibility for every worktree broker of that repository, not only the
+  worktree the live session is actually working in. This is the intended,
+  conservative direction for a live-session safety check — broadening
+  protection rather than narrowing it — but was found undisclosed in review
+  of the second fix round (third fix round, 2026-09-25): an operator with
+  several concurrently active worktrees of one repository, only one of
+  which has a live session at the main checkout itself, should not expect
+  the *other* worktrees' brokers to become eligible while that
+  main-checkout session remains live, even though no live process has a cwd
+  anywhere near those other worktrees.
 - **Guard (e), idle-since-last-job rather than idle-since-ever:** guard (e)
   only requires `--min-age` since the most *recent* job, not since the
   workspace was first used — a session that runs a codex job every 20
@@ -496,18 +531,25 @@ summarizes.
 - **Scope disclosure — `manifests/evidence.json`.** Outside this track's
   allowed paths (`adoption/tools/codex-broker-reaper`,
   `adoption/tools/README.md`, the systemd templates,
-  `tests/test_codex_broker_reaper.py`, this decision record), but touched
-  in both this fix round and the first one (commits 7167a244 and, before
-  it, the first round's own README update): `scripts/validate.py`'s
-  `scan_publication` hash-pins `adoption/tools/README.md`'s exact
-  `sha256`/`bytes` in `manifests/evidence.json`'s `files[]`, so every edit
-  to that README requires a matching two-field re-pin there or
-  `scripts/validate.py` (this track's own acceptance command) fails
-  integrity. Mechanical, sha256/bytes-only, single-file diff each time,
-  computed directly from the edited README's own bytes — never hand-picked
-  or used to touch any other field. The first round's own commit message
-  said as much but this record did not; disclosed here for both rounds,
-  closing that gap.
+  `tests/test_codex_broker_reaper.py`, this decision record):
+  `scripts/validate.py`'s `scan_publication` hash-pins
+  `adoption/tools/README.md`'s exact `sha256`/`bytes` in
+  `manifests/evidence.json`'s `files[]`, so every edit to that README
+  requires a matching two-field re-pin there or `scripts/validate.py` (this
+  track's own acceptance command) fails integrity. Mechanical,
+  sha256/bytes-only, single-file diff each time, computed directly from the
+  edited README's own bytes — never hand-picked or used to touch any other
+  field. Every commit that has re-pinned it for this track's own README
+  edits, named here rather than left for a reader to reconstruct from `git
+  log --follow -- manifests/evidence.json` (checked directly: exactly these
+  three, nothing else in this track's history touches that file): bd03b2a7
+  (this decision record's own first commit, which also added the initial
+  README section), 7167a244 (the first fix round above), and 939ec97d (the
+  second fix round above). The first round's own commit message said as
+  much but this record did not until the second fix round (disclosed there
+  for both rounds then); this correction adds the missing commit hashes
+  themselves (second-pass review finding, resolved in the third fix round
+  below).
 - **Re-measured (second pass):** `python3 -m unittest
   tests.test_codex_broker_reaper -v` (40 tests, all passing); `python3
   adoption/tools/codex-broker-reaper --list` against this host's real
@@ -526,3 +568,96 @@ summarizes.
   `tests/test_codex_broker_reaper.py`, `manifests/evidence.json`) — the same
   9, by name, as an unrelated worker's checkout of the same base commit
   reported before this round began; not this track's regression.
+
+## Fix round (2026-09-25, third pass)
+
+A review of d91bb210 (the second fix round's own HEAD) found one major and
+one minor code finding, plus a consistency finding against this record
+itself, resolved here; see the tool's own docstring and
+`tests/test_codex_broker_reaper.py` for the code-level detail this section
+summarizes.
+
+- **Major — guard (c) permanently blocked pairs of orphaned brokers of one
+  repository against each other.** Excluding only the EVALUATED broker's own
+  descendants (first fix round above) stopped being enough once guard (c)
+  also started scanning a workspace's git-toplevel and worktree-parent roots
+  (second fix round above): every OTHER live broker's own `codex
+  app-server` child then looked like a live session whenever that other
+  workspace's root sat at or under one of the roots this scan checks.
+  Traced from source and verified against this rollout's own live
+  processes, not only reasoned about: a main-checkout orphan and a `git
+  worktree` orphan nested under it (Claude Code's own
+  `.claude/worktrees/<name>/` layout), or two such worktrees, each found
+  the OTHER's app-server child under their shared main checkout, so neither
+  ever became eligible. No existing test spawned two brokers at once, which
+  is why this was never caught. Fixed: new `find_live_broker_pids()` scans
+  `/proc` by cmdline (the same match guard (a) already applies to the
+  evaluated broker, minus the `--endpoint` check, factored out into
+  `is_broker_serve_cmdline()`) to find every live broker on the host; guard
+  (c) now excludes every live broker's own pid and full descendant set,
+  computed once per broker evaluation and reused across the
+  workspace-root/git-toplevel/worktree-parent scans. Regression test:
+  `LiveCwdGuardTests.
+  test_two_orphaned_brokers_of_one_repository_do_not_block_each_other` (two
+  real spawned fake brokers, each with its own fake `codex` child;
+  confirmed red against the pre-fix code by reverting only the tool file
+  before restoring the fix). New, disclosed side effect of this same
+  worktree-parent check, found in this round's own review of the record
+  rather than of the tool: a live session at a repository's main checkout
+  now blocks every worktree broker of that repository, not only the one the
+  session is working in (see "Known limitations" above) — intended and
+  conservative, but previously undisclosed.
+- **Minor — `read_worktree_parent_root()` left a relative `gitdir:` path
+  unresolved.** git writes a relative `gitdir:` line relative to the
+  directory holding the `.git` FILE itself (git 2.48+'s
+  `worktree.useRelativePaths` / `git worktree add --relative-paths`), not
+  to this process's own cwd; unresolved, the returned parent stayed
+  relative and `path_is_under()` then compared it against an absolute
+  `/proc` cwd and never matched, silently dropping the worktree-parent
+  protection for such a worktree (not triggered on this host: git 2.43.0
+  here writes absolute lines). Fixed: `normpath(join(checkout_root,
+  gitdir))` before the marker search — `os.path.join` already discards
+  `checkout_root` when `gitdir` is already absolute, so this is safe either
+  way. Regression test: `LiveCwdGuardTests.
+  test_read_worktree_parent_root_resolves_a_relative_gitdir` (a pure
+  function-level test with a hand-written relative pointer file; also
+  confirmed red against the pre-fix code).
+- **Consistency — this record's own headline sections had fallen behind the
+  tool.** Found in review of the second fix round, against this record
+  rather than the code: the Scope line still claimed unconditionally that
+  no broker a live session owns is touched, though "Known limitations"
+  already disclosed a residual gap; Decision item 1 still described four
+  guards and exit codes 0/2 only, with no mention of guard (e), the
+  worktree/git-toplevel checks, or `broker.json` removal, while the Context
+  section's 17-broker observation still said guards "(b)–(d)"; and the
+  `manifests/evidence.json` scope-disclosure bullet said re-pins happened
+  "in both this fix round and the first one" without naming the commits.
+  Fixed: Scope, the Context bullet, and Decision item 1 above now match the
+  tool's actual five guards, exit codes 0/2/3, and `broker.json` removal;
+  the evidence.json bullet now names all three re-pin commits to date
+  (bd03b2a7, 7167a244, 939ec97d) instead of describing them only
+  relatively; and the new "Known limitations" bullet above discloses the
+  main-checkout-blocks-every-worktree-broker behavior. This round's own
+  commits touch neither `adoption/tools/README.md` nor
+  `manifests/evidence.json` (the README's guard table and exit-code
+  description were already correct, per the second-pass review, and this
+  round's guard (c) change does not change the *set* of exclusions the
+  README describes for the evaluated broker itself, only that other
+  brokers are excluded too), so no further re-pin was needed here.
+- **Re-measured (third pass):** `python3 -m unittest
+  tests.test_codex_broker_reaper -v` (42 tests, all passing — 40 before
+  this round's 2 new regression tests); `python3
+  adoption/tools/codex-broker-reaper --list` against this host's real
+  plugin state (still 17 found, 0 eligible, all refused at guard (a) before
+  guard (c) is reached — this round's guard (c) change does not move this
+  host's own number, same as both earlier rounds); `python3
+  scripts/validate.py` (`{"status": "passed", ...}`, exit 0 — confirms the
+  `manifests/evidence.json` pin from the second fix round still matches,
+  since this round does not touch the README) and `python3
+  scripts/validate_foundation.py` (exit 0), both re-run directly against
+  this round's own commits. The full-suite `python3 -m unittest discover -s
+  tests` figure from the second fix round (4760 tests, 9 pre-existing
+  failures) was not re-run here: this round's own acceptance commands name
+  only the four commands above, and this round's diff is confined to
+  `adoption/tools/codex-broker-reaper`, `tests/test_codex_broker_reaper.py`,
+  and this decision record.
