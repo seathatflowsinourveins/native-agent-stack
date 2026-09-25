@@ -250,6 +250,17 @@ class McpTemplateShapeTests(unittest.TestCase):
         self.assertEqual(data["mcpServers"]["serena"]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
+    def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
+        # The template no longer carries JCODEMUNCH_SHARE_SAVINGS=0, so the two documented opt-in
+        # forms in adoption/bootstrap.md step 4a are where it ships: the local command and the
+        # checked-in .mcp.json entry must both keep it.
+        text = (ROOT / "adoption" / "bootstrap.md").read_text()
+        start = text.index("**jCodeMunch, per project.**")
+        paragraph = text[start:text.index("Then apply the settings template itself", start)]
+        self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
+        self.assertIn('"JCODEMUNCH_SHARE_SAVINGS": "0"', paragraph)
+        self.assertEqual(paragraph.count("JCODEMUNCH_SHARE_SAVINGS"), 2)
+
 
 class McpRenderAndCommandTests(unittest.TestCase):
     def test_placeholders_are_rendered_for_the_target_host(self):

@@ -29685,8 +29685,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "8f47f2fe0060808e186531a1daf6d64a8fe3431038e38b6390a3ceded786c977",
-      "bytes": 24069
+      "sha256": "75338a4d8c4e2eb72ee49ba0e6340551f255918b745b746f3cdc12a8fd3e5272",
+      "bytes": 24818
     },
     {
       "path": "tests/test_job_recovery.py",

@@ -163,7 +163,9 @@ where the server is registered. No catalog verdict or component record changes.
   local-scope entry: `claude mcp get jcodemunch` there reported `Local config (private to you in
   this project)` and `✔ Connected`.
 - **Both opt-in forms, measured** under a temporary `CLAUDE_CONFIG_DIR` and scratch
-  `CODE_INDEX_PATH`, so the host's config and jCodeMunch ledger were untouched:
+  `CODE_INDEX_PATH`, so the host's config and jCodeMunch ledger were untouched. These are local
+  integration checks on one host; their command output stayed in that session's scratch
+  directory and is not retained in this catalog:
   - `claude mcp add --scope local jcodemunch -e ... -- <prefix>/bin/jcodemunch-mcp` exited 0.
     `claude mcp get` reported `✔ Connected` in that project and `No MCP server named
     "jcodemunch"` in another. One of three `get` runs crashed in Bun (segfault, exit 139); the
