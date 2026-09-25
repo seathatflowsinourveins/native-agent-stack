@@ -154,14 +154,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:36Z",
                 "pass": 2
               },
@@ -200,14 +200,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:18Z",
                 "pass": 2
               },
@@ -337,8 +337,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T16:12:15Z",
-                "pass": 1
+                "latest": null,
+                "pass": 0
               },
               "qualified_models": []
             },
@@ -417,7 +417,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:11Z",
                 "pass": 2
               },
@@ -510,8 +510,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T16:12:12Z",
-                "pass": 2
+                "latest": "2026-09-25T05:38:10Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -719,7 +719,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:22Z",
                 "pass": 2
               },
@@ -806,7 +806,7 @@
                 "dissented": 0,
                 "fail": 1,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:21Z",
                 "pass": 2
               },
@@ -1348,7 +1348,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:22Z",
                 "pass": 2
               },
@@ -1387,14 +1387,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:37:27Z",
                 "pass": 1
               },
@@ -1508,8 +1508,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T16:11:58Z",
-                "pass": 1
+                "latest": null,
+                "pass": 0
               },
               "qualified_models": []
             },
@@ -1606,9 +1606,9 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T15:34:31Z",
-                "pass": 2
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T15:34:13Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -1786,7 +1786,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:34:16Z",
                 "pass": 2
               },
@@ -1832,7 +1832,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:34:25Z",
                 "pass": 2
               },
@@ -1878,7 +1878,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:34:07Z",
                 "pass": 2
               },
@@ -1924,7 +1924,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "not_run",
           "evidence_class": "native_proven",
           "name": "MCP Inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector"
@@ -2144,7 +2144,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 3,
                 "latest": "2026-09-25T15:35:35Z",
                 "pass": 3
               },
@@ -2289,7 +2289,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:33:59Z",
                 "pass": 2
               },
@@ -2418,7 +2418,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:04Z",
                 "pass": 2
               },
@@ -2583,7 +2583,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 3,
                 "latest": "2026-09-25T15:34:44Z",
                 "pass": 3
               },
@@ -2748,7 +2748,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:21Z",
                 "pass": 3
               },
@@ -2803,14 +2803,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:54Z",
                 "pass": 2
               },
@@ -2849,14 +2849,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:37Z",
                 "pass": 2
               },
@@ -3177,9 +3177,9 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T15:34:31Z",
-                "pass": 2
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T15:34:13Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -3223,7 +3223,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:22Z",
                 "pass": 2
               },
@@ -3297,7 +3297,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "not_run",
           "evidence_class": "native_proven",
           "name": "Serena",
           "repository": "https://github.com/oraios/serena"
@@ -3633,8 +3633,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T16:06:06Z",
-                "pass": 1
+                "latest": null,
+                "pass": 0
               },
               "qualified_models": []
             },
@@ -3722,7 +3722,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:33:59Z",
                 "pass": 2
               },
@@ -4691,14 +4691,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:18Z",
                 "pass": 2
               },
@@ -4744,7 +4744,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
+                "independently_reviewed_pass": 2,
                 "latest": "2026-09-25T15:35:04Z",
                 "pass": 2
               },
@@ -4970,18 +4970,6 @@
           "component_id": "systemd",
           "e2e_state": "conditional",
           "layer_id": "scheduling-supervision"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "ccusage",
-          "e2e_state": "conditional",
-          "layer_id": "token-efficiency"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "headroom",
-          "e2e_state": "conditional",
-          "layer_id": "token-efficiency"
         },
         {
           "catalog": "foundation",

@@ -61,6 +61,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Install receipt; checked points 3 and 4 and claim support. Re-ran all three commands (exit 0, excerpts identical): qmd resolves to tools/qmd-2.8.3, the retained qmd-2.8.3.tgz sha256 2e608299... equals adoption/pins-linux-x86_64.json, its sha512 integrity is in qmd's own install_note, and package.json and qmd --version read 2.8.3 (facd35e). I also confirmed with npm view that the registry's dist.integrity (sha512-zjfVwrOb...) and dist.shasum (7e1515b1...) match the retained tarball. Point 4 holds: qmd is the document-retrieval winner and 2.8.3 pin_matches. The readiness-only claim matches the commands; catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:52Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

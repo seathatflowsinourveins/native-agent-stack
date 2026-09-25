@@ -61,6 +61,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session reviewing on this host. Reproduced: re-ran all 3 commands (path and pin resolution; the archive vs recipes/README.md v1.19.1 hash comparison and the archive-member vs installed-binary comparison; qdrant --version). Each exited 0, and each output is identical to its retained excerpt. Adequacy (install stage: points 3 and 4 plus claim support): 3 holds. Every install, integrity and version claim has retained output, and the GitHub release v1.19.1 asset digest is 70a40529e2ebe0a2..., equal to the retained archive. The qdrant use receipt is on main (202e0517), the commands do not contact the production service, and the host description matches this host live (48 CPUs, AMD Ryzen Threadripper PRO 5975WX, 102 GiB, RTX 4090 24 GB, Ubuntu 24.04.5 LTS, WSL 2.7.13.0), also retained in the hw profile and this host's vllm use -2 receipt. 4 holds. component_id qdrant is the foundation winner, and 1.19.1 pin_matches 1.19.1. The pin sources (catalogs/landscape foundation/us-equities, manifests/stack.json entry, observability/receipt.json, recipes/README.md entry) are unchanged for this component between catalog_revision 74886724 and 6b2f71fa.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:23:27Z",
+      "reviewer": {
+        "identity_sha256": "e891850f9e8918c14a188be398d923e1f684e7c4cad57a9b78e0501a7cab7b2a",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

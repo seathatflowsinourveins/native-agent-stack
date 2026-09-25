@@ -84,6 +84,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session reviewing on this host. Reproduced: re-ran all 6 commands with RR under /tmp (owned repository, run-time random passwords). Each exited 0. The new repository and snapshot ids differ, as expected. State1 differs only in its byte count, 698659 vs 663118. That is exactly the size of adoption/ at HEAD 6b2f71fa vs catalog_revision 74886724 (git ls-tree: 54 files each), which also corroborates the recorded checkout. State2 new/changed/unmodified 1/1/52; both restores with --verify byte-identical to their manifests and different from each other; wrong password exit 12; check --read-data no errors; cleanup confirmed. Adequacy (recovery stage: points 3 and 4 plus claim support): the commands support the claim of two distinct point-in-time restores after a simulated loss, with a wrong-password refusal as the negative control. 3 holds. restic 0.19.1 and the pin are retained in cmd 1, the restic use receipt is on main (202e0517), and the host description matches this host live (48 CPUs, AMD Ryzen Threadripper PRO 5975WX, 102 GiB, RTX 4090 24 GB, Ubuntu 24.04.5 LTS, WSL 2.7.13.0), also retained in the hw profile and this host's vllm use -2 receipt. 4 holds. component_id restic is the foundation winner, and 0.19.1 pin_matches 0.19.1. The pin sources (catalogs/landscape foundation/us-equities, manifests/stack.json entry, observability/receipt.json, recipes/README.md entry) are unchanged for this component between catalog_revision 74886724 and 6b2f71fa.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:23:27Z",
+      "reviewer": {
+        "identity_sha256": "e891850f9e8918c14a188be398d923e1f684e7c4cad57a9b78e0501a7cab7b2a",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

@@ -69,6 +69,15 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran with scripts/host_receipts.py run_command (sh, repository root, owned mktemp RR under /tmp) on this host at HEAD 6b2f71fa. All 4 commands exit 0 with byte-identical raw output (same output_sha256). The SDK scan gave 36 syft-json python packages, 36 CycloneDX library components and 36 uv pip freeze distributions, as identical sets. The empty directory gave 0 artifacts, and the planted dist-info gave exactly nsr-planted-pkg 9.8.7. Adequacy, all four points hold. Point 1, layer role: syft produced SBOMs (the actual runtime inventory) of a real environment, checked against independent ground truth; I also counted 36 dist-info directories in that site-packages myself. Point 2, positive control: the empty and planted fixtures show that it reports what exists and nothing extra. Point 3: syft 1.52.0 from the resolved path and the winner pins are retained output. Point 4: syft is the ci-supply-chain and security-supply-chain winner, and 1.52.0 pin_matches both 1.52.0 and v1.52.0.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:25:18Z",
+      "reviewer": {
+        "identity_sha256": "53ca4cf7516bb9521922405268b5aae1293b989d5cb11a5b26d64222e0f8c1f7"
+      }
     }
   ]
 }

@@ -68,6 +68,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session reviewing on this host with scratch under /tmp. Reproduced: re-ran all 4 commands (path and pin resolution; sha256sum --check against the retained SHA256SUMS plus the comparison with the offhost-restore installation.json hash and the decompressed-archive vs installed-binary comparison; gpgv with an owned throwaway keyring under /tmp; restic version). Each exited 0, and each output is identical to its retained excerpt. Adequacy (install stage: points 3 and 4 plus claim support): 3 holds. Every install, integrity, signature and version claim has retained output. I also matched the retained archive (f415415624dcc452...), SHA256SUMS and SHA256SUMS.asc to the GitHub release v0.19.1 asset digests. The signing key fingerprint CF8F18F2844575973F79D4E191A6868BD3F7A907 is the one restic's v0.19.1 doc/020_installation.rst publishes, and the host description matches this host live (48 CPUs, AMD Ryzen Threadripper PRO 5975WX, 102 GiB, RTX 4090 24 GB, Ubuntu 24.04.5 LTS, WSL 2.7.13.0), also retained in the hw profile and this host's vllm use -2 receipt. The configured recovery repository and its credential were not read. 4 holds. component_id restic is the foundation winner, and 0.19.1 pin_matches 0.19.1. The pin sources (catalogs/landscape foundation/us-equities, manifests/stack.json entry, observability/receipt.json, recipes/README.md entry) are unchanged for this component between catalog_revision 74886724 and 6b2f71fa.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:23:27Z",
+      "reviewer": {
+        "identity_sha256": "e891850f9e8918c14a188be398d923e1f684e7c4cad57a9b78e0501a7cab7b2a",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

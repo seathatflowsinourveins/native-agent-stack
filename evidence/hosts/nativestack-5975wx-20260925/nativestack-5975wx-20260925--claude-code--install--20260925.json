@@ -69,6 +69,15 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran with scripts/host_receipts.py run_command (sh, repository root, owned mktemp RR under /tmp) on this host at HEAD 6b2f71fa, all 4 commands exit 0. Commands 2-4 (fetch of the 2.1.278 linux-x64 binary with the release-manifest and evidence/receipts/portable-userspace-install-20260921.json sha256 checks, the env -i DISABLE_AUTOUPDATER=1 --version returning 2.1.278, and the cleanup) gave byte-identical raw output (same output_sha256). Command 1 was identical except that the bootstrap floor now reads 2.1.281. Later commits (83b6f87b) changed that; 2.1.280 is correct at the receipt catalog_revision 74886724. Adequacy (install stage, points 3 and 4, and whether the commands support the claim): point 3 holds. Every version, pin and integrity claim has a retained command and output. The limitation that the host client resolves through the codex-ecosystem wrapper to ~/.local/bin/claude is consistent with command 1. The wrapper exec line is not in the output; I read it myself: exec \"$HOME/.local/bin/claude\". Point 4 holds: claude-code is the native-clients and workers winner, and 2.1.278 pin_matches in both. The commands support the claim: the pinned build is present from the official release path and starts, and the daily client 2.1.282 is unchanged. Host facts (5975WX, 48 CPUs, 102 GiB, Ubuntu 24.04.5, RTX 4090) checked with lscpu, free, os-release and nvidia-smi.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:25:18Z",
+      "reviewer": {
+        "identity_sha256": "53ca4cf7516bb9521922405268b5aae1293b989d5cb11a5b26d64222e0f8c1f7"
+      }
     }
   ]
 }

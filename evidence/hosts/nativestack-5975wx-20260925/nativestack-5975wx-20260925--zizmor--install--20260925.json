@@ -61,6 +61,15 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran with scripts/host_receipts.py run_command (sh, repository root, owned mktemp RR under /tmp) on this host at HEAD 6b2f71fa. All 3 commands exit 0 with byte-identical raw output (same output_sha256): the resolved path and pins; uv pip sync --dry-run --offline reports Would make no changes against the hash-pinned .github/requirements-ci.txt; the bin/zizmor sha256 matches its RECORD entry; zizmor --version reports 1.30.1. Adequacy (install stage, points 3 and 4, and whether the commands support the claim): point 3 holds. Every install, version and pin claim is backed. I listed the venv dist-info directories: only zizmor-1.30.1.dist-info, which supports the claim of nothing else. The limitations state that the wheel hash was not recomputed. Point 4 holds: zizmor is the ci-supply-chain winner, and 1.30.1 pin_matches 1.30.1. The commands support the claim.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:25:18Z",
+      "reviewer": {
+        "identity_sha256": "53ca4cf7516bb9521922405268b5aae1293b989d5cb11a5b26d64222e0f8c1f7"
+      }
     }
   ]
 }

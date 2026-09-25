@@ -77,6 +77,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points; re-ran all five commands with RR under /tmp (all exit 0, excerpts identical). (1) Layer role: ccusage aggregated a known-answer Claude Code JSONL fixture to the hand-computed per-day and total tokens with the repeated message deduplicated, honoured --since, and read this host's real logs with internally consistent rows. (2) Control: the exact-value assertion discriminates, since my variant giving the duplicate a distinct message id totalled 16550 instead of 10490; the empty projects dir gave 0 rows; the limitation that spaced JSON rows are skipped also reproduced (0 rows). (3) Backed: cmd 0 retains ccusage --version 20.0.24, the resolved install path and stack/winner pins 20.0.24; catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM. (4) ccusage is the foundation token-efficiency winner and 20.0.24 pin_matches its pin.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:51Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

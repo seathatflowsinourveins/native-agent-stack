@@ -61,6 +61,15 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran with scripts/host_receipts.py run_command (sh, repository root, owned mktemp RR under /tmp) on this host at HEAD 6b2f71fa. All 3 commands exit 0 with byte-identical raw output (same output_sha256): sha256sum --check reports OK; the archive, the publisher checksum list and the installed binary equal the upstream hashes in blueprints/us-equities/supply-chain/receipt.json, which I compared myself; syft version reports 1.52.0, GitCommit 02ba369d. Adequacy (install stage, points 3 and 4, and whether the commands support the claim): point 3 holds. Every install, version and pin claim is backed by retained output, and the limitations state that the cosign verification was not repeated. Point 4 holds: syft is the ci-supply-chain and security-supply-chain winner, and 1.52.0 pin_matches both 1.52.0 and v1.52.0. The commands support the claim.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:25:18Z",
+      "reviewer": {
+        "identity_sha256": "53ca4cf7516bb9521922405268b5aae1293b989d5cb11a5b26d64222e0f8c1f7"
+      }
     }
   ]
 }

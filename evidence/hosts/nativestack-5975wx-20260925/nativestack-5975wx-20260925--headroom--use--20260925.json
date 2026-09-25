@@ -63,6 +63,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points; re-ran all three commands with RR under /tmp (all exit 0, excerpts identical, including 16820 -> 11429 tokens). (1) Layer role: headroom's own MCP server compressed a 600-line log, and headroom_retrieve returned the byte-identical original with the planted anomaly (useful context with a recoverable original). (2) Controls: an unknown hash returned 'Content not found'; the assertion requires fewer tokens and exact equality; the global ~/.headroom files were unchanged. (3) Backed: cmd 0 retains headroom --version 0.37.0, the install path and pins; catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM. (4) headroom is the token-efficiency winner and 0.37.0 pin_matches.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:51Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }
