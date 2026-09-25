@@ -6467,8 +6467,8 @@
     },
     {
       "path": "blueprints/memory-lifecycle-v2/README.md",
-      "sha256": "70dcb968207dc416eebd61f49bba7117bcdb8a576ee352db404f3b4619295bee",
-      "bytes": 9708
+      "sha256": "5da14fac8d9720e320c5aa28c01b58d7de61f7356f22d907ffa652dee35bf349",
+      "bytes": 10079
     },
     {
       "path": "blueprints/memory-lifecycle-v2/analyze.py",

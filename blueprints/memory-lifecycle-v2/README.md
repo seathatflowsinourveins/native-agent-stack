@@ -1,6 +1,6 @@
 # Memory lifecycle v2 -- restart, real-time TTL and multi-project acceptance
 
-Native **ai-memory 2.3.2** (the repository's adopted pin) and **ai-memory 2.4.0** (the
+Native **ai-memory 2.3.2** (the durable-memory landscape winner pin) and **ai-memory 2.4.0** (the
 current upstream release, reviewed but not adopted -- see
 `docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md`) each independently completed
 **69 phase-"pre" + 16 phase-"post" = 85 MCP tool calls**, with **all 72 phase-"pre" checks and
@@ -101,7 +101,7 @@ print(analyze.summarize_pre(pre)['passed'], analyze.summarize_post(post, handoff
 
 ## Results
 
-| | ai-memory 2.3.2 (adopted pin) | ai-memory 2.4.0 (upstream, not adopted) |
+| | ai-memory 2.3.2 (landscape winner pin) | ai-memory 2.4.0 (official upstream release) |
 |---|---|---|
 | binary sha256 (measured; unchanged before/after both phases) | `93eeb299...cfed0` | `360b9dff...246344` |
 | negotiated `initialize` protocolVersion (client requests `2025-03-26`) | `2024-11-05` | `2025-03-26` |
@@ -135,6 +135,7 @@ or Windows execution). In addition, specific to this run:
   no network egress by design). Only the installed binary file's own sha256 was independently
   measured here, before and after each phase, for both binaries.
 - Concurrent multi-client access to one server process is not exercised.
+- Pin note, added later on 2026-09-25: production on the workstation moved to 2.4.0 in a separate, user-approved window, and the pin-move PR takes `manifests/stack.json` and the Linux bootstrap pins to 2.4.0. The durable-memory landscape winner pin stays 2.3.2 until a verdict wave. Where this page says "pin", it means that landscape winner pin.
 - This does not change the repository's adopted ai-memory pin (stays 2.3.2 per
   `manifests/stack.json`); it is independent comparison evidence for that decision, not a
   replacement for it.
