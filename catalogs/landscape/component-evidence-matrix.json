@@ -2765,12 +2765,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 3,
-                "latest": "2026-09-25T16:35:07Z",
-                "pass": 5
+                "independently_reviewed_pass": 4,
+                "latest": "2026-09-25T18:58:47Z",
+                "pass": 7
               },
               "qualified_models": []
             },
@@ -2827,12 +2827,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:54Z",
-                "pass": 2
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T18:58:52Z",
+                "pass": 4
               },
               "qualified_models": []
             },
