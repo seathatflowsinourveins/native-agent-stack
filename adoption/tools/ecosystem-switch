@@ -1320,7 +1320,16 @@ def verify_component(root: Path, component_id: str, spec: dict) -> str | None:
     bootstrap-linux.sh re-run, or a manual `ln -sfn`, repoints bin/* straight back at
     tools/<name>-<version> and silently undoes adopt --relink's indirection -- current/<id> still
     flips correctly on the next apply and this function used to report "ok" throughout, while
-    bin/* kept running whatever build it was last pointed at directly, unrelated to current/<id>."""
+    bin/* kept running whatever build it was last pointed at directly, unrelated to current/<id>.
+
+    Only checks an entrypoint that also declares ``in_root`` (minor finding, round 4): `adopt
+    --relink`'s own repoint loop only ever migrates an entrypoint that has both `bin` and
+    `in_root` (an `in_root`-less entry is intentionally left wherever it already points,
+    unmanaged) -- requiring `bin` alone here used to demand every such unmanaged entrypoint also
+    route through current/<id>, which relink itself would never arrange, so a component mixing a
+    managed and an unmanaged entrypoint failed this check (and any apply's own post-apply verify,
+    costing a real unit-restart and its automatic rollback) forever on the unmanaged one, however
+    correctly the managed one was routed."""
     entry = component_entry(spec, component_id)
     current_link = entry.get("current_link")
     if current_link:
@@ -1332,7 +1341,7 @@ def verify_component(root: Path, component_id: str, spec: dict) -> str | None:
             return drift
         current_link_prefix = str(target) + os.sep
         for entrypoint in entry.get("entrypoints") or []:
-            if not (isinstance(entrypoint, dict) and entrypoint.get("bin")):
+            if not (isinstance(entrypoint, dict) and entrypoint.get("bin") and entrypoint.get("in_root")):
                 continue
             bin_surface = entrypoint["bin"]
             live_target = read_link_target(root / bin_surface)

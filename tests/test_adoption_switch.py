@@ -372,6 +372,30 @@ class RelinkTests(SwitchFixture):
         self.assertTrue((self.root / "current" / "foo").exists())
         self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root / "current" / "foo" / "bin" / "foo"))
 
+    def test_verify_does_not_require_an_in_root_null_entrypoint_to_route_through_current(self):
+        # Minor finding (round 4): verify_component's entrypoint-bypass check (round 3) required
+        # every entrypoint with a "bin" to route through current/<id>, but relink only ever
+        # migrates an entrypoint that ALSO declares "in_root" -- an in_root:null entrypoint is
+        # intentionally left wherever it already points, unmanaged. A component mixing a managed
+        # and an unmanaged entrypoint therefore failed verify (and any apply's own post-apply
+        # verify, costing a real unit-restart and its automatic rollback) on the unmanaged one
+        # forever, however correctly the managed one was routed.
+        (self.root / "bin" / "foo-unmanaged").symlink_to(self.tool_root / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"},
+                            {"bin": "bin/foo-unmanaged", "in_root": None}],
+            "surfaces": [], "state_dirs": [], "window": "default", "rollback_class": "safe",
+        }})
+        self.relink("foo")
+        result = run(self.env, "verify", "--json")
+        payload = json.loads(result.stdout)
+        self.assertEqual(result.returncode, 0, payload)
+        self.assertTrue(payload["foo"]["ok"], payload["foo"])
+        # The unmanaged entrypoint must genuinely be left untouched, not merely un-checked.
+        self.assertEqual(os.path.realpath(self.root / "bin" / "foo-unmanaged"),
+                         os.path.realpath(self.tool_root / "bin" / "foo"))
+
 
 class TextReplaceAndFrozenTests(SwitchFixture):
     def setUp(self):
