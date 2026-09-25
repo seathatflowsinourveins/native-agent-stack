@@ -298,7 +298,7 @@ class ManifestAndLock(unittest.TestCase):
         self.assertEqual(path, Path("/home/example/.agents/.skill-lock.json"))
 
     def test_load_lock_installed_at_from_fixture(self):
-        installed = S.load_lock_installed_at(FIXTURES / "home" / ".agents" / ".skill-lock.json")
+        installed = S.load_lock_installed_at(FIXTURES / "fake-home" / ".agents" / ".skill-lock.json")
         self.assertEqual(installed["gh-fix-ci"], "2026-10-25T00:00:00.000Z")
         self.assertNotIn("codeql", installed)  # deliberately absent from the fixture lock
 
@@ -330,7 +330,7 @@ class BuildReportPruneLogic(unittest.TestCase):
 
     def build(self, **overrides):
         lock = overrides.pop("lock_installed_at",
-                              S.load_lock_installed_at(FIXTURES / "home" / ".agents" / ".skill-lock.json"))
+                              S.load_lock_installed_at(FIXTURES / "fake-home" / ".agents" / ".skill-lock.json"))
         kwargs = dict(claude=self.claude, codex_scan=self.scan, lock_installed_at=lock,
                       now=self.now, windows=[7, 30])
         kwargs.update(overrides)
@@ -469,7 +469,7 @@ class BuildReportPruneLogic(unittest.TestCase):
 class RenderTextAndCli(unittest.TestCase):
     def setUp(self):
         self.manifest_path = FIXTURES / "manifest.json"
-        self.home = FIXTURES / "home"
+        self.home = FIXTURES / "fake-home"
         self.claude_file = FIXTURES / "skill-doctor-sample.json"
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self.roots = [str(root) for root in materialize_codex_roots(tmp)]
