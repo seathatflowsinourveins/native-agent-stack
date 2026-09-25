@@ -43,9 +43,11 @@ import getpass
 import hashlib
 import json
 import os
+import re
 import shlex
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -79,6 +81,11 @@ ROLLBACK_CLASSES = ("safe", "restart_required", "manual_required", "not_applicab
 LEDGER_FIELDS = ("seq", "txn", "op", "component", "surface", "from", "to", "pre_sha256",
                   "post_sha256", "backup", "receipt", "window", "rollback_class", "actor",
                   "at_utc", "prev_hash", "hash")
+
+# A window's start_utc/end_utc must be in exactly this shape for the "<= now <=" string
+# comparison below to be safe (a non-Z offset or a malformed bound sorts unpredictably and
+# could leave a window that looks permanently open or permanently closed).
+ISO_UTC_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
 
 
 class SwitchError(Exception):
@@ -155,9 +162,17 @@ def run_captured(argv: list[str], **kwargs) -> subprocess.CompletedProcess:
     return subprocess.run(argv, capture_output=True, text=True, timeout=kwargs.pop("timeout", 60), **kwargs)
 
 
-def atomic_write_bytes(path: Path, data: bytes, mode: int = 0o600) -> None:
-    """Temp file in the same directory, fsync, then os.replace: never a half-written file."""
+def atomic_write_bytes(path: Path, data: bytes, mode: int = 0o600, *, preserve_mode_from: Path | None = None) -> None:
+    """Temp file in the same directory, fsync, then os.replace: never a half-written file.
+    ``preserve_mode_from`` (an existing file, read before this call replaces anything) overrides
+    ``mode`` with that file's own current permission bits, so switching a component's version
+    never silently drops an entrypoint wrapper's exec bit -- callers that must always keep a
+    fixed mode regardless of what is already on disk (the ledger, state.json, the component
+    spec: always 0600) never pass it."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    if preserve_mode_from is not None:
+        with contextlib.suppress(OSError):
+            mode = stat.S_IMODE(preserve_mode_from.stat().st_mode)
     fd, tmp_name = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.")
     try:
         with os.fdopen(fd, "wb") as handle:
@@ -191,6 +206,31 @@ def read_link_target(link_path: Path) -> str | None:
         return os.readlink(link_path)
     except OSError:
         return None
+
+
+def path_is_under(path: str | None, expected_root: str) -> bool:
+    """Whether ``path`` is ``expected_root`` itself or a real descendant of it (component-wise,
+    not a substring test): ``.../foo-2.0.0`` must not match ``.../foo-2.0.0-r20260925``."""
+    if not path:
+        return False
+    root_norm = os.path.normpath(expected_root)
+    path_norm = os.path.normpath(path)
+    return path_norm == root_norm or path_norm.startswith(root_norm + os.sep)
+
+
+def frozen_surface_issue(surface: str, target: Path) -> str | None:
+    """None unless ``surface`` (its literal text or, once resolved, the real path it names)
+    passes through a ``frozen/`` directory: a parent-directory symlink into ``*/frozen/*`` must
+    refuse a write even when the surface string itself never mentions "frozen"."""
+    if "/frozen/" in surface or surface.startswith("frozen/"):
+        return f"refusing an operation on a frozen surface: {surface}"
+    try:
+        resolved = str(target.resolve())
+    except OSError:
+        resolved = str(target)
+    if "/frozen/" in resolved or resolved.endswith("/frozen"):
+        return f"refusing an operation on a frozen surface (resolves through frozen/): {surface} -> {resolved}"
+    return None
 
 
 def available_memory_kib() -> int | None:
@@ -326,6 +366,12 @@ def recompute_state(root: Path) -> dict:
                 record["status"] = "verify_failed"
             elif op and op.startswith("rollback:") and entry.get("surface") == "_txn_end":
                 record["status"] = "rolled_back"
+            elif op in ("baseline", "resync", "prune"):
+                # Single-shot, non-transactional records, not a multi-step apply: they carry no
+                # reversible operation (rollback_txn's OPERATION_KINDS filter empties them out),
+                # so they must reach a terminal status immediately, never sit "in_progress"
+                # forever -- otherwise cmd_recover would try to "roll them back" on every run.
+                record["status"] = "recorded"
         # Only the component's own current/<id> switch point tracks "current"; a relink also
         # emits "link" entries for each entrypoint (e.g. surface bin/foo), which must not
         # overwrite it -- current_link is always named current/<id> by convention (enforced by
@@ -402,7 +448,11 @@ def load_window(root: Path, name: str) -> dict:
 def window_issue(window: dict, component_id: str, at_utc: str | None = None) -> str | None:
     now = at_utc or now_utc_iso()
     start, end = window.get("start_utc"), window.get("end_utc")
-    if not (isinstance(start, str) and isinstance(end, str) and start <= now <= end):
+    if not (isinstance(start, str) and isinstance(end, str) and ISO_UTC_RE.fullmatch(start)
+            and ISO_UTC_RE.fullmatch(end)):
+        return (f"window {window.get('name')!r} has a malformed start_utc/end_utc ({start!r}..{end!r}, "
+                "must be YYYY-MM-DDTHH:MM:SSZ); refusing rather than comparing it as open or closed")
+    if not (start <= now <= end):
         return f"window {window.get('name')!r} is not open now ({start}..{end}, now {now})"
     allowed = window.get("allowed_components")
     if not isinstance(allowed, list) or component_id not in allowed:
@@ -423,10 +473,18 @@ def load_receipt(root: Path, rid: str) -> dict | None:
 REQUIRED_PASSED_TIERS = ("T0", "T2", "T4")
 
 
-def receipt_gate_issue(receipt: dict | None, component_id: str, version: str) -> str | None:
+def receipt_gate_issue(receipt: dict | None, component_id: str, version: str, *,
+                        root: Path | None = None, to_root: str | None = None) -> str | None:
     """None when ``receipt`` (a tools/sota-convergence/native-rollout-receipt.schema.json
     document) authorizes switching ``component_id`` to ``version``: overall status passed,
-    identity matches, T0/T2/T4 passed, and T1 either passed or declared unavailable."""
+    identity matches, T0/T2/T4 passed, and T1 either passed or declared unavailable. When
+    ``root``/``to_root`` are both given (every real ``apply`` call; direct unit tests of the
+    documented tier rule in isolation pass neither), also requires the receipt's own
+    ``install.root`` (after resolving its ``${STACK_HOME}`` placeholder against ``root``) to name
+    that same ``to_root``, so a receipt authorizes only the specific root it was recorded for --
+    not merely a same-named version anywhere else on disk. ``install.marker_sha256`` is not
+    cross-checked here: no generic, per-component marker-file location is defined yet for
+    ecosystem-switch to locate on its own; a future qualify wave may add one."""
     if receipt is None:
         return "receipt not found"
     if receipt.get("status") != "passed":
@@ -435,6 +493,14 @@ def receipt_gate_issue(receipt: dict | None, component_id: str, version: str) ->
     if identity.get("component_id") != component_id or identity.get("version") != version:
         return (f"receipt identity ({identity.get('component_id')!r}, {identity.get('version')!r}) "
                 f"does not match ({component_id!r}, {version!r})")
+    if root is not None and to_root is not None:
+        install = receipt.get("install") if isinstance(receipt.get("install"), dict) else {}
+        declared_root = install.get("root")
+        if isinstance(declared_root, str):
+            resolved_root = declared_root.replace("${STACK_HOME}", str(root))
+            if os.path.normpath(resolved_root) != os.path.normpath(to_root):
+                return (f"receipt install.root {declared_root!r} (resolved {resolved_root!r}) does not match "
+                        f"--to-root {to_root!r}")
     tiers = {tier.get("tier"): tier for tier in receipt.get("tiers") or [] if isinstance(tier, dict)}
     for required in REQUIRED_PASSED_TIERS:
         tier = tiers.get(required)
@@ -471,7 +537,21 @@ def drift_issue(root: Path, component_id: str, entry: dict) -> str | None:
 
 
 def memory_gate_issue(min_kib: int | None = None) -> str | None:
-    minimum = min_kib if min_kib is not None else int(os.environ.get("ECOSYSTEM_SWITCH_MIN_MEMORY_KIB", DEFAULT_MIN_MEMORY_KIB))
+    """None when available memory clears the floor. ``ECOSYSTEM_SWITCH_MIN_MEMORY_KIB`` may only
+    lower ``DEFAULT_MIN_MEMORY_KIB`` -- never raise a production floor via a casual env var --
+    so it is clamped to the default rather than trusted outright.
+    ``ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB`` has no such ceiling; it exists only so a test
+    can deterministically force this gate to refuse regardless of the real host's MemAvailable,
+    without also weakening the production-facing variable's one-directional guarantee."""
+    if min_kib is not None:
+        minimum = min_kib
+    else:
+        forced = os.environ.get("ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB")
+        if forced is not None:
+            minimum = int(forced)
+        else:
+            requested = os.environ.get("ECOSYSTEM_SWITCH_MIN_MEMORY_KIB")
+            minimum = min(int(requested), DEFAULT_MIN_MEMORY_KIB) if requested is not None else DEFAULT_MIN_MEMORY_KIB
     available = available_memory_kib()
     if available is None:
         return "cannot read /proc/meminfo; refusing a restart that may load a model"
@@ -501,13 +581,17 @@ def op_link(root: Path, surface: str, to: str) -> tuple[dict, dict]:
 
 
 def op_text_replace(root: Path, surface: str, old: str, new: str, *, backup_dir: Path,
-                     expected_count: int = 1) -> tuple[dict, dict]:
-    if "/frozen/" in surface or surface.startswith("frozen/"):
-        raise SwitchError(f"refusing text-replace on a frozen surface: {surface}")
+                     expected_count: int = 1, expected_pre_sha256: str | None = None) -> tuple[dict, dict]:
     target = root / surface if not surface.startswith("/") else Path(surface)
+    frozen_issue = frozen_surface_issue(surface, target)
+    if frozen_issue:
+        raise SwitchError(frozen_issue)
     if not target.is_file():
         raise SwitchError(f"text-replace target does not exist: {target}")
     original = target.read_bytes()
+    if expected_pre_sha256 is not None and sha256_bytes(original) != expected_pre_sha256:
+        raise SwitchError(f"text-replace on {target}: current contents (sha256 {sha256_bytes(original)}) do not "
+                           f"match the expected pre-image ({expected_pre_sha256}); something else changed it")
     count = original.count(old.encode("utf-8"))
     if count != expected_count:
         raise SwitchError(f"text-replace on {target}: expected {old!r} to occur {expected_count} time(s), found {count}")
@@ -524,6 +608,9 @@ def op_text_replace(root: Path, surface: str, old: str, new: str, *, backup_dir:
             os.fsync(handle.fileno())
         if target.suffix == ".json":
             json.loads(updated.decode("utf-8"))
+        elif target.suffix == ".toml":
+            _parse_toml_or_raise(updated)
+        os.chmod(tmp_name, stat.S_IMODE(target.stat().st_mode))
         os.replace(tmp_name, target)
     except Exception:
         with contextlib.suppress(OSError):
@@ -536,10 +623,28 @@ def op_text_replace(root: Path, surface: str, old: str, new: str, *, backup_dir:
     return fields, inverse
 
 
+def _parse_toml_or_raise(data: bytes) -> None:
+    """Refuse a text-replace that leaves a .toml surface (e.g. a codex MCP config) unparsable.
+    ``tomllib`` (stdlib) needs Python 3.11+; on an older interpreter this check is skipped rather
+    than failing every .toml text-replace outright -- report-only, matching this tool's other
+    best-effort re-parse checks (JSON is required everywhere it applies because it always has
+    been; TOML support is new and every currently shipped pins-v2 surfaces[] entry is empty, so
+    nothing exercises this in production yet)."""
+    try:
+        import tomllib
+    except ImportError:
+        return
+    try:
+        tomllib.loads(data.decode("utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise ValueError(f"not valid TOML after replacement: {error}") from error
+
+
 def op_file_write(root: Path, surface: str, content: bytes, *, backup_dir: Path) -> tuple[dict, dict]:
     target = root / surface if not surface.startswith("/") else Path(surface)
-    if "/frozen/" in surface or surface.startswith("frozen/"):
-        raise SwitchError(f"refusing file-write on a frozen surface: {surface}")
+    frozen_issue = frozen_surface_issue(surface, target)
+    if frozen_issue:
+        raise SwitchError(frozen_issue)
     before = target.read_bytes() if target.is_file() else None
     backup_path = None
     if before is not None:
@@ -547,7 +652,7 @@ def op_file_write(root: Path, surface: str, content: bytes, *, backup_dir: Path)
         backup_path = backup_dir / f"{sha256_bytes(before)[:16]}-{target.name}.orig"
         if not backup_path.exists():
             atomic_write_bytes(backup_path, before)
-    atomic_write_bytes(target, content)
+    atomic_write_bytes(target, content, preserve_mode_from=target if before is not None else None)
     fields = {"from": sha256_bytes(before) if before is not None else None, "to": sha256_bytes(content),
               "pre_sha256": sha256_bytes(before) if before is not None else None, "post_sha256": sha256_bytes(content),
               "backup": str(backup_path) if backup_path else None}
@@ -556,7 +661,13 @@ def op_file_write(root: Path, surface: str, content: bytes, *, backup_dir: Path)
     return fields, inverse
 
 
+NATIVE_CLI_ALLOWED = (("claude", "mcp"), ("claude", "plugin"), ("codex", "mcp"))
+
+
 def op_native_cli(argv: list[str], inverse_argv: list[str] | None, *, read_only_check: list[str] | None = None) -> tuple[dict, dict]:
+    program = Path(argv[0]).name if argv else ""
+    if (program, argv[1] if len(argv) > 1 else None) not in NATIVE_CLI_ALLOWED:
+        raise SwitchError(f"native-cli refuses argv {argv!r}: only claude mcp/plugin or codex mcp are switch-managed")
     before = run_captured(read_only_check) if read_only_check else None
     result = run_captured(argv)
     if result.returncode != 0:
@@ -588,7 +699,7 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
     exe = None
     if pid.isdigit() and pid != "0":
         exe = read_link_target(Path(f"/proc/{pid}/exe"))
-    if exe is None or expected_root not in exe:
+    if exe is None or not path_is_under(exe, expected_root):
         raise SwitchError(f"health probe failed for {unit}: /proc/{pid}/exe is {exe!r}, expected it under {expected_root!r}")
     fields = {"from": (before.stdout or "").strip(), "to": exe, "pre_sha256": sha256_text(before.stdout or ""),
               "post_sha256": sha256_text(exe)}
@@ -599,12 +710,13 @@ def op_unit_restart(unit: str, *, window_component_ok: bool, expected_root: str)
 
 def op_data_backup(root: Path, surface: str, *, backup_dir: Path) -> tuple[dict, dict]:
     source = root / surface if not surface.startswith("/") else Path(surface)
-    manifest = sorted(str(p.relative_to(source)) for p in source.rglob("*")) if source.is_dir() else []
+    if not source.is_dir():
+        raise SwitchError(f"data-backup source is not a directory, refusing to record an empty backup: {source}")
+    manifest = sorted(str(p.relative_to(source)) for p in source.rglob("*"))
     destination = backup_dir / surface.replace("/", "__")
-    if source.is_dir():
-        if destination.exists():
-            shutil.rmtree(destination)
-        shutil.copytree(source, destination, symlinks=True)
+    if destination.exists():
+        shutil.rmtree(destination)
+    shutil.copytree(source, destination, symlinks=True)
     fields = {"from": surface, "to": str(destination), "pre_sha256": sha256_text("\n".join(manifest)),
               "post_sha256": sha256_text("\n".join(manifest)), "backup": str(destination)}
     inverse = {"kind": "data-restore", "surface": surface, "restore_from_backup": str(destination)}
@@ -623,23 +735,38 @@ def op_data_restore(root: Path, surface: str, backup_path: str) -> tuple[dict, d
     return fields, {}
 
 
+def _refuse_if_drifted_since_write(target: Path, entry: dict) -> None:
+    """Refuse a blind restore-from-backup when the surface's current bytes no longer match
+    ``entry``'s own recorded ``post_sha256`` (what THIS operation last wrote): something else
+    changed it since, and overwriting that unnoticed change is worse than refusing."""
+    expected_post = entry.get("post_sha256")
+    if expected_post is None:
+        return
+    current = sha256_file(target)
+    if current is not None and current != expected_post:
+        raise SwitchError(f"refusing to roll back {target}: its current contents (sha256 {current}) no longer "
+                           f"match what this operation last wrote ({expected_post}); investigate before rolling back")
+
+
 def apply_inverse(root: Path, entry: dict, spec_inverse: dict, *, backup_dir: Path) -> None:
     kind = spec_inverse.get("kind")
     if kind == "link":
         op_link(root, spec_inverse["surface"], spec_inverse["to"])
     elif kind == "text-replace":
-        backup_path = spec_inverse.get("restore_from_backup")
         target = root / spec_inverse["surface"]
+        _refuse_if_drifted_since_write(target, entry)
+        backup_path = spec_inverse.get("restore_from_backup")
         if backup_path and Path(backup_path).is_file():
-            atomic_write_bytes(target, Path(backup_path).read_bytes())
+            atomic_write_bytes(target, Path(backup_path).read_bytes(), preserve_mode_from=target if target.exists() else None)
         else:
             op_text_replace(root, spec_inverse["surface"], spec_inverse["old"], spec_inverse["new"],
                              backup_dir=backup_dir, expected_count=spec_inverse.get("expected_count", 1))
     elif kind == "file-write":
         target = root / spec_inverse["surface"]
+        _refuse_if_drifted_since_write(target, entry)
         backup_path = spec_inverse.get("restore_from_backup")
         if backup_path and Path(backup_path).is_file():
-            atomic_write_bytes(target, Path(backup_path).read_bytes())
+            atomic_write_bytes(target, Path(backup_path).read_bytes(), preserve_mode_from=target if target.exists() else None)
         elif spec_inverse.get("remove_if_no_backup") and target.is_file():
             target.unlink()
     elif kind == "native-cli" and spec_inverse.get("argv"):
@@ -661,7 +788,15 @@ def build_apply_plan(spec: dict, component_id: str, to_root: str) -> list[dict]:
         raise SwitchError(f"--to-root must be an absolute path (got {to_root!r}): a symlink written at "
                            "current/<id> resolves a relative target against current/'s own directory, "
                            "not ECO_INSTALL_ROOT")
-    steps = [{"kind": "link", "surface": entry["current_link"], "to": to_root}]
+    steps = []
+    # A qualified (non-"pending") state_dirs[] entry must be backed up before the version that
+    # will use it next takes over the link -- the ai-memory pin's own note is explicit that a
+    # switch "must data-backup it". A "pending" entry (every one shipped so far: no state_dirs
+    # path has been independently re-verified yet) is left for the qualify wave, not guessed at.
+    for state_dir in entry.get("state_dirs") or []:
+        if isinstance(state_dir, dict) and isinstance(state_dir.get("path"), str) and state_dir.get("status") != "pending":
+            steps.append({"kind": "data-backup", "surface": state_dir["path"]})
+    steps.append({"kind": "link", "surface": entry["current_link"], "to": to_root})
     for surface in entry.get("surfaces") or []:
         if isinstance(surface, dict) and surface.get("kind") == "unit-restart" and surface.get("path"):
             steps.append({"kind": "unit-restart", "unit": surface["path"], "expected_root": to_root})
@@ -692,9 +827,17 @@ def cmd_apply(args) -> int:
         if digest != args.plan_sha256:
             raise SwitchError(f"--plan-sha256 {args.plan_sha256} does not match the live plan ({digest}); "
                                "re-run plan and review before applying")
-        version = args.to_root.rsplit("-", 1)[-1] if "-" in args.to_root else args.to_root
+        to_root_name = Path(args.to_root).name
+        prefix = f"{args.component}-"
+        if not to_root_name.startswith(prefix):
+            raise SwitchError(f"--to-root basename {to_root_name!r} does not start with the expected "
+                               f"{prefix!r} prefix for component {args.component!r}; refusing to guess a version")
+        version = to_root_name[len(prefix):]
+
+        # Every gate below must pass BEFORE current/<id> (or any unit) is touched: a receipt,
+        # window, memory or denylist refusal must never leave a half-applied component.
         receipt = load_receipt(root, args.receipt)
-        receipt_issue = receipt_gate_issue(receipt, args.component, version)
+        receipt_issue = receipt_gate_issue(receipt, args.component, version, root=root, to_root=args.to_root)
         if receipt_issue:
             raise SwitchError(f"receipt gate: {receipt_issue}")
         window = load_window(root, args.window)
@@ -704,40 +847,50 @@ def cmd_apply(args) -> int:
         drift = drift_issue(root, args.component, entry)
         if drift:
             raise SwitchError(drift)
+        for step in steps:
+            if step["kind"] == "unit-restart":
+                if step["unit"] in DENYLISTED_UNITS:
+                    raise SwitchError(f"refusing to restart denylisted unit {step['unit']}")
+                memory_issue = memory_gate_issue()
+                if memory_issue:
+                    raise SwitchError(f"unit-restart of {step['unit']} refused: {memory_issue}")
 
         ledger = Ledger(root)
         txn = f"{args.component}-{int(time.time())}-{os.getpid()}"
         backup_dir = root / "switch" / "backups" / txn
         ledger.append(txn=txn, op="txn_begin", component=args.component, surface="_txn",
                       receipt=args.receipt, window=args.window, rollback_class=entry.get("rollback_class"))
-        applied_inverses: list[dict] = []
         try:
             for step in steps:
                 if step["kind"] == "link":
-                    fields, inverse = op_link(root, step["surface"], step["to"])
+                    fields, _inverse = op_link(root, step["surface"], step["to"])
+                    surface = step["surface"]
                 elif step["kind"] == "unit-restart":
-                    fields, inverse = op_unit_restart(step["unit"], window_component_ok=True,
+                    fields, _inverse = op_unit_restart(step["unit"], window_component_ok=True,
                                                        expected_root=step["expected_root"])
+                    surface = step["unit"]
+                elif step["kind"] == "data-backup":
+                    fields, _inverse = op_data_backup(root, step["surface"], backup_dir=backup_dir)
+                    surface = step["surface"]
                 else:
                     raise SwitchError(f"unsupported plan step kind: {step['kind']}")
-                ledger.append(txn=txn, op=step["kind"], component=args.component, surface=step["surface"] if step["kind"] == "link" else step["unit"],
+                ledger.append(txn=txn, op=step["kind"], component=args.component, surface=surface,
                               receipt=args.receipt, window=args.window, rollback_class=entry.get("rollback_class"), **fields)
-                if inverse:
-                    applied_inverses.append(inverse)
             verify_issue = verify_component(root, args.component, spec)
             if verify_issue:
                 ledger.append(txn=txn, op="verify_fail", component=args.component, surface="_txn",
                               receipt=args.receipt, window=args.window, rollback_class=entry.get("rollback_class"),
                               to=verify_issue)
-                rollback_txn(root, txn, spec)
-                raise SwitchError(f"post-apply verify failed, automatically rolled back: {verify_issue}")
+                raise SwitchError(f"post-apply verify failed: {verify_issue}")
             confirm_target = "confirm_pending" if args.confirm_within else "applied"
             ledger.append(txn=txn, op="verify_pass", component=args.component, surface="_txn",
                           receipt=args.receipt, window=args.window, rollback_class=entry.get("rollback_class"),
                           to=confirm_target)
-        except SwitchError:
+        except SwitchError as error:
+            problems = rollback_txn(root, txn)
             save_state(root)
-            raise
+            suffix = f" (rollback also reported: {'; '.join(problems)})" if problems else ""
+            raise SwitchError(f"apply failed and was automatically rolled back: {error}{suffix}") from error
         save_state(root)
         if args.confirm_within:
             schedule_confirm_or_revert(root, txn, args.confirm_within)
@@ -751,15 +904,24 @@ def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
     """Ask systemd-run (or its test stub, ECOSYSTEM_SWITCH_SYSTEMD_RUN) to call this same
     executable back with `rollback --txn TXN --if-unconfirmed` after ``seconds``. If even
     *scheduling* the timer fails, a pending apply nothing will ever revert is worse than
-    reverting immediately: fall back to an in-process rollback right away."""
+    reverting immediately: fall back to an in-process rollback right away. ECO_INSTALL_ROOT and
+    the test-stub variables are forwarded explicitly with --setenv=: a systemd --user unit does
+    not inherit this process's environment on its own, so a non-default root (or a test's
+    systemctl/systemd-run stub) would otherwise act on the default root once the timer fires."""
     self_path = str(Path(sys.argv[0]).resolve())
+    setenv_args = []
+    for name in ("ECO_INSTALL_ROOT", "ECOSYSTEM_SWITCH_SYSTEMCTL", "ECOSYSTEM_SWITCH_SYSTEMD_RUN",
+                 "ECOSYSTEM_SWITCH_ACTOR", "ECOSYSTEM_SWITCH_MIN_MEMORY_KIB",
+                 "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB"):
+        value = os.environ.get(name)
+        if value is not None:
+            setenv_args.append(f"--setenv={name}={value}")
     argv = [*systemd_run_argv(), "--user", f"--on-active={seconds}s",
-            f"--unit=ecosystem-switch-revert-{txn}", "--", sys.executable, self_path,
+            f"--unit=ecosystem-switch-revert-{txn}", *setenv_args, "--", sys.executable, self_path,
             "rollback", "--txn", txn, "--if-unconfirmed"]
     result = run_captured(argv, env=dict(os.environ))
     if result.returncode != 0:
-        spec = load_spec(root, None)
-        rollback_txn(root, txn, spec)
+        rollback_txn(root, txn)
         raise SwitchError(f"could not schedule the confirm-or-revert timer ({result.stderr.strip()[:200]}); "
                            "rolled back immediately instead of leaving an unrevertable pending apply")
 
@@ -767,12 +929,16 @@ def schedule_confirm_or_revert(root: Path, txn: str, seconds: int) -> None:
 def cmd_confirm(args) -> int:
     root = eco_root()
     with switch_locks(root):
-        ledger = Ledger(root)
-        entries = ledger.for_txn(args.txn)
-        if not entries:
+        state = load_state(root)
+        record = state["txns"].get(args.txn)
+        if record is None:
             raise SwitchError(f"no such txn {args.txn!r}")
-        component = entries[0].get("component")
-        ledger.append(txn=args.txn, op="txn_confirm", component=component, surface="_txn", to="confirmed")
+        if record.get("status") == "rolled_back":
+            raise SwitchError(f"txn {args.txn!r} was already rolled back; cannot confirm it")
+        if record.get("status") == "verify_failed":
+            raise SwitchError(f"txn {args.txn!r} failed its post-apply verify; cannot confirm it")
+        ledger = Ledger(root)
+        ledger.append(txn=args.txn, op="txn_confirm", component=record.get("component"), surface="_txn", to="confirmed")
         with contextlib.suppress(SwitchError):
             run_captured([*systemctl_argv(), "--user", "stop", f"ecosystem-switch-revert-{args.txn}.timer"])
         save_state(root)
@@ -780,15 +946,37 @@ def cmd_confirm(args) -> int:
         return 0
 
 
-def rollback_txn(root: Path, txn: str, spec: dict) -> None:
+def rollback_txn(root: Path, txn: str) -> list[str]:
+    """Reverse every operation ``txn`` recorded, in reverse-chronological order, and return a
+    list of problems encountered (empty means a clean rollback). ``unit-restart`` entries are
+    reversed only *after* every other kind (link/text-replace/file-write/data-backup): a service
+    must be restarted against its already-reverted root, never restarted first while
+    current/<id> still points at the new one, or it ends up running the new build with the link
+    pointing at the old one. The unit-restart health probe compares against the matching
+    ``link`` entry's own recorded ``from`` (the real old root), not the unit-restart entry's own
+    ``from`` (that field is the pre-restart MainPID, not a root path, and can never match)."""
     ledger = Ledger(root)
     entries = [entry for entry in ledger.for_txn(txn) if entry.get("op") in OPERATION_KINDS]
+    problems: list[str] = []
     component = None
     backup_dir = root / "switch" / "backups" / txn
-    for entry in reversed(entries):
+    link_from_by_component: dict[str, str | None] = {
+        entry.get("component"): entry.get("from") for entry in entries if entry.get("op") == "link"
+    }
+    non_restart_entries = [entry for entry in entries if entry.get("op") != "unit-restart"]
+    unit_restart_entries = [entry for entry in entries if entry.get("op") == "unit-restart"]
+    for entry in reversed(non_restart_entries):
         component = entry.get("component")
         if entry.get("op") == "link":
-            fields, _inverse = op_link(root, entry["surface"], entry["from"]) if entry.get("from") is not None else (None, None)
+            if entry.get("from") is not None:
+                fields, _inverse = op_link(root, entry["surface"], entry["from"])
+            else:
+                # The surface did not exist (or was not a symlink) before this op created it:
+                # its inverse is removal, not "point it nowhere" (op_link has no such mode).
+                link_path = root / entry["surface"]
+                if link_path.is_symlink():
+                    link_path.unlink()
+                fields = {"from": entry.get("to"), "to": None}
         elif entry.get("op") == "text-replace":
             spec_inverse = {"kind": "text-replace", "surface": entry["surface"], "old": entry["to"], "new": entry["from"],
                             "restore_from_backup": entry.get("backup")}
@@ -799,36 +987,43 @@ def rollback_txn(root: Path, txn: str, spec: dict) -> None:
                             "remove_if_no_backup": entry.get("backup") is None}
             apply_inverse(root, entry, spec_inverse, backup_dir=backup_dir)
             fields = {"from": entry["to"], "to": entry["from"]}
-        elif entry.get("op") == "unit-restart":
-            expected_root = entry.get("from") or ""
-            try:
-                fields, _inverse = op_unit_restart(entry["surface"], window_component_ok=True, expected_root=expected_root)
-            except SwitchError:
-                fields = {"from": entry.get("to"), "to": entry.get("from")}
         elif entry.get("op") == "data-backup":
             fields, _inverse = op_data_restore(root, entry["from"], entry["backup"])
         else:
             fields = {"from": entry.get("to"), "to": entry.get("from")}
         ledger.append(txn=txn, op=f"rollback:{entry.get('op')}", component=component, surface=entry.get("surface"),
                       rollback_class=entry.get("rollback_class"), **(fields or {}))
+    for entry in reversed(unit_restart_entries):
+        component = entry.get("component")
+        expected_root = link_from_by_component.get(component) or ""
+        try:
+            fields, _inverse = op_unit_restart(entry["surface"], window_component_ok=True, expected_root=expected_root)
+            op_name = "rollback:unit-restart"
+        except SwitchError as error:
+            fields = {"from": entry.get("to"), "to": entry.get("from")}
+            op_name = "rollback:unit-restart-failed"
+            problems.append(f"{entry.get('surface')}: {error}")
+        ledger.append(txn=txn, op=op_name, component=component, surface=entry.get("surface"),
+                      rollback_class=entry.get("rollback_class"), **fields)
     ledger.append(txn=txn, op="rollback:done", component=component, surface="_txn_end", to="rolled_back")
     save_state(root)
+    return problems
 
 
 def cmd_rollback(args) -> int:
     root = eco_root()
     with switch_locks(root):
         ledger = Ledger(root)
+        state = load_state(root)
         if args.txn:
             txn = args.txn
         else:
-            state = load_state(root)
             candidates = [(record.get("last_seq", 0), t) for t, record in state["txns"].items()
-                          if record.get("component") == args.component]
+                          if record.get("component") == args.component
+                          and any(e.get("op") in OPERATION_KINDS for e in record.get("ops") or [])]
             if not candidates:
-                raise SwitchError(f"no txn recorded for component {args.component!r}")
+                raise SwitchError(f"no reversible txn recorded for component {args.component!r}")
             txn = max(candidates)[1]  # highest ledger seq, i.e. most recently touched, not lexicographic txn-id order
-        state = load_state(root)
         record = state["txns"].get(txn, {})
         if args.if_unconfirmed and record.get("status") == "applied":
             print(json.dumps({"status": "already_confirmed", "txn": txn}))
@@ -836,22 +1031,38 @@ def cmd_rollback(args) -> int:
         if record.get("status") == "rolled_back":
             print(json.dumps({"status": "already_rolled_back", "txn": txn}))
             return 0
-        spec = load_spec(root, None)
-        rollback_txn(root, txn, spec)
-        print(json.dumps({"status": "rolled_back", "txn": txn}))
-        return 0
+        if not any(entry.get("op") in OPERATION_KINDS for entry in ledger.for_txn(txn)):
+            raise SwitchError(f"txn {txn!r} has no reversible operations (e.g. a baseline/resync/prune "
+                               "record); nothing to roll back")
+        component_id = record.get("component")
+        if component_id:
+            current_component_state = state["components"].get(component_id) or {}
+            if current_component_state.get("updated_txn") not in (None, txn):
+                raise SwitchError(f"txn {txn!r} is no longer the latest change to component {component_id!r} "
+                                   f"(a later txn {current_component_state.get('updated_txn')!r} already moved "
+                                   "it on); refusing to roll back a superseded txn and clobber that later apply")
+        problems = rollback_txn(root, txn)
+        payload = {"status": "rolled_back", "txn": txn}
+        if problems:
+            payload["problems"] = problems
+        print(json.dumps(payload))
+        return 0 if not problems else 1
 
 
 def verify_component(root: Path, component_id: str, spec: dict) -> str | None:
-    """None when the component's live current_link target resolves and, for a native-cli
-    surface, its read-only check still succeeds. Used both by apply's automatic post-check
-    and by the standalone `verify` command."""
+    """None when the component's live current_link target resolves and still matches what the
+    ledger last recorded for it (the same comparison ``drift_issue`` makes before an ``apply``):
+    a live root that no longer matches the ledger is exactly the case this must report. Used
+    both by apply's automatic post-check and by the standalone `verify` command."""
     entry = component_entry(spec, component_id)
     current_link = entry.get("current_link")
     if current_link:
         target = root / current_link
         if not target.exists():
             return f"{current_link} does not resolve to an existing path"
+        drift = drift_issue(root, component_id, entry)
+        if drift:
+            return drift
     return None
 
 
@@ -901,32 +1112,102 @@ def cmd_recover(args) -> int:
     root = eco_root()
     with switch_locks(root):
         state = load_state(root)
-        spec = load_spec(root, None)
         recovered = []
+        rollback_problems: list[str] = []
         for txn, record in state["txns"].items():
             if record.get("status") == "in_progress":
-                rollback_txn(root, txn, spec)
+                rollback_problems.extend(rollback_txn(root, txn))
                 recovered.append(txn)
         problems = Ledger(root).verify_chain()
-        print(json.dumps({"recovered_txns": recovered, "ledger_chain_ok": not problems, "ledger_problems": problems}))
-        return 0 if not problems else 1
+        print(json.dumps({"recovered_txns": recovered, "ledger_chain_ok": not problems, "ledger_problems": problems,
+                          "rollback_problems": rollback_problems}))
+        return 0 if not problems and not rollback_problems else 1
 
 
 def cmd_write_installed_versions(args) -> int:
     root = eco_root()
-    state = load_state(root)
-    lines = [f"ecosystem-switch state at {now_utc_iso()}"]
-    for component_id, info in sorted(state["components"].items()):
-        lines.append(f"-- {component_id} --\ncurrent: {info.get('current')}")
-    destination = root / "installed-versions.txt"
-    atomic_write_bytes(destination, ("\n".join(lines) + "\n").encode("utf-8"), mode=0o644)
-    print(str(destination))
-    return 0
+    with switch_locks(root):
+        state = load_state(root)
+        lines = [f"ecosystem-switch state at {now_utc_iso()}"]
+        for component_id, info in sorted(state["components"].items()):
+            current = info.get("current")
+            version_guess = Path(current).name if current else None
+            lines.append(f"-- {component_id} --\ncurrent: {current}\nroot_name: {version_guess}")
+        destination = root / "installed-versions.txt"
+        if destination.is_file():
+            backup_dir = root / "switch" / "backups" / f"write-installed-versions-{int(time.time())}"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            atomic_write_bytes(backup_dir / "installed-versions.txt.orig", destination.read_bytes())
+        atomic_write_bytes(destination, ("\n".join(lines) + "\n").encode("utf-8"), mode=0o644)
+        print(str(destination))
+        return 0
+
+
+def _pids_referencing(needle: str) -> list[str]:
+    """PIDs of this user's own processes (other than this one -- its own argv, e.g. ``prune
+    --apply <target>``, would otherwise always "reference" the very target it was asked to
+    check) whose /proc/<pid>/exe, cwd or cmdline names ``needle`` (a bounded stand-in for
+    bin/ecosystem-wave-retention's fuller process scan on the host)."""
+    hits = []
+    self_pid = str(os.getpid())
+    try:
+        pid_dirs = [name for name in os.listdir("/proc") if name.isdigit() and name != self_pid]
+    except OSError:
+        return hits
+    for pid in pid_dirs:
+        proc_dir = Path("/proc") / pid
+        try:
+            if str(proc_dir.stat().st_uid) != str(os.getuid()):
+                continue
+        except OSError:
+            continue
+        matched = False
+        with contextlib.suppress(OSError):
+            if needle in (read_link_target(proc_dir / "exe") or ""):
+                matched = True
+        if not matched:
+            with contextlib.suppress(OSError):
+                if needle in (read_link_target(proc_dir / "cwd") or ""):
+                    matched = True
+        if not matched:
+            with contextlib.suppress(OSError):
+                if needle in (proc_dir / "cmdline").read_bytes().decode("utf-8", "replace"):
+                    matched = True
+        if matched:
+            hits.append(pid)
+    return hits
+
+
+def _systemd_user_unit_files_referencing(needle: str) -> list[str]:
+    """Names of this user's systemd unit files under ~/.config/systemd/user whose text names
+    ``needle`` -- catches a hard-coded root such as vLLM's
+    ``Environment=PATH=.../tools/vllm-0.25.0/bin`` without depending on the daemon being up."""
+    hits = []
+    unit_dir = Path.home() / ".config" / "systemd" / "user"
+    if not unit_dir.is_dir():
+        return hits
+    with contextlib.suppress(OSError):
+        for unit_file in sorted(unit_dir.iterdir()):
+            if unit_file.is_file():
+                with contextlib.suppress(OSError, UnicodeDecodeError):
+                    if needle in unit_file.read_text(encoding="utf-8"):
+                        hits.append(unit_file.name)
+    return hits
 
 
 def prune_candidates(root: Path) -> list[dict]:
     state = load_state(root)
     referenced_roots = {info["current"] for info in state["components"].values() if info.get("current")}
+    ledger = Ledger(root)
+    for txn, record in state["txns"].items():
+        if record.get("status") == "rolled_back":
+            continue
+        for entry in ledger.for_txn(txn):
+            # An unconfirmed or already-applied txn's *previous* root is a live rollback target
+            # (the scheduled confirm-or-revert timer, or a manual `rollback`, may still need it)
+            # until that txn is actually rolled back -- never merely because a later txn moved on.
+            if entry.get("op") == "link" and entry.get("from"):
+                referenced_roots.add(entry["from"])
     referenced_names = set()
     for value in referenced_roots:
         resolved = read_link_target(root / value) if (root / value).is_symlink() else value
@@ -947,6 +1228,10 @@ def prune_candidates(root: Path) -> list[dict]:
                 for link in bin_dir.iterdir():
                     if link.is_symlink() and str(child) in (read_link_target(link) or ""):
                         in_use_reasons.append(f"bin/{link.name} -> {read_link_target(link)}")
+            for pid in _pids_referencing(str(child)):
+                in_use_reasons.append(f"referenced by running process {pid}")
+            for unit_name in _systemd_user_unit_files_referencing(str(child)):
+                in_use_reasons.append(f"referenced by systemd --user unit file {unit_name}")
             candidates.append({"path": str(child), "eligible": not in_use_reasons, "blocked_by": in_use_reasons})
     return candidates
 
@@ -959,9 +1244,13 @@ def cmd_prune(args) -> int:
             print(json.dumps({
                 "candidates": candidates,
                 "scope_note": ("Reduced-scope in-use check relative to bin/ecosystem-wave-retention on the "
-                               "host (PATH entries and bin/ symlink targets only; no process/mount/systemd-"
-                               "unit/citation scan). Treat 'eligible' as a lead, not a guarantee; a future "
-                               "qualify wave should reuse that script's fuller technique."),
+                               "host: PATH entries, bin/ symlink targets, this user's own running processes "
+                               "(exe/cwd/cmdline) and this user's systemd --user unit file text, plus every "
+                               "unconfirmed or not-yet-rolled-back txn's previous root. No mount/symlink-hop/"
+                               "citation scan, and no check of hard-coded roots inside wrapper scripts under "
+                               "adoption/tools/ (this tool only ever reads $ECO_INSTALL_ROOT, not the catalog "
+                               "checkout). Treat 'eligible' as a lead, not a guarantee; a future qualify wave "
+                               "should reuse that script's fuller technique."),
             }, sort_keys=True, indent=2))
             return 0
         if args.apply:
@@ -1013,14 +1302,41 @@ def cmd_adopt(args) -> int:
                     results[component_id] = "skipped (no switch-managed root; see divergence)"
                     continue
                 txn = f"relink-{component_id}-{int(time.time())}"
-                ledger.append(txn=txn, op="txn_begin", component=component_id, surface="_txn")
-                current_link_path = root / entry["current_link"]
-                real_root = str((root / "tools" / entry["root_name"]).resolve())
-                before_targets = {}
+                real_root_path = root / "tools" / entry["root_name"]
+                if not real_root_path.is_dir():
+                    raise SwitchError(f"relink refuses component {component_id!r}: its pinned root_name "
+                                       f"{entry['root_name']!r} does not exist under {root / 'tools'} -- fix the "
+                                       "component spec/pins before relinking, rather than creating a dangling "
+                                       "current/<id> link")
+                real_root = str(real_root_path.resolve())
+                # Every entrypoint's real, resolved target is checked *before* anything is
+                # touched: a mismatch aborts the whole relink for this component with nothing
+                # yet written (lifecycle.md: 'before it touches anything'; README: 'aborts the
+                # whole relink'). A pre-existing entrypoint that is not a symlink at all (a plain
+                # regular file) is refused outright rather than silently replaced by a symlink,
+                # since converting it has no recorded inverse. The prospective target is computed
+                # straight from the real root, not through current/<id> (which may not exist
+                # yet, on a component's very first relink, so realpath could not see through it).
                 for entrypoint in entry.get("entrypoints") or []:
                     if not (isinstance(entrypoint, dict) and entrypoint.get("bin") and entrypoint.get("in_root")):
                         continue
-                    before_targets[entrypoint["bin"]] = read_link_target(root / entrypoint["bin"])
+                    link_path = root / entrypoint["bin"]
+                    prospective_resolved = os.path.realpath(Path(real_root) / entrypoint["in_root"])
+                    if link_path.is_symlink():
+                        before_resolved = os.path.realpath(link_path)
+                        if before_resolved != prospective_resolved:
+                            raise SwitchError(
+                                f"relink for {component_id!r} refused before changing anything: "
+                                f"{entrypoint['bin']} currently resolves to {before_resolved}, but relinking it "
+                                f"through {entry['current_link']!r} would resolve to {prospective_resolved} -- "
+                                "the component spec's root_name/entrypoints do not match this live root")
+                    elif link_path.exists():
+                        raise SwitchError(
+                            f"relink for {component_id!r} refused before changing anything: {entrypoint['bin']} "
+                            f"({link_path}) is a regular file, not a symlink; replacing it with a symlink has no "
+                            "recorded inverse -- back it up and remove it manually first")
+                ledger.append(txn=txn, op="txn_begin", component=component_id, surface="_txn")
+                current_link_path = root / entry["current_link"]
                 if not current_link_path.exists():
                     fields, _inverse = op_link(root, entry["current_link"], real_root)
                     ledger.append(txn=txn, op="link", component=component_id, surface=entry["current_link"],
@@ -1029,15 +1345,7 @@ def cmd_adopt(args) -> int:
                     if not (isinstance(entrypoint, dict) and entrypoint.get("bin") and entrypoint.get("in_root")):
                         continue
                     new_target = str(root / entry["current_link"] / entrypoint["in_root"])
-                    before_resolved = None
-                    before = before_targets.get(entrypoint["bin"])
-                    if before is not None:
-                        before_resolved = os.path.realpath(root / entrypoint["bin"])
                     fields, _inverse = op_link(root, entrypoint["bin"], new_target)
-                    after_resolved = os.path.realpath(root / entrypoint["bin"])
-                    if before is not None and before_resolved != after_resolved:
-                        raise SwitchError(f"relink changed the real target of {entrypoint['bin']}: "
-                                           f"{before_resolved} -> {after_resolved}")
                     ledger.append(txn=txn, op="link", component=component_id, surface=entrypoint["bin"],
                                   rollback_class=entry.get("rollback_class"), **fields)
                 current_link_absolute = str(root / entry["current_link"])

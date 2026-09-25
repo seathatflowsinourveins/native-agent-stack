@@ -206,31 +206,51 @@ already under memory pressure.
 
 **Rollback.** `apply` itself runs a post-switch verify and, on failure, rolls
 back every operation of that one transaction in reverse order automatically,
-in-process, before it ever returns to the caller. `apply --confirm-within
-SEC` additionally schedules `systemd-run --user --on-active=<SEC>s --
-ecosystem-switch rollback --txn T --if-unconfirmed`, so an operator who never
-runs `confirm --txn T` gets an automatic revert once that window elapses,
-without needing to stay attached to watch it. `rollback ID` (no `--txn`)
-targets that component's most recently touched transaction (by ledger
-sequence -- never by sorting transaction-id text, which sorts a plain `apply`
-transaction's id after a `relink-`-prefixed one regardless of which actually
-happened more recently). A crashed or interrupted `apply`/`adopt --relink`
-never completes after the fact: `ecosystem-switch recover` finds any
-transaction still `in_progress` and rolls it back, the same as an explicit
-`rollback` would.
+in-process, before it ever returns to the caller. A service's `unit-restart`
+step is always reversed only *after* its own `link` (never restarted while
+`current/<id>` still points at the new root, which would leave the unit
+running the new build with the link pointing at the old one); its health
+probe on rollback compares against that `link`'s own recorded old root, not
+the pre-restart MainPID string the ledger's `unit-restart` entry itself
+carries (which is never a root path and could never have matched). `apply
+--confirm-within SEC` additionally schedules `systemd-run --user
+--on-active=<SEC>s --setenv=ECO_INSTALL_ROOT=... -- ecosystem-switch rollback
+--txn T --if-unconfirmed` (every test-stub variable in play is forwarded the
+same way, so the timer acts on the same root and stubs the run that
+scheduled it actually used), so an operator who never runs `confirm --txn T`
+gets an automatic revert once that window elapses, without needing to stay
+attached to watch it. `rollback ID` (no `--txn`) targets that component's
+most recently touched transaction with at least one reversible operation (by
+ledger sequence -- never by sorting transaction-id text, which sorts a plain
+`apply` transaction's id after a `relink-`-prefixed one regardless of which
+actually happened more recently, and never a bare `adopt --baseline`/
+`--resync`/`prune` record, which carries nothing to reverse). `rollback
+--txn T` also refuses a txn a *later* apply on the same component has since
+superseded (re-pointing `current/<id>` to T's old root would silently
+clobber that later apply), and `confirm --txn T` refuses a txn that was
+already rolled back or whose post-apply verify already failed. A crashed or
+interrupted `apply`/`adopt --relink` never completes after the fact:
+`ecosystem-switch recover` finds any transaction still `in_progress` and
+rolls it back, the same as an explicit `rollback` would.
 
 **Prune.** `prune --list` reports which `tools/<name>-<version>` prefixes no
-`current/<id>` link points at and this tool's own reduced-scope in-use check
-(PATH entries and `bin/` symlink targets only) does not find referenced
-elsewhere; `prune --apply ROOT --reason TEXT` removes one such prefix and
-records the reason on the ledger. This in-use check is deliberately narrower
-than `bin/ecosystem-wave-retention` on the host (which additionally inspects
-every process, systemd unit and a citation search across evidence
-repositories for its own, differently-scoped notion of a prunable wave
-cache): treat an "eligible" prefix here as a lead worth checking by hand
-before deleting it, not a proof that nothing on the host still needs it, and
-extend this check with that script's fuller technique before relying on it
-unattended.
+`current/<id>` link points at, that are not the previous root of any
+not-yet-rolled-back transaction (a pending or already-applied transaction's
+own rollback target stays live until that transaction is actually rolled
+back, not merely superseded by a later one), and this tool's own
+reduced-scope in-use check (PATH entries, `bin/` symlink targets, this
+user's own running processes' exe/cwd/cmdline, and this user's `systemd
+--user` unit file text) does not find referenced elsewhere; `prune --apply
+ROOT --reason TEXT` removes one such prefix and records the reason on the
+ledger. This in-use check is deliberately narrower than
+`bin/ecosystem-wave-retention` on the host (which additionally inspects
+mounts, symlink hops and a citation search across evidence repositories, and
+this tool's own check cannot see a hard-coded root inside a wrapper script
+under `adoption/tools/` in the catalog checkout, since it only ever reads
+`$ECO_INSTALL_ROOT`): treat an "eligible" prefix here as a lead worth
+checking by hand before deleting it, not a proof that nothing on the host
+still needs it, and extend this check with that script's fuller technique
+before relying on it unattended.
 
 Component coverage today is intentionally partial: `adoption/pins-linux-x86_64.json`'s
 schema_version 2 migration gave every one of its 14 existing pins the fields

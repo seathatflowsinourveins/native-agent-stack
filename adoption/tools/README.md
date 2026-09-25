@@ -478,18 +478,31 @@ one hash-chained ledger entry per operation:
   `switch/receipts/<RID>.json` document shaped like
   `tools/sota-convergence/native-rollout-receipt.schema.json`. `apply` refuses
   unless that receipt's overall `status` is `"passed"`, its `identity`
-  matches the component and target version, tiers `T0`, `T2` and `T4` are all
-  `"passed"`, and tier `T1` is either `"passed"` or explicitly `"unavailable"`
-  with a stated reason.
+  matches the component and the *full* target version derived from
+  `--to-root`'s basename after stripping the `<component>-` prefix (so
+  `tools/rtk-0.50.0-r20260925` is version `0.50.0-r20260925`, not just the
+  text after the last hyphen -- a receipt for one root never authorizes a
+  different root that happens to share a trailing segment), its
+  `install.root` (its `${STACK_HOME}` placeholder resolved against
+  `ECO_INSTALL_ROOT`) names that same `--to-root`, tiers `T0`, `T2` and `T4`
+  are all `"passed"`, and tier `T1` is either `"passed"` or explicitly
+  `"unavailable"` with a stated reason. (`install.marker_sha256` is not
+  cross-checked: no generic, per-component marker-file location is defined
+  yet for this tool to locate on its own.)
 - **Window gate.** `--window NAME` names `switch/windows/<name>.json`
   (`{name, start_utc, end_utc, allowed_components}`); `apply` refuses outside
   that time range or when the component is not in `allowed_components`.
 - **Memory gate.** A plan step that restarts a unit (a `surfaces[]` entry of
   kind `unit-restart`) refuses when `/proc/meminfo`'s `MemAvailable` is below
   a floor (default 6 GiB, `ECOSYSTEM_SWITCH_MIN_MEMORY_KIB` only ever lowers
-  it, for tests) -- the same rule this rollout's own workers apply to
+  it -- any higher value is clamped back down to the default, never trusted
+  outright -- for tests) -- the same rule this rollout's own workers apply to
   themselves before a heavy job (`docs/linux-efficiency.md`), applied here to
-  a restart that may load a model.
+  a restart that may load a model. A test that needs the gate to
+  deterministically refuse regardless of this host's real `MemAvailable` uses
+  the separate, unbounded `ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB`
+  instead, so the production-facing variable's one-directional guarantee is
+  never itself weakened for a test's convenience.
 - **Drift gate.** If `current/<id>`'s live target no longer matches what the
   ledger last recorded, `apply` refuses and names `adopt --resync` as the
   fix, rather than silently overwriting an out-of-band change.
@@ -514,22 +527,37 @@ real commands.
 
 **Everything else.** `status [--json] [--component ID]` prints each managed
 component's current root and every recorded transaction; `confirm --txn TXN`
-marks a pending transaction confirmed and best-effort stops its revert timer;
-`rollback ID | --txn TXN [--if-unconfirmed]` undoes a transaction's
-operations in reverse order (`--if-unconfirmed` is a no-op once the
-transaction was already confirmed or already rolled back -- exactly what the
-scheduled timer above calls); `verify [--component ID] --json` re-checks live
-state against the ledger and the ledger's own hash chain, independent of any
-apply; `recover` rolls back any transaction still `in_progress` (a crash
+marks a pending transaction confirmed and best-effort stops its revert timer
+(refuses a txn that was already rolled back, or whose post-apply verify
+already failed); `rollback ID | --txn TXN [--if-unconfirmed]` undoes a
+transaction's operations in reverse order -- a service's `unit-restart` is
+always reversed only after its own `link` (never restarted while
+`current/<id>` still points at the new root), and its health probe compares
+against that `link`'s own recorded old root, not the pre-restart MainPID
+string the ledger's `unit-restart` entry itself carries -- (`--if-unconfirmed`
+is a no-op once the transaction was already confirmed or already rolled back
+-- exactly what the scheduled timer above calls; every rollback also refuses
+a txn a later apply on the same component has since superseded, and one with
+no reversible operation at all, e.g. a bare baseline/resync/prune record);
+`verify [--component ID] --json` re-checks live state against the ledger and
+the ledger's own hash chain, independent of any apply; `recover` rolls back
+any transaction still `in_progress` (a crash
 mid-`apply` or mid-`relink`) rather than ever completing one after the fact;
 `prune --list` reports `tools/<name>-<version>` roots no `current/<id>` link
-points at and that this tool's own (reduced-scope: `PATH` entries and `bin/`
-symlink targets only, no process/mount/unit/citation scan --
-`bin/ecosystem-wave-retention` on the host has the fuller technique this
-should grow into) in-use check does not find referenced; `prune --apply ROOT
---reason TEXT` removes one such eligible root and records the reason;
-`write-installed-versions` regenerates an `installed-versions.txt`-style
-report from the switch state, independent of running a fresh bootstrap.
+points at, that are not the previous root of any not-yet-rolled-back txn (a
+pending or already-applied txn's own rollback target stays live until that
+txn is actually rolled back), and that this tool's own (reduced-scope: `PATH`
+entries, `bin/` symlink targets, this user's own running processes'
+exe/cwd/cmdline and this user's `systemd --user` unit file text -- no mount/
+symlink-hop/citation scan, and no check of hard-coded roots inside wrapper
+scripts under `adoption/tools/` since this tool only ever reads
+`$ECO_INSTALL_ROOT`, never the catalog checkout -- `bin/ecosystem-wave-retention`
+on the host has the fuller technique this should grow into) in-use check
+does not find referenced; `prune --apply ROOT --reason TEXT` removes one such
+eligible root and records the reason; `write-installed-versions` regenerates
+an `installed-versions.txt`-style report from the switch state, independent
+of running a fresh bootstrap, backing up any file it is about to overwrite
+under `switch/backups/` first.
 
 **Safety.** A global `flock` on `switch/switch.lock` (busy -> exit 75, the
 same convention as `gitleaks-guarded` above) and, in the same call, the

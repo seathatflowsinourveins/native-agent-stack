@@ -28,6 +28,7 @@ import tempfile
 import textwrap
 import time
 import unittest
+import unittest.mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,8 +100,8 @@ class SwitchFixture(unittest.TestCase):
             "identity": {"component_id": component_id, "version": version, "host_id": "test-host-20260925"},
             "upstream": {"repo": "https://example.invalid/x", "tag": f"v{version}",
                         "artifact_url": "https://example.invalid/x.tar.gz", "sha256": "0" * 64},
-            "install": {"class": "tarball", "root": "${STACK_HOME}/tools/x", "marker_sha256": "0" * 64,
-                       "argv": ["true"], "private_env_names": []},
+            "install": {"class": "tarball", "root": f"${{STACK_HOME}}/tools/{component_id}-{version}",
+                       "marker_sha256": "0" * 64, "argv": ["true"], "private_env_names": []},
             "tiers": tier_docs,
             "independent": {"rerun_label": "test", "agreement": "same_result", "loki": []},
             "decision": "retain", "evidence_class_claimed": "local_integration",
@@ -182,6 +183,54 @@ class RelinkTests(SwitchFixture):
         }})
         result = self.relink("native-thing")
         self.assertIn("skipped", json.loads(result.stdout)["results"]["native-thing"])
+
+    def test_relink_refuses_before_changing_anything_when_root_name_does_not_exist(self):
+        # Blocking finding: a pins root_name that does not match the live root (e.g. this
+        # rollout's own node-24.21.0 vs the real tools/node-v24.21.0) must never leave bin/foo
+        # dangling or unrecorded; it must refuse before creating current/<id> at all.
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-does-not-exist", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        before_target = os.readlink(self.root / "bin" / "foo")
+        result = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("root_name", result.stderr)
+        self.assertFalse((self.root / "current" / "foo").exists(), "no dangling current/foo must be created")
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), before_target, "bin/foo must be untouched")
+        self.assertEqual(switch.Ledger(self.root).all(), [], "a refused relink must leave no ledger entry")
+
+    def test_relink_refuses_a_mismatching_entrypoint_before_changing_it(self):
+        # A component spec whose entrypoints[].in_root does not match where bin/foo currently
+        # resolves (e.g. qmd/mcporter/context-mode/agent-browser's real node_modules/ targets vs
+        # a bare "bin/<x>" guess) must refuse before repointing bin/foo, not after.
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "somewhere/else/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        before_real = os.path.realpath(self.root / "bin" / "foo")
+        before_target = os.readlink(self.root / "bin" / "foo")
+        result = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("refused before changing anything", result.stderr)
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), before_target, "bin/foo must be untouched")
+        self.assertEqual(os.path.realpath(self.root / "bin" / "foo"), before_real)
+        self.assertFalse((self.root / "current" / "foo").exists(),
+                         "current/foo must not be created either when an entrypoint would mismatch")
+
+    def test_relink_refuses_a_regular_file_entrypoint_instead_of_silently_symlinking_over_it(self):
+        # A regular file at a bin/* entrypoint (not a symlink) must never be silently replaced by
+        # a symlink: that conversion has no recorded inverse.
+        (self.root / "bin" / "foo").unlink()
+        (self.root / "bin" / "foo").write_text("#!/bin/sh\necho not-a-symlink\n")
+        (self.root / "bin" / "foo").chmod(0o755)
+        result = run(self.env, "adopt", "--relink")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("regular file", result.stderr)
+        self.assertFalse((self.root / "bin" / "foo").is_symlink())
+        self.assertEqual((self.root / "bin" / "foo").read_text(), "#!/bin/sh\necho not-a-symlink\n")
 
     def test_ledger_is_hash_chained_and_0600(self):
         self.relink("foo")
@@ -304,6 +353,78 @@ class ApplyGateTests(SwitchFixture):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.run_entrypoint(), "v2")
 
+    def test_apply_backs_up_a_qualified_state_dir_before_flipping_the_link(self):
+        # Operation-kind gap: apply never turned a component's state_dirs[] into a data-backup
+        # step (the ai-memory pin's own note: a switch "must data-backup it"). A "pending"
+        # marker (every state_dirs[] entry shipped so far) is still left alone -- only a
+        # qualified entry (no "pending" status) becomes a real backup step.
+        state_dir = self.root / "state" / "foo-data"
+        state_dir.mkdir(parents=True)
+        (state_dir / "db.sqlite").write_text("important")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [],
+            "state_dirs": [{"path": "state/foo-data"}],
+            "window": "default", "rollback_class": "safe",
+        }})
+        self.write_receipt("R1", "foo", "2.0.0")
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        backups = list((self.root / "switch" / "backups").rglob("db.sqlite"))
+        self.assertEqual(len(backups), 1, "a qualified state_dirs[] entry must be backed up on apply")
+        self.assertEqual(backups[0].read_text(), "important")
+        ledger_entries = switch.Ledger(self.root).all()
+        self.assertTrue(any(e["op"] == "data-backup" and e["surface"] == "state/foo-data" for e in ledger_entries))
+
+    def test_apply_leaves_a_pending_state_dir_alone(self):
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [],
+            "state_dirs": [{"path": "state/does-not-exist", "status": "pending", "note": "not verified yet"}],
+            "window": "default", "rollback_class": "safe",
+        }})
+        self.write_receipt("R1", "foo", "2.0.0")
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(result.returncode, 0, f"a pending state_dirs[] entry must never be guessed at: {result.stderr}")
+
+    def test_apply_accepts_a_dated_suffixed_to_root_and_matches_its_full_version(self):
+        # tools/<id>-<version>-rDATE (this rollout's own bootstrap --tools-suffix convention):
+        # the version derived from --to-root must be the full "2.0.0-r20260925" suffix, not just
+        # "r20260925" (the old rsplit("-", 1) bug), and the receipt must be for that exact string.
+        dated_root = self.make_tool_root("foo-2.0.0-r20260925", "v2-dated")
+        self.write_receipt("R2", "foo", "2.0.0-r20260925")
+        result = self.apply("foo", dated_root, "R2")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2-dated")
+
+    def test_rollback_refuses_a_txn_a_later_apply_already_superseded(self):
+        # Major finding: rollback --txn (including the timer's --if-unconfirmed call) must not
+        # blindly re-point current/<id> to an old txn's "from" once a later apply has moved the
+        # component on again -- that would clobber the later apply.
+        self.write_receipt("R1", "foo", "2.0.0")
+        first = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_txn = json.loads(first.stdout)["txn"]
+        root_v3 = self.make_tool_root("foo-3.0.0", "v3")
+        self.write_receipt("R3", "foo", "3.0.0")
+        second = self.apply("foo", root_v3, "R3")
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(self.run_entrypoint(), "v3")
+
+        result = run(self.env, "rollback", "--txn", first_txn)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("supersed", result.stderr.lower())
+        self.assertEqual(self.run_entrypoint(), "v3", "the superseded rollback must never have touched current/foo")
+
+    def test_confirm_refuses_a_rolled_back_txn(self):
+        self.write_receipt("R1", "foo", "2.0.0")
+        applied = self.apply("foo", self.root_v2, "R1")
+        txn = json.loads(applied.stdout)["txn"]
+        run(self.env, "rollback", "--txn", txn)
+        result = run(self.env, "confirm", "--txn", txn)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolled back", result.stderr.lower())
+
     def test_missing_receipt_refuses(self):
         result = self.apply("foo", self.root_v2, "does-not-exist")
         self.assertNotEqual(result.returncode, 0)
@@ -348,6 +469,20 @@ class ApplyGateTests(SwitchFixture):
         result = self.apply("foo", self.root_v2, "R1")
         self.assertNotEqual(result.returncode, 0)
 
+    def test_malformed_window_bound_refuses_rather_than_comparing_it_as_open(self):
+        # A non-Z-suffixed offset or a garbled bound (e.g. "z") must never be compared as a
+        # plain string against now_utc_iso()'s canonical shape -- that can misjudge a window by
+        # hours, or leave it looking permanently open (or permanently closed).
+        self.write_receipt("R1", "foo", "2.0.0")
+        (self.root / "switch" / "windows").mkdir(parents=True, exist_ok=True)
+        window = {"name": "default", "start_utc": "2026-09-25T00:00:00+02:00", "end_utc": "z",
+                  "allowed_components": ["foo"]}
+        (self.root / "switch" / "windows" / "default.json").write_text(json.dumps(window))
+        result = self.apply("foo", self.root_v2, "R1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("malformed", result.stderr.lower())
+        self.assertEqual(self.run_entrypoint(), "v1")
+
     def test_relative_to_root_is_refused(self):
         self.write_receipt("R1", "foo", "2.0.0")
         result = run(self.env, "apply", "foo", "--to-root", "tools/foo-2.0.0", "--receipt", "R1",
@@ -389,7 +524,9 @@ class ApplyGateTests(SwitchFixture):
         result = run(self.env, "apply", "foo", "--to-root", str(missing_root), "--receipt", "R1",
                      "--window", "default", "--plan-sha256", digest)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("rolled back", result.stderr.lower() + result.stdout.lower() or "rolled back")
+        combined_output = result.stderr.lower() + result.stdout.lower()
+        self.assertTrue(combined_output, "apply must print something on stderr/stdout, not fail silently")
+        self.assertIn("rolled back", combined_output)
         self.assertEqual(self.run_entrypoint(), "v1")
         state = json.loads(run(self.env, "status", "--json").stdout)
         self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
@@ -475,7 +612,7 @@ class ConfirmAndRevertTests(SwitchFixture):
 class UnitRestartTests(SwitchFixture):
     STUB_SYSTEMCTL = textwrap.dedent("""\
         #!/usr/bin/env python3
-        import sys, os
+        import json, sys, os
         args = sys.argv[1:]
         if args[:2] == ["--user", "daemon-reload"]:
             sys.exit(0)
@@ -487,7 +624,19 @@ class UnitRestartTests(SwitchFixture):
                 sys.exit(1)
             sys.exit(0)
         if args[:2] == ["--user", "show"]:
-            print(os.environ.get("STUB_MAIN_PID", str(os.getpid())))
+            # Reflects whichever root current/svc *actually* points at right now, read live, so
+            # a forward apply and a later rollback correctly report different daemons (the two
+            # real, separately copied interpreters started in setUp) instead of one fixed pid.
+            pid = os.environ.get("STUB_MAIN_PID", str(os.getpid()))
+            eco_root, pid_map_path = os.environ.get("ECO_INSTALL_ROOT"), os.environ.get("STUB_PID_MAP")
+            if eco_root and pid_map_path:
+                try:
+                    current = os.path.realpath(os.path.join(eco_root, "current", "svc"))
+                    with open(pid_map_path) as handle:
+                        pid = str(json.load(handle).get(current, pid))
+                except OSError:
+                    pass
+            print(pid)
             sys.exit(0)
         sys.exit(1)
         """)
@@ -501,25 +650,34 @@ class UnitRestartTests(SwitchFixture):
         stub_path.write_text(self.STUB_SYSTEMCTL)
         stub_path.chmod(0o755)
         self.stub_log = self.root / "systemctl.log"
-        # The health probe reads /proc/<MainPID>/exe and requires it to resolve *inside* the new
-        # root; os.getpid() would only ever resolve to this test's own /usr/bin/python3, so a
-        # real, separate copy of the interpreter is placed inside root_v2 and run as a genuine
-        # long-lived process -- exec through a symlink still reports the symlink's real target,
-        # not a path inside root_v2, so this needs an actual independent copy of the binary.
-        daemon_bin = self.root_v2 / "bin" / "svc-daemon"
-        shutil.copy2(sys.executable, daemon_bin)
-        daemon_bin.chmod(0o755)
-        self.daemon = subprocess.Popen([str(daemon_bin), "-c", "import time; time.sleep(60)"])
-        self.addCleanup(self._stop_daemon)
+        # The health probe reads /proc/<MainPID>/exe and requires it to resolve *inside* the
+        # expected root; os.getpid() would only ever resolve to this test's own /usr/bin/python3,
+        # so a real, separate copy of the interpreter is placed inside each root and run as a
+        # genuine long-lived process -- exec through a symlink still reports the symlink's real
+        # target, not a path inside the root, so this needs an actual independent copy per root
+        # (one process per root, so a rollback's re-probe genuinely differs from the forward
+        # apply's, rather than trivially reusing the one process that happens to already exist).
+        self.daemons = {}
+        for root_dir in (self.root_v1, self.root_v2):
+            daemon_bin = root_dir / "bin" / "svc-daemon"
+            shutil.copy2(sys.executable, daemon_bin)
+            daemon_bin.chmod(0o755)
+            self.daemons[root_dir] = subprocess.Popen([str(daemon_bin), "-c", "import time; time.sleep(60)"])
+        self.addCleanup(self._stop_daemons)
+        pid_map_path = self.root / "pid-map.json"
+        pid_map_path.write_text(json.dumps({str(root_dir.resolve()): proc.pid for root_dir, proc in self.daemons.items()}))
         self.env = {**self.env, "ECOSYSTEM_SWITCH_SYSTEMCTL": f"{sys.executable} {stub_path}",
-                   "STUB_LOG": str(self.stub_log), "STUB_MAIN_PID": str(self.daemon.pid)}
+                   "STUB_LOG": str(self.stub_log), "STUB_MAIN_PID": str(self.daemons[self.root_v2].pid),
+                   "STUB_PID_MAP": str(pid_map_path)}
         self.write_window("default", allowed=("svc",), open_now=True)
         self.write_receipt("R1", "svc", "2.0.0")
 
-    def _stop_daemon(self):
-        self.daemon.terminate()
-        with contextlib.suppress(subprocess.TimeoutExpired):
-            self.daemon.wait(timeout=5)
+    def _stop_daemons(self):
+        for proc in self.daemons.values():
+            proc.terminate()
+        for proc in self.daemons.values():
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                proc.wait(timeout=5)
 
     def write_svc_spec(self):
         self.write_components({"svc": {
@@ -552,17 +710,72 @@ class UnitRestartTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(self.stub_log.exists() and self.stub_log.read_text(),
                          "a denylisted unit must never reach systemctl restart")
+        # Major finding: apply used to flip current/<id> before the denylist check, leaving the
+        # component on the new root even though the restart itself never happened. The denylist
+        # is now checked before anything is touched, so the live entrypoint must be untouched.
+        self.assertEqual(os.path.realpath(self.root / "bin" / "svc"), os.path.realpath(self.root_v1 / "bin" / "svc"))
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["svc"]["current"], str(self.root_v1.resolve()))
 
     def test_low_memory_refuses_the_restart(self):
         self.write_svc_spec()
         self.relink("svc")
         digest = self.plan_sha("svc", self.root_v2, "R1")
-        env = {**self.env, "ECOSYSTEM_SWITCH_MIN_MEMORY_KIB": str(2**62)}
+        # ECOSYSTEM_SWITCH_MIN_MEMORY_KIB may only ever lower DEFAULT_MIN_MEMORY_KIB (never raise
+        # a production floor via a casual env var), so a test that needs the gate to reliably
+        # refuse regardless of this host's real MemAvailable uses the test-only, unbounded
+        # override instead: ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB.
+        env = {**self.env, "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB": str(2**62)}
         result = run(env, "apply", "svc", "--to-root", str(self.root_v2), "--receipt", "R1",
                      "--window", "default", "--plan-sha256", digest)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("kib", result.stderr.lower())
         self.assertIn("model-loading", result.stderr.lower())
+        # The memory gate now runs before current/svc is touched (major finding: apply used to
+        # flip the link before the denylist/memory/restart gates), so a refused restart must
+        # leave the live entrypoint on the old root entirely, not just fail to finish.
+        self.assertEqual(os.path.realpath(self.root / "bin" / "svc"), os.path.realpath(self.root_v1 / "bin" / "svc"))
+
+    def test_min_memory_kib_env_var_can_only_lower_the_floor_not_raise_it(self):
+        # A plain ECOSYSTEM_SWITCH_MIN_MEMORY_KIB above the real default must never make the gate
+        # *more* permissive than a directly-restarted default would be, and must never disable it
+        # by raising unboundedly -- only ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB can do that.
+        self.assertIsNone(switch.memory_gate_issue(min_kib=0))
+        with unittest.mock.patch.dict(os.environ, {"ECOSYSTEM_SWITCH_MIN_MEMORY_KIB": str(2**62)}, clear=False):
+            # Clamped to DEFAULT_MIN_MEMORY_KIB, not honoured outright: this host must have well
+            # under 2**62 KiB available, so an unclamped read would refuse; the clamp means this
+            # only refuses if the host truly has under 6 GiB free right now.
+            available = switch.available_memory_kib()
+            issue = switch.memory_gate_issue()
+            if available is not None and available >= switch.DEFAULT_MIN_MEMORY_KIB:
+                self.assertIsNone(issue)
+
+
+    def test_rollback_of_a_unit_restart_txn_restores_the_service_on_the_old_root(self):
+        # Major finding: rollback used to reverse ops in plain ledger order, so a service
+        # txn's unit-restart was reversed *before* its link, restarting the unit while
+        # current/<id> still pointed at the new root -- the health probe's "from" was also the
+        # pre-restart MainPID, not a root path, so it could never have matched anyway. After a
+        # rollback, /proc/<MainPID>/exe for the (re-)restarted unit must resolve under the OLD
+        # root, and current/svc must point there too.
+        self.write_svc_spec()
+        self.relink("svc")
+        digest = self.plan_sha("svc", self.root_v2, "R1")
+        result = run(self.env, "apply", "svc", "--to-root", str(self.root_v2), "--receipt", "R1",
+                     "--window", "default", "--plan-sha256", digest)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        rollback = run(self.env, "rollback", "--txn", txn)
+        self.assertEqual(rollback.returncode, 0, rollback.stderr)
+        self.assertEqual(json.loads(rollback.stdout).get("problems"), None)
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["svc"]["current"], str(self.root_v1.resolve()))
+        # The stub systemctl restarted the unit a second time (once forward, once on rollback);
+        # the health probe inside that second restart must have compared against root_v1, not
+        # against the forward entry's own MainPID string.
+        restarts = [line for line in self.stub_log.read_text().splitlines() if line.strip()]
+        self.assertEqual(len(restarts), 2, restarts)
 
 
 class LockTests(SwitchFixture):
@@ -597,6 +810,53 @@ class LockTests(SwitchFixture):
         self.relink("foo")
         second = run(self.env, "status", "--json")
         self.assertEqual(second.returncode, 0)
+
+    def test_concurrent_apply_is_also_refused_with_75(self):
+        # test_concurrent_apply_is_refused_with_75 above actually exercises adopt --relink; this
+        # covers the tool's other mutating command (apply) taking the same lock.
+        self.root_v1 = self.make_tool_root("foo-1.0.0", "v1")
+        self.root_v2 = self.make_tool_root("foo-2.0.0", "v2")
+        self.link_entrypoint("foo", self.root_v1 / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        self.relink("foo")
+        self.write_window("default", allowed=("foo",), open_now=True)
+        digest = run(self.env, "plan", "foo", "--to-root", str(self.root_v2), "--receipt", "R1")
+        digest = json.loads(digest.stdout)["plan_sha256"]
+        lock_path = self.root / "switch" / "switch.lock"
+        handle = open(lock_path, "a+")
+        try:
+            import fcntl
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            result = run(self.env, "apply", "foo", "--to-root", str(self.root_v2), "--receipt", "R1",
+                        "--window", "default", "--plan-sha256", digest)
+            self.assertEqual(result.returncode, 75, result.stderr)
+        finally:
+            handle.close()
+
+    def test_bootstrap_lock_busy_is_also_refused_with_75(self):
+        # switch_locks also takes bootstrap.lock (the same lock adoption/bootstrap-linux.sh
+        # itself holds while installing), so a switch operation never interleaves with a bootstrap
+        # run; this exercises that second lock specifically, not just the tool's own switch.lock.
+        self.root_v1 = self.make_tool_root("foo-1.0.0", "v1")
+        self.link_entrypoint("foo", self.root_v1 / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        lock_path = self.root / "bootstrap.lock"
+        handle = open(lock_path, "a+")
+        try:
+            import fcntl
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            result = run(self.env, "adopt", "--relink")
+            self.assertEqual(result.returncode, 75, result.stderr)
+        finally:
+            handle.close()
 
 
 class PruneTests(SwitchFixture):
@@ -639,6 +899,33 @@ class PruneTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertTrue(stale.exists())
 
+    def test_the_rollback_target_of_an_unconfirmed_txn_is_not_a_prune_candidate(self):
+        # Major finding: prune must not remove the previous root of a txn that has not yet been
+        # confirmed or rolled back -- a later `confirm`-or-revert still needs it.
+        old_root = self.make_tool_root("foo-1.0.0", "v1")
+        new_root = self.make_tool_root("foo-2.0.0", "v2")
+        self.link_entrypoint("foo", old_root / "bin" / "foo")
+        self.write_components({"foo": {
+            "version": "1.0.0", "kind": "tarball", "root_name": "foo-1.0.0", "current_link": "current/foo",
+            "entrypoints": [{"bin": "bin/foo", "in_root": "bin/foo"}], "surfaces": [], "state_dirs": [],
+            "window": "default", "rollback_class": "safe",
+        }})
+        self.relink("foo")
+        self.write_window("default", allowed=("foo",), open_now=True)
+        self.write_receipt("R1", "foo", "2.0.0")
+        digest = self.plan_sha("foo", new_root, "R1")
+        # No --confirm-within here (this fixture does not stub systemd-run, and must not create a
+        # real host timer): a plain apply's txn reaches status "applied" immediately, and its
+        # previous root remains a valid `rollback foo` target for as long as that txn is not
+        # itself rolled back -- so it must stay excluded from pruning too, not only a txn still
+        # literally "pending_confirmation".
+        applied = run(self.env, "apply", "foo", "--to-root", str(new_root), "--receipt", "R1",
+                      "--window", "default", "--plan-sha256", digest)
+        self.assertEqual(applied.returncode, 0, applied.stderr)
+        listing = json.loads(run(self.env, "prune", "--list").stdout)
+        paths = {c["path"]: c["eligible"] for c in listing["candidates"]}
+        self.assertNotIn(str(old_root), paths, "a live rollback target must not even be listed as a candidate")
+
 
 class WriteInstalledVersionsTests(SwitchFixture):
     def test_writes_a_report_from_switch_state(self):
@@ -656,6 +943,17 @@ class WriteInstalledVersionsTests(SwitchFixture):
         self.assertTrue(report.is_file())
         self.assertIn("foo", report.read_text())
         self.assertIn(str(root_v1.resolve()), report.read_text())
+
+    def test_a_pre_existing_file_is_backed_up_before_being_overwritten(self):
+        # The real installed-versions.txt is a hand-maintained multi-tool --version log (git,
+        # node, gh, ...); this command must never silently destroy it with no way back.
+        destination = self.root / "installed-versions.txt"
+        destination.write_text("Verified executable versions at 2026-09-21T20:22:14Z\n-- git --\ngit version 2.99\n")
+        result = run(self.env, "write-installed-versions")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        backups = list((self.root / "switch" / "backups").glob("write-installed-versions-*/installed-versions.txt.orig"))
+        self.assertEqual(len(backups), 1, "the previous report must be preserved somewhere recoverable")
+        self.assertIn("git version 2.99", backups[0].read_text())
 
 
 class OperationUnitTests(unittest.TestCase):
@@ -694,6 +992,55 @@ class OperationUnitTests(unittest.TestCase):
         with self.assertRaises(switch.SwitchError):
             switch.op_text_replace(self.root, "frozen/unit.txt", "/a", "/b", backup_dir=self.root / "backups")
 
+    def test_op_text_replace_refuses_a_parent_symlink_hop_into_frozen(self):
+        (self.root / "frozen" / "real").mkdir(parents=True)
+        target_in_frozen = self.root / "frozen" / "real" / "unit.txt"
+        target_in_frozen.write_text("root=/a\n")
+        (self.root / "alias").symlink_to(self.root / "frozen" / "real")
+        # "alias/unit.txt" never contains the literal text "/frozen/", but it resolves through a
+        # symlink into frozen/real/ -- the frozen check must catch that too.
+        with self.assertRaises(switch.SwitchError):
+            switch.op_text_replace(self.root, "alias/unit.txt", "/a", "/b", backup_dir=self.root / "backups")
+        self.assertEqual(target_in_frozen.read_text(), "root=/a\n")
+
+    def test_op_text_replace_preserves_the_original_exec_bit(self):
+        target = self.root / "gitleaks-guarded"
+        target.write_text("#!/bin/sh\nexec /old/root/gitleaks \"$@\"\n")
+        target.chmod(0o755)
+        switch.op_text_replace(self.root, "gitleaks-guarded", "/old/root", "/new/root", backup_dir=self.root / "backups")
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755, "relinking a wrapper must not drop its exec bit")
+
+    def test_op_text_replace_checks_the_expected_pre_image_sha256(self):
+        target = self.root / "unit.txt"
+        target.write_text("root=/a\n")
+        wrong_sha = "0" * 64
+        with self.assertRaises(switch.SwitchError):
+            switch.op_text_replace(self.root, "unit.txt", "/a", "/b", backup_dir=self.root / "backups",
+                                   expected_pre_sha256=wrong_sha)
+        self.assertEqual(target.read_text(), "root=/a\n")
+        right_sha = switch.sha256_bytes(target.read_bytes())
+        switch.op_text_replace(self.root, "unit.txt", "/a", "/b", backup_dir=self.root / "backups",
+                               expected_pre_sha256=right_sha)
+        self.assertEqual(target.read_text(), "root=/b\n")
+
+    def test_op_text_replace_refuses_invalid_toml_after_replacement(self):
+        try:
+            import tomllib  # noqa: F401
+        except ImportError:
+            self.skipTest("tomllib requires Python 3.11+")
+        target = self.root / "config.toml"
+        target.write_text('[mcp]\nroot = "/old/root"\n')
+        # A replacement that still parses as TOML must succeed.
+        switch.op_text_replace(self.root, "config.toml", "/old/root", "/new/root", backup_dir=self.root / "backups")
+        self.assertIn('root = "/new/root"', target.read_text())
+        # A replacement that breaks TOML syntax must be refused (raises, though not necessarily
+        # as SwitchError -- see op_text_replace's docstring note on this being unwrapped, the
+        # same as the pre-existing JSON re-parse check).
+        target.write_text('[mcp]\nversion = "1.0.0"\n')
+        with self.assertRaises(Exception):
+            # Removing the closing quote leaves an unterminated basic string: invalid TOML.
+            switch.op_text_replace(self.root, "config.toml", '"1.0.0"', '"1.0.0', backup_dir=self.root / "backups")
+
     def test_op_file_write_backs_up_existing_and_removes_on_inverse_when_new(self):
         fields, inverse = switch.op_file_write(self.root, "new-file.txt", b"hello", backup_dir=self.root / "backups")
         self.assertIsNone(fields["backup"])
@@ -705,10 +1052,28 @@ class OperationUnitTests(unittest.TestCase):
         self.assertEqual(Path(fields2["backup"]).read_bytes(), b"old")
 
     def test_op_native_cli_records_before_after_and_propagates_failure(self):
-        fields, inverse = switch.op_native_cli([sys.executable, "-c", "print('ok')"], None)
+        # op_native_cli only ever runs claude mcp/plugin or codex mcp (a fixed policy, not a
+        # caller-supplied allowlist), so the stub executables here are literally named "claude"
+        # to pass that check while still exercising the generic before/after/failure mechanics.
+        ok_dir = self.root / "ok"
+        ok_dir.mkdir()
+        claude_ok = ok_dir / "claude"
+        claude_ok.write_text(f"#!{sys.executable}\nprint('ok')\n")
+        claude_ok.chmod(0o755)
+        fields, inverse = switch.op_native_cli([str(claude_ok), "mcp", "list"], None)
         self.assertIsNotNone(fields["to"])
+
+        fail_dir = self.root / "fail"
+        fail_dir.mkdir()
+        claude_fail = fail_dir / "claude"
+        claude_fail.write_text(f"#!{sys.executable}\nimport sys; sys.exit(3)\n")
+        claude_fail.chmod(0o755)
         with self.assertRaises(switch.SwitchError):
-            switch.op_native_cli([sys.executable, "-c", "import sys; sys.exit(3)"], None)
+            switch.op_native_cli([str(claude_fail), "mcp", "list"], None)
+
+    def test_op_native_cli_refuses_argv_outside_the_fixed_policy(self):
+        with self.assertRaises(switch.SwitchError):
+            switch.op_native_cli([sys.executable, "-c", "print('should never run')"], None)
 
     def test_op_data_backup_and_restore_round_trip(self):
         source = self.root / "state"
@@ -722,6 +1087,20 @@ class OperationUnitTests(unittest.TestCase):
         switch.op_data_restore(self.root, inverse["surface"], inverse["restore_from_backup"])
         self.assertEqual((source / "a.txt").read_text(), "A")
         self.assertFalse((source / "c.txt").exists())
+
+    def test_op_data_backup_refuses_a_non_directory_source_instead_of_recording_an_empty_backup(self):
+        with self.assertRaises(switch.SwitchError):
+            switch.op_data_backup(self.root, "does-not-exist", backup_dir=self.root / "backups")
+        (self.root / "not-a-dir.txt").write_text("x")
+        with self.assertRaises(switch.SwitchError):
+            switch.op_data_backup(self.root, "not-a-dir.txt", backup_dir=self.root / "backups")
+
+    def test_op_file_write_preserves_the_original_exec_bit_on_overwrite(self):
+        target = self.root / "wrapper.sh"
+        target.write_text("#!/bin/sh\necho old\n")
+        target.chmod(0o755)
+        switch.op_file_write(self.root, "wrapper.sh", b"#!/bin/sh\necho new\n", backup_dir=self.root / "backups")
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755)
 
     def test_receipt_gate_issue_matches_the_documented_rule(self):
         base = {
@@ -738,6 +1117,40 @@ class OperationUnitTests(unittest.TestCase):
         self.assertIsNotNone(switch.receipt_gate_issue(no_t2, "foo", "2.0.0"))
         t1_failed = {**base, "tiers": [t if t["tier"] != "T1" else {"tier": "T1", "result": "failed"} for t in base["tiers"]]}
         self.assertIsNotNone(switch.receipt_gate_issue(t1_failed, "foo", "2.0.0"))
+
+    def test_receipt_gate_checks_install_root_only_when_root_and_to_root_are_given(self):
+        base = {
+            "status": "passed",
+            "identity": {"component_id": "foo", "version": "2.0.0"},
+            "install": {"root": "${STACK_HOME}/tools/foo-2.0.0"},
+            "tiers": [{"tier": "T0", "result": "passed"}, {"tier": "T1", "result": "unavailable", "unavailable_reason": "n/a"},
+                      {"tier": "T2", "result": "passed"}, {"tier": "T4", "result": "passed"}],
+        }
+        # Without root/to_root (a direct unit test of the tier rule in isolation): unaffected.
+        self.assertIsNone(switch.receipt_gate_issue(base, "foo", "2.0.0"))
+        # With root/to_root matching the resolved ${STACK_HOME} placeholder: still fine.
+        self.assertIsNone(switch.receipt_gate_issue(base, "foo", "2.0.0", root=self.root, to_root=str(self.root / "tools" / "foo-2.0.0")))
+        # A receipt recorded for a *different* real root (e.g. a stale -r20260101 root, or a
+        # different component entirely) must not authorize switching to this one.
+        issue = switch.receipt_gate_issue(base, "foo", "2.0.0", root=self.root, to_root=str(self.root / "tools" / "foo-2.0.0-r20260101"))
+        self.assertIsNotNone(issue)
+        self.assertIn("install.root", issue)
+
+    def test_receipt_gate_version_parsing_handles_dated_and_wave_suffixed_roots(self):
+        # The version ecosystem-switch derives from --to-root is the full suffix after
+        # "<component>-", not just the text after the last hyphen: a -rDATE or -wN suffixed root
+        # (this rollout's own tools/rtk-0.50.0-r20260925, ai-memory-2.3.2-w2 convention) must
+        # keep its whole version string, and a receipt for one install must not therefore
+        # authorize any other root that happens to end in the same last-hyphen segment.
+        base = {
+            "status": "passed", "identity": {"component_id": "rtk", "version": "0.50.0-r20260925"},
+            "tiers": [{"tier": "T0", "result": "passed"}, {"tier": "T1", "result": "unavailable", "unavailable_reason": "n/a"},
+                      {"tier": "T2", "result": "passed"}, {"tier": "T4", "result": "passed"}],
+        }
+        self.assertIsNone(switch.receipt_gate_issue(base, "rtk", "0.50.0-r20260925"))
+        # A receipt for a *different* rtk build that happens to share the same date suffix (e.g.
+        # a same-day rebuild under a different base version) must not match.
+        self.assertIsNotNone(switch.receipt_gate_issue(base, "rtk", "0.49.0-r20260925"))
 
 
 class LedgerUnitTests(unittest.TestCase):
