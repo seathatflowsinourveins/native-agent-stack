@@ -29,6 +29,11 @@ evidence/hosts/**/*.json.tmp-*
 # explorer-sorted-manifest.md.
 /docs/ecosystem/index.html
 
+# Claude Code: personal project-local settings, and the worktrees
+# `claude --worktree` creates inside the repository.
+.claude/settings.local.json
+.claude/worktrees/
+
 # Credential-shaped files never belong in a checkout; secrets live under
 # ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack (docs/secret-storage.md).
 *.env
