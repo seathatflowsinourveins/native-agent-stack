@@ -104,11 +104,12 @@ def collection_summary(priv):
 def summarize_progress(p):
     labels, stops, agree = collections.Counter(), collections.Counter(), [0, 0]
     for s in p["by_checkpoint"].values():
-        labels.update(s["labels"])
-        stops.update(s["stops"])
-        if "batch1_agreement" in s:
-            agree[0] += s["batch1_agreement"]["agree"]
-            agree[1] += s["batch1_agreement"]["checked"]
+        labels.update(s.get("labels") or {})
+        stops.update(s.get("stops") or {})
+        check = s.get("batch1_agreement")  # absent or null for a checkpoint that did not finish
+        if check:
+            agree[0] += check["agree"]
+            agree[1] += check["checked"]
     return labels, stops, {"agree": agree[0], "checked": agree[1]}
 
 

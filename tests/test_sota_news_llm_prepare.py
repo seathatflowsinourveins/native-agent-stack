@@ -131,6 +131,10 @@ class Receipts(unittest.TestCase):
                                                                       "batch1_agreement": {"agree": 1, "checked": 1}}}}
         (priv / "probe" / "p1" / "progress.json").write_text(json.dumps(progress))
         (priv / "scores" / "progress-delta-liquid.json").write_text(json.dumps(progress))
+        interrupted = {"scored_this_run": 3, "by_checkpoint": {  # a unit stopped mid-checkpoint
+            "2020": {"labels": {"FAVORABLE": 2}, "stops": {"eos": 2}, "load_seconds": 1.0, "batch1_agreement": {"agree": 1, "checked": 1}},
+            "2021": {"labels": {"FAVORABLE": 1}, "stops": {"eos": 1}, "load_seconds": 1.0, "batch1_agreement": None}}}
+        (priv / "scores" / "progress-first-unit.json").write_text(json.dumps(interrupted))
         (priv / "scores" / "progress.json").write_text(json.dumps(progress))  # a copy, not reported twice
         rows = [{"event_id": "1:A", "checkpoint_year": 2020, "label": "FAVORABLE", "raw_output": "FAVORABLE", "stop": "eos"},
                 {"event_id": "2:B", "checkpoint_year": 2020, "label": "PARSE_FAIL", "raw_output": "UNFLEXIBLE", "stop": "eos"},
@@ -150,8 +154,9 @@ class Receipts(unittest.TestCase):
         rec.main(["--private-root", str(priv), "--models-root", str(models), "--out", str(out)])
         status = json.loads((out / "scoring-status.json").read_text())
         self.assertEqual(status["labels_in_files"], {"FAVORABLE": 1, "PARSE_FAIL": 1, "UNFAVORABLE": 1})
-        self.assertEqual(set(status["runs"]), {"progress-delta-liquid.json"})
+        self.assertEqual(set(status["runs"]), {"progress-delta-liquid.json", "progress-first-unit.json"})
         self.assertEqual(status["runs"]["progress-delta-liquid.json"]["batch1_agreement"], {"agree": 1, "checked": 1})
+        self.assertEqual(status["runs"]["progress-first-unit.json"]["batch1_agreement"], {"agree": 1, "checked": 1})
         rules = status["label_rules_on_current_events"]
         ck = rules["by_checkpoint"]["2020"]
         self.assertEqual(ck["rows"], 2)  # the stale row is left out
