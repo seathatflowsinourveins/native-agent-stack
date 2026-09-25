@@ -1,0 +1,824 @@
+{
+ "counts": {
+  "A": 154,
+  "B": 44,
+  "C": 2
+ },
+ "dropped_by_filter": 131566,
+ "evidence_label": "HIST",
+ "kind": "d5-movement-filter-audit",
+ "label_key": {
+  "A": "pure price/trading report of the stock (move, halt, options activity, past performance, IPO open, 'what's going on')",
+  "B": "firm news that also states the stock's own price reaction",
+  "C": "no own-stock price-move content (false positive)"
+ },
+ "labelled_by": "builder (Claude), text only, 2026-09-25",
+ "population_single_symbol": 1761590,
+ "private_file_sha256": "151de9055907592763d678923e5ede4ef621c2b0831eccda88ba70db1fcac03e",
+ "sample_ids_and_labels": [
+  {
+   "label": "A",
+   "news_id": 36043946
+  },
+  {
+   "label": "A",
+   "news_id": 18836704
+  },
+  {
+   "label": "A",
+   "news_id": 16922558
+  },
+  {
+   "label": "A",
+   "news_id": 46196718
+  },
+  {
+   "label": "B",
+   "news_id": 27071078
+  },
+  {
+   "label": "A",
+   "news_id": 53120214
+  },
+  {
+   "label": "A",
+   "news_id": 41634168
+  },
+  {
+   "label": "B",
+   "news_id": 12257524
+  },
+  {
+   "label": "A",
+   "news_id": 29928905
+  },
+  {
+   "label": "B",
+   "news_id": 5622605
+  },
+  {
+   "label": "A",
+   "news_id": 32784923
+  },
+  {
+   "label": "B",
+   "news_id": 5673315
+  },
+  {
+   "label": "A",
+   "news_id": 37270048
+  },
+  {
+   "label": "A",
+   "news_id": 27310844
+  },
+  {
+   "label": "A",
+   "news_id": 25874162
+  },
+  {
+   "label": "A",
+   "news_id": 49317393
+  },
+  {
+   "label": "A",
+   "news_id": 5411096
+  },
+  {
+   "label": "B",
+   "news_id": 15920126
+  },
+  {
+   "label": "A",
+   "news_id": 22445153
+  },
+  {
+   "label": "A",
+   "news_id": 28866343
+  },
+  {
+   "label": "A",
+   "news_id": 44540666
+  },
+  {
+   "label": "B",
+   "news_id": 35540288
+  },
+  {
+   "label": "B",
+   "news_id": 23447261
+  },
+  {
+   "label": "A",
+   "news_id": 26746701
+  },
+  {
+   "label": "B",
+   "news_id": 26811152
+  },
+  {
+   "label": "A",
+   "news_id": 45598478
+  },
+  {
+   "label": "A",
+   "news_id": 61314132
+  },
+  {
+   "label": "A",
+   "news_id": 48130611
+  },
+  {
+   "label": "B",
+   "news_id": 8290227
+  },
+  {
+   "label": "B",
+   "news_id": 11901487
+  },
+  {
+   "label": "A",
+   "news_id": 12540248
+  },
+  {
+   "label": "A",
+   "news_id": 32216478
+  },
+  {
+   "label": "A",
+   "news_id": 49537334
+  },
+  {
+   "label": "B",
+   "news_id": 21266078
+  },
+  {
+   "label": "A",
+   "news_id": 31662585
+  },
+  {
+   "label": "A",
+   "news_id": 22331712
+  },
+  {
+   "label": "A",
+   "news_id": 49523476
+  },
+  {
+   "label": "A",
+   "news_id": 45346073
+  },
+  {
+   "label": "A",
+   "news_id": 39067837
+  },
+  {
+   "label": "A",
+   "news_id": 19393415
+  },
+  {
+   "label": "A",
+   "news_id": 46443100
+  },
+  {
+   "label": "A",
+   "news_id": 42517055
+  },
+  {
+   "label": "A",
+   "news_id": 39197081
+  },
+  {
+   "label": "B",
+   "news_id": 60011725
+  },
+  {
+   "label": "B",
+   "news_id": 10082382
+  },
+  {
+   "label": "A",
+   "news_id": 8890523
+  },
+  {
+   "label": "A",
+   "news_id": 17625855
+  },
+  {
+   "label": "A",
+   "news_id": 21941024
+  },
+  {
+   "label": "A",
+   "news_id": 9153238
+  },
+  {
+   "label": "A",
+   "news_id": 17127529
+  },
+  {
+   "label": "A",
+   "news_id": 38278798
+  },
+  {
+   "label": "A",
+   "news_id": 33917021
+  },
+  {
+   "label": "A",
+   "news_id": 24643999
+  },
+  {
+   "label": "B",
+   "news_id": 47267638
+  },
+  {
+   "label": "A",
+   "news_id": 32247524
+  },
+  {
+   "label": "B",
+   "news_id": 12221658
+  },
+  {
+   "label": "B",
+   "news_id": 32484300
+  },
+  {
+   "label": "A",
+   "news_id": 11887100
+  },
+  {
+   "label": "A",
+   "news_id": 47259468
+  },
+  {
+   "label": "A",
+   "news_id": 26962242
+  },
+  {
+   "label": "B",
+   "news_id": 51357850
+  },
+  {
+   "label": "B",
+   "news_id": 25225038
+  },
+  {
+   "label": "A",
+   "news_id": 53217415
+  },
+  {
+   "label": "B",
+   "news_id": 40397569
+  },
+  {
+   "label": "A",
+   "news_id": 34622254
+  },
+  {
+   "label": "A",
+   "news_id": 47366017
+  },
+  {
+   "label": "B",
+   "news_id": 22082671
+  },
+  {
+   "label": "A",
+   "news_id": 22578008
+  },
+  {
+   "label": "A",
+   "news_id": 32475201
+  },
+  {
+   "label": "A",
+   "news_id": 38109826
+  },
+  {
+   "label": "A",
+   "news_id": 10090194
+  },
+  {
+   "label": "A",
+   "news_id": 21235829
+  },
+  {
+   "label": "A",
+   "news_id": 39358441
+  },
+  {
+   "label": "A",
+   "news_id": 46423000
+  },
+  {
+   "label": "A",
+   "news_id": 10237648
+  },
+  {
+   "label": "A",
+   "news_id": 17071548
+  },
+  {
+   "label": "A",
+   "news_id": 26757930
+  },
+  {
+   "label": "A",
+   "news_id": 42672667
+  },
+  {
+   "label": "A",
+   "news_id": 27360145
+  },
+  {
+   "label": "A",
+   "news_id": 24193328
+  },
+  {
+   "label": "A",
+   "news_id": 18672363
+  },
+  {
+   "label": "A",
+   "news_id": 45006437
+  },
+  {
+   "label": "C",
+   "news_id": 16078191
+  },
+  {
+   "label": "B",
+   "news_id": 43557184
+  },
+  {
+   "label": "A",
+   "news_id": 23466904
+  },
+  {
+   "label": "A",
+   "news_id": 17679058
+  },
+  {
+   "label": "A",
+   "news_id": 36912060
+  },
+  {
+   "label": "B",
+   "news_id": 38456850
+  },
+  {
+   "label": "A",
+   "news_id": 10087607
+  },
+  {
+   "label": "A",
+   "news_id": 15884433
+  },
+  {
+   "label": "A",
+   "news_id": 45949468
+  },
+  {
+   "label": "B",
+   "news_id": 19885990
+  },
+  {
+   "label": "A",
+   "news_id": 36096960
+  },
+  {
+   "label": "A",
+   "news_id": 17803540
+  },
+  {
+   "label": "A",
+   "news_id": 22020296
+  },
+  {
+   "label": "A",
+   "news_id": 22917779
+  },
+  {
+   "label": "B",
+   "news_id": 25934513
+  },
+  {
+   "label": "A",
+   "news_id": 26407176
+  },
+  {
+   "label": "A",
+   "news_id": 44439426
+  },
+  {
+   "label": "A",
+   "news_id": 8379140
+  },
+  {
+   "label": "B",
+   "news_id": 25808506
+  },
+  {
+   "label": "A",
+   "news_id": 28184839
+  },
+  {
+   "label": "A",
+   "news_id": 21769128
+  },
+  {
+   "label": "A",
+   "news_id": 12044623
+  },
+  {
+   "label": "A",
+   "news_id": 61082098
+  },
+  {
+   "label": "B",
+   "news_id": 12364686
+  },
+  {
+   "label": "A",
+   "news_id": 17996998
+  },
+  {
+   "label": "A",
+   "news_id": 36595516
+  },
+  {
+   "label": "A",
+   "news_id": 8442027
+  },
+  {
+   "label": "A",
+   "news_id": 45266422
+  },
+  {
+   "label": "A",
+   "news_id": 38987148
+  },
+  {
+   "label": "B",
+   "news_id": 39357211
+  },
+  {
+   "label": "A",
+   "news_id": 31221308
+  },
+  {
+   "label": "A",
+   "news_id": 20168786
+  },
+  {
+   "label": "B",
+   "news_id": 49350782
+  },
+  {
+   "label": "A",
+   "news_id": 51916164
+  },
+  {
+   "label": "B",
+   "news_id": 22220359
+  },
+  {
+   "label": "A",
+   "news_id": 15635889
+  },
+  {
+   "label": "B",
+   "news_id": 13510154
+  },
+  {
+   "label": "A",
+   "news_id": 35155418
+  },
+  {
+   "label": "B",
+   "news_id": 42684942
+  },
+  {
+   "label": "B",
+   "news_id": 12201212
+  },
+  {
+   "label": "C",
+   "news_id": 15189668
+  },
+  {
+   "label": "A",
+   "news_id": 44887853
+  },
+  {
+   "label": "A",
+   "news_id": 40731823
+  },
+  {
+   "label": "A",
+   "news_id": 38049536
+  },
+  {
+   "label": "A",
+   "news_id": 12643652
+  },
+  {
+   "label": "A",
+   "news_id": 45646843
+  },
+  {
+   "label": "A",
+   "news_id": 51146822
+  },
+  {
+   "label": "A",
+   "news_id": 5645976
+  },
+  {
+   "label": "A",
+   "news_id": 29804961
+  },
+  {
+   "label": "A",
+   "news_id": 32623404
+  },
+  {
+   "label": "A",
+   "news_id": 21791340
+  },
+  {
+   "label": "A",
+   "news_id": 8124504
+  },
+  {
+   "label": "A",
+   "news_id": 30059772
+  },
+  {
+   "label": "A",
+   "news_id": 10233411
+  },
+  {
+   "label": "A",
+   "news_id": 22281135
+  },
+  {
+   "label": "B",
+   "news_id": 38525975
+  },
+  {
+   "label": "A",
+   "news_id": 40751210
+  },
+  {
+   "label": "A",
+   "news_id": 43136264
+  },
+  {
+   "label": "A",
+   "news_id": 35516947
+  },
+  {
+   "label": "A",
+   "news_id": 49182611
+  },
+  {
+   "label": "B",
+   "news_id": 9831211
+  },
+  {
+   "label": "A",
+   "news_id": 24195397
+  },
+  {
+   "label": "A",
+   "news_id": 19588927
+  },
+  {
+   "label": "A",
+   "news_id": 16314240
+  },
+  {
+   "label": "A",
+   "news_id": 60981612
+  },
+  {
+   "label": "A",
+   "news_id": 41882424
+  },
+  {
+   "label": "A",
+   "news_id": 11593816
+  },
+  {
+   "label": "A",
+   "news_id": 22800760
+  },
+  {
+   "label": "B",
+   "news_id": 43429620
+  },
+  {
+   "label": "A",
+   "news_id": 53143510
+  },
+  {
+   "label": "A",
+   "news_id": 11943057
+  },
+  {
+   "label": "A",
+   "news_id": 61286115
+  },
+  {
+   "label": "B",
+   "news_id": 12017786
+  },
+  {
+   "label": "B",
+   "news_id": 35763885
+  },
+  {
+   "label": "A",
+   "news_id": 18657948
+  },
+  {
+   "label": "A",
+   "news_id": 42345176
+  },
+  {
+   "label": "B",
+   "news_id": 50888473
+  },
+  {
+   "label": "B",
+   "news_id": 14055598
+  },
+  {
+   "label": "A",
+   "news_id": 34124153
+  },
+  {
+   "label": "A",
+   "news_id": 42514010
+  },
+  {
+   "label": "A",
+   "news_id": 44123613
+  },
+  {
+   "label": "A",
+   "news_id": 8703062
+  },
+  {
+   "label": "A",
+   "news_id": 60858907
+  },
+  {
+   "label": "A",
+   "news_id": 32768868
+  },
+  {
+   "label": "A",
+   "news_id": 28225501
+  },
+  {
+   "label": "A",
+   "news_id": 8718379
+  },
+  {
+   "label": "A",
+   "news_id": 29926711
+  },
+  {
+   "label": "A",
+   "news_id": 35202530
+  },
+  {
+   "label": "B",
+   "news_id": 8894203
+  },
+  {
+   "label": "A",
+   "news_id": 34805057
+  },
+  {
+   "label": "A",
+   "news_id": 21647741
+  },
+  {
+   "label": "A",
+   "news_id": 20816544
+  },
+  {
+   "label": "A",
+   "news_id": 60501422
+  },
+  {
+   "label": "A",
+   "news_id": 36199262
+  },
+  {
+   "label": "A",
+   "news_id": 52177346
+  },
+  {
+   "label": "B",
+   "news_id": 14735486
+  },
+  {
+   "label": "A",
+   "news_id": 35623072
+  },
+  {
+   "label": "A",
+   "news_id": 11804701
+  },
+  {
+   "label": "A",
+   "news_id": 44063030
+  },
+  {
+   "label": "A",
+   "news_id": 24382504
+  },
+  {
+   "label": "A",
+   "news_id": 23154384
+  },
+  {
+   "label": "A",
+   "news_id": 20662759
+  },
+  {
+   "label": "A",
+   "news_id": 31402182
+  },
+  {
+   "label": "A",
+   "news_id": 11036938
+  },
+  {
+   "label": "A",
+   "news_id": 21961440
+  },
+  {
+   "label": "A",
+   "news_id": 48482192
+  },
+  {
+   "label": "A",
+   "news_id": 50791273
+  },
+  {
+   "label": "B",
+   "news_id": 15681979
+  },
+  {
+   "label": "A",
+   "news_id": 34045311
+  },
+  {
+   "label": "A",
+   "news_id": 37594965
+  },
+  {
+   "label": "A",
+   "news_id": 35130627
+  },
+  {
+   "label": "B",
+   "news_id": 8941462
+  },
+  {
+   "label": "A",
+   "news_id": 21811789
+  },
+  {
+   "label": "A",
+   "news_id": 39165118
+  },
+  {
+   "label": "A",
+   "news_id": 45378479
+  },
+  {
+   "label": "A",
+   "news_id": 32010907
+  },
+  {
+   "label": "A",
+   "news_id": 9751953
+  },
+  {
+   "label": "B",
+   "news_id": 27697289
+  }
+ ],
+ "sample_size": 200,
+ "sampling_rule": "random.Random(seed).sample(dropped, 200), where dropped = every single-symbol archive headline (news_signal.parse_symbols) that news_signal.is_movement_headline flags, as (news id, cleaned headline) pairs sorted by news id",
+ "schema": "sota-news-llm-receipt/1",
+ "seed": 20260925
+}

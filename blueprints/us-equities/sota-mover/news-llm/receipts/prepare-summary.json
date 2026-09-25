@@ -21,6 +21,132 @@
    "rth:ok": 405120,
    "rth:updated_after_cutoff": 2347
   },
+  "guard_B_drops_by_window_and_session_year": {
+   "overnight": {
+    "2016": {
+     "dropped": 152,
+     "evaluated": 36145,
+     "share": 0.0042
+    },
+    "2017": {
+     "dropped": 51,
+     "evaluated": 32029,
+     "share": 0.0016
+    },
+    "2018": {
+     "dropped": 1027,
+     "evaluated": 37570,
+     "share": 0.0273
+    },
+    "2019": {
+     "dropped": 3107,
+     "evaluated": 39725,
+     "share": 0.0782
+    },
+    "2020": {
+     "dropped": 482,
+     "evaluated": 49720,
+     "share": 0.0097
+    },
+    "2021": {
+     "dropped": 1148,
+     "evaluated": 56395,
+     "share": 0.0204
+    },
+    "2022": {
+     "dropped": 2735,
+     "evaluated": 66527,
+     "share": 0.0411
+    },
+    "2023": {
+     "dropped": 384,
+     "evaluated": 72764,
+     "share": 0.0053
+    },
+    "2024": {
+     "dropped": 0,
+     "evaluated": 72937,
+     "share": 0.0
+    },
+    "2025": {
+     "dropped": 0,
+     "evaluated": 78845,
+     "share": 0.0
+    },
+    "2026": {
+     "dropped": 0,
+     "evaluated": 61365,
+     "share": 0.0
+    },
+    "all": {
+     "dropped": 9086,
+     "evaluated": 604022,
+     "share": 0.015
+    }
+   },
+   "rth": {
+    "2016": {
+     "dropped": 2349,
+     "evaluated": 14461,
+     "share": 0.1624
+    },
+    "2017": {
+     "dropped": 664,
+     "evaluated": 9743,
+     "share": 0.0682
+    },
+    "2018": {
+     "dropped": 1022,
+     "evaluated": 11547,
+     "share": 0.0885
+    },
+    "2019": {
+     "dropped": 2190,
+     "evaluated": 14132,
+     "share": 0.155
+    },
+    "2020": {
+     "dropped": 2003,
+     "evaluated": 23156,
+     "share": 0.0865
+    },
+    "2021": {
+     "dropped": 13558,
+     "evaluated": 34421,
+     "share": 0.3939
+    },
+    "2022": {
+     "dropped": 12543,
+     "evaluated": 41663,
+     "share": 0.3011
+    },
+    "2023": {
+     "dropped": 12276,
+     "evaluated": 46541,
+     "share": 0.2638
+    },
+    "2024": {
+     "dropped": 193,
+     "evaluated": 58915,
+     "share": 0.0033
+    },
+    "2025": {
+     "dropped": 0,
+     "evaluated": 58147,
+     "share": 0.0
+    },
+    "2026": {
+     "dropped": 0,
+     "evaluated": 38713,
+     "share": 0.0
+    },
+    "all": {
+     "dropped": 46798,
+     "evaluated": 351439,
+     "share": 0.1332
+    }
+   }
+  },
   "survivorship_single_symbol_not_in_asset_master_by_ny_year": {
    "2014": {
     "not_in_asset_master": 0,
@@ -126,7 +252,7 @@
   "sha256": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781"
  },
  "evidence_label": "HIST",
- "finished_at": "2026-09-25T05:20:07+00:00",
+ "finished_at": "2026-09-25T09:36:20+00:00",
  "funnel": {
   "articles": 2217343,
   "drop_duplicate_24h": 1204,
@@ -155,7 +281,7 @@
   "single_symbol": 1761588
  },
  "git": {
-  "head": "2b73c70ceef3df17fc0eaaf74a05ca74798c2728",
+  "head": "82272cae3262585b1f1edefce5c0bfff61df6802",
   "study_dir_clean": true
  },
  "inputs": {
@@ -167,8 +293,8 @@
   "daily_parquet_sha256": "f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105",
   "news_manifest_sha256": "45e5ab7973d0b6b4eac8b232ecd74fd80f81230ba84943c6bab1db0cdfa9efb6",
   "news_run_header_sha256": "f5b5edd6a2018f302ad35b292b20bc08358cea99be3ae7a40d590a48a506c310",
-  "news_signal_py_sha256": "d8453de13031e58af9fbc07e3e9f4e8d7f469ca30c2ccac622c06b515c19965f",
-  "prepare_py_sha256": "b19713ef574996bf337dd14539b67015e359266f84714e6a18fdfdb833da98bd"
+  "news_signal_py_sha256": "c12c1caedea5499e3224dc3bb979bf93209a44118c135226209020b85a776254",
+  "prepare_py_sha256": "9d559eed3d134ec8895be75c5e0bf6eb9e5adf658293cd20a022af26c7320312"
  },
  "kind": "prepare",
  "schema": "sota-news-llm-receipt/1",
@@ -229,5 +355,5 @@
   "overnight:small": 2672,
   "rth:liquid": 2673
  },
- "started_at": "2026-09-25T05:14:39+00:00"
+ "started_at": "2026-09-25T09:31:56+00:00"
 }

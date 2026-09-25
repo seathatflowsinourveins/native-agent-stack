@@ -201,6 +201,10 @@
     "1min_1h": 273704,
     "gt_1d": 1870,
     "le_1min": 11846
+   },
+   "guard_B_drop_share_by_window": {
+    "overnight": 0.015,
+    "rth": 0.1332
    }
   },
   "d5_audit": {
@@ -547,16 +551,17 @@
   "L9 Label mix varies by checkpoint vintage (float32 probe, 50 events each: e.g. the 2022 checkpoint labels most headlines UNFAVORABLE), so leg sizes shift across years; portfolios are formed within a day, where one checkpoint scores all headlines of that calendar year.",
   "L10 Output malformation varies with the checkpoint vintage. Share of current-event outputs that fail the authors' exact-word rule: 2015 0.09%, 2016 1.56%, 2017 0.05%, 2018 0%, 2019 0.19%, 2020 0.01%, 2021 7.42%, 2022 0.03%, 2023 31.17%, 2024 26.04% (the re-check's 31.2/26.0/7.8% counted superseded rows too); 99.8% of them begin with 'UNF'. Under the operative prefix rule (D22) at most 0.12% of any checkpoint's outputs remain PARSE_FAIL. The strict-rule sensitivity shows how much the confirmatory results depend on D22.",
   "L11 Survivorship: single-symbol headlines whose ticker is absent from the 2026-09-21 asset master are dropped (prepare.py F3). The missing share falls from 30.3% of single-symbol headlines in 2016 to 4.2% in 2026 (reviewer's per-year count; the rerun's counts are in receipts/prepare-summary.json diagnostics.survivorship_*). Delisted and renamed firms are therefore under-represented in early years; every verdict is scoped to firms present in the 2026-09-21 asset master (protocol scope).",
-  "L12 The movement filter drops headlines that carry firm news together with the stock's reaction (22% of the D5 audit sample)."
+  "L12 The movement filter drops headlines that carry firm news together with the stock's reaction (22% of the D5 audit sample).",
+  "L13 Guard B (estimated ingestion after the decision cutoff) drops intraday events very unevenly by year: 2016 16.2%, 2017-2020 6.8%-15.5%, 2021 39.4%, 2022 30.1%, 2023 26.4%, 2024 0.3%, 2025-2026 0%; overnight 1.5% overall (at most 7.8%, 2019). The fall to zero from 2024 points to a change in how the feed assigned news ids (for example batch- or back-filled ingestion before 2024) rather than in publication delays; intraday items are the most exposed because their cutoff is only 15 minutes after release. NEWS-3's sample therefore shifts toward 2024-2026 and toward promptly ingested articles; the table is receipts/prepare-summary.json diagnostics.guard_B_drops_by_window_and_session_year and year-by-year intraday results are descriptive."
  ],
  "pre_freeze_data": {
   "prepare_receipt": "receipts/prepare-summary.json (counts and sha256 only)",
   "events": {
    "rows": 499608,
    "sha256": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781",
-   "built_from_commit": "2b73c70ceef3df17fc0eaaf74a05ca74798c2728",
+   "built_from_commit": "82272cae3262585b1f1edefce5c0bfff61df6802",
    "study_dir_clean": true,
-   "news_signal_py_sha256": "d8453de13031e58af9fbc07e3e9f4e8d7f469ca30c2ccac622c06b515c19965f",
+   "news_signal_py_sha256": "c12c1caedea5499e3224dc3bb979bf93209a44118c135226209020b85a776254",
    "overnight_liquid": 228550,
    "overnight_small": 96328,
    "rth_liquid": 174730,
@@ -568,7 +573,8 @@
    "guard_A_drops": 5060,
    "guard_B_drops": 55884,
    "movement_drops": 72552,
-   "previous_build": "events sha 103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb (449,718 rows) was built from uncommitted code (review finding 9) and is superseded"
+   "previous_build": "events sha 103187845992933dc1716e6bb26aea3332db8caa3939aefef4c77c1dc74bb0cb (449,718 rows) was built from uncommitted code (review finding 9) and is superseded",
+   "rebuild_check": "rebuilt at 82272cae (guard-B table added) with a byte-identical events file (same sha256)"
   },
   "scoring_status": {
    "unit": "sota-news-score-20260925T0419Z (systemd --user transient, MemoryHigh=3G, MemoryMax=4G, RuntimeMaxSec=28800)",
@@ -607,9 +613,10 @@
      "hlmw_alpaca|float32|highest|cached": 499608
     },
     "batch1_agreement": {
-     "incremental_liquid_pass": "160/160 (16 per checkpoint)",
+     "first_unit_2015_2021": "112/112",
+     "incremental_liquid_pass": "160/160",
      "incremental_small_pass": "160/160",
-     "first_unit": "16/16 on each finished checkpoint 2015-2021 before the CUDA fault"
+     "receipt": "receipts/scoring-status.json runs"
     },
     "parse_fail_share": {
      "overnight:liquid": 0.1063,
@@ -650,12 +657,13 @@
    },
    "sha256": "d527b168d1306d10d1857eacf58bf77584802076adbd6c891a29097940a1fbd3",
    "requests": "122,362 + 401 + 68,939 (rebuilt events, 1 transient URLError retried), all HTTP 200, at most 1,900/min, finished 02:00 ET 2026-09-25"
-  }
+  },
+  "d5_audit_receipt": "receipts/d5-audit.json (sampling rule, seed 20260925, 154/44/2, ids and labels without text)"
  },
  "freeze_procedure": [
   "1 finish scoring every event (receipts/scoring-status.json): every liquid event has exactly one row with the pinned settings; record label distribution, parse failures and batch-1 agreement",
   "2 independent pre-outcome re-check of this protocol and the code; resolve findings",
-  "3 run evaluate.py --print-pins, copy the code and private_inputs pins into protocol.json, set status 'frozen_pre_outcome', frozen_before_outcomes true and frozen_at; commit",
+  "3 run evaluate.py --print-pins and confirm it equals protocol.json#/pins (regenerate if any pinned file changed), then set status frozen_pre_outcome, frozen_before_outcomes true and frozen_at; commit",
   "4 copy receipts/freeze-record.template.json to receipts/freeze-record.json with protocol_sha256 (sha256 of the committed protocol.json) and protocol_commit (that commit); commit",
   "5 run evaluate.py on a clean tree; it refuses any other state"
  ],
@@ -720,34 +728,35 @@
  },
  "pins": {
   "code": {
-   "news_signal.py": null,
-   "evaluate.py": null,
-   "prepare.py": null,
-   "score.py": null,
-   "collect_auctions.py": null,
-   "receipts.py": null
-  },
-  "reference": {
-   "fees-v3.json": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
-   "session-calendar.json": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
-   "checkpoints.json": "13423a94490d610f9a7dc4b16503613e38d3896df1db36e6d1bce9f63e4fa1f9"
+   "collect_auctions.py": "cfbdb859d018820e937865bca021f8b5a73be01f722181b28ca4325be60661f9",
+   "evaluate.py": "f6dd8df1df592a04eaba4658c7258245824a06313c309031bd9e089c5c1aecd9",
+   "news_signal.py": "c12c1caedea5499e3224dc3bb979bf93209a44118c135226209020b85a776254",
+   "prepare.py": "9d559eed3d134ec8895be75c5e0bf6eb9e5adf658293cd20a022af26c7320312",
+   "receipts.py": "b0e106a7157baf71919518e63c7f476957b69e9804bbeece6ef58998228c5947",
+   "score.py": "d53d85f44d111a329cf016514e09fd707c352d2352b13e6998c3efba50dae941"
   },
   "private_inputs": {
-   "events.jsonl.gz": null,
-   "auctions/auctions.jsonl.gz": null,
-   "spreads/quotes.jsonl": null,
-   "scores/scores-20151231.jsonl": null,
-   "scores/scores-20161231.jsonl": null,
-   "scores/scores-20171231.jsonl": null,
-   "scores/scores-20181231.jsonl": null,
-   "scores/scores-20191231.jsonl": null,
-   "scores/scores-20201231.jsonl": null,
-   "scores/scores-20211231.jsonl": null,
-   "scores/scores-20221231.jsonl": null,
-   "scores/scores-20231231.jsonl": null,
-   "scores/scores-20241231.jsonl": null
+   "auctions/auctions.jsonl.gz": "0b545e43358bb1508f35b0a1292d485f250af4382bca80e7ce31ebc3b7d6b3ce",
+   "events.jsonl.gz": "c9f4e9a279409cdac045224b209543c9b68e4d8c127ae30122e7375248937781",
+   "scores/scores-20151231.jsonl": "0f1a3e5d0e437ae4117b94234612c5992bb3f596ab2e0082c22df5209e5e54cd",
+   "scores/scores-20161231.jsonl": "4dba4ccb46ef918f8e81ed41f545cd87a2de344d34c4891ed64c8dd05901f526",
+   "scores/scores-20171231.jsonl": "483525cf3e33d9bcbfe92154aba62e9d781706e97bedb1b1ad23e24ca0329ea7",
+   "scores/scores-20181231.jsonl": "f338c869e41e679afe076487bbb1527bab93f3e47743c70c1f1aab72d32f5e63",
+   "scores/scores-20191231.jsonl": "3ae78a71eab448f3b8eb018a9ec6d65afdfff40a86799d09236aa6c722641f25",
+   "scores/scores-20201231.jsonl": "d082475f262df50bfb50c6271368372405b635761434c67d8af30e28edb835c3",
+   "scores/scores-20211231.jsonl": "37e37eaaa7deeca1b2835a24c0831cfbe43514a89ad5ceb541d27216fe98d9f4",
+   "scores/scores-20221231.jsonl": "0d2cc33203489862c5745396217c01111aec02eba9b0db0eed6783bf8cbc9445",
+   "scores/scores-20231231.jsonl": "a3e8cbb934a3b149f0b1cf4afb03d9ad36c646768e5c0144f996db58bffae49f",
+   "scores/scores-20241231.jsonl": "04dad12f60a7fe7dd1bae82bb1d10bbc0566f811c8e3685bf7a3a17b12b50801",
+   "spreads/quotes.jsonl": "d527b168d1306d10d1857eacf58bf77584802076adbd6c891a29097940a1fbd3"
   },
-  "how": "python3 evaluate.py --print-pins prints every pin (paths relative to the private data root); fill code and private_inputs at the freeze commit"
+  "reference": {
+   "checkpoints.json": "13423a94490d610f9a7dc4b16503613e38d3896df1db36e6d1bce9f63e4fa1f9",
+   "fees-v3.json": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+   "session-calendar.json": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c"
+  },
+  "how": "python3 evaluate.py --print-pins prints every pin (paths relative to the private data root); fill code and private_inputs at the freeze commit",
+  "pinned_at": "code as committed at the commit that carries this protocol; regenerate with evaluate.py --print-pins if any pinned file changes"
  },
  "evaluation_access": "evaluate.authorize() alone runs the freeze-record, frozen-protocol, pin, clean-tree and freeze-commit checks and issues the Authorization token; data_pass() and every loader refuse anything else, including the FrozenProtocol returned by the public guard()."
 }
