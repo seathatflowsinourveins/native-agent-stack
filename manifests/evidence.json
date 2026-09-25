@@ -9140,8 +9140,8 @@
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
-      "sha256": "038916faef0ebf657d1ea6b1f7d5a755c078d889fa4a9859189c1ac3f533acfd",
-      "bytes": 30772
+      "sha256": "e82ccd673db67a5aeb2de97c0bd0d80e35f6f35dd871eb27d3dfa009f38e9d8b",
+      "bytes": 31049
     },
     {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",

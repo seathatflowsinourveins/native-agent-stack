@@ -12,7 +12,7 @@ Overturn condition this addresses (`catalogs/sota-convergence/manifest-20260922.
 around L6317): "An intraday fixture ... where queue-position and latency
 modelling changes the cost-adjusted result versus the Nautilus fee/slippage
 scenarios already receipted." The simulation lane now needs intraday
-execution realism at **180-900 fills/minute** -- verified, not just relayed:
+execution realism at **180-900 submissions/minute** (the sim-capacity submit budgets; fills per minute are measured per run) -- verified, not just relayed:
 `blueprints/us-equities/sim-capacity/experiment.json` on branch
 `claude/sim-capacity-20260925` (commit `0e0740e7`, "merging soon" per the
 coordinator) defines a paper-parity profile with a "180/min submit budget"
@@ -390,7 +390,7 @@ configured to match the other exactly:
 
 | Dimension | NautilusTrader (sim-capacity, verified) | hftbacktest (this cross-check) |
 | --- | --- | --- |
-| Liquidity consumption across orders | `liquidity_consumption=True` -- the venue's own L1 book state is decremented by fills | Neither exchange model decrements `self.depth` from a fill (Scenario I); closest available choice is `PartialFillExchange`, which at least caps a single order at the displayed size |
+| Liquidity consumption across orders | `liquidity_consumption=True`. The book itself is not decremented: `apply_liquidity_consumption` (rc5 `matching_engine/mod.rs:330-392`) keeps a separate consumed-size tally per price level, and that tally resets whenever the displayed size at the level changes | Neither exchange model decrements `self.depth` from a fill (Scenario I); closest available choice is `PartialFillExchange`, which at least caps a single order at the displayed size |
 | Queue position for takers | Not applied at all for taker fills: `crates/execution/src/matching_engine/mod.rs` (`v2.0.0rc5`, ~lines 3555-3583) sets `LiquiditySide::Taker` and fills immediately WITHOUT calling `snapshot_queue_position`; that call only happens in the passive/maker branch | `ProbQueueModel` is consulted for RESTING orders only; a fresh L1 price starts at zero queue-ahead (Scenario E) -- also taker-irrelevant, but for a different reason (no notion of "ahead" for an immediate fill at all, vs. hftbacktest's zero-history assumption for passive orders) |
 | Queue position for resting orders | `queue_position=True` on sim-capacity's branch (the older sim-paper-compare lane had it `False`) | `power_prob_queue_model` always on in this fixture; Scenario E's bias applies |
 | Aggressor side on trade prints | `AggressorSide.NO_AGGRESSOR` (verified in sim-capacity's `runner.py`) | Bare `TRADE_EVENT`, no side bit -- same underlying SIP limitation, same absence, independently confirmed on both engines |
@@ -438,8 +438,8 @@ Given this, the plan:
 
 ## Cleanup (host state this task created, per docs/harness-defaults.md)
 
-**Executed** (dates below; commands and their exit codes are in
-`receipt.json`'s `cleanup` block, which an earlier version of this receipt
+**Executed** (dates below; the commands are in
+`receipt.json`'s `cleanup` block, without exit codes (none were recorded), which an earlier version of this receipt
 left saying "not yet run" after the removal had actually already happened --
 that was a stale record, now corrected):
 
