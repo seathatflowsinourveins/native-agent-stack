@@ -1,7 +1,11 @@
 # Decision: ai-memory 2.4.0 release review; no upgrade yet (2026-09-25)
 
 **Decided by:** a Claude Code writer session for the workstation lane, wave A, on
-branch `claude/workstation-lane-wave-a-20260925` (base `origin/main@720e294b`).
+branch `claude/workstation-lane-wave-a-20260925`. The doc was first written against
+`origin/main@720e294b`. It was revised on 2026-09-25 after an independent review and a
+rebase onto `origin/main@8c7b7f3b`. The new base includes #159 (`83b6f87b`), which made
+ai-memory assistant capture opt-in: the Claude settings template's `stop` hook adds
+`--capture-assistant` only through `${AI_MEMORY_CAPTURE_ASSISTANT}`.
 
 **Scope:** a read-only review of
 [ai-memory v2.4.0](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0) against
@@ -15,8 +19,8 @@ Stay on 2.3.2 until a planned upgrade window. 2.4.0 is a normal forward upgrade.
 two schema migrations, one security fix and new features that are off by default. It
 cannot be rolled back without restoring a backup. It does not contain the query/document
 embedding-prefix support this stack needs before ai-memory can use Nemotron embeddings with
-prefixes: upstream PR #859 merged on 2026-09-23, after the release. If the window's goal
-includes that support, target the first release that contains #859.
+prefixes: upstream PR #859 merged into `release/2.5` on 2026-09-23, after the release. If
+the window's goal includes that support, target the first release that contains #859.
 
 ## Evidence (fetched 2026-09-25T14:38Z)
 
@@ -27,6 +31,10 @@ The review used five commands:
 - `gh api` for `docs/design-memory-aging.md` and `docs/install.md` at `ref=v2.4.0`
 - `gh release list`
 - `gh pr view 859`
+
+The revision on 2026-09-25 (fetched about 15:15Z) added `gh api /advisories/<id>` for the
+three advisories, `gh pr view 859 --json baseRefName`, the rmcp features in `Cargo.toml`
+and `crates/ai-memory-cli/Cargo.toml` at `v2.3.2`, and `gh pr diff` for #780 and #804.
 
 The results:
 
@@ -60,10 +68,17 @@ date"). This repository's own 2.4.0 trial found the same failure from the hooks 
 The changelog marks nothing as breaking. The MCP surface stays at 23 tools. These changes
 apply without any opt-in:
 
-- **rmcp 1.7 to 2.2.** This fixes GHSA-9pj6-vhgr-3mwh (an unauthenticated Streamable-HTTP
-  session-table leak or DoS), GHSA-33f5-2c5q-wgwj and GHSA-9g45-5xwm-f3wc. On this host,
-  `nativestack-memory.service` runs `serve --transport http --bind 127.0.0.1:49474`, so the
-  first advisory applies to the transport in use. Exposure is limited to local processes.
+- **rmcp 1.7 to 2.2.** This fixes three rmcp advisories, and only one of them affects the
+  HTTP server. GHSA-9pj6-vhgr-3mwh is an unauthenticated Streamable-HTTP session-table leak
+  or DoS in the server transport. On this host, `nativestack-memory.service` runs
+  `serve --transport http --bind 127.0.0.1:49474`, so it applies to the transport in use.
+  Exposure is limited to local processes. GHSA-9g45-5xwm-f3wc (custom HTTP headers leak to
+  cross-origin redirect targets) affects rmcp's HTTP client, which 2.3.2 uses only in
+  `mcp-bridge`. GHSA-33f5-2c5q-wgwj (missing resource-field validation in OAuth
+  protected-resource metadata discovery) affects rmcp's OAuth support. 2.3.2 does not enable
+  it: its rmcp features are `server`, `macros`, `transport-io`,
+  `transport-streamable-http-server` and `schemars`, plus `client` and the reqwest
+  streamable-HTTP client for the bridge.
 - **Access reinforcement.** `memory_read_page`, its related-page walk and `memory_explore`
   now raise `access_count`/`last_accessed_at`, as `memory_query` already does. Pages read
   this way decay more slowly.
@@ -78,6 +93,12 @@ apply without any opt-in:
   the default. `memory_lint` adds advisory `contradiction` findings when embeddings exist.
 - **Auto-improve.** A failed scheduled review releases its claim and retries, then parks
   after 3 attempts. The reviewer's context now excludes `sessions/` pages.
+- **Pinned pages in the briefing.** A project-scoped `memory_briefing` snapshot now carries
+  a bounded `pinned` list (up to 10) of the project's pinned latest pages (#780). It is
+  omitted when the project has no pins, and no option turns it off. Only `memory_query`'s
+  `pin_first` is opt-in.
+- **Evidence count in status.** `memory_status` now reports the project's `evidence_rows`
+  count. It does not change ranking.
 
 ### Configuration changes
 
@@ -100,7 +121,10 @@ New opt-in MCP arguments:
 - `memory_query`: `answer`, `reasoning`, `pin_first` and `include_superseded`.
 - `memory_read_page`: `include_related` and `related_depth`.
 
-The operator home falls back to `%USERPROFILE%` on Windows only.
+When `AI_MEMORY_HOME` and `$HOME` are both unset, `Config::load` now takes the operator
+home from `%USERPROFILE%`, then `dirs::home_dir` (#804). The changelog motivates this with
+native Windows, but the code reads `USERPROFILE` on every platform. On this host `$HOME` is
+set, so the fallback does not apply.
 
 ### Restart needs
 
@@ -117,12 +141,41 @@ The operator home falls back to `%USERPROFILE%` on Windows only.
    and `ai-memory status`. Take `ai-memory backup`. This backup is the only way to roll
    back, besides the automatic pre-migration archive.
 2. Bump the pin through the repository process in `manifests/stack.json`,
-   `adoption/pins-linux-x86_64.json` and the landscape winner. Verify the downloaded tarball
+   `adoption/pins-linux-x86_64.json`, the landscape winner and
+   `adoption/templates/claude.settings.template.json`, whose eight ai-memory hook commands
+   hardcode `tools/ai-memory-2.3.2`. Verify the downloaded tarball
    against the release checksum list; the release is not immutable. A pin bump retires this
    host's ai-memory receipts, so they must be recorded again.
 3. Stop `nativestack-memory.service`. Switch the service binary and the hook binaries
-   together, then run `install-hooks --apply`, which is idempotent. Start the service again.
-   Never leave a 2.3.2 binary pointed at the migrated store.
+   together. Then re-apply the hooks with the new binary. Name each native target
+   explicitly, and keep this host's existing capture choices
+   (`docs/token-session-handbook.md`, "Applying the defaults on another host"):
+
+   ```sh
+   NEW=~/.local/share/codex-ecosystem/tools/ai-memory-<version>/ai-memory
+   "$NEW" install-hooks --apply --agent claude-code --config-file ~/.claude/settings.json \
+     --server-url http://127.0.0.1:49474
+   "$NEW" install-hooks --apply --agent codex --config-file ~/.codex/hooks.json \
+     --server-url http://127.0.0.1:49474
+   ```
+
+   `--apply` is idempotent, and it writes a timestamped backup next to each file. Always pass
+   `--server-url`: this host's service binds `127.0.0.1:49474`, and on this machine 49374 is
+   another WSL distro's default. A default or copied URL could send the hooks to the wrong
+   store.
+
+   On 2026-09-25 neither hook set on this host carried `--capture-assistant`, so both
+   commands omit it. Keep that state. Per the 2.3.2 `install-hooks --help`, it adds
+   `--capture-assistant` only when the flag is passed, and a re-run without it removes the flag. A host that has opted in must
+   pass it again; the flag is valid only for `--agent claude-code`, and the server must also
+   set `capture_assistant = true`. A bare `--apply` keeps an earlier `--no-capture-prompts`
+   opt-out, the stored capture mode and the project strategy.
+
+   Afterwards, check that every ai-memory hook command names the new binary and
+   `--server-url http://127.0.0.1:49474`. Check that the events are the same as before: on
+   2026-09-25 that was eight Claude Code events and seven Codex events. Review the changed
+   Codex hooks through `/hooks`. Start the service again. Never leave a 2.3.2 binary pointed
+   at the migrated store.
 4. After the restart, confirm the following:
    - The store's applied migration version is 66; upstream bumped its schema-version pin to
      66 for this release.
@@ -144,18 +197,20 @@ The operator home falls back to `%USERPROFILE%` on Windows only.
 2. **Wait for a release that contains #859.** This is preferred if the window also moves
    memory embeddings to Nemotron with prefixes. It avoids carrying a patch, which the laptop
    host did as a pin deviation.
-3. **Stay on 2.3.2 indefinitely.** Rejected as a standing position. It keeps the three rmcp
-   advisories on a loopback HTTP transport.
+3. **Stay on 2.3.2 indefinitely.** Rejected as a standing position. It keeps
+   GHSA-9pj6-vhgr-3mwh on the loopback HTTP transport and GHSA-9g45-5xwm-f3wc in
+   `mcp-bridge`.
 
 ## Comparison that would overturn it
 
 Two findings would each overturn this decision:
 
 - **Upgrade now instead of waiting.** A local process on this host is shown to reach the
-  loopback transport in a way the advisories describe. Or upstream publishes a 2.3.x
+  loopback transport in the way GHSA-9pj6-vhgr-3mwh describes. Or upstream publishes a 2.3.x
   advisory that 2.4.0 fixes and that is exploitable here.
-- **Adopt 2.4.0 even when prefixes are wanted.** Upstream ships prefix support in a 2.4.x
-  release; that release is then the target, not 2.4.0.
+- **Target a 2.4.x release instead of the 2.5 line.** Upstream backports the #859 prefix
+  support to a 2.4.x release. That 2.4.x release then becomes the target for a window that
+  wants prefixes.
 
 ## Limits
 
