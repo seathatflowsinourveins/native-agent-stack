@@ -415,9 +415,22 @@ def recompute_state(root: Path) -> dict:
         if (component and base_op in ("link", "resync", "baseline") and entry.get("to") is not None
                 and (entry.get("surface") or "").startswith("current/")):
             components.setdefault(component, {})["current"] = entry.get("to")
-            components[component]["updated_txn"] = txn
             components[component]["updated_at_utc"] = entry.get("at_utc")
             components[component]["rollback_class"] = entry.get("rollback_class")
+            if base_op != "baseline":
+                # Minor finding (round 4, previously unresolved): adopt --baseline is documented
+                # (adoption/tools/README.md) as "the read-only counterpart ... without changing
+                # anything" -- it only re-observes the live current/<id> target, it never writes
+                # anything -- so it must never become the txn a pending/in-progress rollback's own
+                # superseded-txn refusal compares itself against. It used to: a bare `adopt
+                # --baseline` run between `apply --confirm-within` and its own scheduled revert
+                # timer re-records the SAME live value apply just set, under a brand-new txn id,
+                # which this dict then reported as updated_txn -- so the timer's own `rollback
+                # --txn T --if-unconfirmed` refused T as "superseded" by an observation that
+                # changed nothing on disk at all. `resync` is deliberately different: an operator
+                # names it explicitly to accept a real, out-of-band drifted value, so it
+                # legitimately supersedes a still-pending rollback of an older txn.
+                components[component]["updated_txn"] = txn
     return {"schema_version": SCHEMA_VERSION, "components": components, "txns": txns,
             "generated_at_utc": now_utc_iso()}
 

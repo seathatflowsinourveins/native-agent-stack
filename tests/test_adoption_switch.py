@@ -979,6 +979,28 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
         self.assertEqual(json.loads(recover_result.stdout)["recovered_txns"], ["crashed-1"])
 
+    def test_baseline_between_apply_and_its_revert_timer_must_not_block_the_revert(self):
+        # Previously-unresolved finding (round 3/4): adopt --baseline re-records the live
+        # current/<id> value under a brand-new txn id for every component in the spec. Since
+        # apply's own link step already flips current/<id> before a pending_confirmation txn is
+        # confirmed, a baseline run in that window observes the exact same value apply just set --
+        # yet recompute_state used to let that observation become the component's own updated_txn
+        # anyway, so the still-pending apply's own revert timer (`rollback --txn T
+        # --if-unconfirmed`) then refused T as "superseded" by a baseline that changed nothing on
+        # disk at all.
+        result = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        baseline = run(self.env, "adopt", "--baseline")
+        self.assertEqual(baseline.returncode, 0, baseline.stderr)
+        self.assertEqual(json.loads(baseline.stdout)["observed"]["foo"], str(self.root_v2.resolve()))
+
+        revert = run(self.env, "rollback", "--txn", txn, "--if-unconfirmed")
+        self.assertEqual(revert.returncode, 0, revert.stderr)
+        self.assertEqual(json.loads(revert.stdout)["status"], "rolled_back")
+        self.assertEqual(self.run_entrypoint(), "v1")
+
 
 @REQUIRES_PROCFS
 class UnitRestartTests(SwitchFixture):
