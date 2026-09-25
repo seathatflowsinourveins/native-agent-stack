@@ -20,6 +20,7 @@ import shlex
 import signal
 import time
 
+from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_ENCODING, REASON_SIZE, open_verified
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
@@ -50,40 +51,48 @@ def save(path, data):
         os.close(fd)
 
 
-def _inside_git_worktree(path):
-    """Walk parents for a `.git` entry (directory in a normal clone, file in
-    a linked worktree). Resolved so a symlink cannot hide the real location."""
-    current = path.parent
-    while True:
-        if (current / ".git").exists() or (current / ".git").is_symlink():
-            return True
-        parent = current.parent
-        if parent == current:
-            return False
-        current = parent
-
-
 def credentials(path):
     """Fail closed on a paper-credential env file with unsafe permissions,
     ownership, or location before any content is read. File contents are
-    never included in a raised error or log."""
-    resolved = Path(path).resolve()
+    never included in a raised error or log.
+
+    The ownership/mode/worktree-location rules and their fd-traversal-bound
+    open live in `credential_guard.open_verified()`, shared with
+    `market_research.credentials()` so the two loaders cannot drift; this
+    keeps `follow_symlinks=True`, i.e. a symlinked env file is resolved and
+    the rules applied to its target, matching this loader's prior behavior.
+
+    The file's `KEY=value` lines are required to be plain ASCII: an Alpaca
+    key id/secret is itself an ASCII token, and every writer of this file
+    (`tools/credentials/set_credential.py`, a human `chmod 600`'d text file)
+    only ever emits ASCII. A byte outside that range is refused before any
+    line is parsed, deliberately, rather than accepted as UTF-8 and only
+    failing later (or not at all) inside the per-variable value parser.
+
+    The read is bounded the same way `market_research.credentials()`'s is:
+    at most `MAX_CREDENTIAL_BYTES + 1` bytes are read from the already-open
+    descriptor, and a longer result is refused, rather than trusting an
+    earlier `fstat`-reported size a concurrent writer could grow past.
+    """
     try:
-        info = resolved.stat()
-    except OSError:
-        raise SafetyError("credential_file_permissions: cannot stat the env file; "
-                           "create it at a private path outside this repository with `chmod 600`")
-    if info.st_uid != os.getuid():
-        raise SafetyError("credential_file_permissions: env file is not owned by the current user; "
-                           "chown it to your own account (never share a paper credential file)")
-    if info.st_mode & 0o777 != 0o600:
-        raise SafetyError("credential_file_permissions: env file mode must be exactly 0600; "
-                           f"run `chmod 600 {resolved.name}`")
-    if _inside_git_worktree(resolved):
-        raise SafetyError("credential_file_permissions: env file must live outside any Git worktree; "
-                           "move it to a private, non-repository path (e.g. under your home config directory)")
+        with open_verified(path, follow_symlinks=True) as handle:
+            raw = handle.read(MAX_CREDENTIAL_BYTES + 1)
+    except CredentialGuardError as error:
+        raise SafetyError(str(error)) from None
+    if len(raw) > MAX_CREDENTIAL_BYTES:
+        raise SafetyError(REASON_SIZE)
+    # Checked before decoding, never inside a `except UnicodeDecodeError`
+    # handler: that handler's exception carries `.object` (the *entire*
+    # input bytes, secret included) as an attribute, and raising from
+    # inside it -- even with `from None` -- still leaves that exception
+    # reachable via `__context__`, which `from None` does not clear (see
+    # credential_guard's module docstring for the same reasoning applied
+    # to its own exceptions).
+    if not raw.isascii():
+        raise SafetyError(REASON_ENCODING)
+    text = raw.decode("ascii")
     result = {}
-    for line in resolved.read_text().splitlines():
+    for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue

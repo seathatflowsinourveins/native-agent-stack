@@ -12,10 +12,11 @@ import json
 import os
 from pathlib import Path
 import re
-import stat
 import sys
 from urllib.parse import urlsplit
 
+from credential_guard import (CredentialGuardError, MAX_CREDENTIAL_BYTES as GUARD_MAX_CREDENTIAL_BYTES,
+                              REASON_ENCODING, REASON_SIZE, open_verified)
 from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
@@ -352,18 +353,48 @@ def collect(key, secret, symbols, *, now, lookback_hours=24, max_items=50,
         boundary.close()
 
 
+MAX_CREDENTIAL_BYTES = GUARD_MAX_CREDENTIAL_BYTES  # single source of truth: credential_guard.MAX_CREDENTIAL_BYTES
+
+
 def credentials(path):
-    """Parse only explicit Alpaca variables, never execute an environment file."""
-    path = Path(path)
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    """Fail closed on a paper-credential env file with unsafe permissions,
+    ownership, or location before any content is read; then parse only
+    explicit Alpaca variables, never execute an environment file.
+
+    The ownership/mode/worktree-location rules and their fd-traversal-bound
+    open live in `credential_guard.open_verified()`, shared with
+    `runner.credentials()` so the two loaders cannot drift; this keeps
+    `follow_symlinks=False`, i.e. a symlinked path is refused outright,
+    matching this loader's prior O_NOFOLLOW behavior.
+
+    The size cap is enforced by reading at most `MAX_CREDENTIAL_BYTES + 1`
+    bytes from the already-open descriptor and rejecting a longer result,
+    rather than trusting a separate `fstat` size observed earlier: nothing
+    stops a writer with access to the file from appending to it between an
+    earlier size check and the actual read, so the only size fact that can
+    be trusted is how many bytes this exact read call returns.
+
+    The file's `KEY=value` lines are required to be plain ASCII (see
+    `runner.credentials`'s docstring for the same rule and rationale); a
+    byte outside that range is refused before any line is parsed.
+    """
     try:
-        details = os.fstat(fd)
-        if not stat.S_ISREG(details.st_mode) or details.st_size > 65536:
-            raise ResearchError("invalid_credential_file")
-        with os.fdopen(fd, "r", closefd=False) as stream:
-            lines = stream.read().splitlines()
-    finally:
-        os.close(fd)
+        with open_verified(path, follow_symlinks=False) as handle:
+            raw = handle.read(MAX_CREDENTIAL_BYTES + 1)
+    except CredentialGuardError as error:
+        raise ResearchError(str(error)) from None
+    if len(raw) > MAX_CREDENTIAL_BYTES:
+        raise ResearchError(REASON_SIZE)
+    # Checked before decoding, never inside a `except UnicodeDecodeError`
+    # handler: that handler's exception carries `.object` (the *entire*
+    # input bytes, secret included) as an attribute, and raising from
+    # inside it -- even with `from None` -- still leaves that exception
+    # reachable via `__context__`, which `from None` does not clear (see
+    # credential_guard's module docstring for the same reasoning applied
+    # to its own exceptions).
+    if not raw.isascii():
+        raise ResearchError(REASON_ENCODING)
+    lines = raw.decode("ascii").splitlines()
     found = {}
     for line in lines:
         name, separator, value = line.strip().removeprefix("export ").partition("=")
