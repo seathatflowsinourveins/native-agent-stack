@@ -991,7 +991,17 @@ class UnitRestartTests(SwitchFixture):
         pid_map_path.write_text(json.dumps({str(root_dir.resolve()): proc.pid for root_dir, proc in self.daemons.items()}))
         self.env = {**self.env, "ECOSYSTEM_SWITCH_SYSTEMCTL": f"{sys.executable} {stub_path}",
                    "STUB_LOG": str(self.stub_log), "STUB_MAIN_PID": str(self.daemons[self.root_v2].pid),
-                   "STUB_PID_MAP": str(pid_map_path)}
+                   "STUB_PID_MAP": str(pid_map_path),
+                   # Minor finding: every test below but the two memory-gate ones (which override
+                   # this key locally to force a refusal) needs a real restart to proceed past the
+                   # memory gate to exercise; without this, they silently depended on the real
+                   # host clearing DEFAULT_MIN_MEMORY_KIB (6 GiB) MemAvailable, which
+                   # ecosystem-bounded-run's cgroup cap does not itself change and a smaller CI
+                   # runner might not clear -- an unrelated failure the acceptance full suite would
+                   # then count as a regression. 0 always passes the gate regardless of real host
+                   # memory, the same way the low-memory tests already force a refusal with a
+                   # locally-overridden huge value.
+                   "ECOSYSTEM_SWITCH_TEST_FORCE_MIN_MEMORY_KIB": "0"}
         self.write_window("default", allowed=("svc",), open_now=True)
         self.write_receipt("R1", "svc", "2.0.0")
 
