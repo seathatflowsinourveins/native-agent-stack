@@ -10537,8 +10537,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "1aa65dd76323d44876e3b7ba904090d409312bfab9f6b929e6d59ad77f26b0e4",
-      "bytes": 18010
+      "sha256": "df2adfc08671cc8af77a111cdcfee05b4247200bb92538d566c468debc32f6a1",
+      "bytes": 19587
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -28434,6 +28434,16 @@
       "path": "evidence/artifacts/source-review-20260923/zouuup-landrun.json",
       "sha256": "6cedfb4eaa10ba3e1680ab769d9259782abcbf177496ca31ed3d9753f2657265",
       "bytes": 2639
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
+      "sha256": "87223c09836afa67a89fb92ed0652815455f9a5f46e02234b769fef778db1953",
+      "bytes": 8553
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "sha256": "8b28bf87f8da27aa5a73e36a4ede1b7707ee4e4b21f31b397f1de1197061897b",
+      "bytes": 51728
     },
     {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",

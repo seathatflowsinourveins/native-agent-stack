@@ -1,0 +1,731 @@
+{
+ "schema_version": 1,
+ "kind": "token_stack_subagent_e2e",
+ "host_id": "nativestack-5975wx-20260925",
+ "recorded_at_utc": "2026-09-25T21:15:10Z",
+ "catalog_revision": "f5812d3f",
+ "question": "Does every selected token-efficiency tool run inside Ultracode workflow subagents on this host, and what do the tools' own counters and an exact tokenizer show?",
+ "method": [
+  "One Sonnet 5 workflow subagent per tool did real work on this repository (disposable worktree at origin/main f5812d3f, or the session project root where a tool is bound to it). It wrote the plain baseline only by shell redirect, read only the tool's output, and ran a deterministic check of its answer against the baseline.",
+  "Upstream lifetime counters (rtk gain, headroom savings, jCodeMunch get_session_stats, Context Mode stats) and ccusage were captured immediately before and after the workflows with tools/token-report/token_manifest.py refresh plus raw copies.",
+  "Each baseline/tool-output pair was compared exactly with token_manifest.py compare (o200k_base via gpt-tokenizer 3.4.0) and recorded in the private token-report ledger.",
+  "Provider consumption of every child comes from examples/claude-native/workflows/child-usage.mjs over the workflow transcripts."
+ ],
+ "evidence_classes": {
+  "subagent_tool_use": "native_proven on this host for tools marked worked_in_subagent (the tool ran inside the subagent; answers checked against the baseline)",
+  "exact_comparisons": "local_integration: exact artifact token counts for one task each; they are not provider-billed savings and must not be summed with upstream estimates",
+  "upstream_counters": "upstream_estimate: each tool's own accounting; RTK is isolated to this run by working directory; other counters are host-wide over the window",
+  "consumption": "provider-returned usage per child (child-usage.mjs)"
+ },
+ "tools": [
+  {
+   "tool": "rtk",
+   "component_id": "rtk",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove, from inside this real Ultracode subagent, that rtk (a) is actually applied by the PreToolUse hook to plain Bash git/grep/ls/test commands run against a disposable worktree R, and (b) shows real measured E2E savings vs raw/upstream output, by building W/tool.txt (rtk-filtered) and W/base.txt (rtk proxy, raw) for 6 commands, answering from tool.txt only, verifying the answer against base.txt with one deterministic PASS/FAIL check (base.txt never read into context), and recording rtk's own n",
+   "answer_excerpt": "Newest commit on R (HEAD, detached at f5812d3f2266399b0c3df3ea76aa6720c7f3e598, origin/main): &quot;Portable Claude profile: no silent fallback to an older model; StructuredOutput fields at the top level (#272)&quot;. Unittest tests.test_host_requests result: &quot;Ran 49 tests in 2.702s&quot; / &quot;OK (skipped=1)&quot;.",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "rtk gain --project --format json (from R): {\"summary\": {\"total_commands\": 28, \"total_input\": 80190, \"total_output\": 35250, \"total_saved\": 44940, \"avg_savings_pct\": 56.04190048634493, \"total_time_ms\": 5934, \"avg_time_ms\": 211}}",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 29986,
+    "baseline_bytes": 111003,
+    "baseline_sha256": "765a3f2e5dc893fb0a95413d583055de47319140a8c760a07ada6c300442ecf5",
+    "tool_output_tokens": 3786,
+    "tool_output_bytes": 13619,
+    "tool_output_sha256": "b8b26c4238e3e8d9d3fbfeba8fe810357ea1269b27597bcc86e98bde8b2ecb07",
+    "tokens_removed": 26200,
+    "reduction_percent": 87.4,
+    "boundary": "Same 6 git/grep/ls/unittest commands in one subagent: rtk proxy raw vs RTK hook output; answer verified against raw (PASS)",
+    "recorded_at": "2026-09-25T21:07:54.382924+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Environment: R = disposable detached worktree at f5812d3f (origin/main); W = <scratch>/e2e/work/rtk (created). rtk binary: ~/.local/share/codex-ecosystem/bin/rtk (on PATH via the required export). R was left clean (git status: clean, no commits, no pushes); nothing in ~/.claude, ~/.codex, systemd, or the main checkout (~/code/native-agent-stack) was touched; no UI/server/daemon was started; no --version on banned tools; ANTHROPIC_BASE_URL not set.\n\n1) Hook applies inside this subagent (the user's core complaint): running the 6 commands as plain Bash (no manual `rtk` prefix) returned rtk-conden"
+    }
+   ]
+  },
+  {
+   "tool": "context-mode",
+   "component_id": "context-mode",
+   "channel": "native MCP tool, schema loaded via ToolSearch(\"select:...ctx_execute_file,...ctx_stats\") then called directly (no Bash/c",
+   "worked_in_subagent": true,
+   "task": "Rerun context-mode's ctx_execute_file against a real, larger repository file that sits under the actual MCP project root (the first attempt had targeted a file under the disposable e2e worktree and was refused with \\\"File access blocked, resolves outside project root\\\"). Target: ~/code/native-agent-stack/docs/grand-catalog-handbook.md (644 lines, 416.1K, read-only/detached checkout). Code must print only: (1) count of lines starting with \\\"## \\\", (2) the first 10 such headings, (3) count of line",
+   "answer_excerpt": "grand-catalog-handbook.md has 10 lines starting with \\\"## \\\" (all 10 fall within the requested first-10 window):\\n1. ## What qualifies a selection\\n2. ## Foundation selection by layer\\n3. ## Runtime workers, SDKs and research applications\\n4. ## Memory selection and the strongest relevant challengers\\n5. ## Setting up a new machine\\n6. ## Foundation to the north star\\n7. ## Hardware profiles\\n8. #",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "BEFORE (ctx_stats, called immediately before ctx_execute_file): this-chat scope = 5.0 MB kept out of context, 1,000 captures, conversation \\\"started 24 Sep 2026 22:14, 19 hr alive\\\"; With-context-mode 212 KB / 54.3K tokens vs Without 2.6 MB / 691.4K tokens (92.1% kept out); all-projects scope = 14.9 MB kept out, 8,242 captures across 110 projects; headline \\\"$29.48 of Opus 4.7 tokens your team didn't burn ... ~$53,799/year\\\" for a 10-dev team.\\n\\nAFTER (ctx_stats, called immediately after ctx_ex",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 97952,
+    "baseline_bytes": 426080,
+    "baseline_sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
+    "tool_output_tokens": 204,
+    "tool_output_bytes": 831,
+    "tool_output_sha256": "7669b5e82c5db6e930a03870011b3af19fb294e36ee4cc0d104f4f7e5dfa0f6b",
+    "tokens_removed": 97748,
+    "reduction_percent": 99.8,
+    "boundary": "416 KB handbook: full file vs ctx_execute_file printed summary (heading count, first 10 headings, token-line count); verified against the file (PASS)",
+    "recorded_at": "2026-09-25T21:15:10.175988+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": false,
+     "notes_excerpt": "Baseline W/base.txt was produced only via `cp` + metadata commands (ls -la, wc -lc) \u2014 2,321 lines / 426,080 bytes (~416.1K), matching the task's stated size \u2014 and its content was never read into this context, independent of the tool's failure. Quality-check command (deterministic, one-liner): `grep -q '^H2_COUNT=' W/tool.txt && echo PASS || echo FAIL` \u2192 printed FAIL, correctly reflecting that the saved tool output contains only the sandbox-rejection error, not the expected 'H2_COUNT=' success marker \u2014 i.e. the check honestly confirms there is no tool-derived answer to validate, rather than fab"
+    },
+    {
+     "attempt": 2,
+     "worked": true,
+     "change": "Rerun context-mode's ctx_execute_file against a real, larger repository file that sits under the actual MCP project root (the first attempt had targeted a file under the disposable e2e worktree and was refused with \\\"File access blocked, resolves outside project root\\\"). Target: ~/code/native-agent-stack/docs/grand-catalog-handbook.md (644 lines, 416.1K, read-only/detached checkout). Code must pri"
+    }
+   ]
+  },
+  {
+   "tool": "headroom",
+   "component_id": "headroom",
+   "channel": "mcporter bridge in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove headroom's MCP compress/retrieve round-trip works end-to-end inside this subagent, using only the tool's own returned output in context (baseline captured via shell redirect only), and report compressed-vs-original size plus retrieve exactness with a deterministic PASS/FAIL check against the saved baseline.",
+   "answer_excerpt": "Headroom 0.37.0 has no `compress` CLI subcommand (confirmed: `headroom --help` lists agent-savings, audit-reads, capture, copilot-auth, dashboard, deploy, diff, doctor, evals, init, inspect, install, learn, loc, mcp, memory, output-savings, perf, proxy, recover, rollout, savings, sg, tools, unwrap, update, wrap \u2014 no compress). Used its MCP server through the MCPorter bridge instead, per the task.\n",
+   "quality_check": {
+    "passed": true,
+    "output": "base_bytes=891615\ncompressed_bytes=215267\nretrieved_bytes=891615\nbase_sha256=82e"
+   },
+   "upstream_stats_reported_by_worker": "headroom savings --json (saved to W/savings.json): {\"schema_version\":1,\"top_model\":\"unknown\",\"lifetime\":{\"tokens_saved\":188001,\"tokens_before\":241926,\"cost_usd\":0.564003,\"calls\":2,\"savings_percent\":77.7},\"windows\":{\"today\":{\"tokens_saved\":183904,\"tokens_before\":237698,\"cost_usd\":0.551712,\"calls\":1,\"savings_percent\":77.4},\"last_7_days\":{\"tokens_saved\":188001,\"tokens_before\":241926,\"cost_usd\":0.564003,\"calls\":2,\"savings_percent\":77.7},\"last_30_days\":{\"tokens_saved\":188001,\"tokens_before\":241926,\"c",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 237691,
+    "baseline_bytes": 891615,
+    "baseline_sha256": "82e9249222bafd5daee41ee74840a92d2a00feabd70f4e1149adb21a600d630b",
+    "tool_output_tokens": 56939,
+    "tool_output_bytes": 219709,
+    "tool_output_sha256": "28ad0a1d037d08724e309940365e57c25e2aa0d1627d067d195560e6181aeaab",
+    "tokens_removed": 180752,
+    "reduction_percent": 76.0,
+    "boundary": "git log --stat -150 output vs headroom_compress response; headroom_retrieve returned byte-identical original (PASS)",
+    "recorded_at": "2026-09-25T21:07:55.683019+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Files left in W (all under the given scratchpad, nothing under ~/.claude, ~/.codex, or the main checkout): base.txt (891615B, baseline via redirect only), tool.txt (headroom_compress raw JSON response, byte-exact copy of mcporter's stdout), retrieve.txt (headroom_retrieve raw JSON response, byte-exact copy), savings.json, quality_check.py. R (the detached worktree) was left clean: no edits, no commits, HEAD unchanged at f5812d3f2266399b0c3df3ea76aa6720c7f3e598. Observed (not caused by this run): an unrelated `mcporter daemon start --foreground` process for an OLDER mcporter build (0.13.13) was"
+    }
+   ]
+  },
+  {
+   "tool": "jcodemunch",
+   "component_id": "jcodemunch-mcp",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove jcodemunch MCP works end-to-end inside this subagent on real repo code: index only R/scripts, search_symbols for \"register_file\", retrieve its source with get_symbol_source, verify the returned source against a shell-redirected baseline (cat of host_receipts.py, never read into context), capture get_session_stats, then invalidate the scratch folder's index.",
+   "answer_excerpt": "register_file(root: Path, relative_path: str) -> None is defined in scripts/host_receipts.py, lines 643-660 (end_line=660). It updates relative_path's entry in manifests/evidence.json's files[] list: hashes the target file (safe_file + read_bytes + sha256), builds a {path, sha256, bytes} record, and either overwrites the existing entry for that path or inserts the new record at its sorted (bisect.",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "{\"session_tokens_saved\":23643,\"session_calls\":4,\"session_duration_s\":21915.7,\"session_response_tokens\":2533,\"total_tokens_saved\":23643,\"total_tokens_saved_basis\":{\"generation\":2,\"first_generation\":2,\"mixed_basis\":false},\"lifetime_by_tool\":{\"get_file_tree\":68,\"get_symbol_source\":23575,\"search_symbols\":0},\"lifetime_by_tool_since\":\"2026-09-25\",\"lifetime_unattributed\":0,\"tool_calls\":{\"get_file_tree\":1,\"get_symbol_source\":2,\"search_symbols\":1},\"savings_per_call\":5910.8,\"result_cache\":{\"total_hits\":0,",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 22043,
+    "baseline_bytes": 95432,
+    "baseline_sha256": "90cfe1316bcb2ead4c9bad46b2636341b88cb3b6d38cb1bd8b6364bae22fd20a",
+    "tool_output_tokens": 443,
+    "tool_output_bytes": 1812,
+    "tool_output_sha256": "ef48ea2058acd7fe05d0623c29d97f7395a8f339c330dc8a8d3a2150284a6a85",
+    "tokens_removed": 21600,
+    "reduction_percent": 98.0,
+    "boundary": "Locate register_file source: whole scripts/host_receipts.py vs jCodeMunch get_symbol_source; answer verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:54.668956+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Tool worked end-to-end, no substitution needed. Compliance: baseline was produced only via shell redirect (cat ... > base.txt) and was never Read/cat'd to stdout, so it never entered my context; only wc -l/-c and ls metadata (line/byte counts) were printed. tool.txt holds the exact MCP get_symbol_source JSON, saved via a quoted heredoc from the text already in context (not re-read afterward). No forbidden long-running process, UI, --version probe, or ANTHROPIC_BASE_URL was used; nothing outside R/scripts and W was touched; no commit made; no credentials involved. Cleanup done: invalidate_cache"
+    }
+   ]
+  },
+  {
+   "tool": "qmd",
+   "component_id": "qmd",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove qmd works end-to-end inside this subagent against the real native-agent-stack-catalog qmd index: list collections, search \"release tag re-pin new machine\" in the foundation/adoption-equivalent collection, get the top result, answer which document says how a new machine pins a release and the step, and verify the answer deterministically against a shell-redirected baseline of the full document.",
+   "answer_excerpt": "Document: catalogs/us-equities/engines-strategies.md (qmd URI qmd://us-equities-catalog/engines-strategies.md, collection \"us-equities-catalog\").\n\nThe step: the doc's \"Current selection, reconciled September 22\" paragraph (lines 5-8, returned verbatim by `qmd get`) states that the runtime target \u2014 catalogs/us-equities/runtime-target.json, which this markdown narrates \u2014 selects NautilusTrader relea",
+   "quality_check": {
+    "passed": true,
+    "output": "base has tag: True | base has commit: True | base mentions runtime-target.json: "
+   },
+   "upstream_stats_reported_by_worker": "qmd status: Index ~/.cache/qmd/native-agent-stack-catalog.sqlite, 3.9MB; Documents 121 total indexed, 0 vectors embedded / 121 pending embedding (BM25-only, no reranking active); Collections: us-equities-catalog 22 files (catalogs/us-equities, updated 14h ago), us-equities-foundation 99 files (blueprints/us-equities, updated 34m ago). Search scores from this session: \"release tag\" -c us-equities-catalog top=77% (source-followup.md); \"runtime-target\" -c us-equities-catalog top=77% (engines-strate",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 5756,
+    "baseline_bytes": 25459,
+    "baseline_sha256": "74d4c7f385b6de7ff9f9011647b87eed6c7c3a2a24334732875dc0d4a227277b",
+    "tool_output_tokens": 901,
+    "tool_output_bytes": 3456,
+    "tool_output_sha256": "3da7c188f57f3de53921cf5ca0be84f81d7a0125f1f427bd781fcb54be518c24",
+    "tokens_removed": 4855,
+    "reduction_percent": 84.3,
+    "boundary": "Find the release re-pin step: full document vs QMD BM25 search+get; answer verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:55.224527+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Environment: real qmd binary at ~/.local/share/codex-ecosystem/bin/qmd, hitting a pre-built persistent index (~/.cache/qmd/native-agent-stack-catalog.sqlite, 3.9MB, 121 markdown files, 0 embedded/BM25-only) that indexes ~/code/native-agent-stack-live (a separate live checkout), not R itself -- R (the origin/main f5812d3f worktree) was used only to produce the baseline cat, and file contents matched (same byte layout: 179 lines / 25,459 bytes for engines-strategies.md in both). All qmd calls were read-only (collection list/show, search, get, status, --help), bounded by `timeout`, stdin from /de"
+    }
+   ]
+  },
+  {
+   "tool": "serena",
+   "component_id": "serena",
+   "channel": "mcp",
+   "worked_in_subagent": true,
+   "task": "Rerun: prove Serena (bound to session project ~/code/native-agent-stack via --project-from-cwd, no project switch) works inside this subagent by running find_symbol(register_file, with body) and find_referencing_symbols(register_file) against that bound project, then deterministically quality-check the definition line and referencing-call-site count against a grep/cat baseline.",
+   "answer_excerpt": "register_file is defined in scripts/host_receipts.py at lines 515-532 (18-line function body; Serena reports 0-indexed start_line=514/end_line=531, which is 515-532 in conventional 1-indexed file:line notation matching grep -n).\n\nfind_referencing_symbols (name_path=\"register_file\", relative_path=\"scripts/host_receipts.py\") returned 14 referencing call sites across 6 files:\n- scripts/component_matr",
+   "quality_check": {
+    "passed": true,
+    "output": "baseline definition : scripts/host_receipts.py:515\nexpected definition : scripts"
+   },
+   "upstream_stats_reported_by_worker": "baseline (cat+grep -rn) matched 18 register_file lines in scripts+tests (1 def + 17 text refs); Serena find_symbol returned 1 definition (18-line body, 515-532); find_referencing_symbols returned 14 call sites across 6 files (12 invocations + 2 imports), all 14 confirmed byte-identical against the baseline at their exact 1-indexed line; the baseline's remaining 4 matches are a comment at host_receipts.py:492, a comment and a docstring in test_host_receipts.py, and one string-literal mock.patch.o",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 17723,
+    "baseline_bytes": 77339,
+    "baseline_sha256": "d6dae426339dc8cb32b1772d0a5e8d190531a0169273c9312948d0b6650f2ee5",
+    "tool_output_tokens": 1752,
+    "tool_output_bytes": 6452,
+    "tool_output_sha256": "fd89f401d9fc492e689eaa2a3d1d88e4c333b14249b5a66cd55546453645c3ff",
+    "tokens_removed": 15971,
+    "reduction_percent": 90.1,
+    "boundary": "Locate register_file definition and callers: whole file + grep vs Serena find_symbol/find_referencing_symbols; verified (PASS)",
+    "recorded_at": "2026-09-25T21:15:10.443083+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": false,
+     "notes_excerpt": "worked=false reflects the specific capability requested (bind Serena to the subagent's disposable worktree R and get a verified answer for it), not Serena's find_symbol/find_referencing_symbols mechanics in isolation, which executed cleanly and returned well-formed, correctly-shaped results for whatever project was bound. Root cause is a session-wiring/deployment gap (this MCP endpoint exposes no activate_project/switch-project tool and comes pre-bound to the shared main checkout) rather than a bug in Serena's core LSP-backed search. Recommendation for the parent workflow: either launch a per-"
+    },
+    {
+     "attempt": 2,
+     "worked": true,
+     "change": "Rerun: prove Serena (bound to session project ~/code/native-agent-stack via --project-from-cwd, no project switch) works inside this subagent by running find_symbol(register_file, with body) and find_referencing_symbols(register_file) against that bound project, then deterministically quality-check the definition line and referencing-call-site count against a grep/cat baseline."
+    }
+   ]
+  },
+  {
+   "tool": "socraticode",
+   "component_id": "socraticode",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Using SocratiCode MCP codebase_search against the already-indexed projectPath ~/code/native-agent-stack-live, answer how the host request lane decides GitHub-request trust, naming the author_association and user.type conditions; verify against a shell-redirected baseline never read into context.",
+   "answer_excerpt": "How the host request lane (scripts/host_requests.py::trust(), in native-agent-stack-live) decides a GitHub item (issue/PR/comment) is trusted -- fails closed on any missing field, nothing else (labels/title/body/requesting-host) grants trust:\n\n1. author_association condition: item[\"author_association\"] must equal exactly \"OWNER\" (`item.get(\"author_association\") != \"OWNER\"` is a failure reason othe",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "codebase_status: Status green, Collection codebase_9c518b2ee5c8, Indexed chunks 69926, Code graph 975 files / 408 edges (last built 1056s ago), file watcher active (pre-existing, not started by this run). codebase_search: 10 matches returned, top match scripts/host_requests.py:trust() at RRF score 0.8333.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 16096,
+    "baseline_bytes": 66308,
+    "baseline_sha256": "9402b47b5ddaad9eb58187474d8b8d8c78e62f4395e2a5bac7869a247590c80a",
+    "tool_output_tokens": 4832,
+    "tool_output_bytes": 19368,
+    "tool_output_sha256": "b208e8e779b25accf032a15d3bd105c7b547bfbba93c5c24e573133fcd5c44b6",
+    "tokens_removed": 11264,
+    "reduction_percent": 70.0,
+    "boundary": "Explain host-request trust rule: host_requests.py + recipe vs SocratiCode codebase_search chunks; answer verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:54.952051+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Tool worked end-to-end with no substitution needed. Never read base.txt or the source files into context -- baseline was produced purely by shell redirect (cat ... > base.txt), and only its byte/line counts (66308 bytes / 1263 lines) were observed via wc, never its content. Only the MCP tool's own returned text entered context and was saved verbatim to tool.txt (19368 bytes / 328 lines) via a single-quoted heredoc (no shell expansion of the $/`` in the returned markdown/code). Quality check greps base.txt for the two literal source lines underlying the author_association and user.type conditio"
+    }
+   ]
+  },
+  {
+   "tool": "ai-memory",
+   "component_id": "ai-memory",
+   "channel": "native MCP in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove the ai-memory MCP tool works inside an Ultracode subagent on real repo work: load its deferred schema via ToolSearch, call memory_status and memory_query (workspace=\"local\", project=\"native-agent-stack\", query=\"workstation host request lane GitHub\") against the running server (reported v2.4.0), save only the tool-returned text to W/tool.txt (heredoc, never read into context beforehand), leave W/base.txt empty per instructions (no savings counter exists for this tool), then answer from tool",
+   "answer_excerpt": "Yes: memory_query returned 10 relevant hits (workspace=local, project=native-agent-stack, query=\"workstation host request lane GitHub\") \u2014 top matches directly hit the query terms, e.g. decisions/workstation-sota-refresh-20260925.md (\"...host nativestack-5975wx-20260925, at the user's request to move the workstation lane's...\"), decisions/nativestack-host-layout-20260925.md (\"NativeStack host layou",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS base_empty=True hits=10 scope_keys=['project', 'resolved_by', 'workspace']"
+   },
+   "upstream_stats_reported_by_worker": "memory_status counts (the tool's own stats call, workspace=local project=native-agent-stack): {\"pages_latest\": 33, \"pages_all\": 38, \"sessions\": 35, \"observations\": 78577, \"evidence_rows\": 0}. No token/savings counter exists on this tool, so W/base.txt was left empty per task instructions rather than populated with a raw baseline read.",
+   "exact_comparison": null,
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Ran entirely inside the detached worktree e2e-root (HEAD f5812d3f, clean) via ToolSearch-loaded native MCP calls, never Bash/CLI or an mcporter bridge. No UI or long-lived server was launched, no commits were made, and the main checkout/~/.claude/~/.codex were untouched. Retrieved memory content (all query hits, e.g. past decision/session notes) was treated strictly as untrusted historical data per ai-memory's own server instructions and the task note \u2014 nothing in it was executed or followed as an instruction, only saved verbatim and summarized. tool.txt contains both calls' exact JSON (status"
+    }
+   ]
+  },
+  {
+   "tool": "repomix",
+   "component_id": "repomix",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Pack R/scripts/host_requests.py and R/scripts/credential_status.py with repomix (--include, --compress, --style xml, --output W/tool.txt), read only tool.txt, answer the top-level function names in host_requests.py, and verify each against a shell-redirected baseline (W/base.txt) never read into context.",
+   "answer_excerpt": "Top-level (module-scope) function names in scripts/host_requests.py, as seen in the repomix --compress packed XML output (47 total; class methods `Gh.__init__`, `Gh.endpoint`, `Gh.argv`, `Gh.call`, `Gh.pages` and `NoRedirect.redirect_request` were excluded because they immediately follow a `class` line and take `self`):\n\nclean, iso, parse_time, human_age, private_findings, load_roles, role_spec, r",
+   "quality_check": {
+    "passed": true,
+    "output": "count=47 PASS"
+   },
+   "upstream_stats_reported_by_worker": "repomix Pack Summary (its own printed stats, not derived by me): Total Files: 2; Total Tokens: 8,799; Total Chars: 33,331. Per-file: scripts/host_requests.py = 5,857 tokens / 21,868 chars (66.6%); scripts/credential_status.py = 2,479 tokens / 9,226 chars (28.2%). Security Check: no suspicious files detected. On-disk sizes: tool.txt (packed XML) = 33,873 bytes vs base.txt (raw cat of both files) = 74,397 bytes.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 17935,
+    "baseline_bytes": 74397,
+    "baseline_sha256": "4b53362a04333583e93864d929e5b102faa893f72b3e4d75104413625f1d3aa8",
+    "tool_output_tokens": 8799,
+    "tool_output_bytes": 33873,
+    "tool_output_sha256": "0ca00c22b6be706bb1356ee0bcefe09276d9f107162efd4816d12ba1383ed57e",
+    "tokens_removed": 9136,
+    "reduction_percent": 50.9,
+    "boundary": "Two scripts raw vs repomix --compress XML; all 47 function names verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:55.978224+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Never read base.txt (baseline) into context: it exists on disk only, produced by shell redirect, and consumed only inside the python3 quality-check subprocess whose sole stdout was \"count=47 PASS\". Everything the answer is built from came from W/tool.txt (33,873 bytes), against a raw baseline of 74,397 bytes for the same two files (54.5% smaller, consistent with repomix's own reported 8,799 packed tokens for the pair). repomix succeeded fully; no fallback/substitution was needed. No UI or long-lived process was started; the only external command (repomix) ran under `timeout` with stdin from /d"
+    }
+   ]
+  },
+  {
+   "tool": "toon",
+   "component_id": "toon",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove the toon CLI (encode JSON->TOON with --stats, then strict decode TOON->JSON) works end-to-end inside this subagent on a real tabular array pulled from the native-agent-stack repo, with only toon's own output entering context and a deterministic PASS/FAIL check against a redirect-only baseline.",
+   "answer_excerpt": "Row count: 60. Strict round trip: exact (PASS).\n\nDetail: The largest array of flat objects in R/catalogs/landscape/component-evidence-matrix.json is at JSON path $.summary.needs_host.macos-arm64 \u2014 60 rows x 4 columns (catalog, component_id, e2e_state, layer_id), the largest of 80 candidate flat-object arrays found (next largest was 20 rows). This is corroborated by the TOON artifact's own header l",
+   "quality_check": {
+    "passed": true,
+    "output": "BASE_ROWS 60\nROUNDTRIP_ROWS 60\nPASS"
+   },
+   "upstream_stats_reported_by_worker": "toon --stats: Token estimates: ~2001 (JSON) -> ~964 (TOON); Saved ~1037 tokens (-51.8%)",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 1642,
+    "baseline_bytes": 6552,
+    "baseline_sha256": "6899e551b2bea3918b47cba1b41e27e59d8f5cb12a681f98cc77f73d66a2a2c1",
+    "tool_output_tokens": 907,
+    "tool_output_bytes": 3248,
+    "tool_output_sha256": "a14e3fceed3744b56754524522a63f6b9332543a849a26229464132738ff2aeb",
+    "tokens_removed": 735,
+    "reduction_percent": 44.8,
+    "boundary": "60-row tabular JSON (compact) vs TOON; strict decode round trip exact (PASS)",
+    "recorded_at": "2026-09-25T21:07:56.255414+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "toon v4.1.1 (@toon-format/cli) resolved via PATH at $HOME/.local/share/codex-ecosystem/bin/toon. Used exactly the two toon invocations given in the task (`toon base.txt --stats -o tool.txt`, then `toon tool.txt --decode --strict -o roundtrip.json`); no substitute tool needed. Only tool.txt (the TOON artifact toon produced, 61 lines / 3248 bytes) and tool_stats.txt (toon's own printed --stats line) were read into this session's context; base.txt (the compact-JSON baseline, 6552 bytes) was produced purely by a shell redirect from a Python extraction script and was never read directly -- it was o"
+    }
+   ]
+  },
+  {
+   "tool": "ast-grep",
+   "component_id": "ast-grep",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove ast-grep works end-to-end inside this subagent on real repo work: use `ast-grep run --lang python --pattern 'subprocess.run($$$ARGS)' scripts/ --json=compact` to find every subprocess.run call in R/scripts/*.py, save tool output to W/tool.txt (redirect only), build an independent baseline (cat of matching files) into W/base.txt (redirect only, never read), answer call-count+files from the tool output alone, then run one deterministic PASS/FAIL quality check against the baseline.",
+   "answer_excerpt": "ast-grep found 18 subprocess.run() calls across 10 files in R/scripts/*.py (27 .py files scanned total):\n  scripts/adoption_status.py: 1\n  scripts/build_ecosystem.py: 1\n  scripts/credential_status.py: 1\n  scripts/freshness_propose.py: 3\n  scripts/hardware_profile.py: 1\n  scripts/host_receipts.py: 3\n  scripts/release_due.py: 1\n  scripts/saturation_ledger.py: 3\n  scripts/validate.py: 2\n  scripts/ver",
+   "quality_check": {
+    "passed": true,
+    "output": "tool_total=18 base_total=18 files_match=True\nPASS\n---\nbase.txt_matching_lines=18"
+   },
+   "upstream_stats_reported_by_worker": "",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 105877,
+    "baseline_bytes": 459520,
+    "baseline_sha256": "aabe6ebce1acfb94eb5bd878d63acd695b69c16de2c95a3232f34cfdbbc444d0",
+    "tool_output_tokens": 10293,
+    "tool_output_bytes": 34822,
+    "tool_output_sha256": "89e8955e9b21318ba5461dd7ca951c7536fe8ce583c026534b6567475487f3cb",
+    "tokens_removed": 95584,
+    "reduction_percent": 90.3,
+    "boundary": "Find subprocess.run calls: the 10 files vs ast-grep structural matches; 18 calls verified by grep (PASS)",
+    "recorded_at": "2026-09-25T21:07:56.582503+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Operational finding worth flagging upstream: the repo's PreToolUse hook scripts/hooks/secret_path_guard.py blocked my first quality-check command with reason \"environment_dump\". Root cause (confirmed by reading the hook, not modified): its tokenizer replaces every newline with ';' and always treats a bare '(' or ')' as a segment boundary, even outside shell context. My heredoc'd Python used set(x) - set(y); the '(' right after `set` turned that call into a lone one-word segment [\"set\"], which the heuristic reads as the bash builtin `set` (no args) = a full environment dump. This is a false pos"
+    }
+   ]
+  },
+  {
+   "tool": "codebase-memory",
+   "component_id": "codebase-memory-mcp",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Using codebase-memory-mcp's CLI inside R (a detached worktree of native-agent-stack @ f5812d3f), index R, then use search_graph/get_file_outline/trace_path to find the real callers of register_file (scripts/host_receipts.py), saving all tool output to W/tool.txt, producing a grep+cat baseline via shell redirect only (W/base.txt, never read into context), and running one deterministic PASS/FAIL check of the tool-derived answer against that baseline.",
+   "answer_excerpt": "TASK: find callers of register_file using codebase-memory-mcp (CLI), cross-checked against an independent grep+cat baseline, inside R = <scratch>/e2e-root (detached worktree @ f5812d3f).\n\nWHAT THE TOOL FOUND (from its own output only \u2014 I never read scripts/ or tests/ source myself):\nregister_file is defined at scripts/host_receipts.py:643-660 (Function node, confirmed via get_file_outline).\n\ntrace",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS direct-hop1 files corroborated by grep baseline + def-line=643; indirect-ho"
+   },
+   "upstream_stats_reported_by_worker": "index_repository(mode=fast, superseded): nodes=140263 edges=224736 excluded_dirs_count=19 (scripts/ among them, only 5 examples shown). index_repository(mode=full, used for the answer): nodes=145573 edges=242627 excluded_dirs=4 (.claude, tests/__pycache__, scripts/__pycache__, blueprints/gap-wave2-20260923/us-equities__portfolio-risk/vendored) parse_partial_count=11 parse_unusable_count=0 not_indexed_files_count=48. get_file_outline(scripts/host_receipts.py): 102 symbols, register_file=Function ",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 22445,
+    "baseline_bytes": 97133,
+    "baseline_sha256": "de2c5e56b1e372261c364f269ac572998dc83a418b742e9e8cc4c5202269f5c0",
+    "tool_output_tokens": 19635,
+    "tool_output_bytes": 56866,
+    "tool_output_sha256": "80806644fcd7d35933a6f5c972195f848ad701cd759a9f729d5d25ee8e8f899b",
+    "tokens_removed": 2810,
+    "reduction_percent": 12.5,
+    "boundary": "Find register_file callers: grep+source file vs codebase-memory graph search; verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:56.876682+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "codebase-memory-mcp 0.11.0. Did not modify ~/.claude, ~/.codex, systemd units, running services, or the main checkout; no commits made; no long-running process started (every external call wrapped in `timeout ... </dev/null`, no --ui, no install/inspector/dashboard commands run). No credentials touched. Two genuine tool rough edges worth carrying forward for future E2E runs of this tool: (1) mode=\"fast\"/\"moderate\" can silently drop a whole non-hidden, tracked source directory from the graph with no error surfaced at query time \u2014 always confirm a target path with check_index_coverage before tru"
+    }
+   ]
+  },
+  {
+   "tool": "context-hub",
+   "component_id": "context-hub",
+   "channel": "Bash-invoked CLI (`chub search`, `chub get`); baseline via `curl -sL`",
+   "worked_in_subagent": true,
+   "task": "Rerun the context-hub (chub) token-efficiency proof with content the curated registry actually has (prior attempt: \"Anthropic prompt caching\" returned nothing). Run `chub --help`, search 2-3 likely topics, `chub get` one returned doc into W/tool.txt, fetch its cited/canonical upstream page raw via curl into W/base.txt (shell-redirect only, never read into context), answer one concrete factual question from the tool output, run one deterministic PASS/FAIL quality-check command comparing the answe",
+   "answer_excerpt": "CONCRETE QUESTION ASKED: \"According to the chub `uvicorn/package` doc, what CLI flag did Uvicorn add in version 0.41.0 for staggered worker recycling?\"\nANSWER (read from chub's tool output, W/tool.txt): `--limit-max-requests-jitter`\n  Exact source line in the doc: \"`0.41.0` adds `--limit-max-requests-jitter` for staggered worker recycling.\"\n\nQUALITY-CHECK RESULT: PASS \u2014 the string \"limit-max-reque",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "tool.txt (chub curated doc) = 7,842 bytes vs base.txt (raw upstream release-notes HTML, https://uvicorn.dev/release-notes/, HTTP 200) = 211,569 bytes \u2014 chub's doc is ~27x smaller than the single upstream page needed to verify just one fact from it.",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 70903,
+    "baseline_bytes": 211569,
+    "baseline_sha256": "90ec63e4c1d2aea1c03f16e8ed787c23b4db1e035ba36afe9c66e3eed14d21fd",
+    "tool_output_tokens": 2073,
+    "tool_output_bytes": 7842,
+    "tool_output_sha256": "972bcb01e43e2078bde73d34128a7cbbabdf0779d5b55aaeb68e14ddf24c98b7",
+    "tokens_removed": 68830,
+    "reduction_percent": 97.1,
+    "boundary": "Uvicorn --limit-max-requests-jitter fact: upstream page vs chub get doc; verified in upstream (PASS)",
+    "recorded_at": "2026-09-25T21:15:10.746901+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": false,
+     "notes_excerpt": "Every command above was actually run with the full required prefix (cd \"R\" && export MCP_AUTO_OPEN_ENABLED=false BROWSER=true PATH=\"$HOME/.local/share/codex-ecosystem/bin:$PATH\" &&); abbreviated to \"<prefix> &&\" here only to keep this array readable. No credentials touched; R (the detached worktree) verified clean via `git status --porcelain` at the end (nothing modified, nothing committed); no UI/server/daemon was launched (only chub search/get/cache, curl, python3 -c, git \u2014 all short-lived, every external call wrapped in `timeout` with stdin </dev/null); ~/.claude, ~/.codex, systemd units an"
+    },
+    {
+     "attempt": 2,
+     "worked": true,
+     "change": "Rerun the context-hub (chub) token-efficiency proof with content the curated registry actually has (prior attempt: \"Anthropic prompt caching\" returned nothing). Run `chub --help`, search 2-3 likely topics, `chub get` one returned doc into W/tool.txt, fetch its cited/canonical upstream page raw via curl into W/base.txt (shell-redirect only, never read into context), answer one concrete factual ques"
+    }
+   ]
+  },
+  {
+   "tool": "markitdown",
+   "component_id": "markitdown",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove markitdown works E2E inside an Ultracode subagent on real repository work: fetch the live Claude Code MCP docs page as an HTML baseline via curl (redirect-only, never read into context), convert it to Markdown with markitdown, answer a factual question (the three MCP installation scopes) from ONLY the tool's Markdown output, then run one deterministic PASS/FAIL check verifying that answer against the untouched HTML baseline.",
+   "answer_excerpt": "The official Claude Code MCP docs page (https://code.claude.com/docs/en/mcp, section \"MCP installation scopes\") names exactly three scopes, in this order:\n\n1. Local scope \u2014 loads only in the current project, NOT shared with the team, stored in `~/.claude.json` (this is the default scope; `claude mcp add ...` with no `--scope` flag uses it).\n2. Project scope \u2014 loads only in the current project, IS ",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "",
+   "exact_comparison": {
+    "encoding": "o200k_base",
+    "baseline_tokens": 503230,
+    "baseline_bytes": 1497768,
+    "baseline_sha256": "e01bad2dbad27c89d93ae4e4f680745fc5709bda660737201736dd6dc9f8d440",
+    "tool_output_tokens": 28934,
+    "tool_output_bytes": 123604,
+    "tool_output_sha256": "2f04cd00fdade69186210e31dc0f838e84d14408a4dcef8594f8966228bca417",
+    "tokens_removed": 474296,
+    "reduction_percent": 94.3,
+    "boundary": "Claude Code MCP docs page: HTML vs MarkItDown Markdown; three scopes verified (PASS)",
+    "recorded_at": "2026-09-25T21:07:57.380157+00:00"
+   },
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Verdict: markitdown WORKED end-to-end as a real token-efficiency tool, but only after a documented gotcha.\n\nExtension gotcha (the task predicted this and it happened): markitdown 0.1.8's format detection keys off the file extension. Run on the raw `W/base.txt` (curl's literal .txt extension) it exited 0 but silently no-op'd - output was 1,497,758 bytes (10 fewer than the 1,497,768-byte input) and still contained 14 `<script>` tags and a `<!DOCTYPE>`, i.e. it passed the HTML through nearly untouched rather than converting it. Copying (not moving, so the curl artifact at base.txt stays pristine)"
+    }
+   ]
+  },
+  {
+   "tool": "agentsview",
+   "component_id": "agentsview",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove agentsview (CLI, no web UI) works inside this Ultracode subagent on real repo work: run `sync` then `projects` and `health` (checking --help for JSON/since filters), and confirm whether today's Claude Code sessions for the native-agent-stack project \u2014 including workflow subagent sessions \u2014 are observed by it. Never run serve/daemon; nothing may outlive the command.",
+   "answer_excerpt": "YES \u2014 agentsview observes today's (2026-09-25) Claude Code sessions for this project, including workflow-subagent sessions.\n\nEvidence: `agentsview session list --project native_agent_stack --agent claude --date 2026-09-25 --include-children --json --limit 500` returned 500 sessions (hit the --limit cap, so the true total is \u2265500): 9 top-level sessions and 491 carrying `\"relationship_type\":\"subagen",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS"
+   },
+   "upstream_stats_reported_by_worker": "",
+   "exact_comparison": null,
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Full raw outputs (sync, projects --json, health --json, session list --json, plus the derived python summary) are concatenated at W/tool.txt (~1.0MB / 3457 lines) with '### command:' section headers; per-command raw files (sync-out.txt, projects.json, health.json, session-list-today.json, analysis-summary.txt, help-*.txt) remain individually in W for a full recovery path. base.txt was left empty per the task's explicit 'baseline empty' instruction: this task is a live capability confirmation (does the tool observe today's/subagent sessions), not a content-retrieval task with a natural 'full ra"
+    }
+   ]
+  },
+  {
+   "tool": "otel-tui",
+   "component_id": "otel-tui",
+   "channel": "CLI in this subagent",
+   "worked_in_subagent": true,
+   "task": "Prove, inside a subagent, that otel-tui (an interactive terminal-UI OTLP receiver) can run headless on custom ports and actually receive/render a real OTLP span, without ever binding the shared ecosystem collector's default OTLP ports 4317/4318.",
+   "answer_excerpt": "otel-tui (at ~/.local/share/codex-ecosystem/bin/otel-tui) DOES support running headless on custom, non-default OTLP ports. `otel-tui --help` shows `--http int` (default 4318) and `--grpc int` (default 4317), so 4317/4318 were never touched \u2014 the test used 58318 (http) / 58317 (grpc) instead (note: 24317/24318 were tried first but were already bound by another concurrent process on this shared host",
+   "quality_check": {
+    "passed": true,
+    "output": "PASS | base_empty=True span_in_tty=True trace_in_tty=True curl_200=True"
+   },
+   "upstream_stats_reported_by_worker": "",
+   "exact_comparison": null,
+   "attempts": [
+    {
+     "attempt": 1,
+     "worked": true,
+     "notes_excerpt": "Two harness pitfalls hit and fixed during this run, noted for RTK/Ultracode awareness: (1) chaining a backgrounded command with `&&`-joined setup before it (`cd ... && export ... && cmd &`) backgrounds the WHOLE preceding chain as one subshell in bash, silently losing all those variable/cd assignments in the foreground shell \u2014 fixed by grouping setup and the single background launch inside `{ ...; }` with `;`/newline separators, keeping only the one `cmd &` bare. (2) `pkill/pgrep -f <pattern>` scans every process's full cmdline including the invoking `bash -c \"<this whole script>\"` wrapper, wh"
+    }
+   ]
+  }
+ ],
+ "counters": {
+  "window_utc": [
+   "2026-09-25T20:47:07Z",
+   "2026-09-25T21:15:10Z"
+  ],
+  "rtk_version": "rtk 0.50.0",
+  "rtk_gain_e2e_worktree_only": {
+   "before": {
+    "total_commands": 0,
+    "total_input": 0,
+    "total_output": 0,
+    "total_saved": 0,
+    "avg_savings_pct": 0.0,
+    "total_time_ms": 0,
+    "avg_time_ms": 0
+   },
+   "after": {
+    "total_commands": 89,
+    "total_input": 95366,
+    "total_output": 38839,
+    "total_saved": 56527,
+    "avg_savings_pct": 59.27374535998155,
+    "total_time_ms": 7092,
+    "avg_time_ms": 79
+   }
+  },
+  "rtk_gain_global_all_sessions": {
+   "before": {
+    "total_commands": 20302,
+    "total_input": 32406748,
+    "total_output": 21620070,
+    "total_saved": 10790973,
+    "avg_savings_pct": 33.29853708246196,
+    "total_time_ms": 20393002,
+    "avg_time_ms": 1004
+   },
+   "after": {
+    "total_commands": 20628,
+    "total_input": 32582738,
+    "total_output": 21690263,
+    "total_saved": 10896793,
+    "avg_savings_pct": 33.443454015436025,
+    "total_time_ms": 21602637,
+    "avg_time_ms": 1047
+   },
+   "note": "Host-wide lifetime counter; other live sessions ran commands in the same window, so this delta is not attributable to this run."
+  },
+  "headroom_savings_lifetime": {
+   "before": {
+    "tokens_saved": 4097,
+    "tokens_before": 4228,
+    "cost_usd": 0.012291,
+    "calls": 1,
+    "savings_percent": 96.9
+   },
+   "after": {
+    "tokens_saved": 188001,
+    "tokens_before": 241926,
+    "cost_usd": 0.564003,
+    "calls": 2,
+    "savings_percent": 77.7
+   }
+  },
+  "jcodemunch_persistent_ledger": {
+   "before_total_tokens_saved": 0,
+   "after_total_tokens_saved": 68,
+   "after_lifetime_by_tool": {
+    "get_file_tree": 68,
+    "get_symbol_source": 0,
+    "search_symbols": 0
+   },
+   "note": "Read through a fresh MCPorter stdio instance. The subagent's own get_session_stats in the live server reported session_tokens_saved 23643 over 4 calls; the persistent ledger had not yet received that session when read."
+  },
+  "context_mode_stats_file_sums_delta": {
+   "claude": {
+    "total_calls": 77,
+    "bytes_returned": 291264,
+    "bytes_indexed": 19821,
+    "kept_out": 19821,
+    "total_processed": 311085
+   },
+   "codex": {
+    "total_calls": 0,
+    "bytes_returned": 0,
+    "bytes_indexed": 0,
+    "kept_out": 0,
+    "total_processed": 0
+   }
+  },
+  "ccusage_today_all_claude_sessions_delta": {
+   "inputTokens": 2230,
+   "outputTokens": 1410226,
+   "cacheCreationTokens": 3341595,
+   "cacheReadTokens": 315266068,
+   "totalTokens": 320020119
+  }
+ },
+ "workflow_consumption": {
+  "e2e": {
+   "workflow_run": "wf_2213a80a-65c",
+   "status": "complete",
+   "by_resolved_model": {
+    "claude-sonnet-5": {
+     "children": 16,
+     "input_tokens": 396,
+     "output_tokens": 556956,
+     "cache_read_input_tokens": 12116062,
+     "cache_creation_input_tokens": 990205
+    }
+   },
+   "children": 16,
+   "effort_recorded": [
+    "None"
+   ]
+  },
+  "reruns": {
+   "workflow_run": "wf_2689933e-ec5",
+   "status": "complete",
+   "by_resolved_model": {
+    "claude-sonnet-5": {
+     "children": 3,
+     "input_tokens": 66,
+     "output_tokens": 92237,
+     "cache_read_input_tokens": 1778590,
+     "cache_creation_input_tokens": 173181
+    }
+   },
+   "children": 3,
+   "effort_recorded": [
+    "None"
+   ]
+  }
+ },
+ "fresh_native_session": {
+  "mcp_servers": [
+   [
+    "plugin:context-mode:context-mode",
+    "connected"
+   ],
+   [
+    "ai-memory",
+    "connected"
+   ],
+   [
+    "serena",
+    "connected"
+   ],
+   [
+    "jcodemunch",
+    "connected"
+   ],
+   [
+    "headroom",
+    "connected"
+   ],
+   [
+    "codebase-memory",
+    "pending"
+   ],
+   [
+    "qmd",
+    "connected"
+   ],
+   [
+    "claude.ai Claude Docs",
+    "connected"
+   ]
+  ],
+  "tool_calls": [
+   "ToolSearch",
+   "ToolSearch",
+   "mcp__headroom__headroom_stats",
+   "mcp__qmd__status",
+   "ToolSearch",
+   "mcp__codebase-memory__list_projects"
+  ],
+  "usage": {
+   "input_tokens": 8,
+   "cache_creation_input_tokens": 41424,
+   "cache_read_input_tokens": 124554,
+   "output_tokens": 900
+  },
+  "model": "claude-sonnet-5",
+  "result": "success"
+ },
+ "retained_failures_and_gaps": [
+  "Attempt 1: Context Mode ctx_execute_file refused a file outside the session project root ('File access blocked, resolves outside project root'); attempt 2 on the project root passed.",
+  "Attempt 1: Serena is bound to the session project (--project-from-cwd) and exposes no project switch in this context, so it could not answer for the worktree; attempt 2 on the bound project passed.",
+  "Attempt 1: Context Hub's registry had no Anthropic prompt-caching entry; attempt 2 used an entry it has (uvicorn) and passed.",
+  "Codex workers were not run: `codex exec` returned the account usage limit until 2026-09-30 23:50 (retained probe below).",
+  "Headroom 0.37.0 has no compress CLI subcommand; the subagent used its MCP tools through the MCPorter stdio bridge. Headroom, codebase-memory and QMD MCP servers were registered at user scope during this run, so they load natively only in sessions started afterwards (the fresh-session check shows them connected).",
+  "The jCodeMunch persistent ledger moved only +68 while the subagent's live session reported 23643; the live server had not flushed that session when read.",
+  "The repository secret guard blocked a harmless heredoc Python checker containing set(...) as environment_dump (false positive; workers wrote checkers to files instead).",
+  "MarkItDown needs an .html extension to convert; on a .txt file it exits 0 and silently passes the HTML through.",
+  "Versions differ from pins for tools another session upgraded earlier today: rtk 0.50.0 (pin 0.49.0), markitdown 0.1.8 (0.1.7), ai-memory 2.4.0 (2.3.2), mcporter 0.14.1 (0.13.13).",
+  "OmniRoute was not exercised: it routes model traffic through a gateway and needs a provider credential, which changes native accounts and model routes (a user decision).",
+  "claude-hud and otel-tui are interactive UIs; otel-tui was exercised headless on non-default ports only.",
+  "Macs: requested through host:mac-coordinator issue #276; no Mac result yet."
+ ],
+ "codex_probe": [
+  "ERROR: You\u2019ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Sep 30th, 2026 11:50 PM."
+ ]
+}
