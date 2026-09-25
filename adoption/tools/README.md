@@ -266,10 +266,25 @@ stopped at the cap produced no result: that is fail-closed, not coverage.
 **Install (the host's owner).**
 
 ```bash
+mkdir -p "$HOME/.local/bin" "$HOME/.local/state"
 install -m 0755 adoption/tools/gitleaks-guarded-macos "$HOME/.local/bin/gitleaks-guarded-macos"
+ln -sfn gitleaks-guarded-macos "$HOME/.local/bin/gitleaks"   # the name the tracked pre-commit hook calls
 gitleaks-guarded-macos version                     # execs the native binary directly
 : > "$HOME/.local/state/ecosystem-gitleaks.lock"  # once, outside any sandbox
 ```
+
+`$HOME/.local/bin` must come before every directory that holds the native
+binary on `PATH` (a Homebrew or mise directory, for example). The front end
+finds the native binary through `GITLEAKS_NATIVE` or the mise install path,
+never through `PATH`, and refuses with 78 when that path is missing or
+resolves to the front end itself, so the link cannot loop. The install passes
+when `command -v gitleaks` prints `$HOME/.local/bin/gitleaks`,
+`readlink "$(command -v gitleaks)"` prints `gitleaks-guarded-macos` and
+`gitleaks version` prints `8.30.1`. On 2026-09-25 this was checked only off
+macOS, with a stand-in `HOME`: the link resolved, `gitleaks version` printed
+`8.30.1`, and `GITLEAKS_NATIVE` set to the link was refused with 78. Only the
+`version` path and the refusals run off macOS; the install has not yet been
+run on a Mac.
 
 Every caller must invoke the front end, not the native binary. That includes
 the global pre-commit hook, which the agent-ecosystem repository installs; the
