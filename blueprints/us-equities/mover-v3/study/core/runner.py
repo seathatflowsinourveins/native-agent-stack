@@ -462,7 +462,9 @@ def evaluate_and_write(ctx: dict, *, stage: str, snapshot_sha256: str, vintages:
     results = compute()
     results.update({"protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
                     "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": snapshot_sha256,
-                    "fetch_incomplete_rate": fetch_line["fetch_incomplete_rate"]})
+                    "fetch_incomplete_rate": fetch_line["fetch_incomplete_rate"],
+                    # review round 15, F08: the fetch vintages the result was reconstructed from
+                    "input_vintage_range": [min(vintages), max(vintages)] if vintages else None})
     if before_write is not None:
         before_write()
     digest = atomic_write_results(results_path, results, replace_uncited)

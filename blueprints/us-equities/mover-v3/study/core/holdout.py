@@ -582,6 +582,12 @@ def _setup(ctx: dict, purpose: str, authorization_id: str, snapshot_root, fetch_
     return auth, blocks, n0, last, late, exposed, bases, first[0]["enumeration_fetch_date"] if first else None, pins
 
 
+def _vintage_range(sealed) -> list | None:
+    """[first, last] fetch vintage of every page the evaluation read (review round 15, F08)."""
+    v = sealed.vintages()
+    return [v[0], v[-1]] if v else None
+
+
 def fetch_line_of(ctx: dict, purpose: str, auth: dict):
     """The committed '<purpose>_fetch' run-log line that sealed this action's snapshot (whatever its status): its own,
     or, for a retry, the one of the authorization it retries (followed back along retry_of). None if no snapshot was
@@ -748,7 +754,8 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
             "kind": "mover_v3_holdout_count", "block": blocks, "window": [n0, last], "carried": list(carried),
             "counts": counts, "extension": ext, "fetch_incomplete_rate": rate["rate"], "void": void,
             "protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
-            "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha}, orphan)
+            "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha,
+            "input_vintage_range": _vintage_range(sealed)}, orphan)
         status = "complete"
     finally:
         if digest is None and path.exists() and sha256_file(path) != orphan:
@@ -995,7 +1002,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
                         "holdout_label": holdout_label(ctx, res["items"])})
         res.update({"protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
                     "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha,
-                    "fetch_incomplete_rate": rate["rate"]})
+                    "fetch_incomplete_rate": rate["rate"], "input_vintage_range": _vintage_range(sealed)})
         digest = atomic_write_results(path, res, orphan)
         status = "complete"
     finally:

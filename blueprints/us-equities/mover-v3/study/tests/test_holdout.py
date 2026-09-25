@@ -819,7 +819,7 @@ class Step2Recovery(unittest.TestCase):
     def _mocks(self, setup, fl, sealed_error=None):
         from types import SimpleNamespace
         from core import count_unit as CU
-        sealed = SimpleNamespace(bases=[], live=Store())
+        sealed = SimpleNamespace(bases=[], live=Store(), vintages=lambda: ["2027-12-20T21:00:00Z"])
         return [mock.patch.object(holdout, "fetch_line_of", return_value=fl),
                 mock.patch.object(holdout, "_setup", return_value=setup),
                 mock.patch.object(holdout, "_spec_factory", return_value=lambda store: None),

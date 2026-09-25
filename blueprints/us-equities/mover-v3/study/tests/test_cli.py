@@ -145,6 +145,9 @@ class StageRunsOnce(unittest.TestCase):
                 body = json.loads(results.read_text())
                 self.assertEqual(body["stage_labels"], [])
                 self.assertTrue(all(r["qualifiers"] == [] for r in body["items"].values()))
+                # review round 15, F08: the result states its retrospective scope and its input fetch vintages
+                self.assertTrue(body["claims_scope"].startswith("retrospective reconstruction"))
+                self.assertEqual(body["input_vintage_range"], ["2026-12-01T00:00:00Z", "2026-12-01T00:00:00Z"])
 
 
 class HardKill(unittest.TestCase):

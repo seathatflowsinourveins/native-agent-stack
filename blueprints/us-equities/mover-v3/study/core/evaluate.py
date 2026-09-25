@@ -17,6 +17,10 @@ from core.trades import h3c_event, trade
 ARM_OF = {"H1-D": "b_lane", "H1-D-b_lane-low": "b_lane", "H3-a": "a_intraday", "H3-b": "b_overnight"}
 ARMS = ("b_lane", "a_intraday", "b_overnight")
 SENSITIVITY_MODES = ("c0.5", "c2.0", "table_only", "stress")
+# review round 15, F08: what every result can claim (universe_and_identity.vintage_scope)
+CLAIMS_SCOPE = ("retrospective reconstruction: every input is the provider's data as served at its fetch vintage, "
+                "after the fact; decision-time availability and revisions between the decision and the fetch are "
+                "neither enforced nor claimed (universe_and_identity.vintage_scope)")
 # review round 15, F14: the units of an item's estimate, interval and MDE
 MDE_UNITS = {"H1-D": "difference of mean net returns (fraction)", "H1-D-b_lane-low": "mean net return (fraction)",
              "H3-a": "mean net return (fraction)", "H3-b": "mean net return (fraction)",
@@ -376,7 +380,7 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
     holm_order = None if stage == "development" else \
         ST.holm_order(p_raw, {i: items[i].get("p_normal_tail", 1.0) for i in ITEM_IDS})
     return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
-            "stage_labels": stage_labels, "holm_order": holm_order,
+            "stage_labels": stage_labels, "claims_scope": CLAIMS_SCOPE, "holm_order": holm_order,
             "verdicts": ST.hypothesis_verdict(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
             "profitability": ST.profitability(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),
             "descriptive": desc, "counts": counts}
