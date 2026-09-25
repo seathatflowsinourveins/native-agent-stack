@@ -3096,8 +3096,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "604543fb3a2a54f4b2d87789ca0f28adc748bdcca387f05bc2928bcd577bbe90",
-      "bytes": 1344
+      "sha256": "25559e35def1f1d1846dee28375113c6ff5e6ddb547ee592f39397578948081c",
+      "bytes": 1496
     },
     {
       "path": ".gitattributes",
@@ -3261,8 +3261,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a5d2bed86c974f1f1b61248e2dbb9b89585b5da074468db8e72845d381206af8",
-      "bytes": 11673
+      "sha256": "56c6ec0a0880d1afa44a57472368ed74a7e5d0b5c751d70e807478e216f1cb02",
+      "bytes": 13991
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -3406,8 +3406,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "6090ebd32e24a745f7bf9aaae2eccb9e924d7cd28b9cf227b1a679881fe89dd5",
-      "bytes": 7414
+      "sha256": "9ff8310954bf6ad378404224dd781bbc64ed183ed4a40a2a40ff6bbf067bfc99",
+      "bytes": 7566
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -10177,8 +10177,8 @@
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
-      "sha256": "4c15f89c8d4e2661d2a8a54b76e779f88297954c23ec3b96d609d2cc8db62150",
-      "bytes": 11170
+      "sha256": "e1156e5e03cd84a59860a0777f86ae19bb4def16c5f800f678e06c715c0251b0",
+      "bytes": 13796
     },
     {
       "path": "docs/direct-results.md",
@@ -10472,8 +10472,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "47fe87b8539aa62257fa277b3f08f8aaa9aefa8e60563fbf3fe7db1db1c009d6",
-      "bytes": 31079
+      "sha256": "10a07761ecc2ed882a50f4daff4ab24dae5631ae813fa0a8bcb9fd4f780d9135",
+      "bytes": 39823
     },
     {
       "path": "docs/stack.md",
@@ -29772,8 +29772,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "689960fc56fe48ada78a880464b271b045a7c626875108ed586f64b9f294c237",
-      "bytes": 19904
+      "sha256": "bbec35133b8fe7349062e50b18aa7af710f85d45f7b506a331625b42f4f06fd5",
+      "bytes": 21469
     },
     {
       "path": "scripts/env_freshness.py",
@@ -29792,8 +29792,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "653a990deef23cfcda736a35079df079e420c34e5efd669dcd325be85f82e460",
-      "bytes": 16239
+      "sha256": "2312f977dbaee1a6108480b2474124cb979f25a3625f562250511a6a690bcf2d",
+      "bytes": 17214
     },
     {
       "path": "scripts/host_receipts.py",
@@ -30132,8 +30132,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "2041c9d2718be6857e0a0741ea978294bb658053b83b085350413d57ec13a6be",
-      "bytes": 16410
+      "sha256": "653f66619c14c6ebe45b85459f0186c827394a691b5e9a1c5c30badb486a43c5",
+      "bytes": 24875
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -30462,8 +30462,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "2e82daa80c6ebbf9d5b95528b41b7093f628b3a98294bb76a210068b53030b27",
-      "bytes": 15791
+      "sha256": "45aaf80d8196bc46580d727ef1aee764d962e7658967b6916e172f0916ce4ba7",
+      "bytes": 20537
     },
     {
       "path": "tests/test_security_identity.py",
