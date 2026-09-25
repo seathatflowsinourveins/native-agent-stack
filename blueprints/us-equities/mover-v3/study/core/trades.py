@@ -16,7 +16,6 @@ from core.chronology import embargoed, segment_of
 from core.params import C, T
 from core.records import MERGER_TYPES, SPIN_OFF_TYPES, SPLIT_TYPES, et_date
 
-MULTI_SESSION_ARMS = ("b_lane", "b_overnight")
 
 
 @dataclass
@@ -145,7 +144,9 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
     if seg is None:
         return {**out, "status": "dropped_no_segment"}
     seg_last = ctx.segs[seg][1]
-    if arm in MULTI_SESSION_ARMS and embargoed(cal, ctx.stage, ctx.segs, d1, ctx.dropped_years):
+    # review round 15, F10: every arm is embargoed, H3-a included: a same-session trade whose exit finds no quote
+    # searches through E+5 (populations.terminal_exits), so its hold can reach into the next segment like any other
+    if embargoed(cal, ctx.stage, ctx.segs, d1, ctx.dropped_years):
         return {**out, "status": "embargoed"}
     if arm == "b_overnight" and d1 == seg_last:
         return {**out, "status": "no_entry_segment_last"}

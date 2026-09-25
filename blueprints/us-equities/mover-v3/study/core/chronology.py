@@ -45,8 +45,9 @@ def segment_of(segs: list, session: str):
 
 
 def embargoed(cal, stage: str, segs: list, session: str, dropped_years=frozenset()) -> bool:
-    """Multi-session items give up the first 6 sessions of validation and the first 6 kept sessions after a
-    dropped year as entry sessions. None at N0 (the holdout) and none after the warm-up."""
+    """Every item gives up the first 6 sessions of validation and the first 6 kept sessions after a dropped year as
+    entry sessions (review round 15, F10: H3-a too, since its exit search can run to E+5). None at N0 (the holdout)
+    and none after the warm-up."""
     if stage == "holdout":
         return False
     i = segment_of(segs, session)

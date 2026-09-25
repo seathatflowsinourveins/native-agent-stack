@@ -34,7 +34,7 @@ class Parameters(unittest.TestCase):
 
     def test_prose_parameters_are_named_in_the_protocol(self):
         text = json.dumps(PROTOCOL)
-        for phrase in ("B = 100,000", "Block length is 5 sessions for H3-a and 10 sessions", "0.20 - 1e-9",
+        for phrase in ("B = 100,000", "Block length is 10 sessions for every item", "0.20 - 1e-9",
                        "$1,000,000", "timeout of 300 s", "at most 1000 ms", "min($20,000; 1% of med20; 10%",
                        "filled notional under $1,000", "1.25 x max(hs'(cell), h_fill)", "c = 1.0",
                        "2e-3 x raw_c(e)", "252 kept sessions", "fewer than 60 prior D events",

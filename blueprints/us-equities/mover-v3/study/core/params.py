@@ -47,7 +47,7 @@ PARAMETERS = {
                    "validation": ["2020-01-02", "2020-12-31"], "embargo_sessions": 6,
                    "n0_offset_sessions": 40, "holdout_sessions": 252, "extension_block_sessions": 63,
                    "max_extension_blocks": 2, "read_deadline_sessions": 15, "paper_exposed_max_fraction": 0.05},
-    "bootstrap": {"B": 100_000, "block_sessions": {"H1-D": 10, "H1-D-b_lane-low": 10, "H3-a": 5, "H3-b": 10,
+    "bootstrap": {"B": 100_000, "block_sessions": {"H1-D": 10, "H1-D-b_lane-low": 10, "H3-a": 10, "H3-b": 10,
                                                    "H3-c": 10},
                   "chunk_rows": 10_000, "stage_index": {"development": 0, "validation": 1, "holdout": 2}},
     "testing": {"alpha": 0.05, "m": 5, "development_alpha": 0.05, "lineage_trials": 1012 + 60 + 5,

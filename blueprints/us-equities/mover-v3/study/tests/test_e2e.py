@@ -71,12 +71,13 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(mem["d_events"], 7)
         by = self.results["counts"]["trades_by_arm_status"]
         self.assertEqual(by["b_lane:embargoed"], 1)                 # EARLY enters on 2020-01-06
-        self.assertEqual(by["a_intraday:filled"], 7)                # H3-a has no embargo
+        self.assertEqual(by["a_intraday:embargoed"], 1)             # review round 15, F10: H3-a is embargoed too
+        self.assertEqual(by["a_intraday:filled"], 6)
         self.assertEqual(by["b_overnight:embargoed"], 1)
         items = self.results["items"]
-        self.assertEqual(items["H3-a"]["n"], 7)
+        self.assertEqual(items["H3-a"]["n"], 6)
         self.assertEqual(items["H3-b"]["n"], 6)
-        self.assertEqual(items["H3-a"]["exits"], {"normal": 7})
+        self.assertEqual(items["H3-a"]["exits"], {"normal": 6})
         self.assertIn("terminal_zero", self.results["items"]["H3-b"]["exits"] | {"terminal_zero": 0})
         self.assertEqual(self.results["counts"]["terciles"], {"None": 7})  # fewer than 60 prior validation events
         self.assertEqual(items["H1-D"]["n"], 0)
@@ -116,7 +117,7 @@ class EndToEnd(unittest.TestCase):
                                                                                          EV.SENSITIVITY_MODES}))
                                                        for r in rows])["least_exposed_slice"], 0.3 - 0.05)
         overlap = self.results["counts"]["a_intraday_b_lane_entry_overlap"]
-        self.assertEqual(overlap, {"a_intraday_filled": 7, "also_b_lane_filled": 6})
+        self.assertEqual(overlap, {"a_intraday_filled": 6, "also_b_lane_filled": 6})
 
     def test_delisted_and_censored_b_lane_trades_stay_in_the_arm(self):
         ev_trades = self.results["counts"]["trades_by_arm_status"]

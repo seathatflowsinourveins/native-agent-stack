@@ -465,12 +465,16 @@ class Boundaries(unittest.TestCase):
         ev = make_event(cal, "2020-12-30")
         self.assertEqual(trade(ev, "b_overnight", ctx_for(cal), Store())["status"], "no_entry_segment_last")
 
-    def test_embargo_applies_to_multi_session_arms_only(self):
+    def test_embargo_applies_to_every_arm(self):
+        """Review round 15, F10: H3-a's exit search can run to E+5, so its entries in the first 6 sessions of a segment
+        are embargoed like every other arm's; e7529b47 asserted the exemption."""
         cal = self.cal
         ev = make_event(cal, "2020-01-03")
         self.assertEqual(trade(ev, "b_lane", ctx_for(cal), Store())["status"], "embargoed")
         self.assertEqual(trade(ev, "b_overnight", ctx_for(cal), Store())["status"], "embargoed")
-        self.assertNotEqual(trade(ev, "a_intraday", ctx_for(cal), Store()).get("status"), "embargoed")
+        self.assertEqual(trade(ev, "a_intraday", ctx_for(cal), Store())["status"], "embargoed")
+        from core.params import BOOT
+        self.assertEqual(BOOT["block_sessions"]["H3-a"], 10)      # the block covers its E+5 horizon too
 
     def test_decision_whose_entry_lies_in_no_segment_is_dropped(self):
         cal = self.cal
