@@ -110,10 +110,27 @@ this account's observed entitlement or a1000-trades guarantee.
 ## Lifecycle and native boundaries
 
 The SQLite ledger fsyncs intent and request reservations before sending. Stable
-IDs, cumulative fill accounting and an account-specific exclusive lock prevent
-blind retries and competing writers. Shared STOP blocks new entries; confirmed
-owned exits remain available. Fresh startup requires a flat account with no open
-orders. Periodic and final snapshots compare positions and cash to the ledger.
+IDs, per-execution fill accounting (cumulative averages only where an execution is
+missing) and an account-specific exclusive lock prevent blind retries and competing
+writers. Shared STOP blocks new entries; confirmed owned exits remain available. Fresh
+startup requires a flat account with no open orders. Periodic and final snapshots
+compare positions and cash to the ledger.
+
+Engine release of 2026-09-24 (items 2-4 of the data and execution convergence
+record): each broker execution is booked at its own quantity and price, with fill gaps
+closed from the order's FILL activities (README-native.md, README-safety.md); every
+strategy order and position callback is guarded, because rc5 discards an exception
+raised there (README-native.md); and on SIP the engine tracks per-symbol trading halts,
+LULD pauses and quotation-only periods from the status stream plus a startup seed, and
+while a symbol is halted neither lane sends it an entry or a new exit (stop, trailing,
+gap-risk and forced exits wait for the resume) nor re-prices its resting exit
+(README-native.md, README-transport.md, README-mover.md). The quote's own condition
+flag blocks entries only, and a halt only the startup seed asserts expires (at its
+resumption time, or 12 minutes after a LULD pause began). The evidence is synthetic
+fixtures and local integration against the real rc5 `LiveNode`; no paper session has
+run this release yet. It changes engine files
+that a forward protocol pins, so such a protocol needs a new version before it counts
+sessions run on this release.
 
 Stream authentication/subscription acknowledgement, queue integrity, per-symbol
 freshness and connection generations are observed explicitly. Models never own
@@ -145,6 +162,19 @@ python runner.py paper --trial dated-unique-trial --env-file "$PAPER_ENV_FILE" -
 python runner.py recover --env-file "$PAPER_ENV_FILE" --output "$PRIVATE_OUTPUT/recovery.json"
 python benchmark.py --output "$PRIVATE_OUTPUT/synthetic-capacity.json"
 ```
+
+On macOS the key pair can live in the login Keychain instead (store it once with
+`secret set APCA_API_KEY_ID` and `secret set APCA_API_SECRET_KEY`). `secret run`
+hands it to that one command, which removes it from its own environment as it reads it:
+
+```sh
+secret run APCA_API_KEY_ID APCA_API_SECRET_KEY -- python runner.py preflight --credentials keychain-env --output "$PRIVATE_OUTPUT/preflight.json"
+```
+
+`market_research.py` takes the same `--credentials keychain-env`. Both sources are
+paper-only: an `APCA_API_BASE_URL` in the environment or env file that is not
+`https://paper-api.alpaca.markets` is refused before any request. See the
+2026-09-25 addendum to `docs/decisions/2026-09-22-broker-credential-handling.md`.
 
 `paper` is bounded and fails closed when the regular session, account, data,
 frozen configuration or durable state is not ready. No live endpoint is exposed.

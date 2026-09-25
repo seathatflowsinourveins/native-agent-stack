@@ -57,6 +57,7 @@
           "pin": "0.155.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -65,13 +66,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:16Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.155.1'",
               "derived_status": "untested",
@@ -150,21 +152,23 @@
           "pin": "1.30.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:36Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '1.30.1'",
               "derived_status": "untested",
@@ -194,21 +198,23 @@
           "pin": "1.52.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:18Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '1.52.0'",
               "derived_status": "untested",
@@ -233,6 +239,7 @@
           "pin": "unpinned",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -248,6 +255,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
               "derived_status": "untested",
@@ -286,7 +294,7 @@
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "jCodeMunch",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp"
@@ -319,21 +327,23 @@
           "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T16:35:14Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143'",
               "derived_status": "untested",
@@ -398,32 +408,34 @@
           "pin": "2.8.3",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:11Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '2.8.3'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:23Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -442,21 +454,23 @@
           "pin": "0.1.7",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:09Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.1.7'",
               "derived_status": "untested",
@@ -486,6 +500,7 @@
           "pin": "26.09.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -494,13 +509,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:10Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '26.09.0'",
               "derived_status": "untested",
@@ -627,21 +643,23 @@
           "pin": "2.3.2",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T14:37:15Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.3.2'",
               "derived_status": "untested",
@@ -651,8 +669,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:18:05Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -692,21 +710,23 @@
           "pin": "0.79.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
-              "derived_reason": "source_review winner with no passing host receipt",
-              "derived_status": "not_established",
-              "e2e_state": "not_established",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:22Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -731,6 +751,7 @@
           "pin": "unpinned",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
               "derived_reason": "source_review winner with no passing host receipt",
               "derived_status": "not_established",
@@ -746,6 +767,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
               "derived_status": "untested",
@@ -775,21 +797,23 @@
           "pin": "0.71.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
-              "derived_reason": "source_review winner with no passing host receipt",
-              "derived_status": "not_established",
-              "e2e_state": "not_established",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 1,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T01:05:55Z",
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:21Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.71.0'",
               "derived_status": "untested",
@@ -905,6 +929,7 @@
           "pin": "0.141.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -920,6 +945,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "host receipts at pin '0.141.1' but none passes without a standing dissent",
               "derived_status": "not_established",
@@ -965,6 +991,7 @@
           "pin": "16.3.5",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -980,6 +1007,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "host receipts at pin '16.3.5' but none passes without a standing dissent",
               "derived_status": "not_established",
@@ -1025,6 +1053,7 @@
           "pin": "18.6",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -1040,6 +1069,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "host receipts at pin '18.6' but none passes without a standing dissent",
               "derived_status": "not_established",
@@ -1132,6 +1162,7 @@
           "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -1147,6 +1178,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'dd6ee538aee0f548d4a6b520118f875431fd749e'",
               "derived_status": "untested",
@@ -1171,6 +1203,7 @@
           "pin": "unpinned",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -1186,6 +1219,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
               "derived_status": "untested",
@@ -1210,6 +1244,7 @@
           "pin": "unpinned",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -1225,6 +1260,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
               "derived_status": "untested",
@@ -1303,21 +1339,23 @@
           "pin": "0.79.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:22Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -1347,21 +1385,23 @@
           "pin": "0.0.77",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T15:37:27Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.0.77'",
               "derived_status": "untested",
@@ -1412,6 +1452,7 @@
           "pin": "0.13.13",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -1420,13 +1461,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:17Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.13.13'",
               "derived_status": "untested",
@@ -1456,6 +1498,7 @@
           "pin": "2.7.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -1471,6 +1514,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.7.0'",
               "derived_status": "untested",
@@ -1495,7 +1539,7 @@
       "alternatives": [
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
           "name": "MCPorter native bridge",
           "repository": "https://github.com/openclaw/mcporter"
@@ -1553,6 +1597,7 @@
           "pin": "2.1.278",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -1561,13 +1606,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T15:34:13Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.1.278'",
               "derived_status": "untested",
@@ -1601,6 +1647,7 @@
           "pin": "0.155.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -1609,13 +1656,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:16Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.155.1'",
               "derived_status": "untested",
@@ -1729,21 +1777,23 @@
           "pin": "0.161.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:34:16Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.161.0'",
               "derived_status": "untested",
@@ -1773,21 +1823,23 @@
           "pin": "3.14.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:34:25Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '3.14.0'",
               "derived_status": "untested",
@@ -1817,21 +1869,23 @@
           "pin": "3.7.8",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:34:07Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '3.7.8'",
               "derived_status": "untested",
@@ -1856,14 +1910,14 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "ShellCheck",
           "repository": "https://github.com/koalaman/shellcheck"
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "Difftastic",
           "repository": "https://github.com/Wilfred/difftastic"
@@ -1924,6 +1978,7 @@
           "pin": "0.123.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -1939,6 +1994,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.123.1'",
               "derived_status": "untested",
@@ -1968,6 +2024,7 @@
           "pin": "1.63.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -1983,6 +2040,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "host receipts at pin '1.63.0' but none passes without a standing dissent",
               "derived_status": "not_established",
@@ -2077,32 +2135,34 @@
           "pin": "0.19.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T15:35:35Z",
+                "pass": 3
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.19.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:24Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2116,6 +2176,7 @@
           "pin": "unpinned",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "synthetic winner",
               "derived_status": "conditional",
@@ -2131,6 +2192,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
               "derived_status": "untested",
@@ -2218,21 +2280,23 @@
           "pin": "2.16.6",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:33:59Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.16.6'",
               "derived_status": "untested",
@@ -2278,21 +2342,23 @@
           "pin": "255.4-1ubuntu8.17",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T14:22:45Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '255.4-1ubuntu8.17'",
               "derived_status": "untested",
@@ -2343,21 +2409,23 @@
           "pin": "8.30.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:04Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -2444,32 +2512,34 @@
           "pin": "1.14.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T14:40:04Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '1.14.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:34Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2504,32 +2574,34 @@
           "pin": "1.19.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T15:34:44Z",
+                "pass": 3
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '1.19.1'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T14:17:20Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2548,17 +2620,18 @@
           "pin": "0.25.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T17:14:16Z",
-                "pass": 1
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T17:30:30Z",
+                "pass": 6
               },
               "qualified_models": [
                 {
@@ -2570,6 +2643,36 @@
                   "revision": "4da05a8e",
                   "runtime": "vllm",
                   "runtime_version": "0.29.0"
+                },
+                {
+                  "bars": "Model-card retrieval example, RTX 4090, vLLM 0.25.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+                  "host_id": "nativestack-5975wx-20260925",
+                  "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+                  "receipt_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json",
+                  "result": "pass",
+                  "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+                  "runtime": "vllm",
+                  "runtime_version": "0.25.0"
+                },
+                {
+                  "bars": "Model-card retrieval example, RTX 4090, vLLM 0.30.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+                  "host_id": "nativestack-5975wx-20260925",
+                  "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+                  "receipt_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-3.json",
+                  "result": "pass",
+                  "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+                  "runtime": "vllm",
+                  "runtime_version": "0.30.0"
+                },
+                {
+                  "bars": "Model-card retrieval example, RTX 4090, vLLM 0.30.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+                  "host_id": "nativestack-5975wx-20260925",
+                  "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+                  "receipt_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-4.json",
+                  "result": "pass",
+                  "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+                  "runtime": "vllm",
+                  "runtime_version": "0.30.0"
                 },
                 {
                   "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",
@@ -2584,6 +2687,7 @@
               ]
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.25.0'",
               "derived_status": "untested",
@@ -2608,21 +2712,21 @@
       "alternatives": [
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "local_integration",
           "name": "Repomix",
           "repository": "https://github.com/yamadashy/repomix"
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "measured_comparison",
           "name": "TOON",
           "repository": "https://github.com/toon-format/toon"
@@ -2655,21 +2759,23 @@
           "pin": "0.49.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-23T01:05:22Z",
-                "pass": 1
+                "independently_reviewed_pass": 4,
+                "latest": "2026-09-25T18:58:47Z",
+                "pass": 7
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -2715,21 +2821,23 @@
           "pin": "0.37.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T18:58:52Z",
+                "pass": 4
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.37.0'",
               "derived_status": "untested",
@@ -2759,21 +2867,23 @@
           "pin": "20.0.24",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:37Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '20.0.24'",
               "derived_status": "untested",
@@ -2852,6 +2962,7 @@
           "pin": "0.1.8",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -2867,6 +2978,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.1.8'",
               "derived_status": "untested",
@@ -2896,6 +3008,7 @@
           "pin": "0.38.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -2911,6 +3024,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.38.1'",
               "derived_status": "untested",
@@ -2940,6 +3054,7 @@
           "pin": "0.2.7",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -2955,6 +3070,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '0.2.7'",
               "derived_status": "untested",
@@ -2979,7 +3095,7 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "Codex native workers",
           "repository": "https://github.com/openai/codex"
@@ -3072,6 +3188,7 @@
           "pin": "2.1.278",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "local_integration winner",
               "derived_status": "conditional",
@@ -3080,13 +3197,14 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T15:34:13Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.1.278'",
               "derived_status": "untested",
@@ -3116,21 +3234,23 @@
           "pin": "0.79.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:22Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -3155,7 +3275,7 @@
       "alternatives": [
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-toon",
           "repository": "https://github.com/toon-format/toon"
@@ -3176,7 +3296,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "vllm",
           "repository": "https://github.com/vllm-project/vllm"
@@ -3190,14 +3310,14 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-repomix",
           "repository": "https://github.com/yamadashy/repomix"
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "Serena",
           "repository": "https://github.com/oraios/serena"
@@ -3211,14 +3331,14 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "RTK",
           "repository": "https://github.com/rtk-ai/rtk"
@@ -3239,7 +3359,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "Qdrant",
           "repository": "https://github.com/qdrant/qdrant"
@@ -3302,6 +3422,7 @@
           "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -3317,6 +3438,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'CLI rust-v0.155.1; Python openai-codex 0.154.0'",
               "derived_status": "untested",
@@ -3341,6 +3463,7 @@
           "pin": "v2.3.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -3356,6 +3479,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v2.3.1'",
               "derived_status": "untested",
@@ -3380,6 +3504,7 @@
           "pin": "v1.14.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -3395,6 +3520,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v1.14.0'",
               "derived_status": "untested",
@@ -3461,21 +3587,38 @@
           "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T05:38:10Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [
+                {
+                  "binds": false,
+                  "evidence_class": "local_integration",
+                  "grandfathered": true,
+                  "host_id": "macos-m5pro-20260924",
+                  "observed_at_utc": "2026-09-24T13:12:27Z",
+                  "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
+                  "reason": "recorded under manifests/stack.json id 'nautilus-trader', an alias of winner 'nautilustrader'; receipts bind by the winner's own component_id, and version '2.0.0rc5' is not the winner pin in full",
+                  "recorded_component_id": "nautilus-trader",
+                  "recorded_version": "2.0.0rc5",
+                  "result": "pass",
+                  "stage": "use",
+                  "version_matches_pin": false
+                }
+              ],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)'",
               "derived_status": "untested",
@@ -3500,6 +3643,7 @@
           "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -3515,6 +3659,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '985ef30ad3ac774218c5ac516b4cb0aa2655730f'",
               "derived_status": "untested",
@@ -3588,21 +3733,23 @@
           "pin": "v2.16.6",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:33:59Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v2.16.6'",
               "derived_status": "untested",
@@ -3627,6 +3774,7 @@
           "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "conditional",
               "derived_reason": "synthetic winner",
               "derived_status": "conditional",
@@ -3642,6 +3790,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6'",
               "derived_status": "untested",
@@ -3708,6 +3857,7 @@
           "pin": "v0.2.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
               "derived_reason": "source_review winner with no passing host receipt",
               "derived_status": "not_established",
@@ -3723,6 +3873,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v0.2.1'",
               "derived_status": "untested",
@@ -3747,6 +3898,7 @@
           "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
               "derived_reason": "source_review winner with no passing host receipt",
               "derived_status": "not_established",
@@ -3762,6 +3914,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'",
               "derived_status": "untested",
@@ -3786,6 +3939,7 @@
           "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
               "derived_reason": "source_review winner with no passing host receipt",
               "derived_status": "not_established",
@@ -3801,6 +3955,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09'",
               "derived_status": "untested",
@@ -3851,7 +4006,7 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "foundation-socraticode",
           "repository": "https://github.com/giancarloerra/SocratiCode"
@@ -3900,6 +4055,7 @@
           "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "not_established",
               "derived_reason": "source_review winner with no passing host receipt",
               "derived_status": "not_established",
@@ -3915,6 +4071,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '3.67.1; source 356dfa03278058b02df42124f243c2c345329dae'",
               "derived_status": "untested",
@@ -4016,6 +4173,7 @@
           "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4025,12 +4183,28 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:36:18Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [
+                {
+                  "binds": false,
+                  "evidence_class": "native_proven",
+                  "grandfathered": true,
+                  "host_id": "macos-m5pro-20260924",
+                  "observed_at_utc": "2026-09-24T14:38:03Z",
+                  "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--alpaca-py--use--20260924.json",
+                  "reason": "recorded under manifests/stack.json id 'alpaca-py', an alias of winner 'data-alpaca-py'; receipts bind by the winner's own component_id, and version '0.44.0' is not the winner pin in full",
+                  "recorded_component_id": "alpaca-py",
+                  "recorded_version": "0.44.0",
+                  "result": "pass",
+                  "stage": "use",
+                  "version_matches_pin": false
+                }
+              ],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28'",
               "derived_status": "untested",
@@ -4055,6 +4229,7 @@
           "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4064,12 +4239,13 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:36:36Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a'",
               "derived_status": "untested",
@@ -4094,6 +4270,7 @@
           "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4103,12 +4280,13 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:36:46Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a'",
               "derived_status": "untested",
@@ -4180,6 +4358,7 @@
           "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4189,12 +4368,13 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:37:11Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee'",
               "derived_status": "untested",
@@ -4219,7 +4399,7 @@
       "alternatives": [
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "foundation-qmd",
           "repository": "https://github.com/tobi/qmd"
@@ -4268,7 +4448,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "vllm",
           "repository": "https://github.com/vllm-project/vllm"
@@ -4324,7 +4504,7 @@
         },
         {
           "disposition": "overlap",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "foundation-markitdown",
           "repository": "https://github.com/microsoft/markitdown"
@@ -4373,6 +4553,7 @@
           "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4382,12 +4563,13 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:37:11Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin '1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee'",
               "derived_status": "untested",
@@ -4412,6 +4594,7 @@
           "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4421,12 +4604,13 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:36:36Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a'",
               "derived_status": "untested",
@@ -4479,6 +4663,7 @@
           "pin": "v0.119.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner citing registered evidence",
               "derived_status": "accepted",
@@ -4494,6 +4679,7 @@
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v0.119.0'",
               "derived_status": "untested",
@@ -4523,21 +4709,23 @@
           "pin": "v1.52.0",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:18Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v1.52.0'",
               "derived_status": "untested",
@@ -4567,21 +4755,23 @@
           "pin": "v8.30.1",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T15:35:04Z",
+                "pass": 2
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [],
               "catalog_status": "untested",
               "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
@@ -4655,7 +4845,7 @@
         },
         {
           "disposition": "out_of_scope",
-          "e2e_state": "not_run",
+          "e2e_state": "receipts_recorded",
           "evidence_class": "native_proven",
           "name": "foundation-toon",
           "repository": "https://github.com/toon-format/toon"
@@ -4690,6 +4880,7 @@
           "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
           "platforms": {
             "linux-wsl2-x86_64": {
+              "alias_receipts": [],
               "catalog_status": "accepted",
               "derived_reason": "native_proven winner without a registered evidence/ reference",
               "derived_status": "conditional",
@@ -4699,12 +4890,28 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-25T15:36:28Z",
+                "pass": 1
               },
               "qualified_models": []
             },
             "macos-arm64": {
+              "alias_receipts": [
+                {
+                  "binds": false,
+                  "evidence_class": "native_proven",
+                  "grandfathered": true,
+                  "host_id": "macos-m5pro-20260924",
+                  "observed_at_utc": "2026-09-24T16:38:37Z",
+                  "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--duckdb--use--20260924.json",
+                  "reason": "recorded under manifests/stack.json id 'duckdb', an alias of winner 'data-duckdb'; receipts bind by the winner's own component_id, and version '1.5.5' is not the winner pin in full",
+                  "recorded_component_id": "duckdb",
+                  "recorded_version": "1.5.5",
+                  "result": "pass",
+                  "stage": "use",
+                  "version_matches_pin": false
+                }
+              ],
               "catalog_status": "untested",
               "derived_reason": "no schema-valid host receipt bound to pin 'v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa'",
               "derived_status": "untested",
@@ -4732,37 +4939,13 @@
       "linux-wsl2-x86_64": [
         {
           "catalog": "foundation",
-          "component_id": "markitdown",
-          "e2e_state": "conditional",
-          "layer_id": "document-retrieval"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "poppler",
           "e2e_state": "conditional",
           "layer_id": "document-retrieval"
         },
         {
           "catalog": "foundation",
-          "component_id": "qmd",
-          "e2e_state": "conditional",
-          "layer_id": "document-retrieval"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "candidate:cli-cli",
-          "e2e_state": "not_established",
-          "layer_id": "git-github-automation"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "difftastic",
-          "e2e_state": "not_established",
-          "layer_id": "git-github-automation"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "worktrunk",
           "e2e_state": "not_established",
           "layer_id": "git-github-automation"
         },
@@ -4786,24 +4969,6 @@
         },
         {
           "catalog": "foundation",
-          "component_id": "loki",
-          "e2e_state": "conditional",
-          "layer_id": "observation-inference"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "opentelemetry-collector-contrib",
-          "e2e_state": "conditional",
-          "layer_id": "observation-inference"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "prometheus",
-          "e2e_state": "conditional",
-          "layer_id": "observation-inference"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "playwright-test",
           "e2e_state": "conditional",
           "layer_id": "quality-evaluation"
@@ -4822,45 +4987,9 @@
         },
         {
           "catalog": "foundation",
-          "component_id": "restic",
-          "e2e_state": "conditional",
-          "layer_id": "recovery-portability"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "dagu",
-          "e2e_state": "conditional",
-          "layer_id": "scheduling-supervision"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "systemd",
           "e2e_state": "conditional",
           "layer_id": "scheduling-supervision"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "gitleaks",
-          "e2e_state": "conditional",
-          "layer_id": "secrets-credentials"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "ccusage",
-          "e2e_state": "conditional",
-          "layer_id": "token-efficiency"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "headroom",
-          "e2e_state": "conditional",
-          "layer_id": "token-efficiency"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "rtk",
-          "e2e_state": "conditional",
-          "layer_id": "token-efficiency"
         },
         {
           "catalog": "foundation",
@@ -4885,18 +5014,6 @@
           "component_id": "claude-code",
           "e2e_state": "conditional",
           "layer_id": "workers"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "worktrunk",
-          "e2e_state": "conditional",
-          "layer_id": "workers"
-        },
-        {
-          "catalog": "us-equities",
-          "component_id": "dagu",
-          "e2e_state": "conditional",
-          "layer_id": "data-quality-orchestration"
         },
         {
           "catalog": "us-equities",

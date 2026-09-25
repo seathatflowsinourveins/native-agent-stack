@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "kind": "blind_adjudication_key",
+  "original_file": "adjudication-20260925/adjudication-key.json",
+  "original_sha256": "1eed64c0c60abbcd01239b9c793070d7aef8ef958bb89ee86ba1ff185d696040",
+  "transformation": "Recorder transcription of the original key: absolute local paths are reduced to file names and every other value is unchanged; public_input fields are added.",
+  "adjudication": "adjudication-20260925",
+  "created": "2026-09-25",
+  "practice": "native-agent-stack blueprints/convergence-practice",
+  "judge_run_at_key_creation": false,
+  "order_definitions": {
+    "a": "original: Return A = first lane listed in the brief spec (codex); Return A listed first",
+    "b": "label-swapped: the other lane (claude) is labelled Return A; Return A listed first",
+    "c": "reversed listing: labels as in order a (A = codex); Return B listed first"
+  },
+  "blinding": "Removed only HTML comments carrying lane/model/usage metadata; no other edits.",
+  "questions": {
+    "q1-memory-system": {
+      "sources": {
+        "codex": {
+          "file": "memory-systems-codex.md",
+          "source_sha256": "2eb2fa3b78e8aad04ff1cc7db9175dc213df8e1eafa726ddbd12a85820d948cf",
+          "blinded_sha256": "2eb2fa3b78e8aad04ff1cc7db9175dc213df8e1eafa726ddbd12a85820d948cf",
+          "removed_html_comments": []
+        },
+        "claude": {
+          "file": "memory-systems-claude.md",
+          "source_sha256": "fe609037bee332a597c554c09f03f15b3c3637108ab033e130fe35adbdf43d9d",
+          "blinded_sha256": "1762ac4ede804bfaa3dddb5b5d90b5f5c7a64260af7e1aad06aa38327a00a69c",
+          "removed_html_comments": [
+            "<!-- Claude lane (Opus 5.5 subagent), 2026-09-25; 129 tool uses, 303,563 subagent tokens; answer verbatim below. -->"
+          ]
+        }
+      },
+      "orders": {
+        "a": {
+          "file": "adjudication-20260925/q1-memory-system-a.md",
+          "sha256": "1c40278e0feaf89a6e449fb8dc5b41c28984f1fbb91f52cad4401cc7f29c29ad",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json"
+        },
+        "b": {
+          "file": "adjudication-20260925/q1-memory-system-b.md",
+          "sha256": "06069691dafa39565e75e9a1ced103c7efc4c0c359a6e2670d4afd2326bb05fb",
+          "A": "claude",
+          "B": "codex",
+          "listed_first": {
+            "label": "A",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json"
+        },
+        "c": {
+          "file": "adjudication-20260925/q1-memory-system-c.md",
+          "sha256": "efb4ac7e4c63f6eadfa334f1180b1d3aaec45a2b3bed75f2e2ef866f8ef38672",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json"
+        }
+      }
+    },
+    "q2-memory-llm": {
+      "sources": {
+        "codex": {
+          "file": "sota-models-codex.md",
+          "source_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+          "blinded_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+          "removed_html_comments": []
+        },
+        "claude": {
+          "file": "sota-models-claude.md",
+          "source_sha256": "bd99a4468233d8456899474be6457ac80e2dea3a509fedfc8915e4814b870cd7",
+          "blinded_sha256": "69d4d7273fd46035dd3cd6abcaf510ff82df963a60586cbc52b109cd7d5fdee4",
+          "removed_html_comments": [
+            "<!-- Claude lane (Opus 5.5 subagent), 2026-09-24/25; 130 tool uses, 414,369 subagent tokens; answer verbatim below. -->"
+          ]
+        }
+      },
+      "orders": {
+        "a": {
+          "file": "adjudication-20260925/q2-memory-llm-a.md",
+          "sha256": "4209e482980f68a062ed570b02a235d538266cbd976d0e3c91cee4efb0b378ce",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json"
+        },
+        "b": {
+          "file": "adjudication-20260925/q2-memory-llm-b.md",
+          "sha256": "159751e31bfcc9d750b1697158c855101c17fddcb2c777b38482ac8a57acdf63",
+          "A": "claude",
+          "B": "codex",
+          "listed_first": {
+            "label": "A",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json"
+        },
+        "c": {
+          "file": "adjudication-20260925/q2-memory-llm-c.md",
+          "sha256": "316938aea9967e5d750834e98fe8f375a4f6d38166a30207774bd1413aeb8546",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json"
+        }
+      }
+    },
+    "q3-reranker": {
+      "sources": {
+        "codex": {
+          "file": "sota-models-codex.md",
+          "source_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+          "blinded_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+          "removed_html_comments": []
+        },
+        "claude": {
+          "file": "sota-models-claude.md",
+          "source_sha256": "bd99a4468233d8456899474be6457ac80e2dea3a509fedfc8915e4814b870cd7",
+          "blinded_sha256": "69d4d7273fd46035dd3cd6abcaf510ff82df963a60586cbc52b109cd7d5fdee4",
+          "removed_html_comments": [
+            "<!-- Claude lane (Opus 5.5 subagent), 2026-09-24/25; 130 tool uses, 414,369 subagent tokens; answer verbatim below. -->"
+          ]
+        }
+      },
+      "orders": {
+        "a": {
+          "file": "adjudication-20260925/q3-reranker-a.md",
+          "sha256": "daa4178b5a7bd45885ddc0eac970f9055bde60241d8d6e05d0085858a045b3f6",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json"
+        },
+        "b": {
+          "file": "adjudication-20260925/q3-reranker-b.md",
+          "sha256": "d6d32c9d80e282a880661553ecab56a9c190ca48fe82313863d766e6c0903422",
+          "A": "claude",
+          "B": "codex",
+          "listed_first": {
+            "label": "A",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "B",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json"
+        },
+        "c": {
+          "file": "adjudication-20260925/q3-reranker-c.md",
+          "sha256": "d7dbf218d428e7105e53646e6ea27dc0ce9e16f57539a80f12350fb40b81eeaa",
+          "A": "codex",
+          "B": "claude",
+          "listed_first": {
+            "label": "B",
+            "lane": "claude"
+          },
+          "listed_second": {
+            "label": "A",
+            "lane": "codex"
+          },
+          "public_input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json"
+        }
+      }
+    }
+  },
+  "sha256sums": {
+    "file": "adjudication-20260925/SHA256SUMS",
+    "sha256": "095ec6a82f1db70f42478acde58ff9e07fc1bb2efe8c340ff9a6f6d9edaf3037",
+    "text": "1c40278e0feaf89a6e449fb8dc5b41c28984f1fbb91f52cad4401cc7f29c29ad  q1-memory-system-a.md\n06069691dafa39565e75e9a1ced103c7efc4c0c359a6e2670d4afd2326bb05fb  q1-memory-system-b.md\nefb4ac7e4c63f6eadfa334f1180b1d3aaec45a2b3bed75f2e2ef866f8ef38672  q1-memory-system-c.md\n4209e482980f68a062ed570b02a235d538266cbd976d0e3c91cee4efb0b378ce  q2-memory-llm-a.md\n159751e31bfcc9d750b1697158c855101c17fddcb2c777b38482ac8a57acdf63  q2-memory-llm-b.md\n316938aea9967e5d750834e98fe8f375a4f6d38166a30207774bd1413aeb8546  q2-memory-llm-c.md\ndaa4178b5a7bd45885ddc0eac970f9055bde60241d8d6e05d0085858a045b3f6  q3-reranker-a.md\nd6d32c9d80e282a880661553ecab56a9c190ca48fe82313863d766e6c0903422  q3-reranker-b.md\nd7dbf218d428e7105e53646e6ea27dc0ce9e16f57539a80f12350fb40b81eeaa  q3-reranker-c.md\n1eed64c0c60abbcd01239b9c793070d7aef8ef958bb89ee86ba1ff185d696040  adjudication-key.json\n",
+    "check": "shasum -a 256 -c on the originals passed for all 10 entries at assembly"
+  },
+  "note": "q2 and q3 share the same two returns (the model-screen lane pair); the shared context tells the judge which section to use (section 3 for q2, section 2 for q3). In order c the Claude return is listed first under the letter B, so across a, b and c the Claude return appears in both listing positions and under both letters."
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--data-exchange-calendars--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "data-exchange-calendars",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 -c \"import json,glob,sys;s,c=sys.argv[1],sys.argv[2];print('stack',s,[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==s],'| winner',c,'pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" exchange-calendars data-exchange-calendars && \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"import importlib.metadata as m;print('exchange-calendars',m.version('exchange-calendars'))\" && c=$(python3 -c \"import json,glob,re,sys;c=sys.argv[1];p={w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c};m={x for q in p for x in re.findall(r'[0-9a-f]{40}',q)};assert len(m)==1,p;print(m.pop())\" data-exchange-calendars) && t=$(git ls-remote https://github.com/gerrymanoim/exchange_calendars 'refs/tags/4.13.2' 'refs/tags/4.13.2^{}' | tail -1 | cut -f1) && echo \"upstream gerrymanoim/exchange_calendars tag 4.13.2 -> $t | winner pin commit $c\" && test \"$t\" = \"$c\"",
+      "exit": 0,
+      "duration_s": 0.343,
+      "output_sha256": "6ba39f56e942ced85b3e3d7465acef4bd8647a5b82be2669ee17677a7438b38a",
+      "output_excerpt": "stack exchange-calendars ['4.13.2'] | winner data-exchange-calendars pins ['4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a']\nexchange-calendars 4.13.2\nupstream gerrymanoim/exchange_calendars tag 4.13.2 -> dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a | winner pin commit dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a\n"
+    },
+    {
+      "cmd": "out=$(uv pip sync --dry-run --offline --python \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" adoption/sdk/requirements-linux-x86_64-py313.lock 2>&1) && printf '%s\\n' \"$out\" | tail -2 && printf '%s' \"$out\" | grep -q 'Would make no changes' && grep -A1 \"^exchange-calendars==\" adoption/sdk/requirements-linux-x86_64-py313.lock | head -2 && echo \"the environment matches adoption/sdk/requirements-linux-x86_64-py313.lock exactly (uv pip sync --dry-run --offline would make no changes)\"",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "1bddecd18b5ad2ec0df36a875f2b688a724425ffd5a5ae4c2d262a4c4f63f6dd",
+      "output_excerpt": "Checked 36 packages in 0.38ms\nWould make no changes\nexchange-calendars==4.13.2 \\\n    --hash=sha256:a9459425dd64142cd54fbc639847403c7e0c33d60fbc326c94fc1d6bd127f002 \\\nthe environment matches adoption/sdk/requirements-linux-x86_64-py313.lock exactly (uv pip sync --dry-run --offline would make no changes)\n"
+    },
+    {
+      "cmd": "/usr/bin/timeout 180 bwrap --unshare-net --die-with-parent --ro-bind / / --dev /dev --proc /proc \"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -s -c \"\nimport exchange_calendars as xc\nfrom exchange_calendars.errors import NotSessionError\nc=xc.get_calendar('XNYS');f=lambda t:t.strftime('%Y-%m-%d %H:%M')\ngot=[(f(c.session_open('2013-10-07')),f(c.session_close('2013-10-07'))),f(c.session_close('2024-11-29')),f(c.session_open('2024-03-08')),f(c.session_open('2024-03-11')),[c.is_session(d) for d in ('2024-07-04','2024-03-29','2024-12-25','2025-01-09')],len(c.sessions_in_range('2024-01-01','2024-12-31')),f(c.next_open('2024-07-03 21:00'))]\nwant=[('2013-10-07 13:30','2013-10-07 20:00'),'2024-11-29 18:00','2024-03-08 14:30','2024-03-11 13:30',[False,False,False,False],252,'2024-07-05 13:30']\ntry:\n    c.session_open('2024-07-04');refused='accepted'\nexcept NotSessionError: refused='NotSessionError'\nprint('XNYS in UTC:',sum(g==w for g,w in zip(got,want)),'of',len(want),'checks match (2013-10-07 13:30-20:00; 2024-11-29 early close 18:00; DST 2024-03-08 open 14:30 vs 2024-03-11 13:30; closed 2024-07-04, Good Friday 2024-03-29, 2024-12-25 and 2025-01-09; 252 sessions in 2024; next open after 2024-07-03 close 2024-07-05 13:30) | session_open on a holiday:',refused)\nraise SystemExit(0 if got==want and refused=='NotSessionError' else 1)\"",
+      "exit": 0,
+      "duration_s": 0.641,
+      "output_sha256": "3ea1d0f73b55c393264d67c7fe3dd57ad827ba154eebd4c3f5d7892fe60f1fde",
+      "output_excerpt": "XNYS in UTC: 7 of 7 checks match (2013-10-07 13:30-20:00; 2024-11-29 early close 18:00; DST 2024-03-08 open 14:30 vs 2024-03-11 13:30; closed 2024-07-04, Good Friday 2024-03-29, 2024-12-25 and 2025-01-09; 252 sessions in 2024; next open after 2024-07-03 close 2024-07-05 13:30) | session_open on a holiday: NotSessionError\n"
+    }
+  ],
+  "tool_versions": {
+    "data-exchange-calendars": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a"
+  },
+  "observed_at_utc": "2026-09-25T15:36:46Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), exchange-calendars 4.13.2 (the data-exchange-calendars winner pin '4.13.2; source dbe38b1f...'; upstream tag 4.13.2 resolves to that commit and the SDK environment matches the hash-locked adoption/sdk lock exactly) answered XNYS session questions offline in a network-less bubblewrap namespace, all equal to the exchange's published schedule: 2013-10-07 open 13:30 and close 20:00 UTC (the stack's documented example), the 2024-11-29 early close at 18:00 UTC, the DST shift from a 14:30 UTC open on 2024-03-08 to 13:30 on 2024-03-11, no session on 2024-07-04, Good Friday 2024-03-29, 2024-12-25 or the 2025-01-09 national day of mourning, 252 sessions in 2024, and next open after the 2024-07-03 close at 2024-07-05 13:30 UTC; session_open on a holiday raised NotSessionError. The checking command exits 0 only when every value matches; all commands exit 0.",
+  "limitations": [
+    "XNYS only, with the calendar's default bounds (about 20 years back and one year ahead of the run date); other exchanges, custom calendars and minute-level break handling were not exercised.",
+    "The expected values are hand-written from the NYSE schedule for those dates, not an independent data feed. Recorded under the landscape winner id data-exchange-calendars; manifests/stack.json names it exchange-calendars.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the package is this host's existing SDK environment ~/.local/share/codex-ecosystem/sdk-py313.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:36:46Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    }
+  ]
+}

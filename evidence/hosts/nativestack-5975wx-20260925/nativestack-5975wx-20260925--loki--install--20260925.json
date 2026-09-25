@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--loki--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "loki",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v loki) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" loki",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "bbd36e864c2d6741dac84bf2175d080f48ac1bf169c285cad183a258e9276b2a",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/loki -> ~/.local/share/codex-ecosystem/tools/ecosystem-loki-3.7.8/loki-linux-amd64\nstack ['3.7.8'] winner pins ['3.7.8']\n"
+    },
+    {
+      "cmd": "loki --version",
+      "exit": 0,
+      "duration_s": 0.049,
+      "output_sha256": "246798c1b35f51bad7b63ec645cc55eb0aa9f55d1cbc04dd34ec8dabd82a2af8",
+      "output_excerpt": "loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f)\n  build user:       root@a72310b1e091\n  build date:       2026-09-17T13:46:13Z\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,subprocess;o=subprocess.run(['loki','--version'],capture_output=True,text=True);t=o.stdout+o.stderr;r=[c for c in json.load(open('observability/receipt.json'))['components'] if c.get('id')=='loki'][0];rev=t.split('revision: ')[1].split(')')[0];ok='version 3.7.8 ' in t and r['version']=='3.7.8' and r['source_commit'].startswith(rev);print('loki --version revision',rev,'| observability/receipt.json loki',r['version'],'source_commit',r['source_commit'],'| revision is a prefix of the recorded commit:',ok);raise SystemExit(0 if ok else 1)\"",
+      "exit": 0,
+      "duration_s": 0.074,
+      "output_sha256": "7763328e912211f2efb10a036e763da8c70e98ba271b2b440b520dd92eef2e2a",
+      "output_excerpt": "loki --version revision 09e6ce2f | observability/receipt.json loki 3.7.8 source_commit 09e6ce2ff1bdc19763a10265b870c86f51c98655 | revision is a prefix of the recorded commit: True\n"
+    }
+  ],
+  "tool_versions": {
+    "loki": "3.7.8"
+  },
+  "observed_at_utc": "2026-09-25T15:34:07Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), Loki 3.7.8 (the catalog pin) is installed: loki resolves to ~/.local/share/codex-ecosystem/tools/ecosystem-loki-3.7.8/loki-linux-amd64, loki --version reports 3.7.8 with revision 09e6ce2f, and that revision is a prefix of the upstream source commit observability/receipt.json records for Loki 3.7.8 (09e6ce2ff1bd...). Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The release archive is not retained on this host, so the installed binary was not compared with the archive sha256 recorded in observability/receipt.json; the binding to the release is the embedded version and revision only. Serving is covered by the separate loki use receipt on main.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:07Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session reviewing on this host. Reproduced: re-ran all 3 commands (path and pin resolution; loki --version; the revision-prefix check against observability/receipt.json). Each exited 0, and each output is identical to its retained excerpt. Adequacy (install stage: points 3 and 4 plus claim support): 3 holds. The path, pin, version and revision claims each have retained output. git ls-remote shows upstream tag v3.7.8 at 09e6ce2ff1bd..., so the embedded revision is the release commit. The limitation that no release archive is retained is true: none is in the host's codex-ecosystem downloads or tools. The loki use receipt is on main (202e0517), and the host description matches this host live (48 CPUs, AMD Ryzen Threadripper PRO 5975WX, 102 GiB, RTX 4090 24 GB, Ubuntu 24.04.5 LTS, WSL 2.7.13.0), also retained in the hw profile and this host's vllm use -2 receipt. 4 holds. component_id loki is the foundation winner, and 3.7.8 pin_matches 3.7.8. The pin sources (catalogs/landscape foundation/us-equities, manifests/stack.json entry, observability/receipt.json, recipes/README.md entry) are unchanged for this component between catalog_revision 74886724 and 6b2f71fa. Binding is by version and revision only, as the receipt discloses.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:23:27Z",
+      "reviewer": {
+        "identity_sha256": "e891850f9e8918c14a188be398d923e1f684e7c4cad57a9b78e0501a7cab7b2a",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

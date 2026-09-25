@@ -1,0 +1,1897 @@
+{
+  "schema_version": 1,
+  "kind": "memory_stack_catalog_decisions",
+  "checked_at": "2026-09-25",
+  "baseline_commit": "6568f47252bc394641a32664c00eb1a700f135ed",
+  "scope": "Catalog actions for the one shared Claude Code and Codex memory stack (memory system, embedder, reranker, memory LLM and local serving) from a cross-family blind convergence: two frozen packets went to blind Claude Opus 5.5 and Codex GPT-6 Astra lanes, three roles went to a blind GPT-6 Sol judge in three presentation orders, the coordinator's convergence table set each row, two skeptic checks per row reviewed it, and neutral Mac measurements in the LongMemEval-S harness bound the memory-system and embedder rows. Production stays as configured; no row is adopted.",
+  "evidence": "evidence/artifacts/memory-stack-20260925/README.md",
+  "convergence_record": "evidence/artifacts/memory-stack-20260925/experiment.json",
+  "convergence_table": "evidence/artifacts/memory-stack-20260925/convergence.json",
+  "packet_sha256": {
+    "sota-models": "1847b3a1a0508078076f8d114e9ea1a021a92f8322f8e13e4f2482ca18f5a51a",
+    "memory-systems": "31318b2121b387e4a478456a5b794e6bf1119d100f9cb3aeeb96c17f19e6e807"
+  },
+  "publication_policy": {
+    "universal_sota_claim": false,
+    "automatic_install_or_promotion": false,
+    "best_means": "best-evidenced for this workload on these hosts on 2026-09-25, never state of the art in general"
+  },
+  "decision_values": {
+    "retain": "Keep the current production choice or as-shipped control; it stays until a challenger passes the preregistered rule.",
+    "trial": "Measure in isolation (VelaNext, a trial profile, loopback services, native passwordless sign-in), pinned to an official artifact by version and digest; no production wiring.",
+    "defer": "Record with the named gate or test that would reopen it; nothing is installed.",
+    "reject": "Not for this role this wave, with the condition that would reopen it.",
+    "adopt_within_scope": "Not used: it needs native_cli_execution in our harness plus a pass of the memory-lane acceptance, and no row has both."
+  },
+  "decision_counts": {
+    "defer": 14,
+    "reject": 6,
+    "retain": 9,
+    "trial": 14
+  },
+  "evidence_levels": {
+    "mac_nce_descriptive": "native_cli_execution in our LongMemEval-S harness on the Mac (full track, n = 470, recall_all@5), descriptive under A15.2, plus discovery evidence",
+    "discovery_independent": "discovery: a leaderboard or independent source named in the row, with or without vendor claims; no NCE",
+    "discovery_vendor": "discovery, vendor claims only (DV) or none; no NCE",
+    "operational_record": "an operational or production record outside the harness (a runbook smoke test, a production setting, a catalog status or a bug report); no NCE for this role",
+    "model_task_execution_other_workload": "model_task_execution on VelaNext for a different workload; no embedding evidence and no NCE"
+  },
+  "evidence_classes_in_text": {
+    "NCE": "native_cli_execution: measured in our LongMemEval-S harness (Mac, full track, n = 470, recall_all@5); descriptive under A15.2, with confirmatory decisions from the VelaNext rerun",
+    "D": "discovery: a leaderboard or independent source named in the row",
+    "DV": "discovery, vendor: a vendor claim"
+  },
+  "production_baseline": "ai-memory 19b6429 (local 2.5 build) on Ollama 0.34.4 with qwen3-embedding:4b and qwen3.5-9b-64k (qwen3.5:9b-mlx) for consolidation and LLM reranking; QMD for selected document collections. This record changes none of it.",
+  "replacement_rule": "A challenger replaces production only if it beats both C3 and C4 (A14 intersection–union) under Holm within each family (α = 0.0333; A16 arms at 0.0167) with a significant gain of at least +5 pp (A2, A15.2), then passes the deployable-artifact gate where it applies and the memory-lane acceptance: an explicit durable decision retrievable in its intended scope with cross-scope negatives, and recovery without importing unrelated histories or another host's credential store.",
+  "pin_method": {
+    "github": "gh api graphql: repository(owner, name) { ref(qualifiedName: \"refs/tags/TAG\") { target } object(expression: SHORT) { oid } licenseInfo { spdxId } }",
+    "huggingface": "https://huggingface.co/api/models/ORG/NAME: .sha (main revision, which matched every short revision in the table), .lastModified, the license tag and gating",
+    "ollama": "manifest prefixes as the convergence writer read them from the Ollama registry and `ollama list`; not re-checked here"
+  },
+  "registration": "Only /repository_decisions is registered with the decision index (python3 scripts/catalog_decisions.py --write --supplement catalogs/foundation/memory-stack-20260925.json#/repository_decisions). Hugging Face models, Ollama tags, a production setting and a closed application have no GitHub identity and stay in /non_repository_decisions.",
+  "skeptic_corrections": "Fields listed in corrected_fields carry the recorder-applied corrections from convergence.json#/skeptic_review/corrections (every refuting skeptic check, the LMEB source naming, and the harrier next test). Fields listed in updated_fields carry convergence.json#/measurement_updates: C3 finished after the table, so the rows it bears on cite report-mac-descriptive.md (Mac, descriptive under A15.2). The other text is the convergence table's cell, verbatim. No correction or update changes a decision.",
+  "repository_decisions": [
+    {
+      "id": "memory-stack-ai-memory",
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "role": "Memory system",
+      "decision": "retain",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**ai-memory 2.5-pre `19b6429`**. A local `cargo build` of `release/2.5`; it reports 2.4.0 and is 110 commits ahead of official v2.4.0",
+      "scope": "production control on the Mac coordinator. Scope: explicit decisions, verified project scope, handoffs",
+      "evidence_held": "**NCE** (Mac, descriptive under A15.2): C3 aimem-qwen3, the production embedder with the reranker off, 0.570 recall_all@5, complete at 470/470 (rows 349 onward ran on macOS 27.0; a 20-question drift check without cache reproduced recall_all@5 on 20/20 and ndcg_any@5 on 18/20); aimem-minilm 0.496, aimem-fts 0.400. Paired against C3: am-minilm +0.251 [95% CI +0.203, +0.299], dense-qwen3 +0.183, bm25-full +0.177 and A0 +0.170 (Holm p 0.0001 each), am-keyless +0.047 [−0.006, +0.101] (p 0.52). C4 (production, reranker on) did not run on the Mac. The catalog's acceptance evidence covers official 2.3.2 and does not transfer to this build",
+      "lanes_and_judges": "Lanes: incumbent, not ranked. Judges: retain 3/3 (\"do not reject before C3/C4 and the +5 pp rule\")",
+      "rationale": "Stays the control until a challenger beats C3 and C4. Its binary provenance conflicts with the official-artifact rule (section 4, gate 1)",
+      "next_decision_changing_test": "C4, production with the LLM reranker (A14): the layer decision needs it, because a layer candidate must beat both C3 and C4, and C4 did not run on the Mac. On VelaNext: C3, then C4 (A15, step 2) with at most 5% fallbacks. Then re-run the memory-lane acceptance on the build that is actually running, and move to the first official 2.5 release with a 20-question reproduction of the control",
+      "rollback": "Official v2.4.0 `ai-memory-macos-aarch64.tar.gz` (verify against its `.sha256`). Revert `ProgramArguments` in `local.agent-ecosystem.ai-memory.plist`",
+      "pins": {
+        "running": {
+          "tag": "release/2.5 at 19b6429 (local cargo build; reports 2.4.0)",
+          "commit": "19b6429badfe17903074d2da38b5e533222d7a61",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "official_rollback": {
+          "tag": "v2.4.0",
+          "commit": "b1b25219b507cf56cb7334ac1a408dc9b09eaa50",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "landscape_winner_pin": "2.3.2 (catalogs/landscape/foundation.json durable-memory winner; its native evidence does not transfer to 19b6429)"
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "update_ids": [
+        "u1-ai-memory-c3"
+      ],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/0",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/0",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/measurement_updates"
+      ],
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory"
+      ]
+    },
+    {
+      "id": "memory-stack-agentmemory",
+      "name": "agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "role": "Memory system",
+      "decision": "trial",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**agentmemory 0.9.29**. npm `@agentmemory/agentmemory`, iii 0.11.2",
+      "scope": "VelaNext evaluation plus an isolated dual-client trial. No production wiring",
+      "evidence_held": "**NCE** (Mac, descriptive under A15.2): am-minilm 0.821 (official track 0.814), am-keyless 0.617; paired against C3 (0.570), am-minilm +0.251 [95% CI +0.203, +0.299], Holm p 0.0001, and am-keyless +0.047 [−0.006, +0.101], p 0.52. Ingested through the REST `remember` path, labelled the benchmark API path (A15.2), not the shipped hooks. **DV:** 95.2% recall_any",
+      "lanes_and_judges": "Lanes: on neither shortlist; it was the packet's measured leader. Judges: a #1, b \"measured control; check the hook path\", c #2. Trial 3/3; its rank depends on the order",
+      "rationale": "Strongest neutral result: +32.5 pp over ai-memory with MiniLM and +25.1 pp over C3, descriptively on the Mac. Its standing against C4 is unknown, and its capture path is unmeasured. Apache-2.0, local. Codex Desktop does not dispatch plugin hooks (openai/codex#16430)",
+      "next_decision_changing_test": "C4, production with the reranker, which the layer decision needs (A14), and **D2h**, the shipped Claude Code hook path, both on VelaNext. Then the E-vs-F matched-embedder comparison, and both decision families. Then memory-lane acceptance across both clients",
+      "rollback": "Stop the server, delete the trial data directory, drop the trial profile. Production is never touched",
+      "pins": {
+        "release": {
+          "tag": "v0.9.29",
+          "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "package": "npm @agentmemory/agentmemory@0.9.29 with the iii engine 0.11.2"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [
+        "evidence_held",
+        "rationale",
+        "next_decision_changing_test"
+      ],
+      "update_ids": [
+        "u2-agentmemory-against-c3"
+      ],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/1",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/1",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/measurement_updates"
+      ],
+      "sources": [
+        "https://github.com/rohitg00/agentmemory"
+      ]
+    },
+    {
+      "id": "memory-stack-mempalace",
+      "name": "MemPalace",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "role": "Memory system",
+      "decision": "trial",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**MemPalace 3.10.0** (MIT)",
+      "scope": "VelaNext A16 arms in raw and palace (production) modes, plus an isolated hook trial in both clients",
+      "evidence_held": "**D:** vendor per-question logs, re-scored by the Claude lane; we have not reproduced them. recall_all@5 is 0.857 raw (470 questions, user turns only; raw mode bypasses the palace code) and 0.887 for hybrid v4 (424 held-out questions; tuned on LME). **DV:** recall_any@5 96.6% and 98.4% (BENCHMARKS.md, 2026-04). **D, third party:** palace modes 89.4% and 84.2% recall_any (#214; arXiv 2604.21284). No NCE",
+      "lanes_and_judges": "Lanes: Claude #1, Codex –. Judges: a #2, b #1 (A = Claude preferred), c #1. Trial 3/3; it ranks #1 only when the Claude return is listed first",
+      "rationale": "Best fit to the constraints: local, no services, hooks for both clients, MCP. Its hooks ask the agent to file memories, so capture is model-driven and the production path differs from raw mode",
+      "next_decision_changing_test": "**A16.** First, its own harness at v3.10.0 reproduces the published numbers. Then the official evaluator runs on identical session text with both roles, in raw and palace modes. Add a pooled-store stress run, then memory-lane acceptance",
+      "rollback": "`uv tool uninstall mempalace`. Delete the trial palace and the trial profile's hooks",
+      "pins": {
+        "release": {
+          "tag": "v3.10.0",
+          "commit": "22fd87f09c19d5ffb2d6966486483353937931c0",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "package": "PyPI mempalace==3.10.0 or the ghcr.io/mempalace/mempalace:3.10.0 image by digest (convergence.json#/adoption_plan)"
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/2",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/2",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/MemPalace/mempalace"
+      ]
+    },
+    {
+      "id": "memory-stack-hindsight",
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "role": "Memory system",
+      "decision": "trial",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Hindsight 0.10.1** (MIT)",
+      "scope": "VelaNext. A 100-question subset first, with one local LLM",
+      "evidence_held": "**DV:** LongMemEval-S QA 91.4% (Gemini-3) and 83.6% (gpt-oss-20b) in arXiv 2512.12818; the reproduction was by co-authors, so it is not independent. Undated manifest: 94.6%. BEAM-10M: 64.1%. No retrieval recall is published. Catalog `pinned_source_review` at v0.10.0 (2026-09-19). No NCE",
+      "lanes_and_judges": "Lanes: Codex #1, Claude #2. Judges: a #3, b #2, c #3. Trial 3/3",
+      "rationale": "Clearest documented shared capture for Claude and Codex, with local LLM support. It runs LLM extraction on every retain: about 86 h for 470 questions at the measured gpt-oss-20b rate. It adds Postgres and a worker",
+      "next_decision_changing_test": "**A16 subset.** recall_all@5 ranked by first-seen `document_id`, plus ingest time. Then capture in both clients through the official coding-agents package",
+      "rollback": "`docker rm` the container and its pg0 volume. Remove the coding-agents wiring from the trial profile",
+      "pins": {
+        "release": {
+          "tag": "v0.10.1",
+          "commit": "f8950b0c07d9e34c76493dba802bb309f0ce60fd",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "package": "ghcr.io/vectorize-io/hindsight:0.10.1 by digest or hindsight-all==0.10.1 (convergence.json#/adoption_plan)"
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/3",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/3",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/vectorize-io/hindsight",
+        "https://arxiv.org/abs/2512.12818"
+      ]
+    },
+    {
+      "id": "memory-stack-attemory",
+      "name": "Attemory",
+      "repository": "https://github.com/AttemorySystem/attemory",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Attemory v0.1.3**",
+      "scope": "until a gate passes",
+      "evidence_held": "**DV:** session recall_all@5 96.38% on cleaned LME-S (470 questions, local Qwen3.5-9B; undated file), 83.62% on the M variant. The core is a prebuilt SDK, so source and licence coverage are unverified. Its MCP support is only planned",
+      "lanes_and_judges": "Lanes: Codex #2. Judges: a #4, b below the trials, c #4. Later, with a gate, 3/3",
+      "rationale": "Reports the closest published metric, but its core cannot be audited",
+      "next_decision_changing_test": "`pinned_source_review` of the prebuilt core (source and licence), then an A16 retrieval arm",
+      "rollback": "Nothing installed",
+      "pins": {
+        "release": {
+          "tag": "v0.1.3",
+          "commit": "603c03afa9a04e48b778922eae156a0024752f37",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "MIT for the repository (GitHub API); the prebuilt core SDK's source and licence coverage are unverified",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/4",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/4",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/AttemorySystem/attemory",
+        "https://github.com/AttemorySystem/attemory/blob/main/benchmarks/LongMemEval.md"
+      ]
+    },
+    {
+      "id": "memory-stack-gbrain",
+      "name": "GBrain",
+      "repository": "https://github.com/garrytan/gbrain",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**GBrain v0.56.2.0**",
+      "scope": "Memory-system role; nothing installed; an optional local-provider A16 arm (recorder wording from the row's rationale and next test)",
+      "evidence_held": "**DV:** 95.53% \"all sessions within 5 chunks\", using hosted OpenAI and Voyage models. Chunks are not sessions. 86.6% QA. The catalog rejected it (R-DUP)",
+      "lanes_and_judges": "Lanes: Codex #3. Judges: a –, b \"incomplete\", c #5",
+      "rationale": "Its metric unit differs, it relies on hosted models, and a macOS reindex hang is open",
+      "next_decision_changing_test": "Optional A16 arm with local providers only. Reopen if it beats agentmemory on recall_all@5",
+      "rollback": "Nothing installed",
+      "pins": {
+        "release": {
+          "tag": "v0.56.2.0",
+          "commit": "db56c778e8b287482e21df654e6df6dbcc9745fd",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/5",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/5",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/garrytan/gbrain"
+      ]
+    },
+    {
+      "id": "memory-stack-mem0-oss",
+      "name": "Mem0 OSS",
+      "repository": "https://github.com/mem0ai/mem0",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Mem0 OSS v2.2.0**",
+      "scope": "(catalog status unchanged)",
+      "evidence_held": "**DV:** OSS 91.0% QA (GPT-5) and 88.6% (Gemma 4 extraction); the managed platform scores 94.4%. **D, competitor re-run:** 73.8% (Maximem, 2026-05-27)",
+      "lanes_and_judges": "Lanes: Codex #4, Claude #4. Judges: –",
+      "rationale": "Local capture needs glue code. Its Claude Code plugin needs a Platform key, which is not passwordless",
+      "next_decision_changing_test": "A cost-bounded A16 arm with one local model, or a real need for application-level memory",
+      "rollback": "Nothing installed",
+      "pins": {
+        "release": {
+          "tag": "v2.2.0",
+          "commit": "47a69e1e72dc562b6fdd49a9ef892229afc7508a",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/6",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/6",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/mem0ai/mem0",
+        "https://github.com/mem0ai/memory-benchmarks"
+      ]
+    },
+    {
+      "id": "memory-stack-qmd",
+      "name": "QMD",
+      "repository": "https://github.com/tobi/qmd",
+      "role": "Memory system",
+      "decision": "retain",
+      "evidence_level": "operational_record",
+      "candidate_pin": "**QMD 2.8.3**",
+      "scope": "for selected document collections. Not a session-memory candidate",
+      "evidence_held": "Selected in the agent-ecosystem catalog at pin 2.8.3. Our operational runbook retrieval smoke test: 6/10 hit@3 with `qmd search` (the keyword path), against 3/10 on the old Mac and 9/10 for SocratiCode on the same questions. Not a LongMemEval result",
+      "lanes_and_judges": "Lanes: Claude #3, as a control. Judges: –",
+      "rationale": "Local hybrid search with reranking, already installed. No capture hooks",
+      "next_decision_changing_test": "Rerun the runbook retrieval smoke test after each index rebuild or version change, on both `qmd search` and `qmd query` (the reranking path), and compare it with SocratiCode on the same 10 questions. A drop below the old-Mac baseline (3/10 hit@3), or a consistent loss to SocratiCode on the document collections, moves QMD to defer for those collections. A QMD LongMemEval arm would bear only on the separate session-memory question, and A16 as written names none",
+      "rollback": "n/a",
+      "pins": {
+        "release": {
+          "tag": "v2.8.3",
+          "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k2-qmd-next-test"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/7",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/7",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://github.com/tobi/qmd"
+      ]
+    },
+    {
+      "id": "memory-stack-honcho",
+      "name": "Honcho",
+      "repository": "https://github.com/plastic-labs/honcho",
+      "role": "Memory system",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Honcho v3.2.1, OpenViking v0.4.21, Basic Memory v0.23.2**",
+      "scope": "for this role, this wave",
+      "evidence_held": "**DV only.** Honcho 90.4% QA; OpenViking LoCoMo 80.32%; Basic Memory LoCoMo R@5 76.4%. None has a LongMemEval retrieval score",
+      "lanes_and_judges": "Lanes: Claude #5 (Honcho), Codex #5 (OpenViking). Judges: –",
+      "rationale": "AGPL-3.0 conflicts with a trading lane that may become commercial. Honcho needs Postgres, Redis and a worker, and its embedder can silently fall back to OpenAI (#915)",
+      "next_decision_changing_test": "Reopen if the licence need changes or an independent recall_all@5 result appears",
+      "rollback": "n/a",
+      "pins": {
+        "release": {
+          "tag": "v3.2.1",
+          "commit": "79cb31645f4efdef626d1bd9316a648adb5da89b",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "AGPL-3.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/plastic-labs/honcho"
+      ]
+    },
+    {
+      "id": "memory-stack-openviking",
+      "name": "OpenViking",
+      "repository": "https://github.com/volcengine/OpenViking",
+      "role": "Memory system",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Honcho v3.2.1, OpenViking v0.4.21, Basic Memory v0.23.2**",
+      "scope": "for this role, this wave",
+      "evidence_held": "**DV only.** Honcho 90.4% QA; OpenViking LoCoMo 80.32%; Basic Memory LoCoMo R@5 76.4%. None has a LongMemEval retrieval score",
+      "lanes_and_judges": "Lanes: Claude #5 (Honcho), Codex #5 (OpenViking). Judges: –",
+      "rationale": "AGPL-3.0 conflicts with a trading lane that may become commercial. Honcho needs Postgres, Redis and a worker, and its embedder can silently fall back to OpenAI (#915)",
+      "next_decision_changing_test": "Reopen if the licence need changes or an independent recall_all@5 result appears",
+      "rollback": "n/a",
+      "pins": {
+        "release": {
+          "tag": "v0.4.21",
+          "commit": "3fca2577520f00b7f580d85d4ac6ae42bb9ba6f1",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "AGPL-3.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/volcengine/OpenViking"
+      ]
+    },
+    {
+      "id": "memory-stack-basic-memory",
+      "name": "Basic Memory",
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "role": "Memory system",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Honcho v3.2.1, OpenViking v0.4.21, Basic Memory v0.23.2**",
+      "scope": "for this role, this wave",
+      "evidence_held": "**DV only.** Honcho 90.4% QA; OpenViking LoCoMo 80.32%; Basic Memory LoCoMo R@5 76.4%. None has a LongMemEval retrieval score",
+      "lanes_and_judges": "Lanes: Claude #5 (Honcho), Codex #5 (OpenViking). Judges: –",
+      "rationale": "AGPL-3.0 conflicts with a trading lane that may become commercial. Honcho needs Postgres, Redis and a worker, and its embedder can silently fall back to OpenAI (#915)",
+      "next_decision_changing_test": "Reopen if the licence need changes or an independent recall_all@5 result appears",
+      "rollback": "n/a",
+      "pins": {
+        "release": {
+          "tag": "v0.23.2",
+          "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "AGPL-3.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/8",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/basicmachines-co/basic-memory"
+      ]
+    },
+    {
+      "id": "memory-stack-graphiti",
+      "name": "Graphiti/Zep",
+      "repository": "https://github.com/getzep/graphiti",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "v0.30.2 as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/getzep/graphiti"
+      ]
+    },
+    {
+      "id": "memory-stack-supermemory",
+      "name": "Supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "v0.0.8 (binary-only server) as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "MIT for the repository; the server ships as binaries (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/supermemoryai/supermemory"
+      ]
+    },
+    {
+      "id": "memory-stack-cognee",
+      "name": "Cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "v1.6.1 as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/topoteretes/cognee"
+      ]
+    },
+    {
+      "id": "memory-stack-claude-mem",
+      "name": "claude-mem",
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "v13.25.3 as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/thedotmack/claude-mem"
+      ]
+    },
+    {
+      "id": "memory-stack-memos",
+      "name": "MemOS",
+      "repository": "https://github.com/MemTensor/MemOS",
+      "role": "Memory system",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "v2.0.34 as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/MemTensor/MemOS"
+      ]
+    },
+    {
+      "id": "memory-stack-letta",
+      "name": "Letta server (retired)",
+      "repository": "https://github.com/letta-ai/letta",
+      "role": "Memory system",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "scope": "Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_and_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "0.16.8 (last server release) as the Claude lane reported it; not resolved to a commit"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/9",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/letta-ai/letta"
+      ],
+      "decision_note": "The row decides defer for the group and reject for the retired Letta server ('Letta is reject')."
+    },
+    {
+      "id": "memory-stack-ollama",
+      "name": "Ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "role": "Local serving",
+      "decision": "retain",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**Ollama 0.34.4** (official release, 2026-09-23)",
+      "scope": "production serving on the Mac for the Qwen3 embedder and the memory LLM. On VelaNext it serves only the GGUF chat LLMs (C4 and the H arms, preregistered and not yet run); the VelaNext embedders go to llama-server and the BF16 reference server (A15.1)",
+      "evidence_held": "**NCE** (Mac only, descriptive under A15.2): Ollama served the Qwen3-Embedding GGUF arms: B2 dense-qwen3 and C3 aimem-qwen3 are complete (n = 470; recall_all@5 0.753 and 0.570), and D3 am-qwen3 (12/470) is partial and excluded from every analysis by A15.2. The MiniLM arms C2 and D2 ran in-process on CPU, not on Ollama. Embedding models run single-slot (OLLAMA_NUM_PARALLEL is ignored for them; A13, A15.1). No native rerank endpoint. The agent-ecosystem catalog's selected pin still says 0.34.3 and needs updating; its manifest already records 0.34.4",
+      "lanes_and_judges": "–",
+      "rationale": "Selected. Embedding models run single-slot (A15.1). No native rerank endpoint",
+      "next_decision_changing_test": "None pending for retain. Recheck the VelaNext serving of C4 and the H arms when those runs happen",
+      "rollback": "The official 0.34.3 release asset",
+      "pins": {
+        "release": {
+          "tag": "v0.34.4",
+          "commit": "b2da9e468af2479058ae18c6d908ed29de410684",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "rollback": {
+          "tag": "v0.34.3",
+          "commit": "6383a0fa9cbf97494b847226e189f6e36b401a08",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [
+        "scope",
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k1-ollama-embedding-arms"
+      ],
+      "updated_fields": [
+        "evidence_held"
+      ],
+      "update_ids": [
+        "u4-ollama-c3"
+      ],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/28",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/28",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/measurement_updates"
+      ],
+      "sources": [
+        "https://github.com/ollama/ollama/releases/tag/v0.34.4"
+      ]
+    },
+    {
+      "id": "memory-stack-llama-cpp",
+      "name": "llama.cpp llama-server",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "role": "Local serving",
+      "decision": "trial",
+      "evidence_level": "model_task_execution_other_workload",
+      "candidate_pin": "**llama.cpp `llama-server`**, an official release build (catalog `b11057`; the freshness check found v0.5.0, which points to b11146)",
+      "scope": "(catalog status unchanged): the VelaNext GGUF embedding server (A15.1)",
+      "evidence_held": "model_task_execution on VelaNext at b11057: a Qwen3.8-27B chat-model code repair that passed 12 tests (catalog host record 2026-09-20). Not NCE in this table's sense (not our LongMemEval harness), and no embedding evidence",
+      "lanes_and_judges": "–",
+      "rationale": "A batching server for evaluation throughput",
+      "next_decision_changing_test": "Before C3 and C4 run on VelaNext, on the same GGUF digests (`df5bd2e3c74c`, `ac6da0dfba84`, `64b933495768`) with the same pooling and instruction settings: first a parity gate against Ollama 0.34.4 (cosine ≥ 0.999 on the gate texts, recall within 1 pp on 100 questions), then the A15.1 batch-invariance gate (cosine ≥ 0.9999). If parity fails, llama.cpp moves to defer for this role and single-slot Ollama serves the controls as A15 preregistered; if batch invariance fails, its throughput reason no longer holds, so it moves to defer with Ollama serving the controls. The parity gate is not in the preregistration yet and must be written in before any VelaNext run",
+      "rollback": "Stop the server; remove the extracted release",
+      "pins": {
+        "catalog_build": {
+          "tag": "b11057 (prerelease)",
+          "commit": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        },
+        "release_candidate": {
+          "tag": "v0.5.0 (b11146)",
+          "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "pin_note": "b11057 is an official prerelease tag (commit 59657a613ab0fa4ab327d6c790123dff30bfbd67), the catalog's qualified build; v0.5.0 is a release tag at b11146 (commit 7fe450e19305b828c199d602c23a8337aaa1f03b). A15.1 names neither: fix one, with its asset sha256, before any A15.1 run.",
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k7-llama-cpp-evidence-and-gate"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/29",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/29",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://github.com/ggml-org/llama.cpp"
+      ]
+    },
+    {
+      "id": "memory-stack-vllm-openai",
+      "name": "vLLM official container",
+      "repository": "https://github.com/vllm-project/vllm",
+      "role": "Local serving",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**vLLM official container**: `vllm/vllm-openai:v0.24.0` (`sha256:251eba5c…`) or `v0.25.0` (`sha256:fc56161e…`)",
+      "scope": "Proposed by this writer; not converged",
+      "evidence_held": "**DV:** NVIDIA's model cards validate Nemotron-3-Embed with vllm-openai v0.20–v0.24 (1B) and v0.21/v0.24 (8B), and with vllm 0.25.0 for `/v2/embed`. The MemReranker card documents a vLLM OpenAI-compatible server",
+      "lanes_and_judges": "No lane, no judge",
+      "rationale": "The upstream end-to-end server the user asked for, in place of the lane package's own OpenAI-compatible wrapper around sentence-transformers",
+      "next_decision_changing_test": "Add it through an amendment written before any VelaNext run. It must pass the same reference-output and batch-invariance gates",
+      "rollback": "Keep the wrapper",
+      "pins": {
+        "containers": "vllm/vllm-openai:v0.24.0 (sha256:251eba5c…) or v0.25.0 (sha256:fc56161e…), digest prefixes as the table reports"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/30",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/30",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/vllm-project/vllm"
+      ]
+    },
+    {
+      "id": "memory-stack-mlx",
+      "name": "MLX",
+      "repository": "https://github.com/ml-explore/mlx",
+      "role": "Local serving",
+      "decision": "trial",
+      "evidence_level": "operational_record",
+      "candidate_pin": "**MLX v0.32.2 and mlx-lm**",
+      "scope": "(catalog status unchanged)",
+      "evidence_held": "The production LLM already runs through Ollama's MLX engine",
+      "lanes_and_judges": "–",
+      "rationale": "Kill switch: close mlx-lm as a duplicate if Ollama's MLX path is within 10% of its throughput",
+      "next_decision_changing_test": "As in the catalog",
+      "rollback": "n/a",
+      "pins": {
+        "release": {
+          "tag": "v0.32.2",
+          "commit": "1f8e74e3f12f31365464a6867c6579f0e9b29d85",
+          "source": "GitHub API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table"
+        }
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/31",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/31"
+      ],
+      "sources": [
+        "https://github.com/ml-explore/mlx"
+      ]
+    },
+    {
+      "id": "memory-stack-mlx-lm",
+      "name": "mlx-lm",
+      "repository": "https://github.com/ml-explore/mlx-lm",
+      "role": "Local serving",
+      "decision": "trial",
+      "evidence_level": "operational_record",
+      "candidate_pin": "**MLX v0.32.2 and mlx-lm**",
+      "scope": "(catalog status unchanged)",
+      "evidence_held": "The production LLM already runs through Ollama's MLX engine",
+      "lanes_and_judges": "–",
+      "rationale": "Kill switch: close mlx-lm as a duplicate if Ollama's MLX path is within 10% of its throughput",
+      "next_decision_changing_test": "As in the catalog",
+      "rollback": "n/a",
+      "pins": {
+        "version_reported": "catalog status unchanged; not re-pinned here"
+      },
+      "license": "MIT (GitHub API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/31",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/31"
+      ],
+      "sources": [
+        "https://github.com/ml-explore/mlx-lm"
+      ]
+    },
+    {
+      "id": "memory-stack-transformers-js",
+      "name": "transformers.js / ONNX in Node",
+      "repository": "https://github.com/huggingface/transformers.js",
+      "role": "Local serving",
+      "decision": "retain",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**transformers.js / ONNX in Node** (agentmemory, in-process)",
+      "scope": "inside the agentmemory trial",
+      "evidence_held": "**NCE** through am-minilm: recall_all@5 0.821 on the full track (n = 470), on the Mac benchmark API path (REST `remember`), descriptive under A15.2. The trial tree resolves @huggingface/transformers 4.3.0 and onnxruntime-node 1.30.0 from the agentmemory 0.9.29 lockfile (reported by a skeptic check; not re-verified here)",
+      "lanes_and_judges": "–",
+      "rationale": "As shipped",
+      "next_decision_changing_test": "The agentmemory trial outcome: D2h on the shipped hook path, and E1–E3 (agentmemory through its OpenAI-compatible /v1/embeddings provider on VelaNext) against C3 and C4, with D2 as the paired descriptive reference. If an endpoint embedder is selected, or agentmemory leaves the trial, this runtime moves to defer or reject for the role. The ettin and harrier ONNX drop-in checks decide scope only; they are not preregistered, must be added by amendment before any run, and the harrier build must reproduce the reference outputs (cosine ≥ 0.999)",
+      "rollback": "n/a",
+      "pins": {
+        "trial_tree": "@huggingface/transformers 4.3.0 and onnxruntime-node 1.30.0 via the agentmemory 0.9.29 lockfile (skeptic-check report; not re-verified)"
+      },
+      "license": "Apache-2.0 (GitHub API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k8-transformers-js-next-test"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/32",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/32",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://github.com/huggingface/transformers.js"
+      ]
+    }
+  ],
+  "non_repository_decisions": [
+    {
+      "id": "memory-stack-qwen3-embedding-4b",
+      "name": "Qwen3-Embedding-4B",
+      "role": "Embedder",
+      "decision": "retain",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**Qwen3-Embedding-4B**. Ollama `qwen3-embedding:4b` `df5bd2e3c74c` (Q4_K_M, 2560-d)",
+      "scope": "production embedder control",
+      "evidence_held": "**NCE** (Mac, descriptive under A15.2): dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus) and C3 aimem-qwen3 0.570 (ai-memory with this embedder, reranker off; complete at 470/470). **D:** LMEB LongMemEval task, nDCG@10 50.21 (MTEB leaderboard API snapshot 2026-09-24), the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB",
+      "lanes_and_judges": "Lanes: both lanes challenge it. Judges: not adjudicated, because the lanes agreed",
+      "rationale": "Stays until an F arm beats C4 (A15.2, precedence 2)",
+      "next_decision_changing_test": "F1–F3 against C4. G0 (BF16) separates the effect of quantization and runtime from the effect of model generation",
+      "rollback": "n/a (current)",
+      "pins": {
+        "ollama": {
+          "tag": "qwen3-embedding:4b",
+          "manifest": "df5bd2e3c74c",
+          "note": "Q4_K_M, 2560-d, production embedder"
+        },
+        "huggingface_reference": {
+          "model_id": "Qwen/Qwen3-Embedding-4B",
+          "revision": "5cf2132abc99cad020ac570b19d031efec650f2b",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3-Embedding-4B/tree/5cf2132abc99cad020ac570b19d031efec650f2b",
+          "revision_last_modified": "2025-06-20T09:30:56.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [
+        "evidence_held"
+      ],
+      "correction_ids": [
+        "k5-lmeb-source-qwen3-embedding-4b"
+      ],
+      "updated_fields": [
+        "evidence_held"
+      ],
+      "update_ids": [
+        "u3-qwen3-embedding-4b-c3"
+      ],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/10",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/10",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/measurement_updates"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3-Embedding-4B"
+      ]
+    },
+    {
+      "id": "memory-stack-nemotron-3-embed-8b",
+      "name": "Nemotron-3-Embed-8B-BF16",
+      "role": "Embedder",
+      "decision": "trial",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Nemotron-3-Embed-8B-BF16**, HF revision `d1f2f257`",
+      "scope": "VelaNext arms E1, F1 and G1 only",
+      "evidence_held": "**D:** LMEB average nDCG@10 64.36 (#1) and LMEB LongMemEval task nDCG@10 85.70 (MTEB leaderboard API snapshot 2026-09-24; LMEB PRs #600/#617). RTEB(beta) rank 2; the vendor submitted its public tasks and the MTEB maintainers ran its private tasks. **DV:** RTEB-16 78.46, MMTEB retrieval 75.45. No NCE",
+      "lanes_and_judges": "Lanes: Codex #1, Claude #1. Judges: n/a",
+      "rationale": "Strongest independent evidence on memory retrieval. OpenMDW-1.1: notices must be kept, and rights end on a patent suit. No official GGUF or Ollama build; community GGUFs are unverified for its bidirectional attention. LM Studio has a wrong-dimension bug (#2177)",
+      "next_decision_changing_test": "A15 gates: the card's example similarities to 2 dp, batch invariance ≥ 0.9999, a 4,096-token cap. Then F1 against C4. Then the deployable-artifact gate: cosine ≥ 0.999 on the target host, within 1 pp on 100 questions",
+      "rollback": "Evaluation only. Delete the cached revision",
+      "pins": {
+        "huggingface": {
+          "model_id": "nvidia/Nemotron-3-Embed-8B-BF16",
+          "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+          "revision_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/tree/d1f2f25730bbd775b99b29185134bc86653bf2d1",
+          "revision_last_modified": "2026-08-28T15:59:43.000Z",
+          "license_tag": "other",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "OpenMDW-1.1 per the model card and both lanes (Hugging Face licence tag: other)",
+      "corrected_fields": [
+        "evidence_held"
+      ],
+      "correction_ids": [
+        "k5-lmeb-source-nemotron-8b"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/11",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/11",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+        "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores"
+      ]
+    },
+    {
+      "id": "memory-stack-nemotron-3-embed-1b",
+      "name": "Nemotron-3-Embed-1B-BF16",
+      "role": "Embedder",
+      "decision": "trial",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Nemotron-3-Embed-1B-BF16**, revision `c0c9fea9`",
+      "scope": "E2, F2 and G2",
+      "evidence_held": "**D:** LMEB average nDCG@10 61.50 and LMEB LongMemEval task nDCG@10 81.58 (MTEB leaderboard API snapshot 2026-09-24), RTEB rank 14. **DV:** RTEB-16 72.38. A partner reports LongMemEval R@10 80.38%, method unconfirmed. The catalog's trial note concerns a code-RAG service, which is not memory evidence",
+      "lanes_and_judges": "Lanes: Codex #2, Claude #2. Judges: n/a",
+      "rationale": "At 1.14B, the one more likely to deploy on the Mac through the MPS reference implementation",
+      "next_decision_changing_test": "The same gates, then F2 against C4, then an MPS deployability check on the Mac",
+      "rollback": "Same as above",
+      "pins": {
+        "huggingface": {
+          "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+          "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+          "revision_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/tree/c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+          "revision_last_modified": "2026-08-27T23:53:03.000Z",
+          "license_tag": "other",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "OpenMDW-1.1 per the model card and both lanes (Hugging Face licence tag: other)",
+      "corrected_fields": [
+        "evidence_held"
+      ],
+      "correction_ids": [
+        "k5-lmeb-source-nemotron-1b"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/12",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/12",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+        "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores"
+      ]
+    },
+    {
+      "id": "memory-stack-harrier-oss-v1-0.6b",
+      "name": "harrier-oss-v1-0.6b",
+      "role": "Embedder",
+      "decision": "trial",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**harrier-oss-v1-0.6b**, revision `f9b9dc8d` (MIT)",
+      "scope": "preregistered A15 arms E3, F3 and G3; low prior",
+      "evidence_held": "**D:** LMEB average nDCG@10 58.43 and LMEB LongMemEval task nDCG@10 72.46, below Qwen3-Embedding-0.6B's 73.08 (MTEB leaderboard API snapshot 2026-09-24). **DV:** MMTEB v2 69.01",
+      "lanes_and_judges": "Lanes: Claude #3, Codex –. Judges: n/a",
+      "rationale": "Did not converge across families. It stays only because A15 named it before any run. Its ONNX build (onnx-community, not first-party) suits agentmemory's in-process path",
+      "next_decision_changing_test": "F3 against C4 (A15.2, embedder precedence), and E3 and G3 against both C3 and C4 (A14 intersection–union). E3 against a VelaNext rerun of am-minilm is descriptive only. The onnx-community ONNX build must reproduce the reference embeddings (cosine ≥ 0.999) before any in-process use",
+      "rollback": "Same as above",
+      "pins": {
+        "huggingface": {
+          "model_id": "microsoft/harrier-oss-v1-0.6b",
+          "revision": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+          "revision_url": "https://huggingface.co/microsoft/harrier-oss-v1-0.6b/tree/f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+          "revision_last_modified": "2026-03-30T08:00:59.000Z",
+          "license_tag": "mit",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "onnx": {
+          "model_id": "onnx-community/harrier-oss-v1-0.6b-ONNX",
+          "revision": "e4daffa011e666dcd2ff2a3c6c05084090ac314d",
+          "revision_url": "https://huggingface.co/onnx-community/harrier-oss-v1-0.6b-ONNX/tree/e4daffa011e666dcd2ff2a3c6c05084090ac314d",
+          "revision_last_modified": "2026-04-10T14:30:56.000Z",
+          "license_tag": "mit",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "MIT (Hugging Face API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k5-lmeb-source-harrier"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/13",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/13",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+        "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores"
+      ]
+    },
+    {
+      "id": "memory-stack-qwen3-embedding-8b",
+      "name": "Qwen3-Embedding-8B",
+      "role": "Embedder",
+      "decision": "defer",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Qwen3-Embedding-8B and 0.6B**. Ollama `64b933495768` / `ac6da0dfba84`",
+      "scope": "C6/C5 size diagnostics only",
+      "evidence_held": "**D** (independent): LMEB (Long-horizon Memory Embedding Benchmark) LongMemEval task, nDCG@10: 77.66 (8B) and 73.08 (0.6B), MTEB leaderboard API snapshot 2026-09-24, run by the LMEB (KaLM) authors in results PRs #600/#617. Not QA accuracy and not our recall_all@5. No NCE: C5 and C6 never ran on the Mac",
+      "lanes_and_judges": "Lanes: Codex #3 (8B, as a control)",
+      "rationale": "Measure size with the reranker off. No production path",
+      "next_decision_changing_test": "An amendment written before its first run names an F-style arm: ai-memory with Qwen3-Embedding-8B (`64b933495768`) and the reranker on, decided against C4 under the A14/A15.2 rule, then the deployable-artifact gate. A16 as written names no such arm. Until one exists, C5/C6 against C3 on VelaNext are descriptive size diagnostics with the reranker off and cannot change this row (A15.2, precedence 2)",
+      "rollback": "n/a",
+      "pins": {
+        "ollama": {
+          "tag": "qwen3-embedding:8b",
+          "manifest": "64b933495768"
+        },
+        "huggingface_reference": {
+          "model_id": "Qwen/Qwen3-Embedding-8B",
+          "revision": "1d8ad4ca9b3dd8059ad90a75d4983776a23d44af",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3-Embedding-8B/tree/1d8ad4ca9b3dd8059ad90a75d4983776a23d44af",
+          "revision_last_modified": "2025-07-07T09:02:21.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k4-qwen3-embedding-8b-0.6b"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/14",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/14",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3-Embedding-8B",
+        "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores"
+      ]
+    },
+    {
+      "id": "memory-stack-qwen3-embedding-0.6b",
+      "name": "Qwen3-Embedding-0.6B",
+      "role": "Embedder",
+      "decision": "defer",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Qwen3-Embedding-8B and 0.6B**. Ollama `64b933495768` / `ac6da0dfba84`",
+      "scope": "C6/C5 size diagnostics only",
+      "evidence_held": "**D** (independent): LMEB (Long-horizon Memory Embedding Benchmark) LongMemEval task, nDCG@10: 77.66 (8B) and 73.08 (0.6B), MTEB leaderboard API snapshot 2026-09-24, run by the LMEB (KaLM) authors in results PRs #600/#617. Not QA accuracy and not our recall_all@5. No NCE: C5 and C6 never ran on the Mac",
+      "lanes_and_judges": "Lanes: Codex #3 (8B, as a control)",
+      "rationale": "Measure size with the reranker off. No production path",
+      "next_decision_changing_test": "An amendment written before its first run names an F-style arm: ai-memory with Qwen3-Embedding-8B (`64b933495768`) and the reranker on, decided against C4 under the A14/A15.2 rule, then the deployable-artifact gate. A16 as written names no such arm. Until one exists, C5/C6 against C3 on VelaNext are descriptive size diagnostics with the reranker off and cannot change this row (A15.2, precedence 2)",
+      "rollback": "n/a",
+      "pins": {
+        "ollama": {
+          "tag": "qwen3-embedding:0.6b",
+          "manifest": "ac6da0dfba84"
+        },
+        "huggingface_reference": {
+          "model_id": "Qwen/Qwen3-Embedding-0.6B",
+          "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/tree/97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+          "revision_last_modified": "2026-04-20T02:45:58.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k4-qwen3-embedding-8b-0.6b"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/14",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/14",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+        "https://mteb-leaderboard-backend.hf.space/v1/benchmarks/LMEB/scores"
+      ]
+    },
+    {
+      "id": "memory-stack-all-minilm-l6-v2",
+      "name": "all-MiniLM-L6-v2",
+      "role": "Embedder",
+      "decision": "retain",
+      "evidence_level": "mac_nce_descriptive",
+      "candidate_pin": "**all-MiniLM-L6-v2**, agentmemory's default through transformers.js",
+      "scope": "inside the agentmemory trial only, as shipped",
+      "evidence_held": "**NCE** (Mac, descriptive under A15.2): am-minilm 0.821 on the REST benchmark API path; aimem-minilm 0.496, which measures ai-memory with this embedder rather than the embedder alone. **D:** LMEB LongMemEval task, nDCG@10 67.94 (MTEB leaderboard API snapshot 2026-09-24; LMEB results PRs #600/#617). Its 256-token window truncates 4–8k-token pages",
+      "lanes_and_judges": "–",
+      "rationale": "The as-shipped control for the agentmemory arms",
+      "next_decision_changing_test": "E1–E3 (agentmemory with each new embedder, on VelaNext, benchmark API path) decided against C3 and against C4, passing both Holm families (A14, A15.2, α = 0.0333). D2 (am-minilm), rerun on VelaNext, is reported alongside as the paired, descriptive as-shipped reference, not as the decision comparator. A production switch also needs the A15.2 deployable-artifact gate and D2h, the shipped hook path",
+      "rollback": "n/a",
+      "pins": {
+        "as_shipped": "Xenova/all-MiniLM-L6-v2 through transformers.js inside agentmemory 0.9.29",
+        "huggingface": {
+          "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+          "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+          "revision_url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+          "revision_last_modified": "2026-06-01T06:29:13.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "onnx_as_shipped": {
+          "model_id": "Xenova/all-MiniLM-L6-v2",
+          "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+          "revision_url": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/751bff37182d3f1213fa05d7196b954e230abad9",
+          "revision_last_modified": "2025-07-22T16:42:24.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [
+        "evidence_held",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k3-minilm-next-test"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/15",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/15",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/neutral_measurements",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"
+      ]
+    },
+    {
+      "id": "memory-stack-ai-memory-llm-reranking",
+      "name": "ai-memory LLM listwise reranking",
+      "role": "Reranker",
+      "decision": "retain",
+      "evidence_level": "operational_record",
+      "candidate_pin": "**ai-memory LLM listwise reranking**: `qwen3.5-9b-64k`, reasoning low, 20 s hard timeout",
+      "scope": "the production setting (status quo)",
+      "evidence_held": "No harness result; C4 has not run",
+      "lanes_and_judges": "n/a",
+      "rationale": "Under A14 and A15.2 (precedence 1), it stays unless C3 beats C4. More than 5% fallbacks makes the result inconclusive",
+      "next_decision_changing_test": "C3 against C4 on VelaNext",
+      "rollback": "Unset `AI_MEMORY_RERANKER` (the C3 configuration)",
+      "pins": {
+        "setting": "AI_MEMORY_RERANKER=llm with the qwen3.5-9b-64k tag (5efc0dd55d4a), reasoning low, 20 s hard timeout"
+      },
+      "license": "not applicable (a production setting)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/16",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/16",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json"
+      ],
+      "sources": []
+    },
+    {
+      "id": "memory-stack-memreranker-4b",
+      "name": "MemReranker-4B",
+      "role": "Reranker",
+      "decision": "trial",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**MemReranker-4B**, revision `22890bb4` (Apache-2.0)",
+      "scope": "exploratory stage X (A15) on VelaNext only. Outside Holm; no adoption",
+      "evidence_held": "**DV:** LongMemEval nDCG@10 0.8354 and MAP 0.8043 on a fixed top-50 set (arXiv 2605.06132). No independent result",
+      "lanes_and_judges": "Lanes: Codex #1. Judges: #1 in 3/3",
+      "rationale": "Its evaluation setup is closest to our workload. 4B parameters. Only a community MLX build exists",
+      "next_decision_changing_test": "Stage X over the best system's top 50, plus complete-request latency. Adoption needs an upstream reranker slot in the chosen memory system; we do not maintain forks",
+      "rollback": "Nothing deployed",
+      "pins": {
+        "huggingface": {
+          "model_id": "IAAR-Shanghai/MemReranker-4B",
+          "revision": "22890bb4adff85b83b2181ed91e940ffb5a4ec45",
+          "revision_url": "https://huggingface.co/IAAR-Shanghai/MemReranker-4B/tree/22890bb4adff85b83b2181ed91e940ffb5a4ec45",
+          "revision_last_modified": "2026-05-12T03:44:14.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/17",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/17",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/IAAR-Shanghai/MemReranker-4B",
+        "https://arxiv.org/html/2605.06132v1"
+      ]
+    },
+    {
+      "id": "memory-stack-kalm-reranker-v1-small",
+      "name": "KaLM-Reranker-V1-Small",
+      "role": "Reranker",
+      "decision": "trial",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**KaLM-Reranker-V1-Small**, revision `8c2141c8` (R2: `68b74f09`)",
+      "scope": "stage X, after a code review",
+      "evidence_held": "**DV:** LMEB dialogue LongMemEval 87.58, from its own team, which also runs LMEB. BEIR 60.01. No LMEB result for R2",
+      "lanes_and_judges": "Lanes: Claude #3. Judges: a #3, b #2, c #2. It ranks #2 only when the Claude return is listed first",
+      "rationale": "A strong result, but self-reported. Needs `trust_remote_code`: the repository ships `kalm_*.py` files and a vLLM plugin",
+      "next_decision_changing_test": "`pinned_source_review` of the remote code at the pinned revision, then stage X",
+      "rollback": "Nothing deployed",
+      "pins": {
+        "huggingface": {
+          "model_id": "KaLM-Embedding/KaLM-Reranker-V1-Small",
+          "revision": "8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49",
+          "revision_url": "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Small/tree/8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49",
+          "revision_last_modified": "2026-09-21T05:50:34.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "r2_checkpoint": "68b74f09 as the convergence table reports it; not re-checked"
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/18",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/18",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Small",
+        "https://arxiv.org/abs/2606.22807"
+      ]
+    },
+    {
+      "id": "memory-stack-ettin-reranker-400m-v1",
+      "name": "ettin-reranker-400m-v1",
+      "role": "Reranker",
+      "decision": "trial",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**ettin-reranker-400m-v1**, revision `5dca3628` (`onnx/model_qint8_arm64.onnx`, 397.5 MB)",
+      "scope": "stage X, plus a transformers.js drop-in check",
+      "evidence_held": "**DV:** MTEB(eng, v2) retrieval after reranking 0.6091, against 0.5082 for ms-marco-MiniLM. NanoBEIR 0.7193. No memory result and no independent result",
+      "lanes_and_judges": "Lanes: Codex #3, Claude #1. Judges: a #2, b #3, c #3",
+      "rationale": "The only reranker on both lanes. 0.4B, Apache-2.0, official ARM64 ONNX. The cheapest replacement for agentmemory's 2021 cross-encoder",
+      "next_decision_changing_test": "Stage X. Check that its ONNX scoring head works in transformers.js",
+      "rollback": "Nothing deployed",
+      "pins": {
+        "huggingface": {
+          "model_id": "cross-encoder/ettin-reranker-400m-v1",
+          "revision": "5dca36282a5d85f368d2544002513a29159b4c9e",
+          "revision_url": "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/tree/5dca36282a5d85f368d2544002513a29159b4c9e",
+          "revision_last_modified": "2026-05-19T13:59:49.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "file": "onnx/model_qint8_arm64.onnx (397.5 MB as the table reports)"
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/19",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/19",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1",
+        "https://huggingface.co/blog/ettin-reranker"
+      ]
+    },
+    {
+      "id": "memory-stack-qwen3-reranker-4b",
+      "name": "Qwen3-Reranker-4B",
+      "role": "Reranker",
+      "decision": "defer",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Qwen3-Reranker-4B**",
+      "scope": "runs only as the preregistered stage-X arm",
+      "evidence_held": "**DV:** MTEB-R 69.76. **D (KaLM paper):** LMEB dialogue LongMemEval 53.72. Its GGUF needs the classifier head (llama.cpp #16407)",
+      "lanes_and_judges": "Lanes: Claude #2. Judges: lower in 3/3",
+      "rationale": "Weaker evidence on memory data",
+      "next_decision_changing_test": "The stage-X result",
+      "rollback": "n/a",
+      "pins": {
+        "huggingface": {
+          "model_id": "Qwen/Qwen3-Reranker-4B",
+          "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3-Reranker-4B/tree/22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+          "revision_last_modified": "2026-04-16T08:56:07.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/20",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/20",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3-Reranker-4B"
+      ]
+    },
+    {
+      "id": "memory-stack-jina-reranker-v3.5",
+      "name": "Jina Reranker v3.5",
+      "role": "Reranker",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**Jina Reranker v3.5**",
+      "scope": "Every lane that feeds the shared memory stack (recorder wording: the row's rationale cites the non-commercial licence)",
+      "evidence_held": "**DV:** BEIR 63.20. Licence CC-BY-NC-4.0 (HF card). The catalog rejected it",
+      "lanes_and_judges": "Lanes: Codex #2. Judges: excluded in 3/3",
+      "rationale": "Its non-commercial licence conflicts with a trading lane that may become commercial",
+      "next_decision_changing_test": "A licence change",
+      "rollback": "n/a",
+      "pins": {
+        "huggingface": {
+          "model_id": "jinaai/jina-reranker-v3.5",
+          "revision": "e8a93f33f0b22108f8c2364f8484ce3422552fbc",
+          "revision_url": "https://huggingface.co/jinaai/jina-reranker-v3.5/tree/e8a93f33f0b22108f8c2364f8484ce3422552fbc",
+          "revision_last_modified": "2026-07-30T11:35:06.000Z",
+          "license_tag": "cc-by-nc-4.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "CC-BY-NC-4.0 (Hugging Face API and model card)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/21",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/21",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://jina.ai/models/jina-reranker-v3.5"
+      ]
+    },
+    {
+      "id": "memory-stack-ms-marco-minilm-l6-v2",
+      "name": "ms-marco-MiniLM-L-6-v2",
+      "role": "Reranker",
+      "decision": "retain",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**ms-marco-MiniLM-L-6-v2**, bundled with agentmemory and off by default",
+      "scope": "inside the agentmemory trial only, as the bundled baseline",
+      "evidence_held": "**DV (ettin table):** 0.5082. 512-token window",
+      "lanes_and_judges": "–",
+      "rationale": "The baseline that ettin has to beat",
+      "next_decision_changing_test": "ettin against ms-marco on the agentmemory path",
+      "rollback": "n/a",
+      "pins": {
+        "as_shipped": "Xenova/ms-marco-MiniLM-L-6-v2 bundled with agentmemory 0.9.29, off by default",
+        "huggingface": {
+          "model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+          "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+          "revision_url": "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2/tree/233902d25c440f23af6f7d6e94d2946bac0bee0a",
+          "revision_last_modified": "2026-08-09T15:22:24.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "onnx_as_shipped": {
+          "model_id": "Xenova/ms-marco-MiniLM-L-6-v2",
+          "revision": "a09144355adeed5f58c8ed011d209bf8ee5a1fec",
+          "revision_url": "https://huggingface.co/Xenova/ms-marco-MiniLM-L-6-v2/tree/a09144355adeed5f58c8ed011d209bf8ee5a1fec",
+          "revision_last_modified": "2025-06-30T05:17:09.000Z",
+          "license_tag": null,
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 for cross-encoder/ms-marco-MiniLM-L6-v2 (Hugging Face API); the Xenova ONNX copy carries no licence tag",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/22",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/22",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2"
+      ]
+    },
+    {
+      "id": "memory-stack-qwen3.5-9b",
+      "name": "Qwen3.5-9B",
+      "role": "Memory LLM",
+      "decision": "retain",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Qwen3.5-9B**: `qwen3.5:9b-mlx` `203e30078279` (NVFP4). The production tag `qwen3.5-9b-64k` (`5efc0dd55d4a`) adds `num_ctx` 65536",
+      "scope": "production and control",
+      "evidence_held": "**D:** AA-LCR 46.0 without reasoning, 70.0 with it (Artificial Analysis). **DV:** LongBench v2 55.2. No harness result; C4 is pending",
+      "lanes_and_judges": "Lanes: Codex keeps it as control (#1); Claude keeps it as control. Judges: control in 3/3",
+      "rationale": "The status quo",
+      "next_decision_changing_test": "C4 with at most 5% fallbacks, then H1–H3 against C4",
+      "rollback": "n/a",
+      "pins": {
+        "ollama": {
+          "tag": "qwen3.5:9b-mlx",
+          "manifest": "203e30078279",
+          "note": "NVFP4 on Ollama's MLX engine"
+        },
+        "production_tag": {
+          "tag": "qwen3.5-9b-64k",
+          "manifest": "5efc0dd55d4a",
+          "note": "adds num_ctx 65536"
+        },
+        "huggingface_reference": {
+          "model_id": "Qwen/Qwen3.5-9B",
+          "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3.5-9B/tree/c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+          "revision_last_modified": "2026-03-02T00:51:43.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/23",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/23",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.5-9B",
+        "https://artificialanalysis.ai/models/qwen3-5-9b-non-reasoning"
+      ]
+    },
+    {
+      "id": "memory-stack-qwen3.6-35b-a3b",
+      "name": "Qwen3.6-35B-A3B",
+      "role": "Memory LLM",
+      "decision": "trial",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Qwen3.6-35B-A3B**, HF revision `995ad96e`. Ollama `qwen3.6:35b-a3b` `096fdbd02fe6` (GGUF, 22.6 GB) and `qwen3.6:35b-a3b-nvfp4` `e92a3e94bbca` (MLX, 23.6 GB)",
+      "scope": "H1 on VelaNext; a Mac latency check afterwards",
+      "evidence_held": "**D:** AA-LCR 64.3 without reasoning, 71.7 with it. No LongMemEval score. Apache-2.0",
+      "lanes_and_judges": "Lanes: Claude #1. Judges: #1 in 3/3 (order b preferred A = Claude)",
+      "rationale": "Strongest independent proxy: +18.3 over the control in the same mode, with 3B active parameters. Memory headroom and the 20 s limit are unmeasured",
+      "next_decision_changing_test": "H1 against C4, with at most 5% fallbacks at 20 s. Consolidation fidelity, listwise quality and p95 complete-request latency at 4K and 8K. The Mac check runs only with the user's go-ahead, because the Mac is control-only",
+      "rollback": "`ollama rm` the tag. Production `AI_MEMORY_LLM_MODEL` stays unchanged",
+      "pins": {
+        "huggingface": {
+          "model_id": "Qwen/Qwen3.6-35B-A3B",
+          "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+          "revision_url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/tree/995ad96eacd98c81ed38be0c5b274b04031597b0",
+          "revision_last_modified": "2026-04-24T02:53:42.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "ollama": [
+          {
+            "tag": "qwen3.6:35b-a3b",
+            "manifest": "096fdbd02fe6",
+            "note": "GGUF, 22.6 GB (VelaNext H1)"
+          },
+          {
+            "tag": "qwen3.6:35b-a3b-nvfp4",
+            "manifest": "e92a3e94bbca",
+            "note": "MLX, 23.6 GB (Mac latency check)"
+          }
+        ]
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/24",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/24",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+        "https://artificialanalysis.ai/models/qwen3-6-35b-a3b-non-reasoning"
+      ]
+    },
+    {
+      "id": "memory-stack-lfm2.5-2.6b",
+      "name": "LFM2.5-2.6B",
+      "role": "Memory LLM",
+      "decision": "trial",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**LFM2.5-2.6B**. Official GGUF `LiquidAI/LFM2.5-2.6B-GGUF`, revision `e7caca5d` (Q4_K_M). No Ollama library tag (404)",
+      "scope": "H3, evaluation only. A licence gate comes before any production use",
+      "evidence_held": "**DV:** IFStruct 85.49 (a proxy only); 220 tokens/s on an M5 Max CPU. No memory score. It always reasons. Custom LFM1.0 licence",
+      "lanes_and_judges": "Lanes: Codex #2. Judges: #2 in 3/3",
+      "rationale": "A speed candidate with unproven quality",
+      "next_decision_changing_test": "H3. Review the LFM1.0 licence. Check that Ollama 0.34.4 supports the architecture",
+      "rollback": "`ollama rm`",
+      "pins": {
+        "huggingface": {
+          "model_id": "LiquidAI/LFM2.5-2.6B-GGUF",
+          "revision": "e7caca5d835a3901a8e0d63e94009429bafafdfc",
+          "revision_url": "https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF/tree/e7caca5d835a3901a8e0d63e94009429bafafdfc",
+          "revision_last_modified": "2026-09-22T20:42:43.000Z",
+          "license_tag": "other",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "base_model": {
+          "model_id": "LiquidAI/LFM2.5-2.6B",
+          "revision": "654f9463ce32b05d0429d76fe1f580b27d4c1ac0",
+          "revision_url": "https://huggingface.co/LiquidAI/LFM2.5-2.6B/tree/654f9463ce32b05d0429d76fe1f580b27d4c1ac0",
+          "revision_last_modified": "2026-08-24T21:06:45.000Z",
+          "license_tag": "other",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        },
+        "file": "Q4_K_M (record the blob digest at pull)"
+      },
+      "license": "LFM1.0, a custom licence (lanes; Hugging Face licence tag: other); review before any production use",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/25",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/25",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/LiquidAI/LFM2.5-2.6B",
+        "https://www.liquid.ai/blog/lfm2-5-2-6b"
+      ]
+    },
+    {
+      "id": "memory-stack-nemotron-3.5-lightning",
+      "name": "Nemotron 3.5 Lightning 30B-A3B",
+      "role": "Memory LLM",
+      "decision": "defer",
+      "evidence_level": "discovery_independent",
+      "candidate_pin": "**Nemotron 3.5 Lightning 30B-A3B**. Ollama `nemotron-3.5-lightning:30b-a3b` `e7a64ff15fb1`",
+      "scope": "the preregistered H2 arm runs on VelaNext in the C4 family (reasoning off where supported, official GGUF on Ollama 0.34.4, production Modelfile parameters). It is compared only if C3 against C4 keeps the reranker on, and under A15.2 it is eligible for selection whether or not H1 passes: it must beat C4 under Holm at α = 0.0333 with a significant gain of at least +5 pp and at most 5% fallbacks at 20 s, and have the best point estimate among the passing H arms. Even then it reaches at most trial until the memory-lane acceptance passes",
+      "evidence_held": "**D:** AA-LCR 60.3 with reasoning; no score without reasoning was found. **DV:** AA-LCR 52.00. OpenMDW-1.1",
+      "lanes_and_judges": "Lanes: Claude #2. Judges: not ranked in 3/3; orders a and b defer it and order c deprioritizes it",
+      "rationale": "Its score needs reasoning on and still trails the control's reasoning score",
+      "next_decision_changing_test": "H2 against C4 on VelaNext under the C4-family Holm test (α = 0.0333, +5 pp, at most 5% fallbacks at 20 s), decided only if the reranker stays on; then H2 against H1 by point estimate, with their paired CI",
+      "rollback": "n/a",
+      "pins": {
+        "ollama": {
+          "tag": "nemotron-3.5-lightning:30b-a3b",
+          "manifest": "e7a64ff15fb1"
+        },
+        "huggingface_reference": {
+          "model_id": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+          "revision": "a9904d24bcc1d289a1950fa9d2b978c47cf903b9",
+          "revision_url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16/tree/a9904d24bcc1d289a1950fa9d2b978c47cf903b9",
+          "revision_last_modified": "2026-08-24T23:46:27.000Z",
+          "license_tag": "other",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "OpenMDW-1.1 per the Claude lane (Hugging Face licence tag: other)",
+      "corrected_fields": [
+        "scope",
+        "lanes_and_judges",
+        "next_decision_changing_test"
+      ],
+      "correction_ids": [
+        "k6-nemotron-lightning-scope"
+      ],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/26",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/26",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/skeptic_review/corrections"
+      ],
+      "sources": [
+        "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+        "https://artificialanalysis.ai/models/nemotron-3-5-lightning"
+      ]
+    },
+    {
+      "id": "memory-stack-memreader-4b-thinking",
+      "name": "MemReader-4B-thinking",
+      "role": "Memory LLM",
+      "decision": "reject",
+      "evidence_level": "discovery_vendor",
+      "candidate_pin": "**MemReader-4B-thinking**",
+      "scope": "for this role",
+      "evidence_held": "**DV:** LongMemEval 83.00%, for a pipeline of four memory tools",
+      "lanes_and_judges": "Lanes: Codex #3. Judges: set aside in 3/3",
+      "rationale": "Says nothing about standalone consolidation or listwise ranking",
+      "next_decision_changing_test": "A standalone consolidation benchmark",
+      "rollback": "n/a",
+      "pins": {
+        "huggingface": {
+          "model_id": "IAAR-Shanghai/MemReader-4B-thinking",
+          "revision": "3fcb57e5653ec5d733eea4df61f4b339d4ac0e92",
+          "revision_url": "https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking/tree/3fcb57e5653ec5d733eea4df61f4b339d4ac0e92",
+          "revision_last_modified": "2026-04-08T06:37:14.000Z",
+          "license_tag": "apache-2.0",
+          "gated": false,
+          "source": "Hugging Face API",
+          "resolved_at": "2026-09-25, resolved by the recorder after the lanes and the table",
+          "note": "the main revision at resolution"
+        }
+      },
+      "license": "Apache-2.0 (Hugging Face API)",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/27",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/27",
+        "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking"
+      ]
+    },
+    {
+      "id": "memory-stack-lm-studio",
+      "name": "LM Studio",
+      "role": "Local serving",
+      "decision": "defer",
+      "evidence_level": "operational_record",
+      "candidate_pin": "**LM Studio**",
+      "scope": "Local serving on the Mac; not needed while Ollama covers the role (recorder wording from the row's rationale)",
+      "evidence_held": "A bug report shows wrong output dimensions for Nemotron (#2177; Codex lane)",
+      "lanes_and_judges": "–",
+      "rationale": "Ollama already covers this role",
+      "next_decision_changing_test": "–",
+      "rollback": "n/a",
+      "pins": {
+        "none": "not pinned; closed application"
+      },
+      "license": "proprietary application",
+      "corrected_fields": [],
+      "correction_ids": [],
+      "updated_fields": [],
+      "update_ids": [],
+      "convergence_row": "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/33",
+      "evidence_refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json#/rows/33",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json"
+      ],
+      "sources": [
+        "https://github.com/lmstudio-ai/lmstudio-bug-tracker/issues/2177"
+      ]
+    }
+  ]
+}

@@ -310,6 +310,108 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
                              f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 
+    SOURCE_HASHES_PATH = "blueprints/us-equities/adaptive-paper/source-hashes.json"
+
+    def _source_hashes_fixture(self, target: Path, relative: str, obj: dict, *, compact: bool = False) -> None:
+        """The shape of blueprints/us-equities/adaptive-paper/source-hashes.json: a flat
+        map of repo file paths (several containing the word "credential",
+        e.g. credential_guard.py) to their sha256."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text((json.dumps(obj) if compact else json.dumps(obj, indent=2)) + "\n")
+
+    def test_f_path_keyed_digest_in_the_reviewed_manifest_is_not_detected(self):
+        """A real-shaped `"blueprints/us-equities/adaptive-paper/<name>.py": "<64hex>"` entry
+        in the reviewed manifest -- including a path containing "credential" -- is exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+                "tests/test_adaptive_paper_credential_race.py": HEX64[::-1],
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], f"path-keyed digests in the reviewed manifest must not be flagged: {findings}")
+
+    def test_f2_credential_shaped_key_in_the_same_file_is_detected(self):
+        """The dedicated allowlist requires the ENTIRE key to be a real adaptive-paper/tests
+        repo path: a credential-shaped key such as "credential.key" or "api_key" holding a
+        64-hex value, in the SAME reviewed file, is not a path and must still be detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+                "credential.key": HEX64[::-1],
+                "api_key": HEX64,
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64[::-1], secrets, f"a 'credential.key' value in the reviewed manifest must still be detected: {findings}")
+            self.assertIn(HEX64, secrets, f"an 'api_key' value in the reviewed manifest must still be detected: {findings}")
+
+    def test_f2b_dot_segment_path_key_holding_a_digest_is_detected(self):
+        """The dedicated allowlist refuses path segments starting with ".", so a key that only
+        looks like an adaptive-paper/tests path through "." or ".." (and names a credential)
+        is not exempted and its 64-hex value is still detected in the reviewed manifest."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "tests/../credential_store.py": HEX64,
+                "blueprints/us-equities/adaptive-paper/./api_key.py": HEX64[::-1],
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64, secrets, f"a '..' path key must not be exempted: {findings}")
+            self.assertIn(HEX64[::-1], secrets, f"a '.' path key must not be exempted: {findings}")
+
+    def test_f3_non_hex_value_under_a_path_shaped_key_is_detected(self):
+        """The allowlist's value alternative is exactly `[0-9a-f]{64}`: a same-length value that is
+        not lowercase hex (upper-case letters here) under an otherwise real path key does not match
+        the allowlist regex and must still be detected as a candidate secret."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64.upper(),
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertNotEqual(findings, [], "a non-lowercase-hex value under a path-shaped key must still be flagged")
+
+    def test_f4_second_secret_on_the_same_line_is_detected(self):
+        """Same whole-line-anchor requirement as test_c2/test_e2: a compact (single-line) JSON
+        object holding both a legitimate path-keyed digest AND an unrelated api_key means the
+        line no longer matches the allowlist's single-entry-per-line shape at all, so the
+        api_key finding on that line must still surface."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(
+                target, self.SOURCE_HASHES_PATH,
+                {"blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64, "api_key": HEX64[::-1]},
+                compact=True)
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64[::-1], secrets,
+                          f"an api_key sharing a line with an allowlisted path digest must still be detected: {findings}")
+
+    def test_f5_same_path_keyed_line_in_a_different_file_is_detected(self):
+        """The allowlist is scoped to the exact source-hashes.json path: the identical
+        path-keyed digest line in any other file must still be detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+            })
+            other_path = "blueprints/us-equities/adaptive-paper/not-source-hashes.json"
+            self._source_hashes_fixture(target, other_path, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+            })
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "generic-api-key":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(by_file.get(self.SOURCE_HASHES_PATH, []), [],
+                             f"the reviewed manifest's own path-keyed line must stay exempt: {by_file}")
+            self.assertEqual(len(by_file.get(other_path, [])), 1,
+                             f"the identical path-keyed line in a different file must still be detected: {by_file}")
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 

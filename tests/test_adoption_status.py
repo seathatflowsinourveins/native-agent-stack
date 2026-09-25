@@ -5,13 +5,63 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
 from shutil import which as native_which
 import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.adoption_status import git_revision, inspect_adoption, main
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, NO_CLIENT_STATE, client_wiring,
+                                     git_revision, inspect_adoption, main)
+
+REPO = Path(__file__).resolve().parents[1]
+PRIVATE = "private-value-never-reported"
+CLAUDE_EVENTS = ("PreToolUse", "SessionStart", "SubagentStop", "PostToolUse", "PreCompact", "Stop", "SessionEnd",
+                 "SubagentStart")
+CODEX_EVENTS = ("SessionStart", "UserPromptSubmit", "PreToolUse", "PostToolUse", "PreCompact", "Stop", "SessionEnd")
+CODEX_BASE = f"""model = "{PRIVATE}"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[mcp_servers.serena]
+command = "/opt/{PRIVATE}/bin/serena"
+
+[mcp_servers.socraticode]
+command = "/opt/{PRIVATE}/bin/node"
+
+[mcp_servers.socraticode.env]
+QDRANT_URL = "http://{PRIVATE}"
+
+[mcp_servers.ai-memory]
+url = "http://{PRIVATE}/mcp"
+"""
+CODEX_CONFIG = CODEX_BASE + "\n[features]\nhooks = true\n"  # as the recipe's `codex features enable hooks` writes it
+SERVERS = ("serena", "socraticode", "ai-memory")
+WIRED = {
+    "claude": {"rtk_hook": True, "ai_memory_hook_events": 8, "context_mode_plugin_enabled": True,
+               "subagent_spawn_depth_1": True, "workflow_concurrency_set": True,
+               "effort_level_env_unset": True, "agent_teams_off": True},
+    "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
+    "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
+              "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
+              "ai_memory_hook_events": 7},
+    "complete": True,
+}
+
+
+def ai_memory_group(event: str) -> dict:
+    command = f"/opt/{PRIVATE}/ai-memory --data-dir /opt/{PRIVATE} hook --event {event} --server-url http://{PRIVATE}"
+    return {"matcher": "", "hooks": [{"type": "command", "command": command}]}
+
+
+def leaves(value):
+    if isinstance(value, dict):
+        for item in value.values():
+            yield from leaves(item)
+    else:
+        yield value
 
 
 class AdoptionStatusTests(unittest.TestCase):
@@ -244,6 +294,347 @@ class AdoptionStatusTests(unittest.TestCase):
         result = inspect_adoption(self.path, self.root / "recipes")
         self.assertEqual(result["manifest"]["status"], "invalid")
         self.assertIn("inside the repository root", result["errors"][0])
+
+    def test_client_wiring_is_opt_in(self):
+        with patch("scripts.adoption_status.client_wiring") as wiring, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(["--manifest", str(self.path), "--json"]), 0)
+        wiring.assert_not_called()
+        payload = json.loads(output.getvalue())
+        self.assertNotIn("client_wiring", payload)
+        self.assertIn(NO_CLIENT_STATE, payload["limitations"])
+
+    def test_client_wiring_flag_reports_and_restates_the_limitations(self):
+        canned = {"claude": {"rtk_hook": True}, "complete": False}
+        with patch("scripts.adoption_status.client_wiring", return_value=canned) as wiring, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(["--manifest", str(self.path), "--json", "--client-wiring"]), 0)
+        wiring.assert_called_once_with(self.root.resolve(), None)
+        payload = json.loads(output.getvalue())
+        self.assertEqual(payload["client_wiring"], canned)
+        self.assertNotIn(NO_CLIENT_STATE, payload["limitations"])
+        self.assertEqual(payload["limitations"][-2:], CLIENT_WIRING_LIMITATIONS)
+        with patch("scripts.adoption_status.client_wiring", return_value=canned), \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            # The exit code stays the prerequisite result; incomplete wiring is reported, not exited on.
+            self.assertEqual(main(["--manifest", str(self.path), "--client-wiring"]), 0)
+        self.assertIn('Client wiring complete: false\nClient wiring: {"claude": {"rtk_hook": true}}\n',
+                      output.getvalue())
+
+    def test_client_wiring_is_reported_even_for_an_invalid_manifest(self):
+        self.path.write_text("{", encoding="utf-8")
+        home = self.root / "empty-home"
+        home.mkdir()
+        result = inspect_adoption(self.path, self.root, with_client_wiring=True, env={"HOME": str(home)})
+        self.assertEqual(result["manifest"]["status"], "invalid")
+        self.assertEqual(set(result["client_wiring"]), {*CLIENT_WIRING_KEYS, "complete"})
+        self.assertIs(result["client_wiring"]["complete"], False)
+        self.assertNotIn(str(self.root), json.dumps(result))
+
+
+class ClientWiringTests(unittest.TestCase):
+    """--client-wiring on fake homes: fixed keys, booleans and counts only, never text from a file."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        self.home, self.root = base / "home", base / "checkout"
+        self.home.mkdir()
+        self.root.mkdir()
+        self.env = {"HOME": str(self.home)}
+
+    def write(self, relative: str, content, base: Path | None = None) -> Path:
+        path = (base or self.home) / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if isinstance(content, bytes):
+            path.write_bytes(content)
+        else:
+            path.write_text(content if isinstance(content, str) else json.dumps(content), encoding="utf-8")
+        return path
+
+    def claude_settings(self) -> dict:
+        hooks = {event: [ai_memory_group(event)] for event in CLAUDE_EVENTS}
+        hooks["PreToolUse"].insert(0, {"matcher": "Bash", "hooks": [
+            {"type": "command", "command": f"/opt/{PRIVATE}/bin/rtk hook claude"},
+            {"type": "command", "command": f"python3 /opt/{PRIVATE}/secret_path_guard.py", "timeout": 10}]})
+        env = {"CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1", "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
+               "PATH": f"/opt/{PRIVATE}/bin", "OTEL_EXPORTER_OTLP_ENDPOINT": f"http://{PRIVATE}"}
+        return {"env": env, "hooks": hooks, "enabledPlugins": {"context-mode@context-mode": True}}
+
+    def wire(self):
+        self.write(".claude/settings.json", self.claude_settings())
+        self.write(".claude/plugins/installed_plugins.json", {"version": 2, "plugins": {"context-mode@context-mode": [
+            {"scope": "user", "installPath": f"/opt/{PRIVATE}", "gitCommitSha": "a" * 40}]}})
+        self.write(".codex/config.toml", CODEX_CONFIG)
+        self.write(".codex/AGENTS.md", f"# {PRIVATE}\n\n@RTK.md\n")
+        self.write(".codex/RTK.md", f"# RTK {PRIVATE}\n")
+        self.write(".codex/hooks.json", {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}})
+        self.write(".codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/plugin.json",
+                   {"name": PRIVATE})
+        self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
+                                                     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, self.root)
+        self.write(".codex/config.toml", CODEX_CONFIG, self.root)
+
+    def wiring(self, env=None) -> dict:
+        result = client_wiring(self.root, self.env if env is None else env)
+        self.assertEqual(set(result), {*CLIENT_WIRING_KEYS, "complete"})
+        self.assertIsInstance(result["complete"], bool)
+        self.assertEqual({group: tuple(result[group]) for group in CLIENT_WIRING_KEYS}, CLIENT_WIRING_KEYS)
+        for value in leaves(result):
+            self.assertTrue(value is None or isinstance(value, (bool, int)), repr(value))
+        rendered = json.dumps(result)
+        for private in (PRIVATE, str(self.home), str(self.root)):
+            self.assertNotIn(private, rendered)
+        return result
+
+    def test_a_wired_home_reports_every_check_and_no_file_text(self):
+        self.wire()
+        self.assertEqual(self.wiring(), WIRED)
+
+    def test_an_unwired_home_reports_false_and_zero(self):
+        self.assertEqual(self.wiring(), {
+            "claude": {"rtk_hook": False, "ai_memory_hook_events": 0, "context_mode_plugin_enabled": False,
+                       "subagent_spawn_depth_1": False, "workflow_concurrency_set": False,
+                       "effort_level_env_unset": True, "agent_teams_off": True},
+            "project": {"settings_depth_and_concurrency": False,
+                        "codex_mcp_servers_present": dict.fromkeys(SERVERS, False)},
+            # Without a config.toml Codex keeps its default: hooks on.
+            "codex": {"rtk_instructions": False, "context_mode_plugin_enabled": False,
+                      "mcp_servers_present": dict.fromkeys(SERVERS, False), "hooks_feature_enabled": True,
+                      "ai_memory_hook_events": 0},
+            "complete": False})
+
+    def test_malformed_files_report_null_without_raising(self):
+        self.wire()
+        self.write(".claude/settings.json", '{"hooks": ')
+        self.write(".codex/config.toml", f"[mcp_servers.serena\ncommand = \"{PRIVATE}\"\n")
+        self.write(".codex/hooks.json", f'["{PRIVATE}"]')
+        self.write(".codex/AGENTS.md", b"\xff\xfe@RTK.md\n")
+        self.write(".claude/settings.json", "[]", self.root)
+        self.write(".codex/config.toml", "= broken", self.root)
+        self.assertEqual(self.wiring(), {
+            "claude": dict.fromkeys(CLIENT_WIRING_KEYS["claude"]),
+            "project": {"settings_depth_and_concurrency": None, "codex_mcp_servers_present": dict.fromkeys(SERVERS)},
+            "codex": {"rtk_instructions": None, "context_mode_plugin_enabled": None,
+                      "mcp_servers_present": dict.fromkeys(SERVERS), "hooks_feature_enabled": None,
+                      "ai_memory_hook_events": None},
+            "complete": False})
+
+    def test_directories_oversized_files_and_dangling_links_are_unreadable(self):
+        self.wire()
+        (self.home / ".codex/config.toml").unlink()
+        (self.home / ".codex/config.toml").mkdir()
+        hooks = {"hooks": {event: [ai_memory_group(event)] for event in CODEX_EVENTS}}
+        self.write(".codex/hooks.json", json.dumps(hooks) + " " * 1_048_576)  # valid JSON, over the limit
+        (self.home / ".claude/settings.json").unlink()
+        (self.home / ".claude/settings.json").symlink_to(self.home / "missing-settings.json")
+        result = self.wiring()
+        self.assertEqual(set(result["claude"].values()), {None})
+        self.assertIsNone(result["codex"]["context_mode_plugin_enabled"])
+        self.assertEqual(result["codex"]["mcp_servers_present"], dict.fromkeys(SERVERS))
+        self.assertIsNone(result["codex"]["hooks_feature_enabled"])
+        self.assertIsNone(result["codex"]["ai_memory_hook_events"])
+        self.assertTrue(result["codex"]["rtk_instructions"])
+        self.assertIs(result["complete"], False)
+
+    def test_wrong_types_inside_valid_files_are_not_wiring(self):
+        self.write(".claude/settings.json", {
+            "hooks": {"PreToolUse": f"/opt/{PRIVATE}/rtk hook claude",
+                      "Stop": [3, {"hooks": "ai-memory hook"}, {"hooks": [{"type": "command", "command": 7}]}]},
+            "env": ["CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH"], "enabledPlugins": ["context-mode@context-mode"]})
+        self.write(".codex/config.toml",
+                   'plugins = "context-mode@context-mode"\nmcp_servers = ["serena"]\nfeatures = ["hooks"]\n')
+        self.write(".codex/hooks.json", {"hooks": [f"/opt/{PRIVATE}/ai-memory hook"]})
+        self.write(".codex/AGENTS.md", "@RTK.md\n")  # the referenced RTK.md is absent
+        self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": True,
+                                                     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "999"}}, self.root)
+        result = self.wiring()
+        self.assertEqual(result["claude"], {"rtk_hook": False, "ai_memory_hook_events": 0,
+                                            "context_mode_plugin_enabled": False, "subagent_spawn_depth_1": False,
+                                            "workflow_concurrency_set": False, "effort_level_env_unset": True,
+                                            "agent_teams_off": True})
+        self.assertFalse(result["project"]["settings_depth_and_concurrency"])
+        self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
+                                           "mcp_servers_present": dict.fromkeys(SERVERS, False),
+                                           "hooks_feature_enabled": False, "ai_memory_hook_events": 0})
+        self.assertIs(result["complete"], False)
+
+    def test_the_rtk_hook_needs_a_bash_matcher_and_the_claude_hook_subcommand(self):
+        self.wire()
+        settings = self.claude_settings()
+        cases = (("Bash", "rtk hook claude", True), ("", "rtk hook claude", True), ("*", "rtk hook claude", True),
+                 (None, "rtk hook claude", True), ("Edit|Bash", "rtk hook claude", True),
+                 ("Edit", "rtk hook claude", False), ("(", "rtk hook claude", False),
+                 (["Bash"], "rtk hook claude", False),
+                 ("Bash", "rtk hook codex", False), ("Bash", "rtk rewrite", False),
+                 ("Bash", "echo rtk hook claude", False), ("Bash", "rtk 'hook claude", False))
+        for matcher, command, expected in cases:
+            with self.subTest(matcher=matcher, command=command):
+                group = {"hooks": [{"type": "command", "command": command}]}
+                if matcher is not None:
+                    group["matcher"] = matcher
+                settings["hooks"]["PreToolUse"][0] = group
+                self.write(".claude/settings.json", settings)
+                self.assertIs(self.wiring()["claude"]["rtk_hook"], expected)
+        settings = self.claude_settings()
+        settings["disableAllHooks"] = True
+        self.write(".claude/settings.json", settings)
+        claude = self.wiring()["claude"]
+        self.assertEqual((claude["rtk_hook"], claude["ai_memory_hook_events"]), (False, 0))
+
+    def test_codex_hooks_are_on_by_default_and_false_turns_them_off(self):
+        # Codex 0.155.1: "hooks" is stable and default-enabled, "codex_hooks" its legacy alias, applied first.
+        self.wire()
+        cases = (("", True), ("[features]\n", True), ("[features]\nhooks = true\n", True),
+                 ("[features]\nhooks = false\n", False), ("[features]\ncodex_hooks = false\n", False),
+                 ("[features]\ncodex_hooks = false\nhooks = true\n", True),
+                 ("[features]\nhooks = false\ncodex_hooks = true\n", False),
+                 ('[features]\nhooks = "true"\n', False), ("[features]\ncodex_hooks = 1\n", False))
+        for features, expected in cases:
+            with self.subTest(features=features):
+                self.write(".codex/config.toml", CODEX_BASE + "\n" + features)
+                result = self.wiring()
+                self.assertIs(result["codex"]["hooks_feature_enabled"], expected)
+                self.assertEqual(result["codex"]["ai_memory_hook_events"], 7 if expected else 0)
+                self.assertIs(result["codex"]["context_mode_plugin_enabled"], True)
+                self.assertIs(result["complete"], expected)
+        self.write(".codex/config.toml", 'features = "hooks"\n' + CODEX_BASE)
+        self.assertIs(self.wiring()["codex"]["hooks_feature_enabled"], False)
+        self.write(".codex/config.toml", "= broken")  # hooks.json is still valid: the count is unknown, not zero
+        codex = self.wiring()["codex"]
+        self.assertEqual((codex["hooks_feature_enabled"], codex["ai_memory_hook_events"]), (None, None))
+
+    def test_complete_is_the_documented_rule(self):
+        self.wire()
+        self.assertIs(self.wiring()["complete"], True)
+        elsewhere = CODEX_CONFIG.replace("[mcp_servers.serena]\n", "[mcp_servers.other]\n")
+        self.write(".codex/config.toml", elsewhere)  # still named in the project config.toml
+        self.assertIs(self.wiring()["complete"], True)
+        self.write(".codex/config.toml", elsewhere, self.root)  # now in neither
+        self.assertIs(self.wiring()["complete"], False)
+        for relative, content, base in ((".codex/hooks.json", {"hooks": {}}, None),  # a zero hook count
+                                        (".codex/AGENTS.md", "# no instructions\n", None),  # one false boolean
+                                        (".codex/config.toml", "= broken", self.root)):  # one unreadable file
+            with self.subTest(relative=relative, project=base is not None):
+                self.wire()
+                self.write(relative, content, base)
+                self.assertIs(self.wiring()["complete"], False)
+
+    def test_the_concurrency_cap_must_be_an_integer_the_client_accepts(self):
+        self.wire()
+        for value, expected in (("8", True), (8, True), ("256", True), (" 16 ", True), ("1", True), ("0", False),
+                                ("257", False), ("-1", False), ("8.5", False), ("", False), (True, False),
+                                (None, False)):
+            with self.subTest(value=value):
+                settings = self.claude_settings()
+                settings["env"]["CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS"] = value
+                self.write(".claude/settings.json", settings)
+                self.write(".claude/settings.json", {"env": settings["env"]}, self.root)
+                result = self.wiring()
+                self.assertIs(result["claude"]["workflow_concurrency_set"], expected)
+                self.assertIs(result["project"]["settings_depth_and_concurrency"], expected)
+
+    def test_only_ai_memory_hook_commands_are_counted(self):
+        self.wire()
+        settings = self.claude_settings()
+        settings["hooks"]["Stop"] = [{"hooks": [{"type": "command", "command": f"/opt/{PRIVATE}/ai-memory status"}]}]
+        settings["hooks"]["SessionEnd"] = [{"hooks": [{"type": "command", "command": "echo ai-memory hook"}]}]
+        settings["hooks"]["PreCompact"][0]["hooks"][0]["type"] = "prompt"
+        self.write(".claude/settings.json", settings)
+        self.assertEqual(self.wiring()["claude"]["ai_memory_hook_events"], 5)
+
+    def test_effort_and_agent_team_opt_ins_are_found_by_name_whatever_their_value(self):
+        self.wire()
+        claude = self.wiring({**self.env, "CLAUDE_CODE_EFFORT_LEVEL": PRIVATE})["claude"]
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (False, True))
+        claude = self.wiring({**self.env, "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"})["claude"]
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (True, False))
+        settings = self.claude_settings()
+        settings["env"].update(CLAUDE_CODE_EFFORT_LEVEL=PRIVATE, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=PRIVATE)
+        self.write(".claude/settings.json", settings)
+        claude = self.wiring()["claude"]
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (False, False))
+
+    def test_disabled_or_uninstalled_plugins_and_servers_are_not_wired(self):
+        self.wire()
+        self.write(".claude/plugins/installed_plugins.json",
+                   {"version": 2, "plugins": {"context-mode@context-mode": []}})
+        shutil.rmtree(self.home / ".codex/plugins")
+        self.write(".codex/config.toml",
+                   CODEX_CONFIG.replace("[mcp_servers.serena]\n", "[mcp_servers.serena]\nenabled = false\n"))
+        result = self.wiring()
+        self.assertFalse(result["claude"]["context_mode_plugin_enabled"])
+        self.assertFalse(result["codex"]["context_mode_plugin_enabled"])
+        self.assertEqual(result["codex"]["mcp_servers_present"],
+                         {"serena": False, "socraticode": True, "ai-memory": True})
+        self.write(".claude/plugins/installed_plugins.json", "{")
+        self.assertIsNone(self.wiring()["claude"]["context_mode_plugin_enabled"])  # enabled, registry unreadable
+        settings = self.claude_settings()
+        settings["enabledPlugins"]["context-mode@context-mode"] = False
+        self.write(".claude/settings.json", settings)
+        self.assertFalse(self.wiring()["claude"]["context_mode_plugin_enabled"])
+
+    def test_client_homes_follow_claude_config_dir_and_codex_home(self):
+        self.wire()
+        moved = self.home / "configured"
+        moved.mkdir()
+        (self.home / ".claude").rename(moved / "claude")
+        (self.home / ".codex").rename(moved / "codex")
+        env = {**self.env, "CLAUDE_CONFIG_DIR": str(moved / "claude"), "CODEX_HOME": str(moved / "codex")}
+        self.assertEqual(self.wiring(env), WIRED)
+        self.assertFalse(self.wiring()["claude"]["rtk_hook"])
+
+    def test_a_text_value_can_never_leave_the_check(self):
+        leaked = {**dict.fromkeys(CLIENT_WIRING_KEYS["claude"], True), "rtk_hook": PRIVATE}
+        with patch("scripts.adoption_status.claude_wiring", return_value=leaked), self.assertRaises(AssertionError):
+            client_wiring(self.root, self.env)
+        with patch("scripts.adoption_status.codex_wiring", return_value={"extra": True}), \
+                self.assertRaises(AssertionError):
+            client_wiring(self.root, self.env)
+
+
+class TokenEfficiencyProfileTests(unittest.TestCase):
+    """The selected token practice is a real, resolvable profile of adoption/manifest.json."""
+
+    LAYERS = ("token-efficiency", "code-navigation", "document-retrieval", "semantic-rag", "durable-memory",
+              "mcp-surfaces")
+    CURRENT_CHOICE = {"RTK": "rtk", "Context Mode": "context-mode", "Repomix": "repomix", "Headroom": "headroom",
+                      "TOON": "toon", "ccusage": "ccusage"}
+    OPTIONAL = {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub", "agentsview", "claude-hud",
+                "otel-tui", "omniroute"}
+
+    @staticmethod
+    def load(relative: str):
+        return json.loads((REPO / relative).read_text(encoding="utf-8"))
+
+    def setUp(self):
+        self.profile = next(p for p in self.load("adoption/manifest.json")["profiles"] if p["id"] == "token-efficiency")
+        self.rows = {row["component_id"] for row in self.load("docs/token-efficiency-stack.json")["rows"]}
+
+    def test_the_profile_resolves_to_its_commands_and_recipes(self):
+        with patch("scripts.adoption_status.shutil.which", return_value="/private/bin/tool"), \
+                patch("scripts.adoption_status.git_revision", return_value=None):
+            result = inspect_adoption(REPO / "adoption/manifest.json", REPO, ["token-efficiency"])
+        self.assertEqual(result["manifest"]["status"], "valid", result["errors"])
+        [profile] = result["profiles"]
+        self.assertEqual(profile["status"], "prerequisites_present")
+        self.assertEqual([item["name"] for item in profile["commands"]], self.profile["required_commands"])
+        self.assertTrue(profile["recipes"] and all(item["present"] for item in profile["recipes"]))
+
+    def test_the_profile_is_the_landscape_selection_and_leaves_optional_rows_out(self):
+        layers = {layer["layer_id"]: layer for layer in self.load("catalogs/landscape/foundation.json")["layers"]}
+        stack = {component["id"] for component in self.load("manifests/stack.json")["components"]}
+        selected = set(self.profile["component_ids"])
+        self.assertLessEqual(selected, stack)
+        self.assertEqual(selected - self.rows, {"codex", "claude-code"})
+        choice = layers["token-efficiency"]["current_choice"]
+        self.assertTrue(all(name in choice for name in self.CURRENT_CHOICE), choice)
+        winners = {winner["component_id"] for layer_id in self.LAYERS for winner in layers[layer_id]["winners"]}
+        self.assertEqual(selected & self.rows, (winners & self.rows) | set(self.CURRENT_CHOICE.values()),
+                         "a token row these layers now select (or drop) must join (or leave) the profile")
+        self.assertEqual(selected & self.OPTIONAL, set())
+        self.assertLessEqual(self.OPTIONAL, self.rows)
 
 
 if __name__ == "__main__":

@@ -116,10 +116,14 @@ V = $1M are v1's loosest gain and middle volume floor, chosen for sample size af
 MAX21 is the largest of the 21 split-consistent official-close returns before the decision session. Its terciles use
 breakpoints from D events in the prior 252 sessions, so they are known at the decision. Research sizing is 1x equal
 notional, capacity-capped. Costs per side are 1.25 x the larger of the v1 table cell (pinned by sha256, monotone in
-dollar volume) and the fill quote's own half-spread, plus a square-root impact term. H1 is not supported if H1-D
-excludes a negative effect of the MDE size and the low-MAX cell does not pass. H3 is not supported if H3-c excludes
-the MDE and neither H3-a nor H3-b passes. A high-MAX outperformance is outside H1-D's one-sided test and supports no
-claim.
+dollar volume) and the fill quote's own half-spread, plus a square-root impact term; the cell's dollar volume counts
+only the minute bars complete at the fill. Sale fees use the SEC Section 31 rate of the sale's settlement date (T+3
+before 2017-09-05, T+2, then T+1 from 2024-05-28) and the FINRA TAF of its trade date. Each hypothesis's verdict comes
+from its primary test alone: H1 passes, is not supported (H1-D excludes a negative effect of the MDE size) or is
+inconclusive on H1-D; H3 likewise on H3-c. The tradable cells are reported apart as profitability after costs and never
+decide a verdict. A high-MAX outperformance is outside H1-D's one-sided test and supports no claim. Every result is a
+retrospective reconstruction from the provider's data as later served, not evidence of what was observable at the
+decision.
 
 **Outcome labels.** Each test ends in one of three preregistered labels: a pass; *not supported*, with the excluded
 effect size stated; or *underpowered*. A pass is named by its stage: a descriptive *development pass* that gates
@@ -131,9 +135,12 @@ literature's roughly 1% a month for MAX, so a miss on H1-D will most likely be l
 only large mover-specific effects.
 
 **Data status is fixed at the freeze.** One coverage rule covers all five items, with one set of kept years: a
-2016-2020 year below 90% official-close coverage or 80% eligible-quote coverage (fetch-incomplete stamps count against
-it), or with more than 10% of sampled histories unreachable by `asof` = session screening, is dropped for every item.
-The count-only code applies the rule itself, and the rule text is pinned by hash. Without 2020, no item is tested;
+2016-2020 year below 90% official-close coverage, 80% eligible-quote coverage or 90% minute-bar coverage, or with more
+than 10% of sampled histories unreachable by `asof` = session screening, is dropped for every item. Each rate keeps its
+own cohort, and a pair whose membership or outcome a failed request leaves unknown counts against coverage (fail
+closed). The freeze also needs a passing identity probe (with no observed ticker-reuse failure) and a fetch-time margin
+priced in pages at the measured throughput. The count-only code applies the rule itself, the rule text is pinned by
+hash, and the output it decides is bound to its run-log line, its study tree, both data files and the pinned budgets. Without 2020, no item is tested;
 development years condition nothing. A dropped year's edges are segment boundaries,
 its events leave the tercile windows and the bootstrap wraps over the kept sessions. Data from a new source or a new
 historical range obtained after the freeze can only start a new protocol version (v3.1+), so it cannot change this
@@ -141,9 +148,10 @@ family's Holm thresholds after results are seen.
 
 **Exposure and chronology.** Development is 2017-2019 and validation 2020. The holdout is 252 sessions (early closes
 included) starting at the 40th session after the freeze. The freeze commit is the first commit on `main` whose
-protocol status is frozen (pull requests are squash-merged), timed by its committer timestamp in New York. If the
-validation results commit is not on `main` before 09:30 ET on that 40th session, the holdout of this protocol version
-is void. There is no deferral, so its start cannot be chosen after the results are seen. Every holdout trade enters
+protocol status is frozen (pull requests are squash-merged), timed by its committer timestamp in New York, which the
+code accepts only from a commit signed by GitHub's web-flow key. If the
+governing validation bytes and their evaluation line are not both on `main` before 09:30 ET on that 40th session (a
+file committed earlier under the same path does not count), the holdout of this protocol version is void. There is no deferral, so its start cannot be chosen after the results are seen. Every holdout trade enters
 the primary statistic. Paper orders in holdout symbol-sessions are logged at order time and removed only in a
 sensitivity, and more than 5% exposed trades labels an item's holdout contaminated. A holdout read is defined
 narrowly: computing any v3 outcome from holdout data outside a granted access-log entry. It voids the holdout rather
@@ -156,11 +164,16 @@ Development, validation and the holdout count and read all run from one study-co
 tree hash (not a commit, since pull requests are squash-merged), with a pinned runtime lockfile. The tree imports
 nothing from earlier studies; it holds byte-for-byte copies of the pinned definitions it needs, tested against their
 blobs. The evaluator refuses a holdout count or read from any other tree. Each stage writes its results atomically in
-one file, so a crashed run writes nothing and may be retried from the unchanged tree. A code change after the freeze is
-a numbered deviation whose results are reported beside the governing ones with no label, and a stage that cannot
-complete without one is void. The only exception is a fetch-transport fix confined to `study/fetch/`, accepted only if
-it reproduces already-sealed pages byte for byte. Calendar and fee
-amendments go in append-only data files outside the study tree, so appending one never changes the tree.
+one file. A run that ends before the write writes nothing and may be retried from the same tree and sealed inputs; a
+hard kill after the write leaves a file that no run-log line cites, which the next run under the open start line
+recomputes and replaces from the same seals (a pre-freeze output is adopted only if it reproduces from its seals), and a
+kill between a holdout action's run-log line and its access-log completion is recovered by `run.py complete` from that
+line. These recoveries are synthetic-tested, not proven against every interruption. A code change after the freeze
+cannot run: every command refuses a tree other than the frozen one or a passing transport deviation, so no deviated
+result exists, and a stage that cannot complete without such a change is void (a new protocol version). The only
+exception is a fetch-transport fix confined to `study/fetch/`, accepted only if it reproduces already-sealed pages byte
+for byte. Calendar and fee amendments go in append-only data files outside the study tree, in a versioned line format,
+so appending one never changes the tree.
 
 The 2017-2020 windows are disjoint from #162's v1 and v2, but not unseen. The broad-universe study computed forward
 returns for every eligible symbol-session in 2017-2021 (its C0 control), including a descriptive lane covering names
@@ -461,13 +474,75 @@ into another:
 - the documented market-data rate limit and a fetch-time estimate, from the sampled candidate count, with margin under
   the 40 sessions before the holdout;
 - the holdout collector committed and scheduled so that its first batch covers the freeze session;
-- the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed, including
+- a native dry run of the study tree's fetch plumbing on an already exposed 2023 window, emitting counts only;
+- the study tree committed with its runtime lockfile and synthetic tests before any outcome is computed (done in
+  draft; rerun on the tree the freeze pins), including
   terminal exits, renames and ticker reuse, split and ex-dividend crossings, early-close sessions, segment-end
   censoring and the embargo, validation's independence from development outputs, the access-log authorization and
   completion records and the evaluator's refusals.
 
+**Study code (code-first, 2026-09-24).** The study tree the core preregisters now exists in draft at
+[`study/`](study/README.md): the request plan and fetch loop, the transport (HTTP only, under `study/fetch/`), the
+records and sealed snapshot, identity and dedup (the pinned `dedupe_identity`, run through DuckDB), membership, the
+three arms and five items, terminal exits, the cost model, the stages with Holm over m = 5, the seeded bootstrap, the
+H3-c sign rule, the holdout gate and access log, the frozen-tree and runtime-lock refusals, the append-only data
+amendments and the count-only code. Its synthetic suite passes under `study/runtime.lock` (uv-managed CPython
+3.13.15 with duckdb, exchange_calendars 4.13.2, numpy and pandas pinned); the test command and the draft tree hash
+are in `protocol-core-draft.json` (`run_discipline.study_code`). These are synthetic tests of locally written code,
+not a native run: no market data was read and no provider was called. Review round 8 resolved the 21 remaining
+findings of the last core review in code and in the protocol, including the two high ones: the request plan and
+parsing left `study/fetch/`, so a transport deviation cannot change a stamp or a window (R8-1), and duckdb is an
+allowed, pinned import so that the pinned dedup runs (E1). Review round 9 resolved the 28 findings of a review of the
+study tree: the holdout path is now wired end to end through `run.py` (authorization records, collection batches
+merged per symbol and session, counts with the extension decision, the read of the carried items only and the
+not-read label), a run refuses unless its log and amendment lines are on origin/main and the protocol is the freeze
+commit's blob, a transport deviation governs only when committed and passing, each stage is fetched and evaluated
+once into a fixed results file, and the count-only run has its own committed command. Review round 10 resolved a
+second review of the study tree (23 findings; 19 fixed, the rest fixed in part or recorded as limitations): a
+transport deviation now governs only with the hashed output of a logged `run.py transport-check` run, and the
+transport runs in a child process, so a change under `study/fetch/` cannot patch evaluation code; a holdout count or
+read fetches and seals in one committed step and evaluates in a second, so discarding an unpushed run gives no second
+draw of provider data; every reach and freeze time must come from a commit signed by GitHub's pinned web-flow key,
+the local `origin/main` must equal the remote's, and the logs must be append-only across `main`'s history; calendar
+and fee amendments need their `amend` access-log records; recorded pre-freeze reads void validation or the holdout;
+and every item reports the least-exposed slice. Review round 11 resolved a third review of the study tree (22
+findings; 18 fixed, 3 fixed in part (C15 and F5, one finding, and F6), 1 rejected as already fixed, with limitations recorded): the dry run is bounded by
+every request's lookback, not only its sessions; whether the holdout is read no longer depends on its outcome (a sealed
+read is always evaluated, and a refused authorization cannot be held back and spent later); the transport is paced at
+the pinned rate limit; late collection is judged per session and holdout due times by signed reach times; every
+pre-freeze and stage fetch needs a pushed start line; and the transport check covers holdout snapshots with a seeded
+sample. Review round 12 resolved two independent reviews of the study tree, one cross-family (Codex, 1 P1 and 4 P2)
+and one Claude (18 findings), with none rejected: identity dedup is decided as of each candidate session, so closes
+inside a candidate's own hold cannot remove it; a holdout evaluation reads only the base snapshots its seal pinned;
+quotes are ordered by exact nanosecond stamps; the diagnostic splits cluster by session; an undefined rebooking is
+excluded, not booked at -1; a sealed read may be retried after the deadline; the carried items are rechecked at the
+count and the read; and the freeze needs a passing identity probe and fetch margin at the pinned rate. Review round 13
+resolved a second Claude review (2 findings) and a second Codex review (5 P2), rejecting one part of one finding: a
+void deviation applies only if it reached origin/main before the outcome it would void could be computed, and a later
+one is reported, never applied, so no void can cancel the holdout read; evaluations run under pushed start lines;
+identity survivors come from rename records effective by t; and the count retry, retried-count snapshot, quote-merge
+and fee first-use gaps are closed. Review round 14 resolved a third Claude review (2 medium, 2 low) and a third Codex
+review (1 P1, 2 P2), rejecting none: the validation file is bound by sha256 from authorization to the count and read,
+the read refetches per-event data the count fetched too early, fee amendments supersede by precedence and a gap is
+refused before any fetch, dividend cash no longer moves with prices after the ex-date (and, after a follow-up Codex
+review, is never priced at an older close when a bar before the ex-date is missing), and a hard-killed results write
+is recovered. Round 14 deferred two items to the protocol's `open_before_first_holdout_count`; review round 15
+repaired both before the freeze (a count's and a read's own terminal-record request, and the adoption of an orphan
+pre-freeze output from its seals), so the list is empty, as the freeze requires. Review round 15 resolved the
+2026-09-24 cross-family review of #190 (Codex CLI, GPT-6): the prior findings F01-F15 it rechecked, a fee-date and an
+amendment-format item, and eight new findings N01-N08, each in a dated `review_record` entry; three input values stay
+open decisions for a reviewed pull request (a fixed occupied-session floor, the pipeline allowance values and the rate
+limits). Review round 16 fixed the occupied-session floor at 20 (F06), reconciled the N01 entry with the committed
+2015-09-01 calendar start (the 60-session reach it needs is met, at 2015-10-07), and added the Federal Reserve's own
+holiday-schedule citation beside the SEC and FINRA sources for the bank-holiday settlement-day rule
+(`cost_model.fee_charge_dates`); two input values (the pipeline allowance values and the rate limits, F12) remain
+open. The next steps are an
+independent review of the draft and its study tree from a different model family, then the other preconditions, then
+the freeze. Until then every fetch and evaluation command refuses to run.
+
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-7 (the restructure into the core and its two review rounds) are in `protocol-core-draft.json`.
+`protocol-draft.json` (`review_record`); rounds 5-13 (the restructure into the core, its two review rounds, the code-first round and the five study-tree reviews) are in
+`protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.
 

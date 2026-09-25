@@ -20,6 +20,7 @@
     "OTEL_METRICS_INCLUDE_VERSION": "true",
     "PATH": "${ECO_ROOT}/bin:${HOME}/.local/bin:${HOST_PATH}",
     "RTK_TELEMETRY_DISABLED": "1",
+    "MCP_AUTO_OPEN_ENABLED": "false",
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
   },
@@ -33,6 +34,8 @@
       "Read(~/.claude/.credentials.json)",
       "Read(~/.codex/auth.json)",
       "Read(~/.config/gh/hosts.yml)",
+      "Read(~/.cache/huggingface/token)",
+      "Read(~/.cache/huggingface/stored_tokens)",
       "Read(//proc/*/environ)",
       "Read(.env)",
       "Read(.env.*)",
@@ -43,6 +46,8 @@
       "Bash(env)",
       "Bash(gh auth token)",
       "Bash(gh auth token *)",
+      "Bash(hf auth token)",
+      "Bash(hf auth token *)",
       "Bash(* --show-token*)",
       "Bash(git credential fill*)",
       "Bash(gh auth git-credential *)",
@@ -145,7 +150,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL} --capture-assistant"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}"
           }
         ]
       }

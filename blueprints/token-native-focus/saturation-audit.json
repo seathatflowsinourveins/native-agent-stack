@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 69,
-    "catalog_identities": 850,
-    "nonselected_catalog_identities": 781,
+    "catalog_identities": 861,
+    "nonselected_catalog_identities": 792,
     "exclusive_identity_groups": {
       "star_review": 281,
       "component_record": 69,
       "catalog_card": 114,
-      "research_supplement": 384,
+      "research_supplement": 395,
       "legacy_candidate": 2
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
@@ -5058,10 +5058,10 @@
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "Dated selected-role acceptance exists; this matrix reconciliation performs no new installation.",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.5",
+      "version": "16.3.6",
       "profile": "supporting",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/nextjs",
         "recipe_document": "blueprints/convergence-practice/application-delivery/README.md",
@@ -8735,7 +8735,7 @@
     {
       "component_id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
-      "version": "0.25.0",
+      "version": "0.30.0",
       "profile": "core",
       "role": "Native GPU serving for pinned recent local embeddings",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8805,6 +8805,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "vllm-030-switch-20260925",
+            "path": "evidence/receipts/vllm-030-switch-20260925.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8823,7 +8828,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",

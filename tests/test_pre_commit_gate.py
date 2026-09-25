@@ -28,8 +28,10 @@ class PreCommitGateTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.repo = Path(temporary.name)
-        self.git("init", "-q")
-        self.git("config", "core.hooksPath", str(HOOKS))
+        # Checked, so a failed init cannot leave the absolute hooksPath to an enclosing repository.
+        for args in (("init", "-q"), ("config", "core.hooksPath", str(HOOKS))):
+            result = self.git(*args)
+            self.assertEqual(result.returncode, 0, result.stderr)
         shutil.copy(ROOT / ".gitleaks.toml", self.repo / ".gitleaks.toml")
 
     def git(self, *args, env=None):

@@ -909,5 +909,152 @@ class LeverageLedgerTests(unittest.TestCase):
         ledger.close()
 
 
+# The 2026-09-24 APUS sell: (qty, price, the cumulative average Alpaca reported after it).
+APUS = (("26", "5.62", "5.62"), ("2", "5.61", "5.619286"), ("1", "5.61", "5.618966"))
+
+
+class PerExecutionLedger(unittest.TestCase):
+    """E2 in the ledger (synthetic fixtures): an execution's own qty and price book the
+    fill; a cumulative average only books an advance no recorded execution explains."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.now = 1_800_000_000.0
+        self.limits = replace(s.RiskLimits(), max_order_qty=D(100), max_order_notional_usd=D(1000),
+                              max_spread_bps=D(100))
+        self.db = self.root / "apus.sqlite3"
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.ledger.start_trial(self.now)
+
+    def tearDown(self):
+        self.ledger.close()
+        self.tmp.cleanup()
+
+    def reserve(self, cid, side, qty, price):
+        quote = s.Quote("APUS", "5.61", "5.62", self.now)
+        return self.ledger.reserve_intent(cid, "APUS", side, qty, price, quote=quote, now=self.now, market_open=True,
+                                          session_close=self.now + 3600, stop_file=self.root / "STOP")
+
+    def hold_29(self):
+        self.reserve("buy-1", "buy", "29", "5.64")
+        self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.62",
+                                 execution={"execution_id": "e-buy", "qty": "29", "price": "5.62"})
+        self.reserve("sell-1", "sell", "29", "5.60")
+
+    def execution_rows(self):
+        cum, rows = 0, []
+        for index, (qty, price, average) in enumerate(APUS):
+            cum += int(qty)
+            rows.append({"cum": str(cum), "average": average, "status": "filled" if cum == 29 else "partially_filled",
+                         "execution": {"execution_id": "e-sell-%d" % index, "qty": qty, "price": price}})
+        return rows
+
+    def record(self, row, *, with_execution=True, status=None):
+        return self.ledger.record_order("sell-1", "b-sell", status or row["status"], row["cum"], row["average"],
+                                        execution=row["execution"] if with_execution else None)
+
+    def events(self, kind):
+        return [json.loads(r[0]) for r in self.ledger.db.execute(
+            "SELECT payload FROM events WHERE kind=? ORDER BY id", (kind,))]
+
+    def test_apus_replay_books_the_exact_executions_without_a_freeze(self):
+        self.hold_29()
+        for row in self.execution_rows():
+            self.assertTrue(self.record(row))
+        state = self.ledger.accounting()
+        self.assertEqual(self.ledger.positions(), {})
+        # Exact: 162.95 received for 162.98 paid, not 29 x 5.618966 = 162.950014.
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd), (D("-0.03"), D("-0.03")))
+        self.assertEqual([e["booking"] for e in self.events("order_observed")], ["executions"] * 4)
+        self.assertEqual(self.ledger.intents()[1].average_price, D("5.618966"))   # the broker's own average is kept
+
+    def test_rounded_average_at_the_limit_does_not_freeze_either_path(self):
+        # 26 @ 5.62 then 3 @ 5.60 against a 5.60 sell limit: Alpaca reports 5.617931 (162.92/29
+        # rounded), and the old derivation priced the last 3 at 5.599999, below the limit.
+        for with_execution in (True, False):
+            with self.subTest(with_execution=with_execution):
+                self.ledger.close()
+                self.db = self.root / ("limit-%s.sqlite3" % with_execution)
+                self.ledger = s.Ledger(self.db, self.limits)
+                self.ledger.start_trial(self.now)
+                self.hold_29()
+                first = {"cum": "26", "average": "5.62", "status": "partially_filled",
+                         "execution": {"execution_id": "x1", "qty": "26", "price": "5.62"}}
+                last = {"cum": "29", "average": "5.617931", "status": "filled",
+                        "execution": {"execution_id": "x2", "qty": "3", "price": "5.60"}}
+                self.record(first, with_execution=with_execution)
+                self.record(last, with_execution=with_execution)
+                self.assertEqual(self.ledger.positions(), {})
+                self.assertIsNone(self.ledger.halted_reason())
+                expected = D("-0.06") if with_execution else D("-0.060001")   # derived: 29 x 5.617931 - 162.98
+                self.assertEqual(self.ledger.accounting().cash_delta_usd, expected)
+
+    def test_shuffled_duplicated_and_dropped_executions_never_double_book(self):
+        self.hold_29()
+        e1, e2, e3 = self.execution_rows()
+        self.assertTrue(self.record(e3))     # E3 first: 29 booked from the averages (E1, E2 unknown yet)
+        self.assertFalse(self.record(e1))    # an older cumulative quantity: recorded, never booked again
+        self.assertFalse(self.record(e1))    # a duplicate delivery: no-op
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(self.ledger.intents()[1].filled_qty, D(29))
+        self.assertEqual([e["booking"] for e in self.events("order_observed")][-1], "cumulative_average")
+        self.assertEqual(len(self.events("execution_recorded")), 3)   # buy, E3, E1; E2 was never delivered
+        state = self.ledger.accounting()
+        self.assertEqual(state.cash_delta_usd, D("29") * D("5.618966") - D("162.98"))
+
+    def test_rest_read_ahead_of_the_stream_fill_is_consistent(self):
+        self.reserve("buy-1", "buy", "3", "5.64")
+        rest = self.ledger.record_order("buy-1", "b-1", "canceled", "2", "5.62")        # REST cancel read first
+        stream = self.ledger.record_order("buy-1", "b-1", "partially_filled", "2", "5.62",
+                                          execution={"execution_id": "e-1", "qty": "2", "price": "5.62"})
+        self.assertTrue(rest)
+        self.assertFalse(stream)     # the execution is recorded; no terminal contradiction
+        self.assertEqual(self.ledger.intents()[0].status, "canceled")
+        self.assertEqual(self.ledger.positions()["APUS"].qty, D(2))
+        self.assertEqual(len(self.events("execution_recorded")), 1)
+        with self.assertRaisesRegex(s.SafetyError, "terminal_order_contradiction"):   # a later fill still freezes
+            self.ledger.record_order("buy-1", "b-1", "canceled", "3", "5.62")
+
+    def test_conflicting_or_overlapping_executions_and_limit_violations_fail_closed(self):
+        self.hold_29()
+        e1 = self.execution_rows()[0]
+        self.record(e1)
+        cases = [({"execution_id": "e-sell-0", "qty": "26", "price": "5.63"}, "26", "execution_conflict"),
+                 ({"execution_id": "other", "qty": "26", "price": "5.61"}, "26", "execution_conflict"),
+                 ({"execution_id": "e-sell-0", "qty": "2", "price": "5.61"}, "28", "execution_conflict"),
+                 ({"execution_id": "e-over", "qty": "3", "price": "5.61"}, "28", "execution_overlap"),
+                 ({"execution_id": "e-low", "qty": "2", "price": "5.59"}, "28", "incremental_fill_violates_limit"),
+                 ({"execution_id": "e-big", "qty": "30", "price": "5.61"}, "28", "execution_exceeds_cumulative"),
+                 ({"execution_id": "bad id!", "qty": "2", "price": "5.61"}, "28", "invalid_execution_identity")]
+        before = self.ledger.accounting()
+        for execution, cum, reason in cases:
+            with self.subTest(reason=reason, execution=execution):
+                with self.assertRaisesRegex(s.SafetyError, reason):
+                    self.ledger.record_order("sell-1", "b-sell", "partially_filled", cum,
+                                             "5.62" if cum == "26" else "5.619286", execution=execution)
+                self.assertEqual(self.ledger.accounting(), before)
+
+    def test_recorded_executions_survive_a_restart(self):
+        self.hold_29()
+        e1, e2, e3 = self.execution_rows()
+        self.record(e1)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.assertFalse(self.record(e1))    # replayed after the restart: a no-op
+        self.record(e2)
+        self.record(e3)
+        self.assertEqual(self.ledger.accounting().cash_delta_usd, D("-0.03"))
+
+    def test_execution_from_observation_reads_only_complete_stream_fills(self):
+        row = {"event": "partial_fill", "execution_id": "e", "event_qty": "2", "event_price": "5.61"}
+        self.assertEqual(s.execution_from_observation(row), {"execution_id": "e", "qty": "2", "price": "5.61"})
+        for changes in ({"event": "canceled"}, {"event": None}, {"execution_id": None}, {"event_qty": ""},
+                        {"event_price": None}):
+            with self.subTest(changes=changes):
+                self.assertIsNone(s.execution_from_observation({**row, **changes}))
+        self.assertIsNone(s.execution_from_observation({"filled_qty": "2"}))
+
+
 if __name__ == "__main__":
     unittest.main()

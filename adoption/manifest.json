@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-24",
+  "updated_at": "2026-09-25",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
     "baseline_meaning": "Parent accepted publication before this adoption addition; local revision is always git rev-parse HEAD. This commit predates adoption/ and tools/adoption/ entirely and must never be the checkout target for a new machine (see release_tag/release_commit below, and adoption/bootstrap.md step 0; Codex cross-family review finding, codex-review-72).",
-    "release_tag": "v2026.09.24.1",
-    "release_commit": "81385fe63777cf0fce959c61ee5f323a681db2b2",
+    "release_tag": "v2026.09.25.1",
+    "release_commit": "ae3d3d37377022fe63112dcb10c93c765d6d2601",
     "release_meaning": "The attested release tag adoption/bootstrap.md step 0 checks out on a new machine (or a later tag): published with SLSA build provenance by .github/workflows/publish-catalog.yml, and contains both adoption/ and tools/adoption/ (unlike baseline_commit above)."
   },
   "supported_platforms": [
@@ -375,6 +375,47 @@
       "recipe_paths": [
         "blueprints/us-equities/engine-nautilus/README.md",
         "catalogs/us-equities/runtime-target.json"
+      ]
+    },
+    {
+      "id": "token-efficiency",
+      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "required_commands": [
+        "codex",
+        "claude",
+        "rtk",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "recipe_paths": [
+        "docs/token-efficiency-stack.md",
+        "docs/token-session-handbook.md",
+        "recipes/README.md",
+        "recipes/native-upgrades-20260921.md"
       ]
     }
   ],

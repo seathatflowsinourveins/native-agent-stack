@@ -7,7 +7,8 @@ whether the path sits inside a Git worktree (and, if so, whether Git tracks it)
 and mtime age. It never opens, reads, hashes or follows a credential file, and
 it prints path templates, variable names and reason codes, never values or
 expanded host paths. Environment checks report variable NAMES that are set,
-never their values.
+never their values. That includes a native store's path override (such as
+HF_TOKEN_PATH), which moves the store away from the path this checker inspects.
 
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
@@ -40,17 +41,24 @@ STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native
             "interactive_only", "ci_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
            "local_service_secret", "native_signin", "ci_secret"}
-TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/", "$HOME/")
+TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
+                     "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# ${NAME:-default}, where the default may hold one nested ${NAME:-default}: huggingface_hub's
+# HF_HOME defaults to ${XDG_CACHE_HOME:-$HOME/.cache}/huggingface (constants.py).
+DEFAULT_FORM = re.compile(r"\$\{([A-Z_][A-Z0-9_]*):-((?:[^{}]|\$\{[A-Z_][A-Z0-9_]*:-[^{}]*\})*)\}")
 ENTRY_KEYS = {"id", "label", "class", "status", "lane", "store", "variables",
               "optional_variables", "pointer_variables", "loaders",
               "environment_only_consumers", "rotation", "notes"}
 
 # Tracked basenames that should never exist in a checkout. Basename/extension
 # matching keeps evidence folders such as .../secrets-credentials/ out of scope.
+# Hugging Face's other file, the bare `token` basename, is deliberately not
+# listed: it is too generic to flag repository-wide (.gitignore makes the same
+# choice; docs/secret-storage.md "Threat model").
 SENSITIVE_BASENAME = re.compile(
     r"^(?:\.env|\.env\..+|.+\.env|.+\.key|.+\.pem|credentials\.json|\.credentials\.json"
-    r"|auth\.json|hosts\.yml|\.netrc|id_rsa|id_ecdsa|id_ed25519)$")
+    r"|auth\.json|hosts\.yml|\.netrc|id_rsa|id_ecdsa|id_ed25519|stored_tokens)$")
 
 
 def inventory_errors(inventory, root: Path | None = None) -> list[str]:
@@ -118,12 +126,14 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
 def expand_template(template: str, env) -> Path:
     home = env.get("HOME") or str(Path.home())
 
-    def default(match: re.Match) -> str:
-        value = env.get(match.group(1))
-        return value if value else match.group(2).replace("$HOME", home)
+    def expand(text: str) -> str:
+        def default(match: re.Match) -> str:
+            value = env.get(match.group(1))
+            return value if value else expand(match.group(2))  # only a default is expanded again
 
-    text = re.sub(r"\$\{([A-Z_][A-Z0-9_]*):-([^}]*)\}", default, template)
-    return Path(text.replace("$HOME", home))
+        return DEFAULT_FORM.sub(default, text).replace("$HOME", home)
+
+    return Path(expand(template))
 
 
 def git_worktree_of(directory: Path) -> Path | None:
@@ -147,6 +157,15 @@ def git_tracks(path: Path) -> bool:
     return result.returncode == 0
 
 
+def native_store_overrides(entries, env) -> list[str]:
+    """Names of set pointer variables of native stores (a path override such as HF_TOKEN_PATH).
+
+    Our own stores are found through pointer variables on purpose; a native tool reads such a
+    variable itself, so the store is no longer where its template says. Names only."""
+    return sorted({name for entry in entries if entry["store"]["kind"] == "native_store"
+                   for name in entry["pointer_variables"] if name in env})
+
+
 def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
     store = entry["store"]
     names = entry["variables"] + entry["optional_variables"]
@@ -158,6 +177,9 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
     }
     if report["variables_in_environment"]:
         report["warnings"].append("store_variables_exported_in_environment")
+    if store["kind"] == "native_store" and native_store_overrides([entry], env):
+        # The tool then keeps its store where the variable points, not at the template.
+        report["warnings"].append("store_path_overridden")
     if store["kind"] in NONLOCAL_KINDS:
         report["state"] = "not_local"
         return report
@@ -343,7 +365,8 @@ def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
     report = {
         "schema_version": 1,
         "entries": entries,
-        "environment": {"must_not_be_set_present": exported},
+        "environment": {"must_not_be_set_present": exported,
+                        "native_store_path_overrides_present": native_store_overrides(inventory["entries"], env)},
         "repository": {
             "tracked_sensitive_names": tracked,
             "hooks_path_is_repo_gate": hooks_path(root) == EXPECTED_HOOKS_PATH,
@@ -376,6 +399,8 @@ def render_text(report: dict) -> str:
                      f"{extra} findings={detail}{warn}{env_note}")
     env_names = report["environment"]["must_not_be_set_present"]
     lines.append("environment must_not_be_set present: " + (",".join(env_names) or "none"))
+    overrides = report["environment"]["native_store_path_overrides_present"]
+    lines.append("environment native store path overrides present: " + (",".join(overrides) or "none"))
     repo = report["repository"]
     tracked = repo["tracked_sensitive_names"]
     lines.append("tracked sensitive names: " + ("unknown (not a git checkout)" if tracked is None else (",".join(tracked) or "none")))
