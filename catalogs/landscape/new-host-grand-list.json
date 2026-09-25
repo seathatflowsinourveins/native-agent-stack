@@ -294,6 +294,30 @@
         "wslconfig_source": "/mnt/c/Users/<user>/.wslconfig"
       },
       "sizing_arithmetic": null
+    },
+    {
+      "id": "mac-coordinator-64gb-20260925",
+      "label": "macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory (measured)",
+      "evidence_class": "native_proven",
+      "assumptions": null,
+      "measured_tiers": {
+        "concurrent_use_warning": "Unified memory is one pool shared by the local generation model and the embedding/semantic-RAG stack; the local_generation_model_tier and embedding_semantic_rag_tier budgets below are sequential-use capacity estimates, not a verified concurrent-use budget. Running both near their tier ceiling at the same time on this host is not accounted for here.",
+        "ecosystem_job_memory_high_gb": 10.7,
+        "ecosystem_job_memory_max_gb": 16.0,
+        "embedding_semantic_rag_tier": "full",
+        "local_generation_model_tier": "large-32b-q4",
+        "workflow_concurrency_cap": 16
+      },
+      "measured": {
+        "arm64": true,
+        "cores": 18,
+        "cpu_brand": "Apple M5 Pro",
+        "effective_ram_gb": 64.0,
+        "evidence_class": "native_proven",
+        "platform": "macos",
+        "unified_memory_gb": 64.0
+      },
+      "sizing_arithmetic": null
     }
   ],
   "layers": [
@@ -358,7 +382,7 @@
           "recipe": "blueprints/convergence-practice/ci-security/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -381,7 +405,7 @@
           "recipe": "blueprints/us-equities/supply-chain/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -561,7 +585,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "2.3.2"
             },
@@ -862,7 +886,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -964,12 +988,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.280"
+              "bootstrap_version": "2.1.281"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.280"
+              "bootstrap_version": "2.1.281"
             }
           }
         },
@@ -1329,7 +1353,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1441,7 +1465,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1464,7 +1488,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1586,12 +1610,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.280"
+              "bootstrap_version": "2.1.281"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.280"
+              "bootstrap_version": "2.1.281"
             }
           }
         },
@@ -2200,7 +2224,7 @@
           "recipe": "blueprints/us-equities/supply-chain/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2294,6 +2318,20 @@
       "layer_id": "semantic-rag",
       "component_id": "vllm",
       "platform": "linux-wsl2-x86_64",
+      "bars": "Model-card retrieval example, RTX 4090, vLLM 0.25.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+      "host_id": "nativestack-5975wx-20260925",
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "receipt_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json",
+      "result": "pass",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm",
+      "runtime_version": "0.25.0"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
       "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",
       "host_id": "rtx5090-laptop-20260923",
       "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
@@ -2334,8 +2372,12 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 28,
+      "linux-wsl2-x86_64": 22,
       "macos-arm64": 0
+    },
+    "e2e_host_verified": {
+      "linux-wsl2-x86_64": 26,
+      "macos-arm64": 6
     },
     "bootstrap_pinned": {
       "linux-wsl2-x86_64": [
@@ -2367,7 +2409,7 @@
       ]
     },
     "needs_host": {
-      "linux-wsl2-x86_64": 20,
+      "linux-wsl2-x86_64": 18,
       "macos-arm64": 60
     }
   }

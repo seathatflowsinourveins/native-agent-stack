@@ -416,7 +416,7 @@ class ReadmeReceiptDriftTests(unittest.TestCase):
         import re
 
         readme = (SIM_CAPACITY / "README.md").read_text()
-        receipt = json.loads((SIM_CAPACITY / "receipts/20260924-elite-tier.json").read_text())
+        receipt = json.loads((SIM_CAPACITY / "receipts/20260925-elite-tier.json").read_text())
         by_latency = {row["latency_ms"]: row["fills_per_minute_stats"]
                       for row in receipt["latency_sensitivity_elite_tier"]}
         self.assertTrue(by_latency, "receipt has no latency_sensitivity_elite_tier rows")
@@ -788,6 +788,106 @@ class RealVenueRunOneTests(unittest.TestCase):
         self.assertEqual(result["counters"].get("rejects", 0), 0, reject_reasons)
         self.assertFalse(any("Short selling not permitted on a CASH account" in r for r in reject_reasons),
                          reject_reasons)
+
+
+@unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
+class ExactReleaseTimingTests(unittest.TestCase):
+    """Direct coverage of `CapacityExerciserParams.release_alert_latency_ns`
+    and `runner.run_one`'s `exact_release` parameter -- the fix for the
+    measured rc5 release-on-next-event timing slack (see README.md's Latency
+    section, exerciser.py's `release_alert_latency_ns` comment, and
+    sim-engine-crosscheck/run_nautilus.py's `exact_latency`, which isolated
+    the same finding: extra delay of median 28ms SPY / 53ms NVDA, p90
+    135ms/263ms).
+
+    Uses its own, deliberately SPARSE synthetic quote set (400ms per symbol)
+    -- much sparser than either profile's own submit-tick interval (200ms
+    paper-parity, 60ms elite-tier) -- so the pre-fix "release at the next
+    quote or any due timer" mechanism has real, deterministic slack to show:
+    an order submitted on a tick has its submit+latency instant fall between
+    quotes, so the next actual release trigger (the following tick timer or
+    the following sparse quote, whichever is first) lands measurably later
+    than submit+latency. The shared dense (20ms) RealVenueRunOneTests
+    fixture would not reliably show this, since its next quote almost always
+    arrives within a few ms of submit+latency in either release mode."""
+
+    LATENCY_MS = 70
+
+    @classmethod
+    def setUpClass(cls):
+        cls.runner = _load("sim_capacity_exact_release_runner", "runner.py")
+        symbols = ["AAPL", "MSFT"]
+        quotes = {}
+        for s in symbols:
+            rows = []
+            for i in range(90):  # 90 * 400ms = 36s of sparse quotes
+                ts = i * 400_000_000
+                size = 20 + (i % 5)  # vary size tick-to-tick -- see README's
+                # Limitations section: an unvarying (price, size) quote can
+                # lock up liquidity_consumption's per-price consumed tally.
+                rows.append({"symbol": s, "ts_ns": ts, "bid": "100.00", "ask": "100.02",
+                             "bid_size": size, "ask_size": size})
+            quotes[s] = rows
+        cls.quotes = quotes
+
+    @staticmethod
+    def _submits_and_fills(result):
+        submits = {e["client_order_id"]: e["ts_ns"] for e in result["events"] if e["kind"] == "submit"}
+        fills = [e for e in result["events"] if e["kind"] == "fill"]
+        return submits, fills
+
+    def test_exact_release_resolves_every_fill_at_exactly_submit_plus_latency(self):
+        # exact_release defaults to True: this is the production default.
+        result = self.runner.run_one(self.quotes, {}, profile_name="paper-parity",
+                                      latency_ms=self.LATENCY_MS, run_seconds=20.0)
+        self.assertTrue(result["exact_release"])
+        latency_ns = self.LATENCY_MS * 1_000_000
+        self.assertEqual(result["release_alert_latency_ns"], latency_ns)
+        submits, fills = self._submits_and_fills(result)
+        self.assertGreater(len(fills), 0)
+        for f in fills:
+            self.assertEqual(f["ts_ns"] - submits[f["client_order_id"]], latency_ns, f)
+        check = self.runner.check_release_timing(result["events"], self.LATENCY_MS,
+                                                   result["release_alert_latency_ns"])
+        self.assertEqual(check["checked"], len(fills))
+        self.assertTrue(check["exact_release_expected"])
+        self.assertEqual(check["early_violation_count"], 0, check["early_violations"])
+        self.assertEqual(check["inexact_violation_count"], 0, check["inexact_violations"])
+
+    def test_legacy_release_resolves_some_fills_later_than_exact(self):
+        # Same sparse quote set, same latency, exact_release=False (the
+        # --release-timing legacy CLI switch): fills must never arrive before
+        # submit + latency, but on this sparse fixture at least one fill must
+        # resolve strictly LATER -- real, measured release-on-next-event
+        # slack, not merely "not proven exact."
+        result = self.runner.run_one(self.quotes, {}, profile_name="paper-parity",
+                                      latency_ms=self.LATENCY_MS, run_seconds=20.0, exact_release=False)
+        self.assertFalse(result["exact_release"])
+        self.assertEqual(result["release_alert_latency_ns"], 0)
+        latency_ns = self.LATENCY_MS * 1_000_000
+        submits, fills = self._submits_and_fills(result)
+        self.assertGreater(len(fills), 0)
+        deltas_ns = [f["ts_ns"] - submits[f["client_order_id"]] for f in fills]
+        self.assertTrue(all(d >= latency_ns for d in deltas_ns), deltas_ns)
+        self.assertTrue(any(d > latency_ns for d in deltas_ns), deltas_ns)
+        check = self.runner.check_release_timing(result["events"], self.LATENCY_MS,
+                                                   result["release_alert_latency_ns"])
+        self.assertFalse(check["exact_release_expected"])
+        self.assertEqual(check["early_violation_count"], 0, check["early_violations"])
+
+    def test_summarize_run_reports_release_timing_for_both_modes(self):
+        exact_result = self.runner.run_one(self.quotes, {}, profile_name="paper-parity",
+                                            latency_ms=self.LATENCY_MS, run_seconds=15.0)
+        legacy_result = self.runner.run_one(self.quotes, {}, profile_name="paper-parity",
+                                             latency_ms=self.LATENCY_MS, run_seconds=15.0, exact_release=False)
+        exact_summary = self.runner.summarize_run(exact_result, self.quotes)
+        legacy_summary = self.runner.summarize_run(legacy_result, self.quotes)
+        self.assertTrue(exact_summary["release_timing"]["exact_release"])
+        self.assertEqual(exact_summary["release_timing"]["release_alert_latency_ns"], self.LATENCY_MS * 1_000_000)
+        self.assertEqual(exact_summary["release_timing"]["check"]["inexact_violation_count"], 0)
+        self.assertFalse(legacy_summary["release_timing"]["exact_release"])
+        self.assertEqual(legacy_summary["release_timing"]["release_alert_latency_ns"], 0)
+        self.assertFalse(legacy_summary["release_timing"]["check"]["exact_release_expected"])
 
 
 @unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
