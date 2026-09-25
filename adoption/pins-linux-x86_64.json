@@ -10,7 +10,14 @@
       "kind": "tarball",
       "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
       "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
-      "install_note": "Verified against https://nodejs.org/dist/v24.21.0/SHASUMS256.txt fetched 2026-09-22; also matches the pin already carried in agent-lab .devcontainer/bootstrap-linux.sh. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}."
+      "install_note": "Verified against https://nodejs.org/dist/v24.21.0/SHASUMS256.txt fetched 2026-09-22; also matches the pin already carried in agent-lab .devcontainer/bootstrap-linux.sh. Extract with --strip-components=1 into tools/node-24.21.0; symlink bin/{node,npm,npx,corepack}.",
+      "version_probe": {
+        "method": "exec",
+        "command": "node",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "uv",
@@ -18,7 +25,14 @@
       "kind": "tarball",
       "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
       "sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
-      "install_note": "Verified against the release's .sha256 sidecar fetched 2026-09-22; matches the existing agent-lab devcontainer pin. Archive also contains uvx; install both."
+      "install_note": "Verified against the release's .sha256 sidecar fetched 2026-09-22; matches the existing agent-lab devcontainer pin. Archive also contains uvx; install both.",
+      "version_probe": {
+        "method": "exec",
+        "command": "uv",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "gh",
@@ -26,7 +40,14 @@
       "kind": "tarball",
       "url": "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_linux_amd64.tar.gz",
       "sha256": "9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8",
-      "install_note": "v2.101.0 was GitHub's actual 'latest' release for cli/cli on 2026-09-22 (queried via `gh api repos/cli/cli/releases/latest`); hash verified against the release's gh_2.101.0_checksums.txt. Binary is at bin/gh inside the archive."
+      "install_note": "v2.101.0 was GitHub's actual 'latest' release for cli/cli on 2026-09-22 (queried via `gh api repos/cli/cli/releases/latest`); hash verified against the release's gh_2.101.0_checksums.txt. Binary is at bin/gh inside the archive.",
+      "version_probe": {
+        "method": "exec",
+        "command": "gh",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "codex",
@@ -34,7 +55,14 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.155.1.tgz",
       "sha256": "fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66",
-      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified."
+      "install_note": "npm registry tarball for @openai/codex@0.155.1 (thin wrapper package, 4904 bytes); npm dist.integrity sha512-02fAAGyBtlA1zPjEo3kTj/bOSYbPz5DvjLwRZJdV7weFFEDzNFOMjQGmZ/+5CuirYV0hE+AZTrnjzwXYU4AdAQ== matches a fresh openssl sha512/base64 digest of the same download. `npm install --global --prefix tools/codex-0.155.1 @openai/codex@0.155.1`. The complete native package (codex-code-mode-host, bundled rg) used by the agent-lab devcontainer script is a separate, larger GitHub release asset; this pin follows the npm alternative the task specified.",
+      "version_probe": {
+        "method": "exec",
+        "command": "codex",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "claude-code",
@@ -43,7 +71,16 @@
       "url": "https://downloads.claude.ai/claude-code-releases/2.1.280/linux-x64/claude",
       "sha256": "1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b",
       "install_note": "minimum version; native auto-update on the latest channel. Verified by downloading the linux-x64 binary directly and independently computing its sha256 (2026-09-23), matching both this pin and the 2.1.280 manifest.json's linux-x64 checksum. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.280`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling, and no DISABLE_AUTOUPDATER opt-out is set.",
-      "bin": "claude"
+      "bin": "claude",
+      "version_probe": {
+        "method": "exec",
+        "command": "claude",
+        "args": [
+          "--version"
+        ],
+        "match": "minimum",
+        "note": "The pin is a floor: the native launcher auto-updates on the latest channel, so any version at or above the pin passes."
+      }
     },
     {
       "id": "qmd",
@@ -51,7 +88,14 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
       "sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
-      "install_note": "npm dist.integrity sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA== matched. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md."
+      "install_note": "npm dist.integrity sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA== matched. `npm install --global --prefix tools/qmd-2.8.3 @tobilu/qmd@2.8.3`, matching recipes/README.md.",
+      "version_probe": {
+        "method": "exec",
+        "command": "qmd",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "rtk",
@@ -59,7 +103,14 @@
       "kind": "tarball",
       "url": "https://github.com/rtk-ai/rtk/releases/download/v0.49.0/rtk-x86_64-unknown-linux-musl.tar.gz",
       "sha256": "7278231dfd7e6a730a4ab7f847b195bcf02289c2d57622b0dab75a6411100c8f",
-      "install_note": "Verified against the release's checksums.txt fetched 2026-09-22, matching blueprints/convergence-practice/wsl-native-tools style pins and recipes/README.md's rtk 0.49.0 row."
+      "install_note": "Verified against the release's checksums.txt fetched 2026-09-22, matching blueprints/convergence-practice/wsl-native-tools style pins and recipes/README.md's rtk 0.49.0 row.",
+      "version_probe": {
+        "method": "exec",
+        "command": "rtk",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "ai-memory",
@@ -67,7 +118,14 @@
       "kind": "tarball",
       "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
       "sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
-      "install_note": "Verified against the release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar fetched 2026-09-22, following the upstream source named in blueprints/convergence-practice/wsl-native-tools/pins.json's convention and recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.3.2 archive)."
+      "install_note": "Verified against the release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar fetched 2026-09-22, following the upstream source named in blueprints/convergence-practice/wsl-native-tools/pins.json's convention and recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.3.2 archive).",
+      "version_probe": {
+        "method": "exec",
+        "command": "ai-memory",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "mcporter",
@@ -75,7 +133,14 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz",
       "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
-      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24."
+      "install_note": "npm dist.integrity sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== matched. `npm install --global --prefix tools/mcporter-0.13.13 mcporter@0.13.13`, matching recipes/README.md. Requires Node >=24.",
+      "version_probe": {
+        "method": "exec",
+        "command": "mcporter",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "context-mode",
@@ -83,7 +148,11 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
       "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
-      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog."
+      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
+      "version_probe": {
+        "method": "npm-metadata",
+        "note": "No version flag: every argv other than its named subcommands and --help falls through to starting its MCP stdio server, so the package version is read from npm metadata instead (observed 2026-09-25 with context-mode 1.0.169)."
+      }
     },
     {
       "id": "markitdown",
@@ -91,7 +160,14 @@
       "kind": "uv-tool",
       "url": "https://files.pythonhosted.org/packages/59/93/e8a4af0c47551beb6383e226e840cbc811a577b8096eb385251b3fcc8f62/markitdown-0.1.7.tar.gz",
       "sha256": "4d1f3c69cd43b82288fdc3653686d759dcf355ee7c681aa6a855aed98a1e4f44",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had markitdown 0.1.7 (Microsoft's Office/PDF/HTML-to-Markdown converter) installed as a uv tool on 2026-09-23: its uv-receipt.toml required markitdown==0.1.7 with no-build, and its console script's shebang pointed into the tool's own virtualenv. That is one host's state, not evidence about any other Linux host. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/markitdown/0.1.7/json urls[].digests.sha256, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 markitdown==0.1.7` into UV_TOOL_DIR, so the entry point runs in its own environment. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had markitdown 0.1.7 (Microsoft's Office/PDF/HTML-to-Markdown converter) installed as a uv tool on 2026-09-23: its uv-receipt.toml required markitdown==0.1.7 with no-build, and its console script's shebang pointed into the tool's own virtualenv. That is one host's state, not evidence about any other Linux host. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/markitdown/0.1.7/json urls[].digests.sha256, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 markitdown==0.1.7` into UV_TOOL_DIR, so the entry point runs in its own environment. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal.",
+      "version_probe": {
+        "method": "exec",
+        "command": "markitdown",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "tavily-cli",
@@ -99,7 +175,14 @@
       "kind": "uv-tool",
       "url": "https://files.pythonhosted.org/packages/bc/8a/bb8437105cc2d4794a344b6a4ed84b2fb0002e1973b06d33d7f882c14a76/tavily_cli-0.1.8.tar.gz",
       "sha256": "3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: on the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md), `uv tool list` showed tavily-cli 0.1.8 installed on 2026-09-23 (its `tvly` command). That is one host's state, not evidence about any other Linux host. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/tavily-cli/0.1.8/json, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 tavily-cli==0.1.8`, the same mechanism as that host's install. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: on the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md), `uv tool list` showed tavily-cli 0.1.8 installed on 2026-09-23 (its `tvly` command). That is one host's state, not evidence about any other Linux host. The artifact at the URL above was re-downloaded and sha256-hashed independently; it matches PyPI's published digest (https://pypi.org/pypi/tavily-cli/0.1.8/json, read 2026-09-23). install_pin's *-uv-tool case runs `uv tool install --python 3.13 tavily-cli==0.1.8`, the same mechanism as that host's install. uv resolves the pinned version from PyPI and does not check this sha256; it is recorded as an independent artifact cross-check and satisfies this catalog's fail-closed null-sha256 refusal.",
+      "version_probe": {
+        "method": "exec",
+        "command": "tvly",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "orx",
@@ -107,7 +190,14 @@
       "kind": "tarball",
       "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.7/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
       "sha256": "c0f8c7488cc3ff028e6757ee54957911f754ea3cd80e239e12f7a47a88884d63",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had OpenResearch's `orx` CLI 0.2.7 installed on 2026-09-23 (confirmed there with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). That is one host's state, not evidence about any other Linux host. Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had OpenResearch's `orx` CLI 0.2.7 installed on 2026-09-23 (confirmed there with `orx --version`; alphaXiv/OpenResearch, the local-first research-agent workspace). That is one host's state, not evidence about any other Linux host. Archive re-downloaded and sha256-hashed independently; matches the release's own `openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256` sidecar (`gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.7`, read 2026-09-23) exactly. `tar -tJf` lists exactly one top-level directory containing `orx`, `README.md` and `LICENSE`, matching `install_single_binary_tarball`'s convention of finding a single file literally named `orx` in the extracted tree.",
+      "version_probe": {
+        "method": "exec",
+        "command": "orx",
+        "args": [
+          "--version"
+        ]
+      }
     },
     {
       "id": "agent-browser",
@@ -115,7 +205,14 @@
       "kind": "npm",
       "url": "https://registry.npmjs.org/agent-browser/-/agent-browser-0.38.1.tgz",
       "sha256": "89a7df4761ff335e4dd5367e4cf04cecb9ba4e2cc130a0220f798d188414dc6c",
-      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had agent-browser 0.38.1 installed on 2026-09-23 (confirmed there with `agent-browser --version`). That is one host's state, not evidence about any other Linux host. npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. That host's installed copy placed its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here."
+      "install_note": "2026-09-23 catalog-winner-but-unpinned gap: the host that recorded PR #139 (docs/decisions/2026-09-23-claude-user-profile.md) had agent-browser 0.38.1 installed on 2026-09-23 (confirmed there with `agent-browser --version`). That is one host's state, not evidence about any other Linux host. npm registry tarball re-downloaded independently; npm dist.integrity sha512-k58FCz0yUOCANoNkMiqJe+H2y6r6sUZazqXsWF+MYq1iRC42PjtLcBoag6SSTOD/FRQppvPDvE5HDYEhclvnhw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/agent-browser-0.38.1 agent-browser@0.38.1`. That host's installed copy placed its own platform binary at `node_modules/agent-browser/bin/agent-browser-linux-x64`, resolved by the package's own postinstall/bin dispatch; `install_npm`'s existing generic `bin/*` symlink loop covers this the same way it covers every other npm-kind pin here.",
+      "version_probe": {
+        "method": "exec",
+        "command": "agent-browser",
+        "args": [
+          "--version"
+        ]
+      }
     }
   ]
 }

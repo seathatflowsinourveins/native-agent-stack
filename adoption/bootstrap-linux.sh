@@ -21,6 +21,9 @@ usage() {
     'Uses sudo only for missing Ubuntu/Debian apt prerequisites, installed' \
     'before the curl/git/tar/jq presence check unless --skip-system-packages' \
     'is given, in which case that check lists what is missing and exits 4.' \
+    'After installing, checks each installed pin with the version_probe its' \
+    'pin declares (bounded, stdin closed; servers are never started) and' \
+    'writes installed-versions.txt; exits 5 if any probe fails.' \
     'Never edits a shell profile.'
 }
 
@@ -191,6 +194,13 @@ exec 9>"$ecosystem_root/bootstrap.lock"
 flock -n 9 || { printf 'Another ecosystem bootstrap is running.\n' >&2; exit 1; }
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 cleanup() {
+  # An interrupted version report leaves its probe and watchdog running in
+  # their own process groups (run_version_probe, below); stop both.
+  # Reaped under a silenced stderr, so bash prints no job notice for them.
+  local group
+  for group in "${version_probe_pid:-}" "${version_watchdog_pid:-}"; do
+    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null || true; fi
+  done
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
     rm -rf -- "$stage_dir"
   fi
@@ -370,8 +380,13 @@ install_pin() {
     *-uv-tool) install_uv_tool "$id" "$version" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
+  installed_pin_ids+=("$id")
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
 }
+
+# The pins this run installed, in install order; the version report below
+# observes exactly these.
+installed_pin_ids=()
 
 # node, uv and gh are core prerequisites the npm-kind pins and gh-based
 # verification below depend on; install them before the profile's own list.
@@ -386,20 +401,212 @@ for id in "${component_ids[@]}"; do
   install_pin "$id"
 done
 
-{
-  printf 'Verified executable versions at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
-  git --version
-  # Every symlink actually placed in bin_dir gets its own --version run, not a
-  # fixed subset: this covers all installed pins (node/npm/npx/corepack, uv/uvx,
-  # gh, and each npm- or tarball-kind CLI), so the retained log matches what
-  # was really executed.
-  for installed_executable in "$bin_dir"/*; do
-    [[ -e "$installed_executable" ]] || continue
-    installed_name="$(basename "$installed_executable")"
-    printf -- '-- %s --\n' "$installed_name"
-    "$installed_executable" --version 2>&1 || printf '%s --version exited %s\n' "$installed_name" "$?"
+# Version report ($ECO_INSTALL_ROOT/installed-versions.txt). Each pin declares
+# how its installed version is observed (version_probe in the pins file), as
+# nixpkgs versionCheckHook and Homebrew test blocks are declared per package,
+# instead of one flag run against every file in bin_dir: MCP Inspector,
+# context-mode and socraticode have no --version, and each starts a server
+# (Inspector its web UI) on an unknown argument, so that loop blocked on an
+# interactive terminal. An exec probe runs only the declared command, with
+# stdin from /dev/null, in its own process group and under a wall-clock bound;
+# an npm-metadata probe runs only bin/npm, to read the package version without
+# running the package. Other executables in bin_dir are listed with their link
+# target and not run. A failed probe stops the run with exit 5 once the report
+# is written, before the closing steps.
+# Everything from version_probe_seconds to the end of the script's report
+# step is kept identical in bootstrap-macos.sh (bash 3.2); only this hook,
+# the platform lines at the top of the report, differs.
+version_report_platform() {
+  printf '%s (%s)\n' "${PRETTY_NAME:-${ID:-linux}}" "$(uname -m)"
+}
+
+version_probe_seconds=30
+version_probe_failed=0
+version_probe_failed_ids=""
+version_probe_pid=""
+version_watchdog_pid=""
+
+# run_version_probe SECONDS STDOUT STDERR COMMAND [ARG...]: runs COMMAND with
+# stdin from /dev/null and descriptor 9 closed (bootstrap-linux.sh holds its
+# flock there; nothing is open on it in bootstrap-macos.sh), sends TERM to its
+# whole process group after SECONDS and KILL 2 s later, and returns its
+# status, or 124 when the bound expired. Anything the probe left running in
+# its group is killed once it exits. While it runs, the probe and watchdog
+# group ids stay in version_probe_pid and version_watchdog_pid, so cleanup
+# can stop both if the script is interrupted.
+run_version_probe() {
+  local seconds="$1" stdout_file="$2" stderr_file="$3" expired="$2.expired" status=0
+  shift 3
+  rm -f -- "$expired"
+  # Job control puts each background job in its own process group, so the
+  # watchdog also reaches a server the probe forked, not only the probe.
+  set -m
+  "$@" </dev/null >"$stdout_file" 2>"$stderr_file" 9>&- &
+  version_probe_pid=$!
+  (
+    sleep "$seconds"
+    kill -0 -- "-$version_probe_pid" 2>/dev/null || exit 0
+    : >"$expired"
+    kill -TERM -- "-$version_probe_pid" 2>/dev/null || exit 0
+    sleep 2
+    kill -KILL -- "-$version_probe_pid" 2>/dev/null || exit 0
+  ) </dev/null >/dev/null 2>&1 9>&- &
+  version_watchdog_pid=$!
+  set +m
+  # Braced so bash's own job-status notice for a killed probe is discarded too.
+  { wait "$version_probe_pid"; } 2>/dev/null || status=$?
+  { kill -KILL -- "-$version_probe_pid"; } 2>/dev/null || true
+  # KILL, not TERM: a watchdog still starting up carries the script's own
+  # TERM trap and would exit without its already-forked sleep.
+  { kill -KILL -- "-$version_watchdog_pid"; wait "$version_watchdog_pid"; } 2>/dev/null || true
+  version_probe_pid=""
+  version_watchdog_pid=""
+  if [[ -e "$expired" ]]; then
+    rm -f -- "$expired"
+    return 124
+  fi
+  return "$status"
+}
+
+# version_at_least OBSERVED FLOOR: dot-separated numeric comparison; a
+# missing trailing component counts as 0 (bash 3.2: no array length).
+version_at_least() {
+  local observed_parts floor_parts index=0 observed_part floor_part
+  IFS=. read -r -a observed_parts <<<"$1"
+  IFS=. read -r -a floor_parts <<<"$2"
+  while [[ -n "${observed_parts[index]:-}" || -n "${floor_parts[index]:-}" ]]; do
+    observed_part="${observed_parts[index]:-0}"
+    floor_part="${floor_parts[index]:-0}"
+    [[ "$observed_part" =~ ^[0-9]+$ && "$floor_part" =~ ^[0-9]+$ ]] || return 1
+    if ((10#$observed_part > 10#$floor_part)); then
+      return 0
+    elif ((10#$observed_part < 10#$floor_part)); then
+      return 1
+    fi
+    index=$((index + 1))
   done
-} | tee "$ecosystem_root/installed-versions.txt"
+  return 0
+}
+
+# version_output_matches EXPECTED MATCH FILE...: "exact" finds EXPECTED as a
+# whole version, not inside a longer one; "minimum" takes the first dotted
+# version in the output and requires it to be at least EXPECTED.
+version_output_matches() {
+  local expected="$1" match="$2" pattern observed
+  shift 2
+  case "$match" in
+    exact)
+      pattern="$(printf '%s' "$expected" | sed 's/[][\.*^$+?(){}|/]/\\&/g')"
+      grep -Eq "(^|[^0-9.])${pattern}([^0-9.]|\$)" "$@"
+      ;;
+    minimum)
+      observed="$(cat -- "$@" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1 || true)"
+      [[ -n "$observed" ]] && version_at_least "$observed" "$expected"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+# Prints the report for every pin this run installed, then every executable
+# in bin_dir; counts failed pins in version_probe_failed(_ids).
+write_version_report() {
+  local id entry version method expected match package status observed result executable target argument
+  local probe_stdout="$stage_dir/version-probe.stdout" probe_stderr="$stage_dir/version-probe.stderr"
+  local verified=0
+  local probe_argv
+  printf 'Version report at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
+  printf 'Each installed pin is checked with its version_probe from %s; other executables are listed, not run (npm-metadata probes run only bin/npm).\n' "${pins_path##*/}"
+  version_report_platform
+  git --version
+  for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do
+    entry="$(jq -c --arg id "$id" '.tools[] | select(.id == $id)' "$pins_path")"
+    version="$(jq -r '.version' <<<"$entry")"
+    method="$(jq -r '.version_probe.method // "undeclared"' <<<"$entry")"
+    expected="$(jq -r '.version_probe.expect // .version' <<<"$entry")"
+    match="$(jq -r '.version_probe.match // "exact"' <<<"$entry")"
+    status=0
+    : >"$probe_stdout"
+    : >"$probe_stderr"
+    case "$method" in
+      exec)
+        probe_argv=("$bin_dir/$(jq -r '.version_probe.command' <<<"$entry")")
+        while IFS= read -r argument; do
+          probe_argv+=("$argument")
+        done < <(jq -r '.version_probe.args[]?' <<<"$entry")
+        printf -- '-- %s %s: %s --\n' "$id" "$version" "${probe_argv[*]#"$bin_dir"/}"
+        run_version_probe "$version_probe_seconds" "$probe_stdout" "$probe_stderr" ${probe_argv[@]+"${probe_argv[@]}"} || status=$?
+        sed -n '1,20p' "$probe_stdout" "$probe_stderr"
+        if [[ "$status" == 124 ]]; then
+          result="FAILED (no exit within ${version_probe_seconds}s; its process group was killed)"
+        elif [[ "$status" != 0 ]]; then
+          result="FAILED (exit $status)"
+        elif version_output_matches "$expected" "$match" "$probe_stdout" "$probe_stderr"; then
+          result="verified ($match $expected)"
+        else
+          result="FAILED (output does not report $match $expected)"
+        fi
+        ;;
+      npm-metadata)
+        package="$(npm_package_name "$(jq -r '.url' <<<"$entry")")"
+        printf -- '-- %s %s: npm ls %s (package metadata; the package is not run) --\n' "$id" "$version" "$package"
+        # npm ls exits nonzero for unrelated tree problems while still
+        # printing the installed version, so the version decides the result.
+        run_version_probe "$version_probe_seconds" "$probe_stdout" "$probe_stderr" \
+          "$bin_dir/npm" ls --global --prefix "$ecosystem_root/tools/$id-$version" --depth=0 --json "$package" || status=$?
+        observed="$(jq -r --arg package "$package" '.dependencies[$package].version // empty' "$probe_stdout" 2>/dev/null || true)"
+        printf '%s@%s\n' "$package" "${observed:-(not installed)}"
+        if [[ "$status" == 124 ]]; then
+          result="FAILED (npm ls did not exit within ${version_probe_seconds}s)"
+        elif [[ "$observed" == "$expected" ]]; then
+          result="verified (exact $expected)"
+        else
+          result="FAILED (npm reports ${observed:-no installed package}, pinned $expected)"
+        fi
+        ;;
+      *)
+        printf -- '-- %s %s --\n' "$id" "$version"
+        result="FAILED (no supported version_probe in ${pins_path##*/})"
+        ;;
+    esac
+    printf 'result: %s\n' "$result"
+    case "$result" in
+      verified*) verified=$((verified + 1)) ;;
+      *)
+        version_probe_failed=$((version_probe_failed + 1))
+        version_probe_failed_ids="$version_probe_failed_ids $id"
+        ;;
+    esac
+  done
+  printf -- '-- every entry in %s with its link target (this listing runs nothing) --\n' "${bin_dir##*/}"
+  for executable in "$bin_dir"/*; do
+    [[ -e "$executable" || -L "$executable" ]] || continue
+    if [[ -L "$executable" ]]; then
+      target="$(readlink "$executable")"
+      case "$target" in
+        "$ecosystem_root"/*) target="${target#"$ecosystem_root"/}" ;;
+        "$HOME"/*) target="\$HOME/${target#"$HOME"/}" ;;
+      esac
+      [[ -e "$executable" ]] || target="$target (missing)"
+    else
+      target="(file)"
+    fi
+    printf '%s -> %s\n' "${executable##*/}" "$target"
+  done
+  printf 'summary: %s verified, %s failed\n' "$verified" "$version_probe_failed"
+}
+
+version_report="$ecosystem_root/installed-versions.txt"
+printf 'Checking installed versions (at most %ss per probe)...\n' "$version_probe_seconds"
+write_version_report >"$version_report"
+cat -- "$version_report"
+if [[ "$version_probe_failed" -gt 0 ]]; then
+  printf '\nVersion check failed for:%s. The report is in %s; nothing was removed.\n' \
+    "$version_probe_failed_ids" "$version_report" >&2
+  printf 'Stopped before the PATH hint and --configure-claude-user-profile: fix or re-pin those components, then re-run this script.\n' >&2
+  exit 5
+fi
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \

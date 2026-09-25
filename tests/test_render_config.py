@@ -1,10 +1,12 @@
 """Local integration tests for tools/adoption/render_config.py (fixture host, no live host claims)."""
 
 import json
+import os
 import string
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -193,6 +195,33 @@ class RenderConfigTests(unittest.TestCase):
                      "--live-codex-project", str(self.tmp_path / "nowhere3.toml"))
         self.assertEqual(result.returncode, 1)
         self.assertIn("live file not found", result.stderr)
+
+
+class VerifyStdinTests(unittest.TestCase):
+    def test_verify_closes_stdin_for_the_native_clients(self):
+        # A CLI that falls back to reading stdin must get EOF, not the
+        # caller's terminal: with an inherited open stdin these shims would
+        # block until verify's own 30 s timeout.
+        with tempfile.TemporaryDirectory() as directory:
+            shims = Path(directory)
+            for name in ("codex", "claude"):
+                shim = shims / name
+                shim.write_text(f'#!/bin/sh\ncat >/dev/null\necho "{name} 1.0.0"\n')
+                shim.chmod(0o755)
+            read_end, write_end = os.pipe()
+            try:
+                started = time.monotonic()
+                result = subprocess.run([sys.executable, str(SCRIPT), "--verify"], stdin=read_end,
+                                        capture_output=True, text=True, timeout=60, check=False,
+                                        env={**os.environ, "PATH": f"{shims}{os.pathsep}{os.environ['PATH']}"})
+                elapsed = time.monotonic() - started
+            finally:
+                os.close(read_end)
+                os.close(write_end)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("codex --version: exit 0 -- codex 1.0.0", result.stdout)
+        self.assertIn("claude --version: exit 0 -- claude 1.0.0", result.stdout)
+        self.assertLess(elapsed, 20)
 
 
 if __name__ == "__main__":
