@@ -248,10 +248,11 @@ established** by this replay:
   `submitted_at`).
 - **Cancel timestamps** (`resolve_cancel_timestamps()`) use the adaptive-paper
   runner's **host clock**, captured just before the cancel request is sent
-  (`adaptive-paper/runner.py`'s `before_request()`, which records only
-  `{"timestamp": ..., "kind": ...}` -- no `client_order_id`, which is also why
-  cancel-request-to-order matching is validated rather than trusted blindly;
-  see below).
+  (`adaptive-paper/runner.py`'s `before_request()`). Runs since 2026-09-25
+  also record the cancelled order's `client_id` on each cancel request, which
+  pairs cancels exactly. Older ledgers record only `{"timestamp": ..., "kind":
+  ...}` -- no `client_order_id`, which is why their cancel-request-to-order
+  matching is validated rather than trusted blindly; see below.
 - **SIP quote timestamps** are a third, Alpaca-feed clock.
 
 Measured for this trial: the host clock read **at least +27.994 to +40.769ms
@@ -281,10 +282,21 @@ either side would shift every later pairing by one position and produce
 numbers that look like measurements but pair unrelated events -- as large as
 ~195 seconds in a constructed test case).
 
-**Cancel-request matching is by open-order uniqueness across the whole trial,
-not positional and not limited to canceled orders.** `requests[]` has no
-`client_order_id` and no symbol, so a cancel request cannot be attributed to
-a specific order directly. `resolve_cancel_timestamps()` uses this rule
+**Exact pairing (runs since 2026-09-25).** When cancel requests carry
+`client_id`, each canceled order resolves to its first named request
+(`source: recorded_cancel_request_client_id`, with `named_request_count`; a
+retried cancel counts more than once). A canceled order with no named request
+falls back to submit + `order_timeout_seconds`
+(`submit_plus_order_timeout_seconds_no_named_cancel_request`), and
+`clock_provenance.named_cancel_requests` reports the named requests, the orders
+they name and any unnamed cancel requests that were ignored. Submit entries
+also carry `client_id` and are never read as cancels. The rule below is not
+used for such runs.
+
+**Older ledgers: cancel-request matching is by open-order uniqueness across
+the whole trial, not positional and not limited to canceled orders.** There
+`requests[]` has no `client_order_id` and no symbol, so a cancel request
+cannot be attributed to a specific order directly. `resolve_cancel_timestamps()` uses this rule
 instead of a chronological-order heuristic: a cancel request at time T is
 attributed to order O only if O is the *unique* order that is open (submitted
 by T, and not yet terminal -- a filled order is terminal at its reported
@@ -337,11 +349,11 @@ counterexamples show why each assumption matters, not just in the abstract:
   If the offset ran the other way, the filled order would stay open at the
   request time and the pairing would be refused as ambiguous instead.
 
-Both failure modes trace back to the same root cause: `requests[]` records
-neither `client_order_id` nor symbol. Logging `client_order_id` on cancel
-requests (`adaptive-paper/transport.py:502` calls `self.before_request(kind)`
-with no order identifier at all) would remove this heuristic entirely and
-let cancels be paired directly, with no assumptions needed. **This retained
+Both failure modes trace back to the same root cause in older ledgers:
+`requests[]` recorded neither `client_order_id` nor symbol. Since 2026-09-25
+`AlpacaPaperTransport.cancel()` announces its DELETE on the guarded session,
+the budget hook receives the cancelled order's `client_id`, and new runs are
+paired exactly (above), with no assumptions needed. **This retained
 receipt is unaffected by either counterexample**: order 4 is the *only* open
 order at its cancel-request time in this trial (verified, not assumed --
 there is no other order, of any symbol, open at that instant), so neither a

@@ -175,6 +175,46 @@ class CancelTimestampResolutionTests(unittest.TestCase):
         canceled = next(o for o in self.orders if o["status"] == "canceled")
         self.assertEqual(entry["cancel_ts_ns"], canceled["submitted_at_ns"] + 10 * 10**9)
 
+    def test_named_cancel_requests_resolve_exactly_where_inference_would_refuse(self):
+        # Two orders open at once: the timing inference refuses this as ambiguous, but
+        # requests that name their order (runners since 2026-09-25) resolve each exactly.
+        base = {"symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        orders = [
+            dict(base, client_order_id="a", status="canceled", submitted_at_ns=1_000_000_000),
+            dict(base, client_order_id="b", status="canceled", submitted_at_ns=1_100_000_000),
+            dict(base, client_order_id="c", status="canceled", submitted_at_ns=1_200_000_000),
+            dict(base, client_order_id="d", status="filled", submitted_at_ns=1_300_000_000,
+                 filled_at_ns=1_400_000_000),
+        ]
+        unnamed = {"requests": [{"kind": "cancel", "timestamp": 2.0}, {"kind": "cancel", "timestamp": 3.0}]}
+        refused = C.resolve_cancel_timestamps(orders[:2], unnamed, 10)
+        self.assertTrue(all(r["source"].startswith("submit_plus") for r in refused.values()))
+        named = {"requests": [
+            {"kind": "submit", "timestamp": 0.9, "client_id": "a"},  # submits name their order too: never a cancel
+            {"kind": "submit", "timestamp": 0.95, "client_id": "b"},
+            {"kind": "cancel", "timestamp": 3.0, "client_id": "a"},
+            {"kind": "cancel", "timestamp": 2.5, "client_id": "b"},  # a retry, listed first: the earliest wins
+            {"kind": "cancel", "timestamp": 2.0, "client_id": "b"},
+            {"kind": "cancel", "timestamp": 1.45, "client_id": "d"},  # lost the race to the fill: ignored
+            {"kind": "cancel", "timestamp": 3.5},  # names no order: counted, not used
+            {"kind": "read", "timestamp": 4.0}]}
+        resolved = C.resolve_cancel_timestamps(orders, named, 10)
+        self.assertEqual(resolved, {
+            "a": {"cancel_ts_ns": 3_000_000_000, "source": "recorded_cancel_request_client_id",
+                  "named_request_count": 1},
+            "b": {"cancel_ts_ns": 2_000_000_000, "source": "recorded_cancel_request_client_id",
+                  "named_request_count": 2},
+            "c": {"cancel_ts_ns": 11_200_000_000, "source": "submit_plus_order_timeout_seconds_no_named_cancel_request",
+                  "named_request_count": 0}})
+        provenance = C.clock_provenance(orders, named)
+        self.assertIn("each request naming its owned order's client_order_id", provenance["cancel_clock_source"])
+        self.assertEqual(provenance["named_cancel_requests"],
+                         {"requests": 4, "orders": 3, "unnamed_requests_ignored": 1})
+        legacy = C.clock_provenance(orders, unnamed)
+        self.assertIn("no client_order_id", legacy["cancel_clock_source"])
+        self.assertNotIn("named_cancel_requests", legacy)
+
     def test_two_cancels_matched_by_validated_chronological_order(self):
         base = {"symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}

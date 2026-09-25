@@ -90,11 +90,11 @@
     {
       "repository": "zizmorcore/zizmor",
       "version": "1.30.1",
-      "pin_record": ".github/requirements-ci.lock",
+      "pin_record": ".github/requirements-ci.txt",
       "source": "https://docs.zizmor.sh/usage/",
-      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows",
-      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence. Offline regular persona gates every PR in validate.yml; security-scan.yml's zizmor-online job adds the online audits on push/schedule/dispatch and uploads SARIF (category zizmor) without failing on findings.",
-      "online_command": "GH_TOKEN=<github.token> zizmor --no-config --no-ignores --no-exit-codes --persona regular --strict-collection --format sarif .github/workflows"
+      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .",
+      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence. Since 2026-09-25 the regular persona gates every PR in validate.yml with its online audits (read-only github.token; findings fail the required validate check) over the repository root, so .github/dependabot.yml is audited too; security-scan.yml's zizmor-online job still uploads SARIF (category zizmor) on push/schedule/dispatch without failing on findings.",
+      "online_command": "GH_TOKEN=<github.token> zizmor --no-config --no-ignores --persona regular --strict-collection ."
     },
     {
       "repository": "actions/setup-python",

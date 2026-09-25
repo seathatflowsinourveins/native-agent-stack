@@ -148,6 +148,9 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(result["status"], "passed", result)
             self.assertTrue(result["flat"])
             self.assertGreater(result["native_fill_events"], 0, result)
+            # E2's native assertions ride the outcome (a receipt field, not only counters).
+            self.assertEqual(result["native_assertions"], {"fill_events_carry_execution_fields": True,
+                                                           "no_fill_gap_open_at_stop": True, "overturn_signals": []})
             self.assertTrue(any(e["type"] == "intent" for e in controller.events))
             self.assertEqual(len(ledger.unresolved()), 0)
             self.assertEqual(port.started, 1)
@@ -260,6 +263,45 @@ class IntegratedRunner(unittest.TestCase):
             with self.assertRaisesRegex(SafetyError, "cash_mismatch"):
                 reconcile(ledger, snapshot, "100000")
             ledger.close()
+
+    def test_cancel_requests_name_their_order_without_touching_the_durable_budget(self):
+        # Exact sim-to-paper cancel pairing reads the in-memory log (paper-output
+        # requests[]). The durable row stays unbound for a cancel: requests.client_id is a
+        # foreign key to intents, so an unknown id must not be able to fail the reservation.
+        now = time.time()
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: now)
+            asyncio.run(controller.before_request("cancel", client_id="not-a-durable-intent"))
+            asyncio.run(controller.before_request("read"))
+            controller.port = type("Port", (), {"ready": True})()
+            controller.quote({"symbol": "SPY", "bid": "100", "ask": "100.01", "ts_ns": int(now * 1e9)})
+            controller.before_submit({"client_order_id": "named-submit", "symbol": "SPY", "side": "buy",
+                                      "qty": "1", "limit_price": "100.03"})
+            asyncio.run(controller.before_request("submit", client_id="named-submit"))
+            self.assertEqual(controller.requests, [
+                {"timestamp": now, "kind": "cancel", "client_id": "not-a-durable-intent"},
+                {"timestamp": now, "kind": "read"},
+                {"timestamp": now, "kind": "submit", "client_id": "named-submit"}])
+            rows = ledger.db.execute("SELECT kind, client_id FROM requests ORDER BY id").fetchall()
+            self.assertEqual([tuple(row) for row in rows],
+                             [("cancel", None), ("read", None), ("submit", "named-submit")])
+            ledger.close()
+
+    def test_simulated_ports_name_the_cancelled_order(self):
+        from mover_simulation import MoverSimulatedPort
+        from simulation import SimulatedPort
+        calls = []
+
+        class Recorder:
+            async def before_request(self, kind, client_id=None):
+                calls.append((kind, client_id))
+        asyncio.run(SimulatedPort(Recorder(), ["SPY"]).cancel("sim-1"))
+        mover = MoverSimulatedPort(Recorder(), ["SPY"], path=lambda symbol, elapsed: None)
+        mover._intents["mover-1"] = {"client_order_id": "mover-1"}
+        asyncio.run(mover.cancel("mover-1"))
+        self.assertEqual(calls, [("cancel", "sim-1"), ("cancel", "mover-1")])
 
     def test_submission_rate_defers_without_waiting_or_selling_held_positions(self):
         from native_adapter import NativeOrderRejected
@@ -673,6 +715,262 @@ class IntegratedRunner(unittest.TestCase):
             self.assertNotIn("cancel_requested", strategy.pending[resting_sell_id])
             ledger.close()
 
+    def test_a_halted_symbol_gets_no_order_and_its_resting_exit_is_not_repriced(self):
+        """E4: while halted (runner.Controller.is_halted), a symbol gets no entry and no exit
+        order, and its resting exit is neither cancelled for a timeout nor replaced; the same
+        tick after the resume sends the exit."""
+        from native_strategy import AdaptiveStrategy
+        from strategies import AdaptivePolicy, SelectorConfig
+        from selector import ACTIVE, FLATTEN_BEFORE_SWITCH, SelectionDecision
+
+        class V1Spec:
+            id = "adaptive_policy_v1"
+            receipt_sha256 = "0" * 64
+            sessions = ("regular",)
+            regime_affinity = ()
+
+            def propose(self, decision_inputs):
+                return {}
+
+        class FakeSelector:
+            def __init__(self, decision):
+                self.decision = decision
+                self.config = SelectorConfig(portfolio_transition_policy=FLATTEN_BEFORE_SWITCH)
+
+            def decide(self, decision_inputs):
+                return self.decision
+
+        class FakeOrderFactory:
+            def __init__(self):
+                self.calls = []
+
+            def limit(self, instrument_id, side, quantity, price, *, time_in_force, client_order_id, tags):
+                self.calls.append({"instrument_id": str(instrument_id), "tags": list(tags)})
+                return self.calls[-1]
+
+        class FakeStrategy(AdaptiveStrategy):
+            @property
+            def order_factory(self):
+                return self._fake_order_factory
+
+        now = time.time()
+        halted = {"AAPL", "IBM"}
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            ledger.reserve_intent("buy-1", "AAPL", "buy", "1", "100.01", quote=Quote("AAPL", "100", "100.01", now),
+                                  now=now, market_open=True, session_close=now + 3600)
+            ledger.record_order("buy-1", "broker-buy-1", "filled", "1", "100", timestamp=now)
+            _, _, policy_config = load_config(SOURCE / "config.json")
+            decision = SelectionDecision(timestamp=now, prior_state=ACTIVE, new_state=ACTIVE, regime="trend",
+                                         confidence=1.0, advantage_bps=50.0, incumbent_id="adaptive_policy_v1",
+                                         candidate_id="adaptive_policy_v1", reason_codes=("switched",),
+                                         blocked_by=(), liquidate=True)
+            policy = AdaptivePolicy(policy_config, strategy_pool=(V1Spec(),), selector=FakeSelector(decision))
+            strategy = FakeStrategy(policy, ledger, "fixture", halted=lambda symbol: symbol in halted)
+            strategy._fake_order_factory = FakeOrderFactory()
+            submitted, cancelled = [], []
+            strategy.submit_order = submitted.append
+            strategy.cancel_order = cancelled.append
+            strategy.started = strategy.enabled = True
+            policy.observe("AAPL", 100.995, 101.005, now)
+            strategy.pending["adp-fixture-0000098"] = {"symbol": "IBM", "side": "sell", "created": now - 60}
+            strategy.pending["adp-fixture-0000099"] = {"symbol": "IBM", "side": "buy", "created": now - 60}
+
+            strategy.rebalance(now + .01)
+            strategy.cancel_expired(now + .02, 10)
+            self.assertEqual(submitted, [])                                   # the AAPL flatten waits
+            self.assertEqual([str(c) for c in cancelled], ["adp-fixture-0000099"])   # entries still cancel
+            self.assertNotIn("cancel_requested", strategy.pending["adp-fixture-0000098"])
+
+            halted.clear()                                                    # both resume
+            policy.observe("AAPL", 100.995, 101.005, now + .03)
+            policy.last_decision = 0                                          # the next decision tick
+            strategy.rebalance(now + .03)
+            strategy.cancel_expired(now + .04, 10)
+            self.assertEqual(len(submitted), 1)
+            self.assertIn("reason=rotation_flatten", strategy._fake_order_factory.calls[0]["tags"])
+            self.assertIn("adp-fixture-0000098", [str(c) for c in cancelled])  # re-pricing resumes
+            ledger.close()
+
+    def test_a_stale_seed_on_a_held_symbol_blocks_its_exit_only_until_the_seed_expires(self):
+        """A3 and B6 through the adaptive strategy and a real Controller: the startup seed says
+        AAPL and IBM are in a LULD pause that in fact resumed before the engine subscribed (no
+        status message follows), and their quotes carry the best-effort condition flag. While
+        the seed counts, AAPL's flatten waits and IBM's resting exit is not cancelled for
+        re-pricing; at the seed's 12-minute expiry both go ahead, and the quote flag, still
+        set, holds neither exit back."""
+        from native_strategy import AdaptiveStrategy
+        from strategies import AdaptivePolicy, SelectorConfig
+        from selector import ACTIVE, FLATTEN_BEFORE_SWITCH, SelectionDecision
+
+        class V1Spec:
+            id = "adaptive_policy_v1"
+            receipt_sha256 = "0" * 64
+            sessions = ("regular",)
+            regime_affinity = ()
+
+            def propose(self, decision_inputs):
+                return {}
+
+        class FakeSelector:
+            def __init__(self, decision):
+                self.decision = decision
+                self.config = SelectorConfig(portfolio_transition_policy=FLATTEN_BEFORE_SWITCH)
+
+            def decide(self, decision_inputs):
+                return self.decision
+
+        class FakeOrderFactory:
+            def __init__(self):
+                self.calls = []
+
+            def limit(self, instrument_id, side, quantity, price, *, time_in_force, client_order_id, tags):
+                self.calls.append({"instrument_id": str(instrument_id), "tags": list(tags)})
+                return self.calls[-1]
+
+        class FakeStrategy(AdaptiveStrategy):
+            @property
+            def order_factory(self):
+                return self._fake_order_factory
+
+        now = time.time()
+        clock = [now]
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            ledger.reserve_intent("buy-1", "AAPL", "buy", "1", "100.01", quote=Quote("AAPL", "100", "100.01", now),
+                                  now=now, market_open=True, session_close=now + 3600)
+            ledger.record_order("buy-1", "broker-buy-1", "filled", "1", "100", timestamp=now)
+            controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: clock[0])
+            halted_at = int((now - 12 * 60 + .02) * 1e9)          # the seed expires at now + 0.02 s
+            pause = {"halted_at_ns": halted_at, "resumption_trade_ns": None, "reason_code": "LUDP", "market": "NASDAQ"}
+            controller.apply_halt_seed({"source": "nasdaq_trade_halts_rss", "fetched_at_ns": int(now * 1e9),
+                                        "sha256": "0" * 64, "bytes": 1, "items": 2,
+                                        "halts": {"AAPL": dict(pause), "IBM": dict(pause)}})
+            for symbol in ("AAPL", "IBM"):
+                controller.quote({"symbol": symbol, "bid": "100.99", "ask": "101.01", "ts_ns": int(now * 1e9),
+                                  "halted": True})
+            _, _, policy_config = load_config(SOURCE / "config.json")
+            decision = SelectionDecision(timestamp=now, prior_state=ACTIVE, new_state=ACTIVE, regime="trend",
+                                         confidence=1.0, advantage_bps=50.0, incumbent_id="adaptive_policy_v1",
+                                         candidate_id="adaptive_policy_v1", reason_codes=("switched",),
+                                         blocked_by=(), liquidate=True)
+            policy = AdaptivePolicy(policy_config, strategy_pool=(V1Spec(),), selector=FakeSelector(decision))
+            strategy = FakeStrategy(policy, ledger, "fixture", halted=controller.is_halted)
+            strategy._fake_order_factory = FakeOrderFactory()
+            submitted, cancelled = [], []
+            strategy.submit_order = submitted.append
+            strategy.cancel_order = cancelled.append
+            strategy.started = strategy.enabled = True
+            policy.observe("AAPL", 100.995, 101.005, now)
+            strategy.pending["adp-fixture-0000098"] = {"symbol": "IBM", "side": "sell", "created": now - 60}
+
+            clock[0] = now + .01
+            strategy.rebalance(now + .01)
+            strategy.cancel_expired(now + .01, 10)
+            self.assertEqual((submitted, cancelled), ([], []))                  # the seed still counts
+            self.assertEqual(controller.halt_summary()["halted_now"], ["AAPL", "IBM"])
+
+            clock[0] = now + .03                                                # past the seed's expiry
+            policy.observe("AAPL", 100.995, 101.005, now + .03)
+            policy.last_decision = 0
+            strategy.rebalance(now + .03)
+            strategy.cancel_expired(now + .03, 10)
+            self.assertEqual(len(submitted), 1)
+            self.assertIn("reason=rotation_flatten", strategy._fake_order_factory.calls[0]["tags"])
+            self.assertEqual([str(c) for c in cancelled], ["adp-fixture-0000098"])   # re-pricing resumes
+            self.assertTrue(controller.quotes["AAPL"].halted)                   # the flag alone: entries only
+            self.assertEqual(controller.halt_summary()["halted_now"], [])
+            self.assertEqual(sorted(e["symbol"] for e in controller.events if e.get("effect") == "seed_expired"),
+                             ["AAPL", "IBM"])
+            ledger.close()
+
+    def test_an_order_callback_exception_ends_the_run_needs_attention_and_routes_to_recovery(self):
+        """E3 through run_native: an exception raised beneath the guard of on_order_filled
+        freezes the ledger with its named reason, stops the session (the adapter records the
+        fault and denies every later submit), and the run ends needs_attention and non-flat,
+        which main() hands to recovery.recover (must_end_flat)."""
+        import native_strategy
+        from runner import _final_boundary_from_run_status
+        from sessions import DEFAULT_SESSION_POLICY, must_end_flat
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=3, cleanup_seconds=2, order_timeout_seconds=1)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"), max_positions=6,
+                                  warmup_samples=4, warmup_seconds=.06, sample_seconds=.02,
+                                  rebalance_seconds=.02, min_hold_seconds=.05, max_hold_seconds=.4,
+                                  cooldown_seconds=.05)
+            def price(symbol, tick):
+                slope = Decimal(".03") if symbol in policy.benchmarks else Decimal(".10")
+                return Decimal("100") + min(tick, 70) * slope
+            port = SimulatedPort(controller, policy.symbols, price=price)
+            controller.port = port
+            submits_at_fault = []
+
+            def fault(self, client_id, terminal=None):
+                submits_at_fault.append(len(port.submitted_at))
+                raise RuntimeError("injected bookkeeping fault")
+
+            with patch.object(native_strategy.AdaptiveStrategy, "_release_staged_replacement", fault):
+                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                "fixture", config, "100000"))
+            reason = "strategy_callback_exception_on_order_filled"
+            self.assertEqual(result["status"], "needs_attention", result.get("adapter_errors"))
+            self.assertTrue(result["adapter_errors"])
+            self.assertEqual(set(result["adapter_errors"]), {reason + ":RuntimeError"})
+            self.assertEqual(ledger.halted_reason(), reason)
+            self.assertEqual(result["callback_faults"][0]["callback"], "on_order_filled")
+            self.assertEqual(len(port.submitted_at), submits_at_fault[0])   # no submit after the fault
+            self.assertFalse(result["flat"])
+            self.assertTrue(must_end_flat(DEFAULT_SESSION_POLICY,
+                                          is_final_boundary=_final_boundary_from_run_status(result)))
+            self.assertEqual(trial_phase_and_exit_code(result), ("needs_attention", 3))
+            self.assertTrue(any(e.get("type") == "strategy_callback_exception" for e in controller.events))
+            ledger.close()
+
+    def test_a_seeded_halt_keeps_its_symbol_out_of_run_native_entries(self):
+        """E4 startup state through run_native: the halt seed (a halts-feed result in the
+        shape transport.nasdaq_halt_seed returns) marks AAPL halted while the node connects;
+        with no streamed resume it gets no order while MSFT, on the same price path, trades.
+        The outcome records the seed."""
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=3, cleanup_seconds=2, order_timeout_seconds=1)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"), max_positions=6,
+                                  warmup_samples=4, warmup_seconds=.06, sample_seconds=.02,
+                                  rebalance_seconds=.02, min_hold_seconds=.05, max_hold_seconds=.4,
+                                  cooldown_seconds=.05)
+            def price(symbol, tick):
+                slope = Decimal(".03") if symbol in policy.benchmarks else Decimal(".10")
+                return Decimal("100") + min(tick, 70) * slope
+            port = SimulatedPort(controller, policy.symbols, price=price)
+            controller.port = port
+            reads = []
+
+            def seed(symbols):
+                reads.append(symbols)
+                return {"source": "nasdaq_trade_halts_rss", "fetched_at_ns": time.time_ns(), "sha256": "0" * 64,
+                        "bytes": 1, "items": 1,
+                        "halts": {"AAPL": {"halted_at_ns": time.time_ns() - 10 ** 9, "resumption_trade_ns": None,
+                                           "reason_code": "T12", "market": "NASDAQ"}}}
+            controller.halt_seed_fetch = seed
+            result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                            "fixture", config, "100000"))
+            bought = {i.symbol for i in ledger.intents() if i.side == "buy"}
+            self.assertEqual(result["adapter_errors"], [])
+            self.assertEqual(reads, [sorted(policy.symbols)])
+            self.assertNotIn("AAPL", bought)
+            self.assertIn("MSFT", bought)
+            self.assertEqual((result["halts"]["seed"]["status"], result["halts"]["halted_now"]), ("seeded", ["AAPL"]))
+            ledger.close()
+
     def test_operational_status_against_simulated_port_health_never_keyerrors(self):
         """R2 regression: _operational_status used to read
         self.transport.health["frozen"] unconditionally, which KeyErrors
@@ -906,6 +1204,54 @@ class IntegratedRunner(unittest.TestCase):
         phase2, exit_code2 = trial_phase_and_exit_code(outcome)
         self.assertEqual(phase2, "held_overnight")
         self.assertEqual(exit_code2, 0)
+
+    def test_finalize_status_and_financing_adds_no_key_when_overnight_holds_false(self):
+        """Financing: outcome["modeled_financing"] is added only when the
+        run just ended "held_overnight" under
+        session_policy["overnight_holds"] -- every shipped config leaves
+        overnight_holds False, so _finalize_status_and_financing (the exact
+        function run_native calls, not a re-implementation) must never add
+        the key for any of them; the outcome stays byte-identical to
+        before this function existed. Confirmed from both sides: with
+        overnight_holds False the identical reconciled/boundary inputs
+        never reach "held_overnight" and never gain the key; with it True
+        they do reach "held_overnight" and DO gain a well-formed
+        "modeled_financing" block -- proving the key's absence above is
+        specifically the overnight_holds gate, not some other difference
+        between the two calls."""
+        from datetime import datetime, timezone as _tz
+        from decimal import Decimal
+        from zoneinfo import ZoneInfo
+        import runner as runner_module
+        from safety import Position
+
+        post_ts = datetime(2026, 3, 10, 18, 0, tzinfo=ZoneInfo("America/New_York")) \
+            .astimezone(_tz.utc).timestamp()  # a real POST-session boundary instant
+        reconciliation = {"positions_match": True, "cash_match": True, "cash_delta_usd": "0",
+                          "open_orders": 0, "positions": 1}  # non-flat: one reconciled position
+
+        class _FakeLedger:
+            def positions(self):
+                return {"AAPL": Position("AAPL", Decimal("10"), Decimal("1500"))}
+
+        outcome_off = {"reconciliation": reconciliation, "adapter_errors": [],
+                       "accounting": {"halted_reason": None}, "corporate_action_guard": {}}
+        session_policy_off = {"extended_hours": True, "overnight_holds": False}
+        result_off = runner_module._finalize_status_and_financing(
+            reconciliation, [], 0, outcome_off, session_policy_off, {}, _FakeLedger(), "1000", post_ts)
+        self.assertNotEqual(result_off["status"], "held_overnight")
+        self.assertNotIn("modeled_financing", result_off)
+
+        outcome_on = {"reconciliation": reconciliation, "adapter_errors": [],
+                     "accounting": {"halted_reason": None}, "corporate_action_guard": {}}
+        session_policy_on = {"extended_hours": True, "overnight_holds": True}
+        result_on = runner_module._finalize_status_and_financing(
+            reconciliation, [], 0, outcome_on, session_policy_on, {}, _FakeLedger(), "1000", post_ts)
+        self.assertEqual(result_on["status"], "held_overnight")
+        financing = result_on["modeled_financing"]
+        self.assertEqual(financing["evidence_class"], "modeled")
+        self.assertEqual(financing["plan"], "standard")
+        self.assertEqual(financing["debit_usd"], Decimal("500"))  # 1500 cost basis - 1000 baseline cash
 
     def test_forced_recovery_that_fails_to_flatten_cannot_report_held_overnight_or_exit_0(self):
         """D4 (round 6): main()'s forced-recovery branch used to set

@@ -2,7 +2,11 @@
   "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the three lists.",
   "lockfiles": [
     {
-      "path": ".github/requirements-ci.lock",
+      "path": ".github/requirements-ci.txt",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "parser": "requirements.txt"
     },
     {
@@ -162,6 +166,10 @@
     {
       "path": "blueprints/us-equities/mover-v3/data-tools/requirements.in",
       "lockfile": "blueprints/us-equities/mover-v3/data-tools/requirements.lock"
+    },
+    {
+      "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.in",
+      "lockfile": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock"
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/variant/package.json",

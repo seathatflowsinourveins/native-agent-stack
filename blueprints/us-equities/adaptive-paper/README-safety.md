@@ -91,10 +91,17 @@ limit-order mechanism guarantees a flat finish.
   adopted or looked up as a broker order on restart; any later broker observation
   of the identity fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,
-  timestamp=None)` applies owned broker observations and returns whether state
-  changed. Cumulative quantity decreases are stale and ignored. Duplicate fills
-  are idempotent; contradictory identity, average price or terminal state fails.
-  Later partial fills cannot reverse an observed pending-cancel status.
+  timestamp=None, execution=None)` applies owned broker observations and returns
+  whether state changed. Cumulative quantity decreases are stale and ignored. Duplicate
+  fills are idempotent; contradictory identity, average price or terminal state fails.
+  Later partial fills cannot reverse an observed pending-cancel status. `execution`
+  (`execution_from_observation`: the one execution a stream fill carries, its
+  `execution_id`, `qty` and `price`) is recorded durably in the `executions` table,
+  keyed by the cumulative quantity after it, even when a REST read already advanced the
+  cumulative quantity. A repeat is a no-op; the same key or id with other values, an
+  overlapping execution, or an execution price beyond the order's limit fails
+  (`execution_conflict_requires_reconciliation`, `execution_overlap_requires_reconciliation`,
+  `incremental_fill_violates_limit`).
 - `request_budget(now, kind, client_id=None)` supports `submit`, `read`, `cancel`
   and `data_read`. Zero means an attempt was durably reserved. A positive delay
   means nothing was reserved: wait within the caller's remaining deadline, then
@@ -130,8 +137,15 @@ are created privately; journal directory metadata is fsynced at initialization.
 No account IDs, keys or secret headers are stored. Retain the account database
 across process restarts; a new database would lose budget and risk continuity.
 
-Fill cost uses `new cumulative quantity * new average - old cumulative quantity *
-old average`, not the latest average multiplied by the fill delta. Cost basis uses weighted
+Fill cost uses the recorded executions' own prices whenever they tile the cumulative
+advance (`booking: executions` on the `order_observed` event), each checked against
+the limit. Otherwise (a REST read ahead of the stream, a missing or reordered
+execution) it uses `new cumulative quantity * new average - old cumulative quantity *
+old average` (`booking: cumulative_average`), not the latest average multiplied by the
+fill delta; that derived notional is checked against the limit only beyond Alpaca's
+6-decimal average rounding (0.5e-6 USD per share of both quantities), so a rounded
+average at the limit no longer freezes, and the booked notional then differs from the
+executions' by at most that rounding. Cost basis uses weighted
 average inventory accounting. `cash_delta_usd` is the exact sum of observed gross
 buy/sell cash flows; broker fees and other account activity require independent
 reconciliation. `cumulative_realized_loss_usd` accumulates losing realized deltas;
@@ -302,3 +316,57 @@ Run `python3 -m unittest discover -s tests -p test_adaptive_paper_safety.py -v` 
 the synthetic local failure cases. These checks establish local state invariants,
 not native broker throughput, fault behavior, order fills, or strategy quality.
 `tests/test_adaptive_paper_leverage.py` covers `leverage.py` itself.
+
+## Financing costs (modeled)
+
+`financing.py` (pure, Decimal, no I/O, same style as `leverage.py`) models the
+margin-interest cost of an overnight hold. Sources (fetched 2026-09-25):
+
+* Alpaca, "Margin and Short Selling"
+  (https://docs.alpaca.markets/docs/margin-and-short-selling): annual margin
+  interest rate 5.00% for Elite users, 6.50% for non-Elite (`financing.
+  MARGIN_RATES`, a frozen snapshot -- check the "Alpaca Securities Brokerage
+  Fee Schedule" for the current rate); charged only on the end-of-day
+  (overnight) **settlement-date** debit balance: `daily_margin_interest_charge
+  = settlement_date_debit_balance * rate / 360`; accrues daily, posts at
+  month end. A settlement-date debit balance at the end of day Friday incurs 3
+  days of interest (Fri, Sat, Sun), since no trade settles over the weekend.
+* Alpaca, "Paper Trading" (https://docs.alpaca.markets/docs/paper-trading):
+  paper does not simulate regulatory fees or dividends; its "Paper vs Live"
+  table marks Borrow Fees "Coming Soon"; it does not say whether paper posts
+  margin interest at all.
+
+**Settlement convention:** `financing.settlement_date` is T+1, the next NYSE
+*trading* day (`sessions.next_trading_day`) -- not the separate SIFMA
+bank/securities-settlement calendar, so a bank holiday on which NYSE is open
+(e.g. Columbus Day, Veterans Day) is treated as a normal settlement day here,
+though real DTCC settlement does not occur on those days. `financing.
+overnight_financing_projection` projects the cost of holding the *current*
+book until it is sold at the next trading session: the buys settle T+1, that
+next-session sale settles T+2, and the financed days are the calendar days
+between those two settlement dates. `settled_cash_usd` is the settled cash
+available *before* buying the current book (e.g. the trial's starting
+capital), not a post-buy running-cash figure -- kept deliberately simple and
+documented in the function's own docstring rather than reconstructing an
+intraday settled-cash trajectory.
+
+**Not modelled:** borrow/short-locate fees, dividends, and (per the
+settlement-convention paragraph above) bank-holiday settlement gaps.
+
+**Not reconciled against paper.** Alpaca's paper-trading docs do not confirm
+whether paper posts margin interest at all, so every figure this module
+produces is a projection, never a broker read. `runner.py`'s `run_native` adds
+an outcome `"modeled_financing"` block (`"evidence_class": "modeled"`, with an
+explicit "not reconciled" note) only when a run ends `"held_overnight"` under
+`session_policy["overnight_holds"]` -- every shipped config leaves
+`overnight_holds` `False`, so no existing config's outcome gains this key; see
+`runner._finalize_status_and_financing`/`_modeled_financing_block`. The
+optional top-level config key `"financing_plan"` (`"standard"` or `"elite"`,
+default `"standard"`) selects the rate plan and is validated in
+`runner.load_config` exactly like the other opt-in feature keys above -- any
+other value is refused.
+
+`tests/test_adaptive_paper_financing.py` covers `financing.py` itself
+(stdlib only, runs on system Python); the "no key when `overnight_holds` is
+False" integration case lives in `tests/test_adaptive_paper_runner.py`
+alongside the other `_run_native_status`/`_honest_overnight_hold` tests.
