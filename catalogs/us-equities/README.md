@@ -33,6 +33,17 @@ catalog actions behind the [mover v3 research plan](../../blueprints/us-equities
 literature and metadata evidence only, with each record's sweep status. Its
 repository records are registered in the decision index.
 
+The [September 24 local-model workload discovery](local-model-workloads-20260924.json)
+records which local-model workloads beyond memory and RAG are worth measuring on
+the 64 GB M5 Pro, from two blind cross-family lanes and one blind adjudication
+([sealed evidence](../../evidence/artifacts/local-model-workloads-20260924/README.md)).
+Four workloads converged as trials: catalyst extraction, earnings-call
+transcription, image-only exhibit OCR and volatility/volume time-series features.
+Tabular foundation models for mover prediction were adjudicated a skip. The
+record also keeps single-lane leads and the workloads that stay on the cloud
+agents. Discovery evidence only: nothing was installed or executed, and inclusion
+selects nothing. Its repository records are registered in the decision index.
+
 The [current token-practice audit](../../docs/token-practice.md) maps the
 then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a

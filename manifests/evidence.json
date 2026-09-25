@@ -3194,7 +3194,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "6138ad3a3ebec4ef0146893b9d95340849f7faced088898f0bb31fc31a373b0f",
+      "sha256": "f13ab2240d9571f6e95fded44c72271db92cb1938b01d735d2f87a4fedf27ef4",
       "bytes": 22907
     },
     {
@@ -6415,8 +6415,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "f7af07f2501a28fb82ab4ad9256a80ae43be4bc61edcaea3691cdc7de3c3ae09",
-      "bytes": 479570
+      "sha256": "b60bd150fdbf2a7d78ae42cf7368ad7ee23bdb7d8499f4de7a56dd314933f932",
+      "bytes": 479745
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9490,8 +9490,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "a5a2fe2ffaf45d9ec27d37360d99d278343909fc0ae6482c94826018ddd261d0",
-      "bytes": 15799
+      "sha256": "4ab4b02c9b51746d5891b4aa322d1d2b6dec5fdd3e31512d504475d95c15988b",
+      "bytes": 16601
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -9635,8 +9635,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "41088e48f2fe41affcd98f9ef654144213d7ad8f7aee88f4578e387f78cf00f5",
-      "bytes": 731809
+      "sha256": "21c8c2644a11393f065bc57371f37f8dafe5cb93034babd6f4d6abb29e81e4ed",
+      "bytes": 736510
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -9684,8 +9684,13 @@
       "bytes": 4752
     },
     {
+      "path": "catalogs/us-equities/local-model-workloads-20260924.json",
+      "sha256": "94369971e95b1770031386f311f5f935dbd0992eac50ffde9001977c544fd08d",
+      "bytes": 76400
+    },
+    {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "903cca2b70ae70b0b2642bb655d6356ea4f774e3aa316147d3f054e899356368",
+      "sha256": "7ba59836c6bbda805e7801ad99178a8f7fa704970e6cc5b64acdbe83942ee8dd",
       "bytes": 3215
     },
     {
@@ -25329,6 +25334,76 @@
       "bytes": 3987
     },
     {
+      "path": "evidence/artifacts/local-model-workloads-20260924/README.md",
+      "sha256": "5c91c452128bb8477937c1a369868ec74c381d025ebdb074d3fb5db7aa2943ed",
+      "bytes": 5544
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/SHA256SUMS",
+      "sha256": "fe13a5741e98bb3363265210e1b90f53ac92aa3a1ade7f78e9779bf77dbf55d4",
+      "bytes": 1797
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+      "sha256": "43487581f6d0dc5f7e9b093121d16cc6c74aae473dd43071e333a0193c3ea5bc",
+      "bytes": 3123
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/adjudication-key.json",
+      "sha256": "631fdb341681d10cc139a8b888a032dcc2775e27fd15bbdba1c68b5f94f8ce0f",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+      "sha256": "dc1afd18b206521fa578d51c5d9f72f803d05eb3ff677f6575a1e9eab89d8058",
+      "bytes": 3138
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+      "sha256": "5ada31de5eeb9058ec79424a1df29f656f2c6fbd1cc0d77001daf22364e790f2",
+      "bytes": 3140
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+      "sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546",
+      "bytes": 11053
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json",
+      "sha256": "b30696c8e8720ae2d3bc04ca850304098f603874c8f2e79516b7f655185f6196",
+      "bytes": 25487
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json",
+      "sha256": "5122de310479d12d674aaa49bbab09d7a61c4624fbce2a66b36405a50df21f77",
+      "bytes": 23682
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/convergence.json",
+      "sha256": "18768da848d2b5c114a0fc0922703d542298ab0a67a0a4c324900c14616d5675",
+      "bytes": 9165
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/experiment.json",
+      "sha256": "aa5ee859a6d49a125bfec54bb644cd96374d10274ecb936edb0f07b0717e4339",
+      "bytes": 21727
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/packet.json",
+      "sha256": "c72fc158ae8f74a1fb33dc606bd94ba16159a75c7cb111d71c47effa01435a02",
+      "bytes": 3665
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/provenance.json",
+      "sha256": "fb4ebf2dd0ede2c0c1c3f3dba1c1e7dbba6e75e7941048e6149d1543e2429ca9",
+      "bytes": 13008
+    },
+    {
+      "path": "evidence/artifacts/local-model-workloads-20260924/usage.json",
+      "sha256": "eea0ecfdfd6c022208f0c812dd634c7ba6fff4b0455e875dce017d051ba4ab73",
+      "bytes": 4691
+    },
+    {
       "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
       "sha256": "0b2647471d67bd15bdacdb949f33d9647d72d5f7d2b1b861db77279c63defc2b",
       "bytes": 12066
@@ -29683,6 +29758,7 @@
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
-    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json"
+    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+    "evidence/artifacts/local-model-workloads-20260924/experiment.json"
   ]
 }

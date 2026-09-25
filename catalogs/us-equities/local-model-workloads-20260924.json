@@ -1,0 +1,1306 @@
+{
+  "schema_version": 1,
+  "kind": "local_model_workload_catalog_decisions",
+  "checked_at": "2026-09-24",
+  "baseline_commit": "e94fb5b2cbdf330d59cf3c593ff2dab729bcea80",
+  "scope": "Catalog actions from a cross-family blind discovery of local-model workloads beyond memory and RAG on the 64 GB M5 Pro, for the US-equities north star and native agent engineering. One frozen packet went to a Claude Opus 5.5 lane and a Codex GPT-6 Astra lane; one disagreement was adjudicated blind by GPT-6 Sol in three presentation orders, including a reversed listing; the coordinator's convergence table sets each record's decision. Discovery evidence only: nothing was installed, downloaded or executed for these items, inclusion selects nothing, and no record changes a default, the installed stack or the runtime target.",
+  "evidence": "evidence/artifacts/local-model-workloads-20260924/README.md",
+  "convergence_record": "evidence/artifacts/local-model-workloads-20260924/experiment.json",
+  "packet_sha256": "38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7",
+  "decision_values": {
+    "converged_trial": "Both lanes independently proposed the workload as a local trial; the record is a default, challenger or runtime the convergence table names. A measured trial against the acceptance gate precedes any adoption.",
+    "adjudicated_skip": "The lanes disagreed; a blind judge preferred the skip return in all three presentation orders (original, label-swapped and reversed listing).",
+    "single_lane_lead": "Proposed by one lane only; not converged; discovery only.",
+    "skip_not_local": "A lane named the workload as not worth running locally given the cloud frontier models."
+  },
+  "evidence_levels": {
+    "discovery_web_research": "Named by a blind lane's web research on 2026-09-24 and checked only against the lane returns; no pinned source was read. Pins are live GitHub and Hugging Face API metadata (existence, head or revision, reported license), not a source review."
+  },
+  "pin_method": {
+    "github": "gh api repos/OWNER/REPO/commits/HEAD --jq .sha for the default-branch head, and repos/OWNER/REPO for the default branch, archive state and reported license",
+    "huggingface": "https://huggingface.co/api/models/ORG/NAME .sha for the main revision; the author listings (api/models?author=...) for the dated checkpoint series and api/models/.../refs for branches"
+  },
+  "registration": "Only /repository_decisions is registered with the decision index (python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/local-model-workloads-20260924.json#/repository_decisions), because the union accepts only records that name a GitHub repository. PaddlePaddle/PaddleOCR and amazon-science/chronos-forecasting were already in the union; the other seven enter as research-supplement identities (850 to 857). /non_repository_decisions holds Hugging Face models pinned by revision and the workloads the lanes keep off the Mac, as data. /lane_mentions_not_recorded lists what the lanes named but the convergence table did not carry; it is not registered.",
+  "lane_mentions_not_recorded": [
+    {
+      "name": "olmOCR-2-7B-1025",
+      "url": "https://github.com/allenai/olmocr",
+      "lanes": [
+        "codex"
+      ],
+      "mention": "OCR runner-up",
+      "why_not_recorded": "not carried into the convergence table; already a targeted_candidate in catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/5"
+    },
+    {
+      "name": "mlx-whisper with Whisper large-v3-turbo",
+      "url": "https://github.com/ml-explore/mlx-examples",
+      "lanes": [
+        "codex"
+      ],
+      "mention": "Codex transcription runner-up; the Claude lane uses Whisper-large-v3-turbo as its acceptance baseline",
+      "why_not_recorded": "a baseline for the transcription trial, not a new candidate"
+    },
+    {
+      "name": "TimesFM-3",
+      "url": "https://github.com/google-research/timesfm",
+      "lanes": [
+        "claude",
+        "codex"
+      ],
+      "mention": "higher reported forecasting scores; noted by one lane and runner-up in the other",
+      "why_not_recorded": "neither lane selected it because the 3.0 weights are non-commercial; existing record catalogs/us-equities/engines-strategies.json#/entries/33"
+    },
+    {
+      "name": "Kronos",
+      "url": "https://github.com/shiyu-coder/Kronos",
+      "lanes": [
+        "claude"
+      ],
+      "mention": "fallback if generic time-series models fail",
+      "why_not_recorded": "a conditional fallback in the lane's notes; existing record catalogs/us-equities/star-audit.json#/entries/293"
+    },
+    {
+      "name": "OmniDocBench",
+      "url": "https://github.com/opendatalab/OmniDocBench",
+      "lanes": [
+        "claude"
+      ],
+      "mention": "benchmark cited as evidence",
+      "why_not_recorded": "an evidence source, not a candidate"
+    },
+    {
+      "name": "Qwen3.8 GitHub repository",
+      "url": "https://github.com/QwenLM/Qwen3.8",
+      "lanes": [
+        "codex"
+      ],
+      "mention": "link given for the Qwen3.8-27B failure-log-triage candidate (verified; head 2ea10dc725823bf7c3e21ce8557cbe15245132ae)",
+      "why_not_recorded": "the decisions concern the Hugging Face weights, recorded above and already pinned in catalogs/us-equities/models.json#/entries/3"
+    },
+    {
+      "name": "Qwen3.5-9B",
+      "url": null,
+      "lanes": [
+        "codex"
+      ],
+      "mention": "installed failure-log-triage runner-up",
+      "why_not_recorded": "named without a source"
+    },
+    {
+      "name": "Sweep next-edit 1.5B",
+      "url": "https://huggingface.co/sweepai/sweep-next-edit-1.5B",
+      "lanes": [
+        "codex"
+      ],
+      "mention": "next-edit runner-up",
+      "why_not_recorded": "runner-up of a single-lane lead"
+    },
+    {
+      "name": "MLX-VLM",
+      "url": null,
+      "lanes": [
+        "claude"
+      ],
+      "mention": "Mac runtime named for the OCR models",
+      "why_not_recorded": "named without a link"
+    }
+  ],
+  "repository_decisions": [
+    {
+      "id": "local-workloads-gliner2",
+      "repository": "https://github.com/fastino-ai/GLiNER2",
+      "workload": "Catalyst tagging and extraction from 8-Ks and releases (ex-post labels, never live signals)",
+      "role": "Challenger: CPU span-extraction model (checkpoint gliner2.5-base-v1) as a distilled student for the backfill",
+      "decision": "converged_trial",
+      "claude_disposition": "trial; runner-up as a CPU encoder distilled student",
+      "codex_disposition": "trial first; best candidate (gliner2.5-base-v1)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "55656fbfa01d3d4a77485e1a1eeeaf682990ccdf",
+      "source_commit_date": "2026-09-24T22:52:45Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "model_pins": [
+        {
+          "model_id": "fastino/gliner2.5-base-v1",
+          "revision": "b0c10b23313ec3ff028821dff298dd743e010706",
+          "last_modified": "2026-09-24T22:08:17Z",
+          "license": "apache-2.0",
+          "gated": false,
+          "parameters_reported": 193581591
+        }
+      ],
+      "acceptance_gate": "Convergence table: 1,000 stratified 8-Ks plus 300 hand-checked, macro-F1 against frontier labels. Claude lane: 1,000 stratified 2025–26 8-Ks from Massive plus 300 hand-checked; baselines Opus 5.5 labels and Massive tags; macro-F1, field exact match and filings/hour; adopt for backfill if F1 ≥0.9× Opus. Codex lane: 1,000 manually adjudicated 2024–2025 SEC/news passages including negatives, compared with keyword rules and frontier extraction; ≥95% catalyst recall, ≥90% precision, source-span accuracy and lower cost per document.",
+      "reason": "Both lanes rank catalyst extraction among the directly measurable local workloads. The Codex lane picks GLiNER2 first; the Claude lane uses it as the CPU student behind Qwen3.8-27B, which the convergence table keeps as the default.",
+      "limitations": [
+        "Financial catalyst accuracy is unknown; the only scores are maker-reported general benchmarks (GLiNER2.5: Few-NERD F1 55.14, 16-task average 54.87) and the EMNLP 2025 demo paper.",
+        "M5 Pro throughput is unknown; the Codex lane warns against transferring older GLiNER speed claims.",
+        "The checkpoint's main revision was modified on 2026-09-24, the day of the lanes; the pin is that revision, not a tagged release.",
+        "Labels are ex-post research annotations for +200% movers, never live or backtest signals."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/1",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/0",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/0"
+      ],
+      "sources": [
+        "https://github.com/fastino-ai/GLiNER2",
+        "https://aclanthology.org/2025.emnlp-demos.10/",
+        "https://fastino.ai/blog/gliner2-5-span-free-information-extraction",
+        "https://huggingface.co/fastino/gliner2.5-base-v1"
+      ]
+    },
+    {
+      "id": "local-workloads-fluidaudio",
+      "repository": "https://github.com/FluidInference/FluidAudio",
+      "workload": "Earnings-call transcription",
+      "role": "Runtime for the challenger: Parakeet-TDT-0.6B-v3 on CoreML, with speaker diarization",
+      "decision": "converged_trial",
+      "claude_disposition": "cited as the maker-reported speed source (Parakeet 155.6× real time on M4 Pro; diarization 323× on M5 Pro) and as an ASR runtime in its notes",
+      "codex_disposition": "trial first; best candidate runtime with Parakeet-TDT-0.6B-v3 CoreML",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "21493f8dac5a97e65742e6ff26f42f164c2fda0f",
+      "source_commit_date": "2026-09-25T00:08:29Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: full Earnings-21/22 calls; WER, entity WER and real-time factor. Claude lane: Earnings-21 (44 calls, entity tags) plus Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx and DER; Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice. Codex lane: Earnings-22 test files plus 100 finance dictations compared with Whisper; no worse WER, ≥98% ticker/number accuracy on dictations and ≥20× real time.",
+      "reason": "Both lanes trial local transcription for season-peak call volume, privacy and offline use. FluidAudio is the Codex lane's default path and the source of the only Apple-silicon speed figures either lane found.",
+      "limitations": [
+        "Speeds are the maker's own (LibriSpeech 155.6× and FLEURS 207× real time on an M4 Pro); M5 Pro and hour-long call performance are unknown.",
+        "The pinned head was committed after the lanes ran; the lanes cited the unpinned Benchmarks.md page.",
+        "The CoreML conversion of Parakeet that FluidAudio loads is a separate artifact, not pinned here.",
+        "Finance entities (tickers, numbers) need separate scoring."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/1"
+      ],
+      "sources": [
+        "https://github.com/FluidInference/FluidAudio",
+        "https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md"
+      ]
+    },
+    {
+      "id": "local-workloads-mlx-audio",
+      "repository": "https://github.com/Blaizzy/mlx-audio",
+      "workload": "Earnings-call transcription",
+      "role": "Runtime the Claude lane names for the default model, Cohere Transcribe 03-2026, on Apple silicon",
+      "decision": "converged_trial",
+      "claude_disposition": "named, without a link, as the runtime of its best candidate (trial)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "4ab7e6f7dedd69a136cfaa318c5dc8aed5119446",
+      "source_commit_date": "2026-09-24T16:00:19Z",
+      "default_branch": "main",
+      "license": "MIT (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: full Earnings-21/22 calls; WER, entity WER and real-time factor. Claude lane: Earnings-21 (44 calls, entity tags) plus Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx and DER; Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice. Codex lane: Earnings-22 test files plus 100 finance dictations compared with Whisper; no worse WER, ≥98% ticker/number accuracy on dictations and ≥20× real time.",
+      "reason": "The convergence table lists the default transcription model with mlx-audio; recording the runtime pins the code path a trial of that default would use.",
+      "limitations": [
+        "Named by one lane only, without a link; whether mlx-audio supports Cohere Transcribe 03-2026 at the pinned head was not checked.",
+        "Cohere Transcribe's speed on this Mac is unknown (Claude lane)."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/1"
+      ],
+      "sources": [
+        "https://github.com/Blaizzy/mlx-audio",
+        "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026"
+      ]
+    },
+    {
+      "id": "local-workloads-paddleocr",
+      "repository": "https://github.com/PaddlePaddle/PaddleOCR",
+      "workload": "Image-only exhibits and scans",
+      "role": "Code and pipeline for the challenger model PaddleOCR-VL-1.6",
+      "decision": "converged_trial",
+      "claude_disposition": "not named as a repository; its PaddleOCR-VL-1.6 model is the runner-up (trial, narrow)",
+      "codex_disposition": "trial; best candidate (VL-1.6, 0.9B)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf",
+      "source_commit_date": "2026-09-16T03:30:53Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: narrow trial, because XBRL and HTML already cover most filings. Claude lane: 300 10-Q statement tables rendered to PNG and scored against XBRL facts, plus 100 hand-labeled slides; baseline Qwen3.8-27B vision; numeric-cell exact match (pass ≥99%), TEDS and seconds per page. Codex lane: 200 exhibit pages with transcribed tables compared with deterministic PDF extraction and cloud vision; table TEDS ≥0.95, numeric-cell exact match ≥99.5% and lower corrected-page cost.",
+      "reason": "Already in the union as a discovery record and compared in the document-retrieval layer; this record adds the equities exhibit workload. It is the Codex lane's first choice and the Claude lane's runner-up model.",
+      "limitations": [
+        "The Codex lane cites the maker's report (OmniDocBench v1.6 96.33) and warns that benchmark versions are not interchangeable; the leaderboard the Claude lane cites lists 96.34.",
+        "M5 Pro pages per minute and full-pipeline compatibility are unknown.",
+        "OCR numbers are never verified financial facts; XBRL stays authoritative."
+      ],
+      "existing_records": [
+        "catalogs/landscape/claude-independent-discovery.json#/candidates/287 (discovery_only)",
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/2 (document-retrieval, keep_but_compare; OmniDocBench v1.6 rank 3 behind TeleOCR)"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/3",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/1",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/2"
+      ],
+      "sources": [
+        "https://github.com/PaddlePaddle/PaddleOCR",
+        "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+        "https://arxiv.org/abs/2606.03264",
+        "https://github.com/opendatalab/OmniDocBench"
+      ]
+    },
+    {
+      "id": "local-workloads-chronos-forecasting",
+      "repository": "https://github.com/amazon-science/chronos-forecasting",
+      "workload": "Time-series foundation-model features for volatility and volume",
+      "role": "Code for the default model, Chronos-2 (120M)",
+      "decision": "converged_trial",
+      "claude_disposition": "trial, low priority; best candidate; skip for returns",
+      "codex_disposition": "trial, lower priority; best candidate (120M)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "10afa9ebe016e514f9d7dc1aa873f66af57e116b",
+      "source_commit_date": "2026-09-17T07:39:21Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: low-priority trial, never for returns. Claude lane: 5-minute realized variance for 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE and Diebold-Mariano p<0.05. Codex lane: rolling forecasts on the frozen market archive using only then-known covariates, compared with seasonal-naive volume and EWMA volatility; ≥5% lower pinball loss with calibrated intervals.",
+      "reason": "Both lanes name Chronos-2 first for volatility and volume features, not returns. The existing source-review card stays the component record; this adds the local-workload discovery decision.",
+      "limitations": [
+        "fev-bench is run by Chronos's maker (S); on realized volatility only TTM beat Log-HAR among nine zero-shot models (Brini 2026, A).",
+        "Return forecasting is out of scope: zero-shot out-of-sample R² was negative (Rahimikia et al. 2025, A).",
+        "Mac throughput is unknown; the maker reports more than 300 series/s on an A10G."
+      ],
+      "existing_records": [
+        "catalogs/us-equities/engines-strategies.json#/entries/34 (chronos: conditional, source_review)",
+        "catalogs/us-equities/models.json#/entries/19 (amazon/chronos-2: conditional, source_review, same revision)"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/3"
+      ],
+      "sources": [
+        "https://github.com/amazon-science/chronos-forecasting",
+        "https://arxiv.org/abs/2510.15821",
+        "https://huggingface.co/spaces/autogluon/fev-bench",
+        "https://arxiv.org/abs/2607.05291"
+      ]
+    },
+    {
+      "id": "local-workloads-granite-tsfm",
+      "repository": "https://github.com/ibm-granite/granite-tsfm",
+      "workload": "Time-series foundation-model features for volatility and volume",
+      "role": "Code library for the challenger, TTM r2.1 (about 1M parameters, CPU)",
+      "decision": "converged_trial",
+      "claude_disposition": "not named as a repository; its TTM r2.1 model is the runner-up (trial, low priority)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "fe7a35697723e2a2f5246ae979474bfc554e26c0",
+      "source_commit_date": "2026-08-28T21:17:37Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: low-priority trial, never for returns. Claude lane: 5-minute realized variance for 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE and Diebold-Mariano p<0.05. Codex lane: rolling forecasts on the frozen market archive using only then-known covariates, compared with seasonal-naive volume and EWMA volatility; ≥5% lower pinball loss with calibrated intervals.",
+      "reason": "Added by the coordinator: the TTM model card declares granite-tsfm as its library (Hugging Face library_name), so a trial of the challenger runs through it. TTM was the one zero-shot model that beat Log-HAR on realized volatility in the lane-cited study.",
+      "limitations": [
+        "Neither lane named this repository; it enters through the coordinator's mapping of the TTM challenger to its code.",
+        "TTM r2.1 variants are branches of the ttm-r2 model repository; the model record pins them, and the library revision a trial uses must match."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/3"
+      ],
+      "sources": [
+        "https://github.com/ibm-granite/granite-tsfm",
+        "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
+        "https://arxiv.org/abs/2607.05291"
+      ]
+    },
+    {
+      "id": "local-workloads-piguard",
+      "repository": "https://github.com/leolee99/PIGuard",
+      "workload": "Prompt-injection screening of tool output in agent hooks",
+      "role": "Best candidate: a 184M injection detector used as a flag in hooks",
+      "decision": "single_lane_lead",
+      "claude_disposition": "trial, flag-only, never a security boundary; best candidate",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "1b5751e88bf7475acbedfc8eda795ce060307c84",
+      "source_commit_date": "2025-12-04T02:40:08Z",
+      "default_branch": "main",
+      "license": "MIT (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Claude lane: 2,000 redacted benign outputs from own sessions plus PIArena injections; baseline no detector; TPR at FPR ≤1% and p95 latency; flag-only, never a security boundary.",
+      "reason": "Agent-engineering pillar: per-call latency and cost favor a local screen, and tool outputs may hold code or secrets. Only the Claude lane proposed it.",
+      "limitations": [
+        "PIArena (ACL 2026, A): PIGuard keeps utility (72% vs 74%) but allows over 22% attack success; adaptive attacks are unsolved.",
+        "PIDS-Bench (2026, A): an F1-0.98 detector misflags about a third of external benign inputs.",
+        "The repository was last pushed on 2025-12-04; Mac latency is unknown."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/5",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/1"
+      ],
+      "sources": [
+        "https://github.com/leolee99/PIGuard",
+        "https://aclanthology.org/2026.acl-long.1533/",
+        "https://arxiv.org/abs/2609.15017"
+      ]
+    },
+    {
+      "id": "local-workloads-tabicl",
+      "repository": "https://github.com/soda-inria/tabicl",
+      "workload": "Tabular foundation models for +200% mover prediction",
+      "role": "The Codex lane's first choice, TabICLv2 (checkpoint 20260212)",
+      "decision": "adjudicated_skip",
+      "claude_disposition": "skip: trees and deep nets still win on temporal, non-IID, large data (BeyondArena)",
+      "codex_disposition": "trial; best candidate (research challenger, permissive license)",
+      "adjudicated_disposition": "skip in all three presentation orders, including a reversed listing (gpt-6-sol, high effort)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "0dbff3ec8fc68c123c87af77b0ea8b25cd2d23f3",
+      "source_commit_date": "2026-09-02T13:49:56Z",
+      "default_branch": "main",
+      "license": "NOASSERTION (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Skipped until a walk-forward comparison beats CatBoost (convergence table). If reopened, the Codex lane's test: point-in-time 2015–2025 equities features predicting +200% within 20 sessions, with delistings, temporal splits and a 20-session embargo; beat logistic regression and CatBoost on PR-AUC and Brier score.",
+      "reason": "The judge found BeyondArena's temporal, non-IID and large-data results closest to this task, and TabPFN-3.5's own report says tuned MLPs still lead its temporal and large subsets; TabICLv2's TabArena and TALENT wins do not establish an equities advantage.",
+      "limitations": [
+        "One judge model from the Codex lane's family; listing position and letter labels were counterbalanced across three judgments for this question.",
+        "No cited paper tests rare +200% equity events with PR-AUC and Brier score; the skip rests on the closest evidence (reversed-listing judgment).",
+        "GitHub reports the license as NOASSERTION; the Codex lane calls it permissive.",
+        "TabICL's speed claim (under 10 s for 50K×100) is on an H100, not this Mac."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/3",
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/2",
+        "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/adjudicated/0"
+      ],
+      "sources": [
+        "https://github.com/soda-inria/tabicl",
+        "https://arxiv.org/abs/2602.11139",
+        "https://arxiv.org/abs/2606.30410"
+      ]
+    },
+    {
+      "id": "local-workloads-tabpfn",
+      "repository": "https://github.com/PriorLabs/TabPFN",
+      "workload": "Tabular foundation models for +200% mover prediction",
+      "role": "The Codex lane's runner-up, TabPFN-3.5 (checkpoint 20260909) with restricted weights",
+      "decision": "adjudicated_skip",
+      "claude_disposition": "skip; notes that TabPFN-3 weights are non-commercial",
+      "codex_disposition": "trial; runner-up (restricted weights)",
+      "adjudicated_disposition": "skip in all three presentation orders, including a reversed listing (gpt-6-sol, high effort)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "source_commit": "787f845d698e952fd3271ed25f2fabf33d929557",
+      "source_commit_date": "2026-09-24T16:38:32Z",
+      "default_branch": "main",
+      "license": "Apache-2.0 (GitHub API)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "model_pins": [
+        {
+          "model_id": "Prior-Labs/tabpfn_3_5",
+          "revision": "06bf2ba35c80a92a3b9abb436b99cf49e7a0365e",
+          "last_modified": "2026-09-09T20:05:09Z",
+          "license": "other",
+          "gated": false
+        }
+      ],
+      "acceptance_gate": "Skipped until a walk-forward comparison beats CatBoost (convergence table). If reopened, the Codex lane's test: point-in-time 2015–2025 equities features predicting +200% within 20 sessions, with delistings, temporal splits and a 20-session embargo; beat logistic regression and CatBoost on PR-AUC and Brier score.",
+      "reason": "Adjudicated with TabICLv2: the skip return is better supported for temporal, non-IID equity data. TabPFN-3.5's own report leaves tuned MLPs ahead on its temporal and large subsets.",
+      "limitations": [
+        "The first two judgments call the skip return's license point overstated (TabPFN-3.5 weights permit local evaluation; commercial use is restricted); the reversed-listing judgment does not address it.",
+        "GitHub reports Apache-2.0 for the code; the Hugging Face weights declare license 'other'."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/3",
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/2",
+        "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/adjudicated/0"
+      ],
+      "sources": [
+        "https://github.com/PriorLabs/TabPFN",
+        "https://arxiv.org/abs/2609.17895",
+        "https://huggingface.co/Prior-Labs/tabpfn_3_5",
+        "https://arxiv.org/abs/2606.30410"
+      ]
+    }
+  ],
+  "non_repository_decisions": [
+    {
+      "id": "local-workloads-qwen3.8-27b-catalyst",
+      "item": "Qwen3.8-27B with a JSON schema, installed through Ollama",
+      "workload": "Catalyst tagging and extraction from 8-Ks and releases (ex-post labels, never live signals)",
+      "role": "Default: the installed local generator doing schema-constrained extraction",
+      "decision": "converged_trial",
+      "claude_disposition": "trial; best candidate (installed, JSON schema)",
+      "codex_disposition": "trial first; runner-up for harder relationships",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "revision_url": "https://huggingface.co/Qwen/Qwen3.8-27B/tree/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "revision_last_modified": "2026-08-14T15:00:01Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 27781427952,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: 1,000 stratified 8-Ks plus 300 hand-checked, macro-F1 against frontier labels. Claude lane: 1,000 stratified 2025–26 8-Ks from Massive plus 300 hand-checked; baselines Opus 5.5 labels and Massive tags; macro-F1, field exact match and filings/hour; adopt for backfill if F1 ≥0.9× Opus. Codex lane: 1,000 manually adjudicated 2024–2025 SEC/news passages including negatives, compared with keyword rules and frontier extraction; ≥95% catalyst recall, ≥90% precision, source-span accuracy and lower cost per document.",
+      "reason": "Both lanes trial local catalyst extraction; the convergence table keeps the already installed model as the default and GLiNER2 as the CPU challenger.",
+      "limitations": [
+        "Local accuracy is unknown; Massive's 0.927 precision is LLM-judged and maker-reported (S).",
+        "The Claude lane estimates 15–26 s per 3–5K-token filing at the packet's measured speeds: about 1–2 h for ~260 daily 8-Ks and 50–90 days for the 293K backfill (estimate).",
+        "The installed Ollama 4-bit quantization is not the pinned BF16 revision."
+      ],
+      "existing_records": [
+        "catalogs/us-equities/models.json#/entries/3 (conditional, source_review, same revision)"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/1",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/0",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/0"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B",
+        "https://arxiv.org/abs/2607.08346"
+      ]
+    },
+    {
+      "id": "local-workloads-cohere-transcribe",
+      "item": "Cohere Transcribe 03-2026 (2B speech recognition model)",
+      "workload": "Earnings-call transcription",
+      "role": "Default: lowest open long-form WER on Earnings-21/22 in the lane-cited leaderboard",
+      "decision": "converged_trial",
+      "claude_disposition": "trial; best candidate (2B, Apache-2.0, mlx-audio)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "CohereLabs/cohere-transcribe-03-2026",
+      "revision": "b1eacc2686a3d08ceaae5f24a88b1d519620bc09",
+      "revision_url": "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026/tree/b1eacc2686a3d08ceaae5f24a88b1d519620bc09",
+      "revision_last_modified": "2026-06-10T15:46:19Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": "auto",
+      "parameters_reported": 2065804048,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: full Earnings-21/22 calls; WER, entity WER and real-time factor. Claude lane: Earnings-21 (44 calls, entity tags) plus Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx and DER; Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice. Codex lane: Earnings-22 test files plus 100 finance dictations compared with Whisper; no worse WER, ≥98% ticker/number accuracy on dictations and ≥20× real time.",
+      "reason": "Open ASR long-form WER on Earnings-21/22: Cohere 8.7/12.66 against Whisper v3 turbo 9.84/13.1 and Parakeet 9.96/14.58 (best proprietary 6.48/9.99), as cited by the Claude lane.",
+      "limitations": [
+        "Named by one lane only; the convergence table makes it the default of a converged workload.",
+        "Its speed on this Mac is unknown; the Claude lane keeps it only if it runs at ≥50× real time here, else Parakeet.",
+        "Access is gated behind the model's terms (automatic approval); accepting them is a user decision.",
+        "Open ASR is co-authored by NVIDIA, Mistral and OpenAI (lane note)."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/1"
+      ],
+      "sources": [
+        "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026",
+        "https://huggingface.co/datasets/hf-audio/leaderboard_longform"
+      ]
+    },
+    {
+      "id": "local-workloads-parakeet-tdt-0.6b-v3",
+      "item": "Parakeet-TDT-0.6B-v3 (0.6B speech recognition model)",
+      "workload": "Earnings-call transcription",
+      "role": "Challenger: run on CoreML through FluidAudio",
+      "decision": "converged_trial",
+      "claude_disposition": "trial; runner-up (CC-BY-4.0, 2025-08)",
+      "codex_disposition": "trial first; best candidate on CoreML through FluidAudio",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "nvidia/parakeet-tdt-0.6b-v3",
+      "revision": "541d1f99c6b0c3cd0b11a95167540bb8edefd82b",
+      "revision_url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3/tree/541d1f99c6b0c3cd0b11a95167540bb8edefd82b",
+      "revision_last_modified": "2026-08-05T21:46:17Z",
+      "license": "cc-by-4.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 627057286,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: full Earnings-21/22 calls; WER, entity WER and real-time factor. Claude lane: Earnings-21 (44 calls, entity tags) plus Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx and DER; Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice. Codex lane: Earnings-22 test files plus 100 finance dictations compared with Whisper; no worse WER, ≥98% ticker/number accuracy on dictations and ≥20× real time.",
+      "reason": "Named by both lanes; the only transcription model with Apple-silicon speed evidence (maker-reported 155.6× to 207× real time on an M4 Pro).",
+      "limitations": [
+        "The lanes cite different protocols: the Codex lane the card's Earnings-22 WER 11.42% (S), the Claude lane the long-form leaderboard (Earnings-22 14.58) and the short-form one (5.85).",
+        "CC-BY-4.0 requires attribution.",
+        "The CoreML conversion FluidAudio loads is a separate artifact, not pinned here."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/2",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/1"
+      ],
+      "sources": [
+        "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+        "https://huggingface.co/datasets/hf-audio/leaderboard_longform",
+        "https://huggingface.co/datasets/hf-audio/open-asr-leaderboard-results"
+      ]
+    },
+    {
+      "id": "local-workloads-teleocr",
+      "item": "TeleOCR (document OCR and layout model)",
+      "workload": "Image-only exhibits and scans",
+      "role": "Default: first on OmniDocBench v1.6 (96.91)",
+      "decision": "converged_trial",
+      "claude_disposition": "trial, narrow; best candidate (1.2B, Apache-2.0, 2026-08-17)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "StarDoc-AI/TeleOCR",
+      "revision": "a61433186527cb53958bf354e34ae673c19cec4b",
+      "revision_url": "https://huggingface.co/StarDoc-AI/TeleOCR/tree/a61433186527cb53958bf354e34ae673c19cec4b",
+      "revision_last_modified": "2026-09-22T06:48:34Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 1415072768,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: narrow trial, because XBRL and HTML already cover most filings. Claude lane: 300 10-Q statement tables rendered to PNG and scored against XBRL facts, plus 100 hand-labeled slides; baseline Qwen3.8-27B vision; numeric-cell exact match (pass ≥99%), TEDS and seconds per page. Codex lane: 200 exhibit pages with transcribed tables compared with deterministic PDF extraction and cloud vision; table TEDS ≥0.95, numeric-cell exact match ≥99.5% and lower corrected-page cost.",
+      "reason": "Leads the independent OmniDocBench v1.6 board (96.91 against PaddleOCR-VL-1.6 at 96.34) as cited by the Claude lane; the convergence table makes it the default of the narrow OCR trial.",
+      "limitations": [
+        "Named by one lane only.",
+        "Hugging Face reports 1,415,072,768 parameters; the lane and the convergence table say 1.2B.",
+        "OmniDocBench's maintainer builds MinerU (lane note on conflicts); Mac speed is unknown (the lane estimates 5–15 s per page, decode-bound)."
+      ],
+      "existing_records": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/2 (named there as OmniDocBench v1.6 rank 1, 96.91)"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/3",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/2"
+      ],
+      "sources": [
+        "https://huggingface.co/StarDoc-AI/TeleOCR",
+        "https://github.com/opendatalab/OmniDocBench",
+        "https://arxiv.org/abs/2606.18192"
+      ]
+    },
+    {
+      "id": "local-workloads-paddleocr-vl-1.6",
+      "item": "PaddleOCR-VL-1.6 (0.9B vision-language OCR model)",
+      "workload": "Image-only exhibits and scans",
+      "role": "Challenger: official MLX-VLM path on the Mac",
+      "decision": "converged_trial",
+      "claude_disposition": "trial, narrow; runner-up (0.9B, official MLX-VLM Mac path)",
+      "codex_disposition": "trial; best candidate (VL-1.6, 0.9B)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "PaddlePaddle/PaddleOCR-VL-1.6",
+      "revision": "c5630abae1d940eafe0697512a0325494b02ab42",
+      "revision_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6/tree/c5630abae1d940eafe0697512a0325494b02ab42",
+      "revision_last_modified": "2026-08-08T14:32:21Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 958588736,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: narrow trial, because XBRL and HTML already cover most filings. Claude lane: 300 10-Q statement tables rendered to PNG and scored against XBRL facts, plus 100 hand-labeled slides; baseline Qwen3.8-27B vision; numeric-cell exact match (pass ≥99%), TEDS and seconds per page. Codex lane: 200 exhibit pages with transcribed tables compared with deterministic PDF extraction and cloud vision; table TEDS ≥0.95, numeric-cell exact match ≥99.5% and lower corrected-page cost.",
+      "reason": "Named by both lanes; weights for the PaddleOCR repository record (local-workloads-paddleocr).",
+      "limitations": [
+        "The maker's report gives 96.33 and the leaderboard 96.34 on OmniDocBench v1.6; neither is measured on SEC exhibits.",
+        "Pages per minute on this Mac are unknown."
+      ],
+      "existing_records": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/2"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/3",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/1",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/2"
+      ],
+      "sources": [
+        "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+        "https://arxiv.org/abs/2606.03264"
+      ]
+    },
+    {
+      "id": "local-workloads-chronos-2",
+      "item": "Chronos-2 (120M time-series foundation model) weights",
+      "workload": "Time-series foundation-model features for volatility and volume",
+      "role": "Default: weights for the chronos-forecasting record",
+      "decision": "converged_trial",
+      "claude_disposition": "trial, low priority; best candidate; skip for returns",
+      "codex_disposition": "trial, lower priority; best candidate (120M)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "revision_url": "https://huggingface.co/amazon/chronos-2/tree/29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "revision_last_modified": "2026-06-05T11:55:42Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 119477664,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Convergence table: low-priority trial, never for returns. Claude lane: 5-minute realized variance for 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE and Diebold-Mariano p<0.05. Codex lane: rolling forecasts on the frozen market archive using only then-known covariates, compared with seasonal-naive volume and EWMA volatility; ≥5% lower pinball loss with calibrated intervals.",
+      "reason": "Linked rather than duplicated: the existing model record pins the same revision and carries the model-card review; this record adds only the local-workload decision.",
+      "limitations": [
+        "See the existing model record's limitations; no inference or finance benchmark was run."
+      ],
+      "existing_records": [
+        "catalogs/us-equities/models.json#/entries/19 (conditional, source_review, same revision)",
+        "catalogs/us-equities/engines-strategies.json#/entries/34"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/3"
+      ],
+      "sources": [
+        "https://huggingface.co/amazon/chronos-2"
+      ]
+    },
+    {
+      "id": "local-workloads-ttm-r2",
+      "item": "TinyTimeMixer (TTM) r2.1 variants of granite-timeseries-ttm-r2 (about 0.8M parameters on main)",
+      "workload": "Time-series foundation-model features for volatility and volume",
+      "role": "Challenger: CPU-sized model, the only zero-shot model to beat Log-HAR on realized volatility in the lane-cited study",
+      "decision": "converged_trial",
+      "claude_disposition": "trial, low priority; runner-up (TTM r2.1, ~1M, Apache-2.0)",
+      "codex_disposition": "not named (its runner-up was TimesFM-3)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "ibm-granite/granite-timeseries-ttm-r2",
+      "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "revision_url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2/tree/d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "revision_last_modified": "2025-02-26T13:33:01Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 805280,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "r2_1_branches": [
+        {
+          "branch": "180-60-ft-l1-r2.1",
+          "revision": "fa4e7dde8ad5fc5f9b4811bfebd27c6ef7eaeb59"
+        },
+        {
+          "branch": "360-60-ft-l1-r2.1",
+          "revision": "a75e2756d3823322b7eee5544807ef0c711915cd"
+        },
+        {
+          "branch": "512-48-ft-l1-r2.1",
+          "revision": "caa1eb3d16f053859d81952a1f387d6aeb670076"
+        },
+        {
+          "branch": "512-48-ft-r2.1",
+          "revision": "b972f0c22190b7502764526004d16e2b4ed39e8c"
+        },
+        {
+          "branch": "512-96-ft-l1-r2.1",
+          "revision": "ffbf23413bef2354370a8a336576ba5b2122f800"
+        },
+        {
+          "branch": "512-96-ft-r2.1",
+          "revision": "3442406f106122f414a11f72b4ebfe4878bec89d"
+        },
+        {
+          "branch": "52-16-ft-l1-r2.1",
+          "revision": "0be095bc9724b47d1bb71cba47c3095b4d91f560"
+        },
+        {
+          "branch": "52-16-ft-r2.1",
+          "revision": "8c9c1d742ec5893d6419e3aa2ab21ed23e28df85"
+        },
+        {
+          "branch": "90-30-ft-l1-r2.1",
+          "revision": "cd2ad2a54ba5531fbcf6ba3b7a763a6e14223680"
+        },
+        {
+          "branch": "90-30-ft-r2.1",
+          "revision": "6e5cb8ee51e0634a45637490f5db43148b2fa6be"
+        }
+      ],
+      "acceptance_gate": "Convergence table: low-priority trial, never for returns. Claude lane: 5-minute realized variance for 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE and Diebold-Mariano p<0.05. Codex lane: rolling forecasts on the frozen market archive using only then-known covariates, compared with seasonal-naive volume and EWMA volatility; ≥5% lower pinball loss with calibrated intervals.",
+      "reason": "Brini (2026, A): of nine zero-shot time-series models only TTM beat Log-HAR on realized volatility (QLIKE ratio 0.982–0.987).",
+      "limitations": [
+        "Named by one lane only.",
+        "The r2.1 variants live on branches, not on main; revision pins main and r2_1_branches pins each variant, and a trial must choose the context and forecast length it uses."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/3"
+      ],
+      "sources": [
+        "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
+        "https://arxiv.org/abs/2607.05291"
+      ]
+    },
+    {
+      "id": "local-workloads-pit-4b-ft",
+      "item": "PIT-4B-FT dated point-in-time checkpoints (Diamegs, twelve checkpoints from 2013-12 to 2024-12)",
+      "workload": "Point-in-time text features for backtests (dated weights as the lookahead-bias control)",
+      "role": "Best candidate: dated weights whose training cutoff precedes each backtest period",
+      "decision": "single_lane_lead",
+      "claude_disposition": "trial first; best candidate (dated checkpoints to 2024-12, Apache-2.0)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id_pattern": "Diamegs/PIT-4B-FT-YYYYMM",
+      "checkpoint_series": [
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201312",
+          "revision": "f198c7efb9f16d151ccc3decf9a8985e63f0eda1"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201412",
+          "revision": "2814457274aa625cc18ff1b44d5bb2a1ebdee901"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201511",
+          "revision": "d4a228ecb2dda4a27184f70e2860a67a4c5038f1"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201612",
+          "revision": "782079126b2b3966b88cc6e8f00e990e3849f53b"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201712",
+          "revision": "a917b6b766ab9d030afdf1b6705f13dd2fff5ed4"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201812",
+          "revision": "d92f068f2dd428321febdfcd6391d46fb1edaa3d"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-201912",
+          "revision": "915cab52fadee9232bbe0895703915c892de9593"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-202012",
+          "revision": "29564699d8dafc9a1e592c2d4be5545371f1e017"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-202112",
+          "revision": "f4df3eb33fd2b0e23179d85d2727dd915237e405"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-202212",
+          "revision": "fc043c3253a602bc78975683baefd950e15b3263"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-202312",
+          "revision": "cc8d17e173dca9f1261618a40eb42d389db6d776"
+        },
+        {
+          "model_id": "Diamegs/PIT-4B-FT-202412",
+          "revision": "259530c31264a85f1e7e21397842d2c086d1afba"
+        }
+      ],
+      "license": "apache-2.0 (Hugging Face API, checked on Diamegs/PIT-4B-FT-202412)",
+      "parameters_reported": 4438622208,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Claude lane: frozen EdgarTools 8-Ks 2015–2024 with acceptance times; prior-month checkpoint embeddings into a rolling ridge on next-day abnormal return; baselines Loughran-McDonald tone and Qwen3.8-27B; out-of-sample rank-IC, net Sharpe and HAC t>2. Convergence table next step: out-of-sample rank-IC against Loughran-McDonald tone.",
+      "reason": "Cloud models cannot be pinned to a knowledge cutoff; dated weights are the lookahead-bias control for text features in backtests. The convergence table calls it the highest north-star value, but only the Claude lane proposed it.",
+      "limitations": [
+        "Custom modeling code (trust_remote_code): review the pinned revision's code before loading.",
+        "Checkpoints end at 2024-12; later periods need another control.",
+        "A second account hosts identically named checkpoints; only the Diamegs series the lane linked is pinned.",
+        "Lookahead studies (Gao et al. 2026; Zhang & Stadie 2026) motivate the control; the Sharpe evidence (Kelly et al. 2026) is academic and self-reported."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/0",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/0"
+      ],
+      "sources": [
+        "https://huggingface.co/Diamegs",
+        "https://arxiv.org/abs/2512.23847",
+        "https://arxiv.org/abs/2608.02985",
+        "https://arxiv.org/abs/2607.11889"
+      ]
+    },
+    {
+      "id": "local-workloads-chrono-gpt-bert",
+      "item": "ChronoGPT and ChronoBERT v1 yearly-cutoff checkpoints (manelalab, 1999-12-31 to 2024-12-31)",
+      "workload": "Point-in-time text features for backtests (dated weights as the lookahead-bias control)",
+      "role": "Runner-up: yearly-cutoff generator and encoder series",
+      "decision": "single_lane_lead",
+      "claude_disposition": "trial first; runner-up (v1, 1.55B, yearly cutoffs, MIT)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id_pattern": "manelalab/chrono-gpt-v1-YYYYMMDD and manelalab/chrono-bert-v1-YYYYMMDD",
+      "checkpoint_series": [
+        {
+          "model_id": "manelalab/chrono-gpt-v1-19991231",
+          "revision": "45d6568340081add5c5b1444feb17a94b8f8199d"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20001231",
+          "revision": "aab8e7f10ffc8a63b557d47ceeca0712ddc0fdfa"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20011231",
+          "revision": "84f4d197fc931bb3cc39d1a071e8436304890921"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20021231",
+          "revision": "4b48afa531ff3d530b0273e5c64b8ad1381016e4"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20031231",
+          "revision": "6aba09104ca8ccb8febb2a29d2e4c8bb99526638"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20041231",
+          "revision": "f446364b14657b8f77d864bd305e7caea5e5e209"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20051231",
+          "revision": "64a190a1eba9d0bd4a320225284ceb8376634cda"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20061231",
+          "revision": "a0a130d03014401d9f7370c50537f49c128da78d"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20071231",
+          "revision": "ca382535273b9f3a6d5ff476f565246b8c90fa07"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20081231",
+          "revision": "020fcd3af211e574905941a369f9635bca53a8d6"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20091231",
+          "revision": "0c7124691ed3fb527af12dab7013eac1ae56fec7"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20101231",
+          "revision": "4fb687ab4b3029e5d364423434e6f20019b1b222"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20111231",
+          "revision": "ea5aaed9f362885f367514b067a36cc4faa0ce5e"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20121231",
+          "revision": "67a896b02f6cdcd2e99d62866a2d334eeaeb99b5"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20131231",
+          "revision": "6f2e595689458b1809d5c6efb9a6095257347ca2"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20141231",
+          "revision": "4fba07f4ef563b3addf2b05f385d0b347bf1cc0d"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20151231",
+          "revision": "aacd4c4e8020dd0ad686d36f18bcf34cd8003bc3"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20161231",
+          "revision": "20d93dc9b103644b212db413db4ab1207063d010"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20171231",
+          "revision": "4cc4334a2c2d38ae35deb0bb7fcae642d3f73a10"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20181231",
+          "revision": "17d7de7945199ff03be989ca84d00c0f59a975af"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20191231",
+          "revision": "7e62517f31b11fad179c79ce79a465aa00c7ee4d"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20201231",
+          "revision": "c0d2acbd2a378ac79d8a5ae79a9447d23145eb8a"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20211231",
+          "revision": "a070953708ee809e630e4d9652e9c753d7b6782e"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20221231",
+          "revision": "993711fdf078740fe1c837a3687528e2173443d2"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20231231",
+          "revision": "8ac22e54d37df8bb8037622680414118239fbe53"
+        },
+        {
+          "model_id": "manelalab/chrono-gpt-v1-20241231",
+          "revision": "1d9f1b8ff50bb45a6fe1402280e617af4c2d805c"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-19991231",
+          "revision": "972f0d46401d074be2adda28c3e2baafa3419e14"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20001231",
+          "revision": "014b770948fd1bb26dad4e804ca9fafd50622a7d"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20011231",
+          "revision": "0dd38ced4726fd3f26cd94de1605085681c43e9f"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20021231",
+          "revision": "a19895a4803e37f8e757fc4736c028fb5019b999"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20031231",
+          "revision": "0ac1fffdd0612571529bf6f652bdb0248f25c164"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20041231",
+          "revision": "8638b41321741066645ff2b691bd7d3229ac242a"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20051231",
+          "revision": "1801859ac7e537cefe8a321238b9c05afda4b3d9"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20061231",
+          "revision": "ec84e6c74d57a50ff98f916c49535d0b856ddd91"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20071231",
+          "revision": "8ec5d5c79e8f685a0411a07d6546a149623c9707"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20081231",
+          "revision": "6a6b51e56f913729f21977c40e01421cc5204102"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20091231",
+          "revision": "8f1408aebbe7b6a1787450ac48ceffa38c96a9c0"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20101231",
+          "revision": "1520cf239e7922584ce7762af9e5040e8edd9374"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20111231",
+          "revision": "c525b313b750d52d650a0df6adc28df85570daea"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20121231",
+          "revision": "a21a301631c64230f82020a53c095269c82cb751"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20131231",
+          "revision": "071ed3022975063514f5426d8c42815246241412"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20141231",
+          "revision": "9e61adb8d6674d363f14d0d4a3153e4fea3ebefd"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20151231",
+          "revision": "01122aa3fd7a07879a524b6897c41e55c1db091a"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20161231",
+          "revision": "89dff1bb2043cc929c00756002469dfa9482f280"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20171231",
+          "revision": "02bde7f9d3d8c55c1e44d7e3ee071f374a1b9bb4"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20181231",
+          "revision": "e716596f5c90945781e74e78ab90c591b9b46080"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20191231",
+          "revision": "33a5fc6e87910b614cf4319eb995301195d9a99d"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20201231",
+          "revision": "8402477b6b77b799ee220665fcb258939eaf7455"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20211231",
+          "revision": "2d187f3f29b1071392b546fa1195d6b55036ae9b"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20221231",
+          "revision": "58bdf9ce273a6744bf8c8acda2df56655e7f1f51"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20231231",
+          "revision": "d1cbfa139a61b067ce0089c12d93f196798ad6b1"
+        },
+        {
+          "model_id": "manelalab/chrono-bert-v1-20241231",
+          "revision": "2478c3bd4a676e2e7bdc72f8100262b39bde4b0d"
+        }
+      ],
+      "license": "mit (Hugging Face API, checked on the 2024-12-31 checkpoints)",
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Claude lane: frozen EdgarTools 8-Ks 2015–2024 with acceptance times; prior-month checkpoint embeddings into a rolling ridge on next-day abnormal return; baselines Loughran-McDonald tone and Qwen3.8-27B; out-of-sample rank-IC, net Sharpe and HAC t>2. Convergence table next step: out-of-sample rank-IC against Loughran-McDonald tone.",
+      "reason": "Longer dated history (from 1999) than PIT-4B-FT, at a smaller size; the same lookahead-bias control.",
+      "limitations": [
+        "ChronoGPT checkpoints ship pickle-format pytorch_model.bin with a custom inference script; review before loading.",
+        "Hugging Face reports about 150M parameters for ChronoBERT; ChronoGPT's size (1.55B per the lane) is not in the API metadata.",
+        "An instruct series (chrono-gpt-instruct-v1) exists and is not recorded."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/0",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/0"
+      ],
+      "sources": [
+        "https://huggingface.co/manelalab"
+      ]
+    },
+    {
+      "id": "local-workloads-prompt-guard-2-86m",
+      "item": "Llama Prompt Guard 2 86M (injection classifier)",
+      "workload": "Prompt-injection screening of tool output in agent hooks",
+      "role": "Runner-up: smaller classifier for the same flag-only hook screen",
+      "decision": "single_lane_lead",
+      "claude_disposition": "trial, flag-only; runner-up (2025-04)",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "meta-llama/Llama-Prompt-Guard-2-86M",
+      "revision": "a8ded8e697ce7c355e395a0df51f94adb4a2fd27",
+      "revision_url": "https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M/tree/a8ded8e697ce7c355e395a0df51f94adb4a2fd27",
+      "revision_last_modified": "2025-04-29T15:59:55Z",
+      "license": "other (Hugging Face API)",
+      "gated": "manual",
+      "parameters_reported": 278810882,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Claude lane: 2,000 redacted benign outputs from own sessions plus PIArena injections; baseline no detector; TPR at FPR ≤1% and p95 latency; flag-only, never a security boundary.",
+      "reason": "Runner-up to PIGuard in the only lane that proposed the workload.",
+      "limitations": [
+        "Gated behind manual access approval and a custom license; requesting access is a user decision.",
+        "Hugging Face reports 278,810,882 parameters in total; 86M is the model's name.",
+        "Speed is the maker's 92 ms per 512 tokens on an A100; Mac latency is unknown."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/items/5",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/1"
+      ],
+      "sources": [
+        "https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M"
+      ]
+    },
+    {
+      "id": "local-workloads-qwen3.8-27b-failure-triage",
+      "item": "Qwen3.8-27B for asynchronous failure-log triage, installed through Ollama",
+      "workload": "Asynchronous failure-log triage",
+      "role": "Best candidate: advisory summaries of build and test failures with raw logs retained",
+      "decision": "single_lane_lead",
+      "claude_disposition": "not named for this workload",
+      "codex_disposition": "trial; best candidate (existing Ollama); runner-up the installed Qwen3.5-9B",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "revision_url": "https://huggingface.co/Qwen/Qwen3.8-27B/tree/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "revision_last_modified": "2026-08-14T15:00:01Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 27781427952,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Codex lane: 500 labeled build/test failures compared with regex extraction and frontier processing of raw logs; ≥99% failure recall, ≥30% fewer cloud tokens and no reduction in repair success; asynchronous and advisory, raw logs retained.",
+      "reason": "Private logs and fewer cloud input tokens; only the Codex lane proposed it.",
+      "limitations": [
+        "Evidence is the maker's Terminal Bench 2.1 score (73.0, S); triage-specific evidence is unknown.",
+        "Long-log prefill at 250–320 tok/s can dominate; avoid synchronous hooks at first.",
+        "The Codex lane linked the GitHub repository QwenLM/Qwen3.8; the weights pinned here are the Hugging Face model."
+      ],
+      "existing_records": [
+        "catalogs/us-equities/models.json#/entries/3 (conditional, source_review, same revision)"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/5",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/2"
+      ],
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B",
+        "https://github.com/QwenLM/Qwen3.8"
+      ]
+    },
+    {
+      "id": "local-workloads-sweep-next-edit-v2-7b",
+      "item": "Sweep next-edit v2 7B (editor next-edit suggestion model)",
+      "workload": "Editor next-edit suggestions",
+      "role": "Best candidate: offline next-edit model for hand editing",
+      "decision": "single_lane_lead",
+      "claude_disposition": "not named",
+      "codex_disposition": "trial only if editing frequently; best candidate (runner-up Sweep 1.5B)",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "model_id": "sweepai/sweep-next-edit-v2-7B",
+      "revision": "851f4ac1427ec91eb6c19d408409490d6e0c00a0",
+      "revision_url": "https://huggingface.co/sweepai/sweep-next-edit-v2-7B/tree/851f4ac1427ec91eb6c19d408409490d6e0c00a0",
+      "revision_last_modified": "2026-05-14T06:05:25Z",
+      "license": "apache-2.0 (Hugging Face API)",
+      "gated": false,
+      "parameters_reported": 7615616512,
+      "pinned_at": "2026-09-24, 20:05-20:25 EDT (2026-09-25 00:05-00:25 UTC), after the lanes ran",
+      "acceptance_gate": "Codex lane: 300 chronological edit traces compared with language-server completion; ≥20% accepted suggestions and p95 ≤500 ms including prefill.",
+      "reason": "Offline coding and private source; little benefit to unattended CLI agents.",
+      "limitations": [
+        "Quality superiority is unknown; the only figure is a community throughput benchmark (32.2 tok/s at 8K, 8-bit, on a 48 GB M5 Pro).",
+        "Only worth a trial if editing by hand is frequent."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/6",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/single_lane_leads/3"
+      ],
+      "sources": [
+        "https://huggingface.co/sweepai/sweep-next-edit-v2-7B",
+        "https://omlx.ai/benchmarks/performance/bs4hq2u5"
+      ]
+    },
+    {
+      "id": "local-workloads-skip-primary-agent-loop",
+      "item": "A local model as the primary agent loop (coding, review, planning, synthesis) or a frontier replacement",
+      "workload": "A local model as the primary agent loop (coding, review, planning, synthesis) or a frontier replacement",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "skip: primary agent loop (coding, review, planning, synthesis)",
+      "codex_disposition": "skip: frontier replacement",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Artificial Analysis v4.3.2 lists Qwen3.8-27B at 34 against Opus 5.5 at 58 and GPT-6 Astra at 53 (the packet gives 56–58 and 52–53); its index run emitted 200M tokens, about 89 days at 26 tok/s. Reopen only if a local model matches the cloud agents on this repository's own measured tasks.",
+      "limitations": [
+        "An Aug-17 report said Qwen3.8-27B scored 52; the Claude lane left the conflict unresolved."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/0",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/not_local/0",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/4"
+      ],
+      "sources": [
+        "https://artificialanalysis.ai/models/qwen3-8-27b",
+        "https://simonwillison.net/2026/Aug/17/qwen-38-27b-scores-52/"
+      ]
+    },
+    {
+      "id": "local-workloads-skip-authoritative-judging",
+      "item": "Authoritative model or LLM judging on a local model",
+      "workload": "Authoritative model or LLM judging on a local model",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "skip: LLM judging (listed with text-to-SQL and filing Q&A)",
+      "codex_disposition": "skip: authoritative model judging",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Low volume, no privacy driver and the capability gap (Claude lane); task-specific benefit unproven (Codex lane). Reopen only with a measured judging task where a local judge agrees with the cloud judges.",
+      "limitations": [],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/3",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/not_local/2",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/4"
+      ],
+      "sources": []
+    },
+    {
+      "id": "local-workloads-skip-strategy-selection",
+      "item": "Autonomous strategy selection by a local model",
+      "workload": "Autonomous strategy selection by a local model",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "not named (the lane keeps numeric, risk and order state deterministic)",
+      "codex_disposition": "skip: autonomous strategy selection",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Task-specific benefit unproven (Codex lane); the convergence table lists it with the not-local workloads. Numeric, risk and order state stay deterministic code under the north-star rule.",
+      "limitations": [
+        "Named as a skip by one lane only; the other lane's deterministic-state rule is consistent with it."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/not_local/1",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/4"
+      ],
+      "sources": []
+    },
+    {
+      "id": "local-workloads-skip-return-forecasting",
+      "item": "Return forecasting with time-series foundation models",
+      "workload": "Return forecasting with time-series foundation models",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "skip: negative zero-shot out-of-sample R² on daily excess returns",
+      "codex_disposition": "not a separate skip; its forecasting row says forecasting scores do not establish tradable returns",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Zero-shot out-of-sample R² was −1.37% for Chronos and −2.80% for TimesFM against −0.03% for CatBoost on daily excess returns (Rahimikia et al. 2025, A). The time-series trial stays limited to volatility and volume features.",
+      "limitations": [],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/1",
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/items/4",
+        "evidence/artifacts/local-model-workloads-20260924/convergence.json#/converged/3"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2511.18578"
+      ]
+    },
+    {
+      "id": "local-workloads-skip-text-to-sql-filing-qa",
+      "item": "Text-to-SQL and filing Q&A on a local model",
+      "workload": "Text-to-SQL and filing Q&A on a local model",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "skip: low volume, no privacy driver and the capability gap",
+      "codex_disposition": "not named",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Low volume and no privacy driver, while the capability gap to the cloud agents is large (Claude lane).",
+      "limitations": [
+        "Named as a skip by one lane only."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json#/not_local/3"
+      ],
+      "sources": []
+    },
+    {
+      "id": "local-workloads-skip-synthetic-market-simulation",
+      "item": "Speculative synthetic-market simulation",
+      "workload": "Speculative synthetic-market simulation",
+      "role": "Kept on the cloud primary agents or deterministic code",
+      "decision": "skip_not_local",
+      "claude_disposition": "not named",
+      "codex_disposition": "skip: task-specific benefit unproven",
+      "evidence_level": "discovery_web_research",
+      "native_execution": "none",
+      "acceptance_gate": "None while skipped; reopen only on the condition named in reason.",
+      "reason": "Task-specific benefit is unproven (Codex lane).",
+      "limitations": [
+        "Named as a skip by one lane only."
+      ],
+      "existing_records": [],
+      "evidence_refs": [
+        "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json#/not_local/3"
+      ],
+      "sources": []
+    }
+  ]
+}
