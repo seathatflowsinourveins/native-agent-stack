@@ -186,17 +186,50 @@ class LanesAndShortFilters(unittest.TestCase):
 
 
 ASSET_OK = {"tradable": True, "shortable": True, "easy_to_borrow": True}
+E = Decimal("900000")
+BIG = planner.Limits.for_arm(planner.CORE, E, 1)
 
 
-def ev(i, symbol, label, lane=sig.LIQUID, price=100, asset=None, ssr=False, minute=0):
+def ev(i, symbol, label, lane=sig.LIQUID, price=100, asset=None, ssr=False, minute=0, target="20000"):
     return {"event_id": f"{i}:{symbol}", "news_id": str(i), "symbol": symbol, "label": label, "lane": lane,
             "created_at": z(ny(2026, 9, 24, 17, minute)), "ref_price": Decimal(str(price)),
-            "asset": ASSET_OK if asset is None else asset, "ssr": ssr}
+            "asset": ASSET_OK if asset is None else asset, "ssr": ssr,
+            "target_notional": None if target is None else Decimal(target)}
+
+
+class Sizing(unittest.TestCase):
+    def test_formula_and_caps(self):
+        # risk term binds: 0.0015 * 900k / 0.03 = 45,000 = the 5% E cap; MDV term 0.5% * 20M = 100k
+        self.assertEqual(planner.risk_notional(E, 0.03, 20_000_000), Decimal("45000.00"))
+        # risk term below the others: 0.0015 * 900k / 0.05 = 27,000
+        self.assertEqual(planner.risk_notional(E, 0.05, 20_000_000), Decimal("27000.00"))
+        # liquidity term binds: 0.5% * 4M = 20,000
+        self.assertEqual(planner.risk_notional(E, 0.02, 4_000_000), Decimal("20000.00"))
+        # 5% E binds for a very quiet name
+        self.assertEqual(planner.risk_notional(E, 0.001, 1e12), Decimal("45000.00"))
+        # exploratory arms: 25% of the section-A size
+        self.assertEqual(planner.risk_notional(E, 0.05, 20_000_000, planner.ARM_SIZE_FRACTION), Decimal("6750.00"))
+        self.assertIsNone(planner.risk_notional(E, None, 1e7))
+        self.assertIsNone(planner.risk_notional(E, 0.0, 1e7))
+
+    def test_minimums(self):
+        self.assertEqual(planner.sized_qty(Decimal("27000"), Decimal("100")), (270, Decimal("27000"), None))
+        self.assertEqual(planner.sized_qty(Decimal("999"), Decimal("10"))[2], "below_min_notional")
+        self.assertEqual(planner.sized_qty(Decimal("1500"), Decimal("2000"))[2], "below_one_share")
+        self.assertEqual(planner.sized_qty(None, Decimal("10"))[2], "no_risk_size")
+
+    def test_sigma_needs_21_closes(self):
+        prior = CAL.prior_sessions(date(2026, 9, 25), 21)
+        closes = [100.0 * (1.01 if i % 2 else 0.99) ** 0 * (1 + 0.01 * (-1) ** i) for i in range(21)]
+        rows = [{"t": z(datetime(d.year, d.month, d.day, tzinfo=NY)), "c": c, "v": 1, "l": c} for d, c in zip(prior, closes)]
+        sigma = planner.sigma_from_bars(CAL, date(2026, 9, 25), rows)
+        self.assertAlmostEqual(sigma, 0.0205, places=3)
+        self.assertIsNone(planner.sigma_from_bars(CAL, date(2026, 9, 25), rows[1:]))
 
 
 class Basket(unittest.TestCase):
-    def build(self, events, equity=None):
-        return planner.build_open_basket(events, date(2026, 9, 25), planner.Exposure(), equity)
+    def build(self, events, limits=BIG, account=None, blocked=frozenset()):
+        return planner.build_open_basket(events, date(2026, 9, 25), planner.Exposure(), limits, account, blocked)
 
     def test_legs_filters_and_orders(self):
         events = [ev(1, "AAA", "FAVORABLE", price=40), ev(2, "BBB", "FAVORABLE", minute=1),
@@ -204,17 +237,22 @@ class Basket(unittest.TestCase):
                   ev(5, "EEE", "UNFAVORABLE", asset={**ASSET_OK, "easy_to_borrow": False}, minute=4),
                   ev(6, "FFF", "UNFAVORABLE", ssr=True, minute=5),
                   ev(7, "GGG", "FAVORABLE", lane=sig.SMALL, minute=6),
-                  ev(8, "HHH", "UNCLEAR", minute=7), ev(9, "AAA", "UNFAVORABLE", minute=8)]
-        decisions, intents = self.build(events)
+                  ev(8, "HHH", "UNCLEAR", minute=7), ev(9, "AAA", "UNFAVORABLE", minute=8),
+                  ev(10, "III", "UNFAVORABLE", minute=9, target=None), ev(11, "JJJ", "UNFAVORABLE", minute=10),
+                  ev(12, "KKK", "UNFAVORABLE", asset={**ASSET_OK, "shortable": False}, minute=11)]
+        decisions, intents = self.build(events, blocked={"JJJ"})
         by = {(d["symbol"], d["event_id"]): d for d in decisions}
         self.assertEqual(by[("EEE", "5:EEE")]["reason"], "not_easy_to_borrow")
         self.assertEqual(by[("FFF", "6:FFF")]["reason"], "ssr_rule_201")
+        self.assertEqual(by[("KKK", "12:KKK")]["reason"], "not_shortable")
         self.assertEqual(by[("GGG", "7:GGG")]["action"], "shadow")
         self.assertEqual(by[("HHH", "8:HHH")]["reason"], "label_unclear")
         self.assertEqual(by[("AAA", "9:AAA")]["reason"], "not_first_in_window")
+        self.assertEqual(by[("III", "10:III")]["reason"], "no_risk_size")
+        self.assertEqual(by[("JJJ", "11:JJJ")]["reason"], "symbol_held_by_other_arm")
         got = {(i["symbol"], i["side"], i["qty"], i["time_in_force"], i["type"]) for i in intents}
-        self.assertEqual(got, {("AAA", "buy", "50", "opg", "market"), ("BBB", "buy", "20", "opg", "market"),
-                               ("CCC", "sell", "20", "opg", "market"), ("DDD", "sell", "20", "opg", "market")})
+        self.assertEqual(got, {("AAA", "buy", "500", "opg", "market"), ("BBB", "buy", "200", "opg", "market"),
+                               ("CCC", "sell", "200", "opg", "market"), ("DDD", "sell", "200", "opg", "market")})
         self.assertIn("nf1-20260925-opg-CCC-short", {i["client_order_id"] for i in intents})
 
     def test_leg_needs_two_names(self):
@@ -229,50 +267,75 @@ class Basket(unittest.TestCase):
         self.assertEqual(sum(d["reason"] == "names_per_leg_cap" for d in decisions), 2)
         both = [ev(i, f"L{i:02d}", "FAVORABLE", minute=2 * i) for i in range(12)] + \
                [ev(100 + i, f"S{i:02d}", "UNFAVORABLE", minute=2 * i + 1) for i in range(12)]
-        decisions, intents = self.build(both)
+        small = planner.Limits(E, Decimal("400000"), Decimal("45000"))  # gross cap 400k: 20 names of 20k
+        decisions, intents = self.build(both, limits=small)
         gross = sum(Decimal(i["qty"]) * 100 for i in intents)
-        self.assertLessEqual(gross, planner.MAX_GROSS)
+        self.assertLessEqual(gross, Decimal("400000"))
         self.assertEqual(len(intents), 20)
         self.assertEqual(sum(d["reason"] == "gross_exposure_cap" for d in decisions), 4)
 
-    def test_price_above_name_notional_and_leverage(self):
-        decisions, intents = self.build([ev(1, "AAA", "FAVORABLE", price=2500), ev(2, "BBB", "FAVORABLE", price=2500)])
+    def test_account_cap_across_arms(self):
+        account = [Decimal("890000"), Decimal("900000")]  # other arms already use 890k of a 900k account cap
+        decisions, intents = self.build([ev(1, "AAA", "FAVORABLE"), ev(2, "BBB", "FAVORABLE", minute=1)], account=account)
         self.assertEqual(intents, [])
-        self.assertEqual({d["reason"] for d in decisions}, {"price_above_name_notional"})
-        decisions, intents = self.build([ev(1, "AAA", "FAVORABLE"), ev(2, "BBB", "FAVORABLE")], equity="3000")
-        self.assertEqual(len(intents), 0)  # the second name breaks 1x leverage; one name is below the leg minimum
-        self.assertIn("leverage_cap", {d["reason"] for d in decisions})
+        self.assertIn("account_gross_cap", {d["reason"] for d in decisions})
+        account = [Decimal("0"), Decimal("900000")]
+        decisions, intents = self.build([ev(1, "AAA", "FAVORABLE"), ev(2, "BBB", "FAVORABLE", minute=1)], account=account)
+        self.assertEqual(account[0], Decimal("40000"))  # updated in place with the committed entries
+
+    def test_per_order_cap_and_min_size(self):
+        decisions, intents = self.build([ev(1, "AAA", "FAVORABLE", target="60000"), ev(2, "BBB", "FAVORABLE", target="900")])
+        self.assertEqual(intents, [])
+        self.assertEqual({d["reason"] for d in decisions}, {"per_order_notional_cap", "below_min_notional"})
 
 
 class CapsAndKill(unittest.TestCase):
+    def test_limits_per_arm(self):
+        core = planner.Limits.for_arm(planner.CORE, E, Decimal("1"))
+        self.assertEqual((core.gross_cap, core.per_order_cap), (E, Decimal("45000.00")))
+        self.assertEqual(planner.Limits.for_arm(planner.CORE, E, Decimal("2.5")).gross_cap, Decimal("2250000.0"))
+        pm = planner.Limits.for_arm(planner.PM, E, Decimal("3"), extra_cap=E)
+        self.assertEqual(pm.gross_cap, Decimal("225000.00"))
+        ah = planner.Limits.for_arm(planner.AH, E, Decimal("3"), extra_cap=Decimal("100000"))
+        self.assertEqual(ah.gross_cap, Decimal("100000"))
+
     def test_entry_caps(self):
+        lim = planner.Limits(E, Decimal("50000"), Decimal("45000"))
         e = planner.Exposure()
-        self.assertEqual(planner.entry_cap_violation(Decimal("3000.01"), "rth", "long", "A", e, None), "per_order_notional_cap")
-        self.assertEqual(planner.entry_cap_violation(Decimal("2100"), "rth", "long", "A", e, None), "per_name_notional_cap")
-        self.assertIsNone(planner.entry_cap_violation(Decimal("2000"), "rth", "long", "A", e, None))
-        e.gross = Decimal("39000")
-        self.assertEqual(planner.entry_cap_violation(Decimal("1500"), "rth", "long", "A", e, None), "gross_exposure_cap")
+        self.assertEqual(planner.entry_cap_violation(Decimal("45000.01"), "rth", "long", "A", e, lim), "per_order_notional_cap")
+        self.assertIsNone(planner.entry_cap_violation(Decimal("45000"), "rth", "long", "A", e, lim))
+        e.gross = Decimal("10000")
+        self.assertEqual(planner.entry_cap_violation(Decimal("40001"), "rth", "long", "A", e, lim), "gross_exposure_cap")
         e.gross = Decimal("0")
         e.names[("rth", "long")] = 12
-        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "long", "A", e, None), "names_per_leg_cap")
-        self.assertIsNone(planner.entry_cap_violation(Decimal("100"), "rth", "short", "A", e, None))
+        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "long", "A", e, lim), "names_per_leg_cap")
+        self.assertIsNone(planner.entry_cap_violation(Decimal("100"), "rth", "short", "A", e, lim))
         e.symbols.add("A")
-        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "short", "A", e, None), "symbol_already_traded_today")
-        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "short", "B", planner.Exposure(), "50"), "leverage_cap")
+        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "short", "A", e, lim), "symbol_already_traded_today")
+        self.assertEqual(planner.entry_cap_violation(Decimal("100"), "rth", "short", "B", planner.Exposure(), lim,
+                                                     (Decimal("99950"), Decimal("100000"))), "account_gross_cap")
 
-    def test_kill_switch(self):
-        self.assertTrue(planner.kill_switch_triggered("100000", "98500"))
-        self.assertFalse(planner.kill_switch_triggered("100000", "98500.01"))
+    def test_kill_switch_at_two_percent(self):
+        self.assertTrue(planner.kill_switch_triggered("100000", "98000"))
+        self.assertFalse(planner.kill_switch_triggered("100000", "98000.01"))
+        self.assertFalse(planner.kill_switch_triggered("100000", "98500"))  # the old 1.5% level no longer trips
         self.assertFalse(planner.kill_switch_triggered(None, "1"))
 
 
 class IdsAndEnvelopes(unittest.TestCase):
-    def test_client_order_id(self):
+    def test_client_order_ids_per_arm(self):
         cid = planner.client_order_id(date(2026, 9, 25), "opg", "BRK.B", "long")
         self.assertEqual(cid, "nf1-20260925-opg-BRK.B-long")
         self.assertEqual(cid, planner.client_order_id(date(2026, 9, 25), "opg", "BRK.B", "long"))
-        self.assertTrue(planner.is_nf1(cid))
+        self.assertEqual(planner.client_order_id(date(2026, 9, 25), "ent", "ACME", "short", planner.PM), "nf1x-pm-20260925-ent-ACME-short")
+        self.assertEqual(planner.client_order_id(date(2026, 9, 25), "opg", "ACME", "long", planner.AH), "nf1x-ah-20260925-opg-ACME-long")
+        for c in (cid, "nf1x-pm-20260925-ent-ACME-short", "nf1x-ah-20260925-opg-ACME-long"):
+            self.assertTrue(planner.is_nf1(c))
         self.assertFalse(planner.is_nf1("adaptive-1"))
+        self.assertFalse(planner.is_nf1("nf1x-zz-20260925-ent-ACME-long"))
+        self.assertEqual(planner.parse_cid("nf1x-ah-20260925-opg-BRK.B-long"),
+                         {"arm": "ah", "date": date(2026, 9, 25), "stage": "opg", "symbol": "BRK.B", "leg": "long"})
+        self.assertIsNone(planner.parse_cid("nf1-2026092-opg-A-long"))
         self.assertEqual(planner.exit_intent(date(2026, 9, 25), "cls", "ACME", "-7")["client_order_id"],
                          "nf1-20260925-cls-ACME-short")
 
@@ -284,6 +347,8 @@ class IdsAndEnvelopes(unittest.TestCase):
         self.assertFalse(env["submission_enabled"])
         env = planner.contract_envelope(planner.exit_intent(date(2026, 9, 25), "cls", "ACME", "-20"))
         self.assertEqual((env["intent"]["side"], env["intent"]["time_in_force"], env["intent"]["qty"]), ("buy", "cls", "20"))
+        env = planner.contract_envelope(planner.exit_intent(date(2026, 9, 24), "opg", "ACME", "20", arm=planner.AH))
+        self.assertEqual((env["intent"]["time_in_force"], env["intent"]["client_order_id"]), ("opg", "nf1x-ah-20260924-opg-ACME-long"))
         with self.assertRaises(oc.ContractError):
             planner.contract_envelope({**planner.entry_intent(date(2026, 9, 25), "opg", "ACME", "long", 20, "opg"),
                                        "type": "limit", "limit_price": "10.00"})
@@ -294,8 +359,12 @@ class IdsAndEnvelopes(unittest.TestCase):
         oc = common.order_contract()
         env = planner.contract_envelope(planner.entry_intent(date(2026, 9, 25), "rth", "ACME", "short", 10, "day", Decimal("99.80")))
         self.assertEqual(env["intent"]["limit_price"], "99.8")
+        self.assertFalse(env["intent"]["extended_hours"])
         ext = planner.exit_intent(date(2026, 9, 25), "ext1", "ACME", "10", limit_price=Decimal("99.50"), extended=True)
         self.assertTrue(planner.contract_envelope(ext)["intent"]["extended_hours"])
+        arm_entry = planner.entry_intent(date(2026, 9, 25), "ent", "ACME", "long", 5, "day", "10.03", arm=planner.PM, extended=True)
+        env = planner.contract_envelope(arm_entry)
+        self.assertEqual((env["intent"]["extended_hours"], env["intent"]["time_in_force"], env["intent"]["type"]), (True, "day", "limit"))
         with self.assertRaises(oc.ContractError):
             planner.contract_envelope({k: v for k, v in ext.items() if k != "limit_price"} | {"type": "market"})
         with self.assertRaises(oc.ContractError):
@@ -303,42 +372,102 @@ class IdsAndEnvelopes(unittest.TestCase):
                                        "qty": "1.5"})
 
 
-class RthAndExits(unittest.TestCase):
-    def rth_event(self, label="FAVORABLE"):
+class RthAndArmEntries(unittest.TestCase):
+    def rth_event(self, label="FAVORABLE", target="2000"):
         return {"event_id": "1:ACME", "symbol": "ACME", "label": label, "lane": sig.LIQUID,
-                "entry_utc": z(ny(2026, 9, 25, 10, 15)), "asset": ASSET_OK, "ssr": False}
+                "entry_utc": z(ny(2026, 9, 25, 10, 15)), "asset": ASSET_OK, "ssr": False, "target_notional": Decimal(target)}
+
+    def plan(self, event, quote, now):
+        return planner.plan_rth_entry(event, quote, now, date(2026, 9, 25), planner.Exposure(), BIG)
 
     def test_rth_entry_prices_and_spread(self):
         now = ny(2026, 9, 25, 10, 15, 5)
-        d, intent = planner.plan_rth_entry(self.rth_event(), {"bp": 99.95, "ap": 100.05}, now, date(2026, 9, 25), planner.Exposure(), None)
+        d, intent = self.plan(self.rth_event(), {"bp": 99.95, "ap": 100.05}, now)
         self.assertEqual((d["action"], intent["limit_price"], intent["qty"], intent["side"]), ("enter", "100.26", "19", "buy"))
         self.assertEqual(intent["client_order_id"], "nf1-20260925-rth-ACME-long")
-        d, intent = planner.plan_rth_entry(self.rth_event("UNFAVORABLE"), {"bp": 99.95, "ap": 100.05}, now, date(2026, 9, 25), planner.Exposure(), None)
+        self.assertNotIn("extended_hours", intent)
+        d, intent = self.plan(self.rth_event("UNFAVORABLE"), {"bp": 99.95, "ap": 100.05}, now)
         self.assertEqual((intent["limit_price"], intent["side"]), ("99.75", "sell"))
-        d, intent = planner.plan_rth_entry(self.rth_event(), {"bp": 99.7, "ap": 100.3}, now, date(2026, 9, 25), planner.Exposure(), None)
+        d, intent = self.plan(self.rth_event(), {"bp": 99.7, "ap": 100.3}, now)
         self.assertEqual((d["reason"], intent), ("spread_above_50bps", None))
-        d, _ = planner.plan_rth_entry(self.rth_event(), {"bp": 99.95, "ap": 100.05}, ny(2026, 9, 25, 10, 20, 1), date(2026, 9, 25), planner.Exposure(), None)
+        d, _ = self.plan(self.rth_event(), {"bp": 99.95, "ap": 100.05}, ny(2026, 9, 25, 10, 20, 1))
         self.assertEqual(d["reason"], "entry_late")
-        d, _ = planner.plan_rth_entry(self.rth_event(), {"bp": 99.95, "ap": 100.05}, ny(2026, 9, 25, 10, 14), date(2026, 9, 25), planner.Exposure(), None)
+        d, _ = self.plan(self.rth_event(), {"bp": 99.95, "ap": 100.05}, ny(2026, 9, 25, 10, 14))
         self.assertEqual(d["action"], "wait")
 
-    def test_close_out_plans(self):
-        positions = [{"symbol": "AAA", "qty": "20"}, {"symbol": "BBB", "qty": "-15"}, {"symbol": "CCC", "qty": "0"}]
-        cls = planner.plan_cls_exits(positions, date(2026, 9, 25), covered=set())
-        self.assertEqual([(i["symbol"], i["side"], i["qty"], i["time_in_force"]) for i in cls],
-                         [("AAA", "sell", "20", "cls"), ("BBB", "buy", "15", "cls")])
-        mkt = planner.plan_market_flatten(positions, date(2026, 9, 25), covered={"AAA"})
+    def test_extended_hours_arm_entry_flags(self):
+        ev = {**self.rth_event(target="5000"), "entry_utc": z(ny(2026, 9, 25, 16, 20))}
+        now = ny(2026, 9, 25, 16, 20, 10)
+        d, intent = planner.plan_ext_entry(ev, {"bp": 49.9, "ap": 50.1}, now, date(2026, 9, 25), planner.Exposure(),
+                                           planner.Limits.for_arm(planner.AH, E, 1), planner.AH)
+        self.assertEqual((intent["extended_hours"], intent["time_in_force"], intent["type"], intent["limit_price"], intent["qty"]),
+                         (True, "day", "limit", "50.26", "99"))
+        self.assertEqual(intent["client_order_id"], "nf1x-ah-20260925-ent-ACME-long")
+        self.assertEqual((d["arm"], d["session_label"]), ("ah", planner.EXT_POST))
+        d, intent = planner.plan_ext_entry({**ev, "label": "UNFAVORABLE"}, {"bp": 49.9, "ap": 50.1}, now, date(2026, 9, 25),
+                                           planner.Exposure(), planner.Limits.for_arm(planner.PM, E, 1), planner.PM)
+        self.assertEqual((intent["limit_price"], intent["side"], intent["client_order_id"]), ("49.75", "sell", "nf1x-pm-20260925-ent-ACME-short"))
+        d, intent = planner.plan_ext_entry(ev, {"bp": 49.0, "ap": 50.0}, now, date(2026, 9, 25), planner.Exposure(),
+                                           planner.Limits.for_arm(planner.AH, E, 1), planner.AH)
+        self.assertEqual((d["reason"], intent), ("spread_above_100bps", None))
+        d, intent = planner.plan_ext_entry(ev, None, now, date(2026, 9, 25), planner.Exposure(),
+                                           planner.Limits.for_arm(planner.AH, E, 1), planner.AH)
+        self.assertEqual(d["reason"], "no_two_sided_quote")
+
+    def test_arm_for_release(self):
+        self.assertEqual(planner.arm_for_release(CAL, ny(2026, 9, 25, 4, 30)), planner.PM)
+        self.assertIsNone(planner.arm_for_release(CAL, ny(2026, 9, 25, 9, 0)))
+        self.assertIsNone(planner.arm_for_release(CAL, ny(2026, 9, 25, 3, 59)))
+        self.assertEqual(planner.arm_for_release(CAL, ny(2026, 9, 25, 16, 0)), planner.AH)
+        self.assertEqual(planner.arm_for_release(CAL, ny(2026, 9, 25, 19, 29)), planner.AH)
+        self.assertIsNone(planner.arm_for_release(CAL, ny(2026, 9, 25, 19, 30)))
+        self.assertIsNone(planner.arm_for_release(CAL, ny(2026, 11, 27, 16, 0)))  # early close day: no ah arm
+        self.assertIsNone(planner.arm_for_release(CAL, ny(2026, 9, 26, 5, 0)))    # Saturday
+
+
+class LedgerAndExits(unittest.TestCase):
+    def orders(self):
+        return [
+            {"client_order_id": "nf1-20260925-opg-AAA-long", "side": "buy", "filled_qty": "20"},
+            {"client_order_id": "nf1-20260925-opg-BBB-short", "side": "sell", "filled_qty": "15"},
+            {"client_order_id": "nf1x-pm-20260925-ent-AAA-long", "side": "buy", "filled_qty": "5"},
+            {"client_order_id": "nf1x-ah-20260924-ent-CCC-long", "side": "buy", "filled_qty": "8"},
+            {"client_order_id": "nf1x-ah-20260925-ent-DDD-short", "side": "sell", "filled_qty": "4"},
+            {"client_order_id": "nf1-20260925-rth-EEE-long", "side": "buy", "filled_qty": "0"},
+            {"client_order_id": "other-1", "side": "buy", "filled_qty": "100"},
+        ]
+
+    def test_ledger(self):
+        book = planner.ledger(self.orders())
+        self.assertEqual(book, {("core", date(2026, 9, 25), "AAA"): Decimal("20"), ("core", date(2026, 9, 25), "BBB"): Decimal("-15"),
+                                ("pm", date(2026, 9, 25), "AAA"): Decimal("5"), ("ah", date(2026, 9, 24), "CCC"): Decimal("8"),
+                                ("ah", date(2026, 9, 25), "DDD"): Decimal("-4")})
+        closed = planner.ledger(self.orders() + [{"client_order_id": "nf1-20260925-cls-AAA-long", "side": "sell", "filled_qty": "20"}])
+        self.assertNotIn(("core", date(2026, 9, 25), "AAA"), closed)
+
+    def test_close_out_plans_per_arm(self):
+        book = planner.ledger(self.orders())
+        cls = planner.plan_cls_exits(book, date(2026, 9, 25), covered=set())
+        self.assertEqual([(i["client_order_id"], i["side"], i["qty"], i["time_in_force"]) for i in cls],
+                         [("nf1-20260925-cls-AAA-long", "sell", "20", "cls"), ("nf1-20260925-cls-BBB-short", "buy", "15", "cls"),
+                          ("nf1x-pm-20260925-cls-AAA-long", "sell", "5", "cls")])
+        mkt = planner.plan_market_flatten(book, date(2026, 9, 25), covered={("core", "AAA"), ("pm", "AAA")})
         self.assertEqual([(i["symbol"], i["time_in_force"], i["type"]) for i in mkt], [("BBB", "day", "market")])
-        ext, missing = planner.plan_ext_flatten(positions + [{"symbol": "DDD", "qty": "5"}],
-                                                {"AAA": {"bp": 50.0, "ap": 50.1}, "BBB": {"bp": 20.0, "ap": 20.02}},
+        ext, missing = planner.plan_ext_flatten(book, {"AAA": {"bp": 50.0, "ap": 50.1}, "BBB": {"bp": 20.0, "ap": 20.02}},
                                                 date(2026, 9, 25), stage="ext1")
-        self.assertEqual([(i["symbol"], i["side"], i["limit_price"], i["extended_hours"]) for i in ext],
-                         [("AAA", "sell", "49.75", True), ("BBB", "buy", "20.13", True)])
-        self.assertEqual(missing, ["DDD"])
+        self.assertEqual([(i["client_order_id"], i["side"], i["limit_price"], i["extended_hours"]) for i in ext],
+                         [("nf1-20260925-ext1-AAA-long", "sell", "49.75", True), ("nf1-20260925-ext1-BBB-short", "buy", "20.13", True),
+                          ("nf1x-pm-20260925-ext1-AAA-long", "sell", "49.75", True)])
+        self.assertEqual(missing, [])
+        opg = planner.plan_ah_opg_exits(book, date(2026, 9, 25), CAL)
+        self.assertEqual([(i["client_order_id"], i["side"], i["time_in_force"]) for i in opg],
+                         [("nf1x-ah-20260924-opg-CCC-long", "sell", "opg")])
+        opg_monday = planner.plan_ah_opg_exits(book, date(2026, 9, 28), CAL)
+        self.assertEqual([i["client_order_id"] for i in opg_monday], ["nf1x-ah-20260925-opg-DDD-short"])
 
 
 class Reconciliation(unittest.TestCase):
-    def test_reconcile(self):
+    def test_reconcile_flat_day(self):
         fills = [{"side": "buy", "filled_qty": "10", "filled_avg_price": "100"},
                  {"side": "sell", "filled_qty": "10", "filled_avg_price": "101"}]
         ok = planner.reconcile("100000", "100009.98", fills, [], [])
@@ -347,6 +476,17 @@ class Reconciliation(unittest.TestCase):
         bad = planner.reconcile("100000", "100005", fills, [{"symbol": "A", "qty": "3"}],
                                 [{"client_order_id": "nf1-20260925-cls-A-long"}])
         self.assertEqual(bad["problems"], ["positions_open", "orders_open", "cash_mismatch"])
+
+    def test_reconcile_with_overnight_arm(self):
+        fills = [{"side": "buy", "filled_qty": "10", "filled_avg_price": "100"},
+                 {"side": "sell", "filled_qty": "10", "filled_avg_price": "101"},
+                 {"side": "buy", "filled_qty": "5", "filled_avg_price": "20"}]
+        ok = planner.reconcile("100000", "99910", fills, [{"symbol": "AHX", "qty": "5"}], [], expected={"AHX": "5"})
+        self.assertTrue(ok["ok"], ok)
+        self.assertIsNone(ok["realized_pnl"])
+        bad = planner.reconcile("100000", "99910", fills, [{"symbol": "AHX", "qty": "5"}, {"symbol": "B", "qty": "-1"}], [],
+                                expected={"AHX": "5"})
+        self.assertEqual((bad["problems"], bad["unexpected_positions"]), (["positions_open"], ["B"]))
 
 
 if __name__ == "__main__":

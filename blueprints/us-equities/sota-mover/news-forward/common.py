@@ -24,7 +24,10 @@ ORDER_CONTRACT = os.path.join(REPO, "blueprints/us-equities/order-contract/order
 STATE_ROOT = os.path.expanduser("~/.local/state/native-agent-stack/research/sota-mover/news-forward")
 SECRETS_DIR = os.path.expanduser("~/.config/codex-ecosystem/secrets")
 TRADING_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-3.env")
-DATA_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-2.env")
+# Coordinator update 2026-09-25 01:46 ET: paper-3 is both the trading and the data key.
+DATA_ENV = TRADING_ENV
+# paper-2 belongs to other studies: never used here except to refuse a copied key id.
+PAPER2_ENV = os.path.join(SECRETS_DIR, "alpaca-paper-2.env")
 MODEL_STORAGE = os.path.expanduser("~/.local/share/native-agent-stack/models/chronogpt-instruct")
 
 NY = ZoneInfo("America/New_York")

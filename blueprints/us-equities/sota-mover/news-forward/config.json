@@ -1,4 +1,11 @@
 {
  "mode": "dry-run",
+ "first_order_not_before": "2026-09-25T09:15:00-04:00",
+ "dry_run_equity": "900988.95",
+ "dry_run_multiplier": "4",
+ "arms": {
+  "pm": {"orders_from": "2026-09-28", "note": "pm entries fall before 09:15, and no order may precede 09:15 on 2026-09-25: intents are journaled only today"},
+  "ah": {"orders_from": "2099-01-01", "note": "set to the first live date once the ah path and its corporate-action guard pass their tests"}
+ },
  "note": "Set mode to paper only after `executor.py check-account` prints ready_for_paper for alpaca-paper-3.env; a paper start that fails any account check runs as dry-run and journals the refusal."
 }

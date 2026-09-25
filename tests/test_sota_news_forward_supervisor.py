@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 from unittest import mock
 from zoneinfo import ZoneInfo
@@ -74,49 +75,74 @@ class ShadowSchedule(unittest.TestCase):
 
 
 class Broker:
-    """Paper broker double: positions, open orders, fills and cancels, all in memory."""
+    """Paper broker double: every order in one list; positions derive from fills."""
+
+    LIVE = ("new", "accepted", "partially_filled")
 
     def __init__(self):
-        self.pos = {"AAA": "20", "BBB": "-15"}
-        self.open = {"o-rth": {"id": "o-rth", "client_order_id": "nf1-20260925-rth-CCC-long", "symbol": "CCC",
-                               "submitted_at": ny(15, 20), "status": "new"}}
-        self.sent, self.cancelled = [], []
+        self.all = []
         self.cash = "100000"
+
+    def add(self, cid, side, qty, filled, status="filled", at=None, price="10"):
+        info = planner.parse_cid(cid)
+        order = {"id": f"o{len(self.all)}", "client_order_id": cid, "symbol": info["symbol"], "side": side, "qty": str(qty),
+                 "filled_qty": str(filled), "filled_avg_price": price if Decimal(str(filled)) else None,
+                 "status": status, "submitted_at": at or ny(9, 20)}
+        self.all.append(order)
+        return order
+
+    def fill(self, cid, qty=None):
+        for o in self.all:
+            if o["client_order_id"] == cid:
+                o["filled_qty"], o["status"], o["filled_avg_price"] = str(qty or o["qty"]), "filled", "10"
 
     def account(self):
         return {"status": "ACTIVE", "equity": "100000", "cash": self.cash}
 
     def positions(self):
-        return [{"symbol": s, "qty": q, "market_value": "0"} for s, q in self.pos.items()]
+        net = {}
+        for (arm, day, sym), q in planner.ledger(self.all).items():
+            net[sym] = net.get(sym, Decimal("0")) + q
+        return [{"symbol": s, "qty": str(q), "market_value": "0"} for s, q in net.items() if q]
 
     def orders(self, status="open", after=None, symbols=None, limit=500):
         if status == "open":
-            return list(self.open.values())
-        return [{"client_order_id": "nf1-20260925-opg-AAA-long", "side": "buy", "filled_qty": "20", "filled_avg_price": "10"},
-                {"client_order_id": "nf1-20260925-cls-AAA-long", "side": "sell", "filled_qty": "20", "filled_avg_price": "10.5"},
-                {"client_order_id": "other-1", "side": "sell", "filled_qty": "5", "filled_avg_price": "1"}]
+            return [o for o in self.all if o["status"] in self.LIVE]
+        if status == "closed":
+            return [o for o in self.all if o["status"] not in self.LIVE]
+        return list(self.all)
 
     def submit(self, intent):
-        self.sent.append(intent)
-        oid = f"o{len(self.sent)}"
-        self.open[oid] = {"id": oid, "client_order_id": intent["client_order_id"], "symbol": intent["symbol"],
-                          "submitted_at": ny(15, 40), "status": "accepted"}
-        return {"id": oid, "client_order_id": intent["client_order_id"], "status": "accepted"}
+        o = self.add(intent["client_order_id"], intent["side"], intent["qty"], 0, status="accepted", at=ny(15, 40))
+        o.update(time_in_force=intent["time_in_force"], type=intent["type"], limit_price=intent.get("limit_price"),
+                 extended_hours=intent.get("extended_hours", False))
+        return dict(o)
 
     def cancel(self, order_id):
-        self.cancelled.append(self.open.pop(order_id)["client_order_id"])
+        for o in self.all:
+            if o["id"] == order_id:
+                o["status"] = "canceled"
 
 
 class PaperCloseOut(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="nf-close-")
-        self.broker = Broker()
+        b = self.broker = Broker()
+        b.add("nf1-20260925-opg-AAA-long", "buy", 20, 20)
+        b.add("nf1-20260925-opg-BBB-short", "sell", 15, 15)
+        b.add("nf1-20260925-rth-CCC-long", "buy", 9, 0, status="new", at=ny(15, 20))
+        b.add("nf1x-pm-20260925-ent-AAA-long", "buy", 5, 5)
+        b.add("nf1x-ah-20260924-ent-OLD-long", "buy", 8, 8)
+        b.add("nf1x-ah-20260924-opg-OLD-long", "sell", 8, 8)
         journal = common.Journal(self.dir, date(2026, 9, 25))
         sup = supervisor.Supervisor.__new__(supervisor.Supervisor)
-        sup.mode, sup.schedule, sup.trade_date, sup.journal = "paper", SCHED, date(2026, 9, 25), journal
-        sup.executor = supervisor.ex.Executor("paper", journal, self.dir, broker=self.broker)
-        sup.done_steps, sup.exit_orders, sup.ext_round, sup.last_ext, sup.last_stale_check = set(), {}, 0, None, None
-        sup.counts, sup.sim_positions, sup.sod = supervisor.Counter(), {}, {"cash": "100000", "equity": "100000"}
+        sup.mode, sup.schedule, sup.trade_date, sup.journal, sup.state = "paper", SCHED, date(2026, 9, 25), journal, self.dir
+        sup.prev_session = common.load_calendar().previous(date(2026, 9, 25))
+        sup.cfg = {"arms": {"pm": {"orders_from": "2026-09-25"}, "ah": {"orders_from": "2026-09-25"}}}
+        sup.clock = lambda: ny(16, 30)
+        sup.executor = supervisor.ex.Executor("paper", journal, self.dir, broker=b)
+        sup.done_steps, sup.ext_round, sup.last_ext, sup.last_stale_check = set(), 0, None, None
+        sup.counts, sup.sod = supervisor.Counter(), {"cash": "100000", "equity": "100000"}
         sup.data = mock.Mock()
         sup.data.latest_quotes.return_value = {"AAA": {"bp": 10.0, "ap": 10.02}, "BBB": {"bp": 5.0, "ap": 5.02}}
         self.sup = sup
@@ -124,31 +150,41 @@ class PaperCloseOut(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir, ignore_errors=True)
 
+    def ids(self, since):
+        return [o["client_order_id"] for o in self.broker.all[since:]]
+
     def test_sequence(self):
         sup, b = self.sup, self.broker
         sup.run_exits(ny(15, 24))  # the RTH entry is only 4 minutes old
-        self.assertEqual(b.cancelled, [])
+        self.assertEqual(b.all[2]["status"], "new")
+        sup.last_stale_check = None
         sup.run_exits(ny(15, 26))  # stale after 5 minutes
-        self.assertEqual(b.cancelled, ["nf1-20260925-rth-CCC-long"])
+        self.assertEqual(b.all[2]["status"], "canceled")
+        n = len(b.all)
         sup.run_exits(ny(15, 40))
-        self.assertEqual([(i["symbol"], i["side"], i["time_in_force"]) for i in b.sent],
-                         [("AAA", "sell", "cls"), ("BBB", "buy", "cls")])
-        b.pos["DDD"] = "7"  # an entry filled after the CLS step
+        self.assertEqual(self.ids(n), ["nf1-20260925-cls-AAA-long", "nf1-20260925-cls-BBB-short", "nf1x-pm-20260925-cls-AAA-long"])
+        self.assertEqual([o["time_in_force"] for o in b.all[n:]], ["cls"] * 3)
+        b.add("nf1-20260925-rth-EEE-long", "buy", 7, 7)  # an entry filled after the CLS step
+        n = len(b.all)
         sup.run_exits(ny(15, 55))
-        self.assertEqual([(i["symbol"], i["time_in_force"], i["type"]) for i in b.sent[2:]], [("DDD", "day", "market")])
-        b.open.clear()
-        b.pos = {"BBB": "-15"}  # the CLS buy did not fill
+        self.assertEqual(self.ids(n), ["nf1-20260925-mkt-EEE-long"])
+        # at the close: AAA (both arms) and EEE fill; the BBB CLS order is left unfilled
+        for cid in ("nf1-20260925-cls-AAA-long", "nf1x-pm-20260925-cls-AAA-long", "nf1-20260925-mkt-EEE-long"):
+            b.fill(cid)
+        b.add("nf1x-ah-20260925-ent-FFF-long", "buy", 3, 3)  # tonight's overnight hold (ah arm)
+        n = len(b.all)
         sup.run_exits(ny(16, 2))
-        ext = b.sent[-1]
-        self.assertEqual((ext["symbol"], ext["side"], ext["limit_price"], ext["extended_hours"], ext["client_order_id"]),
-                         ("BBB", "buy", "5.05", True, "nf1-20260925-ext1-BBB-short"))
-        b.pos, b.open, b.cash = {}, {}, "100010"
+        self.assertEqual(self.ids(n), ["nf1-20260925-ext1-BBB-short"])
+        ext = b.all[n]
+        self.assertEqual((ext["side"], ext["limit_price"], ext["extended_hours"]), ("buy", "5.05", True))
+        self.assertEqual([o["status"] for o in b.all if o["client_order_id"] == "nf1-20260925-cls-BBB-short"], ["canceled"])
+        b.fill("nf1-20260925-ext1-BBB-short")
+        b.cash = "99970"  # fill cash flows: -200+150-50-80+80-70+200+50+70-30-150 = -30
         rec = sup.reconcile()
         self.assertTrue(rec["ok"], rec)
-        self.assertEqual((rec["fills"], rec["realized_pnl"]), (2, "10.0"))
-        kinds = [r["kind"] for r in common.read_jsonl(sup.journal.path)]
-        self.assertEqual(kinds.count("fill"), 2)
-        self.assertEqual(kinds.count("order_submitted"), 4)
+        self.assertEqual(rec["overnight_holdings"], {"FFF": "3"})
+        rows = common.read_jsonl(os.path.join(self.dir, "autolev-daily-paper.jsonl"))
+        self.assertEqual((rows[0]["evidence_label"], rows[0]["arm"], rows[0]["core_flat"]), ("pilot", "core", True))
 
 
 if __name__ == "__main__":

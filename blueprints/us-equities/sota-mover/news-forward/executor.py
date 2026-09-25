@@ -57,8 +57,11 @@ ACCOUNT_FIELDS = ("status", "equity", "last_equity", "cash", "buying_power", "mu
                   "account_blocked", "shorting_enabled", "pattern_day_trader")
 
 
-def trading_credentials(path=common.TRADING_ENV, data_env=common.DATA_ENV):
-    """(key_id, secret) of the dedicated paper-3 account, or AccountRefused."""
+def trading_credentials(path=common.TRADING_ENV, paper2_env=common.PAPER2_ENV):
+    """(key_id, secret) of the dedicated paper-3 account, or AccountRefused.
+
+    paper2_env is read only to refuse a paper-3 file that carries the paper-2 key id.
+    """
     name = os.path.basename(path)
     if name != TRADING_ENV_NAME or "paper-2" in path or "live" in name:
         raise AccountRefused("trading_env_not_paper_3")
@@ -68,9 +71,9 @@ def trading_credentials(path=common.TRADING_ENV, data_env=common.DATA_ENV):
         key_id, secret = live_news.read_credentials(path)
     except live_news.CredentialError as error:
         raise AccountRefused(f"trading_env_guard:{error}") from None
-    if os.path.lexists(data_env):
+    if os.path.lexists(paper2_env):
         try:
-            other_key, _ = live_news.read_credentials(data_env)
+            other_key, _ = live_news.read_credentials(paper2_env)
         except live_news.CredentialError:
             other_key = None
         if other_key is not None and other_key == key_id:
@@ -181,7 +184,7 @@ def start_check(broker):
 class Executor:
     """Validates, caps and journals every order; submits only in paper mode."""
 
-    def __init__(self, mode, journal, state_root, broker=None, clock=common.utc_now):
+    def __init__(self, mode, journal, state_root, broker=None, clock=common.utc_now, not_before=None):
         if mode not in ("dry-run", "paper"):
             raise ValueError("mode must be dry-run or paper")
         if mode == "paper" and broker is None:
@@ -191,14 +194,19 @@ class Executor:
         self.state_root = state_root
         self.broker = broker if mode == "paper" else None
         self.clock = clock
+        self.not_before = not_before  # no order is sent before this instant (UTC)
         self.killed = False
         self.submitted = {}  # client_order_id -> order dict (or dry-run record)
 
     def halted(self):
         return os.path.exists(os.path.join(self.state_root, "STOP")) or self.killed
 
-    def send(self, intent, context):
-        """Validate with the order contract, then submit (paper) or journal (dry-run)."""
+    def send(self, intent, context, dry_run=False):
+        """Validate with the order contract, then submit (paper) or journal (dry-run).
+
+        dry_run=True journals the validated intent without sending it, in any mode (an
+        arm that is not yet enabled for orders).
+        """
         cid = intent["client_order_id"]
         if not planner.is_nf1(cid):
             self.journal.write("order_refused", reason="client_order_id_prefix", intent=intent, **context)
@@ -216,9 +224,15 @@ class Executor:
         except ValueError as error:
             self.journal.write("order_refused", reason=f"contract:{error}", intent=intent, **context)
             return None
-        self.journal.write("order_intent", mode=self.mode, envelope=envelope, **context)
-        if self.mode == "dry-run":
-            record = {"client_order_id": cid, "status": "dry_run_not_sent", "symbol": intent["symbol"]}
+        mode = "dry-run" if dry_run else self.mode
+        if mode == "paper" and self.not_before is not None and self.clock() < self.not_before:
+            self.journal.write("order_refused", reason="before_first_order_time", intent=intent,
+                               not_before=common.iso(self.not_before), **context)
+            return None
+        self.journal.write("order_intent", mode=mode, envelope=envelope, **context)
+        if mode == "dry-run":
+            record = {"client_order_id": cid, "status": "dry_run_not_sent", "symbol": intent["symbol"],
+                      "side": intent["side"], "filled_qty": intent["qty"]}
             self.submitted[cid] = record
             return record
         try:
