@@ -72,6 +72,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (server observed answering PromQL over stored data and its rules API; a query server, so no planted-fault control is needed; buildinfo 3.14.0 and unit state are backed; bound to the observation-inference winner) and re-ran buildinfo, promtool up, the vllm count_over_time query and the rules summary on this host: the same seven targets up, 240 samples, 2 groups and 14 rules healthy, with EcosystemCollectorHealthUnexpected no longer firing.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

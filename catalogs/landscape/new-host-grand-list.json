@@ -476,7 +476,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "2.8.3"
             },
@@ -499,7 +499,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "0.1.7"
             },
@@ -596,7 +596,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "not_established",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -642,7 +642,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "not_established",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -839,7 +839,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1026,7 +1026,7 @@
           "recipe": "observability/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1051,7 +1051,7 @@
           "recipe": "observability/backends/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1076,7 +1076,7 @@
           "recipe": "observability/backends/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1171,7 +1171,7 @@
           "recipe": "blueprints/us-equities/hosting/backup/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1231,7 +1231,7 @@
           "recipe": "blueprints/us-equities/hosting/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1291,7 +1291,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1356,7 +1356,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1381,7 +1381,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1418,7 +1418,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": true,
               "bootstrap_version": "0.49.0"
             },
@@ -1607,7 +1607,7 @@
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1732,7 +1732,7 @@
           "recipe": "blueprints/us-equities/engine-nautilus/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -1794,7 +1794,7 @@
           "recipe": "blueprints/us-equities/hosting/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "conditional",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2223,7 +2223,7 @@
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2334,7 +2334,7 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 33,
+      "linux-wsl2-x86_64": 28,
       "macos-arm64": 0
     },
     "bootstrap_pinned": {
@@ -2367,7 +2367,7 @@
       ]
     },
     "needs_host": {
-      "linux-wsl2-x86_64": 33,
+      "linux-wsl2-x86_64": 20,
       "macos-arm64": 60
     }
   }

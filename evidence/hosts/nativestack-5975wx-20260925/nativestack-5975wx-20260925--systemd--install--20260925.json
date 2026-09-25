@@ -56,6 +56,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Point 3 fails: the version and pin claim is backed and reproduced on this host (systemctl --version and dpkg-query both give 255.4-1ubuntu8.17, cgroup v2 with cpu memory pids delegated) and point 4 holds, but the receipt also claims the tool is an existing install under ~/.local/share/codex-ecosystem resolved as the first command shows, while that first command shows the Ubuntu systemd package and systemctl resolves to /usr/bin/systemctl, so this install claim is contradicted by its own retained output; re-record with that limitation corrected.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

@@ -64,6 +64,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (the frozen ingestion protocol extracted exact page text and table cells; its invalid-PDF native refusal and negative retrieval are the controls; pdftotext 26.09.0 and its resolved build path are backed; bound to the document-retrieval winner; the local_integration class is declared honestly) and re-ran pdftotext -v and ingest.py into a mktemp output on this host with status passed and all eight checks true.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

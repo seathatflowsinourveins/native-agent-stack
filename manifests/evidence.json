@@ -9425,8 +9425,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "57a6991a385ab438521fb1979a0ea21cee1b2e7f50f0c25655af3a6721773666",
-      "bytes": 180805
+      "sha256": "9ed65813828bf171912a0ba6c034e4096c9d5e97f5f2e78a0063ad5eadb6fefc",
+      "bytes": 179052
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9480,8 +9480,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "85a44b134ec7d081092a964ff919f47d927bbbce94ec4416516175199cb0d855",
-      "bytes": 77933
+      "sha256": "f288e3db0d0b3cdd4bba99a8c71324f024b417d16cfc381c6a6fcca1809cbd3f",
+      "bytes": 77976
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9925,8 +9925,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "6103890543d6139473d04390364e340bee8c155b7b6fbcbc6b4f0ea9a5a4323a",
-      "bytes": 18294
+      "sha256": "eacab116e7e38e1d29b3c6cfd4d8f28c54bc0f5363e9c3bc33433d6ef78390aa",
+      "bytes": 17289
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10230,8 +10230,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "4b43509b70aea5dec0f0bbd1351c25d876489b89b14e360e85e3d8f2c3a1760e",
-      "bytes": 15402
+      "sha256": "14a041d327cd883be7b84075bf3a0bd1600bfbe5d97803bb98c3ca733c9a9b55",
+      "bytes": 15445
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -27855,108 +27855,108 @@
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ai-memory--install--20260925.json",
-      "sha256": "c0f0592968e52e25d3ce2fb89366245e94beb22afbcc893c8095e0a372341262",
-      "bytes": 4254
+      "sha256": "fac4a3544bf6d2786b0f0bba563d8c5e0ebab5c94f4c20d6ca46eb551b6d16f6",
+      "bytes": 4890
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ccusage--install--20260925.json",
-      "sha256": "761736e00998e6cf7354a522d270e6fac3876a7007af98367276e1eee8ee89e0",
-      "bytes": 3683
+      "sha256": "15739642653640620a17adafa62ade5f7847c7c1431e035135b603f106737807",
+      "bytes": 4281
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--install--20260925.json",
-      "sha256": "cd4b9906394e9ed69cede3091c5f648295d29d2d87a538d24b60873d971f4bbe",
-      "bytes": 4206
+      "sha256": "579a2629ca8c2f4c4b489b30c13b12704b35e00a00f75a48c4ad203a3c1711a8",
+      "bytes": 4863
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--dagu--use--20260925.json",
-      "sha256": "e327adbff1e13b2f23c66cabb0f1c0ab7656d8b50cf07b19cf2f7ff1fdab7482",
-      "bytes": 7210
+      "sha256": "10466140d5a9f4e01ee6e911835d86bf2b933f0462f71eb4190a6991b9f5a5f0",
+      "bytes": 7972
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--difftastic--use--20260925.json",
-      "sha256": "2d96a2f7aadc0a4d3911578448013c28771fdfdd3e20900218acd05d62e90041",
-      "bytes": 5981
+      "sha256": "be06adaa218fd1a4b1ce00ae7cb6fa872c3312605af4ffd20deacc96199dc0f6",
+      "bytes": 6636
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--gitleaks--use--20260925.json",
-      "sha256": "593192aa1230d4f60451bdc13a6f91285627a7a59c9dde602dd6f4e1a0d1ac4f",
-      "bytes": 8483
+      "sha256": "4aecf1c2c178ea208ba769ace7e1922f280ec15c8d9d0fb8213d7ffcebab41b0",
+      "bytes": 9293
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--headroom--install--20260925.json",
-      "sha256": "890d51713d12536e0d4f34ec3759f8a99a47f1434793160c5e72b6633396325a",
-      "bytes": 3657
+      "sha256": "d6511a03b62612b8c96a2b2e2b92c651c6f9283c0be2cefb61663a2b798329ea",
+      "bytes": 4263
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--loki--use--20260925.json",
-      "sha256": "956aa7d0bbf177173fd0aa24b7c37bd799d9cdfb8dea9f4b73812f66c257f2c5",
-      "bytes": 6641
+      "sha256": "1cfbb220fc37120cb7ea7c0151059fa21a3d46fc0ddde1d0f6f71986a57d43ea",
+      "bytes": 7420
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--markitdown--use--20260925.json",
-      "sha256": "280e1a3073e77216e76707bcf2da1c14e36c4c2d219e3b7b5efb6bc1e5107416",
-      "bytes": 5565
+      "sha256": "b3f934ccbe8cc1c9f10b4901e405cc400e36cfbb0faf1e3fa572f46661ac0697",
+      "bytes": 6294
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcporter--install--20260925.json",
-      "sha256": "ba3ad2bae687931560aaa770a9b4dc0f580779ec2bf0533206950301f18f1f73",
-      "bytes": 4265
+      "sha256": "1f4f808e7f9d3a8d3783e2109ea9c7c780f2547961821fee46b427fe09cafec1",
+      "bytes": 4893
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--nautilustrader--use--20260925.json",
-      "sha256": "bef0fd334c8ad0b17318f4c0f0d380ecf6fb8cf0d28c6f0fccba50b7991b3221",
-      "bytes": 9748
+      "sha256": "7e28472acd7b684e33195cf451231dfb123d150d57ea2556f6497f101ac681a3",
+      "bytes": 10560
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--opentelemetry-collector-contrib--use--20260925.json",
-      "sha256": "4efc869329ddf9a619d52d8050bd518122d24ffc70dceb4d3ac22ee7f1f5a26c",
-      "bytes": 8034
+      "sha256": "444902f635cc937a7fdd1f62cbf1e315040e5965bddfe21c24ae7d2e10a26fdc",
+      "bytes": 8884
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--poppler--use--20260925.json",
-      "sha256": "d1f5781bb6302f99a9945c851e1065c58d2000234f4d535d824b39dac35df989",
-      "bytes": 5209
+      "sha256": "c34e13b2c93ea9042c69922794d56c241c8487baae8453a58b41397171a91e10",
+      "bytes": 5953
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--prometheus--use--20260925.json",
-      "sha256": "c626be6b4d435d3fdf36909a88243dfa529ae9bef203658ef079d5cde16e20de",
-      "bytes": 6919
+      "sha256": "400318969fe62351838f8dfdca467d90dc6a59c1cb72956e9e706a1e28fb76f0",
+      "bytes": 7694
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json",
-      "sha256": "fc44611861de46ebb0d9ad980cf2fd85424a3d5f2b12dd16caff227dd2829956",
-      "bytes": 6691
+      "sha256": "fb9def9c2d0091dd6b4a9a7209c7fb2f8e81bf4796b53632e9c2e38defc5fb61",
+      "bytes": 7491
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qmd--use--20260925.json",
-      "sha256": "8dd390cc03be499f9dc37133144a09b49eea695af915eb4d3e5c961d2681eec9",
-      "bytes": 5851
+      "sha256": "3da5628de82b3dd46ea0883c92f3a78c929fa60a18969ebf908e5c9cd057e280",
+      "bytes": 6538
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--restic--use--20260925.json",
-      "sha256": "25eb984c8c3d32316def3c7e08cd2ccdfd198952ae2d12816a2a0459559d2dda",
-      "bytes": 8490
+      "sha256": "00f6d2026d2a42daaca312b9d911daf0cebd17e0b98a894172b702ef0e090e58",
+      "bytes": 9234
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--rtk--use--20260925.json",
-      "sha256": "c2e0fb946b03dcbedd934eed6a23cff1d3231dd57fbc3c432ef6a81d6f46eccd",
-      "bytes": 6508
+      "sha256": "e353dea7765dfbadb86500677f5fe88f14e47c83ef5633e57600737475575a46",
+      "bytes": 7192
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--install--20260925.json",
-      "sha256": "91b76fabf6bce5967172da984763c9ad3b6a55b8a3cf8aa6b91cfbbe0243b10d",
-      "bytes": 4058
+      "sha256": "c403b071f9396d4840bb6fcea72e3a2d35f3f066bbb9c0f09dfb1311eeb9c8d0",
+      "bytes": 4916
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925.json",
-      "sha256": "f03fc8127c18a0e2d6825eee17fc38afb52cf1ff36407e0016d1e9a2fb917190",
-      "bytes": 6197
+      "sha256": "83545836421c7856dac61733b74238810cb0899f0890380e99d291bb05e5406b",
+      "bytes": 6925
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--worktrunk--use--20260925.json",
-      "sha256": "510bb930d60f23c23c71ee9899155948de350943028284e48ce07e8966d938be",
-      "bytes": 7364
+      "sha256": "d5cd53b54b023e8e39a5ef90f0011b56320bc6f98b472132c783d90fa946173c",
+      "bytes": 8036
     },
     {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",

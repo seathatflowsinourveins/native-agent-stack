@@ -93,6 +93,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (redacted git scans; the planted sidekiq-secret fixture gives exit 1 with one finding as the positive control; launcher hashes and 8.30.1 are backed; bound to both winner pins) and re-ran the launcher and runner hash comparison and gitleaks version on this host (identical), plus the clean-commit and fixture-commit scans in a fresh throwaway repository using the native 8.30.1 binary directly rather than the bounded-run scope (exit 0, then exit 1 with RuleID sidekiq-secret).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

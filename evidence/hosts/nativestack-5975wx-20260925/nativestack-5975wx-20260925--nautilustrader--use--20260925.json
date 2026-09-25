@@ -79,6 +79,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (the unchanged upstream quickstart backtest ran with its counts asserted and account.csv compared byte for byte to the authoring-host runs; package versions and quickstart and observer sha256 are backed; bound to the backtesting-engine winner pin) and re-ran the environment check, the sha256-verified quickstart download and the same Bubblewrap run on this host: exit 0, empty stderr, identical counts, ending total 1000431.00 and account.csv sha256 equal to the authoring runs.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

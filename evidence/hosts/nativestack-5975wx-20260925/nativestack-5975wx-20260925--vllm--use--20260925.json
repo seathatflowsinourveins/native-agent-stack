@@ -64,6 +64,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (server answered /v1/models and a /v1/embeddings request whose cosines rank the backup passage first, asserted; /version 0.25.0, unit, GPU and model directory are backed; bound to the semantic-rag winner) and re-ran /version, /v1/models, unit state, nvidia-smi and the same embeddings request on this host: 0.25.0, the same model, 2048 dimensions and the same ranking with cosines within 0.0004.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:51Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }

@@ -72,6 +72,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (one OTLP/HTTP log carried through the logs pipeline into Loki; planted non-allowlisted attributes and a raw body must be dropped and replaced, a positive control for the privacy transform; 0.161.0 is backed by --version and self-metrics; bound to the observation-inference winner) and re-ran the version, self-metrics and unit-state checks on this host and confirmed read-only in Loki that record nsr-otel-1790314675-1989360 is stored once with body [content omitted] and no non-allowlisted labels, with no new send.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
     }
   ]
 }
