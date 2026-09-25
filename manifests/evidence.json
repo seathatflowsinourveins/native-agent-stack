@@ -3224,8 +3224,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a164c072941274ed5f158d32437bb630550a7d582188971658780669ec244639",
-      "bytes": 11605
+      "sha256": "a5d2bed86c974f1f1b61248e2dbb9b89585b5da074468db8e72845d381206af8",
+      "bytes": 11673
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -7217,6 +7217,21 @@
       "path": "blueprints/us-equities/alpaca-historical/plan.json",
       "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b",
       "bytes": 1761
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/README.md",
+      "sha256": "f4abb17a17adfa2146937317be11beef8e3f2e87d6f4f9b4725996f806785c54",
+      "bytes": 10667
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/fixture.py",
+      "sha256": "2a7d77bbad8de02e8e36e0cfb59b352e42b97c342648dae19ce8f111c0389101",
+      "bytes": 52182
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-history-fixture/protocol.json",
+      "sha256": "cb5e321de20b784857af31e265959676b046c066a7ad8932045b760e96888876",
+      "bytes": 24538
     },
     {
       "path": "blueprints/us-equities/alpaca-paper/README.md",
@@ -29602,6 +29617,11 @@
       "path": "tests/test_alpaca_historical.py",
       "sha256": "4ec30086b77d6a75081be8ffdae1a7aa5fe516229573aa71eec818c2f5f58ac0",
       "bytes": 18678
+    },
+    {
+      "path": "tests/test_alpaca_history_fixture.py",
+      "sha256": "bd164d7eb3ca7559eaec1b9ecaaad6d576ae677f7d938148ac20fb0bfa76a584",
+      "bytes": 33202
     },
     {
       "path": "tests/test_alpaca_paper.py",

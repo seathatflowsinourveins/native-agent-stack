@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "id": "alpaca-history-fixture-v1-20260925",
+  "kind": "frozen_fixture_protocol",
+  "frozen_before_any_run": true,
+  "frozen_note": "Written and committed on 2026-09-25 before any request under it. No live request was made while writing it: the API keys were not yet stored. The git commit that adds this file is the evidence of the freeze. Changing a rule after a run needs a new protocol id and a dated deviation record, never an edit to this file.",
+  "question": "Before anything is bought, can Alpaca Market Data (SIP, historical) close either of the two data gates that R1 left purchasable, pre-2020-delisting and dated-security-identity, under their frozen definitions, and does it reproduce the extreme-gainer audit's official closes on the 130 rows that audit still owes?",
+  "decision_source": "The user's decision of 2026-09-25 (shared memory page decisions/north-star-research-decisions-2026-09-25.md, item 1): test Alpaca history first, against the R1 fixtures, before buying anything. R1 is the north-star R1 convergence note of 2026-09-25 (sha256 6d73e0ec873f1687).",
+
+  "scope_boundary": {
+    "host": "data.alpaca.markets",
+    "scheme": "https",
+    "method": "GET",
+    "paths": ["/v2/stocks/bars", "/v2/stocks/auctions"],
+    "refused": "Every other host, including the trading hosts (api.alpaca.markets, paper-api.alpaca.markets), every other path on the data host, every redirect and every non-GET method. The runner never calls an order, account, position, asset or clock endpoint.",
+    "credentials": "Only from the environment variables APCA_API_KEY_ID and APCA_API_SECRET_KEY, which `secret run` loads from the login Keychain for this one command. They are never printed, logged, written to the snapshot or receipt, or passed as arguments.",
+    "licence": "Algo Trader Plus through Elite is for personal use only. Raw market data stays in a private snapshot outside the repository; the public receipt holds counts, verdicts and hashes, no prices."
+  },
+
+  "plan_facts": {
+    "read_on": "2026-09-25",
+    "user_report": "Algo Trader Plus, free through Elite 100k: 9+ years of history, real-time coverage of all exchanges, 10,000 API calls per minute, unlimited WebSocket symbols.",
+    "verified": [
+      {"fact": "Algo Trader Plus stock data: real-time coverage", "value": "All US Stock Exchanges (Basic: IEX)", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "Historical data depth", "value": "Since 2016, on both Basic and Algo Trader Plus", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "Historical limitation", "value": "Algo Trader Plus: no restriction. Basic: the latest 15 minutes are withheld", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "API calls per minute", "value": "10,000 (Basic: 200)", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "WebSocket subscriptions", "value": "Unlimited symbols (Basic: 30)", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "Price", "value": "$99/month", "url": "https://docs.alpaca.markets/docs/about-market-data-api", "page_last_updated": "2026-07-16"},
+      {"fact": "Elite $100,000 tier market data", "value": "Algo Trader Plus included at no charge (value $99/month), only for personal use", "url": "https://alpaca.markets/elite", "page_last_updated": "not shown on the page"},
+      {"fact": "Historical bars endpoint", "value": "GET https://data.alpaca.markets/v2/stocks/bars; limit 1-10,000 data points per page across all symbols; adjustment raw (default), split, dividend, spin-off or all; feed sip (default), iex, otc or boats; asof YYYY-MM-DD selects the entity trading as the symbol on that date (default: the current day), and '-' skips symbol mapping; a symbol not found on the asof date is answered by the symbol alone; HTTP 429 when rate-limited, with X-RateLimit-Limit, -Remaining and -Reset headers", "url": "https://docs.alpaca.markets/reference/stockbars", "page_last_updated": "2026-05-27"},
+      {"fact": "Historical auctions endpoint", "value": "GET https://data.alpaca.markets/v2/stocks/auctions; opening (o) and closing (c) auction prints per day with exchange, price, size and condition; only feed sip is valid; asof as for bars", "url": "https://docs.alpaca.markets/reference/stockauctions-1", "page_last_updated": "2026-05-27"},
+      {"fact": "Symbol mapping timing", "value": "asof mapping is on by default and becomes available on the historical endpoints the day after a rename", "url": "https://docs.alpaca.markets/us/docs/market-data-faq", "page_last_updated": "2026-09-21"}
+    ],
+    "conflicts": [
+      {"topic": "history depth", "detail": "The marketing page https://alpaca.markets/data (no date shown, read 2026-09-25) says '7+ years' for both plans. The docs say 'Since 2016', about 10.7 years at the read date. The user's '9+ years' fits the docs. This protocol uses 2016-01-01 as the documented floor and 2016-01-04, the first SIP daily bar the repository observed (broad-universe/receipt.json), as the first session."},
+      {"topic": "call limit", "detail": "The same marketing page says 'Unlimited API calls' for Algo Trader Plus. The docs say 10,000 per minute, and the X-RateLimit-Limit header read 10000 on this repository's data key on 2026-09-21 (broad-universe/receipt.json) and 2026-09-24 (extreme-gainer-audit/plan.json). The binding limit here is 10,000 per minute."}
+    ],
+    "what_the_plan_changes_for_this_test": "Both plans serve SIP history since 2016, and every window here ends by 2026-09-18, so the plan changes only the call limit for this test. The runner records the X-RateLimit-Limit header it observes; 10000 is consistent with Algo Trader Plus, and 200 would mean the Basic plan."
+  },
+
+  "data_request": {
+    "feed": "sip",
+    "timeframe": "1Day",
+    "adjustments": {
+      "raw": "Unadjusted daily bars and auction prints. Coverage, segmentation and every official close use raw prices.",
+      "split": "Daily bars adjusted for forward and reverse splits only (no dividends or spin-offs). Requested beside raw for every bar request and reported separately, never merged into the raw result."
+    },
+    "history_floor": "2016-01-01",
+    "window_end": "2026-09-18",
+    "page_limit": 10000,
+    "sort": "asc",
+    "pagination": "Follow next_page_token until it is absent. A repeated token, or more than 1,000 pages for one request, is an error for that request.",
+    "session_calendar": "The dates of SPY raw SIP daily bars from 2016-01-01 to 2026-09-18, requested once with the provider-default asof. As in broad-universe, SPY is the session calendar only."
+  },
+
+  "rate_budget": {
+    "verified_plan_limit_per_minute": 10000,
+    "client_cap_per_minute": 5000,
+    "cap_rule": "At most 50% of the verified limit, enforced by a 60-second sliding window. If a response's X-RateLimit-Limit header is lower than 10,000, the cap drops to 50% of that header for the rest of the run.",
+    "headroom_rule": "When X-RateLimit-Remaining falls to 5% of the limit or below, wait until X-RateLimit-Reset (at most 60 seconds) before the next request.",
+    "backoff": "HTTP 429: wait for Retry-After, else until X-RateLimit-Reset, else 2^attempt seconds (each wait bounded to 1-60 seconds); at most 5 retries. HTTP 5xx, timeouts and connection errors: 2^attempt seconds, at most 5 retries. HTTP 400, 404 and 422 are not retried; the item that needed that request is fetch_error, never no data (as in extreme-gainer-audit D7). HTTP 401 or 403 stops the whole run.",
+    "concurrency": 1,
+    "request_ceiling": 12000,
+    "expected_requests": "About 4,100 at most: 1 calendar request; 2 per delisting row that has a ticker (up to 2,472); 2 per collision plus 1 per segment probe (about 1,200); 6 per reused-ticker row (24); 3 per owed audit row (390); plus pagination pages. A run that reaches the ceiling stops as a failure."
+  },
+
+  "fixtures": {
+    "delistings": {
+      "source": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json, produced by blueprints/us-equities/delisting-coverage/collect.py (receipt evidence/receipts/pre-2020-delisting-coverage.json)",
+      "source_sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
+      "row_selection": "documents whose security_class is common_ordinary_equity and whose date_filed year is 2016 to 2019, sorted by (date_filed, accession)",
+      "expected_rows_by_year": {"2016": 378, "2017": 296, "2018": 268, "2019": 294},
+      "expected_rows": 1236,
+      "filing_ids_sha256": "b1b60f7d41d5ce87cb4b0cdacd05eb91548f3b96e44d08aea8b277a82f87a3e3",
+      "filing_ids_rule": "sha256 of the selected accession numbers joined by newlines, in selection order",
+      "known_residuals": "The receipt measures residual classification errors (LP units, REITs classed as funds, fund-named issuers, preference ADS). This protocol uses the list as it is; correcting it is outside this test.",
+      "ticker_gap": "No row carries a ticker. The Form 25-NSE XML has no trading-symbol field (0 of 3,181 documents), and the delisting sample resolved 1 of 40 tickers. Alpaca's data API is keyed by symbol and has no issuer-name or CIK lookup, so tickers must come from a separate map, supplied with --delisting-tickers.",
+      "ticker_map": {
+        "schema": "alpaca-history-fixture/delisting-tickers/1",
+        "shape": "{\"schema\": \"alpaca-history-fixture/delisting-tickers/1\", \"rows\": {\"<accession>\": {\"symbol\": \"<ticker>\", \"provenance\": \"<class>\", \"source_ref\": \"<accession or URL of the source document>\"}}}",
+        "pit_provenance": {
+          "edgar_dei_trading_symbol": "dei:TradingSymbol in an XBRL filing by the same CIK accepted on or before the Form 25 date",
+          "edgar_cover_trading_symbol": "the Section 12(b) 'Trading Symbol(s)' cover-page table of a filing by the same CIK accepted on or before the Form 25 date",
+          "exchange_delisting_notice": "the listing exchange's dated notice that names both the issuer and the symbol"
+        },
+        "non_pit_provenance": {
+          "current_submissions_ticker": "the filer's current tickers from data.sec.gov submissions; not point in time",
+          "name_candidate": "a normalised issuer-name match against an asset list; a candidate, not an identity"
+        },
+        "rules": "Only the classes above are accepted; any other class, an accession outside the fixture or an invalid symbol refuses the whole map. The runner decides pit from the class, not from the file. The map must not be derived from Alpaca bars, which would be circular. Its sha256 is recorded in the receipt; freeze it in a dated commit before the run.",
+        "status_at_freeze": "No map exists in the repository. Without one, every row is no_symbol and no delisting request is made."
+      }
+    },
+    "collisions": {
+      "definition": "blueprints/us-equities/broad-universe/collect_daily.py select_symbols: a non-OTC us_equity symbol that matches the data-symbol pattern and has more than one asset id in the asset master (active and inactive lists)",
+      "source": "the private asset-master snapshot the broad-universe run used (--asset-master ACTIVE.json INACTIVE.json), or that run's private symbol-identities.json (--symbol-identities). The runner cannot fetch an asset master: that endpoint is on the trading host, which it refuses.",
+      "expected": {"symbols": 15418, "collisions": 235, "excluded": {"OTC": 17456, "placeholder_symbol": 418}},
+      "expected_source": "blueprints/us-equities/broad-universe/receipt.json coverage.plan",
+      "rule": "The supplied snapshot must reproduce these counts exactly (with --symbol-identities, the symbol and collision counts). A newer asset master is a different fixture and needs a new protocol version. The receipt records the sha256 of the canonical collision set; asset ids themselves are never published."
+    },
+    "reused_tickers": {
+      "tickers": ["LOGC", "TEN", "BTX", "CBIO"],
+      "source": "the extreme-gainer package's forward-returns CSV (sha256 pinned in extreme-gainer-audit/plan.json), which the runner checks with that audit's own check_inputs",
+      "row_selection": "the one row per ticker whose Ticker is that symbol. The runner refuses unless each has exactly one row with both Computed_Gain_Pct and Gain_Pct_Dataset.",
+      "why": "The package priced these rows from the ticker's later holder: Computed_Gain_Pct is the wrong issuer's move, while Gain_Pct_Dataset is the catalogued event. The audit found that asof set to the event date returns the issuer that traded then (extreme-gainer-audit/README.md).",
+      "privacy": "Event dates and gains stay in the private package; the public receipt names the tickers and their verdicts only."
+    },
+    "audit_owed_rows": {
+      "source": "the private per-event results of extreme-gainer-audit run-20260924b (compare --rules v2), identified by private_results_sha256 in extreme-gainer-audit/evidence/summary-run-20260924b.json",
+      "results_sha256": "7e8b6999f52bfbbf5e45d0bdcbdf681aa119dff5f88d22b9d00e2604c7ce8b82",
+      "summary_sha256": "1712bf738699b3e948252ed29e34fbbefa4453dbf75e154c2235d09db3da166b",
+      "audit_plan_sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+      "row_selection": "events whose v2 verdict is mismatch, recovered_mismatch or package_uncomputed_mismatch",
+      "expected": {"mismatch": 84, "recovered_mismatch": 45, "package_uncomputed_mismatch": 1, "total": 130},
+      "symbol": "the symbol_used the audit recorded for the event",
+      "status_at_freeze": "The results file and the audit snapshot were written on another host and are not on the Mac that wrote this protocol. Without --audit-results this fixture is not_run; it is never re-derived from a new fetch, which would pick the rows after seeing them."
+    }
+  },
+
+  "metrics": {
+    "delisting_coverage": {
+      "request": "per row with a symbol and per adjustment: bars from max(F - 400 calendar days, 2016-01-01) to F + 45 calendar days, asof = F, where F is date_filed",
+      "definitions": {
+        "sF": "index of the first calendar session on or after F",
+        "W": "the up to 252 sessions ending at session sF, clipped at the first session (2016-01-04); clipped rows are counted separately",
+        "R": "the sessions from max(first session of W, first bar) to the last bar"
+      },
+      "row_verdicts_in_order": [
+        ["fetch_error", "a request failed after the retry rules"],
+        ["no_symbol", "the ticker map gives no symbol for the row"],
+        ["no_bars", "the response has no bars"],
+        ["bars_continue_after_event", "a bar later than session sF + 10 (the name kept trading, or the symbol answers for another issuer)"],
+        ["no_recent_bars", "no bar from F - 60 calendar days to F"],
+        ["thin_window", "fewer than min(20, |W|) bars in W"],
+        ["incomplete_window", "bars on fewer than 90% of the sessions in R"],
+        ["covered", "none of the above"]
+      ],
+      "precedent": "The 60-day and 10-session bounds are the ones delisting-coverage/collect.py already used for its sample probe; here the session count comes from the SPY calendar, not weekdays.",
+      "reported": "per year and per adjustment: rows, rows with a symbol, rows with a point-in-time symbol, verdict counts, covered rows, clipped rows, and gate-covered rows (point-in-time symbol and covered on raw)"
+    },
+    "collision_dating": {
+      "requests": "per collision: the literal series, raw and split, from 2016-01-01 to 2026-09-18 with asof '-'; then, per raw segment, one raw probe over the same range with asof = the segment's last bar date",
+      "segments": "Split the literal raw series where more than 10 sessions pass between consecutive bars.",
+      "attribution": "A segment is attributed when its probe has a bar on every segment date with identical o, h, l, c and v.",
+      "entities": "Two segments belong to the same entity when their probe responses are identical (the same dates and values). An entity's tenure on the symbol runs from its first segment's first bar to its last segment's last bar.",
+      "dated_resolved": "Every segment is attributed, no two entities' tenures overlap, and the number of entities equals the number of asset ids for the symbol in the asset master. Fewer entities (an identity whose tenure ended before 2016, or one that never traded in the window) or more entities both leave the collision unresolved.",
+      "unresolved_reasons_in_order": ["fetch_error", "no_bars", "unattributed_segment", "overlapping_tenures", "entity_count_mismatch", "security_type_unavailable"],
+      "security_type": "The gate's title requires a historical security type for each identity. The Market Data API returns no security-type field, so a collision that is dated_resolved is still unresolved under the frozen definition, with reason security_type_unavailable.",
+      "split_basis": "The split literal series is segmented the same way and reported as split_segments_match; it does not change the verdict."
+    },
+    "reused_ticker_issuer": {
+      "requests": "per row: auctions and raw and split bars from D - 12 calendar days to D, asof = D (D is the event date), trying the audit's symbol order (Ticker_Used, then Ticker, then alias) until one has event-date data; then the same three requests with the provider-default asof (the run date) as a control",
+      "gain": "official-close gain under extreme-gainer-audit rules v2 (audit.py event_gain with rules v2: the listing exchange's condition-6 closing print, raw prices, split-corrected when a split falls between the two closes)",
+      "pass": "the asof-D gain agrees with Gain_Pct_Dataset and does not agree with Computed_Gain_Pct",
+      "control": "control_differs is true when the provider-default mapping gives no event-date data or a gain that does not agree with the asof-D gain. It is descriptive only.",
+      "fixture_verdict": "pass when all 4 rows pass; otherwise fail"
+    },
+    "audit_owed_agreement": {
+      "requests": "per row: auctions and raw and split bars from D - 12 calendar days to D, asof = D, for the audit's symbol_used",
+      "tolerance": "the audit's preregistered gain tolerance (extreme-gainer-audit/plan.json tolerance.event_gain): agree when |x - ref| <= max(0.5 percentage points, 0.005 * |ref|). It is a tolerance on the gain, never on a price.",
+      "measures": {
+        "reproduces_audit": "the official-close gain (rules v2) agrees with the audit's own Alpaca gain for the row (alpaca_gain_pct in the results file)",
+        "agrees_package_official": "the official-close gain agrees with the audit reference, package_reference.event_gain (Computed_Gain_Pct when Status is OK, else Gain_Pct_Dataset)",
+        "agrees_package_raw_bar": "the gain from raw daily-bar closes (event day over the previous bar) agrees with the audit reference",
+        "agrees_package_split_bar": "the gain from split-adjusted daily-bar closes agrees with the audit reference"
+      },
+      "fixture_verdict": "reproduced when reproduces_audit holds on at least 95% of the 130 rows and no row is fetch_error; not_evaluable when any row is fetch_error; otherwise drifted",
+      "threshold_basis": "95% mirrors the audit's own 5% overturn share (extreme-gainer-audit/plan.json overturn)."
+    }
+  },
+
+  "gates": {
+    "frozen_source": "catalogs/us-equities/gates-20260922.json, sha256 1062310d9936150f2808929b83ae70e8111880e9e64637cb4e496de0f029e5c6 when this protocol was written. The runner refuses to run if either gate's title, receipt_path or flip_condition below no longer matches that file.",
+    "pre-2020-delisting": {
+      "title": "Delisting coverage before 2020 from an entitled or open dated source",
+      "receipt_path": "evidence/receipts/pre-2020-delisting-coverage.json",
+      "flip_condition": {"type": "equals", "pointer": "/coverage_status", "equals": "confirmed"},
+      "frozen_receipt_schema": "{\"schema_version\": 1, \"coverage_status\": \"confirmed\", \"years_covered\": [2016, 2017, 2018, 2019], \"source\": {\"name\": \"...\", \"kind\": \"entitled\"|\"open\"}}",
+      "what_must_be_shown": "a corrected equity-event list with point-in-time tickers, plus price history through delisting (R1)",
+      "source_kind": "entitled (a paid market-data subscription, personal use)",
+      "pass": "proposed coverage_status is confirmed when, in each year 2016 to 2019, gate-covered rows / fixture rows >= 0.95, where a gate-covered row has a point-in-time symbol and is covered on raw bars, and no row is fetch_error",
+      "not_evaluable": "any fetch_error row, or no delisting request made because no ticker map was supplied",
+      "fail": "otherwise not_confirmed",
+      "threshold_basis": "the same 5% budget as the audit's overturn share",
+      "limits": "A confirmed proposal covers the price-history half only. The gate also needs the corrected event list and a manual qualification; this runner never writes the gate receipt or changes a gate status.",
+      "prediction_at_freeze": "not_evaluable without a ticker map; with one, the SIP daily history is at most since 2016, so rows filed in early 2016 are judged on clipped windows."
+    },
+    "dated-security-identity": {
+      "title": "Dated security identity (listing/delisting dates, historical security type) resolving the 235 asset-master ticker collisions",
+      "receipt_path": "evidence/receipts/dated-security-identity.json",
+      "flip_condition": {"type": "equals", "pointer": "/unresolved_collisions", "equals": 0},
+      "frozen_receipt_schema": "{\"schema_version\": 1, \"collisions_total\": 235, \"unresolved_collisions\": 0, \"source\": \"...\"}",
+      "pass": "proposed unresolved_collisions is 0 and the reused-ticker fixture passes (all of LOGC, TEN, BTX and CBIO resolve to the issuer trading on the event date)",
+      "fail": "otherwise; the receipt also reports undated_collisions (collisions that are not dated_resolved) as partial evidence that does not count toward the gate",
+      "not_evaluable": "any fetch_error collision, no collision fixture supplied, or zero unresolved collisions while the reused-ticker fixture is missing or has a fetch_error",
+      "limits": "The runner never writes the gate receipt or changes a gate status.",
+      "prediction_at_freeze": "fail: the Market Data API carries no historical security type, so unresolved_collisions stays 235 whatever the dating shows. The dating count shows whether Alpaca plus a separate type source could be tested under a new protocol."
+    }
+  },
+
+  "independence": "Alpaca SIP is the extreme-gainer audit's own second source. Agreement or disagreement on the 130 owed rows therefore adjudicates nothing: the overturn rule needs a third source. The package's CSV notes name the Yahoo chart API for rows it could not price (269 of 957 Notes cells mention Yahoo), which suggests Yahoo, not Massive or Polygon, was its price source; that is an inference from notes, not a declared field.",
+
+  "outputs": {
+    "private": "--out-dir, outside the repository (the runner refuses a path inside it), created 0700 with 0600 files: snapshot.json (every response, keyed by request, no credentials) and details.json (per-row and per-symbol results with dates and gains).",
+    "public": "--receipt: counts, verdicts, gate proposals and sha256 values of the protocol, runner, inputs, snapshot and details. No keys, account ids, asset ids, local paths or prices. The runner refuses to write it if a check finds a credential value, a UUID or a home path in it.",
+    "determinism": "evaluate --snapshot recomputes the receipt from the snapshot alone; the same snapshot and inputs give byte-identical output."
+  },
+
+  "deviation_policy": "Any change to a rule, threshold, window or fixture after the first live request is a deviation: record it with its reason and date, run it as a new protocol version, and report it beside the original result, never instead of it.",
+
+  "not_measured": [
+    "OTC names (feed otc is outside this test)",
+    "dividend or spin-off adjustments",
+    "whether the bars match what was published at each historical close (vintages)",
+    "intraday data, halts and extended-hours prints",
+    "third-source adjudication of the 130 owed rows"
+  ]
+}
