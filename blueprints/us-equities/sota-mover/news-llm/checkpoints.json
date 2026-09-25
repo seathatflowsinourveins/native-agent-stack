@@ -1,0 +1,447 @@
+{
+ "schema": "sota-news-llm-checkpoints/1",
+ "retrieved_at": "2026-09-25",
+ "source": "https://huggingface.co/api/models/<repo>/revision/<revision>?blobs=true; non-LFS sha256 computed from https://huggingface.co/<repo>/resolve/<revision>/<file>",
+ "license": "MIT (model card cardData.license); gated=false; private=false",
+ "storage_root": "~/.local/share/native-agent-stack/models/chronogpt-instruct/",
+ "layout": "<storage_root>/<YYYY>1231/<revision>/<file>",
+ "load_policy": {
+  "weights": "torch.load(path, map_location='cpu', weights_only=True, mmap=True); pytorch_model.bin and config.pt are pickles and are never loaded any other way",
+  "config": "config.json (plain JSON) is used; config.pt is downloaded and hash-verified but never unpickled",
+  "code": "ChronoGPT_instruct.py is imported from the verified local file by path after its sha256 matches reviewed_code.sha256; ChronoGPT.from_pretrained (network download plus torch.load without weights_only) is never called; no remote-code loader is used",
+  "network": "HF_HUB_OFFLINE=1 and TIKTOKEN_CACHE_DIR=<storage_root>/tiktoken-cache are set before the first import in the scoring process"
+ },
+ "reviewed_code": {
+  "file": "ChronoGPT_instruct.py",
+  "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+  "identical_across_revisions": true,
+  "review_2026_09_25": [
+   "Module-level imports: os, json, math, torch, torch.nn, torch.nn.functional, typing, huggingface_hub (PyTorchModelHubMixin, hf_hub_download). No exec, eval, compile, subprocess, socket or pickle use at import time.",
+   "Network: only ChronoGPT.from_pretrained calls hf_hub_download; it is not called here.",
+   "Deserialization: from_pretrained uses torch.load without weights_only; not called here. save_pretrained writes files; not called here.",
+   "forward(): pure tensor math (embeddings, RMS norm, rotary, causal scaled_dot_product_attention, ReLU^2 MLP, U-net skip weights, tanh logit soft-cap at 15) under torch.inference_mode; there is no padding mask, so batched inputs are right-padded and read at each sequence's own last position (causal attention keeps earlier positions independent of later padding).",
+   "Rotary buffers are created for max_seq_len=65536 unless the module is built on the meta device; score.py builds on meta and recreates them on the GPU with max_seq_len=2048 (>= the 1,792-token context)."
+  ]
+ },
+ "tokenizer": {
+  "library": "tiktoken encoding 'gpt2' (the upstream tutorial ChronoGPT_instruct_tutorial.ipynb at github.com/LinyingLyu/ChronoGPT commit 2c3bc01ddaf409a6c69932fe6a1b6aaf64d54fb0 uses tiktoken.get_encoding('gpt2'))",
+  "files": {
+   "https://openaipublic.blob.core.windows.net/gpt-2/encodings/main/vocab.bpe": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5",
+   "https://openaipublic.blob.core.windows.net/gpt-2/encodings/main/encoder.json": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783"
+  },
+  "eos_id": 50256,
+  "context_tokens": 1792
+ },
+ "checkpoints": {
+  "2015": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20151231",
+   "revision": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "ca45fe2a94e8a70c438471f4f9b3678299da358392304d135f339d6fa279b932",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2016": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20161231",
+   "revision": "5aec0aacc696f9526e12abe22a3fc96348dfca1d",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "5f0bd6a0d34136343536a19098a577e8166bae8fc2750a2ef79853ff0ab36819",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2017": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20171231",
+   "revision": "5f6b4ab1664bd5e658af44ad6b02183178b81b55",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "aa235c0f1928eeae52dd7633b47ff09837cd6bb4fc0b6a4accf9c1952b0c34c6",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2018": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20181231",
+   "revision": "331c03be137a1a80f1a371232d3d6a9636f6ad9a",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "8199a30afc412cfb6028668806ecb839c5361708a7dd02c7258c1ef87b680648",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2019": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20191231",
+   "revision": "4dfb7817915d07d0ed99815877186f827ec3b88e",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "493e42da2289a91c2237e554ee4eabbe9419f172b3d3e7929c3620c917fe3465",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2020": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20201231",
+   "revision": "f8020c2c939645abbec9caf8a0cdd1d7806cb42a",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "108e25532f5eef2717c5f98464456ef733d7791fee398d94e5c670533de41b8e",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2021": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20211231",
+   "revision": "7f3c7d0dccea060d96dfb89391ef830655b8dbaf",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "93883b81a48a2eb6f18d3dc9595cc1308d76d29576d7a137fe975f834df3a00b",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2022": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20221231",
+   "revision": "f1b8c4eb806a9fe7c26b7e5d30cf003304ed9281",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "f2c0d79e933216b38a6bed5bed001667af0a57a694efcabd26524f6ba7fe8df0",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2023": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20231231",
+   "revision": "2156f3ac9a36916773664266397682b951d43411",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "fbbe820d9a1c3ee4b9a5e3e418da7a4d398286f1f2db689ee537c3e3493ab10e",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  },
+  "2024": {
+   "repo": "manelalab/chrono-gpt-instruct-v1-20241231",
+   "revision": "c162df20666475d125737e030943e18e10b3d91f",
+   "files": {
+    ".gitattributes": {
+     "size": 1519,
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "lfs": false
+    },
+    "ChronoGPT_instruct.py": {
+     "size": 12098,
+     "sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+     "lfs": false
+    },
+    "README.md": {
+     "size": 2676,
+     "sha256": "6b4ffabf37ce97eacd2c208bb5ba5a8598f442b6ec50134835ee513bc03bdb54",
+     "lfs": false
+    },
+    "config.json": {
+     "size": 75,
+     "sha256": "325cbbe0803da6be05637d5b5e8ecd19255c01898fdfa7441925358805b5516c",
+     "lfs": false
+    },
+    "config.pt": {
+     "size": 924,
+     "sha256": "fd361c21702305300c57e0816a0e6e53f9ff0ce6fe988895b8a65ce7d411502f",
+     "lfs": true
+    },
+    "pytorch_model.bin": {
+     "size": 7434295614,
+     "sha256": "47d89294cf162c4d3ba8cace24b7f9246ad9b073d363115bef80523e15f8df73",
+     "lfs": true
+    },
+    "requirements.txt": {
+     "size": 138,
+     "sha256": "7b8d7b91999da5c70f0a6d969a513027f4133104d4f56e55a2fcc2f845af67e0",
+     "lfs": false
+    }
+   }
+  }
+ }
+}

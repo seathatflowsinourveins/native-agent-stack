@@ -1,0 +1,242 @@
+{
+ "schema": "sota-mover-news-llm-protocol/1",
+ "id": "sota-mover-news-llm-20260925",
+ "status": "draft_pending_independent_pre_outcome_review",
+ "frozen_before_outcomes": false,
+ "created_at": "2026-09-25",
+ "base_commit": "636751ae",
+ "evidence_labels": {
+  "SYN": "synthetic fixtures in tests/test_sota_news_llm_*.py",
+  "HIST": "historical archive, market data and model scores collected before the freeze"
+ },
+ "question": "Does the direction a chronologically consistent LLM assigns to a single-company news headline predict that stock's same-session return after realistic costs, entering at the first tradable point after the headline (Lopez-Lira & Tang post-news drift), in US equities 2016-2026?",
+ "why_this_study": "Earlier price-based early-entry studies failed after costs (mover v1 0/768 rule-exits, v2 0/244; a broad price/volume scan found volatility, not direction). A primary-source review ranked LLM headline direction first and rated it plausible: it is the only candidate effect shown to hold outside its model's training window, but it decays and breaks even near 20 bps per round trip. This study removes look-ahead by scoring every headline with a model whose training cutoff precedes it.",
+ "source_paper": {
+  "citation": "Lopez-Lira, A. and Tang, Y., Can ChatGPT Forecast Stock Price Movements? Return Predictability and Large Language Models, arXiv 2304.07619v6 (30 Oct 2025); SSRN 4412788",
+  "facts_confirmed_from_pdf_text": {
+   "data_p13_14": "CRSP common stocks (share codes 10/11) with news matched to RavenPack, relevance score 100, 'event similarity days' > 90, stock-gain/stock-loss headlines excluded, same-day near duplicates (Optimal String Alignment similarity > 0.6) removed; Oct 2021-May 2024; 159,137 firm-headline-date observations, 4,123 firms; 82% overnight.",
+   "model_p16": "gpt-4-0314 (training data to Sep 2021), temperature 0; YES -> 1, UNKNOWN -> 0, NO -> -1.",
+   "prompt_p15": "See scoring.paper_prompt_verbatim.",
+   "timing_p19": "News before 9 a.m. on a trading day: enter at that day's open, exit at that day's close. News after the close: enter at the next open, exit at the next close. Daily rebalanced, equal weight. Footnote 20: at least two firms per leg, otherwise only the other leg is entered.",
+   "table1_p51": "Overnight drift, gross: long-short mean 0.34%/day, Sharpe 2.97, hit rate 58.06%; long 0.08%/day; short-only portfolio mean -0.26%/day (Table 5: N+ 69, N- 20). Intraday drift in Table 1 is measured close-to-next-close (0.50%/day, Sharpe 2.63).",
+   "costs_p20_fig4_p46": "Cumulative return above 300% at 5 bps round trip, above 100% at 10 bps, unprofitable at 20 bps; costs modelled as fixed round-trip bps because trades execute in open/close call auctions.",
+   "decay_p35_fig8_p50": "Annualized Sharpe of the overnight strategy: 6.54 (2021Q4), 3.68 (2022), 2.33 (2023), 1.22 (Jan-May 2024).",
+   "intraday_p22_23_table3_p54": "Headline-level regressions: score coefficient 0.027 (t=1.32) for 1-15 min after release; 0.189 (t=5.12) from 15 min after release to that day's close; 0.116 (t=2.31) close to next close.",
+   "size_p22_p35": "Small-firm interaction 0.404 (t=4.75) for overnight drift; after negative news large caps (top size tercile) show no drift while small caps keep drifting.",
+   "footnote30_p35": "The same-day intraday drift strategy is hard to implement because the number of intraday releases per day, hence position size, is unknown in advance."
+  },
+  "critiques_considered": [
+   "Glasserman & Lin, arXiv 2309.17322: part of the effect is a distraction effect from entity names in the prompt.",
+   "Sarkar & Vafa (ICML 2025): prompting a model to ignore later knowledge does not remove look-ahead.",
+   "Lopez-Lira, Tang & Zhu, arXiv 2504.14765: LLMs memorize financial data, so in-window tests are contaminated.",
+   "Chronologically consistent models avoid look-ahead by construction: ChronoGPT (He, Lv, Manela, Wu; arXiv 2502.21206) and DatedGPT (arXiv 2603.11838). This study uses ChronoGPT-Instruct."
+  ]
+ },
+ "models": {
+  "family": "ChronoGPT-Instruct v1 (manelalab/chrono-gpt-instruct-v1-<YYYY>1231), MIT licence, not gated, about 1.55B parameters (52 layers, dim 1536, 12 heads), context 1,792 tokens, GPT-2 BPE via tiktoken 'gpt2'",
+  "pins_file": "blueprints/us-equities/sota-mover/news-llm/checkpoints.json",
+  "pins_file_sha256": "13423a94490d610f9a7dc4b16503613e38d3896df1db36e6d1bce9f63e4fa1f9",
+  "revisions": {
+   "2015": "5a7f3439fd5d782b3780c366160c43177e6f5eba",
+   "2016": "5aec0aacc696f9526e12abe22a3fc96348dfca1d",
+   "2017": "5f6b4ab1664bd5e658af44ad6b02183178b81b55",
+   "2018": "331c03be137a1a80f1a371232d3d6a9636f6ad9a",
+   "2019": "4dfb7817915d07d0ed99815877186f827ec3b88e",
+   "2020": "f8020c2c939645abbec9caf8a0cdd1d7806cb42a",
+   "2021": "7f3c7d0dccea060d96dfb89391ef830655b8dbaf",
+   "2022": "f1b8c4eb806a9fe7c26b7e5d30cf003304ed9281",
+   "2023": "2156f3ac9a36916773664266397682b951d43411",
+   "2024": "c162df20666475d125737e030943e18e10b3d91f"
+  },
+  "code_sha256": "60af30736d94f8db2be3da7cea5ca045430d33b8aaf384fe953a496380bdb462",
+  "year_mapping": "A headline whose created_at falls in New York calendar year Y is scored by the (Y-1)-12-31 checkpoint; Y >= 2025 uses 2024-12-31. Headlines before 2016 are dropped (no checkpoint strictly before them in the pinned set, and their sessions lack 20 prior daily bars anyway). news_signal.checkpoint_year.",
+  "runtime": "~/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python used read-only (torch 2.13.0+cu130, tiktoken 0.14.0); nothing installed. GPU RTX 5090 Laptop; process capped at 12 GiB by torch.cuda.set_per_process_memory_fraction.",
+  "security": "See checkpoints.json load_policy: weights and config.pt only through torch.load(weights_only=True); ChronoGPT_instruct.py imported from the verified local file after its sha256 matches; from_pretrained and remote-code loaders never used; HF_HUB_OFFLINE=1 and a local TIKTOKEN_CACHE_DIR in the scoring process; every file's sha256 verified at download and weights re-verified at each load.",
+  "numerics": "Weights cast from fp32 to bfloat16 (the forward pass computes in bfloat16 regardless); batched greedy decoding with right padding, prompts sorted by token length; batch-1 agreement measured on a deterministic subset per checkpoint."
+ },
+ "scoring": {
+  "paper_prompt_verbatim": "Forget all your previous instructions. Pretend you are a financial expert. You are a financial expert with stock recommendation experience. Answer “YES” if good news, “NO” if bad news, or “UNKNOWN” if uncertain in the first line. Then elaborate with one short and concise sentence on the next line. Is this headline good or bad for the stock price of company name in the short term?\nHeadline: headline",
+  "operative_template": "Forget all your previous instructions. Pretend you are a financial expert. You are a financial expert with stock recommendation experience. Answer \"YES\" if good news, \"NO\" if bad news, or \"UNKNOWN\" if uncertain in the first line. Then elaborate with one short and concise sentence on the next line. Is this headline good or bad for the stock price of {company} in the short term?\nHeadline: {headline}",
+  "instruct_wrapper": "news_signal.chrono_format: the exact string ChronoGPT_instruct.extract_response() builds: '\\n\\n### Instruction:\\n' + its system prompt + '\\n' + prompt + '\\n\\n### Input:\\n### Response:\\n'",
+  "template_sha256": "see news_signal.TEMPLATE_SHA256 (sha256 of the wrapper applied to the operative template); every score row stores template_sha256 and the prompt_sha256 of its own filled prompt",
+  "company": "news_signal.clean_company_name(asset-master name): security-type tails such as 'Common Stock', 'Class A Common Stock', '(The)' removed",
+  "headline": "news_signal.clean_headline: HTML entities decoded, whitespace collapsed",
+  "decoding": "greedy (argmax; the paper used temperature 0), at most 16 new tokens, stop at EOS (50256) or at the first newline after non-whitespace text",
+  "parse": "news_signal.parse_label: first non-empty line; leading quotes/markdown and an optional 'Answer:'/'Response:' prefix removed; first alphabetic word compared case-insensitively with YES/NO/UNKNOWN -> +1/-1/0; anything else is PARSE_FAIL scored 0 (no position)",
+  "context_overflow": "prompt tokens + 16 > 1,792: not generated, stored as PARSE_FAIL with stop 'context_overflow'",
+  "stored_per_event": ["event_id", "news_id", "symbol", "checkpoint_year", "repo", "revision", "weights_sha256", "code_sha256", "template_sha256", "prompt_sha256", "n_prompt_tokens", "n_new_tokens", "raw_output", "stop", "label", "score", "parse_ok", "batch_size", "dtype", "scored_at"],
+  "no_rescoring_rule": "After the freeze no event is rescored, and no alternative prompt, model, parse rule or decoding setting is evaluated against outcomes of this dataset."
+ },
+ "news": {
+  "archive": "~/.local/state/native-agent-stack/research/data-lake/news/<YYYY>/<MM>/<DD>.jsonl.gz (Alpaca news API, Benzinga), 2015-01-01..2026-09-23; run-header records 2,213,433 records; 2,217,343 lines read on 2026-09-25 (2 repeated ids dropped)",
+  "archive_manifest_sha256": "see prepare receipt inputs.news_manifest_sha256",
+  "symbols_field": "a string holding a list, JSON or Python-literal; parsed with json.loads, else ast.literal_eval (literals only)",
+  "filters_in_order": [
+   "F1 parseable created_at and unique id",
+   "F2 symbols parse to a list; exactly one symbol (relevance proxy)",
+   "F3 symbol resolves to exactly one asset in the 2026-09-21 asset master (active preferred over inactive)",
+   "F4 primary operating company: exchange in NYSE/NASDAQ/AMEX/ARCA/BATS; no .WS/.W/.U/.R/.RT suffix; name does not match the broad-universe fund pattern ETF|ETN|Fund|Trust|Shares|ProShares|Direxion|iShares|SPDR|Index|Portfolio nor the security-type pattern Warrant(s)|Unit(s)|Right(s)|Preferred|Note(s)|Debenture(s)|Depositary|Ordinary Share|Subordinated|Cert.|Certificate(s)|Perpetual",
+   "F5 timing window overnight or RTH (see timing), trade session within 2016-01-04..2026-09-18",
+   "F6 timestamp guard A: updated_at before the window's decision cutoff (overnight: strictly before 09:00 NY on the session; RTH: at or before release + 15 min)",
+   "F7 non-empty headline",
+   "F8 not a price-movement headline (news_signal.MOVEMENT_PATTERNS)",
+   "F9 novelty: no article mentioning the same symbol (any symbol count) with the same normalized headline in the prior 24 h, articles ordered by (created_at, id)",
+   "F10 New York headline year >= 2016",
+   "F11 timestamp guard B: created_at not more than 1 h before the median created_at of the 101 articles centred on it in id order",
+   "F12 liquidity lane from prior-session daily bars (see universe); RTH additionally requires the liquid lane and minute bars for the symbol-year and session <= 2026-08-14",
+   "F13 first headline per (symbol, session, window) by (created_at, id)"
+  ],
+  "timestamp_measurements_pre_freeze": {
+   "updated_minus_created_single_symbol": "n 1,761,588; zero 898,769; <=60 s 835,434; <=15 min 13,326; <=1 h 4,644; <=1 d 7,398; >1 d 2,014; negative 3; p50 0 s, p95 1 s, p99 337 s, p99.9 118,612 s",
+   "id_order_vs_median_of_101_neighbours": "n 2,217,341; created 1 h-1 d before neighbours 35,226; > 1 d before 1,676; > 1 d after 10,010",
+   "guard_A_drops": 5060,
+   "guard_B_drops": 8095
+  }
+ },
+ "timing": {
+  "calendar": "blueprints/us-equities/mover-v3/data/session-calendar.json (XNYS via exchange_calendars 4.13.2, early closes included), sha256 44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c",
+  "rule": "With s the first session whose official close is after the release time t (America/New_York, DST-aware through zoneinfo; weekends, holidays and early closes follow from the calendar): [close(s-1), 09:00 on s) -> overnight, enter at s's official open, exit at s's official close; [09:00, open(s)) -> excluded (paper convention); [open(s), close(s) - 30 min) -> RTH, enter at t + 15 min, exit at s's official close; [close(s) - 30 min, close(s)) -> excluded. Intervals are half-open. news_signal.Calendar.classify.",
+  "sub_windows_reported": "overnight events are labelled pre_open (released on the session date) or post_close (released earlier); both trade identically"
+ },
+ "universe": {
+  "daily_bars": "~/codex-ecosystem/state/broad-market-20260921/dataset/daily.parquet (raw_* columns; 2016-01-04..2026-09-18); only sessions strictly before the trade session are read",
+  "lane_rule": "news_signal.lane_for on the 20 XNYS sessions before the trade session, all of which must have a bar: liquid if the prior session's raw close >= $5 and the median raw close x raw volume >= $20,000,000; small if raw close >= $1 and median >= $2,000,000 and not liquid; otherwise ineligible",
+  "lanes": {"liquid": "primary, confirmatory", "small": "descriptive only, never promoted"},
+  "identity": "Daily bars, auctions and minute bars are keyed by the ticker current on their collection date (provider default asof); news symbols are the tickers as published. Renamed or reused tickers can join a headline to another issuer (limitation L1)."
+ },
+ "prices": {
+  "auctions": "GET https://data.alpaca.markets/v2/stocks/auctions (feed sip) for every event symbol-session, collected before the freeze (collect_auctions.py); raw entries stored",
+  "auction_selection": "news_signal.select_auction_price: (1) auction print (O open / 6 close) at a tape code of the current listing venue (NASDAQ: Q or T; NYSE: N; AMEX: A; ARCA: P; BATS: Z); (2) else the print of the only non-Arca venue with one; (3) else the print of the only venue with one; (4) else the official-price condition (Q open / M close) at the listing venue; else the event is excluded and counted",
+  "rth_entry": "news_signal.rth_entry_minute + pick_entry_bar: open of the first 1-minute SIP bar starting at or after release + 15 min (seconds round up), searching at most 5 minutes; raw minute bars ~/.local/share/native-agent-stack/minute-bars/stage1 (universe A, 2017-01-03..2026-08-14); else excluded and counted",
+  "exit": "official close of the trade session by the auction selection rule, for both windows",
+  "no_adjustment": "entry and exit fall in the same session, so raw prices need no corporate-action adjustment"
+ },
+ "costs": {
+  "notional_usd": 10000,
+  "auction_slippage_bps_per_side": {"liquid": 2.0, "small": 10.0},
+  "auction_slippage_justification": "Market-on-open/close orders fill at the official auction price; a $10,000 order is far below auction size for names with >= $20M median daily dollar volume. 2 bps per side is a stated allowance for fill and impact risk, not a measurement; 10 bps for the descriptive small-cap lane. Break-even costs are reported so any allowance can be compared.",
+  "rth_entry_allowance_bps": 2.0,
+  "rth_half_spread": "adverse half-spread at entry: (ask - bid)/(ask + bid) from the first two-sided uncrossed SIP quote in [entry, entry + 60 s] collected before the freeze (collect_auctions.py spreads); if missing, the median of that symbol-year's measured events, else the median of all measured events, else rth_half_spread_fallback_bps",
+  "rth_half_spread_fallback_bps": 5.0,
+  "fees": {
+   "file": "blueprints/us-equities/mover-v3/data/fees-v3.json",
+   "sha256": "f45bed8b5b826a927716d3122ef9f0d07ce7adcb00028a9a343577f5a2677e3a",
+   "rule": "news_signal.sale_fees_usd on the sale leg (long exit, short entry): SEC Section 31 rate on sale notional plus FINRA TAF per share with its per-trade cap (none when the price is below the per-share rate); Alpaca commission 0",
+   "date_basis": "trade date (the SEC rate's charge date is the settlement date; the difference only matters within two sessions of a rate change)",
+   "before_first_row": "sessions before 2016-02-16 use the earliest SEC row (21.8 $/M; the in-force FY2015 rate was lower, so this is conservative)"
+  },
+  "short_leg": "no borrow fee (positions open and close in the same session); locate availability not modelled (limitation L5)",
+  "net_return": "news_signal.position_net_return: fills moved adversely by the per-side costs, shares = notional / entry fill, P&L net of fees divided by notional"
+ },
+ "portfolios": {
+  "rule": "news_signal.daily_portfolios per window x lane: score +1 long, -1 short, 0 (UNKNOWN or PARSE_FAIL) no position; each leg is the equal-weight mean of its positions' net returns and exists only with >= 2 names; long-short = long leg + short leg when both exist, otherwise the single existing leg (paper footnote 20); days without a leg are absent",
+  "legs_reported": ["long", "short", "long_short"],
+  "tradable_leg": "the long leg is the one a long-only paper account can trade"
+ },
+ "segments": {
+  "overnight_full": {"first_session": "2016-02-02", "last_session": "2026-09-18"},
+  "rth_full": {"first_session": "2017-01-03", "last_session": "2026-08-14"},
+  "recent_24m": {"first_session": "2024-09-19", "last_session": "2026-09-18"},
+  "paper_window": {"first_session": "2021-10-01", "last_session": "2024-05-31"},
+  "justification": "Every headline is scored by a checkpoint whose training cutoff precedes it, and nothing is fitted on returns, so the whole period is out of sample for the scorer and is used once, confirmatorily. overnight_full starts at the first session with 20 prior daily bars; rth_full is the minute-bar coverage. recent_24m tests the documented decay in the regime a paper account would trade now. paper_window is descriptive only (comparison with the paper). Year-by-year results are descriptive."
+ },
+ "items": [
+  {"id": "NEWS-1", "window": "overnight", "lane": "liquid", "leg": "long_short", "segment": "overnight_full", "min_days": 1000, "hypothesis": "mean daily net long-short return > 0"},
+  {"id": "NEWS-2", "window": "overnight", "lane": "liquid", "leg": "long", "segment": "overnight_full", "min_days": 1000, "hypothesis": "mean daily net long-leg return > 0 (the long-only tradable leg)"},
+  {"id": "NEWS-3", "window": "rth", "lane": "liquid", "leg": "long_short", "segment": "rth_full", "min_days": 800, "hypothesis": "mean daily net long-short return > 0 for entries 15 minutes after intraday releases, held to the close"},
+  {"id": "NEWS-4", "window": "overnight", "lane": "liquid", "leg": "long_short", "segment": "recent_24m", "min_days": 250, "hypothesis": "mean daily net long-short return > 0 in the most recent 24 months"}
+ ],
+ "items_justification": "Four items (m=4). The brief's example 'break-even cost >= measured cost' is, under this fixed cost model, the same event as 'mean net return > 0' and would duplicate NEWS-1; it is replaced by NEWS-4, the recent-segment test the documented decay makes decisive. Break-even round-trip costs are reported descriptively for every window x lane x segment.",
+ "inference": {
+  "statistic": "one-sided t of the mean daily net return with a Newey-West (Bartlett) variance",
+  "newey_west_lags": 5,
+  "p_value": "upper-tail standard normal",
+  "multiplicity": "Holm step-down over the four items",
+  "family_alpha": 0.05,
+  "item_pass": "days >= min_days AND Holm-adjusted p <= 0.05 AND mean > 0; days < min_days -> insufficient_sample (not a pass)"
+ },
+ "gates": {
+  "long_only_paper_candidate": "NEWS-2 passes AND the overnight liquid long-leg mean net return in recent_24m is > 0 (point estimate). Otherwise the study does not support a long-only paper strategy.",
+  "long_short_candidate": "NEWS-1 and NEWS-4 both pass.",
+  "rth_candidate": "NEWS-3 passes; the long leg alone is then examined descriptively before any paper design.",
+  "failure_rule": "If no gate is met the result is recorded as a failure of this preregistered specification; no post-hoc prompt, model, threshold, lane or window variant is promoted from this dataset."
+ },
+ "minimum_detectable_effect": {
+  "formula": "MDE = (z_{1-0.05/4} + z_{0.80}) x sigma / sqrt(N) = 3.083 x sigma / sqrt(N) (Holm worst case, one-sided, 80% power; Newey-West inflation ignored)",
+  "sigma_assumptions": "daily sd of the long-short series 1.0% (liquid-only guess) and 1.82% (the paper's Table 1: 0.34% mean at Sharpe 2.97); long leg 1.63% (paper: 0.08% mean at Sharpe 0.78)",
+  "expected_days": "overnight_full about 2,600 (2,673 sessions carry liquid overnight events); rth_full about 2,400 (2,417 sessions); recent_24m about 500",
+  "mde_percent_per_day": {
+   "NEWS-1": {"sigma_1.0": 0.060, "sigma_1.82": 0.110},
+   "NEWS-2": {"sigma_1.63": 0.099},
+   "NEWS-3": {"sigma_1.0": 0.063, "sigma_1.82": 0.115},
+   "NEWS-4": {"sigma_1.0": 0.138, "sigma_1.82": 0.251}
+  },
+  "reading": "The paper's gross 0.34%/day long-short minus about 0.09%/day of modelled costs is detectable in the full segment; an effect decayed to the paper's 2024 level (Sharpe 1.22) may fall below the recent-segment MDE."
+ },
+ "descriptive_only": [
+  "gross and net long, short and long-short for every window x lane x segment, with Sharpe and daily hit rate",
+  "break-even per-position round-trip cost",
+  "year-by-year net long-short",
+  "small-cap lane (never confirmatory)",
+  "paper_window comparison",
+  "exclusion counts (missing prices, labels)",
+  "label distribution and parse-failure rate by checkpoint"
+ ],
+ "deviations": [
+  {"id": "D1", "what": "ChronoGPT-Instruct (1.55B, chronologically consistent) instead of gpt-4-0314", "why": "Removes look-ahead by construction (critiques above); the paper's own Table 5 shows smaller models give weaker signals, so a null here does not refute the GPT-4 result."},
+  {"id": "D2", "what": "Alpaca/Benzinga news with a single-symbol tag as the relevance proxy instead of RavenPack relevance 100", "why": "No RavenPack licence; a single-symbol tag is the nearest available 'predominantly about one firm' signal."},
+  {"id": "D3", "what": "Prompt with ASCII quotes, inside ChronoGPT's instruction wrapper", "why": "The PDF shows typographic quotes that an API prompt would not normally carry; the instruct model is trained on its own wrapper."},
+  {"id": "D4", "what": "Only the first answer line is generated (greedy, <= 16 tokens)", "why": "The paper uses only the label; greedy decoding makes the first line identical to that of a longer generation."},
+  {"id": "D5", "what": "Regex exclusion of price-movement headlines instead of RavenPack stock-gain/stock-loss categories", "why": "Category not available; patterns listed in news_signal.MOVEMENT_PATTERNS and checked by synthetic tests."},
+  {"id": "D6", "what": "Instrument filter from the current asset master (reused broad-universe fund pattern plus a security-type pattern) instead of CRSP share codes 10/11", "why": "No CRSP; the reused pattern keeps the definition consistent with earlier mover studies; the security-type pattern removes warrants, units, rights, preferreds and notes that the fund pattern misses."},
+  {"id": "D7", "what": "First headline per symbol per window instead of aggregating all headlines per firm-day", "why": "A deterministic rule that avoids choosing among later, overlapping headlines; the paper's same-day near-duplicate removal is approximated by the 24 h exact-duplicate rule."},
+  {"id": "D8", "what": "Intraday lane enters 15 min after release and exits at that day's close; releases in the last 30 minutes are excluded", "why": "Matches the paper's significant intraday window (Table 3, 0.189, t=5.12) rather than Table 1's close-to-next-close intraday drift; the 30-minute cutoff keeps at least 15 minutes between entry and close."},
+  {"id": "D9", "what": "Official SIP auction prints and explicit fees plus allowances instead of CRSP open/close and flat 5/10/20 bps", "why": "Measures executable prices and costs for the account that would trade."},
+  {"id": "D10", "what": "Newey-West one-sided tests with Holm over four items", "why": "The paper reports Sharpe ratios and cumulative returns without a preregistered multiplicity rule."},
+  {"id": "D11", "what": "2016-2026 instead of Oct 2021-May 2024", "why": "Chronologically consistent checkpoints make every year out of sample; the paper's window is reported descriptively."},
+  {"id": "D12", "what": "Two timestamp guards (updated_at before the decision cutoff; created_at consistent with id order)", "why": "Alpaca does not guarantee created_at is the publication time and the archive stores the last version of each article."},
+  {"id": "D13", "what": "Checkpoint by New York headline year; 2025-2026 headlines use the 2024-12-31 checkpoint", "why": "Strictly earlier cutoff for every headline; no newer checkpoint is published (gap up to 21 months)."},
+  {"id": "D14", "what": "bfloat16 weights", "why": "The model's forward pass computes in bfloat16 whatever the storage dtype; the upstream tutorial stores fp16."},
+  {"id": "D15", "what": "Batched right-padded greedy decoding", "why": "Throughput; causal attention makes it exact up to floating-point reduction order, and agreement with batch size 1 is measured on a subset."},
+  {"id": "D16", "what": "SEC fee applied by trade date; the earliest SEC row before 2016-02-16", "why": "Charge-date differences are at most two sessions around a rate change; the earliest row overstates the FY2015 rate (conservative)."}
+ ],
+ "limitations": [
+  "L1 Ticker identity: news symbols are as published while daily bars, auctions and minute bars use collection-date tickers; 948 candidates had no daily bars at all and other renamed or reused tickers can join silently to another issuer.",
+  "L2 Company names and exchanges are current (asset master of 2026-09-21), not as of the headline.",
+  "L3 Minute-bar universe A is the per-year top 500 by that year's liquidity (membership uses the whole year's volume, not returns).",
+  "L4 The ChronoGPT-Instruct model card states its instruction data were filtered to pre-2000 content; pretraining is year-bounded per checkpoint.",
+  "L5 The short leg assumes shares can be located and sold short at the open or 15 minutes after release.",
+  "L6 The RTH daily equal-weight normalization uses the day's event count (paper footnote 30); per-event dollar P&L is implementable, the daily percentage is not known in advance.",
+  "L7 News coverage grows over time (18,585 selected events scored by the 2015 checkpoint vs 104,614 by the 2024 checkpoint), so early years carry fewer names per leg.",
+  "L8 Timestamp guards reduce but cannot remove the risk that created_at precedes public availability."
+ ],
+ "pre_freeze_data": {
+  "prepare_receipt": "~/.local/state/native-agent-stack/research/sota-mover/news-llm/prepare-receipt.json (private); committed summary in receipts/prepare-summary.json",
+  "events": {"rows": 448363, "overnight_liquid": 229288, "overnight_small": 96713, "rth_liquid": 122362, "sessions": {"overnight_liquid": 2673, "overnight_small": 2672, "rth_liquid": 2417}},
+  "scoring_status": null,
+  "auctions_status": null,
+  "spreads_status": null
+ },
+ "frozen_inputs": {
+  "events.jsonl.gz": null,
+  "auctions/auctions.jsonl.gz": null,
+  "spreads/quotes.jsonl": null,
+  "scores/scores-20151231.jsonl": null,
+  "scores/scores-20161231.jsonl": null,
+  "scores/scores-20171231.jsonl": null,
+  "scores/scores-20181231.jsonl": null,
+  "scores/scores-20191231.jsonl": null,
+  "scores/scores-20201231.jsonl": null,
+  "scores/scores-20211231.jsonl": null,
+  "scores/scores-20221231.jsonl": null,
+  "scores/scores-20231231.jsonl": null,
+  "scores/scores-20241231.jsonl": null
+ },
+ "freeze_procedure": [
+  "1 finish scoring every event; record label distribution, parse failures and batch-1 agreement in pre_freeze_data",
+  "2 independent pre-outcome review of this protocol and the code at its commit; resolve findings",
+  "3 set status 'frozen' and frozen_before_outcomes true, fill frozen_inputs with the sha256 of each private file (paths relative to the private data root), commit",
+  "4 run evaluate.py --protocol-sha256 <sha256 of the committed protocol.json>; it refuses any other state"
+ ],
+ "no_outcome_statement": "Up to this draft no return, P&L, hit rate or post-decision price change has been computed on real data; see README.md for the exact list of pre-freeze computations."
+}
