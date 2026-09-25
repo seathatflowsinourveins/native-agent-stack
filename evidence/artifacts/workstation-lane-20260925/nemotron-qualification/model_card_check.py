@@ -18,8 +18,9 @@ Modes:
               dimensions, unit norms, intended-first ranking, and the largest
               difference from the 2026-09-21 laptop scores.
   v1-rotated  Discriminating control: the v1 check with the documents rotated by
-              one. The ranking assertion must fail (0/4 intended first). This mode
-              exits 0 only when it does fail.
+              one. As preregistered, it must report exactly 0/4 intended first,
+              so the ranking assertion fails. This mode exits 0 only at 0/4; any
+              other count (1/4 to 4/4) exits 1.
 
 Exit 0 when the mode's bars hold, 1 otherwise.
 """
@@ -139,11 +140,16 @@ def run_v1(base: str, tolerance: float, rotated: bool) -> int:
                "scores": [[round(x, 4) for x in row] for row in scores], "top": order,
                "intended_first": f"{intended_first}/4"}
     if rotated:
+        # preregistration.txt Q4: the rotated check "must report 0/4 intended-first and fail its
+        # ranking assertion". A partial result (1/4 to 3/4) also fails the assertion but is not
+        # the preregistered outcome, so it exits 1.
         ranking_ok = intended_first == 4
+        control_ok = intended_first == 0
         summary["ranking_assertion"] = "pass" if ranking_ok else "fail"
-        summary["control_as_expected"] = not ranking_ok
+        summary["control_required"] = "0/4"
+        summary["control_as_expected"] = control_ok
         print(json.dumps(summary, separators=(",", ":")))
-        return 0 if not ranking_ok else 1
+        return 0 if control_ok else 1
     delta = max_delta(scores, laptop)
     summary["max_abs_delta_to_laptop_20260921"] = round(delta, 4)
     summary["tolerance"] = tolerance
