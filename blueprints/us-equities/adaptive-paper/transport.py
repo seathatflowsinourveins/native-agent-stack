@@ -737,15 +737,33 @@ class GuardedSession:
         # Every order POST must carry a body equal to an envelope registered by
         # submit_enveloped for that client id (order-contract boundary).
         self._envelopes = {}
-        # (broker order id, client order id) of the DELETE the owner is about to send, so
-        # the budget hook can record which order a cancel request was for.
-        self.cancel_expectation = None
+        # (lowercase broker order id, client order id) of the DELETE the owner is about to
+        # send, so the budget hook can record which order a cancel request was for.
+        self._cancel_expectation = None
 
     def expect_submission(self, envelope):
         self._envelopes[envelope["intent"]["client_order_id"]] = envelope
 
     def withdraw_submission(self, client_id):
         self._envelopes.pop(client_id, None)
+
+    def announce_cancel(self, order_id, client_id):
+        try:
+            self._cancel_expectation = (str(order_id).lower(), str(client_id))
+        except Exception:
+            self._cancel_expectation = None
+
+    def withdraw_cancel(self):
+        self._cancel_expectation = None
+
+    def _cancel_client_id(self, path):
+        """The announced client id when `path` is the announced DELETE, else None. Never
+        raises: naming a cancel is metadata and must not stop the DELETE."""
+        try:
+            order_id, client_id = self._cancel_expectation
+            return client_id if path[len("/v2/orders/"):].lower() == order_id else None
+        except Exception:
+            return None
 
     def request(self, method, url, **kwargs):
         method = method.upper()
@@ -785,10 +803,9 @@ class GuardedSession:
                         self.before_send(kwargs.get("json", {}))
                 except Exception:
                     raise SubmissionNotSent("submission prevented before HTTP request") from None
-            elif kind == "cancel" and (expected := self.cancel_expectation) and \
-                    path[len("/v2/orders/"):].lower() == str(expected[0]).lower():
+            elif kind == "cancel" and (named := self._cancel_client_id(path)):
                 # Only the DELETE for the announced broker order carries its client id.
-                self.before_request(kind, client_id=expected[1])
+                self.before_request(kind, client_id=named)
             else:
                 self.before_request(kind)
             kwargs.update(timeout=(5, 5), allow_redirects=False, verify=True, proxies={})
@@ -1443,17 +1460,17 @@ class AlpacaPaperTransport:
                     return None
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
-            # The request log records which owned order this DELETE was for (exact
-            # sim-to-paper cancel pairing); the operation lock keeps it to one DELETE.
-            self._client._session.cancel_expectation = (order["id"], client_order_id)
             try:
+                # The request log records which owned order this DELETE was for (exact
+                # sim-to-paper cancel pairing); the operation lock keeps it to one DELETE.
+                self._client._session.announce_cancel(order["id"], client_order_id)
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
             except Exception as exc:
                 answer = getattr(exc, "status_code", None)
                 if answer not in (404, 422):
                     self.freeze_health("cancellation_unresolved")
             finally:
-                self._client._session.cancel_expectation = None
+                self._client._session.withdraw_cancel()
             # A successful DELETE is only an acknowledgement; query cumulative state.
             final = await self._lookup(client_order_id)
             if final is None:

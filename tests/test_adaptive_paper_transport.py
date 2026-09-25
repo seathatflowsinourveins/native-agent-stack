@@ -284,16 +284,23 @@ class HTTPBoundary(unittest.TestCase):
         self.assertEqual(self.observer.call_args.args[0]["headers"], {"x-ratelimit-limit": "200"})
 
     def test_cancel_budget_names_only_the_announced_order(self):
+        lettered = "abcdef01-2345-4789-abcd-ef0123456789"  # hex letters: case folding is exercised
         other = str(__import__("uuid").UUID(int=2))
-        with patch.object(self.session._session, "request", return_value=response(None, 204)):
-            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + ID)
-            self.session.cancel_expectation = (ID, "trial-1")
+        with patch.object(self.session._session, "request", return_value=response(None, 204)) as sent:
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
+            self.session.announce_cancel(lettered.upper(), "trial-1")
             self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + other)
-            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + ID.upper())
-            self.session.request("GET", t.PAPER_URL + "/v2/orders/" + ID)
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered.upper())
+            self.session.request("GET", t.PAPER_URL + "/v2/orders/" + lettered)
+            # A malformed expectation only drops the name: the DELETE still goes out.
+            self.session._cancel_expectation = 5
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
+            self.session.withdraw_cancel()
+            self.session.request("DELETE", t.PAPER_URL + "/v2/orders/" + lettered)
         self.assertEqual([(c.args, c.kwargs) for c in self.budget.call_args_list],
                          [(("cancel",), {}), (("cancel",), {}), (("cancel",), {"client_id": "trial-1"}),
-                          (("read",), {})])
+                          (("read",), {}), (("cancel",), {}), (("cancel",), {})])
+        self.assertEqual([c.args[0] for c in sent.call_args_list], ["DELETE"] * 3 + ["GET"] + ["DELETE"] * 2)
 
     def test_fill_activities_read_is_allowed_only_filtered_by_one_order(self):
         url = t.PAPER_URL + t.ACTIVITY_FILL_PATH
@@ -573,6 +580,18 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([c.args[0] for c in request.call_args_list], ["DELETE", "GET"])
         self.assertEqual(self.port.health["reasons"], [])
 
+    async def test_a_named_cancel_uses_the_default_owner_deadline_and_freeze(self):
+        # No _owner_timeout/_freeze_timeout override: the 65 s default and the freeze on timeout.
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port, "_on_owner", side_effect=self.port._on_owner) as owner, \
+                patch.object(self.port._client._session._session, "request",
+                             side_effect=[response(None, 204), response(order(status="canceled"))]):
+            await self.port.cancel("trial-1")
+        cancels = [c for c in owner.call_args_list if c.args[1:2] == ("cancel",)]
+        self.assertEqual([(c.args, c.kwargs) for c in cancels],
+                         [((self.port.before_request, "cancel"), {"client_id": "trial-1"})])
+
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])
         with patch.object(self.port._client._session._session, "request") as request:
@@ -591,7 +610,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "DELETE", "GET"])
         # Only the DELETE's budget call names the owned order; the expectation does not outlive it.
         self.assertEqual([c[:2] for c in self.budgets], [("read", None), ("cancel", "trial-1"), ("read", None)])
-        self.assertIsNone(self.port._client._session.cancel_expectation)
+        self.assertIsNone(self.port._client._session._cancel_expectation)
 
     async def test_known_partial_then_invisible_order_still_cancels_known_id(self):
         self.port.adopt_intents([intent()])
@@ -653,7 +672,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                 response(order(status="canceled", updated_at="2026-09-21T15:00:01Z"))]):
             await self.port.cancel("trial-1")
         self.assertIn("cancellation_unresolved", self.port.health["reasons"])
-        self.assertIsNone(self.port._client._session.cancel_expectation)
+        self.assertIsNone(self.port._client._session._cancel_expectation)
 
     async def test_documented_sub_penny_422_is_definitive_once_absent(self):
         # C04: Alpaca documents this body for a price beyond the minimum price variance.

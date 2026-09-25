@@ -275,12 +275,33 @@ class IntegratedRunner(unittest.TestCase):
             controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: now)
             asyncio.run(controller.before_request("cancel", client_id="not-a-durable-intent"))
             asyncio.run(controller.before_request("read"))
+            controller.port = type("Port", (), {"ready": True})()
+            controller.quote({"symbol": "SPY", "bid": "100", "ask": "100.01", "ts_ns": int(now * 1e9)})
+            controller.before_submit({"client_order_id": "named-submit", "symbol": "SPY", "side": "buy",
+                                      "qty": "1", "limit_price": "100.03"})
+            asyncio.run(controller.before_request("submit", client_id="named-submit"))
             self.assertEqual(controller.requests, [
                 {"timestamp": now, "kind": "cancel", "client_id": "not-a-durable-intent"},
-                {"timestamp": now, "kind": "read"}])
+                {"timestamp": now, "kind": "read"},
+                {"timestamp": now, "kind": "submit", "client_id": "named-submit"}])
             rows = ledger.db.execute("SELECT kind, client_id FROM requests ORDER BY id").fetchall()
-            self.assertEqual([tuple(row) for row in rows], [("cancel", None), ("read", None)])
+            self.assertEqual([tuple(row) for row in rows],
+                             [("cancel", None), ("read", None), ("submit", "named-submit")])
             ledger.close()
+
+    def test_simulated_ports_name_the_cancelled_order(self):
+        from mover_simulation import MoverSimulatedPort
+        from simulation import SimulatedPort
+        calls = []
+
+        class Recorder:
+            async def before_request(self, kind, client_id=None):
+                calls.append((kind, client_id))
+        asyncio.run(SimulatedPort(Recorder(), ["SPY"]).cancel("sim-1"))
+        mover = MoverSimulatedPort(Recorder(), ["SPY"], path=lambda symbol, elapsed: None)
+        mover._intents["mover-1"] = {"client_order_id": "mover-1"}
+        asyncio.run(mover.cancel("mover-1"))
+        self.assertEqual(calls, [("cancel", "sim-1"), ("cancel", "mover-1")])
 
     def test_submission_rate_defers_without_waiting_or_selling_held_positions(self):
         from native_adapter import NativeOrderRejected

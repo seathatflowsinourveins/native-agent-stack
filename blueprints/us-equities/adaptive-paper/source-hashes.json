@@ -33,7 +33,7 @@
   "blueprints/us-equities/adaptive-paper/simulation.py": "ae7bdc2b9ca3bfe3a0d91098b836da65dd96b34d9a91f8d407f7add6bf196199",
   "blueprints/us-equities/adaptive-paper/strategies.py": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e",
   "blueprints/us-equities/adaptive-paper/strategies_v1.py": "1952be269694485e12e4d927f124adca0ee29667588d6ac6651caede454c92f7",
-  "blueprints/us-equities/adaptive-paper/transport.py": "b328353e1b14eb4ec5f9cb91af73f2a001f9ed6726ac3d8222b9805f695061bf",
+  "blueprints/us-equities/adaptive-paper/transport.py": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc",
   "tests/_credential_mutation_driver.py": "bfe35e69702016718452ed702aab20a0a33da5723e28a61de513b3c268849301",
   "tests/adaptive_paper_hermetic.py": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
   "tests/test_adaptive_market_research.py": "772b4fd467d4405bd098a440c54de4bfd61f91bbb80693c052077b867f9e2fd6",
@@ -46,10 +46,10 @@
   "tests/test_adaptive_paper_mover_native.py": "15ad37b5901ffac27bffcc1bc3b91f3b04307781de0103f45634b2046c5a9542",
   "tests/test_adaptive_paper_native.py": "d1a78c53fa19a7d13e90fc6f15fa96555f9f7bdf27c21876f6b27f5057d25302",
   "tests/test_adaptive_paper_recovery.py": "08e351ff903d6d008b802dc93a8dde07da8900df5cc0540f551ffa909cf4ce95",
-  "tests/test_adaptive_paper_runner.py": "65322061fb8413ad6ba9bd780c1a800ab12ae34e131b32174858b7ee4df4af33",
+  "tests/test_adaptive_paper_runner.py": "d3179f86e597ce55ac48a6ba92882e8470c1282dfd488c660168117b48292a30",
   "tests/test_adaptive_paper_safety.py": "cbcc6c2387987109f39603e9620c4ad120cb030e4621a1b2678a057a66493632",
   "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",
   "tests/test_adaptive_paper_sessions.py": "b0f32069da4f823ad0ce0bdbba6de98b30bec3d49b3a21582e8b5c7c61cd462b",
   "tests/test_adaptive_paper_strategies.py": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",
-  "tests/test_adaptive_paper_transport.py": "4504d4924ae3cfc57c2cc35702969ff133155e2f60678c65a1a46c87c736050b"
+  "tests/test_adaptive_paper_transport.py": "4390b1857796be40624c74d4faf042e08551db78eaa207b3b46c23e364cb9e1f"
 }

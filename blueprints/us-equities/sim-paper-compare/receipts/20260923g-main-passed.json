@@ -40,7 +40,7 @@
     "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either the host clock or the broker clock is not established by this replay",
     "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)"
   },
-  "completed_utc": "2026-09-25T09:48:33.034659+00:00",
+  "completed_utc": "2026-09-25T10:15:41.948305+00:00",
   "data_provenance": {
     "adjustment": "n/a (quotes)",
     "asof": "2026-09-23",
@@ -1455,13 +1455,13 @@
       }
     ]
   },
-  "runner_sha256": "144abe6bfe03a5218af207538d5a693bb80fa8c27a2e704d1dd91bf0cfd2424d",
+  "runner_sha256": "3d5b4e9d1188709d11127609265a027de9f96d18ade8ae81966fd771f4cc7f11",
   "runtime_environment": {
     "alpaca_py_installed_version": "0.44.0",
     "note": "alpaca-py is installed in this runtime but not used by this script's fetch path (urllib.request directly); recorded for environment reproducibility only."
   },
   "scope": "One retained trial, five order decisions (four filled, one canceled). This is an agreement measurement between one paper session and one deterministic quote-driven replay, not a fill-rate or slippage calibration, and not a claim about any other trial, symbol, session or market regime. The order-4/order-5 timing explanation in the README is a hypothesis consistent with this receipt's data, not a demonstrated broker-side mechanism.",
-  "started_utc": "2026-09-25T09:48:26.413998+00:00",
+  "started_utc": "2026-09-25T10:15:35.366131+00:00",
   "stdout_sha256": "1b901b223399972f1395e7ca2d4cb91230207c4f8d6958436e292cdf7610113d",
   "stdout_sha256_basis": "exact_bytes_written",
   "trial": "20260923g-main-passed",

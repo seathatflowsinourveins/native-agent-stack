@@ -303,12 +303,25 @@ def named_cancel_request_ns(paper_output: dict) -> dict[str, int]:
     """client_order_id -> host-clock time of the *first* cancel request that names it.
     Runners since 2026-09-25 record `client_id` on each cancel request (the owned
     order the DELETE was for); older ledgers have none, and this returns {}. A retried
-    cancel keeps its first request, the instant the cancel was initiated."""
-    named = {}
+    cancel keeps its first request, the instant the cancel was initiated. Submit
+    entries also carry `client_id` and are never read here."""
+    return cancel_request_names(paper_output)[0]
+
+
+def cancel_request_names(paper_output: dict) -> tuple[dict[str, int], dict[str, int], int]:
+    """(first named cancel request ns per client_order_id, named cancel request count per
+    client_order_id, count of cancel requests that name no order)."""
+    first, counts, unnamed = {}, {}, 0
     for request in sorted(paper_output.get("requests", []), key=lambda r: r["timestamp"]):
-        if request.get("kind") == "cancel" and request.get("client_id"):
-            named.setdefault(request["client_id"], epoch_seconds_to_ns(request["timestamp"]))
-    return named
+        if request.get("kind") != "cancel":
+            continue
+        client_id = request.get("client_id")
+        if not client_id:
+            unnamed += 1
+            continue
+        first.setdefault(client_id, epoch_seconds_to_ns(request["timestamp"]))
+        counts[client_id] = counts.get(client_id, 0) + 1
+    return first, counts, unnamed
 
 
 def resolve_order_timeout_seconds(ingest_receipt: dict) -> tuple[int, str]:
@@ -409,15 +422,18 @@ def resolve_cancel_timestamps(paper_orders: list[dict], paper_output: dict, orde
     their mutual agreement is not established by this replay and is not assumed."""
     canceled = [o for o in paper_orders if o["status"] == "canceled"]
     canceled_ids = {o["client_order_id"] for o in canceled}
-    named = named_cancel_request_ns(paper_output)
+    named, named_counts, _unnamed = cancel_request_names(paper_output)
     if named:
         # Runners since 2026-09-25 record the owned order each cancel request was for,
         # so every canceled order resolves exactly, or declares its fallback per order.
+        # named_request_count > 1 marks a retried cancel (its first request is used).
         return {order["client_order_id"]: (
-            {"cancel_ts_ns": named[order["client_order_id"]], "source": "recorded_cancel_request_client_id"}
+            {"cancel_ts_ns": named[order["client_order_id"]], "source": "recorded_cancel_request_client_id",
+             "named_request_count": named_counts[order["client_order_id"]]}
             if order["client_order_id"] in named else
             {"cancel_ts_ns": order["submitted_at_ns"] + order_timeout_seconds * 10**9,
-             "source": "submit_plus_order_timeout_seconds_no_named_cancel_request"})
+             "source": "submit_plus_order_timeout_seconds_no_named_cancel_request",
+             "named_request_count": 0})
             for order in canceled}
     cancel_reqs = parse_cancel_request_ns(paper_output)
     resolved = {}
@@ -497,12 +513,17 @@ def clock_provenance(paper_orders: list[dict], paper_output: dict) -> dict:
                                f"({len(orders_sorted)}); correspondence between the two lists cannot be "
                                f"established, so no offsets are reported (a truncated pairing would not be "
                                f"a valid incomplete measurement -- see docstring).")
+    named, named_counts, unnamed = cancel_request_names(paper_output)
+    named_summary = ({"named_cancel_requests": {"requests": sum(named_counts.values()), "orders": len(named),
+                                                "unnamed_requests_ignored": unnamed}} if named else {})
     return {
         "submit_clock_source": "broker-reported (Alpaca order `submitted_at`)",
         "cancel_clock_source": "host clock, captured just before send in adaptive-paper/runner.py's "
-                                "before_request() " + ("(with the owned order's client_order_id)"
-                                                       if named_cancel_request_ns(paper_output)
-                                                       else "(no client_order_id recorded alongside it)"),
+                                "before_request() " + (
+                                    "(each request naming its owned order's client_order_id; a canceled order "
+                                    "with no named request uses submit + order_timeout_seconds on the broker "
+                                    "clock instead)" if named else "(no client_order_id recorded alongside it)"),
+        **named_summary,
         "sip_quote_clock_source": "Alpaca SIP feed timestamps, a third clock whose agreement with either "
                                    "the host clock or the broker clock is not established by this replay",
         "counts_match": counts_match,
