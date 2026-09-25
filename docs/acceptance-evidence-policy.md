@@ -39,6 +39,13 @@ do not replace it with an easier custom demo and call the original requirement
 passed. Local fault injection and integration checks may cover behavior that an
 upstream suite does not exercise, but remain separately labelled.
 
+**Discriminating controls.** A passing check counts as evidence only after it
+has been run at least once with its condition absent (the guard disarmed, the
+input empty, the answer wrong) and failed. Reject a vacuous pass: zero files
+scanned, zero rows compared or zero tests selected, or a verdict computed from
+placeholder verifier output such as a stub, a template value or a verifier that
+never ran. Record such a check as untested, not passed.
+
 ## Preserve the returned result
 
 Freeze the chosen inputs, source/test versions, commands and required outcomes

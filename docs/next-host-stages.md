@@ -50,6 +50,29 @@ and treat the projection as superseded guidance rather than looking for it to ha
    if Windows keeps more than 12 GB free. This replaces the 96 GB proposal in the
    [workstation runtime profile](new-workstation-runtime-profile-20260922.md), which under the
    profiles' own arithmetic would just miss the `headroom` tier.
+
+   Note added 2026-09-25: `sparseVhd=true` has no effect on current WSL. WSL 2.7.14 creates every
+   new VHD non-sparse "while data corruption is being debugged" and prints "Sparse VHD support is
+   currently disabled due to potential data corruption"
+   ([`WslCoreFilesystem.cpp`](https://github.com/microsoft/WSL/blob/2.7.14/src/windows/common/WslCoreFilesystem.cpp#L35-L39)).
+   Making an existing distribution sparse needs
+   `wsl --manage <distro> --set-sparse true --allow-unsafe`
+   ([microsoft/WSL#13075](https://github.com/microsoft/WSL/issues/13075)); this page does not
+   recommend it. To reclaim VHD space instead, run `sudo fstrim -v /` in the distribution, then
+   `wsl --shutdown` and compact its `ext4.vhdx`
+   ([location](https://learn.microsoft.com/en-us/windows/wsl/disk-space#how-to-locate-the-vhdx-file-and-disk-path-for-your-linux-distribution))
+   offline from an elevated prompt: `diskpart` with `select vdisk file="<path>"`,
+   `attach vdisk readonly`, `compact vdisk` and `detach vdisk`, or Hyper-V's
+   `Optimize-VHD -Path <path> -Mode Full`. Both compact only a detached or read-only disk. WSL's
+   own disk-space page uses `diskpart` only to expand a VHD and warns that Windows tools on WSL's
+   `AppData` files can corrupt a distribution, so export or back up the distribution first.
+
+   The workstation's live `%UserProfile%\.wslconfig`, read on 2026-09-25, differs from the
+   projection above: `memory=104GB`, `processors=48`, `swap=24GB`, `networkingMode=mirrored` and
+   `[experimental] autoMemoryReclaim=dropCache`, with no `sparseVhd` (that file records removing it
+   on 2026-09-08 as inert), plus host-specific swap-file, crash-dump and idle-timeout keys. Inside
+   WSL, `nproc` returned 48 and `free -g` 102 GiB of memory and 24 GiB of swap. The projection and
+   its 2026-09-23 decision are left as recorded.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
 3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
    `wsl-workstation-20261015`); this writes the measured report and adds the entry to the

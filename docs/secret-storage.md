@@ -129,9 +129,50 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
    one pair per account, so move that file through your own private channel,
    such as your password manager or an `age`-encrypted file sent out of band.
 4. Add the pointer lines from the previous section to your shell startup file.
-5. Run `git config core.hooksPath scripts/git-hooks` in each clone, and put the
-   pinned gitleaks 8.30.1 on `PATH`: through the WSL native-tools recipe, or
-   Homebrew on macOS. This replaces `.git/hooks` for that clone.
+5. Install the scanner before you enable the hook. The tracked
+   [`scripts/git-hooks/pre-commit`](../scripts/git-hooks/pre-commit) runs
+   whatever `gitleaks` resolves on `PATH`. Enabled first, it refuses every
+   commit while gitleaks is missing, and it scans with no memory, task or time
+   cap while the raw binary comes first on `PATH`. Unbounded gitleaks scans
+   caused the 2026-09-24 memory kills recorded in
+   [`next-host-stages.md`](next-host-stages.md).
+
+   **5a. Install and verify gitleaks 8.30.1 and the guarded launcher.** On
+   Linux/WSL2, install the native binary from the pinned release archive
+   (`gitleaks_8.30.1_linux_x64.tar.gz`, checked against the release's
+   `gitleaks_8.30.1_checksums.txt`; pinned in
+   [`wsl-native-tools/pins.json`](../blueprints/convergence-practice/wsl-native-tools/pins.json)).
+   Then install `ecosystem-bounded-run`, `gitleaks-guarded` and the `gitleaks`
+   link beside them as in
+   [`adoption/tools/README.md`](../adoption/tools/README.md#install-on-a-new-linuxwsl2-host).
+   `gitleaks-guarded` runs `$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1/gitleaks`
+   unless `GITLEAKS_NATIVE` names another path. An install that unpacked the
+   binary to `tools/gitleaks-8.30.1/payload/gitleaks` needs either
+   `GITLEAKS_NATIVE` or the relative link below. The link needs no environment
+   change, so sessions that are already running use it too:
+   ```sh
+   ECO_INSTALL_ROOT="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+   # Only for the payload/ layout:
+   ln -s payload/gitleaks "$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1/gitleaks"
+   # Then, for every layout:
+   command -v gitleaks                 # $ECO_INSTALL_ROOT/bin/gitleaks
+   readlink "$(command -v gitleaks)"   # $ECO_INSTALL_ROOT/bin/gitleaks-guarded
+   gitleaks version                    # 8.30.1; `version` execs the native binary and starts no scan
+   ```
+   On macOS, the bounded front end is `gitleaks-guarded-macos` (same README,
+   macOS section). The hook calls `gitleaks` by name there too, so check what
+   `command -v gitleaks` resolves to: a hook run that reaches the native binary
+   is unbounded.
+
+   **5b. Enable the hook** in each clone, which replaces `.git/hooks` for that
+   clone, and run it once with nothing staged:
+   ```sh
+   git config core.hooksPath scripts/git-hooks
+   scripts/git-hooks/pre-commit; echo "exit=$?"   # "no leaks found", exit=0
+   ```
+   That run shows the hook starts and exits cleanly with the `gitleaks` that
+   5a checked. It scans nothing, so it is not evidence that the scan finds a
+   secret.
 6. Install the user-level guards with the Claude profile tools
    ([`adoption/bootstrap.md`](../adoption/bootstrap.md) step 4a):
    `python3 tools/adoption/install_claude_profile.py --only guard`, then render

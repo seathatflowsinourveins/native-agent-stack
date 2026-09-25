@@ -3309,8 +3309,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "31a96d867d084d1b399f5d6da71544b04a842cbb016bfe56d41235e7cdca4c8c",
-      "bytes": 11269
+      "sha256": "1d9badec2a4e78257984c46256608baa7fe9dacc938f3b496643e75870bbb44a",
+      "bytes": 11857
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3319,8 +3319,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "e6a509cf6453014aa9b296f55f8472437d02fc9259144206ea166396d0373a87",
-      "bytes": 6008
+      "sha256": "36b3cfe309bfd6d53a80ef2cffe287e0a94ff26c00eb876e6bdc38af993058a2",
+      "bytes": 10593
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -3374,8 +3374,8 @@
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "f0bc6d67bb58604925a8e332c30b8fdea9a1da080d06550ba11222b6c9a58675",
-      "bytes": 2432
+      "sha256": "f43c46a7921142390dd29db39c3e1be9c042bfdcc01ddc4ee240689cae88c352",
+      "bytes": 2424
     },
     {
       "path": "adoption/tools/README.md",
@@ -9815,8 +9815,8 @@
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
-      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400",
-      "bytes": 4916
+      "sha256": "0f788bb378728db787f162b1d14009c2033db7b8ce54c59a75ce2d0ebe461e02",
+      "bytes": 5365
     },
     {
       "path": "docs/activation.md",
@@ -10210,13 +10210,13 @@
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
-      "sha256": "b92e8574a165c9ec0b481cca654494c9521a7c47900b1b2023b1b93c3c809ee9",
-      "bytes": 16474
+      "sha256": "eb3f6fd97bdc294991edb2c73c125d934919252db9411eea031337e3267795a0",
+      "bytes": 17430
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "e32fb119c3585a614a11eeb7bb6bc169302ea8e44e455b9212e7dc223f0fd4a9",
-      "bytes": 10963
+      "sha256": "15768bbcdbd2e3683a9c5c3e0c32c57d4932ed2153b76292220a2547255ec536",
+      "bytes": 12815
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -10245,8 +10245,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "3791e7d42de764b8a991b14a158e2ae855586a30cbab3b703ccb657c4e8a2177",
-      "bytes": 26445
+      "sha256": "2f5f6a23f696eacab67ef6a572fa2d001eb3f918efe31e269e762be8fbf24f5b",
+      "bytes": 28786
     },
     {
       "path": "docs/stack.md",
@@ -29375,8 +29375,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "758c725d424541a466a84342b204a180f97f9c110520a352495ec4b4f9924746",
-      "bytes": 19610
+      "sha256": "dad2d0c6f1fac75ec74e28e94a6e9b4938b5da6f3b04695b24b47234481e36c0",
+      "bytes": 20903
     },
     {
       "path": "tests/test_job_recovery.py",
