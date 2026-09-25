@@ -532,6 +532,40 @@ class TextReplaceAndFrozenTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.unit_path.read_text(), self.original_unit_text)
 
+    def test_rollback_reverses_two_chained_text_replace_entries_on_the_same_surface_in_one_txn(self):
+        # Minor finding (round 8), synthetic fixture: no shipped pins-v2 surfaces[] entry gives a
+        # single txn two forward entries on the same path yet (relink's own duplicate-(kind,path)
+        # guard above refuses that specific shape at relink time), so this ledgers them directly
+        # rather than through the CLI -- the same technique several ApplyGateTests/RelinkTests
+        # tests already use for a synthetic crashed/interrupted txn. Round 7's all-entries
+        # pre-check compared every entry independently against today's raw, pre-reversal live
+        # bytes -- correct for one entry per surface, but a false refusal here: the OLDER entry's
+        # own check would compare its own post_sha256 (S1) against the CURRENT live bytes (S2,
+        # since neither entry has been reversed yet), matching neither its own post_sha256 nor
+        # pre_sha256, and refuse a rollback the real reversal loop below would in fact complete
+        # correctly (S2->S1, then S1->S0) -- _rollback_precheck_issues now simulates that same
+        # reverse walk instead.
+        real_root = str(self.tool_root.resolve())
+        backup_dir = self.root / "switch" / "backups" / "chain-1"
+        fields_1, _inverse = switch.op_text_replace(self.root, "units/bar.service", real_root, "MARKER-S1",
+                                                     backup_dir=backup_dir, expected_count=2)
+        ledger = switch.Ledger(self.root)
+        ledger.append(txn="chain-1", op="txn_begin", component="bar", surface="_txn")
+        ledger.append(txn="chain-1", op="text-replace", component="bar", surface="units/bar.service", **fields_1)
+        fields_2, _inverse = switch.op_text_replace(self.root, "units/bar.service", "MARKER-S1", "MARKER-S2",
+                                                     backup_dir=backup_dir, expected_count=2)
+        ledger.append(txn="chain-1", op="text-replace", component="bar", surface="units/bar.service", **fields_2)
+        ledger.append(txn="chain-1", op="verify_pass", component="bar", surface="_txn", to="applied")
+        switch.save_state(self.root)
+        self.assertIn("MARKER-S2", self.unit_path.read_text())
+
+        problems = switch.rollback_txn(self.root, "chain-1")
+        self.assertEqual(problems, [])
+        self.assertEqual(self.unit_path.read_text(), self.original_unit_text,
+                         "both chained entries must be fully reversed back to the original text")
+        reversal_ops = [e["op"] for e in ledger.for_txn("chain-1") if str(e["op"]).startswith("rollback:")]
+        self.assertEqual(reversal_ops.count("rollback:text-replace"), 2)
+
 
 class TildeSurfaceRollbackTests(SwitchFixture):
     """Major finding: resolve_surface_path's own "~" expansion (op_text_replace/op_file_write,
@@ -793,6 +827,120 @@ class ApplyGateTests(SwitchFixture):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("supersed", result.stderr.lower())
         self.assertEqual(self.run_entrypoint(), "v3", "the superseded rollback must never have touched current/foo")
+
+    def test_rollback_refuses_a_relink_performed_after_current_link_already_existed_while_a_later_apply_stands(self):
+        # Major finding (round 8), the reviewer's own repro: a relink performed while current/<id>
+        # already exists only re-links entrypoints/surfaces, never current/<id> itself (relink
+        # links it only when absent), so its own forward entries never include a current/<id>-
+        # setting "link" -- the round-7 gate (the now-removed _txn_sets_current_link) made such a
+        # relink's own rollback invisible to the superseded-txn refusal even while a later,
+        # still-standing apply stood, letting `rollback --txn` on it exit 0 and silently move
+        # bin/foo back to a direct, unindirected target while current/foo -- and the ledger --
+        # still claimed the later apply's version was active.
+        first_relink_txn = next(iter(json.loads(run(self.env, "status", "--json").stdout)["txns"]))
+        # An out-of-band repoint (e.g. a plain bootstrap-linux.sh re-run without --no-link/
+        # --link-dir) undoes setUp's own relink indirection...
+        (self.root / "bin" / "foo").unlink()
+        (self.root / "bin" / "foo").symlink_to(self.root_v1 / "bin" / "foo")
+        # ...and a second `adopt --relink` restores it: current/foo already exists, so this relink
+        # only re-links bin/foo (the normal flow test_recover_closes_a_superseded_crashed_txn_
+        # instead_of_leaving_it_stuck's own tail already exercises, there with no later apply
+        # involved).
+        second_relink = run(self.env, "adopt", "--relink", "--component", "foo")
+        self.assertEqual(second_relink.returncode, 0, second_relink.stderr)
+        state_after_relink = json.loads(run(self.env, "status", "--json").stdout)
+        second_relink_txn = next(t for t in state_after_relink["txns"] if t != first_relink_txn)
+        self.assertEqual(self.run_entrypoint(), "v1")
+
+        self.write_receipt("R1", "foo", "2.0.0")
+        apply_result = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(apply_result.returncode, 0, apply_result.stderr)
+        self.assertEqual(self.run_entrypoint(), "v2")
+
+        result = run(self.env, "rollback", "--txn", second_relink_txn)
+        self.assertNotEqual(result.returncode, 0,
+                            "the second relink must stay refused while the later apply stands")
+        self.assertIn("supersed", result.stderr.lower())
+        self.assertEqual(self.run_entrypoint(), "v2",
+                         "the refused rollback must never have moved bin/foo off current/foo")
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root / "current" / "foo" / "bin" / "foo"),
+                         "bin/foo must still be indirected through current/foo, not the direct root "
+                         "the refused rollback would have restored")
+
+    def test_bare_rollback_stops_at_the_relink_migration_once_every_apply_is_reverted(self):
+        # Minor finding (round 8): once a component has ever had a real apply, a REPEATED bare
+        # `rollback ID` must stay a clean no-op once every apply-type txn is reverted -- never
+        # tunnel on into the one-time relink migration underneath (lifecycle.md: "a second,
+        # redundant rollback ... is a clean no-op"). At 2c3f286b (round 7) the automatic candidate
+        # set still included the relink migration itself (also "applied", also with reversible
+        # link entries), so a repeat bare call kept cascading: current/foo was removed and bin/foo
+        # went back to a direct root, after which apply/relink refuse until someone relinks again
+        # by hand.
+        self.write_receipt("R1", "foo", "2.0.0")
+        applied = self.apply("foo", self.root_v2, "R1")
+        self.assertEqual(applied.returncode, 0, applied.stderr)
+
+        first = run(self.env, "rollback", "foo")
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertEqual(self.run_entrypoint(), "v1")
+
+        repeat = run(self.env, "rollback", "foo")
+        self.assertEqual(repeat.returncode, 0, repeat.stderr)
+        self.assertEqual(json.loads(repeat.stdout)["status"], "already_rolled_back",
+                         "a repeat bare rollback must be a clean no-op, not reach into the relink migration")
+        self.assertEqual(self.run_entrypoint(), "v1", "the relink migration must not have been touched")
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root / "current" / "foo" / "bin" / "foo"),
+                         "bin/foo must still be indirected through current/foo")
+
+        # The relink migration is still reachable explicitly, if an operator genuinely wants it.
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        relink_txn = next(t for t in state["txns"] if t.startswith("relink-foo-"))
+        explicit = run(self.env, "rollback", "--txn", relink_txn)
+        self.assertEqual(explicit.returncode, 0, explicit.stderr)
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root_v1 / "bin" / "foo"),
+                         "an explicit --txn rollback of the relink migration must still work")
+
+    def test_bare_rollback_on_a_never_applied_component_still_targets_its_only_relink(self):
+        # Companion to the test above: a component that has NEVER been applied has no
+        # version-change boundary to respect at all -- its one relink IS the only txn there has
+        # ever been to undo, and the bare form has always been allowed to reach it (see
+        # TildeSurfaceRollbackTests.test_relink_then_rollback_restores_a_tilde_surface_in_place,
+        # which covers the same rule through a ~-rooted surfaces[] entry instead of a plain link).
+        result = run(self.env, "rollback", "foo")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotEqual(json.loads(result.stdout)["status"], "already_rolled_back",
+                            "a component that was only ever relinked must still have its relink "
+                            "reachable through the bare form")
+        self.assertFalse((self.root / "current" / "foo").exists())
+        self.assertEqual(os.readlink(self.root / "bin" / "foo"), str(self.root_v1 / "bin" / "foo"))
+
+    def test_status_reports_current_as_absent_after_rolling_back_the_only_relink(self):
+        # Major finding (round 8): recompute_state's own "current" derivation used to also
+        # require the touching entry's "to" to be non-None, which skipped the update whenever a
+        # current/<id> link's OWN reversal unlinks it entirely (a relink's first-ever forward
+        # entry always has from=None, since current/<id> did not exist before it -- so rolling it
+        # back removes the link rather than repointing it, recorded here as to=None; see
+        # rollback_txn's link branch). "current" then stayed at whatever STALE value it held
+        # before that reversal instead of reflecting that current/<id> no longer exists at all --
+        # contradicting both the live filesystem and lifecycle.md's own promise that state.json
+        # "is always recomputed from this ledger", not a value that lags behind an actual
+        # reversal. (Caught only by tests/test_adoption_switch_model.py: no other CLI-facing test
+        # happened to assert the DERIVED "current" specifically after fully rolling back a
+        # component's only-ever relink -- every other rollback test here always has a later apply
+        # or a second relink to fall back to as "current".)
+        result = run(self.env, "rollback", "foo")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse((self.root / "current" / "foo").exists())
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertIsNone(state["components"]["foo"].get("current"),
+                          "the derived 'current' must reflect the relink's own reversal (current/foo "
+                          "no longer exists), not a stale pre-reversal value")
+
+        # A fresh relink afterward must still correctly re-derive "current" too.
+        relink_again = run(self.env, "adopt", "--relink", "--component", "foo")
+        self.assertEqual(relink_again.returncode, 0, relink_again.stderr)
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["components"]["foo"]["current"], str(self.root_v1.resolve()))
 
     def test_recover_rolls_back_a_crashed_apply_when_nothing_later_superseded_it(self):
         # Crash-then-recover, the ordinary case (coordinator decision, round 5): an apply crashes
@@ -1530,6 +1678,75 @@ class ConfirmAndRevertTests(SwitchFixture):
         self.assertEqual(revert.returncode, 0, revert.stderr)
         self.assertEqual(json.loads(revert.stdout)["status"], "rolled_back")
         self.assertEqual(self.run_entrypoint(), "v1")
+
+    def test_a_same_value_resync_during_the_confirm_window_must_not_block_the_revert_timer(self):
+        # Minor finding (round 8): _superseding_txn used to count ANY later resync as a standing,
+        # forever-superseding event on its own (round 4), even one that merely re-observed the
+        # exact value a still-pending txn itself set (a resync run, out of habit, during an
+        # `apply --confirm-within` window that changes nothing on disk) -- well past the
+        # coordinator's literal rule ("applied/unconfirmed/in_progress"). T's own confirm-or-revert
+        # timer must still be able to revert it: resync never itself changes the live value, so
+        # blocking on it here bought no real safety the entry-level compare-and-swap checks don't
+        # already provide independently for a GENUINELY different out-of-band value (see the
+        # drift-refusal test next to this one).
+        result = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        resync = run(self.env, "adopt", "--resync", "foo", "--reason", "operator re-observed the same value")
+        self.assertEqual(resync.returncode, 0, resync.stderr)
+        self.assertEqual(json.loads(resync.stdout)["observed"], str(self.root_v2.resolve()),
+                         "the resync must have re-observed exactly what T itself set, not a new value")
+
+        revert = run(self.env, "rollback", "--txn", txn, "--if-unconfirmed")
+        self.assertEqual(revert.returncode, 0, revert.stderr)
+        self.assertEqual(json.loads(revert.stdout)["status"], "rolled_back")
+        self.assertEqual(self.run_entrypoint(), "v1")
+
+    def test_a_drifted_confirm_or_revert_refusal_never_leaves_an_intent_marker_that_would_wedge_the_txn(self):
+        # Major finding (round 8), the reviewer's own repro: rollback_txn used to ledger
+        # rollback:intent BEFORE its own all-entries drift pre-check, so a rollback the pre-check
+        # went on to refuse (here, the confirm-or-revert timer's own `--if-unconfirmed` call,
+        # refused by drift) still left that marker behind. The marker is load-bearing: confirm
+        # refuses any txn that carries one (cmd_confirm), and recover's has_incomplete_rollback
+        # stops treating an in_progress txn as a plain crashed apply once it exists -- and neither
+        # the drift nor a standing superseding txn ever resolves itself on a later retry, so a txn
+        # refused this way could never be closed by a retry of rollback/recover: a permanent wedge
+        # (apply/relink on "foo" would exit 75 forever).
+        result = self.apply("foo", self.root_v2, "R1", extra=("--confirm-within", "300"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        txn = json.loads(result.stdout)["txn"]
+
+        # An out-of-band repoint (e.g. a manual ln -sfn) drifts current/foo away from what T
+        # itself set, before the timer ever fires.
+        other_root = self.make_tool_root("foo-9.9.9", "v9")
+        current = self.root / "current" / "foo"
+        current.unlink()
+        current.symlink_to(other_root.resolve())
+
+        fired = run(self.env, "rollback", "--txn", txn, "--if-unconfirmed")
+        self.assertNotEqual(fired.returncode, 0, "the drifted revert must be refused, not silently overwrite it")
+        self.assertIn("no longer matches", fired.stderr)
+
+        entries = switch.Ledger(self.root).for_txn(txn)
+        self.assertFalse(any(e["op"] == "rollback:intent" for e in entries),
+                         "a refused rollback must never leave the load-bearing intent marker behind")
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][txn]["status"], "pending_confirmation",
+                         "the refused rollback must not have changed T's own status at all")
+
+        # The documented operator escape hatch still reaches a clean state from here: accept the
+        # drift, then confirm T (closing its now-moot confirm-or-revert window through the ledger
+        # -- confirm never itself claims T's own recorded value still matches what is live).
+        resync = run(self.env, "adopt", "--resync", "foo", "--reason", "operator accepted the drift")
+        self.assertEqual(resync.returncode, 0, resync.stderr)
+        confirm = run(self.env, "confirm", "--txn", txn)
+        self.assertEqual(confirm.returncode, 0, confirm.stderr)
+        state = json.loads(run(self.env, "status", "--json").stdout)
+        self.assertEqual(state["txns"][txn]["status"], "applied")
+        recover_result = run(self.env, "recover")
+        self.assertEqual(recover_result.returncode, 0, recover_result.stderr)
+        self.assertEqual(json.loads(recover_result.stdout)["rollback_problems"], [])
 
     def test_a_systemd_run_timeout_rolls_back_immediately_like_a_clean_scheduling_failure(self):
         # Minor finding (round 4): schedule_confirm_or_revert's own systemd-run call had no
