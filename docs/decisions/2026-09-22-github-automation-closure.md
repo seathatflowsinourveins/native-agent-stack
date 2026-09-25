@@ -1221,10 +1221,13 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   `bootstrap-macos` and `bootstrap-macos-brew` all completed as skipped, and `validate-macos` ran
   normally (it has no `needs:`). This would have silently stopped the weekly pinned-download
   re-check and the post-merge/dispatch install smoke.
-- **Measured (after the fix).** *(coordinator to fill in after the fix is pushed: dispatch run id,
-  and confirmation that `changes` still runs only on `pull_request` while `bootstrap-linux`,
-  `bootstrap-macos` and `bootstrap-macos-brew` now complete rather than skip on
-  `workflow_dispatch`.)*
+- **Measured (after the fix).** The coordinator's dispatch run
+  [36086815267](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36086815267)
+  (same command, at `8ec88c1c`) reported `changes` skipped, as intended, since it runs only on
+  `pull_request`. `bootstrap-linux`, `bootstrap-macos`, `bootstrap-macos-brew` and
+  `validate-macos` all ran and completed with `success`. The PR's own `pull_request` runs at
+  `f0bea733` and `8ec88c1c` ran `changes` (bootstrap-relevant paths changed), all three
+  bootstrap jobs and `validate-macos`, and passed.
 - **Static checks.** `tests/test_workflow_hardening.py`'s new `AdoptionBootstrapMacosRequiredTests`
   asserts the `pull_request` trigger carries no `paths:` key, that `validate-macos` has no
   `needs:` and no job-level `if:`, that `bootstrap-linux`/`bootstrap-macos`/`bootstrap-macos-brew`
