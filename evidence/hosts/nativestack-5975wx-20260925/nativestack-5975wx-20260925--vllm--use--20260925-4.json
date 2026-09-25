@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--vllm--use--20260925-4",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3ff521176ea632962843641f45e6e4bdf4f8494a",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "vllm",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "curl -fsS http://127.0.0.1:18231/version && echo && systemctl --user show -p ActiveState -p SubState -p NRestarts -p ExecStart native-stack-embeddings.service | grep -o 'ActiveState=[a-z]*\\|SubState=[a-z]*\\|NRestarts=[0-9]*\\|tools/vllm-[0-9.]*/bin/vllm' | awk '!seen[$0]++' | tr '\\n' ' ' && echo && nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" vllm",
+      "exit": 0,
+      "duration_s": 0.101,
+      "output_sha256": "4ce997f9cf5b8890388168a97fa7ea9be8c23bd2d1ddfe8bafff33fd815475eb",
+      "output_excerpt": "{\"version\":\"0.30.0\"}\nNRestarts=0 tools/vllm-0.30.0/bin/vllm ActiveState=active SubState=running \nNVIDIA GeForce RTX 4090, 24564 MiB, 616.64\nstack ['0.30.0'] winner pins ['0.25.0']\n"
+    },
+    {
+      "cmd": "curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;m=json.load(sys.stdin)['data'][0];print(m['id'],'max_model_len',m['max_model_len'],'root',m['root'])\" ",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_sha256": "ab46ba7b0e0cb6fcf7ceeb1f6cda96f234d51fa864986a869850b26e675b9bb1",
+      "output_excerpt": "nvidia/Nemotron-3-Embed-1B-BF16 max_model_len 4096 root ~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,math,urllib.request as u\ndocs=['passage: restic restore latest --target DIR restores the newest backup snapshot into DIR','passage: Prometheus scrapes metrics from HTTP targets at a fixed interval','passage: Loki indexes log streams by label and stores chunks on the filesystem']\nq='query: how do I recover files from my latest backup?'\nr=u.Request('http://127.0.0.1:18231/v1/embeddings',data=json.dumps({'model':'nvidia/Nemotron-3-Embed-1B-BF16','input':[q]+docs}).encode(),headers={'Content-Type':'application/json'})\nd=sorted(json.load(u.urlopen(r,timeout=60))['data'],key=lambda x:x['index']);v=[x['embedding'] for x in d]\ncos=lambda a,b:sum(x*y for x,y in zip(a,b))/math.sqrt(sum(x*x for x in a)*sum(y*y for y in b))\ns=[round(cos(v[0],e),4) for e in v[1:]]\nprint('dims',len(v[0]),'inputs',len(v),'cosine(query, [backup, prometheus, loki] passages)',s,'best',s.index(max(s)))\nraise SystemExit(0 if s.index(max(s))==0 else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.118,
+      "output_sha256": "db00793e48ea1323378d898fc58dc708bd9407a9b3eef92281c67284b149775d",
+      "output_excerpt": "dims 2048 inputs 4 cosine(query, [backup, prometheus, loki] passages) [0.5844, 0.0588, 0.2269] best 0\n"
+    },
+    {
+      "cmd": "grep PRETTY_NAME /etc/os-release && uname -r && /mnt/c/Windows/System32/wsl.exe --version | tr -d '\\0\\r' | grep -E '^(WSL|Kernel|Windows) version'",
+      "exit": 0,
+      "duration_s": 0.065,
+      "output_sha256": "6fd0eb047e27ead1b578e6f12e34ed88741886309e2aec9d1b5713334fa5114d",
+      "output_excerpt": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\n6.18.33.2-microsoft-standard-WSL2\nWSL version: 2.7.13.0\nKernel version: 6.18.33.2-2\nWindows version: 10.0.26200.9168\n"
+    },
+    {
+      "cmd": "sha256sum evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py evidence/artifacts/workstation-lane-20260925/nemotron-qualification/preregistration.txt && hf version",
+      "exit": 0,
+      "duration_s": 0.174,
+      "output_sha256": "4e897cd59e64930e9165deac4a19b4ef4dbd7da5c3e9c3dbc5b0a66bd4434a36",
+      "output_excerpt": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3  evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py\n70aca9ee6daf99f893cfec7c1aa86084d6bb1312442fcc632e6735310cb08619  evidence/artifacts/workstation-lane-20260925/nemotron-qualification/preregistration.txt\nversion=1.32.0\n"
+    },
+    {
+      "cmd": "root=$(curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;print(json.load(sys.stdin)['data'][0]['root'])\"); HF_HUB_DISABLE_IMPLICIT_TOKEN=1 HF_HUB_DISABLE_TELEMETRY=1 hf cache verify nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"$root\" --format json",
+      "exit": 0,
+      "duration_s": 1.825,
+      "output_sha256": "c30eaa1bb8710abcdef2fefdd341f6f46ebfedf5e2131d4602a20d3a943d7961",
+      "output_excerpt": "{\"repo_id\": \"nvidia/Nemotron-3-Embed-1B-BF16\", \"repo_type\": \"model\", \"checked\": 15, \"path\": \"~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea\"}\nWarning: 33 local file(s) do not exist on the remote repo. Use --fail-on-extra-files for details.\n"
+    },
+    {
+      "cmd": "root=$(curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;print(json.load(sys.stdin)['data'][0]['root'])\"); t=$(mktemp -d); mkdir \"$t/m\"; cp \"$root/README.md\" \"$root/config.json\" \"$t/m/\"; v() { HF_HUB_DISABLE_IMPLICIT_TOKEN=1 HF_HUB_DISABLE_TELEMETRY=1 hf cache verify nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"$t/m\" --format json > \"$t/$1\" 2>&1; echo $?; }; a=$(v copy); printf ' ' >> \"$t/m/config.json\"; b=$(v altered); echo \"control: 2-file copy verify exit $a ($(grep -o '\"checked\": [0-9]*' \"$t/copy\")); same copy with one byte appended to config.json: exit $b ($(grep -o 'Verification failed' \"$t/altered\"))\"; rm -rf \"$t\"; test \"$a\" = 0 && test \"$b\" != 0",
+      "exit": 0,
+      "duration_s": 0.647,
+      "output_sha256": "7545eb33baf08bcf60227402dc011ac1d9a983513dceb00b70302c3f2f3db424",
+      "output_excerpt": "control: 2-file copy verify exit 0 (\"checked\": 2); same copy with one byte appended to config.json: exit 1 (Verification failed)\n"
+    },
+    {
+      "cmd": "\"$HOME/.local/share/codex-ecosystem/tools/vllm-0.30.0/bin/python\" -I evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py v2",
+      "exit": 0,
+      "duration_s": 0.464,
+      "output_sha256": "d0298462dd9bb65df9e421ca813dde8b888d130c3d724513e64dc42a76a5fedd",
+      "output_excerpt": "{\"route\":\"/v2/embed\",\"example_exit\":0,\"executed_sha256\":\"f987636977fd185b\",\"scores\":[[0.8113,0.0255,0.0003,-0.0308],[0.0445,0.6465,-0.0513,0.0386],[-0.0099,-0.0406,0.6472,0.1004],[-0.0221,0.0214,0.1205,0.7688]],\"top\":[0,1,2,3],\"max_abs_delta_to_card_expected\":0.0006,\"tolerance\":0.005,\"pass\":true}\n"
+    },
+    {
+      "cmd": "python3 evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py v1",
+      "exit": 0,
+      "duration_s": 0.136,
+      "output_sha256": "e797563ff5ecb8168a5b606dd3690c378b581a416c0cd6bf4b3d43a49e9c2f56",
+      "output_excerpt": "{\"route\":\"/v1/embeddings\",\"documents\":\"card order\",\"vectors\":8,\"dims\":[2048],\"prompt_tokens\":336,\"norm_range\":[0.9999999,1.0],\"scores\":[[0.811,0.0251,0.0002,-0.031],[0.0448,0.6463,-0.0512,0.0386],[-0.0102,-0.0406,0.647,0.1002],[-0.0221,0.0218,0.1204,0.7689]],\"top\":[0,1,2,3],\"intended_first\":\"4/4\",\"max_abs_delta_to_laptop_20260921\":0.0007,\"tolerance\":0.005,\"pass\":true}\n"
+    },
+    {
+      "cmd": "python3 evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py v1-rotated",
+      "exit": 0,
+      "duration_s": 0.135,
+      "output_sha256": "53e208cf283ce7b7c3b2f6b531bc52fef7c43c6901fb84bea9a369aa7bebe24a",
+      "output_excerpt": "{\"route\":\"/v1/embeddings\",\"documents\":\"rotated by one\",\"vectors\":8,\"dims\":[2048],\"prompt_tokens\":336,\"norm_range\":[1.0,1.0],\"scores\":[[0.0251,0.0003,-0.0311,0.8112],[0.6471,-0.0513,0.0388,0.0446],[-0.0407,0.6468,0.1009,-0.0099],[0.0217,0.1207,0.7694,-0.022]],\"top\":[3,0,1,2],\"intended_first\":\"0/4\",\"ranking_assertion\":\"fail\",\"control_required\":\"0/4\",\"control_as_expected\":true}\n"
+    },
+    {
+      "cmd": "systemctl --user show -p ActiveEnterTimestamp -p DropInPaths -p NRestarts native-stack-embeddings.service\n",
+      "exit": 0,
+      "duration_s": 0.017,
+      "output_sha256": "978388bb8754d5570bf20e0cf0b307ce642019e8bdf777c50610b2656166d0e7",
+      "output_excerpt": "NRestarts=0\nDropInPaths=~/.config/systemd/user/native-stack-embeddings.service.d/override.conf\nActiveEnterTimestamp=Fri 2026-09-25 11:52:14 EDT\n"
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.30.0"
+  },
+  "observed_at_utc": "2026-09-25T17:30:30Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64; the fourth command prints Ubuntu 24.04.5 LTS, the WSL2 kernel and WSL 2.7.13.0), the running vLLM embedding server (GET /version 0.30.0; unit native-stack-embeddings active and running from tools/vllm-0.30.0 with 0 restarts; the eleventh command retains its start time and drop-in) on an NVIDIA GeForce RTX 4090 (24564 MiB, driver 616.64) served nvidia/Nemotron-3-Embed-1B-BF16 from the local model directory at revision c0c9fea (max_model_len 4096). With the ten commands of the 0.25.0 receipt (-2), only the interpreter path in the eighth changed, plus one added unit query: 2048-dimensional embeddings ranked the backup passage first for the restore query; NVIDIA's /v2/embed model-card example ranked 4/4 intended documents first within the 0.005 tolerance of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranked 4/4 first within the 0.005 tolerance of the 2026-09-21 laptop scores; the rotated-document control gave exactly 0/4 as required; and hf cache verify checked 15 files at c0c9fea, while a copy with one byte appended failed with exit 1. Exact cosines and deltas are in the retained outputs; they vary slightly from run to run.",
+  "limitations": [
+    "Example-level qualification: four public model-card queries and four documents. This is not an RTEB or MTEB rerun, not retrieval quality on a real corpus, and not a throughput, latency or long-context measurement. GPU memory used by the server was not measured.",
+    "This does not rerun the laptop receipt's bar for these weights (rtx5090-laptop-20260923 vllm use receipt: ai-memory hybrid retrieval, nDCG@10 +0.078 over all-MiniLM-L6-v2 on 130 pages; evidence/artifacts/local-model-alignment-20260923/). That corpus is a sealed snapshot of the laptop's private ai-memory store, and its query set is not committed. Its winning arm also needed max-model-len 8192, while this server runs 4096 (second command); at 4096 the laptop arm embedded 121/130 pages. This receipt therefore qualifies the weights on this runtime and GPU for the model-card bar only, not the ai-memory embedder configuration.",
+    "The bars follow docs/hf-memory-model-qualification.md (intended documents ranked first, no numeric threshold). The 0.005 tolerance and the rotated-document control come from evidence/artifacts/workstation-lane-20260925/nemotron-qualification/preregistration.txt, written at 2026-09-25T14:34:49Z for the 0.25.0 recordings, before the switch to 0.30.0 at 15:52:14Z; the fifth command prints its sha256 and that of model_card_check.py. Before the first 0.30.0 recording (-3) the ten commands were run once as a dry run; all passed the same bars, but cosines and deltas differ slightly between runs (an independent session saw the laptop delta range from 0.0005 to 0.0009 over 8 runs), so this claim states the bars rather than values.",
+    "The service was already running under its systemd user unit (switched to 0.30.0 at 15:52:14Z by a drop-in that changes only the binary path); this receipt only sent read-only HTTP requests and read local files. hf cache verify queried the Hugging Face Hub's public file list with implicit tokens disabled.",
+    "The foundation semantic-rag winner pin in catalogs/landscape/foundation.json is still 0.25.0, while manifests/stack.json pins 0.30.0 (#260). A receipt counts toward a winner only while its tool_versions entry equals the winner's pin, so this receipt does not count toward the semantic-rag winner until that pin moves through the lane process.",
+    "Recorded from a Claude Code session in a detached git worktree of this repository at origin/main (the catalog_revision). It took over this recording from the session that switched production (evidence/receipts/vllm-030-switch-20260925.json), whose round-2 receipts were deferred by a model-usage limit.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review. This receipt changes no platform_status.",
+    "Supersedes nativestack-5975wx-20260925--vllm--use--20260925-3, which an independent session marked needs_changes: its claim quoted cosines and a laptop delta from the dry run instead of its own retained output, and called the changed command the seventh. -3 is unchanged. Like -3, this receipt follows nativestack-5975wx-20260925--vllm--use--20260925-2 only because the host's production embedding server moved from vLLM 0.25.0 to 0.30.0 on 2026-09-25; -2 remains a correct, independently reviewed record of 0.25.0. The install-stage receipt for 0.30.0 is nativestack-5975wx-20260925--vllm--install--20260925."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:30:30Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Needs changes on point 4 (bound to winner) only: I adequacy-checked all four points, and points 1-3 hold with -3's two issues fixed (every claim clause matches -4's own retained outputs and states bars, not values; the command whose interpreter path changed from -2 is the eighth, with commands 1-7 and 9-10 byte-identical to -2's; the eleventh command backs the 15:52:14Z start and the drop-in, whose ExecStart I read locally and which differs from the base unit only in the binary path; catalog_revision 3ff52117 is origin/main and resolves on GitHub), and I re-ran commands 1-5 and 8-11 (1-based) read-only on this host, all exit 0, with 1, 2, 4, 5 and 11 byte-identical and v2 4/4 within 0.0011, v1 4/4 within 0.0007-0.0009 and the rotated control exactly 0/4 in 6 of 6 runs, but tool_versions vllm 0.30.0 does not pin_match the semantic-rag winner pin 0.25.0, which the receipt discloses correctly and only the lane process can change, and step 8 allows no agree while a point fails, so a fresh receipt should be recorded and reviewed once the pin moves; hf cache verify (commands 6-7) was not re-run because it queries the Hub.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T17:34:55Z",
+      "reviewer": {
+        "identity_sha256": "58bad8b5bb5a0c049db558c97061d5e05d4221930cf0fff4ac032ade62630f60",
+        "model": "claude headless reviewer"
+      }
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm",
+      "runtime_version": "0.30.0",
+      "bars": "Model-card retrieval example, RTX 4090, vLLM 0.30.0, max-model-len 4096: NVIDIA's /v2/embed example ranks 4/4 intended docs first within 0.005 of the card's printed scores; /v1/embeddings with query:/passage: prefixes ranks 4/4 within 0.005 of the 2026-09-21 laptop v1 scores; rotated docs give exactly 0/4; hf cache verify 15 files at c0c9fea. Not the ai-memory hybrid-retrieval bar.",
+      "result": "pass"
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--vllm--use--20260925-3"
+}
