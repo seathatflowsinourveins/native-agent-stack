@@ -3135,8 +3135,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "cf7d756ca57d049dd0f341911d9e7c276cff99a5e4519189a8033812c4869be6",
-      "bytes": 20523
+      "sha256": "ce7e7b16e3ef36c2880d59d17950fa77cefa1c71bc48146100d65779acd6f0ce",
+      "bytes": 21136
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -10256,8 +10256,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "0dd5e4be0115ca2f48f09c4595c6d32d11dd6cc68beb54321316c48ebe00fd8c",
-      "bytes": 82313
+      "sha256": "3e360c1f090aed5b29cdbd934158d0d66904ab958705ca681ec78f5321ab8692",
+      "bytes": 83034
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -30201,13 +30201,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "ab01c9cdb40b57dcfa92b8eb579d4c78c7cce867523f9af4d026bd2f267581f3",
-      "bytes": 175949
+      "sha256": "7ed2ccc82ba384b21657791839ea8a331fa9b7f959f598149da5222b99c49a8a",
+      "bytes": 177396
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "27bb9173a1257ece29d0eb9ab3d5e2845f1c88dad8128ddda4b683387f34e90b",
-      "bytes": 98814
+      "sha256": "464645953be70796181fbc795c9ac7c43349863f8cafa25e8cda97433f9e20c0",
+      "bytes": 107061
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -30216,8 +30216,8 @@
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
-      "sha256": "fdf467de78339e320cb124371ebeda135de16c6253f04fd1214cac6c7715e08d",
-      "bytes": 11159
+      "sha256": "faacd1c9ab418a2b4fb58a22433a88b449f8a10e357cc54222d9bbdbcedf928b",
+      "bytes": 17455
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
@@ -30231,8 +30231,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "1451cb4ffdc7465a52230976d8f8bdff689f358e48e110199cedbed17261f3f1",
-      "bytes": 14423
+      "sha256": "8543c6f90ded7c032c1e6f9c1315682dafdc1c4a08fc91194f844e9db6aa49f6",
+      "bytes": 14762
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
