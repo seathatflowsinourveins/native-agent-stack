@@ -143,7 +143,7 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
     if refusals:
         raise guards.Refused("; ".join(refusals))
     cal = Calendar.from_files(cal_path, amend[AMENDMENT_FILES[0]], freeze_session=freeze_session)
-    fees = Fees.from_files(fee_path, amend[AMENDMENT_FILES[1]], freeze_session=freeze_session)
+    fees = Fees.from_files(fee_path, amend[AMENDMENT_FILES[1]], freeze_session=freeze_session, cal=cal)
     coverage = check_coverage_decision(repo, protocol)
     tip = guards.git(repo, "rev-parse", guards.MAIN)
     from datetime import datetime, timezone

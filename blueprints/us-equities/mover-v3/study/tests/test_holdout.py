@@ -262,9 +262,10 @@ class HoldoutPath(unittest.TestCase):
             self.assertEqual(len(res["holdout_label"]), 3)
             self.assertTrue(all("reported, not applied" in x for x in res["holdout_label"][:2]))
             self.assertEqual([(v["number"], v["scope"]) for v in res["voids_late"]], [(1, "holdout"), (2, "validation")])
-            # Codex P2 (round 13): the read's line records the sessions whose fee rows its exits can use
+            # Codex P2 (round 13): the read's line records the dates whose fee rows its exits can use; review round
+            # 15 (fee-date item): through the T+1 settlement date of its last sale session, last + 5
             reads = [x for x in logs.read_lines(repo / RUN_LOG) if x.get("purpose") == "read"]
-            self.assertEqual([x["fee_span"] for x in reads], [[n0, cal.offset(last2, 5)]] * 2)
+            self.assertEqual([x["fee_span"] for x in reads], [[n0, cal.offset(last2, 6)]] * 2)
             self.assertEqual((res["late_read"], res["void_after_seal"]), (True, []))     # F1; late: the retry
             self.assertEqual(res["labels"]["H3-a"], "underpowered")
             self.assertNotIn("b_lane:filled", res["counts"]["trades_by_arm_status"])
@@ -721,10 +722,11 @@ class OpenList(unittest.TestCase):
             self.assertEqual((repo / ACCESS_LOG).read_text(), "")
 
 
-def _gap_fees(n0):
+def _gap_fees(n0, cal):
     """Fee rows with an SEC Section 31 gap from the session after N0 (cost_model.fees)."""
     from core import costs
-    return costs.Fees(synth.fee_document([("2016-01-01", n0, 8.0)], [("2016-01-01", "2030-12-31", 0.000166, 8.3)]))
+    return costs.Fees(synth.fee_document([("2016-01-01", n0, 8.0)], [("2016-01-01", "2030-12-31", 0.000166, 8.3)]),
+                      cal=cal)
 
 
 def _granted(tmp, purpose, aid, final_count=False):
@@ -763,7 +765,7 @@ class FeeCoverageBeforeFetch(unittest.TestCase):
                         mock.patch.object(holdout, "_fetch_step",
                                           side_effect=lambda *a, **k: fetched.append(a[1]) or {"step": "fetch"}):
                     with self.assertRaisesRegex(holdout.HoldoutRefused, "no governing fee row"):
-                        act(dict(ctx, fees=_gap_fees(ctx["n0_pinned"])), aid, str(Path(tmp) / "snap"), {}, now)
+                        act(dict(ctx, fees=_gap_fees(ctx["n0_pinned"], ctx["cal"])), aid, str(Path(tmp) / "snap"), {}, now)
                     self.assertEqual(fetched, [])
                     act(ctx, aid, str(Path(tmp) / "snap"), {}, now)
                     self.assertEqual(fetched, [purpose])

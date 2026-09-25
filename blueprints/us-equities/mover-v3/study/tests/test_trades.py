@@ -45,7 +45,7 @@ def resolve(ev, arm, ctx, store, quotes_by_symbol, fail=()):
 
 def ctx_for(cal, stage="validation", actions=(), segs=None, mode="read"):
     segs = segs or [("2020-01-02", "2020-12-31")]
-    return Ctx(cal=cal, stage=stage, segs=segs, actions=list(actions), fees=costs.Fees(FEES), cells=CELLS, mode=mode)
+    return Ctx(cal=cal, stage=stage, segs=segs, actions=list(actions), fees=costs.Fees(FEES, cal=cal), cells=CELLS, mode=mode)
 
 
 def book(cal, d, hhmm, bp=10.0, ap=10.02, dt=0.0):
@@ -73,7 +73,7 @@ class Arms(unittest.TestCase):
                               0.02 / 20.02, imp)
         cum_out = FM.cum_dv_at(cal, self.ev["minute"], d[5], cal.at(d[5], "15:55"))
         c_out = costs.per_side(CELLS[costs.cell_key(d[5], cal.at(d[5], "15:55"), exit_mid, cum_out)], 0.02 / 22.02, imp)
-        want = costs.trade_net_return(20_000.0, entry_mid, exit_mid, 1.0, 0.0, c_in, c_out, costs.Fees(FEES), d[5])
+        want = costs.trade_net_return(20_000.0, entry_mid, exit_mid, 1.0, 0.0, c_in, c_out, costs.Fees(FEES, cal=self.cal), d[5])
         self.assertAlmostEqual(tr["nets"]["primary"], want, places=12)
 
     def test_a_intraday_and_b_overnight(self):
@@ -155,7 +155,7 @@ class Arms(unittest.TestCase):
         qs = [book(cal, d[1], "09:35"), book(cal, d[4], "15:59", 11.9, 11.95), book(cal, d[4], "15:59", 11.9, 11.9, dt=30)]
         tr = resolve(self.ev, "b_lane", ctx_for(cal, actions=[merger]), Store(), {"MOVR": qs})
         self.assertEqual((tr["exit"], tr["terminal_booking"]), ("terminal_merger", "merger"))
-        f = costs.Fees(FEES)
+        f = costs.Fees(FEES, cal=self.cal)
         imp = costs.impact(1.0, 0.05, 20_000.0, 5_000_000.0)
         self.assertLess(abs(tr["nets"]["primary"] - (11.9 / 10.01 - 1)), 0.03)
         # review round 12, F6: exactly the net with c_out = 0 and fees on the raw bid (populations.corporate_actions)
@@ -245,7 +245,7 @@ class Round9(unittest.TestCase):
         self.seg = [("2026-11-30", self.cal.offset("2026-11-30", 251))]
 
     def hctx(self, **kw):
-        return Ctx(cal=self.cal, stage="holdout", segs=self.seg, fees=costs.Fees(FEES_2028), cells=CELLS, **kw)
+        return Ctx(cal=self.cal, stage="holdout", segs=self.seg, fees=costs.Fees(FEES_2028, cal=self.cal), cells=CELLS, **kw)
 
     def test_paper_exposure_and_late_sessions_at_the_holdout(self):
         cal, d = self.cal, self.d

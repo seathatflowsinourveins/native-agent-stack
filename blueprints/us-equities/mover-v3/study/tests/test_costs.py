@@ -16,6 +16,15 @@ FEES = synth.fee_document([("2016-10-01", "2017-10-19", 21.80), ("2017-10-20", "
                           [("2016-01-01", "2021-06-30", 0.000119, 5.95)])
 
 
+def fee_cal():
+    """The calendar the fee tests settle on (review round 15, fee-date item)."""
+    return synth.calendar("2015-09-01", "2028-12-29")
+
+
+def fee_table(doc=FEES, lines=(), **kw):
+    return costs.Fees(doc, lines, cal=fee_cal(), **kw)
+
+
 class Table(unittest.TestCase):
     def setUp(self):
         self.cells = costs.load_table(REPO / COST_TABLE["path"])
@@ -76,7 +85,7 @@ class Sizing(unittest.TestCase):
 
 class Fees(unittest.TestCase):
     def test_2017_and_2019_sales_with_the_taf_cap(self):
-        f = costs.Fees(FEES)
+        f = fee_table()
         self.assertAlmostEqual(f.sale_fees("2017-03-01", 1000, 10_000), 21.80 * 0.01 + 0.119)
         self.assertAlmostEqual(f.sale_fees("2019-06-03", 1000, 10_000), 13.00 * 0.01 + 0.119)
         self.assertAlmostEqual(f.sale_fees("2019-06-03", 100_000, 20_000), 13.00 * 0.02 + 5.95)  # capped
@@ -85,28 +94,28 @@ class Fees(unittest.TestCase):
         base = json.loads(json.dumps(FEES))
         base["sec_section31"]["rows"][-1]["to"] = "2026-12-31"
         base["finra_taf_covered_equity"]["rows"][-1]["to"] = "2026-12-31"
-        amended = costs.Fees(base, [
+        amended = fee_table(base, [
             synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31", usd_per_share=0.0002,
                            max_usd_per_trade=10.0),
             synth.fee_line("sec_section31", "2027-01-01", "2027-12-31", usd_per_million=30.0)])
         self.assertAlmostEqual(amended.sale_fees("2027-02-01", 1000, 10_000), 0.30 + 0.2)
         with self.assertRaises(ValueError):
-            costs.Fees(base, [synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31",
-                                             usd_per_share=0.0002)])
+            fee_table(base, [synth.fee_line("finra_taf_covered_equity", "2027-01-01", "2027-12-31",
+                                       usd_per_share=0.0002)])
         # review round 9, F5: a line that starts before the freeze session is refused
         early = synth.fee_line("sec_section31", "2020-01-01", "2020-12-31", usd_per_million=99.0)
         with self.assertRaises(ValueError):
-            costs.Fees(base, [early], freeze_session="2026-10-05")
+            fee_table(base, [early], freeze_session="2026-10-05")
         with tempfile.TemporaryDirectory() as tmp:
             b, a = Path(tmp) / "fees.json", Path(tmp) / "amend.jsonl"
             b.write_text(json.dumps(base))
             a.write_text(json.dumps(early) + "\n")
             with self.assertRaises(ValueError):          # no freeze session: the line cannot apply
-                costs.Fees.from_files(b, a)
+                costs.Fees.from_files(b, a, cal=fee_cal())
             with self.assertRaises(ValueError):
-                costs.Fees.from_files(b, a, freeze_session="2026-10-05")
+                costs.Fees.from_files(b, a, freeze_session="2026-10-05", cal=fee_cal())
         with self.assertRaises(KeyError):
-            costs.Fees(FEES).sale_fees("2021-07-06", 1, 1)
+            fee_table().sale_fees("2021-07-06", 1, 1)
 
 
 class FeeSupersession(unittest.TestCase):
@@ -117,34 +126,93 @@ class FeeSupersession(unittest.TestCase):
         base = json.loads(json.dumps(FEES))
         base["sec_section31"]["rows"][-1]["to"] = None               # open-ended, as pinned
         base["finra_taf_covered_equity"]["rows"][-1]["to"] = None
-        f = costs.Fees(base, [synth.fee_line("sec_section31", "2027-05-14", None, usd_per_million=27.8),
-                              synth.fee_line("sec_section31", "2027-10-01", None, usd_per_million=20.6)],
-                       freeze_session="2026-10-05")
-        self.assertEqual(f.rates("2027-05-13")[0], 13.00)
-        self.assertEqual(f.rates("2027-05-14")[0], 27.8)
+        f = fee_table(base, [synth.fee_line("sec_section31", "2027-05-14", None, usd_per_million=27.8),
+                        synth.fee_line("sec_section31", "2027-10-01", None, usd_per_million=20.6)],
+                 freeze_session="2026-10-05")
+        # T+1 in 2027: a sale on 2027-05-12 settles 2027-05-13, one on 2027-05-13 settles 2027-05-14 (a SEC row is
+        # chosen by the charge date, cost_model.fee_charge_dates)
+        self.assertEqual(f.rates("2027-05-12")[0], 13.00)
+        self.assertEqual(f.rates("2027-05-13")[0], 27.8)
         self.assertEqual(f.rates("2027-10-01")[0], 20.6)          # the latest appended line that covers the date
-        self.assertEqual(f.gaps(["2027-05-14", "2027-10-01"]), [])
+        self.assertEqual(f.gaps(["2027-05-13", "2027-10-01"]), [])
 
     def test_overlapping_base_rows_are_refused_and_gaps_are_named(self):
         bad = json.loads(json.dumps(FEES))
         bad["sec_section31"]["rows"][0]["to"] = "2017-10-20"
         with self.assertRaisesRegex(ValueError, "overlap"):
-            costs.Fees(bad)
-        f = costs.Fees(FEES)                                      # the base ends 2021-06-30
-        self.assertEqual(f.gaps(["2021-06-30", "2021-07-01", "2021-07-02"]), ["2021-07-01", "2021-07-02"])
+            fee_table(bad)
+        f = fee_table()                                                # the base ends 2021-06-30
+        # T+2: a sale on 2021-06-28 settles 2021-06-30; one on 2021-06-29 settles 2021-07-01, after the SEC rows
+        self.assertEqual(f.gaps(["2021-06-28", "2021-06-29", "2021-06-30", "2021-07-01"]),
+                         ["2021-06-29", "2021-06-30", "2021-07-01"])
 
     def test_a_count_or_read_refuses_a_fee_gap_before_it_fetches(self):
         from core import holdout, logs
         cal = synth.calendar(last="2021-12-31")
-        ctx = {"cal": cal, "fees": costs.Fees(FEES)}
-        with self.assertRaisesRegex(holdout.HoldoutRefused, "no governing fee row .first 2021-07-01"):
+        ctx = {"cal": cal, "fees": costs.Fees(FEES, cal=cal)}
+        with self.assertRaisesRegex(holdout.HoldoutRefused, "no governing fee row .first 2021-06-29"):
             holdout.require_fee_coverage(ctx, ["2021-06-25", "2021-07-09"])
-        holdout.require_fee_coverage(ctx, ["2021-06-01", "2021-06-30"])
+        holdout.require_fee_coverage(ctx, ["2021-06-01", "2021-06-28"])
         # a '_fetch' line's dates are a first use: no fee line for them can be added between seal and evaluation
         line = {"stage": "holdout", "purpose": "read_fetch", "utc_start": "2021-07-12T21:00:00Z",
                 "sessions": ["2021-06-01", "2021-06-30"], "fee_span": ["2021-06-01", "2021-07-08"]}
         use = logs.fee_first_use([{"kind": "sec_section31", "from": "2021-07-01", "to": "2021-12-31"}], [line])
         self.assertIn(0, use)
+
+
+class ChargeDates(unittest.TestCase):
+    """Review round 15, fee-date item: the SEC Section 31 row is the one in force on the sale's charge date, its
+    settlement date under the cycle in force on its trade date (T+3 before 2017-09-05, T+2 from then, T+1 from
+    2024-05-28), counted in settlement days (sessions that are not Columbus Day or Veterans Day); the FINRA TAF row is
+    the one in force on the trade date. At e7529b47 both rows were chosen by the trade date."""
+
+    def setUp(self):
+        from core.calendar import Calendar
+        data = Path(__file__).resolve().parents[2] / "data"
+        self.cal = Calendar.from_files(data / "session-calendar.json")
+        self.f = costs.Fees.from_files(data / "fees-v3.json", data / "fees-v3-amendments.jsonl", cal=self.cal)
+
+    def test_settlement_cycles_and_their_transitions(self):
+        sd = lambda d: costs.settlement_date(self.cal, d)    # noqa: E731
+        self.assertEqual(sd("2017-06-28"), "2017-07-03")      # T+3
+        self.assertEqual(sd("2017-06-29"), "2017-07-05")      # T+3 across Independence Day
+        self.assertEqual(sd("2017-09-01"), "2017-09-07")      # the last T+3 trade, across Labor Day
+        self.assertEqual(sd("2017-09-05"), "2017-09-07")      # the first T+2 trade (SEC statement 2017-163)
+        self.assertEqual(sd("2024-05-24"), "2024-05-29")      # the last T+2 trade, across Memorial Day
+        self.assertEqual(sd("2024-05-28"), "2024-05-29")      # the first T+1 trade (compliance date)
+        self.assertEqual(sd("2018-11-09"), "2018-11-14")      # T+2 across Veterans Day observed on 2018-11-12
+        self.assertEqual(sd("2027-10-08"), "2027-10-12")      # T+1 across Columbus Day 2027-10-11
+        self.assertEqual(sd("2017-07-04"), None)              # not a session
+        self.assertEqual(costs.bank_only_holidays(2018), frozenset({"2018-10-08", "2018-11-12"}))
+        self.assertEqual(costs.bank_only_holidays(2017), frozenset({"2017-10-09"}))   # Nov 11 on a Saturday
+
+    def test_sec_rows_cross_on_the_settlement_date_and_taf_rows_on_the_trade_date(self):
+        sec = lambda d: self.f.rates(d)[0]                   # noqa: E731
+        self.assertEqual(sec("2017-06-28"), 21.80)            # settles 2017-07-03, before the 2017-07-04 row
+        self.assertEqual(sec("2017-06-29"), 23.10)            # settles 2017-07-05 (by trade date: 21.80)
+        self.assertEqual(sec("2020-02-12"), 20.70)            # settles 2020-02-14
+        self.assertEqual(sec("2020-02-13"), 22.10)            # settles 2020-02-18, the row's first day
+        self.assertEqual(sec("2024-05-17"), 8.00)             # settles 2024-05-21
+        self.assertEqual(sec("2024-05-20"), 27.80)            # settles 2024-05-22 (by trade date: 8.00)
+        self.assertEqual(sec("2021-02-22"), 22.10)            # settles 2021-02-24
+        self.assertEqual(sec("2021-02-23"), 5.10)             # settles 2021-02-25, the row's first day
+        taf = lambda d: self.f.rates(d)[1:]                  # noqa: E731
+        self.assertEqual(taf("2021-12-31"), (0.000119, 5.95))  # by trade date, though it settles in 2022
+        self.assertEqual(taf("2022-01-03"), (0.000130, 6.49))
+        self.assertEqual(taf("2026-09-30"), (0.000195, 9.79))  # the last trade date before the TAF pause
+        self.assertEqual(taf("2026-10-01"), (0.0, 0.0))
+
+    def test_no_base_sec_boundary_depends_on_a_bank_only_holiday(self):
+        """The settlement-day rule decides a row only where a SEC row starts within k settlement days after a bank
+        holiday the exchange keeps open; no row of the committed file does, so the pinned rows' selection is the
+        same with or without it (a later amendment line is dated by the same rule)."""
+        doc = json.loads((Path(__file__).resolve().parents[2] / "data" / "fees-v3.json").read_text())
+        for row in doc["sec_section31"]["rows"][1:]:
+            start = row["from"]
+            first = self.cal.next_on_or_after(start)
+            window = self.cal.range(self.cal.offset(first, -4), first)
+            hol = {h for d in window for h in costs.bank_only_holidays(int(d[:4]))}
+            self.assertFalse(hol & set(window), start)
 
 
 class PinnedDataFiles(unittest.TestCase):
@@ -156,14 +224,15 @@ class PinnedDataFiles(unittest.TestCase):
     DATA = Path(__file__).resolve().parents[2] / "data"
 
     def test_the_committed_fee_file_loads_and_covers_every_development_and_validation_sale(self):
-        f = costs.Fees.from_files(self.DATA / "fees-v3.json", self.DATA / "fees-v3-amendments.jsonl")
+        from core.calendar import Calendar
+        cal = Calendar.from_files(self.DATA / "session-calendar.json")
+        f = costs.Fees.from_files(self.DATA / "fees-v3.json", self.DATA / "fees-v3-amendments.jsonl", cal=cal)
         cases = {"2017-01-03": (21.80, 0.000119, 5.95), "2017-07-05": (23.10, 0.000119, 5.95),
                  "2019-06-03": (20.70, 0.000119, 5.95), "2020-12-31": (22.10, 0.000119, 5.95),
                  "2022-05-16": (22.90, 0.000130, 6.49), "2026-10-01": (20.60, 0.0, 0.0),
-                 "2031-06-02": (20.60, 0.000249, 12.5)}                  # both open-ended last rows
+                 "2030-12-30": (20.60, 0.00024, 12.05)}                  # the open-ended SEC row
         for day, want in cases.items():
             self.assertEqual(f.rates(day), want, day)
-        cal = synth.calendar("2015-09-01", "2021-06-30")
         # a development sale is booked from the first development entry through E+5 of the last validation trade
         days = cal.range("2017-01-03", cal.offset("2020-12-31", 12))
         self.assertEqual(f.gaps(days), [])
@@ -173,16 +242,16 @@ class PinnedDataFiles(unittest.TestCase):
                "finra_taf_covered_equity_sales": [{"from": "2016-01-01", "to": "2030-12-31", "usd_per_share": 0.0001,
                                                    "max_per_trade": 5.0}]}
         with self.assertRaises(costs.FeeSchemaError):
-            costs.Fees(old)
+            fee_table(old)
         doc = json.loads((self.DATA / "fees-v3.json").read_text())
         doc["sec_section31"]["unit"] = "US dollars per thousand dollars"          # a unit change is refused
         with self.assertRaises(costs.FeeSchemaError):
-            costs.Fees(doc)
+            fee_table(doc)
 
 
 class NetReturn(unittest.TestCase):
     def test_formula_on_a_small_table(self):
-        f = costs.Fees(FEES)
+        f = fee_table()
         # N = 10000 / 10 = 1000 shares; exit mid 11; c_in 0.01; c_out 0.02; F 1; cash 0
         net = costs.trade_net_return(10_000, 10.0, 11.0, 1.0, 0.0, 0.01, 0.02, f, "2019-06-03")
         fees = 13.0 * 11_000 / 1e6 + min(0.000119 * 1000, 5.95)

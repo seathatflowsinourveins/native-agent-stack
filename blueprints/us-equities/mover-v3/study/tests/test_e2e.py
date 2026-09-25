@@ -46,7 +46,7 @@ def build_market(cal, extra_dev_event=False):
 
 
 def spec_for(cal, symbols):
-    return ST.StageSpec(stage="validation", cal=cal, symbols=symbols, actions=[], fees=costs.Fees(FEES), cells=CELLS)
+    return ST.StageSpec(stage="validation", cal=cal, symbols=symbols, actions=[], fees=costs.Fees(FEES, cal=cal), cells=CELLS)
 
 
 class EndToEnd(unittest.TestCase):

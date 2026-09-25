@@ -4,7 +4,7 @@ are equal, as for the parameters. data-pins.json named no line format; the parse
 base files (a fee line's 'rate' and 'max_per_trade' against the base rows' usd_per_million and max_usd_per_trade).
 
 A calendar line removes one session of the pinned calendar; a fee line sets one rate over an inclusive date range on
-the date basis of its table (cost_model.fees.charge_date). Every line cites a primary source on an official host.
+the date basis of its table (cost_model.fee_charge_dates). Every line cites a primary source on an official host.
 """
 from __future__ import annotations
 
@@ -39,12 +39,13 @@ FORMAT = {
     },
     "fee_lines": {
         "file": "data/fees-v3-amendments.jsonl",
-        "sec_section31": {"fields": {"from": "ISO date, inclusive, on the SEC table's date basis (cost_model.fees)",
+        "sec_section31": {"fields": {"from": "ISO date, inclusive, a charge (settlement) date "
+                                             "(cost_model.fee_charge_dates)",
                                      "to": "ISO date, inclusive, or null for an open-ended rate",
                                      "usd_per_million": "a finite number >= 0: US dollars per million dollars of "
                                                         "covered sales, as data/fees-v3.json sec_section31.rows"}},
-        "finra_taf_covered_equity": {"fields": {"from": "ISO date, inclusive, on the TAF table's date basis "
-                                                        "(cost_model.fees)",
+        "finra_taf_covered_equity": {"fields": {"from": "ISO date, inclusive, a trade date "
+                                                        "(cost_model.fee_charge_dates)",
                                                 "to": "ISO date, inclusive, or null for an open-ended rate",
                                                 "usd_per_share": "a finite number >= 0: US dollars per share sold",
                                                 "max_usd_per_trade": "a finite number >= 0: the per-trade cap, as "

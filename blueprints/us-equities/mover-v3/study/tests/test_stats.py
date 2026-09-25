@@ -292,8 +292,9 @@ class Diagnostics(unittest.TestCase):
 
     def test_break_even_multiple(self):
         from core import costs
+        from tests import synth
         from tests.test_costs import FEES
-        f = costs.Fees(FEES)
+        f = costs.Fees(FEES, cal=synth.calendar())
         tr = {"nets": {"primary": None}, "primary_parts": (10_000.0, 10.0, 10.5, 1.0, 0.0, 0.01, 0.01, "2019-06-03")}
         k = ST.break_even_multiple([tr], f)
         self.assertAlmostEqual(costs.trade_net_return(10_000.0, 10.0, 10.5, 1.0, 0.0, k * 0.01, k * 0.01, f, "2019-06-03"),

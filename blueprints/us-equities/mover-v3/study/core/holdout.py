@@ -633,7 +633,7 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
     if fl is None:
         require_fee_coverage(ctx, [n0, last])                                  # review round 14, F2
         return _fetch_step(ctx, "count", auth, bases, snapshot_root, spec_for, "count", enum_date, transports, clock,
-                           now, [n0, last], pins)
+                           now, [n0, last], pins, charge_span(ctx, n0, last))
     enum_date = fl["enumeration_fetch_date"]
     start, status, sha, digest, ext, void, rows = iso_utc(now), "failed", fl["input_snapshot_sha256s"][0], None, \
         None, None, 0
@@ -656,26 +656,42 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
             body = json.loads(path.read_text())
             status, digest, ext, void = "complete", sha256_file(path), body["extension"], body["void"]
         _finish(ctx, authorization_id, start, now, status, sha, rows, digest, [],
-                {"purpose": "count", "sessions": [n0, last], "block": blocks, "extension": ext, "void": void,
+                {"purpose": "count", "sessions": [n0, last], "fee_span": charge_span(ctx, n0, last), "block": blocks,
+                 "extension": ext, "void": void,
                  "enumeration_fetch_date": enum_date, "validation_results_reach_utc": _validation_reach_utc(ctx),
                  **({"replaced_uncited_results_sha256": orphan} if orphan else {})},
                 [sha])
     return {"results_sha256": digest, "extension": ext, "window": [n0, last]}
 
 
-def fee_span(ctx: dict, n0: str, last: str) -> list:
-    """The sessions whose fee rows a read can use (cost_model.fees; review round 13, Codex P2): a trade exits, and
-    pays its sale fees, from N0 through the end of the last terminal-search window, 5 sessions after the last
-    session. core.logs.fee_first_use takes a fee amendment line's first use from this span."""
+def sale_sessions(ctx: dict, n0: str, last: str) -> list:
+    """The trade sessions on which a read's trades can sell (review round 13, Codex P2): from N0 through the end of
+    the last terminal-search window, 5 sessions after the last session."""
     end = ctx["cal"].offset(last, T["search_sessions"])
     return [n0, end or last]
 
 
+def charge_span(ctx: dict, first: str, last_sale: str) -> list:
+    """The dates whose fee rows sales on trade sessions first .. last_sale can use (review round 15, fee-date item):
+    a TAF row by the trade date, a SEC row by the charge (settlement) date, so the span runs to the settlement date
+    of the last sale session (cost_model.fee_charge_dates)."""
+    from core.costs import settlement_date
+    return [first, settlement_date(ctx["cal"], last_sale) or last_sale]
+
+
+def fee_span(ctx: dict, n0: str, last: str) -> list:
+    """The dates whose fee rows a read can use (cost_model.fees; review round 13, Codex P2; review round 15, fee-date
+    item): its sale sessions (sale_sessions) and their charge dates. core.logs.fee_first_use takes a fee amendment
+    line's first use from this span."""
+    return charge_span(ctx, n0, sale_sessions(ctx, n0, last)[1])
+
+
 def require_fee_coverage(ctx: dict, span: list) -> None:
-    """Review round 14, F2: every session a count or read can book (its sessions; for a read, fee_span) has one
-    governing SEC Section 31 row and one FINRA TAF row (cost_model.fees), checked before the action fetches or
-    logs anything. A gap is refused here, so the missing amendment line can still be appended and logged: once a
-    count or read line names these dates, core.logs.fee_first_use refuses a later line for them."""
+    """Review round 14, F2: every trade session a count or read can book (its sessions; for a read, sale_sessions)
+    has one governing SEC Section 31 row at its charge date and one FINRA TAF row (cost_model.fees), checked before
+    the action fetches or logs anything. A gap is refused here, so the missing amendment line can still be appended
+    and logged: once a count or read line names these dates, core.logs.fee_first_use refuses a later line for
+    them."""
     days = ctx["cal"].range(span[0], span[1])
     missing = ctx["fees"].gaps(days)
     if missing:
@@ -847,7 +863,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
                                                                            snapshot_root, fl)
     spec_for = _spec_factory(ctx, n0, last, late, exposed, carried)
     if fl is None:
-        require_fee_coverage(ctx, fee_span(ctx, n0, last))                     # review round 14, F2
+        require_fee_coverage(ctx, sale_sessions(ctx, n0, last))                # review round 14, F2
         return _fetch_step(ctx, "read", auth, bases, snapshot_root, spec_for, "plan", enum_date or iso_utc(now)[:10],
                            transports, clock, now, [n0, last], pins, fee_span(ctx, n0, last))
     # review round 14, Codex P1: the sign comes from the validation results bound to the authorization

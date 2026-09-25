@@ -29,7 +29,7 @@ class CountUnit(unittest.TestCase):
         self.cal = synth.calendar("2026-06-01", "2028-06-30")
         self.n0 = "2026-11-23"
         seg = (self.n0, self.cal.offset(self.n0, 251))
-        self.ctx = Ctx(cal=self.cal, stage="holdout", segs=[seg], fees=costs.Fees(FEES), cells=CELLS, mode="count")
+        self.ctx = Ctx(cal=self.cal, stage="holdout", segs=[seg], fees=costs.Fees(FEES, cal=self.cal), cells=CELLS, mode="count")
 
     def _events(self):
         cal = self.cal
