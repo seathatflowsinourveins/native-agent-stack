@@ -1415,8 +1415,13 @@ What remains and how it is handled:
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
     (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
-    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
-    blind child without the network or a CLI it cannot resolve. Measured
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://`, `local://`, any `unix` scheme (`http+unix://%2F...`)
+    and `https:///` do. Two shapes that voided layers in the wave 20260924 run are exempt too: a bare quoted `'://'`
+    (Python's `'://' in ref`), and a path ending in the regex anchor `$` before `)` or `|` (an rg fragment like
+    `(...|/runner.py$)`). `cat //`, an unquoted `://x`, `/etc/passwd$''` and `'/runner.py$'` stay flagged. A URL reaches nothing from a blind child without the network or a CLI it cannot resolve.
+    Measured the same day, a blind child could create an AF_UNIX socket, but its `connect()` to a probe-owned
+    socket that the caller had just reached failed with `PermissionError: [Errno 1] Operation not permitted`. So
+    local sockets (the peer sessions' `/run/user/<uid>/cc-socks`) are closed to it too. Measured
     2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
     had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
     not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
@@ -1451,7 +1456,7 @@ What remains and how it is handled:
     passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
     child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
     elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
-    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    node by name, or asdf's `#!/usr/bin/env bash` shims) is refused up front, and a failed child's last stderr lines go to the console, not the record.
     A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
     (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
 
