@@ -143,6 +143,12 @@ locally with `GH_TOKEN` set and no `--offline`, using
   test on that path, and a reason without "fixture" failed the exclusion
   test. **Overturn:** the fixture becomes an installed dependency, or a second
   exclusion is proposed for a file that is not a test fixture.
+  **Superseded (2026-09-25):** the fixture was renamed to
+  `requirements.txt.fixture` to stop it feeding GitHub's dependency graph
+  (Scorecard's vulnerability check followed those alerts, not this repo's own
+  scanner exclusions), so it is no longer a tracked manifest name and this
+  `excluded` entry was removed rather than kept; the test's exclusion path
+  itself is unchanged.
 - **`--no-resolve` (measured).** With transitive resolution, three unlocked
   manifests reported versions that no lockfile installs. OSV's resolver picked
   `httpx2`/`httpcore2` 2.9.1 (PyPI latest 2.13.0) and `six` 1.9.0 (latest
@@ -369,6 +375,12 @@ locally with `GH_TOKEN` set and no `--offline`, using
   and the PR limit apply to version updates only. New advisories still raise
   alerts on the fixture; those are dismissed `not_used`. Requested by the
   gap-resolution session that owns the fixture.
+  **Superseded (2026-09-25):** the fixture was renamed to
+  `requirements.txt.fixture`, so Dependabot's pip manifest discovery no
+  longer finds it in that directory at all; this dedicated `pip` entry was
+  removed from `.github/dependabot.yml` rather than kept, closing code-scanning
+  alert #19 (Scorecard's "Vulnerabilities" check, which reads the dependency
+  graph directly and does not honor either scanner's own exclusion lists).
 - **Security updates stay on.** Dependabot security updates are free, gave the
   fastest signal here (#97/#98 within minutes of enabling), and auto-close
   their alerts when a fix lands (alerts 1-6 closed on #99's merge). The cost is

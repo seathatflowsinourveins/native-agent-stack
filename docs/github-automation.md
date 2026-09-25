@@ -220,14 +220,12 @@ ruleset, use `gh api --method DELETE repos/seathatflowsinourveins/native-agent-s
 leave unrelated settings intact. Reverting the workflow/dependency commit restores
 prior scheduling. Dependabot has no auto-merge; its version PRs still need reviewed
 source/hash updates. The automation maintainer owns the actionlint release/checksum,
-CI lock and ruleset; Dependabot owns GitHub Actions references plus, since
-2026-09-22, the `pip` fixture entry in `.github/dependabot.yml`
-(`blueprints/gap-wave2-20260923/grype-known-cve-fixture`, `ignore: urllib3`,
-`open-pull-requests-limit: 0`), which suppresses security-update PRs for that
-pin (`ignore` applies to security updates; `exclude-paths` and the PR limit
-apply only to version updates) while its alerts still appear via the
-dependency graph and are dismissed `not_used`; it owns no real Python or
-binary pin.
+CI lock and ruleset; Dependabot owns GitHub Actions references. The grype
+positive-control fixture at `blueprints/gap-wave2-20260923/grype-known-cve-fixture`
+is named `requirements.txt.fixture`, so Dependabot's pip manifest discovery
+never finds it there and `.github/dependabot.yml` needs no dedicated `pip`
+entry or `ignore: urllib3` rule for it (removed 2026-09-25); Dependabot owns
+no real Python or binary pin.
 
 [Native artifact attestations](catalog-provenance.md) identify the producing
 workflow and revision for a manually published catalog/evidence archive. The
@@ -492,15 +490,14 @@ generating catalogs and running local scripts.
 **Ownership.** The GitHub automation maintainer owns binary pins (actionlint,
 gitleaks, syft, grype, and workflow-declared package pins like
 `nautilus_trader`) and repository rulesets. Dependabot owns GitHub Actions
-references, plus (since 2026-09-22) the `pip` fixture entry in
-`.github/dependabot.yml` added for the intentionally vulnerable
-`grype-known-cve-fixture` pin (`ignore: urllib3` suppresses security-update
-PRs for that pin; `open-pull-requests-limit: 0` also stops version-update
-PRs; the dependency graph still raises alerts on it regardless, dismissed
-`not_used`) -- it does not, and per the decision above still does
-not, own any real Python or binary pin. (2026-09-22: repository-level
-security updates may now propose a fix for an alerted lock; a maintainer
-still owns the reviewed relock.)
+references; it does not, and per the decision above still does not, own any
+real Python or binary pin. The intentionally vulnerable
+`grype-known-cve-fixture` pin is retained as `requirements.txt.fixture` (not
+`requirements.txt`), so it never surfaces as a Dependabot/dependency-graph
+manifest at all and `.github/dependabot.yml` needs no dedicated `pip` entry
+or `ignore: urllib3` for it (removed 2026-09-25, replacing the 2026-09-22
+entry). (2026-09-22: repository-level security updates may now propose a fix
+for an alerted lock; a maintainer still owns the reviewed relock.)
 
 Each decision above names its evidence (the exact filename/permission gap
 checked), the alternative considered (activate now) and the exact
@@ -1171,10 +1168,13 @@ holds the evidence, alternatives and overturn comparison for each item.
   an artifact that the tool-free `osv-sarif-upload` job uploads (category
   `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
-  a deliberately vulnerable test fixture, with a reason and an evidence path:
-  today only `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`
-  (urllib3 1.26.4, the grype positive control for gap ci-supply-chain[13];
-  OSV-Scanner reports its 9 advisories, exit 1, when scanned on its own). The `zizmor-online` job
+  a deliberately vulnerable test fixture, with a reason and an evidence path;
+  it is currently empty, because the grype positive control for gap
+  ci-supply-chain[13] (urllib3 1.26.4, `tests/test_grype_known_cve_fixture.py`)
+  is retained as `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt.fixture`
+  -- a name no manifest/lockfile scanner recognizes, so it needs no exclusion
+  (the test copies it into a fresh temp dir as `requirements.txt` immediately
+  before invoking grype, never into the repository tree). The `zizmor-online` job
   (push/schedule/dispatch) reuses the hash-locked zizmor with its online
   audits in a `contents: read` job; the tool-free `zizmor-sarif-upload` job
   uploads its SARIF (category `zizmor`); findings do not fail it. The
