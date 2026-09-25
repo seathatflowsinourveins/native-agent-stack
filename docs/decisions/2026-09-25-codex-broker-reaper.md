@@ -111,7 +111,9 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
    or under it, under its nearest git checkout root, or under the *other*
    checkout a `git worktree` workspace belongs to (fix rounds below) --
    excluding every live broker's own descendant processes, not just the one
-   being evaluated (third fix round below); (d) the broker is older than
+   being evaluated (third fix round below); "no longer exists" is decided
+   against that same git checkout root, not the broker's raw cwd alone,
+   when the two differ (fifth fix round below); (d) the broker is older than
    `--min-age` (default 1800s), measured from `/proc/<pid>/stat`'s
    `starttime`; (e) the workspace's most recent recorded job activity
    (`state.json` jobs[]' timestamps) is also at least `--min-age` in the
@@ -195,21 +197,45 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
   Regression test:
   `LiveCwdGuardTests.test_review_broker_in_a_git_subdirectory_is_blocked_by_a_session_at_the_checkout_root`
   in `tests/test_codex_broker_reaper.py`.
-- **Guard (b), crash-orphaned jobs:** a job's status only ever leaves
-  `queued`/`running` via `cleanupSessionJobs` (`session-lifecycle-hook.mjs`),
-  which runs solely from a normal `SessionEnd`. A session that crashes (or a
-  workflow-child worktree whose session never reaches `SessionEnd`) with a
-  job still `running`/`queued` leaves that status forever, and guard (b)
-  then blocks its broker permanently — which is precisely the crash
-  scenario this tool otherwise targets. This is disclosed, not fixed: guard
-  (b) is implemented exactly as the brief specifies ("no job in its
-  `state.json` has a non-terminal status"), and relaxing it based on the
-  job's own recorded `pid` (which `cleanupSessionJobs` itself uses to
-  `terminateProcessTree`, `session-lifecycle-hook.mjs:65`) not being alive
-  would trade a disclosed, conservative safety margin for a materially
-  different, unverified one — exactly the kind of guess this tool's own
-  docstring says it never makes. Operators can see this in `--list`'s
-  per-broker `reasons` (a guard (b) failure names the blocking job ids).
+- **Guard (b), crash-orphaned jobs.** Corrected (minor finding, fifth fix
+  round, 2026-09-25: an earlier version of this bullet said a job's status
+  "only ever leaves `queued`/`running` via `cleanupSessionJobs`", and called
+  the resulting block "permanent" without naming the operator's own remedy):
+  `cleanupSessionJobs` (`session-lifecycle-hook.mjs`, runs solely from a
+  normal `SessionEnd`) does not itself change any job's status at all — for
+  the ending session's own jobs, it terminates the process behind any still
+  `queued`/`running` one, then unconditionally REMOVES every one of that
+  session's own jobs from `state.json`'s `jobs[]`
+  (`saveState(workspaceRoot, {...state, jobs: state.jobs.filter(job =>
+  job.sessionId !== sessionId)})`), terminal or not — so a session that
+  reaches a normal `SessionEnd` never leaves guard (b) blocked by its own
+  jobs at all. A session that crashes (or a workflow-child worktree whose
+  session never reaches `SessionEnd`) never runs that cleanup, so a job left
+  `running`/`queued` keeps that exact recorded status in `state.json`
+  indefinitely on its own, and guard (b) then blocks its broker until acted
+  on — which is precisely the crash scenario this tool otherwise targets.
+  This tool does not act on it itself: guard (b) is implemented exactly as
+  the brief specifies ("no job in its `state.json` has a non-terminal
+  status"), and relaxing it based on the job's own recorded `pid` (which
+  `cleanupSessionJobs` itself uses to `terminateProcessTree`,
+  `session-lifecycle-hook.mjs:65`) not being alive would trade a disclosed,
+  conservative safety margin for a materially different, unverified one —
+  exactly the kind of guess this tool's own docstring says it never makes.
+  **The operator's remedy** (omitted here until this correction):
+  `/codex:cancel <job-id>`, run from ANY later session opened at that same
+  workspace root — not only the session that originally started the job —
+  sets that job's status to `cancelled`
+  (`codex-companion.mjs` `handleCancel` -> `upsertJob({status: "cancelled",
+  ...})`), which clears guard (b) for that broker without this tool relaxing
+  anything. Verified directly in the plugin source:
+  `resolveCancelableJob(cwd, reference, {env})`
+  (`scripts/lib/job-control.mjs`) matches an explicit `<job-id>` reference
+  against every `queued`/`running` job recorded for the WHOLE workspace, not
+  only ones the invoking session's own id started — so a fresh session
+  opened in the workspace after a crash can cancel a job an earlier,
+  now-dead session left behind. Operators can read the blocking job's id
+  straight out of `--list`'s per-broker `reasons` (a guard (b) failure names
+  it) to pass to `/codex:cancel`.
 - **Guard (c), a coordinator with no git relationship to the worktree at
   all:** found in review of this rollout's own "reaper" track (second fix
   round, 2026-09-25) — a coordinating session that dispatches into a
@@ -281,15 +307,20 @@ hand over the `broker/shutdown` RPC, which worked cleanly.
 - `python3 -m unittest tests.test_codex_broker_reaper -v`: 20 tests, all
   passing, at the initial build — the "19" recorded here at the time of
   review was inaccurate (`grep -cE '^\s+def test_' tests/test_codex_broker_reaper.py`
-  gives 20 at bd03b2a7, the commit this sentence was written at, and
-  likewise at 8a86ba52, the commit that last changed the test file before
+  gives 20 at b536a801, the commit this sentence was written at, and
+  likewise at e9f5d060, the commit that last changed the test file before
   then — corrected in the second fix round below; this sentence previously
-  said "HEAD" in place of "bd03b2a7", which is only accurate at the commit
-  it was written at, not as a standing reference — at 7167a244 and after it
-  no longer named that commit at all); 26 after the 2026-09-25 fix round
+  said "HEAD" in place of "b536a801", which is only accurate at the commit
+  it was written at, not as a standing reference — at 0a2cf94b and after it
+  no longer named that commit at all; hashes corrected again here, fifth
+  pass, 2026-09-25, to the reachable post-rebase equivalents of the same
+  commits — see the "Fix round (2026-09-25, fifth pass)" section below);
+  26 after the 2026-09-25 fix round
   added six regression tests (see "Fix round" below), all still passing; 40
   after the second fix round (see "Fix round (2026-09-25, second pass)"
-  below), all still passing.
+  below); 42 after the third pass; 43 after the fourth pass; 50 after the
+  fifth pass (see "Fix round (2026-09-25, fifth pass)" below), all still
+  passing.
   Every guard is exercised against a real spawned process, not a
   mock: a small Python stand-in plays the broker (a genuine unix-socket
   server started from a script file literally named `app-server-broker.mjs`
@@ -339,7 +370,10 @@ above is a synthetic `state.json`, not a real in-flight task).
 
 ## Fix round (2026-09-25)
 
-A review of the initial commits (3ff02227, 8a86ba52, 07ca2da8, bd03b2a7) found
+A review of the initial commits (a9ffaf49, e9f5d060, 872d1c0f, b536a801 —
+corrected here, fifth pass, 2026-09-25: this line's original hashes,
+3ff02227/8a86ba52/07ca2da8/bd03b2a7, were rewritten by this branch's later
+rebase onto `origin/main` and are not reachable from it) found
 one blocking and two major findings, resolved here; see the tool's own
 docstring and `tests/test_codex_broker_reaper.py` for the code-level detail
 this section summarizes.
@@ -381,8 +415,11 @@ this section summarizes.
   limitations" above: a review-triggered broker's OS cwd can be a
   subdirectory of the actual live session's own checkout root (guard (c)
   now also checks that checkout root); a job left `running`/`queued` by a
-  crashed session permanently blocks guard (b) (unchanged — guard (b) is
-  implemented exactly as the brief specifies).
+  crashed session blocks guard (b) until acted on (unchanged — guard (b) is
+  implemented exactly as the brief specifies; corrected here, fifth pass,
+  2026-09-25: this bullet originally said "permanently", omitting that
+  `/codex:cancel <job-id>` from a later session is the operator's own
+  remedy — see "Known limitations" above).
 - **Also fixed, both safety-adjacent rather than correctness bugs:** `run()`
   now re-checks every guard immediately before stopping each broker, not
   once for the whole batch, since an earlier broker's own stop can take long
@@ -435,7 +472,9 @@ this section summarizes.
 
 ## Fix round (2026-09-25, second pass)
 
-A review of 7167a244 (the first fix round's own HEAD) found one new major
+A review of 0a2cf94b (the first fix round's own HEAD; corrected here, fifth
+pass, 2026-09-25, from the pre-rebase hash 7167a244, no longer reachable
+from this branch) found one new major
 finding and four new minor findings, resolved here, plus a scope-disclosure
 gap in this same record; see the tool's own docstring and
 `tests/test_codex_broker_reaper.py` for the code-level detail this section
@@ -550,13 +589,15 @@ summarizes.
   `state.json`, and a monkeypatched-raise proving `run()`/`main()` still
   evaluates every other broker and exits 0).
 - **Also fixed — this record's own inaccurate "HEAD" reference.** See
-  "Measured" above: "gives 20 at both HEAD and 8a86ba52" was written once,
-  at bd03b2a7, where it was correct — but was never revisited when the
-  first fix round (5da77e6b) added six more tests, so "HEAD" silently kept
-  meaning whatever commit a reader checked it against. By 7167a244 (this
+  "Measured" above: "gives 20 at both HEAD and e9f5d060" was written once,
+  at b536a801, where it was correct — but was never revisited when the
+  first fix round (762ac8f3) added six more tests, so "HEAD" silently kept
+  meaning whatever commit a reader checked it against. By 0a2cf94b (this
   pass's own review base) `grep -cE '^\s+def test_' tests/test_codex_broker_reaper.py`
   gave 26 there (now 40), contradicting the sentence's own "20" figure.
-  Corrected to name the specific commit (bd03b2a7) instead of "HEAD".
+  Corrected to name the specific commit (b536a801) instead of "HEAD"
+  (hashes in this bullet corrected again, fifth pass, 2026-09-25, to their
+  reachable post-rebase equivalents — see below).
 - **Scope disclosure — `manifests/evidence.json`.** Outside this track's
   allowed paths (`adoption/tools/codex-broker-reaper`,
   `adoption/tools/README.md`, the systemd templates,
@@ -571,14 +612,27 @@ summarizes.
   field. Every commit that has re-pinned it for this track's own README
   edits, named here rather than left for a reader to reconstruct from `git
   log --follow -- manifests/evidence.json` (checked directly: exactly these
-  three, nothing else in this track's history touches that file): bd03b2a7
-  (this decision record's own first commit, which also added the initial
-  README section), 7167a244 (the first fix round above), and 939ec97d (the
-  second fix round above). The first round's own commit message said as
-  much but this record did not until the second fix round (disclosed there
-  for both rounds then); this correction adds the missing commit hashes
-  themselves (second-pass review finding, resolved in the third fix round
-  below).
+  five, nothing else in this track's history touches that file):
+  b536a801 (this decision record's own first commit, which also added the
+  initial README section), 0a2cf94b (the first fix round above), 936259a6
+  (the second fix round above), c039da1b (a re-pin after rebasing this
+  branch onto `origin/main`, keeping the upstream file's own JSON escaping),
+  and 61447c86 (the fourth fix round's own re-pin). The first round's own
+  commit message said as much but this record did not until the second fix
+  round (disclosed there for both rounds then); this correction adds the
+  missing commit hashes themselves (second-pass review finding, resolved in
+  the third fix round below). Corrected again here, fifth pass, 2026-09-25
+  (major/minor review finding): the third fix round's own version of this
+  bullet named only three commits, by their pre-rebase hashes
+  (bd03b2a7/7167a244/939ec97d), none of which remain reachable from this
+  branch after its later rebase onto `origin/main`, and never named `c039da1b`
+  (the rebase re-pin itself) or the fourth pass's own re-pin (`61447c86`) at
+  all — an actual gap in "exactly these, nothing else", not only a hash-
+  rot problem. This fifth pass touches neither `adoption/tools/README.md`
+  nor `manifests/evidence.json` itself (see "Re-measured" below), so it adds
+  no sixth commit to this list; a future pass that does edit the README
+  should extend this list with its own re-pin's hash once that commit
+  exists, the same gap this correction closes for the five before it.
 - **Re-measured (second pass):** `python3 -m unittest
   tests.test_codex_broker_reaper -v` (40 tests, all passing); `python3
   adoption/tools/codex-broker-reaper --list` against this host's real
@@ -600,7 +654,9 @@ summarizes.
 
 ## Fix round (2026-09-25, third pass)
 
-A review of d91bb210 (the second fix round's own HEAD) found one major and
+A review of ad76872b (the second fix round's own HEAD; corrected here, fifth
+pass, 2026-09-25, from the pre-rebase hash d91bb210, no longer reachable
+from this branch) found one major and
 one minor code finding, plus a consistency finding against this record
 itself, resolved here; see the tool's own docstring and
 `tests/test_codex_broker_reaper.py` for the code-level detail this section
@@ -664,8 +720,9 @@ summarizes.
   Fixed: Scope, the Context bullet, and Decision item 1 above now match the
   tool's actual five guards, exit codes 0/2/3, and `broker.json` removal;
   the evidence.json bullet now names all three re-pin commits to date
-  (bd03b2a7, 7167a244, 939ec97d) instead of describing them only
-  relatively; and the new "Known limitations" bullet above discloses the
+  (b536a801, 0a2cf94b, 936259a6 — hashes corrected, fifth pass, 2026-09-25,
+  from their pre-rebase equivalents bd03b2a7/7167a244/939ec97d) instead of
+  describing them only relatively; and the new "Known limitations" bullet above discloses the
   main-checkout-blocks-every-worktree-broker behavior. This round's own
   commits touch neither `adoption/tools/README.md` nor
   `manifests/evidence.json` (the README's guard table and exit-code
@@ -775,3 +832,164 @@ here is a documentation, test-hermeticity, or evidence-pin correction.
   decision record, the tool's own module docstring,
   `tests/test_codex_broker_reaper.py`, `adoption/tools/README.md`, and the
   `manifests/evidence.json` re-pin named above.
+
+## Fix round (2026-09-25, fifth pass)
+
+A review of 61447c86 (the fourth pass's own HEAD) found one major and four
+minor findings. Three are resolved here (code and record); the fourth is a
+verification-scope note about required PR-merge checks, not a defect, and
+is left for the coordinator (see below). See the tool's own docstring and
+`tests/test_codex_broker_reaper.py` for the code-level detail this section
+summarizes.
+
+- **Major — guard (c) treated a missing broker `/proc` cwd as an unused
+  workspace even when the checkout it belongs to was still live.** A
+  *review*-triggered broker's OS cwd can be a SUBdirectory of its checkout
+  (Known limitations, above); before this fix, `evaluate_broker` declared
+  the workspace unused — skipping the live-session, git-toplevel, and
+  worktree-parent scans entirely — the instant
+  `os.path.isdir(workspace_root)` went False, which happens whenever only
+  that subdirectory is later removed (`rm`, `git clean`, a branch switch),
+  even though the checkout the plugin's own `resolveWorkspaceRoot(cwd)`
+  actually keys this broker's state dir on (`scripts/lib/workspace.mjs` ->
+  `state.mjs` `resolveStateDir`, both read directly from the installed
+  plugin during this fix) was still there, still live, and never itself
+  checked. `--apply` would have stopped a live session's own broker in
+  exactly this shape. Fixed: guard (c) now computes `keying_root =
+  find_git_toplevel(workspace_root) or workspace_root` (the same
+  git-toplevel lookup guard (c) already used for its checkout-root scan,
+  now also gating the "workspace unused" shortcut) and only skips the
+  live-session scan when THAT directory, not the broker's raw
+  `/proc/<pid>/cwd` alone, no longer exists; the live-session scan itself
+  now also checks `workspace_root` even when it alone is gone (a directory
+  removed while a live process still holds it open keeps reporting that
+  exact path from its own `/proc/<pid>/cwd`, per `read_proc_cwd`'s own
+  docstring). Regression tests (`LiveCwdGuardTests`):
+  `test_deleted_review_subdirectory_does_not_hide_a_live_session_at_the_checkout_root`
+  (confirmed red against the pre-fix code -- see "Re-measured" below, not
+  only reasoned about);
+  `test_deleted_review_subdirectory_with_an_idle_checkout_root_is_still_correctly_unused`
+  and `test_deleted_review_subdirectory_and_deleted_checkout_root_is_unused`
+  (companions proving the fix does not simply fail guard (c) closed
+  whenever `workspace_root` alone is gone: the checkout-root scan still
+  runs, and still correctly reports "unused" once nothing live is under the
+  checkout either, or once the checkout itself is gone too). The tool's own
+  module docstring (guard (c)'s entry) and Decision item 1(c) above are
+  corrected the same way.
+- **Minor — `read_proc_comm` and `process_parent_pid` could still raise,
+  crashing `--apply` with no receipt.** Both caught only `OSError` around a
+  plain `Path(...).read_text()`; a live process whose `comm` is not valid
+  UTF-8 (settable to any <=15-byte string via `prctl(PR_SET_NAME)`, not
+  only valid UTF-8 -- reproduced with a fixture process forced to
+  `b"ab\xe6\x97"`, a truncated multibyte sequence, matching the finding's
+  own reproduction) makes `read_text()` raise `UnicodeDecodeError` (a
+  `ValueError` subclass, not an `OSError`) instead. `safe_evaluate_broker`'s
+  own `except Exception` net covers every `evaluate_broker()` call site,
+  but `stop_broker()`'s own `collect_child_pids(pid)` ->
+  `process_parent_pid()` -- reached directly from `run()`'s `--apply` loop,
+  scanning literally every pid on the host, not only ones related to the
+  broker being stopped -- runs OUTSIDE that net, so a single such process
+  anywhere on the host crashed `--apply` with an uncaught traceback, exit
+  1, and no receipt at all, even after earlier brokers in the same run had
+  already been stopped successfully -- breaking both the module docstring's
+  "never raises" contract for its `/proc` helpers and the documented 0/2/3
+  exit contract. Fixed: both readers now catch `(OSError, ValueError)`,
+  matching `process_start_epoch`'s existing `(OSError, ValueError,
+  IndexError)` for the same kind of `/proc/<pid>/stat` read. Regression
+  tests (new `NonUtf8ProcFieldTests`, confirmed red against the pre-fix code
+  the same way as the major finding above):
+  `test_read_proc_comm_returns_none_instead_of_raising`,
+  `test_process_parent_pid_returns_none_instead_of_raising`,
+  `test_collect_child_pids_does_not_raise_when_the_host_has_a_non_utf8_comm_process`,
+  and an end-to-end
+  `test_apply_still_stops_an_eligible_broker_and_writes_a_receipt` (a
+  non-UTF-8-comm fixture present on the host throughout a real `--apply`
+  run via `main()`, not just the unit-level reader calls).
+- **Minor — this record cited commit hashes rewritten by this branch's own
+  rebase onto `origin/main`, unreachable from it.** `bd03b2a7`, `7167a244`,
+  `939ec97d`, `8a86ba52`, `3ff02227`, `07ca2da8`, `5da77e6b`, and `d91bb210`
+  -- every hash this record cited from before the rebase recorded in
+  `c039da1b` -- exist only as loose objects on this specific local
+  checkout, not as ancestors of `HEAD` (`git merge-base --is-ancestor
+  <hash> HEAD` fails for all eight; checked directly, not assumed); a
+  reader on a fresh clone, or after this repository's next `git gc`, could
+  not resolve any of them. The `manifests/evidence.json` disclosure bullet
+  (Measured section above) additionally underclaimed its own completeness:
+  it named only three re-pin commits as "exactly these, nothing else",
+  omitting both the rebase's own re-pin (`c039da1b`) and the fourth pass's
+  (`61447c86`) -- five commits actually touch that file on this branch
+  (`git log origin/main..HEAD -- manifests/evidence.json`), not three.
+  Fixed: every hash reference in this record now names its reachable
+  post-rebase equivalent (mapped by matching each stale commit's own
+  subject line, not guessed -- see the inline corrections throughout), and
+  the evidence.json bullet now lists all five. This pass touches neither
+  `adoption/tools/README.md` nor `manifests/evidence.json` itself, so it
+  adds no sixth commit to that list.
+- **Minor — the crash-orphaned-jobs limitation overstated itself and
+  omitted the operator's own remedy.** "Known limitations" said a job's
+  status "only ever leaves `queued`/`running` via `cleanupSessionJobs`" and
+  called the resulting guard (b) block "permanent". Verified directly
+  against the installed plugin source
+  (`scripts/session-lifecycle-hook.mjs`): `cleanupSessionJobs` does not
+  change any job's status at all -- for the ending session's own jobs, it
+  terminates the process behind any still-active one, then unconditionally
+  REMOVES every one of that session's own jobs from `state.json`, terminal
+  or not, so a normal `SessionEnd` never leaves guard (b) blocked by its
+  own jobs regardless. `/codex:cancel <job-id>`, run from ANY later session
+  at the same workspace root, sets that job's status to `cancelled`
+  (`codex-companion.mjs` `handleCancel`) and clears guard (b) -- confirmed
+  from `resolveCancelableJob` (`scripts/lib/job-control.mjs`), which
+  matches an explicit job-id reference against every active job recorded
+  for the WHOLE workspace, not only ones the invoking session itself
+  started. Fixed: both this bullet and the first fix round's own summary of
+  it are corrected to describe the actual mechanism and name
+  `/codex:cancel` as the remedy; this tool still does not act on it itself
+  (unchanged rationale: relaxing guard (b) based on the job's own recorded
+  `pid` not being alive would trade a disclosed, conservative margin for a
+  different, unverified one).
+- **Not actioned -- verification-scope note, not a code defect.** A finding
+  that required-check results on the eventual PR merge commit (`validate`,
+  `validate-macos`, `secret-scan`, `token-report`, `dependency-review`,
+  `osv-scanner`, `verdict-review-gate`, `CodeQL`) were not themselves
+  observed, only author-reported local runs, and that two specific
+  behaviors were "not exercised" on this host (a `claude`/`codex` process
+  with an unreadable cwd is ignored fail-open; every live broker's
+  descendants are excluded host-wide). This is explicitly self-scoped as a
+  verification gap for the coordinator to close at merge time, not a defect
+  in the tool, the tests, or this record, and this track has no access to a
+  PR merge commit or its required-check run from inside this worktree;
+  left for the coordinator, as the finding itself directs. The two "not
+  exercised" behaviors are unchanged by this pass (neither guard (a)'s
+  cwd-read path nor `find_live_broker_pids`'s host-wide exclusion were
+  touched) and remain covered only by the existing static/unit evidence the
+  finding itself already credits.
+- **Re-measured (fifth pass):** `python3 -m unittest
+  tests.test_codex_broker_reaper -v` (50 tests, all passing -- 43 before
+  this round's 7 new regression tests: 3 for the major finding, 4 for the
+  proc-reader minor finding); `python3 adoption/tools/codex-broker-reaper
+  --list` against this host's real plugin state (still 17 found, 0
+  eligible, all refused at guard (a) before guard (c) is reached --
+  unchanged from every earlier round); `python3 scripts/validate.py`
+  (`{"components": 69, "hashed_files": 5402, "profiles": 4, "receipts":
+  145, "status": "passed"}`, exit 0 -- identical to the fourth pass's own
+  figures, confirming this pass touches no hash-pinned file) and `python3
+  scripts/validate_foundation.py` (`FOUNDATION catalog valid: layers=20,
+  decisions=54, foundation_components=61, domain_components=7,
+  evidence_receipts=84, candidates=3`, exit 0), both re-run directly
+  against this round's own commits. The new regression tests for both the
+  major finding and the proc-reader minor finding were additionally
+  confirmed red against the pre-fix tool: a scratch copy of the test module
+  pointed at `git show 61447c86:adoption/tools/codex-broker-reaper`
+  reproduces both the guard (c) assertion failure and the exact
+  `UnicodeDecodeError` traceback the findings describe, through
+  `stop_broker` -> `collect_child_pids` -> `process_parent_pid`, matching
+  the findings' own evidence; the two companion guard (c) tests pass
+  against both the pre-fix and fixed tool, confirming the fix does not
+  overcorrect. This round's diff is confined to the tool script,
+  `tests/test_codex_broker_reaper.py`, and this decision record; it does
+  not touch `adoption/tools/README.md` or `manifests/evidence.json`, so the
+  README's own "43 tests (fourth pass)" line and guard (c) table row are
+  now one pass behind the tool and the suite -- left as a disclosed,
+  proportionate gap rather than triggering a re-pin for a wording-only
+  change; a future pass touching the README for another reason should
+  update both while it is there.
