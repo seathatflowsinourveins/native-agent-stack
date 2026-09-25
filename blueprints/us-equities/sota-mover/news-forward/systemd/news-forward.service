@@ -9,6 +9,9 @@ StartLimitIntervalSec=0
 Type=simple
 WorkingDirectory=%h/code/sota-news-forward/blueprints/us-equities/sota-mover/news-forward
 Environment=PYTHONUNBUFFERED=1
+# WSL exposes nvidia-smi only under /usr/lib/wsl/lib, which the systemd user PATH lacks; without it the GPU gate
+# reports nvidia_smi_unavailable and the scorer never loads on the GPU.
+Environment=PATH=/usr/lib/wsl/lib:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=%h/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python %h/code/sota-news-forward/blueprints/us-equities/sota-mover/news-forward/supervisor.py
 ExecStopPost=-/usr/bin/systemctl --user stop news-forward-scorer.service
 Restart=on-failure
