@@ -305,14 +305,47 @@ install_npm() {
 # lines 158-171): fetch the exact per-version download, chmod it executable,
 # run `"$bin" install <version>`, and leave the binary's own auto-update in
 # control from there (no DISABLE_AUTOUPDATER opt-out).
+#
+# The pin is a floor, not a ceiling (2026-09-24): `"$bin" install <pin>`
+# moves the installer's own launcher back to the pin, dropping a newer
+# auto-updated release's fixes. A launcher at $HOME/.local/bin/<bin> whose
+# `--version` first word ("2.1.281" of "2.1.281 (Claude Code)") is a dotted
+# numeric version at or above the pin is kept: nothing is downloaded or
+# installed, and install_pin logs "Kept" instead of "Installed". Fields are
+# compared as base-10 numbers (2.1.99 is older than 2.1.281). No launcher, a
+# failing --version, a non-numeric version or an older one takes the
+# unchanged checksum-verified install. The function is identical to
+# adoption/bootstrap-macos.sh's install_native, which added this floor first;
+# tests/test_adoption_bootstrap.py fails if the two copies differ.
 install_native() {
   # $5 is the command the native installer creates (the pin's `bin`, e.g.
   # claude-code installs ~/.local/bin/claude); it defaults to the pin id.
   local id="$1" version="$2" url="$3" sha256="$4" bin_name="${5:-$1}"
-  local download="$cache_dir/${id}-${version}-native"
-  fetch "$url" "$sha256" "$download"
-  chmod 0755 "$download"
-  "$download" install "$version"
+  local launcher="$HOME/.local/bin/$bin_name" installed="" keep=0 have want have_field want_field
+  if [[ -x "$launcher" ]] && installed="$("$launcher" --version </dev/null 2>/dev/null)"; then
+    installed="${installed%%[[:space:]]*}"
+    keep=1
+    case "$installed" in ''|*[!0-9.]*|.*|*.|*..*) keep=0 ;; esac
+    case "$version" in ''|*[!0-9.]*|.*|*.|*..*) keep=0 ;; esac
+    have="$installed" want="$version"
+    while [[ "$keep" == 1 && -n "$have$want" ]]; do
+      have_field="${have%%.*}" want_field="${want%%.*}"
+      if [[ "$have" == *.* ]]; then have="${have#*.}"; else have=""; fi
+      if [[ "$want" == *.* ]]; then want="${want#*.}"; else want=""; fi
+      if (( 10#${have_field:-0} > 10#${want_field:-0} )); then break; fi
+      if (( 10#${have_field:-0} < 10#${want_field:-0} )); then keep=0; fi
+    done
+  fi
+  if [[ "$keep" == 1 ]]; then
+    native_floor_kept="$installed"
+    printf 'Kept installed %s %s: at or above the pinned floor %s, so nothing was downloaded or installed (installing the pin would downgrade it).\n' \
+      "$id" "$installed" "$version"
+  else
+    local download="$cache_dir/${id}-${version}-native"
+    fetch "$url" "$sha256" "$download"
+    chmod 0755 "$download"
+    "$download" install "$version"
+  fi
   # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
   # into ~/.local/share/claude/versions) already provides the command; writing
   # ours there would replace it with a script that execs itself.
@@ -370,6 +403,9 @@ install_pin() {
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
   fi
+  # install_native sets this when it keeps an installed launcher at or above
+  # the pin (the pin is a floor); it has already logged that decision.
+  native_floor_kept=""
   case "$id-$kind" in
     node-tarball) install_node "$version" "$url" "$sha256" ;;
     uv-tarball) install_uv "$version" "$url" "$sha256" ;;
@@ -380,7 +416,10 @@ install_pin() {
     *-uv-tool) install_uv_tool "$id" "$version" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
+  # A kept native launcher (at or above its floor) is still an installed
+  # pin: the version report probes it like any other.
   installed_pin_ids+=("$id")
+  [[ -z "$native_floor_kept" ]] || return 0
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
 }
 

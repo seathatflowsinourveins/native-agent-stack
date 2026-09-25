@@ -137,7 +137,9 @@ class ReportStructureTests(unittest.TestCase):
             text = path.read_text()
             self.assertNotIn('"$installed_executable" --version', text, platform_id)
             self.assertIn('for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do', text, platform_id)
-            self.assertIn('  installed_pin_ids+=("$id")\n  printf \'Installed %s %s (%s)\\n\'', text, platform_id)
+            # A kept native launcher (the Claude Code floor) returns early from
+            # install_pin, so the pin must be recorded before that return.
+            self.assertIn('  installed_pin_ids+=("$id")\n  [[ -z "$native_floor_kept" ]] || return 0\n', text, platform_id)
             self.assertIn('"$@" </dev/null >"$stdout_file" 2>"$stderr_file" 9>&- &', text, platform_id)
             self.assertIn('version_report="$ecosystem_root/installed-versions.txt"', text, platform_id)
 

@@ -5058,10 +5058,10 @@
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "Dated selected-role acceptance exists; this matrix reconciliation performs no new installation.",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.5",
+      "version": "16.3.6",
       "profile": "supporting",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/nextjs",
         "recipe_document": "blueprints/convergence-practice/application-delivery/README.md",

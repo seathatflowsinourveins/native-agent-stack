@@ -56,7 +56,7 @@
         "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
       },
       {
-        "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
+        "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
         "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
       }
     ],

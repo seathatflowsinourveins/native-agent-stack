@@ -26,6 +26,9 @@ FIXTURE_VALUES = {
     "AI_MEMORY_URL": "127.0.0.1:49374",
     "QDRANT_URL": "127.0.0.1:16333",
     "EMBED_URL": "127.0.0.1:8231",
+    # The explicit opt-in, left off: empty renders as empty text both under a direct
+    # string.Template substitution below and in render_config.py (absent, "" and "false" alike).
+    "AI_MEMORY_CAPTURE_ASSISTANT": "",
 }
 
 
@@ -54,7 +57,7 @@ class RenderConfigTests(unittest.TestCase):
 
     def test_templates_round_trip_with_string_template_substitute(self):
         # The statusLine bash fragment keeps its own literal ${COLUMNS:-},
-        # ${CLAUDE_CONFIG_DIR:-$HOME/.claude} and ${plugin_dir}; only our nine
+        # ${CLAUDE_CONFIG_DIR:-$HOME/.claude} and ${plugin_dir}; only our own
         # placeholder names are required to disappear after substitution.
         for name in TEMPLATE_NAMES:
             text = (TEMPLATES / name).read_text()
@@ -187,6 +190,54 @@ class RenderConfigTests(unittest.TestCase):
         # The other two files, unchanged, are still reported byte-identical.
         self.assertIn("codex.config.toml: byte-identical", result.stdout)
         self.assertIn("project.codex.config.toml: byte-identical", result.stdout)
+
+    def stop_commands(self, settings_path: Path) -> list[str]:
+        stop = json.loads(settings_path.read_text())["hooks"]["Stop"]
+        return [hook["command"] for group in stop for hook in group["hooks"]]
+
+    def test_default_render_has_no_assistant_capture(self):
+        # Automatic assistant capture stays off unless a host opts in: the committed
+        # example hosts (which never mention the opt-in) and the fixture host (which
+        # leaves it empty) render no --capture-assistant in any file, and ai-memory's
+        # Stop hook ends at its server URL.
+        self.assertNotIn("--capture-assistant", (TEMPLATES / "claude.settings.template.json").read_text())
+        for host in ("example", "macos-example", "test-fixture-host"):
+            with self.subTest(host=host):
+                values = json.loads((self.hosts_dir / f"{host}.json").read_text())
+                out_dir = self.tmp_path / f"out-{host}"
+                result = run("--host", host, "--out", str(out_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                for filename in ("settings.json", "codex.config.toml", "project.codex.config.toml"):
+                    self.assertNotIn("--capture-assistant", (out_dir / filename).read_text(), filename)
+                commands = self.stop_commands(out_dir / "settings.json")
+                self.assertEqual(len(commands), 1, commands)
+                self.assertTrue(commands[0].endswith(f"--server-url http://{values['AI_MEMORY_URL']}"), commands[0])
+
+    def test_assistant_capture_is_an_explicit_opt_in_on_the_stop_hook_only(self):
+        rendered = {}
+        for setting in (None, "false", "true"):
+            out_dir = self.tmp_path / f"out-capture-{setting}"
+            extra = [] if setting is None else ["--set", f"AI_MEMORY_CAPTURE_ASSISTANT={setting}"]
+            result = run("--host", "test-fixture-host", *extra, "--out", str(out_dir))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            rendered[setting] = out_dir / "settings.json"
+        # "false" renders exactly like leaving the opt-in out.
+        self.assertEqual(rendered["false"].read_bytes(), rendered[None].read_bytes())
+        opted_in = rendered["true"].read_text()
+        self.assertEqual(opted_in.count("--capture-assistant"), 1)
+        self.assertEqual(self.stop_commands(rendered["true"]),
+                         [self.stop_commands(rendered[None])[0] + " --capture-assistant"])
+        # Nothing but the Stop hook changes.
+        opted_in_settings, default_settings = json.loads(opted_in), json.loads(rendered[None].read_text())
+        del opted_in_settings["hooks"]["Stop"], default_settings["hooks"]["Stop"]
+        self.assertEqual(opted_in_settings, default_settings)
+
+    def test_assistant_capture_rejects_anything_but_true_or_false(self):
+        out_dir = self.tmp_path / "out-capture-typo"
+        result = run("--host", "test-fixture-host", "--set", "AI_MEMORY_CAPTURE_ASSISTANT=yes", "--out", str(out_dir))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("AI_MEMORY_CAPTURE_ASSISTANT must be", result.stderr)
+        self.assertFalse((out_dir / "settings.json").exists())
 
     def test_check_reports_missing_live_file(self):
         result = run("--host", "test-fixture-host", "--check",
