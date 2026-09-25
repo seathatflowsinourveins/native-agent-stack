@@ -71,7 +71,7 @@ python3 scripts/validate_catalogs.py
 # Or select the supported interpreter through native uv:
 uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
 # The selected token practice: command presence plus native client wiring (booleans and counts only;
-# changed after v2026.09.25.1, so run it from a default-branch clone until the next release):
+# changed after v2026.09.25.1, so run it from a later release or a default-branch clone):
 "$PYTHON_BIN" scripts/adoption_status.py --profile token-efficiency --client-wiring --json
 # After the SDK recipe, use that environment to check research prerequisites:
 "$SDK_ENV/bin/python" scripts/adoption_status.py --profile research-runtime --json

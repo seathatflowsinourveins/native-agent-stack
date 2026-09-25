@@ -3116,8 +3116,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "7760b633919767f6e0851e7af284471f81fb820a6b736323142f543adb5b0d8a",
-      "bytes": 1699
+      "sha256": "5b6a1543053c995222fb0b6de9e213fa9446aa86e20aaa6086e6289bf1e97013",
+      "bytes": 1763
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -3126,8 +3126,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "414a6890b079dde81f3ba595eabb6727907bd9bea223d310015e901a34424262",
-      "bytes": 2024
+      "sha256": "3cf7addac4078f976d74be98f02f72cb30bf35b9b642061fd2563115c3cfa6ab",
+      "bytes": 2346
     },
     {
       "path": ".github/requirements-ci.txt",
@@ -3196,8 +3196,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "fc67d96ca3fb4ff8d6a6f399676aa2d09cb1a1d12500bbe9d93dc1f744fd57fb",
-      "bytes": 18132
+      "sha256": "8c00e1b8fa7a8ebc49491f95d54133b2fcfa4c42e3c7e2e286fdcae98618b485",
+      "bytes": 19787
     },
     {
       "path": ".gitignore",
@@ -3216,8 +3216,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "90318145bbe7c91931729138e6e540b180783997183466049f06e9ab87802c15",
-      "bytes": 11142
+      "sha256": "044c15be75192905cc5debe0a55d24612656f97a72dfa06ce6f309ec9b771685",
+      "bytes": 11708
     },
     {
       "path": "CLAUDE.md",
@@ -3241,8 +3241,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "efdaf45e29fc42d3765c2b6347a76059dd222f1e7f3dfa7941efa81527a316de",
-      "bytes": 16733
+      "sha256": "d8268a9e26e5eb443812f02e95f75d1d34b6b35ccd1ab0f81a4867805369097c",
+      "bytes": 16729
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -3316,7 +3316,7 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "c3dde56e7ac26e6e6e90754aeb5cf26fc7132790b3e19cded90e064d7d4e6c69",
+      "sha256": "b4c4e4cbc52cf4b3d61df4a429c98184d6afc147279d1ed62b2f5c5b4bda5616",
       "bytes": 19228
     },
     {
@@ -3361,8 +3361,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "d05d07701afd8deedbd58576468ba0f5341279d6a5c23f6efe075ce772a7484e",
-      "bytes": 12312
+      "sha256": "83de16c5621ea08ec5d4ab32b24798e958055b1998278d8548a0f1003f24da80",
+      "bytes": 12677
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -3406,18 +3406,18 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "3909b624dd03741f888d5f5d4495aa4b130638caf8b62b441687bc18c9030dcd",
-      "bytes": 7604
+      "sha256": "e06ca5d1102a8f78c7a2d26e603de20a6706a9563258be39ee8019c52b6350b5",
+      "bytes": 7684
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "e8cf599985565695f10b76ffd4637609f2866eaaeaaa537b8f5a3aad27fa3a5e",
-      "bytes": 3985
+      "sha256": "25573c73964d92088cb5e02aaab9ee97b5ff9ac4a415b555b2181be508db6e9c",
+      "bytes": 6229
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "f43c46a7921142390dd29db39c3e1be9c042bfdcc01ddc4ee240689cae88c352",
-      "bytes": 2424
+      "sha256": "4d8fb060f3fda6113575d1bf529e39f9b44405ae7d83e573fd0469b62fe16bcb",
+      "bytes": 1967
     },
     {
       "path": "adoption/tools/README.md",
@@ -6421,6 +6421,36 @@
       "bytes": 4172
     },
     {
+      "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
+      "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
+      "bytes": 23733
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/README.md",
+      "sha256": "70dcb968207dc416eebd61f49bba7117bcdb8a576ee352db404f3b4619295bee",
+      "bytes": 9708
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/analyze.py",
+      "sha256": "aade41ff4efd347c3269c7e88283fe0133a594346bdfeaea251ddac6458ac832",
+      "bytes": 12358
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/exercise.py",
+      "sha256": "bcca4997c8ea0b5812c402f7af78ee90518a1c761344ca94e97c55b5f8aae62d",
+      "bytes": 18370
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/results-20260925.json",
+      "sha256": "f87410a11b1894460bbe504ca8417e15e6711b79203251a940d2dbbeb51ef3b3",
+      "bytes": 20380
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/run.py",
+      "sha256": "b0b82e4b634d1b0e1140065ef1d9425846415d8240ecbd7d0638d420a8bea911",
+      "bytes": 6315
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "f171739544379d3e69bdc0001911776584e1b0b0775f4f37e6b7737c106c4996",
       "bytes": 5271
@@ -6469,6 +6499,31 @@
       "path": "blueprints/native-skill-practice/worker-packet.json",
       "sha256": "afd162f790c9f1b55559f32db0a34bbc8d134e6ee8044cd1a37740313d77a912",
       "bytes": 10732
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/PREREGISTRATION.md",
+      "sha256": "8ad75717860afaa735ed1e449c577ec2043299e7ccf041b902e97dbd55d1d652",
+      "bytes": 14601
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/README.md",
+      "sha256": "3f59164e3ef68e0d83115e4e94d47c470cdee9f63f9b01ec5e21af4e24c02c2b",
+      "bytes": 7097
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/queries.json",
+      "sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+      "bytes": 25811
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/results-20260925.json",
+      "sha256": "4a45bcc24f2da8235ebfb934ff5ce6752363d38fa831f126598527b9a318ca05",
+      "bytes": 59218
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/run.py",
+      "sha256": "594e2d44e218a506f5b8a6f99de80a78c2db5b11648e9dc634c05f02e73fb1b6",
+      "bytes": 48248
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -6532,8 +6587,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "664a7a3b0371d7d47c3ebe575c8340be1556eb47e976e92553ae208d71c4aa7e",
-      "bytes": 19255
+      "sha256": "3cfecac5e77fc5b53a2aeefce73a290f2b3238d35a2e8cc078603b24d85f0eb1",
+      "bytes": 20256
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -6637,8 +6692,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "7d6ef2dbdaaed3de1a0c1f65257d834c92b9b1027a4f8a206c5ed148c4cf0e6f",
-      "bytes": 19657
+      "sha256": "7ff02ea7feb7449573cd41cffd44faac98e16e4019d9739ba2e1e39dc48c740d",
+      "bytes": 27462
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
@@ -6837,7 +6892,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "d14c8d7262357e39a562fe519b41ecc64ec555845f1107c28f1614908d3537b6",
+      "sha256": "075dab0e4f736fc78cc1ce2213ec007445da52bd8c9c9b45da248365ea18419a",
       "bytes": 6969
     },
     {
@@ -8657,8 +8712,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "2f54419877841b64ea72c8738447ff34d360bc3619f662f005d9b81ab6669e15",
-      "bytes": 5877
+      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
+      "bytes": 7585
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -8696,14 +8751,14 @@
       "bytes": 441
     },
     {
+      "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
+      "sha256": "715f893dc329c40c6db6ffcbe23a308c5696e0ec791e49a4a38adfc627f0886d",
+      "bytes": 770
+    },
+    {
       "path": "blueprints/us-equities/hosting/receipt.json",
       "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc",
       "bytes": 4873
-    },
-    {
-      "path": "blueprints/us-equities/hosting/research-evidence.yaml",
-      "sha256": "12834f94024d25cfb9fcc423a640e7af8734182a30bc5ab57e06fa8a730be18c",
-      "bytes": 565
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
@@ -9707,8 +9762,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "8bd30d107d0c6405d02b9f6e02e133f208a905511dde089dfa0bc1653d6d1faf",
-      "bytes": 189511
+      "sha256": "c121c2db3f0cfe25064368ac1b2df2e582cb75dbf83b99a7fbb71361289f5f93",
+      "bytes": 188936
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -9762,8 +9817,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "727407c577b2077937d0f45c094efc524ba640d2f446d4d4829adb2277532cb7",
-      "bytes": 285667
+      "sha256": "745af2b10e4a9c1b7179381d37ecd0aef576e79bda4452725315f528c2866813",
+      "bytes": 285723
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10207,8 +10262,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "fd7fa53af2a50ebeb3d693f7b028e39f681505ba1ab601b428676085fdf015fc",
-      "bytes": 18974
+      "sha256": "7974aad91a5da389ec4f097bca1c3b6bc6afe2af4bae7dd06e302bcc83761d68",
+      "bytes": 18668
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -10517,8 +10572,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "06949c67c8caec4813d371bb8566f8505a05d54967250aa2cb3c98679886dd5e",
-      "bytes": 17673
+      "sha256": "83a77106c6bcf574971b2b2f18c1e2e54295ef51e13263bd9eca0d9897fd0e19",
+      "bytes": 17729
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10617,13 +10672,13 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "e960d359de2d750eea69acd3e3d1dd9e9b33bb82f8e06b3e30d6fa9ffa51b0e2",
-      "bytes": 157375
+      "sha256": "2336acccb3975b6fce1a00c8df06b6440313a05c7916f71654b9d154a369d5ec",
+      "bytes": 157327
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "a6ecf2e70b25b01ddfd07f414d42d066f4bb0ea1e53ed95fb700fb6ee73ff290",
-      "bytes": 17268
+      "sha256": "1aa65dd76323d44876e3b7ba904090d409312bfab9f6b929e6d59ad77f26b0e4",
+      "bytes": 18010
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -10637,8 +10692,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
-      "bytes": 35942
+      "sha256": "960a45a4ac3bb1e7854ad015398c5e01d28df06df08f2212baa193a73152d4ea",
+      "bytes": 35907
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -28871,6 +28926,11 @@
       "bytes": 4863
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--context-mode--install--20260925.json",
+      "sha256": "5ee6485e7cdb6f844eeec9e41e9a3969edb0f7b5854e9bed5d073e3072aab50c",
+      "bytes": 8958
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--context-mode--use--20260925-2.json",
       "sha256": "edd8b2f0ded897b56acbd1315112e8fafc53e0dac548e400c06ce5097dbf38c6",
       "bytes": 9712
@@ -28892,23 +28952,33 @@
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-alpaca-py--install--20260925.json",
-      "sha256": "184628b498e991d7db610d5af3b69c4525dea2b0a691df7e6f877247abbb851a",
-      "bytes": 6810
+      "sha256": "5db2036d759ba3aa25a9f57385b842f88d00aace180b9861912ece7158bbbdb1",
+      "bytes": 7757
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-duckdb--install--20260925.json",
-      "sha256": "70479df01bd9a2dd506557ce4b84b177d660a142deb605a14f4a806440e7acca",
-      "bytes": 6758
+      "sha256": "6f302bc5bfb587cafe8cb6e20a5ca9669d95ad92444096d80bc4e7474f07a423",
+      "bytes": 7660
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-duckdb--use--20260925.json",
+      "sha256": "3c7b3f7e0c20581ac92fab8a7ce6b4aff439d357085504d566ef7cf8ca098f4a",
+      "bytes": 11153
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-edgartools--use--20260925.json",
-      "sha256": "ba293238fbd637c56f1e707b0441cdbb6f8b39d2d95bfaedd34ea4f69a47d4a8",
-      "bytes": 8466
+      "sha256": "67e6f78184e9072885b4d95a583a36cbed107b3064d8ff797a647b6e00b04ec1",
+      "bytes": 9612
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-exchange-calendars--use--20260925.json",
-      "sha256": "1870c850cb503ae54c078df3e1dc8ba79efb546c973d38e187fd746e5665c809",
-      "bytes": 7989
+      "sha256": "eaddeb7a5484b9029c5b7068292fa7c4ad757b1264f03f74f3f4b17b7a71f517",
+      "bytes": 9091
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--data-pandera--use--20260925.json",
+      "sha256": "d46103154385c6883d5ce688b9cb8ddb96e2ac170aaa3b3e4b0a689d00d7e075",
+      "bytes": 10382
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--difftastic--install--20260925.json",
@@ -28919,6 +28989,16 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--difftastic--use--20260925.json",
       "sha256": "be06adaa218fd1a4b1ce00ae7cb6fa872c3312605af4ffd20deacc96199dc0f6",
       "bytes": 6636
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--fastapi--use--20260925-2.json",
+      "sha256": "91e4af578ef67d91546ea60475cdefd4dedf8773addbc4f831022531520d59d1",
+      "bytes": 12932
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--fastapi--use--20260925.json",
+      "sha256": "e9046f44a1a4275e591f0ce36eb37ce0f25c600efa558cf6d17d0585b2666eb8",
+      "bytes": 11034
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--gitleaks--install--20260925.json",
@@ -28941,6 +29021,21 @@
       "bytes": 8855
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260925-2.json",
+      "sha256": "75121416f8b4f8e21571c1b70c1bc7bbf1bb45f135ca55fca42f6113137d53f5",
+      "bytes": 11320
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260925.json",
+      "sha256": "eeec5b5ff258f9d37a170bba0324e1c1a1f8456d7f585f0a2691e73fe0e1c531",
+      "bytes": 9350
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--jcodemunch-mcp--install--20260925.json",
+      "sha256": "842c2a141d37518a99244959f048fc1b049b84f564b40760251fafa47459df9d",
+      "bytes": 10520
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925-2.json",
       "sha256": "a6027089ffa04812e07184dca602f114d6a32382aa5561ced9c9ea558850f210",
       "bytes": 8175
@@ -28949,6 +29044,11 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925.json",
       "sha256": "c1e7bea0520884f24ffc78b13e5f2e3ed0d42682a2a5683e566a7052f82d4d2d",
       "bytes": 7370
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--lean--use--20260925.json",
+      "sha256": "7d54b367a8eea7798db6d1638bb93d6ed4f4cf19f1b45d6d8364604225b95162",
+      "bytes": 10672
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--loki--install--20260925.json",
@@ -28961,14 +29061,44 @@
       "bytes": 7420
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--markitdown--install--20260925.json",
+      "sha256": "e34b63adecaa2c73c809c0e1ad07d70682283294f6e714535ec858d0061087db",
+      "bytes": 8070
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--markitdown--use--20260925.json",
       "sha256": "b3f934ccbe8cc1c9f10b4901e405cc400e36cfbb0faf1e3fa572f46661ac0697",
       "bytes": 6294
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcp-inspector--use--20260925-2.json",
+      "sha256": "f11226e2cb409d36e65b46b34799243851e0109490e8aeea0a639ca1f05abcf7",
+      "bytes": 10749
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcp-inspector--use--20260925.json",
+      "sha256": "85891467eff68391b35bbd3bf0be2ea41d69c587f67e01fb97963b85986302b8",
+      "bytes": 9684
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcporter--install--20260925.json",
       "sha256": "1f4f808e7f9d3a8d3783e2109ea9c7c780f2547961821fee46b427fe09cafec1",
       "bytes": 4893
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcporter--use--20260925-2.json",
+      "sha256": "0febb0fe2524ca49b6fbb7abf143af851e9990da8996c3ea6fe047e3b29bd227",
+      "bytes": 11198
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcporter--use--20260925-3.json",
+      "sha256": "b1166869494a68b8eec2e605607f91d6c1d4d1f7417a3724919d16d6f173d566",
+      "bytes": 11669
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--mcporter--use--20260925.json",
+      "sha256": "447d48e107077840870979dd9fe1fdedf18e8da133ce96abfb4017ad0fa78863",
+      "bytes": 9411
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--nautilustrader--use--20260925.json",
@@ -28986,6 +29116,16 @@
       "bytes": 8884
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--poppler--install--20260925.json",
+      "sha256": "23548aea5c8a5790a597c5134b8d932dd7a7196474548d040cf9fb7afaa818e8",
+      "bytes": 7875
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--poppler--use--20260925-2.json",
+      "sha256": "577bc1fce8b0822524d9ccaba6bb837f1c296f99efb7b92f4aa90a81617cea86",
+      "bytes": 6808
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--poppler--use--20260925.json",
       "sha256": "c34e13b2c93ea9042c69922794d56c241c8487baae8453a58b41397171a91e10",
       "bytes": 5953
@@ -28999,6 +29139,16 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--prometheus--use--20260925.json",
       "sha256": "400318969fe62351838f8dfdca467d90dc6a59c1cb72956e9e706a1e28fb76f0",
       "bytes": 7694
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--use--20260925-2.json",
+      "sha256": "54cd95706fd54a8aa556559abef99ddacae9650dd9647e6e7855c046a6779328",
+      "bytes": 12797
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--use--20260925.json",
+      "sha256": "e29ad276bc607b55d6c3ac21214ab0ce214ff24b19fea75ee885a42490db97f0",
+      "bytes": 10619
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--install--20260925.json",
@@ -29081,6 +29231,11 @@
       "bytes": 11201
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--serena--install--20260925.json",
+      "sha256": "ceca3b1c253f8cf6a537d60b987547383e3fe571fde88c1339fd46a1e0661205",
+      "bytes": 7311
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--serena--use--20260925-2.json",
       "sha256": "703af00ef1d079d9317db8ab3be980c3f02f9f1e14a2ae6f42254e05bc3a4a81",
       "bytes": 10485
@@ -29092,8 +29247,13 @@
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--skfolio--use--20260925.json",
-      "sha256": "3377c4d19b8e366505362c33ccf7de7900ef1f3d640fb27d9662d34eaa6f8457",
-      "bytes": 10214
+      "sha256": "4aa1506cb04d56f0c43905782a06fcfa61e7b72c82bba8963d222f89ef3bd967",
+      "bytes": 11318
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--install--20260925.json",
+      "sha256": "905550615a80deaa7d94f18c579016b6df705ab0f9496217791aa40d7562898d",
+      "bytes": 9240
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
@@ -29124,6 +29284,16 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--install--20260925.json",
       "sha256": "c403b071f9396d4840bb6fcea72e3a2d35f3f066bbb9c0f09dfb1311eeb9c8d0",
       "bytes": 4916
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--use--20260925-2.json",
+      "sha256": "859c096ac3e86de085a1e9e27a3435397c831cd89fe72c57fcfa972d01cf2b64",
+      "bytes": 11760
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--systemd--use--20260925.json",
+      "sha256": "d78f5a4833c777540bce8ae94d8f5e822946371e22046e57708bb4c9f5a3311d",
+      "bytes": 10560
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--toon--install--20260925.json",
@@ -29832,8 +30002,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "fdb21dc1aa910ff68f2b558a02cdf98c9d836307b85dc8ecdb57aedfa3de4291",
-      "bytes": 5324
+      "sha256": "41893a5f18340f5529e1b95d1e0f860adf5cf607f5aebddda1b391f1615f7a1c",
+      "bytes": 6337
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
@@ -30057,8 +30227,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
-      "bytes": 15802
+      "sha256": "076a8608b1f97acd5c07fab68b839c62884daffd87ad4914f79340650eaa09f1",
+      "bytes": 19700
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -30072,13 +30242,18 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "d5e3a92337fba097365a061d31ed35457b903d98ef2f3e088b0421420ea90b9e",
-      "bytes": 4049
+      "sha256": "4d8c94bc4812d4a2f976d6828715277b94464c90b4223e3c8ce7560fd4ff212e",
+      "bytes": 8225
     },
     {
       "path": "observability/backends/install.py",
       "sha256": "d87c47cfe1e728f3ca8b3eb5e3fa7031f553407b0ea9c649965c4fdaa6a3e8e6",
       "bytes": 3619
+    },
+    {
+      "path": "observability/backends/paper-alert-file-sd-host-20260925.json",
+      "sha256": "94b47cbb74916f0e7a14f3f97174d0d2f92eebcfa3db7aac7303a45732fb4191",
+      "bytes": 5365
     },
     {
       "path": "observability/backends/pins.json",
@@ -30137,13 +30312,13 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "45c5ca5fcfd2575e398494f353289634056c0064e0b216045e5092f320d5a931",
-      "bytes": 9373
+      "sha256": "3791486b1bc1a006cb02ae4c894d4c61d5e97a238887a885cb9c45b3fcc88416",
+      "bytes": 9821
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
-      "sha256": "fdaae9c4934c33585f9cade2a38c77767958b648f358295ef8220302fb49bb7b",
-      "bytes": 1092
+      "sha256": "4c41e85e2cb3cc0aabed4776f19b6e7590625944d41fcd909124f9046b70ce25",
+      "bytes": 1147
     },
     {
       "path": "observability/collector/README.md",
@@ -30232,8 +30407,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "3422ef86764be93c08b935307de648767b492e59852df1818daf4341172eda7f",
-      "bytes": 12612
+      "sha256": "638fa051728b85b553dca177300f3c7901c50aa29b78d2ea0c4f30b96b1e16fd",
+      "bytes": 13279
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -30302,8 +30477,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "a131f5515f3d02aaf7e2660723bb92dd418dc85d77f9aa0daecdb9ed6f035096",
-      "bytes": 61506
+      "sha256": "048dd1173af844d96b27c88af1d7ac438e25276463e7fd7a4295d862f761a714",
+      "bytes": 61471
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -30342,8 +30517,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "c274575a6b3297e187f99cddb7eef62688532c8cc50eb525ed7c0a0df532d6b8",
-      "bytes": 26327
+      "sha256": "9da040c4f73eb7c87e972b04a79125a1964bd6a945243fefca480aa5b8c532a4",
+      "bytes": 34868
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -30547,8 +30722,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "8b0627f752ddf11c87005200e76d0ad4873261905ba073163476c66659d564f9",
-      "bytes": 20491
+      "sha256": "4e80ecdb3af5c5303b9dd6d2b3ea0f589e2bcb3ae6360fc0e19a80502340315b",
+      "bytes": 30222
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",
@@ -30622,8 +30797,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "4f46a8e3871479ba55929a9cd0ed813c87c2dc33e30363b78f4d0e0ffd38ded3",
-      "bytes": 36665
+      "sha256": "b68795021ce92542ccce28c42a8d8d79accd35b83828fec79b06807571362bd1",
+      "bytes": 49735
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -30962,8 +31137,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "c015775d7072829877361f358f79d560075e0d84c06c9155146aa0c58875ba90",
-      "bytes": 8168
+      "sha256": "5ef5f7b4ed58773c090401c9472162222b623a2973012560cae577d7a8f854a6",
+      "bytes": 13446
     },
     {
       "path": "tests/test_offhost_app_state.py",
@@ -31222,8 +31397,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "3e49abf372621001a43c88dad8b91d462bcae421bb2028862fce9c5e5f947aa9",
-      "bytes": 10537
+      "sha256": "62261258cf18514b713cf566c05f84163d6f11efa60c2eea8c15359b134dda46",
+      "bytes": 12439
     },
     {
       "path": "tools/token-report/config.example.json",
@@ -31242,13 +31417,13 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "1283656ec58d2095b7915887c0d005e83dcf206dc275907cd20ed5a80507da91",
-      "bytes": 41324
+      "sha256": "1e81e6498ae91fe812b5f394b602dc24a42816ea16d3d42e2179c92f5acec03b",
+      "bytes": 50696
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
-      "sha256": "7be2d96285cb69a6d9587a8a1bd011ddb7e1bce60aecfa856a8b62b5da0d65aa",
-      "bytes": 39777
+      "sha256": "c64f360872e47adec78be657f189711274bf0c6d4b6e3f675c1261fea70db71e",
+      "bytes": 40062
     },
     {
       "path": "tools/token-report/token_manifest.html.in",
@@ -31257,8 +31432,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
-      "bytes": 50793
+      "sha256": "561975460e3305b5a8b4de14360575a1eb8b5efc7f7fc9f4f5cf91579e53be01",
+      "bytes": 56779
     }
   ],
   "convergence_records": [

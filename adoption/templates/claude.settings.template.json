@@ -22,7 +22,8 @@
     "RTK_TELEMETRY_DISABLED": "1",
     "MCP_AUTO_OPEN_ENABLED": "false",
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"
   },
   "permissions": {
     "deny": [
@@ -233,5 +234,6 @@
   "enableWorkflows": true,
   "showThinkingSummaries": true,
   "cleanupPeriodDays": 3650,
-  "autoContinueAtUsageLimit": true
+  "autoContinueAtUsageLimit": true,
+  "switchModelsOnFlag": false
 }

@@ -1,5 +1,7 @@
 # Repository work
 
+**Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.
+
 The two maintained catalogs start at `catalogs/README.md`. Use
 `catalogs/foundation/manifest.json` for general native harness layers and
 `catalogs/us-equities/README.md` for the separate trading architecture. Apply

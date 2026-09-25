@@ -68,6 +68,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduced on this host from a clean detached checkout of main at cd17bda2: every recorded command re-ran with the recorded exit code; all outputs byte-identical except uv's timing line in cmd 2; the network tag check (cmd 3) byte-identical. Install stage, readiness only, as claimed: beyond a version call, the engine's own pragma_version() returned library_version v1.5.5 with source_id d8cdaa33fd, a prefix of the pinned commit, in a no-network namespace. Checked: every version, lock and pin claim is backed by a retained command, and the receipt is bound to the layer winner data-duckdb (pin_matches true).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T20:24:41Z",
+      "reviewer": {
+        "identity_sha256": "ebc869dd1e67d16a8d46b08a45900ac439b2f0de4b27f34c4cba532be5a529b3",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

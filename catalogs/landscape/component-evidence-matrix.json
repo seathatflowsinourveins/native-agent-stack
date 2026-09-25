@@ -336,9 +336,9 @@
                 "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T16:35:14Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T19:02:22Z",
+                "pass": 3
               },
               "qualified_models": []
             },
@@ -463,9 +463,9 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:09Z",
-                "pass": 1
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T19:02:24Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -502,16 +502,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:10Z",
-                "pass": 1
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T19:35:21Z",
+                "pass": 3
               },
               "qualified_models": []
             },
@@ -931,16 +931,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:46:13Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -1454,16 +1454,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T05:38:17Z",
-                "pass": 1
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-25T19:49:22Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -1500,16 +1500,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:48:13Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -1539,7 +1539,7 @@
       "alternatives": [
         {
           "disposition": "out_of_scope",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "local_integration",
           "name": "MCPorter native bridge",
           "repository": "https://github.com/openclaw/mcporter"
@@ -1924,7 +1924,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "native_proven",
           "name": "MCP Inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector"
@@ -1980,16 +1980,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:46:15Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -2344,16 +2344,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "local_integration winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T14:22:45Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T19:48:16Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -2521,9 +2521,9 @@
                 "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T14:40:04Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T19:02:24Z",
+                "pass": 3
               },
               "qualified_models": []
             },
@@ -3645,16 +3645,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
               "derived_status": "accepted",
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:06:42Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -3776,16 +3776,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "conditional",
-              "derived_reason": "synthetic winner",
-              "derived_status": "conditional",
-              "e2e_state": "conditional",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:06:40Z",
+                "pass": 1
               },
               "qualified_models": []
             },
@@ -3836,7 +3836,7 @@
         },
         {
           "disposition": "conditional",
-          "e2e_state": "not_run",
+          "e2e_state": "host_verified",
           "evidence_class": "local_integration",
           "name": "promptfoo",
           "repository": "https://github.com/promptfoo/promptfoo"
@@ -3900,16 +3900,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "not_established",
-              "derived_reason": "source_review winner with no passing host receipt",
-              "derived_status": "not_established",
-              "e2e_state": "not_established",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-25T19:47:31Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -4182,7 +4182,7 @@
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:18Z",
                 "pass": 1
               },
@@ -4231,14 +4231,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:36Z",
                 "pass": 1
               },
@@ -4272,14 +4272,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:46Z",
                 "pass": 1
               },
@@ -4360,14 +4360,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:37:11Z",
                 "pass": 1
               },
@@ -4555,14 +4555,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:37:11Z",
                 "pass": 1
               },
@@ -4596,14 +4596,14 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
+                "independently_reviewed_pass": 1,
                 "latest": "2026-09-25T15:36:36Z",
                 "pass": 1
               },
@@ -4882,16 +4882,16 @@
             "linux-wsl2-x86_64": {
               "alias_receipts": [],
               "catalog_status": "accepted",
-              "derived_reason": "native_proven winner without a registered evidence/ reference",
-              "derived_status": "conditional",
-              "e2e_state": "accepted",
+              "derived_reason": "independently reviewed native_proven pass at the current pin",
+              "derived_status": "accepted",
+              "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": "2026-09-25T15:36:28Z",
-                "pass": 1
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-25T19:06:39Z",
+                "pass": 2
               },
               "qualified_models": []
             },
@@ -4939,12 +4939,6 @@
       "linux-wsl2-x86_64": [
         {
           "catalog": "foundation",
-          "component_id": "poppler",
-          "e2e_state": "conditional",
-          "layer_id": "document-retrieval"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "candidate:cli-cli",
           "e2e_state": "not_established",
           "layer_id": "git-github-automation"
@@ -4975,21 +4969,9 @@
         },
         {
           "catalog": "foundation",
-          "component_id": "promptfoo",
-          "e2e_state": "conditional",
-          "layer_id": "quality-evaluation"
-        },
-        {
-          "catalog": "foundation",
           "component_id": "candidate:astral-sh-uv",
           "e2e_state": "conditional",
           "layer_id": "recovery-portability"
-        },
-        {
-          "catalog": "foundation",
-          "component_id": "systemd",
-          "e2e_state": "conditional",
-          "layer_id": "scheduling-supervision"
         },
         {
           "catalog": "foundation",
@@ -5017,12 +4999,6 @@
         },
         {
           "catalog": "us-equities",
-          "component_id": "data-pandera",
-          "e2e_state": "conditional",
-          "layer_id": "data-quality-orchestration"
-        },
-        {
-          "catalog": "us-equities",
           "component_id": "data-mlflow",
           "e2e_state": "not_established",
           "layer_id": "evaluation-experiments"
@@ -5030,12 +5006,6 @@
         {
           "catalog": "us-equities",
           "component_id": "foundation-agent-retrieval-bench",
-          "e2e_state": "not_established",
-          "layer_id": "evaluation-experiments"
-        },
-        {
-          "catalog": "us-equities",
-          "component_id": "inspect-ai",
           "e2e_state": "not_established",
           "layer_id": "evaluation-experiments"
         },

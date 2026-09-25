@@ -12,8 +12,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, NO_CLIENT_STATE, client_wiring,
-                                     git_revision, inspect_adoption, main)
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, NO_CLIENT_STATE,
+                                     NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring, git_revision,
+                                     inspect_adoption, main, probe_pinned_version, version_output_matches)
 
 REPO = Path(__file__).resolve().parents[1]
 PRIVATE = "private-value-never-reported"
@@ -330,6 +331,213 @@ class AdoptionStatusTests(unittest.TestCase):
         self.assertEqual(set(result["client_wiring"]), {*CLIENT_WIRING_KEYS, "complete"})
         self.assertIs(result["client_wiring"]["complete"], False)
         self.assertNotIn(str(self.root), json.dumps(result))
+
+
+class PinnedVersionProbeTests(unittest.TestCase):
+    """probe_pinned_version/version_output_matches units, against a real tiny script on PATH (never a
+    fake subprocess.run): never execs a non-"exec" method, exact and minimum matching, and a missing
+    command, malformed command string or timeout is unchecked rather than raising."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.bin = Path(temporary.name)
+        self.enter = contextlib.ExitStack()
+        self.addCleanup(self.enter.close)
+        self.enter.enter_context(patch.dict("os.environ", {"PATH": str(self.bin)}))
+        self.enter.enter_context(patch("scripts.adoption_status.shutil.which", side_effect=native_which))
+
+    def script(self, name: str, body: str) -> None:
+        executable = self.bin / name
+        executable.write_text(f"#!/bin/sh\n{body}\n")
+        executable.chmod(0o755)
+
+    def test_exact_match_reports_checked_and_matched(self):
+        self.script("gh", "printf 'gh version 2.101.0 (2026-09-22)\\n'")
+        entry = {"version": "2.101.0", "version_probe": {"method": "exec", "command": "gh", "args": ["--version"]}}
+        self.assertEqual(probe_pinned_version(entry),
+                          {"pinned_version": "2.101.0", "checked": True, "matches_pin": True})
+
+    def test_exact_mismatch_is_checked_and_not_matched(self):
+        self.script("gh", "printf 'gh version 2.100.0\\n'")
+        entry = {"version": "2.101.0", "version_probe": {"method": "exec", "command": "gh", "args": ["--version"]}}
+        self.assertEqual(probe_pinned_version(entry),
+                          {"pinned_version": "2.101.0", "checked": True, "matches_pin": False})
+
+    def test_minimum_match_is_a_floor_not_a_ceiling(self):
+        self.script("claude", "printf 'claude-code 2.1.290\\n'")
+        entry = {"version": "2.1.281",
+                 "version_probe": {"method": "exec", "command": "claude", "match": "minimum", "args": ["--version"]}}
+        self.assertTrue(probe_pinned_version(entry)["matches_pin"])
+        self.script("claude", "printf 'claude-code 2.1.100\\n'")
+        self.assertFalse(probe_pinned_version(entry)["matches_pin"])
+
+    def test_npm_metadata_method_is_never_executed(self):
+        self.script("context-mode", "printf 'never run\\n'; exit 1")
+        entry = {"version": "1.0.169", "version_probe": {"method": "npm-metadata", "note": "starts a server"}}
+        with patch("scripts.adoption_status.subprocess.run") as run:
+            result = probe_pinned_version(entry)
+        run.assert_not_called()
+        self.assertEqual(result, {"pinned_version": "1.0.169", "checked": False, "matches_pin": None})
+
+    def test_an_undeclared_future_method_is_also_never_executed(self):
+        self.script("future-tool", "printf 'never run\\n'; exit 1")
+        entry = {"version": "9.9.9",
+                 "version_probe": {"method": "some-future-method", "command": "future-tool", "args": ["--version"]}}
+        with patch("scripts.adoption_status.subprocess.run") as run:
+            result = probe_pinned_version(entry)
+        run.assert_not_called()
+        self.assertFalse(result["checked"])
+
+    def test_a_command_not_on_path_is_unchecked_not_an_error(self):
+        entry = {"version": "1.0.0",
+                 "version_probe": {"method": "exec", "command": "definitely-not-on-any-path-xyz", "args": []}}
+        self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.0.0", "checked": False, "matches_pin": None})
+
+    def test_a_malformed_command_string_is_rejected_before_exec(self):
+        for command in ("rm -rf /", "/bin/sh", "../escape", ""):
+            with self.subTest(command=command):
+                entry = {"version": "1.0.0", "version_probe": {"method": "exec", "command": command, "args": []}}
+                with patch("scripts.adoption_status.subprocess.run") as run:
+                    result = probe_pinned_version(entry)
+                run.assert_not_called()
+                self.assertFalse(result["checked"])
+
+    def test_a_hanging_probe_times_out_and_is_unchecked(self):
+        # A shell built-in loop only: PATH is scoped to this test's own bin dir, so an external "sleep"
+        # binary would not be found on it (exit 127, not a hang) -- ":" and "while" need no PATH lookup.
+        self.script("slow-tool", "while :; do :; done")
+        entry = {"version": "1.0.0", "version_probe": {"method": "exec", "command": "slow-tool", "args": [],
+                                                        "timeout_seconds": 0.2}}
+        self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.0.0", "checked": False, "matches_pin": None})
+
+    def test_version_output_matches_rules(self):
+        self.assertTrue(version_output_matches("2.101.0", "exact", "gh version 2.101.0 (2026-09-22)\n"))
+        self.assertFalse(version_output_matches("2.101.0", "exact", "gh version 2.100.0\n"))
+        self.assertTrue(version_output_matches("2.1.281", "minimum", "claude-code 2.1.281\n"))
+        self.assertTrue(version_output_matches("2.1.281", "minimum", "claude-code 2.2.0\n"))
+        self.assertFalse(version_output_matches("2.1.281", "minimum", "claude-code 2.1.100\n"))
+        self.assertFalse(version_output_matches("2.1.281", "minimum", "no version here\n"))
+
+    def test_exact_is_bounded_by_non_version_characters_like_the_bootstrap(self):
+        # bootstrap-linux.sh anchors "exact" with (^|[^0-9.])...([^0-9.]|$); a bare substring would match these.
+        self.assertFalse(version_output_matches("2.10", "exact", "v12.10.0\n"))
+        self.assertFalse(version_output_matches("1.0.0", "exact", "tool 21.0.0\n"))
+        self.assertFalse(version_output_matches("0.49.0", "exact", "rtk 0.49.0.1\n"))
+        self.assertTrue(version_output_matches("2.8.3", "exact", "qmd 2.8.3 (facd35e)"))
+        self.assertTrue(version_output_matches("0.49.0", "exact", "first line\nrtk 0.49.0\n"))
+
+    def test_minimum_with_a_non_numeric_part_is_not_a_match_and_never_raises(self):
+        # bootstrap-linux.sh version_at_least returns 1 for a non-numeric part instead of failing.
+        self.assertFalse(version_output_matches("2.0.0.dev0", "minimum", "Serena 2.0.0\n"))
+        # As in the bootstrap, the observed version is the first dotted number, so ".dev0" is not part of it.
+        self.assertTrue(version_output_matches("2.0.0", "minimum", "Serena 2.0.0.dev0\n"))
+        self.assertTrue(version_output_matches("1.2", "minimum", "tool 1.2.0\n"))
+        self.assertFalse(version_output_matches("1.0", "unknown-rule", "tool 1.0\n"))
+
+
+class PinnedVersionsCheckTests(unittest.TestCase):
+    """--pinned-versions end to end: opt-in, value-free JSON shape, and the swapped limitation."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        (self.root / "adoption").mkdir()
+        (self.root / "recipes").mkdir()
+        (self.root / "recipes/README.md").write_text("Native recipe\n")
+        self.path = self.root / "adoption/manifest.json"
+        self.manifest = {
+            "schema_version": 1,
+            "supported_platforms": [{"os": "linux", "architecture": "x86_64", "python": "3.13"}],
+            "profiles": [{"id": "foundation-cpu", "label": "CPU foundation",
+                          "required_commands": ["qmd"], "component_ids": ["qmd", "context-mode", "unpinned-tool"],
+                          "recipe_paths": ["recipes/README.md"]}],
+            "default_profile": "foundation-cpu",
+            "source": {"baseline_commit": "a" * 40, "repository": "https://github.com/example/reference"},
+        }
+        self.path.write_text(json.dumps(self.manifest), encoding="utf-8")
+        self.pins = self.root / "adoption/pins-linux-x86_64.json"
+        self.pins.write_text(json.dumps({"schema_version": 1, "platform": "linux-x86_64", "tools": [
+            {"id": "qmd", "version": "2.8.3",
+             "version_probe": {"method": "exec", "command": "qmd", "args": ["--version"]}},
+            {"id": "context-mode", "version": "1.0.169", "version_probe": {"method": "npm-metadata"}},
+        ]}), encoding="utf-8")
+        bin_dir = self.root / "bin"
+        bin_dir.mkdir()
+        executable = bin_dir / "qmd"
+        executable.write_text("#!/bin/sh\nprintf 'qmd 2.8.3\\n'\n")
+        executable.chmod(0o755)
+        self.enter = contextlib.ExitStack()
+        self.addCleanup(self.enter.close)
+        self.enter.enter_context(patch.dict("os.environ", {"PATH": str(bin_dir)}))
+        self.enter.enter_context(patch("scripts.adoption_status.platform.system", return_value="Linux"))
+        self.enter.enter_context(patch("scripts.adoption_status.platform.machine", return_value="x86_64"))
+        self.enter.enter_context(patch("scripts.adoption_status.sys.version_info", (3, 13, 7)))
+        self.enter.enter_context(patch("scripts.adoption_status.shutil.which", side_effect=native_which))
+        self.enter.enter_context(patch("scripts.adoption_status.git_revision", return_value="a" * 40))
+
+    def test_pinned_versions_is_opt_in(self):
+        with patch("scripts.adoption_status.subprocess.run") as run:
+            result = inspect_adoption(self.path, self.root)
+        run.assert_not_called()
+        self.assertEqual(result["profiles"][0].keys(), {"id", "commands", "recipes", "status"})
+        self.assertIn(NO_PINNED_VERSION, result["limitations"])
+
+    def test_pinned_versions_reports_matched_unchecked_and_absent(self):
+        result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        self.assertEqual(result["profiles"][0]["pinned_versions"], [
+            {"id": "qmd", "pinned_version": "2.8.3", "checked": True, "matches_pin": True},
+            {"id": "context-mode", "pinned_version": "1.0.169", "checked": False, "matches_pin": None},
+            {"id": "unpinned-tool", "pinned_version": None, "checked": False, "matches_pin": None},
+        ])
+        self.assertNotIn(NO_PINNED_VERSION, result["limitations"])
+        self.assertEqual(result["limitations"][-1:], PINNED_VERSION_LIMITATIONS)
+
+    def test_an_absent_pins_file_reports_every_component_unchecked_not_an_error(self):
+        self.pins.unlink()
+        result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        self.assertTrue(all(item["checked"] is False and item["matches_pin"] is None
+                            for item in result["profiles"][0]["pinned_versions"]))
+
+    def test_a_malformed_pins_file_reports_every_component_unchecked_not_an_error(self):
+        for body in ("{not json", "[]", '{"tools": {}}', '{"tools": [1, "x", null]}',
+                     '{"tools": [{"version": "1.0"}]}', '{"tools": [{"id": "rtk"}]}'):
+            with self.subTest(body=body):
+                self.pins.write_text(body, encoding="utf-8")
+                result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+                self.assertTrue(all(item["checked"] is False and item["matches_pin"] is None
+                                    for item in result["profiles"][0]["pinned_versions"]))
+
+    def test_client_wiring_and_pinned_versions_compose(self):
+        canned = {"claude": {"rtk_hook": True}, "complete": False}
+        with patch("scripts.adoption_status.client_wiring", return_value=canned):
+            result = inspect_adoption(self.path, self.root, with_client_wiring=True, with_pinned_versions=True)
+        self.assertNotIn(NO_CLIENT_STATE, result["limitations"])
+        self.assertNotIn(NO_PINNED_VERSION, result["limitations"])
+        self.assertEqual(result["limitations"][-1:], PINNED_VERSION_LIMITATIONS)
+        self.assertIn("client_wiring", result)
+        self.assertIn("pinned_versions", result["profiles"][0])
+
+    def test_cli_json_and_text_report_pinned_versions(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = main(["--manifest", str(self.path), "--repo-root", str(self.root), "--json", "--pinned-versions"])
+        self.assertEqual(code, 0)
+        payload = json.loads(output.getvalue())
+        self.assertIn("pinned_versions", payload["profiles"][0])
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            main(["--manifest", str(self.path), "--repo-root", str(self.root), "--pinned-versions"])
+        self.assertIn("pinned versions: 1 matched, unchecked: context-mode, unpinned-tool", output.getvalue())
+
+    def test_pinned_versions_output_is_value_free(self):
+        result = inspect_adoption(self.path, self.root, with_pinned_versions=True)
+        rendered = json.dumps(result)
+        self.assertNotIn(str(self.root), rendered)
+        for item in result["profiles"][0]["pinned_versions"]:
+            for key, value in item.items():
+                self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
 
 
 class ClientWiringTests(unittest.TestCase):

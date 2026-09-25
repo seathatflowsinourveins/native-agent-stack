@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--context-mode--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "context-mode",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v context-mode) && rp=$(readlink -f \"$p\") && ap=$(python3 -c \"import json;print([t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']=='context-mode'][0])\") && sv=$(python3 -c \"import json;print([x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='context-mode'][0])\") && wp=$(python3 -c \"import json,glob;print(sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')=='context-mode'}))\") && echo \"resolves: $p -> $rp | adoption pin: $ap | stack pin: $sv | landscape winner pins: $wp\" && test -n \"$p\" && test \"$ap\" = \"1.0.169\" && test \"$sv\" = \"1.0.169\" && test \"$wp\" = \"[]\" && echo \"ASSERT_OK resolved CLI present; adoption pin, stack pin and landscape winner pins all consistent with 1.0.169\"",
+      "exit": 0,
+      "duration_s": 0.069,
+      "output_sha256": "55f6e084ce499e0f644af0bf75ec1ca8e1e0bcba3a02de46a5357cd895dd9135",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/context-mode -> ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/cli.bundle.mjs | adoption pin: 1.0.169 | stack pin: 1.0.169 | landscape winner pins: []\nASSERT_OK resolved CLI present; adoption pin, stack pin and landscape winner pins all consistent with 1.0.169\n"
+    },
+    {
+      "cmd": "PREFIX=\"$HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169\" && PKGJSON=\"$PREFIX/lib/node_modules/context-mode/package.json\" && TARBALL=\"$HOME/.local/share/codex-ecosystem/downloads/context-mode-1.0.169.tgz\" && pv=$(python3 -c \"import json;print(json.load(open('$PKGJSON'))['version'])\") && pinsha=$(python3 -c \"import json;print([t['sha256'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']=='context-mode'][0])\") && tbsha=$(sha256sum \"$TARBALL\" | cut -d' ' -f1) && membersha=$(tar -xzOf \"$TARBALL\" package/package.json | sha256sum | cut -d' ' -f1) && instsha=$(sha256sum \"$PKGJSON\" | cut -d' ' -f1) && nls=$(npm ls --global --prefix \"$PREFIX\" --depth=0 2>&1) && echo \"npm pkg version: $pv | tarball sha256 $(echo $tbsha | cut -c1-16)... | pin sha256 $(echo $pinsha | cut -c1-16)... | tarball pkg.json member $(echo $membersha | cut -c1-16)... | installed pkg.json $(echo $instsha | cut -c1-16)... | npm ls: $(echo \"$nls\" | tr '\\n' ' ')\" && test \"$pv\" = \"1.0.169\" && test \"$tbsha\" = \"$pinsha\" && test \"$membersha\" = \"$instsha\" && echo \"$nls\" | grep -q \"context-mode@1.0.169\" && echo \"ASSERT_OK version+integrity+npmls all match pin\"",
+      "exit": 0,
+      "duration_s": 0.402,
+      "output_sha256": "ddf1b983291b384732aa54fb99f3f5a19af0582315e204415a14b985415451b7",
+      "output_excerpt": "npm pkg version: 1.0.169 | tarball sha256 09c41e4cf77b2156... | pin sha256 09c41e4cf77b2156... | tarball pkg.json member f0a96c5affd66f53... | installed pkg.json f0a96c5affd66f53... | npm ls: ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib \u2514\u2500\u2500 context-mode@1.0.169 \nASSERT_OK version+integrity+npmls all match pin\n"
+    },
+    {
+      "cmd": "P=\"$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169\" && rev=$(sed -n 's/.*mksglu\\/context-mode --ref \\([0-9a-f]\\{40\\}\\).*/\\1/p' recipes/README.md | head -1) && python3 -c \"import json,os,sys;p,rev=sys.argv[1],sys.argv[2];pj=json.load(open(os.path.join(p,'.claude-plugin','plugin.json')));e=json.load(open(os.path.expanduser('~/.claude/plugins/installed_plugins.json')))['plugins'].get('context-mode@context-mode',[]);m=[x for x in e if x.get('installPath')==p];ok=bool(m) and pj.get('version')=='1.0.169' and m[0].get('version')=='1.0.169' and m[0].get('gitCommitSha')==rev;print('plugin.json version',pj.get('version'),'| installed_plugins.json version',(m[0].get('version') if m else None),'gitCommitSha',(m[0].get('gitCommitSha') if m else None),'| recipes/README.md reviewed ref',rev,'|','ASSERT_OK' if ok else 'ASSERT_FAIL');raise SystemExit(0 if ok else 1)\" \"$P\" \"$rev\"",
+      "exit": 0,
+      "duration_s": 0.021,
+      "output_sha256": "181e744fa2fa259c017c8949054518216995e2929025dd4be5192c458facec2b",
+      "output_excerpt": "plugin.json version 1.0.169 | installed_plugins.json version 1.0.169 gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b | recipes/README.md reviewed ref 6f0cc6841c687e754059f36714a11233fda1a02b | ASSERT_OK\n"
+    }
+  ],
+  "tool_versions": {
+    "context-mode": "1.0.169"
+  },
+  "observed_at_utc": "2026-09-25T19:02:21Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), context-mode 1.0.169 is installed at its pin. The CLI resolves to this host's tools/context-mode-1.0.169 prefix. The adoption pin and the stack pin both read 1.0.169. The retained npm tarball's sha256 equals the adoption pin's sha256, and the tarball's package.json member is byte-identical to the installed one. npm ls reports context-mode@1.0.169. The Claude Code plugin cache reports version 1.0.169 with gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b, which equals the reviewed ref in recipes/README.md. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "context-mode is not a landscape layer winner (it is an alternative in token-efficiency), so this binds only to the manifests/stack.json and adoption pin 1.0.169; it changes no platform_status.",
+    "The Claude Code marketplace source cannot pin a commit: the recipe adds it without a ref and then checks gitCommitSha, as this receipt does. Codex's plugin registration for context-mode is not checked here.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision), not from a pinned install checkout; the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:21Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran all 3 commands from the worktree root (local reads only); each exited 0 and printed output identical to the retained excerpt. Adequacy-checked (install receipt, points 3 and 4): point 3 every claim sentence maps to a retained command: CLI resolve plus adoption pin and stack pin 1.0.169 (cmd 1); tarball sha256 equals adoption pin sha256 by full-hash test, tarball package.json member equals installed package.json, npm ls reports context-mode@1.0.169 (cmd 2); plugin cache version and gitCommitSha equal the recipes/README.md reviewed ref 6f0cc68 (cmd 3); I confirmed the pin sha256 in adoption/pins-linux-x86_64.json and recipes/README.md lines 92 and 119-122. Point 4: context-mode is not a foundation.json layer winner (alternative in token-efficiency, whose winners are rtk, headroom, ccusage), and tool_versions 1.0.169 equals the manifests/stack.json version under host_receipts.pin_matches. Claim and limitations state readiness only (install stage, conditional at most) and keep the npm-CLI versus plugin-revision distinction. No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:24Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--socraticode--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "socraticode",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v socraticode) && rp=$(readlink -f \"$p\") && echo \"resolves: $p -> $rp\" && case \"$rp\" in */tools/socraticode-1.14.0/*) echo \"under pinned tools/socraticode-1.14.0 prefix: yes\" ;; *) echo \"UNEXPECTED prefix: $rp\" >&2; exit 1 ;; esac && python3 -c \"import json;d=json.load(open('adoption/pins-linux-x86_64.json'));hit=[t['version'] for t in d['tools'] if t['id']=='socraticode'];print('pins-linux-x86_64.json:', hit or 'NONE (manual --ignore-scripts recipe per recipes/README.md, not a pins-file entry)')\" && python3 -c \"import json,glob;c='socraticode';print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" && (grep -q -- \"-- socraticode --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" && echo \"present in installed-versions.txt\") || echo \"absent from installed-versions.txt (expected: not part of the automated pins-linux-x86_64.json/bootstrap flow)\"",
+      "exit": 0,
+      "duration_s": 0.055,
+      "output_sha256": "c7bcec02518a2e0e0bb670a16a5bec84a83a32f82ba5253e4461f811481f8913",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/socraticode -> ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\nunder pinned tools/socraticode-1.14.0 prefix: yes\npins-linux-x86_64.json: NONE (manual --ignore-scripts recipe per recipes/README.md, not a pins-file entry)\nstack ['1.14.0'] winner pins ['1.14.0']\nabsent from installed-versions.txt (expected"
+    },
+    {
+      "cmd": "timeout 20 npm ls --global --prefix \"$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0\" --depth=0 2>&1 && python3 -c \"import json;p=json.load(open('$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/package.json'));v=p['version'];print('package.json:', p['name'], v);import sys;sys.exit(0 if v=='1.14.0' else 1)\" && echo \"version call ok: 1.14.0 (socraticode has no usable --version; every invocation starts its MCP stdio server per adoption/pins-macos-arm64.json, so the version is read from package metadata, matching recipes/README.md's mcp-inspector convention)\"",
+      "exit": 0,
+      "duration_s": 0.399,
+      "output_sha256": "427dfdf779176fa524b0a81b863fba1092afbf19beff2eb9a0e4ac08fd6a5389",
+      "output_excerpt": "~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib\n\u2514\u2500\u2500 socraticode@1.14.0\n\npackage.json: socraticode 1.14.0\nversion call ok: 1.14.0 (socraticode has no usable --version; every invocation starts its MCP stdio server per adoption/pins-macos-arm64.json, so the version is read from package metadata, matching recipes/README.md's mcp-inspector convention)\n"
+    },
+    {
+      "cmd": "python3 -c \"import json;stack=[x for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='socraticode'][0];mac=[t for t in json.load(open('adoption/pins-macos-arm64.json'))['tools'] if t['id']=='socraticode'][0];readme=open('recipes/README.md').read();commit_ok=stack['source_pin'] in readme;recipe_ok='npm install --global --prefix \\\"\\$STACK_HOME/tools/socraticode-1.14.0\\\" --ignore-scripts socraticode@1.14.0' in readme;pkg=json.load(open('$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/package.json'));print('stack.json source_pin:', stack['source_pin'], '| recipes/README.md has same commit:', commit_ok, '| has exact recipe line:', recipe_ok);print('pins-macos-arm64.json (only pinned-hash source; no linux-x86_64 sha256 exists):', mac['version'], mac['sha256'], mac['checksum_source']);print('installed package.json:', pkg['name'], pkg['version']);ok=commit_ok and recipe_ok and mac['version']=='1.14.0' and pkg['version']=='1.14.0' and stack['version']=='1.14.0';print('integrity cross-check PASS' if ok else 'integrity cross-check FAIL');import sys;sys.exit(0 if ok else 1)\"",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_sha256": "9cbad3250d51df6dcdb3aad18420d309fb7e78948c9784b5167b59d038f76798",
+      "output_excerpt": "stack.json source_pin: 2218f25153d0f3f4a76ee240a5643dbc873e80be | recipes/README.md has same commit: True | has exact recipe line: True\npins-macos-arm64.json (only pinned-hash source; no linux-x86_64 sha256 exists): 1.14.0 3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46 npm_registry_integrity_crosscheck\ninstalled package.json: socraticode 1.14.0\nintegrity cross-check PASS\n"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0"
+  },
+  "observed_at_utc": "2026-09-25T19:02:24Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), SocratiCode is installed at the semantic-rag winner pin, 1.14.0. The launcher resolves into this host's tools/socraticode-1.14.0 prefix. npm ls and the installed package.json report socraticode 1.14.0, matching manifests/stack.json and the landscape winner pin. The stack source_pin 2218f25153d0f3f4a76ee240a5643dbc873e80be and the exact --ignore-scripts install line both appear in recipes/README.md. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "SocratiCode has no usable --version: every invocation starts its MCP stdio server, so the version is read from npm package metadata, as adoption/pins-macos-arm64.json documents for its version_probe.",
+    "No Linux pinned artifact hash exists; SocratiCode is a manual recipe outside adoption/pins-linux-x86_64.json. The only pinned hash, the npm-registry integrity cross-check in adoption/pins-macos-arm64.json, is cited for version agreement and is not compared against an on-host tarball.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision), not from a pinned install checkout; the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:24Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran all 3 commands from the worktree root (local reads only); each exited 0 and printed output identical to the retained excerpt. cmd 1's retained excerpt is cut mid-sentence by the recorder's excerpt cap; the re-run's full output has the retained text as an exact prefix. Adequacy-checked (install receipt, points 3 and 4): point 3 every claim sentence maps to a retained command: launcher resolves into tools/socraticode-1.14.0 (cmd 1); npm ls and installed package.json report socraticode 1.14.0 (cmd 2); stack and winner pins print as 1.14.0 (cmd 1); stack source_pin 2218f251 and the exact --ignore-scripts install line both found in recipes/README.md (cmd 3). The 'version call ok' echo in cmd 2 is a fixed label, since no version flag exists and none is called; the claim correctly says package metadata was read, and I confirmed the version_probe note in adoption/pins-macos-arm64.json. Point 4: socraticode is the semantic-rag layer winner in catalogs/landscape/foundation.json; tool_versions 1.14.0 equals the winner pin and the stack version under host_receipts.pin_matches (I ran it). Claim and limitations state readiness only (conditional at most) and admit there is no Linux artifact hash. No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:40Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

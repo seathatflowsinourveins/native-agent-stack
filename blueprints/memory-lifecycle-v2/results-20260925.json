@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "claim_id": "memory-lifecycle-v2-20260925",
+  "kind": "native_cli_e2e",
+  "observed_at_utc": "2026-09-25T20:28Z",
+  "status": "passed_scoped_acceptance",
+  "scope": "Disposable fixture only, both binaries independently against their own fresh --data-dir: TTL crossing in real wall-clock time, scoped retrieval across 4 projects / 2 workspaces including documented scopes[] and global=true search, restart durability (a second native process against the same store), plus v1-shape supersession/delete/expiry-sweep regressions.",
+  "preregistration": {
+    "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
+    "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
+    "sha256_recorded_before_any_run": true,
+    "note": "One post-freeze correction: the phase-\"post\" call-count arithmetic (15 -> 16) was fixed after exercise.py's own len(outcomes)!=N guard caught the miscount on the FIRST 2.3.2 phase-post attempt, before that attempt produced a usable result. No check or pass bar changed. Superseded sha256 (as first frozen): ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3."
+  },
+  "v1_reference": {
+    "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+    "claim_id": "native-memory-lifecycle-20260919",
+    "version_tested": "2.3.1",
+    "status": "passed_scoped_acceptance",
+    "checks": 23,
+    "tool_calls": 31,
+    "gaps_this_run_closes": [
+      "restart durability",
+      "TTL crossing in real time",
+      "scoped retrieval under more than two projects",
+      "same-checks comparison against 2.4.0"
+    ]
+  },
+  "binaries": {
+    "2.3.2": {
+      "path": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+      "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+      "binary_sha256_unchanged_before_after_both_phases": true,
+      "release_tarball_sha256_asserted_not_refetched": null,
+      "reported_version_pre": "ai-memory 2.3.2",
+      "reported_version_post": "ai-memory 2.3.2",
+      "negotiated_initialize_protocolVersion": "2024-11-05",
+      "advertised_tool_count": 23,
+      "tools_list_schema_sha256": {
+        "phase_pre": "58806666b51efc4e3acac23fd606c9367a85d461214dbce1fedeb2e4d083fa72",
+        "phase_post": "58806666b51efc4e3acac23fd606c9367a85d461214dbce1fedeb2e4d083fa72",
+        "stable_across_restart": true
+      },
+      "phase_pre": {
+        "exit_code": 0,
+        "duration_seconds": 7.34,
+        "tool_calls": 69,
+        "checks_total": 72,
+        "checks_passed": 72,
+        "checks_failed": [],
+        "passed": true,
+        "expected_protocol_rejections": {
+          "invalid_combined_scope": {
+            "code": -32603,
+            "message": "global cannot be combined with workspace/project/scopes"
+          },
+          "invalid_expiry": {
+            "code": -32603,
+            "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+          },
+          "missing_scope": {
+            "code": -32602,
+            "message": "project 'absent' not found in workspace 'lifecycle-v2'"
+          }
+        },
+        "sweep": {
+          "preview_expired": [
+            {
+              "id": "01a0da44…",
+              "path": "notes/ttl-short.md",
+              "expired_at": "2026-09-25T20:32:08Z",
+              "deleted": false
+            },
+            {
+              "id": "01a0da44…",
+              "path": "notes/expired.md",
+              "expired_at": "2000-01-01T00:00:00Z",
+              "deleted": false
+            }
+          ],
+          "apply_expired": [
+            {
+              "id": "01a0da44…",
+              "path": "notes/ttl-short.md",
+              "expired_at": "2026-09-25T20:32:08Z",
+              "deleted": true
+            },
+            {
+              "id": "01a0da44…",
+              "path": "notes/expired.md",
+              "expired_at": "2000-01-01T00:00:00Z",
+              "deleted": true
+            }
+          ],
+          "native_hard_deleted_counter": 0
+        },
+        "status_counts": {
+          "pages_latest": 4,
+          "pages_all": 5,
+          "sessions": 0,
+          "observations": 0
+        }
+      },
+      "phase_post": {
+        "exit_code": 0,
+        "duration_seconds": 0.211,
+        "tool_calls": 16,
+        "checks_total": 17,
+        "checks_passed": 17,
+        "checks_failed": [],
+        "passed": true,
+        "expected_protocol_rejections": {
+          "revision_deleted_direct_read": {
+            "code": -32603,
+            "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
+          }
+        }
+      },
+      "passed": true
+    },
+    "2.4.0": {
+      "path": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory",
+      "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+      "binary_sha256_unchanged_before_after_both_phases": true,
+      "release_tarball_sha256_asserted_not_refetched": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+      "reported_version_pre": "ai-memory 2.4.0",
+      "reported_version_post": "ai-memory 2.4.0",
+      "negotiated_initialize_protocolVersion": "2025-03-26",
+      "advertised_tool_count": 23,
+      "tools_list_schema_sha256": {
+        "phase_pre": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "phase_post": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "stable_across_restart": true
+      },
+      "phase_pre": {
+        "exit_code": 0,
+        "duration_seconds": 7.402,
+        "tool_calls": 69,
+        "checks_total": 72,
+        "checks_passed": 72,
+        "checks_failed": [],
+        "passed": true,
+        "expected_protocol_rejections": {
+          "invalid_combined_scope": {
+            "code": -32603,
+            "message": "global cannot be combined with workspace/project/scopes"
+          },
+          "invalid_expiry": {
+            "code": -32603,
+            "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+          },
+          "missing_scope": {
+            "code": -32602,
+            "message": "project 'absent' not found in workspace 'lifecycle-v2'"
+          }
+        },
+        "sweep": {
+          "preview_expired": [
+            {
+              "id": "01a0da44…",
+              "path": "notes/ttl-short.md",
+              "expired_at": "2026-09-25T20:32:16Z",
+              "deleted": false
+            },
+            {
+              "id": "01a0da44…",
+              "path": "notes/expired.md",
+              "expired_at": "2000-01-01T00:00:00Z",
+              "deleted": false
+            }
+          ],
+          "apply_expired": [
+            {
+              "id": "01a0da44…",
+              "path": "notes/ttl-short.md",
+              "expired_at": "2026-09-25T20:32:16Z",
+              "deleted": true
+            },
+            {
+              "id": "01a0da44…",
+              "path": "notes/expired.md",
+              "expired_at": "2000-01-01T00:00:00Z",
+              "deleted": true
+            }
+          ],
+          "native_hard_deleted_counter": 0
+        },
+        "status_counts": {
+          "pages_latest": 4,
+          "pages_all": 5,
+          "sessions": 0,
+          "observations": 0,
+          "evidence_rows": 0
+        }
+      },
+      "phase_post": {
+        "exit_code": 0,
+        "duration_seconds": 0.266,
+        "tool_calls": 16,
+        "checks_total": 17,
+        "checks_passed": 17,
+        "checks_failed": [],
+        "passed": true,
+        "expected_protocol_rejections": {
+          "revision_deleted_direct_read": {
+            "code": -32603,
+            "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
+          }
+        }
+      },
+      "passed": true
+    }
+  },
+  "cross_binary_observations": [
+    "Negotiated MCP initialize protocolVersion differs even though this client always requests 2025-03-26: 2.3.2 responds 2024-11-05; 2.4.0 responds 2025-03-26. Neither v1 nor any read source specifies a required value; out of scope per PREREGISTRATION section 5, recorded here only.",
+    "Both binaries advertise exactly 23 MCP tools (matches v1's 2.3.1 count and the 2.4.0 release-review doc). The full memory_query schema text is byte-identical between the two EXCEPT 2.4.0 additionally advertises include_superseded, pin_first, answer and reasoning -- none exercised here (out of scope).",
+    "global=true results arrive in a separate global_hits array (workspace_name / project_name per hit); hits stays [] for a global query. This is the confirmed live shape for the documented \"each hit is annotated with its workspace + project\" behavior (PREREGISTRATION section 3), identical on both binaries.",
+    "missing_scope (an absent project name) returns JSON-RPC code -32602 on BOTH 2.3.2 and 2.4.0 here, versus -32603 in v1's 2.3.1 receipt for the analogous check. v1's own README already flagged this exact error classification as having \"changed since the installed release\" between its pinned commit and main; this is a further data point on the same axis, not a check failure (this run only asserts an integer code, like v1 did).",
+    "The default-scoped (project=None) memory_status count for the alpha project was identical on both binaries: pages_latest=4, pages_all=5. The extra pages_all entry is consistent with notes/revision2.md (superseded but never deleted) retaining its one prior version, while the sweep-deleted and explicitly-deleted pages in the same project retain none. Descriptive; PREREGISTRATION deliberately did not pre-commit to this exact number (section 4, Status row), only that it stays IDENTICAL across the restart, which it did on both binaries.",
+    "ai-memory serve --help documents a single-instance data-dir lock; this run's two bwrap invocations run strictly sequentially (subprocess.run blocks), so the \"post\" server never started until the \"pre\" server's process had fully exited -- observed, not merely assumed, via each phase's own exit_code and the second phase starting only after the first phase's subprocess.run returned."
+  ],
+  "isolation": {
+    "mechanism": "bubblewrap --unshare-all --clearenv --die-with-parent --new-session --cap-drop ALL; only the selected binary/system runtime/driver read-only, a fresh output directory read-write, network namespace unshared (loopback only, unused)",
+    "embedding_provider": "none",
+    "llm": "not configured",
+    "watcher": false,
+    "gpu": "not used (no local model loaded by either binary in this configuration)",
+    "real_memory_or_authentication_stores_mounted": false
+  },
+  "limitations": [
+    "Same limitations as v1 (tenant authorization, secure erasure from Git/backups, market/valid-time semantics, retrieval quality/ranking/embeddings/LLM synthesis, macOS/Windows execution) -- see PREREGISTRATION.md section 5 for the full, extended list.",
+    "Store migration (one store opened by both binaries) is explicitly NOT exercised; each binary used its own fresh store. Upgrade behavior here means \"the same checks pass on both binaries,\" not \"2.3.2 data migrates cleanly to 2.4.0.\"",
+    "The 2.4.0 release tarball sha256 is asserted (task-supplied, peer-verified) and not re-fetched over the network by this run; only the installed binary's own sha256 was independently measured here.",
+    "Concurrent multi-client access to one server process is not exercised; every check is one client, one request in flight at a time.",
+    "This does not certify the repository's adopted pin (stays 2.3.2 per manifests/stack.json and docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md) or change it; it is comparison evidence only."
+  ],
+  "raw_private_run_directories_not_copied_into_worktree": true,
+  "itemized_checks": {
+    "source": "each binary's acceptance.json in its private run directory; check names and booleans only",
+    "by_binary": {
+      "2.3.2": {
+        "pre": {
+          "write_alpha_ok": true,
+          "alpha_read_matches": true,
+          "alpha_search_self_one_hit": true,
+          "write_beta_ok": true,
+          "beta_read_matches": true,
+          "beta_search_self_one_hit": true,
+          "write_gamma_ok": true,
+          "gamma_read_matches": true,
+          "gamma_search_self_one_hit": true,
+          "write_delta_ok": true,
+          "delta_read_matches": true,
+          "delta_search_self_one_hit": true,
+          "alpha_search_beta_zero": true,
+          "alpha_search_gamma_zero": true,
+          "alpha_search_delta_zero": true,
+          "beta_search_alpha_zero": true,
+          "beta_search_gamma_zero": true,
+          "beta_search_delta_zero": true,
+          "gamma_search_alpha_zero": true,
+          "gamma_search_beta_zero": true,
+          "gamma_search_delta_zero": true,
+          "delta_search_alpha_zero": true,
+          "delta_search_beta_zero": true,
+          "delta_search_gamma_zero": true,
+          "missing_scope_error": true,
+          "invalid_combined_scope_error": true,
+          "scopes_ws1_three_count3": true,
+          "scopes_ws1_three_all_routing": true,
+          "scopes_excludes_delta_zero": true,
+          "global_finds_alpha_one_hit": true,
+          "global_finds_alpha_origin_annotated": true,
+          "global_finds_beta_one_hit": true,
+          "global_finds_beta_origin_annotated": true,
+          "global_finds_gamma_one_hit": true,
+          "global_finds_gamma_origin_annotated": true,
+          "global_finds_delta_one_hit": true,
+          "global_finds_delta_origin_annotated": true,
+          "ttl_before_expiry_one_hit": true,
+          "ttl_after_expiry_default_zero": true,
+          "ttl_after_expiry_explicit_one_hit": true,
+          "ttl_after_expiry_direct_read_ok": true,
+          "durable_after_expiry_wait_one_hit": true,
+          "sweep_preview_dry_run_true": true,
+          "sweep_preview_expired_set_correct": true,
+          "expired_past_after_preview_one_hit": true,
+          "ttl_after_preview_one_hit": true,
+          "sweep_apply_dry_run_false": true,
+          "sweep_apply_expired_set_correct": true,
+          "expired_past_after_sweep_zero": true,
+          "ttl_after_sweep_zero": true,
+          "future_after_sweep_one_hit": true,
+          "durable_after_sweep_one_hit": true,
+          "write_expired_past_ok": true,
+          "expired_past_default_zero": true,
+          "expired_past_explicit_one_hit": true,
+          "expired_past_direct_read_body_and_pinned": true,
+          "write_future_ok": true,
+          "future_default_one_hit": true,
+          "invalid_expiry_error": true,
+          "write_old_new_distinct_ids": true,
+          "old_now_zero": true,
+          "new_now_one_hit": true,
+          "old_as_of_matches_old_id_and_fts_active": true,
+          "new_as_of_zero": true,
+          "delete_revision_true": true,
+          "deleted_now_zero": true,
+          "deleted_as_of_zero": true,
+          "beta_unaffected_by_alpha": true,
+          "write_old2_new2_distinct_ids": true,
+          "old2_as_of_one_hit_matches_id": true,
+          "new2_now_one_hit_matches_id": true,
+          "status_pre_no_imported_history": true
+        },
+        "post": {
+          "alpha_read_persisted": true,
+          "beta_read_persisted": true,
+          "gamma_read_persisted": true,
+          "delta_read_persisted": true,
+          "durable_persisted": true,
+          "old2_as_of_persisted_same_id": true,
+          "new2_now_persisted_same_id": true,
+          "revision_deletion_persisted_current": true,
+          "revision_deletion_persisted_as_of": true,
+          "revision_deleted_direct_read_still_errors": true,
+          "ttl_sweep_persisted": true,
+          "expired_past_sweep_persisted": true,
+          "future_persisted": true,
+          "status_post_no_imported_history": true,
+          "status_stable_across_restart": true,
+          "post_restart_write_ok": true,
+          "post_restart_readback_one_hit": true
+        },
+        "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+        "passed": true
+      },
+      "2.4.0": {
+        "pre": {
+          "write_alpha_ok": true,
+          "alpha_read_matches": true,
+          "alpha_search_self_one_hit": true,
+          "write_beta_ok": true,
+          "beta_read_matches": true,
+          "beta_search_self_one_hit": true,
+          "write_gamma_ok": true,
+          "gamma_read_matches": true,
+          "gamma_search_self_one_hit": true,
+          "write_delta_ok": true,
+          "delta_read_matches": true,
+          "delta_search_self_one_hit": true,
+          "alpha_search_beta_zero": true,
+          "alpha_search_gamma_zero": true,
+          "alpha_search_delta_zero": true,
+          "beta_search_alpha_zero": true,
+          "beta_search_gamma_zero": true,
+          "beta_search_delta_zero": true,
+          "gamma_search_alpha_zero": true,
+          "gamma_search_beta_zero": true,
+          "gamma_search_delta_zero": true,
+          "delta_search_alpha_zero": true,
+          "delta_search_beta_zero": true,
+          "delta_search_gamma_zero": true,
+          "missing_scope_error": true,
+          "invalid_combined_scope_error": true,
+          "scopes_ws1_three_count3": true,
+          "scopes_ws1_three_all_routing": true,
+          "scopes_excludes_delta_zero": true,
+          "global_finds_alpha_one_hit": true,
+          "global_finds_alpha_origin_annotated": true,
+          "global_finds_beta_one_hit": true,
+          "global_finds_beta_origin_annotated": true,
+          "global_finds_gamma_one_hit": true,
+          "global_finds_gamma_origin_annotated": true,
+          "global_finds_delta_one_hit": true,
+          "global_finds_delta_origin_annotated": true,
+          "ttl_before_expiry_one_hit": true,
+          "ttl_after_expiry_default_zero": true,
+          "ttl_after_expiry_explicit_one_hit": true,
+          "ttl_after_expiry_direct_read_ok": true,
+          "durable_after_expiry_wait_one_hit": true,
+          "sweep_preview_dry_run_true": true,
+          "sweep_preview_expired_set_correct": true,
+          "expired_past_after_preview_one_hit": true,
+          "ttl_after_preview_one_hit": true,
+          "sweep_apply_dry_run_false": true,
+          "sweep_apply_expired_set_correct": true,
+          "expired_past_after_sweep_zero": true,
+          "ttl_after_sweep_zero": true,
+          "future_after_sweep_one_hit": true,
+          "durable_after_sweep_one_hit": true,
+          "write_expired_past_ok": true,
+          "expired_past_default_zero": true,
+          "expired_past_explicit_one_hit": true,
+          "expired_past_direct_read_body_and_pinned": true,
+          "write_future_ok": true,
+          "future_default_one_hit": true,
+          "invalid_expiry_error": true,
+          "write_old_new_distinct_ids": true,
+          "old_now_zero": true,
+          "new_now_one_hit": true,
+          "old_as_of_matches_old_id_and_fts_active": true,
+          "new_as_of_zero": true,
+          "delete_revision_true": true,
+          "deleted_now_zero": true,
+          "deleted_as_of_zero": true,
+          "beta_unaffected_by_alpha": true,
+          "write_old2_new2_distinct_ids": true,
+          "old2_as_of_one_hit_matches_id": true,
+          "new2_now_one_hit_matches_id": true,
+          "status_pre_no_imported_history": true
+        },
+        "post": {
+          "alpha_read_persisted": true,
+          "beta_read_persisted": true,
+          "gamma_read_persisted": true,
+          "delta_read_persisted": true,
+          "durable_persisted": true,
+          "old2_as_of_persisted_same_id": true,
+          "new2_now_persisted_same_id": true,
+          "revision_deletion_persisted_current": true,
+          "revision_deletion_persisted_as_of": true,
+          "revision_deleted_direct_read_still_errors": true,
+          "ttl_sweep_persisted": true,
+          "expired_past_sweep_persisted": true,
+          "future_persisted": true,
+          "status_post_no_imported_history": true,
+          "status_stable_across_restart": true,
+          "post_restart_write_ok": true,
+          "post_restart_readback_one_hit": true
+        },
+        "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+        "passed": true
+      }
+    }
+  }
+}

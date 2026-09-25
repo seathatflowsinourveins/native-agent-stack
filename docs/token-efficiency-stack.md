@@ -138,12 +138,20 @@ The manifest supports Python 3.13 only. A `python3` of another version (Ubuntu
 `prerequisites_missing` with exit 2, and one older than 3.11 cannot parse the Codex
 TOML. This check changed after `v2026.09.25.1`: that release's `adoption_status.py`
 has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run it
-from a default-branch clone until the next release. The command runs none of the
+from a later release or a default-branch clone. The command runs none of the
 selected tools. It parses the client files named below whole and in-process, emits no
 value from them, and opens no credential store (`~/.claude.json`,
 `~/.claude/.credentials.json`, `~/.codex/auth.json`). It prints command presence plus
 `client_wiring`: booleans, two hook-event counts, `null` for a file it could not read
 or parse, and the computed `complete`.
+
+Add `--pinned-versions` to also report, per profile, whether each component's
+installed version matches its platform pin (`adoption/pins-<os>-<arch>.json`). It runs
+only a pin's declared `exec` version probe, never one declared `npm-metadata` (which
+exists because any other argument starts that tool's server). Components without a
+pin entry for the platform are reported unchecked. This flag is new after
+`v2026.09.25.1` as well. Run the check from a fresh worktree, not only from the main
+checkout, to confirm that worktree workers inherit the wiring.
 
 The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)
 is the selected set. It holds the context-and-usage layer's current choice (RTK,
@@ -157,7 +165,10 @@ clients. `client_wiring` checks three places:
   `CLAUDE_CODE_EFFORT_LEVEL` nor the agent-teams opt-in appears in the settings or
   the checker's environment;
 - `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
-  a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers;
+  a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers
+  (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh
+  worktree inherits them; see
+  [the Codex MCP scope decision](decisions/2026-09-25-codex-mcp-scope.md));
 - `codex`, the Codex home: `AGENTS.md` references `RTK.md` (RTK 0.49.0 gives Codex
   instructions, not a hook); Context Mode is enabled and installed; `config.toml`
   names the same three servers; hooks are on (`hooks_feature_enabled`); and the

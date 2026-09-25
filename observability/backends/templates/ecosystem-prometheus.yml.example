@@ -31,8 +31,9 @@ scrape_configs:
     static_configs:
       - targets: ['127.0.0.1:19093']
   - job_name: adaptive-paper
-    static_configs:
-      - targets: ['127.0.0.1:18890']
+    file_sd_configs:
+      - files: ['@CONFIG_ROOT@/adaptive-paper-targets.json']
+        refresh_interval: 30s
   - job_name: acceptance-fixture
     scrape_interval: 5s
     scrape_timeout: 2s

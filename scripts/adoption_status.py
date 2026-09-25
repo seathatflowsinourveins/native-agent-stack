@@ -7,7 +7,12 @@ only subprocess is a bounded native Git revision query. It opens no credential s
 service/process state, network endpoint or model API. Client configuration is read
 only with the opt-in --client-wiring, which parses fixed native client files whole and
 in-process and emits no value from them: fixed booleans and hook-event counts only,
-never a value, command, path or environment value.
+never a value, command, path or environment value. The opt-in --pinned-versions execs
+a profile's PATH-resolved commands with their platform pin's declared "exec"
+version_probe only (never one declared "npm-metadata" or another method, since that
+method exists exactly because running the tool starts a server or a UI) and emits
+booleans, counts and version strings from the checked-in pins file and the probe's own
+version output.
 """
 
 from __future__ import annotations
@@ -32,8 +37,10 @@ NAME = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_.-]*\Z")
 COMMAND_ALIASES = {("loki", "linux", "x86_64"): ("loki-linux-amd64",)}
 NO_CLIENT_STATE = ("No credentials, client configuration, environment values, network endpoints, or running "
                    "processes are inspected.")
+# --pinned-versions replaces this statement with PINNED_VERSION_LIMITATIONS.
+NO_PINNED_VERSION = "Executable presence does not verify its version, installation integrity, activation, or E2E behavior."
 LIMITATIONS = [
-    "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+    NO_PINNED_VERSION,
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
     "Git comparison reports source identity only; changed worktree files are not inspected.",
     NO_CLIENT_STATE,
@@ -50,9 +57,26 @@ CLIENT_WIRING_LIMITATIONS = [
     "and project trust, Claude MCP registrations, MCP server startup and a useful native call remain the clients' "
     "own checks (/mcp, /hooks, the plugin doctor).",
 ]
+PINNED_VERSION_TIMEOUT_SECONDS = 30
+# A pin's version_probe.method this script ever execs. "npm-metadata" (context-mode: no version flag, any
+# other argument starts its MCP stdio server) and any future undeclared method are reported unchecked instead;
+# see adoption/bootstrap-linux.sh's write_version_report, which this reuses the pins file's schema from (#251).
+SUPPORTED_VERSION_PROBE_METHODS = ("exec",)
+# --pinned-versions replaces NO_PINNED_VERSION with this statement.
+PINNED_VERSION_LIMITATIONS = [
+    "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this "
+    "platform's pins file (adoption/pins-<os>-<arch>.json): the declared command, located on PATH only, run with "
+    "stdin from /dev/null and killed after its pin's timeout_seconds or "
+    f"{PINNED_VERSION_TIMEOUT_SECONDS}s, and its stdout and stderr text compared against the pinned version. A "
+    "component with no pins entry for this platform, or whose declared method is not \"exec\" (for example "
+    "context-mode's \"npm-metadata\", declared because any other argument starts its MCP stdio server), is "
+    "reported unchecked; this never execs a probe whose declared method is not \"exec\".",
+]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
 WIRED_MCP_SERVERS = ("serena", "socraticode", "ai-memory")
+# This catalog's pins-<os>-<arch>.json naming (adoption/pins-macos-arm64.json) vs. platform.system().lower().
+PIN_OS_ALIASES = {"darwin": "macos"}
 DEPTH_VARIABLE = "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH"
 CONCURRENCY_VARIABLE = "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS"
 EFFORT_VARIABLE = "CLAUDE_CODE_EFFORT_LEVEL"  # any value overrides every child's effort
@@ -406,8 +430,95 @@ def client_wiring(root: Path, env=None) -> dict:
     return {**groups, "complete": wiring_complete(groups)}
 
 
+def pins_file_path(root: Path, host: dict) -> Path:
+    """This catalog's platform pins file (adoption/pins-<os>-<arch>.json), matching each pin's own
+    version_probe (#251) against a profile's component_ids. PIN_OS_ALIASES covers a platform.system()
+    name this catalog's own pins files spell differently (only "darwin" -> "macos" today)."""
+    osname = PIN_OS_ALIASES.get(host["os"], host["os"])
+    return root / "adoption" / f"pins-{osname}-{host['architecture']}.json"
+
+
+def read_pins(path: Path) -> dict:
+    """Pin entries by id from a platform pins file; {} when absent, unreadable, oversized or malformed --
+    every component is then reported unchecked, the same as one simply missing from a readable file."""
+    data = read_client_file(path, "json")
+    tools = data.get("tools") if isinstance(data, dict) else None
+    if not isinstance(tools, list):
+        return {}
+    return {entry["id"]: entry for entry in tools
+            if isinstance(entry, dict) and isinstance(entry.get("id"), str) and isinstance(entry.get("version"), str)}
+
+
+def version_at_least(observed: str, floor: str) -> bool:
+    """adoption/bootstrap-linux.sh version_at_least: compare dotted parts numerically, padding the
+    shorter with 0; any non-numeric part (e.g. "dev0") is not a match rather than an error."""
+    observed_parts, floor_parts = observed.split("."), floor.split(".")
+    for index in range(max(len(observed_parts), len(floor_parts))):
+        observed_part = observed_parts[index] if index < len(observed_parts) else "0"
+        floor_part = floor_parts[index] if index < len(floor_parts) else "0"
+        if not (observed_part.isdigit() and floor_part.isdigit()):
+            return False
+        if int(observed_part) != int(floor_part):
+            return int(observed_part) > int(floor_part)
+    return True
+
+
+def version_output_matches(expected: str, match: str, output: str) -> bool:
+    """The bootstrap scripts' own two match rules (adoption/bootstrap-linux.sh version_output_matches):
+    "exact" is the expected text bounded by no adjacent digit or dot (so "2.10" does not match
+    "12.10.0"), "minimum" the first dotted number in the output against a numeric floor (a later
+    version also passes). Any other rule is not a match."""
+    if match == "exact":
+        return re.search(r"(^|[^0-9.])" + re.escape(expected) + r"([^0-9.]|$)", output, re.MULTILINE) is not None
+    if match == "minimum":
+        found = re.search(r"[0-9]+(?:\.[0-9]+)+", output)
+        return found is not None and version_at_least(found.group(), expected)
+    return False
+
+
+def probe_pinned_version(entry: dict) -> dict:
+    """One component's pinned-version result. Never execs a probe whose declared method is not "exec": a
+    "npm-metadata" method (context-mode) is declared exactly because any other argument starts its MCP
+    stdio server, and any future undeclared method is left unchecked the same way."""
+    pinned = entry.get("version")
+    result = {"pinned_version": pinned if isinstance(pinned, str) else None, "checked": False, "matches_pin": None}
+    probe = table(entry.get("version_probe"))
+    if probe.get("method") not in SUPPORTED_VERSION_PROBE_METHODS:
+        return result
+    command, args = probe.get("command"), probe.get("args")
+    if not isinstance(command, str) or NAME.fullmatch(command) is None or not isinstance(args, list) \
+            or not all(isinstance(item, str) for item in args):
+        return result
+    resolved = shutil.which(command)
+    if resolved is None:
+        return result
+    expect = probe.get("expect")
+    expected = expect if isinstance(expect, str) else pinned
+    match = probe.get("match") if probe.get("match") in ("exact", "minimum") else "exact"
+    declared_seconds = probe.get("timeout_seconds")
+    seconds = declared_seconds if isinstance(declared_seconds, (int, float)) and 0 < declared_seconds <= 300 \
+        else PINNED_VERSION_TIMEOUT_SECONDS
+    try:
+        completed = subprocess.run([resolved, *args], stdin=subprocess.DEVNULL, capture_output=True,
+                                   text=True, timeout=seconds, check=False)
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return result
+    result["checked"] = True
+    result["matches_pin"] = isinstance(expected, str) and version_output_matches(expected, match,
+                                                                                 completed.stdout + completed.stderr)
+    return result
+
+
+def pinned_versions(component_ids: list[str], pins: dict) -> list[dict]:
+    """Opt-in per-component pinned-version result for one profile's component_ids; {} pins (no platform
+    file for this host) reports every component unchecked, same as one simply absent from it."""
+    return [{"id": identifier, **(probe_pinned_version(pins[identifier]) if identifier in pins else
+             {"pinned_version": None, "checked": False, "matches_pin": None})}
+            for identifier in component_ids]
+
+
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
-                     *, with_client_wiring: bool = False, env=None) -> dict:
+                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -417,7 +528,12 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
               "runtime_acceptance_verified": False, "limitations": LIMITATIONS.copy()}
     if with_client_wiring:
         result["client_wiring"] = client_wiring(root, env)
-        result["limitations"] = [item for item in LIMITATIONS if item != NO_CLIENT_STATE] + CLIENT_WIRING_LIMITATIONS
+        result["limitations"] = [item for item in result["limitations"]
+                                 if item != NO_CLIENT_STATE] + CLIENT_WIRING_LIMITATIONS
+    pins = read_pins(pins_file_path(root, host)) if with_pinned_versions else {}
+    if with_pinned_versions:
+        result["limitations"] = [item for item in result["limitations"]
+                                 if item != NO_PINNED_VERSION] + PINNED_VERSION_LIMITATIONS
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -443,8 +559,11 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         recipes = [{"path": reference, "present": recipe_path(root, reference).is_file()}
                    for reference in profile["recipe_paths"]]
         ready = all(item["present"] for item in commands + recipes)
-        result["profiles"].append({"id": identifier, "commands": commands, "recipes": recipes,
-            "status": "prerequisites_present" if ready else "prerequisites_missing"})
+        entry = {"id": identifier, "commands": commands, "recipes": recipes,
+                 "status": "prerequisites_present" if ready else "prerequisites_missing"}
+        if with_pinned_versions:
+            entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
+        result["profiles"].append(entry)
     revision = git_revision(root)
     baseline = data["source"]["baseline_commit"]
     result["git"] = {"baseline_commit": baseline, "current_commit": revision,
@@ -465,8 +584,14 @@ def main(argv: list[str] | None = None) -> int:
                         help="Also report whether the selected token practice is wired into the native Claude Code "
                              "and Codex clients (fixed booleans, hook-event counts and a computed 'complete' only; "
                              "the exit code is unchanged)")
+    parser.add_argument("--pinned-versions", action="store_true",
+                        help="Also report, per selected profile, whether each component_id's declared platform "
+                             "pin (adoption/pins-<os>-<arch>.json) version_probe observed the pinned version "
+                             "(booleans, counts and version strings only; never execs a probe whose declared "
+                             "method is not \"exec\", and the exit code is unchanged)")
     args = parser.parse_args(argv)
-    report = inspect_adoption(args.manifest, args.repo_root, args.profile, with_client_wiring=args.client_wiring)
+    report = inspect_adoption(args.manifest, args.repo_root, args.profile, with_client_wiring=args.client_wiring,
+                              with_pinned_versions=args.pinned_versions)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -476,6 +601,14 @@ def main(argv: list[str] | None = None) -> int:
             missing = [item["name"] for item in profile["commands"] if not item["present"]]
             missing += [item["path"] for item in profile["recipes"] if not item["present"]]
             print(f"{profile['id']}: {profile['status']}" + (f" (missing: {', '.join(missing)})" if missing else ""))
+            if "pinned_versions" in profile:
+                matched = sum(1 for item in profile["pinned_versions"] if item["matches_pin"])
+                mismatched = [item["id"] for item in profile["pinned_versions"]
+                             if item["checked"] and not item["matches_pin"]]
+                unchecked = [item["id"] for item in profile["pinned_versions"] if not item["checked"]]
+                print(f"  pinned versions: {matched} matched"
+                      + (f", mismatched: {', '.join(mismatched)}" if mismatched else "")
+                      + (f", unchecked: {', '.join(unchecked)}" if unchecked else ""))
         if "client_wiring" in report:
             wiring = dict(report["client_wiring"])
             print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")

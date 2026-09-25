@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mcporter--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "mcporter",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v mcporter) && v=$(mcporter --version) && echo \"resolves: $p -> $(readlink -f \"$p\") | version: $v\" && python3 -c \"\nimport json, glob, sys\nsys.path.insert(0, 'scripts')\nfrom host_receipts import pin_matches\nv = sys.argv[1]\nbp = [t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id'] == 'mcporter']\nst = [x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id'] == 'mcporter']\nwp = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == 'mcporter'})\nprint('bootstrap pin', bp, 'stack', st, 'winner pins', wp)\nok = bool(wp) and all(pin_matches(v, p) for p in wp) and bp == st == wp\nprint('pin_matches(version, winner pins):', ok)\nsys.exit(0 if ok else 1)\n\" \"$v\"",
+      "exit": 0,
+      "duration_s": 0.148,
+      "output_sha256": "158be834ac7a7507fc816da07014092b8ecd41f87dc536f7654aaebe2ac7ce41",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/mcporter -> ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/lib/node_modules/mcporter/dist/cli.js | version: 0.13.13\nbootstrap pin ['0.13.13'] stack ['0.13.13'] winner pins ['0.13.13']\npin_matches(version, winner pins): True\n"
+    },
+    {
+      "cmd": "w=$(pwd) && d=$(mktemp -d) && mkdir -p \"$d/home\" \"$d/fixture\" && cat > \"$d/fixture/zqxjv-note.md\" <<'FIXTURE_EOF'\n# zqxjv fixture note\n\nThe unique token nsrqmdfixture42 appears exactly once in this corpus.\nFIXTURE_EOF\nHOME=\"$d/home\" timeout 15 qmd collection add \"$d/fixture\" >\"$d/add.out\" 2>&1 || { echo \"collection add failed\"; cat \"$d/add.out\"; rm -rf \"$d\"; exit 1; }\ntimeout 20 mcporter list --stdio qmd --stdio-arg mcp --env \"HOME=$d/home\" --cwd \"$w\" --name qmdtest --json --no-oauth > \"$d/list.json\" 2>\"$d/list.err\"; lec=$?\ntimeout 20 mcporter call --stdio qmd --stdio-arg mcp --env \"HOME=$d/home\" --cwd \"$w\" --name qmdtest --no-oauth --output json query --args '{\"searches\":[{\"type\":\"lex\",\"query\":\"nsrqmdfixture42\"}]}' > \"$d/hit.json\" 2>\"$d/hit.err\"; hec=$?\ntimeout 20 mcporter call --stdio qmd --stdio-arg mcp --env \"HOME=$d/home\" --cwd \"$w\" --name qmdtest --no-oauth --output json query --args '{\"searches\":[{\"type\":\"lex\",\"query\":\"zzzqnonexistentbogus99\"}]}' > \"$d/miss.json\" 2>\"$d/miss.err\"; mec=$?\necho \"list_exit=$lec hit_exit=$hec miss_exit=$mec\"\npython3 -c \"\nimport json, sys\nL = json.load(open('$d/list.json'))\nnames = sorted(t['name'] for t in L['tools'])\nH = json.load(open('$d/hit.json'))\nM = json.load(open('$d/miss.json'))\nhfiles = [r['file'] for r in H['results']]\nhit_tok = any('nsrqmdfixture42' in (r.get('snippet') or '') for r in H['results'])\nprint('tools:', names, '| status:', L['status'])\nprint('hit query -> files:', hfiles, 'token_in_snippet:', hit_tok)\nprint('miss query (control) -> result_count:', len(M['results']))\nok = (names == ['get', 'multi_get', 'query', 'status'] and L['status'] == 'ok'\n      and hfiles == ['fixture/zqxjv-note.md'] and hit_tok\n      and len(M['results']) == 0)\nsys.exit(0 if ok else 1)\n\"\npyec=$?\necho \"assert_exit=$pyec\"\nrm -rf \"$d\"\ntest $lec -eq 0 -a $hec -eq 0 -a $mec -eq 0 -a $pyec -eq 0",
+      "exit": 0,
+      "duration_s": 13.861,
+      "output_sha256": "17a902e17206d50e0e3e66f6b9dd2fe57238fa888b50376eeab7083a011fef68",
+      "output_excerpt": "list_exit=0 hit_exit=0 miss_exit=0\ntools: ['get', 'multi_get', 'query', 'status'] | status: ok\nhit query -> files: ['fixture/zqxjv-note.md'] token_in_snippet: True\nmiss query (control) -> result_count: 0\nassert_exit=0\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) && mkdir -p \"$d/home\"\nout=$(timeout 20 mcporter call --stdio qmd --stdio-arg mcp --env \"HOME=$d/home\" --name qmdtest --no-oauth --output json nsr_no_such_tool_zqxjv --args '{}' 2>&1)\nec=$?\necho \"call_exit=$ec\"\npython3 -c \"\nimport json, sys\nraw = sys.argv[1]\nstart = raw.find('{')\nobj = json.loads(raw[start:])\nok = (obj.get('tool') == 'nsr_no_such_tool_zqxjv' and 'not found' in obj.get('error', '').lower())\nprint('parsed error object ok:', ok, '| error:', obj.get('error'))\nsys.exit(0 if ok else 1)\n\" \"$out\"\npyec=$?\necho \"assert_exit=$pyec\"\nrm -rf \"$d\"\ntest $ec -ne 0 -a $pyec -eq 0",
+      "exit": 0,
+      "duration_s": 0.794,
+      "output_sha256": "6554c1f5908aa5711db9462bf2cd5222447cb02baff6fc4b56feb7e6f59b454f",
+      "output_excerpt": "call_exit=1\nparsed error object ok: True | error: Tool nsr_no_such_tool_zqxjv not found\nassert_exit=0\n"
+    }
+  ],
+  "tool_versions": {
+    "mcporter": "0.13.13"
+  },
+  "observed_at_utc": "2026-09-25T19:02:25Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), MCPorter 0.13.13, the mcp-surfaces winner, bridges a real MCP server. It spawns a fresh QMD MCP stdio server that is isolated to a temporary HOME holding a one-file fixture collection. It lists that server's tools (get, multi_get, query, status) and calls query twice: a lexical query for the fixture's unique token returns the fixture file with the token in its snippet, and a query for an absent token returns 0 results. Calling a tool that does not exist exits non-zero with a JSON error naming that tool (positive control). The version and pin cross-check uses host_receipts.pin_matches. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "The bridged server is QMD 2.8.3 over stdio with a temporary index; no production MCP server, no HTTP or OAuth transport and no host mcporter configuration file was used.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:25Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran cmd 1 (version and pin cross-check) and cmd 3 (nonexistent tool: exit 1 and JSON error, output identical). Re-ran cmd 2 (QMD bridge) with an empty temporary HOME: output identical, 13.9 s, so the result does not depend on any host mcporter config. Caveat on that re-run: it had network access, which I chose after a network-less run failed; QMD creates a models cache under HOME on the hit query, and with no external network (isolated namespace, loopback up) the hit query times out (hit_exit=124, assert_exit=1). The recorded run therefore likely fetches a QMD model into its temporary HOME over the network; the limitations do not say so. That is a reproducibility note, not a failed point, and it also shows the receipt's own assertions fail when the hit does not arrive. Adequacy-checked (use receipt, all four points): (1) Layer role: mcp-surfaces requires bridging MCP servers, and the winner rationale says mcporter bridges; the commands spawn a real QMD MCP stdio server through mcporter, list its tools (get, multi_get, query, status) and call query for a token in a fixture file, returning that file with the token in its snippet. Configuring is not exercised and not claimed. (2) Positive control: an absent token returns 0 results and a nonexistent tool exits 1 with a JSON error naming it. (3) Backed claims: every sentence of the claim maps to retained output; the pin check prints pin_matches True (cmd 1). Residual, in limitations not claim: QMD 2.8.3 and 'no host mcporter configuration file was used' have no retained command. I confirmed qmd --version prints 2.8.3 and the empty-HOME re-run matched. (4) Bound to the winner: mcporter is the mcp-surfaces winner id, and tool_versions 0.13.13 equals the winner pin, the stack version and the adoption pin under host_receipts.pin_matches. No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:52Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

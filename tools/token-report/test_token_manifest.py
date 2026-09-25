@@ -566,6 +566,17 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(self.db.event_totals()[0]["estimated_saved"],256)
         self.assertEqual(issues,[])
 
+    def test_codex_hook_engine_follows_the_stable_hooks_flag_not_removed_plugin_hooks(self):
+        cases=[({},True),({"features":{}},True),({"features":{"hooks":True}},True),
+               ({"features":{"hooks":False,"plugin_hooks":True}},False),
+               ({"features":{"hooks":True,"plugin_hooks":False}},True),
+               ({"features":{"plugin_hooks":True}},True),({"features":{"codex_hooks":False}},False),
+               ({"features":{"hooks":True,"codex_hooks":False}},True),
+               ({"features":{"hooks":"true"}},False),({"features":"hooks"},True)]
+        for config,expected in cases:
+            with self.subTest(config=config):
+                self.assertIs(m.codex_hooks_enabled(config),expected)
+
     @contextmanager
     def assert_connections_closed(self):
         from unittest.mock import patch
@@ -597,7 +608,7 @@ class LedgerContract(unittest.TestCase):
                 m.Ledger(malformed)
 
     def test_native_source_connections_close_after_success_and_query_errors(self):
-        for reader in ("archive","projects","hooks"):
+        for reader in ("archive","projects","hooks","client_visible"):
             for valid in (True,False):
                 with self.subTest(reader=reader,valid=valid):
                     home=self.root/(reader+str(valid));sessions=home/"context-mode/sessions"
@@ -617,6 +628,9 @@ class LedgerContract(unittest.TestCase):
                             m.archive_native_events(config,self.db,issues)
                         elif reader=="projects":
                             m.retained_projects(config,home,[],issues)
+                        elif reader=="client_visible":
+                            try:m.rtk_client_visible(source)
+                            except sqlite3.Error as exc:issues.append(str(exc))
                         else:
                             m.native_hook_inventory(config,home,issues,self.db)
                     self.assertEqual(bool(issues),not valid)
@@ -643,6 +657,117 @@ class LedgerContract(unittest.TestCase):
                                 m.refresh(config)
                     else:
                         m.refresh(config)
+
+    def rtk_history(self,rows,name="history.db"):
+        db=self.root/name
+        with closing(sqlite3.connect(db)) as c:
+            c.execute("CREATE TABLE commands (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, original_cmd TEXT NOT NULL,"
+                      " rtk_cmd TEXT NOT NULL, input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL,"
+                      " saved_tokens INTEGER NOT NULL, project_path TEXT DEFAULT '')")
+            c.executemany("INSERT INTO commands (timestamp,original_cmd,rtk_cmd,input_tokens,output_tokens,saved_tokens)"
+                          " VALUES (?,?,?,?,?,?)",[("2026-09-25T00:00:00Z","cmd","rtk cmd",i,o,max(0,i-o)) for i,o in rows])
+            c.commit()
+        return db
+
+    def test_rtk_client_visible_counts_what_the_client_shows_first(self):
+        # Rows: inline both ways; exactly at the inline limit (still whole); one token over (preview); a huge raw
+        # output with a short filtered one; a filtered output longer than the raw preview (added); an expansion.
+        view=m.rtk_client_visible(self.rtk_history([(100,20),(7500,100),(7501,100),(200000,300),(40000,1000),(50,80)]))
+        self.assertEqual((view["inline_tokens"],view["preview_tokens"]),(7500,500))
+        self.assertEqual((view["avoided"],view["added"],view["net"]),(80+7400+400+200,500+30,8080-530))
+        self.assertEqual(view["saved"],80+7400+7401+199700+39000+0)  # upstream floors the expansion at zero
+        self.assertAlmostEqual(view["net_share"],7550/view["saved"])
+        # ceil(bytes/4): a 30001-character limit is 7501 tokens, so a 7501-token raw output still shows whole.
+        wide=m.rtk_client_visible(self.rtk_history([(7501,100)],"wide.db"),inline_chars=30001,preview_chars=2001)
+        self.assertEqual((wide["inline_tokens"],wide["preview_tokens"],wide["net"]),(7501,501,7401))
+        self.assertIn("with the configured client limits",m.rtk_visible_boundary(wide))
+        self.assertIn("as Claude Code 2.1.282 first shows it by default",m.rtk_visible_boundary(view))
+        # The top-ten share ranks rows by saved tokens, not by storage order.
+        many=m.rtk_client_visible(self.rtk_history([(i+1,0) for i in range(12)],"many.db"))
+        self.assertAlmostEqual(many["top10_share"],sum(range(3,13))/sum(range(1,13)))
+        zero=m.rtk_client_visible(self.rtk_history([(10,10)],"zero.db"))
+        self.assertEqual((zero["saved"],zero["top10_share"],zero["net_share"]),(0,None,None))
+        self.assertIsNone(m.rtk_client_visible(self.rtk_history([],"empty.db")))
+
+    def test_refresh_states_rtk_client_view_and_headroom_ledger_presence(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",headroom="selected-headroom",rtk_database=str(self.rtk_history([(100,20),(200000,300)])))
+        reply={"rtk":{"summary":{"total_saved":199780,"total_commands":2}},
+               "headroom":{"path":"workspace/savings_events.jsonl","lifetime":{"tokens_saved":0,"calls":0}}}
+        def returned(argv,cwd,root,label):
+            body=reply["rtk" if label.startswith("rtk") else "headroom"]
+            return {"argv":argv,"exit_code":0,"stdout_text":json.dumps(body),"stderr_text":"","completed_at":m.now()}
+        def refresh():
+            with patch.object(m,"capture",side_effect=returned):
+                issues=m.refresh(config)["issues"]
+            rows=json.loads(Path(config["output_json"]).read_text())["native"]
+            return issues,{r["tool"]+"|"+r["scope"]:r["latest"]["metrics"] for r in rows}
+        issues,rows=refresh()
+        self.assertEqual(issues,[])
+        rtk_global=rows["rtk|Native / all retained projects"]
+        self.assertEqual((rtk_global["saved"],rtk_global["client_visible"]["net"]),(199780,80+200))
+        self.assertIn("as Claude Code 2.1.282 first shows it",rtk_global["boundary"])
+        self.assertNotIn("client_visible",rows["rtk|Native / project "+str(self.root)])
+        headroom=rows["headroom|Native / last 30 days"]
+        self.assertFalse(headroom["ledger_present"])
+        self.assertIn("ledger file the report names is absent",headroom["boundary"])
+        # A relative ledger path resolves from the configured project, the directory Headroom runs in.
+        (self.root/"workspace").mkdir();(self.root/"workspace"/"savings_events.jsonl").write_text("")
+        headroom=refresh()[1]["headroom|Native / last 30 days"]
+        self.assertTrue(headroom["ledger_present"]);self.assertNotIn("absent",headroom["boundary"])
+        # A nonzero reading is never labelled absent, and a report that names no path records no presence.
+        reply["headroom"]={"path":str(self.root/"elsewhere.jsonl"),"lifetime":{"tokens_saved":7,"calls":1}}
+        headroom=refresh()[1]["headroom|Native / last 30 days"]
+        self.assertFalse(headroom["ledger_present"]);self.assertNotIn("absent",headroom["boundary"])
+        reply["headroom"]={"lifetime":{"tokens_saved":0,"calls":0}}
+        self.assertNotIn("ledger_present",refresh()[1]["headroom|Native / last 30 days"])
+
+    def test_rtk_client_view_tolerates_retention_pruning_between_reads(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",rtk_database=str(self.rtk_history([(10+i,0) for i in range(99)])))
+        def returned(argv,cwd,root,label):
+            body={"summary":{"total_saved":5445,"total_commands":100}}
+            return {"argv":argv,"exit_code":0,"stdout_text":json.dumps(body),"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+        latest=[r["latest"] for r in json.loads(Path(config["output_json"]).read_text())["native"]
+                if r["scope"]=="Native / all retained projects"][0]
+        self.assertEqual(latest["metrics"]["client_visible"]["rows"],99)
+        # One row more than 1% short is flagged: 98 rows against 100 counted.
+        config["rtk_database"]=str(self.rtk_history([(10+i,0) for i in range(98)],"pruned.db"))
+        with patch.object(m,"capture",side_effect=returned):
+            issues=m.refresh(config)["issues"]
+        self.assertTrue(any("holds 98 rows but rtk gain reported 100" in i for i in issues),issues)
+
+    def test_rtk_client_view_problems_are_issues_not_counter_failures(self):
+        from unittest.mock import patch
+        config=self.portable_config();gain={"total_saved":80,"total_commands":1}
+        def returned(argv,cwd,root,label):
+            return {"argv":argv,"exit_code":0,"stdout_text":json.dumps({"summary":gain}),"stderr_text":"","completed_at":m.now()}
+        corrupt=self.root/"corrupt.db";corrupt.write_bytes(b"not a sqlite database")
+        cases=[({"rtk_database":str(corrupt)},1,"RTK client-visible view: "),
+               ({"rtk_database":str(self.rtk_history([(100,20)])),"client_inline_chars":100},1,
+                "RTK client-visible view: client_inline_chars must be an integer from 4000 to 128000"),
+               ({"rtk_database":str(self.rtk_history([(100,20)],"preview.db")),"client_inline_chars":8000,
+                 "client_preview_chars":8000},1,
+                "RTK client-visible view: client_preview_chars must be an integer from 1 to 7999"),
+               ({"rtk_database":str(self.rtk_history([(100,20)],"short.db")),"client_inline_chars":None,
+                 "client_preview_chars":None},5,
+                "RTK client-visible view: the configured rtk_database holds 1 rows but rtk gain reported 5 commands")]
+        for overrides,commands,expected in cases:
+            with self.subTest(expected=expected):
+                config.update(rtk="selected-rtk",**overrides);gain["total_commands"]=commands
+                with patch.object(m,"capture",side_effect=returned):
+                    issues=m.refresh(config)["issues"]
+                latest=[r["latest"] for r in json.loads(Path(config["output_json"]).read_text())["native"]
+                        if r["scope"]=="Native / all retained projects"][0]
+                self.assertTrue(latest["success"])
+                self.assertEqual(latest["metrics"]["saved"],80)
+                self.assertNotIn("client_visible",latest["metrics"])
+                self.assertTrue(any(i.startswith(expected) for i in issues),issues)
+                self.assertFalse(any(i.startswith("rtk-global:") for i in issues),issues)
 
 if __name__=="__main__":
     unittest.main()
