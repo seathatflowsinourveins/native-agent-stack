@@ -3194,7 +3194,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "f13ab2240d9571f6e95fded44c72271db92cb1938b01d735d2f87a4fedf27ef4",
+      "sha256": "f6b4442743b0693a60d897f5785da277d632d9117548f3f7bfe07cf45de8c2c7",
       "bytes": 22907
     },
     {
@@ -6415,8 +6415,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "b60bd150fdbf2a7d78ae42cf7368ad7ee23bdb7d8499f4de7a56dd314933f932",
-      "bytes": 479745
+      "sha256": "90796fee6aeba3372936251bb58c622c1233c78d93e8f2f7ee1299bd4422b95d",
+      "bytes": 479903
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -9375,8 +9375,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "a3d76f8afc83861f3d2bc469ffc49ff297b49ae30624e69ecd8fddddc82b5e57",
-      "bytes": 14182
+      "sha256": "c48fb89b7bb1df551e54545380290286e2cfbe786261f3e53fa779b3adad8c03",
+      "bytes": 14966
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -9397,6 +9397,11 @@
       "path": "catalogs/foundation/manifest.json",
       "sha256": "36ab5311baacd3b69e397610d9bdb726b49061c491a4211e173cdf5dcc3af71b",
       "bytes": 23034
+    },
+    {
+      "path": "catalogs/foundation/memory-stack-20260925.json",
+      "sha256": "a5d2b9647e044b7140f6952d36d27c5b6f2f78490452101895d33ac748faeb45",
+      "bytes": 105311
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -9430,8 +9435,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "c2ee606f29d43519e407f34f7c1f8aa81329f4649dee4215f7b99c941036eb77",
-      "bytes": 468999
+      "sha256": "e480d7cdd5d54a7b40646a6ccfc2955defc743d7c069ab232dc9370d26f5c87b",
+      "bytes": 470568
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -9675,8 +9680,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "21c8c2644a11393f065bc57371f37f8dafe5cb93034babd6f4d6abb29e81e4ed",
-      "bytes": 736510
+      "sha256": "d40f497a2bb12a7392fbc32e6f0c44cc450278bc5e7faeb75a67456aaa7b6a86",
+      "bytes": 744533
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -9730,7 +9735,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "7ba59836c6bbda805e7801ad99178a8f7fa704970e6cc5b64acdbe83942ee8dd",
+      "sha256": "59d93891eb5e10cdf71e2e43c58cc8b55ba55dbb1cf8b9884a8a29ec7a50a9ed",
       "bytes": 3215
     },
     {
@@ -25764,6 +25769,131 @@
       "bytes": 4187
     },
     {
+      "path": "evidence/artifacts/memory-stack-20260925/README.md",
+      "sha256": "889cabc39af850db4c228089aa089e738e23182d6793b0beffb3fd0c60727567",
+      "bytes": 10909
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/SHA256SUMS",
+      "sha256": "6a5f5d6220f33548d15a93562acd679ae88b4130259d6f95d9f7cdc3f17cde47",
+      "bytes": 3364
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+      "sha256": "2882221c9e895964190830c28449107a8a6fd151cf2eae7f9c1558e7d538ad51",
+      "bytes": 9705
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+      "sha256": "dcfe6a1db362c4555de62683db601602668e3e22b9d63aa94ec608d9da1e6db7",
+      "bytes": 20450
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+      "sha256": "8aaa24e7418cd4da2d26d47dc7a27827a539ada0fd9133c9c6994bd29ec2a3b6",
+      "bytes": 20450
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+      "sha256": "25101afbbd159b0485ec0f3df2665ab3e77cb5a2ccb2a39883de63f06c5fc328",
+      "bytes": 20450
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+      "sha256": "113ddece701e6f647151cdb7b2ad505ebcfe8e6f8d6b7c4676644f876859f8ab",
+      "bytes": 17367
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+      "sha256": "b4ea294ef737848d396d5b016f11cbb36f506e31f1787c813b6573c10c16c0a4",
+      "bytes": 17367
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+      "sha256": "ade78033b5932c1aeb7ba6bd33f62eef92d3ffe33ed4e0a80bca561ec1155a1f",
+      "bytes": 17367
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+      "sha256": "11a3d119ff06592d33d1475d35d02df90ec4f129aac67c2b176fe4802012b6c6",
+      "bytes": 17487
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+      "sha256": "f83257ee3d725d531b251324a091286e720336097938fc86701a5d18322dd2b0",
+      "bytes": 17487
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+      "sha256": "d26a14c6f2aac0bce5d5a262a5e98f02d50655225c3f97ee0cf4edeeba8d41e3",
+      "bytes": 17487
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+      "sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039",
+      "bytes": 18520
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+      "sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780",
+      "bytes": 14278
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+      "sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8",
+      "bytes": 14953
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+      "sha256": "6d1c522475b5bce6350d19a7a89b178d3dfe8dd09d4144eb9335595faa7b53b6",
+      "bytes": 31870
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+      "sha256": "b0bc3c145c4ac2bf20e95d1fe79e20afd5661b6c7afc25cd7eb24b9911bdc7cf",
+      "bytes": 27469
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+      "sha256": "5166806f08076904f3990d17d739217eec2d05776452c6f57e9450e6b0015823",
+      "bytes": 27535
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+      "sha256": "6b6579d91f1a0d3b11fbd28a9cbeb1e31f92961eea9ba56a7957e136b51ce3c9",
+      "bytes": 25601
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+      "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed",
+      "bytes": 140717
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/experiment.json",
+      "sha256": "8f0dcd992d4bfc5193255a363dbfefa98d56d2734ad5620c0cd9350b70da358d",
+      "bytes": 56035
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/packets/memory-systems.json",
+      "sha256": "63f5361e20fa4ef52a7110b71c36ed748f7fe168c177590c807bc61f709ffdba",
+      "bytes": 4145
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/packets/sota-models.json",
+      "sha256": "8d6f1fe60f4cd2052bf647ac53571839008dbe1c2eeb0fe0966dc8c397ec28f5",
+      "bytes": 4472
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/provenance.json",
+      "sha256": "6dfb775a100637f3432c4316f4a48176a2ca49d7c1c1fe701edb6ca11b317a01",
+      "bytes": 34614
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/usage.json",
+      "sha256": "0a7be62925865c5d0db37ac1506b69c559b621db4c8c1fe7db6ebfd32084c31e",
+      "bytes": 12897
+    },
+    {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
@@ -29814,6 +29944,7 @@
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
     "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
-    "evidence/artifacts/local-model-workloads-20260924/experiment.json"
+    "evidence/artifacts/local-model-workloads-20260924/experiment.json",
+    "evidence/artifacts/memory-stack-20260925/experiment.json"
   ]
 }
