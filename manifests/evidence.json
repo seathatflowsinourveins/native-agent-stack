@@ -9606,7 +9606,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "f6674ea97fa35d4690e2c6a230cdfe3fc6166cb06666b76e69c35bc7f2661ab5",
+      "sha256": "32401a07dfc90540329a4d3ed57b0800c8b335bee79a5b87fa274703c6205945",
       "bytes": 187516
     },
     {
@@ -10106,7 +10106,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "adb26f548aba22bac0e516830aa46d38536b1293593970a80bc9e53084a3634a",
+      "sha256": "10109357ced814d5c13327b6f8d89291287b9a7691bcf8068f27320d402962e8",
       "bytes": 19028
     },
     {
@@ -28461,8 +28461,8 @@
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925-2.json",
-      "sha256": "ae63e97ab829806057799fa65563a33764cb8161e04d8fd8cdb5868d1af7bf64",
-      "bytes": 15747
+      "sha256": "2934bd6cba89eed3ac5d3cf28a801d10a8a73b031e9635b2fb9c2f6c683814a8",
+      "bytes": 17090
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--vllm--use--20260925.json",

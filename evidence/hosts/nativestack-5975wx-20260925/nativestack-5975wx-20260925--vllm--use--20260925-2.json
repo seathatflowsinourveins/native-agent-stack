@@ -115,6 +115,16 @@
         "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
         "model": "claude-opus-5-5"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points and re-ran all ten commands read-only on this host (all exit 0): /version 0.25.0 equals the foundation semantic-rag winner pin (pin_matches true), unit active with 0 restarts, backup passage ranked first, v2 4/4 within 0.0012 of the card, v1 4/4 within 0.0009 of the laptop scores, rotated control exactly 0/4 with its ranking assertion failing, hf cache verify 15 files at c0c9fea (the 33 extras are all .cache metadata) with the one-byte tamper exiting 1, and the OS/WSL command printing Ubuntu 24.04.5 and WSL 2.7.13.0; the withdrawn -2's issues are fixed, since catalog_revision 8c7b7f3b resolves via the GitHub API and is an ancestor of origin/main, model_card_check.py (sha256 c6ecc30a, commit b6e6e649, before the observation) exits 0 only at exactly 0/4, the claim and bars name each run's single baseline, and the preregistration and rehearsal timing is disclosed (the rehearsal times rest on an uncommitted local log, while the preregistration sha256 70aca9ee is unchanged since the first recording).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:45:06Z",
+      "reviewer": {
+        "identity_sha256": "a43a471a91e34bb22c758d64841385f29ffeacbc94b72d7339591fc15882b141",
+        "model": "claude headless reviewer"
+      }
     }
   ],
   "qualified_models": [
