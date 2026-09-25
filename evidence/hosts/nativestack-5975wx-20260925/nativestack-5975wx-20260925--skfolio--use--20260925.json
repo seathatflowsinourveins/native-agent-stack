@@ -77,6 +77,16 @@
       "reviewer": {
         "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
       }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduced on this host from a clean detached checkout of main at cd17bda2: every recorded command re-ran with the recorded exit code; all outputs byte-identical except uv's timing line in cmd 0; the WalkForward-hash and network tag check (cmd 1) byte-identical. Adequacy-checked all four points: (1) layer role: the frozen research-evaluation WalkForward study reproduced 20 folds with stdout byte-identical to the recorded authoring run, and MeanRisk min-variance weights sum to 1, none negative, variance below equal weight, with (8312-252)//63 = 127 walk-forward test folds; (2) positive control: an infeasible min_weights=0.2 over 20 assets was refused (SolverError); (3) installed _walk_forward.py sha256, lock match and tag-to-commit claims backed; (4) bound to the layer winner skfolio (pin_matches true).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T20:24:41Z",
+      "reviewer": {
+        "identity_sha256": "ebc869dd1e67d16a8d46b08a45900ac439b2f0de4b27f34c4cba532be5a529b3",
+        "model": "claude-opus-5-5"
+      }
     }
   ]
 }

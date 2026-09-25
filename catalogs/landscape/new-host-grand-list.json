@@ -2619,7 +2619,7 @@
           "recipe": "blueprints/us-equities/catalyst-provenance/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2656,7 +2656,7 @@
           "recipe": "blueprints/us-equities/data/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2716,7 +2716,7 @@
           "recipe": "blueprints/us-equities/research-evaluation/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2759,7 +2759,7 @@
           "recipe": "blueprints/us-equities/research-evaluation/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -2790,7 +2790,7 @@
           "recipe": "blueprints/us-equities/catalyst-provenance/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
-              "e2e_state": "accepted",
+              "e2e_state": "host_verified",
               "bootstrap_pinned": false,
               "bootstrap_version": null
             },
@@ -3062,11 +3062,11 @@
       "candidate:typesafe-ai-skills"
     ],
     "e2e_accepted": {
-      "linux-wsl2-x86_64": 21,
+      "linux-wsl2-x86_64": 16,
       "macos-arm64": 0
     },
     "e2e_host_verified": {
-      "linux-wsl2-x86_64": 27,
+      "linux-wsl2-x86_64": 32,
       "macos-arm64": 6
     },
     "bootstrap_pinned": {
