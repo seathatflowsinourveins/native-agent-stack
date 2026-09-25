@@ -1,0 +1,17 @@
+# Drafted, not run: see codex-broker-reaper.service in this directory for
+# the placeholder and deployment notes that also apply here.
+[Unit]
+Description=Hourly trigger for the guarded openai-codex broker reaper
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1h
+AccuracySec=1min
+# A missed run (host was off/suspended at the scheduled time) still runs
+# once shortly after the next start, instead of silently waiting a full
+# extra hour before the next on-time trigger.
+Persistent=true
+Unit=codex-broker-reaper.service
+
+[Install]
+WantedBy=timers.target
