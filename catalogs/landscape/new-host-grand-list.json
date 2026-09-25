@@ -105,6 +105,27 @@
         "nautilus-trader",
         "alpaca-py"
       ]
+    },
+    {
+      "order": 8,
+      "profile": "token-efficiency",
+      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ]
     }
   ],
   "hosts": [
@@ -342,7 +363,8 @@
           "install_profiles": [
             "foundation-cpu",
             "research-runtime",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -504,7 +526,9 @@
           "upstream_latest": "v1.7.0",
           "pin_behind_upstream": null,
           "manifest_joined": true,
-          "install_profiles": [],
+          "install_profiles": [
+            "token-efficiency"
+          ],
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
@@ -547,7 +571,8 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [
-            "foundation-cpu"
+            "foundation-cpu",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -579,7 +604,9 @@
           "upstream_latest": "v0.1.8",
           "pin_behind_upstream": true,
           "manifest_joined": true,
-          "install_profiles": [],
+          "install_profiles": [
+            "token-efficiency"
+          ],
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
@@ -656,7 +683,8 @@
           "install_profiles": [
             "foundation-cpu",
             "recovery",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -1102,7 +1130,8 @@
           "manifest_joined": true,
           "install_profiles": [
             "foundation-cpu",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -1182,7 +1211,8 @@
           "install_profiles": [
             "foundation-cpu",
             "research-runtime",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/claude-native-profile.md",
           "platforms": {
@@ -1220,7 +1250,8 @@
           "install_profiles": [
             "foundation-cpu",
             "research-runtime",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -1674,7 +1705,8 @@
           "manifest_joined": true,
           "install_profiles": [
             "semantic-rag",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -1787,7 +1819,8 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [
-            "foundation-cpu"
+            "foundation-cpu",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -1818,7 +1851,9 @@
           "upstream_latest": "v0.38.0",
           "pin_behind_upstream": true,
           "manifest_joined": true,
-          "install_profiles": [],
+          "install_profiles": [
+            "token-efficiency"
+          ],
           "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
@@ -1848,7 +1883,9 @@
           "upstream_latest": "v20.0.24",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
+          "install_profiles": [
+            "token-efficiency"
+          ],
           "recipe": "recipes/native-upgrades-20260921.md",
           "platforms": {
             "linux-wsl2-x86_64": {
@@ -2016,7 +2053,8 @@
           "install_profiles": [
             "foundation-cpu",
             "research-runtime",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/claude-native-profile.md",
           "platforms": {
@@ -2131,7 +2169,8 @@
           "install_profiles": [
             "foundation-cpu",
             "recovery",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {
@@ -2167,7 +2206,8 @@
           "manifest_joined": true,
           "install_profiles": [
             "semantic-rag",
-            "macos-arm64-foundation"
+            "macos-arm64-foundation",
+            "token-efficiency"
           ],
           "recipe": "recipes/README.md",
           "platforms": {

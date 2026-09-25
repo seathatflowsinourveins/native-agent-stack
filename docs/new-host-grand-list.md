@@ -22,6 +22,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | 5 | `recovery`: Selected application-state recovery | `restic`, `ai-memory`, `qdrant` |
 | 6 | `macos-arm64-foundation`: Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon | `codex`, `claude-code`, `context-mode`, `ai-memory`, `mcporter`, `llama-cpp`, `qdrant`, `socraticode` |
 | 7 | `trading-nautilus`: Selected north-star Nautilus engine with separate broker boundaries | `nautilus-trader`, `alpaca-py` |
+| 8 | `token-efficiency`: Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
 
 ## Hosts and hardware tiers
 
@@ -52,15 +53,15 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation | 12 / 14 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
 | CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | host_verified | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 | native_proven | host_verified | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
-| Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | host_verified | untested | — | 2 / 5 |
-| Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested | foundation-cpu | 5 / 7 |
-|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.7 | untested | — |  |
+| Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | host_verified | untested | token-efficiency | 2 / 5 |
+| Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested | foundation-cpu, token-efficiency | 5 / 7 |
+|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.7 | untested | token-efficiency |  |
 |  |  | `poppler` | 26.09.0 | local_integration | conditional | untested | — |  |
-| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation | 9 / 13 |
+| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | host_verified | host_verified | — | 11 / 12 |
 |  |  | `candidate:cli-cli` | unpinned | source_review | not_established, bootstrap 2.101.0 | untested, bootstrap 2.101.0 | — |  |
 |  |  | `difftastic` | 0.71.0 | source_review | host_verified | untested | — |  |
@@ -72,10 +73,10 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:openai-skills` | unpinned | local_integration | conditional | untested | — |  |
 | Isolation | retain | `worktrunk` | 0.79.0 | native_proven | host_verified | host_verified | — | 16 / 19 |
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | host_verified | untested | — |  |
-| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 / 14 |
+| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | accepted | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
-|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation |  |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
+|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | host_verified | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | host_verified | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | host_verified | untested | observability |  |
@@ -86,16 +87,16 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Scheduling and supervision | keep_but_compare | `dagu` | 2.16.6 (behind v2.17.0) | local_integration | host_verified | untested | research-runtime | 5 / 13 |
 |  |  | `systemd` | 255.4-1ubuntu8.17 | local_integration | conditional | untested | research-runtime |  |
 | Secrets and credentials | keep_but_compare | `gitleaks` | 8.30.1 | local_integration | host_verified | host_verified | — | 5 / 9 |
-| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | host_verified | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation | 10 / 12 |
+| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | host_verified | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency | 10 / 12 |
 |  |  | `qdrant` | 1.19.1 | native_proven | host_verified | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.30.0) | native_proven | host_verified | untested | semantic-rag |  |
-| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.49.0 | host_verified | foundation-cpu | 4 / 6 |
-|  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified | untested | — |  |
-|  |  | `ccusage` | 20.0.24 | synthetic | host_verified | untested | — |  |
+| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.49.0 | host_verified | foundation-cpu, token-efficiency | 4 / 6 |
+|  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified | untested | token-efficiency |  |
+|  |  | `ccusage` | 20.0.24 | synthetic | host_verified | untested | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
 |  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | host_verified | host_verified | — |  |
 
 ## Trading layers (north star)
@@ -103,8 +104,8 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 / 15 |
-|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation |  |
-|  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation |  |
+|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
+|  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
 | Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | accepted | untested | research-runtime |  |
 | Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | host_verified | untested | research-runtime | 6 / 9 |

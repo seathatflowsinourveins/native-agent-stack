@@ -376,6 +376,47 @@
         "blueprints/us-equities/engine-nautilus/README.md",
         "catalogs/us-equities/runtime-target.json"
       ]
+    },
+    {
+      "id": "token-efficiency",
+      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "required_commands": [
+        "codex",
+        "claude",
+        "rtk",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "recipe_paths": [
+        "docs/token-efficiency-stack.md",
+        "docs/token-session-handbook.md",
+        "recipes/README.md",
+        "recipes/native-upgrades-20260921.md"
+      ]
     }
   ],
   "toolchain": {
